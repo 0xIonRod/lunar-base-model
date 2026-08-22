@@ -1,0 +1,47 @@
+#usda 1.0
+(
+    defaultPrim = "Luna2"
+    upAxis = "Y"
+    metersPerUnit = 1
+)
+
+def Xform "Luna2" (
+    kind = "assembly"
+)
+{
+    def Xform "Terrain" (
+        prepend apiSchemas = ["LunCoTerrainAPI"]
+    )
+    {
+        string lunco:assetMode = "layered"
+        bool lunco:terrain:horizonShadows = true
+        int lunco:terrain:horizonMapResolution = 2048
+        custom double lunco:anchor:lat = 32.4
+        custom double lunco:anchor:lon = 358.1
+        rel material:binding = </Luna2/Looks/TerrainLook>
+
+        def Xform "Ground" (
+            prepend apiSchemas = ["LunCoTerrainLayerAPI"]
+        )
+        {
+            uniform token lunco:layer = "dem"
+            bool lunco:layer:lodViz = true
+            bool lunco:layer:colliderRing = true
+            asset lunco:layer:demSource = @.cache/terrain/luna2@
+            float lunco:layer:windowM = 200000.0
+            int lunco:layer:targetRes = 32
+        }
+    }
+
+    def Scope "Looks"
+    {
+        def Material "TerrainLook"
+        {
+            token outputs:surface.connect = </Luna2/Looks/TerrainLook/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform asset info:wgsl:sourceAsset = @lunco://shaders/terrain_layered.wgsl@
+            }
+        }
+    }
+}

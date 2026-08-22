@@ -1,0 +1,37 @@
+# Python bytecode and local environments
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Local simulator/runtime output
+logs/
+**/logs/
+
+# Generated news state and rolling briefing outputs
+news/.artemis_news_state.json
+news/artemis_news.md
+news/artemis_news.json
+.artemis_news_state.json
+artemis_news.md
+artemis_news.json
+
+# Generated audit/report outputs
+quality_audit_results*.json
+data_quality_report_artifact.json
+nasa_lunar_base_data_quality_report.html
+
+# Local exports and temporary evidence
+*.zip
+*.sqlite
+*.ogg
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# This terrain cache contains the reproducible package referenced by the
+# USD scene. Keep metadata, model files, DEM, and textures reviewable.
+luna2_twin/.cache/terrain/luna2/luna2_sinus_lunicus_preview.png

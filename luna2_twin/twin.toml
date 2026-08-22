@@ -1,0 +1,7 @@
+name = "Luna2SinusLunicus"
+version = "0.1.0"
+description = "Luna 2 landing region terrain model near Sinus Lunicus, generated from NASA LOLA DEM data."
+
+[usd]
+default_scene = "sim/scenes/luna2_static.usda"
+scenes = ["sim/scenes/*.usda"]

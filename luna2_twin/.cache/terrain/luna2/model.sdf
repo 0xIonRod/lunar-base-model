@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<sdf version="1.11">
+  <model name="luna2_sinus_lunicus">
+    <static>true</static>
+    <link name="terrain_link">
+      <collision name="terrain_collision">
+        <geometry>
+          <heightmap>
+            <uri>materials/textures/heightmap.tif</uri>
+            <size>204823 242587 8040.0</size>
+            <pos>0 0 -9249.0</pos>
+          </heightmap>
+        </geometry>
+      </collision>
+      <visual name="terrain_visual">
+        <geometry>
+          <heightmap>
+            <uri>materials/textures/heightmap.tif</uri>
+            <size>204823 242587 8040.0</size>
+            <pos>0 0 -9249.0</pos>
+            <texture>
+              <diffuse>model://materials/moon_diffuse.png</diffuse>
+              <normal>model://materials/moon_normal.png</normal>
+              <size>20</size>
+            </texture>
+          </heightmap>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

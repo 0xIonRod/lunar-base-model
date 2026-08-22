@@ -1,0 +1,15 @@
+site_id: luna2_sinus_lunicus
+display_name: Luna 2 Sinus Lunicus
+description: Regional terrain model centered on the Luna 2 commemorative region at
+  Sinus Lunicus, Mare Imbrium; generated from the NASA LOLA LDEM_4 DEM.
+coordinates:
+  lat: 32.4
+  lon: -1.9
+size_x_m: 204823
+size_y_m: 242587
+resolution_x: 32
+resolution_y: 32
+elevation_min_m: -9249.0
+elevation_max_m: -1209.0
+elevation_range_m: 8040.0
+source: NASA LOLA GDR LDEM_4.JP2 (4 pixels/degree; regional approximation)
