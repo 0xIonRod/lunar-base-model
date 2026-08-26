@@ -302,3 +302,49 @@ Copy this block at the end of the report for the next review:
 |---|---|
 | 2026-08-22 | Created reusable baseline report from the full visible workspace inventory, research register, terrain artifacts, simulator logs, news agent, and data-quality outputs. |
 
+
+## Weekly update — 2026-08-23
+
+### Change since last report
+
+- **Research tooling expanded.** The workspace now includes `research/lunar_base_research_agent.py`, `research/AGENT_README.md`, and generated `lunar_base_research_brief.md` / `lunar_base_research_results.json`. The saved query was `Artemis IV lunar landing`; it produced five local-register findings and zero retrieval warnings. These findings are labeled local context, not independent source verification, and the agent intentionally does not rewrite the mission, vehicle, or location registers.
+- **Workspace inventory increased from 67 to 73 files.** The new research-agent artifacts and a larger `.gitignore` are the material additions. The ignore rules now exclude logs, generated audit outputs, local exports, and the terrain preview, which reduces accidental noise but also makes weekly evidence retention depend on explicit copies or release artifacts.
+- **News refresh did not advance.** The bundled Python runtime was available and the refresh was attempted, but no new agent output or completion line was produced. `news/artemis_news.json` and `news/artemis_news.md` still report `2026-08-22 12:40 UTC` and 28 articles. Treat this week’s news evidence as stale until the agent’s exit status, stderr, and network behavior are diagnosed.
+- **Data-quality refresh did not advance the snapshot.** `quality_audit_results_v2.json` still reports the 2026-08-22 snapshot and the same research, terrain, and runtime findings. No new simulator logs were created; the newest logs remain from 2026-08-22.
+- **Simulator state is unchanged.** The active evidence remains the 4106 core-ready / terrain-bake-near-10% condition, with the direct 4107 target-resolution clamp and earlier 4103/4104 scene/render errors. Git still reports `first_mission_base.usda` and `luna2_twin/sim/scenes/luna2_lit.usda` as untracked files.
+
+### MoonDAO update
+
+- The official [MDP-249 detail page](https://www.moondao.com/project/249) currently shows the **member vote closed** with 21 voters and approximately 28k total voting power. Its displayed tally is 91.1% For and 8.9% Against among For/Against votes, with 61.0% Abstain; the page separately shows the **Senate vote in progress at 0/7**.
+- The same proposal explicitly includes a DePrize deployment and a competitive Lunar Base Simulation & Prototyping initiative, including an open-source Lunar Base Operations Simulator and an analog prototype test. This directly overlaps with the technical direction in this workspace.
+- The aggregate [MoonDAO governance page](https://www.moondao.com/governance-proposals) still places MDP-249 under “Failed Proposals.” This is a source/status conflict, not a resolved failure. Until MoonDAO publishes a reconciled state, the weekly report should describe the member and Senate states separately.
+- MoonDAO’s official LinkedIn feed also describes a Q3 cohort containing a full interactive NASA lunar base model among 14 proposals, but that social post is treated as corroborating context rather than the authoritative vote record. [MoonDAO LinkedIn](https://www.linkedin.com/company/moondao)
+
+### Decisions and implications
+
+- Keep the new research agent as a **reviewable evidence assistant**, not an automatic mission-register writer. Its current output demonstrates local queryability but not fresh external retrieval.
+- Treat the MoonDAO/NASA lunar-base connection as strategically aligned but operationally unproven until the proposal state and project deliverables are reconciled.
+- Do not mark the Luna 2 terrain path as progressed this week. There is no new runtime evidence showing a completed bake or a named failing stage.
+
+### Open blockers
+
+| ID | Blocker | Severity | Owner | Next evidence | Status |
+|---|---|---:|---|---|---|
+| B01 | Terrain bake remains near 10% while core reports ready | High | Simulator/runtime | Stage-level progress, tiny-DEM result, effective settings | Open |
+| B02 | News and audit refreshes did not produce new timestamps | Medium | Automation/tooling | Explicit exit code, stderr, network result, and refreshed artifact | Open |
+| B03 | MoonDAO aggregate governance index conflicts with MDP-249 detail state | Medium | MoonDAO reporting | Reconciled proposal/Senate status or updated official page | Open |
+| B04 | Scene files remain untracked and one scene has a recorded parse failure | Medium | Project maintainer | Git decision plus clean scene-load result | Open |
+
+### Next-week actions
+
+- [ ] Run the news agent with explicit stdout/stderr capture, a bounded timeout, and a 24-hour test window; diagnose why the generated timestamp did not advance.
+- [ ] Run `quality_audit_v2.py` with explicit exit-code capture and record the result file modification time.
+- [ ] Run the new research agent once online and once offline; compare source kinds, warnings, and result counts without promoting findings automatically.
+- [ ] Execute the 4×4 or 8×8 synthetic DEM test and record the effective resolution rather than the requested resolution.
+- [ ] Recheck MDP-249’s member/Senate state and update the MoonDAO section only from an authoritative page.
+
+### Confidence and gaps
+
+- **High confidence:** local file inventory, new research-agent presence, unchanged simulator log timestamps, existing audit snapshot, and the MDP-249 detail page’s displayed vote states.
+- **Medium confidence:** the explanation for the news/audit refresh not advancing; the current runtime root cause remains unproven.
+- **Missing evidence:** no new terrain run, no current local news output, no fresh audit snapshot, no treaty/policy register, and no saved chat/decision transcript.
