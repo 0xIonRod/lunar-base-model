@@ -9,17 +9,18 @@ The durable project inputs are:
 - [`scenarios/`](scenarios/) — operational scenario contracts.
 - [`tools/`](tools/) — validation and analysis utilities.
 
-The first twin is intentionally simple: a flat 1 km × 1 km lunar terrain tile,
-one lander, and one rover. It is a smoke-test scene, not a flight-ready model.
-Values marked `engineering_assumption` must be replaced with sourced
-specifications during later iterations.
+The first twin represents Mission One: Blue Origin’s Blue Moon MK1 Endurance.
+It is intentionally simple: a flat 1 km × 1 km lunar terrain tile, one lander,
+and one simulator-only rover. It is a smoke-test scene, not a flight-ready
+model. Public facts and unknowns are recorded in
+[`missions/mission-001/mission-research.md`](missions/mission-001/mission-research.md).
 
 ## Repository map
 
 | Path | Contents |
 |---|---|
 | [`research/`](research/) | Human-reviewed evidence and explicit research gaps. |
-| [`missions/mission-001/`](missions/mission-001/) | Minimal first mission twin and physical assumptions. |
+| [`missions/mission-001/`](missions/mission-001/) | M01 Endurance twin, research record, and physical assumptions. |
 | [`scenarios/`](scenarios/) | Five initial mission scenarios. |
 | [`tools/`](tools/) | Scripts and notebooks; analysis code does not live beside project data. |
 | [`NASA_LUNAR_BASE_OVERVIEW.md`](NASA_LUNAR_BASE_OVERVIEW.md) | Plain-language lunar-base context. |
@@ -29,7 +30,8 @@ specifications during later iterations.
 - Keep facts, assumptions, and simulator inputs separate.
 - Use `TBD` or `null` when a source does not provide a value.
 - Record units, provenance, and confidence for every physical parameter.
-- Iterate from the simple twin toward realistic lander and rover models.
+- Prefer LunCoSim-native scene and visual-processing features.
+- Iterate from the simple twin toward a realistic mission model.
 - Validate the repository after each mission-parameter change.
 
 Run the structural checks from the project root:

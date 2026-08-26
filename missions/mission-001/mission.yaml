@@ -1,10 +1,30 @@
 schema_version: 1
 mission_id: mission-001
-name: Minimal Lunar Surface Demonstration
-status: baseline_scaffold
+source_mission_id: M01
+name: Blue Moon MK1 Endurance
+status: planning_model
+mission_class: uncrewed_lunar_lander_demonstration
+operator: Blue Origin / NASA Moon Base / NASA CLPS
 purpose: >-
-  Establish a small, auditable lander-and-rover mission twin before adding
-  detailed terrain and mission-specific hardware.
+  Represent Mission One with public facts separated from simulator-only
+  assumptions, using a flat local test tile until a real DEM is selected.
+target_year: 2026
+target_window: no earlier than fall 2026
+mission_objectives:
+  - precision landing
+  - autonomous guidance navigation and control
+  - cryogenic propulsion demonstration
+  - lunar plume and surface-environment characterization
+  - continuous downlink and operational risk reduction
+payloads:
+  - id: scalpss
+    name: Stereo Cameras for Lunar Plume-Surface Studies
+    purpose: image engine-plume interaction with the lunar surface
+    source: primary_nasa
+  - id: lra
+    name: Laser Retroreflector Array
+    purpose: provide a precise reference point for lunar-orbit tracking
+    source: primary_nasa
 terrain:
   shape: flat_square
   width_m: 1000
@@ -12,33 +32,51 @@ terrain:
   elevation_m: 0
   gravity_m_s2: 1.62
   coordinate_frame: local_ned
-  source: engineering_assumption
+  real_site: Shackleton Connecting Ridge
+  real_region: lunar South Pole
+  source: simulator_simplification
 landing_site:
-  position_m: [0, 0, 100]
+  name: Shackleton Connecting Ridge
+  region: lunar South Pole
+  coordinates: TBD
+  landing_accuracy_m: 100
+  pad_position_m: [0, 0, 100]
   pad_size_m: [40, 40]
-  source: engineering_assumption
+  source: primary_nasa_and_blue_origin
 lander:
   id: lander-001
-  type: generic_descent_lander
+  type: Blue Moon MK1
+  flight_name: Endurance
   position_m: [0, 8, 100]
-  dimensions_m: [12, 8, 6]
-  dry_mass_kg: 1800
+  dimensions_m: null
+  dry_mass_kg: null
+  cargo_capacity_kg: 3000
   propellant:
-    type: cryogenic_oxygen_methane_placeholder
-    usable_mass_kg: 900
-    tank_volume_m3: 2.2
+    fuel: liquid_hydrogen
+    oxidizer: liquid_oxygen
+    usable_mass_kg: null
+    tank_volume_m3: null
+    source: primary_blue_origin_be7
   engine:
-    count: 4
-    thrust_total_kn: 24
-    specific_impulse_s: 360
+    family: BE-7
+    count: null
+    thrust_vacuum_kn_per_engine: 44.5
+    deep_throttle_min_kn_per_engine: 8.9
+    specific_impulse_s: null
+    restartable: true
+    source: primary_blue_origin_be7
   power:
-    solar_array_area_m2: 18
-    solar_array_position: deployable_top_west
-    battery_capacity_kwh: 12
-  confidence: engineering_assumption
+    solar_array_area_m2: null
+    solar_array_position: TBD
+    battery_capacity_kwh: null
+  communications:
+    continuous_downlink: true
+  confidence: public_facts_plus_explicit_gaps
 rover:
   id: rover-001
   type: generic_four_wheel_solar_rover
+  status: simulator_only_test_asset
+  manifested_on_endurance: false
   position_m: [-20, 2, 100]
   dimensions_m: [3.2, 1.8, 1.5]
   mass_kg: 240
@@ -48,14 +86,20 @@ rover:
   power:
     solar_array_area_m2: 4
     battery_capacity_kwh: 2
-  mission_role: local reconnaissance and cargo inspection
+  mission_role: exercise lander-rover interaction scenarios only
   confidence: engineering_assumption
 artifacts:
   scene: scene.usda
+  research: mission-research.md
   scenarios:
     - ../../scenarios/01_landing_and_commissioning.yaml
     - ../../scenarios/02_rover_traverse.yaml
     - ../../scenarios/03_power_and_illumination.yaml
     - ../../scenarios/04_communications_blackout.yaml
     - ../../scenarios/05_cargo_inspection.yaml
-
+sources:
+  - https://www.nasa.gov/moonbase-phases/
+  - https://www.nasa.gov/missions/moon-base/nasa-provides-updates-on-moon-base-cargo-landers-tech-demonstrations/
+  - https://www.nasa.gov/missions/artemis/blue-origin-moon-lander-completes-testing-at-nasa-vacuum-chamber/
+  - https://www.blueorigin.com/blue-moon/mark-1
+  - https://www.blueorigin.com/engines/be-7

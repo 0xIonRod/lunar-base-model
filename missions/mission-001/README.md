@@ -1,14 +1,17 @@
-# Mission 001 — Minimal Lunar Surface Demonstration
+# Mission 001 — Blue Moon MK1 Endurance
 
-This is the first executable mission twin. It is intentionally a rectangular
-smoke-test scene, not a flight-ready vehicle model.
+This package represents Mission One (`M01`) as a planning model for Blue
+Origin’s Blue Moon Mark 1 Endurance lander. Public mission facts and unknowns
+are recorded in [`mission-research.md`](mission-research.md).
 
-Contents:
+The executable scene remains intentionally simple:
 
-- `mission.yaml` — machine-readable mission, vehicle, and provenance contract.
-- `scene.usda` — flat 1 km × 1 km terrain with one lander and one rover.
+- flat 1 km × 1 km local ground plane;
+- one simplified Endurance lander body at a 40 m landing pad;
+- lunar gravity of 1.62 m/s²; and
+- one rover marked as a simulator-only test asset, not an Endurance payload.
 
-All physical values in the initial version are labeled
-`engineering_assumption`. Replace them with mission-specific values only after
-adding a source and confidence note.
+`mission.yaml` is the machine-readable contract. Values that are not public
+are `null` or explicitly labeled as engineering assumptions; they must not be
+silently replaced with guesses.
 

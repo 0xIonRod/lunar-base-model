@@ -7,11 +7,12 @@
 
 def Xform "Mission001" (
     kind = "assembly"
-    doc = "Minimal 1 km square lunar mission twin with one lander and one rover."
+    doc = "Blue Moon MK1 Endurance planning scene on a 1 km square local test tile."
 )
 {
     custom string mission:id = "mission-001"
-    custom string mission:status = "baseline_scaffold"
+    custom string mission:status = "planning_model"
+    custom string mission:source = "M01 Blue Moon MK1 Endurance"
 
     def PhysicsScene "PhysicsScene"
     {
@@ -41,7 +42,7 @@ def Xform "Mission001" (
         }
     }
 
-    def Xform "Lander"
+    def Xform "EnduranceLander"
     {
         custom string vehicle:id = "lander-001"
         def Cube "Body"
@@ -53,9 +54,10 @@ def Xform "Mission001" (
         }
     }
 
-    def Xform "Rover"
+    def Xform "SimulatorTestRover"
     {
         custom string vehicle:id = "rover-001"
+        custom bool vehicle:manifestedOnEndurance = false
         def Cube "Chassis"
         {
             double size = 1
@@ -65,4 +67,6 @@ def Xform "Mission001" (
         }
     }
 }
+
+
 
