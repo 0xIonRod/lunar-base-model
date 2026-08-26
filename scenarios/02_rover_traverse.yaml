@@ -1,0 +1,13 @@
+scenario_id: scenario-02
+mission_id: mission-001
+name: Local rover traverse
+objective: Drive the rover to a survey waypoint and return it to the lander.
+actors: [rover-001]
+initial_state: rover_deployed_at_lander
+actions: [drive outbound, pause for survey, return to lander]
+success_criteria:
+  - rover completes a 200 m round trip
+  - rover remains within speed and slope limits
+  - position, distance, and energy use are recorded
+parameters_to_refine: [wheelbase, wheel radius, traction, maximum speed, battery capacity]
+

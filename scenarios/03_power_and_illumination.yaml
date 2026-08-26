@@ -1,0 +1,13 @@
+scenario_id: scenario-03
+mission_id: mission-001
+name: Power and illumination check
+objective: Test whether the lander and rover power budgets support a short surface day.
+actors: [lander-001, rover-001]
+initial_state: both_assets_nominal
+actions: [generate power, operate rover, charge battery, enter safe mode]
+success_criteria:
+  - no asset falls below its defined reserve
+  - solar generation and load are logged separately
+  - safe mode can be entered and exited
+parameters_to_refine: [solar array area, array orientation, battery capacity, load profile]
+

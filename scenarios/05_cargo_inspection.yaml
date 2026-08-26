@@ -1,0 +1,13 @@
+scenario_id: scenario-05
+mission_id: mission-001
+name: Cargo inspection and handoff
+objective: Use the rover to inspect and report on a notional lander cargo area.
+actors: [lander-001, rover-001]
+initial_state: rover_deployed_at_lander
+actions: [navigate to cargo area, inspect, return, transmit report]
+success_criteria:
+  - rover reaches the cargo area without collision
+  - inspection observations include timestamp and position
+  - report is available to the mission controller
+parameters_to_refine: [payload capacity, sensor field of view, cargo geometry, rover clearance]
+

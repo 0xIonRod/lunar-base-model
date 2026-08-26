@@ -1,0 +1,68 @@
+#usda 1.0
+(
+    defaultPrim = "Mission001"
+    upAxis = "Y"
+    metersPerUnit = 1
+)
+
+def Xform "Mission001" (
+    kind = "assembly"
+    doc = "Minimal 1 km square lunar mission twin with one lander and one rover."
+)
+{
+    custom string mission:id = "mission-001"
+    custom string mission:status = "baseline_scaffold"
+
+    def PhysicsScene "PhysicsScene"
+    {
+        vector3f physics:gravityDirection = (0, -1, 0)
+        float physics:gravityMagnitude = 1.62
+    }
+
+    def Xform "Terrain"
+    {
+        def Cube "FlatSquare"
+        {
+            double size = 1
+            double3 xformOp:scale = (1000, 1, 1000)
+            double3 xformOp:translate = (0, -0.5, 0)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        }
+    }
+
+    def Xform "LandingPad"
+    {
+        def Cube "Pad"
+        {
+            double size = 1
+            double3 xformOp:scale = (40, 0.1, 40)
+            double3 xformOp:translate = (0, 0.05, 100)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        }
+    }
+
+    def Xform "Lander"
+    {
+        custom string vehicle:id = "lander-001"
+        def Cube "Body"
+        {
+            double size = 1
+            double3 xformOp:scale = (6, 3, 4)
+            double3 xformOp:translate = (0, 6, 100)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        }
+    }
+
+    def Xform "Rover"
+    {
+        custom string vehicle:id = "rover-001"
+        def Cube "Chassis"
+        {
+            double size = 1
+            double3 xformOp:scale = (1.6, 0.75, 0.9)
+            double3 xformOp:translate = (-20, 1.65, 100)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        }
+    }
+}
+

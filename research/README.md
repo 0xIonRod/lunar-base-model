@@ -1,11 +1,11 @@
 # Lunar Mission Research
 
-**Snapshot date:** 2026-08-22  
+The repository orientation and simulator workflow live in the root [`README.md`](../README.md). This directory is the curated evidence layer for missions, vehicles, locations, sources, and assumptions.
 **Scope:** Upcoming lunar missions and infrastructure relevant to a lunar-base simulator, with emphasis on NASA Moon Base Phase One, Artemis, commercial lunar delivery, and international south-polar exploration.
 
 ## Technical summary
 
-The research is organized as a small, auditable mission dataset rather than a single narrative. NASA describes Phase One of its Moon Base architecture as running through 2029 and including more than twenty robotic landings, while only a subset of those missions has been publicly named. The mission register therefore separates named missions from planned assets and an explicit unnamed-deliveries placeholder.
+The research is organized as a small, auditable mission dataset rather than a single narrative. NASA describes a broad Moon Base architecture, while only a subset of missions has been publicly named. The mission register therefore separates named missions from planned assets and an explicit unnamed-deliveries placeholder.
 
 Every mission entry includes a direct source link, target date or date range, location or orbit, operator, carrier/lander, rover or other surface vehicle, purpose, status, and confidence. Dates are planning targets, not guarantees.
 
@@ -24,4 +24,5 @@ Use `missions.md` as the starting input for the first landing-and-surface model.
 
 ## Important boundary
 
-This is a research snapshot, not a complete launch manifest for every country or commercial company. It prioritizes missions with an official agency, provider, or program source and includes a separate placeholder for NASA's additional unnamed Moon Base/CLPS deliveries.
+This is a maintained research register, not a complete launch manifest for every country or commercial company. It prioritizes missions with an official agency, provider, or program source and includes a separate placeholder for NASA's additional unnamed Moon Base/CLPS deliveries. Generated briefs and dated snapshot exports are intentionally kept out of this folder; update the source registers and preserve uncertainty instead.
+

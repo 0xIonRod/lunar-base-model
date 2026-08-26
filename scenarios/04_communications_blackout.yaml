@@ -1,0 +1,13 @@
+scenario_id: scenario-04
+mission_id: mission-001
+name: Communications blackout recovery
+objective: Verify local autonomy when direct communications are unavailable.
+actors: [lander-001, rover-001]
+initial_state: both_assets_nominal
+actions: [disable communications, execute rover waypoint plan, restore link]
+success_criteria:
+  - rover completes its queued route autonomously
+  - lander and rover preserve state during blackout
+  - queued telemetry is delivered after link restoration
+parameters_to_refine: [antenna placement, link range, telemetry queue size, autonomy timeout]
+

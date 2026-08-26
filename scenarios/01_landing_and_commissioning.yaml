@@ -1,0 +1,13 @@
+scenario_id: scenario-01
+mission_id: mission-001
+name: Landing and commissioning
+objective: Place the lander on the pad and confirm the rover can power on.
+actors: [lander-001, rover-001]
+initial_state: lander_on_pad_rover_stowed
+actions: [lander touchdown, system checkout, rover deployment, short drive]
+success_criteria:
+  - lander remains stable on the pad
+  - rover travels at least 20 m without leaving the terrain tile
+  - power and vehicle states are recorded
+parameters_to_refine: [lander dimensions, dry mass, landing gear geometry, rover deployment clearance]
+

@@ -1,0 +1,61 @@
+schema_version: 1
+mission_id: mission-001
+name: Minimal Lunar Surface Demonstration
+status: baseline_scaffold
+purpose: >-
+  Establish a small, auditable lander-and-rover mission twin before adding
+  detailed terrain and mission-specific hardware.
+terrain:
+  shape: flat_square
+  width_m: 1000
+  length_m: 1000
+  elevation_m: 0
+  gravity_m_s2: 1.62
+  coordinate_frame: local_ned
+  source: engineering_assumption
+landing_site:
+  position_m: [0, 0, 100]
+  pad_size_m: [40, 40]
+  source: engineering_assumption
+lander:
+  id: lander-001
+  type: generic_descent_lander
+  position_m: [0, 8, 100]
+  dimensions_m: [12, 8, 6]
+  dry_mass_kg: 1800
+  propellant:
+    type: cryogenic_oxygen_methane_placeholder
+    usable_mass_kg: 900
+    tank_volume_m3: 2.2
+  engine:
+    count: 4
+    thrust_total_kn: 24
+    specific_impulse_s: 360
+  power:
+    solar_array_area_m2: 18
+    solar_array_position: deployable_top_west
+    battery_capacity_kwh: 12
+  confidence: engineering_assumption
+rover:
+  id: rover-001
+  type: generic_four_wheel_solar_rover
+  position_m: [-20, 2, 100]
+  dimensions_m: [3.2, 1.8, 1.5]
+  mass_kg: 240
+  payload_capacity_kg: 60
+  maximum_speed_m_s: 0.25
+  wheel_count: 4
+  power:
+    solar_array_area_m2: 4
+    battery_capacity_kwh: 2
+  mission_role: local reconnaissance and cargo inspection
+  confidence: engineering_assumption
+artifacts:
+  scene: scene.usda
+  scenarios:
+    - ../../scenarios/01_landing_and_commissioning.yaml
+    - ../../scenarios/02_rover_traverse.yaml
+    - ../../scenarios/03_power_and_illumination.yaml
+    - ../../scenarios/04_communications_blackout.yaml
+    - ../../scenarios/05_cargo_inspection.yaml
+
