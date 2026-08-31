@@ -1,0 +1,105 @@
+schema_version: 1
+mission_id: mission-002
+source_mission_id: M02
+name: Astrobotic Griffin Mission One / FLIP
+aliases:
+  - Griffin-1
+  - Moon Base II
+status: integration_study
+mission_class: uncrewed_lunar_south_pole_cargo_lander
+operator: Voyager Technologies / Astrobotic / NASA CLPS
+purpose: >-
+  Maintain a source-backed Griffin-1 landing and FLIP surface-operations
+  record while separating public mission facts from the LunCoSim engineering
+  proxy used for Modelica and control integration.
+target_year: 2026
+target_window: late 2026
+mission_objectives:
+  - deliver Griffin-1 cargo to the lunar South Pole region
+  - perform guided powered descent and landing event qualification
+  - deploy two prototype side ramps, release the top-deck FLIP adapter after touchdown, and route FLIP to the base site
+  - exercise rover mobility, dust mitigation, power, thermal, sensing, and operations contracts
+payloads:
+  - id: flip-001
+    name: Astrolab FLIP / FLEX Lunar Innovation Platform
+    purpose: lunar surface mobility and payload demonstration
+    public_mass_description: nearly half a metric ton
+    public_payload_capacity_kg: 30
+    source: primary_astrolab
+  - id: nasa-payloads
+    name: NASA Griffin-1 payload suite
+    purpose: environmental, navigation, ranging, and lunar-surface technology demonstrations
+    source: primary_nasa
+terrain:
+  shape: procedural_flat_site
+  width_m: 1000
+  length_m: 1000
+  elevation_m: 0
+  gravity_m_s2: 1.62
+  coordinate_frame: local_ned
+  real_site: Nobile Crater region
+  real_region: lunar South Pole
+  source: simulator_simplification
+landing_site:
+  name: Nobile Crater region
+  region: lunar South Pole
+  coordinates: TBD
+  landing_accuracy_m: null
+  source: primary_nasa_and_astrobotic
+lander:
+  id: griffin-1
+  type: Astrobotic Griffin lander
+  flight_name: Griffin-1
+  position_m: [0, 60, 0]
+  dimensions_m: null
+  dry_mass_kg: null
+  cargo_public_mass_lb_greater_than: 1100
+  propulsion: TBD from as-built mission data
+  engine_count: null
+  thrust_curve: null
+  power:
+    solar_array_area_m2: null
+    battery_capacity_kwh: null
+  confidence: public_identity_plus_generic_lander_integration_proxy
+  prototype_configuration:
+    payload_class_kg: 625
+    landing_legs: 4
+    deck: isogrid
+    solar_layout: side_mounted
+    egress: two_physical_revolute_ramps
+    status: MoonDAO_backlog_simulation_requirement_not_public_flight_data
+rover:
+  id: flip-001
+  type: Astrolab FLIP / FLEX Lunar Innovation Platform
+  status: manifested_publicly; engineering_parameters_incomplete
+  public_mass_kg: null
+  public_mass_description: nearly half a metric ton
+  payload_capacity_kg: 30
+  wheel_count: null
+  dimensions_m: null
+  maximum_speed_m_s: null
+  deployment: top_deck_adapter_then_two_side_ramps_after_touchdown
+  simulation_proxy:
+    mass_kg: 450
+    dimensions_m: [2.4, 1.8, 0.7]
+    wheel_count: 4
+    steering: all_wheel_steer
+    wheel_radius_m: 0.45
+    battery_voltage_v: 28
+    battery_capacity_ah: 83.33
+    solar_array_area_m2: 3
+    status: explicit_engineering_assumption
+  confidence: public_concept_plus_explicit_simulation_proxy
+artifacts:
+  scene: scene.usda
+  research: mission-research.md
+  executable_twin: ../../twins/astrobotic-griffin-1/
+  executable_scene: ../../twins/astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda
+sources:
+  - https://www.youtube.com/watch?v=UFEMOrg27KE
+  - https://www.astrolab.space/flip-rover/
+  - https://www.astrolab.space/2025/02/05/astrolabs-flip-rover-joins-astrobotics-griffin-1-to-the-moon/
+  - https://www.astrolab.space/2026/05/18/astrolab-announces-nasa-payloads-for-upcoming-mission-to-the-moon/
+  - https://www.nasa.gov/event/clps-flight-astrobotic-griffin-mission-one/
+  - https://www.nasa.gov/missions/moon-base/nasa-provides-updates-on-moon-base-cargo-landers-tech-demonstrations/
+  - https://www.astrobotic.com/astrobotic-to-join-voyager-technologies-accelerating-americas-moon-base/

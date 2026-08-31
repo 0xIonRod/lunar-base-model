@@ -1,0 +1,19 @@
+#usda 1.0
+(
+    defaultPrim = "FLIP"
+    upAxis = "Y"
+    metersPerUnit = 1
+)
+
+# FLIP mission wrapper. The current six-wheel skid-steer vehicle provides the
+# mechanically explicit surface-mobility surrogate while actual FLIP data is pending.
+def Xform "FLIP" (
+    prepend references = @lunco://vessels/rovers/six_wheel_rover.usda@</SixWheelRover>
+    kind = "assembly"
+    doc = "Astrolab FLIP surrogate using LunCoSim's supported six-wheel skid-steer topology."
+)
+{
+    custom string lunco:mission:payload = "Astrolab FLIP"
+    custom string lunco:parameter_status = "six-wheel skid-steer surrogate pending FLIP public engineering data"
+    custom string lunco:provenance:source = "Astrobotic Griffin-1 public manifest"
+}

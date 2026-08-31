@@ -1,0 +1,7 @@
+name = "astrobotic-griffin-1"
+version = "0.1.0"
+description = "Astrobotic Griffin-1 surface-operations study Twin"
+
+[usd]
+default_scene = "scenes/griffin_1_surface_ops.usda"
+scenes = ["scenes/*.usda", "tests/*.usda"]

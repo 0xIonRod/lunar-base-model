@@ -21,6 +21,8 @@ model. Public facts and unknowns are recorded in
 |---|---|
 | [`research/`](research/) | Human-reviewed evidence and explicit research gaps. |
 | [`missions/mission-001/`](missions/mission-001/) | M01 Endurance twin, research record, and physical assumptions. |
+| [`missions/mission-002/`](missions/mission-002/) | M02 Griffin-1 / FLIP mission record and project index scene. |
+| [`twins/astrobotic-griffin-1/`](twins/astrobotic-griffin-1/) | Executable Griffin-1 Twin package with Modelica lander/FLIP integration and handover. |
 | [`scenarios/`](scenarios/) | Five initial mission scenarios. |
 | [`tools/`](tools/) | Scripts and notebooks; analysis code does not live beside project data. |
 | [`NASA_LUNAR_BASE_OVERVIEW.md`](NASA_LUNAR_BASE_OVERVIEW.md) | Plain-language lunar-base context. |

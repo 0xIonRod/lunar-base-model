@@ -1,0 +1,67 @@
+#usda 1.0
+(
+    defaultPrim = "Mission002"
+    upAxis = "Y"
+    metersPerUnit = 1
+)
+
+def Xform "Mission002" (
+    kind = "assembly"
+    doc = "Griffin-1 / FLIP project index scene; use the Twin-local scene for executable Modelica co-simulation."
+)
+{
+    custom string mission:id = "mission-002"
+    custom string mission:status = "integration_study"
+    custom string mission:source = "Astrobotic Griffin Mission One / Astrolab FLIP"
+    custom string mission:operator = "Voyager Technologies / Astrobotic / NASA CLPS"
+    custom string mission:landing_region = "lunar South Pole; Nobile Crater region"
+    custom string mission:executable_twin = "../../luncosim-griffin-1/twins/astrobotic-griffin-1"
+    custom string mission:executable_scene = "../../luncosim-griffin-1/twins/astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda"
+    custom string mission:engineering_boundary = "FLIP four-wheel all-wheel-steer proxy; no flight-fidelity claim"
+
+    def PhysicsScene "PhysicsScene"
+    {
+        vector3f physics:gravityDirection = (0, -1, 0)
+        float physics:gravityMagnitude = 1.62
+    }
+
+    def Xform "LandingSite"
+    {
+        custom string site:name = "Nobile Crater region"
+        custom string site:terrain_status = "procedural surrogate; registered DEM TBD"
+        def Cube "DevelopmentTile"
+        {
+            double size = 1
+            double3 xformOp:scale = (500, 0.5, 500)
+            double3 xformOp:translate = (0, -0.5, 0)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        }
+    }
+
+    def Xform "Griffin1"
+    {
+        custom string vehicle:id = "griffin-1"
+        custom string vehicle:model_status = "generic powered-descent integration proxy"
+        def Cube "LanderEnvelope"
+        {
+            double size = 1
+            double3 xformOp:scale = (4, 3, 4)
+            double3 xformOp:translate = (0, 8, 0)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        }
+    }
+
+    def Xform "FLIP"
+    {
+        custom string vehicle:id = "flip-001"
+        custom string vehicle:model_status = "four-wheel all-wheel-steer engineering proxy"
+        custom string vehicle:deployment = "post-touchdown direct top-deck egress"
+        def Cube "Chassis"
+        {
+            double size = 1
+            double3 xformOp:scale = (1.2, 0.35, 0.9)
+            double3 xformOp:translate = (0, 0.8, 0)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        }
+    }
+}
