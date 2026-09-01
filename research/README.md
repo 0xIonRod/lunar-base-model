@@ -17,6 +17,7 @@ Every mission entry includes a direct source link, target date or date range, lo
 - [data-model.md](data-model.md) — proposed fields and relationships for turning the research into simulator data.
 - [sources.md](sources.md) — primary source inventory with retrieval date and intended use.
 - [assumptions.md](assumptions.md) — schedule conflicts, confidence rules, aliases, and known gaps.
+- [flip_rover.md](flip_rover.md) — Griffin-1 FLIP video extraction, public engineering facts, and simulator parameter boundary.
 
 ## Recommended use
 

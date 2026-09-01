@@ -24,13 +24,17 @@
 14. [ispace schedule update](https://www.ispace-inc.com/2026/03/30/statement-regarding-certain-reports-in-domestic-media/) — Missions 2.5, 3, 4, 5, and CP-12 schedule.
 15. [ispace ULTRA and H3 announcement](https://www.ispace-inc.com/2026/07/29/ispace-and-mitsubishi-heavy-industries-agree-to-launch-mission-3-ultra-lunar-lander-aboard-h3-rocket/) — Mission 3 ULTRA lander and H3 launch vehicle.
 16. [ispace MAGPIE announcement](https://www.ispace-inc.com/2026/07/24/esa-awards-ispace-europe-contract-for-execution-of-magpie-esas-first-lunar-rover/) — ESA MAGPIE rover and Mission 4 assignment.
+17. [Astrolab FLIP rover](https://www.astrolab.space/flip-rover/) — FLIP design, mobility, batteries, tires, avionics, sensors, and software context.
+18. [Astrolab FLIP joins Griffin-1](https://www.astrolab.space/2025/02/05/astrolabs-flip-rover-joins-astrobotics-griffin-1-to-the-moon/) — Griffin-1 manifest, South-Pole/Nobile region, public mass scale, and payload capacity.
+19. [Astrolab 2026 NASA payload announcement](https://www.astrolab.space/2026/05/18/astrolab-announces-nasa-payloads-for-upcoming-mission-to-the-moon/) — late-2026 planning, direct top-deck egress, and FLIP operations context.
+20. [Astrolab FLIP design video](https://www.youtube.com/watch?v=UFEMOrg27KE) — current design-rendering reference supplied for the Griffin Twin.
+21. [Voyager Technologies / Astrobotic announcement](https://www.astrobotic.com/astrobotic-to-join-voyager-technologies-accelerating-americas-moon-base/) — 2026 corporate transition context; Griffin-1 mission identity continues.
 
 ## International agencies
 
-17. [CNSA Chang’e-7 and Chang’e-8 update](https://www.cnsa.gov.cn/english/n6465652/n6465653/c10573094/content.html) — 2026/2028 lunar exploration timing and resource-utilization goals.
-18. [CNSA Chang’e-8 south-polar target](https://www.cnsa.gov.cn/english/n6465652/n6465653/c10670293/content.html) — later Chang’e-8 timing and Leibnitz-Beta target context.
-19. [JAXA LUPEX](https://www.exploration.jaxa.jp/e/program/lunarpolar/) — H3, south-polar landing, rover mass, drill depth, and water-resource objectives.
-20. [ISRO Chandrayaan-4 approval](https://www.isro.gov.in/ISRO_EN/UnionCabinetApprovesIndiasMission.html) — official sample-return objective and approval status.
-21. [ESA Argonaut](https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/Exploration/Argonaut_Europe_s_lunar_lander_programme) — 2030 cargo-lander target, Ariane 6, south-polar landing, and payload uncertainty.
-22. [ESA CM25 exploration plan](https://www.esa.int/About_Us/Ministerial_Council_2025/CM25_Explore_and_discover) — Lunar Pathfinder and Moonlight communications/navigation context.
-
+22. [CNSA Chang’e-7 and Chang’e-8 update](https://www.cnsa.gov.cn/english/n6465652/n6465653/c10573094/content.html) — 2026/2028 lunar exploration timing and resource-utilization goals.
+23. [CNSA Chang’e-8 south-polar target](https://www.cnsa.gov.cn/english/n6465652/n6465653/c10670293/content.html) — later Chang’e-8 timing and Leibnitz-Beta target context.
+24. [JAXA LUPEX](https://www.exploration.jaxa.jp/e/program/lunarpolar/) — H3, south-polar landing, rover mass, drill depth, and water-resource objectives.
+25. [ISRO Chandrayaan-4 approval](https://www.isro.gov.in/ISRO_EN/UnionCabinetApprovesIndiasMission.html) — official sample-return objective and approval status.
+26. [ESA Argonaut](https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/Exploration/Argonaut_Europe_s_lunar_lander_programme) — 2030 cargo-lander target, Ariane 6, south-polar landing, and payload uncertainty.
+27. [ESA CM25 exploration plan](https://www.esa.int/About_Us/Ministerial_Council_2025/CM25_Explore_and_discover) — Lunar Pathfinder and Moonlight communications/navigation context.

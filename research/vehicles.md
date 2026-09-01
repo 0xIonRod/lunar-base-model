@@ -24,7 +24,7 @@ This catalog normalizes vehicle names used by the mission register. A vehicle ma
 
 | ID | Vehicle | Operator / builder | Missions | Known role | Source |
 |---|---|---|---|---|---|
-| R01 | **FLIP** / FLEX Lunar Innovation Platform | Astrolab | M02 | Demonstrate lunar logistics and surface mobility near the South Pole | [NASA Moon Base phases](https://www.nasa.gov/moonbase-phases/) |
+| R01 | **FLIP** / FLEX Lunar Innovation Platform | Astrolab | M02 | Demonstrate lunar logistics and surface mobility near the South Pole | [Astrolab FLIP rover](https://www.astrolab.space/flip-rover/), [FLIP joins Griffin-1](https://www.astrolab.space/2025/02/05/astrolabs-flip-rover-joins-astrobotics-griffin-1-to-the-moon/) |
 | R02 | **Rashid Rover 2** | UAE MBRSC | M04 | Far-side mobility, dust durability, plasma, geology, and thermal measurements | [Firefly Mission 2](https://fireflyspace.com/missions/blue-ghost-mission-2/) |
 | R03 | **VIPER** | NASA | M07 | Drill and map water ice and other volatiles in polar terrain | [NASA Moon Base phases](https://www.nasa.gov/moonbase-phases/), [NASA VIPER](https://science.nasa.gov/mission/viper/) |
 | R04 | **LUPEX rover** | JAXA | M14 | Drill to approximately 1.5 m, characterize water, and demonstrate polar mobility and survival | [JAXA LUPEX](https://www.exploration.jaxa.jp/e/program/lunarpolar/) |
@@ -45,4 +45,3 @@ This catalog normalizes vehicle names used by the mission register. A vehicle ma
 | O04 | CAPSTONE 02 spacecraft | Two small lunar-orbit spacecraft | M05 | Rendezvous, proximity operations, navigation, and communications | [NASA CAPSTONE 02](https://www.nasa.gov/directorates/rtmd/nasa-announces-new-spacecraft-technology-demonstration-mission-at-moon/) |
 | O05 | LASSO spacecraft | Small lunar orbiter | M20 | Very-low-lunar-orbit resource mapping and autonomous operations | [NASA FY2027 budget request](https://www.nasa.gov/wp-content/uploads/2026/04/fiscal-year-2027-full-budget-request.pdf) |
 | O06 | Moonlight constellation | Lunar communications/navigation satellites | A02 | Provide lunar communications and navigation services | [ESA CM25](https://www.esa.int/About_Us/Ministerial_Council_2025/CM25_Explore_and_discover) |
-
