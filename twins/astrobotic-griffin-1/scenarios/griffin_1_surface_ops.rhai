@@ -8,19 +8,22 @@
 fn on_event(me, evt) {
     let rover = find("/Griffin1SurfaceOps/FLIP");
     if evt.name != "waypoint.reached" || evt.source != rover { return; }
-    if evt.value == "/Griffin1SurfaceOps/RoverRampApproach" {
+    let path = waypoint_event_path(evt);
+    if path == () { return; }
+    apply_waypoint_reached(evt);
+    if path == "/Griffin1SurfaceOps/RoverRampApproach" {
         emit("griffin_ramp_approach_reached");
         print("[griffin] rover reached ramp approach");
-    } else if evt.value == "/Griffin1SurfaceOps/RoverRampExit" {
+    } else if path == "/Griffin1SurfaceOps/RoverRampExit" {
         emit("griffin_ramp_exit_reached");
         print("[griffin] rover cleared ramp");
-    } else if evt.value == "/Griffin1SurfaceOps/RoverTarget1" {
+    } else if path == "/Griffin1SurfaceOps/RoverTarget1" {
         emit("griffin_waypoint_1_reached");
         print("[griffin] waypoint 1 reached");
-    } else if evt.value == "/Griffin1SurfaceOps/RoverTarget2" {
+    } else if path == "/Griffin1SurfaceOps/RoverTarget2" {
         emit("griffin_waypoint_2_reached");
         print("[griffin] waypoint 2 reached");
-    } else if evt.value == "/Griffin1SurfaceOps/BaseSite" {
+    } else if path == "/Griffin1SurfaceOps/BaseSite" {
         emit("griffin_base_site_reached");
         emit("griffin_surface_ops_complete");
         print("[griffin] base site reached; surface operations complete");
@@ -70,28 +73,19 @@ fn release_rover(me) {
 
 fn engage_rover(me) {
     emit("griffin_flip_deployed");
-    // The FLIP BTXML remains the editable route source, but it must not be
-    // re-used implicitly here: the attached rover may have crossed a marker
-    // while the lander was descending. Re-arm the complete route explicitly
-    // after the adapter weld is detached, with the ramp-entry waypoint first.
-    //
-    // This bounded landing-demo uses an accelerated control demand so the
-    // complete ramp-to-base acceptance path can be exercised in a short
-    // deterministic run. It is not a claim about FLIP's flight speed: the
-    // nominal public FLEX-family proxy remains the lower-speed profile in the
-    // BTXML and the research register, and the live four-wheel drivetrain,
-    // contact, battery, and thermal equations remain active here.
+    // Re-claim the released rover, loading the route already authored on the
+    // FLIP prim. No inline spec is supplied: the scene marker paths in the
+    // BTXML remain the route source and continue to produce waypoint.reached.
     let route_ack = cmd("EngageAutopilot", #{
-        vessel: find("/Griffin1SurfaceOps/FLIP"),
-        spec_json: to_json(griffin_surface_ops::surface_route())
+        vessel: find("/Griffin1SurfaceOps/FLIP")
     });
     if route_ack.ok == false {
-        notify_kind("FLIP route was rejected.", "error");
+        notify_kind("Authored FLIP route was rejected.", "error");
         emit("griffin_phase_timeout");
         return;
     }
-    notify_kind("FLIP deployment complete; rover route engaged.", "success");
-    print("[griffin] FLIP route engaged");
+    notify_kind("FLIP deployment complete; authored rover route continues.", "success");
+    print("[griffin] FLIP authored route continues after release");
 }
 
 fn fail_phase(me, phase) {
@@ -110,7 +104,11 @@ fn task(me) {
                 wait_for_from("lander_touchdown", "/Griffin1SurfaceOps/Lander"),
             ]),
             seq([
-                wait(90.0),
+                // The authored 60 m descent settles just after 100 s in the
+                // current powered-descent proxy. Keep the watchdog bounded,
+                // but leave enough margin for the physical touchdown event to
+                // arrive before declaring the mission failed.
+                wait(180.0),
                 once(|m| fail_phase(m, "landing")),
             ]),
         ]),
@@ -119,9 +117,7 @@ fn task(me) {
         once(|m| deploy_ramps(m)),
         wait(4.0),
         once(|m| release_rover(m)),
-        // Re-arm the route immediately after the adapter disappears. The rover
-        // may enter the ramp-approach sensor during this short handoff; engaging
-        // first keeps that physical arrival in the same ordered route session.
+        // Re-arm the authored BTXML immediately after the adapter disappears.
         wait(0.25),
         once(|m| engage_rover(m)),
         par_race([

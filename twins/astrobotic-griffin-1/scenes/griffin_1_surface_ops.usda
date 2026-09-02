@@ -2,23 +2,18 @@
 (
     defaultPrim = "Griffin1SurfaceOps"
     upAxis = "Y"
-    metersPerUnit = 1
+    metersPerUnit = 1.0
 )
 
-# Astrobotic Griffin-1 surface-operations MVP.
-#
-# The base lunar surface owns the single authoritative gravity scene and sun.
-# This scene owns mission composition: the polar Griffin wrapper, top-deck FLIP
-# payload adapter, ramp hinges, guidance connections, base site, and Scenario policy.
 def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
-    prepend apiSchemas = ["LunCoCatalogAPI"]
+    prepend apiSchemas = "LunCoCatalogAPI"
     kind = "assembly"
-    doc = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
+    documentation = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
 )
 {
     uniform bool lunco:spawnable = false
-    double lunco:anchor:lat = 26.13
+    double lunco:anchor:lat = -85.28
     double lunco:anchor:lon = 3.63
     double lunco:anchor:height = 0.0
     int lunco:anchor:body = 301
@@ -29,21 +24,21 @@ def Xform "Griffin1SurfaceOps" (
     custom string lunco:mission:scope = "surface operations only"
     custom string lunco:mission:evidence = "assumptions and surrogate values are not flight validation"
     custom string lunco:mission:deployment = "top-deck adapter during descent; two physical side ramps deploy after touchdown; FLIP joint release then rover egress"
-
+    custom string lunco:anchor:status = "south-polar study anchor near Nobile Crater; exact flight coordinates unresolved"
+    custom string lunco:lighting:contract = "all Griffin and FLIP geometry uses the LunarSurface/Sun polar direction"
+    custom string lunco:route:status = "ramp entry marker moved outside descent column; center lane remains clear of four solid legs"
     def "SolarSystem" (
         prepend references = @lunco://celestial/solar_system.usda@</SolarSystem>
     )
     {
     }
-
     def Xform "Environment" (
         prepend references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
     )
     {
     }
-
     def Camera "Avatar" (
-        prepend apiSchemas = ["LunCoAvatarAPI"]
+        prepend apiSchemas = "LunCoAvatarAPI"
         prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
     )
     {
@@ -52,109 +47,105 @@ def Xform "Griffin1SurfaceOps" (
         double3 xformOp:translate = (18.0, 12.0, 20.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
-
     def Scope "CameraTrack" (
-        prepend apiSchemas = ["LunCoCameraTrackAPI"]
+        prepend apiSchemas = "LunCoCameraTrackAPI"
     )
     {
-        token lunco:activeCamera.timeSamples = { 0: "Avatar" }
+        token lunco:activeCamera
+        token lunco:activeCamera.timeSamples = {
+            0.0: "Avatar",
+        }
     }
-
-    # The guidance component is composed at the mission boundary. The vehicle
-    # wrapper remains reusable and contains the airframe's Lander.mo contract.
     def "Lander" (
-        prepend references = [
-            @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>,
-            @lunco://components/gnc/position_pid_guidance.usda@</PositionPIDGuidance>,
-        ]
+        prepend references = [@twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>, @lunco://components/gnc/position_pid_guidance.usda@</PositionPIDGuidance>]
     )
     {
-        double3 xformOp:translate = (0, 60.0, 0)
+        double3 xformOp:translate = (0.0, 60.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        # Clean powered-descent baseline: the public mission has no released
-        # cross-range trajectory in the sources, so the landing study starts
-        # vertically over the authored target instead of inventing one.
         double3 physics:velocity = (0.0, 0.0, 0.0)
-
+        float inputs:guidance_throttle
         float inputs:guidance_throttle.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:throttle_cmd>
+        float inputs:guidance_pitch
         float inputs:guidance_pitch.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:pitch_cmd>
+        float inputs:guidance_roll
         float inputs:guidance_roll.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:roll_cmd>
+        float inputs:guidance_yaw
         float inputs:guidance_yaw.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:yaw_cmd>
+        float inputs:landing_engine_cutoff
         float inputs:landing_engine_cutoff.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:landing_engine_cutoff>
+        float inputs:landing_handoff
         float inputs:landing_handoff.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:landing_handoff>
-
         over "GNC"
         {
-            float inputs:touchdown.connect = </Griffin1SurfaceOps/Lander.outputs:touchdown>
-            float inputs:engine_cutoff_contact.connect = </Griffin1SurfaceOps/Lander.outputs:engine_cutoff_contact>
-            float inputs:landing_contact.connect = </Griffin1SurfaceOps/Lander.outputs:landing_contact>
-
             float inputs:initial_pos_x = 0.0
             float inputs:initial_pos_y = 60.0
             float inputs:initial_pos_z = 0.0
             float inputs:initial_vel_x = 0.0
             float inputs:initial_vel_y = 0.0
             float inputs:initial_vel_z = 0.0
-
-            float inputs:vehicle_mass.connect = </Griffin1SurfaceOps/Lander/MainPropulsion.outputs:vehicle_mass_kg>
-            # During powered descent the lander carries FLIP (450 kg proxy),
-            # the four-point adapter, and two 250 kg hinged ramp bodies. The
-            # reusable propulsion model publishes the airframe mass only, so
-            # the mission supplies the attached-stack guidance mass here. This
-            # is intentionally a fixed prototype value until the released
-            # Griffin/FLIP mass-properties ICD can drive a release-aware mass
-            # model; after touchdown the GNC is no longer authority for the
-            # rover route.
             float inputs:vehicle_mass = 4950.0
+            float inputs:vehicle_mass.connect = </Griffin1SurfaceOps/Lander/MainPropulsion.outputs:vehicle_mass_kg>
+            float inputs:touchdown
+            float inputs:touchdown.connect = </Griffin1SurfaceOps/Lander.outputs:touchdown>
+            float inputs:engine_cutoff_contact
+            float inputs:engine_cutoff_contact.connect = </Griffin1SurfaceOps/Lander.outputs:engine_cutoff_contact>
+            float inputs:landing_contact
+            float inputs:landing_contact.connect = </Griffin1SurfaceOps/Lander.outputs:landing_contact>
+            float inputs:max_thrust
             float inputs:max_thrust.connect = </Griffin1SurfaceOps/Lander/MainPropulsion.outputs:maximum_thrust_n>
-
+            float inputs:altimeter_range
             float inputs:altimeter_range.connect = </Griffin1SurfaceOps/Lander/Altimeter/Model.outputs:range_m>
+            float inputs:altimeter_position_valid
             float inputs:altimeter_position_valid.connect = </Griffin1SurfaceOps/Lander/Altimeter/Model.outputs:range_valid>
+            float inputs:altimeter_altitude_confidence
             float inputs:altimeter_altitude_confidence.connect = </Griffin1SurfaceOps/Lander/Altimeter/Model.outputs:range_confidence>
+            float inputs:altimeter_vehicle_position_x
             float inputs:altimeter_vehicle_position_x.connect = </Griffin1SurfaceOps/Lander/Altimeter/Model.outputs:vehicle_position_x>
+            float inputs:altimeter_vehicle_position_y
             float inputs:altimeter_vehicle_position_y.connect = </Griffin1SurfaceOps/Lander/Altimeter/Model.outputs:vehicle_position_y>
+            float inputs:altimeter_vehicle_position_z
             float inputs:altimeter_vehicle_position_z.connect = </Griffin1SurfaceOps/Lander/Altimeter/Model.outputs:vehicle_position_z>
+            float inputs:imu_coordinate_accel_local_x
             float inputs:imu_coordinate_accel_local_x.connect = </Griffin1SurfaceOps/Lander/IMU.outputs:coordinate_accel_local_x>
+            float inputs:imu_coordinate_accel_local_y
             float inputs:imu_coordinate_accel_local_y.connect = </Griffin1SurfaceOps/Lander/IMU.outputs:coordinate_accel_local_y>
+            float inputs:imu_coordinate_accel_local_z
             float inputs:imu_coordinate_accel_local_z.connect = </Griffin1SurfaceOps/Lander/IMU.outputs:coordinate_accel_local_z>
+            float inputs:imu_attitude_quat_w
             float inputs:imu_attitude_quat_w.connect = </Griffin1SurfaceOps/Lander/IMU.outputs:attitude_quat_w>
+            float inputs:imu_attitude_quat_x
             float inputs:imu_attitude_quat_x.connect = </Griffin1SurfaceOps/Lander/IMU.outputs:attitude_quat_x>
+            float inputs:imu_attitude_quat_y
             float inputs:imu_attitude_quat_y.connect = </Griffin1SurfaceOps/Lander/IMU.outputs:attitude_quat_y>
+            float inputs:imu_attitude_quat_z
             float inputs:imu_attitude_quat_z.connect = </Griffin1SurfaceOps/Lander/IMU.outputs:attitude_quat_z>
-
+            float inputs:target_x
             float inputs:target_x.connect = </Griffin1SurfaceOps/LandingTarget.outputs:position_x>
+            float inputs:target_y
             float inputs:target_y.connect = </Griffin1SurfaceOps/LandingTarget.outputs:position_y>
+            float inputs:target_z
             float inputs:target_z.connect = </Griffin1SurfaceOps/LandingTarget.outputs:position_z>
+            float inputs:command_tilt_limit_rad
             float inputs:command_tilt_limit_rad.connect = </Griffin1SurfaceOps/Lander.inputs:command_tilt_limit_rad>
         }
     }
-
     def "FLIP" (
         prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
     )
     {
-        # Lander starts at y=60.0. The adapter joint datum is lander-local
-        # y=1.94 and FLIP's wheel datum is rover-local y=-1.0, so the initial
-        # top-deck attachment pose is y=62.94.
-        double3 xformOp:translate = (0, 62.94, 0)
+        double3 xformOp:translate = (0.0, 62.94, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         double3 physics:velocity = (0.0, 0.0, 0.0)
         custom string lunco:mission:deployment_state = "top_deck_attached_until_touchdown"
         custom string lunco:mission:payload_mount = "Griffin top deck through four-point adapter; detach after both ramps deploy"
     }
-
-    # The payload adapter is a real fixed joint during powered descent. The
-    # joint is removed only after touchdown and ramp deployment, so the rover
-    # remains a carried mass through landing and becomes an independent dynamic
-    # body for surface driving.
     def PhysicsFixedJoint "FLIPPayloadAdapterJoint"
     {
         rel physics:body0 = </Griffin1SurfaceOps/Lander>
         rel physics:body1 = </Griffin1SurfaceOps/FLIP>
-        point3f physics:localPos0 = (0.0, 1.94, 0.0)
+        point3f physics:localPos0 = (0.0, 1.940000057220459, 0.0)
         point3f physics:localPos1 = (0.0, -1.0, 0.0)
     }
-
     def Scope "FLIPEgressInterface"
     {
         custom string lunco:mission:payload = "Astrolab FLIP"
@@ -163,30 +154,18 @@ def Xform "Griffin1SurfaceOps" (
         double3 lunco:nominal_deck_offset = (0.0, 2.94, 0.0)
         custom string lunco:public_design_boundary = "Astrolab public 2026 material describes direct top-deck egress; ramp mechanism is this project's prototype assumption"
     }
-
     def Xform "RoverRampApproach" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        # Place the approach marker on the first deployed-ramp segment rather
-        # than in the descent column. The settled port hinge is approximately
-        # x=2.2, y=7.4; x=4.00 is the first deployed-ramp segment and y=6.20
-        # follows the -0.58 rad prototype ramp surface. This keeps the 2.5 m
-        # sensor clear of the attached FLIP
-        # and lander envelope during descent while still making the first
-        # arrival a physical ramp-entry event.
-        double3 xformOp:translate = (4.00, 6.20, 0.0)
+        double3 xformOp:translate = (5.3, 6.2, 0.8)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverRampExit" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        # The ramp's outer edge is approximately 1.0 m above the flat
-        # surrogate surface at the commanded -0.58/+0.58 rad deployment.
-        # Keep the arrival marker at the physical wheel-contact datum so the
-        # sensor and 3-D navigation radius describe the same event.
-        double3 xformOp:translate = (11.90, 1.00, 0.0)
+        double3 xformOp:translate = (8.2, 1.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverTarget1" (
@@ -200,8 +179,6 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        # Curvature-control point between the first science waypoint and the
-        # outbound leg. It is a navigation aid, not a mission acceptance stop.
         double3 xformOp:translate = (19.0, 0.0, 2.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
@@ -209,8 +186,6 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        # Keeps the four-wheel steering demand bounded before the second
-        # science waypoint; the live vehicle still owns contact and traction.
         double3 xformOp:translate = (21.0, 0.0, 0.5)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
@@ -218,8 +193,6 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        # Second curvature-control point turns the rover toward the outbound
-        # science waypoint without demanding an in-place heading change.
         double3 xformOp:translate = (21.6, 0.0, -1.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
@@ -255,8 +228,6 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        # Close-spaced final turn point keeps the four-wheel steering demand
-        # bounded before the base approach segment.
         double3 xformOp:translate = (24.5, 0.0, -8.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
@@ -271,7 +242,6 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        # Final curvature-control point before the base-site pad.
         double3 xformOp:translate = (27.0, 0.0, -10.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
@@ -289,20 +259,18 @@ def Xform "Griffin1SurfaceOps" (
         double3 xformOp:translate = (31.0, 0.0, -12.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
-
     def Cube "BaseSitePad" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         double size = 1.0
         double3 xformOp:translate = (31.0, -0.05, -12.0)
-        double3 xformOp:scale = (4.0, 0.10, 4.0)
+        double3 xformOp:scale = (4.0, 0.1, 4.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.28, 0.30, 0.32)]
+        color3f[] primvars:displayColor = [(0.2800000011920929, 0.30000001192092896, 0.3199999928474426)]
         bool physics:collisionEnabled = true
         rel material:binding:physics = </Griffin1SurfaceOps/PhysicsMaterials/Friction_1_0>
     }
-
     def Xform "LandingTarget" (
         prepend references = @lunco://components/gnc/landing_target.usda@</LandingTarget>
     )
@@ -310,13 +278,11 @@ def Xform "Griffin1SurfaceOps" (
         double3 xformOp:translate = (0.0, 5.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
-
     def Scope "Scenario"
     {
         custom string lunco:scenario = "griffin-1-surface-ops"
-
         def Scope "Mission" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            prepend apiSchemas = "LunCoProgramAPI"
         )
         {
             uniform token info:implementationSource = "sourceAsset"

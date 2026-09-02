@@ -25,8 +25,8 @@ fn surface_route() {
     #{
         kind: "sequence",
         children: [
-            #{ kind: "drive_to", target: [4.0, 6.2, 0.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [11.9, 1.0, 0.0], speed: 1.0, radius: 2.5 },
+            #{ kind: "drive_to", target: [5.3, 6.2, 0.8], speed: 1.0, radius: 2.5 },
+            #{ kind: "drive_to", target: [8.2, 1.0, 0.0], speed: 1.0, radius: 2.5 },
             #{ kind: "drive_to", target: [16.0, 0.0, 4.0], speed: 1.0, radius: 2.5 },
             #{ kind: "drive_to", target: [19.0, 0.0, 2.0], speed: 1.0, radius: 2.5 },
             #{ kind: "drive_to", target: [21.0, 0.0, 0.5], speed: 1.0, radius: 2.5 },

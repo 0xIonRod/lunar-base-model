@@ -1,33 +1,30 @@
 #usda 1.0
 (
     defaultPrim = "LunarSurface"
-    doc = "Twin-local lunar surface preamble: gravity, sun, and default contact material."
-    metersPerUnit = 1
+    documentation = "Twin-local lunar surface preamble: gravity, sun, and default contact material."
+    metersPerUnit = 1.0
     upAxis = "Y"
 )
 
-# The installed LunCoSim bundle does not guarantee that the shared
-# lunco://scenes/base/lunar_surface.usda catalog asset is present. Keep this
-# small shared preamble inside the Griffin twin so the scene is portable while
-# preserving one physics scene and one default contact material.
 def Xform "LunarSurface"
 {
+    custom string lunco:lighting:status = "single authoritative low-elevation polar sun; shared by Griffin and FLIP"
+    custom string lunco:lighting:source = "scene refinement of lunco://lighting/sun.usda; no duplicate mission light"
     def PhysicsScene "PhysicsScene"
     {
-        vector3f physics:gravityDirection = (0, -1, 0)
-        float physics:gravityMagnitude = 1.62
+        vector3f physics:gravityDirection = (0.0, -1.0, 0.0)
+        float physics:gravityMagnitude = 1.6200000047683716
     }
-
     def DistantLight "Sun" (
         prepend references = @lunco://lighting/sun.usda@</Sun>
     )
     {
+        double3 xformOp:rotateXYZ = (-8.14, 95.72, 0.0)
     }
-
     def Scope "PhysicsMaterials"
     {
         def Material "Friction_1_0" (
-            prepend apiSchemas = ["PhysicsMaterialAPI"]
+            prepend apiSchemas = "PhysicsMaterialAPI"
         )
         {
             float physics:dynamicFriction = 1.0
