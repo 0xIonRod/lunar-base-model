@@ -28,7 +28,7 @@ fn on_event(me, evt) {
 }
 
 fn begin_descent(me) {
-    follow(find("/Griffin1SurfaceOps/Lander"));
+    griffin_surface_ops::follow_lander();
     emit("griffin_powered_descent_started");
     notify_kind("Griffin-1 powered descent started.", "info");
     print("[griffin] powered descent started");
@@ -53,10 +53,16 @@ fn release_rover(me) {
     // This is an execution-time release boundary. Interactive intent removes
     // the live fixed joint without trying to author a RemovePrim into a
     // runtime layer that does not own the authored scene joint.
-    cmd("DetachJoint", #{
+    griffin_surface_ops::follow_rover();
+    let release = cmd("DetachJoint", #{
         target: find("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint"),
         intent: "Interactive"
     });
+    if release.ok == false {
+        notify_kind("FLIP adapter release was rejected.", "error");
+        emit("griffin_phase_timeout");
+        return;
+    }
     emit("griffin_flip_released");
     notify_kind("FLIP released from the top-deck adapter; rover egress enabled.", "info");
     print("[griffin] FLIP payload adapter detached");
@@ -75,30 +81,15 @@ fn engage_rover(me) {
     // nominal public FLEX-family proxy remains the lower-speed profile in the
     // BTXML and the research register, and the live four-wheel drivetrain,
     // contact, battery, and thermal equations remain active here.
-    let route = #{
-        kind: "sequence",
-        children: [
-            #{ kind: "drive_to", target: [4.0, 6.2, 0.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [11.9, 1.0, 0.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [16.0, 0.0, 4.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [19.0, 0.0, 2.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [21.0, 0.0, 0.5], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [21.6, 0.0, -1.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [21.8, 0.0, -2.5], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [22.0, 0.0, -4.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [22.4, 0.0, -5.5], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [23.0, 0.0, -7.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [24.5, 0.0, -8.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [26.0, 0.0, -9.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [27.0, 0.0, -10.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [29.0, 0.0, -11.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [31.0, 0.0, -12.0], speed: 1.0, radius: 2.5 }
-        ]
-    };
-    cmd("EngageAutopilot", #{
+    let route_ack = cmd("EngageAutopilot", #{
         vessel: find("/Griffin1SurfaceOps/FLIP"),
-        spec_json: to_json(route)
+        spec_json: to_json(griffin_surface_ops::surface_route())
     });
+    if route_ack.ok == false {
+        notify_kind("FLIP route was rejected.", "error");
+        emit("griffin_phase_timeout");
+        return;
+    }
     notify_kind("FLIP deployment complete; rover route engaged.", "success");
     print("[griffin] FLIP route engaged");
 }
