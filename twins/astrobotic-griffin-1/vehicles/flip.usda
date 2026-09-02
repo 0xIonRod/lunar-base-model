@@ -11,7 +11,7 @@ def Xform "FLIP" (
     prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "PhysxVehicleAckermannSteeringAPI", "LunCoCatalogAPI", "CollectionAPI:components"]
     prepend references = [@lunco://components/avionics/obc.usda@</OBC>, @lunco://components/cameras/rover_front_camera.usda@</RoverFrontCamera>]
     prepend variantSets = "drivetrain"
-    variants = { string "drivetrain" = "raycast" }
+    variants = { string "drivetrain" = "physical" }
 )
 {
     uniform bool lunco:spawnable = true
@@ -67,24 +67,65 @@ def Xform "FLIP" (
     variantSet "drivetrain" = {
         "raycast" {
         }
+        "physical" (
+            prepend references = @lunco://components/mobility/physical_drivetrain.usda@</Drivetrain>
+        ) {
+            over "Suspension_FL" (
+                prepend apiSchemas = "PhysicsRigidBodyAPI"
+            )
+            {
+            }
+            over "Suspension_FR" (
+                prepend apiSchemas = "PhysicsRigidBodyAPI"
+            )
+            {
+            }
+            over "Suspension_RL" (
+                prepend apiSchemas = "PhysicsRigidBodyAPI"
+            )
+            {
+            }
+            over "Suspension_RR" (
+                prepend apiSchemas = "PhysicsRigidBodyAPI"
+            )
+            {
+            }
+            over "Suspension_FL/Wheel_FL" (
+                prepend apiSchemas = "PhysicsFilteredPairsAPI"
+            )
+            {
+                rel physics:filteredPairs = </FLIP/Chassis>
+            }
+            over "Suspension_FR/Wheel_FR" (
+                prepend apiSchemas = "PhysicsFilteredPairsAPI"
+            )
+            {
+                rel physics:filteredPairs = </FLIP/Chassis>
+            }
+            over "Suspension_RL/Wheel_RL" (
+                prepend apiSchemas = "PhysicsFilteredPairsAPI"
+            )
+            {
+                rel physics:filteredPairs = </FLIP/Chassis>
+            }
+            over "Suspension_RR/Wheel_RR" (
+                prepend apiSchemas = "PhysicsFilteredPairsAPI"
+            )
+            {
+                rel physics:filteredPairs = </FLIP/Chassis>
+            }
+        }
     }
     def "Controls" (
         prepend references = @lunco://vessels/control_profiles.usda@</RoverControls>
     )
     {
     }
-    def Scope "Autopilot" (
-        prepend apiSchemas = "LunCoProgramAPI"
-    )
-    {
-        uniform token info:implementationSource = "sourceAsset"
-        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/behaviors/griffin_1_flip_patrol.btxml@
-    }
     def Cube "Chassis" (
         prepend references = @lunco://components/mobility/chassis/box_chassis.usda@</Chassis>
     )
     {
-        double3 xformOp:scale = (1.8, 0.7, 2.4)
+        double3 xformOp:scale = (2.4, 0.42, 3.15)
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.23999999463558197, 0.2800000011920929)]
     }
     def Cube "PayloadDeck" (

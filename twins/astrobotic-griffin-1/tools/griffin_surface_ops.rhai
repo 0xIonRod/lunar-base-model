@@ -18,28 +18,29 @@ fn follow_rover() {
     follow(find("/Griffin1SurfaceOps/FLIP"));
 }
 
-/// The short, explicit Griffin landing-demo route: approach both ramps, clear
-/// the lander, then reach the two survey gates and the base site.  This is
-/// route data, not a claim about flight speed or the as-built FLIP ICD.
+/// The short, explicit Griffin landing-demo route: clear the deployed ramp,
+/// then reach the two survey gates and the base site. The top-deck approach
+/// marker is deliberately not a post-release target: its y=6.2 m elevation
+/// describes the attached payload deck, not the surface the rover drives on.
+/// This is route data, not a claim about flight speed or the as-built FLIP ICD.
 fn surface_route() {
     #{
         kind: "sequence",
         children: [
-            #{ kind: "drive_to", target: [5.3, 6.2, 0.8], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [8.2, 1.0, 0.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [16.0, 0.0, 4.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [19.0, 0.0, 2.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [21.0, 0.0, 0.5], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [21.6, 0.0, -1.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [21.8, 0.0, -2.5], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [22.0, 0.0, -4.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [22.4, 0.0, -5.5], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [23.0, 0.0, -7.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [24.5, 0.0, -8.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [26.0, 0.0, -9.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [27.0, 0.0, -10.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [29.0, 0.0, -11.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [31.0, 0.0, -12.0], speed: 1.0, radius: 2.5 }
+            #{ kind: "drive_to", target: [8.2, 1.0, 0.0], speed: 0.22, radius: 2.5 },
+            #{ kind: "drive_to", target: [16.0, 0.0, 4.0], speed: 0.35, radius: 2.5 },
+            #{ kind: "drive_to", target: [19.0, 0.0, 2.0], speed: 0.35, radius: 2.5 },
+            #{ kind: "drive_to", target: [21.0, 0.0, 0.5], speed: 0.35, radius: 2.5 },
+            #{ kind: "drive_to", target: [21.6, 0.0, -1.0], speed: 0.35, radius: 2.5 },
+            #{ kind: "drive_to", target: [21.8, 0.0, -2.5], speed: 0.35, radius: 2.5 },
+            #{ kind: "drive_to", target: [22.0, 0.0, -4.0], speed: 0.35, radius: 2.5 },
+            #{ kind: "drive_to", target: [22.4, 0.0, -5.5], speed: 0.35, radius: 2.5 },
+            #{ kind: "drive_to", target: [23.0, 0.0, -7.0], speed: 0.35, radius: 2.5 },
+            #{ kind: "drive_to", target: [24.5, 0.0, -8.0], speed: 0.30, radius: 2.5 },
+            #{ kind: "drive_to", target: [26.0, 0.0, -9.0], speed: 0.30, radius: 2.5 },
+            #{ kind: "drive_to", target: [27.0, 0.0, -10.0], speed: 0.30, radius: 2.5 },
+            #{ kind: "drive_to", target: [29.0, 0.0, -11.0], speed: 0.30, radius: 2.5 },
+            #{ kind: "drive_to", target: [31.0, 0.0, -12.0], speed: 0.30, radius: 2.5 }
         ]
     }
 }

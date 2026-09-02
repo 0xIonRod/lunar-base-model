@@ -10,7 +10,11 @@ fn on_event(me, evt) {
     if evt.name != "waypoint.reached" || evt.source != rover { return; }
     let path = waypoint_event_path(evt);
     if path == () { return; }
-    apply_waypoint_reached(evt);
+    // Keep the marker presentation static during this mission. The generic
+    // helper writes the runtime USD layer, which can rebuild a live physical
+    // vehicle while its post-detach bodies are settling. Mission milestones
+    // are already carried by this typed waypoint event; no color write is
+    // worth disturbing the drivetrain.
     if path == "/Griffin1SurfaceOps/RoverRampApproach" {
         emit("griffin_ramp_approach_reached");
         print("[griffin] rover reached ramp approach");
@@ -76,11 +80,13 @@ fn release_rover(me) {
 
 fn engage_rover(me) {
     emit("griffin_flip_deployed");
-    // Re-claim the released rover, loading the route already authored on the
-    // FLIP prim. No inline spec is supplied: the scene marker paths in the
-    // BTXML remain the route source and continue to produce waypoint.reached.
+    // Re-claim the released rover with an explicit route. The FLIP assembly no
+    // longer starts its behavior tree at scene load: while it is fixed to the
+    // lander it must remain passive. This is the first point at which route
+    // authority is valid.
     let route_ack = cmd("EngageAutopilot", #{
-        vessel: find("/Griffin1SurfaceOps/FLIP")
+        vessel: find("/Griffin1SurfaceOps/FLIP"),
+        spec_json: to_json(griffin_surface_ops::surface_route())
     });
     if route_ack.ok == false {
         notify_kind("Authored FLIP route was rejected.", "error");

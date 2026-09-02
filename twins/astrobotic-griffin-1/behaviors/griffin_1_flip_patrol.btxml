@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <root BTCPP_format="4" main_tree_to_execute="MainTree">
-    <!-- Griffin-1 FLIP route; targets are scene-local. The first two targets
-         are the physical deck approach and ramp exit before the base-site leg. -->
+    <!-- Griffin-1 FLIP route; targets are scene-local and begin at the
+         deployed ramp exit because the deck approach is pre-release only. -->
     <BehaviorTree ID="MainTree">
         <Sequence>
-        <Action ID="drive_to" target="/Griffin1SurfaceOps/RoverRampApproach" speed="0.22" radius="2.5"/>
         <Action ID="drive_to" target="/Griffin1SurfaceOps/RoverRampExit" speed="0.22" radius="2.5"/>
         <Action ID="drive_to" target="/Griffin1SurfaceOps/RoverTarget1" speed="0.35" radius="2.5"/>
         <Action ID="drive_to" target="/Griffin1SurfaceOps/RoverTransit1" speed="0.35" radius="2.5"/>

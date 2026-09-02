@@ -8,15 +8,6 @@
 fn lander_path() { "/Griffin1SurfaceOps/Lander" }
 fn rover_path() { "/Griffin1SurfaceOps/FLIP" }
 
-fn rover_wheel_paths() {
-    [
-        "/Griffin1SurfaceOps/FLIP/Suspension_FL/Wheel_FL",
-        "/Griffin1SurfaceOps/FLIP/Suspension_FR/Wheel_FR",
-        "/Griffin1SurfaceOps/FLIP/Suspension_RL/Wheel_RL",
-        "/Griffin1SurfaceOps/FLIP/Suspension_RR/Wheel_RR"
-    ]
-}
-
 fn resolve(path, label) {
     let target = find(path);
     if target == () || target < 0 {
@@ -58,56 +49,66 @@ fn show_rover_controls() {
     objectives_hud([
         #{ text: "FLIP is the active surface vehicle", state: "active" },
         #{ text: "Drive  " + forward + "/" + backward + "   Steer  " + left + "/" + right + "   Brake  Space", state: "active" },
-        #{ text: "STEERING MODE  griffin_controls::crab_walk() / ::ackermann_steering()", state: "pending" },
-        #{ text: "Stopped FLIP: griffin_controls::toggle_rover_steering_mode()", state: "pending" },
+        #{ text: "STEERING MODE  crab_walk() = parallel · ackermann_steering() = wheel geometry", state: "pending" },
+        #{ text: "Stopped FLIP: toggle_rover_steering_mode() switches the vehicle once", state: "pending" },
         #{ text: action + " toggles the authored route; manual input disengages autopilot", state: "pending" },
         #{ text: cancel + " releases FLIP and returns to free flight", state: "pending" }
     ]);
 }
 
-// Configure FLIP's four steering actuators as one vehicle-level mode. The
-// current production runtime exposes steering lock and Ackermann correction on
-// each wheel, so the Twin applies both values as one single policy rather than
-// leaving a mixed front/rear state behind. Ordinary Ackermann driving gives the
-// rear axle a zero lock; crab walk gives all four wheels the same parallel lock.
+// Configure FLIP's four steering actuators as one vehicle-level mode. FLIP is
+// authored as an all-wheel-steer rover: the shared vehicle attribute controls
+// whether each left/right wheel pair receives full Ackermann correction (1.0)
+// or parallel wheel angles (0.0) for crab walk. The old implementation tried
+// to reach SteeringActuator on the USD wheel entities, but physical wheels own
+// that actuator on synthesized joint entities. That made every public helper
+// fail even though the wheel rig itself was valid.
 //
-// This is a live control state, not an authored geometry edit. Stop FLIP before
-// changing it so the steering axes do not slew underneath a moving chassis.
+// SetUsdAttribute is the runtime's authored vehicle-control path. It resyncs
+// the four physical steering joints in place; it does not rebuild the rover.
+// Stop FLIP before changing it so the steering axes do not slew underneath a
+// moving chassis.
 fn set_rover_steering_mode(mode) {
     if mode != "ackermann" && mode != "crab" {
         notify_kind("FLIP steering mode must be ackermann or crab.", "error");
         return #{ ok: false, error: "unknown steering mode" };
     }
 
-    let wheels = rover_wheel_paths();
-    let first = resolve(wheels[0], "FLIP wheel");
-    if first == () { return #{ ok: false, error: "wheel is unavailable" }; }
-    let lock = get(first, "SteeringActuator.max_steer_angle");
-    if lock == () || lock <= 0.0 {
-        notify_kind("FLIP steering lock is not ready.", "error");
-        return #{ ok: false, error: "steering lock is unavailable" };
+    let target = resolve(rover_path(), "FLIP rover");
+    if target == () { return #{ ok: false, error: "rover is unavailable" }; }
+
+    let speed = get(target, "speed");
+    if speed == () {
+        notify_kind("FLIP speed is not available; steering mode was not changed.", "error");
+        return #{ ok: false, error: "rover speed is unavailable" };
     }
-    let parallel = mode == "crab";
-    let strength = if parallel { 0.0 } else { 1.0 };
-    for i in [0, 1, 2, 3] {
-        let path = wheels[i];
-        let wheel = resolve(path, "FLIP wheel");
-        if wheel == () { return #{ ok: false, error: "wheel is unavailable" }; }
-        if set(wheel, "SteeringActuator.ackermann_strength", strength) == false {
-            notify_kind("FLIP steering actuator is not ready on " + path + ".", "error");
-            return #{ ok: false, error: "steering actuator is unavailable" };
-        }
-        let wheel_lock = if parallel || i < 2 { lock } else { 0.0 };
-        if set(wheel, "SteeringActuator.max_steer_angle", wheel_lock) == false {
-            notify_kind("FLIP steering lock is not ready on " + path + ".", "error");
-            return #{ ok: false, error: "steering lock is unavailable" };
-        }
+    if speed.abs() > 0.08 {
+        // Take route authority away and request a safe stop. The caller can
+        // issue the same one-place toggle again after the vehicle settles.
+        cmd("DisengageAutopilot", #{ vessel: target });
+        cmd("SetPorts", #{
+            target: target,
+            writes: [["throttle", 0.0], ["steer", 0.0], ["brake", 1.0]]
+        });
+        notify_kind("FLIP is still moving; route stopped and brake applied. Try the steering mode again when speed is below 0.08 m/s.", "warning");
+        return #{ ok: false, error: "rover must be stopped", speed: speed };
     }
 
+    let strength = if mode == "crab" { 0.0 } else { 1.0 };
+    let result = cmd("SetUsdAttribute", #{
+        path: "/Griffin1SurfaceOps/FLIP",
+        name: "physxVehicleAckermannSteering:strength",
+        type_name: "float",
+        value: if mode == "crab" { "0.0" } else { "1.0" }
+    });
+    if !result.ok {
+        notify_kind("FLIP steering mode command was rejected: " + result.error, "error");
+        return #{ ok: false, error: "steering mode command rejected" };
+    }
     let label = if mode == "crab" { "CRAB WALK" } else { "ACKERMANN" };
-    notify_kind("FLIP steering mode: " + label + ". Change only while stopped.", "success");
+    notify_kind("FLIP steering mode: " + label + " queued on all four wheel joints.", "success");
     show_rover_controls();
-    #{ ok: true, mode: mode }
+    #{ ok: true, mode: mode, strength: strength, speed: speed }
 }
 
 fn crab_walk() {
@@ -119,12 +120,14 @@ fn ackermann_steering() {
 }
 
 fn toggle_rover_steering_mode() {
-    let first = resolve("/Griffin1SurfaceOps/FLIP/Suspension_FL/Wheel_FL", "FLIP wheel");
-    if first == () { return #{ ok: false, error: "wheel is unavailable" }; }
-    let strength = get(first, "SteeringActuator.ackermann_strength");
+    let state = query("QueryUsdPrim", #{
+        path: "/Griffin1SurfaceOps/FLIP",
+        attrs: ["physxVehicleAckermannSteering:strength"]
+    });
+    let strength = state.attrs["physxVehicleAckermannSteering:strength"];
     if strength == () {
-        notify_kind("FLIP steering actuator is not ready.", "error");
-        return #{ ok: false, error: "steering actuator is unavailable" };
+        notify_kind("FLIP steering mode is not readable from the active scene.", "error");
+        return #{ ok: false, error: "steering mode is unavailable" };
     }
     if strength > 0.5 { crab_walk() } else { ackermann_steering() }
 }

@@ -215,11 +215,16 @@ lander-to-rover handoff:
    bound input channels, autopilot authority, and release state. Generic
    `PossessVessel` works as a primitive, but the mission currently has to
    rebuild the operator-facing contract in Twin-local Rhai.
-5. Vehicle steering needs a native mode-aware control surface. The Twin-local
-   helper currently uses reflected `SteeringActuator.max_steer_angle` and
-   `SteeringActuator.ackermann_strength` to implement one-command front-only
-   Ackermann versus all-wheel parallel crab steering, but that state is live
-   actuator tuning rather than an authored, replicated, undoable vehicle mode.
+5. Vehicle steering needs a native mode-aware control surface. Physical FLIP
+   steering actuators currently live on synthesized joint entities rather than
+   the authored wheel prims, so Rhai cannot address them as stable wheel
+   handles. The Twin-local helper now uses the vehicle-root
+   `physxVehicleAckermannSteering:strength` live-edit path to resync all four
+   authored steering joints in place: `0.0` is parallel crab walk and `1.0` is
+   the runtime's full left/right wheel-geometry correction. A native API should
+   expose an explicit steering mode, axle roles (front-only/all-wheel), stable
+   readback, replication, and undo semantics instead of making a mode out of a
+   scalar actuator setting.
 6. Solar generation needs a frame-aware Sun direction and panel-normal
    contract. The FLIP panel is now vertical rear-deck geometry for the polar
    study, but the simplified electrical model still needs dynamic incidence

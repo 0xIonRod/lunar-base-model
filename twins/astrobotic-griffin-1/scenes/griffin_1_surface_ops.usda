@@ -134,10 +134,11 @@ def Xform "Griffin1SurfaceOps" (
     )
     {
         double3 xformOp:translate = (0.0, 62.94, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         double3 physics:velocity = (0.0, 0.0, 0.0)
         custom string lunco:mission:deployment_state = "top_deck_attached_until_touchdown"
         custom string lunco:mission:payload_mount = "Griffin top deck through four-point adapter; detach after both ramps deploy"
+        custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
     }
     def PhysicsFixedJoint "FLIPPayloadAdapterJoint"
     {
@@ -145,6 +146,7 @@ def Xform "Griffin1SurfaceOps" (
         rel physics:body1 = </Griffin1SurfaceOps/FLIP>
         point3f physics:localPos0 = (0.0, 1.940000057220459, 0.0)
         point3f physics:localPos1 = (0.0, -1.0, 0.0)
+        quatf physics:localRot1 = (0.7071067690849304, 0.0, 0.7071067690849304, 0.0)
     }
     def Scope "FLIPEgressInterface"
     {
