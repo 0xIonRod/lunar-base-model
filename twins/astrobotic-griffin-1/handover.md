@@ -1,7 +1,7 @@
 # Griffin-1 Twin build handover
 
 Status: implementation handover
-Date: 2026-08-30
+Date: 2026-09-02
 Repository baseline: LunCoSim main at 042f024679900c9916dc23ee52f0485ceae5392f
 Working branch: codex/astrobotic-griffin-1-twin
 Package: twins/astrobotic-griffin-1
@@ -22,11 +22,14 @@ and an interactive joint release after touchdown. The ramp mechanism is a
 MoonDAO prototype requirement; public Astrolab material describes direct
 top-deck egress and does not publish a ramp ICD.
 
-The corrected headless Griffin scenario reports PASS at 3,983 ticks / 66.38
-simulated seconds with the current installed
-`luncosim 0.6.0-nightly.64.1 (042f0246)` binary. The verdict is produced by
-the landing/event/waypoint chain: no timer-only PASS was added. The tested
-composition is still an integration study, not a flight-validated model.
+The historical staged Griffin scenario reported PASS at 3,983 ticks / 66.38
+simulated seconds with the installed
+`luncosim 0.6.0-nightly.64.1 (042f0246)` binary. That result predates the
+attached-ramp and interactive adapter-release changes. The current production
+run reaches landing, ramp deployment, adapter release, and FLIP autopilot
+engagement, then expires NO-VERDICT at 7,200 ticks / 120 simulated seconds
+because FLIP remains at its release pose and emits no post-release waypoint
+events. No timer-only PASS was added.
 
 ## Mission baseline
 
@@ -63,10 +66,11 @@ Primary sources:
 | identity | twin.toml | Twin name, version, default scene, scene glob |
 | mission scene | scenes/griffin_1_surface_ops.usda | composition, frame anchor, GNC wires, camera, waypoints, target |
 | lander wrapper | vehicles/griffin_1.usda | Griffin identity over the reusable descent lander |
-| FLIP asset | vehicles/flip.usda | FLIP identity over the four-wheel all-wheel-steer study proxy, EPS, and thermal network |
-| route | behaviors/griffin_1_flip_patrol.btxml | Scene-local deck-approach, ramp-exit, surface-waypoint, and base-site route |
+| FLIP asset | vehicles/flip.usda | FLIP identity over the four-wheel all-wheel-steer study proxy, collision topology, solar panel, EPS, and thermal network |
+| route | behaviors/griffin_1_flip_patrol.btxml | Scene-local ramp actions, surface-waypoint, and base-site route |
 | environment | environments/south_pole_surrogate.usda | deterministic flat collision plane and visual berms |
-| policy | scenarios/griffin_1_surface_ops.rhai | descent waits, deployment boundary, patrol route, verdict channel |
+| policy | scenarios/griffin_1_surface_ops.rhai | descent waits, deployment boundary, control brief, patrol route, verdict channel |
+| controls | tools/griffin_controls.rhai | Twin-local lander/FLIP possession, release, and autopilot helpers |
 | assumptions | research/griffin_1_assumptions.md | facts, surrogate values, and confidence boundaries |
 | instructions | README.md | setup, build, parse, run, and replacement-data sequence |
 | follow-up | agent_to_agent_missing.md | missing code and acceptance tests |
@@ -108,9 +112,10 @@ change was made to celestial-eop-data. The build completed in about 14 minutes
 
 Command:
 
-    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai
+    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai twins\astrobotic-griffin-1\behaviors\griffin_1_flip_patrol.btxml
 
-Result: PASS. All four files reported OK.
+Result: PASS. All six Twin-local source files reported OK, including the
+Griffin-local behavior tree and control library.
 
 ### Repository control
 
@@ -157,29 +162,28 @@ why the current MVP does not retain the physical joint.
 The current scene composes FLIP on the Griffin top deck with a scene-level
 fixed adapter joint during descent. After touchdown the scenario commands both
 physical revolute ramp hinges, waits for deployment, removes the live adapter
-joint with interactive intent, and engages the Griffin-local route through the
-deck approach, ramp exit, surface waypoints, and base site.
+joint with interactive intent, and engages the Griffin-local surface route.
 
 Command:
 
     .\target\debug\luncosim.exe test --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda --max-ticks 14400 --tick-hz 60 --verdict-channel GRIFFIN_SURFACE_OPS
 
-Result: the original staged baseline passed at 3,983 ticks / 66.38 simulated
-seconds on the installed 0.6.0-nightly.64.1 (042f0246) binary. The attached
-prototype is being re-qualified after the ramp geometry and release transition
-were added; its result must not be conflated with that staged baseline. This is
-an integration acceptance boundary for the authored proxy, not flight
-validation.
+Result: the current run reaches `griffin_touchdown_confirmed`,
+`griffin_ramps_deploy_commanded`, `griffin_ramp_deployment_settled`,
+`griffin_flip_released`, and `griffin_flip_deployed`, then expires
+NO-VERDICT at 7,200 ticks / 120 simulated seconds. FLIP is owned by its
+vehicle controller after release but remains at approximately its release
+pose, so no post-release waypoint events arrive. This is an integration
+acceptance boundary for the authored proxy, not flight validation.
 
-The production binary was rebuilt with two relevant runtime corrections: nested
-vehicle behavior is no longer collected by the parent scene, and waypoint
-sensors are ignored while a candidate vehicle remains on a `PhysicsFixedJoint`.
-The trace verified landing, both ramp commands, adapter release, and post-release
-ramp-approach acceptance. A later route trace exposed released adapter geometry
-as an obstruction; the adapter plate/restraints are now non-colliding after
-release. The host blocked the final post-change binary launch through its
-approval/ACL service, so the active ramp-and-base route has no new PASS verdict
-yet and must be re-qualified before claiming completion.
+The production binary includes two relevant runtime corrections: nested vehicle
+behavior is no longer collected by the parent scene, and waypoint sensors are
+ignored while a candidate vehicle remains on a `PhysicsFixedJoint`. The trace
+verified landing, both ramp commands, adapter release, and autopilot handoff.
+A generic fixed-joint regression passes after detach, which narrows the
+remaining issue to FLIP's vehicle-specific body admission/wake lifecycle. The
+runtime still needs an explicit live physics-state query and a supported
+release transition for raycast vehicles before the route can be accepted.
 
 ## Non-blocking runtime warnings
 
@@ -202,9 +206,12 @@ The package is clean in the architectural sense:
 - the FLIP asset is selected by USD reference, not Rust-side name matching;
 - the failed jointed composition is not left as an apparently valid PASS.
 
-The working branch contains the initial package commit
-56e069b Add Griffin-1 surface Twin MVP plus subsequent runtime cleanup changes.
-Review and commit the changes as one logical follow-up before merging.
+The working branch contains the merged remote Griffin-2 FreeCAD study, the
+source-only Editor cleanup that hides superseded horizontal solar hardware,
+the matched vertical FLIP panel, and the Twin-local control library. The
+FreeCAD file is a design-study input, not an executable Twin asset; its
+`RampController` proxy also needs rehydration work before it can be treated as
+an editable parametric source.
 
 ## Acceptance definition for the next handoff
 

@@ -47,6 +47,7 @@ Sources:
 | behaviors/griffin_1_flip_patrol.btxml | Griffin-local route tree targeting the deck approach, ramp exit, waypoints, and base site |
 | environments/south_pole_surrogate.usda | Labelled flat/cratered study surface |
 | scenarios/griffin_1_surface_ops.rhai | Mission sequencing and route policy |
+| tools/griffin_controls.rhai | Twin-local possession, handoff, and control briefing helpers |
 | research/griffin_1_assumptions.md | Public facts, surrogate values, and confidence boundaries |
 | handover.md | Detailed implementation and verification handover |
 | agent_to_agent_missing.md | Concrete follow-up work for the next coding agent |
@@ -70,9 +71,9 @@ The PATH change is process-local and does not change the repository.
 
 ### Parse/lint the Twin files
 
-    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai behaviors\griffin_1_flip_patrol.btxml
+    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai twins\astrobotic-griffin-1\behaviors\griffin_1_flip_patrol.btxml
 
-All five files must report OK.
+All six files must report OK.
 
 ### Run the scene
 
@@ -87,11 +88,12 @@ luncosim binary and the default scene from twin.toml.
 
 Exit code 0 means the Rhai scenario emitted PASS. Exit code 1 means a
 terminal runtime or scenario failure. Exit code 2 means the bound expired
-without a verdict. The current corrected package passes the same composed
-scene at 3,983 ticks / 66.38 simulated seconds on the installed
-`luncosim 0.6.0-nightly.64.1 (042f0246)` binary. The 14,400-tick bound remains
-the reproducible command because it leaves margin for Modelica startup and
-route completion.
+without a verdict. The current package reaches powered descent, touchdown,
+ramp deployment, adapter-joint release, and FLIP autopilot engagement, but a
+7,200-tick / 120-second run expires with NO-VERDICT because FLIP remains at
+its release pose and emits no post-release waypoint events. This is the active
+prototype result, not a mission PASS. The 14,400-tick bound remains the
+reproducible command while the vehicle-release lifecycle is repaired.
 
 ## What the MVP demonstrates
 
@@ -104,28 +106,56 @@ The current stable boundary demonstrates:
 4. The mission scene owns guidance wiring, landing target, camera, anchors,
    waypoint markers, and mission metadata.
 5. The Griffin wrapper carries the MoonDAO prototype configuration: 625 kg
-   payload class, four landing legs, isogrid deck, side-mounted solar arrays,
-   top-deck adapter, and two side ramps. These are explicit study requirements,
-   not public as-built Griffin values.
-6. FLIP uses a four-wheel all-wheel-steer study topology, with explicit wheel,
-   motor/gearbox, finite-EPS, and motor-thermal Modelica contracts. The
-   wheel count and numeric values are proxy assumptions until FLIP ICD data is
+   payload class, four landing legs, isogrid deck, matched side-mounted
+   vertical solar arrays, a clean top deck, top-deck adapter, and two side
+   ramps with collision geometry. These are explicit study requirements, not
+   public as-built Griffin values.
+6. FLIP uses a four-wheel all-wheel-steer study topology with compound chassis
+   collision, explicit wheel geometry, a vertical rear-deck solar-panel proxy,
+   motor/gearbox, finite-EPS, and motor-thermal Modelica contracts. The wheel
+   count and numeric values are proxy assumptions until FLIP ICD data is
    available.
 7. The surface environment uses the current runtime's flat-site terrain role.
 8. The Rhai task tree expresses descent event waits, physical ramp deployment,
-   adapter-joint release, and a ramp-approach → ramp-exit → surface-transit →
-   base-site route. The close-spaced transit and base-arc markers are authored
-   to keep the current four-wheel proxy on a feasible turn path.
+   adapter-joint release, and a post-release surface-transit → base-site route.
+   The close-spaced transit and base-arc markers are authored to keep the
+   current four-wheel proxy on a feasible turn path. Ramp approach and ramp
+   exit remain authored route actions, but are not used as pre-release mission
+   gates because an attached payload can own those sensors.
 
 The active scene now keeps FLIP on a scene-level fixed top-deck adapter joint
 during descent, deploys two finite-mass collision ramps after touchdown, then
 removes the live adapter joint before the rover route begins. Fixed-joint cargo
 is prevented from consuming route sensors before that release. The current
 prototype ramps use a 12 m clear collision envelope to accommodate the study
-proxy's steering transient. The public
-Astrolab material describes direct top-deck egress; the ramps are the MoonDAO
-prototype requirement. The historical six-wheel wrapper is retained as
+proxy's steering transient. The public Astrolab material describes direct
+top-deck egress; the ramps are the MoonDAO prototype requirement. The
+historical six-wheel wrapper is retained as
 `vehicles/flip.legacy-six-wheel.usda` for comparison, not as the active asset.
+The generic joint regression passes after detach, but the FLIP-specific
+vehicle body does not yet fall onto the surface or advance after release; a
+runtime body-promotion/wake feature is needed before route completion can be
+claimed. No timer-only PASS was added.
+
+## Interactive control contract
+
+The mission starts with an explicit persistent control brief. Click the
+vehicle in the viewport to possess it; the Command Deck and vehicle HUD remain
+the authority/status surface. The Twin-local `griffin_controls` library also
+provides `control_lander()`, `control_rover()`, `release_control()`,
+`toggle_rover_autopilot()`, `start_rover_autopilot()`, and
+`stop_rover_autopilot()` for the Rhai console.
+
+While the Griffin lander is possessed, `W/S` command pitch, `A/D` command roll,
+`Q/E` command yaw, `Space` commands thrust, and `G` is the authored release
+action. While FLIP is possessed, `W/S` drive, `A/D` steer, `Space` brakes, and
+`F` toggles the authored rover route. `Escape`/`Backspace` releases the active
+vehicle. Manual input disengages rover autopilot; the mission route remains a
+separate, visible autopilot phase after adapter release.
+
+The controls are a study interface, not a claim about the flight command
+dictionary. The generic simulator still owns possession, input routing,
+Ackermann steering, autopilot authority, and release semantics.
 
 ## Next required data
 

@@ -1,6 +1,6 @@
 # Agent-to-agent missing-code report: Griffin-1 Twin
 
-Date: 2026-08-30
+Date: 2026-09-02
 Owner of this handover: implementation agent
 Next owner: LunCoSim mission/Twin agent
 Baseline: 042f024679900c9916dc23ee52f0485ceae5392f
@@ -9,14 +9,17 @@ Branch: codex/astrobotic-griffin-1-twin
 ## Current revision
 
 The active package was corrected on 2026-08-30. `vehicles/flip.usda` is now a
-four-wheel all-wheel-steer FLIP study proxy with explicit Modelica EPS and
-thermal networks; `behaviors/griffin_1_flip_patrol.btxml` owns the scene-local
-route. The original staged baseline reported `GRIFFIN_SURFACE_OPS PASS` at
-3,983 ticks / 66.38 simulated seconds; that result predates the physical ramp
-and attached-adapter re-qualification and must not be reused as the active
-prototype verdict. Current source preflight is clean, while the final
-post-adapter route run remains pending. The flight-attached joint, supplier
-FLIP ICD, and Nobile DEM also remain open.
+four-wheel all-wheel-steer FLIP study proxy with compound collision,
+frame-mounted vertical solar-panel geometry, explicit Modelica EPS and thermal
+networks; `behaviors/griffin_1_flip_patrol.btxml` owns the scene-local route,
+and `tools/griffin_controls.rhai` exposes the lander/rover handoff. The
+original staged baseline reported `GRIFFIN_SURFACE_OPS PASS` at 3,983 ticks /
+66.38 simulated seconds; that result predates the physical ramp and
+attached-adapter re-qualification and must not be reused as the active
+prototype verdict. The current production run reaches release and autopilot
+engagement, then expires NO-VERDICT because the FLIP body does not advance
+after detach. The flight-attached joint, supplier FLIP ICD, and Nobile DEM
+also remain open.
 
 ## Handoff in one paragraph
 
@@ -25,8 +28,9 @@ flight-stack acceptance product. The active boundary uses the four-wheel FLIP
 proxy, a scene-level fixed top-deck adapter during descent, two physical side
 ramps, and interactive release after touchdown. The older six-wheel joint
 failure and staged NO-VERDICT are retained below as historical evidence. The
-current post-adapter route still requires a fresh runtime verdict; do not
-reuse the historical PASS or claim mission completion until that run passes.
+current production run reaches adapter release and autopilot engagement, then
+expires NO-VERDICT because FLIP does not advance after detach; do not reuse the
+historical PASS or claim mission completion until that lifecycle is repaired.
 
 ## Existing package
 
@@ -38,6 +42,7 @@ The package is at twins/astrobotic-griffin-1:
 - environments/lunar_surface_base.usda: twin-local gravity/sun/contact preamble
 - environments/south_pole_surrogate.usda: labelled procedural surface
 - scenarios/griffin_1_surface_ops.rhai: task-tree mission policy
+- tools/griffin_controls.rhai: Twin-local lander/rover control and handoff helpers
 - research/griffin_1_assumptions.md: data confidence record
 - README.md: setup and run instructions
 - handover.md: full evidence handover
@@ -106,8 +111,7 @@ Required implementation:
 2. Add a failure verdict for each missing event after a separate phase timeout.
 3. Check source paths with the same strictness as the stock acceptance test.
 4. Check that the final rover pose is within the final marker radius.
-5. Check that the route command is accepted by the six-wheel rover's actual
-   drive ports.
+5. Check that the route command is accepted by FLIP's actual drive ports.
 6. Keep mission policy in task-tree Rhai; do not use on_tick as a controller.
 7. If a task-tree leaf fails at runtime, surface the error in the headless
    runner instead of leaving NO-VERDICT.
@@ -115,7 +119,7 @@ Required implementation:
 ## Priority 2: make FLIP data-driven
 
 Public information is insufficient for a flight model. The current wrapper
-selects the supported six-wheel vehicle only to obtain a working surface
+uses a four-wheel all-wheel-steer study proxy only to obtain a working surface
 topology.
 
 Add a Twin-local manifest, for example research/flip_parameters.toml or
@@ -189,19 +193,50 @@ The current task demonstrates route policy only. Add real mission operations:
 
 These should be authored as ports, events, and task-tree policy with tests.
 
+## Rust/runtime feedback from this build
+
+The Twin-local Rhai layer is sufficient for mission sequencing, visible
+briefings, possession requests, autopilot requests, and typed source edits.
+The following production features are missing or too implicit for a reliable
+lander-to-rover handoff:
+
+1. `DetachJoint` needs a vehicle-aware release transition that invalidates the
+   old physics island and promotes/wakes a released raycast vehicle body. A
+   generic rigid-body detach regression passes, but FLIP remains at its
+   adapter pose after the same lifecycle.
+2. Rhai/API needs a live physics-state query exposing body mode, velocity,
+   contacts, wheel contact/suspension state, and current joint ownership. The
+   current script can observe events and command ports, but cannot explain this
+   failure without temporary instrumentation.
+3. Waypoint arrival should be phase-scoped and joint-aware by default. An
+   attached payload must not consume ramp or surface sensors, and route
+   ownership should be visible in the emitted event metadata.
+4. Possession should expose a vehicle-control deck with the active vehicle,
+   bound input channels, autopilot authority, and release state. Generic
+   `PossessVessel` works as a primitive, but the mission currently has to
+   rebuild the operator-facing contract in Twin-local Rhai.
+5. Solar generation needs a frame-aware Sun direction and panel-normal
+   contract. The FLIP panel is now vertical rear-deck geometry for the polar
+   study, but the simplified electrical model still needs dynamic incidence
+   wiring to make illumination physically meaningful.
+6. The assembly editor needs stable source-preview handles and a viewport
+   inspection query in the production command surface. The documented query
+   is unavailable in the installed binary, so visual review currently relies
+   on focusing the dedicated source preview and capturing it.
+
 ## Acceptance test matrix
 
 | Test | Required result |
 |---|---|
-| four-file validation | every Twin-local USD/Rhai file reports OK |
+| six-file validation | every Twin-local USD/Rhai/BTXML file reports OK |
 | clean package load | no unresolved Twin-local asset |
 | generic fixed stack control | stock LANDER_ROVER_STACK remains PASS |
-| FLIP standalone | six-wheel control and camera contract have a verdict |
+| FLIP standalone | four-wheel Ackermann control and camera contract have a verdict |
 | guided Griffin lander | no escaped body through landing bound |
 | jointed Griffin stack | PASS only after attachment contract is stable |
 | landing event chain | all three events with correct sources |
 | physical release | joint/state change observed, not only emitted event |
-| route | all markers reached in order |
+| route | all post-release markers reached in order |
 | final mission | GRIFFIN_SURFACE_OPS PASS |
 | jitter diagnostic | result recorded separately from deterministic gate |
 | threaded diagnostic | result recorded separately from single-thread gate |

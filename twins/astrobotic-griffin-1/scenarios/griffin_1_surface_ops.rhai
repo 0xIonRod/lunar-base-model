@@ -32,12 +32,14 @@ fn on_event(me, evt) {
 
 fn begin_descent(me) {
     griffin_surface_ops::follow_lander();
+    griffin_controls::show_briefing();
     emit("griffin_powered_descent_started");
     notify_kind("Griffin-1 powered descent started.", "info");
     print("[griffin] powered descent started");
 }
 
 fn touchdown_notice(me) {
+    griffin_controls::show_briefing();
     emit("griffin_touchdown_confirmed");
     notify_kind("Griffin-1 touchdown confirmed.", "success");
     print("[griffin] touchdown confirmed");
@@ -57,6 +59,7 @@ fn release_rover(me) {
     // the live fixed joint without trying to author a RemovePrim into a
     // runtime layer that does not own the authored scene joint.
     griffin_surface_ops::follow_rover();
+    griffin_controls::show_rover_controls();
     let release = cmd("DetachJoint", #{
         target: find("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint"),
         intent: "Interactive"
@@ -122,8 +125,6 @@ fn task(me) {
         once(|m| engage_rover(m)),
         par_race([
             par_all([
-                wait_for("griffin_ramp_approach_reached"),
-                wait_for("griffin_ramp_exit_reached"),
                 wait_for("griffin_waypoint_1_reached"),
                 wait_for("griffin_waypoint_2_reached"),
                 wait_for("griffin_base_site_reached"),
