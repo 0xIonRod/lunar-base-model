@@ -369,4 +369,44 @@ def Xform "Griffin1" (
             bool physics:collisionEnabled = true
         }
     }
+    def Xform "SolarWingPX" (
+        active = false
+    )
+    {
+    }
+    def Xform "SolarWingNX" (
+        active = false
+    )
+    {
+    }
+    def Xform "SolarCellsPX" (
+        active = false
+    )
+    {
+    }
+    def Xform "SolarCellsNX" (
+        active = false
+    )
+    {
+    }
+    def Xform "WingYokePX" (
+        active = false
+    )
+    {
+    }
+    def Xform "WingHingePX" (
+        active = false
+    )
+    {
+    }
+    def Xform "WingYokeNX" (
+        active = false
+    )
+    {
+    }
+    def Xform "WingHingeNX" (
+        active = false
+    )
+    {
+    }
 }
