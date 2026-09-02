@@ -393,10 +393,10 @@ def Xform "FLIP" (
         prepend references = @lunco://components/power/solar_panel.usda@</SolarPanel>
     )
     {
-        double3 xformOp:translate = (0.0, 0.52, 0.28)
+        custom double3 xformOp:translate = (0.0, 1.45, 1.05)
         double3 xformOp:scale = (0.39, 0.03, 0.39)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        float inputs:area = 3.0
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale", "xformOp:rotateXYZ"]
+        float inputs:area = 4.800000190734863
         float inputs:efficiency = 0.30000001192092896
         float inputs:irradiance = 1361.0
         float inputs:sun_mount_x = 0.0
@@ -404,7 +404,12 @@ def Xform "FLIP" (
         float inputs:sun_mount_z = 0.0
         custom token connectors:p
         token connectors:p.connect = </FLIP/Battery.connectors:p>
-        custom string lunco:geometry:status = "2.42 m x 1.25 m visible panel; approximately 3.0 m2 nameplate geometry"
+        custom string lunco:geometry:status = "2.48 m x 1.92 m vertical rear-deck panel; 4.8 m2 nameplate geometry"
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
+        float inputs:panel_normal_x = 0.0
+        float inputs:panel_normal_y = 0.0
+        float inputs:panel_normal_z = 1.0
+        custom string lunco:installation = "vertical rear-deck photovoltaic panel; collision and mass remain owned by the FLIP root body"
     }
     def LunCoEvent "BatteryDrained"
     {
