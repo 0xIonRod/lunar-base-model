@@ -145,10 +145,11 @@ the authority/status surface. The Twin-local `griffin_controls` library also
 provides `control_lander()`, `control_rover()`, `release_control()`,
 `toggle_rover_autopilot()`, `start_rover_autopilot()`, and
 `stop_rover_autopilot()` for the Rhai console. For FLIP steering, use
-`crab_walk()` for parallel four-wheel steering, `ackermann_steering()` for
-front-axle Ackermann steering, or `toggle_rover_steering_mode()` to switch
-between them from one command. Change the steering mode while FLIP is
-stopped; the HUD repeats these commands after rover possession.
+`griffin_controls::crab_walk()` for parallel four-wheel steering,
+`griffin_controls::ackermann_steering()` for front-axle Ackermann steering,
+or `griffin_controls::toggle_rover_steering_mode()` to switch between them
+from one command. Change the steering mode while FLIP is stopped; the HUD
+repeats these commands after rover possession.
 
 While the Griffin lander is possessed, `W/S` command pitch, `A/D` command roll,
 `Q/E` command yaw, `Space` commands thrust, and `G` is the authored release

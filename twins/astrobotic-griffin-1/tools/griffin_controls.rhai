@@ -58,8 +58,8 @@ fn show_rover_controls() {
     objectives_hud([
         #{ text: "FLIP is the active surface vehicle", state: "active" },
         #{ text: "Drive  " + forward + "/" + backward + "   Steer  " + left + "/" + right + "   Brake  Space", state: "active" },
-        #{ text: "STEERING MODE  console: crab_walk() or ackermann_steering()", state: "pending" },
-        #{ text: "Change mode while FLIP is stopped; toggle_rover_steering_mode() is also available", state: "pending" },
+        #{ text: "STEERING MODE  griffin_controls::crab_walk() / ::ackermann_steering()", state: "pending" },
+        #{ text: "Stopped FLIP: griffin_controls::toggle_rover_steering_mode()", state: "pending" },
         #{ text: action + " toggles the authored route; manual input disengages autopilot", state: "pending" },
         #{ text: cancel + " releases FLIP and returns to free flight", state: "pending" }
     ]);
