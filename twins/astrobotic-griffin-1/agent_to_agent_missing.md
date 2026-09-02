@@ -215,11 +215,16 @@ lander-to-rover handoff:
    bound input channels, autopilot authority, and release state. Generic
    `PossessVessel` works as a primitive, but the mission currently has to
    rebuild the operator-facing contract in Twin-local Rhai.
-5. Solar generation needs a frame-aware Sun direction and panel-normal
+5. Vehicle steering needs a native mode-aware control surface. The Twin-local
+   helper currently uses reflected `SteeringActuator.max_steer_angle` and
+   `SteeringActuator.ackermann_strength` to implement one-command front-only
+   Ackermann versus all-wheel parallel crab steering, but that state is live
+   actuator tuning rather than an authored, replicated, undoable vehicle mode.
+6. Solar generation needs a frame-aware Sun direction and panel-normal
    contract. The FLIP panel is now vertical rear-deck geometry for the polar
    study, but the simplified electrical model still needs dynamic incidence
    wiring to make illumination physically meaningful.
-6. The assembly editor needs stable source-preview handles and a viewport
+7. The assembly editor needs stable source-preview handles and a viewport
    inspection query in the production command surface. The documented query
    is unavailable in the installed binary, so visual review currently relies
    on focusing the dedicated source preview and capturing it.
