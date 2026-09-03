@@ -13,7 +13,9 @@ a flight-fidelity version requires:
 2. Griffin propulsion, RCS, propellant, leg, sensor, and GNC interfaces.
 3. FLIP as-built geometry, mass properties, wheel/traction, power, thermal,
    payload, and communications data.
-4. Registered Nobile Crater DEM and site frame.
+4. Final registered Griffin touchdown DEM/site frame. The package currently
+   includes a reproducible regional LROC NOBILE03 crop as an interim terrain
+   source; its center is not a confirmed touchdown coordinate.
 5. Mission epoch, solar geometry, command timeline, and release sequence.
 6. A source or owner confirmation for every parameter marked unknown.
 
@@ -42,6 +44,9 @@ Keep this structure:
     vehicles/griffin_1.usda
     vehicles/flip.usda
     behaviors/griffin_1_flip_patrol.btxml
+    Assets.toml
+    terrain/nobile03/                 # generated and ignored
+    tools/terrain/reproject_lroc_polar_dem.py
     environments/south_pole_surrogate.usda
     scenarios/griffin_1_surface_ops.rhai
     tools/griffin_controls.rhai
@@ -53,7 +58,18 @@ Keep this structure:
 The Twin-local references use twin://astrobotic-griffin-1/. Do not change them
 to absolute Windows paths.
 
-## Step 3: build the current LunCoSim binary
+## Step 3: provision the reproducible regional terrain
+
+From the repository root, follow [`tools/terrain/README.md`](../../tools/terrain/README.md)
+to download the two pinned NOBILE03 source files and generate the local
+heightfield. Downloads and generated terrain bytes must remain ignored; verify
+the boundary with `git check-ignore -v` before staging.
+
+The processing record uses a 512 m × 512 m, 129 × 129-node crop centered at
+`-84.72672255, 29.14428685` east, with an explicit source-datum normalization
+into the scene-local height frame.
+
+## Step 4: build the current LunCoSim binary
 
 From the repository root:
 
@@ -63,7 +79,7 @@ From the repository root:
 The PATH line supplies date.exe for the current celestial EOP build helper.
 It changes only the current PowerShell process.
 
-## Step 4: validate authored source
+## Step 5: validate authored source
 
 Run:
 
@@ -72,7 +88,7 @@ Run:
 Expected result: six OK lines. A parse pass only proves syntax and source
 loading; it does not prove physics or mission completion.
 
-## Step 5: run the interactive Twin
+## Step 6: run the interactive Twin
 
 Run:
 
@@ -81,7 +97,7 @@ Run:
 Check:
 
 - the Griffin lander is present at the authored descent start;
-- the South-Pole surrogate ground is present;
+- the NOBILE03 DEM-backed South-Pole ground is present;
 - the camera and landing target are present;
 - the four-wheel FLIP study proxy is visible on the lander top deck during
   descent;
@@ -103,10 +119,10 @@ console: `griffin_controls::control_lander()`,
 `griffin_controls::release_control()`.
 
 The current prototype keeps FLIP on a scene-level fixed top-deck adapter joint
-through descent, deploys the two physical side ramps after touchdown, then
-releases the live joint before rover egress. The earlier six-wheel jointed
-attempt remains historical failure evidence; the active asset is the
-four-wheel FLIP proxy.
+through descent, confirms the two solid integrated side ramps in their
+authored landed pose, then releases the live joint before rover egress. The
+earlier independent-ramp and six-wheel jointed attempts remain historical
+failure evidence; the active asset is the four-wheel FLIP proxy.
 
 ## Step 6: run the deterministic headless check
 

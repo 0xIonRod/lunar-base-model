@@ -45,15 +45,46 @@ fn show_rover_controls() {
     let right = input_hint("right");
     let action = input_hint("action");
     let cancel = input_hint("cancel");
+    let steering_mode = rover_steering_mode_label();
     hint("FLIP CONTROL: " + forward + "/" + backward + " drive · " + left + "/" + right + " steer · Space brake · " + cancel + " release");
     objectives_hud([
         #{ text: "FLIP is the active surface vehicle", state: "active" },
         #{ text: "Drive  " + forward + "/" + backward + "   Steer  " + left + "/" + right + "   Brake  Space", state: "active" },
-        #{ text: "STEERING MODE  crab_walk() = parallel · ackermann_steering() = wheel geometry", state: "pending" },
+        #{ text: "STEERING MODE  " + steering_mode + "  (CRAB = parallel / ACKERMANN = wheel geometry)", state: "active" },
         #{ text: "Stopped FLIP: toggle_rover_steering_mode() switches the vehicle once", state: "pending" },
         #{ text: action + " toggles the authored route; manual input disengages autopilot", state: "pending" },
         #{ text: cancel + " releases FLIP and returns to free flight", state: "pending" }
     ]);
+}
+
+fn rover_steering_mode_label() {
+    let state = query("QueryUsdPrim", #{
+        path: "/Griffin1SurfaceOps/FLIP",
+        attrs: ["physxVehicleAckermannSteering:strength"]
+    });
+    if state.ok == false { return "UNKNOWN"; }
+    let strength = state.attrs["physxVehicleAckermannSteering:strength"];
+    if strength == () { return "UNKNOWN"; }
+    if strength > 0.5 { "ACKERMANN" } else { "CRAB WALK" }
+}
+
+// SimulateIntent is the same per-vessel controller path used by the keyboard,
+// but persists the brake intent until explicitly released. A one-shot SetPorts
+// write is useful for a single control frame; it is not a reliable stop on a
+// sloped polar heightfield.
+fn hold_rover_brake() {
+    let target = resolve(rover_path(), "FLIP rover");
+    if target == () { return #{ ok: false, error: "rover is unavailable" }; }
+    cmd("DisengageAutopilot", #{ vessel: target });
+    let result = cmd("SimulateIntent", #{ intent: "brake", held: true, target: target });
+    if result.ok { notify_kind("FLIP brake held through the vehicle controller.", "info"); }
+    result
+}
+
+fn release_rover_brake() {
+    let target = resolve(rover_path(), "FLIP rover");
+    if target == () { return #{ ok: false, error: "rover is unavailable" }; }
+    cmd("SimulateIntent", #{ intent: "brake", held: false, target: target })
 }
 
 // Configure FLIP's four steering actuators as one vehicle-level mode. FLIP is
@@ -83,17 +114,15 @@ fn set_rover_steering_mode(mode) {
         return #{ ok: false, error: "rover speed is unavailable" };
     }
     if speed.abs() > 0.08 {
-        // Take route authority away and request a safe stop. The caller can
-        // issue the same one-place toggle again after the vehicle settles.
-        cmd("DisengageAutopilot", #{ vessel: target });
-        cmd("SetPorts", #{
-            target: target,
-            writes: [["throttle", 0.0], ["steer", 0.0], ["brake", 1.0]]
-        });
-        notify_kind("FLIP is still moving; route stopped and brake applied. Try the steering mode again when speed is below 0.08 m/s.", "warning");
-        return #{ ok: false, error: "rover must be stopped", speed: speed };
+        // Take route authority away and hold the brake through the same
+        // per-vessel intent path as Space. The caller can issue the same
+        // toggle again after the vehicle settles.
+        hold_rover_brake();
+        notify_kind("FLIP is still moving; brake is held. Try the steering mode again below 0.08 m/s.", "warning");
+        return #{ ok: false, error: "rover must be stopped", speed: speed, brake_held: true };
     }
 
+    release_rover_brake();
     let strength = if mode == "crab" { 0.0 } else { 1.0 };
     let result = cmd("SetUsdAttribute", #{
         path: "/Griffin1SurfaceOps/FLIP",

@@ -11,7 +11,7 @@ def Xform "FLIP" (
     prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "PhysxVehicleAckermannSteeringAPI", "LunCoCatalogAPI", "CollectionAPI:components"]
     prepend references = [@lunco://components/avionics/obc.usda@</OBC>, @lunco://components/cameras/rover_front_camera.usda@</RoverFrontCamera>]
     prepend variantSets = "drivetrain"
-    variants = { string "drivetrain" = "physical" }
+    variants = { string "drivetrain" = "raycast" }
 )
 {
     uniform bool lunco:spawnable = true
@@ -28,7 +28,7 @@ def Xform "FLIP" (
     float physxRigidBody:linearDamping = 0.5
     float physxRigidBody:angularDamping = 2.0
     float physxVehicleAckermannSteering:maxSteerAngle = 0.44999998807907104
-    float physxVehicleAckermannSteering:strength = 1.0
+    float physxVehicleAckermannSteering:strength = 0.0
     float outputs:drive_left = 0.0
     float outputs:drive_right = 0.0
     float outputs:steering = 0.0
@@ -451,6 +451,7 @@ def Xform "FLIP" (
         float inputs:panel_normal_y = 0.0
         float inputs:panel_normal_z = 1.0
         custom string lunco:installation = "vertical rear-deck photovoltaic panel; collision and mass remain owned by the FLIP root body"
+        token visibility = "invisible"
     }
     def LunCoEvent "BatteryDrained"
     {
@@ -464,6 +465,7 @@ def Xform "FLIP" (
     def Scope "Thermal" (
         prepend apiSchemas = "CollectionAPI:components"
         documentation = "FLIP motor thermal network: four motor losses into left/right masses and radiators."
+        active = false
     )
     {
         uniform token collection:components:expansionRule = "explicitOnly"
@@ -550,5 +552,25 @@ def Xform "FLIP" (
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
         }
+    }
+    def Cube "RoverSolarBacksheet" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double3 xformOp:translate = (0.0, 0.52, 1.75)
+        double3 xformOp:scale = (1.6, 0.06, 0.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.18000000715255737, 0.20000000298023224, 0.23999999463558197)]
+        bool physics:collisionEnabled = true
+    }
+    def Cube "RoverSolarCells" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double3 xformOp:translate = (0.0, 0.59, 1.75)
+        double3 xformOp:scale = (1.45, 0.02, 0.78)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.03500000014901161, 0.07000000029802322, 0.2800000011920929)]
+        bool physics:collisionEnabled = true
     }
 }

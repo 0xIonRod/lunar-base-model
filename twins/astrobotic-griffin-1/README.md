@@ -2,14 +2,16 @@
 
 This Twin is a LunCoSim study model for the planned Astrobotic Griffin-1
 mission, now presented by NASA as Moon Base II. It composes a generic LunCoSim
-powered-descent lander, a four-wheel FLIP mobility study proxy, a deterministic
-South-Pole surface surrogate, live Modelica co-simulation, USD-authored
+powered-descent lander, a four-wheel FLIP mobility study proxy, a source-backed
+LROC NOBILE03 South-Pole DEM, live Modelica co-simulation, USD-authored
 connections, and a Rhai mission sequence.
 
 It is an integration and operations study, not a flight-validated Griffin
 vehicle model. Public Griffin and FLIP engineering data must replace the
-surrogate values before any performance, landing, structural, or mobility
-claim is made.
+surrogate vehicle values before any performance, landing, structural, or
+mobility claim is made. The terrain source is real LROC data, but the selected
+regional center is a reproducible study anchor, not a confirmed touchdown
+coordinate.
 
 ## Current public mission baseline
 
@@ -28,6 +30,10 @@ The latest primary-source baseline used for this package is:
   Platform, with a public mass of nearly half a metric ton and a 30 kg payload
   capacity. These public values are not silently copied into the generic
   vehicle asset; the Twin records where the real values still need to enter.
+- LROC's official NAC DTM NOBILE03 product is a 4 m/pixel polar-stereographic
+  digital terrain model covering the Nobile South-Pole region. The source
+  product, label, checksums, crop, and reprojection are recorded in
+  `Assets.toml`, `tools/terrain/README.md`, and the research record.
 
 Sources:
 
@@ -41,17 +47,36 @@ Sources:
 | Path | Purpose |
 |---|---|
 | twin.toml | Twin identity and default scene |
+| Assets.toml | Reproducible LROC NOBILE03 download manifest and checksums |
 | scenes/griffin_1_surface_ops.usda | Mission composition and USD topology |
 | vehicles/griffin_1.usda | Reusable Griffin lander wrapper around the LunCoSim descent lander |
 | vehicles/flip.usda | Reusable FLIP study asset with four-wheel all-wheel-steer mobility, EPS, and thermal networks |
 | behaviors/griffin_1_flip_patrol.btxml | Griffin-local route tree targeting the deck approach, ramp exit, waypoints, and base site |
-| environments/south_pole_surrogate.usda | Labelled flat/cratered study surface |
+| environments/south_pole_surrogate.usda | DEM-backed NOBILE03 environment (legacy filename retained for scene compatibility) |
+| terrain/nobile03/ | Ignored processed heightfield output, regenerated from the manifest and adapter |
+| tools/terrain/ | Polar-stereo download, reprojection, and provenance instructions |
 | scenarios/griffin_1_surface_ops.rhai | Mission sequencing and route policy |
 | tools/griffin_controls.rhai | Twin-local possession, handoff, and control briefing helpers |
 | research/griffin_1_assumptions.md | Public facts, surrogate values, and confidence boundaries |
 | handover.md | Detailed implementation and verification handover |
 | agent_to_agent_missing.md | Concrete follow-up work for the next coding agent |
 | instructions.md | Step-by-step setup and completion procedure |
+
+## Provision the NOBILE03 terrain
+
+The checked-in `Assets.toml` is the source manifest. Raw downloads are stored
+under the Twin-local `.cache/` directory and are ignored by Git. The processed
+heightfield is also ignored because it is reproducible; only the manifest,
+adapter, provenance, and USD wiring are reviewable source.
+
+From the LunCoSim repository root, follow
+[`tools/terrain/README.md`](tools/terrain/README.md). The current reproducible
+study crop is a 512 m × 512 m local ENU window at 4 m node spacing (129 × 129
+nodes), centered at latitude `-84.72672255` and east longitude `29.14428685`.
+The source is polar stereographic, so the checked-in Python adapter converts it
+to the equirectangular local GeoTIFF format currently consumed by LunCoSim and
+normalizes the source datum into the scene-local height frame. This center is a
+regional simulation anchor until the flight site is published.
 
 ## Build and run
 
@@ -106,17 +131,18 @@ The current stable boundary demonstrates:
 4. The mission scene owns guidance wiring, landing target, camera, anchors,
    waypoint markers, and mission metadata.
 5. The Griffin wrapper carries the MoonDAO prototype configuration: 625 kg
-   payload class, four landing legs, isogrid deck, matched side-mounted
-   vertical solar arrays, a clean top deck, top-deck adapter, and two side
-   ramps with collision geometry. These are explicit study requirements, not
-   public as-built Griffin values.
+   payload class, four attached solid landing struts and pads, isogrid deck,
+   matched side-mounted vertical solar arrays, a clean top deck, top-deck
+   adapter, and two solid integrated ramps with two rails each. These are
+   explicit study requirements, not public as-built Griffin values.
 6. FLIP uses a four-wheel all-wheel-steer study topology with compound chassis
    collision, explicit wheel geometry, a vertical rear-deck solar-panel proxy,
    motor/gearbox, finite-EPS, and motor-thermal Modelica contracts. The wheel
    count and numeric values are proxy assumptions until FLIP ICD data is
    available.
-7. The surface environment uses the current runtime's flat-site terrain role.
-8. The Rhai task tree expresses descent event waits, physical ramp deployment,
+7. The surface environment uses a typed `LunCoTerrainAPI`/DEM layer wired to
+   the processed LROC NOBILE03 crop; the old flat `Ground` fixture is inactive.
+8. The Rhai task tree expresses descent event waits, the authored ramp pose,
    adapter-joint release, and a post-release surface-transit → base-site route.
    The close-spaced transit and base-arc markers are authored to keep the
    current four-wheel proxy on a feasible turn path. Ramp approach and ramp
@@ -124,18 +150,27 @@ The current stable boundary demonstrates:
    gates because an attached payload can own those sensors.
 
 The active scene now keeps FLIP on a scene-level fixed top-deck adapter joint
-during descent, deploys two finite-mass collision ramps after touchdown, then
-removes the live adapter joint before the rover route begins. Fixed-joint cargo
-is prevented from consuming route sensors before that release. The current
-prototype ramps use a 12 m clear collision envelope to accommodate the study
-proxy's steering transient. The public Astrolab material describes direct
-top-deck egress; the ramps are the MoonDAO prototype requirement. The
+during descent, confirms two solid integrated ramps in their authored landed
+pose, then removes the live adapter joint before the rover route begins.
+Fixed-joint cargo is prevented from consuming route sensors before that
+release. The ramps span the deck datum to the terrain plane and carry paired
+edge rails; the public Astrolab material describes direct top-deck egress, so
+the ramps are a MoonDAO prototype requirement rather than a released ICD. The
 historical six-wheel wrapper is retained as
 `vehicles/flip.legacy-six-wheel.usda` for comparison, not as the active asset.
 The generic joint regression passes after detach, but the FLIP-specific
 vehicle body does not yet fall onto the surface or advance after release; a
 runtime body-promotion/wake feature is needed before route completion can be
 claimed. No timer-only PASS was added.
+
+The headful Griffin-only Editor check exposed a second runtime boundary: the
+current USD projector admits child `PhysicsCollisionAPI` geometry as loose
+physics bodies instead of aggregating it into the lander's rigid body. The
+wrapper therefore keeps collision schemas on every solid deck, panel, ramp,
+rail, strut, pad, and hinge; the source contract is correct, but the live
+viewport cannot be called physically accepted until compound-child admission
+is fixed. See `research/griffin_1_vehicle_spec.md` for the acceptance gate and
+the missing Rust capabilities.
 
 ## Interactive control contract
 
@@ -149,8 +184,10 @@ provides `control_lander()`, `control_rover()`, `release_control()`,
 steering joints, `griffin_controls::ackermann_steering()` for left/right
 wheel-geometry correction on those four joints, or
 `griffin_controls::toggle_rover_steering_mode()` to switch between them from
-one command. Change the steering mode while FLIP is stopped; the HUD repeats
-these commands after rover possession.
+one command. Change the steering mode while FLIP is stopped; if it is moving,
+the helper holds the brake until the crawl threshold is reached and reports
+the active mode in the HUD. The HUD repeats these commands after rover
+possession.
 
 While the Griffin lander is possessed, `W/S` command pitch, `A/D` command roll,
 `Q/E` command yaw, `Space` commands thrust, and `G` is the authored release

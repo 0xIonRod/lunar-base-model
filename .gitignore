@@ -9,6 +9,7 @@ env/
 # Local simulator/runtime output
 logs/
 **/logs/
+target/
 
 # Generated news state and rolling briefing outputs
 news/.artemis_news_state.json
@@ -35,3 +36,11 @@ Thumbs.db
 # This terrain cache contains the reproducible package referenced by the
 # USD scene. Keep metadata, model files, DEM, and textures reviewable.
 luna2_twin/.cache/terrain/luna2/luna2_sinus_lunicus_preview.png
+
+# Downloaded and baked Twin geo-assets are reproducible from Assets.toml and
+# the checked-in processing tools. Never commit raw downloads, generated DEM
+# bytes, or bake stamps; keep the manifest, provenance, and USD wiring
+# reviewable instead.
+twins/**/.cache/
+twins/**/terrain/*/materials/
+twins/**/terrain/*/.bakekey

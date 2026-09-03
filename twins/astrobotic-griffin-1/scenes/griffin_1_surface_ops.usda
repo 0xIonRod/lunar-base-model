@@ -13,20 +13,21 @@ def Xform "Griffin1SurfaceOps" (
 )
 {
     uniform bool lunco:spawnable = false
-    double lunco:anchor:lat = -85.28
-    double lunco:anchor:lon = 3.63
+    double lunco:anchor:lat = -84.72672255
+    double lunco:anchor:lon = 29.14428685
     double lunco:anchor:height = 0.0
     int lunco:anchor:body = 301
     double lunco:time:epochJd = 2461395.5
     custom string lunco:mission:id = "M02"
     custom string lunco:mission:name = "Astrobotic Griffin Mission One"
-    custom string lunco:mission:site = "Nobile Crater region; procedural surrogate"
+    custom string lunco:mission:site = "Nobile regional study anchor backed by LROC NAC DTM NOBILE03; exact touchdown coordinate unresolved"
     custom string lunco:mission:scope = "surface operations only"
-    custom string lunco:mission:evidence = "assumptions and surrogate values are not flight validation"
+    custom string lunco:mission:evidence = "LROC NOBILE03 regional relief is source-backed; Griffin vehicle values and exact touchdown site remain assumptions"
     custom string lunco:mission:deployment = "top-deck adapter during descent; two physical side ramps deploy after touchdown; FLIP joint release then rover egress"
-    custom string lunco:anchor:status = "south-polar study anchor near Nobile Crater; exact flight coordinates unresolved"
-    custom string lunco:lighting:contract = "all Griffin and FLIP geometry uses the LunarSurface/Sun polar direction"
+    custom string lunco:anchor:status = "MOON_ME ENU frame at NOBILE03 regional center; local height zero is the normalized terrain datum"
+    custom string lunco:lighting:contract = "all Griffin and FLIP geometry uses LunarSurface/Sun polar direction and the authored mission epoch"
     custom string lunco:route:status = "ramp entry marker moved outside descent column; center lane remains clear of four solid legs"
+    custom string lunco:terrain:source = "twin://astrobotic-griffin-1/Assets.toml → NOBILE03 TIF/LBL → tools/terrain/reproject_lroc_polar_dem.py"
     def "SolarSystem" (
         prepend references = @lunco://celestial/solar_system.usda@</SolarSystem>
     )
@@ -195,70 +196,70 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (21.6, 0.0, -1.0)
+        custom double3 xformOp:translate = (22.5, 0.0, 0.2)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverTransit4" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (21.8, 0.0, -2.5)
+        custom double3 xformOp:translate = (23.7, 0.0, -0.3)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverTransit5" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (22.0, 0.0, -4.0)
+        custom double3 xformOp:translate = (24.6, 0.0, -1.2)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverTransit6" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (22.4, 0.0, -5.5)
+        custom double3 xformOp:translate = (25.2, 0.0, -2.3)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverTarget2" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (23.0, 0.0, -7.0)
+        custom double3 xformOp:translate = (25.4, 0.0, -3.6)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverBaseArc1" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (24.5, 0.0, -8.0)
+        custom double3 xformOp:translate = (25.8, 0.0, -4.9)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverBaseArc2" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (26.0, 0.0, -9.0)
+        custom double3 xformOp:translate = (26.7, 0.0, -6.1)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverBaseApproach" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (27.0, 0.0, -10.0)
+        custom double3 xformOp:translate = (28.0, 0.0, -7.2)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "RoverBaseFinal" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (29.0, 0.0, -11.0)
+        custom double3 xformOp:translate = (29.5, 0.0, -8.5)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "BaseSite" (
         prepend references = @lunco://vessels/markers/waypoint.usda@</WaypointMarker>
     )
     {
-        double3 xformOp:translate = (31.0, 0.0, -12.0)
+        custom double3 xformOp:translate = (31.0, 0.0, -10.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Cube "BaseSitePad" (

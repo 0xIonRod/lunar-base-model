@@ -2,8 +2,10 @@
 //
 // This is mission policy only. Continuous control remains in the composed
 // Modelica lander/rover domains; this script waits for physical/model events,
-// commands the two revolute ramp targets, detaches the top-deck adapter after
-// touchdown, and announces phase transitions.
+// confirms the authored solid-ramp pose, detaches the top-deck adapter after
+// touchdown, and announces phase transitions. The ramp meshes are integrated
+// into the lander compound; the unstable independent-body hinge variant is
+// deliberately not selected by this mission.
 
 fn on_event(me, evt) {
     let rover = find("/Griffin1SurfaceOps/FLIP");
@@ -50,11 +52,13 @@ fn touchdown_notice(me) {
 }
 
 fn deploy_ramps(me) {
-    set(find("/Griffin1SurfaceOps/Lander/EgressRampPortHinge"), "angle", -0.58);
-    set(find("/Griffin1SurfaceOps/Lander/EgressRampStarboardHinge"), "angle", 0.58);
+    // The two ramps are authored in their landed/folded-down pose and carry
+    // collision geometry as part of the lander compound. Do not spawn a
+    // separate rigid body here: the former revolute-body implementation could
+    // separate from the lander and leave the bounded physics world.
     emit("griffin_ramps_deploy_commanded");
-    notify_kind("Griffin side ramps deploying.", "info");
-    print("[griffin] both egress-ramp hinge targets commanded");
+    notify_kind("Griffin solid side ramps are in the authored deployed pose.", "info");
+    print("[griffin] solid egress ramps confirmed in authored deployed pose");
 }
 
 fn release_rover(me) {

@@ -9,10 +9,11 @@ The durable project inputs are:
 - [`scenarios/`](scenarios/) — operational scenario contracts.
 - [`tools/`](tools/) — validation and analysis utilities.
 
-The first twin represents Mission One: Blue Origin’s Blue Moon MK1 Endurance.
-It is intentionally simple: a flat 1 km × 1 km lunar terrain tile, one lander,
-and one simulator-only rover. It is a smoke-test scene, not a flight-ready
-model. Public facts and unknowns are recorded in
+The repository contains Mission One: Blue Origin’s Blue Moon MK1 Endurance,
+and the executable Astrobotic Griffin-1 / FLIP Twin. The Griffin package now
+uses a reproducibly processed LROC NOBILE03 regional terrain crop alongside
+its lander and rover study assets. Neither Twin is a flight-ready model;
+public facts and unknowns are recorded in
 [`missions/mission-001/mission-research.md`](missions/mission-001/mission-research.md).
 
 ## Repository map
@@ -41,4 +42,3 @@ Run the structural checks from the project root:
 ```powershell
 python .\tools\validate_repository.py
 ```
-

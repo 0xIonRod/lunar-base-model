@@ -17,10 +17,10 @@ The package is intentionally not marked as a completed flight-stack
 simulation. The earlier fixed-joint attempt used the six-wheel rover and
 produced a terminal escaped-body failure in the current Avian solver. The
 active prototype now uses a four-wheel FLIP proxy, a scene-level fixed
-top-deck adapter joint through descent, two finite-mass physical side ramps,
-and an interactive joint release after touchdown. The ramp mechanism is a
-MoonDAO prototype requirement; public Astrolab material describes direct
-top-deck egress and does not publish a ramp ICD.
+top-deck adapter joint through descent, two solid integrated side ramps with
+paired rails, and an interactive joint release after touchdown. The ramp
+mechanism is a MoonDAO prototype requirement; public Astrolab material
+describes direct top-deck egress and does not publish a ramp ICD.
 
 The historical staged Griffin scenario reported PASS at 3,983 ticks / 66.38
 simulated seconds with the installed
@@ -68,7 +68,9 @@ Primary sources:
 | lander wrapper | vehicles/griffin_1.usda | Griffin identity over the reusable descent lander |
 | FLIP asset | vehicles/flip.usda | FLIP identity over the four-wheel all-wheel-steer study proxy, collision topology, solar panel, EPS, and thermal network |
 | route | behaviors/griffin_1_flip_patrol.btxml | Scene-local ramp actions, surface-waypoint, and base-site route |
-| environment | environments/south_pole_surrogate.usda | deterministic flat collision plane and visual berms |
+| terrain manifest | Assets.toml | pinned LROC NOBILE03 downloads and checksums; raw bytes are ignored |
+| terrain adapter | tools/terrain/reproject_lroc_polar_dem.py | polar-stereo to runtime-local float32 GeoTIFF conversion |
+| environment | environments/south_pole_surrogate.usda | DEM-backed NOBILE03 terrain container; legacy filename retained for scene compatibility |
 | policy | scenarios/griffin_1_surface_ops.rhai | descent waits, deployment boundary, control brief, patrol route, verdict channel |
 | controls | tools/griffin_controls.rhai | Twin-local lander/FLIP possession, release, and autopilot helpers |
 | assumptions | research/griffin_1_assumptions.md | facts, surrogate values, and confidence boundaries |
@@ -84,12 +86,12 @@ Primary sources:
 | 3 | Record latest public Griffin and FLIP facts | Done in README and assumptions |
 | 4 | Add a reusable Griffin lander wrapper | Done; generic descent lander is labelled surrogate |
 | 5 | Add a reusable FLIP asset | Done; four-wheel all-wheel-steer study proxy with explicit EPS and thermal networks |
-| 6 | Author a deterministic South-Pole environment | Done; procedural surrogate, not a DEM |
+| 6 | Author a deterministic South-Pole environment | Done; NOBILE03 regional DEM wired through typed terrain APIs |
 | 7 | Compose celestial anchor and landing frame | Done; explicit study values |
 | 8 | Compose guided lander and sensor/GNC wires | Done using PositionPIDGuidance |
 | 9 | Compose waypoint markers and rover patrol policy | Done using EngageAutopilot and Griffin-local BTXML route |
 | 10 | Test physical lander/FLIP attachment | Active prototype uses an explicit fixed adapter joint; bounded validation below |
-| 11 | Establish a stable MVP boundary | Done; attached descent, interactive release, and physical ramps |
+| 11 | Establish a stable MVP boundary | Done; attached descent, interactive release, and solid integrated ramp pose |
 | 12 | Add handover, instructions, and evidence | Updated for the Griffin backlog prototype; flight fidelity remains open |
 
 ## Build procedure
@@ -160,9 +162,11 @@ why the current MVP does not retain the physical joint.
 ### Griffin corrected integration path
 
 The current scene composes FLIP on the Griffin top deck with a scene-level
-fixed adapter joint during descent. After touchdown the scenario commands both
-physical revolute ramp hinges, waits for deployment, removes the live adapter
-joint with interactive intent, and engages the Griffin-local surface route.
+fixed adapter joint during descent. After touchdown the scenario confirms both
+solid integrated ramps in their authored deployed pose, removes the live
+adapter joint with interactive intent, and engages the Griffin-local surface
+route. The unstable independent rigid-body hinge path is not part of the
+accepted runtime.
 
 Command:
 
@@ -201,7 +205,10 @@ The package is clean in the architectural sense:
 - mission facts are separated from simulator assumptions;
 - no public FLIP mass or geometry is represented as measured in the generic
   LunCoSim asset;
-- the South-Pole terrain is explicitly a procedural surrogate;
+- the South-Pole terrain is source-backed NOBILE03 relief with a documented
+  regional study anchor; exact touchdown coordinates remain unresolved;
+- downloaded and processed terrain bytes are ignored and reproducible from
+  `Assets.toml` plus the checked-in adapter;
 - frame anchor and epoch are authored rather than inferred;
 - the FLIP asset is selected by USD reference, not Rust-side name matching;
 - the failed jointed composition is not left as an apparently valid PASS.
@@ -223,9 +230,9 @@ Do not close this work until all of the following are true:
 3. The chosen flight-stack attachment stays within world bounds under guided
    descent.
 4. FLIP release is a physical joint/state transition, not only a Rhai event.
-5. Both ramps deploy through their revolute joints and the rover reaches the
-   deck approach, ramp exit, surface waypoints, and base site through the
-   supported control surface.
+5. Both authored ramps are solid, rail-equipped, and seated from the deck to
+   the terrain plane; the rover reaches the deck approach, ramp exit, surface
+   waypoints, and base site through the supported control surface.
 6. GRIFFIN_SURFACE_OPS emits PASS with a reproducible command and seed.
 7. A jittered and multi-thread diagnostic run is recorded separately from the
    deterministic single-thread gate.

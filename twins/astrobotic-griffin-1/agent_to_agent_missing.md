@@ -18,8 +18,9 @@ original staged baseline reported `GRIFFIN_SURFACE_OPS PASS` at 3,983 ticks /
 attached-adapter re-qualification and must not be reused as the active
 prototype verdict. The current production run reaches release and autopilot
 engagement, then expires NO-VERDICT because the FLIP body does not advance
-after detach. The flight-attached joint, supplier FLIP ICD, and Nobile DEM
-also remain open.
+after detach. The flight-attached joint, supplier FLIP ICD, and exact Griffin
+touchdown coordinate remain open; the regional Nobile03 DEM is now integrated
+through a checked-in reprojection adapter.
 
 ## Handoff in one paragraph
 
@@ -40,7 +41,10 @@ The package is at twins/astrobotic-griffin-1:
 - vehicles/griffin_1.usda: reusable Griffin lander wrapper
 - vehicles/flip.usda: four-wheel FLIP study wrapper with Modelica EPS/thermal networks
 - environments/lunar_surface_base.usda: twin-local gravity/sun/contact preamble
-- environments/south_pole_surrogate.usda: labelled procedural surface
+- environments/south_pole_surrogate.usda: DEM-backed NOBILE03 surface container
+- Assets.toml: pinned LROC downloads and checksums
+- terrain/nobile03/: ignored processed heightfield output
+- tools/terrain/: checked-in polar reprojection adapter and workflow
 - scenarios/griffin_1_surface_ops.rhai: task-tree mission policy
 - tools/griffin_controls.rhai: Twin-local lander/rover control and handoff helpers
 - research/griffin_1_assumptions.md: data confidence record
@@ -161,20 +165,26 @@ replacement is supported by a source.
 
 ## Priority 4: terrain and frame fidelity
 
-The current environment is intentionally flat with visual berms. It is not a
-Nobile Crater DEM.
+The environment now uses an official LROC NAC DTM NOBILE03 source product. It
+is a source-backed regional terrain study, not the exact Griffin touchdown
+site. The raw polar-stereographic source is downloaded from `Assets.toml` and
+converted by `tools/terrain/reproject_lroc_polar_dem.py` into the runtime's
+current local GeoTIFF contract. The raw and processed bytes are intentionally
+ignored by Git and must be regenerated from the manifest.
 
 Add:
 
-- a registered DEM or height field with provenance;
+- the registered NOBILE03 DEM and its source checksums;
 - horizontal and vertical datum;
 - landing-site origin and orientation;
 - solar azimuth/elevation and epoch;
 - hazard and slope layers;
 - regolith friction, restitution, sinkage, and bearing assumptions;
-- a validation image or numeric surface report.
+- a numeric surface report and processing parameters;
+- a native polar-stereo reprojection and vertical-datum contract in Rust.
 
-Retain the current flat-site scene as a deterministic development fixture.
+Retain the old flat-site fixture only as a deterministic development fixture;
+it is inactive in the Griffin composed environment.
 
 ## Priority 5: surface-operations realism
 
