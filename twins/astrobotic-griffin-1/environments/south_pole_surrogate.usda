@@ -25,6 +25,21 @@ def Xform "SouthPoleSurrogate" (
             token physxMaterial:frictionCombineMode = "min"
         }
     }
+    def Scope "Looks"
+    {
+        def Material "RegolithSurface"
+        {
+            token outputs:surface.connect = </SouthPoleSurrogate/Looks/RegolithSurface/Shader.outputs:surface>
+
+            def Shader "Shader"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:wgsl:sourceAsset = @lunco://shaders/terrain_layered.wgsl@
+                color3f inputs:albedo = (0.13, 0.13, 0.13)
+                token outputs:surface
+            }
+        }
+    }
     def Cube "Ground" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoTerrainAPI", "MaterialBindingAPI"]
         active = false
@@ -59,7 +74,7 @@ def Xform "SouthPoleSurrogate" (
         }
     }
     def Xform "Terrain" (
-        prepend apiSchemas = "LunCoTerrainAPI"
+        prepend apiSchemas = ["LunCoTerrainAPI", "MaterialBindingAPI"]
     )
     {
         string lunco:assetMode = "layered"
@@ -73,6 +88,7 @@ def Xform "SouthPoleSurrogate" (
         custom string lunco:terrain:horizontalDatum = "MOON_ME; local ENU (+X east, +Y up, -Z north)"
         custom string lunco:terrain:verticalDatum = "LROC source datum normalized by -5187.322 m into scene-local height"
         custom asset lunco:terrain:processedAsset = @terrain/nobile03@
+        rel material:binding = </SouthPoleSurrogate/Looks/RegolithSurface>
         def Xform "dem" (
             prepend apiSchemas = "LunCoTerrainLayerAPI"
         )
