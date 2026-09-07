@@ -1,0 +1,79 @@
+"""Regenerate view metadata, reopen twice and inspect the completed body."""
+import FreeCAD as App
+import FreeCADGui as Gui
+from pathlib import Path
+import json,zipfile,shutil,traceback,time
+import xml.etree.ElementTree as ET
+from PySide import QtCore,QtWidgets
+import os
+W=Path(os.environ.get('GRIFFIN8_WORK_DIR', str(Path(__file__).resolve().parent)));OUT=W/'griffin_8_lander.FCStd'
+report={'model':str(OUT),'started':time.time(),'save_recoveries':[]}
+def progress(s):
+ report['phase']=s;(W/'griffin_8_presentation.json').write_text(json.dumps(report,indent=2))
+def validate_archive(path):
+ with zipfile.ZipFile(path) as z:
+  assert z.testzip() is None
+  for name in ('Document.xml','GuiDocument.xml'):ET.fromstring(z.read(name))
+def save(d):
+ before=set(W.glob(OUT.name+'.*'))
+ try:d.saveAs(str(OUT))
+ except OSError:
+  new=set(W.glob(OUT.name+'.*'))-before
+  assert len(new)==1,'Cannot identify exactly one newly written archive'
+  temp=next(iter(new));validate_archive(temp);shutil.copyfile(str(temp),str(OUT))
+  report['save_recoveries'].append(str(temp))
+ validate_archive(OUT)
+def visibility(d):
+ for o in d.Objects:
+  if not o.ViewObject:continue
+  o.ViewObject.Visibility=o.TypeId in ('App::Part','Part::Feature')
+  if o.TypeId=='Part::Feature':
+   color=(0.72,0.76,0.80)
+   if 'StudyColor' in o.PropertiesList:color=tuple(o.StudyColor)[:3]
+   elif o.Name.startswith('Tank') and 'Mount' not in o.Name:color=(0.95,0.67,0.055)
+   elif o.Name.startswith('SolarCell'):color=(0.035,0.055,0.12)
+   elif o.Name.startswith('Engine'):color=(0.20,0.23,0.26)
+   elif o.Name=='AstroboticMark':color=(0.8,0.04,0.03)
+   o.ViewObject.ShapeColor=color;o.ViewObject.LineColor=(0.16,0.18,0.20)
+   o.ViewObject.LineWidth=1.0;o.ViewObject.DisplayMode='Flat Lines'
+def setup(d):
+ App.setActiveDocument(d.Name);Gui.activateWorkbench('PartWorkbench');Gui.Selection.clearSelection()
+ main=Gui.getMainWindow();main.showMaximized();main.raise_();main.activateWindow()
+ for dock in main.findChildren(QtWidgets.QDockWidget):
+  if dock.objectName() in ('Python console','Report view'):dock.hide()
+ view=Gui.activeDocument().activeView();view.viewAxonometric();view.fitAll();Gui.updateGui();return view
+def checks(d):
+ report['hidden_geometry_after_reopen']=[o.Name for o in d.Objects if o.TypeId in ('App::Part','Part::Feature') and not o.ViewObject.Visibility]
+ report['visible_construction_helpers']=[o.Name for o in d.Objects if o.ViewObject and o.ViewObject.Visibility and o.TypeId not in ('App::Part','Part::Feature')]
+ report['joint_expressions']=sum(len(o.ExpressionEngine) for o in d.Objects if 'Joint' in o.Name)
+ report['invalid_shapes']=[o.Name for o in d.Objects if o.TypeId=='Part::Feature' and (o.Shape.isNull() or not o.Shape.isValid())]
+ assert not report['hidden_geometry_after_reopen'] and not report['visible_construction_helpers'] and not report['invalid_shapes']
+ assert report['joint_expressions']==12
+def finish():
+ try:
+  progress('Opening geometry archive with fresh view providers')
+  d=App.openDocument(str(OUT));d.Label='Griffin 8 | completed body frame'
+  visibility(d);p=d.getObject('RampSettings');p.ForeDeployment=0;p.AftDeployment=0;d.recompute()
+  setup(d);save(d);App.closeDocument(d.Name)
+  progress('Reopening styled native file')
+  d=App.openDocument(str(OUT));view=setup(d);checks(d)
+  view.saveImage(str(W/'griffin_8_stowed.png'),1600,1200,'Current')
+  view.viewBottom();view.fitAll();Gui.updateGui();view.saveImage(str(W/'griffin_8_body_bottom.png'),1600,1200,'Current')
+  # Inspection cutaway only: restore all assembly geometry before final save.
+  for n in ('Rampways','Carrier','Tanks','Panels','Deck')+tuple('Skirt%02d'%i for i in range(8)):
+   o=d.getObject(n)
+   if o:o.ViewObject.Visibility=False
+  view.viewAxonometric();view.fitAll();Gui.updateGui();view.saveImage(str(W/'griffin_8_frame_cutaway.png'),1600,1200,'Current')
+  visibility(d);p=d.getObject('RampSettings');p.ForeDeployment=100;d.recompute();view.fitAll();Gui.updateGui()
+  view.saveImage(str(W/'griffin_8_deployed.png'),1600,1200,'Current')
+  p.ForeDeployment=0;d.recompute();view.fitAll();Gui.updateGui();save(d);App.closeDocument(d.Name)
+  progress('Second saved-file reopen')
+  d=App.openDocument(str(OUT));setup(d);checks(d)
+  report['status']='PASS: fresh native views, 12 hinge expressions, all geometry visible after two reopen tests'
+  def capture():
+   Gui.updateGui();Gui.getMainWindow().grab().save(str(W/'griffin_8_freecad_window.png'))
+   progress('Opened and visible in FreeCAD')
+  QtCore.QTimer.singleShot(1000,capture)
+ except Exception:
+  report['error']=traceback.format_exc();progress('ERROR')
+QtCore.QTimer.singleShot(1500,finish)

@@ -1,0 +1,11 @@
+{
+  "model": "griffin_8_lander.FCStd",
+  "started": 1788792937.843967,
+  "save_recoveries": [],
+  "phase": "Opened and visible in FreeCAD",
+  "hidden_geometry_after_reopen": [],
+  "visible_construction_helpers": [],
+  "joint_expressions": 12,
+  "invalid_shapes": [],
+  "status": "PASS: fresh native views, 12 hinge expressions, all geometry visible after two reopen tests"
+}

@@ -1,0 +1,140 @@
+{
+  "units": "mm and cubic mm",
+  "body_collisions": [],
+  "connections": {
+    "BodyUpperRing / Deck": 0.0,
+    "BodyLowerRing / Skirt00": 0.0,
+    "UpperAdapterFoot / Deck": 0.0,
+    "UpperAdapterCone / UpperAdapterFoot": 0.0,
+    "UpperAdapterCrown / UpperAdapterCone": 0.0,
+    "UpperAdapterCrown / ConnectingMainBeams": 0.0,
+    "LowerAdapterCone / LowerAdapterCrown": 0.0,
+    "LowerAdapterCrown / Deck": 0.0,
+    "LowerAdapterClampRing / LowerAdapterCone": 0.0,
+    "BodyCornerPost01 / BodyUpperRing": 0.0,
+    "BodyCornerPost01 / BodyLowerRing": 0.0,
+    "BodyCornerPost02 / BodyUpperRing": 0.0,
+    "BodyCornerPost02 / BodyLowerRing": 0.0,
+    "BodyCornerPost03 / BodyUpperRing": 0.0,
+    "BodyCornerPost03 / BodyLowerRing": 0.0,
+    "BodyCornerPost04 / BodyUpperRing": 0.0,
+    "BodyCornerPost04 / BodyLowerRing": 0.0,
+    "BodyCornerPost05 / BodyUpperRing": 0.0,
+    "BodyCornerPost05 / BodyLowerRing": 0.0,
+    "BodyCornerPost06 / BodyUpperRing": 0.0,
+    "BodyCornerPost06 / BodyLowerRing": 0.0,
+    "BodyCornerPost07 / BodyUpperRing": 0.0,
+    "BodyCornerPost07 / BodyLowerRing": 0.0,
+    "BodyCornerPost08 / BodyUpperRing": 0.0,
+    "BodyCornerPost08 / BodyLowerRing": 0.0,
+    "BodyDeckWeb1 / Deck": 0.0,
+    "LegRootYoke1 / Deck": 0.0,
+    "LegRootYoke1 / LegPin1": 0.0,
+    "Tank1Gusset1 / Deck": 0.0,
+    "Tank1Gusset1 / TankMount1": 0.0,
+    "Tank1Gusset2 / Deck": 0.0,
+    "Tank1Gusset2 / TankMount1": 0.0,
+    "Tank1Gusset3 / Deck": 0.0,
+    "Tank1Gusset3 / TankMount1": 0.0,
+    "Tank1Gusset4 / Deck": 0.0,
+    "Tank1Gusset4 / TankMount1": 0.0,
+    "BodyDeckWeb2 / Deck": 0.0,
+    "LegRootYoke2 / Deck": 0.0,
+    "LegRootYoke2 / LegPin2": 0.0,
+    "Tank2Gusset1 / Deck": 0.0,
+    "Tank2Gusset1 / TankMount2": 0.0,
+    "Tank2Gusset2 / Deck": 0.0,
+    "Tank2Gusset2 / TankMount2": 0.0,
+    "Tank2Gusset3 / Deck": 0.0,
+    "Tank2Gusset3 / TankMount2": 0.0,
+    "Tank2Gusset4 / Deck": 0.0,
+    "Tank2Gusset4 / TankMount2": 0.0,
+    "BodyDeckWeb3 / Deck": 0.0,
+    "LegRootYoke3 / Deck": 0.0,
+    "LegRootYoke3 / LegPin3": 0.0,
+    "Tank3Gusset1 / Deck": 0.0,
+    "Tank3Gusset1 / TankMount3": 0.0,
+    "Tank3Gusset2 / Deck": 0.0,
+    "Tank3Gusset2 / TankMount3": 0.0,
+    "Tank3Gusset3 / Deck": 0.0,
+    "Tank3Gusset3 / TankMount3": 0.0,
+    "Tank3Gusset4 / Deck": 0.0,
+    "Tank3Gusset4 / TankMount3": 0.0,
+    "BodyDeckWeb4 / Deck": 0.0,
+    "LegRootYoke4 / Deck": 0.0,
+    "LegRootYoke4 / LegPin4": 0.0,
+    "Tank4Gusset1 / Deck": 0.0,
+    "Tank4Gusset1 / TankMount4": 0.0,
+    "Tank4Gusset2 / Deck": 0.0,
+    "Tank4Gusset2 / TankMount4": 0.0,
+    "Tank4Gusset3 / Deck": 0.0,
+    "Tank4Gusset3 / TankMount4": 0.0,
+    "Tank4Gusset4 / Deck": 0.0,
+    "Tank4Gusset4 / TankMount4": 0.0
+  },
+  "motion_samples": [
+    {
+      "percent": 0,
+      "collisions": []
+    },
+    {
+      "percent": 5,
+      "collisions": []
+    },
+    {
+      "percent": 10,
+      "collisions": []
+    },
+    {
+      "percent": 15,
+      "collisions": []
+    },
+    {
+      "percent": 20,
+      "collisions": []
+    },
+    {
+      "percent": 30,
+      "collisions": []
+    },
+    {
+      "percent": 40,
+      "collisions": []
+    },
+    {
+      "percent": 50,
+      "collisions": []
+    },
+    {
+      "percent": 60,
+      "collisions": []
+    },
+    {
+      "percent": 70,
+      "collisions": []
+    },
+    {
+      "percent": 80,
+      "collisions": []
+    },
+    {
+      "percent": 85,
+      "collisions": []
+    },
+    {
+      "percent": 90,
+      "collisions": []
+    },
+    {
+      "percent": 95,
+      "collisions": []
+    },
+    {
+      "percent": 100,
+      "collisions": []
+    }
+  ],
+  "invalid": [],
+  "last_component_checked": "LegRootYoke4",
+  "status": "PASS"
+}

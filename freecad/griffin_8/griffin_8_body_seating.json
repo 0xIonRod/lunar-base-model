@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "trimmed": [
+    "BodyUpperRing",
+    "BodyDeckWeb1",
+    "BodyDeckWeb2",
+    "BodyDeckWeb3",
+    "BodyDeckWeb4"
+  ],
+  "unchanged_existing_shapes": 176
+}

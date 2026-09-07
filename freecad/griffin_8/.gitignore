@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.FCBak
+*.FCStd.*
+griffin_8_with_inherited_views.FCStd
+griffin_8_seated_native.FCStd
+griffin_8_freecad_window.png
