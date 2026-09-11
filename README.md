@@ -38,3 +38,7 @@ Run the structural checks from the project root:
 python .\tools\validate_repository.py
 ```
 
+
+## Weekly lunar news
+
+See [research/news/](research/news/) for source-linked briefings, AI-readable evidence records, and actionable simulation research tasks. The weekly GitHub workflow commits news to a review branch and opens a pull request.

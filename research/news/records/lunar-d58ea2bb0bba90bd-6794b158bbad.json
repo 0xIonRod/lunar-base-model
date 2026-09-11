@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0",
+  "id": "lunar-d58ea2bb0bba90bd",
+  "revision": "6794b158bbad",
+  "content_sha256": "6794b158bbadb62e349dac05d82bc526ec5fe49569e70ca35ce1b47ae77d4db0",
+  "title": "NASA Calls for Proposals to Accelerate Lunar Surface Technologies",
+  "published_at": "2026-09-08T20:16:16+00:00",
+  "retrieved_at": "2026-09-11T08:29:31.756097+00:00",
+  "event_date": "2026-09-08",
+  "supersedes": [
+    "lunar-d58ea2bb0bba90bd-accdf27fddcf.json"
+  ],
+  "source": {
+    "name": "NASA Moon Base",
+    "url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+    "feed_url": "https://www.nasa.gov/missions/moon-base/feed/",
+    "type": "primary",
+    "evidence_scope": "full_article"
+  },
+  "summary": "NASA is seeking lunar infrastructure technology proposals. This creates a research lead for power supply and resource-production scenarios, but supplies no validated hardware performance values for the model.",
+  "reported_facts": [
+    {
+      "statement": "NASA announced a solicitation on September 8 for technologies supporting lunar South Pole infrastructure.",
+      "source_url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+      "locator": "Opening paragraphs, announcement date",
+      "evidence_excerpt": "the solicitation targets capability gaps"
+    },
+    {
+      "statement": "The listed areas include vertical solar arrays, oxygen production from regolith, radioisotope Stirling generators, advanced manufacturing, and nanomaterials.",
+      "source_url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+      "locator": "Five capability areas listed under NextSTEP-3 Appendix A",
+      "evidence_excerpt": ""
+    }
+  ],
+  "topics": [
+    "power",
+    "resources_and_construction"
+  ],
+  "simulation_actions": [
+    {
+      "kind": "propose_scenario",
+      "status": "proposed",
+      "rationale": "The solicitation makes alternative power supply and storage architectures relevant to the base energy budget.",
+      "next_step": "Prepare a study comparing solar-plus-storage and a constant power-source placeholder across the same lunar illumination profile. Obtain actual power, storage, degradation and thermal inputs before executing a decision-grade comparison.",
+      "affected_paths": [
+        "scenarios/03_power_and_illumination.yaml",
+        "research/assumptions.md"
+      ],
+      "missing_inputs": [
+        "location-specific illumination series",
+        "power output and storage performance",
+        "load schedule",
+        "thermal constraints",
+        "actual technology readiness"
+      ],
+      "acceptance_criteria": "Study reports unmet load in Wh, minimum state of charge, and blackout survival time for both cases; all numerical inputs trace to sources or explicitly bounded assumptions. No design is called flight-ready.",
+      "parameters": [
+        {
+          "name": "electrical_output",
+          "value": null,
+          "unit": "W",
+          "source_url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+          "locator": "Article names capability areas but gives no numerical design requirement for this parameter.",
+          "uncertainty": "Not specified in this announcement; retrieve solicitation or technical test evidence.",
+          "basis": "unknown"
+        },
+        {
+          "name": "usable_storage",
+          "value": null,
+          "unit": "Wh",
+          "source_url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+          "locator": "Article names capability areas but gives no numerical design requirement for this parameter.",
+          "uncertainty": "Not specified in this announcement; retrieve solicitation or technical test evidence.",
+          "basis": "unknown"
+        }
+      ]
+    },
+    {
+      "kind": "propose_scenario",
+      "status": "proposed",
+      "rationale": "Oxygen production and manufacturing could change delivered cargo and power demand, but the announcement establishes research intent rather than operational capability.",
+      "next_step": "Draft a coupled oxygen-production and power-demand study. Compare imported oxygen against a regolith-processing concept and identify the production rate, duty cycle, equipment mass and energy data needed to run it.",
+      "affected_paths": [
+        "research/assumptions.md",
+        "research/vehicles.md",
+        "scenarios/05_cargo_inspection.yaml"
+      ],
+      "missing_inputs": [
+        "oxygen demand",
+        "regolith yield",
+        "equipment and consumables mass",
+        "specific energy",
+        "production duty cycle",
+        "delivery and readiness dates"
+      ],
+      "acceptance_criteria": "Mass and energy balances use consistent units; the study states its break-even assumptions and cannot claim reduced resupply until sourced inputs support that result.",
+      "parameters": [
+        {
+          "name": "oxygen_production_rate",
+          "value": null,
+          "unit": "kg/h",
+          "source_url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+          "locator": "Article names capability areas but gives no numerical design requirement for this parameter.",
+          "uncertainty": "Not specified in this announcement; retrieve solicitation or technical test evidence.",
+          "basis": "unknown"
+        },
+        {
+          "name": "specific_energy",
+          "value": null,
+          "unit": "Wh/kg",
+          "source_url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+          "locator": "Article names capability areas but gives no numerical design requirement for this parameter.",
+          "uncertainty": "Not specified in this announcement; retrieve solicitation or technical test evidence.",
+          "basis": "unknown"
+        },
+        {
+          "name": "equipment_mass",
+          "value": null,
+          "unit": "kg",
+          "source_url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+          "locator": "Article names capability areas but gives no numerical design requirement for this parameter.",
+          "uncertainty": "Not specified in this announcement; retrieve solicitation or technical test evidence.",
+          "basis": "unknown"
+        }
+      ]
+    }
+  ],
+  "review": {
+    "status": "verified",
+    "reviewer": "Codex (AI source review)",
+    "reviewed_at": "2026-09-11T08:29:31.756097+00:00",
+    "notes": "Checked the full NASA article through web retrieval on 2026-09-11. Verified the qualitative announcement only. Proposed studies are our inferences; no numerical parameter or model change is approved."
+  }
+}

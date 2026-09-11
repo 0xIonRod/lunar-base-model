@@ -1,0 +1,171 @@
+{
+  "feeds": [
+    {
+      "name": "NASA Moon Base",
+      "url": "https://www.nasa.gov/missions/moon-base/feed/",
+      "article_hosts": [
+        "www.nasa.gov",
+        "science.nasa.gov"
+      ]
+    },
+    {
+      "name": "NASA Artemis",
+      "url": "https://www.nasa.gov/missions/artemis/feed/",
+      "article_hosts": [
+        "www.nasa.gov",
+        "science.nasa.gov"
+      ]
+    },
+    {
+      "name": "NASA News",
+      "url": "https://www.nasa.gov/feed/",
+      "article_hosts": [
+        "www.nasa.gov",
+        "science.nasa.gov"
+      ]
+    }
+  ],
+  "lunar_keywords": [
+    "lunar",
+    "moon base",
+    "moonbase",
+    "artemis",
+    "CLPS",
+    "blue moon",
+    "griffin",
+    "VIPER"
+  ],
+  "routes": [
+    {
+      "topic": "power",
+      "keywords": [
+        "power",
+        "solar array",
+        "energy storage",
+        "battery",
+        "radioisotope"
+      ],
+      "rationale": "Surface power and storage constrain operating time and survival through darkness.",
+      "next_step": "Check the full source for power-system changes and propose a daylight/darkness energy-budget comparison.",
+      "affected_paths": [
+        "scenarios/03_power_and_illumination.yaml",
+        "research/assumptions.md"
+      ],
+      "missing_inputs": [
+        "usable power in W",
+        "storage capacity in Wh",
+        "illumination profile",
+        "technology readiness and delivery status"
+      ],
+      "acceptance_criteria": "A sourced parameter table with units and uncertainty, plus a proposed energy-budget test with an explicit pass/fail criterion."
+    },
+    {
+      "topic": "mobility",
+      "keywords": [
+        "rover",
+        "wheel",
+        "mobility",
+        "traverse",
+        "regolith",
+        "dust"
+      ],
+      "rationale": "Mobility and surface interactions affect traverse feasibility and vehicle assumptions.",
+      "next_step": "Identify the relevant vehicle or terrain evidence and propose a terrain/mobility sensitivity test.",
+      "affected_paths": [
+        "scenarios/02_rover_traverse.yaml",
+        "research/vehicles.md",
+        "research/locations.md"
+      ],
+      "missing_inputs": [
+        "vehicle applicability",
+        "terrain or soil properties",
+        "test conditions and measured performance"
+      ],
+      "acceptance_criteria": "Document source applicability and a bounded sensitivity test; distinguish measured values from assumed ranges."
+    },
+    {
+      "topic": "communications",
+      "keywords": [
+        "communications",
+        "communication",
+        "relay",
+        "navigation",
+        "LunaNet"
+      ],
+      "rationale": "Relay availability and line of sight constrain blackout periods and remote operations.",
+      "next_step": "Check relay and navigation capability changes and propose an outage or coverage test.",
+      "affected_paths": [
+        "scenarios/04_communications_blackout.yaml",
+        "research/assumptions.md"
+      ],
+      "missing_inputs": [
+        "relay orbit and availability",
+        "link budget",
+        "surface coordinates",
+        "operational date"
+      ],
+      "acceptance_criteria": "A traceable coverage/outage scenario with source-backed inputs or explicitly marked unknowns."
+    },
+    {
+      "topic": "resources_and_construction",
+      "keywords": [
+        "oxygen",
+        "ISRU",
+        "water ice",
+        "manufacturing",
+        "construction",
+        "habitat",
+        "life support"
+      ],
+      "rationale": "Resource production and construction can change cargo demand, power demand, and base dependencies.",
+      "next_step": "Extract capability maturity and resource/power requirements; propose a mass-and-energy balance study.",
+      "affected_paths": [
+        "research/assumptions.md",
+        "research/vehicles.md",
+        "scenarios/05_cargo_inspection.yaml"
+      ],
+      "missing_inputs": [
+        "production rate",
+        "specific energy",
+        "equipment mass",
+        "demonstrated maturity",
+        "delivery schedule"
+      ],
+      "acceptance_criteria": "An explicit study proposal with units, evidence gaps, and a check that a solicitation is not treated as deployed hardware."
+    },
+    {
+      "topic": "mission_and_delivery",
+      "keywords": [
+        "lander",
+        "landing",
+        "launch",
+        "delivery",
+        "CLPS",
+        "Griffin",
+        "Blue Moon"
+      ],
+      "rationale": "Mission and delivery changes can alter landing, commissioning, and campaign dependencies.",
+      "next_step": "Compare the source against the mission register and identify any schedule, payload, site, or readiness changes.",
+      "affected_paths": [
+        "research/missions.md",
+        "research/vehicles.md",
+        "scenarios/01_landing_and_commissioning.yaml"
+      ],
+      "missing_inputs": [
+        "affected mission ID",
+        "previous versus new value",
+        "date precision and status",
+        "confirmation from mission operator"
+      ],
+      "acceptance_criteria": "A cited before/after comparison that preserves target dates and distinguishes plans from completed events."
+    }
+  ],
+  "exclude_title_keywords": [
+    "signing ceremony",
+    "Artemis Accords",
+    "invites media",
+    "crew at",
+    "award ceremony",
+    "student competition"
+  ]
+}

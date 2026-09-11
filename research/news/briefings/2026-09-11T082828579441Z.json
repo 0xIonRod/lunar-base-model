@@ -1,0 +1,38 @@
+{
+  "date": "2026-09-11",
+  "generated_at": "2026-09-11T08:28:28.579441+00:00",
+  "window_start": "2026-09-04T08:28:28.579441+00:00",
+  "coverage": "complete",
+  "sources": [
+    {
+      "name": "NASA Moon Base",
+      "url": "https://www.nasa.gov/missions/moon-base/feed/",
+      "status": "ok",
+      "entries": 9,
+      "undated": 0,
+      "rejected": 0,
+      "filtered": 0
+    },
+    {
+      "name": "NASA Artemis",
+      "url": "https://www.nasa.gov/missions/artemis/feed/",
+      "status": "ok",
+      "entries": 10,
+      "undated": 0,
+      "rejected": 0,
+      "filtered": 1
+    },
+    {
+      "name": "NASA News",
+      "url": "https://www.nasa.gov/feed/",
+      "status": "ok",
+      "entries": 10,
+      "undated": 0,
+      "rejected": 0,
+      "filtered": 10
+    }
+  ],
+  "records": [
+    "lunar-d58ea2bb0bba90bd-accdf27fddcf.json"
+  ]
+}

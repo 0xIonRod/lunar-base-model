@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "lunar-d58ea2bb0bba90bd",
+  "revision": "accdf27fddcf",
+  "content_sha256": "accdf27fddcfea3e66773709a6ce8682628116138c71e9067fa6c4c51269b85e",
+  "title": "NASA Calls for Proposals to Accelerate Lunar Surface Technologies",
+  "published_at": "2026-09-08T20:16:16+00:00",
+  "retrieved_at": "2026-09-11T08:28:28.579441+00:00",
+  "event_date": null,
+  "supersedes": [],
+  "source": {
+    "name": "NASA Moon Base",
+    "url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+    "feed_url": "https://www.nasa.gov/missions/moon-base/feed/",
+    "type": "primary",
+    "evidence_scope": "feed_excerpt"
+  },
+  "summary": "NASA Calls for Proposals to Accelerate Lunar Surface Technologies",
+  "reported_facts": [
+    {
+      "statement": "NASA Calls for Proposals to Accelerate Lunar Surface Technologies",
+      "source_url": "https://www.nasa.gov/news-release/nasa-calls-for-proposals-to-accelerate-lunar-surface-technologies/",
+      "locator": "RSS/Atom title",
+      "evidence_excerpt": "NASA is seeking proposals to advance the technology and infrastructure needed to explore the Moon and establish a Moon Base in the lunar South"
+    }
+  ],
+  "topics": [
+    "power",
+    "resources_and_construction"
+  ],
+  "simulation_actions": [
+    {
+      "kind": "research",
+      "status": "proposed",
+      "rationale": "Surface power and storage constrain operating time and survival through darkness.",
+      "next_step": "Check the full source for power-system changes and propose a daylight/darkness energy-budget comparison.",
+      "affected_paths": [
+        "scenarios/03_power_and_illumination.yaml",
+        "research/assumptions.md"
+      ],
+      "missing_inputs": [
+        "usable power in W",
+        "storage capacity in Wh",
+        "illumination profile",
+        "technology readiness and delivery status"
+      ],
+      "acceptance_criteria": "A sourced parameter table with units and uncertainty, plus a proposed energy-budget test with an explicit pass/fail criterion.",
+      "parameters": []
+    },
+    {
+      "kind": "research",
+      "status": "proposed",
+      "rationale": "Resource production and construction can change cargo demand, power demand, and base dependencies.",
+      "next_step": "Extract capability maturity and resource/power requirements; propose a mass-and-energy balance study.",
+      "affected_paths": [
+        "research/assumptions.md",
+        "research/vehicles.md",
+        "scenarios/05_cargo_inspection.yaml"
+      ],
+      "missing_inputs": [
+        "production rate",
+        "specific energy",
+        "equipment mass",
+        "demonstrated maturity",
+        "delivery schedule"
+      ],
+      "acceptance_criteria": "An explicit study proposal with units, evidence gaps, and a check that a solicitation is not treated as deployed hardware.",
+      "parameters": []
+    }
+  ],
+  "review": {
+    "status": "candidate",
+    "reviewer": null,
+    "reviewed_at": null,
+    "notes": "Keyword-routed source lead. Read the full article; do not apply to model parameters."
+  }
+}
