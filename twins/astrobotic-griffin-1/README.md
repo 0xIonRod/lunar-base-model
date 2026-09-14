@@ -2,8 +2,8 @@
 
 This Twin is a LunCoSim study model for the planned Astrobotic Griffin-1
 mission, now presented by NASA as Moon Base II. It composes a generic LunCoSim
-powered-descent lander, a four-wheel FLIP dynamics study proxy plus a separate
-six-wheel visual silhouette, a source-backed
+powered-descent lander and a four-wheel FLIP dynamics/visual study proxy, a
+source-backed
 LROC NOBILE03 South-Pole DEM, live Modelica co-simulation, USD-authored
 connections, and a Rhai mission sequence.
 
@@ -55,7 +55,7 @@ Sources:
 | vehicles/griffin_1.usda | Reusable Griffin lander wrapper around the LunCoSim descent lander |
 | vehicles/griffin_1_visual.usda | Render-only Griffin assembly of replaceable bus, leg, tank, panel, bell, and ramp components |
 | vehicles/flip.usda | Reusable FLIP study asset with four-wheel all-wheel-steer mobility, EPS, and thermal networks |
-| vehicles/flip_visual.usda | Render-only FLIP assembly with six wheel stations, chassis, mast, and solar-array components |
+| vehicles/flip_visual.usda | Render-only FLIP assembly with four directional wheel stations, chassis, mast, and solar-array components |
 | components/lander/ | Twin-local visual components for the bus, landing legs, tanks, panels, bells, and ramps |
 | components/rover/ | Twin-local visual components for chassis, wheels, mast, and solar array |
 | behaviors/griffin_1_flip_patrol.btxml | Griffin-local route tree targeting the deck approach, ramp exit, waypoints, and base site |
@@ -193,9 +193,9 @@ present before submission. The live Editor remains open; after the command is
 acknowledged, query the same document generation and run
 `scenarios/tests/griffin_flip_visual.rhai`. The test checks every leg, tank,
 ramp, solar panel, engine bell, wheel subpart, mast subpart, and the composed
-geometry bounds against SysML metre datums. The six-wheel visual is deliberate:
-the dynamic `vehicles/flip.usda` four-wheel model is not silently changed by a
-presentation-only requirement.
+geometry bounds against SysML metre datums. Both visual and dynamic assemblies
+use the source-backed four-wheel directional topology; a presentation-only
+proxy must not silently change that count.
 
 Station names are read from the SysML source (`landingLegNames`,
 `propellantTankNames`, `rampNames`, `solarArrayNames`, `mainEngineNames`, and

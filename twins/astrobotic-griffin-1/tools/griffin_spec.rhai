@@ -6,52 +6,28 @@
 // meaning and provenance.
 
 fn _sysml_source() {
-    let name = twin_name();
-    if name == "" { return (); }
-    let report = query("ValidateSysml", #{
-        path: "twin://" + name,
-        compact: true
-    });
-    if report == () || report.ok != true || report.attributes == () {
-        return ();
-    }
-    report.attributes
+    // The generic helper is the one source-set admission point. It carries
+    // qualified attributes, collision diagnostics, and the source revision;
+    // this Twin policy must not recreate that lookup or choose a fallback.
+    sysml_requirements::source()
 }
 
 fn _sysml_attribute(name) {
     let source = _sysml_source();
-    if source == () { return (); }
-    let record = source[name];
-    if record == () || record.value == () { return (); }
-    let value = record.value;
-    if value.number == () { return (); }
-    value.number
+    if source == () || source.ok != true { return (); }
+    sysml_requirements::number(source, name)
 }
 
 fn _sysml_integer(name) {
-    let source = _sysml_source();
-    if source == () { return (); }
-    let record = source[name];
-    if record == () || record.value == () || record.value.number == () { return (); }
-    record.value.number.to_int()
+    let value = _sysml_attribute(name);
+    if value == () { return (); }
+    value.to_int()
 }
 
 fn _sysml_text(name) {
     let source = _sysml_source();
-    if source == () { return (); }
-    let record = source[name];
-    if record == () || record.value == () { return (); }
-    let literal = record.value.literal;
-    // Trim either quote edge independently. The compact SysML snapshot can
-    // preserve one edge while projecting a String literal through the generic
-    // AST adapter, so requiring a matched pair is not stable.
-    if literal.len() > 0 && literal.starts_with("\"") {
-        literal = literal.sub_string(1, literal.len() - 1);
-    }
-    if literal.len() > 0 && literal.ends_with("\"") {
-        literal = literal.sub_string(0, literal.len() - 1);
-    }
-    literal
+    if source == () || source.ok != true { return (); }
+    sysml_requirements::text(source, name)
 }
 
 fn _sysml_list(name) {

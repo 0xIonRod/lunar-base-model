@@ -17,26 +17,13 @@ fn solar_array_count() { griffin_spec::solar_array_count() }
 fn landing_com_touchdown_y() { griffin_spec::landing_com_touchdown_y() }
 
 fn _sysml_number(report, name) {
-    if report == () || report.attributes == () || report.attributes[name] == ()
-        || report.attributes[name].value == () {
-        return ();
-    }
-    report.attributes[name].value.number
+    if report == () || report.ok != true { return (); }
+    sysml_requirements::number(report, name)
 }
 
 fn _sysml_text(report, name) {
-    if report == () || report.attributes == () || report.attributes[name] == ()
-        || report.attributes[name].value == () {
-        return ();
-    }
-    let literal = report.attributes[name].value.literal;
-    if literal.len() > 0 && literal.starts_with("\"") {
-        literal = literal.sub_string(1, literal.len() - 1);
-    }
-    if literal.len() > 0 && literal.ends_with("\"") {
-        literal = literal.sub_string(0, literal.len() - 1);
-    }
-    literal
+    if report == () || report.ok != true { return (); }
+    sysml_requirements::text(report, name)
 }
 
 fn _sysml_list(report, name) {

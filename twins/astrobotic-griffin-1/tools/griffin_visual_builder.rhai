@@ -24,28 +24,26 @@ fn component_asset(relative) {
     "twin://" + twin_name() + "/components/" + relative
 }
 
-fn _sysml_number(report, name, fallback) {
-    if report == () || report.attributes == () || report.attributes[name] == () {
-        return fallback;
-    }
-    let value = report.attributes[name].value;
-    if value == () { return fallback; }
-    if value.number != () { return value.number.to_float(); }
-    let literal = value.literal;
-    if literal == () || literal == "" { return fallback; }
-    literal.to_float()
+fn _sysml_number(report, name) {
+    if report == () || report.ok != true { return (); }
+    sysml_requirements::number(report, name)
 }
 
 fn flip_steering_angles() {
     let report = sysml_requirements::source();
-    [_sysml_number(report, "frontSteeringAngleDeg", -12.0),
-     _sysml_number(report, "rearSteeringAngleDeg", 8.0)]
+    let front = _sysml_number(report, "frontSteeringAngleDeg");
+    let rear = _sysml_number(report, "rearSteeringAngleDeg");
+    if front == () || rear == () { return (); }
+    [front, rear]
 }
 
 fn visual_component_specs(root) {
     let lander = root + "/Griffin1";
     let rover = root + "/FLIP";
     let steering = flip_steering_angles();
+    if steering == () {
+        return [];
+    }
     let specs = [
         #{parent: lander, name: "Bus", type_name: "Xform",
           asset: component_asset("lander/griffin_bus_visual.usda"),
@@ -99,29 +97,38 @@ fn visual_component_specs(root) {
     // FLIP is a four-wheel directional rover.  The front and rear steering
     // angles are intentionally explicit so the visual communicates the
     // steering architecture instead of looking like a six-wheel box proxy.
-    for entry in [
-        #{name: "FL", translation: [-1.75, -0.42, -1.15], rotation: [0.0, steering[0], 0.0], index: 0},
-        #{name: "RL", translation: [-1.75, -0.42, 1.15], rotation: [0.0, steering[1], 0.0], index: 1},
-        #{name: "FR", translation: [1.75, -0.42, -1.15], rotation: [0.0, steering[0], 0.0], index: 2},
-        #{name: "RR", translation: [1.75, -0.42, 1.15], rotation: [0.0, steering[1], 0.0], index: 3},
-    ] {
-        let station = rover + "/Suspension_" + entry.name;
-        specs.push(#{parent: station, name: "Wheel_" + entry.name, type_name: "Xform",
-            asset: component_asset("rover/flip_wheel_visual.usda"),
-            translation: (), rotation: entry.rotation, scale: (), index: entry.index});
+    let wheel_names = griffin_spec::visual_rover_wheel_names();
+    let wheel_positions = [
+        [-1.75, -0.42, -1.15],
+        [-1.75, -0.42, 1.15],
+        [1.75, -0.42, -1.15],
+        [1.75, -0.42, 1.15],
+    ];
+    if wheel_names.len() != wheel_positions.len() {
+        return [];
     }
-    for entry in [
-        #{name: "Engine01", translation: [0.0, 1.75, 0.0]},
-        #{name: "Engine02", translation: [1.0, 1.75, 0.0]},
-        #{name: "Engine03", translation: [-1.0, 1.75, 0.0]},
-        #{name: "Engine04", translation: [0.0, 1.75, 1.0]},
-        #{name: "Engine05", translation: [0.0, 1.75, -1.0]},
-        #{name: "Engine06", translation: [0.9, 1.75, 0.9]},
-        #{name: "Engine07", translation: [-0.9, 1.75, -0.9]},
-    ] {
-        specs.push(#{parent: lander + "/Nozzle/MainEngineCluster", name: entry.name,
+    for index in 0..wheel_names.len() {
+        let name = wheel_names[index];
+        let steering_index = if name.starts_with("F") { 0 } else { 1 };
+        let station = rover + "/Suspension_" + name;
+        specs.push(#{parent: station, name: "Wheel_" + name, type_name: "Xform",
+            asset: component_asset("rover/flip_wheel_visual.usda"),
+            translation: (), rotation: [0.0, steering[steering_index], 0.0],
+            scale: (), index: index});
+    }
+    let engine_names = griffin_spec::main_engine_names();
+    let engine_positions = [
+        [0.0, 1.75, 0.0], [1.0, 1.75, 0.0], [-1.0, 1.75, 0.0],
+        [0.0, 1.75, 1.0], [0.0, 1.75, -1.0], [0.9, 1.75, 0.9],
+        [-0.9, 1.75, -0.9],
+    ];
+    if engine_names.len() != engine_positions.len() {
+        return [];
+    }
+    for index in 0..engine_names.len() {
+        specs.push(#{parent: lander + "/Nozzle/MainEngineCluster", name: engine_names[index],
             type_name: "Xform", asset: component_asset("lander/griffin_engine_bell_visual.usda"),
-            translation: entry.translation, rotation: (), scale: ()});
+            translation: engine_positions[index], rotation: (), scale: ()});
     }
     specs
 }
@@ -171,7 +178,7 @@ fn visual_detail_specs(root) {
     // USD Cone exposes radius1/radius2 while the current lightweight viewer
     // uses one effective radius. Keep a thin typed collar at every bell so
     // the engine throat remains legible at every mesh quality.
-    for entry in ["Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07"] {
+    for entry in griffin_spec::main_engine_names() {
         details.push(#{parent: cluster + "/" + entry, name: "BellCollar", shape: "cylinder",
             translation: [0.0, -0.23, 0.0], radius: 0.38, height: 0.08, axis: "Y",
             color: [0.24, 0.27, 0.31]});
@@ -185,7 +192,7 @@ fn _engine_radius_ops(edit_target, root) {
     // Keep the standard radius1/radius2 opinions in the component asset while
     // providing an explicit effective radius to the lightweight primitive
     // viewer until frustum tessellation is available there.
-    for entry in ["Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07"] {
+    for entry in griffin_spec::main_engine_names() {
         ops.push(#{SetAttribute: #{edit_target: edit_target,
             path: cluster + "/" + entry + "/Bell", name: "radius",
             type_name: "double", value: "0.34"}});
@@ -351,6 +358,9 @@ fn visual_component_plan(doc, edit_target, root) {
         return plan_error("visual_component_plan requires a document, edit target, and absolute root");
     }
     let specs = visual_component_specs(root);
+    if specs.len() == 0 {
+        return plan_error("cannot build visual assembly: required SysML FLIP steering angles are missing");
+    }
     let ops = [];
     let paths = [];
     let existing = [];
