@@ -13,8 +13,11 @@ fn finite_number(value) {
 }
 
 fn on_start(me) {
-    this.start_elapsed = elapsed_seconds();
+    // SimTick is the shared simulation master. Fixed/virtual elapsed resources
+    // also include scheduler bookkeeping while a causal participant is held,
+    // so they are diagnostic clocks rather than the test horizon.
     this.clock_start = clock_snapshot();
+    this.start_tick = sim_tick();
     this.elapsed = 0.0;
     this.stability_done = false;
     this.last_sample_tick = sim_tick();
@@ -42,7 +45,9 @@ fn emit_stability_verdict(me, contract, source, checks) {
     let last_ground = if me.last.ground_speed != () { me.last.ground_speed } else { 0.0 };
     let last_angular = if me.last.angular_speed != () { me.last.angular_speed } else { 0.0 };
     let clocks = clock_snapshot();
-    let clock_elapsed_delta = clocks.fixed_elapsed_s - me.clock_start.fixed_elapsed_s;
+    let clock_elapsed_delta = (clocks.sim_tick - me.clock_start.sim_tick).to_float()
+        * clocks.fixed_dt_s;
+    let fixed_elapsed_delta = clocks.fixed_elapsed_s - me.clock_start.fixed_elapsed_s;
     let clock_sync_error = (clock_elapsed_delta - me.elapsed).abs();
     let metrics = #{
         horizon_s: contract.horizon_s,
@@ -51,8 +56,10 @@ fn emit_stability_verdict(me, contract, source, checks) {
         clock_start_sim_tick: me.clock_start.sim_tick,
         clock_tick_delta: clocks.sim_tick - me.clock_start.sim_tick,
         fixed_elapsed_s: clocks.fixed_elapsed_s,
-        fixed_elapsed_delta_s: clock_elapsed_delta,
+        fixed_elapsed_delta_s: fixed_elapsed_delta,
+        admitted_sim_elapsed_delta_s: clock_elapsed_delta,
         clock_sync_error_s: clock_sync_error,
+        clock_contract_ok: clocks.clock_contract_ok,
         virtual_elapsed_s: clocks.virtual_elapsed_s,
         physics_elapsed_s: clocks.physics_elapsed_s,
         barrier_held: clocks.barrier_held,
@@ -90,8 +97,6 @@ fn emit_stability_verdict(me, contract, source, checks) {
 }
 
 fn on_tick(me) {
-    let now = elapsed_seconds();
-    this.elapsed = now - this.start_elapsed;
     if this.stability_done { return; }
     let contract = this.contract;
     if contract == () || contract.horizon_s == () || contract.horizon_s <= 0.0 {
@@ -101,7 +106,13 @@ fn on_tick(me) {
     // Sampling every ten fixed ticks keeps the test inexpensive while still
     // resolving the powered-descent oscillations that caused divergence.
     let tick = sim_tick();
-    if tick % 10 == 0 && tick != this.last_sample_tick {
+    // Sample in the test's own fixed-tick frame, not against the process-wide
+    // tick modulus. Startup admission may begin at any absolute SimTick, but
+    // a relative observer must produce the same sample set for the same
+    // horizon on every fresh process.
+    let relative_tick = tick - this.start_tick;
+    this.elapsed = relative_tick.to_float() * dt();
+    if relative_tick > 0 && relative_tick % 10 == 0 && tick != this.last_sample_tick {
         this.last_sample_tick = tick;
         let sample = griffin_surface_ops::landing_stability_sample();
         if sample == () {
@@ -142,8 +153,8 @@ fn on_tick(me) {
     if this.elapsed < contract.horizon_s { return; }
     let source = sysml_requirements::source();
     let current_clocks = clock_snapshot();
-    let clock_sync_error = (current_clocks.fixed_elapsed_s
-        - this.clock_start.fixed_elapsed_s - this.elapsed).abs();
+    let clock_sync_error = ((current_clocks.sim_tick - this.clock_start.sim_tick).to_float()
+        * current_clocks.fixed_dt_s - this.elapsed).abs();
     let checks = [
         #{ id: "GR-031-stability-finite", component: "lander", kind: "divergence", path: ROOT + "/Lander", actual: this.finite, expected: true, ok: this.finite, error: "landing telemetry became non-finite" },
         #{ id: "GR-031-clock-sync", component: "simulation-clock", kind: "divergence", path: ROOT, actual: clock_sync_error, expected: 0.0, ok: clock_sync_error <= 1.0e-7, error: "Rhai elapsed time diverged from the fixed clock" },

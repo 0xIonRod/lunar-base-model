@@ -37,10 +37,12 @@ for run in 1 2; do
         --readiness-timeout "$readiness_timeout" >"$log" 2>&1
     exit_code=$?
     set -e
+    printf '%s\n' "$exit_code" >"$work/run-$run.exit"
     if [[ $exit_code -ne 0 ]]; then
-        echo "landing trial $run failed with exit $exit_code" >&2
-        tail -80 "$log" >&2
-        exit $exit_code
+        # Keep collecting the second fresh process. A Rhai stability verdict
+        # can fail because the authored physical envelope is too tight while
+        # the two metric streams are still exactly repeatable.
+        echo "landing trial $run returned exit $exit_code; collecting metrics for repeatability" >&2
     fi
     metrics=$(sed -n 's/^.*GRIFFIN_LANDING_STABILITY_METRICS //p' "$log" | tail -1)
     if [[ -z "$metrics" ]]; then
@@ -48,6 +50,7 @@ for run in 1 2; do
         tail -80 "$log" >&2
         exit 2
     fi
+    echo "landing trial $run metrics: $metrics" >&2
     printf '%s\n' "$metrics" >"$work/run-$run.json"
 done
 
@@ -62,11 +65,19 @@ with open(sys.argv[2], encoding="utf-8") as handle:
     second = json.load(handle)
 
 if first.get("source_revision") != second.get("source_revision"):
-    raise SystemExit("FAIL landing source revisions differ")
+    raise SystemExit(
+        f"FAIL landing source revisions differ: {first.get('source_revision')} != {second.get('source_revision')}"
+    )
 if first.get("sample_count") != second.get("sample_count"):
-    raise SystemExit("FAIL landing sample counts differ")
+    raise SystemExit(
+        f"FAIL landing sample counts differ: {first.get('sample_count')} != {second.get('sample_count')}"
+    )
 if first.get("clock_tick_delta") != second.get("clock_tick_delta"):
-    raise SystemExit("FAIL fixed-clock tick counts differ")
+    raise SystemExit(
+        f"FAIL fixed-clock tick counts differ: {first.get('clock_tick_delta')} != {second.get('clock_tick_delta')}"
+    )
+if first.get("clock_contract_ok") is not True or second.get("clock_contract_ok") is not True:
+    raise SystemExit("FAIL deterministic clock contract was not satisfied")
 
 def number(name):
     value = first.get(name)
@@ -102,7 +113,7 @@ for key, tolerance in (
     if delta > tolerance:
         raise SystemExit(f"FAIL {key} diverged by {delta:.6g} (limit {tolerance:.6g})")
 
-for key in ("elapsed_s", "fixed_elapsed_delta_s", "virtual_elapsed_s"):
+for key in ("elapsed_s", "admitted_sim_elapsed_delta_s"):
     first_value = number(key)
     second_value = second.get(key)
     if not isinstance(second_value, (int, float)) or not math.isfinite(second_value):
@@ -117,3 +128,10 @@ print("upright_delta=" + str(abs(float(first['upright_axis_y']) - float(second['
       + " ground_speed_delta_mps=" + str(abs(float(first['ground_speed_mps']) - float(second['ground_speed_mps'])))
       + " angular_speed_delta_rad_per_sec=" + str(abs(float(first['angular_speed_rad_per_sec']) - float(second['angular_speed_rad_per_sec']))) )
 PY
+
+run1_exit=$(<"$work/run-1.exit")
+run2_exit=$(<"$work/run-2.exit")
+if [[ "$run1_exit" -ne 0 || "$run2_exit" -ne 0 ]]; then
+    echo "GRIFFIN LANDING ACCEPTANCE: FAIL (trial exits: $run1_exit, $run2_exit)" >&2
+    exit 1
+fi
