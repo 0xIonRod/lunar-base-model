@@ -18,12 +18,12 @@ fn landing_com_touchdown_y() { griffin_spec::landing_com_touchdown_y() }
 
 fn _sysml_number(report, name) {
     if report == () || report.ok != true { return (); }
-    sysml_requirements::number(report, name)
+    sysml_requirements::number(report, griffin_spec::qualified_attribute_name(name))
 }
 
 fn _sysml_text(report, name) {
     if report == () || report.ok != true { return (); }
-    sysml_requirements::text(report, name)
+    sysml_requirements::text(report, griffin_spec::qualified_attribute_name(name))
 }
 
 fn _sysml_list(report, name) {
@@ -110,7 +110,11 @@ fn sysml_contract_report() {
             // Definitions (GR001_...) and usages (gr001) are both valid
             // SysML records. The verification case covers the 33 usages,
             // which are the stable instance-level contract for this gate.
-            if _qualified(requirement).contains("::gr") {
+            // Count only Griffin's instance usages.  Other Twin packages use
+            // the same lowercase `gr...` naming convention (for example the
+            // dedicated ramp package), but they have their own verification
+            // declarations and must not inflate this Griffin count.
+            if _qualified(requirement).starts_with("Griffin1Requirements::gr") {
                 requirement_usages += 1;
             }
         }
@@ -135,23 +139,18 @@ fn sysml_contract_report() {
         || verification.verifies.len() != expected_requirement_usages {
         missing.push("declared verification case covering all requirements");
     }
-    for name in ["maxRampCommandRad", "mainEngineCount", "propellantTankCount", "landingComTouchdownY"] {
-        if report.attributes == () || report.attributes[name] == ()
-            || report.attributes[name].value == ()
-            || report.attributes[name].value.number == () {
+    for name in ["rampMaxDeploymentAngleRad", "mainEngineCount", "propellantTankCount", "landingComTouchdownY"] {
+        if _sysml_number(report, name) == () {
             missing.push("typed SysML attribute " + name);
         }
     }
     let canonical_attributes = ["payloadCapacityKg", "landingLegCount", "mainEngineCount",
-        "propellantTankCount", "rampCount", "solarArrayCount", "flipPayloadCapacityKg",
+        "propellantTankCount", "rampCount", "rampMaxDeploymentAngleRad", "solarArrayCount", "flipPayloadCapacityKg",
         "wheelCount", "visualRoverWheelCount", "visualWheelNames"];
-    if report.attribute_collisions != () {
-        for collision in report.attribute_collisions {
-            if collision.name != () && _has(canonical_attributes, collision.name) {
-                missing.push("ambiguous canonical SysML attribute " + collision.name);
-            }
-        }
-    }
+    // Short names may intentionally collide across component packages.  The
+    // accessors above resolve each canonical value to its owning qualified
+    // SysML name; do not reject a valid composed source merely because a
+    // different component reuses a local attribute name.
     // Source-backed creation facts are checked separately from the active
     // USD proxy. This prevents an inherited/default value from making a model
     // look Griffin-compatible when the public architecture has drifted.
@@ -164,7 +163,9 @@ fn sysml_contract_report() {
         }
     }
     for name in ["missionName", "landingRegion", "primaryRover",
-        "griffinProductSource", "flipProductSource", "flipEgressSource",
+        "griffinProductSource", "nasaMissionSource", "nasaLanderFactsSource",
+        "astroboticMissionManifestSource", "griffinPressReference",
+        "flipProductSource", "flipEgressSource",
         "tankSource", "geometryStatus", "massPropertiesStatus",
         "rampStatus", "solarArrayStatus", "wheelCountStatus", "egressMode",
         "solarArrayMode", "mobilityStatus", "exactVehicleIcdStatus",

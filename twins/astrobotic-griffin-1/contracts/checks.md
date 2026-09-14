@@ -51,6 +51,24 @@ the current model until the Editor repairs the authoritative geometry. The
 planned checks remain visible so future work cannot mistake a green partial
 lint for a complete vehicle qualification.
 
+## Isolated component gates
+
+The integration catalog above is not the component boundary. Each reusable
+assembly has an independently runnable SysML/Rhai/USD fixture:
+
+| Component | SysML source | Rhai observer | Fixture / verification |
+|---|---|---|---|
+| Griffin lander (bus, legs, tanks, engines, arrays) | `requirements/griffin_lander_requirements.sysml` | `scenarios/tests/griffin_lander_requirements.rhai` | `tests/griffin_lander_requirements.usda` / `GriffinLanderRequirements::Verify_GriffinLanderRequirements` |
+| FLIP rover (chassis, four directional wheels, mast, solar proxy) | `requirements/flip_requirements.sysml` | `scenarios/tests/flip_requirements.rhai` | `tests/flip_requirements.usda` / `FlipRequirements::Verify_FLIPComponentRequirements` |
+| Griffin egress ramp (port/starboard instances, hinge, placement, envelope) | `requirements/griffin_ramp_requirements.sysml` | `scenarios/tests/griffin_ramp_requirements.rhai` | `tests/griffin_ramp_requirements.usda` / `GriffinRampRequirements::Verify_GriffinRampRequirements` |
+
+The observers use the generic `sysml_requirements::evaluate` check kinds. They
+read qualified attributes from the validated SysML snapshot, query composed USD
+read-only, and emit a structured verdict on a dedicated channel. The
+`source_list_count` check also verifies that a declared identity list (for
+example the four FLIP wheels) agrees with its count before checking each USD
+path. This keeps stale lists from silently dropping a component.
+
 ## Visual review checks
 
 The visual contract is intentionally separate from flight/dynamics topology.

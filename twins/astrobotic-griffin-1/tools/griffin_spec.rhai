@@ -15,7 +15,7 @@ fn _sysml_source() {
 fn _sysml_attribute(name) {
     let source = _sysml_source();
     if source == () || source.ok != true { return (); }
-    sysml_requirements::number(source, name)
+    sysml_requirements::number(source, _qualified_attribute(name))
 }
 
 fn _sysml_integer(name) {
@@ -27,8 +27,61 @@ fn _sysml_integer(name) {
 fn _sysml_text(name) {
     let source = _sysml_source();
     if source == () || source.ok != true { return (); }
-    sysml_requirements::text(source, name)
+    sysml_requirements::text(source, _qualified_attribute(name))
 }
+
+// The Twin intentionally composes several SysML packages that reuse local
+// names such as `solarArrayCount` and `missionReference`.  Resolve every
+// public accessor to its owning package before crossing the generic bridge;
+// an ambiguous short-name lookup must never silently select another
+// component's value.
+fn _qualified_attribute(name) {
+    let lander = [
+        "payloadCapacityKg", "landingLegCount", "mainEngineCount",
+        "propellantTankCount", "solarArrayCount", "geometryStatus",
+        "massPropertiesStatus", "rampStatus", "solarArrayStatus"
+    ];
+    if lander.contains(name) {
+        return "Griffin1Requirements::Griffin1Lander::" + name;
+    }
+    let ramp = [
+        "rampCount", "rampSurfaceLengthM", "rampSurfaceWidthM",
+        "rampSurfaceThicknessM", "rampMaxDeploymentAngleRad",
+        "rampPortMountX", "rampStarboardMountX", "rampMountY", "rampMountZ",
+        "rampHingeOffsetX", "rampHingeOffsetY", "rampHingeOffsetZ",
+        "rampSocketX", "rampSocketY", "rampSocketZ",
+        "rampPortDeploymentAngleRad", "rampStarboardDeploymentAngleRad",
+        "rampBehavior", "hingeAxis", "mountDatum", "rampGeometryStatus",
+        "provenanceSource", "referenceImage"
+    ];
+    if ramp.contains(name) {
+        return "GriffinRampRequirements::GriffinEgressRamp::" + name;
+    }
+    let rover = [
+        "flipMassStudyKg", "flipPayloadCapacityKg", "wheelCount",
+        "wheelCountStatus", "egressMode", "solarArrayMode", "mobilityStatus",
+        "exactVehicleIcdStatus", "visualRoverName", "visualRoverWheelRadiusM",
+        "visualRoverWheelCount", "visualWheelNames", "frontSteeringAngleDeg",
+        "rearSteeringAngleDeg", "chassisWidthM", "chassisLengthM",
+        "sensorMastHeightM", "componentReference", "missionReference"
+    ];
+    if rover.contains(name) {
+        return "FlipRequirements::FlipRover::" + name;
+    }
+    let project = [
+        "unitSystem", "lengthUnit", "massUnit", "angleUnit", "timeUnit",
+        "frameUpAxis", "metersPerUnit", "moonbaseRequirementUsageCount",
+        "moonbaseRequirementIds", "moonbaseVerificationCaseName"
+    ];
+    if project.contains(name) {
+        return "MoonBaseProjectRequirements::ProjectSimulationContract::" + name;
+    }
+    "Griffin1Requirements::PublicMissionContext::" + name
+}
+
+// Public for Twin-local policy modules that need to validate the same
+// cross-package source without duplicating ownership tables.
+fn qualified_attribute_name(name) { _qualified_attribute(name) }
 
 fn _sysml_list(name) {
     let value = _sysml_text(name);
@@ -46,7 +99,10 @@ fn _sysml_list(name) {
 // One canonical payload datum lives on Griffin1Lander.  Requirement GR-009
 // consumes that datum instead of declaring a second 625 kg literal.
 fn max_payload_kg() { _sysml_attribute("payloadCapacityKg") }
-fn max_ramp_command_rad() { _sysml_attribute("maxRampCommandRad") }
+// Ramp limits are owned by the dedicated ramp requirement package. Keep this
+// compatibility accessor for lander mission helpers without duplicating the
+// numeric datum in the Griffin package.
+fn max_ramp_command_rad() { _sysml_attribute("rampMaxDeploymentAngleRad") }
 fn main_engine_count() { _sysml_integer("mainEngineCount") }
 fn propellant_tank_count() { _sysml_integer("propellantTankCount") }
 fn landing_leg_count() { _sysml_integer("landingLegCount") }

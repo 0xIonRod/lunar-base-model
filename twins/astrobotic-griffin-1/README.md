@@ -64,9 +64,17 @@ Sources:
 | tools/terrain/ | Polar-stereo download, reprojection, and provenance instructions |
 | scenarios/griffin_1_surface_ops.rhai | Mission sequencing and route policy |
 | scenarios/tests/griffin_requirements.rhai | Twin-owned structural/parameter verdict and boundary checks |
+| scenarios/tests/griffin_lander_requirements.rhai | Rhai observer for the standalone lander-component contract |
+| scenarios/tests/flip_requirements.rhai | Rhai observer for the standalone four-wheel FLIP contract |
+| scenarios/tests/griffin_ramp_requirements.rhai | Rhai observer for independent port/starboard ramp topology, placement, geometry, and deployment checks |
 | tests/griffin_requirements.usda | Minimal composed fixture for the Griffin contract test |
+| tests/griffin_lander_requirements.usda | Minimal Griffin-only fixture for the lander-component gate |
+| tests/flip_requirements.usda | Minimal FLIP-only fixture for the rover-component gate |
+| tests/griffin_ramp_requirements.usda | Griffin-only fixture for the independent ramp gate |
 | requirements/griffin_requirements.sysml | Normative Griffin lander/integration SysML v2 requirements, usages, study values, and verification case |
+| requirements/griffin_lander_requirements.sysml | Standalone Griffin lander-component SysML v2 contract for bus, legs, tanks, engines, and solar arrays |
 | requirements/flip_requirements.sysml | Rover-owned FLIP SysML v2 values and visual verification case |
+| requirements/griffin_ramp_requirements.sysml | Dedicated Griffin ramp subsystem requirements, metric envelope, hinge contract, and independent verification case |
 | twin.toml `[verification]` | Single registry binding each qualified SysML verification to its Twin scene, Rhai observer, and verdict channel |
 | contracts/ | Part contracts, full active/planned check catalog, and typed authoring procedure |
 | tools/griffin_spec.rhai | Rhai compatibility projection of limits read from the SysML source |
@@ -80,6 +88,15 @@ Sources:
 | handover.md | Detailed implementation and verification handover |
 | agent_to_agent_missing.md | Concrete follow-up work for the next coding agent |
 | instructions.md | Step-by-step setup and completion procedure |
+
+Each major component has the same three-part acceptance contract: a SysML v2
+source file owns names, counts, metric study values, and provenance; a Twin
+Rhai observer performs read-only generic USD checks; and a minimal composed USD
+fixture binds that observer to the component in isolation. The combined
+Griffin/FLIP visual scene remains an integration gate, not the only place where
+component correctness is checked. Observers use qualified SysML attribute names
+when packages intentionally reuse local names; the generic evaluator rejects
+ambiguous short-name lookups instead of guessing.
 
 ## Provision the NOBILE03 terrain
 
@@ -110,6 +127,15 @@ mission/tutorial scenario do not obscure the lander. Keep that scene for
 visual authoring; use `scenes/griffin_1_surface_ops.usda` for integration and
 runtime acceptance.
 
+For render-only component work, open `vehicles/griffin_1_visual.usda` and
+`vehicles/flip_visual.usda` as two independent USD previews in Editor
+Perspective. Use the Twin `griffin_visual_builder` library for the complete
+vehicle recipe, or its isolated `apply_isolated_griffin_ramp(..., "port"|
+"starboard", ...)` entry point when refining one ramp. Each operation is
+typed, journaled, and saved through the Editor; never rewrite the USDA text by
+hand. The ramp requirements and Rhai verification are intentionally separate
+so a ramp can be accepted without coupling it to FLIP's visual review.
+
 ### Build
 
 On native Windows, the current EOP-data build helper expects the Unix date
@@ -123,7 +149,7 @@ The PATH change is process-local and does not change the repository.
 
 ### Parse/lint the Twin files
 
-    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\requirements\griffin_requirements.sysml twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai twins\astrobotic-griffin-1\behaviors\griffin_1_flip_patrol.btxml
+    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\requirements\griffin_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_lander_requirements.sysml twins\astrobotic-griffin-1\requirements\flip_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_ramp_requirements.sysml twins\astrobotic-griffin-1\requirements\moonbase_project_requirements.sysml twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_lander_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\flip_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_ramp_requirements.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai twins\astrobotic-griffin-1\behaviors\griffin_1_flip_patrol.btxml
 
 All listed source files must report OK; the Twin requirements test below is the
 composed-stage check rather than a text-only parse. The Rhai test also validates
@@ -158,6 +184,16 @@ active/planned requirement matrix is in `contracts/checks.md`; planned checks
 are intentionally not represented as passing. Re-run
 `lint_live` after the projection advances; do not close or reload the document
 between edit and inspection.
+
+Run the isolated component gates with the same fixed-clock settings:
+
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_lander_requirements.usda --verification GriffinLanderRequirements::Verify_GriffinLanderRequirements --verdict-channel GRIFFIN_LANDER_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/flip_requirements.usda --verification FlipRequirements::Verify_FLIPComponentRequirements --verdict-channel FLIP_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_ramp_requirements.usda --verification GriffinRampRequirements::Verify_GriffinRampRequirements --verdict-channel GRIFFIN_RAMP_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+
+These fixtures deliberately load one vehicle component at a time. A component
+gate is not replaced by the combined visual gate: it is the evidence that a
+lander, rover, or ramp can be reviewed and diagnosed independently.
 
 ### Check landing divergence
 

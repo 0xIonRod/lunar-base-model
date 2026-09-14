@@ -11,7 +11,9 @@ runtime discovers `tools/*.rhai` at the top level only.
 |---|---|---|
 | `contracts/*.md` | Twin authors | Explain part obligations, units, provenance, and acceptance policy. |
 | `requirements/griffin_requirements.sysml` | Twin authors | Normative Griffin lander/integration SysML v2 requirement/verification definitions, usages, and study limits. |
+| `requirements/griffin_lander_requirements.sysml` | Twin authors | Standalone lander-component values, identity lists, metric envelope, and seven-requirement verification case. |
 | `requirements/flip_requirements.sysml` | Twin authors | Rover-owned FLIP values and the four-wheel visual verification case. |
+| `requirements/griffin_ramp_requirements.sysml` | Twin authors | Standalone ramp geometry, hinge, placement, deployment, and evidence requirements. |
 | `tools/griffin_spec.rhai` | Twin authors | Read-only compatibility projection of SysML values for the Rhai test API. |
 | `tools/griffin_requirements.rhai` | Twin authors | Stable Rhai API for lint, reports, live gates, and command limiters. |
 | `tools/griffin_visual_builder.rhai` | Twin authors | Dry/apply component assembly recipe over the generic typed USD tools. |
@@ -21,11 +23,12 @@ runtime discovers `tools/*.rhai` at the top level only.
 | Rust runtime | generic simulator | Supplies query, typed edit, projection, and test seams; no Griffin-specific policy. |
 
 Do not duplicate a numeric requirement in a scene file and a script. A value
-belongs in `requirements/griffin_requirements.sysml`; the Rhai spec module reads
-that source through the compact `ValidateSysml` query and exposes a compatibility
-function to the executable test. The Markdown records meaning and provenance.
-A value that is not source-backed must remain explicitly marked as a study
-proxy or `TBD`.
+belongs in the owning component SysML package (`griffin_requirements.sysml`,
+`griffin_lander_requirements.sysml`, `flip_requirements.sysml`, or
+`griffin_ramp_requirements.sysml`); the Rhai observers read that source through
+the compact `ValidateSysml` query and the generic evaluator. The Markdown
+records meaning and provenance. A value that is not source-backed must remain
+explicitly marked as a study proxy or `TBD`.
 
 ## Check execution
 

@@ -32,19 +32,12 @@ fn flip_visual_children_check(id, component, path, paths) {
 // passed to the generic evaluator.  The test owns only child geometry names;
 // it does not carry a second list of rover/lander station identities.
 fn _sysml_list(report, name) {
-    if report == () || report.attributes == () || report.attributes[name] == ()
-        || report.attributes[name].value == () {
+    let value = sysml_requirements::text(report, griffin_spec::qualified_attribute_name(name));
+    if value == () || value == "" {
         return [];
     }
-    let literal = report.attributes[name].value.literal;
-    if literal.len() > 0 && literal.starts_with("\"") {
-        literal = literal.sub_string(1, literal.len() - 1);
-    }
-    if literal.len() > 0 && literal.ends_with("\"") {
-        literal = literal.sub_string(0, literal.len() - 1);
-    }
     let items = [];
-    for item in literal.split(",") {
+    for item in value.split(",") {
         item.trim();
         if item != "" { items.push(item); }
     }
@@ -152,7 +145,7 @@ fn on_tick(me) {
         root + "/FLIP/SolarArray/BlueCells", root + "/FLIP/SolarArray/FoldHinge"]));
     let wheel_count = flip_visual_exists_check("GV-003-wheel-count", "wheels", "attribute", root + "/FLIP");
     wheel_count.attr = "lunco:visual:wheel_count";
-    wheel_count.expected_attr = "visualRoverWheelCount";
+    wheel_count.expected_attr = griffin_spec::qualified_attribute_name("visualRoverWheelCount");
     wheel_count.tolerance = 0.0;
     checks.push(wheel_count);
     let wheel_names = _sysml_list(source, "visualWheelNames");
@@ -169,7 +162,7 @@ fn on_tick(me) {
             requirement: "FlipRequirements::fvg001",
             verification: "FlipRequirements::Verify_FLIPVisualRequirements",
             kind: "bounds_component", path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Tire",
-            index: 1, multiplier: 1.0, expected_attr: "visualRoverWheelRadiusM", tolerance: 0.001 };
+            index: 1, multiplier: 1.0, expected_attr: griffin_spec::qualified_attribute_name("visualRoverWheelRadiusM"), tolerance: 0.001 };
         checks.push(check);
     }
     let rover_config = #{ id: "FGV-001-rover-config", component: "rover",
@@ -183,25 +176,21 @@ fn on_tick(me) {
         requirement: "FlipRequirements::fvg001",
         verification: "FlipRequirements::Verify_FLIPVisualRequirements",
         kind: "attribute", path: root + "/FLIP", attr: "lunco:visual:wheel_count",
-        expected_attr: "visualRoverWheelCount", tolerance: 0.0 };
+        expected_attr: griffin_spec::qualified_attribute_name("visualRoverWheelCount"), tolerance: 0.0 };
     checks.push(wheel_count);
-    for name in ["FL", "FR"] {
+    for name in wheel_names {
+        let expected_attr = if name.starts_with("F") {
+            "frontSteeringAngleDeg"
+        } else {
+            "rearSteeringAngleDeg"
+        };
         checks.push(#{ id: "FGV-001-steering-" + name, component: "wheels",
             requirement: "FlipRequirements::fvg001",
             verification: "FlipRequirements::Verify_FLIPVisualRequirements",
             kind: "attribute_component",
             path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name,
             attr: "xformOp:rotateXYZ", index: 1,
-            expected_attr: "frontSteeringAngleDeg", tolerance: 0.001 });
-    }
-    for name in ["RL", "RR"] {
-        checks.push(#{ id: "FGV-001-steering-" + name, component: "wheels",
-            requirement: "FlipRequirements::fvg001",
-            verification: "FlipRequirements::Verify_FLIPVisualRequirements",
-            kind: "attribute_component",
-            path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name,
-            attr: "xformOp:rotateXYZ", index: 1,
-            expected_attr: "rearSteeringAngleDeg", tolerance: 0.001 });
+            expected_attr: griffin_spec::qualified_attribute_name(expected_attr), tolerance: 0.001 });
     }
     // The assembly-authored socket/frame relationships are the durable
     // placement contract behind the numeric transforms.
@@ -237,19 +226,19 @@ fn on_tick(me) {
     checks.push(visual_exists_check("GV-004-deck-width", "lander_deck", "Griffin1Requirements::gv004", "bounds_component", root + "/Griffin1/Bus/WhiteEquipmentBox"));
     checks[checks.len() - 1].index = 0;
     checks[checks.len() - 1].multiplier = 2.0;
-    checks[checks.len() - 1].expected_attr = "visualLanderDeckWidthM";
+    checks[checks.len() - 1].expected_attr = griffin_spec::qualified_attribute_name("visualLanderDeckWidthM");
     checks[checks.len() - 1].tolerance = 0.001;
     let pad = #{ id: "GV-004-pad-radius", component: "context",
         requirement: "Griffin1Requirements::gv004",
         verification: "Griffin1Requirements::Verify_GriffinVisualRequirements",
         kind: "bounds_component", path: root + "/Ground/LandingPad", index: 0,
-        multiplier: 1.0, expected_attr: "visualLandingPadRadiusM", tolerance: 0.001 };
+        multiplier: 1.0, expected_attr: griffin_spec::qualified_attribute_name("visualLandingPadRadiusM"), tolerance: 0.001 };
     checks.push(pad);
     let ground = #{ id: "GV-004-ground-width", component: "context",
         requirement: "Griffin1Requirements::gv004",
         verification: "Griffin1Requirements::Verify_GriffinVisualRequirements",
         kind: "bounds_component", path: root + "/Ground/RegolithPad",
-        index: 0, multiplier: 2.0, expected_attr: "visualReviewGroundWidthM", tolerance: 0.001 };
+        index: 0, multiplier: 2.0, expected_attr: griffin_spec::qualified_attribute_name("visualReviewGroundWidthM"), tolerance: 0.001 };
     checks.push(ground);
     let render = #{ id: "GV-005-ground-render", component: "context",
         requirement: "Griffin1Requirements::gv005",

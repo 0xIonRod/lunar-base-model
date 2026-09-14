@@ -12,6 +12,10 @@ package Griffin1Requirements {
         attribute cargoStatement : String = "more than 499 kg of cargo (metric conversion of the public NASA lower bound)";
         attribute primaryRover : String = "Astrolab FLIP (FLEX Lunar Innovation Platform)";
         attribute griffinProductSource : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
+        attribute nasaMissionSource : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
+        attribute nasaLanderFactsSource : String = "https://science.nasa.gov/wp-content/uploads/2023/11/astrobotic-lunar-landers-pug.pdf";
+        attribute astroboticMissionManifestSource : String = "https://www.astrobotic.com/lunar-delivery/manifest/";
+        attribute griffinPressReference : String = "https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/";
         attribute flipProductSource : String = "https://www.astrobotic.com/astrolabs-flip-rover-joins-astrobotics-griffin-1-to-the-moon/";
         attribute flipEgressSource : String = "https://www.astrolab.space/2026/05/18/astrolab-announces-nasa-payloads-for-upcoming-mission-to-the-moon/";
         attribute tankSource : String = "https://www.astrobotic.com/griffin-1-mission-update/";
@@ -70,7 +74,6 @@ package Griffin1Requirements {
         attribute landingLegCount : Integer = 4;
         attribute mainEngineCount : Integer = 7;
         attribute propellantTankCount : Integer = 4;
-        attribute rampCount : Integer = 2;
         attribute solarArrayCount : Integer = 2;
         // Mechanical ICD values remain explicit study inputs until supplied.
         attribute geometryStatus : String = "study surrogate; Griffin ICD TBD";
@@ -128,7 +131,6 @@ package Griffin1Requirements {
 
     requirement def GR011_RampBodies {
         doc /* GR-011 [study control] retain two side-ramp bodies with contact geometry and revolute hinges; the command bound is a proxy, not a released mechanical limit. */
-        attribute maxRampCommandRad : Real = 0.58;
     }
 
     requirement def GR012_LoadBearingMass {

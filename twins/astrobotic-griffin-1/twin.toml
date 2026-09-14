@@ -33,6 +33,24 @@ script = "scenarios/tests/griffin_flip_visual.rhai"
 verdict_channel = "GRIFFIN_FLIP_VISUAL"
 
 [[verification.cases]]
+name = "GriffinRampRequirements::Verify_GriffinRampRequirements"
+scene = "tests/griffin_ramp_requirements.usda"
+script = "scenarios/tests/griffin_ramp_requirements.rhai"
+verdict_channel = "GRIFFIN_RAMP_REQUIREMENTS"
+
+[[verification.cases]]
+name = "GriffinLanderRequirements::Verify_GriffinLanderRequirements"
+scene = "tests/griffin_lander_requirements.usda"
+script = "scenarios/tests/griffin_lander_requirements.rhai"
+verdict_channel = "GRIFFIN_LANDER_REQUIREMENTS"
+
+[[verification.cases]]
+name = "FlipRequirements::Verify_FLIPComponentRequirements"
+scene = "tests/flip_requirements.usda"
+script = "scenarios/tests/flip_requirements.rhai"
+verdict_channel = "FLIP_REQUIREMENTS"
+
+[[verification.cases]]
 name = "Griffin1Requirements::Verify_GriffinSurfaceOperations"
 scene = "scenes/griffin_1_surface_ops.usda"
 script = "scenarios/griffin_1_surface_ops.rhai"
