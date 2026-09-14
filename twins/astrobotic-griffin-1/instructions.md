@@ -13,7 +13,9 @@ a flight-fidelity version requires:
 2. Griffin propulsion, RCS, propellant, leg, sensor, and GNC interfaces.
 3. FLIP as-built geometry, mass properties, wheel/traction, power, thermal,
    payload, and communications data.
-4. Registered Nobile Crater DEM and site frame.
+4. Final registered Griffin touchdown DEM/site frame. The package currently
+   includes a reproducible regional LROC NOBILE03 crop as an interim terrain
+   source; its center is not a confirmed touchdown coordinate.
 5. Mission epoch, solar geometry, command timeline, and release sequence.
 6. A source or owner confirmation for every parameter marked unknown.
 
@@ -42,8 +44,12 @@ Keep this structure:
     vehicles/griffin_1.usda
     vehicles/flip.usda
     behaviors/griffin_1_flip_patrol.btxml
+    Assets.toml
+    terrain/nobile03/                 # generated and ignored
+    tools/terrain/reproject_lroc_polar_dem.py
     environments/south_pole_surrogate.usda
     scenarios/griffin_1_surface_ops.rhai
+    tools/griffin_controls.rhai
     research/griffin_1_assumptions.md
     README.md
     handover.md
@@ -52,7 +58,18 @@ Keep this structure:
 The Twin-local references use twin://astrobotic-griffin-1/. Do not change them
 to absolute Windows paths.
 
-## Step 3: build the current LunCoSim binary
+## Step 3: provision the reproducible regional terrain
+
+From the repository root, follow [`tools/terrain/README.md`](../../tools/terrain/README.md)
+to download the two pinned NOBILE03 source files and generate the local
+heightfield. Downloads and generated terrain bytes must remain ignored; verify
+the boundary with `git check-ignore -v` before staging.
+
+The processing record uses a 512 m × 512 m, 129 × 129-node crop centered at
+`-84.72672255, 29.14428685` east, with an explicit source-datum normalization
+into the scene-local height frame.
+
+## Step 4: build the current LunCoSim binary
 
 From the repository root:
 
@@ -62,16 +79,16 @@ From the repository root:
 The PATH line supplies date.exe for the current celestial EOP build helper.
 It changes only the current PowerShell process.
 
-## Step 4: validate authored source
+## Step 5: validate authored source
 
 Run:
 
-    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai
+    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai twins\astrobotic-griffin-1\behaviors\griffin_1_flip_patrol.btxml
 
-Expected result: four OK lines. A parse pass only proves syntax and source
+Expected result: six OK lines. A parse pass only proves syntax and source
 loading; it does not prove physics or mission completion.
 
-## Step 5: run the interactive Twin
+## Step 6: run the interactive Twin
 
 Run:
 
@@ -80,19 +97,32 @@ Run:
 Check:
 
 - the Griffin lander is present at the authored descent start;
-- the South-Pole surrogate ground is present;
+- the NOBILE03 DEM-backed South-Pole ground is present;
 - the camera and landing target are present;
 - the four-wheel FLIP study proxy is visible on the lander top deck during
   descent;
-- the isogrid deck, side solar arrays, two ramps, and the ordered route markers
-  are present;
+- the isogrid deck, clean top deck, matched vertical side solar arrays, two
+  collision-safe ramps, and the ordered route markers are present;
 - the runtime has no unresolved twin:// asset error.
 
+The persistent control brief is part of the interactive acceptance check:
+
+- click the Griffin lander to possess it and verify the lander control card;
+- use `W/S` pitch, `A/D` roll, `Q/E` yaw, `Space` thrust, and `G` release;
+- after rover release, click FLIP to possess it and verify the rover HUD;
+- use `W/S` drive, `A/D` steer, `Space` brake, and `F` to toggle autopilot;
+- use `Escape` or `Backspace` to return to free flight.
+
+The Twin-local Rhai tool library exposes the same handoff explicitly for the
+console: `griffin_controls::control_lander()`,
+`griffin_controls::control_rover()`, and
+`griffin_controls::release_control()`.
+
 The current prototype keeps FLIP on a scene-level fixed top-deck adapter joint
-through descent, deploys the two physical side ramps after touchdown, then
-releases the live joint before rover egress. The earlier six-wheel jointed
-attempt remains historical failure evidence; the active asset is the
-four-wheel FLIP proxy.
+through descent, confirms the two solid integrated side ramps in their
+authored landed pose, then releases the live joint before rover egress. The
+earlier independent-ramp and six-wheel jointed attempts remain historical
+failure evidence; the active asset is the four-wheel FLIP proxy.
 
 ## Step 6: run the deterministic headless check
 
@@ -107,17 +137,21 @@ Interpret the result:
 - exit 2: the bound expired or the app exited before a verdict.
 
 The original staged baseline reports PASS at 3,983 ticks / 66.38 simulated
-seconds on `luncosim 0.6.0-nightly.64.1 (042f0246)`. The active attached-ramp
-prototype is a separate re-qualification target. The route tree is
+seconds on `luncosim 0.6.0-nightly.64.1 (042f0246)`, before the current
+attached-ramp release changes. The active prototype is a separate
+re-qualification target: the production run reaches touchdown, both ramp
+commands, adapter release, and FLIP autopilot engagement, then expires
+NO-VERDICT without post-release waypoint progress. The route tree is
 Griffin-local; do not substitute the generic LanderTest patrol asset because
 its waypoint paths belong to another scene.
 
 The active runtime build includes a fixed-joint cargo gate: FLIP cannot consume
 the ramp-approach sensor while it is still attached to the lander. The current
 prototype also treats the released adapter plate/restraints as non-colliding;
-only the deck, ramps, and surface are the post-release contact path. The final
-post-change route test remains pending because the host blocked the launch
-through its approval/ACL service.
+only the deck, ramps, and surface are the post-release contact path. A generic
+fixed-joint regression passes, but the FLIP-specific body remains at its
+release pose after detach, so the missing phase is vehicle-body promotion/wake
+and route motion—not a missing Rhai event or a reason to add timer-only PASS.
 
 ## Step 7: investigate before changing the verdict
 
@@ -126,10 +160,12 @@ If the command reports NO-VERDICT:
 1. Check the terminal log for a physics-body-escaped fault.
 2. Confirm the lander event source paths.
 3. Confirm the Rhai task is attached to /Griffin1SurfaceOps/Scenario/Mission.
-4. Confirm the ramp-approach, ramp-exit, surface-waypoint, and base-site
-   events are emitted by FLIP.
-5. Confirm the rover command reaches its supported drive ports.
-6. Add diagnostics to the acceptance observer.
+4. After release, confirm the surface-waypoint and base-site events are
+   emitted by FLIP; do not treat attached ramp sensors as acceptance events.
+5. Confirm the rover command reaches its supported drive ports and that its
+   body leaves the adapter release pose.
+6. Add diagnostics to the acceptance observer, including live body state,
+   velocity, contacts, wheel state, and joint ownership.
 7. Keep the deterministic bound and report the missing phase.
 
 Do not add a timer-only PASS.

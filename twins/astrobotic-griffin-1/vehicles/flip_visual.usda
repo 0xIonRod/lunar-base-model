@@ -1,0 +1,115 @@
+#usda 1.0
+(
+    defaultPrim = "FLIP"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+# FLIP presentation assembly.  The six-wheel visual silhouette follows the
+# public rover concept while the production dynamics remain in vehicles/flip.usda.
+def Xform "FLIP" (
+    kind = "assembly"
+)
+{
+    custom string lunco:visual:status = "componentized review proxy; no flight CAD"
+    custom string lunco:visual:configuration = "six wheels, white equipment box, sensor mast, collapsible rear solar array"
+    custom int lunco:visual:wheel_count = 6
+
+    def Xform "Chassis" (
+        prepend references = @twin://astrobotic-griffin-1/components/rover/flip_chassis_visual.usda@</FlipChassis>
+    )
+    {
+    }
+    def Xform "SensorMast" (
+        prepend references = @twin://astrobotic-griffin-1/components/rover/flip_sensor_mast_visual.usda@</FlipSensorMast>
+    )
+    {
+    }
+    def Xform "SolarArray" (
+        prepend references = @twin://astrobotic-griffin-1/components/rover/flip_solar_panel_visual.usda@</FlipSolarPanel>
+    )
+    {
+        double3 xformOp:translate = (0.0, 1.45, 1.30)
+        double3 xformOp:rotateXYZ = (18.0, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+
+    def Xform "Suspension_FL"
+    {
+        double3 xformOp:translate = (-1.75, -0.42, -1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        def Xform "Wheel_FL" (
+            prepend references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@</FlipWheel>
+        )
+        {
+            custom float physxVehicleWheel:radius = 0.45
+            custom float physxVehicleWheel:width = 0.30
+            custom int physxVehicleWheelAttachment:index = 0
+        }
+    }
+    def Xform "Suspension_ML"
+    {
+        double3 xformOp:translate = (-1.75, -0.42, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        def Xform "Wheel_ML" (
+            prepend references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@</FlipWheel>
+        )
+        {
+            custom float physxVehicleWheel:radius = 0.45
+            custom float physxVehicleWheel:width = 0.30
+            custom int physxVehicleWheelAttachment:index = 1
+        }
+    }
+    def Xform "Suspension_RL"
+    {
+        double3 xformOp:translate = (-1.75, -0.42, 1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        def Xform "Wheel_RL" (
+            prepend references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@</FlipWheel>
+        )
+        {
+            custom float physxVehicleWheel:radius = 0.45
+            custom float physxVehicleWheel:width = 0.30
+            custom int physxVehicleWheelAttachment:index = 2
+        }
+    }
+    def Xform "Suspension_FR"
+    {
+        double3 xformOp:translate = (1.75, -0.42, -1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        def Xform "Wheel_FR" (
+            prepend references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@</FlipWheel>
+        )
+        {
+            custom float physxVehicleWheel:radius = 0.45
+            custom float physxVehicleWheel:width = 0.30
+            custom int physxVehicleWheelAttachment:index = 3
+        }
+    }
+    def Xform "Suspension_MR"
+    {
+        double3 xformOp:translate = (1.75, -0.42, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        def Xform "Wheel_MR" (
+            prepend references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@</FlipWheel>
+        )
+        {
+            custom float physxVehicleWheel:radius = 0.45
+            custom float physxVehicleWheel:width = 0.30
+            custom int physxVehicleWheelAttachment:index = 4
+        }
+    }
+    def Xform "Suspension_RR"
+    {
+        double3 xformOp:translate = (1.75, -0.42, 1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        def Xform "Wheel_RR" (
+            prepend references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@</FlipWheel>
+        )
+        {
+            custom float physxVehicleWheel:radius = 0.45
+            custom float physxVehicleWheel:width = 0.30
+            custom int physxVehicleWheelAttachment:index = 5
+        }
+    }
+}

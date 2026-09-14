@@ -1,0 +1,84 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World" (
+    prepend apiSchemas = "PhysicsRigidBodyAPI"
+)
+{
+    float physics:mass = 42.0
+    float3 physics:centerOfMass = (0.0, -0.8799999952316284, 0.0)
+    float3 physics:diagonalInertia = (18.0, 2.5, 18.0)
+    custom string lunco:part:role = "Griffin-1 landing leg module"
+    custom string lunco:part:interface = "deck mount to circular touchdown pad; reusable four-way instance"
+    custom string lunco:provenance:source = "Twin-authored study geometry; public flight ICD unavailable"
+    def Cube "TopMount"
+    {
+        custom double3 xformOp:translate = (0.0, -0.08, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.38, 0.12, 0.38)
+        color3f[] primvars:displayColor = [(0.5799999833106995, 0.3799999952316284, 0.11999999731779099)]
+        bool physics:collisionEnabled = false
+        uniform token purpose = "render"
+    }
+    def Cylinder "OuterStrut" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:translate = (0.0, -0.98, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token axis = "Y"
+        float radius = 0.10499999672174454
+        float height = 1.5499999523162842
+        color3f[] primvars:displayColor = [(0.3199999928474426, 0.3400000035762787, 0.3799999952316284)]
+        bool physics:collisionEnabled = true
+    }
+    def Cylinder "ShockHousing"
+    {
+        custom double3 xformOp:translate = (0.0, -0.52, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token axis = "Y"
+        float radius = 0.17000000178813934
+        float height = 0.5400000214576721
+        color3f[] primvars:displayColor = [(0.6600000262260437, 0.4399999976158142, 0.15000000596046448)]
+        bool physics:collisionEnabled = false
+        uniform token purpose = "render"
+    }
+    def Cylinder "Piston"
+    {
+        custom double3 xformOp:translate = (0.0, -1.14, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token axis = "Y"
+        float radius = 0.06499999761581421
+        float height = 0.8799999952316284
+        color3f[] primvars:displayColor = [(0.699999988079071, 0.7200000286102295, 0.75)]
+        bool physics:collisionEnabled = false
+        uniform token purpose = "render"
+    }
+    def Cylinder "FootHub"
+    {
+        custom double3 xformOp:translate = (0.0, -1.69, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token axis = "Y"
+        float radius = 0.18000000715255737
+        float height = 0.11999999731779099
+        color3f[] primvars:displayColor = [(0.5600000023841858, 0.5799999833106995, 0.6200000047683716)]
+        bool physics:collisionEnabled = false
+        uniform token purpose = "render"
+    }
+    def Cylinder "FootPad" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:translate = (0.0, -1.78, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token axis = "Y"
+        float radius = 0.3199999928474426
+        float height = 0.10000000149011612
+        color3f[] primvars:displayColor = [(0.3799999952316284, 0.4000000059604645, 0.4399999976158142)]
+        bool physics:collisionEnabled = true
+    }
+}

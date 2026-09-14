@@ -1,0 +1,47 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1LanderRoverAssembly"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "Griffin1LanderRoverAssembly" (
+    kind = "assembly"
+    documentation = "Reusable Griffin-1 delivery stack. The lander, FLIP rover, and PayloadDock share one authored local frame."
+)
+{
+    custom string lunco:assembly:role = "lander plus rover delivery stack"
+    custom string lunco:assembly:units = "SI metres; upAxis Y; metersPerUnit 1"
+    custom string lunco:assembly:placement = "Move this assembly root; do not place its child bodies independently."
+
+    def Xform "Lander" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
+    )
+    {
+        double3 xformOp:translate = (0.0, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 physics:velocity = (0.0, -0.2, 0.0)
+        custom string lunco:assembly:role = "dynamic Griffin lander"
+    }
+
+    def Xform "Rover" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
+    )
+    {
+        # PayloadDock localPos0.y = +1.72 and localPos1.y = -1.30.
+        # Keeping the authored 3.02 m separation here makes the fixed joint
+        # frame invariant when the assembly root is moved.
+        double3 xformOp:translate = (0.0, 3.02, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        custom string lunco:assembly:role = "four-wheel FLIP payload rover"
+    }
+
+    def PhysicsFixedJoint "PayloadDock"
+    {
+        rel physics:body0 = </Griffin1LanderRoverAssembly/Lander>
+        rel physics:body1 = </Griffin1LanderRoverAssembly/Rover>
+        point3f physics:localPos0 = (0.0, 1.72, 0.0)
+        point3f physics:localPos1 = (0.0, -1.30, 0.0)
+        bool physics:collisionEnabled = false
+    }
+}

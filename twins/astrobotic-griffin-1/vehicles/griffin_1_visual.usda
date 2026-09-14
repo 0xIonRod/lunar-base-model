@@ -1,0 +1,136 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+# Griffin-1 presentation assembly.  Every visible subsystem is a referenced
+# component so the Editor can replace one part without rebuilding the vehicle.
+def Xform "Griffin1" (
+    kind = "assembly"
+)
+{
+    custom string lunco:visual:status = "componentized review proxy; no flight CAD"
+    custom string lunco:visual:configuration = "hexagonal bus, four legs, four vertical tank pods, dual side arrays, seven bells, two ramps"
+
+    def Xform "Bus" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda@</GriffinBus>
+    )
+    {
+        double3 xformOp:translate = (0.0, 3.20, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Xform "TankPX" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@</PropellantTank>
+    )
+    {
+        double3 xformOp:translate = (1.30, 5.85, -1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Xform "TankNX" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@</PropellantTank>
+    )
+    {
+        double3 xformOp:translate = (-1.30, 5.85, -1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Xform "TankPZ" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@</PropellantTank>
+    )
+    {
+        double3 xformOp:translate = (1.30, 5.85, 1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Xform "TankNZ" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@</PropellantTank>
+    )
+    {
+        double3 xformOp:translate = (-1.30, 5.85, 1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Xform "LegPX" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+    )
+    {
+        double3 xformOp:translate = (1.75, 2.35, -1.25)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Xform "LegNX" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+    )
+    {
+        double3 xformOp:translate = (-1.75, 2.35, -1.25)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Xform "LegPZ" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+    )
+    {
+        double3 xformOp:translate = (1.75, 2.35, 1.25)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Xform "LegNZ" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+    )
+    {
+        double3 xformOp:translate = (-1.75, 2.35, 1.25)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Xform "SolarPanelPort" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
+    )
+    {
+        double3 xformOp:translate = (2.70, 3.35, 0.0)
+        double3 xformOp:rotateXYZ = (0.0, 0.0, 90.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+    def Xform "SolarPanelStarboard" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
+    )
+    {
+        double3 xformOp:translate = (-2.70, 3.35, 0.0)
+        double3 xformOp:rotateXYZ = (0.0, 0.0, 90.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+
+    def Xform "Nozzle"
+    {
+        def Xform "MainEngineCluster"
+        {
+            def Xform "Engine01" (prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>)
+            { double3 xformOp:translate = (0.0, 1.75, 0.0); uniform token[] xformOpOrder = ["xformOp:translate"] }
+            def Xform "Engine02" (prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>)
+            { double3 xformOp:translate = (1.0, 1.75, 0.0); uniform token[] xformOpOrder = ["xformOp:translate"] }
+            def Xform "Engine03" (prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>)
+            { double3 xformOp:translate = (-1.0, 1.75, 0.0); uniform token[] xformOpOrder = ["xformOp:translate"] }
+            def Xform "Engine04" (prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>)
+            { double3 xformOp:translate = (0.0, 1.75, 1.0); uniform token[] xformOpOrder = ["xformOp:translate"] }
+            def Xform "Engine05" (prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>)
+            { double3 xformOp:translate = (0.0, 1.75, -1.0); uniform token[] xformOpOrder = ["xformOp:translate"] }
+            def Xform "Engine06" (prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>)
+            { double3 xformOp:translate = (0.9, 1.75, 0.9); uniform token[] xformOpOrder = ["xformOp:translate"] }
+            def Xform "Engine07" (prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>)
+            { double3 xformOp:translate = (-0.9, 1.75, -0.9); uniform token[] xformOpOrder = ["xformOp:translate"] }
+        }
+    }
+
+    def Xform "EgressRampPort" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_visual.usda@</EgressRamp>
+    )
+    {
+        double3 xformOp:translate = (2.48, 2.15, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Xform "EgressRampStarboard" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_visual.usda@</EgressRamp>
+    )
+    {
+        double3 xformOp:translate = (-2.48, 2.15, 0.0)
+        double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+}

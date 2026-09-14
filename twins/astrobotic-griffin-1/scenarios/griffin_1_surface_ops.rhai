@@ -2,25 +2,124 @@
 //
 // This is mission policy only. Continuous control remains in the composed
 // Modelica lander/rover domains; this script waits for physical/model events,
-// commands the two revolute ramp targets, detaches the top-deck adapter after
-// touchdown, and announces phase transitions.
+// confirms the authored solid-ramp pose, detaches the top-deck adapter after
+// touchdown, and announces phase transitions. The ramp meshes are integrated
+// into the lander compound; the unstable independent-body hinge variant is
+// deliberately not selected by this mission.
+
+const LANDER = "/Griffin1SurfaceOps/Lander";
+const ROVER = "/Griffin1SurfaceOps/FLIP";
+const DOCK = "/Griffin1SurfaceOps/FLIPPayloadAdapterJoint";
+
+fn on_start(me) {
+    this.lander_settled = false;
+    this.release_latched = false;
+    this.rover_detached = false;
+    this.ramps_deployed = false;
+    this.route_engaged = false;
+    this.ramp_approach_reached = false;
+    this.ramp_exit_reached = false;
+    this.waypoint_1_reached = false;
+    this.waypoint_2_reached = false;
+    this.base_site_reached = false;
+    this.geometry_valid = true;
+    this.phase_timeout = false;
+}
 
 fn on_event(me, evt) {
-    let rover = find("/Griffin1SurfaceOps/FLIP");
+    let lander = find(LANDER);
+    let rover = find(ROVER);
+
+    // The shared controller publishes a target-scoped semantic edge for the
+    // G binding. G is an explicit lander-owned release action and is available
+    // at any phase; the rover must never interpret it as a drive/action command.
+    // Keep the actual joint mutation in the Twin policy, where the authored dock
+    // is known.
+    if evt.name == "intent.edge" && evt.source == lander {
+        let value = evt.value;
+        if value != () && value["target_gid"] == lander &&
+           value["intent"] == "release" &&
+           (value["edge"] == "pressed" || value["edge"] == "pulse") {
+            if release_rover() { this.rover_detached = true; }
+        }
+        return;
+    }
+
+    // Native keyboard projection is a fallback for a lander that is under the
+    // local human's control but whose authored binding has not produced an
+    // edge yet (for example during an ownership handoff). It is still gated to
+    // the lander owner, so pressing G while driving FLIP cannot detach it.
+    if evt.name == "key:KeyG" &&
+       owner_of(lander) == 0 && owner_of(rover) != 0 {
+        if release_rover() { this.rover_detached = true; }
+        return;
+    }
+
+    // Retain the level-triggered compatibility path for older controller
+    // producers. It is idempotent with the semantic-edge path above.
+    if evt.name == "cmd:SetPorts" && evt.source == lander {
+        let transition = dock_release_edge(
+            lander, this.release_latched, true, this.rover_detached);
+        this.release_latched = transition.held;
+        if transition.fire && release_rover() { this.rover_detached = true; }
+        return;
+    }
+
+    if evt.name == "lander_touchdown" && evt.source == lander {
+        this.lander_settled = true;
+        return;
+    }
+    // The route task emits these mission-local edges after the same typed
+    // arrival predicate used by navigation.  Keep accepting the generic
+    // waypoint sensor events below for interactive/editor runs that use the
+    // authored marker triggers instead of the deterministic route task.
+    if evt.name == "griffin_ramp_exit_reached" {
+        this.ramp_exit_reached = true;
+        emit("griffin_ramp_exit_reached_confirmed");
+        return;
+    }
+    if evt.name == "griffin_waypoint_1_reached" {
+        this.waypoint_1_reached = true;
+        emit("griffin_waypoint_1_reached_confirmed");
+        return;
+    }
+    if evt.name == "griffin_waypoint_2_reached" {
+        this.waypoint_2_reached = true;
+        emit("griffin_waypoint_2_reached_confirmed");
+        return;
+    }
+    if evt.name == "griffin_base_site_reached" {
+        this.base_site_reached = true;
+        emit("griffin_surface_ops_complete");
+        print("[griffin] base site reached; surface operations complete");
+        return;
+    }
     if evt.name != "waypoint.reached" || evt.source != rover { return; }
-    if evt.value == "/Griffin1SurfaceOps/RoverRampApproach" {
+    let path = waypoint_event_path(evt);
+    if path == () { return; }
+    // Keep the marker presentation static during this mission. The generic
+    // helper writes the runtime USD layer, which can rebuild a live physical
+    // vehicle while its post-detach bodies are settling. Mission milestones
+    // are already carried by this typed waypoint event; no color write is
+    // worth disturbing the drivetrain.
+    if path == "/Griffin1SurfaceOps/RoverRampApproach" {
+        this.ramp_approach_reached = true;
         emit("griffin_ramp_approach_reached");
         print("[griffin] rover reached ramp approach");
-    } else if evt.value == "/Griffin1SurfaceOps/RoverRampExit" {
+    } else if path == "/Griffin1SurfaceOps/RoverRampExit" {
+        this.ramp_exit_reached = true;
         emit("griffin_ramp_exit_reached");
         print("[griffin] rover cleared ramp");
-    } else if evt.value == "/Griffin1SurfaceOps/RoverTarget1" {
+    } else if path == "/Griffin1SurfaceOps/RoverTarget1" {
+        this.waypoint_1_reached = true;
         emit("griffin_waypoint_1_reached");
         print("[griffin] waypoint 1 reached");
-    } else if evt.value == "/Griffin1SurfaceOps/RoverTarget2" {
+    } else if path == "/Griffin1SurfaceOps/RoverTarget2" {
+        this.waypoint_2_reached = true;
         emit("griffin_waypoint_2_reached");
         print("[griffin] waypoint 2 reached");
-    } else if evt.value == "/Griffin1SurfaceOps/BaseSite" {
+    } else if path == "/Griffin1SurfaceOps/BaseSite" {
+        this.base_site_reached = true;
         emit("griffin_base_site_reached");
         emit("griffin_surface_ops_complete");
         print("[griffin] base site reached; surface operations complete");
@@ -28,90 +127,139 @@ fn on_event(me, evt) {
 }
 
 fn begin_descent(me) {
-    follow(find("/Griffin1SurfaceOps/Lander"));
+    let target_check = griffin_requirements::landing_target_geometry_check(
+        (), "/Griffin1SurfaceOps/LandingTarget");
+    if target_check.ok != true {
+        let detail = target_check.error;
+        if detail == () { detail = "unknown landing-target mismatch"; }
+        print("[griffin] landing target geometry check failed: " + detail);
+        notify_kind("Griffin landing target does not match the SysML geometry datum.", "error");
+        emit("griffin_surface_ops_geometry_failed");
+        return false;
+    }
+    print("[griffin] landing target geometry check PASS (Y="
+        + target_check.actual_y + " m)");
+    griffin_surface_ops::follow_lander();
+    griffin_controls::show_briefing();
     emit("griffin_powered_descent_started");
     notify_kind("Griffin-1 powered descent started.", "info");
     print("[griffin] powered descent started");
+    true
 }
 
 fn touchdown_notice(me) {
+    griffin_controls::show_briefing();
     emit("griffin_touchdown_confirmed");
     notify_kind("Griffin-1 touchdown confirmed.", "success");
     print("[griffin] touchdown confirmed");
 }
 
 fn deploy_ramps(me) {
-    set(find("/Griffin1SurfaceOps/Lander/EgressRampPortHinge"), "angle", -0.58);
-    set(find("/Griffin1SurfaceOps/Lander/EgressRampStarboardHinge"), "angle", 0.58);
+    // The two ramps are authored in their landed/folded-down pose and carry
+    // collision geometry as part of the lander compound. Do not spawn a
+    // separate rigid body here: the former revolute-body implementation could
+    // separate from the lander and leave the bounded physics world.
     emit("griffin_ramps_deploy_commanded");
-    notify_kind("Griffin side ramps deploying.", "info");
-    print("[griffin] both egress-ramp hinge targets commanded");
+    notify_kind("Griffin solid side ramps are in the authored deployed pose.", "info");
+    print("[griffin] solid egress ramps confirmed in authored deployed pose");
 }
 
-fn release_rover(me) {
+fn release_rover() {
     emit("griffin_ramp_deployment_settled");
+
+    let joint = find(DOCK);
+    if joint == () || joint < 0 {
+        // DetachJoint is a live execution boundary. If another valid path
+        // already removed the joint, do not turn the later automatic mission
+        // step into a failure or issue a second release.
+        emit("griffin_flip_released");
+        notify_kind("FLIP is already released from the top-deck adapter.", "info");
+        return true;
+    }
+
     // This is an execution-time release boundary. Interactive intent removes
     // the live fixed joint without trying to author a RemovePrim into a
     // runtime layer that does not own the authored scene joint.
-    cmd("DetachJoint", #{
-        target: find("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint"),
+    let release = cmd("DetachJoint", #{
+        target: joint,
         intent: "Interactive"
     });
+    if release.ok == false {
+        notify_kind("FLIP adapter release was rejected.", "error");
+        return false;
+    }
+    griffin_surface_ops::follow_rover();
+    griffin_controls::show_rover_controls();
     emit("griffin_flip_released");
     notify_kind("FLIP released from the top-deck adapter; rover egress enabled.", "info");
     print("[griffin] FLIP payload adapter detached");
+    true
 }
 
 fn engage_rover(me) {
     emit("griffin_flip_deployed");
-    // The FLIP BTXML remains the editable route source, but it must not be
-    // re-used implicitly here: the attached rover may have crossed a marker
-    // while the lander was descending. Re-arm the complete route explicitly
-    // after the adapter weld is detached, with the ramp-entry waypoint first.
-    //
-    // This bounded landing-demo uses an accelerated control demand so the
-    // complete ramp-to-base acceptance path can be exercised in a short
-    // deterministic run. It is not a claim about FLIP's flight speed: the
-    // nominal public FLEX-family proxy remains the lower-speed profile in the
-    // BTXML and the research register, and the live four-wheel drivetrain,
-    // contact, battery, and thermal equations remain active here.
-    let route = #{
-        kind: "sequence",
-        children: [
-            #{ kind: "drive_to", target: [4.0, 6.2, 0.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [11.9, 1.0, 0.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [16.0, 0.0, 4.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [19.0, 0.0, 2.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [21.0, 0.0, 0.5], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [21.6, 0.0, -1.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [21.8, 0.0, -2.5], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [22.0, 0.0, -4.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [22.4, 0.0, -5.5], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [23.0, 0.0, -7.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [24.5, 0.0, -8.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [26.0, 0.0, -9.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [27.0, 0.0, -10.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [29.0, 0.0, -11.0], speed: 1.0, radius: 2.5 },
-            #{ kind: "drive_to", target: [31.0, 0.0, -12.0], speed: 1.0, radius: 2.5 }
-        ]
-    };
-    cmd("EngageAutopilot", #{
-        vessel: find("/Griffin1SurfaceOps/FLIP"),
-        spec_json: to_json(route)
-    });
-    notify_kind("FLIP deployment complete; rover route engaged.", "success");
-    print("[griffin] FLIP route engaged");
+    // Re-claim the released rover with the shared typed possession command.
+    // The route task below writes normal SetPorts through nav_command; there is
+    // no bespoke EngageAutopilot command or hidden teleport path.
+    let route_ack = griffin_surface_ops::engage_route_subject();
+    if route_ack.ok != true {
+        notify_kind("Authored FLIP route was rejected: " + route_ack.error, "error");
+        emit("griffin_phase_timeout");
+        return;
+    }
+    notify_kind("FLIP deployment complete; authored rover route continues.", "success");
+    print("[griffin] FLIP authored route continues after release");
+    true
 }
 
 fn fail_phase(me, phase) {
     print("[griffin] phase timeout: " + phase);
+    // Keep a typed, repeatable snapshot beside the phase failure.  This is
+    // deliberately a read-only query: the mission must never turn a timeout
+    // into a hidden pose/physics mutation just to make the report look good.
+    let gates = griffin_surface_ops::landing_gate_report();
+    print("[griffin] phase timeout evidence: " + gates);
+    let source = sysml_requirements::source();
+    let failure = #{id: "GR-004-phase-" + phase, component: "mission",
+        requirement: "Griffin1Requirements::gr004",
+        verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
+        kind: "phase", path: "/Griffin1SurfaceOps", actual: phase,
+        expected: "completed", ok: false, error: "phase timed out"};
+    report_structured_verdict(#{ok: false, verification:
+        "Griffin1Requirements::Verify_GriffinSurfaceOperations",
+        requirement_count: 5, source_revision: source.source_revision_hex,
+        source_files: source.source_files, results: [failure], failures: [failure]},
+        "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
     emit("griffin_phase_timeout");
-    emit("GRIFFIN_SURFACE_OPS", "FAIL");
+}
+
+fn finish_surface_ops(me) {
+    let source = sysml_requirements::source();
+    let checks = [
+        #{id: "GR-004-lander-settled", component: "landing", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander", actual: me.lander_settled, expected: true, ok: me.lander_settled, error: "lander did not settle"},
+        #{id: "GR-003-ramps-deployed", component: "egress_ramps", requirement: "Griffin1Requirements::gr003", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander/EgressRampPort", actual: me.ramps_deployed, expected: true, ok: me.ramps_deployed, error: "ramps were not deployed"},
+        #{id: "GR-026-adapter-release", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: DOCK, actual: me.rover_detached, expected: true, ok: me.rover_detached, error: "FLIP adapter was not released"},
+        #{id: "GR-004-route-engaged", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: ROVER, actual: me.route_engaged, expected: true, ok: me.route_engaged, error: "FLIP route was not engaged"},
+        #{id: "GR-007-ramp-approach", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampApproach", actual: me.ramp_approach_reached, expected: true, ok: me.ramp_approach_reached, error: "ramp approach was not reached"},
+        #{id: "GR-007-ramp-exit", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampExit", actual: me.ramp_exit_reached, expected: true, ok: me.ramp_exit_reached, error: "ramp exit was not reached"},
+        #{id: "GR-004-waypoint-1", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget1", actual: me.waypoint_1_reached, expected: true, ok: me.waypoint_1_reached, error: "first survey waypoint was not reached"},
+        #{id: "GR-004-waypoint-2", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget2", actual: me.waypoint_2_reached, expected: true, ok: me.waypoint_2_reached, error: "second survey waypoint was not reached"},
+        #{id: "GR-004-base-site", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/BaseSite", actual: me.base_site_reached, expected: true, ok: me.base_site_reached, error: "base site was not reached"},
+        #{id: "GR-031-geometry", component: "mission", requirement: "Griffin1Requirements::gr031", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps", actual: me.geometry_valid, expected: true, ok: me.geometry_valid, error: "mission geometry gate failed"}
+    ];
+    let failures = [];
+    for check in checks { if check.ok != true { failures.push(check); } }
+    report_structured_verdict(#{ok: failures.len() == 0,
+        verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
+        requirement_count: checks.len(), source_revision: source.source_revision_hex,
+        source_files: source.source_files, results: checks, failures: failures},
+        "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
 }
 
 fn task(me) {
+    let route = griffin_surface_ops::surface_route_task(find(ROVER));
     seq([
-        once(|m| begin_descent(m)),
+        once(|m| { if !begin_descent(m) { this.geometry_valid = false; }; true }),
         par_race([
             par_all([
                 wait_for_from("lander_engine_cutoff", "/Griffin1SurfaceOps/Lander/GNC"),
@@ -119,33 +267,60 @@ fn task(me) {
                 wait_for_from("lander_touchdown", "/Griffin1SurfaceOps/Lander"),
             ]),
             seq([
-                wait(90.0),
-                once(|m| fail_phase(m, "landing")),
+                // The authored 60 m descent settles just after 100 s in the
+                // current powered-descent proxy. Keep the watchdog bounded,
+                // but leave enough margin for the physical touchdown event to
+                // arrive before declaring the mission failed.
+                wait(180.0),
+                once(|m| { this.phase_timeout = true; fail_phase(m, "landing"); true }),
             ]),
         ]),
-        once(|m| touchdown_notice(m)),
+        // `par_race` succeeds when the timeout branch completes; stop the
+        // mission immediately after its structured failure verdict instead of
+        // falling through to touchdown/egress steps.
+        check(|m| this.phase_timeout != true),
+        once(|m| { this.lander_settled = true; touchdown_notice(m); true }),
         wait(1.5),
-        once(|m| deploy_ramps(m)),
+        once(|m| { this.ramps_deployed = true; deploy_ramps(m); true }),
         wait(4.0),
-        once(|m| release_rover(m)),
-        // Re-arm the route immediately after the adapter disappears. The rover
-        // may enter the ramp-approach sensor during this short handoff; engaging
-        // first keeps that physical arrival in the same ordered route session.
+        once(|m| { if release_rover() { this.rover_detached = true; }; true }),
+        // Re-arm the authored BTXML immediately after the adapter disappears.
         wait(0.25),
-        once(|m| engage_rover(m)),
+        once(|m| { if engage_rover(m) { this.route_engaged = true; }; true }),
+        // The rover is released from a top-deck adapter several metres above
+        // the pad.  Wait on its authoritative pose/velocity rather than a
+        // guessed delay before issuing a horizontal route command; an
+        // airborne steering command creates an artificial roll impulse.
+        par_race([
+            wait_until(|m| {
+                let rover = find(ROVER);
+                griffin_surface_ops::rover_route_settle_report(rover).ok
+            }),
+            seq([
+                // A free-body release should settle within a few seconds. If
+                // it does not, report the physical state instead of allowing
+                // the route task to hang until the outer harness expires.
+                wait(30.0),
+                once(|m| { this.phase_timeout = true; fail_phase(m, "rover-settle"); true }),
+            ]),
+        ]),
+        check(|m| this.phase_timeout != true),
+        // Drive every leg through the shared navigation/SetPorts surface.  A
+        // completion edge is emitted after each typed arrival so the existing
+        // scenario evidence remains event-driven and repeatable.
+        route,
         par_race([
             par_all([
-                wait_for("griffin_ramp_approach_reached"),
-                wait_for("griffin_ramp_exit_reached"),
                 wait_for("griffin_waypoint_1_reached"),
                 wait_for("griffin_waypoint_2_reached"),
                 wait_for("griffin_base_site_reached"),
             ]),
             seq([
                 wait(900.0),
-                once(|m| fail_phase(m, "surface-route")),
+                once(|m| { this.phase_timeout = true; fail_phase(m, "surface-route"); true }),
             ]),
         ]),
-        once(|m| emit("GRIFFIN_SURFACE_OPS", "PASS")),
+        check(|m| this.phase_timeout != true),
+        once(|m| finish_surface_ops(m)),
     ])
 }

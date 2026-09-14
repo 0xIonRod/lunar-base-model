@@ -1,0 +1,664 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinFlipVisual"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "GriffinFlipVisual" (
+    prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
+    kind = "assembly"
+    documentation = "Griffin-1 and Astrolab FLIP visual review composition; SI metres."
+)
+{
+    custom string lunco:visual:status = "review-ready proxy geometry, not flight CAD"
+    custom string lunco:visual:ownership = "Twin USD owns topology/material placement; Rhai owns visual acceptance"
+    custom string lunco:visual:camera = "VisualCamera"
+    def Xform "Ground"
+    {
+        def Cube "RegolithPad"
+        {
+            double size = 1.0
+            double3 xformOp:translate = (3.0, -0.35, 0.0)
+            double3 xformOp:scale = (36.0, 0.35, 14.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            color3f[] primvars:displayColor = [(0.12999999523162842, 0.11999999731779099, 0.10999999940395355)]
+            bool physics:collisionEnabled = false
+            uniform token purpose = "render"
+        }
+        def Cylinder "LandingPad"
+        {
+            float radius = 6.0
+            float height = 0.1599999964237213
+            uniform token axis = "Y"
+            double3 xformOp:translate = (0.0, 0.08, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.25999999046325684, 0.27000001072883606, 0.28999999165534973)]
+            bool physics:collisionEnabled = false
+            uniform token purpose = "guide"
+            token visibility = "invisible"
+        }
+        def Cylinder "PadRing"
+        {
+            float radius = 5.400000095367432
+            float height = 0.1899999976158142
+            uniform token axis = "Y"
+            double3 xformOp:translate = (0.0, 0.18, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.6499999761581421, 0.47999998927116394, 0.18000000715255737)]
+            bool physics:collisionEnabled = false
+            uniform token purpose = "guide"
+            token visibility = "invisible"
+        }
+    }
+    def Xform "Griffin1" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1_visual.usda@</Griffin1>
+    )
+    {
+        bool physics:rigidBodyEnabled = false
+        double3 xformOp:translate = (-2.7, -0.38, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        custom string lunco:visual:subject = "625 kg Griffin-1 lander study envelope"
+        over "Bus"
+        {
+            custom double3 xformOp:translate = (0.0, 3.2, 0.0)
+            custom rel lunco:mount:sockets = [</GriffinFlipVisual/Griffin1/Bus/RampSocketPort>, </GriffinFlipVisual/Griffin1/Bus/RampSocketStarboard>]
+            def "WhiteEquipmentBox"
+            {
+                color3f[] primvars:displayColor = [(0.7200000286102295, 0.7400000095367432, 0.7699999809265137)]
+            }
+            def Cube "HexCornerRailFront" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.1, 1.42, 0.1)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.0, 0.0, 2.58)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20999999344348907)]
+            }
+            def Cube "HexCornerRailRear" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.1, 1.42, 0.1)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.0, 0.0, -2.58)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20999999344348907)]
+            }
+            def Cube "HexCornerRailPortFront" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.1, 1.42, 0.1)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (2.53, 0.0, 1.3)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20999999344348907)]
+            }
+            def Cube "HexCornerRailPortRear" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.1, 1.42, 0.1)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (2.53, 0.0, -1.3)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20999999344348907)]
+            }
+            def Cube "HexCornerRailStarboardFront" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.1, 1.42, 0.1)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-2.53, 0.0, 1.3)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20999999344348907)]
+            }
+            def Cube "HexCornerRailStarboardRear" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.1, 1.42, 0.1)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-2.53, 0.0, -1.3)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20999999344348907)]
+            }
+            def Xform "RampSocketPort" (
+                prepend apiSchemas = "LunCoMountSocketAPI"
+            )
+            {
+                custom double3 xformOp:translate = (2.6, -1.1, 0.0)
+                custom token[] xformOpOrder = ["xformOp:translate"]
+                uniform token lunco:mount:socket = "egress_ramp"
+                uniform token lunco:mount:joint = "revolute"
+                token lunco:mount:axis = "Z"
+                uniform token lunco:mount:asset = "twin://astrobotic-griffin-1/components/lander/griffin_ramp_visual.usda"
+                custom rel lunco:mount:part = </GriffinFlipVisual/Griffin1/EgressRampPort>
+            }
+            def Xform "RampSocketStarboard" (
+                prepend apiSchemas = "LunCoMountSocketAPI"
+            )
+            {
+                custom double3 xformOp:translate = (-2.6, -1.1, 0.0)
+                custom token[] xformOpOrder = ["xformOp:translate"]
+                uniform token lunco:mount:socket = "egress_ramp"
+                uniform token lunco:mount:joint = "revolute"
+                token lunco:mount:axis = "Z"
+                uniform token lunco:mount:asset = "twin://astrobotic-griffin-1/components/lander/griffin_ramp_visual.usda"
+                custom rel lunco:mount:part = </GriffinFlipVisual/Griffin1/EgressRampStarboard>
+            }
+        }
+        over "TankPX"
+        {
+            custom double3 xformOp:translate = (1.3, 5.85, -1.15)
+        }
+        over "TankNX"
+        {
+            custom double3 xformOp:translate = (-1.3, 5.85, -1.15)
+        }
+        over "TankPZ"
+        {
+            custom double3 xformOp:translate = (1.3, 5.85, 1.15)
+        }
+        over "TankNZ"
+        {
+            custom double3 xformOp:translate = (-1.3, 5.85, 1.15)
+        }
+        over "LegPX"
+        {
+            custom double3 xformOp:translate = (1.75, 2.35, -1.25)
+        }
+        over "LegNX"
+        {
+            custom double3 xformOp:translate = (-1.75, 2.35, -1.25)
+        }
+        over "LegPZ"
+        {
+            custom double3 xformOp:translate = (1.75, 2.35, 1.25)
+        }
+        over "LegNZ"
+        {
+            custom double3 xformOp:translate = (-1.75, 2.35, 1.25)
+        }
+        over "SolarPanelPort"
+        {
+            custom double3 xformOp:translate = (2.65, 3.35, 0.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 90.0)
+        }
+        over "SolarPanelStarboard"
+        {
+            custom double3 xformOp:translate = (-2.65, 3.35, 0.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -90.0)
+        }
+        over "EgressRampPort"
+        {
+            custom double3 xformOp:translate = (2.6, 1.65, 0.0)
+            custom rel lunco:mount:frame = </GriffinFlipVisual/Griffin1/EgressRampPort/MountFrame>
+            uniform token lunco:mount:plug = "egress_ramp"
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            def Cube "MountPlate" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.12, 0.22, 0.92)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.7, 0.0, 0.0)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            }
+            def Cylinder "HingePin" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:translate = (0.7, 0.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:translate"]
+                double radius = 0.12
+                double height = 0.92
+                bool physics:collisionEnabled = false
+                uniform token axis = "Z"
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+            }
+            def Xform "MountFrame"
+            {
+                custom double3 xformOp:translate = (0.725, 0.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:translate"]
+            }
+        }
+        over "EgressRampStarboard"
+        {
+            custom double3 xformOp:translate = (-2.6, 1.65, 0.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+            custom rel lunco:mount:frame = </GriffinFlipVisual/Griffin1/EgressRampStarboard/MountFrame>
+            uniform token lunco:mount:plug = "egress_ramp"
+            def Cube "MountPlate" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.12, 0.22, 0.92)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.7, 0.0, 0.0)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            }
+            def Cylinder "HingePin" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:translate = (0.7, 0.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:translate"]
+                double radius = 0.12
+                double height = 0.92
+                bool physics:collisionEnabled = false
+                uniform token axis = "Z"
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+            }
+            def Xform "MountFrame"
+            {
+                custom double3 xformOp:translate = (0.725, 0.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+            }
+        }
+        over "Nozzle"
+        {
+            over "MainEngineCluster"
+            {
+                over "Engine01"
+                {
+                    custom double3 xformOp:translate = (0.0, 1.75, 0.0)
+                    def "Bell"
+                    {
+                        double radius = 0.34
+                    }
+                    def Cylinder "BellCollar" (
+                        prepend apiSchemas = "PhysicsCollisionAPI"
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.23, 0.0)
+                        custom token[] xformOpOrder = ["xformOp:translate"]
+                        double radius = 0.38
+                        double height = 0.08
+                        bool physics:collisionEnabled = false
+                        uniform token axis = "Y"
+                        uniform token purpose = "render"
+                        color3f[] primvars:displayColor = [(0.23999999463558197, 0.27000001072883606, 0.3100000023841858)]
+                    }
+                }
+                over "Engine02"
+                {
+                    custom double3 xformOp:translate = (1.0, 1.75, 0.0)
+                    def Cylinder "BellCollar" (
+                        prepend apiSchemas = "PhysicsCollisionAPI"
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.23, 0.0)
+                        custom token[] xformOpOrder = ["xformOp:translate"]
+                        double radius = 0.38
+                        double height = 0.08
+                        bool physics:collisionEnabled = false
+                        uniform token axis = "Y"
+                        uniform token purpose = "render"
+                        color3f[] primvars:displayColor = [(0.23999999463558197, 0.27000001072883606, 0.3100000023841858)]
+                    }
+                    def "Bell"
+                    {
+                        double radius = 0.34
+                    }
+                }
+                over "Engine03"
+                {
+                    custom double3 xformOp:translate = (-1.0, 1.75, 0.0)
+                    def Cylinder "BellCollar" (
+                        prepend apiSchemas = "PhysicsCollisionAPI"
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.23, 0.0)
+                        custom token[] xformOpOrder = ["xformOp:translate"]
+                        double radius = 0.38
+                        double height = 0.08
+                        bool physics:collisionEnabled = false
+                        uniform token axis = "Y"
+                        uniform token purpose = "render"
+                        color3f[] primvars:displayColor = [(0.23999999463558197, 0.27000001072883606, 0.3100000023841858)]
+                    }
+                    def "Bell"
+                    {
+                        double radius = 0.34
+                    }
+                }
+                over "Engine04"
+                {
+                    custom double3 xformOp:translate = (0.0, 1.75, 1.0)
+                    def Cylinder "BellCollar" (
+                        prepend apiSchemas = "PhysicsCollisionAPI"
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.23, 0.0)
+                        custom token[] xformOpOrder = ["xformOp:translate"]
+                        double radius = 0.38
+                        double height = 0.08
+                        bool physics:collisionEnabled = false
+                        uniform token axis = "Y"
+                        uniform token purpose = "render"
+                        color3f[] primvars:displayColor = [(0.23999999463558197, 0.27000001072883606, 0.3100000023841858)]
+                    }
+                    def "Bell"
+                    {
+                        double radius = 0.34
+                    }
+                }
+                over "Engine05"
+                {
+                    custom double3 xformOp:translate = (0.0, 1.75, -1.0)
+                    def Cylinder "BellCollar" (
+                        prepend apiSchemas = "PhysicsCollisionAPI"
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.23, 0.0)
+                        custom token[] xformOpOrder = ["xformOp:translate"]
+                        double radius = 0.38
+                        double height = 0.08
+                        bool physics:collisionEnabled = false
+                        uniform token axis = "Y"
+                        uniform token purpose = "render"
+                        color3f[] primvars:displayColor = [(0.23999999463558197, 0.27000001072883606, 0.3100000023841858)]
+                    }
+                    def "Bell"
+                    {
+                        double radius = 0.34
+                    }
+                }
+                over "Engine06"
+                {
+                    custom double3 xformOp:translate = (0.9, 1.75, 0.9)
+                    def Cylinder "BellCollar" (
+                        prepend apiSchemas = "PhysicsCollisionAPI"
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.23, 0.0)
+                        custom token[] xformOpOrder = ["xformOp:translate"]
+                        double radius = 0.38
+                        double height = 0.08
+                        bool physics:collisionEnabled = false
+                        uniform token axis = "Y"
+                        uniform token purpose = "render"
+                        color3f[] primvars:displayColor = [(0.23999999463558197, 0.27000001072883606, 0.3100000023841858)]
+                    }
+                    def "Bell"
+                    {
+                        double radius = 0.34
+                    }
+                }
+                over "Engine07"
+                {
+                    custom double3 xformOp:translate = (-0.9, 1.75, -0.9)
+                    def Cylinder "BellCollar" (
+                        prepend apiSchemas = "PhysicsCollisionAPI"
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.23, 0.0)
+                        custom token[] xformOpOrder = ["xformOp:translate"]
+                        double radius = 0.38
+                        double height = 0.08
+                        bool physics:collisionEnabled = false
+                        uniform token axis = "Y"
+                        uniform token purpose = "render"
+                        color3f[] primvars:displayColor = [(0.23999999463558197, 0.27000001072883606, 0.3100000023841858)]
+                    }
+                    def "Bell"
+                    {
+                        double radius = 0.34
+                    }
+                }
+                def Cube "EngineSkirtFront" (
+                    prepend apiSchemas = "PhysicsCollisionAPI"
+                )
+                {
+                    custom double3 xformOp:scale = (1.65, 0.1, 0.1)
+                    custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, 1.68, 1.55)
+                    uniform token purpose = "render"
+                    color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+                }
+                def Cube "EngineSkirtRear" (
+                    prepend apiSchemas = "PhysicsCollisionAPI"
+                )
+                {
+                    custom double3 xformOp:scale = (1.65, 0.1, 0.1)
+                    custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, 1.68, -1.55)
+                    uniform token purpose = "render"
+                    color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+                }
+                def Cube "EngineSkirtPort" (
+                    prepend apiSchemas = "PhysicsCollisionAPI"
+                )
+                {
+                    custom double3 xformOp:scale = (0.1, 0.1, 1.55)
+                    custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (1.55, 1.68, 0.0)
+                    uniform token purpose = "render"
+                    color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+                }
+                def Cube "EngineSkirtStarboard" (
+                    prepend apiSchemas = "PhysicsCollisionAPI"
+                )
+                {
+                    custom double3 xformOp:scale = (0.1, 0.1, 1.55)
+                    custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (-1.55, 1.68, 0.0)
+                    uniform token purpose = "render"
+                    color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+                }
+                def Cube "EngineAdapterPlate" (
+                    prepend apiSchemas = "PhysicsCollisionAPI"
+                )
+                {
+                    custom double3 xformOp:scale = (1.42, 0.06, 1.42)
+                    custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, 1.7, 0.0)
+                    uniform token purpose = "render"
+                    color3f[] primvars:displayColor = [(0.18000000715255737, 0.20000000298023224, 0.23000000417232513)]
+                }
+            }
+        }
+    }
+    def Xform "FLIP" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/flip_visual.usda@</FLIP>
+    )
+    {
+        bool physics:rigidBodyEnabled = false
+        double3 xformOp:translate = (7.0, 1.0, 0.5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        custom string lunco:visual:subject = "Astrolab FLIP rover study proxy"
+        custom int lunco:visual:wheel_count = 4
+        custom string lunco:visual:configuration = '"four directional wheels, white equipment box, sensor mast, fixed solar-array proxy"'
+        over "SolarArray"
+        {
+            custom double3 xformOp:translate = (0.0, 1.45, 1.3)
+            custom double3 xformOp:rotateXYZ = (18.0, 0.0, 0.0)
+        }
+        over "Suspension_FL"
+        {
+            over "Wheel_FL"
+            {
+                custom double3 xformOp:rotateXYZ = (0.0, -12.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            }
+        }
+        over "Suspension_RL"
+        {
+            over "Wheel_RL"
+            {
+                custom double3 xformOp:rotateXYZ = (0.0, 8.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            }
+        }
+        over "Suspension_FR"
+        {
+            over "Wheel_FR"
+            {
+                custom double3 xformOp:rotateXYZ = (0.0, -12.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            }
+        }
+        over "Suspension_RR"
+        {
+            over "Wheel_RR"
+            {
+                custom double3 xformOp:rotateXYZ = (0.0, 8.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            }
+        }
+        def "Suspension_ML" (
+            active = false
+        )
+        {
+        }
+        def "Suspension_MR" (
+            active = false
+        )
+        {
+        }
+        over "Chassis"
+        {
+            def Cube "SideGuardLeft" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.08, 0.42, 1.18)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-1.98, 0.36, 0.0)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            }
+            def Cube "SideGuardRight" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:scale = (0.08, 0.42, 1.18)
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (1.98, 0.36, 0.0)
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            }
+        }
+        over "SensorMast"
+        {
+            def Cylinder "SensorLens" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:translate = (0.0, 1.88, -0.55)
+                custom token[] xformOpOrder = ["xformOp:translate"]
+                double radius = 0.12
+                double height = 0.16
+                bool physics:collisionEnabled = false
+                uniform token axis = "Z"
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.03999999910593033, 0.07999999821186066, 0.11999999731779099)]
+            }
+        }
+    }
+    def Scope "ContextRocks"
+    {
+        def Sphere "RockA"
+        {
+            float radius = 0.75
+            double3 xformOp:translate = (12.0, 0.72, -3.0)
+            double3 xformOp:scale = (1.2, 0.8, 0.9)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            color3f[] primvars:displayColor = [(0.23999999463558197, 0.2199999988079071, 0.20000000298023224)]
+            bool physics:collisionEnabled = false
+            uniform token purpose = "render"
+        }
+        def Sphere "RockB"
+        {
+            float radius = 0.44999998807907104
+            double3 xformOp:translate = (-10.0, 0.42, 3.8)
+            double3 xformOp:scale = (1.4, 0.8, 1.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            color3f[] primvars:displayColor = [(0.20000000298023224, 0.1899999976158142, 0.18000000715255737)]
+            bool physics:collisionEnabled = false
+            uniform token purpose = "render"
+        }
+    }
+    def DomeLight "ReviewFill"
+    {
+        float inputs:intensity = 18000.0
+        float inputs:exposure = 2.0
+        color3f inputs:color = (0.6200000047683716, 0.6800000071525574, 0.7799999713897705)
+    }
+    over "Sun"
+    {
+        float inputs:intensity = 120000.0
+    }
+    def Camera "VisualCamera" (
+        prepend apiSchemas = ["LunCoCameraAPI", "LunCoAvatarAPI"]
+        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+    )
+    {
+        uniform bool lunco:avatar = true
+        uniform token lunco:cameraMode = "freeflight"
+        double3 lunco:cameraLookAt = (1.5, 2.2, 0.0)
+        double3 xformOp:translate = (17.0, 8.5, 16.0)
+        float focalLength = 32.0
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Scope "CameraTrack" (
+        prepend apiSchemas = "LunCoCameraTrackAPI"
+    )
+    {
+        token lunco:activeCamera
+        token lunco:activeCamera.timeSamples = {
+            0.0: "VisualCamera",
+        }
+    }
+    def Scope "Scenario"
+    {
+        def Scope "Mission" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_flip_visual.rhai@
+        }
+    }
+}

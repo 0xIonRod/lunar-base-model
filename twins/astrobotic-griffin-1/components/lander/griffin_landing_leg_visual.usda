@@ -1,0 +1,53 @@
+#usda 1.0
+(
+    defaultPrim = "LandingLeg"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "LandingLeg" (
+    kind = "component"
+)
+{
+    custom string lunco:visual:component = "landing_leg"
+    def Cube "StrutOuter"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.22, -1.05, 0.0)
+        double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
+        double3 xformOp:scale = (0.10, 1.15, 0.10)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.12, 0.14, 0.17)]
+        uniform token purpose = "render"
+    }
+    def Cube "StrutInner"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (-0.22, -1.05, 0.0)
+        double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
+        double3 xformOp:scale = (0.10, 1.15, 0.10)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.12, 0.14, 0.17)]
+        uniform token purpose = "render"
+    }
+    def Cylinder "ShockPiston"
+    {
+        uniform token axis = "Y"
+        float radius = 0.09
+        float height = 1.15
+        double3 xformOp:translate = (0.0, -1.05, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        color3f[] primvars:displayColor = [(0.68, 0.70, 0.74)]
+        uniform token purpose = "render"
+    }
+    def Cylinder "FootPad"
+    {
+        uniform token axis = "Y"
+        float radius = 0.38
+        float height = 0.12
+        double3 xformOp:translate = (0.0, -1.75, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        color3f[] primvars:displayColor = [(0.32, 0.35, 0.39)]
+        uniform token purpose = "render"
+    }
+}

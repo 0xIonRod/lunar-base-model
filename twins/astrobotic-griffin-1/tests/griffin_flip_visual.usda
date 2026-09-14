@@ -1,0 +1,15 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinFlipVisual"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+# Test entry point kept under the Twin tests directory.  The composed scene is
+# reusable for an interactive screenshot or the graphics test runner.
+def Xform "GriffinFlipVisual" (
+    prepend references = @twin://astrobotic-griffin-1/scenes/griffin_flip_visual.usda@</GriffinFlipVisual>
+    kind = "assembly"
+)
+{
+}

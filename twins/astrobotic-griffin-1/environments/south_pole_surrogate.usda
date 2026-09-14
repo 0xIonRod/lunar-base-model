@@ -2,57 +2,66 @@
 (
     defaultPrim = "SouthPoleSurrogate"
     upAxis = "Y"
-    metersPerUnit = 1
+    metersPerUnit = 1.0
 )
 
-# Deterministic, labelled environment for surface-operations studies. It is
-# intentionally not a geographic reconstruction of Nobile Crater.
 def Xform "SouthPoleSurrogate" (
     kind = "assembly"
-    doc = "Procedural South-Pole terrain surrogate; not a validated Nobile Crater DEM."
+    documentation = "Procedural South-Pole terrain surrogate; not a validated Nobile Crater DEM."
 )
 {
-    custom string lunco:terrain:source = "procedural surrogate"
-    custom string lunco:terrain:site = "Nobile Crater region, coordinates unresolved"
-    custom string lunco:terrain:confidence = "low"
-
+    custom string lunco:terrain:source = "LROC NAC DTM NOBILE03 (4 m/pixel polar-stereographic source; locally reprojected)"
+    custom string lunco:terrain:site = "Nobile regional study anchor; exact Griffin touchdown coordinate unresolved"
+    custom string lunco:terrain:confidence = "source-backed regional relief; simulator-selected center and vertical datum"
     def Scope "PhysicsMaterials"
     {
         def Material "RegolithSurrogate" (
-            prepend apiSchemas = ["PhysicsMaterialAPI"]
+            prepend apiSchemas = "PhysicsMaterialAPI"
         )
         {
-            float physics:dynamicFriction = 0.65
-            float physics:staticFriction = 0.80
+            float physics:dynamicFriction = 0.6499999761581421
+            float physics:staticFriction = 0.800000011920929
             float physics:restitution = 0.0
             token physxMaterial:frictionCombineMode = "min"
         }
     }
+    def Scope "Looks"
+    {
+        def Material "RegolithSurface"
+        {
+            token outputs:surface.connect = </SouthPoleSurrogate/Looks/RegolithSurface/Shader.outputs:surface>
 
+            def Shader "Shader"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:wgsl:sourceAsset = @lunco://shaders/terrain_layered.wgsl@
+                color3f inputs:albedo = (0.13, 0.13, 0.13)
+                token outputs:surface
+            }
+        }
+    }
     def Cube "Ground" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoTerrainAPI", "MaterialBindingAPI"]
+        active = false
     )
     {
         token lunco:terrain:surfaceRole = "flat-site"
         double size = 1.0
-        double3 xformOp:translate = (0, -0.5, 0)
+        double3 xformOp:translate = (0.0, -0.5, 0.0)
         double3 xformOp:scale = (200.0, 1.0, 200.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.13, 0.125, 0.12)]
+        color3f[] primvars:displayColor = [(0.12999999523162842, 0.125, 0.11999999731779099)]
         bool physics:collisionEnabled = true
         rel material:binding:physics = </SouthPoleSurrogate/PhysicsMaterials/RegolithSurrogate>
     }
-
-    # Low visual berms make the surrogate read as a cratered site without
-    # pretending to be a DEM or changing the collision plane.
     def Scope "VisualBerms"
     {
         def Cylinder "BermEast"
         {
             float radius = 16.0
-            float height = 0.35
+            float height = 0.3499999940395355
             double3 xformOp:translate = (28.0, 0.15, 12.0)
-            color3f[] primvars:displayColor = [(0.18, 0.17, 0.16)]
+            color3f[] primvars:displayColor = [(0.18000000715255737, 0.17000000178813934, 0.1599999964237213)]
             uniform token[] xformOpOrder = ["xformOp:translate"]
         }
         def Cylinder "BermWest"
@@ -60,8 +69,38 @@ def Xform "SouthPoleSurrogate" (
             float radius = 12.0
             float height = 0.25
             double3 xformOp:translate = (-24.0, 0.1, -18.0)
-            color3f[] primvars:displayColor = [(0.18, 0.17, 0.16)]
+            color3f[] primvars:displayColor = [(0.18000000715255737, 0.17000000178813934, 0.1599999964237213)]
             uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+    def Xform "Terrain" (
+        prepend apiSchemas = ["LunCoTerrainAPI", "MaterialBindingAPI"]
+    )
+    {
+        string lunco:assetMode = "layered"
+        custom string lunco:terrain:source = "LROC NAC DTM NOBILE03 (4 m/pixel polar-stereographic source; locally reprojected)"
+        custom string lunco:terrain:site = "Nobile regional study anchor; exact Griffin touchdown coordinate unresolved"
+        custom string lunco:terrain:confidence = "source-backed regional relief; simulator-selected center and vertical datum"
+        double lunco:anchor:lat = -84.72672255
+        double lunco:anchor:lon = 29.14428685
+        double lunco:anchor:height = 5187.322
+        int lunco:anchor:body = 301
+        custom string lunco:terrain:horizontalDatum = "MOON_ME; local ENU (+X east, +Y up, -Z north)"
+        custom string lunco:terrain:verticalDatum = "LROC source datum normalized by -5187.322 m into scene-local height"
+        custom asset lunco:terrain:processedAsset = @terrain/nobile03@
+        rel material:binding = </SouthPoleSurrogate/Looks/RegolithSurface>
+        def Xform "dem" (
+            prepend apiSchemas = "LunCoTerrainLayerAPI"
+        )
+        {
+            uniform token lunco:layer = "dem"
+            asset lunco:layer:demSource = @terrain/nobile03@
+            float lunco:layer:windowM = 512.0
+            int lunco:layer:targetRes = 129
+            bool lunco:layer:lodViz = false
+            bool lunco:layer:colliderRing = false
+            int lunco:layer:colliderDepth = 4
+            int lunco:layer:colliderResolution = 65
         }
     }
 }

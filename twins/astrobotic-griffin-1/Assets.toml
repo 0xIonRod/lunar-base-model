@@ -1,0 +1,20 @@
+# Griffin-1 terrain inputs
+#
+# These entries are raw, download-only sources. NOBILE03 is a PDS3-labelled
+# polar-stereographic DTM, while the native lunco-assets DEM cropper currently
+# accepts equirectangular products only. Use tools/terrain/
+# reproject_lroc_polar_dem.py after downloading both entries.
+
+[nobile03_dem]
+name = "LROC NAC DTM NOBILE03 (4 m/pixel polar-stereographic DEM)"
+url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/NOBILE03/NAC_DTM_NOBILE03.TIF"
+dest = "sources/nobile03/NAC_DTM_NOBILE03.TIF"
+sha256 = "952f4b898e03fc10e7cdda5ee8e95c8f7c20ba669b7cd5d3e20589d489081f02"
+recommended = true
+
+[nobile03_label]
+name = "LROC NAC DTM NOBILE03 PDS3 label"
+url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/NOBILE03/NAC_DTM_NOBILE03.LBL"
+dest = "sources/nobile03/NAC_DTM_NOBILE03.LBL"
+sha256 = "a208196171bfb777554e8e9ae840339135f99f28d7fe4ce0e3be60f9937e5906"
+recommended = true

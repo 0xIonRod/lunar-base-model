@@ -1,0 +1,58 @@
+#usda 1.0
+(
+    defaultPrim = "FlipChassis"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+# FLIP's visual chassis is a low white equipment box with a forward service
+# frame.  It intentionally carries no rigid-body or wheel schemas.
+def Xform "FlipChassis" (
+    kind = "component"
+)
+{
+    custom string lunco:visual:component = "flip_chassis"
+    def Cube "LowerFrame"
+    {
+        double size = 1.0
+        double3 xformOp:scale = (2.20, 0.38, 1.38)
+        color3f[] primvars:displayColor = [(0.16, 0.18, 0.20)]
+        uniform token purpose = "render"
+    }
+    def Cube "WhiteEquipmentBox"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 0.45, 0.08)
+        double3 xformOp:scale = (1.95, 0.72, 1.22)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.83, 0.84, 0.84)]
+        uniform token purpose = "render"
+    }
+    def Cube "FrontBumper"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 0.20, -1.52)
+        double3 xformOp:scale = (1.55, 0.25, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.10, 0.12, 0.14)]
+        uniform token purpose = "render"
+    }
+    def Cube "PayloadDeck"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 0.92, 0.04)
+        double3 xformOp:scale = (1.72, 0.10, 1.08)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.34, 0.36, 0.38)]
+        uniform token purpose = "render"
+    }
+    def Cube "ServicePanel"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 0.47, -1.25)
+        double3 xformOp:scale = (1.12, 0.33, 0.025)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.36, 0.39, 0.42)]
+        uniform token purpose = "render"
+    }
+}

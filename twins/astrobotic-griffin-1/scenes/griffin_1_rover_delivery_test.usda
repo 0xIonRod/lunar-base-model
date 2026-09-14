@@ -1,0 +1,93 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinRoverDeliveryTest"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "GriffinRoverDeliveryTest" (
+    kind = "assembly"
+    documentation = "Griffin-1 drop with a four-wheel FLIP rover docked on the top deck, followed by release and drive."
+)
+{
+    custom string lunco:test:name = "Griffin-1 rover delivery and release"
+    custom string lunco:test:contract = "lander lands first; PayloadDock is then detached; Rover is driven through authored throttle, steer, and brake ports"
+    custom string lunco:test:scale = "SI metres; upAxis Y; metersPerUnit 1"
+    custom string lunco:test:rover = "Astrolab FLIP four-wheel skid-steer study proxy"
+    custom string lunco:test:release = "Detach PayloadDock after touchdown; no scene reload between release and drive"
+    def PhysicsScene "MoonPhysics"
+    {
+        float3 physics:gravityDirection = (0.0, -1.0, 0.0)
+        float physics:gravityMagnitude = 1.6200000047683716
+    }
+    def Cube "Ground" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, -3.52, 0.0)
+        double3 xformOp:scale = (50.0, 0.1, 50.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.25, 0.23999999463558197, 0.23000000417232513)]
+        bool physics:collisionEnabled = true
+        float physics:friction = 1.0
+    }
+    def Xform "Lander" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
+    )
+    {
+        double3 xformOp:translate = (0.0, 14.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 physics:velocity = (0.0, -0.5, 0.0)
+        custom string lunco:test:role = "dynamic Griffin lander"
+    }
+    def Xform "Rover" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 17.02, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        custom string lunco:test:role = "four-wheel payload rover attached during descent"
+        custom string lunco:test:control = "after PayloadDock removal: throttle=0.45, steer=0.0, brake=0.0"
+    }
+    def PhysicsFixedJoint "PayloadDock"
+    {
+        rel physics:body0 = </GriffinRoverDeliveryTest/Lander>
+        rel physics:body1 = </GriffinRoverDeliveryTest/Rover>
+        point3f physics:localPos0 = (0.0, 1.7200000286102295, 0.0)
+        point3f physics:localPos1 = (0.0, -1.2999999523162842, 0.0)
+        bool physics:collisionEnabled = false
+    }
+    def Camera "TestCamera"
+    {
+        double3 xformOp:translate = (14.0, 9.0, 16.0)
+        double3 xformOp:rotateXYZ = (-20.0, 40.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+    def Camera "Avatar" (
+        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+        prepend apiSchemas = "LunCoAvatarAPI"
+    )
+    {
+        uniform bool lunco:avatar = true
+        uniform token lunco:cameraMode = "freeflight"
+        custom double3 xformOp:translate = (14.0, 9.0, 16.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (-20.0, 40.0, 0.0)
+    }
+    def DistantLight "KeyLight"
+    {
+        float intensity = 0.550000011920929
+        float angle = 0.5
+        custom double3 xformOp:rotateXYZ = (-35.0, -35.0, 0.0)
+        custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+    }
+    def Scope "DeliveryController" (
+        prepend apiSchemas = "LunCoProgramAPI"
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/griffin_1_delivery_release.rhai@
+        uniform bool lunco:program:realtimeSafe = false
+    }
+}

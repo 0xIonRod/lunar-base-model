@@ -1,0 +1,128 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinBody"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "GriffinBody" (
+    kind = "component"
+    prepend apiSchemas = "MaterialBindingAPI"
+)
+{
+    custom string lunco:part:role = "Griffin-1 MLI-wrapped box-section body"
+    custom string lunco:provenance:source = "Twin-authored Griffin study geometry; public flight ICD unavailable"
+    custom string lunco:material:outer = "gold multilayer insulation blanket"
+    def Scope "Looks"
+    {
+        def Material "MliFoil_Mat"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </GriffinBody/Looks/MliFoil_Mat/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:wgsl:sourceAsset = @lunco://shaders/mli_foil.wgsl@
+                color3f inputs:foil_color = (0.8299999833106995, 0.6200000047683716, 0.18000000715255737)
+                color3f inputs:shade_color = (0.44999998807907104, 0.30000001192092896, 0.07999999821186066)
+                float inputs:crinkle = 26.0
+                float inputs:facet_depth = 0.550000011920929
+                float inputs:sheen = 0.8500000238418579
+                float inputs:v_scale = 0.1899999976158142
+                token outputs:surface
+            }
+        }
+    }
+    def Mesh "MliWrappedBus" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        point3f[] points = [(3.0, -1.5499999523162842, 0.0), (1.5, -1.5499999523162842, 2.598076105117798), (-1.5, -1.5499999523162842, 2.598076105117798), (-3.0, -1.5499999523162842, 0.0), (-1.5, -1.5499999523162842, -2.598076105117798), (1.5, -1.5499999523162842, -2.598076105117798), (3.0, 1.5499999523162842, 0.0), (1.5, 1.5499999523162842, 2.598076105117798), (-1.5, 1.5499999523162842, 2.598076105117798), (-3.0, 1.5499999523162842, 0.0), (-1.5, 1.5499999523162842, -2.598076105117798), (1.5, 1.5499999523162842, -2.598076105117798)]
+        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+        uniform token subdivisionScheme = "none"
+        custom rel material:binding = </GriffinBody/Looks/MliFoil_Mat>
+        bool physics:collisionEnabled = false
+    }
+    def Mesh "UpperMliBlanket" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        point3f[] points = [(3.1600000858306885, 1.5199999809265137, 0.0), (1.5800000429153442, 1.5199999809265137, 2.736639976501465), (-1.5800000429153442, 1.5199999809265137, 2.736639976501465), (-3.1600000858306885, 1.5199999809265137, 0.0), (-1.5800000429153442, 1.5199999809265137, -2.736639976501465), (1.5800000429153442, 1.5199999809265137, -2.736639976501465), (3.1600000858306885, 1.7200000286102295, 0.0), (1.5800000429153442, 1.7200000286102295, 2.736639976501465), (-1.5800000429153442, 1.7200000286102295, 2.736639976501465), (-3.1600000858306885, 1.7200000286102295, 0.0), (-1.5800000429153442, 1.7200000286102295, -2.736639976501465), (1.5800000429153442, 1.7200000286102295, -2.736639976501465)]
+        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+        uniform token subdivisionScheme = "none"
+        custom rel material:binding = </GriffinBody/Looks/MliFoil_Mat>
+        bool physics:collisionEnabled = false
+    }
+    def Mesh "LowerMliBlanket" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        point3f[] points = [(3.1600000858306885, -1.7200000286102295, 0.0), (1.5800000429153442, -1.7200000286102295, 2.736639976501465), (-1.5800000429153442, -1.7200000286102295, 2.736639976501465), (-3.1600000858306885, -1.7200000286102295, 0.0), (-1.5800000429153442, -1.7200000286102295, -2.736639976501465), (1.5800000429153442, -1.7200000286102295, -2.736639976501465), (3.1600000858306885, -1.5199999809265137, 0.0), (1.5800000429153442, -1.5199999809265137, 2.736639976501465), (-1.5800000429153442, -1.5199999809265137, 2.736639976501465), (-3.1600000858306885, -1.5199999809265137, 0.0), (-1.5800000429153442, -1.5199999809265137, -2.736639976501465), (1.5800000429153442, -1.5199999809265137, -2.736639976501465)]
+        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+        uniform token subdivisionScheme = "none"
+        custom rel material:binding = </GriffinBody/Looks/MliFoil_Mat>
+        bool physics:collisionEnabled = false
+    }
+    def Cube "BodyCollisionProxy" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:scale = (2.65, 3.44, 2.1)
+        custom token[] xformOpOrder = ["xformOp:scale"]
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+    def Cube "BodyCollisionNorth" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.0, 0.0, 2.28)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.5, 1.55, 0.32)
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+    def Cube "BodyCollisionSouth" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.0, 0.0, -2.28)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.5, 1.55, 0.32)
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+    def Cube "BodyCollisionEast" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (2.55, 0.0, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.45, 1.55, 1.45)
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+    def Cube "BodyCollisionWest" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (-2.55, 0.0, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.45, 1.55, 1.45)
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+}

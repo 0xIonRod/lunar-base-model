@@ -1,0 +1,133 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinBus"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+# Presentation-only Griffin bus.  The hexagonal white equipment body and dark
+# perimeter frame are kept independent from the flight body/colliders.
+def Xform "GriffinBus" (
+    kind = "component"
+)
+{
+    custom string lunco:visual:component = "lander_bus"
+    custom string lunco:visual:status = "study proxy; replaceable component"
+    custom string lunco:visual:body_profile = "hexagonal-prism"
+
+    def Mesh "PerimeterFrame"
+    {
+        # Six-sided footprint, 5.60 m across flats in X and 4.85 m deep in Z.
+        point3f[] points = [(0.0, -1.62, 2.86), (2.80, -1.62, 1.43), (2.80, -1.62, -1.43), (0.0, -1.62, -2.86), (-2.80, -1.62, -1.43), (-2.80, -1.62, 1.43), (0.0, 1.62, 2.86), (2.80, 1.62, 1.43), (2.80, 1.62, -1.43), (0.0, 1.62, -2.86), (-2.80, 1.62, -1.43), (-2.80, 1.62, 1.43)]
+        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+        uniform token subdivisionScheme = "none"
+        color3f[] primvars:displayColor = [(0.14, 0.16, 0.19)]
+        uniform token purpose = "render"
+    }
+    def Mesh "WhiteEquipmentBox"
+    {
+        # Exact SI envelope used by GV-004: x extent is 5.20 m.  The regular
+        # hexagonal footprint gives the Griffin silhouette without CAD detail.
+        point3f[] points = [(0.0, -1.45, 2.65), (2.60, -1.45, 1.325), (2.60, -1.45, -1.325), (0.0, -1.45, -2.65), (-2.60, -1.45, -1.325), (-2.60, -1.45, 1.325), (0.0, 1.45, 2.65), (2.60, 1.45, 1.325), (2.60, 1.45, -1.325), (0.0, 1.45, -2.65), (-2.60, 1.45, -1.325), (-2.60, 1.45, 1.325)]
+        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+        uniform token subdivisionScheme = "none"
+        color3f[] primvars:displayColor = [(0.92, 0.93, 0.95)]
+        uniform token purpose = "render"
+    }
+    def Cube "FrontThermalPanel"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 0.0, 2.47)
+        double3 xformOp:scale = (1.60, 0.74, 0.035)
+        color3f[] primvars:displayColor = [(0.98, 0.98, 0.97)]
+        uniform token purpose = "render"
+    }
+    def Cube "FrontLogoRedA"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (-0.34, 0.0, 2.51)
+        double3 xformOp:rotateXYZ = (0.0, 0.0, -18.0)
+        double3 xformOp:scale = (0.08, 0.36, 0.04)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.86, 0.06, 0.035)]
+        uniform token purpose = "render"
+    }
+    def Cube "FrontLogoRedB"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.34, 0.0, 2.51)
+        double3 xformOp:rotateXYZ = (0.0, 0.0, 18.0)
+        double3 xformOp:scale = (0.08, 0.36, 0.04)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.86, 0.06, 0.035)]
+        uniform token purpose = "render"
+    }
+    def Cube "TopDeck"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 1.55, 0.0)
+        double3 xformOp:scale = (4.65, 0.12, 3.95)
+        color3f[] primvars:displayColor = [(0.22, 0.25, 0.29)]
+        uniform token purpose = "render"
+    }
+
+    # Small render-only service layers break up the otherwise box-like bus.
+    # They are deliberately separate geometry so the visual component remains
+    # replaceable without changing the flight body or collider topology.
+    def Cube "LowerServiceSkirt"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, -1.56, 0.0)
+        double3 xformOp:scale = (4.48, 0.18, 3.18)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.10, 0.12, 0.15)]
+        uniform token purpose = "render"
+    }
+    def Cube "AvionicsDeck"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 1.75, 0.0)
+        double3 xformOp:scale = (3.82, 0.10, 2.56)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.34, 0.38, 0.43)]
+        uniform token purpose = "render"
+    }
+    def Cube "AvionicsPod"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 1.96, 0.0)
+        double3 xformOp:scale = (0.72, 0.36, 0.72)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.68, 0.71, 0.75)]
+        uniform token purpose = "render"
+    }
+    def Cube "ServiceBayPort"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (2.52, -0.16, -0.38)
+        double3 xformOp:scale = (0.10, 0.46, 0.70)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.38, 0.42, 0.47)]
+        uniform token purpose = "render"
+    }
+    def Cube "ServiceBayStarboard"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (-2.52, -0.16, -0.38)
+        double3 xformOp:scale = (0.10, 0.46, 0.70)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.38, 0.42, 0.47)]
+        uniform token purpose = "render"
+    }
+    def Cube "DeckRailFront"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 1.98, 2.04)
+        double3 xformOp:scale = (3.72, 0.08, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.62, 0.65, 0.69)]
+        uniform token purpose = "render"
+    }
+}

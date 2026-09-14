@@ -1,0 +1,54 @@
+#usda 1.0
+(
+    defaultPrim = "SolarPanel"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "SolarPanel" (
+    kind = "component"
+)
+{
+    custom string lunco:visual:component = "solar_panel"
+    def Cube "Frame"
+    {
+        double size = 1.0
+        double3 xformOp:scale = (1.85, 0.07, 1.25)
+        color3f[] primvars:displayColor = [(0.16, 0.18, 0.21)]
+        uniform token purpose = "render"
+    }
+    def Cube "Cells"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 0.075, 0.0)
+        double3 xformOp:scale = (1.70, 0.025, 1.10)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.03, 0.10, 0.27)]
+        uniform token purpose = "render"
+    }
+    def Cube "CellDividerX"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 0.11, 0.0)
+        double3 xformOp:scale = (0.025, 0.02, 1.10)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.55, 0.60, 0.66)]
+        uniform token purpose = "render"
+    }
+    def Cube "CellDividerZ"
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, 0.115, 0.0)
+        double3 xformOp:scale = (1.70, 0.02, 0.025)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.55, 0.60, 0.66)]
+        uniform token purpose = "render"
+    }
+    def Cube "MountBracket"
+    {
+        double size = 1.0
+        double3 xformOp:scale = (0.22, 0.16, 0.22)
+        color3f[] primvars:displayColor = [(0.12, 0.14, 0.17)]
+        uniform token purpose = "render"
+    }
+}

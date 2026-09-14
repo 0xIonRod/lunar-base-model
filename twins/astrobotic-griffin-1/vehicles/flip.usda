@@ -2,127 +2,146 @@
 (
     defaultPrim = "FLIP"
     upAxis = "Y"
-    metersPerUnit = 1
+    metersPerUnit = 1.0
 )
 
-# Astrolab FLIP (FLEX Lunar Innovation Platform) study asset.
-#
-# Public material establishes the design intent: FLIP uses the same full-size
-# hyper-deformable wheels and battery family as FLEX, has a collapsible solar
-# array, and shares avionics, sensors, software, and communications with FLEX.
-# The public sources do not publish FLIP's as-built wheel count, wheel geometry,
-# motor constants, battery capacity, or mass properties. This asset therefore
-# uses a four-wheel, all-wheel-steer engineering proxy for the visible design
-# and keeps every non-public number in the assumption register.
-#
-# This is a real continuous simulation path, not a visual-only rover: each
-# wheel has a suspension/contact model, motor + reduction + shaft, and all four
-# motor electrical loads share one finite battery/solar Modelica island. The
-# thermal scope consumes the motor heat outputs in a separate DAE.
 def Xform "FLIP" (
-    doc = "Astrolab FLIP four-wheel lunar rover study proxy with finite EPS and Modelica drivetrain."
+    documentation = "Astrolab FLIP four-wheel lunar rover study proxy with finite EPS and Modelica drivetrain."
     kind = "assembly"
-    prepend apiSchemas = [
-        "PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI",
-        "PhysxVehicleContextAPI", "PhysxVehicleAckermannSteeringAPI",
-        "LunCoCatalogAPI", "CollectionAPI:components"
-    ]
+    prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "PhysxVehicleAckermannSteeringAPI", "LunCoCatalogAPI", "CollectionAPI:components"]
     prepend references = [
         @lunco://components/avionics/obc.usda@</OBC>,
-        @lunco://components/cameras/rover_front_camera.usda@</RoverFrontCamera>
+        @lunco://components/cameras/rover_front_camera.usda@</RoverFrontCamera>,
+        @lunco://components/mobility/drive_laws/modelica_ackermann.usda@</DriveLaw>
     ]
-    prepend variantSets = ["drivetrain"]
-    variants = {
-        string drivetrain = "raycast"
-    }
+    prepend variantSets = "drivetrain"
+    variants = { string "drivetrain" = "raycast" }
 )
 {
     uniform bool lunco:spawnable = true
-
     custom string lunco:mission:payload = "Astrolab FLIP"
     custom string lunco:mission:vehicle_family = "FLEX Lunar Innovation Platform"
-    custom string lunco:configuration = "four-wheel all-wheel-steer study proxy"
+    custom string lunco:configuration = "four-wheel front-steer Ackermann study proxy"
     custom string lunco:parameter_status = "public envelope plus explicit simulator assumptions"
     custom string lunco:provenance:source = "https://www.astrolab.space/flip-rover/"
     custom string lunco:provenance:video = "https://www.youtube.com/watch?v=UFEMOrg27KE"
     custom string lunco:provenance:engineering_boundary = "replace proxy values with FLIP as-built CAD and test data"
-
-    # Approximate envelope used only until Astrolab supplies as-built data.
-    # The mass is an engineering midpoint around the public "nearly half a
-    # metric ton" statement; it is not a measured flight value.
     float physics:mass = 450.0
-    float3 physics:centerOfMass = (0.0, -0.05, 0.0)
+    float3 physics:centerOfMass = (0.0, -0.05000000074505806, 0.0)
     float3 physics:diagonalInertia = (240.0, 337.5, 145.5)
     float physxRigidBody:linearDamping = 0.5
     float physxRigidBody:angularDamping = 2.0
-
-    # FLEX's public reference architecture uses four-wheel crab steering. The
-    # FLIP-specific wheel count and steering map remain an assumption here.
-    float physxVehicleAckermannSteering:maxSteerAngle = 0.45
+    float physxVehicleAckermannSteering:maxSteerAngle = 0.44999998807907104
     float physxVehicleAckermannSteering:strength = 0.0
-
-    # OBC command surface and Modelica/network telemetry boundaries.
-    # These root inputs are the explicit network boundaries used by the
-    # generated Modelica domain. The OBC/vehicle outputs remain the command
-    # producer; the child loads consume the boundary inputs so the compiler
-    # never treats a cross-domain root connection as an internal component edge.
-    float inputs:drive_left.connect = </FLIP.outputs:drive_left>
-    float inputs:drive_right.connect = </FLIP.outputs:drive_right>
-    float inputs:shaft_speed_FL.connect = </FLIP/Suspension_FL/Wheel_FL.outputs:shaft_speed>
-    float inputs:shaft_speed_FR.connect = </FLIP/Suspension_FR/Wheel_FR.outputs:shaft_speed>
-    float inputs:shaft_speed_RL.connect = </FLIP/Suspension_RL/Wheel_RL.outputs:shaft_speed>
-    float inputs:shaft_speed_RR.connect = </FLIP/Suspension_RR/Wheel_RR.outputs:shaft_speed>
+    uniform token lunco:steeringGeometry = "ackermann"
     float outputs:drive_left = 0.0
     float outputs:drive_right = 0.0
     float outputs:steering = 0.0
     float outputs:brake = 0.0
+    uniform token collection:components:expansionRule = "explicitOnly"
+    rel collection:components:includes
+    prepend rel collection:components:includes = [</FLIP/Battery>, </FLIP/SolarArray>, </FLIP/Motor_FL>, </FLIP/TorqueSource_FL>, </FLIP/Gearbox_FL>, </FLIP/Shaft_FL>, </FLIP/Motor_FR>, </FLIP/TorqueSource_FR>, </FLIP/Gearbox_FR>, </FLIP/Shaft_FR>, </FLIP/Motor_RL>, </FLIP/TorqueSource_RL>, </FLIP/Gearbox_RL>, </FLIP/Shaft_RL>, </FLIP/Motor_RR>, </FLIP/TorqueSource_RR>, </FLIP/Gearbox_RR>, </FLIP/Shaft_RR>]
+    float inputs:drive_left
+    float inputs:drive_left.connect = </FLIP.outputs:drive_left>
+    float inputs:drive_right
+    float inputs:drive_right.connect = </FLIP.outputs:drive_right>
+    float inputs:shaft_speed_FL
+    float inputs:shaft_speed_FL.connect = </FLIP/Suspension_FL/Wheel_FL.outputs:shaft_speed>
+    float inputs:shaft_speed_FR
+    float inputs:shaft_speed_FR.connect = </FLIP/Suspension_FR/Wheel_FR.outputs:shaft_speed>
+    float inputs:shaft_speed_RL
+    float inputs:shaft_speed_RL.connect = </FLIP/Suspension_RL/Wheel_RL.outputs:shaft_speed>
+    float inputs:shaft_speed_RR
+    float inputs:shaft_speed_RR.connect = </FLIP/Suspension_RR/Wheel_RR.outputs:shaft_speed>
+    float outputs:bus_voltage
     float outputs:bus_voltage.connect = </FLIP/Battery.outputs:terminal_voltage_v>
+    float outputs:bus_current
     float outputs:bus_current.connect = </FLIP/Battery.outputs:terminal_current_a>
+    float outputs:bus_power
     float outputs:bus_power.connect = </FLIP/Battery.outputs:net_power_w>
+    float outputs:battery_soc
     float outputs:battery_soc.connect = </FLIP/Battery.outputs:soc_out>
+    float outputs:battery_drained
     float outputs:battery_drained.connect = </FLIP/Battery.outputs:drained>
+    float outputs:solar_power
     float outputs:solar_power.connect = </FLIP/SolarArray.outputs:power_out>
+    float outputs:solar_available_power
     float outputs:solar_available_power.connect = </FLIP/SolarArray.outputs:available_power_w>
-
+    custom string lunco:steering:status = "front-wheel Ackermann heading is authored by the shared drive law; rear wheels track straight ahead"
+    custom string lunco:wheel:geometry = "four solid 0.45 m radius x 0.28 m width wheel assemblies; each composes regolith tire, collision, and 0.70 m suspension"
+    variantSet "drivetrain" = {
+        "raycast" {
+        }
+        "physical" (
+            prepend references = @lunco://components/mobility/physical_drivetrain.usda@</Drivetrain>
+        ) {
+            over "Suspension_FL" (
+                prepend apiSchemas = "PhysicsRigidBodyAPI"
+            )
+            {
+            }
+            over "Suspension_FR" (
+                prepend apiSchemas = "PhysicsRigidBodyAPI"
+            )
+            {
+            }
+            over "Suspension_RL" (
+                prepend apiSchemas = "PhysicsRigidBodyAPI"
+            )
+            {
+            }
+            over "Suspension_RR" (
+                prepend apiSchemas = "PhysicsRigidBodyAPI"
+            )
+            {
+            }
+            over "Suspension_FL/Wheel_FL" (
+                prepend apiSchemas = "PhysicsFilteredPairsAPI"
+            )
+            {
+                rel physics:filteredPairs = </FLIP/Chassis>
+            }
+            over "Suspension_FR/Wheel_FR" (
+                prepend apiSchemas = "PhysicsFilteredPairsAPI"
+            )
+            {
+                rel physics:filteredPairs = </FLIP/Chassis>
+            }
+            over "Suspension_RL/Wheel_RL" (
+                prepend apiSchemas = "PhysicsFilteredPairsAPI"
+            )
+            {
+                rel physics:filteredPairs = </FLIP/Chassis>
+            }
+            over "Suspension_RR/Wheel_RR" (
+                prepend apiSchemas = "PhysicsFilteredPairsAPI"
+            )
+            {
+                rel physics:filteredPairs = </FLIP/Chassis>
+            }
+        }
+    }
     def "Controls" (
         prepend references = @lunco://vessels/control_profiles.usda@</RoverControls>
     )
     {
     }
-
-    # The scene policy enables this authored behavior after touchdown. Keeping
-    # the route behavior on the vehicle composition makes `EngageAutopilot` a
-    # real ownership handoff instead of a Rhai-only timer or blind cruise.
-    def Scope "Autopilot" (
-        prepend apiSchemas = ["LunCoProgramAPI"]
-    )
-    {
-        uniform token info:implementationSource = "sourceAsset"
-        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/behaviors/griffin_1_flip_patrol.btxml@
-    }
-
-    # Low, broad payload deck: the video and Astrolab's public FLIP material
-    # show a compact platform rather than a tall planetary science rover.
     def Cube "Chassis" (
         prepend references = @lunco://components/mobility/chassis/box_chassis.usda@</Chassis>
     )
     {
-        double3 xformOp:scale = (1.8, 0.70, 2.40)
-        color3f[] primvars:displayColor = [(0.20, 0.24, 0.28)]
+        double3 xformOp:scale = (2.4, 0.42, 3.15)
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23999999463558197, 0.2800000011920929)]
     }
-
     def Cube "PayloadDeck" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
         double3 xformOp:translate = (0.0, 0.38, 0.0)
         double3 xformOp:scale = (1.45, 0.08, 0.95)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.48, 0.50, 0.52)]
+        color3f[] primvars:displayColor = [(0.47999998927116394, 0.5, 0.5199999809265137)]
     }
-
-    # Small sensor/avionics mast. The actual FLIP sensor placement is not public;
-    # the mast is a visible, replaceable composition detail, not flight data.
     def Xform "SensorMast"
     {
         def Cylinder "Post"
@@ -131,19 +150,18 @@ def Xform "FLIP" (
             double height = 0.55
             double3 xformOp:translate = (0.0, 0.78, -0.25)
             uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.35, 0.37, 0.40)]
+            color3f[] primvars:displayColor = [(0.3499999940395355, 0.3700000047683716, 0.4000000059604645)]
+            bool physics:collisionEnabled = false
         }
         def Cube "SensorBar"
         {
             double3 xformOp:translate = (0.0, 1.08, -0.25)
             double3 xformOp:scale = (0.42, 0.06, 0.08)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.12, 0.14, 0.16)]
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.1599999964237213)]
+            bool physics:collisionEnabled = false
         }
     }
-
-    # Four wheel-on-limb visual/contact mounts. Raycast is the stable production
-    # realization; no free carrier bodies are introduced into the landing scene.
     def Xform "Suspension_FL" (
         prepend references = @lunco://components/mobility/suspensions/physical_carrier.usda@</SuspensionCarrier>
     )
@@ -152,23 +170,21 @@ def Xform "FLIP" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_FL" (
             prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
-            prepend references = [
-                @lunco://components/mobility/wheel.usda@</Wheel>,
-                @lunco://components/mobility/suspensions/standard.usda@</Suspension>
-            ]
+            prepend references = [@lunco://components/mobility/wheel.usda@</Wheel>, @lunco://components/mobility/suspensions/standard.usda@</Suspension>]
         )
         {
             double radius = 0.45
             double height = 0.28
-            float physxVehicleWheel:radius = 0.45
-            float physxVehicleWheel:width = 0.28
-            float physxVehicleWheel:moi = 3.4
+            float physxVehicleWheel:radius = 0.44999998807907104
+            float physxVehicleWheel:width = 0.2800000011920929
+            float physxVehicleWheel:moi = 3.4000000953674316
             int physxVehicleWheelAttachment:index = 0
+            float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_FL.outputs:torque>
-            float inputs:steer.connect = </FLIP.outputs:steering>
+            float inputs:heading
+            float inputs:heading.connect = </FLIP.outputs:heading_fl>
         }
     }
-
     def Xform "Suspension_FR" (
         prepend references = @lunco://components/mobility/suspensions/physical_carrier.usda@</SuspensionCarrier>
     )
@@ -177,23 +193,21 @@ def Xform "FLIP" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_FR" (
             prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
-            prepend references = [
-                @lunco://components/mobility/wheel.usda@</Wheel>,
-                @lunco://components/mobility/suspensions/standard.usda@</Suspension>
-            ]
+            prepend references = [@lunco://components/mobility/wheel.usda@</Wheel>, @lunco://components/mobility/suspensions/standard.usda@</Suspension>]
         )
         {
             double radius = 0.45
             double height = 0.28
-            float physxVehicleWheel:radius = 0.45
-            float physxVehicleWheel:width = 0.28
-            float physxVehicleWheel:moi = 3.4
+            float physxVehicleWheel:radius = 0.44999998807907104
+            float physxVehicleWheel:width = 0.2800000011920929
+            float physxVehicleWheel:moi = 3.4000000953674316
             int physxVehicleWheelAttachment:index = 1
+            float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_FR.outputs:torque>
-            float inputs:steer.connect = </FLIP.outputs:steering>
+            float inputs:heading
+            float inputs:heading.connect = </FLIP.outputs:heading_fr>
         }
     }
-
     def Xform "Suspension_RL" (
         prepend references = @lunco://components/mobility/suspensions/physical_carrier.usda@</SuspensionCarrier>
     )
@@ -202,23 +216,19 @@ def Xform "FLIP" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_RL" (
             prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
-            prepend references = [
-                @lunco://components/mobility/wheel.usda@</Wheel>,
-                @lunco://components/mobility/suspensions/standard.usda@</Suspension>
-            ]
+            prepend references = [@lunco://components/mobility/wheel.usda@</Wheel>, @lunco://components/mobility/suspensions/standard.usda@</Suspension>]
         )
         {
             double radius = 0.45
             double height = 0.28
-            float physxVehicleWheel:radius = 0.45
-            float physxVehicleWheel:width = 0.28
-            float physxVehicleWheel:moi = 3.4
+            float physxVehicleWheel:radius = 0.44999998807907104
+            float physxVehicleWheel:width = 0.2800000011920929
+            float physxVehicleWheel:moi = 3.4000000953674316
             int physxVehicleWheelAttachment:index = 2
+            float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_RL.outputs:torque>
-            float inputs:steer.connect = </FLIP.outputs:steering>
         }
     }
-
     def Xform "Suspension_RR" (
         prepend references = @lunco://components/mobility/suspensions/physical_carrier.usda@</SuspensionCarrier>
     )
@@ -227,272 +237,343 @@ def Xform "FLIP" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_RR" (
             prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
-            prepend references = [
-                @lunco://components/mobility/wheel.usda@</Wheel>,
-                @lunco://components/mobility/suspensions/standard.usda@</Suspension>
-            ]
+            prepend references = [@lunco://components/mobility/wheel.usda@</Wheel>, @lunco://components/mobility/suspensions/standard.usda@</Suspension>]
         )
         {
             double radius = 0.45
             double height = 0.28
-            float physxVehicleWheel:radius = 0.45
-            float physxVehicleWheel:width = 0.28
-            float physxVehicleWheel:moi = 3.4
+            float physxVehicleWheel:radius = 0.44999998807907104
+            float physxVehicleWheel:width = 0.2800000011920929
+            float physxVehicleWheel:moi = 3.4000000953674316
             int physxVehicleWheelAttachment:index = 3
+            float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_RR.outputs:torque>
-            float inputs:steer.connect = </FLIP.outputs:steering>
         }
     }
-
-    # Four independent DC motor + reduction chains. The motor constants and
-    # 200:1 reduction are the simulator hardware proxy; replace them from FLIP
-    # qualification data when Astrolab releases the propulsion ICD.
-    def Xform "Motor_FL" (prepend references = @lunco://components/mobility/motor.usda@</Motor>)
+    def Xform "Motor_FL" (
+        prepend references = @lunco://components/mobility/motor.usda@</Motor>
+    )
     {
-        double3 xformOp:translate = (-0.45, -0.30, -1.05)
+        double3 xformOp:translate = (-0.45, -0.3, -1.05)
         uniform token[] xformOpOrder = ["xformOp:translate"]
+        float inputs:demand
         float inputs:demand.connect = </FLIP.inputs:drive_left>
+        float inputs:speed
         float inputs:speed.connect = </FLIP/Gearbox_FL.outputs:speed_a>
-        custom token connectors:p.connect = </FLIP/Battery.connectors:p>
+        custom token connectors:p
+        token connectors:p.connect = </FLIP/Battery.connectors:p>
     }
-    def Xform "TorqueSource_FL" (prepend references = @lunco://components/mobility/torque.usda@</Torque>)
+    def Xform "TorqueSource_FL" (
+        prepend references = @lunco://components/mobility/torque.usda@</Torque>
+    )
     {
+        float inputs:tau_ref
         float inputs:tau_ref.connect = </FLIP/Motor_FL.outputs:shaft_torque>
-        custom token connectors:flange.connect = </FLIP/Gearbox_FL.connectors:flange_a>
+        custom token connectors:flange
+        token connectors:flange.connect = </FLIP/Gearbox_FL.connectors:flange_a>
     }
-    def Xform "Gearbox_FL" (prepend references = @lunco://components/mobility/gearbox.usda@</Gearbox>)
+    def Xform "Gearbox_FL" (
+        prepend references = @lunco://components/mobility/gearbox.usda@</Gearbox>
+    )
     {
-        double3 xformOp:translate = (-0.45, -0.30, -1.05)
+        double3 xformOp:translate = (-0.45, -0.3, -1.05)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         float inputs:ratio = 200.0
-        float inputs:eta = 0.85
+        float inputs:eta = 0.8500000238418579
         float inputs:max_output_torque = 400.0
-        custom token connectors:flange_a.connect = </FLIP/TorqueSource_FL.connectors:flange>
-        custom token connectors:flange_b.connect = </FLIP/Shaft_FL.connectors:flange>
+        custom token connectors:flange_a
+        token connectors:flange_a.connect = </FLIP/TorqueSource_FL.connectors:flange>
+        custom token connectors:flange_b
+        token connectors:flange_b.connect = </FLIP/Shaft_FL.connectors:flange>
     }
-
-    def Xform "Motor_FR" (prepend references = @lunco://components/mobility/motor.usda@</Motor>)
+    def Xform "Motor_FR" (
+        prepend references = @lunco://components/mobility/motor.usda@</Motor>
+    )
     {
-        double3 xformOp:translate = (0.45, -0.30, -1.05)
+        double3 xformOp:translate = (0.45, -0.3, -1.05)
         uniform token[] xformOpOrder = ["xformOp:translate"]
+        float inputs:demand
         float inputs:demand.connect = </FLIP.inputs:drive_right>
+        float inputs:speed
         float inputs:speed.connect = </FLIP/Gearbox_FR.outputs:speed_a>
-        custom token connectors:p.connect = </FLIP/Battery.connectors:p>
+        custom token connectors:p
+        token connectors:p.connect = </FLIP/Battery.connectors:p>
     }
-    def Xform "TorqueSource_FR" (prepend references = @lunco://components/mobility/torque.usda@</Torque>)
+    def Xform "TorqueSource_FR" (
+        prepend references = @lunco://components/mobility/torque.usda@</Torque>
+    )
     {
+        float inputs:tau_ref
         float inputs:tau_ref.connect = </FLIP/Motor_FR.outputs:shaft_torque>
-        custom token connectors:flange.connect = </FLIP/Gearbox_FR.connectors:flange_a>
+        custom token connectors:flange
+        token connectors:flange.connect = </FLIP/Gearbox_FR.connectors:flange_a>
     }
-    def Xform "Gearbox_FR" (prepend references = @lunco://components/mobility/gearbox.usda@</Gearbox>)
+    def Xform "Gearbox_FR" (
+        prepend references = @lunco://components/mobility/gearbox.usda@</Gearbox>
+    )
     {
-        double3 xformOp:translate = (0.45, -0.30, -1.05)
+        double3 xformOp:translate = (0.45, -0.3, -1.05)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         float inputs:ratio = 200.0
-        float inputs:eta = 0.85
+        float inputs:eta = 0.8500000238418579
         float inputs:max_output_torque = 400.0
-        custom token connectors:flange_a.connect = </FLIP/TorqueSource_FR.connectors:flange>
-        custom token connectors:flange_b.connect = </FLIP/Shaft_FR.connectors:flange>
+        custom token connectors:flange_a
+        token connectors:flange_a.connect = </FLIP/TorqueSource_FR.connectors:flange>
+        custom token connectors:flange_b
+        token connectors:flange_b.connect = </FLIP/Shaft_FR.connectors:flange>
     }
-
-    def Xform "Motor_RL" (prepend references = @lunco://components/mobility/motor.usda@</Motor>)
+    def Xform "Motor_RL" (
+        prepend references = @lunco://components/mobility/motor.usda@</Motor>
+    )
     {
-        double3 xformOp:translate = (-0.45, -0.30, 1.05)
+        double3 xformOp:translate = (-0.45, -0.3, 1.05)
         uniform token[] xformOpOrder = ["xformOp:translate"]
+        float inputs:demand
         float inputs:demand.connect = </FLIP.inputs:drive_left>
+        float inputs:speed
         float inputs:speed.connect = </FLIP/Gearbox_RL.outputs:speed_a>
-        custom token connectors:p.connect = </FLIP/Battery.connectors:p>
+        custom token connectors:p
+        token connectors:p.connect = </FLIP/Battery.connectors:p>
     }
-    def Xform "TorqueSource_RL" (prepend references = @lunco://components/mobility/torque.usda@</Torque>)
+    def Xform "TorqueSource_RL" (
+        prepend references = @lunco://components/mobility/torque.usda@</Torque>
+    )
     {
+        float inputs:tau_ref
         float inputs:tau_ref.connect = </FLIP/Motor_RL.outputs:shaft_torque>
-        custom token connectors:flange.connect = </FLIP/Gearbox_RL.connectors:flange_a>
+        custom token connectors:flange
+        token connectors:flange.connect = </FLIP/Gearbox_RL.connectors:flange_a>
     }
-    def Xform "Gearbox_RL" (prepend references = @lunco://components/mobility/gearbox.usda@</Gearbox>)
+    def Xform "Gearbox_RL" (
+        prepend references = @lunco://components/mobility/gearbox.usda@</Gearbox>
+    )
     {
-        double3 xformOp:translate = (-0.45, -0.30, 1.05)
+        double3 xformOp:translate = (-0.45, -0.3, 1.05)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         float inputs:ratio = 200.0
-        float inputs:eta = 0.85
+        float inputs:eta = 0.8500000238418579
         float inputs:max_output_torque = 400.0
-        custom token connectors:flange_a.connect = </FLIP/TorqueSource_RL.connectors:flange>
-        custom token connectors:flange_b.connect = </FLIP/Shaft_RL.connectors:flange>
+        custom token connectors:flange_a
+        token connectors:flange_a.connect = </FLIP/TorqueSource_RL.connectors:flange>
+        custom token connectors:flange_b
+        token connectors:flange_b.connect = </FLIP/Shaft_RL.connectors:flange>
     }
-
-    def Xform "Motor_RR" (prepend references = @lunco://components/mobility/motor.usda@</Motor>)
+    def Xform "Motor_RR" (
+        prepend references = @lunco://components/mobility/motor.usda@</Motor>
+    )
     {
-        double3 xformOp:translate = (0.45, -0.30, 1.05)
+        double3 xformOp:translate = (0.45, -0.3, 1.05)
         uniform token[] xformOpOrder = ["xformOp:translate"]
+        float inputs:demand
         float inputs:demand.connect = </FLIP.inputs:drive_right>
+        float inputs:speed
         float inputs:speed.connect = </FLIP/Gearbox_RR.outputs:speed_a>
-        custom token connectors:p.connect = </FLIP/Battery.connectors:p>
+        custom token connectors:p
+        token connectors:p.connect = </FLIP/Battery.connectors:p>
     }
-    def Xform "TorqueSource_RR" (prepend references = @lunco://components/mobility/torque.usda@</Torque>)
+    def Xform "TorqueSource_RR" (
+        prepend references = @lunco://components/mobility/torque.usda@</Torque>
+    )
     {
+        float inputs:tau_ref
         float inputs:tau_ref.connect = </FLIP/Motor_RR.outputs:shaft_torque>
-        custom token connectors:flange.connect = </FLIP/Gearbox_RR.connectors:flange_a>
+        custom token connectors:flange
+        token connectors:flange.connect = </FLIP/Gearbox_RR.connectors:flange_a>
     }
-    def Xform "Gearbox_RR" (prepend references = @lunco://components/mobility/gearbox.usda@</Gearbox>)
+    def Xform "Gearbox_RR" (
+        prepend references = @lunco://components/mobility/gearbox.usda@</Gearbox>
+    )
     {
-        double3 xformOp:translate = (0.45, -0.30, 1.05)
+        double3 xformOp:translate = (0.45, -0.3, 1.05)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         float inputs:ratio = 200.0
-        float inputs:eta = 0.85
+        float inputs:eta = 0.8500000238418579
         float inputs:max_output_torque = 400.0
-        custom token connectors:flange_a.connect = </FLIP/TorqueSource_RR.connectors:flange>
-        custom token connectors:flange_b.connect = </FLIP/Shaft_RR.connectors:flange>
+        custom token connectors:flange_a
+        token connectors:flange_a.connect = </FLIP/TorqueSource_RR.connectors:flange>
+        custom token connectors:flange_b
+        token connectors:flange_b.connect = </FLIP/Shaft_RR.connectors:flange>
     }
-
-    def Xform "Shaft_FL" (prepend references = @lunco://components/mobility/avian_shaft.usda@</AvianShaft>)
+    def Xform "Shaft_FL" (
+        prepend references = @lunco://components/mobility/avian_shaft.usda@</AvianShaft>
+    )
     {
+        float inputs:speed
         float inputs:speed.connect = </FLIP.inputs:shaft_speed_FL>
     }
-    def Xform "Shaft_FR" (prepend references = @lunco://components/mobility/avian_shaft.usda@</AvianShaft>)
+    def Xform "Shaft_FR" (
+        prepend references = @lunco://components/mobility/avian_shaft.usda@</AvianShaft>
+    )
     {
+        float inputs:speed
         float inputs:speed.connect = </FLIP.inputs:shaft_speed_FR>
     }
-    def Xform "Shaft_RL" (prepend references = @lunco://components/mobility/avian_shaft.usda@</AvianShaft>)
+    def Xform "Shaft_RL" (
+        prepend references = @lunco://components/mobility/avian_shaft.usda@</AvianShaft>
+    )
     {
+        float inputs:speed
         float inputs:speed.connect = </FLIP.inputs:shaft_speed_RL>
     }
-    def Xform "Shaft_RR" (prepend references = @lunco://components/mobility/avian_shaft.usda@</AvianShaft>)
+    def Xform "Shaft_RR" (
+        prepend references = @lunco://components/mobility/avian_shaft.usda@</AvianShaft>
+    )
     {
+        float inputs:speed
         float inputs:speed.connect = </FLIP.inputs:shaft_speed_RR>
     }
-
-    # Finite EPS. The 28 V / 83.33 Ah / 3 m² values are explicitly provisional:
-    # 28 V and the motor network are simulator conventions, 83.33 Ah is the
-    # inherited pack proxy, and 3 m² is the public FLEX array reference used for
-    # a FLIP design study. FLIP's flight battery ICD supersedes all three.
     def Xform "Battery" (
         prepend references = @lunco://components/power/battery.usda@</Battery>
     )
     {
-        double3 xformOp:translate = (0.0, 0.28, 0.20)
+        double3 xformOp:translate = (0.0, 0.28, 0.2)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         float inputs:voltage_nom = 28.0
-        float inputs:capacity = 83.33
-        float inputs:R_internal = 0.01
-        float inputs:soc_init = 0.85
+        float inputs:capacity = 83.33000183105469
+        float inputs:R_internal = 0.009999999776482582
+        float inputs:soc_init = 0.8500000238418579
     }
-
-    # The collapsible array is represented in its deployed power-producing pose
-    # for surface operations. A flight/stowed pose is a scene-level composition
-    # concern; no untested articulation joint is added to the descent stack.
     def Xform "SolarArray" (
         prepend references = @lunco://components/power/solar_panel.usda@</SolarPanel>
     )
     {
-        double3 xformOp:translate = (0.0, 0.52, 0.28)
-        double3 xformOp:scale = (1.20, 0.03, 0.90)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        float inputs:area = 3.0
-        float inputs:efficiency = 0.30
+        custom double3 xformOp:translate = (0.0, 1.45, 1.05)
+        double3 xformOp:scale = (0.39, 0.03, 0.39)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale", "xformOp:rotateXYZ"]
+        float inputs:area = 4.800000190734863
+        float inputs:efficiency = 0.30000001192092896
         float inputs:irradiance = 1361.0
-        custom token connectors:p.connect = </FLIP/Battery.connectors:p>
-        # Fixed +Y panel normal for the surface power case. The solar probe is
-        # intentionally not a member of this electrical collection: the
-        # collection compiler requires all members to be Modelica components,
-        # while the environment probe is a non-Modelica causal source. A later
-        # Sun-tracker composition can replace these three scalar inputs at the
-        # scene boundary without changing the rover EPS.
         float inputs:sun_mount_x = 0.0
         float inputs:sun_mount_y = 1.0
         float inputs:sun_mount_z = 0.0
+        custom token connectors:p
+        token connectors:p.connect = </FLIP/Battery.connectors:p>
+        custom string lunco:geometry:status = "2.48 m x 1.92 m vertical rear-deck panel; 4.8 m2 nameplate geometry"
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
+        float inputs:panel_normal_x = 0.0
+        float inputs:panel_normal_y = 0.0
+        float inputs:panel_normal_z = 1.0
+        custom string lunco:installation = "vertical rear-deck photovoltaic panel; collision and mass remain owned by the FLIP root body"
+        token visibility = "invisible"
     }
-
-    # One generated electrical DAE owns the finite battery, source, and four
-    # motor loads. Keep membership explicit so the model compiler cannot infer
-    # a second power bus from a child collection.
-    uniform token collection:components:expansionRule = "explicitOnly"
-    prepend rel collection:components:includes = [
-        </FLIP/Battery>,
-        </FLIP/SolarArray>,
-        </FLIP/Motor_FL>, </FLIP/TorqueSource_FL>, </FLIP/Gearbox_FL>, </FLIP/Shaft_FL>,
-        </FLIP/Motor_FR>, </FLIP/TorqueSource_FR>, </FLIP/Gearbox_FR>, </FLIP/Shaft_FR>,
-        </FLIP/Motor_RL>, </FLIP/TorqueSource_RL>, </FLIP/Gearbox_RL>, </FLIP/Shaft_RL>,
-        </FLIP/Motor_RR>, </FLIP/TorqueSource_RR>, </FLIP/Gearbox_RR>, </FLIP/Shaft_RR>
-    ]
-
     def LunCoEvent "BatteryDrained"
     {
-        float inputs:trigger.connect = </FLIP/Battery.outputs:drained>
         uniform token lunco:event:name = "flip_battery_drained"
         uniform token lunco:event:severity = "warning"
         uniform bool lunco:event:latched = true
         double lunco:event:qualificationTime = 0.0
+        float inputs:trigger
+        float inputs:trigger.connect = </FLIP/Battery.outputs:drained>
     }
-
-    # Separate thermal DAE: four electrical motor heat outputs feed two thermal
-    # masses/radiators. This is deliberately coupled across domains only through
-    # causal heat-load ports, matching the simulator's existing rover contract.
     def Scope "Thermal" (
-        prepend apiSchemas = ["CollectionAPI:components"]
-        doc = "FLIP motor thermal network: four motor losses into left/right masses and radiators."
+        prepend apiSchemas = "CollectionAPI:components"
+        documentation = "FLIP motor thermal network: four motor losses into left/right masses and radiators."
+        active = false
     )
     {
-        float inputs:motor_heat_FL.connect = </FLIP/Motor_FL.outputs:heat>
-        float inputs:motor_heat_FR.connect = </FLIP/Motor_FR.outputs:heat>
-        float inputs:motor_heat_RL.connect = </FLIP/Motor_RL.outputs:heat>
-        float inputs:motor_heat_RR.connect = </FLIP/Motor_RR.outputs:heat>
-        float outputs:motor_temp_left.connect = </FLIP/Thermal/MotorThermalLeft.outputs:temp_k>
-        float outputs:motor_temp_right.connect = </FLIP/Thermal/MotorThermalRight.outputs:temp_k>
         uniform token collection:components:expansionRule = "explicitOnly"
-        prepend rel collection:components:includes = [
-            </FLIP/Thermal/MotorHeat_FL>, </FLIP/Thermal/MotorHeat_RL>,
-            </FLIP/Thermal/MotorHeat_FR>, </FLIP/Thermal/MotorHeat_RR>,
-            </FLIP/Thermal/MotorThermalLeft>, </FLIP/Thermal/MotorThermalRight>,
-            </FLIP/Thermal/MotorRadiatorLeft>, </FLIP/Thermal/MotorRadiatorRight>,
-            </FLIP/Thermal/ThermalBridge>
-        ]
-
+        rel collection:components:includes
+        prepend rel collection:components:includes = [</FLIP/Thermal/MotorHeat_FL>, </FLIP/Thermal/MotorHeat_RL>, </FLIP/Thermal/MotorHeat_FR>, </FLIP/Thermal/MotorHeat_RR>, </FLIP/Thermal/MotorThermalLeft>, </FLIP/Thermal/MotorThermalRight>, </FLIP/Thermal/MotorRadiatorLeft>, </FLIP/Thermal/MotorRadiatorRight>, </FLIP/Thermal/ThermalBridge>]
+        float inputs:motor_heat_FL
+        float inputs:motor_heat_FL.connect = </FLIP/Motor_FL.outputs:heat>
+        float inputs:motor_heat_FR
+        float inputs:motor_heat_FR.connect = </FLIP/Motor_FR.outputs:heat>
+        float inputs:motor_heat_RL
+        float inputs:motor_heat_RL.connect = </FLIP/Motor_RL.outputs:heat>
+        float inputs:motor_heat_RR
+        float inputs:motor_heat_RR.connect = </FLIP/Motor_RR.outputs:heat>
+        float outputs:motor_temp_left
+        float outputs:motor_temp_left.connect = </FLIP/Thermal/MotorThermalLeft.outputs:temp_k>
+        float outputs:motor_temp_right
+        float outputs:motor_temp_right.connect = </FLIP/Thermal/MotorThermalRight.outputs:temp_k>
         def Xform "ThermalBridge" (
             prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
         )
         {
-            custom token connectors:port_a.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
-            custom token connectors:port_b.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            custom token connectors:port_a
+            token connectors:port_a.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            custom token connectors:port_b
+            token connectors:port_b.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
         }
-
-        def Xform "MotorHeat_FL" (prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>)
+        def Xform "MotorHeat_FL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
         {
+            float inputs:heat_w
             float inputs:heat_w.connect = </FLIP/Thermal.inputs:motor_heat_FL>
-            custom token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
         }
-        def Xform "MotorHeat_RL" (prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>)
+        def Xform "MotorHeat_RL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
         {
+            float inputs:heat_w
             float inputs:heat_w.connect = </FLIP/Thermal.inputs:motor_heat_RL>
-            custom token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
         }
-        def Xform "MotorThermalLeft" (prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorThermalMass>)
+        def Xform "MotorThermalLeft" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorThermalMass>
+        )
         {
         }
-        def Xform "MotorRadiatorLeft" (prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorRadiator>)
+        def Xform "MotorRadiatorLeft" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorRadiator>
+        )
         {
-            custom token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
         }
-
-        def Xform "MotorHeat_FR" (prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>)
+        def Xform "MotorHeat_FR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
         {
+            float inputs:heat_w
             float inputs:heat_w.connect = </FLIP/Thermal.inputs:motor_heat_FR>
-            custom token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
         }
-        def Xform "MotorHeat_RR" (prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>)
+        def Xform "MotorHeat_RR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
         {
+            float inputs:heat_w
             float inputs:heat_w.connect = </FLIP/Thermal.inputs:motor_heat_RR>
-            custom token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
         }
-        def Xform "MotorThermalRight" (prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorThermalMass>)
+        def Xform "MotorThermalRight" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorThermalMass>
+        )
         {
         }
-        def Xform "MotorRadiatorRight" (prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorRadiator>)
+        def Xform "MotorRadiatorRight" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorRadiator>
+        )
         {
-            custom token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
         }
     }
-
-    variantSet "drivetrain" = {
-        "raycast" {
-        }
+    def Cube "RoverSolarBacksheet" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double3 xformOp:translate = (0.0, 0.52, 1.75)
+        double3 xformOp:scale = (1.6, 0.06, 0.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.18000000715255737, 0.20000000298023224, 0.23999999463558197)]
+        bool physics:collisionEnabled = true
+    }
+    def Cube "RoverSolarCells" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double3 xformOp:translate = (0.0, 0.59, 1.75)
+        double3 xformOp:scale = (1.45, 0.02, 0.78)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.03500000014901161, 0.07000000029802322, 0.2800000011920929)]
+        bool physics:collisionEnabled = true
     }
 }

@@ -1,7 +1,54 @@
 name = "astrobotic-griffin-1"
-version = "0.1.0"
 description = "Astrobotic Griffin-1 surface-operations study Twin"
+version = "0.1.0"
 
 [usd]
 default_scene = "scenes/griffin_1_surface_ops.usda"
-scenes = ["scenes/*.usda", "tests/*.usda"]
+scenes = [
+    "scenes/*.usda",
+    "tests/*.usda",
+]
+
+[sysml]
+root = "requirements/griffin_requirements.sysml"
+paths = ["requirements"]
+
+[verification]
+[[verification.cases]]
+name = "Griffin1Requirements::Verify_GriffinRequirements"
+scene = "tests/griffin_requirements.usda"
+script = "scenarios/tests/griffin_requirements.rhai"
+verdict_channel = "GRIFFIN_REQUIREMENTS"
+
+[[verification.cases]]
+name = "Griffin1Requirements::Verify_GriffinVisualRequirements"
+scene = "tests/griffin_flip_visual.usda"
+script = "scenarios/tests/griffin_flip_visual.rhai"
+verdict_channel = "GRIFFIN_FLIP_VISUAL"
+
+[[verification.cases]]
+name = "FlipRequirements::Verify_FLIPVisualRequirements"
+scene = "tests/griffin_flip_visual.usda"
+script = "scenarios/tests/griffin_flip_visual.rhai"
+verdict_channel = "GRIFFIN_FLIP_VISUAL"
+
+[[verification.cases]]
+name = "Griffin1Requirements::Verify_GriffinSurfaceOperations"
+scene = "scenes/griffin_1_surface_ops.usda"
+script = "scenarios/griffin_1_surface_ops.rhai"
+verdict_channel = "GRIFFIN_SURFACE_OPS"
+
+[[verification.cases]]
+name = "Griffin1Requirements::Verify_GriffinLandingStability"
+scene = "tests/griffin_surface_ops_contract.usda"
+script = "scenarios/tests/griffin_surface_ops_contract.rhai"
+verdict_channel = "GRIFFIN_LANDING_STABILITY"
+
+[[verification.cases]]
+name = "MoonBaseProjectRequirements::Verify_MoonBaseProjectRequirements"
+scene = "tests/griffin_requirements.usda"
+script = "scenarios/tests/griffin_requirements.rhai"
+verdict_channel = "GRIFFIN_REQUIREMENTS"
+
+[settings]
+"usd.runtime_persistence" = true

@@ -1,0 +1,68 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinFlipNoJoint"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "GriffinFlipNoJoint" (
+    kind = "assembly"
+    documentation = "Isolated Griffin and FLIP projection test with no payload joint."
+)
+{
+    def PhysicsScene "MoonPhysics"
+    {
+        float3 physics:gravityDirection = (0.0, -1.0, 0.0)
+        float physics:gravityMagnitude = 1.6200000047683716
+    }
+    def Cube "Ground" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.0, -3.52, 0.0)
+        double3 xformOp:scale = (14.0, 0.1, 14.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.25, 0.23999999463558197, 0.23000000417232513)]
+        bool physics:collisionEnabled = true
+    }
+    def Xform "Lander" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
+    )
+    {
+        double3 xformOp:translate = (0.0, 10.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 physics:velocity = (0.0, -0.5, 0.0)
+    }
+    def Xform "Rover" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
+    )
+    {
+        double3 xformOp:translate = (0.0, 4.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def DistantLight "KeyLight"
+    {
+        float intensity = 0.550000011920929
+        float angle = 0.5
+        double3 xformOp:rotateXYZ = (-35.0, -35.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
+    }
+    def Camera "TestCamera"
+    {
+        double3 xformOp:translate = (14.0, 9.0, 16.0)
+        double3 xformOp:rotateXYZ = (-20.0, 40.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+    def Camera "Avatar" (
+        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+        prepend apiSchemas = "LunCoAvatarAPI"
+    )
+    {
+        uniform bool lunco:avatar = true
+        uniform token lunco:cameraMode = "freeflight"
+        custom double3 xformOp:translate = (14.0, 9.0, 16.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (-20.0, 40.0, 0.0)
+    }
+}
