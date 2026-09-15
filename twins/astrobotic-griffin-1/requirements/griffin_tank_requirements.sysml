@@ -7,14 +7,15 @@ package GriffinTankRequirements {
         attribute sourceComponent : String = "GriffinLanderRequirements::GriffinLanderComponent";
         attribute namesSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankNames";
         attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankCount";
-        attribute childNames : String = "MliTank,TankBandA,TankBandB,TankBandC,TankCradle,TankDomeTop,TankDomeBottom,TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
-        attribute endHardwareNames : String = "TankDomeTop,TankDomeBottom,TankNeckTop,TankNeckBottom";
+        attribute childNames : String = "MliTank,TankBandA,TankBandB,TankBandC,TankCradle,TankDomeTopProfile,TankDomeBottomProfile,TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
+        attribute endHardwareNames : String = "TankDomeTopProfile,TankDomeBottomProfile,TankNeckTop,TankNeckBottom";
         attribute serviceHardwareNames : String = "TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
         attribute status : String = "metric visual study proxy; exact COPV dimensions and placement TBD";
         attribute bodyRadiusM : Real = 0.48;
         attribute bodyHeightM : Real = 2.25;
         attribute domeRadiusM : Real = 0.48;
-        attribute domeFlatteningRatio : Real = 0.35;
+        attribute domeHeightM : Real = 0.35;
+        attribute domeNeckRadiusM : Real = 0.18;
         attribute neckRadiusM : Real = 0.18;
         attribute neckHeightM : Real = 0.18;
         attribute shoulderCollarRadiusM : Real = 0.30;
@@ -44,7 +45,7 @@ package GriffinTankRequirements {
         doc /* GPT-005 [layout] each tank root transform matches the ordered metric station datums owned by GriffinLanderComponent. */
     }
     requirement def GPT006_TankEndHardware {
-        doc /* GPT-006 [visual] each tank includes two retained end domes and coaxial necks so the pressure-vessel silhouette is not a bare cylinder. */
+        doc /* GPT-006 [visual] each tank includes two retained tapered end domes and coaxial necks so the pressure-vessel silhouette is not a bare cylinder. */
     }
     requirement def GPT007_TankServiceHardware {
         doc /* GPT-007 [visual] each tank includes the sourced shoulder collars and valve/cap hardware with the metric proxy dimensions defined by the component. */
