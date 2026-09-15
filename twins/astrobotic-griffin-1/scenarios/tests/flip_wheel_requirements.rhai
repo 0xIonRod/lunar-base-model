@@ -36,6 +36,13 @@ fn on_tick(me) {
     let xs = component_requirements::source_number_list(source, rover("wheelStationX"));
     let ys = component_requirements::source_number_list(source, rover("wheelStationY"));
     let zs = component_requirements::source_number_list(source, rover("wheelStationZ"));
+    let suspension_component = sysml_requirements::text(source, own("suspensionComponent"));
+    if suspension_component == () || suspension_component == "" {
+        throw("FlipWheelRequirements::suspensionComponent is required");
+    }
+    if xs.len() != names.len() || ys.len() != names.len() || zs.len() != names.len() {
+        throw("FlipWheelRequirements wheel station datums must match visualWheelNames");
+    }
     let checks = [];
     checks.push(component_requirements::source_list_count("FWW-001-count", "wheels", "FlipWheelRequirements::fww001", VERIFICATION, names_source, count_source));
     for axis in ["wheelStationX", "wheelStationY", "wheelStationZ"] {
@@ -64,38 +71,17 @@ fn on_tick(me) {
             checks.push(position("FWW-005-" + name + "-y", station, 1, ys[index]));
             checks.push(position("FWW-005-" + name + "-z", station, 2, zs[index]));
         }
-        let strut = station + "/" + strut_name;
-        let strut_scale = component_requirements::source_number_list(source,
-            rover("suspensionStrutScale"));
-        let strut_offset = component_requirements::source_number_list(source,
-            rover("suspensionStrutOffset"));
+        let suspension = station + "/Suspension";
         checks.push(component_requirements::exists("FWW-006-" + name,
             "suspension", "FlipWheelRequirements::fww006", VERIFICATION,
-            strut, "Cube"));
-        checks.push(component_requirements::attribute_equals("FWW-006-" + name + "-purpose",
+            suspension, "Xform"));
+        checks.push(component_requirements::attribute_equals("FWW-006-" + name + "-source",
             "suspension", "FlipWheelRequirements::fww006", VERIFICATION,
-            strut, "purpose", "render"));
-        checks.push(component_requirements::attribute_equals("FWW-006-" + name + "-collision",
-            "suspension", "FlipWheelRequirements::fww006", VERIFICATION,
-            strut, "physics:collisionEnabled", false));
-        if strut_scale.len() == 3 {
-            for axis in 0..3 {
-                checks.push(#{id: "FWW-006-" + name + "-scale-" + axis.to_string(),
-                    component: "suspension", requirement: "FlipWheelRequirements::fww006",
-                    verification: VERIFICATION, kind: "attribute_component", path: strut,
-                    attr: "xformOp:scale", index: axis, expected: strut_scale[axis],
-                    tolerance: 0.002});
-            }
-        }
-        if strut_offset.len() == 3 {
-            for axis in 0..3 {
-                checks.push(#{id: "FWW-006-" + name + "-offset-" + axis.to_string(),
-                    component: "suspension", requirement: "FlipWheelRequirements::fww006",
-                    verification: VERIFICATION, kind: "attribute_component", path: strut,
-                    attr: "xformOp:translate", index: axis, expected: strut_offset[axis],
-                    tolerance: 0.002});
-            }
-        }
+            suspension, "lunco:visual:component", "flip_suspension"));
+        checks.push(#{id: "FWW-006-" + name + "-mirror", component: "suspension",
+            requirement: "FlipWheelRequirements::fww006", verification: VERIFICATION,
+            kind: "attribute_component", path: suspension, attr: "xformOp:rotateXYZ",
+            index: 1, expected: if xs[index] < 0.0 { 0.0 } else { 180.0 }, tolerance: 0.002});
     }
     checks.push(component_requirements::coverage("FWW-004-traceability", "wheels", "FlipWheelRequirements::fww004", VERIFICATION));
     component_requirements::finish(source, checks, "FLIP WHEEL REQUIREMENTS", "FLIP_WHEEL_REQUIREMENTS", root, PACKAGE, VERIFICATION);

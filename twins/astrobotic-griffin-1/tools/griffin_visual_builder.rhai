@@ -272,7 +272,7 @@ fn _detail_ops(edit_target, detail) {
 }
 
 // Author named mounting datums and their relationships.  Numeric transforms
-// are derived once by `align_visual_mounts`; the durable contract is the
+// are derived once by ; the durable contract is the
 // socket/frame relationship, so a later component replacement can be snapped
 // by the generic frame-alignment tool without hand-editing USDA.
 fn _mount_frame_specs(root) {
@@ -517,7 +517,7 @@ fn apply_visual_components(doc, edit_target, root, parent_gen) {
 // The combined review scene above remains useful as a regression fixture, but
 // authoring must also work on each vehicle's own document.  These helpers keep
 // the same typed component recipes while taking the vehicle root itself
-// (`/Griffin1` or `/FLIP`).  No path in an isolated plan crosses into the other
+// ( or ).  No path in an isolated plan crosses into the other
 // vehicle, which makes visual review and saved authored layers independently
 // repeatable.
 
@@ -674,24 +674,35 @@ fn _isolated_griffin_detail_specs(root) {
 }
 
 fn _isolated_flip_detail_specs(root) {
-    let details = [
+    // Chassis guards and the sensor lens are presentation details of the FLIP
+    // assembly itself.  Wheel suspension is deliberately not authored here:
+    // it is a replaceable component with its own SysML contract and gate.
+    [
         #{parent: root + "/Chassis", name: "SideGuardLeft", shape: "cube", translation: [-1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
         #{parent: root + "/Chassis", name: "SideGuardRight", shape: "cube", translation: [1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
         #{parent: root + "/SensorMast", name: "SensorLens", shape: "cylinder", translation: [0.0, 1.88, -0.55], radius: 0.12, height: 0.16, axis: "Z", color: [0.04, 0.08, 0.12]},
-    ];
-    // Each wheel gets its own visible suspension strut.  The detail is
-    // assembly-owned (the replaceable wheel asset remains unchanged) and the
-    // task tag keeps a single-wheel Editor pass from touching its neighbours.
-    // Its local origin is the wheel hub; the 0.36 m vertical extent reaches
-    // from the hub into the lower chassis frame without inventing a second
-    // station table.
-    for name in griffin_spec::visual_rover_wheel_names() {
-        details.push(#{parent: root + "/Suspension_" + name,
-            name: "SuspensionStrut", task: "Wheel_" + name, shape: "cube",
-            translation: [0.0, 0.20, 0.0], scale: [0.14, 0.36, 0.14],
-            color: [0.10, 0.12, 0.14]});
+    ]
+}
+
+// One reusable suspension asset is instanced at every wheel station.  The
+// canonical component points toward +X; right-hand stations mirror it with a
+// typed 180-degree Y rotation.  Station positions remain owned by FlipRover.
+fn _isolated_flip_suspension_specs(root) {
+    let names = griffin_spec::visual_rover_wheel_names();
+    let wheel_x = griffin_spec::rover_wheel_station_x();
+    if names.len() != 4 || wheel_x.len() != names.len() {
+        throw("FlipRequirements wheel station datums must contain four entries");
     }
-    details
+    let specs = [];
+    for index in 0..names.len() {
+        let station = root + "/Suspension_" + names[index];
+        specs.push(#{parent: station, name: "Suspension", type_name: "Xform",
+            asset: component_asset("rover/flip_suspension_visual.usda"),
+            translation: (),
+            rotation: if wheel_x[index] < 0.0 { [0.0, 0.0, 0.0] } else { [0.0, 180.0, 0.0] },
+            scale: ()});
+    }
+    specs
 }
 
 fn _isolated_details_plan(doc, edit_target, details) {
@@ -754,7 +765,7 @@ fn _isolated_mount_ops(doc, edit_target, root) {
         let result = _mount_frame_ops(doc, edit_target,
             #{parent: spec.parent, name: spec.name, translation: spec.translation,
               rotation: spec.rotation, socket: spec.socket}, root + "/Griffin1");
-        // `_mount_frame_ops` only uses the spec's parent/name and is otherwise
+        //  only uses the spec's parent/name and is otherwise
         // root agnostic; avoid its combined-scene path by emitting the frame
         // plan locally when the datum does not exist.
         if !result.ok { return result; }
@@ -817,6 +828,26 @@ fn isolated_griffin_component_plan(doc, edit_target, root) {
       component_count: specs.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
 }
 
+fn _flip_suspension_cleanup_and_refs(doc, edit_target, root, names, ops, paths) {
+    for name in names {
+        let station = root + "/Suspension_" + name;
+        // These struts were authored by the pre-component vehicle source.
+        // Remove only an actually composed prim; a rejected source-layer edit
+        // must remain a loud error rather than silently duplicating geometry.
+        let obsolete = station + "/SuspensionStrut";
+        if query_ok(assembly_builder::composed_query(doc, #{path: obsolete, children: false})) {
+            ops.push(#{RemovePrim: #{edit_target: edit_target, path: obsolete}});
+        }
+    }
+    for spec in _isolated_flip_suspension_specs(root) {
+        let result = _component_plan(doc, edit_target, spec);
+        if !result.ok { return result; }
+        paths.push(result.path);
+        for op in result.ops { ops.push(op); }
+    }
+    #{ok: true, ops: ops, paths: paths}
+}
+
 fn isolated_flip_component_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
         return plan_error("isolated_flip_component_plan requires a document, edit target, and absolute root");
@@ -849,6 +880,10 @@ fn isolated_flip_component_plan(doc, edit_target, root) {
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
     }
+    let suspension = _flip_suspension_cleanup_and_refs(doc, edit_target, root, names, ops, paths);
+    if !suspension.ok { return suspension; }
+    ops = suspension.ops;
+    paths = suspension.paths;
     // The source vehicle predates the four-wheel SysML study.  Preserve its
     // authored history, but make the isolated presentation loud and typed.
     for obsolete in [root + "/Suspension_ML", root + "/Suspension_MR"] {
@@ -917,7 +952,7 @@ fn isolated_griffin_component_plan_for(doc, edit_target, root, task) {
         if _griffin_task_match(spec.name, task) { selected.push(spec); }
     }
     if selected.len() == 0 {
-        return plan_error("unknown Griffin visual component task `" + task + "`");
+        return plan_error("unknown Griffin visual component task ");
     }
     let ops = [];
     let paths = [];
@@ -978,7 +1013,7 @@ fn isolated_flip_component_plan_for(doc, edit_target, root, task) {
         if _flip_task_match(spec.name, task) { selected.push(spec); }
     }
     if selected.len() == 0 {
-        return plan_error("unknown FLIP visual component task `" + task + "`");
+        return plan_error("unknown FLIP visual component task ");
     }
     let ops = [];
     let paths = [];
@@ -995,6 +1030,27 @@ fn isolated_flip_component_plan_for(doc, edit_target, root, task) {
         let detail_plan = _detail_ops(edit_target, detail);
         if !detail_plan.ok { return detail_plan; }
         for op in detail_plan.ops { ops.push(op); }
+    }
+    if task == "DirectionalWheels" || task.starts_with("Wheel_") {
+        let names = griffin_spec::visual_rover_wheel_names();
+        let wheel_x = griffin_spec::rover_wheel_station_x();
+        if names.len() != 4 || wheel_x.len() != names.len() {
+            return plan_error("FLIP wheel station datums must contain four entries");
+        }
+        let suspension_specs = _isolated_flip_suspension_specs(root);
+        for index in 0..names.len() {
+            let wheel_name = "Wheel_" + names[index];
+            if task != "DirectionalWheels" && wheel_name != task { continue; }
+            let station = root + "/Suspension_" + names[index];
+            let obsolete = station + "/SuspensionStrut";
+            if query_ok(assembly_builder::composed_query(doc, #{path: obsolete, children: false})) {
+                ops.push(#{RemovePrim: #{edit_target: edit_target, path: obsolete}});
+            }
+            let result = _component_plan(doc, edit_target, suspension_specs[index]);
+            if !result.ok { return result; }
+            paths.push(result.path);
+            for op in result.ops { ops.push(op); }
+        }
     }
     let names = griffin_spec::visual_rover_wheel_names();
     let wheel_x = griffin_spec::rover_wheel_station_x();
@@ -1096,7 +1152,7 @@ fn _isolated_ramp_contract_ops(edit_target, path, side) {
 /// Build one ramp, its hinge datum, and its typed mount relation.  This is the
 /// preferred entry point when an agent is refining the ramp in the Editor;
 /// the full-vehicle plan is only a convenience that composes these same
-/// operations.  `side` is deliberately explicit so port/starboard cannot be
+/// operations.   is deliberately explicit so port/starboard cannot be
 /// accidentally edited together.
 fn isolated_griffin_ramp_plan(doc, edit_target, root, side) {
     if doc == () || edit_target == () || !absolute_root(root) {

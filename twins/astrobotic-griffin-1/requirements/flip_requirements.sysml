@@ -34,6 +34,13 @@ package FlipRequirements {
         // suspension proxy in the visual vehicle layer.
         attribute suspensionStrutScale : String = "0.14,0.36,0.14";
         attribute suspensionStrutOffset : String = "0.0,0.20,0.0";
+        // The wheel hubs sit outboard of the lower-frame side datum.  These
+        // metric values describe the render-only bridge and its hub knuckle;
+        // they are consumed by the typed Editor builder and the Rhai gate.
+        attribute suspensionArmScale : String = "0.65,0.16,0.16";
+        attribute suspensionArmOffsetM : Real = 0.325;
+        attribute suspensionKnuckleRadiusM : Real = 0.18;
+        attribute suspensionKnuckleWidthM : Real = 0.36;
         attribute solarArrayMount : String = "0.0,1.45,1.30";
         attribute solarArrayTiltDeg : Real = 18.0;
         attribute componentReference : String = "https://www.astrolab.space/flip/";

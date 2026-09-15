@@ -1,0 +1,49 @@
+#usda 1.0
+(
+    defaultPrim = "FlipSuspension"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "FlipSuspension" (
+    kind = "component"
+)
+{
+    custom string lunco:visual:component = "flip_suspension"
+    custom string lunco:visual:units = "SI metres, Y-up"
+    def Cube "SuspensionArm" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.65, 0.16, 0.16)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.325, 0.0, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.07999999821186066, 0.10000000149011612, 0.11999999731779099)]
+    }
+    def Cylinder "SuspensionKnuckle" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double radius = 0.18
+        double height = 0.36
+        bool physics:collisionEnabled = false
+        uniform token axis = "X"
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.2199999988079071, 0.25, 0.2800000011920929)]
+    }
+    def Cube "SuspensionStrut" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.14, 0.36, 0.14)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.2, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]
+    }
+}

@@ -8,6 +8,9 @@ package GriffinTankRequirements {
         attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankCount";
         attribute childNames : String = "MliTank,TankBandA,TankBandB,TankBandC";
         attribute status : String = "visual study proxy; exact COPV dimensions and placement TBD";
+        attribute sourceReference : String = "https://www.astrobotic.com/griffin-1-mission-update/";
+        attribute sourceFact : String = "Griffin-1 integration includes four propellant tanks and fit checks";
+        attribute sourceRationale : String = "Each tank is a repeated, independently inspectable pressure-vessel visual component whose station and retention bands must not drift";
     }
 
     requirement def GPT001_TankCount {

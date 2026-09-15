@@ -1,0 +1,25 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+)
+
+def Xform "World"
+{
+    def Scope "Scenario"
+    {
+        def Scope "Mission" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/flip_suspension_requirements.rhai@
+            uniform token info:id = ""
+            uniform string info:sourceCode = ""
+        }
+    }
+    def Xform "FlipSuspension" (
+        prepend references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@</FlipSuspension>
+    )
+    {
+    }
+}

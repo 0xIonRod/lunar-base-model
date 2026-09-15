@@ -8,6 +8,10 @@ package GriffinPropulsionRequirements {
         attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::engineCount";
         attribute childNames : String = "Bell,Throat";
         attribute colliderPolicy : String = "render-only bell and throat; thrust/collision stay with flight model";
+        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
+        attribute sourceFact : String = "Seven main engines perform the lander's major maneuvers";
+        attribute sourceRationale : String = "The engine cluster is a separately replaceable visual subassembly; Modelica/physics remains the sole thrust owner";
+        attribute geometryStatus : String = "metric visual study proxy; engine ICD and bell profile are not public";
     }
 
     requirement def GPP001_EngineCount {

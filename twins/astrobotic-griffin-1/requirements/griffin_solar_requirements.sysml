@@ -8,6 +8,10 @@ package GriffinSolarRequirements {
         attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::solarArrayCount";
         attribute childNames : String = "Frame,Cells";
         attribute deploymentStatus : String = "fixed visual study state; flight deployment state TBD";
+        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
+        attribute sourceFact : String = "Griffin uses triple-junction solar cells and a lithium-ion battery";
+        attribute sourceRationale : String = "Solar panels are an independently replaceable visual/power interface with a mirrored pair and explicit station datums";
+        attribute geometryStatus : String = "metric visual study proxy; panel cell layout and deployment kinematics are not public";
     }
 
     requirement def GSA001_ArrayCount {

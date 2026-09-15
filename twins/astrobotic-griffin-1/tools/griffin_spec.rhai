@@ -65,6 +65,9 @@ fn _qualified_attribute(name) {
         "rearSteeringAngleDeg", "chassisWidthM", "chassisLengthM",
         "sensorMastHeightM", "wheelStationX", "wheelStationY",
         "wheelStationZ", "solarArrayMount", "solarArrayTiltDeg",
+        "suspensionStrutScale", "suspensionStrutOffset",
+        "suspensionArmScale", "suspensionArmOffsetM",
+        "suspensionKnuckleRadiusM", "suspensionKnuckleWidthM",
         "componentReference", "missionReference"
     ];
     if rover.contains(name) {
@@ -175,6 +178,12 @@ fn component_engine_station_z() { _sysml_number_list("engineStationZ") }
 fn rover_wheel_station_x() { _sysml_number_list("wheelStationX") }
 fn rover_wheel_station_y() { _sysml_number_list("wheelStationY") }
 fn rover_wheel_station_z() { _sysml_number_list("wheelStationZ") }
+fn suspension_strut_scale() { _sysml_number_list("suspensionStrutScale") }
+fn suspension_strut_offset() { _sysml_number_list("suspensionStrutOffset") }
+fn suspension_arm_scale() { _sysml_number_list("suspensionArmScale") }
+fn suspension_arm_offset_m() { _sysml_attribute("suspensionArmOffsetM") }
+fn suspension_knuckle_radius_m() { _sysml_attribute("suspensionKnuckleRadiusM") }
+fn suspension_knuckle_width_m() { _sysml_attribute("suspensionKnuckleWidthM") }
 fn rover_solar_array_mount() { _sysml_number_list("solarArrayMount") }
 fn rover_solar_array_tilt_deg() { _sysml_attribute("solarArrayTiltDeg") }
 fn visual_landing_pad_radius_m() { _sysml_attribute("visualLandingPadRadiusM") }

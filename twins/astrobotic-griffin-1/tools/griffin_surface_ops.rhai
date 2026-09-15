@@ -240,23 +240,32 @@ fn rover_route_settle_report(rover) {
 /// then emits a named mission edge consumed by the scenario's evidence hook.
 /// The route remains data in `surface_route`; this function only lowers it to
 /// the reusable Rhai task vocabulary.
+// Build one route leg in its own call frame.  Rhai closures capture the local
+// scope in which they are created; creating them directly inside the loop that
+// owns `steps` also captures the growing task array and eventually exceeds the
+// bounded string/value budget.  Keeping the closure frame here makes each
+// leaf capture only the rover and this leg's datum, while `surface_route()`
+// remains the single source of route geometry.
+fn _surface_route_leg_task(rover, leg) {
+    let target = leg.target;
+    let target_speed = leg.speed;
+    let arrival_radius = leg.radius;
+    let event = leg.event;
+    seq([
+        step(|m| {
+            griffin_surface_ops::drive_route_point(rover, target, target_speed, arrival_radius)
+        }, |m| arrived(rover, target, arrival_radius)),
+        once(|m| emit(event))
+    ])
+}
+
 fn surface_route_task(rover) {
     // Keep one source of route geometry: the returned sequence is also the
     // machine-readable route consumed by tools and review scripts.
     let legs = surface_route().children;
     let steps = [];
     for leg in legs {
-        let target = leg.target;
-        // `speed` is also the generic sensing helper name in the Rhai
-        // prelude.  Use explicit names here so closure capture cannot resolve
-        // the helper function instead of the numeric route field.
-        let target_speed = leg.speed;
-        let arrival_radius = leg.radius;
-        let event = leg.event;
-        steps.push(step(|m| {
-            griffin_surface_ops::drive_route_point(rover, target, target_speed, arrival_radius)
-        }, |m| arrived(rover, target, arrival_radius)));
-        steps.push(once(|m| emit(event)));
+        steps.push(_surface_route_leg_task(rover, leg));
     }
     seq(steps)
 }

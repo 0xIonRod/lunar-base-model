@@ -8,6 +8,10 @@ package GriffinLandingLegRequirements {
         attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::legCount";
         attribute childNames : String = "StrutOuter,StrutInner,ShockPiston,FootPad";
         attribute placementFrame : String = "signed X/Z body axes; local Y is vertical";
+        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
+        attribute sourceFact : String = "Griffin has four legs that absorb shock and stabilize the lander during touchdown";
+        attribute sourceRationale : String = "Legs are a repeated load-bearing subassembly with an independent visual/collision contract and a mount datum at each bus corner";
+        attribute geometryStatus : String = "metric visual study proxy; shock absorber dimensions are not public";
     }
 
     requirement def GLL001_LegCount {

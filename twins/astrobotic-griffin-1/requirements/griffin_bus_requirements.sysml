@@ -10,6 +10,10 @@ package GriffinBusRequirements {
         attribute profileAttribute : String = "lunco:visual:body_profile";
         attribute profileValue : String = "hexagonal-prism";
         attribute envelopeSource : String = "bodyWidthM,bodyDepthM,bodyHeightM";
+        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
+        attribute sourceFact : String = "Griffin uses a stout aluminum frame and main isogrid deck for payload mounting";
+        attribute sourceRationale : String = "The bus is the structural datum from which tanks, legs, engines, solar arrays and ramps are placed; its faceted envelope must remain independently inspectable";
+        attribute geometryStatus : String = "metric visual study proxy; public page does not publish a complete CAD envelope";
     }
 
     requirement def GBC001_BusIdentity {

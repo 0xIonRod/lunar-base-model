@@ -7,7 +7,8 @@ package FlipWheelRequirements {
         attribute namesSource : String = "FlipRequirements::FlipRover::visualWheelNames";
         attribute countSource : String = "FlipRequirements::FlipRover::visualRoverWheelCount";
         attribute childNames : String = "Tire,MetalHub,HubCap";
-        attribute suspensionVisualChild : String = "SuspensionStrut";
+        attribute suspensionVisualChild : String = "Suspension/SuspensionStrut";
+        attribute suspensionComponent : String = "FlipSuspensionRequirements::FlipSuspensionComponent";
         attribute steeringSource : String = "frontSteeringAngleDeg,rearSteeringAngleDeg";
         attribute inactiveStationPolicy : String = "middle stations are authored inactive; exactly four directional wheels are acceptance scope";
     }
@@ -28,7 +29,7 @@ package FlipWheelRequirements {
         doc /* FWW-005 [layout] each directional wheel station transform matches the ordered metric X/Y/Z station datum owned by FlipRover. */
     }
     requirement def FWW006_SuspensionVisual {
-        doc /* FWW-006 [visual] each active wheel station exposes one render-only suspension strut with the authored metric offset and scale; it must not become a physics collider. */
+        doc /* FWW-006 [integration] each active wheel station references the detached FlipSuspension component; its internal geometry and collision contract are verified by FlipSuspensionRequirements. */
     }
 
     requirement fww001 : FWW001_WheelCount { subject wheels : FlipDirectionalWheelAssembly; }

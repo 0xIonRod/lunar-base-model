@@ -14,6 +14,7 @@ const DOCK = "/Griffin1SurfaceOps/FLIPPayloadAdapterJoint";
 fn on_start(me) {
     this.lander_settled = false;
     this.release_latched = false;
+    this.release_requested = false;
     this.rover_detached = false;
     this.ramps_deployed = false;
     this.route_engaged = false;
@@ -41,7 +42,7 @@ fn on_event(me, evt) {
         if value != () && value["target_gid"] == lander &&
            value["intent"] == "release" &&
            (value["edge"] == "pressed" || value["edge"] == "pulse") {
-            if release_rover() { this.rover_detached = true; }
+            release_rover(me);
         }
         return;
     }
@@ -52,7 +53,7 @@ fn on_event(me, evt) {
     // the lander owner, so pressing G while driving FLIP cannot detach it.
     if evt.name == "key:KeyG" &&
        owner_of(lander) == 0 && owner_of(rover) != 0 {
-        if release_rover() { this.rover_detached = true; }
+        release_rover(me);
         return;
     }
 
@@ -62,7 +63,7 @@ fn on_event(me, evt) {
         let transition = dock_release_edge(
             lander, this.release_latched, true, this.rover_detached);
         this.release_latched = transition.held;
-        if transition.fire && release_rover() { this.rover_detached = true; }
+        if transition.fire { release_rover(me); }
         return;
     }
 
@@ -165,22 +166,22 @@ fn deploy_ramps(me) {
     print("[griffin] solid egress ramps confirmed in authored deployed pose");
 }
 
-fn release_rover() {
+fn release_rover(me) {
+    if me.release_requested { return true; }
     emit("griffin_ramp_deployment_settled");
 
     let joint = find(DOCK);
     if joint == () || joint < 0 {
-        // DetachJoint is a live execution boundary. If another valid path
-        // already removed the joint, do not turn the later automatic mission
-        // step into a failure or issue a second release.
-        emit("griffin_flip_released");
-        notify_kind("FLIP is already released from the top-deck adapter.", "info");
+        // The adapter is already absent. Keep the same completion gate as a
+        // requested detach so the mission never treats a command acknowledgement
+        // as proof of topology removal.
+        me.release_requested = true;
         return true;
     }
 
-    // This is an execution-time release boundary. Interactive intent removes
-    // the live fixed joint without trying to author a RemovePrim into a
-    // runtime layer that does not own the authored scene joint.
+    // This is an execution-time release request. The generic physics bridge
+    // retires the live edge at its solver boundary; this Twin waits for the
+    // entity to disappear before announcing completion or driving the rover.
     let release = cmd("DetachJoint", #{
         target: joint,
         intent: "Interactive"
@@ -189,12 +190,23 @@ fn release_rover() {
         notify_kind("FLIP adapter release was rejected.", "error");
         return false;
     }
+    me.release_requested = true;
+    print("[griffin] FLIP adapter detach requested; waiting for solver retirement");
+    true
+}
+
+fn adapter_detach_complete() {
+    let joint = find(DOCK);
+    joint == () || joint < 0
+}
+
+fn complete_rover_release(me) {
+    me.rover_detached = true;
     griffin_surface_ops::follow_rover();
     griffin_controls::show_rover_controls();
     emit("griffin_flip_released");
     notify_kind("FLIP released from the top-deck adapter; rover egress enabled.", "info");
     print("[griffin] FLIP payload adapter detached");
-    true
 }
 
 fn engage_rover(me) {
@@ -306,8 +318,12 @@ fn task(me) {
         wait(1.5),
         once(|m| { this.ramps_deployed = true; deploy_ramps(m); true }),
         wait(4.0),
-        once(|m| { if release_rover() { this.rover_detached = true; }; true }),
-        // Re-arm the authored BTXML immediately after the adapter disappears.
+        once(|m| { release_rover(m); true }),
+        // The command acknowledgement only means the request was accepted.
+        // Wait until the physics-owned lifecycle has retired the live entity,
+        // then hand rover control to the Twin.
+        wait_until(|m| adapter_detach_complete()),
+        once(|m| { complete_rover_release(m); true }),
         wait(0.25),
         once(|m| {
             let engaged = engage_rover(m);

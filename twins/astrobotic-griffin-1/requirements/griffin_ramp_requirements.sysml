@@ -32,6 +32,8 @@ package GriffinRampRequirements {
         attribute missionReference : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
         attribute productReference : String = "https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/";
         attribute referenceImage : String = "https://aviationweek.com/gallery-look-nasas-commercial-lunar-payload-services-deliveries";
+        attribute sourceFact : String = "Griffin provides optional egress ramps so a rover can drive off the lander";
+        attribute sourceRationale : String = "A ramp has its own hinge, actuator-limit and contact geometry, so it is detached and verified independently from the bus";
     }
 
     requirement def GRR001_RampTopology {

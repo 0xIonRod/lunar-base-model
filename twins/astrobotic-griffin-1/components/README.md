@@ -18,6 +18,7 @@ index that binds the three artifacts.
 | FLIP rover | `requirements/flip_requirements.sysml` | `scenarios/tests/flip_requirements.rhai` | `tests/flip_requirements.usda` |
 | FLIP chassis | `requirements/flip_chassis_requirements.sysml` | `scenarios/tests/flip_chassis_requirements.rhai` | `tests/flip_chassis_requirements.usda` |
 | FLIP directional wheels | `requirements/flip_wheel_requirements.sysml` | `scenarios/tests/flip_wheel_requirements.rhai` | `tests/flip_wheel_requirements.usda` |
+| FLIP suspension module | `requirements/flip_suspension_requirements.sysml` | `scenarios/tests/flip_suspension_requirements.rhai` | `tests/flip_suspension_requirements.usda` |
 | FLIP sensor/power | `requirements/flip_sensor_power_requirements.sysml` | `scenarios/tests/flip_sensor_power_requirements.rhai` | `tests/flip_sensor_power_requirements.usda` |
 
 Do not edit USD text directly. Build or adjust an assembly through the typed
@@ -40,6 +41,15 @@ dimensions, and behavior.  A missing or cardinality-mismatched station list
 is a failed source check, not a default.  This makes a component fixture
 independently reviewable and prevents a combined lander/rover scene from
 masking a misplaced subassembly.
+
+The suspension module demonstrates the detached-subcomponent rule: the wheel
+assembly verifies only the reference identity, station placement and handed
+mirror; `flip_suspension_requirements.sysml` and its Rhai gate own the arm,
+knuckle, strut dimensions and render-only collision policy.  The same split is
+required for every reusable or articulated mission component.  The gate loads
+`components/rover/flip_suspension_visual.usda` from the SysML `componentAsset`
+datum through `assembly_builder::referenced_instance_plan` at runtime, using
+the document handle discovered from the active workspace.
 
 For a fast focused gate, run the fixture and its qualified verification from
 the `[[verification.cases]]` entry in `twin.toml`; all component gates use the

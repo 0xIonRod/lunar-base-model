@@ -93,6 +93,12 @@ script = "scenarios/tests/flip_wheel_requirements.rhai"
 verdict_channel = "FLIP_WHEEL_REQUIREMENTS"
 
 [[verification.cases]]
+name = "FlipSuspensionRequirements::Verify_FLIPSuspensionRequirements"
+scene = "tests/flip_suspension_requirements.usda"
+script = "scenarios/tests/flip_suspension_requirements.rhai"
+verdict_channel = "FLIP_SUSPENSION_REQUIREMENTS"
+
+[[verification.cases]]
 name = "FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements"
 scene = "tests/flip_sensor_power_requirements.usda"
 script = "scenarios/tests/flip_sensor_power_requirements.rhai"
@@ -178,6 +184,12 @@ name = "flip.directional_wheels"
 requirements = "requirements/flip_wheel_requirements.sysml"
 verification = "FlipWheelRequirements::Verify_FLIPWheelRequirements"
 usd_path = "/World/FLIP"
+
+[[components]]
+name = "flip.suspension"
+requirements = "requirements/flip_suspension_requirements.sysml"
+verification = "FlipSuspensionRequirements::Verify_FLIPSuspensionRequirements"
+usd_path = "/FlipSuspension"
 
 [[components]]
 name = "flip.sensor_power"

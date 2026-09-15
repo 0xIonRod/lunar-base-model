@@ -5,8 +5,6 @@
     metersPerUnit = 1.0
 )
 
-# FLIP's visual chassis is a low white equipment box with a forward service
-# frame.  It intentionally carries no rigid-body or wheel schemas.
 def Xform "FlipChassis" (
     kind = "component"
 )
@@ -15,9 +13,10 @@ def Xform "FlipChassis" (
     def Cube "LowerFrame"
     {
         double size = 1.0
-        double3 xformOp:scale = (2.20, 0.38, 1.38)
-        color3f[] primvars:displayColor = [(0.16, 0.18, 0.20)]
+        custom double3 xformOp:scale = (2.2, 0.38, 1.38)
+        color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20000000298023224)]
         uniform token purpose = "render"
+        custom token[] xformOpOrder = ["xformOp:scale"]
     }
     def Cube "WhiteEquipmentBox"
     {
@@ -25,25 +24,25 @@ def Xform "FlipChassis" (
         double3 xformOp:translate = (0.0, 0.45, 0.08)
         double3 xformOp:scale = (1.95, 0.72, 1.22)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.83, 0.84, 0.84)]
+        color3f[] primvars:displayColor = [(0.8299999833106995, 0.8399999737739563, 0.8399999737739563)]
         uniform token purpose = "render"
     }
     def Cube "FrontBumper"
     {
         double size = 1.0
-        double3 xformOp:translate = (0.0, 0.20, -1.52)
+        double3 xformOp:translate = (0.0, 0.2, -1.52)
         double3 xformOp:scale = (1.55, 0.25, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.10, 0.12, 0.14)]
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]
         uniform token purpose = "render"
     }
     def Cube "PayloadDeck"
     {
         double size = 1.0
         double3 xformOp:translate = (0.0, 0.92, 0.04)
-        double3 xformOp:scale = (1.72, 0.10, 1.08)
+        double3 xformOp:scale = (1.72, 0.1, 1.08)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.34, 0.36, 0.38)]
+        color3f[] primvars:displayColor = [(0.3400000035762787, 0.36000001430511475, 0.3799999952316284)]
         uniform token purpose = "render"
     }
     def Cube "ServicePanel"
@@ -52,7 +51,7 @@ def Xform "FlipChassis" (
         double3 xformOp:translate = (0.0, 0.47, -1.25)
         double3 xformOp:scale = (1.12, 0.33, 0.025)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.36, 0.39, 0.42)]
+        color3f[] primvars:displayColor = [(0.36000001430511475, 0.38999998569488525, 0.41999998688697815)]
         uniform token purpose = "render"
     }
 }

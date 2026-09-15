@@ -42,6 +42,8 @@ package GriffinLanderRequirements {
         attribute productReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute missionReference : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
         attribute dataSheetReference : String = "https://science.nasa.gov/wp-content/uploads/2023/11/astrobotic-lunar-landers-pug.pdf";
+        attribute sourceFact : String = "Griffin is a medium-class, flexible-payload lander with four shock-absorbing legs, seven main engines and optional rover egress ramps";
+        attribute sourceRationale : String = "This package is the shared source for the reusable lander datum and ordered component station lists; subsystem contracts reference it rather than copying coordinates";
     }
 
     requirement def GLR001_BusTopology {
