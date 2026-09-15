@@ -10,15 +10,6 @@ def Xform "PropellantTank" (
 )
 {
     custom string lunco:visual:component = "propellant_tank"
-    def Cylinder "MliTank"
-    {
-        uniform token axis = "Y"
-        float radius = 0.47999998927116394
-        float height = 2.25
-        color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
-        uniform token purpose = "render"
-        uniform bool doubleSided = true
-    }
     def Cylinder "TankBandA"
     {
         uniform token axis = "Y"
@@ -154,24 +145,13 @@ def Xform "PropellantTank" (
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
         uniform token axis = "Y"
     }
-    def Sphere "TankDomeTopProfile"
+    def Capsule "MliTank"
     {
-        double radius = 0.48
+        uniform token axis = "Y"
+        float radius = 0.47999998927116394
+        float height = 1.2899999618530273
         uniform token purpose = "render"
         uniform bool doubleSided = true
         color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
-        custom double3 xformOp:translate = (0.0, 1.125, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (1.0, 0.73, 1.0)
-    }
-    def Sphere "TankDomeBottomProfile"
-    {
-        double radius = 0.48
-        uniform token purpose = "render"
-        uniform bool doubleSided = true
-        color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
-        custom double3 xformOp:translate = (0.0, -1.125, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (1.0, 0.73, 1.0)
     }
 }
