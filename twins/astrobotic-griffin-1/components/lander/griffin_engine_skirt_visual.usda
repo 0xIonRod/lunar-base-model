@@ -1,0 +1,65 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+    def Xform "EngineSkirt" (
+        kind = "component"
+    )
+    {
+        custom string lunco:visual:component = "engine_skirt"
+        custom string lunco:visual:datum = "centered on engine adapter; local Y-up"
+        def Cube "RailFront" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            double3 xformOp:scale = (1.6, 0.1, 0.1)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            double3 xformOp:translate = (0.0, 0.0, 1.5)
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            uniform token purpose = "render"
+        }
+        def Cube "RailRear" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            double3 xformOp:scale = (1.6, 0.1, 0.1)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            double3 xformOp:translate = (0.0, 0.0, -1.5)
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            uniform token purpose = "render"
+        }
+        def Cube "RailPort" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            double3 xformOp:scale = (0.1, 0.1, 1.6)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            double3 xformOp:translate = (1.5, 0.0, 0.0)
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            uniform token purpose = "render"
+        }
+        def Cube "RailStarboard" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            double3 xformOp:scale = (0.1, 0.1, 1.6)
+            uniform token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            double3 xformOp:translate = (-1.5, 0.0, 0.0)
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            uniform token purpose = "render"
+        }
+    }
+}

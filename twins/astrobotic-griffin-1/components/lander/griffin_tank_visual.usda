@@ -13,48 +13,49 @@ def Xform "PropellantTank" (
     def Cylinder "MliTank"
     {
         uniform token axis = "Y"
-        float radius = 0.48
+        float radius = 0.47999998927116394
         float height = 2.25
-        color3f[] primvars:displayColor = [(0.83, 0.52, 0.12)]
+        color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
         uniform token purpose = "render"
+        uniform bool doubleSided = true
     }
     def Cylinder "TankBandA"
     {
         uniform token axis = "Y"
-        float radius = 0.54
-        float height = 0.10
+        float radius = 0.5400000214576721
+        float height = 0.10000000149011612
         double3 xformOp:translate = (0.0, -0.78, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.25, 0.19, 0.12)]
+        color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
         uniform token purpose = "render"
     }
     def Cylinder "TankBandB"
     {
         uniform token axis = "Y"
-        float radius = 0.54
-        float height = 0.10
+        float radius = 0.5400000214576721
+        float height = 0.10000000149011612
         double3 xformOp:translate = (0.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.25, 0.19, 0.12)]
+        color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
         uniform token purpose = "render"
     }
     def Cylinder "TankBandC"
     {
         uniform token axis = "Y"
-        float radius = 0.54
-        float height = 0.10
+        float radius = 0.5400000214576721
+        float height = 0.10000000149011612
         double3 xformOp:translate = (0.0, 0.78, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.25, 0.19, 0.12)]
+        color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
         uniform token purpose = "render"
     }
     def Cube "TankCradle"
     {
         double size = 1.0
         double3 xformOp:translate = (0.0, -1.12, 0.0)
-        double3 xformOp:scale = (0.72, 0.10, 0.72)
+        double3 xformOp:scale = (0.72, 0.1, 0.72)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.20, 0.22, 0.25)]
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
         uniform token purpose = "render"
     }
 }

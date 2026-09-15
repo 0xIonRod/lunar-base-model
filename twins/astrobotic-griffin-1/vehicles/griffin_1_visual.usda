@@ -114,6 +114,50 @@ def Xform "Griffin1" (
             uniform token lunco:mount:asset = "twin://astrobotic-griffin-1/components/lander/griffin_ramp_visual.usda"
             custom rel lunco:mount:part = </Griffin1/EgressRampStarboard>
         }
+        def "TopDeck" (
+            active = false
+        )
+        {
+        }
+        def Mesh "TopDeckHex" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+            active = false
+        )
+        {
+            point3f[] points = [(0.0, -0.11999999731779099, 2.825000047683716), (2.7750000953674316, -0.11999999731779099, 1.412500023841858), (2.7750000953674316, -0.11999999731779099, -1.412500023841858), (0.0, -0.11999999731779099, -2.825000047683716), (-2.7750000953674316, -0.11999999731779099, -1.412500023841858), (-2.7750000953674316, -0.11999999731779099, 1.412500023841858), (0.0, 0.11999999731779099, 2.825000047683716), (2.7750000953674316, 0.11999999731779099, 1.412500023841858), (2.7750000953674316, 0.11999999731779099, -1.412500023841858), (0.0, 0.11999999731779099, -2.825000047683716), (-2.7750000953674316, 0.11999999731779099, -1.412500023841858), (-2.7750000953674316, 0.11999999731779099, 1.412500023841858)]
+            int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+            uniform token subdivisionScheme = "none"
+            uniform token purpose = "render"
+            color3f[] primvars:displayColor = [(0.2199999988079071, 0.25, 0.28999999165534973)]
+            bool physics:collisionEnabled = false
+            custom double3 xformOp:translate = (0.0, 1.55, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def "LowerServiceSkirt" (
+            active = false
+        )
+        {
+        }
+        def Mesh "LowerServiceSkirtHex" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            point3f[] points = [(0.0, -0.18000000715255737, 2.5999999046325684), (2.549999952316284, -0.18000000715255737, 1.2999999523162842), (2.549999952316284, -0.18000000715255737, -1.2999999523162842), (0.0, -0.18000000715255737, -2.5999999046325684), (-2.549999952316284, -0.18000000715255737, -1.2999999523162842), (-2.549999952316284, -0.18000000715255737, 1.2999999523162842), (0.0, 0.18000000715255737, 2.5999999046325684), (2.549999952316284, 0.18000000715255737, 1.2999999523162842), (2.549999952316284, 0.18000000715255737, -1.2999999523162842), (0.0, 0.18000000715255737, -2.5999999046325684), (-2.549999952316284, 0.18000000715255737, -1.2999999523162842), (-2.549999952316284, 0.18000000715255737, 1.2999999523162842)]
+            int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+            uniform token subdivisionScheme = "none"
+            uniform token purpose = "render"
+            color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+            bool physics:collisionEnabled = false
+            custom double3 xformOp:translate = (0.0, -1.56, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def "PerimeterFrame" (
+            active = false
+        )
+        {
+        }
     }
     def Xform "TankPX" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@</PropellantTank>
@@ -191,6 +235,7 @@ def Xform "Griffin1" (
     {
         def Xform "MainEngineCluster"
         {
+            custom string lunco:visual:skirt_metric_envelope = '"3.20 m x 3.20 m x 0.20 m; 0.20 m rails; centered on engine adapter datum"'
             def Xform "Engine01" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
@@ -375,63 +420,91 @@ def Xform "Griffin1" (
             }
             def Cube "EngineSkirtFront" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
+                active = false
             )
             {
-                custom double3 xformOp:scale = (1.65, 0.1, 0.1)
+                custom double3 xformOp:scale = (1.5, 0.1, 0.1)
                 custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
                 double size = 1.0
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 1.68, 1.55)
+                custom double3 xformOp:translate = (0.0, 1.65, 1.5)
                 uniform token purpose = "render"
                 color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
             }
             def Cube "EngineSkirtRear" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
+                active = false
             )
             {
-                custom double3 xformOp:scale = (1.65, 0.1, 0.1)
+                custom double3 xformOp:scale = (1.5, 0.1, 0.1)
                 custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
                 double size = 1.0
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 1.68, -1.55)
+                custom double3 xformOp:translate = (0.0, 1.65, -1.5)
                 uniform token purpose = "render"
                 color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
             }
             def Cube "EngineSkirtPort" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
+                active = false
             )
             {
-                custom double3 xformOp:scale = (0.1, 0.1, 1.55)
+                custom double3 xformOp:scale = (0.1, 0.1, 1.5)
                 custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
                 double size = 1.0
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (1.55, 1.68, 0.0)
+                custom double3 xformOp:translate = (1.5, 1.65, 0.0)
                 uniform token purpose = "render"
                 color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
             }
             def Cube "EngineSkirtStarboard" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
+                active = false
             )
             {
                 custom double3 xformOp:scale = (0.1, 0.1, 1.55)
-                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
                 double size = 1.0
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (-1.55, 1.68, 0.0)
+                custom double3 xformOp:translate = (-1.55, 1.65, 0.0)
                 uniform token purpose = "render"
                 color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+                custom double3 xformOp:rotateXYZ = (0.5950900791862165, 0.0015200488402722686, 0.1917020037121857)
             }
             def Cube "EngineAdapterPlate" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
+                active = true
             )
             {
                 custom double3 xformOp:scale = (1.42, 0.06, 1.42)
-                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+                custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
                 double size = 1.0
                 bool physics:collisionEnabled = false
                 custom double3 xformOp:translate = (0.0, 1.7, 0.0)
                 uniform token purpose = "render"
                 color3f[] primvars:displayColor = [(0.18000000715255737, 0.20000000298023224, 0.23000000417232513)]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            }
+            def Mesh "EngineSkirtShell" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+                active = false
+            )
+            {
+                point3f[] points = [(-1.600000023841858, 1.75, 1.600000023841858), (1.600000023841858, 1.75, 1.600000023841858), (1.600000023841858, 1.75, -1.600000023841858), (-1.600000023841858, 1.75, -1.600000023841858), (-1.2999999523162842, 1.25, 1.2999999523162842), (1.2999999523162842, 1.25, 1.2999999523162842), (1.2999999523162842, 1.25, -1.2999999523162842), (-1.2999999523162842, 1.25, -1.2999999523162842)]
+                int[] faceVertexCounts = [4, 4, 4, 4]
+                int[] faceVertexIndices = [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                uniform token subdivisionScheme = "none"
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.07000000029802322, 0.09000000357627869, 0.11999999731779099)]
+                bool physics:collisionEnabled = false
+                uniform bool doubleSided = true
+            }
+            def Xform "EngineSkirt" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
+            )
+            {
+                custom double3 xformOp:translate = (0.0, 1.75, 0.0)
+                custom token[] xformOpOrder = ["xformOp:translate"]
             }
         }
     }
