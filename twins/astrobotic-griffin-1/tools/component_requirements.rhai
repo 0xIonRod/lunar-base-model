@@ -17,8 +17,8 @@ fn source_text_list(source, qualified_name) {
 
 // Decode a comma-separated numeric station datum from the SysML source.  The
 // caller must check cardinality against the corresponding identity list
-// before indexing; an absent or malformed list is returned empty so the
-// generic evaluator can report a missing source instead of guessing values.
+// before indexing; an absent list is returned empty and a malformed numeric
+// token raises a Rhai error instead of being coerced or guessed.
 fn source_number_list(source, qualified_name) {
     let text = sysml_requirements::text(source, qualified_name);
     if text == () || text == "" { return []; }
