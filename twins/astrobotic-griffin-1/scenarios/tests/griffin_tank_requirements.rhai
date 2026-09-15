@@ -32,6 +32,7 @@ fn on_tick(me) {
     let names = component_requirements::source_text_list(source, names_source);
     let child_names = component_requirements::source_text_list(source, own("childNames"));
     let end_hardware_names = component_requirements::source_text_list(source, own("endHardwareNames"));
+    let service_hardware_names = component_requirements::source_text_list(source, own("serviceHardwareNames"));
     let xs = component_requirements::source_number_list(source, parent("tankStationX"));
     let ys = component_requirements::source_number_list(source, parent("tankStationY"));
     let zs = component_requirements::source_number_list(source, parent("tankStationZ"));
@@ -41,8 +42,16 @@ fn on_tick(me) {
     let dome_flattening = sysml_requirements::number(source, own("domeFlatteningRatio"));
     let neck_radius = sysml_requirements::number(source, own("neckRadiusM"));
     let neck_height = sysml_requirements::number(source, own("neckHeightM"));
+    let shoulder_radius = sysml_requirements::number(source, own("shoulderCollarRadiusM"));
+    let shoulder_height = sysml_requirements::number(source, own("shoulderCollarHeightM"));
+    let valve_radius = sysml_requirements::number(source, own("valveRadiusM"));
+    let valve_height = sysml_requirements::number(source, own("valveHeightM"));
+    let valve_cap_radius = sysml_requirements::number(source, own("valveCapRadiusM"));
+    let valve_cap_height = sysml_requirements::number(source, own("valveCapHeightM"));
     if body_radius == () || body_height == () || dome_radius == () || dome_flattening == ()
-        || neck_radius == () || neck_height == () || child_names.len() == 0 || end_hardware_names.len() != 4 {
+        || neck_radius == () || neck_height == () || shoulder_radius == () || shoulder_height == ()
+        || valve_radius == () || valve_height == () || valve_cap_radius == () || valve_cap_height == ()
+        || child_names.len() == 0 || end_hardware_names.len() != 4 || service_hardware_names.len() != 6 {
         component_requirements::finish(source, [component_requirements::coverage("GPT-006-source", "tank", "GriffinTankRequirements::gpt006", VERIFICATION)], "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
         this.done = true;
         return;
@@ -61,6 +70,8 @@ fn on_tick(me) {
         for child_name in child_names { child_paths.push(path + "/" + child_name); }
         let end_hardware_paths = [];
         for child_name in end_hardware_names { end_hardware_paths.push(path + "/" + child_name); }
+        let service_hardware_paths = [];
+        for child_name in service_hardware_names { service_hardware_paths.push(path + "/" + child_name); }
         checks.push(component_requirements::exists("GPT-001-" + name, "tank", "GriffinTankRequirements::gpt001", VERIFICATION, path, "Xform"));
         checks.push(component_requirements::children("GPT-002-" + name, "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path,
             child_paths));
@@ -77,6 +88,20 @@ fn on_tick(me) {
         checks.push(#{id: "GPT-006-" + name + "-dome-flattening", component: "tank", requirement: "GriffinTankRequirements::gpt006", verification: VERIFICATION, kind: "attribute_component", path: path + "/TankDomeTop", attr: "xformOp:scale", index: 1, expected: dome_flattening, tolerance: 0.002});
         checks.push(attribute("GPT-006-" + name + "-neck-radius", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "radius", neck_radius));
         checks.push(attribute("GPT-006-" + name + "-neck-height", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "height", neck_height));
+        checks.push(component_requirements::children("GPT-007-" + name, "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path,
+            service_hardware_paths));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-shoulder-top", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankShoulderTop", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-shoulder-bottom", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankShoulderBottom", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-valve-top", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankValveTop", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-valve-bottom", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankValveBottom", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-cap-top", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankValveCapTop", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-cap-bottom", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankValveCapBottom", "Cylinder"));
+        checks.push(attribute("GPT-007-" + name + "-shoulder-radius", "GriffinTankRequirements::gpt007", path + "/TankShoulderTop", "radius", shoulder_radius));
+        checks.push(attribute("GPT-007-" + name + "-shoulder-height", "GriffinTankRequirements::gpt007", path + "/TankShoulderTop", "height", shoulder_height));
+        checks.push(attribute("GPT-007-" + name + "-valve-radius", "GriffinTankRequirements::gpt007", path + "/TankValveTop", "radius", valve_radius));
+        checks.push(attribute("GPT-007-" + name + "-valve-height", "GriffinTankRequirements::gpt007", path + "/TankValveTop", "height", valve_height));
+        checks.push(attribute("GPT-007-" + name + "-cap-radius", "GriffinTankRequirements::gpt007", path + "/TankValveCapTop", "radius", valve_cap_radius));
+        checks.push(attribute("GPT-007-" + name + "-cap-height", "GriffinTankRequirements::gpt007", path + "/TankValveCapTop", "height", valve_cap_height));
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("GPT-005-" + name + "-x", path, 0, xs[index]));
             checks.push(position("GPT-005-" + name + "-y", path, 1, ys[index]));
