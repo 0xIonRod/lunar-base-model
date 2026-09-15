@@ -28,6 +28,12 @@ package FlipRequirements {
         attribute wheelStationX : String = "-1.75,-1.75,1.75,1.75";
         attribute wheelStationY : String = "-0.42,-0.42,-0.42,-0.42";
         attribute wheelStationZ : String = "-1.15,1.15,-1.15,1.15";
+        // Assembly-owned visual connector dimensions, ordered by wheel
+        // station.  The replaceable wheel asset remains responsible for tire
+        // geometry; these values describe the authored station-to-chassis
+        // suspension proxy in the visual vehicle layer.
+        attribute suspensionStrutScale : String = "0.14,0.36,0.14";
+        attribute suspensionStrutOffset : String = "0.0,0.20,0.0";
         attribute solarArrayMount : String = "0.0,1.45,1.30";
         attribute solarArrayTiltDeg : Real = 18.0;
         attribute componentReference : String = "https://www.astrolab.space/flip/";

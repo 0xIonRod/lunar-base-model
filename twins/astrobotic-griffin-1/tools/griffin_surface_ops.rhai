@@ -33,11 +33,17 @@ fn landing_gate_report() {
         attrs: ["xformOp:translate"]
     });
     let physics = query("QueryPhysicsState", #{id: lander});
-    let rover_physics = query("QueryPhysicsState", #{id: find("/Griffin1SurfaceOps/FLIP")});
+    let rover = find("/Griffin1SurfaceOps/FLIP");
+    let rover_physics = query("QueryPhysicsState", #{id: rover});
+    let rover_settle = rover_route_settle_report(rover);
     let report = #{
         position: if pose == () { [] } else { pose.world_position },
         physics_state: physics,
         rover_physics_state: rover_physics,
+        rover_settle: rover_settle,
+        rover_brake_command: get(rover, "brake"),
+        rover_throttle_command: get(rover, "throttle"),
+        rover_steer_command: get(rover, "steer"),
         all_legs_contact: get(lander, "all_legs_contact"),
         upright_axis_y: get(lander, "upright_axis_y"),
         ground_speed: get(lander, "ground_speed"),
@@ -220,9 +226,13 @@ fn drive_route_point(rover, target, speed, radius) {
 fn rover_route_settle_report(rover) {
     let pose = world_pos(rover);
     let speed = get(rover, "speed");
-    let ok = pose != () && speed != () && pose[1] <= 1.75 && speed.abs() <= 0.25;
+    let height_limit = griffin_spec::rover_settle_height_limit_m();
+    let speed_limit = griffin_spec::rover_settle_speed_limit_mps();
+    let ok = pose != () && speed != () && height_limit != () && speed_limit != ()
+        && pose[1] <= height_limit && speed.abs() <= speed_limit;
     #{ok: ok,
-      pose: pose, speed: speed, height_limit_m: 1.75, speed_limit_mps: 0.25}
+      pose: pose, speed: speed, height_limit_m: height_limit,
+      speed_limit_mps: speed_limit}
 }
 
 /// Build the native task tree for the short, observable surface route.  Every

@@ -451,7 +451,7 @@ fn visual_component_plan(doc, edit_target, root) {
     for index in 0..wheel_names.len() {
         let station = rover + "/Suspension_" + wheel_names[index];
         let placement = assembly_builder::place_plan(edit_target, station,
-            [wheel_x[index], wheel_y[index], wheel_z[index]], ());
+            [wheel_x[index], wheel_y[index], wheel_z[index]], (), ());
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
     }
@@ -674,11 +674,24 @@ fn _isolated_griffin_detail_specs(root) {
 }
 
 fn _isolated_flip_detail_specs(root) {
-    [
+    let details = [
         #{parent: root + "/Chassis", name: "SideGuardLeft", shape: "cube", translation: [-1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
         #{parent: root + "/Chassis", name: "SideGuardRight", shape: "cube", translation: [1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
         #{parent: root + "/SensorMast", name: "SensorLens", shape: "cylinder", translation: [0.0, 1.88, -0.55], radius: 0.12, height: 0.16, axis: "Z", color: [0.04, 0.08, 0.12]},
-    ]
+    ];
+    // Each wheel gets its own visible suspension strut.  The detail is
+    // assembly-owned (the replaceable wheel asset remains unchanged) and the
+    // task tag keeps a single-wheel Editor pass from touching its neighbours.
+    // Its local origin is the wheel hub; the 0.36 m vertical extent reaches
+    // from the hub into the lower chassis frame without inventing a second
+    // station table.
+    for name in griffin_spec::visual_rover_wheel_names() {
+        details.push(#{parent: root + "/Suspension_" + name,
+            name: "SuspensionStrut", task: "Wheel_" + name, shape: "cube",
+            translation: [0.0, 0.20, 0.0], scale: [0.14, 0.36, 0.14],
+            color: [0.10, 0.12, 0.14]});
+    }
+    details
 }
 
 fn _isolated_details_plan(doc, edit_target, details) {
@@ -832,7 +845,7 @@ fn isolated_flip_component_plan(doc, edit_target, root) {
     for index in 0..names.len() {
         let station = root + "/Suspension_" + names[index];
         let placement = assembly_builder::place_plan(edit_target, station,
-            [wheel_x[index], wheel_y[index], wheel_z[index]], ());
+            [wheel_x[index], wheel_y[index], wheel_z[index]], (), ());
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
     }
@@ -857,6 +870,161 @@ fn isolated_flip_component_plan(doc, edit_target, root) {
     }
     #{ok: true, kind: "flip_isolated_visual_assembly", root: root,
       component_count: specs.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
+}
+
+// Component-scoped authoring ------------------------------------------------
+//
+// These entry points are intentionally narrower than the aggregate plans
+// above.  They let an Editor session make one reviewable change, inspect the
+// projection, and run one component gate before continuing.  Group names are
+// explicit task boundaries; they are not a license to apply the whole vehicle.
+
+fn _griffin_task_match(name, task) {
+    if name == task { return true; }
+    if task == "PropellantTanks" { return name.starts_with("Tank"); }
+    if task == "LandingLegs" { return name.starts_with("Leg"); }
+    if task == "SolarArrays" { return name.starts_with("SolarPanel"); }
+    if task == "MainEngineCluster" { return name.starts_with("Engine"); }
+    false
+}
+
+fn _detail_matches_task(detail, task) {
+    let parent = detail.parent;
+    if task == "Bus" { return parent.ends_with("/Bus"); }
+    if task == "MainEngineCluster" {
+        return parent.ends_with("/MainEngineCluster") || parent.contains("/MainEngineCluster/");
+    }
+    if task == "EgressRampPort" { return parent.ends_with("/EgressRampPort"); }
+    if task == "EgressRampStarboard" { return parent.ends_with("/EgressRampStarboard"); }
+    false
+}
+
+fn isolated_griffin_component_plan_for(doc, edit_target, root, task) {
+    if doc == () || edit_target == () || !absolute_root(root) || task == () || task == "" {
+        return plan_error("isolated_griffin_component_plan_for requires a document, edit target, root, and task");
+    }
+    // Ramps own a hinge frame, mount relation, and deployment contract.  Keep
+    // that behavior in the dedicated one-ramp planner instead of partially
+    // applying it from a generic component selector.
+    if task == "EgressRampPort" || task == "EgressRampStarboard" {
+        return isolated_griffin_ramp_plan(doc, edit_target, root,
+            if task == "EgressRampPort" { "port" } else { "starboard" });
+    }
+    let specs = _isolated_griffin_specs(root);
+    if specs.len() == 0 { return plan_error("SysML Griffin visual parameters are missing"); }
+    let selected = [];
+    for spec in specs {
+        if _griffin_task_match(spec.name, task) { selected.push(spec); }
+    }
+    if selected.len() == 0 {
+        return plan_error("unknown Griffin visual component task `" + task + "`");
+    }
+    let ops = [];
+    let paths = [];
+    for spec in selected {
+        let result = _isolated_component_plan(doc, edit_target, spec);
+        if !result.ok { return result; }
+        paths.push(result.path);
+        for op in result.ops { ops.push(op); }
+    }
+    for detail in _isolated_griffin_detail_specs(root) {
+        if !_detail_matches_task(detail, task) { continue; }
+        let path = detail.parent + "/" + detail.name;
+        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
+        let detail_plan = _detail_ops(edit_target, detail);
+        if !detail_plan.ok { return detail_plan; }
+        for op in detail_plan.ops { ops.push(op); }
+    }
+    if task == "MainEngineCluster" {
+        for op in _isolated_engine_radius_ops(edit_target, root) { ops.push(op); }
+    }
+    #{ok: true, kind: "griffin_component_task", root: root, component: task,
+      component_count: selected.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
+}
+
+fn apply_isolated_griffin_component(doc, edit_target, root, task, parent_gen) {
+    let plan = isolated_griffin_component_plan_for(doc, edit_target, root, task);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc, "Build Griffin component " + task,
+        plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, command: command,
+      component: task, component_count: plan.component_count, root: root}
+}
+
+fn _flip_task_match(name, task) {
+    if name == task { return true; }
+    if task == "DirectionalWheels" { return name.starts_with("Wheel_"); }
+    false
+}
+
+fn _flip_detail_matches_task(detail, task) {
+    let parent = detail.parent;
+    if detail.task != () {
+        return task == "DirectionalWheels" || detail.task == task;
+    }
+    if task == "Chassis" { return parent.ends_with("/Chassis"); }
+    if task == "SensorMast" { return parent.ends_with("/SensorMast"); }
+    false
+}
+
+fn isolated_flip_component_plan_for(doc, edit_target, root, task) {
+    if doc == () || edit_target == () || !absolute_root(root) || task == () || task == "" {
+        return plan_error("isolated_flip_component_plan_for requires a document, edit target, root, and task");
+    }
+    let specs = _isolated_flip_specs(root);
+    if specs.len() == 0 { return plan_error("SysML FLIP visual parameters are missing"); }
+    let selected = [];
+    for spec in specs {
+        if _flip_task_match(spec.name, task) { selected.push(spec); }
+    }
+    if selected.len() == 0 {
+        return plan_error("unknown FLIP visual component task `" + task + "`");
+    }
+    let ops = [];
+    let paths = [];
+    for spec in selected {
+        let result = _isolated_component_plan(doc, edit_target, spec);
+        if !result.ok { return result; }
+        paths.push(result.path);
+        for op in result.ops { ops.push(op); }
+    }
+    for detail in _isolated_flip_detail_specs(root) {
+        if !_flip_detail_matches_task(detail, task) { continue; }
+        let path = detail.parent + "/" + detail.name;
+        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
+        let detail_plan = _detail_ops(edit_target, detail);
+        if !detail_plan.ok { return detail_plan; }
+        for op in detail_plan.ops { ops.push(op); }
+    }
+    let names = griffin_spec::visual_rover_wheel_names();
+    let wheel_x = griffin_spec::rover_wheel_station_x();
+    let wheel_y = griffin_spec::rover_wheel_station_y();
+    let wheel_z = griffin_spec::rover_wheel_station_z();
+    if task == "DirectionalWheels" || task.starts_with("Wheel_") {
+        if names.len() != 4 || wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4 {
+            return plan_error("FLIP wheel station datums must contain four entries");
+        }
+        for index in 0..names.len() {
+            let wheel_name = "Wheel_" + names[index];
+            if task != "DirectionalWheels" && wheel_name != task { continue; }
+            let station = root + "/Suspension_" + names[index];
+            let placement = assembly_builder::place_plan(edit_target, station,
+                [wheel_x[index], wheel_y[index], wheel_z[index]], (), ());
+            if !placement.ok { return placement; }
+            for op in placement.ops { ops.push(op); }
+        }
+    }
+    #{ok: true, kind: "flip_component_task", root: root, component: task,
+      component_count: selected.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
+}
+
+fn apply_isolated_flip_component(doc, edit_target, root, task, parent_gen) {
+    let plan = isolated_flip_component_plan_for(doc, edit_target, root, task);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc, "Build FLIP component " + task,
+        plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, command: command,
+      component: task, component_count: plan.component_count, root: root}
 }
 
 fn _isolated_ramp_spec(root, side) {

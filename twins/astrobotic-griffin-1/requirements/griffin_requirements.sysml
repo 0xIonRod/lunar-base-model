@@ -39,6 +39,14 @@ package Griffin1Requirements {
         attribute landingDivergenceToleranceM : Real = 0.50;
         attribute landingDivergenceToleranceUpright : Real = 0.02;
         attribute landingDivergenceToleranceSpeedMps : Real = 0.50;
+        // Mission watchdogs are explicit study policy, not hidden Rhai timing
+        // literals. They bound a missing physical event and must never turn
+        // into a PASS by themselves.
+        attribute landingPhaseTimeoutS : Real = 300.0;
+        attribute roverSettleTimeoutS : Real = 30.0;
+        attribute roverSettleHeightLimitM : Real = 1.75;
+        attribute roverSettleSpeedLimitMps : Real = 0.25;
+        attribute surfaceRouteTimeoutS : Real = 900.0;
         // Visual review contract.  These are intentionally small, stable
         // presentation datums, not a hidden CAD model: the Twin graphics test
         // reads them and compares them with composed USD geometry.

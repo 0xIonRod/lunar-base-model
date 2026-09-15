@@ -25,6 +25,10 @@ fn on_tick(me) {
     let root = sysml_requirements::text(source, own("usdRootPath"));
     let names_source = sysml_requirements::text(source, own("namesSource"));
     let count_source = sysml_requirements::text(source, own("countSource"));
+    let strut_name = sysml_requirements::text(source, own("suspensionVisualChild"));
+    if strut_name == () || strut_name == "" {
+        throw("FlipWheelRequirements::suspensionVisualChild is required");
+    }
     let names = component_requirements::source_text_list(source, names_source);
     let radius_source = rover("visualRoverWheelRadiusM");
     let front_source = rover("frontSteeringAngleDeg");
@@ -59,6 +63,38 @@ fn on_tick(me) {
             checks.push(position("FWW-005-" + name + "-x", station, 0, xs[index]));
             checks.push(position("FWW-005-" + name + "-y", station, 1, ys[index]));
             checks.push(position("FWW-005-" + name + "-z", station, 2, zs[index]));
+        }
+        let strut = station + "/" + strut_name;
+        let strut_scale = component_requirements::source_number_list(source,
+            rover("suspensionStrutScale"));
+        let strut_offset = component_requirements::source_number_list(source,
+            rover("suspensionStrutOffset"));
+        checks.push(component_requirements::exists("FWW-006-" + name,
+            "suspension", "FlipWheelRequirements::fww006", VERIFICATION,
+            strut, "Cube"));
+        checks.push(component_requirements::attribute_equals("FWW-006-" + name + "-purpose",
+            "suspension", "FlipWheelRequirements::fww006", VERIFICATION,
+            strut, "purpose", "render"));
+        checks.push(component_requirements::attribute_equals("FWW-006-" + name + "-collision",
+            "suspension", "FlipWheelRequirements::fww006", VERIFICATION,
+            strut, "physics:collisionEnabled", false));
+        if strut_scale.len() == 3 {
+            for axis in 0..3 {
+                checks.push(#{id: "FWW-006-" + name + "-scale-" + axis.to_string(),
+                    component: "suspension", requirement: "FlipWheelRequirements::fww006",
+                    verification: VERIFICATION, kind: "attribute_component", path: strut,
+                    attr: "xformOp:scale", index: axis, expected: strut_scale[axis],
+                    tolerance: 0.002});
+            }
+        }
+        if strut_offset.len() == 3 {
+            for axis in 0..3 {
+                checks.push(#{id: "FWW-006-" + name + "-offset-" + axis.to_string(),
+                    component: "suspension", requirement: "FlipWheelRequirements::fww006",
+                    verification: VERIFICATION, kind: "attribute_component", path: strut,
+                    attr: "xformOp:translate", index: axis, expected: strut_offset[axis],
+                    tolerance: 0.002});
+            }
         }
     }
     checks.push(component_requirements::coverage("FWW-004-traceability", "wheels", "FlipWheelRequirements::fww004", VERIFICATION));

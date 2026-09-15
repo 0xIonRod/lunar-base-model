@@ -24,6 +24,7 @@ fn on_start(me) {
     this.base_site_reached = false;
     this.geometry_valid = true;
     this.phase_timeout = false;
+    this.rover_brake_held = false;
 }
 
 fn on_event(me, evt) {
@@ -205,11 +206,34 @@ fn engage_rover(me) {
     if route_ack.ok != true {
         notify_kind("Authored FLIP route was rejected: " + route_ack.error, "error");
         emit("griffin_phase_timeout");
-        return;
+        return #{ok: false, error: route_ack.error};
+    }
+    // The adapter release makes FLIP a live rigid body.  Take explicit
+    // ownership of the settle phase through the shared controller surface:
+    // stop any authored/autopilot writer and hold the normal brake intent
+    // until the authoritative pose/velocity gate passes.  No pose or velocity
+    // is overwritten here.
+    let brake = griffin_controls::hold_rover_brake();
+    if brake == () || brake.ok != true {
+        let detail = if brake == () { "controller rejected settle brake" } else { brake.error };
+        notify_kind("FLIP settle brake was rejected: " + detail, "error");
+        emit("griffin_phase_timeout");
+        return #{ok: false, error: detail};
     }
     notify_kind("FLIP deployment complete; authored rover route continues.", "success");
     print("[griffin] FLIP authored route continues after release");
-    true
+    #{ok: true}
+}
+
+fn release_rover_settle_brake() {
+    let brake = griffin_controls::release_rover_brake();
+    if brake == () || brake.ok != true {
+        let detail = if brake == () { "controller rejected brake release" } else { brake.error };
+        notify_kind("FLIP route brake release was rejected: " + detail, "error");
+        return #{ok: false, error: detail};
+    }
+    print("[griffin] FLIP settle brake released; route authority is active");
+    #{ok: true}
 }
 
 fn fail_phase(me, phase) {
@@ -267,11 +291,10 @@ fn task(me) {
                 wait_for_from("lander_touchdown", "/Griffin1SurfaceOps/Lander"),
             ]),
             seq([
-                // The authored 60 m descent settles just after 100 s in the
-                // current powered-descent proxy. Keep the watchdog bounded,
-                // but leave enough margin for the physical touchdown event to
-                // arrive before declaring the mission failed.
-                wait(180.0),
+                // This watchdog is a SysML-authored bound for a missing
+                // physical event. It cannot create a PASS; the event branch
+                // must still complete the landing predicates.
+                wait(griffin_spec::landing_phase_timeout_s()),
                 once(|m| { this.phase_timeout = true; fail_phase(m, "landing"); true }),
             ]),
         ]),
@@ -286,7 +309,18 @@ fn task(me) {
         once(|m| { if release_rover() { this.rover_detached = true; }; true }),
         // Re-arm the authored BTXML immediately after the adapter disappears.
         wait(0.25),
-        once(|m| { if engage_rover(m) { this.route_engaged = true; }; true }),
+        once(|m| {
+            let engaged = engage_rover(m);
+            if engaged.ok == true {
+                this.route_engaged = true;
+                this.rover_brake_held = true;
+            } else {
+                this.phase_timeout = true;
+                fail_phase(m, "rover-engage");
+            }
+            true
+        }),
+        check(|m| this.phase_timeout != true),
         // The rover is released from a top-deck adapter several metres above
         // the pad.  Wait on its authoritative pose/velocity rather than a
         // guessed delay before issuing a horizontal route command; an
@@ -300,10 +334,21 @@ fn task(me) {
                 // A free-body release should settle within a few seconds. If
                 // it does not, report the physical state instead of allowing
                 // the route task to hang until the outer harness expires.
-                wait(30.0),
+                wait(griffin_spec::rover_settle_timeout_s()),
                 once(|m| { this.phase_timeout = true; fail_phase(m, "rover-settle"); true }),
             ]),
         ]),
+        check(|m| this.phase_timeout != true),
+        once(|m| {
+            let released = release_rover_settle_brake();
+            if released.ok == true {
+                this.rover_brake_held = false;
+            } else {
+                this.phase_timeout = true;
+                fail_phase(m, "rover-brake-release");
+            }
+            true
+        }),
         check(|m| this.phase_timeout != true),
         // Drive every leg through the shared navigation/SetPorts surface.  A
         // completion edge is emitted after each typed arrival so the existing
@@ -316,7 +361,7 @@ fn task(me) {
                 wait_for("griffin_base_site_reached"),
             ]),
             seq([
-                wait(900.0),
+                wait(griffin_spec::surface_route_timeout_s()),
                 once(|m| { this.phase_timeout = true; fail_phase(m, "surface-route"); true }),
             ]),
         ]),

@@ -145,6 +145,11 @@ fn landing_max_horizontal_drift_m() { _sysml_attribute("landingMaxHorizontalDrif
 fn landing_divergence_tolerance_m() { _sysml_attribute("landingDivergenceToleranceM") }
 fn landing_divergence_tolerance_upright() { _sysml_attribute("landingDivergenceToleranceUpright") }
 fn landing_divergence_tolerance_speed_mps() { _sysml_attribute("landingDivergenceToleranceSpeedMps") }
+fn landing_phase_timeout_s() { _sysml_attribute("landingPhaseTimeoutS") }
+fn rover_settle_timeout_s() { _sysml_attribute("roverSettleTimeoutS") }
+fn rover_settle_height_limit_m() { _sysml_attribute("roverSettleHeightLimitM") }
+fn rover_settle_speed_limit_mps() { _sysml_attribute("roverSettleSpeedLimitMps") }
+fn surface_route_timeout_s() { _sysml_attribute("surfaceRouteTimeoutS") }
 fn visual_requirement_usage_count() { _sysml_integer("visualRequirementUsageCount") }
 fn visual_verification_case_name() { _sysml_text("visualVerificationCaseName") }
 fn visual_camera_name() { _sysml_text("visualCameraName") }

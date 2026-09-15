@@ -155,12 +155,16 @@ runtime acceptance.
 
 For render-only component work, open `vehicles/griffin_1_visual.usda` and
 `vehicles/flip_visual.usda` as two independent USD previews in Editor
-Perspective. Use the Twin `griffin_visual_builder` library for the complete
-vehicle recipe, or its isolated `apply_isolated_griffin_ramp(..., "port"|
-"starboard", ...)` entry point when refining one ramp. Each operation is
-typed, journaled, and saved through the Editor; never rewrite the USDA text by
-hand. The ramp requirements and Rhai verification are intentionally separate
-so a ramp can be accepted without coupling it to FLIP's visual review.
+Perspective. Follow the repository-local
+[`interactive-component-authoring`](../../skills/interactive-component-authoring/SKILL.md)
+cycle: one component plan, one Editor batch, one projection/readback, one
+focused visual check, and one Rhai/SysML gate before moving on. The Twin
+`griffin_visual_builder` library is a dry-plan and typed-apply facade; use its
+component-scoped entry points for the current task rather than applying a whole
+vehicle recipe. Each operation is journaled and saved through the Editor; never
+rewrite the USDA text by hand. The ramp requirements and Rhai verification are
+intentionally separate so a ramp can be accepted without coupling it to FLIP's
+visual review.
 
 ### Build
 
@@ -254,20 +258,23 @@ The visual review composition is intentionally not a CAD or B-rep deliverable.
 Each visible subsystem is a referenced USDA component with its own stable
 children and SI geometry. `tools/griffin_visual_builder.rhai` exposes:
 
-* `griffin_visual_builder::visual_component_plan(doc, edit_target, root)` for a
-  dry, idempotent operation list;
-* `griffin_visual_builder::apply_visual_components(doc, edit_target, root,
-  parent_generation)` for one journaled `ApplyUsdOps` change set.
+* component-scoped `*_plan_for(...)` functions for one dry operation list;
+* component-scoped `apply_*_component(...)` functions for one journaled
+  `ApplyUsdOps` change set;
+* aggregate plans only for inspection or a deliberate, reviewed rebuild.
 
 The helper uses the generic LunCoSim `assembly_builder`/`assembly_edit` surface,
 accepts Twin-local `twin://` references, and requires the parent frames to be
-present before submission. The live Editor remains open; after the command is
-acknowledged, query the same document generation and run
-`scenarios/tests/griffin_flip_visual.rhai`. The test checks every leg, tank,
-ramp, solar panel, engine bell, wheel subpart, mast subpart, and the composed
-geometry bounds against SysML metre datums. Both visual and dynamic assemblies
-use the source-backed four-wheel directional topology; a presentation-only
-proxy must not silently change that count.
+present before submission. The live Editor remains open; after each small
+command is acknowledged, query the same document generation, inspect the
+focused preview, and run the owning component gate (for example
+`flip_wheel_requirements.rhai` for one wheel task). The aggregate
+`griffin_flip_visual.rhai` gate is reserved for the checkpoint after all
+component cycles. Wheel FWW-006 also checks the assembly-owned suspension
+strut's type, metric offset/scale, render purpose, and disabled collision;
+the replaceable wheel asset remains responsible for tire/hub geometry. Both
+visual and dynamic assemblies use the source-backed four-wheel directional
+topology; a presentation-only proxy must not silently change that count.
 
 Station names are read from the SysML source (`landingLegNames`,
 `propellantTankNames`, `rampNames`, `solarArrayNames`, `mainEngineNames`, and

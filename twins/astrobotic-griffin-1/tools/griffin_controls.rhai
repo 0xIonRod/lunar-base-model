@@ -52,7 +52,7 @@ fn show_rover_controls() {
         #{ text: "Drive  " + forward + "/" + backward + "   Steer  " + left + "/" + right + "   Brake  Space", state: "active" },
         #{ text: "STEERING MODE  " + steering_mode + "  (CRAB = parallel / ACKERMANN = wheel geometry)", state: "active" },
         #{ text: "Stopped FLIP: toggle_rover_steering_mode() switches the vehicle once", state: "pending" },
-        #{ text: action + " toggles the authored route; manual input disengages autopilot", state: "pending" },
+        #{ text: action + " is reserved for the authored route; manual input takes control", state: "pending" },
         #{ text: cancel + " releases FLIP and returns to free flight", state: "pending" }
     ]);
 }
@@ -68,15 +68,22 @@ fn rover_steering_mode_label() {
     if strength > 0.5 { "ACKERMANN" } else { "CRAB WALK" }
 }
 
-// SimulateIntent is the same per-vessel controller path used by the keyboard,
-// but persists the brake intent until explicitly released. A one-shot SetPorts
-// write is useful for a single control frame; it is not a reliable stop on a
-// sloped polar heightfield.
+// SimulateIntent is the controller-owned persistent hold used by the keyboard;
+// the immediate SetPorts write closes the one-tick gap before the next control
+// projection.  Both target the authored `brake` input and therefore use the
+// generic mobility parking-brake boundary.  No autopilot-specific command is
+// assumed: route ownership is explicit in the mission's PossessVessel step.
 fn hold_rover_brake() {
     let target = resolve(rover_path(), "FLIP rover");
     if target == () { return #{ ok: false, error: "rover is unavailable" }; }
-    cmd("DisengageAutopilot", #{ vessel: target });
-    let result = cmd("SimulateIntent", #{ intent: "brake", held: true, target: target });
+    let intent = cmd("SimulateIntent", #{ intent: "brake", held: true, target: target });
+    if intent == () || intent.ok != true {
+        return #{ ok: false, error: "controller rejected persistent brake intent" };
+    }
+    let result = cmd("SetPorts", #{
+        target: target,
+        writes: [["throttle", 0.0], ["steer", 0.0], ["brake", 1.0]],
+    });
     if result.ok { notify_kind("FLIP brake held through the vehicle controller.", "info"); }
     result
 }
@@ -84,7 +91,14 @@ fn hold_rover_brake() {
 fn release_rover_brake() {
     let target = resolve(rover_path(), "FLIP rover");
     if target == () { return #{ ok: false, error: "rover is unavailable" }; }
-    cmd("SimulateIntent", #{ intent: "brake", held: false, target: target })
+    let intent = cmd("SimulateIntent", #{ intent: "brake", held: false, target: target });
+    if intent == () || intent.ok != true {
+        return #{ ok: false, error: "controller rejected brake release" };
+    }
+    cmd("SetPorts", #{
+        target: target,
+        writes: [["throttle", 0.0], ["steer", 0.0], ["brake", 0.0]],
+    })
 }
 
 // Configure FLIP's four steering actuators as one vehicle-level mode. FLIP is
@@ -209,21 +223,16 @@ fn release_control() {
 }
 
 fn toggle_rover_autopilot() {
-    let target = resolve(rover_path(), "FLIP rover");
-    if target == () { return; }
-    let result = cmd("ToggleAutopilot", #{ vessel: target });
-    if result.ok { show_rover_controls(); }
-    result
+    notify_kind("FLIP autopilot toggle is not registered; use the authored route task.", "error");
+    #{ ok: false, error: "ToggleAutopilot is not a registered command" }
 }
 
 fn start_rover_autopilot() {
-    let target = resolve(rover_path(), "FLIP rover");
-    if target == () { return; }
-    cmd("StartAutopilot", #{ vessel: target });
+    notify_kind("FLIP autopilot start is not registered; use the authored route task.", "error");
+    #{ ok: false, error: "StartAutopilot is not a registered command" }
 }
 
 fn stop_rover_autopilot() {
-    let target = resolve(rover_path(), "FLIP rover");
-    if target == () { return; }
-    cmd("DisengageAutopilot", #{ vessel: target });
+    notify_kind("FLIP autopilot stop is not registered; use the authored route task.", "error");
+    #{ ok: false, error: "DisengageAutopilot is not a registered command" }
 }

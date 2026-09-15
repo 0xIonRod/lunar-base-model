@@ -322,6 +322,11 @@ The shared procedure is in the `author-rhai-tool`, `author-usd-component`,
   with `skills/author-rhai-tool/references/tool-authoring-contract.md`.
 - All changed skill folders passed
   `skill-creator/scripts/quick_validate.py`; installed aliases were not edited.
+- Repository-local interactive authoring skill:
+  `skills/interactive-component-authoring/SKILL.md`. It is the mandatory
+  cycle for future visual work: one named component, one dry typed plan, one
+  Editor batch, one same-generation projection/readback, one focused visual
+  inspection, one Rhai/SysML gate, then an explicit save before the next task.
 
 ## Live session
 
@@ -343,7 +348,29 @@ Last known open documents:
 |---|---:|---|---|
 | `griffin_1` / `vehicles/griffin_1.usda` | `111883701669039` | writable Griffin assembly | edit after fresh inspection |
 | `descent_lander` | `111895678861192` | read-only global source inspection | do not modify |
-| `UntitledStage-3.usda` | `111895797082559` | intended ramp component | inspect; no successful component batch yet |
+| `UntitledStage-3.usda` | `111895797082559` | historical ramp component | historical id; re-discover before use |
+
+The current incremental Editor session has independently exercised the visual
+builder against the Griffin and FLIP previews. A bus-only plan was applied to
+`griffin_1_visual` (generation 84 -> 85), then a chassis-only plan to
+`flip_visual` (20 -> 21), then one front-left wheel task (21 -> 24). Each
+change used a generation-checked `assembly_edit::batch`; the previews were
+reopened through the typed `OpenUsdPreview` lease after projection invalidation,
+not by restarting the simulator. Composed readback reported the authored bus
+station `(0, 3.2, 0)` and FLIP front-left station `(-1.75, -0.42, -1.15)` with
+`xformOp:rotateXYZ.y = -12 deg`. Dedicated Rhai fixtures passed for the bus,
+chassis, and four-wheel contract; the full vehicle recipes remain available
+only for a deliberate rebuild, not as the normal iteration unit.
+
+The next isolated tasks added one typed visual suspension connector per active
+wheel. Each `isolated_flip_component_plan_for(..., "Wheel_*"`)
+produced only that wheel pose plus one `AddPrim`/attribute sequence beneath its
+station; the successive preview generations were 35 (FL), 46 (RL), 57 (FR),
+and 68 (RR). The focused readbacks all show render-only Cubes with local
+scale `(0.14, 0.36, 0.14)`, local offset `(0, 0.20, 0)`, and collision
+disabled; world station positions remain the SysML datums. The updated
+`FlipWheelRequirements::Verify_FLIPWheelRequirements` gate now checks those
+visual connectors as FWW-006 and passes 69/69 results with zero failures.
 
 The last focused preview unexpectedly showed the descent-lander inspection
 preview rather than Griffin. Refocus the Griffin preview using typed preview
