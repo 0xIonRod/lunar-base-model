@@ -117,8 +117,12 @@ component even when the fixture contains its sibling visual components; no
 combined mission gate can hide a component failure. Component packages reuse
 canonical names/counts/dimensions from `griffin_lander_requirements.sysml` or
 `flip_requirements.sysml` through qualified source-name attributes, so Rhai does
-not carry a second geometry catalog. The generic evaluator rejects ambiguous
-short-name lookups instead of guessing.
+not carry a second geometry catalog. The same packages own the ordered metric
+station datums; the builder and component observers both consume those lists
+and the observers compare them with composed `xformOp:translate` values. The
+generic evaluator rejects ambiguous short-name lookups instead of guessing and
+indexes requirement/verification coverage once per report so detailed station
+gates remain fast.
 
 ## Provision the NOBILE03 terrain
 
