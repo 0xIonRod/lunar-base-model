@@ -1,4 +1,5 @@
 package GriffinTankRequirements {
+    private import ScalarValues::Real;
     private import ScalarValues::String;
 
     part def GriffinPropellantTankAssembly {
@@ -6,8 +7,15 @@ package GriffinTankRequirements {
         attribute sourceComponent : String = "GriffinLanderRequirements::GriffinLanderComponent";
         attribute namesSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankNames";
         attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankCount";
-        attribute childNames : String = "MliTank,TankBandA,TankBandB,TankBandC";
-        attribute status : String = "visual study proxy; exact COPV dimensions and placement TBD";
+        attribute childNames : String = "MliTank,TankBandA,TankBandB,TankBandC,TankCradle,TankDomeTop,TankDomeBottom,TankNeckTop,TankNeckBottom";
+        attribute endHardwareNames : String = "TankDomeTop,TankDomeBottom,TankNeckTop,TankNeckBottom";
+        attribute status : String = "metric visual study proxy; exact COPV dimensions and placement TBD";
+        attribute bodyRadiusM : Real = 0.48;
+        attribute bodyHeightM : Real = 2.25;
+        attribute domeRadiusM : Real = 0.48;
+        attribute domeFlatteningRatio : Real = 0.35;
+        attribute neckRadiusM : Real = 0.18;
+        attribute neckHeightM : Real = 0.18;
         attribute sourceReference : String = "https://www.astrobotic.com/griffin-1-mission-update/";
         attribute sourceFact : String = "Griffin-1 integration includes four propellant tanks and fit checks";
         attribute sourceRationale : String = "Each tank is a repeated, independently inspectable pressure-vessel visual component whose station and retention bands must not drift";
@@ -17,7 +25,7 @@ package GriffinTankRequirements {
         doc /* GPT-001 [topology] exactly four named propellant-tank owners are present and visible. */
     }
     requirement def GPT002_TankRetention {
-        doc /* GPT-002 [visual] every tank exposes a body and three retention bands with a lower cradle. */
+        doc /* GPT-002 [visual] every tank exposes a body, three retention bands, a lower cradle, and the retained end hardware listed by the component. */
     }
     requirement def GPT003_TankStatus {
         doc /* GPT-003 [traceability] tank geometry is labelled as a metric visual proxy until the mechanical ICD is available. */
@@ -28,12 +36,16 @@ package GriffinTankRequirements {
     requirement def GPT005_TankPlacement {
         doc /* GPT-005 [layout] each tank root transform matches the ordered metric station datums owned by GriffinLanderComponent. */
     }
+    requirement def GPT006_TankEndHardware {
+        doc /* GPT-006 [visual] each tank includes two retained end domes and coaxial necks so the pressure-vessel silhouette is not a bare cylinder. */
+    }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt002 : GPT002_TankRetention { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt003 : GPT003_TankStatus { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt004 : GPT004_TankTraceability { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt005 : GPT005_TankPlacement { subject tanks : GriffinPropellantTankAssembly; }
+    requirement gpt006 : GPT006_TankEndHardware { subject tanks : GriffinPropellantTankAssembly; }
 
     verification def Verify_GriffinTankRequirements {
         subject tanks : GriffinPropellantTankAssembly;
@@ -42,5 +54,6 @@ package GriffinTankRequirements {
         verify gpt003;
         verify gpt004;
         verify gpt005;
+        verify gpt006;
     }
 }
