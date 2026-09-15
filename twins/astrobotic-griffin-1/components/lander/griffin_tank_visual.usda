@@ -65,6 +65,7 @@ def Xform "PropellantTank" (
         custom double3 xformOp:translate = (0.0, 1.5, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
         color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
+        uniform token axis = "Y"
     }
     def Cylinder "TankNeckBottom"
     {
@@ -73,6 +74,7 @@ def Xform "PropellantTank" (
         custom double3 xformOp:translate = (0.0, -1.5, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
         color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
+        uniform token axis = "Y"
     }
     def Cylinder "TankShoulderTop" (
         prepend apiSchemas = "PhysicsCollisionAPI"
@@ -85,6 +87,7 @@ def Xform "PropellantTank" (
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
+        uniform token axis = "Y"
     }
     def Cylinder "TankShoulderBottom" (
         prepend apiSchemas = "PhysicsCollisionAPI"
@@ -97,6 +100,7 @@ def Xform "PropellantTank" (
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
+        uniform token axis = "Y"
     }
     def Cylinder "TankValveTop" (
         prepend apiSchemas = "PhysicsCollisionAPI"
@@ -109,6 +113,7 @@ def Xform "PropellantTank" (
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.47999998927116394, 0.5, 0.5299999713897705)]
+        uniform token axis = "Y"
     }
     def Cylinder "TankValveBottom" (
         prepend apiSchemas = "PhysicsCollisionAPI"
@@ -121,6 +126,7 @@ def Xform "PropellantTank" (
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.47999998927116394, 0.5, 0.5299999713897705)]
+        uniform token axis = "Y"
     }
     def Cylinder "TankValveCapTop" (
         prepend apiSchemas = "PhysicsCollisionAPI"
@@ -133,6 +139,7 @@ def Xform "PropellantTank" (
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
+        uniform token axis = "Y"
     }
     def Cylinder "TankValveCapBottom" (
         prepend apiSchemas = "PhysicsCollisionAPI"
@@ -145,6 +152,7 @@ def Xform "PropellantTank" (
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
+        uniform token axis = "Y"
     }
     def Cone "TankDomeTopProfile"
     {
@@ -153,10 +161,12 @@ def Xform "PropellantTank" (
         double radius2 = 0.18
         double height = 0.35
         custom double3 xformOp:translate = (0.0, 1.25, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
         uniform bool doubleSided = true
+        double radius = 0.48
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
     def Cone "TankDomeBottomProfile"
     {
@@ -165,9 +175,11 @@ def Xform "PropellantTank" (
         double radius2 = 0.48
         double height = 0.35
         custom double3 xformOp:translate = (0.0, -1.25, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
         uniform bool doubleSided = true
+        double radius = 0.48
+        custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
     }
 }

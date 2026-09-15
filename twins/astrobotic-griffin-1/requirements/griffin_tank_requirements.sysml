@@ -10,6 +10,9 @@ package GriffinTankRequirements {
         attribute childNames : String = "MliTank,TankBandA,TankBandB,TankBandC,TankCradle,TankDomeTopProfile,TankDomeBottomProfile,TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
         attribute endHardwareNames : String = "TankDomeTopProfile,TankDomeBottomProfile,TankNeckTop,TankNeckBottom";
         attribute serviceHardwareNames : String = "TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
+        attribute axialHardwareNames : String = "TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankDomeTopProfile,TankDomeBottomProfile";
+        attribute tankAxis : String = "Y";
+        attribute bottomDomeRotationDeg : Real = 180.0;
         attribute status : String = "metric visual study proxy; exact COPV dimensions and placement TBD";
         attribute bodyRadiusM : Real = 0.48;
         attribute bodyHeightM : Real = 2.25;
@@ -50,6 +53,9 @@ package GriffinTankRequirements {
     requirement def GPT007_TankServiceHardware {
         doc /* GPT-007 [visual] each tank includes the sourced shoulder collars and valve/cap hardware with the metric proxy dimensions defined by the component. */
     }
+    requirement def GPT008_TankOrientation {
+        doc /* GPT-008 [orientation] all axial tank hardware is Y-up; the lower tapered dome is inverted so both domes meet the body and necks without through-geometry. */
+    }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt002 : GPT002_TankRetention { subject tanks : GriffinPropellantTankAssembly; }
@@ -58,6 +64,7 @@ package GriffinTankRequirements {
     requirement gpt005 : GPT005_TankPlacement { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt006 : GPT006_TankEndHardware { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt007 : GPT007_TankServiceHardware { subject tanks : GriffinPropellantTankAssembly; }
+    requirement gpt008 : GPT008_TankOrientation { subject tanks : GriffinPropellantTankAssembly; }
 
     verification def Verify_GriffinTankRequirements {
         subject tanks : GriffinPropellantTankAssembly;
@@ -68,5 +75,6 @@ package GriffinTankRequirements {
         verify gpt005;
         verify gpt006;
         verify gpt007;
+        verify gpt008;
     }
 }

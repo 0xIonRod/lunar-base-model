@@ -18,6 +18,18 @@ fn attribute(id, requirement, path, attr, expected) {
       attr: attr, expected: expected, tolerance: 0.002}
 }
 
+fn source_attribute(id, requirement, path, attr, expected_attr) {
+    #{id: id, component: "tank", requirement: requirement,
+      verification: VERIFICATION, kind: "attribute_equals", path: path,
+      attr: attr, expected_attr: expected_attr}
+}
+
+fn source_component(id, requirement, path, attr, index, expected_attr) {
+    #{id: id, component: "tank", requirement: requirement,
+      verification: VERIFICATION, kind: "attribute_component", path: path,
+      attr: attr, index: index, expected_attr: expected_attr, tolerance: 0.002}
+}
+
 fn on_start(me) {
     this.started = elapsed_seconds();
     this.done = false;
@@ -33,6 +45,7 @@ fn on_tick(me) {
     let child_names = component_requirements::source_text_list(source, own("childNames"));
     let end_hardware_names = component_requirements::source_text_list(source, own("endHardwareNames"));
     let service_hardware_names = component_requirements::source_text_list(source, own("serviceHardwareNames"));
+    let axial_hardware_names = component_requirements::source_text_list(source, own("axialHardwareNames"));
     let xs = component_requirements::source_number_list(source, parent("tankStationX"));
     let ys = component_requirements::source_number_list(source, parent("tankStationY"));
     let zs = component_requirements::source_number_list(source, parent("tankStationZ"));
@@ -53,7 +66,8 @@ fn on_tick(me) {
         || dome_neck_radius == ()
         || neck_radius == () || neck_height == () || shoulder_radius == () || shoulder_height == ()
         || valve_radius == () || valve_height == () || valve_cap_radius == () || valve_cap_height == ()
-        || child_names.len() == 0 || end_hardware_names.len() != 4 || service_hardware_names.len() != 6 {
+        || child_names.len() == 0 || end_hardware_names.len() != 4 || service_hardware_names.len() != 6
+        || axial_hardware_names.len() != 10 {
         component_requirements::finish(source, [component_requirements::coverage("GPT-006-source", "tank", "GriffinTankRequirements::gpt006", VERIFICATION)], "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
         this.done = true;
         return;
@@ -108,6 +122,14 @@ fn on_tick(me) {
         checks.push(attribute("GPT-007-" + name + "-valve-height", "GriffinTankRequirements::gpt007", path + "/TankValveTop", "height", valve_height));
         checks.push(attribute("GPT-007-" + name + "-cap-radius", "GriffinTankRequirements::gpt007", path + "/TankValveCapTop", "radius", valve_cap_radius));
         checks.push(attribute("GPT-007-" + name + "-cap-height", "GriffinTankRequirements::gpt007", path + "/TankValveCapTop", "height", valve_cap_height));
+        for hardware_name in axial_hardware_names {
+            checks.push(source_attribute("GPT-008-" + name + "-" + hardware_name + "-axis",
+                "GriffinTankRequirements::gpt008", path + "/" + hardware_name,
+                "axis", "tankAxis"));
+        }
+        checks.push(source_component("GPT-008-" + name + "-bottom-dome-inverted",
+            "GriffinTankRequirements::gpt008", path + "/TankDomeBottomProfile",
+            "xformOp:rotateXYZ", 0, "bottomDomeRotationDeg"));
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("GPT-005-" + name + "-x", path, 0, xs[index]));
             checks.push(position("GPT-005-" + name + "-y", path, 1, ys[index]));
