@@ -116,5 +116,74 @@ scene = "tests/griffin_requirements.usda"
 script = "scenarios/tests/griffin_requirements.rhai"
 verdict_channel = "GRIFFIN_REQUIREMENTS"
 
+# Component ownership is explicit.  Each entry points to one normative SysML
+# source and one qualified verification case; the case supplies that
+# component's Twin-local USD fixture and Rhai observer above.
+[[components]]
+name = "griffin.lander"
+requirements = "requirements/griffin_lander_requirements.sysml"
+verification = "GriffinLanderRequirements::Verify_GriffinLanderRequirements"
+usd_path = "/World/Griffin1"
+
+[[components]]
+name = "griffin.bus"
+requirements = "requirements/griffin_bus_requirements.sysml"
+verification = "GriffinBusRequirements::Verify_GriffinBusRequirements"
+usd_path = "/World/Griffin1/Bus"
+
+[[components]]
+name = "griffin.landing_legs"
+requirements = "requirements/griffin_landing_legs_requirements.sysml"
+verification = "GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements"
+usd_path = "/World/Griffin1"
+
+[[components]]
+name = "griffin.propulsion"
+requirements = "requirements/griffin_propulsion_requirements.sysml"
+verification = "GriffinPropulsionRequirements::Verify_GriffinPropulsionRequirements"
+usd_path = "/World/Griffin1/Nozzle/MainEngineCluster"
+
+[[components]]
+name = "griffin.tanks"
+requirements = "requirements/griffin_tank_requirements.sysml"
+verification = "GriffinTankRequirements::Verify_GriffinTankRequirements"
+usd_path = "/World/Griffin1"
+
+[[components]]
+name = "griffin.solar"
+requirements = "requirements/griffin_solar_requirements.sysml"
+verification = "GriffinSolarRequirements::Verify_GriffinSolarRequirements"
+usd_path = "/World/Griffin1"
+
+[[components]]
+name = "griffin.egress_ramps"
+requirements = "requirements/griffin_ramp_requirements.sysml"
+verification = "GriffinRampRequirements::Verify_GriffinRampRequirements"
+usd_path = "/World/Griffin1"
+
+[[components]]
+name = "flip.rover"
+requirements = "requirements/flip_requirements.sysml"
+verification = "FlipRequirements::Verify_FLIPComponentRequirements"
+usd_path = "/World/FLIP"
+
+[[components]]
+name = "flip.chassis"
+requirements = "requirements/flip_chassis_requirements.sysml"
+verification = "FlipChassisRequirements::Verify_FLIPChassisRequirements"
+usd_path = "/World/FLIP/Chassis"
+
+[[components]]
+name = "flip.directional_wheels"
+requirements = "requirements/flip_wheel_requirements.sysml"
+verification = "FlipWheelRequirements::Verify_FLIPWheelRequirements"
+usd_path = "/World/FLIP"
+
+[[components]]
+name = "flip.sensor_power"
+requirements = "requirements/flip_sensor_power_requirements.sysml"
+verification = "FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements"
+usd_path = "/World/FLIP"
+
 [settings]
 "usd.runtime_persistence" = true

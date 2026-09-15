@@ -48,6 +48,7 @@ Sources:
 | Path | Purpose |
 |---|---|
 | twin.toml | Twin identity and default scene |
+| twin.toml `[[components]]` | Explicit component ownership: one SysML requirement source and one unique Rhai verification binding per lander/rover subassembly |
 | Assets.toml | Reproducible LROC NOBILE03 download manifest and checksums |
 | scenes/griffin_1_surface_ops.usda | Mission composition and USD topology |
 | scenes/griffin_flip_visual.usda | Componentized headful review composition for Griffin and FLIP |

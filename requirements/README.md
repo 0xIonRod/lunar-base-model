@@ -12,6 +12,14 @@ build requirements.
 - [Griffin Lander](griffin-lander.md) — lander structure, ramps, payload
   adapter, deployment sequence, and flight-data boundaries.
 
+The executable Twin adds an explicit ownership record for every reusable
+subassembly. `twins/astrobotic-griffin-1/twin.toml` lists these as
+`[[components]]`; each entry points to one component SysML file and one unique
+qualified verification case. That case owns the component's `.usda` fixture
+and Rhai observer. A component may share the assembled vehicle scene at
+runtime, but it must not share another component's requirement source,
+fixture, or script.
+
 ## Maintenance rule
 
 Before changing CAD, USD, Modelica, Rhai, or scenario behavior, read this index
