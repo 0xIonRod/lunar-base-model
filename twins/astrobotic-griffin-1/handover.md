@@ -390,6 +390,16 @@ station, with `projection_ready: true` after the preview lease renewal.
 `GriffinTankRequirements::Verify_GriffinTankRequirements` passed 30/30 with
 zero failures. The other tank stations were not touched by this task.
 
+The next lander tasks followed the same boundary. `LegPX` was authored alone
+at `(1.75, 2.35, -1.25)` (generation 87) and read back with `StrutOuter`,
+`StrutInner`, `ShockPiston`, and `FootPad`; its landing-leg gate passed 26/26.
+`MainEngineCluster` then selected exactly seven engines, applied the SysML
+stations and typed bell radii (generation 115), and its propulsion gate passed
+48/48. Finally, port and starboard ramps were edited in separate batches
+(generations 131 and 147). Each readback shows its own surface/rails/support,
+mount plate, hinge pin, mount frame, and socket relationship; the independent
+ramp gate passed 65/65 with no geometry, placement, or hinge failures.
+
 The last focused preview unexpectedly showed the descent-lander inspection
 preview rather than Griffin. Refocus the Griffin preview using typed preview
 commands before a screenshot. The old audit image is
