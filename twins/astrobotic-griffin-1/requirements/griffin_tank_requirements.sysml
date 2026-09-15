@@ -37,6 +37,8 @@ package GriffinTankRequirements {
         attribute bandRadiusM : Real = 0.45;
         attribute bandHeightM : Real = 0.08;
         attribute cradleLocalY : Real = -1.18;
+        attribute cradleHalfHeightM : Real = 0.05;
+        attribute minimumDeckClearanceM : Real = 0.02;
         attribute deckTopSource : String = "GriffinLanderRequirements::GriffinLanderComponent::avionicsDeckTopY";
     }
 

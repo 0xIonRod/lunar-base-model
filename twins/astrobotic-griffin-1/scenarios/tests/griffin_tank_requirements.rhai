@@ -68,16 +68,22 @@ fn on_tick(me) {
     let band_radius = sysml_requirements::number(source, own("bandRadiusM"));
     let band_height = sysml_requirements::number(source, own("bandHeightM"));
     let cradle_local_y = sysml_requirements::number(source, own("cradleLocalY"));
+    let cradle_half_height = sysml_requirements::number(source, own("cradleHalfHeightM"));
+    let minimum_deck_clearance = sysml_requirements::number(source, own("minimumDeckClearanceM"));
     let deck_top = sysml_requirements::number(source, parent("avionicsDeckTopY"));
-    if body_radius == () || body_height == () || body_shape == () || body_shape == ""
-        || body_cylindrical_height == ()
-        || neck_radius == () || neck_height == () || shoulder_radius == () || shoulder_height == ()
-        || valve_radius == () || valve_height == () || valve_cap_radius == () || valve_cap_height == ()
-        || transition_shoulder_radius == () || transition_neck_radius == () || transition_height == ()
-        || transition_radius == ()
-        || band_radius == () || band_height == () || cradle_local_y == () || deck_top == ()
-        || child_names.len() == 0 || end_hardware_names.len() != 2 || service_hardware_names.len() != 6
-        || axial_hardware_names.len() != 10 {
+    let missing_shape = body_radius == () || body_height == () || body_shape == ()
+        || body_shape == "" || body_cylindrical_height == ();
+    let missing_end = neck_radius == () || neck_height == ()
+        || transition_shoulder_radius == () || transition_neck_radius == ()
+        || transition_height == () || transition_radius == ();
+    let missing_service = shoulder_radius == () || shoulder_height == ()
+        || valve_radius == () || valve_height == () || valve_cap_radius == ()
+        || valve_cap_height == () || band_radius == () || band_height == ();
+    let missing_interface = cradle_local_y == () || cradle_half_height == ()
+        || minimum_deck_clearance == () || deck_top == ();
+    let missing_topology = child_names.len() == 0 || end_hardware_names.len() != 2
+        || service_hardware_names.len() != 6 || axial_hardware_names.len() != 10;
+    if missing_shape || missing_end || missing_service || missing_interface || missing_topology {
         component_requirements::finish(source, [component_requirements::coverage("GPT-006-source", "tank", "GriffinTankRequirements::gpt006", VERIFICATION)], "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
         this.done = true;
         return;
@@ -139,6 +145,13 @@ fn on_tick(me) {
         checks.push(attribute("GPT-002-" + name + "-band-a-radius", "GriffinTankRequirements::gpt002", path + "/TankBandA", "radius", band_radius));
         checks.push(attribute("GPT-002-" + name + "-band-a-height", "GriffinTankRequirements::gpt002", path + "/TankBandA", "height", band_height));
         checks.push(position("GPT-009-" + name + "-cradle", path + "/TankCradle", 1, cradle_local_y));
+        if ys.len() == names.len() {
+            // Derive the authored local cradle datum from the shared deck
+            // datum. This verifies the physical interface, not just a copied
+            // local coordinate.
+            let expected_cradle_local = deck_top - ys[index] + cradle_half_height + minimum_deck_clearance;
+            checks.push(position("GPT-009-" + name + "-deck-clearance", path + "/TankCradle", 1, expected_cradle_local));
+        }
         for hardware_name in axial_hardware_names {
             checks.push(source_attribute("GPT-008-" + name + "-" + hardware_name + "-axis",
                 "GriffinTankRequirements::gpt008", path + "/" + hardware_name,
