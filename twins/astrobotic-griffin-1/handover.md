@@ -400,6 +400,14 @@ stations and typed bell radii (generation 115), and its propulsion gate passed
 mount plate, hinge pin, mount frame, and socket relationship; the independent
 ramp gate passed 65/65 with no geometry, placement, or hinge failures.
 
+The two Griffin solar-array tasks were also kept separate: `SolarPanelPort`
+advanced the preview to generation 149 and read back `(2.70, 3.35, 0)` with
+its frame/cells/dividers/mount bracket; `SolarPanelStarboard` advanced to
+generation 151 and read back `(-2.70, 3.35, 0)` with the same child topology.
+Both focused previews reached `projection_ready: true`, and the dedicated
+`GriffinSolarRequirements::Verify_GriffinSolarRequirements` gate passed 16/16
+after each task.
+
 The last focused preview unexpectedly showed the descent-lander inspection
 preview rather than Griffin. Refocus the Griffin preview using typed preview
 commands before a screenshot. The old audit image is
