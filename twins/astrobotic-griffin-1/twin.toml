@@ -45,10 +45,58 @@ script = "scenarios/tests/griffin_lander_requirements.rhai"
 verdict_channel = "GRIFFIN_LANDER_REQUIREMENTS"
 
 [[verification.cases]]
+name = "GriffinBusRequirements::Verify_GriffinBusRequirements"
+scene = "tests/griffin_bus_requirements.usda"
+script = "scenarios/tests/griffin_bus_requirements.rhai"
+verdict_channel = "GRIFFIN_BUS_REQUIREMENTS"
+
+[[verification.cases]]
+name = "GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements"
+scene = "tests/griffin_landing_legs_requirements.usda"
+script = "scenarios/tests/griffin_landing_legs_requirements.rhai"
+verdict_channel = "GRIFFIN_LANDING_LEG_REQUIREMENTS"
+
+[[verification.cases]]
+name = "GriffinPropulsionRequirements::Verify_GriffinPropulsionRequirements"
+scene = "tests/griffin_propulsion_requirements.usda"
+script = "scenarios/tests/griffin_propulsion_requirements.rhai"
+verdict_channel = "GRIFFIN_PROPULSION_REQUIREMENTS"
+
+[[verification.cases]]
+name = "GriffinTankRequirements::Verify_GriffinTankRequirements"
+scene = "tests/griffin_tank_requirements.usda"
+script = "scenarios/tests/griffin_tank_requirements.rhai"
+verdict_channel = "GRIFFIN_TANK_REQUIREMENTS"
+
+[[verification.cases]]
+name = "GriffinSolarRequirements::Verify_GriffinSolarRequirements"
+scene = "tests/griffin_solar_requirements.usda"
+script = "scenarios/tests/griffin_solar_requirements.rhai"
+verdict_channel = "GRIFFIN_SOLAR_REQUIREMENTS"
+
+[[verification.cases]]
 name = "FlipRequirements::Verify_FLIPComponentRequirements"
 scene = "tests/flip_requirements.usda"
 script = "scenarios/tests/flip_requirements.rhai"
 verdict_channel = "FLIP_REQUIREMENTS"
+
+[[verification.cases]]
+name = "FlipChassisRequirements::Verify_FLIPChassisRequirements"
+scene = "tests/flip_chassis_requirements.usda"
+script = "scenarios/tests/flip_chassis_requirements.rhai"
+verdict_channel = "FLIP_CHASSIS_REQUIREMENTS"
+
+[[verification.cases]]
+name = "FlipWheelRequirements::Verify_FLIPWheelRequirements"
+scene = "tests/flip_wheel_requirements.usda"
+script = "scenarios/tests/flip_wheel_requirements.rhai"
+verdict_channel = "FLIP_WHEEL_REQUIREMENTS"
+
+[[verification.cases]]
+name = "FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements"
+scene = "tests/flip_sensor_power_requirements.usda"
+script = "scenarios/tests/flip_sensor_power_requirements.rhai"
+verdict_channel = "FLIP_SENSOR_POWER_REQUIREMENTS"
 
 [[verification.cases]]
 name = "Griffin1Requirements::Verify_GriffinSurfaceOperations"

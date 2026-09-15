@@ -1,0 +1,23 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+)
+
+def Xform "World"
+{
+    def Scope "Scenario"
+    {
+        def Scope "Mission" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/flip_sensor_power_requirements.rhai@
+        }
+    }
+    def Xform "FLIP" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/flip_visual.usda@</FLIP>
+    )
+    {
+    }
+}

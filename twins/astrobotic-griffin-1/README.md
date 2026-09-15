@@ -65,15 +65,34 @@ Sources:
 | scenarios/griffin_1_surface_ops.rhai | Mission sequencing and route policy |
 | scenarios/tests/griffin_requirements.rhai | Twin-owned structural/parameter verdict and boundary checks |
 | scenarios/tests/griffin_lander_requirements.rhai | Rhai observer for the standalone lander-component contract |
+| scenarios/tests/griffin_bus_requirements.rhai | Component-owned Rhai gate for the hexagonal bus |
+| scenarios/tests/griffin_landing_legs_requirements.rhai | Component-owned Rhai gate for the four landing legs |
+| scenarios/tests/griffin_propulsion_requirements.rhai | Component-owned Rhai gate for the seven-engine bell cluster |
+| scenarios/tests/griffin_tank_requirements.rhai | Component-owned Rhai gate for the four propellant tanks |
+| scenarios/tests/griffin_solar_requirements.rhai | Component-owned Rhai gate for the two Griffin solar arrays |
 | scenarios/tests/flip_requirements.rhai | Rhai observer for the standalone four-wheel FLIP contract |
+| scenarios/tests/flip_chassis_requirements.rhai | Component-owned Rhai gate for the FLIP chassis |
+| scenarios/tests/flip_wheel_requirements.rhai | Component-owned Rhai gate for the four directional wheel stations |
+| scenarios/tests/flip_sensor_power_requirements.rhai | Component-owned Rhai gate for the FLIP sensor mast and solar array |
 | scenarios/tests/griffin_ramp_requirements.rhai | Rhai observer for independent port/starboard ramp topology, placement, geometry, and deployment checks |
+| tools/component_requirements.rhai | Shared generic SysML/USD component-check constructors and verdict metadata |
 | tests/griffin_requirements.usda | Minimal composed fixture for the Griffin contract test |
 | tests/griffin_lander_requirements.usda | Minimal Griffin-only fixture for the lander-component gate |
 | tests/flip_requirements.usda | Minimal FLIP-only fixture for the rover-component gate |
+| tests/griffin_*_requirements.usda | Editor-authored, one-component lander verification fixtures |
+| tests/flip_*_requirements.usda | Editor-authored, one-component FLIP verification fixtures |
 | tests/griffin_ramp_requirements.usda | Griffin-only fixture for the independent ramp gate |
 | requirements/griffin_requirements.sysml | Normative Griffin lander/integration SysML v2 requirements, usages, study values, and verification case |
 | requirements/griffin_lander_requirements.sysml | Standalone Griffin lander-component SysML v2 contract for bus, legs, tanks, engines, and solar arrays |
+| requirements/griffin_bus_requirements.sysml | Bus-owned SysML v2 requirements and verification case |
+| requirements/griffin_landing_legs_requirements.sysml | Landing-leg-owned SysML v2 requirements and verification case |
+| requirements/griffin_propulsion_requirements.sysml | Propulsion-owned SysML v2 requirements and verification case |
+| requirements/griffin_tank_requirements.sysml | Tank-owned SysML v2 requirements and verification case |
+| requirements/griffin_solar_requirements.sysml | Griffin-array-owned SysML v2 requirements and verification case |
 | requirements/flip_requirements.sysml | Rover-owned FLIP SysML v2 values and visual verification case |
+| requirements/flip_chassis_requirements.sysml | Chassis-owned SysML v2 requirements and verification case |
+| requirements/flip_wheel_requirements.sysml | Wheel-owned SysML v2 requirements and verification case |
+| requirements/flip_sensor_power_requirements.sysml | Sensor/power-owned SysML v2 requirements and verification case |
 | requirements/griffin_ramp_requirements.sysml | Dedicated Griffin ramp subsystem requirements, metric envelope, hinge contract, and independent verification case |
 | twin.toml `[verification]` | Single registry binding each qualified SysML verification to its Twin scene, Rhai observer, and verdict channel |
 | contracts/ | Part contracts, full active/planned check catalog, and typed authoring procedure |
@@ -89,14 +108,16 @@ Sources:
 | agent_to_agent_missing.md | Concrete follow-up work for the next coding agent |
 | instructions.md | Step-by-step setup and completion procedure |
 
-Each major component has the same three-part acceptance contract: a SysML v2
-source file owns names, counts, metric study values, and provenance; a Twin
-Rhai observer performs read-only generic USD checks; and a minimal composed USD
-fixture binds that observer to the component in isolation. The combined
-Griffin/FLIP visual scene remains an integration gate, not the only place where
-component correctness is checked. Observers use qualified SysML attribute names
-when packages intentionally reuse local names; the generic evaluator rejects
-ambiguous short-name lookups instead of guessing.
+Each component has the same three-part acceptance contract: its own SysML v2
+file declares the requirement usages and verification case, its own Twin Rhai
+observer performs read-only generic USD checks, and the existing Griffin-only
+or FLIP-only fixture provides the composed stage. The observer is scoped to one
+component even when the fixture contains its sibling visual components; no
+combined mission gate can hide a component failure. Component packages reuse
+canonical names/counts/dimensions from `griffin_lander_requirements.sysml` or
+`flip_requirements.sysml` through qualified source-name attributes, so Rhai does
+not carry a second geometry catalog. The generic evaluator rejects ambiguous
+short-name lookups instead of guessing.
 
 ## Provision the NOBILE03 terrain
 
@@ -188,11 +209,21 @@ between edit and inspection.
 Run the isolated component gates with the same fixed-clock settings:
 
     luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_lander_requirements.usda --verification GriffinLanderRequirements::Verify_GriffinLanderRequirements --verdict-channel GRIFFIN_LANDER_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_bus_requirements.usda --verification GriffinBusRequirements::Verify_GriffinBusRequirements --verdict-channel GRIFFIN_BUS_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_landing_legs_requirements.usda --verification GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements --verdict-channel GRIFFIN_LANDING_LEG_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_propulsion_requirements.usda --verification GriffinPropulsionRequirements::Verify_GriffinPropulsionRequirements --verdict-channel GRIFFIN_PROPULSION_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_tank_requirements.usda --verification GriffinTankRequirements::Verify_GriffinTankRequirements --verdict-channel GRIFFIN_TANK_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_solar_requirements.usda --verification GriffinSolarRequirements::Verify_GriffinSolarRequirements --verdict-channel GRIFFIN_SOLAR_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
     luncosim test --scene twins/astrobotic-griffin-1/tests/flip_requirements.usda --verification FlipRequirements::Verify_FLIPComponentRequirements --verdict-channel FLIP_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/flip_chassis_requirements.usda --verification FlipChassisRequirements::Verify_FLIPChassisRequirements --verdict-channel FLIP_CHASSIS_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/flip_wheel_requirements.usda --verification FlipWheelRequirements::Verify_FLIPWheelRequirements --verdict-channel FLIP_WHEEL_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/flip_sensor_power_requirements.usda --verification FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements --verdict-channel FLIP_SENSOR_POWER_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
     luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_ramp_requirements.usda --verification GriffinRampRequirements::Verify_GriffinRampRequirements --verdict-channel GRIFFIN_RAMP_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
 
-These fixtures deliberately load one vehicle component at a time. A component
-gate is not replaced by the combined visual gate: it is the evidence that a
+The fixtures deliberately load one vehicle at a time, while each registered
+observer scopes its checks to one component. A component gate is not replaced
+by the combined visual gate: it is the evidence that a bus, leg set, engine
+cluster, tank set, solar array, chassis, wheel set, sensor/power assembly,
 lander, rover, or ramp can be reviewed and diagnosed independently.
 
 ### Check landing divergence

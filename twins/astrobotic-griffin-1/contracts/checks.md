@@ -54,12 +54,24 @@ lint for a complete vehicle qualification.
 ## Isolated component gates
 
 The integration catalog above is not the component boundary. Each reusable
-assembly has an independently runnable SysML/Rhai/USD fixture:
+assembly has an independently runnable SysML/Rhai/USD gate. Each component has
+an Editor-authored fixture whose Mission source points at the matching Rhai
+observer; this prevents a registry selection from silently running a different
+script. Each observer scopes every check to one component root and emits a
+dedicated channel:
 
 | Component | SysML source | Rhai observer | Fixture / verification |
 |---|---|---|---|
-| Griffin lander (bus, legs, tanks, engines, arrays) | `requirements/griffin_lander_requirements.sysml` | `scenarios/tests/griffin_lander_requirements.rhai` | `tests/griffin_lander_requirements.usda` / `GriffinLanderRequirements::Verify_GriffinLanderRequirements` |
-| FLIP rover (chassis, four directional wheels, mast, solar proxy) | `requirements/flip_requirements.sysml` | `scenarios/tests/flip_requirements.rhai` | `tests/flip_requirements.usda` / `FlipRequirements::Verify_FLIPComponentRequirements` |
+| Griffin bus | `requirements/griffin_bus_requirements.sysml` | `scenarios/tests/griffin_bus_requirements.rhai` | `tests/griffin_bus_requirements.usda` / `GriffinBusRequirements::Verify_GriffinBusRequirements` |
+| Griffin landing legs | `requirements/griffin_landing_legs_requirements.sysml` | `scenarios/tests/griffin_landing_legs_requirements.rhai` | `tests/griffin_landing_legs_requirements.usda` / `GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements` |
+| Griffin propulsion bells | `requirements/griffin_propulsion_requirements.sysml` | `scenarios/tests/griffin_propulsion_requirements.rhai` | `tests/griffin_propulsion_requirements.usda` / `GriffinPropulsionRequirements::Verify_GriffinPropulsionRequirements` |
+| Griffin propellant tanks | `requirements/griffin_tank_requirements.sysml` | `scenarios/tests/griffin_tank_requirements.rhai` | `tests/griffin_tank_requirements.usda` / `GriffinTankRequirements::Verify_GriffinTankRequirements` |
+| Griffin solar arrays | `requirements/griffin_solar_requirements.sysml` | `scenarios/tests/griffin_solar_requirements.rhai` | `tests/griffin_solar_requirements.usda` / `GriffinSolarRequirements::Verify_GriffinSolarRequirements` |
+| Griffin lander aggregate | `requirements/griffin_lander_requirements.sysml` | `scenarios/tests/griffin_lander_requirements.rhai` | `tests/griffin_lander_requirements.usda` / `GriffinLanderRequirements::Verify_GriffinLanderRequirements` |
+| FLIP chassis | `requirements/flip_chassis_requirements.sysml` | `scenarios/tests/flip_chassis_requirements.rhai` | `tests/flip_chassis_requirements.usda` / `FlipChassisRequirements::Verify_FLIPChassisRequirements` |
+| FLIP directional wheels | `requirements/flip_wheel_requirements.sysml` | `scenarios/tests/flip_wheel_requirements.rhai` | `tests/flip_wheel_requirements.usda` / `FlipWheelRequirements::Verify_FLIPWheelRequirements` |
+| FLIP sensor/power | `requirements/flip_sensor_power_requirements.sysml` | `scenarios/tests/flip_sensor_power_requirements.rhai` | `tests/flip_sensor_power_requirements.usda` / `FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements` |
+| FLIP rover aggregate | `requirements/flip_requirements.sysml` | `scenarios/tests/flip_requirements.rhai` | `tests/flip_requirements.usda` / `FlipRequirements::Verify_FLIPComponentRequirements` |
 | Griffin egress ramp (port/starboard instances, hinge, placement, envelope) | `requirements/griffin_ramp_requirements.sysml` | `scenarios/tests/griffin_ramp_requirements.rhai` | `tests/griffin_ramp_requirements.usda` / `GriffinRampRequirements::Verify_GriffinRampRequirements` |
 
 The observers use the generic `sysml_requirements::evaluate` check kinds. They
