@@ -1,4 +1,5 @@
 package GriffinPropulsionRequirements {
+    private import ScalarValues::Real;
     private import ScalarValues::String;
 
     part def GriffinMainPropulsionAssembly {
@@ -8,6 +9,10 @@ package GriffinPropulsionRequirements {
         attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::engineCount";
         attribute childNames : String = "Bell,Throat";
         attribute colliderPolicy : String = "render-only bell and throat; thrust/collision stay with flight model";
+        attribute bellRadiusM : Real = 0.34;
+        attribute bellHeightM : Real = 0.52;
+        attribute throatRadiusM : Real = 0.12;
+        attribute throatHeightM : Real = 0.16;
         attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute sourceFact : String = "Seven main engines perform the lander's major maneuvers";
         attribute sourceRationale : String = "The engine cluster is a separately replaceable visual subassembly; Modelica/physics remains the sole thrust owner";

@@ -21,6 +21,12 @@ fn component_position(id, path, index, expected) {
       attr: "xformOp:translate", index: index, expected: expected, tolerance: 0.002}
 }
 
+fn attribute(id, requirement, path, attr, expected) {
+    #{id: id, component: "engine", requirement: requirement,
+      verification: VERIFICATION, kind: "attribute", path: path,
+      attr: attr, expected: expected, tolerance: 0.002}
+}
+
 fn on_start(me) {
     this.started = elapsed_seconds();
     this.done = false;
@@ -32,6 +38,10 @@ fn on_tick(me) {
     let root = sysml_requirements::text(source, own("usdRootPath"));
     let names_source = sysml_requirements::text(source, own("namesSource"));
     let count_source = sysml_requirements::text(source, own("countSource"));
+    let bell_radius = sysml_requirements::number(source, own("bellRadiusM"));
+    let bell_height = sysml_requirements::number(source, own("bellHeightM"));
+    let throat_radius = sysml_requirements::number(source, own("throatRadiusM"));
+    let throat_height = sysml_requirements::number(source, own("throatHeightM"));
     let names = component_requirements::source_text_list(source, names_source);
     let xs = component_requirements::source_number_list(source, parent("engineStationX"));
     let ys = component_requirements::source_number_list(source, parent("engineStationY"));
@@ -61,6 +71,12 @@ fn on_tick(me) {
             [path + "/Bell", path + "/Throat"]));
         checks.push(component_requirements::attribute_equals("GPP-002-" + name + "-purpose", "engine", "GriffinPropulsionRequirements::gpp002", VERIFICATION,
             path + "/Bell", "purpose", "render"));
+        if bell_radius != () && bell_height != () && throat_radius != () && throat_height != () {
+            checks.push(attribute("GPP-002-" + name + "-bell-radius", "GriffinPropulsionRequirements::gpp002", path + "/Bell", "radius", bell_radius));
+            checks.push(attribute("GPP-002-" + name + "-bell-height", "GriffinPropulsionRequirements::gpp002", path + "/Bell", "height", bell_height));
+            checks.push(attribute("GPP-002-" + name + "-throat-radius", "GriffinPropulsionRequirements::gpp002", path + "/Throat", "radius", throat_radius));
+            checks.push(attribute("GPP-002-" + name + "-throat-height", "GriffinPropulsionRequirements::gpp002", path + "/Throat", "height", throat_height));
+        }
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("GPP-005-" + name + "-x", path, 0, xs[index]));
             checks.push(position("GPP-005-" + name + "-y", path, 1, ys[index]));

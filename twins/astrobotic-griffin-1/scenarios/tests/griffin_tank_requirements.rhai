@@ -61,12 +61,18 @@ fn on_tick(me) {
     let valve_height = sysml_requirements::number(source, own("valveHeightM"));
     let valve_cap_radius = sysml_requirements::number(source, own("valveCapRadiusM"));
     let valve_cap_height = sysml_requirements::number(source, own("valveCapHeightM"));
+    let transition_shoulder_radius = sysml_requirements::number(source, own("transitionShoulderRadiusM"));
+    let transition_neck_radius = sysml_requirements::number(source, own("transitionNeckRadiusM"));
+    let transition_height = sysml_requirements::number(source, own("transitionHeightM"));
+    let transition_radius = sysml_requirements::number(source, own("transitionRadiusM"));
     if body_radius == () || body_height == () || body_shape == () || body_shape == ""
         || body_cylindrical_height == ()
         || neck_radius == () || neck_height == () || shoulder_radius == () || shoulder_height == ()
         || valve_radius == () || valve_height == () || valve_cap_radius == () || valve_cap_height == ()
+        || transition_shoulder_radius == () || transition_neck_radius == () || transition_height == ()
+        || transition_radius == ()
         || child_names.len() == 0 || end_hardware_names.len() != 2 || service_hardware_names.len() != 6
-        || axial_hardware_names.len() != 8 {
+        || axial_hardware_names.len() != 10 {
         component_requirements::finish(source, [component_requirements::coverage("GPT-006-source", "tank", "GriffinTankRequirements::gpt006", VERIFICATION)], "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
         this.done = true;
         return;
@@ -95,12 +101,22 @@ fn on_tick(me) {
             end_hardware_paths));
         checks.push(component_requirements::exists("GPT-006-" + name + "-neck-top", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankNeckTop", "Cylinder"));
         checks.push(component_requirements::exists("GPT-006-" + name + "-neck-bottom", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankNeckBottom", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-006-" + name + "-transition-top", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankTransitionTop", "Cone"));
+        checks.push(component_requirements::exists("GPT-006-" + name + "-transition-bottom", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankTransitionBottom", "Cone"));
         checks.push(component_requirements::exists("GPT-006-" + name + "-body", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/MliTank", body_shape));
         checks.push(attribute("GPT-006-" + name + "-body-radius", "GriffinTankRequirements::gpt006", path + "/MliTank", "radius", body_radius));
         checks.push(attribute("GPT-006-" + name + "-body-height", "GriffinTankRequirements::gpt006", path + "/MliTank", "height", body_cylindrical_height));
         checks.push(component_requirements::bounds_component("GPT-006-" + name + "-body-envelope", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/MliTank", 1, own("bodyHeightM"), 2.0, 0.002));
         checks.push(attribute("GPT-006-" + name + "-neck-radius", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "radius", neck_radius));
         checks.push(attribute("GPT-006-" + name + "-neck-height", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "height", neck_height));
+        checks.push(attribute("GPT-006-" + name + "-transition-top-shoulder", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "radius1", transition_shoulder_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-top-neck", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "radius2", transition_neck_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-top-height", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "height", transition_height));
+        checks.push(attribute("GPT-006-" + name + "-transition-top-radius", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "radius", transition_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-bottom-neck", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "radius1", transition_neck_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-bottom-shoulder", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "radius2", transition_shoulder_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-bottom-height", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "height", transition_height));
+        checks.push(attribute("GPT-006-" + name + "-transition-bottom-radius", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "radius", transition_radius));
         checks.push(component_requirements::children("GPT-007-" + name, "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path,
             service_hardware_paths));
         checks.push(component_requirements::exists("GPT-007-" + name + "-shoulder-top", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankShoulderTop", "Cylinder"));

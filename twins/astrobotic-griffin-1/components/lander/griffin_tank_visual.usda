@@ -154,4 +154,28 @@ def Xform "PropellantTank" (
         uniform bool doubleSided = true
         color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
     }
+    def Cone "TankTransitionTop"
+    {
+        uniform token axis = "Y"
+        float radius1 = 0.30000001192092896
+        float radius2 = 0.18000000715255737
+        float height = 0.11999999731779099
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
+        custom double3 xformOp:translate = (0.0, 1.35, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        float radius = 0.30000001192092896
+    }
+    def Cone "TankTransitionBottom"
+    {
+        uniform token axis = "Y"
+        float radius1 = 0.18000000715255737
+        float radius2 = 0.30000001192092896
+        float height = 0.11999999731779099
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
+        custom double3 xformOp:translate = (0.0, -1.35, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        float radius = 0.30000001192092896
+    }
 }
