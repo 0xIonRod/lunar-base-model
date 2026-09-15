@@ -2839,6 +2839,9 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
+            double3 xformOp:translate = (0.0, -1.15, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double3 xformOp:rotateXYZ = (0.0, 0.0, 15.0)
             double size = 1.0
             double3 xformOp:scale = (2.25, 0.10, 1.45)
             uniform token[] xformOpOrder = ["xformOp:scale"]
