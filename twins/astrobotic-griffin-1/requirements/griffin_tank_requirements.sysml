@@ -10,9 +10,11 @@ package GriffinTankRequirements {
         attribute childNames : String = "MliTank,TankBandA,TankBandB,TankBandC,TankCradle,TankDomeTopProfile,TankDomeBottomProfile,TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
         attribute endHardwareNames : String = "TankDomeTopProfile,TankDomeBottomProfile,TankNeckTop,TankNeckBottom";
         attribute serviceHardwareNames : String = "TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
-        attribute axialHardwareNames : String = "TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankDomeTopProfile,TankDomeBottomProfile";
+        attribute axialHardwareNames : String = "TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
         attribute tankAxis : String = "Y";
-        attribute bottomDomeRotationDeg : Real = 180.0;
+        attribute domeShape : String = "Sphere";
+        attribute domeScaleYM : Real = 0.73;
+        attribute domeCenterOffsetM : Real = 1.125;
         attribute status : String = "metric visual study proxy; exact COPV dimensions and placement TBD";
         attribute bodyRadiusM : Real = 0.48;
         attribute bodyHeightM : Real = 2.25;
@@ -48,13 +50,13 @@ package GriffinTankRequirements {
         doc /* GPT-005 [layout] each tank root transform matches the ordered metric station datums owned by GriffinLanderComponent. */
     }
     requirement def GPT006_TankEndHardware {
-        doc /* GPT-006 [visual] each tank includes two retained tapered end domes and coaxial necks so the pressure-vessel silhouette is not a bare cylinder. */
+        doc /* GPT-006 [visual] each tank includes two retained rounded ellipsoidal end domes and coaxial necks so the pressure-vessel silhouette is not a bare cylinder. */
     }
     requirement def GPT007_TankServiceHardware {
         doc /* GPT-007 [visual] each tank includes the sourced shoulder collars and valve/cap hardware with the metric proxy dimensions defined by the component. */
     }
     requirement def GPT008_TankOrientation {
-        doc /* GPT-008 [orientation] all axial tank hardware is Y-up; the lower tapered dome is inverted so both domes meet the body and necks without through-geometry. */
+        doc /* GPT-008 [orientation] all axial tank hardware is Y-up and each dome is centered on the body end datum without a hidden rotation or through-geometry. */
     }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }

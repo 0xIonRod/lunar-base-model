@@ -154,32 +154,24 @@ def Xform "PropellantTank" (
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
         uniform token axis = "Y"
     }
-    def Cone "TankDomeTopProfile"
+    def Sphere "TankDomeTopProfile"
     {
-        uniform token axis = "Y"
-        double radius1 = 0.48
-        double radius2 = 0.18
-        double height = 0.35
-        custom double3 xformOp:translate = (0.0, 1.25, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
-        uniform bool doubleSided = true
         double radius = 0.48
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        uniform token purpose = "render"
+        uniform bool doubleSided = true
+        color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
+        custom double3 xformOp:translate = (0.0, 1.125, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 0.73, 1.0)
     }
-    def Cone "TankDomeBottomProfile"
+    def Sphere "TankDomeBottomProfile"
     {
-        uniform token axis = "Y"
-        double radius1 = 0.18
-        double radius2 = 0.48
-        double height = 0.35
-        custom double3 xformOp:translate = (0.0, -1.25, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
-        uniform bool doubleSided = true
         double radius = 0.48
-        custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+        uniform token purpose = "render"
+        uniform bool doubleSided = true
+        color3f[] primvars:displayColor = [(0.7599999904632568, 0.6200000047683716, 0.4000000059604645)]
+        custom double3 xformOp:translate = (0.0, -1.125, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 0.73, 1.0)
     }
 }

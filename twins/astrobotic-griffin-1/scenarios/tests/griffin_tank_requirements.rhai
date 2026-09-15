@@ -62,12 +62,16 @@ fn on_tick(me) {
     let valve_height = sysml_requirements::number(source, own("valveHeightM"));
     let valve_cap_radius = sysml_requirements::number(source, own("valveCapRadiusM"));
     let valve_cap_height = sysml_requirements::number(source, own("valveCapHeightM"));
+    let dome_scale_y = sysml_requirements::number(source, own("domeScaleYM"));
+    let dome_center = sysml_requirements::number(source, own("domeCenterOffsetM"));
+    let dome_shape = sysml_requirements::text(source, own("domeShape"));
     if body_radius == () || body_height == () || dome_radius == () || dome_height == ()
         || dome_neck_radius == ()
         || neck_radius == () || neck_height == () || shoulder_radius == () || shoulder_height == ()
         || valve_radius == () || valve_height == () || valve_cap_radius == () || valve_cap_height == ()
+        || dome_scale_y == () || dome_center == () || dome_shape == () || dome_shape == ""
         || child_names.len() == 0 || end_hardware_names.len() != 4 || service_hardware_names.len() != 6
-        || axial_hardware_names.len() != 10 {
+        || axial_hardware_names.len() != 8 {
         component_requirements::finish(source, [component_requirements::coverage("GPT-006-source", "tank", "GriffinTankRequirements::gpt006", VERIFICATION)], "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
         this.done = true;
         return;
@@ -94,18 +98,18 @@ fn on_tick(me) {
         checks.push(component_requirements::exists("GPT-002-" + name + "-cradle", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradle", "Cube"));
         checks.push(component_requirements::children("GPT-006-" + name, "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path,
             end_hardware_paths));
-        checks.push(component_requirements::exists("GPT-006-" + name + "-dome-top", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankDomeTopProfile", "Cone"));
-        checks.push(component_requirements::exists("GPT-006-" + name + "-dome-bottom", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankDomeBottomProfile", "Cone"));
+        checks.push(component_requirements::exists("GPT-006-" + name + "-dome-top", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankDomeTopProfile", dome_shape));
+        checks.push(component_requirements::exists("GPT-006-" + name + "-dome-bottom", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankDomeBottomProfile", dome_shape));
         checks.push(component_requirements::exists("GPT-006-" + name + "-neck-top", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankNeckTop", "Cylinder"));
         checks.push(component_requirements::exists("GPT-006-" + name + "-neck-bottom", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankNeckBottom", "Cylinder"));
         checks.push(attribute("GPT-006-" + name + "-body-radius", "GriffinTankRequirements::gpt006", path + "/MliTank", "radius", body_radius));
         checks.push(attribute("GPT-006-" + name + "-body-height", "GriffinTankRequirements::gpt006", path + "/MliTank", "height", body_height));
-        checks.push(attribute("GPT-006-" + name + "-dome-top-radius1", "GriffinTankRequirements::gpt006", path + "/TankDomeTopProfile", "radius1", dome_radius));
-        checks.push(attribute("GPT-006-" + name + "-dome-top-radius2", "GriffinTankRequirements::gpt006", path + "/TankDomeTopProfile", "radius2", dome_neck_radius));
-        checks.push(attribute("GPT-006-" + name + "-dome-top-height", "GriffinTankRequirements::gpt006", path + "/TankDomeTopProfile", "height", dome_height));
-        checks.push(attribute("GPT-006-" + name + "-dome-bottom-radius1", "GriffinTankRequirements::gpt006", path + "/TankDomeBottomProfile", "radius1", dome_neck_radius));
-        checks.push(attribute("GPT-006-" + name + "-dome-bottom-radius2", "GriffinTankRequirements::gpt006", path + "/TankDomeBottomProfile", "radius2", dome_radius));
-        checks.push(attribute("GPT-006-" + name + "-dome-bottom-height", "GriffinTankRequirements::gpt006", path + "/TankDomeBottomProfile", "height", dome_height));
+        checks.push(attribute("GPT-006-" + name + "-dome-top-radius", "GriffinTankRequirements::gpt006", path + "/TankDomeTopProfile", "radius", dome_radius));
+        checks.push(attribute("GPT-006-" + name + "-dome-bottom-radius", "GriffinTankRequirements::gpt006", path + "/TankDomeBottomProfile", "radius", dome_radius));
+        checks.push(source_component("GPT-006-" + name + "-dome-top-scale-y", "GriffinTankRequirements::gpt006", path + "/TankDomeTopProfile", "xformOp:scale", 1, "domeScaleYM"));
+        checks.push(source_component("GPT-006-" + name + "-dome-bottom-scale-y", "GriffinTankRequirements::gpt006", path + "/TankDomeBottomProfile", "xformOp:scale", 1, "domeScaleYM"));
+        checks.push(position("GPT-006-" + name + "-dome-top-center", path + "/TankDomeTopProfile", 1, dome_center));
+        checks.push(position("GPT-006-" + name + "-dome-bottom-center", path + "/TankDomeBottomProfile", 1, -dome_center));
         checks.push(attribute("GPT-006-" + name + "-neck-radius", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "radius", neck_radius));
         checks.push(attribute("GPT-006-" + name + "-neck-height", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "height", neck_height));
         checks.push(component_requirements::children("GPT-007-" + name, "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path,
@@ -127,9 +131,9 @@ fn on_tick(me) {
                 "GriffinTankRequirements::gpt008", path + "/" + hardware_name,
                 "axis", "tankAxis"));
         }
-        checks.push(source_component("GPT-008-" + name + "-bottom-dome-inverted",
-            "GriffinTankRequirements::gpt008", path + "/TankDomeBottomProfile",
-            "xformOp:rotateXYZ", 0, "bottomDomeRotationDeg"));
+        checks.push(source_component("GPT-008-" + name + "-dome-top-axis",
+            "GriffinTankRequirements::gpt008", path + "/TankDomeTopProfile",
+            "xformOp:scale", 1, "domeScaleYM"));
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("GPT-005-" + name + "-x", path, 0, xs[index]));
             checks.push(position("GPT-005-" + name + "-y", path, 1, ys[index]));
