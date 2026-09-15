@@ -61,45 +61,64 @@ fn visual_component_specs(root) {
     let mount_z = _ramp_number("rampMountZ");
     let port_angle = _ramp_angle_deg("port");
     let starboard_angle = _ramp_angle_deg("starboard");
+    let tank_x = griffin_spec::component_tank_station_x();
+    let tank_y = griffin_spec::component_tank_station_y();
+    let tank_z = griffin_spec::component_tank_station_z();
+    let leg_x = griffin_spec::component_leg_station_x();
+    let leg_y = griffin_spec::component_leg_station_y();
+    let leg_z = griffin_spec::component_leg_station_z();
+    let solar_x = griffin_spec::component_solar_station_x();
+    let solar_y = griffin_spec::component_solar_station_y();
+    let solar_z = griffin_spec::component_solar_station_z();
+    let engine_x = griffin_spec::component_engine_station_x();
+    let engine_y = griffin_spec::component_engine_station_y();
+    let engine_z = griffin_spec::component_engine_station_z();
+    let rover_solar_mount = griffin_spec::rover_solar_array_mount();
+    let rover_solar_tilt = griffin_spec::rover_solar_array_tilt_deg();
     if steering == () || port_mount_x == () || starboard_mount_x == ()
         || mount_y == () || mount_z == () || port_angle == ()
-        || starboard_angle == () {
+        || starboard_angle == () || griffin_spec::component_bus_mount_y() == ()
+        || tank_x.len() != 4 || tank_y.len() != 4 || tank_z.len() != 4
+        || leg_x.len() != 4 || leg_y.len() != 4 || leg_z.len() != 4
+        || solar_x.len() != 2 || solar_y.len() != 2 || solar_z.len() != 2
+        || rover_solar_mount.len() != 3 || rover_solar_tilt == ()
+        || engine_x.len() != 7 || engine_y.len() != 7 || engine_z.len() != 7 {
         return [];
     }
     let specs = [
         #{parent: lander, name: "Bus", type_name: "Xform",
           asset: component_asset("lander/griffin_bus_visual.usda"),
-          translation: [0.0, 3.20, 0.0], rotation: (), scale: ()},
+          translation: [0.0, griffin_spec::component_bus_mount_y(), 0.0], rotation: (), scale: ()},
         #{parent: lander, name: "TankPX", type_name: "Xform",
           asset: component_asset("lander/griffin_tank_visual.usda"),
-          translation: [1.30, 5.85, -1.15], rotation: (), scale: ()},
+          translation: [tank_x[0], tank_y[0], tank_z[0]], rotation: (), scale: ()},
         #{parent: lander, name: "TankNX", type_name: "Xform",
           asset: component_asset("lander/griffin_tank_visual.usda"),
-          translation: [-1.30, 5.85, -1.15], rotation: (), scale: ()},
+          translation: [tank_x[1], tank_y[1], tank_z[1]], rotation: (), scale: ()},
         #{parent: lander, name: "TankPZ", type_name: "Xform",
           asset: component_asset("lander/griffin_tank_visual.usda"),
-          translation: [1.30, 5.85, 1.15], rotation: (), scale: ()},
+          translation: [tank_x[2], tank_y[2], tank_z[2]], rotation: (), scale: ()},
         #{parent: lander, name: "TankNZ", type_name: "Xform",
           asset: component_asset("lander/griffin_tank_visual.usda"),
-          translation: [-1.30, 5.85, 1.15], rotation: (), scale: ()},
+          translation: [tank_x[3], tank_y[3], tank_z[3]], rotation: (), scale: ()},
         #{parent: lander, name: "LegPX", type_name: "Xform",
           asset: component_asset("lander/griffin_landing_leg_visual.usda"),
-          translation: [1.75, 2.35, -1.25], rotation: (), scale: ()},
+          translation: [leg_x[0], leg_y[0], leg_z[0]], rotation: (), scale: ()},
         #{parent: lander, name: "LegNX", type_name: "Xform",
           asset: component_asset("lander/griffin_landing_leg_visual.usda"),
-          translation: [-1.75, 2.35, -1.25], rotation: (), scale: ()},
+          translation: [leg_x[1], leg_y[1], leg_z[1]], rotation: (), scale: ()},
         #{parent: lander, name: "LegPZ", type_name: "Xform",
           asset: component_asset("lander/griffin_landing_leg_visual.usda"),
-          translation: [1.75, 2.35, 1.25], rotation: (), scale: ()},
+          translation: [leg_x[2], leg_y[2], leg_z[2]], rotation: (), scale: ()},
         #{parent: lander, name: "LegNZ", type_name: "Xform",
           asset: component_asset("lander/griffin_landing_leg_visual.usda"),
-          translation: [-1.75, 2.35, 1.25], rotation: (), scale: ()},
+          translation: [leg_x[3], leg_y[3], leg_z[3]], rotation: (), scale: ()},
         #{parent: lander, name: "SolarPanelPort", type_name: "Xform",
           asset: component_asset("lander/griffin_solar_panel_visual.usda"),
-          translation: [2.65, 3.35, 0.0], rotation: [0.0, 0.0, 90.0], scale: ()},
+          translation: [solar_x[0], solar_y[0], solar_z[0]], rotation: [0.0, 0.0, 90.0], scale: ()},
         #{parent: lander, name: "SolarPanelStarboard", type_name: "Xform",
           asset: component_asset("lander/griffin_solar_panel_visual.usda"),
-          translation: [-2.65, 3.35, 0.0], rotation: [0.0, 0.0, -90.0], scale: ()},
+          translation: [solar_x[1], solar_y[1], solar_z[1]], rotation: [0.0, 0.0, -90.0], scale: ()},
         #{parent: lander, name: "EgressRampPort", type_name: "Xform",
           asset: component_asset("lander/griffin_ramp_visual.usda"),
           translation: [port_mount_x, mount_y, mount_z], rotation: [0.0, 0.0, port_angle], scale: ()},
@@ -114,19 +133,17 @@ fn visual_component_specs(root) {
           translation: (), rotation: (), scale: ()},
         #{parent: rover, name: "SolarArray", type_name: "Xform",
           asset: component_asset("rover/flip_solar_panel_visual.usda"),
-          translation: [0.0, 1.45, 1.30], rotation: [18.0, 0.0, 0.0], scale: ()},
+          translation: rover_solar_mount, rotation: [rover_solar_tilt, 0.0, 0.0], scale: ()},
     ];
     // FLIP is a four-wheel directional rover.  The front and rear steering
     // angles are intentionally explicit so the visual communicates the
     // steering architecture instead of looking like a six-wheel box proxy.
     let wheel_names = griffin_spec::visual_rover_wheel_names();
-    let wheel_positions = [
-        [-1.75, -0.42, -1.15],
-        [-1.75, -0.42, 1.15],
-        [1.75, -0.42, -1.15],
-        [1.75, -0.42, 1.15],
-    ];
-    if wheel_names.len() != wheel_positions.len() {
+    let wheel_x = griffin_spec::rover_wheel_station_x();
+    let wheel_y = griffin_spec::rover_wheel_station_y();
+    let wheel_z = griffin_spec::rover_wheel_station_z();
+    if wheel_names.len() != 4 || wheel_x.len() != 4
+        || wheel_y.len() != 4 || wheel_z.len() != 4 {
         return [];
     }
     for index in 0..wheel_names.len() {
@@ -135,22 +152,17 @@ fn visual_component_specs(root) {
         let station = rover + "/Suspension_" + name;
         specs.push(#{parent: station, name: "Wheel_" + name, type_name: "Xform",
             asset: component_asset("rover/flip_wheel_visual.usda"),
-            translation: (), rotation: [0.0, steering[steering_index], 0.0],
+            translation: [0.0, 0.0, 0.0], rotation: [0.0, steering[steering_index], 0.0],
             scale: (), index: index});
     }
     let engine_names = griffin_spec::main_engine_names();
-    let engine_positions = [
-        [0.0, 1.75, 0.0], [1.0, 1.75, 0.0], [-1.0, 1.75, 0.0],
-        [0.0, 1.75, 1.0], [0.0, 1.75, -1.0], [0.9, 1.75, 0.9],
-        [-0.9, 1.75, -0.9],
-    ];
-    if engine_names.len() != engine_positions.len() {
+    if engine_names.len() != engine_x.len() {
         return [];
     }
     for index in 0..engine_names.len() {
         specs.push(#{parent: lander + "/Nozzle/MainEngineCluster", name: engine_names[index],
             type_name: "Xform", asset: component_asset("lander/griffin_engine_bell_visual.usda"),
-            translation: engine_positions[index], rotation: (), scale: ()});
+            translation: [engine_x[index], engine_y[index], engine_z[index]], rotation: (), scale: ()});
     }
     specs
 }
@@ -425,11 +437,28 @@ fn visual_component_plan(doc, edit_target, root) {
             added.push(result.path);
         }
     }
+    let rover = root + "/FLIP";
+    // Keep the four wheel station roots in the same authored frame as the
+    // SysML source.  This is separate from adding the wheel instance so a
+    // source vehicle with stale station transforms is corrected idempotently.
+    let wheel_names = griffin_spec::visual_rover_wheel_names();
+    let wheel_x = griffin_spec::rover_wheel_station_x();
+    let wheel_y = griffin_spec::rover_wheel_station_y();
+    let wheel_z = griffin_spec::rover_wheel_station_z();
+    if wheel_names.len() != 4 || wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4 {
+        return plan_error("FLIP wheel station datums must contain four entries");
+    }
+    for index in 0..wheel_names.len() {
+        let station = rover + "/Suspension_" + wheel_names[index];
+        let placement = assembly_builder::place_plan(edit_target, station,
+            [wheel_x[index], wheel_y[index], wheel_z[index]], ());
+        if !placement.ok { return placement; }
+        for op in placement.ops { ops.push(op); }
+    }
     // Deactivate obsolete middle stations from older six-wheel visual
     // revisions through a reversible authored opinion.  RemovePrim would be
     // invalid here because those children are owned by the referenced vehicle
     // source layer; SetActive is the generic USD override for that case.
-    let rover = root + "/FLIP";
     for obsolete in [rover + "/Suspension_ML", rover + "/Suspension_MR"] {
         let old = assembly_builder::composed_query(doc, #{path: obsolete, children: false});
         if query_ok(old) {
@@ -503,44 +532,61 @@ fn _isolated_griffin_specs(root) {
     let mount_z = _ramp_number("rampMountZ");
     let port_angle = _ramp_angle_deg("port");
     let starboard_angle = _ramp_angle_deg("starboard");
+    let tank_x = griffin_spec::component_tank_station_x();
+    let tank_y = griffin_spec::component_tank_station_y();
+    let tank_z = griffin_spec::component_tank_station_z();
+    let leg_x = griffin_spec::component_leg_station_x();
+    let leg_y = griffin_spec::component_leg_station_y();
+    let leg_z = griffin_spec::component_leg_station_z();
+    let solar_x = griffin_spec::component_solar_station_x();
+    let solar_y = griffin_spec::component_solar_station_y();
+    let solar_z = griffin_spec::component_solar_station_z();
+    let engine_x = griffin_spec::component_engine_station_x();
+    let engine_y = griffin_spec::component_engine_station_y();
+    let engine_z = griffin_spec::component_engine_station_z();
     if port_mount_x == () || starboard_mount_x == () || mount_y == ()
-        || mount_z == () || port_angle == () || starboard_angle == () {
+        || mount_z == () || port_angle == () || starboard_angle == ()
+        || griffin_spec::component_bus_mount_y() == ()
+        || tank_x.len() != 4 || tank_y.len() != 4 || tank_z.len() != 4
+        || leg_x.len() != 4 || leg_y.len() != 4 || leg_z.len() != 4
+        || solar_x.len() != 2 || solar_y.len() != 2 || solar_z.len() != 2
+        || engine_x.len() != 7 || engine_y.len() != 7 || engine_z.len() != 7 {
         return [];
     }
     let specs = [
         #{parent: root, name: "Bus", type_name: "Xform",
           asset: component_asset("lander/griffin_bus_visual.usda"),
-          translation: [0.0, 3.20, 0.0], rotation: (), scale: ()},
+          translation: [0.0, griffin_spec::component_bus_mount_y(), 0.0], rotation: (), scale: ()},
         #{parent: root, name: "TankPX", type_name: "Xform",
           asset: component_asset("lander/griffin_tank_visual.usda"),
-          translation: [1.30, 5.85, -1.15], rotation: (), scale: ()},
+          translation: [tank_x[0], tank_y[0], tank_z[0]], rotation: (), scale: ()},
         #{parent: root, name: "TankNX", type_name: "Xform",
           asset: component_asset("lander/griffin_tank_visual.usda"),
-          translation: [-1.30, 5.85, -1.15], rotation: (), scale: ()},
+          translation: [tank_x[1], tank_y[1], tank_z[1]], rotation: (), scale: ()},
         #{parent: root, name: "TankPZ", type_name: "Xform",
           asset: component_asset("lander/griffin_tank_visual.usda"),
-          translation: [1.30, 5.85, 1.15], rotation: (), scale: ()},
+          translation: [tank_x[2], tank_y[2], tank_z[2]], rotation: (), scale: ()},
         #{parent: root, name: "TankNZ", type_name: "Xform",
           asset: component_asset("lander/griffin_tank_visual.usda"),
-          translation: [-1.30, 5.85, 1.15], rotation: (), scale: ()},
+          translation: [tank_x[3], tank_y[3], tank_z[3]], rotation: (), scale: ()},
         #{parent: root, name: "LegPX", type_name: "Xform",
           asset: component_asset("lander/griffin_landing_leg_visual.usda"),
-          translation: [1.75, 2.35, -1.25], rotation: (), scale: ()},
+          translation: [leg_x[0], leg_y[0], leg_z[0]], rotation: (), scale: ()},
         #{parent: root, name: "LegNX", type_name: "Xform",
           asset: component_asset("lander/griffin_landing_leg_visual.usda"),
-          translation: [-1.75, 2.35, -1.25], rotation: (), scale: ()},
+          translation: [leg_x[1], leg_y[1], leg_z[1]], rotation: (), scale: ()},
         #{parent: root, name: "LegPZ", type_name: "Xform",
           asset: component_asset("lander/griffin_landing_leg_visual.usda"),
-          translation: [1.75, 2.35, 1.25], rotation: (), scale: ()},
+          translation: [leg_x[2], leg_y[2], leg_z[2]], rotation: (), scale: ()},
         #{parent: root, name: "LegNZ", type_name: "Xform",
           asset: component_asset("lander/griffin_landing_leg_visual.usda"),
-          translation: [-1.75, 2.35, 1.25], rotation: (), scale: ()},
+          translation: [leg_x[3], leg_y[3], leg_z[3]], rotation: (), scale: ()},
         #{parent: root, name: "SolarPanelPort", type_name: "Xform",
           asset: component_asset("lander/griffin_solar_panel_visual.usda"),
-          translation: [2.70, 3.35, 0.0], rotation: [0.0, 0.0, 90.0], scale: ()},
+          translation: [solar_x[0], solar_y[0], solar_z[0]], rotation: [0.0, 0.0, 90.0], scale: ()},
         #{parent: root, name: "SolarPanelStarboard", type_name: "Xform",
           asset: component_asset("lander/griffin_solar_panel_visual.usda"),
-          translation: [-2.70, 3.35, 0.0], rotation: [0.0, 0.0, -90.0], scale: ()},
+          translation: [solar_x[1], solar_y[1], solar_z[1]], rotation: [0.0, 0.0, -90.0], scale: ()},
         #{parent: root, name: "EgressRampPort", type_name: "Xform",
           asset: component_asset("lander/griffin_ramp_visual.usda"),
           translation: [port_mount_x, mount_y, mount_z], rotation: [0.0, 0.0, port_angle], scale: ()},
@@ -551,24 +597,21 @@ fn _isolated_griffin_specs(root) {
     let steering = flip_steering_angles();
     if steering == () { return []; }
     let cluster = root + "/Nozzle/MainEngineCluster";
-    let positions = [
-        [0.0, 1.75, 0.0], [1.0, 1.75, 0.0], [-1.0, 1.75, 0.0],
-        [0.0, 1.75, 1.0], [0.0, 1.75, -1.0], [0.9, 1.75, 0.9],
-        [-0.9, 1.75, -0.9],
-    ];
     let engines = griffin_spec::main_engine_names();
-    if engines.len() != positions.len() { return []; }
+    if engines.len() != engine_x.len() { return []; }
     for index in 0..engines.len() {
         specs.push(#{parent: cluster, name: engines[index], type_name: "Xform",
             asset: component_asset("lander/griffin_engine_bell_visual.usda"),
-            translation: positions[index], rotation: (), scale: ()});
+            translation: [engine_x[index], engine_y[index], engine_z[index]], rotation: (), scale: ()});
     }
     specs
 }
 
 fn _isolated_flip_specs(root) {
     let steering = flip_steering_angles();
-    if steering == () { return []; }
+    let solar_mount = griffin_spec::rover_solar_array_mount();
+    let solar_tilt = griffin_spec::rover_solar_array_tilt_deg();
+    if steering == () || solar_mount.len() != 3 || solar_tilt == () { return []; }
     let specs = [
         #{parent: root, name: "Chassis", type_name: "Xform",
           asset: component_asset("rover/flip_chassis_visual.usda"),
@@ -578,14 +621,13 @@ fn _isolated_flip_specs(root) {
           translation: [0.0, 0.0, 0.0], rotation: (), scale: ()},
         #{parent: root, name: "SolarArray", type_name: "Xform",
           asset: component_asset("rover/flip_solar_panel_visual.usda"),
-          translation: [0.0, 1.45, 1.30], rotation: [18.0, 0.0, 0.0], scale: ()},
+          translation: solar_mount, rotation: [solar_tilt, 0.0, 0.0], scale: ()},
     ];
     let names = griffin_spec::visual_rover_wheel_names();
-    let positions = [
-        [-1.75, -0.42, -1.15], [-1.75, -0.42, 1.15],
-        [1.75, -0.42, -1.15], [1.75, -0.42, 1.15],
-    ];
-    if names.len() != positions.len() { return []; }
+    let wheel_x = griffin_spec::rover_wheel_station_x();
+    let wheel_y = griffin_spec::rover_wheel_station_y();
+    let wheel_z = griffin_spec::rover_wheel_station_z();
+    if names.len() != 4 || wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4 { return []; }
     for index in 0..names.len() {
         let name = names[index];
         let steering_index = if name.starts_with("F") { 0 } else { 1 };
@@ -775,6 +817,24 @@ fn isolated_flip_component_plan(doc, edit_target, root) {
         if !result.ok { return result; }
         paths.push(result.path);
         for op in result.ops { ops.push(op); }
+    }
+    // Station roots are authored in the visual vehicle source.  Update those
+    // roots through the same typed placement plan so the builder and verifier
+    // consume the identical SysML datum rather than relying on stale source
+    // transforms.
+    let names = griffin_spec::visual_rover_wheel_names();
+    let wheel_x = griffin_spec::rover_wheel_station_x();
+    let wheel_y = griffin_spec::rover_wheel_station_y();
+    let wheel_z = griffin_spec::rover_wheel_station_z();
+    if names.len() != 4 || wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4 {
+        return plan_error("FLIP wheel station datums must contain four entries");
+    }
+    for index in 0..names.len() {
+        let station = root + "/Suspension_" + names[index];
+        let placement = assembly_builder::place_plan(edit_target, station,
+            [wheel_x[index], wheel_y[index], wheel_z[index]], ());
+        if !placement.ok { return placement; }
+        for op in placement.ops { ops.push(op); }
     }
     // The source vehicle predates the four-wheel SysML study.  Preserve its
     // authored history, but make the isolated presentation loud and typed.

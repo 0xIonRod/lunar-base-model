@@ -15,6 +15,22 @@ fn source_text_list(source, qualified_name) {
     values
 }
 
+// Decode a comma-separated numeric station datum from the SysML source.  The
+// caller must check cardinality against the corresponding identity list
+// before indexing; an absent or malformed list is returned empty so the
+// generic evaluator can report a missing source instead of guessing values.
+fn source_number_list(source, qualified_name) {
+    let text = sysml_requirements::text(source, qualified_name);
+    if text == () || text == "" { return []; }
+    let values = [];
+    for item in text.split(",") {
+        item.trim();
+        if item == "" { return []; }
+        values.push(parse_float(item));
+    }
+    values
+}
+
 fn exists(id, component, requirement, verification, path, expected_type) {
     #{id: id, component: component, requirement: requirement,
       verification: verification, kind: "exists", path: path,

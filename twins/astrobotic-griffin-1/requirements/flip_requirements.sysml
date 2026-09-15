@@ -23,6 +23,13 @@ package FlipRequirements {
         attribute chassisWidthM : Real = 4.40;
         attribute chassisLengthM : Real = 2.76;
         attribute sensorMastHeightM : Real = 0.70;
+        // Four-wheel station datums are ordered exactly as visualWheelNames.
+        // They are shared by the Editor builder and the wheel verifier.
+        attribute wheelStationX : String = "-1.75,-1.75,1.75,1.75";
+        attribute wheelStationY : String = "-0.42,-0.42,-0.42,-0.42";
+        attribute wheelStationZ : String = "-1.15,1.15,-1.15,1.15";
+        attribute solarArrayMount : String = "0.0,1.45,1.30";
+        attribute solarArrayTiltDeg : Real = 18.0;
         attribute componentReference : String = "https://www.astrolab.space/flip/";
         attribute missionReference : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
   }

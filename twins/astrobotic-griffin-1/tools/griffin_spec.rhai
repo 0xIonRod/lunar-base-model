@@ -63,7 +63,9 @@ fn _qualified_attribute(name) {
         "exactVehicleIcdStatus", "visualRoverName", "visualRoverWheelRadiusM",
         "visualRoverWheelCount", "visualWheelNames", "frontSteeringAngleDeg",
         "rearSteeringAngleDeg", "chassisWidthM", "chassisLengthM",
-        "sensorMastHeightM", "componentReference", "missionReference"
+        "sensorMastHeightM", "wheelStationX", "wheelStationY",
+        "wheelStationZ", "solarArrayMount", "solarArrayTiltDeg",
+        "componentReference", "missionReference"
     ];
     if rover.contains(name) {
         return "FlipRequirements::FlipRover::" + name;
@@ -75,6 +77,16 @@ fn _qualified_attribute(name) {
     ];
     if project.contains(name) {
         return "MoonBaseProjectRequirements::ProjectSimulationContract::" + name;
+    }
+    let lander_component = [
+        "componentName", "bodyProfile", "bodyWidthM", "bodyDepthM",
+        "bodyHeightM", "busMountY", "tankStationX", "tankStationY",
+        "tankStationZ", "legStationX", "legStationY", "legStationZ",
+        "solarStationX", "solarStationY", "solarStationZ",
+        "engineStationX", "engineStationY", "engineStationZ"
+    ];
+    if lander_component.contains(name) {
+        return "GriffinLanderRequirements::GriffinLanderComponent::" + name;
     }
     "Griffin1Requirements::PublicMissionContext::" + name
 }
@@ -94,6 +106,22 @@ fn _sysml_list(name) {
         if item != "" { items.push(item); }
     }
     items
+}
+
+// Parse a comma-separated numeric datum list owned by SysML.  Returning an
+// empty list for a missing/empty source is intentional: callers must validate
+// the expected cardinality before indexing, so malformed station data fails
+// loudly instead of silently inventing a placement.
+fn _sysml_number_list(name) {
+    let text = _sysml_text(name);
+    if text == () || text == "" { return []; }
+    let values = [];
+    for item in text.split(",") {
+        item.trim();
+        if item == "" { return []; }
+        values.push(parse_float(item));
+    }
+    values
 }
 
 // One canonical payload datum lives on Griffin1Lander.  Requirement GR-009
@@ -126,6 +154,24 @@ fn visual_lander_deck_width_m() { _sysml_attribute("visualLanderDeckWidthM") }
 fn visual_rover_wheel_radius_m() { _sysml_attribute("visualRoverWheelRadiusM") }
 fn visual_rover_wheel_count() { _sysml_integer("visualRoverWheelCount") }
 fn visual_rover_wheel_names() { _sysml_list("visualWheelNames") }
+fn component_bus_mount_y() { _sysml_attribute("busMountY") }
+fn component_tank_station_x() { _sysml_number_list("tankStationX") }
+fn component_tank_station_y() { _sysml_number_list("tankStationY") }
+fn component_tank_station_z() { _sysml_number_list("tankStationZ") }
+fn component_leg_station_x() { _sysml_number_list("legStationX") }
+fn component_leg_station_y() { _sysml_number_list("legStationY") }
+fn component_leg_station_z() { _sysml_number_list("legStationZ") }
+fn component_solar_station_x() { _sysml_number_list("solarStationX") }
+fn component_solar_station_y() { _sysml_number_list("solarStationY") }
+fn component_solar_station_z() { _sysml_number_list("solarStationZ") }
+fn component_engine_station_x() { _sysml_number_list("engineStationX") }
+fn component_engine_station_y() { _sysml_number_list("engineStationY") }
+fn component_engine_station_z() { _sysml_number_list("engineStationZ") }
+fn rover_wheel_station_x() { _sysml_number_list("wheelStationX") }
+fn rover_wheel_station_y() { _sysml_number_list("wheelStationY") }
+fn rover_wheel_station_z() { _sysml_number_list("wheelStationZ") }
+fn rover_solar_array_mount() { _sysml_number_list("solarArrayMount") }
+fn rover_solar_array_tilt_deg() { _sysml_attribute("solarArrayTiltDeg") }
 fn visual_landing_pad_radius_m() { _sysml_attribute("visualLandingPadRadiusM") }
 fn visual_review_ground_width_m() { _sysml_attribute("visualReviewGroundWidthM") }
 fn visual_render_ownership() { _sysml_text("visualRenderOwnership") }

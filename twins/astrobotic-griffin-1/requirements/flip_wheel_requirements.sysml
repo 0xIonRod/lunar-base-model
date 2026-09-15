@@ -23,11 +23,15 @@ package FlipWheelRequirements {
     requirement def FWW004_WheelTraceability {
         doc /* FWW-004 [evidence] wheel identities and count resolve from the rover SysML source; inactive middle station proxies do not count. */
     }
+    requirement def FWW005_WheelPlacement {
+        doc /* FWW-005 [layout] each directional wheel station transform matches the ordered metric X/Y/Z station datum owned by FlipRover. */
+    }
 
     requirement fww001 : FWW001_WheelCount { subject wheels : FlipDirectionalWheelAssembly; }
     requirement fww002 : FWW002_WheelGeometry { subject wheels : FlipDirectionalWheelAssembly; }
     requirement fww003 : FWW003_AllWheelSteering { subject wheels : FlipDirectionalWheelAssembly; }
     requirement fww004 : FWW004_WheelTraceability { subject wheels : FlipDirectionalWheelAssembly; }
+    requirement fww005 : FWW005_WheelPlacement { subject wheels : FlipDirectionalWheelAssembly; }
 
     verification def Verify_FLIPWheelRequirements {
         subject wheels : FlipDirectionalWheelAssembly;
@@ -35,5 +39,6 @@ package FlipWheelRequirements {
         verify fww002;
         verify fww003;
         verify fww004;
+        verify fww005;
     }
 }

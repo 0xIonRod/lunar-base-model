@@ -42,6 +42,13 @@ fn _coverage(id, requirement) {
       verification: VERIFICATION, kind: "coverage"}
 }
 
+fn _position(id, requirement, path, index, expected) {
+    #{id: id, component: "placement", requirement: requirement,
+      verification: VERIFICATION, kind: "attribute_component", path: path,
+      attr: "xformOp:translate", index: index, expected: expected,
+      tolerance: 0.002}
+}
+
 fn on_tick(me) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
@@ -54,34 +61,94 @@ fn on_tick(me) {
         requirement: "GriffinLanderRequirements::glr001", verification: VERIFICATION,
         kind: "attribute_equals", path: ROOT + "/Bus", attr: "lunco:visual:body_profile",
         expected: "hexagonal-prism"});
+    checks.push(#{id: "GLR-008-bus-y", component: "bus",
+        requirement: "GriffinLanderRequirements::glr008", verification: VERIFICATION,
+        kind: "attribute_component", path: ROOT + "/Bus", attr: "xformOp:translate",
+        index: 1, expected_attr: _source_attr("busMountY"), tolerance: 0.002});
 
     let leg_names = _list(source, "legNames");
-    for name in leg_names {
+    let leg_x = component_requirements::source_number_list(source, _source_attr("legStationX"));
+    let leg_y = component_requirements::source_number_list(source, _source_attr("legStationY"));
+    let leg_z = component_requirements::source_number_list(source, _source_attr("legStationZ"));
+    for axis in ["legStationX", "legStationY", "legStationZ"] {
+        checks.push(component_requirements::source_list_count("GLR-008-" + axis,
+            "placement", "GriffinLanderRequirements::glr008", VERIFICATION,
+            _source_attr(axis), _source_attr("legCount")));
+    }
+    for index in 0..leg_names.len() {
+        let name = leg_names[index];
         let path = ROOT + "/" + name;
         checks.push(_exists("GLR-002-" + name, "GriffinLanderRequirements::glr002", path, "Xform"));
         checks.push(_children("GLR-002-" + name + "-parts", "GriffinLanderRequirements::glr002", path,
             [path + "/StrutOuter", path + "/StrutInner", path + "/ShockPiston", path + "/FootPad"]));
+        if leg_x.len() == leg_names.len() && leg_y.len() == leg_names.len() && leg_z.len() == leg_names.len() {
+            checks.push(_position("GLR-008-" + name + "-x", "GriffinLanderRequirements::glr008", path, 0, leg_x[index]));
+            checks.push(_position("GLR-008-" + name + "-y", "GriffinLanderRequirements::glr008", path, 1, leg_y[index]));
+            checks.push(_position("GLR-008-" + name + "-z", "GriffinLanderRequirements::glr008", path, 2, leg_z[index]));
+        }
     }
     let tank_names = _list(source, "tankNames");
-    for name in tank_names {
+    let tank_x = component_requirements::source_number_list(source, _source_attr("tankStationX"));
+    let tank_y = component_requirements::source_number_list(source, _source_attr("tankStationY"));
+    let tank_z = component_requirements::source_number_list(source, _source_attr("tankStationZ"));
+    for axis in ["tankStationX", "tankStationY", "tankStationZ"] {
+        checks.push(component_requirements::source_list_count("GLR-008-" + axis,
+            "placement", "GriffinLanderRequirements::glr008", VERIFICATION,
+            _source_attr(axis), _source_attr("tankCount")));
+    }
+    for index in 0..tank_names.len() {
+        let name = tank_names[index];
         let path = ROOT + "/" + name;
         checks.push(_exists("GLR-003-" + name, "GriffinLanderRequirements::glr003", path, "Xform"));
         checks.push(_children("GLR-003-" + name + "-parts", "GriffinLanderRequirements::glr003", path,
             [path + "/MliTank", path + "/TankBandA", path + "/TankBandB", path + "/TankBandC"]));
+        if tank_x.len() == tank_names.len() && tank_y.len() == tank_names.len() && tank_z.len() == tank_names.len() {
+            checks.push(_position("GLR-008-" + name + "-x", "GriffinLanderRequirements::glr008", path, 0, tank_x[index]));
+            checks.push(_position("GLR-008-" + name + "-y", "GriffinLanderRequirements::glr008", path, 1, tank_y[index]));
+            checks.push(_position("GLR-008-" + name + "-z", "GriffinLanderRequirements::glr008", path, 2, tank_z[index]));
+        }
     }
     let engine_names = _list(source, "engineNames");
-    for name in engine_names {
+    let engine_x = component_requirements::source_number_list(source, _source_attr("engineStationX"));
+    let engine_y = component_requirements::source_number_list(source, _source_attr("engineStationY"));
+    let engine_z = component_requirements::source_number_list(source, _source_attr("engineStationZ"));
+    for axis in ["engineStationX", "engineStationY", "engineStationZ"] {
+        checks.push(component_requirements::source_list_count("GLR-008-" + axis,
+            "placement", "GriffinLanderRequirements::glr008", VERIFICATION,
+            _source_attr(axis), _source_attr("engineCount")));
+    }
+    for index in 0..engine_names.len() {
+        let name = engine_names[index];
         let path = ROOT + "/Nozzle/MainEngineCluster/" + name;
         checks.push(_exists("GLR-004-" + name, "GriffinLanderRequirements::glr004", path, "Xform"));
         checks.push(_children("GLR-004-" + name + "-parts", "GriffinLanderRequirements::glr004", path,
             [path + "/Bell", path + "/Throat"]));
+        if engine_x.len() == engine_names.len() && engine_y.len() == engine_names.len() && engine_z.len() == engine_names.len() {
+            checks.push(_position("GLR-008-" + name + "-x", "GriffinLanderRequirements::glr008", path, 0, engine_x[index]));
+            checks.push(_position("GLR-008-" + name + "-y", "GriffinLanderRequirements::glr008", path, 1, engine_y[index]));
+            checks.push(_position("GLR-008-" + name + "-z", "GriffinLanderRequirements::glr008", path, 2, engine_z[index]));
+        }
     }
     let solar_names = _list(source, "solarArrayNames");
-    for name in solar_names {
+    let solar_x = component_requirements::source_number_list(source, _source_attr("solarStationX"));
+    let solar_y = component_requirements::source_number_list(source, _source_attr("solarStationY"));
+    let solar_z = component_requirements::source_number_list(source, _source_attr("solarStationZ"));
+    for axis in ["solarStationX", "solarStationY", "solarStationZ"] {
+        checks.push(component_requirements::source_list_count("GLR-008-" + axis,
+            "placement", "GriffinLanderRequirements::glr008", VERIFICATION,
+            _source_attr(axis), _source_attr("solarArrayCount")));
+    }
+    for index in 0..solar_names.len() {
+        let name = solar_names[index];
         let path = ROOT + "/" + name;
         checks.push(_exists("GLR-005-" + name, "GriffinLanderRequirements::glr005", path, "Xform"));
         checks.push(_children("GLR-005-" + name + "-parts", "GriffinLanderRequirements::glr005", path,
             [path + "/Frame", path + "/Cells"]));
+        if solar_x.len() == solar_names.len() && solar_y.len() == solar_names.len() && solar_z.len() == solar_names.len() {
+            checks.push(_position("GLR-008-" + name + "-x", "GriffinLanderRequirements::glr008", path, 0, solar_x[index]));
+            checks.push(_position("GLR-008-" + name + "-y", "GriffinLanderRequirements::glr008", path, 1, solar_y[index]));
+            checks.push(_position("GLR-008-" + name + "-z", "GriffinLanderRequirements::glr008", path, 2, solar_z[index]));
+        }
     }
 
     checks.push(#{id: "GLR-006-width", component: "bus",

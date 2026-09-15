@@ -24,3 +24,24 @@ Do not edit USD text directly. Build or adjust an assembly through the typed
 LunCoSim Editor/runtime tools, then run the component's Rhai observer against
 the resulting composed stage. The generic Twin registry rejects a missing,
 shared, or mismatched requirement/test binding before simulation starts.
+
+## Single-source component contract
+
+The component SysML file is the source of truth for both identity and metric
+placement.  Counts and names are declared once, while station datums (for
+example `legStationX/Y/Z`, `engineStationX/Y/Z`, and FLIP's four
+`wheelStationX/Y/Z` lists) are qualified attributes in that same package.  The
+visual builder reads those attributes through `griffin_spec` and emits typed
+Editor placement operations; it does not carry a second table of coordinates.
+
+The matching Rhai observer verifies the same datums against the composed
+`xformOp:translate` values, in addition to checking the component's children,
+dimensions, and behavior.  A missing or cardinality-mismatched station list
+is a failed source check, not a default.  This makes a component fixture
+independently reviewable and prevents a combined lander/rover scene from
+masking a misplaced subassembly.
+
+For a fast focused gate, run the fixture and its qualified verification from
+the `[[verification.cases]]` entry in `twin.toml`; all component gates use the
+same deterministic invocation (`--max-ticks 120 --tick-hz 60 --threads 1
+--jitter 0`).

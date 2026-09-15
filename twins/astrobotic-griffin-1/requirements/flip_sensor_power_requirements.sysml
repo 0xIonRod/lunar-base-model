@@ -7,6 +7,8 @@ package FlipSensorPowerRequirements {
         attribute mastPath : String = "/World/FLIP/SensorMast";
         attribute solarPath : String = "/World/FLIP/SolarArray";
         attribute mastHeightSource : String = "FlipRequirements::FlipRover::sensorMastHeightM";
+        attribute solarMountSource : String = "FlipRequirements::FlipRover::solarArrayMount";
+        attribute solarTiltSource : String = "FlipRequirements::FlipRover::solarArrayTiltDeg";
         attribute solarStatusSource : String = "FlipRequirements::FlipRover::solarArrayMode";
         attribute mastChildNames : String = "MastPost,SensorHead,SensorAntenna";
         attribute solarChildNames : String = "WhiteBacksheet,BlueCells,FoldHinge";

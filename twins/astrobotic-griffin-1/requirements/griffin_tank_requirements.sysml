@@ -22,11 +22,15 @@ package GriffinTankRequirements {
     requirement def GPT004_TankTraceability {
         doc /* GPT-004 [evidence] tank identities and count resolve from the lander SysML source and are checked individually. */
     }
+    requirement def GPT005_TankPlacement {
+        doc /* GPT-005 [layout] each tank root transform matches the ordered metric station datums owned by GriffinLanderComponent. */
+    }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt002 : GPT002_TankRetention { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt003 : GPT003_TankStatus { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt004 : GPT004_TankTraceability { subject tanks : GriffinPropellantTankAssembly; }
+    requirement gpt005 : GPT005_TankPlacement { subject tanks : GriffinPropellantTankAssembly; }
 
     verification def Verify_GriffinTankRequirements {
         subject tanks : GriffinPropellantTankAssembly;
@@ -34,5 +38,6 @@ package GriffinTankRequirements {
         verify gpt002;
         verify gpt003;
         verify gpt004;
+        verify gpt005;
     }
 }

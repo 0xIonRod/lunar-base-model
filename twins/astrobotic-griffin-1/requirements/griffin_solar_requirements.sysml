@@ -22,11 +22,15 @@ package GriffinSolarRequirements {
     requirement def GSA004_ArrayTraceability {
         doc /* GSA-004 [evidence] array identities and count resolve from the lander SysML source and deployment status is explicit. */
     }
+    requirement def GSA005_ArrayPlacement {
+        doc /* GSA-005 [layout] each array root transform matches the ordered metric station datum owned by GriffinLanderComponent. */
+    }
 
     requirement gsa001 : GSA001_ArrayCount { subject arrays : GriffinSolarArrayAssembly; }
     requirement gsa002 : GSA002_ArrayStructure { subject arrays : GriffinSolarArrayAssembly; }
     requirement gsa003 : GSA003_ArraySymmetry { subject arrays : GriffinSolarArrayAssembly; }
     requirement gsa004 : GSA004_ArrayTraceability { subject arrays : GriffinSolarArrayAssembly; }
+    requirement gsa005 : GSA005_ArrayPlacement { subject arrays : GriffinSolarArrayAssembly; }
 
     verification def Verify_GriffinSolarRequirements {
         subject arrays : GriffinSolarArrayAssembly;
@@ -34,5 +38,6 @@ package GriffinSolarRequirements {
         verify gsa002;
         verify gsa003;
         verify gsa004;
+        verify gsa005;
     }
 }

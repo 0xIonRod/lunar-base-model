@@ -8,6 +8,12 @@ const VERIFICATION = "FlipWheelRequirements::Verify_FLIPWheelRequirements";
 fn own(name) { PACKAGE + "::FlipDirectionalWheelAssembly::" + name }
 fn rover(name) { "FlipRequirements::FlipRover::" + name }
 
+fn position(id, path, index, expected) {
+    #{id: id, component: "wheel", requirement: "FlipWheelRequirements::fww005",
+      verification: VERIFICATION, kind: "attribute_component", path: path,
+      attr: "xformOp:translate", index: index, expected: expected, tolerance: 0.002}
+}
+
 fn on_start(me) {
     this.started = elapsed_seconds();
     this.done = false;
@@ -23,9 +29,18 @@ fn on_tick(me) {
     let radius_source = rover("visualRoverWheelRadiusM");
     let front_source = rover("frontSteeringAngleDeg");
     let rear_source = rover("rearSteeringAngleDeg");
+    let xs = component_requirements::source_number_list(source, rover("wheelStationX"));
+    let ys = component_requirements::source_number_list(source, rover("wheelStationY"));
+    let zs = component_requirements::source_number_list(source, rover("wheelStationZ"));
     let checks = [];
     checks.push(component_requirements::source_list_count("FWW-001-count", "wheels", "FlipWheelRequirements::fww001", VERIFICATION, names_source, count_source));
-    for name in names {
+    for axis in ["wheelStationX", "wheelStationY", "wheelStationZ"] {
+        checks.push(component_requirements::source_list_count("FWW-005-" + axis,
+            "wheel", "FlipWheelRequirements::fww005", VERIFICATION,
+            rover(axis), count_source));
+    }
+    for index in 0..names.len() {
+        let name = names[index];
         let station = root + "/Suspension_" + name;
         let wheel = station + "/Wheel_" + name;
         checks.push(component_requirements::exists("FWW-001-" + name, "wheel", "FlipWheelRequirements::fww001", VERIFICATION, wheel, "Xform"));
@@ -40,6 +55,11 @@ fn on_tick(me) {
             requirement: "FlipWheelRequirements::fww003", verification: VERIFICATION,
             kind: "attribute_component", path: wheel, attr: "xformOp:rotateXYZ",
             index: 1, expected_attr: steering_source, tolerance: 0.002});
+        if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
+            checks.push(position("FWW-005-" + name + "-x", station, 0, xs[index]));
+            checks.push(position("FWW-005-" + name + "-y", station, 1, ys[index]));
+            checks.push(position("FWW-005-" + name + "-z", station, 2, zs[index]));
+        }
     }
     checks.push(component_requirements::coverage("FWW-004-traceability", "wheels", "FlipWheelRequirements::fww004", VERIFICATION));
     component_requirements::finish(source, checks, "FLIP WHEEL REQUIREMENTS", "FLIP_WHEEL_REQUIREMENTS", root, PACKAGE, VERIFICATION);

@@ -66,6 +66,14 @@ fn on_tick(me) {
     checks.push(_exists("FGV-004-solar", "FlipRequirements::fvg004", ROOT + "/SolarArray", "Xform"));
     checks.push(_children("FGV-004-solar-parts", "FlipRequirements::fvg004", ROOT + "/SolarArray",
         [ROOT + "/SolarArray/WhiteBacksheet", ROOT + "/SolarArray/BlueCells", ROOT + "/SolarArray/FoldHinge"]));
+    let solar_mount = component_requirements::source_number_list(source, _source_attr("solarArrayMount"));
+    if solar_mount.len() == 3 {
+        checks.push(_attribute_component("FGV-004-solar-x", "FlipRequirements::fvg004", ROOT + "/SolarArray", "xformOp:translate", 0, solar_mount[0]));
+        checks.push(_attribute_component("FGV-004-solar-y", "FlipRequirements::fvg004", ROOT + "/SolarArray", "xformOp:translate", 1, solar_mount[1]));
+        checks.push(_attribute_component("FGV-004-solar-z", "FlipRequirements::fvg004", ROOT + "/SolarArray", "xformOp:translate", 2, solar_mount[2]));
+        checks.push(_attribute_component("FGV-004-solar-tilt", "FlipRequirements::fvg004", ROOT + "/SolarArray", "xformOp:rotateXYZ", 0,
+            sysml_requirements::number(source, _source_attr("solarArrayTiltDeg"))));
+    }
 
     checks.push(#{id: "FGV-002-width", component: "chassis",
         requirement: "FlipRequirements::fvg002", verification: VERIFICATION,
@@ -81,7 +89,16 @@ fn on_tick(me) {
         expected_attr: _source_attr("sensorMastHeightM"), tolerance: 0.002});
 
     let wheel_names = _list(source, "visualWheelNames");
-    for name in wheel_names {
+    let wheel_x = component_requirements::source_number_list(source, _source_attr("wheelStationX"));
+    let wheel_y = component_requirements::source_number_list(source, _source_attr("wheelStationY"));
+    let wheel_z = component_requirements::source_number_list(source, _source_attr("wheelStationZ"));
+    for axis in ["wheelStationX", "wheelStationY", "wheelStationZ"] {
+        checks.push(component_requirements::source_list_count("FGV-003-" + axis,
+            "wheel", "FlipRequirements::fvg003", VERIFICATION,
+            _source_attr(axis), _source_attr("visualRoverWheelCount")));
+    }
+    for index in 0..wheel_names.len() {
+        let name = wheel_names[index];
         let station = ROOT + "/Suspension_" + name;
         let wheel = station + "/Wheel_" + name;
         checks.push(_exists("FGV-003-" + name, "FlipRequirements::fvg003", wheel, "Xform"));
@@ -99,6 +116,11 @@ fn on_tick(me) {
         checks.push(_attribute_component("FGV-003-" + name + "-steering", "FlipRequirements::fvg003",
             wheel, "xformOp:rotateXYZ", 1,
             sysml_requirements::number(source, _source_attr(steering_attr))));
+        if wheel_x.len() == wheel_names.len() && wheel_y.len() == wheel_names.len() && wheel_z.len() == wheel_names.len() {
+            checks.push(_attribute_component("FGV-003-" + name + "-x", "FlipRequirements::fvg003", station, "xformOp:translate", 0, wheel_x[index]));
+            checks.push(_attribute_component("FGV-003-" + name + "-y", "FlipRequirements::fvg003", station, "xformOp:translate", 1, wheel_y[index]));
+            checks.push(_attribute_component("FGV-003-" + name + "-z", "FlipRequirements::fvg003", station, "xformOp:translate", 2, wheel_z[index]));
+        }
     }
     checks.push(#{id: "FGV-005-source", component: "rover",
         requirement: "FlipRequirements::fvg005", verification: VERIFICATION,

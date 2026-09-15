@@ -13,6 +13,23 @@ package GriffinLanderRequirements {
         attribute bodyWidthM : Real = 5.20;
         attribute bodyDepthM : Real = 5.30;
         attribute bodyHeightM : Real = 2.90;
+        // Presentation station datums.  These are the single source of truth
+        // for the component roots in both the isolated Editor assembly and
+        // the component verifiers; the values are metre/Y-up study values,
+        // not hidden CAD dimensions.
+        attribute busMountY : Real = 3.20;
+        attribute tankStationX : String = "1.30,-1.30,1.30,-1.30";
+        attribute tankStationY : String = "5.85,5.85,5.85,5.85";
+        attribute tankStationZ : String = "-1.15,-1.15,1.15,1.15";
+        attribute legStationX : String = "1.75,-1.75,1.75,-1.75";
+        attribute legStationY : String = "2.35,2.35,2.35,2.35";
+        attribute legStationZ : String = "-1.25,-1.25,1.25,1.25";
+        attribute solarStationX : String = "2.70,-2.70";
+        attribute solarStationY : String = "3.35,3.35";
+        attribute solarStationZ : String = "0.0,0.0";
+        attribute engineStationX : String = "0.0,1.0,-1.0,0.0,0.0,0.9,-0.9";
+        attribute engineStationY : String = "1.75,1.75,1.75,1.75,1.75,1.75,1.75";
+        attribute engineStationZ : String = "0.0,0.0,0.0,1.0,-1.0,0.9,-0.9";
         attribute legCount : Integer = 4;
         attribute tankCount : Integer = 4;
         attribute engineCount : Integer = 7;
@@ -48,6 +65,9 @@ package GriffinLanderRequirements {
     requirement def GLR007_Traceability {
         doc /* GLR-007 [evidence] component names, counts, status, and public references shall come from this SysML package and be checked by a Twin Rhai observer. */
     }
+    requirement def GLR008_StationPlacement {
+        doc /* GLR-008 [layout] every replaceable lander component root uses the ordered metric station datums in this package; no verifier or builder owns a second placement table. */
+    }
 
     requirement glr001 : GLR001_BusTopology { subject lander : GriffinLanderComponent; }
     requirement glr002 : GLR002_LandingLegs { subject lander : GriffinLanderComponent; }
@@ -56,6 +76,7 @@ package GriffinLanderRequirements {
     requirement glr005 : GLR005_SolarArrays { subject lander : GriffinLanderComponent; }
     requirement glr006 : GLR006_MetricEnvelope { subject lander : GriffinLanderComponent; }
     requirement glr007 : GLR007_Traceability { subject lander : GriffinLanderComponent; }
+    requirement glr008 : GLR008_StationPlacement { subject lander : GriffinLanderComponent; }
 
     verification def Verify_GriffinLanderRequirements {
         subject lander : GriffinLanderComponent;
@@ -66,5 +87,6 @@ package GriffinLanderRequirements {
         verify glr005;
         verify glr006;
         verify glr007;
+        verify glr008;
     }
 }

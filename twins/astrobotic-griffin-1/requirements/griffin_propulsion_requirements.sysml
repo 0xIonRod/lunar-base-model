@@ -22,11 +22,15 @@ package GriffinPropulsionRequirements {
     requirement def GPP004_PropulsionTraceability {
         doc /* GPP-004 [evidence] engine identities and count resolve from the lander SysML source and are checked individually. */
     }
+    requirement def GPP005_EnginePlacement {
+        doc /* GPP-005 [layout] each bell owner uses the ordered metric engine station datum owned by GriffinLanderComponent. */
+    }
 
     requirement gpp001 : GPP001_EngineCount { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement gpp002 : GPP002_BellGeometry { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement gpp003 : GPP003_ThrustOwnership { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement gpp004 : GPP004_PropulsionTraceability { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement gpp005 : GPP005_EnginePlacement { subject propulsion : GriffinMainPropulsionAssembly; }
 
     verification def Verify_GriffinPropulsionRequirements {
         subject propulsion : GriffinMainPropulsionAssembly;
@@ -34,5 +38,6 @@ package GriffinPropulsionRequirements {
         verify gpp002;
         verify gpp003;
         verify gpp004;
+        verify gpp005;
     }
 }

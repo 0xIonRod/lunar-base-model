@@ -81,6 +81,14 @@ read-only, and emit a structured verdict on a dedicated channel. The
 example the four FLIP wheels) agrees with its count before checking each USD
 path. This keeps stale lists from silently dropping a component.
 
+Station placement is part of the same contract: the observer compares every
+component root's authored `xformOp:translate` to the qualified metric station
+datums in SysML.  The generic evaluator indexes requirement usages and
+verification coverage once per report, so adding one check per leg, tank,
+engine, panel, or wheel remains linear and does not exhaust Rhai's per-tick
+operation budget.  The verdict includes the component package and source
+revision, allowing a result to be traced back to the exact SysML snapshot.
+
 ## Visual review checks
 
 The visual contract is intentionally separate from flight/dynamics topology.

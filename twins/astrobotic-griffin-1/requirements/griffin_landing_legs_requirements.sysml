@@ -22,11 +22,15 @@ package GriffinLandingLegRequirements {
     requirement def GLL004_LegTraceability {
         doc /* GLL-004 [evidence] the leg identity list and count are resolved from the lander SysML source without a second list in Rhai. */
     }
+    requirement def GLL005_LegPlacement {
+        doc /* GLL-005 [layout] each leg root transform matches the ordered X/Y/Z station datums owned by GriffinLanderComponent. */
+    }
 
     requirement gll001 : GLL001_LegCount { subject legs : GriffinLandingLegAssembly; }
     requirement gll002 : GLL002_LegStructure { subject legs : GriffinLandingLegAssembly; }
     requirement gll003 : GLL003_LegFrame { subject legs : GriffinLandingLegAssembly; }
     requirement gll004 : GLL004_LegTraceability { subject legs : GriffinLandingLegAssembly; }
+    requirement gll005 : GLL005_LegPlacement { subject legs : GriffinLandingLegAssembly; }
 
     verification def Verify_GriffinLandingLegRequirements {
         subject legs : GriffinLandingLegAssembly;
@@ -34,5 +38,6 @@ package GriffinLandingLegRequirements {
         verify gll002;
         verify gll003;
         verify gll004;
+        verify gll005;
     }
 }
