@@ -13,13 +13,18 @@ package GriffinLanderRequirements {
         attribute bodyWidthM : Real = 5.20;
         attribute bodyDepthM : Real = 5.30;
         attribute bodyHeightM : Real = 2.90;
+        // Upper avionics-deck top datum used by tank seating checks.
+        attribute avionicsDeckTopY : Real = 5.00;
         // Presentation station datums.  These are the single source of truth
         // for the component roots in both the isolated Editor assembly and
         // the component verifiers; the values are metre/Y-up study values,
         // not hidden CAD dimensions.
         attribute busMountY : Real = 3.20;
         attribute tankStationX : String = "1.30,-1.30,1.30,-1.30";
-        attribute tankStationY : String = "5.85,5.85,5.85,5.85";
+        // The tank datum is above the avionics deck.  The value includes the
+        // component-local cradle/end-fitting envelope, so no tank hardware
+        // intersects the deck in the composed stage.
+        attribute tankStationY : String = "6.25,6.25,6.25,6.25";
         attribute tankStationZ : String = "-1.15,-1.15,1.15,1.15";
         attribute legStationX : String = "1.75,-1.75,1.75,-1.75";
         attribute legStationY : String = "2.35,2.35,2.35,2.35";
@@ -30,6 +35,12 @@ package GriffinLanderRequirements {
         attribute engineStationX : String = "0.0,1.0,-1.0,0.0,0.0,0.9,-0.9";
         attribute engineStationY : String = "1.75,1.75,1.75,1.75,1.75,1.75,1.75";
         attribute engineStationZ : String = "0.0,0.0,0.0,1.0,-1.0,0.9,-0.9";
+        attribute engineClusterWidthM : Real = 3.20;
+        attribute engineClusterDepthM : Real = 3.20;
+        attribute engineSkirtHeightM : Real = 0.20;
+        attribute engineSkirtRailSectionM : Real = 0.20;
+        attribute engineBellClearanceM : Real = 0.10;
+        attribute engineMountYM : Real = 1.75;
         attribute legCount : Integer = 4;
         attribute tankCount : Integer = 4;
         attribute engineCount : Integer = 7;
