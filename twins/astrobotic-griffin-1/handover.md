@@ -382,6 +382,14 @@ read back the SysML mount `(0, 1.45, 1.30)` and tilt `18 deg`, with
 passed 10/10. Both previews were renewed through typed `OpenUsdPreview` and
 reported `projection_ready: true` at their final generations.
 
+The next Griffin checkpoint was a single `TankPX` task. Its dry plan contained
+only the SysML station placement `(1.30, 5.85, -1.15)`; the typed Editor batch
+advanced the Griffin preview to generation 86. Readback confirmed the tank
+root and its `MliTank`, three bands, and `TankCradle` children at that world
+station, with `projection_ready: true` after the preview lease renewal.
+`GriffinTankRequirements::Verify_GriffinTankRequirements` passed 30/30 with
+zero failures. The other tank stations were not touched by this task.
+
 The last focused preview unexpectedly showed the descent-lander inspection
 preview rather than Griffin. Refocus the Griffin preview using typed preview
 commands before a screenshot. The old audit image is
