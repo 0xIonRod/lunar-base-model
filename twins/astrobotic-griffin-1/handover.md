@@ -372,6 +372,16 @@ disabled; world station positions remain the SysML datums. The updated
 `FlipWheelRequirements::Verify_FLIPWheelRequirements` gate now checks those
 visual connectors as FWW-006 and passes 69/69 results with zero failures.
 
+The remaining FLIP visual checkpoints were then run independently: a
+`SensorMast` placement-only batch advanced the preview to generation 69 and
+read back the mast root plus `MastPost`, `SensorHead`, `SensorAntenna`, and
+`SensorLens`; the `FlipSensorPowerRequirements` gate passed 10/10. A separate
+`SolarArray` placement/tilt batch advanced the preview to generation 71 and
+read back the SysML mount `(0, 1.45, 1.30)` and tilt `18 deg`, with
+`WhiteBacksheet`, `BlueCells`, and `FoldHinge` children; the same focused gate
+passed 10/10. Both previews were renewed through typed `OpenUsdPreview` and
+reported `projection_ready: true` at their final generations.
+
 The last focused preview unexpectedly showed the descent-lander inspection
 preview rather than Griffin. Refocus the Griffin preview using typed preview
 commands before a screenshot. The old audit image is
