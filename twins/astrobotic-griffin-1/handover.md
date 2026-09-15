@@ -408,6 +408,12 @@ Both focused previews reached `projection_ready: true`, and the dedicated
 `GriffinSolarRequirements::Verify_GriffinSolarRequirements` gate passed 16/16
 after each task.
 
+Only after all component checkpoints did the aggregate visual checkpoint run:
+`Griffin1Requirements::Verify_GriffinVisualRequirements` on
+`tests/griffin_flip_visual.usda` passed 70/70 at one fixed-clock tick. This is
+integration evidence for the composed topology, not a replacement for the
+component gates or for the unresolved physics/runtime caveats below.
+
 The last focused preview unexpectedly showed the descent-lander inspection
 preview rather than Griffin. Refocus the Griffin preview using typed preview
 commands before a screenshot. The old audit image is
