@@ -43,7 +43,7 @@ def Xform "PropellantTank" (
     def Cube "TankCradle"
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.0, -1.18, 0.0)
+        custom double3 xformOp:translate = (0.0, -1.23, 0.0)
         double3 xformOp:scale = (0.72, 0.1, 0.72)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]

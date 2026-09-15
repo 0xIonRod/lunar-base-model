@@ -24,7 +24,7 @@ package GriffinLanderRequirements {
         // The tank datum is above the avionics deck.  The value includes the
         // component-local cradle/end-fitting envelope, so no tank hardware
         // intersects the deck in the composed stage.
-        attribute tankStationY : String = "6.25,6.25,6.25,6.25";
+        attribute tankStationY : String = "6.30,6.30,6.30,6.30";
         attribute tankStationZ : String = "-1.15,-1.15,1.15,1.15";
         attribute legStationX : String = "1.75,-1.75,1.75,-1.75";
         attribute legStationY : String = "2.35,2.35,2.35,2.35";
