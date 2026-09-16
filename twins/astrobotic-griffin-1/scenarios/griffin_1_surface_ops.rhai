@@ -11,6 +11,19 @@ const LANDER = "/Griffin1SurfaceOps/Lander";
 const ROVER = "/Griffin1SurfaceOps/FLIP";
 const DOCK = "/Griffin1SurfaceOps/FLIPPayloadAdapterJoint";
 
+fn trace_event(evt) {
+    if this.event_trace == () || this.event_trace.len() >= 64 { return; }
+    let source_id = if evt.source == () { () } else { evt.source };
+    let source_path = ();
+    if source_id != () { source_path = usd_path(source_id); }
+    this.event_trace.push(#{
+        name: evt.name,
+        source: source_id,
+        source_path: if source_path == () { "" } else { source_path },
+        sim_tick: sim_tick(),
+    });
+}
+
 fn on_start(me, ctx) {
     this.lander_settled = false;
     this.release_latched = false;
@@ -26,9 +39,11 @@ fn on_start(me, ctx) {
     this.geometry_valid = true;
     this.phase_timeout = false;
     this.rover_brake_held = false;
+    this.event_trace = [];
 }
 
 fn on_event(me, evt, ctx) {
+    trace_event(evt);
     let lander = find(LANDER);
     let rover = find(ROVER);
 
@@ -266,8 +281,10 @@ fn fail_phase(me, phase) {
         expected: "completed", ok: false, error: "phase timed out"};
     report_structured_verdict(#{ok: false, verification:
         "Griffin1Requirements::Verify_GriffinSurfaceOperations",
-        requirement_count: 5, source_revision: source.source_revision_hex,
-        source_files: source.source_files, results: [failure], failures: [failure]},
+        requirement_count: 1, source_revision: source.source_revision_hex,
+        source_files: source.source_files, results: [failure], failures: [failure],
+        metrics: #{phase: phase, event_trace: this.event_trace,
+            clocks: clock_snapshot(), landing_gates: gates}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
     emit("griffin_phase_timeout");
 }
@@ -291,7 +308,9 @@ fn finish_surface_ops(state) {
     report_structured_verdict(#{ok: failures.len() == 0,
         verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
         requirement_count: checks.len(), source_revision: source.source_revision_hex,
-        source_files: source.source_files, results: checks, failures: failures},
+        source_files: source.source_files, results: checks, failures: failures,
+        metrics: #{event_trace: this.event_trace, clocks: clock_snapshot(),
+            final_state: state}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
 }
 
