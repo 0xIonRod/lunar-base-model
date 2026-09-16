@@ -65,6 +65,11 @@ fn on_tick(me) {
     let transition_neck_radius = sysml_requirements::number(source, own("transitionNeckRadiusM"));
     let transition_height = sysml_requirements::number(source, own("transitionHeightM"));
     let transition_radius = sysml_requirements::number(source, own("transitionRadiusM"));
+    let shoulder_center_y = sysml_requirements::number(source, own("shoulderCenterYM"));
+    let transition_center_y = sysml_requirements::number(source, own("transitionCenterYM"));
+    let neck_center_y = sysml_requirements::number(source, own("neckCenterYM"));
+    let valve_center_y = sysml_requirements::number(source, own("valveCenterYM"));
+    let cap_center_y = sysml_requirements::number(source, own("capCenterYM"));
     let band_radius = sysml_requirements::number(source, own("bandRadiusM"));
     let band_height = sysml_requirements::number(source, own("bandHeightM"));
     let cradle_local_y = sysml_requirements::number(source, own("cradleLocalY"));
@@ -76,7 +81,9 @@ fn on_tick(me) {
         || body_shape == "" || body_cylindrical_height == ();
     let missing_end = neck_radius == () || neck_height == ()
         || transition_shoulder_radius == () || transition_neck_radius == ()
-        || transition_height == () || transition_radius == ();
+        || transition_height == () || transition_radius == ()
+        || shoulder_center_y == () || transition_center_y == ()
+        || neck_center_y == () || valve_center_y == () || cap_center_y == ();
     let missing_service = shoulder_radius == () || shoulder_height == ()
         || valve_radius == () || valve_height == () || valve_cap_radius == ()
         || valve_cap_height == () || band_radius == () || band_height == ();
@@ -130,6 +137,16 @@ fn on_tick(me) {
         checks.push(attribute("GPT-006-" + name + "-transition-bottom-shoulder", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "radius2", transition_shoulder_radius));
         checks.push(attribute("GPT-006-" + name + "-transition-bottom-height", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "height", transition_height));
         checks.push(attribute("GPT-006-" + name + "-transition-bottom-radius", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "radius", transition_radius));
+        checks.push(position("GPT-006-" + name + "-shoulder-top-center", path + "/TankShoulderTop", 1, shoulder_center_y));
+        checks.push(position("GPT-006-" + name + "-shoulder-bottom-center", path + "/TankShoulderBottom", 1, -shoulder_center_y));
+        checks.push(position("GPT-006-" + name + "-transition-top-center", path + "/TankTransitionTop", 1, transition_center_y));
+        checks.push(position("GPT-006-" + name + "-transition-bottom-center", path + "/TankTransitionBottom", 1, -transition_center_y));
+        checks.push(position("GPT-006-" + name + "-neck-top-center", path + "/TankNeckTop", 1, neck_center_y));
+        checks.push(position("GPT-006-" + name + "-neck-bottom-center", path + "/TankNeckBottom", 1, -neck_center_y));
+        checks.push(position("GPT-006-" + name + "-valve-top-center", path + "/TankValveTop", 1, valve_center_y));
+        checks.push(position("GPT-006-" + name + "-valve-bottom-center", path + "/TankValveBottom", 1, -valve_center_y));
+        checks.push(position("GPT-006-" + name + "-cap-top-center", path + "/TankValveCapTop", 1, cap_center_y));
+        checks.push(position("GPT-006-" + name + "-cap-bottom-center", path + "/TankValveCapBottom", 1, -cap_center_y));
         checks.push(component_requirements::children("GPT-007-" + name, "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path,
             service_hardware_paths));
         checks.push(component_requirements::exists("GPT-007-" + name + "-shoulder-top", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankShoulderTop", "Cylinder"));
