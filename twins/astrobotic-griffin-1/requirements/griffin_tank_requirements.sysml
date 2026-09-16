@@ -85,6 +85,7 @@ package GriffinTankRequirements {
         attribute bracketCenterOffsetM : Real = 0.20;
         attribute bracketCenterYM : Real = -0.60;
         attribute bracketTiltDeg : Real = 12.0;
+        attribute bracketOrientationConvention : String = "radial: each brace top slopes inward toward the tank datum; PX/NX use XZ corner signs (+,+)/(-,+), PZ/NZ use (+,-)/(-,-)";
         attribute mountingSource : String = "https://www.nasa.gov/gallery/astrobotics-griffin-1/";
         attribute mountingSourceFact : String = "NASA Griffin imagery shows spherical propellant tanks supported by compact structural mounting hardware";
         attribute mountingSourceRationale : String = "Four explicit bracket envelopes make the tank-to-deck interface visually inspectable and prevent a floating tank silhouette without inventing a flight ICD";
@@ -118,7 +119,7 @@ package GriffinTankRequirements {
         doc /* GPT-009 [interface] the lower cradle plate is a 1.04 m x 1.04 m x 0.16 m metric envelope and the 0.52 m x 0.52 m x 0.08 m adapter pad seats the tank above the avionics-deck top datum; a coaxial support post bridges the pad to the lower neck without tank hardware penetrating the deck. */
     }
     requirement def GPT010_TankMounting {
-        doc /* GPT-010 [interface/visual] four compact metric mounting brackets bridge the lower tank shoulder/support to the adapter pad; each bracket is a 0.16 m x 0.16 m section with a 0.52 m axial envelope, mirrored about the tank datum and tilted toward the spherical vessel so the envelope touches both the adapter pad and lower vessel without extending below the pad. */
+        doc /* GPT-010 [interface/visual] four compact metric mounting brackets bridge the lower tank shoulder/support to the adapter pad; each bracket is a 0.16 m x 0.16 m section with a 0.52 m axial envelope, mirrored about the tank datum and radially tilted so its upper end slopes inward toward the spherical vessel. The four signed X/Z tilts are part of the interface datum, so no brace may splay away from the tank or extend below the pad. */
     }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }

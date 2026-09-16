@@ -242,12 +242,7 @@ fn on_tick(me) {
         let bracket_x = [bracket_offset, -bracket_offset, bracket_offset, -bracket_offset];
         let bracket_z = [bracket_offset, bracket_offset, -bracket_offset, -bracket_offset];
         let bracket_rx = [-bracket_tilt, -bracket_tilt, bracket_tilt, bracket_tilt];
-        let bracket_rz = [-bracket_tilt, bracket_tilt, -bracket_tilt, bracket_tilt];
-        // The children check covers all four mirrored members.  Keep one
-        // representative's full transform/scale evidence in the bounded
-        // result table; the four expected names and the authored plan share
-        // one SysML contract, so this avoids duplicating a large per-tank
-        // record while still catching frame/order drift.
+        let bracket_rz = [bracket_tilt, -bracket_tilt, bracket_tilt, -bracket_tilt];
         let bracket_index = 0;
         let bracket_path = bracket_paths[bracket_index];
         let bracket_name = bracket_names[bracket_index];
