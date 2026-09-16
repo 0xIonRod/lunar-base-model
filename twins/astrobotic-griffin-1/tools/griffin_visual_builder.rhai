@@ -1123,6 +1123,268 @@ fn apply_refined_griffin_bus(doc, edit_target, root, parent_gen) {
       root: root, paths: plan.paths}
 }
 
+// Refine the reusable propellant-tank visual in its own document.  USD
+// geometry dimensions stay double all the way to the schema boundary.  The
+// only lower-precision value authored here is the required renderer extent.
+fn _tank_extent_literal(radius, height) {
+    let half_height = height / 2.0;
+    "[(-" + radius.to_string() + ", -" + half_height.to_string()
+        + ", -" + radius.to_string() + "), (" + radius.to_string()
+        + ", " + half_height.to_string() + ", " + radius.to_string() + ")]"
+}
+
+fn _tank_cylinder_schema_ops(edit_target, parent, name, radius, height,
+    translation, color, add) {
+    let path = parent + "/" + name;
+    let ops = [];
+    if add {
+        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: parent,
+            name: name, type_name: "Cylinder", reference: (),
+            reference_prim_path: ""}});
+    }
+    let placement = assembly_builder::place_plan(edit_target, path,
+        translation, (), ());
+    if !placement.ok { return placement; }
+    for op in placement.ops { ops.push(op); }
+    for item in [
+        #{name: "radius", type_name: "double", value: radius.to_string()},
+        #{name: "height", type_name: "double", value: height.to_string()},
+        #{name: "axis", type_name: "token", value: "\"Y\""},
+        #{name: "extent", type_name: "float3[]", value: _tank_extent_literal(radius, height)},
+        #{name: "purpose", type_name: "token", value: "\"render\""},
+        #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
+        #{name: "primvars:displayColor", type_name: "color3f[]",
+          value: "[(" + color[0].to_string() + ", " + color[1].to_string()
+              + ", " + color[2].to_string() + ")]"},
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+            name: item.name, type_name: item.type_name, value: item.value}});
+    }
+    #{ok: true, path: path, ops: ops}
+}
+
+fn _tank_cone_schema_ops(edit_target, parent, name, radius1, radius2,
+    height, translation, color, add) {
+    let path = parent + "/" + name;
+    let ops = [];
+    if add {
+        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: parent,
+            name: name, type_name: "Cone", reference: (),
+            reference_prim_path: ""}});
+    }
+    let placement = assembly_builder::place_plan(edit_target, path,
+        translation, (), ());
+    if !placement.ok { return placement; }
+    for op in placement.ops { ops.push(op); }
+    let extent_radius = if radius1 > radius2 { radius1 } else { radius2 };
+    for item in [
+        #{name: "radius1", type_name: "double", value: radius1.to_string()},
+        #{name: "radius2", type_name: "double", value: radius2.to_string()},
+        #{name: "radius", type_name: "double", value: radius1.to_string()},
+        #{name: "height", type_name: "double", value: height.to_string()},
+        #{name: "axis", type_name: "token", value: "\"Y\""},
+        #{name: "extent", type_name: "float3[]",
+          value: _tank_extent_literal(extent_radius, height)},
+        #{name: "purpose", type_name: "token", value: "\"render\""},
+        #{name: "primvars:displayColor", type_name: "color3f[]",
+          value: "[(" + color[0].to_string() + ", " + color[1].to_string()
+              + ", " + color[2].to_string() + ")]"},
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+            name: item.name, type_name: item.type_name, value: item.value}});
+    }
+    #{ok: true, path: path, ops: ops}
+}
+
+fn _tank_schema_prim_ready(doc, path, type_name) {
+    let inspection = assembly_edit::inspect(doc, path);
+    if inspection == () || inspection.prim == () || inspection.prim.exists != true
+        || inspection.prim.type != type_name {
+        return false;
+    }
+    let required = if type_name == "Cone" {
+        ["radius1", "radius2", "height", "extent"]
+    } else {
+        ["radius", "height", "extent"]
+    };
+    for field in required {
+        let found = false;
+        for attr in inspection.prim.attributes {
+            if attr.name.ends_with("." + field) {
+                if field == "extent" && attr.type != "float3[]"
+                    || field != "extent" && attr.type != "double" {
+                    return false;
+                }
+                found = true;
+            }
+        }
+        if !found { return false; }
+    }
+    true
+}
+
+fn refine_griffin_tank_component_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("refine_griffin_tank_component_plan requires a document, edit target, and absolute root");
+    }
+    let component = assembly_builder::composed_query(doc, #{path: root, children: false});
+    if !query_ok(component) || component.type_name != "Xform" {
+        return plan_error(root + ": propellant tank component root is missing or not Xform");
+    }
+    let source = sysml_requirements::source();
+    let radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bodyRadiusM");
+    let body_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bodyCylindricalHeightM");
+    let neck_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::neckRadiusM");
+    let neck_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::neckHeightM");
+    let shoulder_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::shoulderCollarRadiusM");
+    let shoulder_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::shoulderCollarHeightM");
+    let valve_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::valveRadiusM");
+    let valve_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::valveHeightM");
+    let cap_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::valveCapRadiusM");
+    let cap_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::valveCapHeightM");
+    let transition_shoulder = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::transitionShoulderRadiusM");
+    let transition_neck = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::transitionNeckRadiusM");
+    let transition_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::transitionHeightM");
+    let transition_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::transitionRadiusM");
+    let shoulder_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::shoulderCenterYM");
+    let transition_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::transitionCenterYM");
+    let neck_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::neckCenterYM");
+    let valve_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::valveCenterYM");
+    let cap_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::capCenterYM");
+    let band_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandHeightM");
+    let band_centers = component_requirements::source_number_list(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandCenterYM");
+    let band_radii = component_requirements::source_number_list(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandRadiusByCenterM");
+    let cradle_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradleRadiusM");
+    let cradle_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradleHeightM");
+    let cradle_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradleLocalY");
+    let support_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::supportRadiusM");
+    let support_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::supportHeightM");
+    let support_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::supportCenterYM");
+    let missing_body = radius == () || body_height == ();
+    let missing_end = neck_radius == () || neck_height == ()
+        || shoulder_radius == () || shoulder_height == ()
+        || valve_radius == () || valve_height == ()
+        || cap_radius == () || cap_height == ();
+    let missing_transitions = transition_shoulder == () || transition_neck == ()
+        || transition_height == () || transition_radius == ()
+        || shoulder_y == () || transition_y == () || neck_y == ()
+        || valve_y == () || cap_y == () || band_height == ();
+    let missing_interface = band_centers.len() != 3 || band_radii.len() != 3
+        || cradle_radius == () || cradle_height == () || cradle_y == ()
+        || support_radius == () || support_height == () || support_y == ();
+    if missing_body || missing_end || missing_transitions || missing_interface {
+        return plan_error("tank SysML double dimensions or axial datums are missing");
+    }
+    let desired = [
+        #{path: root + "/MliTank", type_name: "Cylinder"},
+        #{path: root + "/TankBandA", type_name: "Cylinder"},
+        #{path: root + "/TankBandB", type_name: "Cylinder"},
+        #{path: root + "/TankBandC", type_name: "Cylinder"},
+        #{path: root + "/TankNeckTop", type_name: "Cylinder"},
+        #{path: root + "/TankNeckBottom", type_name: "Cylinder"},
+        #{path: root + "/TankShoulderTop", type_name: "Cylinder"},
+        #{path: root + "/TankShoulderBottom", type_name: "Cylinder"},
+        #{path: root + "/TankValveTop", type_name: "Cylinder"},
+        #{path: root + "/TankValveBottom", type_name: "Cylinder"},
+        #{path: root + "/TankValveCapTop", type_name: "Cylinder"},
+        #{path: root + "/TankValveCapBottom", type_name: "Cylinder"},
+        #{path: root + "/TankCradle", type_name: "Cylinder"},
+        #{path: root + "/TankSupportPost", type_name: "Cylinder"},
+        #{path: root + "/TankTransitionTop", type_name: "Cone"},
+        #{path: root + "/TankTransitionBottom", type_name: "Cone"},
+    ];
+    let existing_invalid = [];
+    for item in desired {
+        if !_tank_schema_prim_ready(doc, item.path, item.type_name) {
+            if query_ok(assembly_builder::composed_query(doc, #{path: item.path, children: false})) {
+                existing_invalid.push(item.path);
+            }
+        }
+    }
+    let stale_paths = [];
+    for old_name in ["TankBodyVisual", "TankBandAVisual", "TankBandBVisual", "TankBandCVisual"] {
+        let old_path = root + "/" + old_name;
+        if query_ok(assembly_builder::composed_query(doc, #{path: old_path, children: false})) {
+            stale_paths.push(old_path);
+        }
+    }
+    let ops = [];
+    // OpenUSD validates a typed attribute against the composed prim before
+    // applying a batch.  A malformed legacy prim therefore needs its own
+    // transaction: removing it and recreating it in the same batch is not
+    // valid because the AddPrim still sees the old schema.  Return an
+    // explicit removal phase so callers cannot accidentally hide this state.
+    if existing_invalid.len() > 0 || stale_paths.len() > 0 {
+        for path in existing_invalid { ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}}); }
+        for path in stale_paths { ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}}); }
+        return #{ok: true, kind: "griffin_tank_usd_double_schema_remove_required",
+            phase: "remove", root: root, component_count: 1, ops: ops,
+            no_op: ops.len() == 0,
+            diagnostic: "legacy tank prims must be removed in a separate Editor transaction before rebuilding"};
+    }
+    // Once the removal transaction has committed, only absent prims are
+    // added. Existing valid prims receive typed placement/attribute updates.
+    let body_path = root + "/MliTank";
+    let body = _tank_cylinder_schema_ops(edit_target, root, "MliTank", radius,
+        body_height, [0.0, 0.0, 0.0], [0.58, 0.43, 0.24],
+        !query_ok(assembly_builder::composed_query(doc, #{path: body_path, children: false})));
+    if !body.ok { return body; }
+    for op in body.ops { ops.push(op); }
+    for band in [
+        #{name: "TankBandA", index: 0}, #{name: "TankBandB", index: 1},
+        #{name: "TankBandC", index: 2},
+    ] {
+        let ring = _tank_cylinder_schema_ops(edit_target, root, band.name,
+            band_radii[band.index], band_height,
+            [0.0, band_centers[band.index], 0.0], [0.10, 0.12, 0.15],
+            !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + band.name, children: false})));
+        if !ring.ok { return ring; }
+        for op in ring.ops { ops.push(op); }
+    }
+    let cylinders = [
+        #{name: "TankNeckTop", radius: neck_radius, height: neck_height, y: neck_y, color: [0.25, 0.19, 0.12]},
+        #{name: "TankNeckBottom", radius: neck_radius, height: neck_height, y: -neck_y, color: [0.25, 0.19, 0.12]},
+        #{name: "TankShoulderTop", radius: shoulder_radius, height: shoulder_height, y: shoulder_y, color: [0.28, 0.18, 0.08]},
+        #{name: "TankShoulderBottom", radius: shoulder_radius, height: shoulder_height, y: -shoulder_y, color: [0.28, 0.18, 0.08]},
+        #{name: "TankValveTop", radius: valve_radius, height: valve_height, y: valve_y, color: [0.48, 0.50, 0.53]},
+        #{name: "TankValveBottom", radius: valve_radius, height: valve_height, y: -valve_y, color: [0.48, 0.50, 0.53]},
+        #{name: "TankValveCapTop", radius: cap_radius, height: cap_height, y: cap_y, color: [0.20, 0.22, 0.25]},
+        #{name: "TankValveCapBottom", radius: cap_radius, height: cap_height, y: -cap_y, color: [0.20, 0.22, 0.25]},
+        #{name: "TankCradle", radius: cradle_radius, height: cradle_height, y: cradle_y, color: [0.20, 0.22, 0.25]},
+        #{name: "TankSupportPost", radius: support_radius, height: support_height, y: support_y, color: [0.10, 0.12, 0.15]},
+    ];
+    for item in cylinders {
+        let part = _tank_cylinder_schema_ops(edit_target, root, item.name,
+            item.radius, item.height, [0.0, item.y, 0.0], item.color,
+            !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + item.name, children: false})));
+        if !part.ok { return part; }
+        for op in part.ops { ops.push(op); }
+    }
+    for cone in [
+        #{name: "TankTransitionTop", radius1: transition_shoulder, radius2: transition_neck, y: transition_y},
+        #{name: "TankTransitionBottom", radius1: transition_neck, radius2: transition_shoulder, y: -transition_y},
+    ] {
+        let part = _tank_cone_schema_ops(edit_target, root, cone.name,
+            cone.radius1, cone.radius2, transition_height,
+            [0.0, cone.y, 0.0], [0.28, 0.18, 0.08],
+            !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + cone.name, children: false})));
+        if !part.ok { return part; }
+        for op in part.ops { ops.push(op); }
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: part.path,
+            name: "radius", type_name: "double", value: transition_radius.to_string()}});
+    }
+    #{ok: true, kind: "griffin_tank_usd_double_schema", root: root,
+      component_count: 1, ops: ops, no_op: ops.len() == 0}
+}
+
+fn apply_refined_griffin_tank(doc, edit_target, root, parent_gen) {
+    let plan = refine_griffin_tank_component_plan(doc, edit_target, root);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc, "Normalize Griffin tank USD double schema", plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, command: command,
+      root: root, component_count: plan.component_count}
+}
+
 // Refine only the engine-skirt frame.  This is intentionally a separate
 // Editor task: the four rails remain assembly-owned geometry, while the
 // engine bell references stay untouched and continue to own the visual bell

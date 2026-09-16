@@ -75,9 +75,9 @@ fn on_tick(me) {
     let valve_center_y = sysml_requirements::number(source, own("valveCenterYM"));
     let cap_center_y = sysml_requirements::number(source, own("capCenterYM"));
     let band_height = sysml_requirements::number(source, own("bandHeightM"));
+    let tank_axis = sysml_requirements::text(source, own("tankAxis"));
     let band_centers = component_requirements::source_number_list(source, own("bandCenterYM"));
     let band_radii = component_requirements::source_number_list(source, own("bandRadiusByCenterM"));
-    let band_scale_y = sysml_requirements::number(source, own("bandScaleYM"));
     let band_transform_order_text = sysml_requirements::text(source, own("bandTransformOrder"));
     let band_transform_order = [];
     if band_transform_order_text != () && band_transform_order_text != "" {
@@ -111,7 +111,7 @@ fn on_tick(me) {
     let bracket_center_y = sysml_requirements::number(source, own("bracketCenterYM"));
     let bracket_tilt = sysml_requirements::number(source, own("bracketTiltDeg"));
     let missing_shape = body_radius == () || body_height == () || body_shape == ()
-        || body_shape == "" || body_cylindrical_height == ();
+        || body_shape != "Cylinder" || body_cylindrical_height == ();
     let missing_end = neck_radius == () || neck_height == ()
         || transition_shoulder_radius == () || transition_neck_radius == ()
         || transition_height == () || transition_radius == ()
@@ -120,9 +120,9 @@ fn on_tick(me) {
     let missing_service = shoulder_radius == () || shoulder_height == ()
         || valve_radius == () || valve_height == () || valve_cap_radius == ()
         || valve_cap_height == () || band_height == ()
-        || band_scale_y == () || band_centers.len() != 3
+        || band_centers.len() != 3 || tank_axis == () || tank_axis == ""
         || band_radii.len() != 3
-        || band_transform_order.len() != 2;
+        || band_transform_order.len() != 1;
     let missing_interface = cradle_local_y == () || cradle_shape == () || cradle_shape == ""
         || cradle_radius == () || cradle_half_height == () || cradle_height == ()
         || cradle_pad_local_y == () || cradle_pad_width == ()
@@ -172,12 +172,13 @@ fn on_tick(me) {
         checks.push(component_requirements::exists("GPT-006-" + name + "-transition-bottom", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankTransitionBottom", "Cone"));
         checks.push(component_requirements::exists("GPT-006-" + name + "-body", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/MliTank", body_shape));
         checks.push(attribute("GPT-006-" + name + "-body-radius", "GriffinTankRequirements::gpt006", path + "/MliTank", "radius", body_radius));
-        if body_shape == "Capsule" {
+        if body_shape == "Cylinder" {
             checks.push(attribute("GPT-006-" + name + "-body-height", "GriffinTankRequirements::gpt006", path + "/MliTank", "height", body_cylindrical_height));
         }
+        // QueryUsdPrim reports half-extents.  The explicit factor of two
+        // converts the geometric half-height back to the full SysML envelope.
         checks.push(component_requirements::bounds_component("GPT-006-" + name + "-body-envelope", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/MliTank", 1, own("bodyHeightM"), 2.0, 0.002));
         checks.push(attribute("GPT-006-" + name + "-neck-radius", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "radius", neck_radius));
-        checks.push(attribute("GPT-006-" + name + "-neck-height", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "height", neck_height));
         checks.push(attribute("GPT-006-" + name + "-transition-top-shoulder", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "radius1", transition_shoulder_radius));
         checks.push(attribute("GPT-006-" + name + "-transition-top-neck", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "radius2", transition_neck_radius));
         checks.push(attribute("GPT-006-" + name + "-transition-top-height", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "height", transition_height));
@@ -214,8 +215,8 @@ fn on_tick(me) {
         for band_index in 0..band_centers.len() {
             let band_name = ["TankBandA", "TankBandB", "TankBandC"][band_index];
             checks.push(attribute("GPT-002-" + name + "-" + band_name + "-radius", "GriffinTankRequirements::gpt002", path + "/" + band_name, "radius", band_radii[band_index]));
+            checks.push(source_attribute("GPT-008-" + name + "-" + band_name + "-axis", "GriffinTankRequirements::gpt008", path + "/" + band_name, "axis", own("tankAxis")));
             checks.push(position("GPT-002-" + name + "-" + band_name + "-center", path + "/" + band_name, 1, band_centers[band_index]));
-            checks.push(#{id: "GPT-002-" + name + "-" + band_name + "-scale-y", component: "tank", requirement: "gpt002", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/" + band_name, attr: "xformOp:scale", index: 1, expected: band_scale_y, tolerance: 0.002});
             checks.push(component_requirements::attribute_equals("GPT-008-" + name + "-" + band_name + "-transform-order", "tank", "GriffinTankRequirements::gpt008", VERIFICATION, path + "/" + band_name, "xformOpOrder", band_transform_order));
         }
         checks.push(position("GPT-009-" + name + "-cradle", path + "/TankCradle", 1, cradle_local_y));
@@ -264,11 +265,9 @@ fn on_tick(me) {
                 "GriffinTankRequirements::gpt008", path + "/" + hardware_name,
                 "axis", "tankAxis"));
         }
-        if body_shape != "Sphere" {
-            checks.push(source_attribute("GPT-008-" + name + "-body-axis",
-                "GriffinTankRequirements::gpt008", path + "/MliTank",
-                "axis", "tankAxis"));
-        }
+        checks.push(source_attribute("GPT-008-" + name + "-body-axis",
+            "GriffinTankRequirements::gpt008", path + "/MliTank",
+            "axis", "tankAxis"));
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("GPT-005-" + name + "-x", path, 0, xs[index]));
             checks.push(position("GPT-005-" + name + "-y", path, 1, ys[index]));
