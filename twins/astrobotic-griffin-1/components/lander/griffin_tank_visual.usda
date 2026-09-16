@@ -179,4 +179,14 @@ def Xform "PropellantTank" (
         uniform bool doubleSided = true
         float height = 0.035999998450279236
     }
+    def Cube "TankCradlePad"
+    {
+        custom double3 xformOp:translate = (0.0, -0.86, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.26, 0.04, 0.26)
+        double size = 1.0
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        color3f[] primvars:displayColor = [(0.11999999731779099, 0.12999999523162842, 0.1599999964237213)]
+    }
 }

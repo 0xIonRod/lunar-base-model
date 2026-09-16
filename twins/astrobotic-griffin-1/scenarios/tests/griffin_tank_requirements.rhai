@@ -76,6 +76,10 @@ fn on_tick(me) {
     let band_scale_y = sysml_requirements::number(source, own("bandScaleYM"));
     let cradle_local_y = sysml_requirements::number(source, own("cradleLocalY"));
     let cradle_half_height = sysml_requirements::number(source, own("cradleHalfHeightM"));
+    let cradle_pad_local_y = sysml_requirements::number(source, own("cradlePadLocalY"));
+    let cradle_pad_width = sysml_requirements::number(source, own("cradlePadWidthM"));
+    let cradle_pad_depth = sysml_requirements::number(source, own("cradlePadDepthM"));
+    let cradle_pad_height = sysml_requirements::number(source, own("cradlePadHeightM"));
     let minimum_deck_clearance = sysml_requirements::number(source, own("minimumDeckClearanceM"));
     let deck_top_source = sysml_requirements::text(source, own("deckTopSource"));
     let deck_top = sysml_requirements::number(source, deck_top_source);
@@ -91,6 +95,8 @@ fn on_tick(me) {
         || valve_cap_height == () || band_radius == () || band_height == ()
         || band_scale_y == () || band_centers.len() != 3;
     let missing_interface = cradle_local_y == () || cradle_half_height == ()
+        || cradle_pad_local_y == () || cradle_pad_width == ()
+        || cradle_pad_depth == () || cradle_pad_height == ()
         || minimum_deck_clearance == () || deck_top_source == ()
         || deck_top_source == "" || deck_top == ();
     let missing_topology = child_names.len() == 0 || end_hardware_names.len() != 2
@@ -120,6 +126,7 @@ fn on_tick(me) {
         checks.push(component_requirements::children("GPT-002-" + name, "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path,
             child_paths));
         checks.push(component_requirements::exists("GPT-002-" + name + "-cradle", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradle", "Cube"));
+        checks.push(component_requirements::exists("GPT-002-" + name + "-cradle-pad", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradlePad", "Cube"));
         checks.push(component_requirements::children("GPT-006-" + name, "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path,
             end_hardware_paths));
         checks.push(component_requirements::exists("GPT-006-" + name + "-neck-top", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankNeckTop", "Cylinder"));
@@ -174,6 +181,13 @@ fn on_tick(me) {
             checks.push(#{id: "GPT-002-" + name + "-" + band_name + "-scale-y", component: "tank", requirement: "GriffinTankRequirements::gpt002", verification: VERIFICATION, kind: "attribute_component", path: path + "/" + band_name, attr: "xformOp:scale", index: 1, expected: band_scale_y, tolerance: 0.002});
         }
         checks.push(position("GPT-009-" + name + "-cradle", path + "/TankCradle", 1, cradle_local_y));
+        checks.push(position("GPT-009-" + name + "-cradle-pad", path + "/TankCradlePad", 1, cradle_pad_local_y));
+        // TankCradlePad is a unit Cube, so USD xformOp:scale stores half of
+        // each declared full physical dimension. Keep the SysML dimensions
+        // authoritative while making the representation conversion explicit.
+        checks.push(#{id: "GPT-009-" + name + "-cradle-pad-scale-x", component: "tank", requirement: "GriffinTankRequirements::gpt009", verification: VERIFICATION, kind: "attribute_component", path: path + "/TankCradlePad", attr: "xformOp:scale", index: 0, expected: cradle_pad_width / 2.0, tolerance: 0.002});
+        checks.push(#{id: "GPT-009-" + name + "-cradle-pad-scale-y", component: "tank", requirement: "GriffinTankRequirements::gpt009", verification: VERIFICATION, kind: "attribute_component", path: path + "/TankCradlePad", attr: "xformOp:scale", index: 1, expected: cradle_pad_height / 2.0, tolerance: 0.002});
+        checks.push(#{id: "GPT-009-" + name + "-cradle-pad-scale-z", component: "tank", requirement: "GriffinTankRequirements::gpt009", verification: VERIFICATION, kind: "attribute_component", path: path + "/TankCradlePad", attr: "xformOp:scale", index: 2, expected: cradle_pad_depth / 2.0, tolerance: 0.002});
         if ys.len() == names.len() {
             // Derive the authored local cradle datum from the shared deck
             // datum. This verifies the physical interface, not just a copied

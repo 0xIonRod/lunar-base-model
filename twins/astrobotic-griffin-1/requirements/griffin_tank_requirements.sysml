@@ -7,7 +7,7 @@ package GriffinTankRequirements {
         attribute sourceComponent : String = "GriffinLanderRequirements::GriffinLanderComponent";
         attribute namesSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankNames";
         attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankCount";
-        attribute childNames : String = "TankBandA,TankBandB,TankBandC,TankCradle,TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom,MliTank";
+        attribute childNames : String = "TankBandA,TankBandB,TankBandC,TankCradle,TankCradlePad,TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom,MliTank";
         attribute endHardwareNames : String = "TankNeckTop,TankNeckBottom";
         attribute serviceHardwareNames : String = "TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
         attribute axialHardwareNames : String = "TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom";
@@ -48,6 +48,10 @@ package GriffinTankRequirements {
         attribute bandScaleYM : Real = 0.018;
         attribute cradleLocalY : Real = -0.93;
         attribute cradleHalfHeightM : Real = 0.05;
+        attribute cradlePadLocalY : Real = -0.86;
+        attribute cradlePadWidthM : Real = 0.52;
+        attribute cradlePadDepthM : Real = 0.52;
+        attribute cradlePadHeightM : Real = 0.08;
         attribute minimumDeckClearanceM : Real = 0.02;
         attribute deckTopSource : String = "GriffinLanderRequirements::GriffinLanderComponent::avionicsDeckTopY";
     }
@@ -56,7 +60,7 @@ package GriffinTankRequirements {
         doc /* GPT-001 [topology] exactly four named propellant-tank owners are present and visible. */
     }
     requirement def GPT002_TankRetention {
-        doc /* GPT-002 [visual] every tank exposes a body, three retention bands, a lower cradle, and the retained end hardware listed by the component. */
+        doc /* GPT-002 [visual] every tank exposes a body, three retention bands, a lower cradle plate with a seated adapter pad, and the retained end hardware listed by the component. */
     }
     requirement def GPT003_TankStatus {
         doc /* GPT-003 [traceability] tank geometry is labelled as a metric visual proxy until the mechanical ICD is available. */
@@ -77,7 +81,7 @@ package GriffinTankRequirements {
         doc /* GPT-008 [orientation] the spherical body and all axial tank hardware are Y-up; the authored envelope is centered on the tank datum without hidden rotations or through-geometry. */
     }
     requirement def GPT009_TankDeckSeat {
-        doc /* GPT-009 [interface] the lower cradle datum is above the avionics-deck top datum with no tank hardware penetrating the deck. */
+        doc /* GPT-009 [interface] the lower cradle plate and adapter pad seat the tank above the avionics-deck top datum with no tank hardware penetrating the deck. */
     }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }
