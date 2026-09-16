@@ -473,7 +473,7 @@ def Xform "Griffin1" (
             }
             def Cube "EngineAdapterPlate" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
-                active = true
+                active = false
             )
             {
                 custom double3 xformOp:scale = (1.42, 0.06, 1.42)
@@ -503,7 +503,7 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
             )
             {
-                custom double3 xformOp:translate = (0.0, 1.75, 0.0)
+                custom double3 xformOp:translate = (0.0, 1.68, 0.0)
                 custom token[] xformOpOrder = ["xformOp:translate"]
             }
         }

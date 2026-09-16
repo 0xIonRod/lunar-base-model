@@ -11,6 +11,17 @@ fn query_ok(record) {
     record != () && record.ok != false
 }
 
+// Component documents are inspected through the same Editor readback API
+// used for selection.  QueryUsdPrim is a live-stage query and cannot resolve
+// an isolated component's default-prim path after an asset-only edit.
+fn _component_query(doc, path) {
+    let record = assembly_edit::inspect(doc, path);
+    if record == () || record.prim == () || record.prim.exists != true {
+        return #{ok: false, error: path + ": component prim is missing"};
+    }
+    #{ok: true, type_name: record.prim.type, path: path}
+}
+
 fn plan_error(message) {
     #{ ok: false, kind: "griffin_visual_component_assembly", error: message, ops: [] }
 }
@@ -41,6 +52,12 @@ fn _ramp_angle_deg(side) {
     });
     if angle == () { return (); }
     angle * 180.0 / 3.141592653589793
+}
+
+fn _skirt_number(source, name) {
+    if source == () || source.ok != true { return (); }
+    sysml_requirements::number(source,
+        "GriffinPropulsionRequirements::GriffinEngineSkirtComponent::" + name)
 }
 
 fn flip_steering_angles() {
@@ -984,6 +1001,265 @@ fn apply_isolated_griffin_component(doc, edit_target, root, task, parent_gen) {
         plan.ops, parent_gen);
     #{ok: command.ok != false, kind: plan.kind, command: command,
       component: task, component_count: plan.component_count, root: root}
+}
+
+// Refine the bus shell in-place without replacing the component identity.
+// The original visual asset used rectangular service/deck slabs; these two
+// authored mesh replacements retain their stable paths while restoring the
+// six-sided Griffin silhouette.  Dimensions come from GriffinLanderComponent,
+// and the operation is still submitted through the generic USD journal.
+fn _hex_prism_points(width, depth, half_height) {
+    let x = width / 2.0;
+    let z = depth / 2.0;
+    let q = depth / 4.0;
+    [
+        [0.0, -half_height, z], [x, -half_height, q],
+        [x, -half_height, -q], [0.0, -half_height, -z],
+        [-x, -half_height, -q], [-x, -half_height, q],
+        [0.0, half_height, z], [x, half_height, q],
+        [x, half_height, -q], [0.0, half_height, -z],
+        [-x, half_height, -q], [-x, half_height, q],
+    ]
+}
+
+fn _hex_prism_topology() {
+    [6, 6, 4, 4, 4, 4, 4, 4]
+}
+
+fn _hex_prism_indices() {
+    [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7,
+     0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3,
+     3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+}
+
+fn _refine_hex_slab(doc, edit_target, parent, name, width, depth, height, translation, color) {
+    let path = parent + "/" + name;
+    let current = assembly_builder::composed_query(doc, #{path: path, children: false});
+    if !query_ok(current) { return plan_error(path + ": bus slab is missing"); }
+    // Referenced component children are owned by their source layer.  A
+    // runtime assembly must not try to RemovePrim them from @root@ (that
+    // would reject the whole compound edit).  Instead, mute the inherited
+    // slab with a typed active opinion and add a sibling mesh owned by this
+    // assembly.  This preserves source ownership while making the refinement
+    // reversible and journaled.
+    let replacement_name = name + "Hex";
+    let replacement_path = parent + "/" + replacement_name;
+    let replacement = assembly_builder::composed_query(doc, #{path: replacement_path, children: false});
+    if query_ok(replacement) {
+        if replacement.type_name != "Mesh" {
+            return plan_error(replacement_path + ": existing refinement must be Mesh, got " + replacement.type_name);
+        }
+        return #{ok: true, path: replacement_path, ops: [], no_op: true};
+    }
+    if current.type_name != "Cube" && current.type_name != "Mesh" {
+        return plan_error(path + ": expected the referenced slab to be Cube or Mesh, got " + current.type_name);
+    }
+    let mesh = assembly_builder::mesh_shape_plan(edit_target, parent, name,
+        _hex_prism_points(width, depth, height / 2.0), _hex_prism_topology(),
+        _hex_prism_indices(), color, false);
+    if !mesh.ok { return mesh; }
+    // mesh_shape_plan targets the requested name, so retarget its operations
+    // to the assembly-owned sibling before submission.
+    let ops = [#{SetActive: #{edit_target: edit_target, path: path, active: false}}];
+    for op in mesh.ops {
+        if op.AddPrim != () {
+            let add = op.AddPrim;
+            add.name = replacement_name;
+            add.parent_path = parent;
+            ops.push(#{AddPrim: add});
+        } else if op.SetAttribute != () {
+            let attr = op.SetAttribute;
+            attr.path = replacement_path;
+            ops.push(#{SetAttribute: attr});
+        } else if op.SetApiSchemas != () {
+            let schema = op.SetApiSchemas;
+            schema.path = replacement_path;
+            ops.push(#{SetApiSchemas: schema});
+        } else {
+            ops.push(op);
+        }
+    }
+    ops.push(#{SetTranslate: #{edit_target: edit_target, path: replacement_path, value: translation}});
+    #{ok: true, path: replacement_path, ops: ops, no_op: false}
+}
+
+fn refine_griffin_bus_component_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("refine_griffin_bus_component_plan requires a document, edit target, and absolute root");
+    }
+    let source = sysml_requirements::source();
+    let width = _sysml_number(source, "bodyWidthM");
+    let depth = _sysml_number(source, "bodyDepthM");
+    if width == () || depth == () || width <= 0.0 || depth <= 0.0 {
+        return plan_error("Griffin lander metric bus envelope is missing");
+    }
+    let ops = [];
+    let top = _refine_hex_slab(doc, edit_target, root, "TopDeck",
+        width + 0.35, depth + 0.35, 0.24, [0.0, 1.55, 0.0], [0.22, 0.25, 0.29]);
+    if !top.ok { return top; }
+    for op in top.ops { ops.push(op); }
+    let lower = _refine_hex_slab(doc, edit_target, root, "LowerServiceSkirt",
+        width - 0.10, depth - 0.10, 0.36, [0.0, -1.56, 0.0], [0.10, 0.12, 0.15]);
+    if !lower.ok { return lower; }
+    for op in lower.ops { ops.push(op); }
+    #{ok: true, kind: "griffin_bus_hex_refinement", root: root,
+      paths: [root + "/TopDeck", root + "/LowerServiceSkirt"],
+      ops: ops, no_op: ops.len() == 0}
+}
+
+// Assembly convenience wrapper. It is intentionally a dry diagnostic only:
+// referenced children remain owned by their component document, so callers
+// must open that document and submit refine_griffin_bus_component_plan there.
+fn refine_griffin_bus_plan(doc, edit_target, root) {
+    if !absolute_root(root) { return plan_error("refine_griffin_bus_plan requires an absolute root"); }
+    refine_griffin_bus_component_plan(doc, edit_target, root + "/Bus")
+}
+
+fn apply_refined_griffin_bus(doc, edit_target, root, parent_gen) {
+    let plan = refine_griffin_bus_component_plan(doc, edit_target, root);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc, "Refine Griffin bus hexagonal shell", plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, command: command,
+      root: root, paths: plan.paths}
+}
+
+// Refine only the engine-skirt frame.  This is intentionally a separate
+// Editor task: the four rails remain assembly-owned geometry, while the
+// engine bell references stay untouched and continue to own the visual bell
+// profile.  All dimensions and the adapter datum come from the lander SysML
+// source, so this helper contains no second placement table.
+fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("refine_griffin_engine_skirt_plan requires a document, edit target, and absolute root");
+    }
+    let source = sysml_requirements::source();
+    let width = _sysml_number(source, "engineClusterWidthM");
+    let depth = _sysml_number(source, "engineClusterDepthM");
+    let height = _sysml_number(source, "engineSkirtHeightM");
+    let section = _sysml_number(source, "engineSkirtRailSectionM");
+    let shell_depth = _skirt_number(source, "shellDepthM");
+    let shell_inset = _skirt_number(source, "shellBottomInsetM");
+    let adapter_name = sysml_requirements::text(source,
+        "GriffinPropulsionRequirements::GriffinEngineSkirtComponent::adapterPlateName");
+    let adapter_width = _skirt_number(source, "adapterPlateWidthM");
+    let adapter_depth = _skirt_number(source, "adapterPlateDepthM");
+    let adapter_height = _skirt_number(source, "adapterPlateHeightM");
+    let local_center_y = _skirt_number(source, "componentLocalCenterYM");
+    if width == () || depth == () || height == () || section == ()
+        || shell_depth == () || shell_inset == () || local_center_y == ()
+        || adapter_name == () || adapter_name == ""
+        || adapter_width == () || adapter_depth == () || adapter_height == ()
+        || width <= 0.0 || depth <= 0.0 || height <= 0.0 || section <= 0.0
+        || shell_depth <= 0.0 || shell_inset <= 0.0
+        || shell_inset >= width / 2.0 || shell_inset >= depth / 2.0
+        || adapter_width <= 0.0 || adapter_depth <= 0.0 || adapter_height <= 0.0 {
+        return plan_error("engine-skirt SysML metric dimensions are missing");
+    }
+    // The isolated component owns the canonical rail names.  The older
+    // assembly-local EngineSkirtFront/... opinions are inactive migration
+    // remnants and must never be targeted by a component refinement.
+    let paths = [
+        root + "/RailFront", root + "/RailRear",
+        root + "/RailPort", root + "/RailStarboard",
+    ];
+    let rail_x = width / 2.0 - section / 2.0;
+    let rail_z = depth / 2.0 - section / 2.0;
+    // This document is the reusable component asset.  Its parent instance
+    // owns the global assemblyMountYM; applying that global value here would
+    // double-translate every rail when the component is referenced.
+    let rail_y = local_center_y;
+    let specs = [
+        // Rails run to the outer envelope; their centres are inset by half
+        // the section so adjacent members meet without a corner gap.
+        #{path: paths[0], translation: [0.0, rail_y, rail_z], scale: [width / 2.0, height / 2.0, section / 2.0]},
+        #{path: paths[1], translation: [0.0, rail_y, -rail_z], scale: [width / 2.0, height / 2.0, section / 2.0]},
+        #{path: paths[2], translation: [rail_x, rail_y, 0.0], scale: [section / 2.0, height / 2.0, depth / 2.0]},
+        #{path: paths[3], translation: [-rail_x, rail_y, 0.0], scale: [section / 2.0, height / 2.0, depth / 2.0]},
+    ];
+    let ops = [];
+    for spec in specs {
+        let existing = _component_query(doc, spec.path);
+        if !query_ok(existing) { return plan_error(spec.path + ": engine-skirt rail is missing"); }
+        if existing.type_name != "Cube" { return plan_error(spec.path + ": expected Cube, got " + existing.type_name); }
+        let placement = assembly_builder::place_plan(edit_target, spec.path,
+            spec.translation, (), spec.scale);
+        if !placement.ok { return placement; }
+        for op in placement.ops { ops.push(op); }
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: spec.path,
+            name: "purpose", type_name: "token", value: "\"render\""}});
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: spec.path,
+            name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
+    }
+    let adapter_path = root + "/" + adapter_name;
+    let adapter = _component_query(doc, adapter_path);
+    if query_ok(adapter) && adapter.type_name != "Cube" {
+        return plan_error(adapter_path + ": expected Cube, got " + adapter.type_name);
+    }
+    if !query_ok(adapter) {
+        let adapter_plan = assembly_builder::cube_shape_plan(edit_target, root, adapter_name,
+            1.0, [adapter_width / 2.0, adapter_height / 2.0, adapter_depth / 2.0], false);
+        if !adapter_plan.ok { return adapter_plan; }
+        for op in adapter_plan.ops { ops.push(op); }
+        ops.push(#{SetTranslate: #{edit_target: edit_target, path: adapter_path,
+            value: [0.0, local_center_y + height / 2.0 + adapter_height / 2.0, 0.0]}});
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: adapter_path,
+            name: "purpose", type_name: "token", value: "\"render\""}});
+    }
+    // Add the visible beveled octagonal shroud as its own replaceable visual part.
+    // It is open at both ends so the seven bells remain readable, and it is
+    // double-sided because a study-level thin shell must not disappear when
+    // the Editor camera moves underneath the lander.
+    let shell_path = root + "/EngineSkirtShell";
+    let shell = _component_query(doc, shell_path);
+    if query_ok(shell) && shell.type_name != "Mesh" {
+        return plan_error(shell_path + ": existing skirt shell must be Mesh, got " + shell.type_name);
+    }
+    if !query_ok(shell) {
+        let y_top = local_center_y + height / 2.0;
+        let y_bottom = y_top - shell_depth;
+        let top_x = width / 2.0;
+        let top_z = depth / 2.0;
+        let corner = shell_inset;
+        let top_x_bevel = top_x - corner;
+        let top_z_bevel = top_z - corner;
+        let points = [
+            [-top_x, y_top, top_z_bevel], [-top_x_bevel, y_top, top_z],
+            [top_x_bevel, y_top, top_z], [top_x, y_top, top_z_bevel],
+            [top_x, y_top, -top_z_bevel], [top_x_bevel, y_top, -top_z],
+            [-top_x_bevel, y_top, -top_z], [-top_x, y_top, -top_z_bevel],
+            [-top_x, y_bottom, top_z_bevel], [-top_x_bevel, y_bottom, top_z],
+            [top_x_bevel, y_bottom, top_z], [top_x, y_bottom, top_z_bevel],
+            [top_x, y_bottom, -top_z_bevel], [top_x_bevel, y_bottom, -top_z],
+            [-top_x_bevel, y_bottom, -top_z], [-top_x, y_bottom, -top_z_bevel],
+        ];
+        let mesh = assembly_builder::mesh_shape_plan(edit_target, root,
+            "EngineSkirtShell", points, [4, 4, 4, 4, 4, 4, 4, 4],
+            [0, 1, 9, 8, 1, 2, 10, 9, 2, 3, 11, 10, 3, 4, 12, 11,
+             4, 5, 13, 12, 5, 6, 14, 13, 6, 7, 15, 14, 7, 0, 8, 15],
+            [0.07, 0.09, 0.12], false);
+        if !mesh.ok { return mesh; }
+        for op in mesh.ops { ops.push(op); }
+    }
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
+        name: "doubleSided", type_name: "bool", value: "true"}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
+        name: "purpose", type_name: "token", value: "\"render\""}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
+        name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
+        name: "lunco:visual:skirt_metric_envelope", type_name: "string",
+        value: "\"3.20 m x 3.20 m x 0.20 m; 0.20 m rails; centered on engine adapter datum\""}});
+    paths.push(shell_path);
+    #{ok: true, kind: "griffin_engine_skirt_refinement", root: root,
+      paths: paths, ops: ops, no_op: ops.len() == 0}
+}
+
+fn apply_refined_griffin_engine_skirt(doc, edit_target, root, parent_gen) {
+    let plan = refine_griffin_engine_skirt_plan(doc, edit_target, root);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc, "Refine Griffin engine skirt", plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, command: command,
+      root: root, paths: plan.paths}
 }
 
 fn _flip_task_match(name, task) {

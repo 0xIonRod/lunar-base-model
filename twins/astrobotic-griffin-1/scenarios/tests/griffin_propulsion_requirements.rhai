@@ -54,6 +54,12 @@ fn on_tick(me) {
     let skirt_height = sysml_requirements::number(source, parent("engineSkirtHeightM"));
     let skirt_section = sysml_requirements::number(source, parent("engineSkirtRailSectionM"));
     let skirt_mount_y = sysml_requirements::number(source, parent("engineMountYM"));
+    let skirt_shell_depth = sysml_requirements::number(source, skirt("shellDepthM"));
+    let skirt_assembly_y = sysml_requirements::number(source, skirt("assemblyMountYM"));
+    let adapter_name = sysml_requirements::text(source, skirt("adapterPlateName"));
+    let adapter_width = sysml_requirements::number(source, skirt("adapterPlateWidthM"));
+    let adapter_depth = sysml_requirements::number(source, skirt("adapterPlateDepthM"));
+    let adapter_height = sysml_requirements::number(source, skirt("adapterPlateHeightM"));
     let skirt_transform_order_text = sysml_requirements::text(source, skirt("transformOrder"));
     let skirt_transform_order = if skirt_transform_order_text == () || skirt_transform_order_text == "" { [] } else { skirt_transform_order_text.split(",") };
     let checks = [];
@@ -88,11 +94,15 @@ fn on_tick(me) {
     // owner of the component geometry.
     if skirt_names.len() == 4 && skirt_width != () && skirt_depth != ()
         && skirt_height != () && skirt_section != () && skirt_mount_y != ()
+        && skirt_shell_depth != () && skirt_assembly_y != ()
+        && adapter_name != () && adapter_name != ""
+        && adapter_width != () && adapter_depth != () && adapter_height != ()
         && skirt_transform_order.len() == 2 {
         let rail_paths = [];
         for name in skirt_names { rail_paths.push(skirt_root + "/" + name); }
         checks.push(component_requirements::exists("GES-001-component", "engine_skirt", "GriffinPropulsionRequirements::ges001", VERIFICATION, skirt_root, "Xform"));
         checks.push(component_requirements::children("GES-001-rails", "engine_skirt", "GriffinPropulsionRequirements::ges001", VERIFICATION, skirt_root, rail_paths));
+        checks.push(component_position("GES-003-assembly-y", skirt_root, 1, skirt_assembly_y));
         for index in 0..skirt_names.len() {
             let rail = rail_paths[index];
             checks.push(component_requirements::exists("GES-001-" + skirt_names[index], "engine_skirt", "GriffinPropulsionRequirements::ges001", VERIFICATION, rail, "Cube"));
@@ -111,8 +121,15 @@ fn on_tick(me) {
         }
         checks.push(component_requirements::exists("GES-002-shell", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, skirt_shell, "Mesh"));
         checks.push(component_requirements::bounds_component("GES-002-shell-width", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, skirt_shell, 0, parent("engineClusterWidthM"), 2.0, 0.002));
-        checks.push(component_requirements::bounds_component("GES-002-shell-height", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, skirt_shell, 1, parent("engineSkirtHeightM"), 2.0, 0.002));
-        checks.push(component_requirements::bounds_component("GES-002-shell-depth", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, skirt_shell, 2, parent("engineClusterDepthM"), 2.0, 0.002));
+        checks.push(component_requirements::bounds_component("GES-002-shell-depth-y", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, skirt_shell, 1, skirt("shellDepthM"), 2.0, 0.002));
+        checks.push(component_requirements::bounds_component("GES-002-shell-envelope-depth", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, skirt_shell, 2, parent("engineClusterDepthM"), 2.0, 0.002));
+        let adapter_path = skirt_root + "/" + adapter_name;
+        checks.push(component_requirements::exists("GES-002-adapter-plate", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, adapter_path, "Cube"));
+        checks.push(component_requirements::extent_component("GES-002-adapter-width", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, adapter_path, 0, skirt("adapterPlateWidthM"), 2.0, 0.002));
+        checks.push(component_requirements::extent_component("GES-002-adapter-height", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, adapter_path, 1, skirt("adapterPlateHeightM"), 2.0, 0.002));
+        checks.push(component_requirements::extent_component("GES-002-adapter-depth", "engine_skirt", "GriffinPropulsionRequirements::ges002", VERIFICATION, adapter_path, 2, skirt("adapterPlateDepthM"), 2.0, 0.002));
+        checks.push(component_requirements::attribute_equals("GES-005-adapter-purpose", "engine_skirt", "GriffinPropulsionRequirements::ges005", VERIFICATION, adapter_path, "purpose", "render"));
+        checks.push(component_requirements::attribute_equals("GES-005-adapter-collision", "engine_skirt", "GriffinPropulsionRequirements::ges005", VERIFICATION, adapter_path, "physics:collisionEnabled", false));
         checks.push(component_requirements::attribute_equals("GES-005-shell-purpose", "engine_skirt", "GriffinPropulsionRequirements::ges005", VERIFICATION, skirt_shell, "purpose", "render"));
         checks.push(component_requirements::attribute_equals("GES-005-shell-collision", "engine_skirt", "GriffinPropulsionRequirements::ges005", VERIFICATION, skirt_shell, "physics:collisionEnabled", false));
         checks.push(component_requirements::coverage("GES-004-clearance", "engine_skirt", "GriffinPropulsionRequirements::ges004", VERIFICATION));

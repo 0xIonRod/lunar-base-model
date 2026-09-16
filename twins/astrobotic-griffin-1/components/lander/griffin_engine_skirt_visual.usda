@@ -13,6 +13,7 @@ def Xform "World"
     {
         custom string lunco:visual:component = "engine_skirt"
         custom string lunco:visual:datum = "centered on engine adapter; local Y-up"
+        custom string lunco:visual:skirt_metric_envelope = '"3.20 m x 3.20 m x 0.20 m; 0.20 m rails; centered on engine adapter datum"'
         def Cube "RailFront" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
@@ -65,14 +66,26 @@ def Xform "World"
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            point3f[] points = [(-1.600000023841858, 0.10000000149011612, 1.600000023841858), (1.600000023841858, 0.10000000149011612, 1.600000023841858), (1.600000023841858, 0.10000000149011612, -1.600000023841858), (-1.600000023841858, 0.10000000149011612, -1.600000023841858), (-1.600000023841858, -0.10000000149011612, 1.600000023841858), (1.600000023841858, -0.10000000149011612, 1.600000023841858), (1.600000023841858, -0.10000000149011612, -1.600000023841858), (-1.600000023841858, -0.10000000149011612, -1.600000023841858)]
-            int[] faceVertexCounts = [4, 4, 4, 4]
-            int[] faceVertexIndices = [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            point3f[] points = [(-1.600000023841858, 0.10000000149011612, 1.2999999523162842), (-1.2999999523162842, 0.10000000149011612, 1.600000023841858), (1.2999999523162842, 0.10000000149011612, 1.600000023841858), (1.600000023841858, 0.10000000149011612, 1.2999999523162842), (1.600000023841858, 0.10000000149011612, -1.2999999523162842), (1.2999999523162842, 0.10000000149011612, -1.600000023841858), (-1.2999999523162842, 0.10000000149011612, -1.600000023841858), (-1.600000023841858, 0.10000000149011612, -1.2999999523162842), (-1.2999999523162842, -0.4000000059604645, 1.0), (-1.0, -0.4000000059604645, 1.2999999523162842), (1.0, -0.4000000059604645, 1.2999999523162842), (1.2999999523162842, -0.4000000059604645, 1.0), (1.2999999523162842, -0.4000000059604645, -1.0), (1.0, -0.4000000059604645, -1.2999999523162842), (-1.0, -0.4000000059604645, -1.2999999523162842), (-1.2999999523162842, -0.4000000059604645, -1.0)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 1, 9, 8, 1, 2, 10, 9, 2, 3, 11, 10, 3, 4, 12, 11, 4, 5, 13, 12, 5, 6, 14, 13, 6, 7, 15, 14, 7, 0, 8, 15]
             uniform token subdivisionScheme = "none"
             uniform token purpose = "render"
             uniform bool doubleSided = true
-            color3f[] primvars:displayColor = [(0.07000000029802322, 0.09000000357627869, 0.11999999731779099)]
+            color3f[] primvars:displayColor = [(0.14000000059604645, 0.18000000715255737, 0.23000000417232513)]
             bool physics:collisionEnabled = false
+        }
+        def Cube "EngineAdapterPlate" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 0.16, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (1.42, 0.06, 1.42)
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            uniform token purpose = "render"
+            color3f[] primvars:displayColor = [(0.18000000715255737, 0.20000000298023224, 0.23000000417232513)]
         }
     }
 }

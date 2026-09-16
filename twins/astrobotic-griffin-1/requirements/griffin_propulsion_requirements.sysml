@@ -30,15 +30,23 @@ package GriffinPropulsionRequirements {
         attribute componentRootName : String = "EngineSkirt";
         attribute componentMemberNames : String = "RailFront,RailRear,RailPort,RailStarboard";
         attribute shellName : String = "EngineSkirtShell";
+        attribute adapterPlateName : String = "EngineAdapterPlate";
+        attribute adapterPlateWidthM : Real = 2.84;
+        attribute adapterPlateDepthM : Real = 2.84;
+        attribute adapterPlateHeightM : Real = 0.12;
+        attribute shellDepthM : Real = 0.50;
+        attribute shellBottomInsetM : Real = 0.30;
+        attribute componentLocalCenterYM : Real = 0.00;
+        attribute assemblyMountYM : Real = 1.68;
         attribute sourceComponent : String = "GriffinLanderRequirements::GriffinLanderComponent";
-        attribute dimensionSource : String = "engineClusterWidthM,engineClusterDepthM,engineSkirtHeightM";
-        attribute metricEnvelope : String = "3.20 m x 3.20 m x 0.20 m nominal frame envelope";
+        attribute dimensionSource : String = "engineClusterWidthM,engineClusterDepthM,engineSkirtHeightM,shellDepthM";
+        attribute metricEnvelope : String = "3.20 m x 3.20 m rail envelope; 0.50 m tapered shell depth; 0.20 m rail section";
         attribute railSection : String = "0.20 m wide x 0.20 m tall nominal square rail";
         attribute datum : String = "engine adapter plate at y = engineMountYM; skirt center y = engineMountYM - 0.07 m";
         attribute clearance : String = "minimum 0.10 m radial clearance to every bell outer radius";
         attribute colliderPolicy : String = "render-only frame; no physics collision or thrust authority";
         attribute transformOrder : String = "xformOp:translate,xformOp:scale";
-        attribute shellTopology : String = "four-sided open-ended mesh shroud";
+        attribute shellTopology : String = "beveled octagonal tapered open-ended mesh shroud";
         attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute sourceFact : String = "the public Griffin material identifies a clustered propulsion system but does not publish an engine-skirt ICD";
         attribute sourceRationale : String = "the frame is a transparent study-level interpretation, kept separate so an ICD can replace it without changing the engine owners";
@@ -64,7 +72,7 @@ package GriffinPropulsionRequirements {
         doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the seven-engine cluster. */
     }
     requirement def GES002_SkirtEnvelope {
-        doc /* GES-002 [geometry] the skirt envelope is 3.20 m by 3.20 m with a 0.20 m rail section and 0.20 m height, metric. */
+        doc /* GES-002 [geometry] the rail envelope is 3.20 m by 3.20 m with a 0.20 m rail section; the tapered open-ended shell extends 0.50 m below the adapter and a 2.84 m x 2.84 m x 0.12 m plate seats the cluster, all metric. */
     }
     requirement def GES003_SkirtDatum {
         doc /* GES-003 [placement] the skirt is centered on the engine adapter datum immediately below the bus. */
