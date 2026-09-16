@@ -77,11 +77,13 @@ package GriffinTankRequirements {
         // model of that interface; exact bracket ICD dimensions remain TBD.
         attribute bracketGroupName : String = "TankMountBrackets";
         attribute bracketNames : String = "TankMountBracketPX,TankMountBracketNX,TankMountBracketPZ,TankMountBracketNZ";
-        attribute bracketLengthM : Real = 0.60;
+        // The visual proxy spans the pad top to the lower spherical shell;
+        // the earlier 0.60 m arm extended below the pad and read as detached.
+        attribute bracketLengthM : Real = 0.52;
         attribute bracketWidthM : Real = 0.16;
         attribute bracketDepthM : Real = 0.16;
-        attribute bracketCenterOffsetM : Real = 0.14;
-        attribute bracketCenterYM : Real = -0.64;
+        attribute bracketCenterOffsetM : Real = 0.20;
+        attribute bracketCenterYM : Real = -0.60;
         attribute bracketTiltDeg : Real = 12.0;
         attribute mountingSource : String = "https://www.nasa.gov/gallery/astrobotics-griffin-1/";
         attribute mountingSourceFact : String = "NASA Griffin imagery shows spherical propellant tanks supported by compact structural mounting hardware";
@@ -116,7 +118,7 @@ package GriffinTankRequirements {
         doc /* GPT-009 [interface] the lower cradle plate is a 1.04 m x 1.04 m x 0.16 m metric envelope and the 0.52 m x 0.52 m x 0.08 m adapter pad seats the tank above the avionics-deck top datum; a coaxial support post bridges the pad to the lower neck without tank hardware penetrating the deck. */
     }
     requirement def GPT010_TankMounting {
-        doc /* GPT-010 [interface/visual] four compact metric mounting brackets bridge the lower tank shoulder/support to the adapter pad; each bracket is a 0.16 m x 0.16 m section with a 0.60 m axial envelope, mirrored about the tank datum and tilted toward the spherical vessel so the envelope touches both the adapter pad and lower vessel. */
+        doc /* GPT-010 [interface/visual] four compact metric mounting brackets bridge the lower tank shoulder/support to the adapter pad; each bracket is a 0.16 m x 0.16 m section with a 0.52 m axial envelope, mirrored about the tank datum and tilted toward the spherical vessel so the envelope touches both the adapter pad and lower vessel without extending below the pad. */
     }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }

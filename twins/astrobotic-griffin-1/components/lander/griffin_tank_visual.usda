@@ -209,10 +209,10 @@ def Xform "PropellantTank" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            custom double3 xformOp:translate = (0.14, -0.64, 0.14)
+            custom double3 xformOp:translate = (0.2, -0.6, 0.2)
             custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (-12.0, 0.0, -12.0)
-            custom double3 xformOp:scale = (0.08, 0.3, 0.08)
+            custom double3 xformOp:scale = (0.08, 0.26, 0.08)
             double size = 1.0
             bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
@@ -221,10 +221,10 @@ def Xform "PropellantTank" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            custom double3 xformOp:translate = (-0.14, -0.64, 0.14)
+            custom double3 xformOp:translate = (-0.2, -0.6, 0.2)
             custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (-12.0, 0.0, 12.0)
-            custom double3 xformOp:scale = (0.08, 0.3, 0.08)
+            custom double3 xformOp:scale = (0.08, 0.26, 0.08)
             double size = 1.0
             bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
@@ -233,10 +233,10 @@ def Xform "PropellantTank" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            custom double3 xformOp:translate = (0.14, -0.64, -0.14)
+            custom double3 xformOp:translate = (0.2, -0.6, -0.2)
             custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (12.0, 0.0, -12.0)
-            custom double3 xformOp:scale = (0.08, 0.3, 0.08)
+            custom double3 xformOp:scale = (0.08, 0.26, 0.08)
             double size = 1.0
             bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
@@ -245,10 +245,10 @@ def Xform "PropellantTank" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            custom double3 xformOp:translate = (-0.14, -0.64, -0.14)
+            custom double3 xformOp:translate = (-0.2, -0.6, -0.2)
             custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (12.0, 0.0, 12.0)
-            custom double3 xformOp:scale = (0.08, 0.3, 0.08)
+            custom double3 xformOp:scale = (0.08, 0.26, 0.08)
             double size = 1.0
             bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
