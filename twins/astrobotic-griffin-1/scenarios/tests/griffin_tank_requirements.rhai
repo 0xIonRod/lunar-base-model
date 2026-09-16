@@ -74,6 +74,14 @@ fn on_tick(me) {
     let band_height = sysml_requirements::number(source, own("bandHeightM"));
     let band_centers = component_requirements::source_number_list(source, own("bandCenterYM"));
     let band_scale_y = sysml_requirements::number(source, own("bandScaleYM"));
+    let band_transform_order_text = sysml_requirements::text(source, own("bandTransformOrder"));
+    let band_transform_order = [];
+    if band_transform_order_text != () && band_transform_order_text != "" {
+        for token in band_transform_order_text.split(",") {
+            token.trim();
+            if token != "" { band_transform_order.push(token); }
+        }
+    }
     let cradle_local_y = sysml_requirements::number(source, own("cradleLocalY"));
     let cradle_half_height = sysml_requirements::number(source, own("cradleHalfHeightM"));
     let cradle_pad_local_y = sysml_requirements::number(source, own("cradlePadLocalY"));
@@ -93,7 +101,8 @@ fn on_tick(me) {
     let missing_service = shoulder_radius == () || shoulder_height == ()
         || valve_radius == () || valve_height == () || valve_cap_radius == ()
         || valve_cap_height == () || band_radius == () || band_height == ()
-        || band_scale_y == () || band_centers.len() != 3;
+        || band_scale_y == () || band_centers.len() != 3
+        || band_transform_order.len() != 2;
     let missing_interface = cradle_local_y == () || cradle_half_height == ()
         || cradle_pad_local_y == () || cradle_pad_width == ()
         || cradle_pad_depth == () || cradle_pad_height == ()
@@ -179,6 +188,7 @@ fn on_tick(me) {
             let band_name = ["TankBandA", "TankBandB", "TankBandC"][band_index];
             checks.push(position("GPT-002-" + name + "-" + band_name + "-center", path + "/" + band_name, 1, band_centers[band_index]));
             checks.push(#{id: "GPT-002-" + name + "-" + band_name + "-scale-y", component: "tank", requirement: "GriffinTankRequirements::gpt002", verification: VERIFICATION, kind: "attribute_component", path: path + "/" + band_name, attr: "xformOp:scale", index: 1, expected: band_scale_y, tolerance: 0.002});
+            checks.push(component_requirements::attribute_equals("GPT-008-" + name + "-" + band_name + "-transform-order", "tank", "GriffinTankRequirements::gpt008", VERIFICATION, path + "/" + band_name, "xformOpOrder", band_transform_order));
         }
         checks.push(position("GPT-009-" + name + "-cradle", path + "/TankCradle", 1, cradle_local_y));
         checks.push(position("GPT-009-" + name + "-cradle-pad", path + "/TankCradlePad", 1, cradle_pad_local_y));

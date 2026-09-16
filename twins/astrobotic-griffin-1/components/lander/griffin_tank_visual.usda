@@ -150,7 +150,7 @@ def Xform "PropellantTank" (
     {
         float radius = 0.49000000953674316
         custom double3 xformOp:scale = (1.0, 0.018, 1.0)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         custom double3 xformOp:translate = (0.0, -0.24, 0.0)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.11999999731779099, 0.07500000298023224, 0.03500000014901161)]
@@ -161,7 +161,7 @@ def Xform "PropellantTank" (
     {
         float radius = 0.49000000953674316
         custom double3 xformOp:scale = (1.0, 0.018, 1.0)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.11999999731779099, 0.07500000298023224, 0.03500000014901161)]
@@ -172,7 +172,7 @@ def Xform "PropellantTank" (
     {
         float radius = 0.49000000953674316
         custom double3 xformOp:scale = (1.0, 0.018, 1.0)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         custom double3 xformOp:translate = (0.0, 0.24, 0.0)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.11999999731779099, 0.07500000298023224, 0.03500000014901161)]

@@ -46,6 +46,10 @@ package GriffinTankRequirements {
         attribute bandHeightM : Real = 0.036;
         attribute bandCenterYM : String = "-0.24,0.0,0.24";
         attribute bandScaleYM : Real = 0.018;
+        // Translation must precede scale in USD xformOpOrder.  Keeping this
+        // authored in SysML prevents a renderer/importer from collapsing the
+        // three strap stations toward the tank equator.
+        attribute bandTransformOrder : String = "xformOp:translate,xformOp:scale";
         attribute cradleLocalY : Real = -0.93;
         attribute cradleHalfHeightM : Real = 0.05;
         attribute cradlePadLocalY : Real = -0.86;
