@@ -178,10 +178,19 @@ fn on_tick(me) {
     let knuckle_width = sysml_requirements::number(source, own("knuckleWidthM"));
     let strut_scale = component_requirements::source_number_list(source, own("strutScale"));
     let strut_offset = component_requirements::source_number_list(source, own("strutOffset"));
+    let transform_order_text = sysml_requirements::text(source, own("transformOrder"));
+    let transform_order = [];
+    if transform_order_text != () && transform_order_text != "" {
+        for token in transform_order_text.split(",") {
+            token.trim();
+            if token != "" { transform_order.push(token); }
+        }
+    }
     let source_ref = sysml_requirements::text(source, own("sourceReference"));
     let rationale = sysml_requirements::text(source, own("sourceRationale"));
     if root == () || root == "" || children.len() != 3 || arm_scale.len() != 3
         || strut_scale.len() != 3 || strut_offset.len() != 3
+        || transform_order.len() != 2
         || arm_offset == () || knuckle_radius == () || knuckle_width == ()
         || source_ref == () || source_ref == "" || rationale == () || rationale == "" {
         fail(this, "FlipSuspensionRequirements source contract is incomplete");
@@ -204,6 +213,8 @@ fn on_tick(me) {
         checks.push(#{id: "FSR-004-strut-offset-" + axis.to_string(), component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute_component", path: strut, attr: "xformOp:translate", index: axis, expected: strut_offset[axis], tolerance: 0.002});
     }
     checks.push(#{id: "FSR-004-arm-offset", component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute_component", path: arm, attr: "xformOp:translate", index: 0, expected: arm_offset, tolerance: 0.002});
+    checks.push(component_requirements::attribute_equals("FSR-006-arm-order", "suspension", "FlipSuspensionRequirements::fsr006", VERIFICATION, arm, "xformOpOrder", transform_order));
+    checks.push(component_requirements::attribute_equals("FSR-006-strut-order", "suspension", "FlipSuspensionRequirements::fsr006", VERIFICATION, strut, "xformOpOrder", transform_order));
     checks.push(component_requirements::attribute_equals("FSR-004-knuckle-axis", "suspension", "FlipSuspensionRequirements::fsr004", VERIFICATION, knuckle, "axis", "X"));
     checks.push(#{id: "FSR-004-knuckle-radius", component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "radius", expected: knuckle_radius, tolerance: 0.002});
     checks.push(#{id: "FSR-004-knuckle-width", component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "height", expected: knuckle_width, tolerance: 0.002});

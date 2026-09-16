@@ -16,7 +16,7 @@ def Xform "FlipSuspension" (
     )
     {
         custom double3 xformOp:scale = (0.65, 0.16, 0.16)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (0.325, 0.0, 0.0)
@@ -39,7 +39,7 @@ def Xform "FlipSuspension" (
     )
     {
         custom double3 xformOp:scale = (0.14, 0.36, 0.14)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (0.0, 0.2, 0.0)

@@ -86,17 +86,13 @@ def Xform "FLIP" (
             custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, -12.0, 0.0)
         }
-        def Cube "SuspensionStrut" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+        def Xform "Suspension" (
+            references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
         )
         {
-            custom double3 xformOp:scale = (0.14, 0.36, 0.14)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
-            double size = 1.0
-            bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.0, 0.2, 0.0)
-            uniform token purpose = "render"
-            color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         }
     }
     def Xform "Suspension_ML" (
@@ -129,17 +125,13 @@ def Xform "FLIP" (
             custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 8.0, 0.0)
         }
-        def Cube "SuspensionStrut" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+        def Xform "Suspension" (
+            references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
         )
         {
-            custom double3 xformOp:scale = (0.14, 0.36, 0.14)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
-            double size = 1.0
-            bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.0, 0.2, 0.0)
-            uniform token purpose = "render"
-            color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         }
     }
     def Xform "Suspension_FR"
@@ -157,17 +149,13 @@ def Xform "FLIP" (
             custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, -12.0, 0.0)
         }
-        def Cube "SuspensionStrut" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+        def Xform "Suspension" (
+            references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
         )
         {
-            custom double3 xformOp:scale = (0.14, 0.36, 0.14)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
-            double size = 1.0
-            bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.0, 0.2, 0.0)
-            uniform token purpose = "render"
-            color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
         }
     }
     def Xform "Suspension_MR" (
@@ -200,17 +188,13 @@ def Xform "FLIP" (
             custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 8.0, 0.0)
         }
-        def Cube "SuspensionStrut" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+        def Xform "Suspension" (
+            references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
         )
         {
-            custom double3 xformOp:scale = (0.14, 0.36, 0.14)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
-            double size = 1.0
-            bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.0, 0.2, 0.0)
-            uniform token purpose = "render"
-            color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
         }
     }
 }

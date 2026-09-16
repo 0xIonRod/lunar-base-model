@@ -21,6 +21,7 @@ package FlipSuspensionRequirements {
         attribute knuckleWidthM : Real = 0.36;
         attribute strutScale : String = "0.14,0.36,0.14";
         attribute strutOffset : String = "0.0,0.20,0.0";
+        attribute transformOrder : String = "xformOp:translate,xformOp:scale";
         attribute childNames : String = "SuspensionArm,SuspensionKnuckle,SuspensionStrut";
     }
 
@@ -39,12 +40,16 @@ package FlipSuspensionRequirements {
     requirement def FSR005_RenderOnlyCollision {
         doc /* FSR-005 [physics boundary] suspension presentation geometry is render-only and cannot create a second collider. */
     }
+    requirement def FSR006_TransformOrder {
+        doc /* FSR-006 [transform] translated suspension members shall use translate-before-scale so metric offsets remain true in the composed stage. */
+    }
 
     requirement fsr001 : FSR001_SourceTraceability { subject suspension : FlipSuspensionComponent; }
     requirement fsr002 : FSR002_LocalFrame { subject suspension : FlipSuspensionComponent; }
     requirement fsr003 : FSR003_Topology { subject suspension : FlipSuspensionComponent; }
     requirement fsr004 : FSR004_Dimensions { subject suspension : FlipSuspensionComponent; }
     requirement fsr005 : FSR005_RenderOnlyCollision { subject suspension : FlipSuspensionComponent; }
+    requirement fsr006 : FSR006_TransformOrder { subject suspension : FlipSuspensionComponent; }
 
     verification def Verify_FLIPSuspensionRequirements {
         subject suspension : FlipSuspensionComponent;
@@ -53,5 +58,6 @@ package FlipSuspensionRequirements {
         verify fsr003;
         verify fsr004;
         verify fsr005;
+        verify fsr006;
     }
 }
