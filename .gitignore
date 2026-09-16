@@ -28,6 +28,8 @@ nasa_lunar_base_data_quality_report.html
 *.zip
 *.sqlite
 *.ogg
+handover/*.png
+twins/**/.lunco/runtime/
 
 # OS metadata
 .DS_Store

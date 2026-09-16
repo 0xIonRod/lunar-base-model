@@ -295,7 +295,7 @@ fn finish_surface_ops(state) {
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
 }
 
-fn task(me) {
+fn task(me, ctx) {
     let route = griffin_surface_ops::surface_route_task(find(ROVER));
     seq([
         once(|m| { if !begin_descent(m) { this.geometry_valid = false; }; true }),

@@ -85,7 +85,7 @@ fn on_event(me, evt, ctx) {
     if request { release_rover(me); }
 }
 
-fn task(me) {
+fn task(me, ctx) {
     seq([
         // Touchdown is emitted by the composed lander Modelica supervisor
         // after its contact predicate; the mission does not infer landing from

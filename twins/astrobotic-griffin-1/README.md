@@ -166,6 +166,10 @@ rewrite the USDA text by hand. The ramp requirements and Rhai verification are
 intentionally separate so a ramp can be accepted without coupling it to FLIP's
 visual review.
 
+`assembly_builder` remains the shared LunCoSim tool library. Do not copy it into
+the Twin: a Twin-local file with that name would shadow the generic policy and
+silently diverge from the shared authoring substrate.
+
 ### Build
 
 On native Windows, the current EOP-data build helper expects the Unix date

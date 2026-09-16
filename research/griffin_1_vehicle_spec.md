@@ -99,8 +99,9 @@ mission configuration until they pass the same runtime tests.
 
 ## Evidence required for acceptance
 
-1. Run `python3 tools/validate_griffin_spec.py` and keep its output with the
-   authored changes.
+1. Run the Twin-owned Rhai requirement gate from `twin.toml` and keep its
+   structured verdict/evidence with the authored changes. Static source checks
+   are not an acceptance substitute for a composed-stage Rhai observation.
 2. In the headful Editor, capture a Griffin-only preview showing the clean top,
    side panels, four-leg envelope, and rail-equipped ramps.
 3. In View, inspect both vessel records, possess the lander, release it, then
