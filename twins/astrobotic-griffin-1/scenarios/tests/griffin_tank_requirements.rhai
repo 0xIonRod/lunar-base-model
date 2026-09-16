@@ -72,6 +72,8 @@ fn on_tick(me) {
     let cap_center_y = sysml_requirements::number(source, own("capCenterYM"));
     let band_radius = sysml_requirements::number(source, own("bandRadiusM"));
     let band_height = sysml_requirements::number(source, own("bandHeightM"));
+    let band_centers = component_requirements::source_number_list(source, own("bandCenterYM"));
+    let band_scale_y = sysml_requirements::number(source, own("bandScaleYM"));
     let cradle_local_y = sysml_requirements::number(source, own("cradleLocalY"));
     let cradle_half_height = sysml_requirements::number(source, own("cradleHalfHeightM"));
     let minimum_deck_clearance = sysml_requirements::number(source, own("minimumDeckClearanceM"));
@@ -86,7 +88,8 @@ fn on_tick(me) {
         || neck_center_y == () || valve_center_y == () || cap_center_y == ();
     let missing_service = shoulder_radius == () || shoulder_height == ()
         || valve_radius == () || valve_height == () || valve_cap_radius == ()
-        || valve_cap_height == () || band_radius == () || band_height == ();
+        || valve_cap_height == () || band_radius == () || band_height == ()
+        || band_scale_y == () || band_centers.len() != 3;
     let missing_interface = cradle_local_y == () || cradle_half_height == ()
         || minimum_deck_clearance == () || deck_top_source == ()
         || deck_top_source == "" || deck_top == ();
@@ -125,7 +128,9 @@ fn on_tick(me) {
         checks.push(component_requirements::exists("GPT-006-" + name + "-transition-bottom", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankTransitionBottom", "Cone"));
         checks.push(component_requirements::exists("GPT-006-" + name + "-body", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/MliTank", body_shape));
         checks.push(attribute("GPT-006-" + name + "-body-radius", "GriffinTankRequirements::gpt006", path + "/MliTank", "radius", body_radius));
-        checks.push(attribute("GPT-006-" + name + "-body-height", "GriffinTankRequirements::gpt006", path + "/MliTank", "height", body_cylindrical_height));
+        if body_shape == "Capsule" {
+            checks.push(attribute("GPT-006-" + name + "-body-height", "GriffinTankRequirements::gpt006", path + "/MliTank", "height", body_cylindrical_height));
+        }
         checks.push(component_requirements::bounds_component("GPT-006-" + name + "-body-envelope", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/MliTank", 1, own("bodyHeightM"), 2.0, 0.002));
         checks.push(attribute("GPT-006-" + name + "-neck-radius", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "radius", neck_radius));
         checks.push(attribute("GPT-006-" + name + "-neck-height", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "height", neck_height));
@@ -163,12 +168,17 @@ fn on_tick(me) {
         checks.push(attribute("GPT-007-" + name + "-cap-height", "GriffinTankRequirements::gpt007", path + "/TankValveCapTop", "height", valve_cap_height));
         checks.push(attribute("GPT-002-" + name + "-band-a-radius", "GriffinTankRequirements::gpt002", path + "/TankBandA", "radius", band_radius));
         checks.push(attribute("GPT-002-" + name + "-band-a-height", "GriffinTankRequirements::gpt002", path + "/TankBandA", "height", band_height));
+        for band_index in 0..band_centers.len() {
+            let band_name = ["TankBandA", "TankBandB", "TankBandC"][band_index];
+            checks.push(position("GPT-002-" + name + "-" + band_name + "-center", path + "/" + band_name, 1, band_centers[band_index]));
+            checks.push(#{id: "GPT-002-" + name + "-" + band_name + "-scale-y", component: "tank", requirement: "GriffinTankRequirements::gpt002", verification: VERIFICATION, kind: "attribute_component", path: path + "/" + band_name, attr: "xformOp:scale", index: 1, expected: band_scale_y, tolerance: 0.002});
+        }
         checks.push(position("GPT-009-" + name + "-cradle", path + "/TankCradle", 1, cradle_local_y));
         if ys.len() == names.len() {
             // Derive the authored local cradle datum from the shared deck
             // datum. This verifies the physical interface, not just a copied
             // local coordinate.
-            let expected_cradle_local = deck_top - ys[index] + cradle_half_height + minimum_deck_clearance;
+            let expected_cradle_local = deck_top - ys[index] - cradle_half_height + minimum_deck_clearance;
             checks.push(position("GPT-009-" + name + "-deck-clearance", path + "/TankCradle", 1, expected_cradle_local));
         }
         for hardware_name in axial_hardware_names {
@@ -176,9 +186,11 @@ fn on_tick(me) {
                 "GriffinTankRequirements::gpt008", path + "/" + hardware_name,
                 "axis", "tankAxis"));
         }
-        checks.push(source_attribute("GPT-008-" + name + "-body-axis",
-            "GriffinTankRequirements::gpt008", path + "/MliTank",
-            "axis", "tankAxis"));
+        if body_shape != "Sphere" {
+            checks.push(source_attribute("GPT-008-" + name + "-body-axis",
+                "GriffinTankRequirements::gpt008", path + "/MliTank",
+                "axis", "tankAxis"));
+        }
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("GPT-005-" + name + "-x", path, 0, xs[index]));
             checks.push(position("GPT-005-" + name + "-y", path, 1, ys[index]));

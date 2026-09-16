@@ -163,28 +163,28 @@ def Xform "Griffin1" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@</PropellantTank>
     )
     {
-        custom double3 xformOp:translate = (1.3, 6.3, -1.15)
+        custom double3 xformOp:translate = (1.3, 5.9, -1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "TankNX" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@</PropellantTank>
     )
     {
-        custom double3 xformOp:translate = (-1.3, 6.3, -1.15)
+        custom double3 xformOp:translate = (-1.3, 5.9, -1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "TankPZ" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@</PropellantTank>
     )
     {
-        custom double3 xformOp:translate = (1.3, 6.3, 1.15)
+        custom double3 xformOp:translate = (1.3, 5.9, 1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "TankNZ" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@</PropellantTank>
     )
     {
-        custom double3 xformOp:translate = (-1.3, 6.3, 1.15)
+        custom double3 xformOp:translate = (-1.3, 5.9, 1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "LegPX" (

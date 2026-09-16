@@ -10,40 +10,10 @@ def Xform "PropellantTank" (
 )
 {
     custom string lunco:visual:component = "propellant_tank"
-    def Cylinder "TankBandA"
-    {
-        uniform token axis = "Y"
-        float radius = 0.46000000834465027
-        float height = 0.03500000014901161
-        custom double3 xformOp:translate = (0.0, -0.47, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.18000000715255737, 0.11999999731779099, 0.05999999865889549)]
-        uniform token purpose = "render"
-    }
-    def Cylinder "TankBandB"
-    {
-        uniform token axis = "Y"
-        float radius = 0.46000000834465027
-        float height = 0.03500000014901161
-        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.18000000715255737, 0.11999999731779099, 0.05999999865889549)]
-        uniform token purpose = "render"
-    }
-    def Cylinder "TankBandC"
-    {
-        uniform token axis = "Y"
-        float radius = 0.46000000834465027
-        float height = 0.03500000014901161
-        custom double3 xformOp:translate = (0.0, 0.47, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.18000000715255737, 0.11999999731779099, 0.05999999865889549)]
-        uniform token purpose = "render"
-    }
     def Cube "TankCradle"
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.0, -1.23, 0.0)
+        custom double3 xformOp:translate = (0.0, -0.93, 0.0)
         double3 xformOp:scale = (0.72, 0.1, 0.72)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
@@ -51,18 +21,18 @@ def Xform "PropellantTank" (
     }
     def Cylinder "TankNeckTop"
     {
-        float radius = 0.10999999940395355
-        float height = 0.11999999731779099
-        custom double3 xformOp:translate = (0.0, 0.91, 0.0)
+        float radius = 0.09000000357627869
+        float height = 0.10000000149011612
+        custom double3 xformOp:translate = (0.0, 0.67, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
         color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
         uniform token axis = "Y"
     }
     def Cylinder "TankNeckBottom"
     {
-        float radius = 0.10999999940395355
-        float height = 0.11999999731779099
-        custom double3 xformOp:translate = (0.0, -0.91, 0.0)
+        float radius = 0.09000000357627869
+        float height = 0.10000000149011612
+        custom double3 xformOp:translate = (0.0, -0.67, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
         color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
         uniform token axis = "Y"
@@ -71,10 +41,10 @@ def Xform "PropellantTank" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, 0.7, 0.0)
+        custom double3 xformOp:translate = (0.0, 0.5, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
-        double radius = 0.24
-        double height = 0.1
+        double radius = 0.2
+        double height = 0.08
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.2800000011920929, 0.18000000715255737, 0.07999999821186066)]
@@ -84,10 +54,10 @@ def Xform "PropellantTank" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, -0.7, 0.0)
+        custom double3 xformOp:translate = (0.0, -0.5, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
-        double radius = 0.24
-        double height = 0.1
+        double radius = 0.2
+        double height = 0.08
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.2800000011920929, 0.18000000715255737, 0.07999999821186066)]
@@ -97,10 +67,10 @@ def Xform "PropellantTank" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, 1.005, 0.0)
+        custom double3 xformOp:translate = (0.0, 0.75, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
-        double radius = 0.06
-        double height = 0.07
+        double radius = 0.045
+        double height = 0.06
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.47999998927116394, 0.5, 0.5299999713897705)]
@@ -110,10 +80,10 @@ def Xform "PropellantTank" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, -1.005, 0.0)
+        custom double3 xformOp:translate = (0.0, -0.75, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
-        double radius = 0.06
-        double height = 0.07
+        double radius = 0.045
+        double height = 0.06
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.47999998927116394, 0.5, 0.5299999713897705)]
@@ -123,10 +93,10 @@ def Xform "PropellantTank" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, 1.11, 0.0)
+        custom double3 xformOp:translate = (0.0, 0.84, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
-        double radius = 0.09
-        double height = 0.14
+        double radius = 0.075
+        double height = 0.12
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
@@ -136,46 +106,77 @@ def Xform "PropellantTank" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, -1.11, 0.0)
+        custom double3 xformOp:translate = (0.0, -0.84, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
-        double radius = 0.09
-        double height = 0.14
+        double radius = 0.075
+        double height = 0.12
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
         uniform token axis = "Y"
     }
-    def Capsule "MliTank"
-    {
-        uniform token axis = "Y"
-        float radius = 0.44999998807907104
-        float height = 0.550000011920929
-        uniform token purpose = "render"
-        uniform bool doubleSided = true
-        color3f[] primvars:displayColor = [(0.7200000286102295, 0.47999998927116394, 0.1599999964237213)]
-    }
     def Cone "TankTransitionTop"
     {
         uniform token axis = "Y"
-        float radius1 = 0.20000000298023224
-        float radius2 = 0.14000000059604645
-        float height = 0.10000000149011612
+        float radius1 = 0.1599999964237213
+        float radius2 = 0.10999999940395355
+        float height = 0.07999999821186066
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.2800000011920929, 0.18000000715255737, 0.07999999821186066)]
-        custom double3 xformOp:translate = (0.0, 0.8, 0.0)
+        custom double3 xformOp:translate = (0.0, 0.58, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
-        float radius = 0.20000000298023224
+        float radius = 0.1599999964237213
     }
     def Cone "TankTransitionBottom"
     {
         uniform token axis = "Y"
-        float radius1 = 0.14000000059604645
-        float radius2 = 0.20000000298023224
-        float height = 0.10000000149011612
+        float radius1 = 0.10999999940395355
+        float radius2 = 0.1599999964237213
+        float height = 0.07999999821186066
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.2800000011920929, 0.18000000715255737, 0.07999999821186066)]
-        custom double3 xformOp:translate = (0.0, -0.8, 0.0)
+        custom double3 xformOp:translate = (0.0, -0.58, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
-        float radius = 0.20000000298023224
+        float radius = 0.1599999964237213
+    }
+    def Sphere "MliTank"
+    {
+        float radius = 0.5
+        uniform token purpose = "render"
+        uniform bool doubleSided = true
+        color3f[] primvars:displayColor = [(0.8199999928474426, 0.550000011920929, 0.1599999964237213)]
+    }
+    def Sphere "TankBandA"
+    {
+        float radius = 0.49000000953674316
+        custom double3 xformOp:scale = (1.0, 0.018, 1.0)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:translate = (0.0, -0.24, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.11999999731779099, 0.07500000298023224, 0.03500000014901161)]
+        uniform bool doubleSided = true
+        float height = 0.035999998450279236
+    }
+    def Sphere "TankBandB"
+    {
+        float radius = 0.49000000953674316
+        custom double3 xformOp:scale = (1.0, 0.018, 1.0)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.11999999731779099, 0.07500000298023224, 0.03500000014901161)]
+        uniform bool doubleSided = true
+        float height = 0.035999998450279236
+    }
+    def Sphere "TankBandC"
+    {
+        float radius = 0.49000000953674316
+        custom double3 xformOp:scale = (1.0, 0.018, 1.0)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:translate = (0.0, 0.24, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.11999999731779099, 0.07500000298023224, 0.03500000014901161)]
+        uniform bool doubleSided = true
+        float height = 0.035999998450279236
     }
 }

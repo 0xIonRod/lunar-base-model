@@ -12,39 +12,41 @@ package GriffinTankRequirements {
         attribute serviceHardwareNames : String = "TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
         attribute axialHardwareNames : String = "TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom";
         attribute tankAxis : String = "Y";
-        attribute bodyShape : String = "Capsule";
+        attribute bodyShape : String = "Sphere";
         attribute status : String = "metric visual study proxy; exact COPV dimensions and placement TBD";
-        attribute bodyRadiusM : Real = 0.45;
-        // Capsule height is the cylindrical section; the full envelope is
-        // bodyHeightM = bodyCylindricalHeightM + 2 * bodyRadiusM.
-        attribute bodyHeightM : Real = 1.45;
-        attribute bodyCylindricalHeightM : Real = 0.55;
-        attribute neckRadiusM : Real = 0.11;
-        attribute neckHeightM : Real = 0.12;
-        attribute shoulderCollarRadiusM : Real = 0.24;
-        attribute shoulderCollarHeightM : Real = 0.10;
-        attribute valveRadiusM : Real = 0.06;
-        attribute valveHeightM : Real = 0.07;
-        attribute valveCapRadiusM : Real = 0.09;
-        attribute valveCapHeightM : Real = 0.14;
-        attribute transitionShoulderRadiusM : Real = 0.20;
-        attribute transitionNeckRadiusM : Real = 0.14;
-        attribute transitionHeightM : Real = 0.10;
-        attribute transitionRadiusM : Real = 0.20;
+        attribute bodyRadiusM : Real = 0.50;
+        // The Griffin reference shows compact spherical, gold-wrapped vessels.
+        // A sphere has no cylindrical section; bodyHeightM is its full envelope.
+        attribute bodyHeightM : Real = 1.00;
+        attribute bodyCylindricalHeightM : Real = 0.00;
+        attribute neckRadiusM : Real = 0.09;
+        attribute neckHeightM : Real = 0.10;
+        attribute shoulderCollarRadiusM : Real = 0.20;
+        attribute shoulderCollarHeightM : Real = 0.08;
+        attribute valveRadiusM : Real = 0.045;
+        attribute valveHeightM : Real = 0.06;
+        attribute valveCapRadiusM : Real = 0.075;
+        attribute valveCapHeightM : Real = 0.12;
+        attribute transitionShoulderRadiusM : Real = 0.16;
+        attribute transitionNeckRadiusM : Real = 0.11;
+        attribute transitionHeightM : Real = 0.08;
+        attribute transitionRadiusM : Real = 0.16;
         // Axial centers are explicit interface datums.  The verifier mirrors
         // them about the tank datum for the lower train and checks the cradle
         // against the declared deck relationship.
-        attribute shoulderCenterYM : Real = 0.70;
-        attribute transitionCenterYM : Real = 0.80;
-        attribute neckCenterYM : Real = 0.91;
-        attribute valveCenterYM : Real = 1.005;
-        attribute capCenterYM : Real = 1.11;
-        attribute sourceReference : String = "https://www.astrobotic.com/griffin-1-mission-update/";
-        attribute sourceFact : String = "Griffin-1 integration includes four propellant tanks and fit checks";
-        attribute sourceRationale : String = "Each tank is a repeated, independently inspectable pressure-vessel visual component whose station and retention bands must not drift";
-        attribute bandRadiusM : Real = 0.46;
-        attribute bandHeightM : Real = 0.035;
-        attribute cradleLocalY : Real = -1.23;
+        attribute shoulderCenterYM : Real = 0.50;
+        attribute transitionCenterYM : Real = 0.58;
+        attribute neckCenterYM : Real = 0.67;
+        attribute valveCenterYM : Real = 0.75;
+        attribute capCenterYM : Real = 0.84;
+        attribute sourceReference : String = "https://www.astrobotic.com/media-kit/images/";
+        attribute sourceFact : String = "Griffin reference imagery shows compact gold spherical propellant vessels; Astrobotic confirms four propellant tanks";
+        attribute sourceRationale : String = "Each tank is a repeated, independently inspectable spherical pressure-vessel visual component whose station and retention straps must not drift";
+        attribute bandRadiusM : Real = 0.49;
+        attribute bandHeightM : Real = 0.036;
+        attribute bandCenterYM : String = "-0.24,0.0,0.24";
+        attribute bandScaleYM : Real = 0.018;
+        attribute cradleLocalY : Real = -0.93;
         attribute cradleHalfHeightM : Real = 0.05;
         attribute minimumDeckClearanceM : Real = 0.02;
         attribute deckTopSource : String = "GriffinLanderRequirements::GriffinLanderComponent::avionicsDeckTopY";
@@ -66,13 +68,13 @@ package GriffinTankRequirements {
         doc /* GPT-005 [layout] each tank root transform matches the ordered metric station datums owned by GriffinLanderComponent and leaves the lower cradle seated above the avionics deck. */
     }
     requirement def GPT006_TankEndHardware {
-        doc /* GPT-006 [visual] each tank body is a compact metric capsule with hemispherical ends, tapered shoulder-to-neck transitions, and coaxial necks, so the pressure-vessel silhouette is not a flat-ended cylinder with floating hardware. */
+        doc /* GPT-006 [visual] each tank body is a compact metric sphere with a gold-wrapped pressure-vessel silhouette, seated adapter hardware, and coaxial necks; no floating end hardware or flat-ended cylinder is permitted. */
     }
     requirement def GPT007_TankServiceHardware {
-        doc /* GPT-007 [visual] each tank includes the sourced shoulder collars and valve/cap hardware with the metric proxy dimensions defined by the component. */
+        doc /* GPT-007 [visual] each tank includes three thin retention straps plus the shoulder collars and valve/cap hardware with the metric proxy dimensions defined by the component. */
     }
     requirement def GPT008_TankOrientation {
-        doc /* GPT-008 [orientation] the capsule body and all axial tank hardware are Y-up; the authored envelope is centered on the tank datum without hidden rotations or through-geometry. */
+        doc /* GPT-008 [orientation] the spherical body and all axial tank hardware are Y-up; the authored envelope is centered on the tank datum without hidden rotations or through-geometry. */
     }
     requirement def GPT009_TankDeckSeat {
         doc /* GPT-009 [interface] the lower cradle datum is above the avionics-deck top datum with no tank hardware penetrating the deck. */
