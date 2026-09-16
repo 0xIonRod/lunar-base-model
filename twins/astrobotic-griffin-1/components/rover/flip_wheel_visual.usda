@@ -12,26 +12,26 @@ def Xform "FlipWheel" (
     custom string lunco:visual:component = "flip_wheel"
     def Cylinder "Tire"
     {
-        uniform token axis = "X"
-        float radius = 0.45
-        float height = 0.30
-        color3f[] primvars:displayColor = [(0.12, 0.13, 0.14)]
+        uniform token axis = "Z"
+        float radius = 0.44999998807907104
+        float height = 0.30000001192092896
+        color3f[] primvars:displayColor = [(0.11999999731779099, 0.12999999523162842, 0.14000000059604645)]
         uniform token purpose = "render"
     }
     def Cylinder "MetalHub"
     {
-        uniform token axis = "X"
+        uniform token axis = "Z"
         float radius = 0.25
-        float height = 0.33
-        color3f[] primvars:displayColor = [(0.62, 0.65, 0.68)]
+        float height = 0.33000001311302185
+        color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6800000071525574)]
         uniform token purpose = "render"
     }
     def Cylinder "HubCap"
     {
-        uniform token axis = "X"
-        float radius = 0.10
-        float height = 0.36
-        color3f[] primvars:displayColor = [(0.22, 0.24, 0.27)]
+        uniform token axis = "Z"
+        float radius = 0.10000000149011612
+        float height = 0.36000001430511475
+        color3f[] primvars:displayColor = [(0.2199999988079071, 0.23999999463558197, 0.27000001072883606)]
         uniform token purpose = "render"
     }
 }

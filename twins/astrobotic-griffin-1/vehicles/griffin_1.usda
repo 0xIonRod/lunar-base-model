@@ -3022,10 +3022,10 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:translate = (0.0, -1.15, 0.0)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 15.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
             double size = 1.0
-            double3 xformOp:scale = (2.25, 0.1, 1.45)
+            custom double3 xformOp:scale = (1.85, 0.09, 0.85)
             color3f[] primvars:displayColor = [(0.5, 0.38999998569488525, 0.23999999463558197)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
@@ -3035,23 +3035,37 @@ def Xform "Griffin1" (
         )
         {
             double size = 1.0
-            double3 xformOp:translate = (0.0, 0.18, -1.25)
-            double3 xformOp:scale = (2.25, 0.16, 0.08)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:translate = (0.0, -0.92, 0.78)
+            custom double3 xformOp:scale = (1.85, 0.14, 0.07)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
         }
         def Cube "EdgeRailInner" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
             double size = 1.0
-            double3 xformOp:translate = (0.0, 0.18, 1.25)
-            double3 xformOp:scale = (2.25, 0.16, 0.08)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:translate = (0.0, -0.92, -0.78)
+            custom double3 xformOp:scale = (1.85, 0.14, 0.07)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
             bool physics:collisionEnabled = true
+            uniform token purpose = "render"
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
+        }
+        def Cube "SupportArm" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:scale = (0.1, 0.55, 0.1)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            custom double3 xformOp:translate = (0.75, -0.55, 0.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -6.0)
             uniform token purpose = "render"
         }
     }
@@ -3071,36 +3085,50 @@ def Xform "Griffin1" (
         )
         {
             double size = 1.0
-            double3 xformOp:scale = (2.25, 0.1, 1.45)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:scale = (1.85, 0.09, 0.85)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.5, 0.38999998569488525, 0.23999999463558197)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
             custom double3 xformOp:translate = (0.0, -1.15, 0.0)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -15.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
         }
         def Cube "EdgeRail" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
             double size = 1.0
-            double3 xformOp:translate = (0.0, 0.18, -1.25)
-            double3 xformOp:scale = (2.25, 0.16, 0.08)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:translate = (0.0, -0.92, 0.78)
+            custom double3 xformOp:scale = (1.85, 0.14, 0.07)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
         }
         def Cube "EdgeRailInner" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
             double size = 1.0
-            double3 xformOp:translate = (0.0, 0.18, 1.25)
-            double3 xformOp:scale = (2.25, 0.16, 0.08)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:translate = (0.0, -0.92, -0.78)
+            custom double3 xformOp:scale = (1.85, 0.14, 0.07)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
             bool physics:collisionEnabled = true
+            uniform token purpose = "render"
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
+        }
+        def Cube "SupportArm" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:scale = (0.1, 0.55, 0.1)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            custom double3 xformOp:translate = (0.75, -0.55, 0.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 6.0)
             uniform token purpose = "render"
         }
     }

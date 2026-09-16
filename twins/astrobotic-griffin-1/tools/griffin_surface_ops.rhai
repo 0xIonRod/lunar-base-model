@@ -229,7 +229,20 @@ fn drive_route_point(rover, target, speed, radius) {
 // physics or grounding implementation.
 fn rover_route_settle_report(rover) {
     let pose = world_pos(rover);
-    let speed = get(rover, "speed");
+    // `speed` is not a reflected component field. Read the generic physics
+    // provider instead so this gate observes the same admitted rigid-body
+    // state as every other Twin physics acceptance check.
+    let physics = query("QueryPhysicsState", #{id: rover});
+    let velocity = if physics == () || physics.linear_velocity_mps == () {
+        ()
+    } else {
+        physics.linear_velocity_mps
+    };
+    let speed = if velocity == () || velocity.len() != 3 {
+        ()
+    } else {
+        vlen(velocity)
+    };
     let height_limit = griffin_spec::rover_settle_height_limit_m();
     let speed_limit = griffin_spec::rover_settle_speed_limit_mps();
     let ok = pose != () && speed != () && height_limit != () && speed_limit != ()

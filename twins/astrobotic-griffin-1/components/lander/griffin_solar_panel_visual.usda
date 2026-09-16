@@ -14,41 +14,43 @@ def Xform "SolarPanel" (
     {
         double size = 1.0
         double3 xformOp:scale = (1.85, 0.07, 1.25)
-        color3f[] primvars:displayColor = [(0.16, 0.18, 0.21)]
+        color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20999999344348907)]
         uniform token purpose = "render"
+        uniform token[] xformOpOrder = ["xformOp:scale"]
     }
     def Cube "Cells"
     {
         double size = 1.0
         double3 xformOp:translate = (0.0, 0.075, 0.0)
-        double3 xformOp:scale = (1.70, 0.025, 1.10)
+        double3 xformOp:scale = (1.7, 0.025, 1.1)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.03, 0.10, 0.27)]
+        color3f[] primvars:displayColor = [(0.029999999329447746, 0.10000000149011612, 0.27000001072883606)]
         uniform token purpose = "render"
     }
     def Cube "CellDividerX"
     {
         double size = 1.0
         double3 xformOp:translate = (0.0, 0.11, 0.0)
-        double3 xformOp:scale = (0.025, 0.02, 1.10)
+        double3 xformOp:scale = (0.025, 0.02, 1.1)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.55, 0.60, 0.66)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.6000000238418579, 0.6600000262260437)]
         uniform token purpose = "render"
     }
     def Cube "CellDividerZ"
     {
         double size = 1.0
         double3 xformOp:translate = (0.0, 0.115, 0.0)
-        double3 xformOp:scale = (1.70, 0.02, 0.025)
+        double3 xformOp:scale = (1.7, 0.02, 0.025)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.55, 0.60, 0.66)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.6000000238418579, 0.6600000262260437)]
         uniform token purpose = "render"
     }
     def Cube "MountBracket"
     {
         double size = 1.0
         double3 xformOp:scale = (0.22, 0.16, 0.22)
-        color3f[] primvars:displayColor = [(0.12, 0.14, 0.17)]
+        color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
         uniform token purpose = "render"
+        uniform token[] xformOpOrder = ["xformOp:scale"]
     }
 }

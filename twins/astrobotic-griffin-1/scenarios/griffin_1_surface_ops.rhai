@@ -42,7 +42,9 @@ fn on_event(me, evt) {
         if value != () && value["target_gid"] == lander &&
            value["intent"] == "release" &&
            (value["edge"] == "pressed" || value["edge"] == "pulse") {
-            release_rover(me);
+            if release_rover(me, this.release_requested) {
+                this.release_requested = true;
+            }
         }
         return;
     }
@@ -53,7 +55,9 @@ fn on_event(me, evt) {
     // the lander owner, so pressing G while driving FLIP cannot detach it.
     if evt.name == "key:KeyG" &&
        owner_of(lander) == 0 && owner_of(rover) != 0 {
-        release_rover(me);
+        if release_rover(me, this.release_requested) {
+            this.release_requested = true;
+        }
         return;
     }
 
@@ -63,7 +67,9 @@ fn on_event(me, evt) {
         let transition = dock_release_edge(
             lander, this.release_latched, true, this.rover_detached);
         this.release_latched = transition.held;
-        if transition.fire { release_rover(me); }
+        if transition.fire && release_rover(me, this.release_requested) {
+            this.release_requested = true;
+        }
         return;
     }
 
@@ -166,8 +172,8 @@ fn deploy_ramps(me) {
     print("[griffin] solid egress ramps confirmed in authored deployed pose");
 }
 
-fn release_rover(me) {
-    if this.release_requested { return true; }
+fn release_rover(me, already_requested) {
+    if already_requested { return true; }
     emit("griffin_ramp_deployment_settled");
 
     let joint = find(DOCK);
@@ -175,7 +181,6 @@ fn release_rover(me) {
         // The adapter is already absent. Keep the same completion gate as a
         // requested detach so the mission never treats a command acknowledgement
         // as proof of topology removal.
-        this.release_requested = true;
         return true;
     }
 
@@ -190,7 +195,6 @@ fn release_rover(me) {
         notify_kind("FLIP adapter release was rejected.", "error");
         return false;
     }
-    this.release_requested = true;
     print("[griffin] FLIP adapter detach requested; waiting for solver retirement");
     true
 }
@@ -201,7 +205,6 @@ fn adapter_detach_complete() {
 }
 
 fn complete_rover_release(me) {
-    this.rover_detached = true;
     griffin_surface_ops::follow_rover();
     griffin_controls::show_rover_controls();
     emit("griffin_flip_released");
@@ -269,19 +272,19 @@ fn fail_phase(me, phase) {
     emit("griffin_phase_timeout");
 }
 
-fn finish_surface_ops(me) {
+fn finish_surface_ops(state) {
     let source = sysml_requirements::source();
     let checks = [
-        #{id: "GR-004-lander-settled", component: "landing", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander", actual: this.lander_settled, expected: true, ok: this.lander_settled, error: "lander did not settle"},
-        #{id: "GR-003-ramps-deployed", component: "egress_ramps", requirement: "Griffin1Requirements::gr003", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander/EgressRampPort", actual: this.ramps_deployed, expected: true, ok: this.ramps_deployed, error: "ramps were not deployed"},
-        #{id: "GR-026-adapter-release", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: DOCK, actual: this.rover_detached, expected: true, ok: this.rover_detached, error: "FLIP adapter was not released"},
-        #{id: "GR-004-route-engaged", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: ROVER, actual: this.route_engaged, expected: true, ok: this.route_engaged, error: "FLIP route was not engaged"},
-        #{id: "GR-007-ramp-approach", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampApproach", actual: this.ramp_approach_reached, expected: true, ok: this.ramp_approach_reached, error: "ramp approach was not reached"},
-        #{id: "GR-007-ramp-exit", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampExit", actual: this.ramp_exit_reached, expected: true, ok: this.ramp_exit_reached, error: "ramp exit was not reached"},
-        #{id: "GR-004-waypoint-1", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget1", actual: this.waypoint_1_reached, expected: true, ok: this.waypoint_1_reached, error: "first survey waypoint was not reached"},
-        #{id: "GR-004-waypoint-2", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget2", actual: this.waypoint_2_reached, expected: true, ok: this.waypoint_2_reached, error: "second survey waypoint was not reached"},
-        #{id: "GR-004-base-site", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/BaseSite", actual: this.base_site_reached, expected: true, ok: this.base_site_reached, error: "base site was not reached"},
-        #{id: "GR-031-geometry", component: "mission", requirement: "Griffin1Requirements::gr031", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps", actual: this.geometry_valid, expected: true, ok: this.geometry_valid, error: "mission geometry gate failed"}
+        #{id: "GR-004-lander-settled", component: "landing", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander", actual: state.lander_settled, expected: true, ok: state.lander_settled, error: "lander did not settle"},
+        #{id: "GR-003-ramps-deployed", component: "egress_ramps", requirement: "Griffin1Requirements::gr003", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander/EgressRampPort", actual: state.ramps_deployed, expected: true, ok: state.ramps_deployed, error: "ramps were not deployed"},
+        #{id: "GR-026-adapter-release", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: DOCK, actual: state.rover_detached, expected: true, ok: state.rover_detached, error: "FLIP adapter was not released"},
+        #{id: "GR-004-route-engaged", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: ROVER, actual: state.route_engaged, expected: true, ok: state.route_engaged, error: "FLIP route was not engaged"},
+        #{id: "GR-007-ramp-approach", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampApproach", actual: state.ramp_approach_reached, expected: true, ok: state.ramp_approach_reached, error: "ramp approach was not reached"},
+        #{id: "GR-007-ramp-exit", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampExit", actual: state.ramp_exit_reached, expected: true, ok: state.ramp_exit_reached, error: "ramp exit was not reached"},
+        #{id: "GR-004-waypoint-1", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget1", actual: state.waypoint_1_reached, expected: true, ok: state.waypoint_1_reached, error: "first survey waypoint was not reached"},
+        #{id: "GR-004-waypoint-2", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget2", actual: state.waypoint_2_reached, expected: true, ok: state.waypoint_2_reached, error: "second survey waypoint was not reached"},
+        #{id: "GR-004-base-site", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/BaseSite", actual: state.base_site_reached, expected: true, ok: state.base_site_reached, error: "base site was not reached"},
+        #{id: "GR-031-geometry", component: "mission", requirement: "Griffin1Requirements::gr031", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps", actual: state.geometry_valid, expected: true, ok: state.geometry_valid, error: "mission geometry gate failed"}
     ];
     let failures = [];
     for check in checks { if check.ok != true { failures.push(check); } }
@@ -318,12 +321,24 @@ fn task(me) {
         wait(1.5),
         once(|m| { this.ramps_deployed = true; deploy_ramps(m); true }),
         wait(4.0),
-        once(|m| { release_rover(m); true }),
+        once(|m| {
+            if release_rover(m, this.release_requested) {
+                this.release_requested = true;
+            } else {
+                this.phase_timeout = true;
+                fail_phase(m, "adapter-release");
+            }
+            true
+        }),
         // The command acknowledgement only means the request was accepted.
         // Wait until the physics-owned lifecycle has retired the live entity,
         // then hand rover control to the Twin.
         wait_until(|m| adapter_detach_complete()),
-        once(|m| { complete_rover_release(m); true }),
+        once(|m| {
+            complete_rover_release(m);
+            this.rover_detached = true;
+            true
+        }),
         wait(0.25),
         once(|m| {
             let engaged = engage_rover(m);
@@ -382,6 +397,6 @@ fn task(me) {
             ]),
         ]),
         check(|m| this.phase_timeout != true),
-        once(|m| finish_surface_ops(m)),
+        once(|m| finish_surface_ops(this)),
     ])
 }

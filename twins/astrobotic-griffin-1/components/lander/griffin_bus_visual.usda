@@ -13,7 +13,7 @@ def Xform "GriffinBus" (
     custom string lunco:visual:status = "study proxy; replaceable component"
     custom string lunco:visual:body_profile = "hexagonal-prism"
     def Mesh "PerimeterFrame" (
-        active = false
+        active = true
     )
     {
         point3f[] points = [(0.0, -1.6200000047683716, 2.859999895095825), (2.799999952316284, -1.6200000047683716, 1.4299999475479126), (2.799999952316284, -1.6200000047683716, -1.4299999475479126), (0.0, -1.6200000047683716, -2.859999895095825), (-2.799999952316284, -1.6200000047683716, -1.4299999475479126), (-2.799999952316284, -1.6200000047683716, 1.4299999475479126), (0.0, 1.6200000047683716, 2.859999895095825), (2.799999952316284, 1.6200000047683716, 1.4299999475479126), (2.799999952316284, 1.6200000047683716, -1.4299999475479126), (0.0, 1.6200000047683716, -2.859999895095825), (-2.799999952316284, 1.6200000047683716, -1.4299999475479126), (-2.799999952316284, 1.6200000047683716, 1.4299999475479126)]
@@ -65,7 +65,7 @@ def Xform "GriffinBus" (
         uniform token purpose = "render"
     }
     def Cube "TopDeck" (
-        active = false
+        active = true
     )
     {
         double size = 1.0
@@ -73,9 +73,10 @@ def Xform "GriffinBus" (
         double3 xformOp:scale = (4.65, 0.12, 3.95)
         color3f[] primvars:displayColor = [(0.2199999988079071, 0.25, 0.28999999165534973)]
         uniform token purpose = "render"
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
     }
     def Cube "LowerServiceSkirt" (
-        active = false
+        active = true
     )
     {
         double size = 1.0
@@ -135,7 +136,7 @@ def Xform "GriffinBus" (
     )
     {
         custom double3 xformOp:scale = (1.46, 1.45, 0.06)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (1.3, 0.0, 1.9875)
@@ -148,7 +149,7 @@ def Xform "GriffinBus" (
     )
     {
         custom double3 xformOp:scale = (1.46, 1.45, 0.06)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (2.6, 0.0, 0.0)
@@ -161,7 +162,7 @@ def Xform "GriffinBus" (
     )
     {
         custom double3 xformOp:scale = (1.46, 1.45, 0.06)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (1.3, 0.0, -1.9875)
@@ -174,7 +175,7 @@ def Xform "GriffinBus" (
     )
     {
         custom double3 xformOp:scale = (1.46, 1.45, 0.06)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (-1.3, 0.0, -1.9875)
@@ -187,7 +188,7 @@ def Xform "GriffinBus" (
     )
     {
         custom double3 xformOp:scale = (1.46, 1.45, 0.06)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (-2.6, 0.0, 0.0)
@@ -200,7 +201,7 @@ def Xform "GriffinBus" (
     )
     {
         custom double3 xformOp:scale = (1.46, 1.45, 0.06)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate", "xformOp:rotateXYZ"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (-1.3, 0.0, 1.9875)

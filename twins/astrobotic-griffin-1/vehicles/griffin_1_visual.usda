@@ -23,7 +23,7 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:scale = (0.1, 1.42, 0.1)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
             custom double3 xformOp:translate = (0.0, 0.0, 2.58)
@@ -35,7 +35,7 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:scale = (0.1, 1.42, 0.1)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
             custom double3 xformOp:translate = (0.0, 0.0, -2.58)
@@ -47,7 +47,7 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:scale = (0.1, 1.42, 0.1)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
             custom double3 xformOp:translate = (2.53, 0.0, 1.3)
@@ -59,7 +59,7 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:scale = (0.1, 1.42, 0.1)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
             custom double3 xformOp:translate = (2.53, 0.0, -1.3)
@@ -71,7 +71,7 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:scale = (0.1, 1.42, 0.1)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
             custom double3 xformOp:translate = (-2.53, 0.0, 1.3)
@@ -83,7 +83,7 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:scale = (0.1, 1.42, 0.1)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
             custom double3 xformOp:translate = (-2.53, 0.0, -1.3)
@@ -530,7 +530,7 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:scale = (0.12, 0.22, 0.92)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
@@ -579,7 +579,7 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:scale = (0.12, 0.22, 0.92)
-            custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
