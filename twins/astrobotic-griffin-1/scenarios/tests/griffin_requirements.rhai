@@ -143,6 +143,7 @@ fn on_tick(me, ctx) {
     report_structured_verdict(#{ok: failure_count == 0, failures: failures,
         results: evidence_results, verification: verification_name,
         requirement_count: report.checked_rules.len(),
+        source_files: sysml.source_files,
         source_revision: sysml.source_revision_hex},
         "GRIFFIN REQUIREMENTS", "GRIFFIN_REQUIREMENTS");
     this.done = true;
