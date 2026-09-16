@@ -12,7 +12,7 @@ fn finite_number(value) {
     value != () && value.is_finite()
 }
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     // SimTick is the shared simulation master. Fixed/virtual elapsed resources
     // also include scheduler bookkeeping while a causal participant is held,
     // so they are diagnostic clocks rather than the test horizon.
@@ -100,7 +100,7 @@ fn emit_stability_verdict(me, contract, source, checks) {
     me.stability_done = true;
 }
 
-fn on_tick(me) {
+fn on_tick(me, ctx) {
     if this.stability_done { return; }
     let contract = this.contract;
     if contract == () || contract.horizon_s == () || contract.horizon_s <= 0.0 {

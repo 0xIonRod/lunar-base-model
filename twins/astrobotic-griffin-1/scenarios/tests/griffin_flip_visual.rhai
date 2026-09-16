@@ -44,7 +44,7 @@ fn _sysml_list(report, name) {
     items
 }
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     this.griffin = find("/GriffinFlipVisual/Griffin1");
     this.flip = find("/GriffinFlipVisual/FLIP");
     this.camera = find("/GriffinFlipVisual/VisualCamera");
@@ -52,7 +52,7 @@ fn on_start(me) {
     this.done = false;
 }
 
-fn on_tick(me) {
+fn on_tick(me, ctx) {
     if this.done || dt() <= 0.0 { return; }
     this.done = true;
     let source = sysml_requirements::source();

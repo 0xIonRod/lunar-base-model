@@ -63,7 +63,7 @@ fn source_contract() {
     #{ok: true, source: source, root: root, asset: asset}
 }
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     this.doc = -1;
     this.phase = 0;
     this.elapsed = 0.0;
@@ -75,7 +75,7 @@ fn on_start(me) {
     this.done = false;
 }
 
-fn on_tick(me) {
+fn on_tick(me, ctx) {
     if this.done { return; }
     this.elapsed += dt();
     if this.elapsed > 30.0 {

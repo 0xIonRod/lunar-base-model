@@ -5,7 +5,7 @@
 const ROOT = "/World/Griffin1";
 const VERIFICATION = "GriffinLanderRequirements::Verify_GriffinLanderRequirements";
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
 }
@@ -49,7 +49,7 @@ fn _position(id, requirement, path, index, expected) {
       tolerance: 0.002}
 }
 
-fn on_tick(me) {
+fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let checks = [];

@@ -27,12 +27,12 @@ fn attribute(id, requirement, path, attr, expected) {
       attr: attr, expected: expected, tolerance: 0.002}
 }
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
 }
 
-fn on_tick(me) {
+fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let root = sysml_requirements::text(source, own("usdRootPath"));

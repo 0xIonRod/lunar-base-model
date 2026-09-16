@@ -11,7 +11,7 @@ const LANDER = "/Griffin1SurfaceOps/Lander";
 const ROVER = "/Griffin1SurfaceOps/FLIP";
 const DOCK = "/Griffin1SurfaceOps/FLIPPayloadAdapterJoint";
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     this.lander_settled = false;
     this.release_latched = false;
     this.release_requested = false;
@@ -28,7 +28,7 @@ fn on_start(me) {
     this.rover_brake_held = false;
 }
 
-fn on_event(me, evt) {
+fn on_event(me, evt, ctx) {
     let lander = find(LANDER);
     let rover = find(ROVER);
 

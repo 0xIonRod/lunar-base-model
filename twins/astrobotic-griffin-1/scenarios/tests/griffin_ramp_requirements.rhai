@@ -6,7 +6,7 @@
 const ROOT = "/World/Griffin1";
 const VERIFICATION = "GriffinRampRequirements::Verify_GriffinRampRequirements";
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
 }
@@ -46,7 +46,7 @@ fn _behavior_result(id, requirement, ok, message, actual, expected) {
       error: if ok { "" } else { message }, actual: actual, expected: expected}
 }
 
-fn on_tick(me) {
+fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let checks = [];

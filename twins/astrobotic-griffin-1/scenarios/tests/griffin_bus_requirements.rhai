@@ -8,12 +8,12 @@ const VERIFICATION = "GriffinBusRequirements::Verify_GriffinBusRequirements";
 fn own(name) { PACKAGE + "::GriffinBusComponent::" + name }
 fn lander(name) { "GriffinLanderRequirements::GriffinLanderComponent::" + name }
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
 }
 
-fn on_tick(me) {
+fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let root = sysml_requirements::text(source, own("usdPath"));

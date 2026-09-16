@@ -11,14 +11,14 @@ fn expected(ok, message) {
     if ok { "" } else { message }
 }
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     this.start_elapsed = elapsed_seconds();
     this.elapsed = 0.0;
     this.done = false;
     print("[griffin-requirements] waiting for composed Twin stage");
 }
 
-fn on_tick(me) {
+fn on_tick(me, ctx) {
     if this.done { return; }
     this.elapsed = elapsed_seconds() - this.start_elapsed;
     if this.elapsed < 0.1 { return; }

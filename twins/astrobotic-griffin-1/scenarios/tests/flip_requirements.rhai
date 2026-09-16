@@ -5,7 +5,7 @@
 const ROOT = "/World/FLIP";
 const VERIFICATION = "FlipRequirements::Verify_FLIPComponentRequirements";
 
-fn on_start(me) {
+fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
 }
@@ -43,7 +43,7 @@ fn _attribute_component(id, requirement, path, attr, index, expected) {
       attr: attr, index: index, expected: expected, tolerance: 0.002}
 }
 
-fn on_tick(me) {
+fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let checks = [];
