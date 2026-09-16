@@ -70,9 +70,9 @@ fn on_tick(me) {
     let neck_center_y = sysml_requirements::number(source, own("neckCenterYM"));
     let valve_center_y = sysml_requirements::number(source, own("valveCenterYM"));
     let cap_center_y = sysml_requirements::number(source, own("capCenterYM"));
-    let band_radius = sysml_requirements::number(source, own("bandRadiusM"));
     let band_height = sysml_requirements::number(source, own("bandHeightM"));
     let band_centers = component_requirements::source_number_list(source, own("bandCenterYM"));
+    let band_radii = component_requirements::source_number_list(source, own("bandRadiusByCenterM"));
     let band_scale_y = sysml_requirements::number(source, own("bandScaleYM"));
     let band_transform_order_text = sysml_requirements::text(source, own("bandTransformOrder"));
     let band_transform_order = [];
@@ -100,8 +100,9 @@ fn on_tick(me) {
         || neck_center_y == () || valve_center_y == () || cap_center_y == ();
     let missing_service = shoulder_radius == () || shoulder_height == ()
         || valve_radius == () || valve_height == () || valve_cap_radius == ()
-        || valve_cap_height == () || band_radius == () || band_height == ()
+        || valve_cap_height == () || band_height == ()
         || band_scale_y == () || band_centers.len() != 3
+        || band_radii.len() != 3
         || band_transform_order.len() != 2;
     let missing_interface = cradle_local_y == () || cradle_half_height == ()
         || cradle_pad_local_y == () || cradle_pad_width == ()
@@ -182,10 +183,10 @@ fn on_tick(me) {
         checks.push(attribute("GPT-007-" + name + "-valve-height", "GriffinTankRequirements::gpt007", path + "/TankValveTop", "height", valve_height));
         checks.push(attribute("GPT-007-" + name + "-cap-radius", "GriffinTankRequirements::gpt007", path + "/TankValveCapTop", "radius", valve_cap_radius));
         checks.push(attribute("GPT-007-" + name + "-cap-height", "GriffinTankRequirements::gpt007", path + "/TankValveCapTop", "height", valve_cap_height));
-        checks.push(attribute("GPT-002-" + name + "-band-a-radius", "GriffinTankRequirements::gpt002", path + "/TankBandA", "radius", band_radius));
         checks.push(attribute("GPT-002-" + name + "-band-a-height", "GriffinTankRequirements::gpt002", path + "/TankBandA", "height", band_height));
         for band_index in 0..band_centers.len() {
             let band_name = ["TankBandA", "TankBandB", "TankBandC"][band_index];
+            checks.push(attribute("GPT-002-" + name + "-" + band_name + "-radius", "GriffinTankRequirements::gpt002", path + "/" + band_name, "radius", band_radii[band_index]));
             checks.push(position("GPT-002-" + name + "-" + band_name + "-center", path + "/" + band_name, 1, band_centers[band_index]));
             checks.push(#{id: "GPT-002-" + name + "-" + band_name + "-scale-y", component: "tank", requirement: "GriffinTankRequirements::gpt002", verification: VERIFICATION, kind: "attribute_component", path: path + "/" + band_name, attr: "xformOp:scale", index: 1, expected: band_scale_y, tolerance: 0.002});
             checks.push(component_requirements::attribute_equals("GPT-008-" + name + "-" + band_name + "-transform-order", "tank", "GriffinTankRequirements::gpt008", VERIFICATION, path + "/" + band_name, "xformOpOrder", band_transform_order));

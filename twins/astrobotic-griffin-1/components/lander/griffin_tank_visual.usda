@@ -148,7 +148,7 @@ def Xform "PropellantTank" (
     }
     def Sphere "TankBandA"
     {
-        float radius = 0.49000000953674316
+        float radius = 0.4519999921321869
         custom double3 xformOp:scale = (1.0, 0.018, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         custom double3 xformOp:translate = (0.0, -0.24, 0.0)
@@ -159,7 +159,7 @@ def Xform "PropellantTank" (
     }
     def Sphere "TankBandB"
     {
-        float radius = 0.49000000953674316
+        float radius = 0.5120000243186951
         custom double3 xformOp:scale = (1.0, 0.018, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
@@ -170,7 +170,7 @@ def Xform "PropellantTank" (
     }
     def Sphere "TankBandC"
     {
-        float radius = 0.49000000953674316
+        float radius = 0.4519999921321869
         custom double3 xformOp:scale = (1.0, 0.018, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         custom double3 xformOp:translate = (0.0, 0.24, 0.0)

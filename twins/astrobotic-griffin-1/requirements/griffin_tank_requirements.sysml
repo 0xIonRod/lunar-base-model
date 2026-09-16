@@ -42,7 +42,10 @@ package GriffinTankRequirements {
         attribute sourceReference : String = "https://www.astrobotic.com/media-kit/images/";
         attribute sourceFact : String = "Griffin reference imagery shows compact gold spherical propellant vessels; Astrobotic confirms four propellant tanks";
         attribute sourceRationale : String = "Each tank is a repeated, independently inspectable spherical pressure-vessel visual component whose station and retention straps must not drift";
-        attribute bandRadiusM : Real = 0.49;
+        // Strap radii follow the sphere latitude so each band sits on the
+        // MLI envelope instead of appearing as a floating ring.  Order is
+        // A/B/C and corresponds to bandCenterYM.
+        attribute bandRadiusByCenterM : String = "0.452,0.512,0.452";
         attribute bandHeightM : Real = 0.036;
         attribute bandCenterYM : String = "-0.24,0.0,0.24";
         attribute bandScaleYM : Real = 0.018;
