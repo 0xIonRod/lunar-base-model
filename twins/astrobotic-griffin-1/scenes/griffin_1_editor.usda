@@ -9,5 +9,11 @@ def Xform "World"
         prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
     )
     {
+        token visibility = "invisible"
+    }
+    def Xform "Griffin1Visual" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1_visual.usda@</Griffin1>
+    )
+    {
     }
 }

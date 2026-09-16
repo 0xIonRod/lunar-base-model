@@ -77,7 +77,11 @@ fn emit_stability_verdict(me, contract, source, checks) {
         source_revision: source.source_revision_hex,
         divergence_tolerance_m: contract.divergence_tolerance_m,
         divergence_tolerance_upright: contract.divergence_tolerance_upright,
-        divergence_tolerance_speed_mps: contract.divergence_tolerance_speed_mps
+        divergence_tolerance_speed_mps: contract.divergence_tolerance_speed_mps,
+        replay_tolerance_m: contract.replay_tolerance_m,
+        replay_tolerance_upright: contract.replay_tolerance_upright,
+        replay_tolerance_speed_mps: contract.replay_tolerance_speed_mps,
+        replay_tolerance_time_s: contract.replay_tolerance_time_s
     };
     // This compact line is parsed by the Twin-local repeatability harness.
     // The full typed result remains on the generic *_EVIDENCE telemetry event.

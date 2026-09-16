@@ -39,6 +39,15 @@ package Griffin1Requirements {
         attribute landingDivergenceToleranceM : Real = 0.50;
         attribute landingDivergenceToleranceUpright : Real = 0.02;
         attribute landingDivergenceToleranceSpeedMps : Real = 0.50;
+        // Replay tolerances are distinct from engineering acceptance bounds.
+        // With the deterministic single-thread profile, two fresh processes
+        // must reproduce the same state to numerical round-off; the broader
+        // divergence limits above describe acceptable physical envelopes, not
+        // permission to hide an admission-order bug.
+        attribute landingReplayToleranceM : Real = 1.0e-6;
+        attribute landingReplayToleranceUpright : Real = 1.0e-7;
+        attribute landingReplayToleranceSpeedMps : Real = 1.0e-6;
+        attribute landingReplayToleranceTimeS : Real = 1.0e-9;
         // Mission watchdogs are explicit study policy, not hidden Rhai timing
         // literals. They bound a missing physical event and must never turn
         // into a PASS by themselves.

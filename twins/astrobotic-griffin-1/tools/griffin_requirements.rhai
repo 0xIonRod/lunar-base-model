@@ -62,7 +62,11 @@ fn sysml_contract_report() {
     // A Twin URI asks the generic provider for the manifest-declared source
     // set, rather than coupling this policy to an absolute checkout path.
     let path = "twin://" + name;
-    let report = query("ValidateSysml", #{path: path, compact: true});
+    // Keep the source envelope bounded.  Scalar literals are resolved lazily
+    // by `sysml_requirements::attribute`; requesting the complete qualified
+    // attribute map here makes the report exceed Rhai's value budget as the
+    // Twin grows.
+    let report = query("ValidateSysml", #{path: path, compact: true, attributes: []});
     if report == () {
         return #{ok: false, error: "ValidateSysml returned no SysML report", path: path};
     }
@@ -428,6 +432,19 @@ fn _position(record) {
     ()
 }
 
+// A relationship between a parent and a nested child must use resolved stage
+// coordinates.  The landing-pad wrappers intentionally publish a local offset
+// relative to each leg, so comparing their local xformOp:translate values
+// would report a false "inboard" failure.  QueryUsdPrim owns this resolved
+// value; missing world pose is an evidence failure, not a reason to fall back
+// to an unrelated local frame.
+fn _world_position(record) {
+    if record == () { return (); }
+    let world = record.world_position;
+    if world != () && world.len() == 3 { return world; }
+    ()
+}
+
 // Layout contracts describe the authored assembly, not a body after gravity
 // or contact dynamics have moved it. Prefer the explicit local datum when it
 // exists; fall back to the resolved pose for references that do not publish a
@@ -753,8 +770,12 @@ fn _leg_layout_report(doc_id, root) {
         if !_ok(leg) { continue; }
         let pos = _authored_position(leg);
         if pos == () || pos.len() != 3 { continue; }
-        let dynamic_pos = _position(leg);
-        if dynamic_pos == () || dynamic_pos.len() != 3 { dynamic_pos = pos; }
+        let dynamic_pos = _world_position(leg);
+        if dynamic_pos == () || dynamic_pos.len() != 3 {
+            findings.push(_layout_finding("GR-019", path,
+                "resolved world position is required for leg-to-pad placement"));
+            continue;
+        }
         if i == 0 && (pos[0] <= 0.0 || !_near(pos[2], 0.0, 0.02)) {
             findings.push(_layout_finding("GR-019", path, "LegPX must attach on +X"));
         }
@@ -772,8 +793,12 @@ fn _leg_layout_report(doc_id, root) {
             ["axis", "radius", "height", "physics:collisionEnabled",
              "xformOp:translate"], false);
         if !_ok(pad) { continue; }
-        let pad_pos = _position(pad);
-        if pad_pos == () || pad_pos.len() != 3 { continue; }
+        let pad_pos = _world_position(pad);
+        if pad_pos == () || pad_pos.len() != 3 {
+            findings.push(_layout_finding("GR-019", pad_path,
+                "resolved world position is required for leg-to-pad placement"));
+            continue;
+        }
         if pad_pos[1] >= dynamic_pos[1] {
             findings.push(_layout_finding("GR-019", pad_path,
                 "foot pad must be below its leg attachment"));

@@ -87,9 +87,9 @@ fn on_tick(me) {
         }
     }
     let cradle_local_y = sysml_requirements::number(source, own("cradleLocalY"));
+    let cradle_shape = sysml_requirements::text(source, own("cradleShape"));
+    let cradle_radius = sysml_requirements::number(source, own("cradleRadiusM"));
     let cradle_half_height = sysml_requirements::number(source, own("cradleHalfHeightM"));
-    let cradle_width = sysml_requirements::number(source, own("cradleWidthM"));
-    let cradle_depth = sysml_requirements::number(source, own("cradleDepthM"));
     let cradle_height = sysml_requirements::number(source, own("cradleHeightM"));
     let cradle_pad_local_y = sysml_requirements::number(source, own("cradlePadLocalY"));
     let cradle_pad_width = sysml_requirements::number(source, own("cradlePadWidthM"));
@@ -123,8 +123,8 @@ fn on_tick(me) {
         || band_scale_y == () || band_centers.len() != 3
         || band_radii.len() != 3
         || band_transform_order.len() != 2;
-    let missing_interface = cradle_local_y == () || cradle_half_height == ()
-        || cradle_width == () || cradle_depth == () || cradle_height == ()
+    let missing_interface = cradle_local_y == () || cradle_shape == () || cradle_shape == ""
+        || cradle_radius == () || cradle_half_height == () || cradle_height == ()
         || cradle_pad_local_y == () || cradle_pad_width == ()
         || cradle_pad_depth == () || cradle_pad_height == ()
         || support_name == () || support_name == "" || support_radius == ()
@@ -161,7 +161,7 @@ fn on_tick(me) {
         checks.push(component_requirements::exists("GPT-001-" + name, "tank", "GriffinTankRequirements::gpt001", VERIFICATION, path, "Xform"));
         checks.push(component_requirements::children("GPT-002-" + name, "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path,
             child_paths));
-        checks.push(component_requirements::exists("GPT-002-" + name + "-cradle", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradle", "Cube"));
+        checks.push(component_requirements::exists("GPT-002-" + name + "-cradle", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradle", cradle_shape));
         checks.push(component_requirements::exists("GPT-002-" + name + "-cradle-pad", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradlePad", "Cube"));
         checks.push(component_requirements::exists("GPT-009-" + name + "-support", "tank", "GriffinTankRequirements::gpt009", VERIFICATION, path + "/" + support_name, "Cylinder"));
         checks.push(component_requirements::children("GPT-006-" + name, "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path,
@@ -221,11 +221,8 @@ fn on_tick(me) {
         checks.push(position("GPT-009-" + name + "-cradle", path + "/TankCradle", 1, cradle_local_y));
         checks.push(position("GPT-009-" + name + "-cradle-pad", path + "/TankCradlePad", 1, cradle_pad_local_y));
         checks.push(position("GPT-009-" + name + "-support", path + "/" + support_name, 1, support_center_y));
-        // TankCradle is a unit Cube; the authored scale is therefore half of
-        // the full metric envelope declared in SysML.
-        checks.push(#{id: "GPT-009-" + name + "-cradle-scale-x", component: "tank", requirement: "gpt009", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/TankCradle", attr: "xformOp:scale", index: 0, expected: cradle_width / 2.0, tolerance: 0.002});
-        checks.push(#{id: "GPT-009-" + name + "-cradle-scale-y", component: "tank", requirement: "gpt009", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/TankCradle", attr: "xformOp:scale", index: 1, expected: cradle_height / 2.0, tolerance: 0.002});
-        checks.push(#{id: "GPT-009-" + name + "-cradle-scale-z", component: "tank", requirement: "gpt009", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/TankCradle", attr: "xformOp:scale", index: 2, expected: cradle_depth / 2.0, tolerance: 0.002});
+        checks.push(attribute("GPT-009-" + name + "-cradle-radius", "GriffinTankRequirements::gpt009", path + "/TankCradle", "radius", cradle_radius));
+        checks.push(attribute("GPT-009-" + name + "-cradle-height", "GriffinTankRequirements::gpt009", path + "/TankCradle", "height", cradle_height));
         checks.push(attribute("GPT-009-" + name + "-support-radius", "GriffinTankRequirements::gpt009", path + "/" + support_name, "radius", support_radius));
         checks.push(attribute("GPT-009-" + name + "-support-height", "GriffinTankRequirements::gpt009", path + "/" + support_name, "height", support_height));
         // TankCradlePad is a unit Cube, so USD xformOp:scale stores half of

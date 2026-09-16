@@ -10,15 +10,6 @@ def Xform "PropellantTank" (
 )
 {
     custom string lunco:visual:component = "propellant_tank"
-    def Cube "TankCradle"
-    {
-        double size = 1.0
-        custom double3 xformOp:translate = (0.0, -0.93, 0.0)
-        custom double3 xformOp:scale = (0.52, 0.08, 0.52)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
-        uniform token purpose = "render"
-    }
     def Cylinder "TankNeckTop"
     {
         float radius = 0.09000000357627869
@@ -253,5 +244,18 @@ def Xform "PropellantTank" (
             bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
         }
+    }
+    def Cylinder "TankCradle" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:translate = (0.0, -0.95, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        double radius = 0.44
+        double height = 0.14
+        bool physics:collisionEnabled = false
+        uniform token axis = "Y"
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
     }
 }

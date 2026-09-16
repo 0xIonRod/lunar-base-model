@@ -86,7 +86,9 @@ fn _qualified_attribute(name) {
         "bodyHeightM", "busMountY", "tankStationX", "tankStationY",
         "tankStationZ", "legStationX", "legStationY", "legStationZ",
         "solarStationX", "solarStationY", "solarStationZ",
-        "engineStationX", "engineStationY", "engineStationZ"
+        "engineStationX", "engineStationY", "engineStationZ",
+        "engineClusterWidthM", "engineClusterDepthM", "engineSkirtHeightM",
+        "engineSkirtRailSectionM", "engineBellClearanceM", "engineMountYM"
     ];
     if lander_component.contains(name) {
         return "GriffinLanderRequirements::GriffinLanderComponent::" + name;
@@ -148,6 +150,10 @@ fn landing_max_horizontal_drift_m() { _sysml_attribute("landingMaxHorizontalDrif
 fn landing_divergence_tolerance_m() { _sysml_attribute("landingDivergenceToleranceM") }
 fn landing_divergence_tolerance_upright() { _sysml_attribute("landingDivergenceToleranceUpright") }
 fn landing_divergence_tolerance_speed_mps() { _sysml_attribute("landingDivergenceToleranceSpeedMps") }
+fn landing_replay_tolerance_m() { _sysml_attribute("landingReplayToleranceM") }
+fn landing_replay_tolerance_upright() { _sysml_attribute("landingReplayToleranceUpright") }
+fn landing_replay_tolerance_speed_mps() { _sysml_attribute("landingReplayToleranceSpeedMps") }
+fn landing_replay_tolerance_time_s() { _sysml_attribute("landingReplayToleranceTimeS") }
 fn landing_phase_timeout_s() { _sysml_attribute("landingPhaseTimeoutS") }
 fn rover_settle_timeout_s() { _sysml_attribute("roverSettleTimeoutS") }
 fn rover_settle_height_limit_m() { _sysml_attribute("roverSettleHeightLimitM") }

@@ -53,14 +53,15 @@ package GriffinTankRequirements {
         // authored in SysML prevents a renderer/importer from collapsing the
         // three strap stations toward the tank equator.
         attribute bandTransformOrder : String = "xformOp:translate,xformOp:scale";
-        attribute cradleLocalY : Real = -0.93;
-        attribute cradleHalfHeightM : Real = 0.05;
-        // The unit Cube is scaled to this metric envelope.  Keep the
-        // interface half-height above separate: it is the seating datum used
-        // to derive the cradle's authored Y location from the shared deck.
-        attribute cradleWidthM : Real = 1.04;
-        attribute cradleDepthM : Real = 1.04;
-        attribute cradleHeightM : Real = 0.16;
+        // The cradle is a round seating ring, not a square placeholder plate.
+        // Its radius/height are authored directly on a unit Cylinder, while
+        // the half-height remains the interface datum used to derive the
+        // local Y position from the shared deck.
+        attribute cradleShape : String = "Cylinder";
+        attribute cradleRadiusM : Real = 0.44;
+        attribute cradleLocalY : Real = -0.95;
+        attribute cradleHalfHeightM : Real = 0.07;
+        attribute cradleHeightM : Real = 0.14;
         attribute cradlePadLocalY : Real = -0.86;
         attribute cradlePadWidthM : Real = 0.52;
         attribute cradlePadDepthM : Real = 0.52;
@@ -95,7 +96,7 @@ package GriffinTankRequirements {
         doc /* GPT-001 [topology] exactly four named propellant-tank owners are present and visible. */
     }
     requirement def GPT002_TankRetention {
-        doc /* GPT-002 [visual] every tank exposes a body, three retention bands, a lower cradle plate with a seated adapter pad, and the retained end hardware listed by the component. */
+        doc /* GPT-002 [visual] every tank exposes a body, three retention bands, a lower circular cradle ring with a seated adapter pad, and the retained end hardware listed by the component. */
     }
     requirement def GPT003_TankStatus {
         doc /* GPT-003 [traceability] tank geometry is labelled as a metric visual proxy until the mechanical ICD is available. */
@@ -116,7 +117,7 @@ package GriffinTankRequirements {
         doc /* GPT-008 [orientation] the spherical body and all axial tank hardware are Y-up; the authored envelope is centered on the tank datum without hidden rotations or through-geometry. */
     }
     requirement def GPT009_TankDeckSeat {
-        doc /* GPT-009 [interface] the lower cradle plate is a 1.04 m x 1.04 m x 0.16 m metric envelope and the 0.52 m x 0.52 m x 0.08 m adapter pad seats the tank above the avionics-deck top datum; a coaxial support post bridges the pad to the lower neck without tank hardware penetrating the deck. */
+        doc /* GPT-009 [interface] the lower cradle is a 0.44 m radius x 0.14 m high metric Cylinder and the 0.52 m x 0.52 m x 0.08 m adapter pad seats the tank above the avionics-deck top datum; a coaxial support post bridges the pad to the lower neck without tank hardware penetrating the deck. */
     }
     requirement def GPT010_TankMounting {
         doc /* GPT-010 [interface/visual] four compact metric mounting brackets bridge the lower tank shoulder/support to the adapter pad; each bracket is a 0.16 m x 0.16 m section with a 0.52 m axial envelope, mirrored about the tank datum and radially tilted so its upper end slopes inward toward the spherical vessel. The four signed X/Z tilts are part of the interface datum, so no brace may splay away from the tank or extend below the pad. */

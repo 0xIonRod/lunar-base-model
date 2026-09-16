@@ -138,7 +138,11 @@ fn landing_stability_contract() {
         max_horizontal_drift_m: griffin_spec::landing_max_horizontal_drift_m(),
         divergence_tolerance_m: griffin_spec::landing_divergence_tolerance_m(),
         divergence_tolerance_upright: griffin_spec::landing_divergence_tolerance_upright(),
-        divergence_tolerance_speed_mps: griffin_spec::landing_divergence_tolerance_speed_mps()
+        divergence_tolerance_speed_mps: griffin_spec::landing_divergence_tolerance_speed_mps(),
+        replay_tolerance_m: griffin_spec::landing_replay_tolerance_m(),
+        replay_tolerance_upright: griffin_spec::landing_replay_tolerance_upright(),
+        replay_tolerance_speed_mps: griffin_spec::landing_replay_tolerance_speed_mps(),
+        replay_tolerance_time_s: griffin_spec::landing_replay_tolerance_time_s()
     }
 }
 

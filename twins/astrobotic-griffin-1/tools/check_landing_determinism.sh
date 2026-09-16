@@ -78,6 +78,17 @@ if first.get("clock_tick_delta") != second.get("clock_tick_delta"):
     )
 if first.get("clock_contract_ok") is not True or second.get("clock_contract_ok") is not True:
     raise SystemExit("FAIL deterministic clock contract was not satisfied")
+if first.get("finite") is not True or second.get("finite") is not True:
+    raise SystemExit("FAIL landing telemetry was not finite")
+
+# Categorical outcomes are part of the deterministic state.  A replay that
+# changes touchdown/hold state but remains inside a broad physical envelope is
+# still a simulation divergence and must fail loudly.
+for key in ("touchdown", "barrier_held"):
+    if first.get(key) != second.get(key):
+        raise SystemExit(
+            f"FAIL {key} diverged: {first.get(key)!r} != {second.get(key)!r}"
+        )
 
 def number(name):
     value = first.get(name)
@@ -85,9 +96,10 @@ def number(name):
         raise SystemExit(f"FAIL {name} is not finite in run 1")
     return float(value)
 
-tol_pos = number("divergence_tolerance_m")
-tol_upright = number("divergence_tolerance_upright")
-tol_speed = number("divergence_tolerance_speed_mps")
+tol_pos = number("replay_tolerance_m")
+tol_upright = number("replay_tolerance_upright")
+tol_speed = number("replay_tolerance_speed_mps")
+tol_time = number("replay_tolerance_time_s")
 
 for index, axis in enumerate(("x", "y", "z")):
     delta = abs(float(first["position"][index]) - float(second["position"][index]))
@@ -118,7 +130,7 @@ for key in ("elapsed_s", "admitted_sim_elapsed_delta_s"):
     second_value = second.get(key)
     if not isinstance(second_value, (int, float)) or not math.isfinite(second_value):
         raise SystemExit(f"FAIL {key} is not finite in run 2")
-    if abs(first_value - float(second_value)) > 1.0e-7:
+    if abs(first_value - float(second_value)) > tol_time:
         raise SystemExit(f"FAIL {key} diverged by {abs(first_value - float(second_value)):.6g} s")
 
 print("GRIFFIN LANDING DETERMINISM: PASS")
