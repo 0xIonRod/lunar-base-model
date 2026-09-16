@@ -31,55 +31,66 @@ fn source_number_list(source, qualified_name) {
     values
 }
 
+// The SysML registry validates both qualified and short identities.  Store
+// only the stable short form in each repeated check record so large component
+// check arrays do not exhaust Rhai's bounded value budget with duplicated
+// package prefixes.
+fn _short_identity(name) {
+    if name == () { return (); }
+    let parts = name.split("::");
+    if parts.len() == 0 { return name; }
+    parts[parts.len() - 1]
+}
+
 fn exists(id, component, requirement, verification, path, expected_type) {
-    #{id: id, component: component, requirement: requirement,
-      verification: verification, kind: "exists", path: path,
+    #{id: id, component: component, requirement: _short_identity(requirement),
+      verification: _short_identity(verification), kind: "exists", path: path,
       expected_type: expected_type, visible: true}
 }
 
 fn children(id, component, requirement, verification, path, paths) {
-    #{id: id, component: component, requirement: requirement,
-      verification: verification, kind: "children", path: path,
+    #{id: id, component: component, requirement: _short_identity(requirement),
+      verification: _short_identity(verification), kind: "children", path: path,
       paths: paths, visible: true}
 }
 
 fn attribute_check(id, component, requirement, verification, path, attr, expected_attr, tolerance) {
-    #{id: id, component: component, requirement: requirement,
-      verification: verification, kind: "attribute", path: path,
+    #{id: id, component: component, requirement: _short_identity(requirement),
+      verification: _short_identity(verification), kind: "attribute", path: path,
       attr: attr, expected_attr: expected_attr, tolerance: tolerance}
 }
 
 fn attribute_equals(id, component, requirement, verification, path, attr, expected) {
-    #{id: id, component: component, requirement: requirement,
-      verification: verification, kind: "attribute_equals", path: path,
+    #{id: id, component: component, requirement: _short_identity(requirement),
+      verification: _short_identity(verification), kind: "attribute_equals", path: path,
       attr: attr, expected: expected}
 }
 
 fn extent_component(id, component, requirement, verification, path, index,
                     expected_attr, multiplier, tolerance) {
-    #{id: id, component: component, requirement: requirement,
-      verification: verification, kind: "extent_component", path: path,
+    #{id: id, component: component, requirement: _short_identity(requirement),
+      verification: _short_identity(verification), kind: "extent_component", path: path,
       index: index, multiplier: multiplier, expected_attr: expected_attr,
       tolerance: tolerance}
 }
 
 fn bounds_component(id, component, requirement, verification, path, index,
                     expected_attr, multiplier, tolerance) {
-    #{id: id, component: component, requirement: requirement,
-      verification: verification, kind: "bounds_component", path: path,
+    #{id: id, component: component, requirement: _short_identity(requirement),
+      verification: _short_identity(verification), kind: "bounds_component", path: path,
       index: index, multiplier: multiplier, expected_attr: expected_attr,
       tolerance: tolerance}
 }
 
 fn source_list_count(id, component, requirement, verification, list_attr, count_attr) {
-    #{id: id, component: component, requirement: requirement,
-      verification: verification, kind: "source_list_count",
+    #{id: id, component: component, requirement: _short_identity(requirement),
+      verification: _short_identity(verification), kind: "source_list_count",
       path: list_attr, list_attr: list_attr, expected_attr: count_attr}
 }
 
 fn coverage(id, component, requirement, verification) {
-    #{id: id, component: component, requirement: requirement,
-      verification: verification, kind: "coverage"}
+    #{id: id, component: component, requirement: _short_identity(requirement),
+      verification: _short_identity(verification), kind: "coverage"}
 }
 
 fn finish(source, checks, title, channel, root, package_name, verification) {

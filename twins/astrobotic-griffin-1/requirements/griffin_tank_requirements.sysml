@@ -55,6 +55,12 @@ package GriffinTankRequirements {
         attribute bandTransformOrder : String = "xformOp:translate,xformOp:scale";
         attribute cradleLocalY : Real = -0.93;
         attribute cradleHalfHeightM : Real = 0.05;
+        // The unit Cube is scaled to this metric envelope.  Keep the
+        // interface half-height above separate: it is the seating datum used
+        // to derive the cradle's authored Y location from the shared deck.
+        attribute cradleWidthM : Real = 1.04;
+        attribute cradleDepthM : Real = 1.04;
+        attribute cradleHeightM : Real = 0.16;
         attribute cradlePadLocalY : Real = -0.86;
         attribute cradlePadWidthM : Real = 0.52;
         attribute cradlePadDepthM : Real = 0.52;
@@ -65,6 +71,21 @@ package GriffinTankRequirements {
         attribute supportCenterYM : Real = -0.79;
         attribute minimumDeckClearanceM : Real = 0.02;
         attribute deckTopSource : String = "GriffinLanderRequirements::GriffinLanderComponent::avionicsDeckTopY";
+        // The public Griffin reference shows the spherical vessels carried by
+        // a compact lower mounting structure rather than floating above a
+        // flat deck.  These four visual gussets are a lightweight envelope
+        // model of that interface; exact bracket ICD dimensions remain TBD.
+        attribute bracketGroupName : String = "TankMountBrackets";
+        attribute bracketNames : String = "TankMountBracketPX,TankMountBracketNX,TankMountBracketPZ,TankMountBracketNZ";
+        attribute bracketLengthM : Real = 0.36;
+        attribute bracketWidthM : Real = 0.10;
+        attribute bracketDepthM : Real = 0.10;
+        attribute bracketCenterOffsetM : Real = 0.14;
+        attribute bracketCenterYM : Real = -0.60;
+        attribute bracketTiltDeg : Real = 12.0;
+        attribute mountingSource : String = "https://www.nasa.gov/gallery/astrobotics-griffin-1/";
+        attribute mountingSourceFact : String = "NASA Griffin imagery shows spherical propellant tanks supported by compact structural mounting hardware";
+        attribute mountingSourceRationale : String = "Four explicit bracket envelopes make the tank-to-deck interface visually inspectable and prevent a floating tank silhouette without inventing a flight ICD";
     }
 
     requirement def GPT001_TankCount {
@@ -92,7 +113,10 @@ package GriffinTankRequirements {
         doc /* GPT-008 [orientation] the spherical body and all axial tank hardware are Y-up; the authored envelope is centered on the tank datum without hidden rotations or through-geometry. */
     }
     requirement def GPT009_TankDeckSeat {
-        doc /* GPT-009 [interface] the lower cradle plate and adapter pad seat the tank above the avionics-deck top datum; a coaxial support post bridges the pad to the lower neck without tank hardware penetrating the deck. */
+        doc /* GPT-009 [interface] the lower cradle plate is a 1.04 m x 1.04 m x 0.16 m metric envelope and the 0.52 m x 0.52 m x 0.08 m adapter pad seats the tank above the avionics-deck top datum; a coaxial support post bridges the pad to the lower neck without tank hardware penetrating the deck. */
+    }
+    requirement def GPT010_TankMounting {
+        doc /* GPT-010 [interface/visual] four compact metric mounting brackets bridge the lower tank shoulder/support to the adapter pad; each bracket is a 0.10 m x 0.10 m section with a 0.36 m axial envelope, mirrored about the tank datum and tilted toward the spherical vessel. */
     }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }
@@ -104,6 +128,7 @@ package GriffinTankRequirements {
     requirement gpt007 : GPT007_TankServiceHardware { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt008 : GPT008_TankOrientation { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt009 : GPT009_TankDeckSeat { subject tanks : GriffinPropellantTankAssembly; }
+    requirement gpt010 : GPT010_TankMounting { subject tanks : GriffinPropellantTankAssembly; }
 
     verification def Verify_GriffinTankRequirements {
         subject tanks : GriffinPropellantTankAssembly;
@@ -116,5 +141,6 @@ package GriffinTankRequirements {
         verify gpt007;
         verify gpt008;
         verify gpt009;
+        verify gpt010;
     }
 }

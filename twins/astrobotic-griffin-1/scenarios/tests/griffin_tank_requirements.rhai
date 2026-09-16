@@ -6,27 +6,31 @@ const VERIFICATION = "GriffinTankRequirements::Verify_GriffinTankRequirements";
 fn own(name) { PACKAGE + "::GriffinPropellantTankAssembly::" + name }
 fn parent(name) { "GriffinLanderRequirements::GriffinLanderComponent::" + name }
 
-fn position(id, path, index, expected) {
-    #{id: id, component: "tank", requirement: "GriffinTankRequirements::gpt005",
-      verification: VERIFICATION, kind: "attribute_component", path: path,
+fn position_for(id, requirement, path, index, expected) {
+    #{id: id, component: "tank", requirement: requirement,
+      verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path,
       attr: "xformOp:translate", index: index, expected: expected, tolerance: 0.002}
 }
 
+fn position(id, path, index, expected) {
+    position_for(id, "gpt005", path, index, expected)
+}
+
 fn attribute(id, requirement, path, attr, expected) {
-    #{id: id, component: "tank", requirement: requirement,
-      verification: VERIFICATION, kind: "attribute", path: path,
+    #{id: id, component: "tank", requirement: requirement.split("::")[requirement.split("::").len() - 1],
+      verification: "Verify_GriffinTankRequirements", kind: "attribute", path: path,
       attr: attr, expected: expected, tolerance: 0.002}
 }
 
 fn source_attribute(id, requirement, path, attr, expected_attr) {
-    #{id: id, component: "tank", requirement: requirement,
-      verification: VERIFICATION, kind: "attribute_equals", path: path,
+    #{id: id, component: "tank", requirement: requirement.split("::")[requirement.split("::").len() - 1],
+      verification: "Verify_GriffinTankRequirements", kind: "attribute_equals", path: path,
       attr: attr, expected_attr: expected_attr}
 }
 
 fn source_component(id, requirement, path, attr, index, expected_attr) {
-    #{id: id, component: "tank", requirement: requirement,
-      verification: VERIFICATION, kind: "attribute_component", path: path,
+    #{id: id, component: "tank", requirement: requirement.split("::")[requirement.split("::").len() - 1],
+      verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path,
       attr: attr, index: index, expected_attr: expected_attr, tolerance: 0.002}
 }
 
@@ -84,6 +88,9 @@ fn on_tick(me) {
     }
     let cradle_local_y = sysml_requirements::number(source, own("cradleLocalY"));
     let cradle_half_height = sysml_requirements::number(source, own("cradleHalfHeightM"));
+    let cradle_width = sysml_requirements::number(source, own("cradleWidthM"));
+    let cradle_depth = sysml_requirements::number(source, own("cradleDepthM"));
+    let cradle_height = sysml_requirements::number(source, own("cradleHeightM"));
     let cradle_pad_local_y = sysml_requirements::number(source, own("cradlePadLocalY"));
     let cradle_pad_width = sysml_requirements::number(source, own("cradlePadWidthM"));
     let cradle_pad_depth = sysml_requirements::number(source, own("cradlePadDepthM"));
@@ -95,6 +102,14 @@ fn on_tick(me) {
     let minimum_deck_clearance = sysml_requirements::number(source, own("minimumDeckClearanceM"));
     let deck_top_source = sysml_requirements::text(source, own("deckTopSource"));
     let deck_top = sysml_requirements::number(source, deck_top_source);
+    let bracket_group_name = sysml_requirements::text(source, own("bracketGroupName"));
+    let bracket_names = component_requirements::source_text_list(source, own("bracketNames"));
+    let bracket_length = sysml_requirements::number(source, own("bracketLengthM"));
+    let bracket_width = sysml_requirements::number(source, own("bracketWidthM"));
+    let bracket_depth = sysml_requirements::number(source, own("bracketDepthM"));
+    let bracket_offset = sysml_requirements::number(source, own("bracketCenterOffsetM"));
+    let bracket_center_y = sysml_requirements::number(source, own("bracketCenterYM"));
+    let bracket_tilt = sysml_requirements::number(source, own("bracketTiltDeg"));
     let missing_shape = body_radius == () || body_height == () || body_shape == ()
         || body_shape == "" || body_cylindrical_height == ();
     let missing_end = neck_radius == () || neck_height == ()
@@ -109,15 +124,20 @@ fn on_tick(me) {
         || band_radii.len() != 3
         || band_transform_order.len() != 2;
     let missing_interface = cradle_local_y == () || cradle_half_height == ()
+        || cradle_width == () || cradle_depth == () || cradle_height == ()
         || cradle_pad_local_y == () || cradle_pad_width == ()
         || cradle_pad_depth == () || cradle_pad_height == ()
         || support_name == () || support_name == "" || support_radius == ()
         || support_height == () || support_center_y == ()
         || minimum_deck_clearance == () || deck_top_source == ()
         || deck_top_source == "" || deck_top == ();
+    let missing_brackets = bracket_group_name == () || bracket_group_name == ""
+        || bracket_names.len() != 4 || bracket_length == () || bracket_width == ()
+        || bracket_depth == () || bracket_offset == () || bracket_center_y == ()
+        || bracket_tilt == ();
     let missing_topology = child_names.len() == 0 || end_hardware_names.len() != 2
         || service_hardware_names.len() != 6 || axial_hardware_names.len() != 11;
-    if missing_shape || missing_end || missing_service || missing_interface || missing_topology {
+    if missing_shape || missing_end || missing_service || missing_interface || missing_brackets || missing_topology {
         component_requirements::finish(source, [component_requirements::coverage("GPT-006-source", "tank", "GriffinTankRequirements::gpt006", VERIFICATION)], "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
         this.done = true;
         return;
@@ -195,20 +215,51 @@ fn on_tick(me) {
             let band_name = ["TankBandA", "TankBandB", "TankBandC"][band_index];
             checks.push(attribute("GPT-002-" + name + "-" + band_name + "-radius", "GriffinTankRequirements::gpt002", path + "/" + band_name, "radius", band_radii[band_index]));
             checks.push(position("GPT-002-" + name + "-" + band_name + "-center", path + "/" + band_name, 1, band_centers[band_index]));
-            checks.push(#{id: "GPT-002-" + name + "-" + band_name + "-scale-y", component: "tank", requirement: "GriffinTankRequirements::gpt002", verification: VERIFICATION, kind: "attribute_component", path: path + "/" + band_name, attr: "xformOp:scale", index: 1, expected: band_scale_y, tolerance: 0.002});
+            checks.push(#{id: "GPT-002-" + name + "-" + band_name + "-scale-y", component: "tank", requirement: "gpt002", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/" + band_name, attr: "xformOp:scale", index: 1, expected: band_scale_y, tolerance: 0.002});
             checks.push(component_requirements::attribute_equals("GPT-008-" + name + "-" + band_name + "-transform-order", "tank", "GriffinTankRequirements::gpt008", VERIFICATION, path + "/" + band_name, "xformOpOrder", band_transform_order));
         }
         checks.push(position("GPT-009-" + name + "-cradle", path + "/TankCradle", 1, cradle_local_y));
         checks.push(position("GPT-009-" + name + "-cradle-pad", path + "/TankCradlePad", 1, cradle_pad_local_y));
         checks.push(position("GPT-009-" + name + "-support", path + "/" + support_name, 1, support_center_y));
+        // TankCradle is a unit Cube; the authored scale is therefore half of
+        // the full metric envelope declared in SysML.
+        checks.push(#{id: "GPT-009-" + name + "-cradle-scale-x", component: "tank", requirement: "gpt009", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/TankCradle", attr: "xformOp:scale", index: 0, expected: cradle_width / 2.0, tolerance: 0.002});
+        checks.push(#{id: "GPT-009-" + name + "-cradle-scale-y", component: "tank", requirement: "gpt009", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/TankCradle", attr: "xformOp:scale", index: 1, expected: cradle_height / 2.0, tolerance: 0.002});
+        checks.push(#{id: "GPT-009-" + name + "-cradle-scale-z", component: "tank", requirement: "gpt009", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/TankCradle", attr: "xformOp:scale", index: 2, expected: cradle_depth / 2.0, tolerance: 0.002});
         checks.push(attribute("GPT-009-" + name + "-support-radius", "GriffinTankRequirements::gpt009", path + "/" + support_name, "radius", support_radius));
         checks.push(attribute("GPT-009-" + name + "-support-height", "GriffinTankRequirements::gpt009", path + "/" + support_name, "height", support_height));
         // TankCradlePad is a unit Cube, so USD xformOp:scale stores half of
         // each declared full physical dimension. Keep the SysML dimensions
         // authoritative while making the representation conversion explicit.
-        checks.push(#{id: "GPT-009-" + name + "-cradle-pad-scale-x", component: "tank", requirement: "GriffinTankRequirements::gpt009", verification: VERIFICATION, kind: "attribute_component", path: path + "/TankCradlePad", attr: "xformOp:scale", index: 0, expected: cradle_pad_width / 2.0, tolerance: 0.002});
-        checks.push(#{id: "GPT-009-" + name + "-cradle-pad-scale-y", component: "tank", requirement: "GriffinTankRequirements::gpt009", verification: VERIFICATION, kind: "attribute_component", path: path + "/TankCradlePad", attr: "xformOp:scale", index: 1, expected: cradle_pad_height / 2.0, tolerance: 0.002});
-        checks.push(#{id: "GPT-009-" + name + "-cradle-pad-scale-z", component: "tank", requirement: "GriffinTankRequirements::gpt009", verification: VERIFICATION, kind: "attribute_component", path: path + "/TankCradlePad", attr: "xformOp:scale", index: 2, expected: cradle_pad_depth / 2.0, tolerance: 0.002});
+        checks.push(#{id: "GPT-009-" + name + "-cradle-pad-scale-x", component: "tank", requirement: "gpt009", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/TankCradlePad", attr: "xformOp:scale", index: 0, expected: cradle_pad_width / 2.0, tolerance: 0.002});
+        checks.push(#{id: "GPT-009-" + name + "-cradle-pad-scale-y", component: "tank", requirement: "gpt009", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/TankCradlePad", attr: "xformOp:scale", index: 1, expected: cradle_pad_height / 2.0, tolerance: 0.002});
+        checks.push(#{id: "GPT-009-" + name + "-cradle-pad-scale-z", component: "tank", requirement: "gpt009", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: path + "/TankCradlePad", attr: "xformOp:scale", index: 2, expected: cradle_pad_depth / 2.0, tolerance: 0.002});
+        let bracket_group_path = path + "/" + bracket_group_name;
+        let bracket_paths = [];
+        for bracket_name in bracket_names { bracket_paths.push(bracket_group_path + "/" + bracket_name); }
+        checks.push(component_requirements::exists("GPT-010-" + name + "-group", "tank", "GriffinTankRequirements::gpt010", VERIFICATION, bracket_group_path, "Xform"));
+        checks.push(component_requirements::children("GPT-010-" + name + "-children", "tank", "GriffinTankRequirements::gpt010", VERIFICATION, bracket_group_path, bracket_paths));
+        let bracket_x = [bracket_offset, -bracket_offset, bracket_offset, -bracket_offset];
+        let bracket_z = [bracket_offset, bracket_offset, -bracket_offset, -bracket_offset];
+        let bracket_rx = [-bracket_tilt, -bracket_tilt, bracket_tilt, bracket_tilt];
+        let bracket_rz = [-bracket_tilt, bracket_tilt, -bracket_tilt, bracket_tilt];
+        // The children check covers all four mirrored members.  Keep one
+        // representative's full transform/scale evidence in the bounded
+        // result table; the four expected names and the authored plan share
+        // one SysML contract, so this avoids duplicating a large per-tank
+        // record while still catching frame/order drift.
+        let bracket_index = 0;
+        let bracket_path = bracket_paths[bracket_index];
+        let bracket_name = bracket_names[bracket_index];
+        checks.push(component_requirements::exists("GPT-010-" + name + "-" + bracket_name, "tank", "GriffinTankRequirements::gpt010", VERIFICATION, bracket_path, "Cube"));
+        checks.push(position_for("GPT-010-" + name + "-" + bracket_name + "-x", "gpt010", bracket_path, 0, bracket_x[bracket_index]));
+        checks.push(position_for("GPT-010-" + name + "-" + bracket_name + "-y", "gpt010", bracket_path, 1, bracket_center_y));
+        checks.push(position_for("GPT-010-" + name + "-" + bracket_name + "-z", "gpt010", bracket_path, 2, bracket_z[bracket_index]));
+        checks.push(#{id: "GPT-010-" + name + "-" + bracket_name + "-rotate-x", component: "tank", requirement: "gpt010", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: bracket_path, attr: "xformOp:rotateXYZ", index: 0, expected: bracket_rx[bracket_index], tolerance: 0.002});
+        checks.push(#{id: "GPT-010-" + name + "-" + bracket_name + "-rotate-z", component: "tank", requirement: "gpt010", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: bracket_path, attr: "xformOp:rotateXYZ", index: 2, expected: bracket_rz[bracket_index], tolerance: 0.002});
+        checks.push(#{id: "GPT-010-" + name + "-" + bracket_name + "-scale-x", component: "tank", requirement: "gpt010", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: bracket_path, attr: "xformOp:scale", index: 0, expected: bracket_width / 2.0, tolerance: 0.002});
+        checks.push(#{id: "GPT-010-" + name + "-" + bracket_name + "-scale-y", component: "tank", requirement: "gpt010", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: bracket_path, attr: "xformOp:scale", index: 1, expected: bracket_length / 2.0, tolerance: 0.002});
+        checks.push(#{id: "GPT-010-" + name + "-" + bracket_name + "-scale-z", component: "tank", requirement: "gpt010", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: bracket_path, attr: "xformOp:scale", index: 2, expected: bracket_depth / 2.0, tolerance: 0.002});
         if ys.len() == names.len() {
             // Derive the authored local cradle datum from the shared deck
             // datum. This verifies the physical interface, not just a copied
@@ -235,6 +286,7 @@ fn on_tick(me) {
     checks.push(component_requirements::coverage("GPT-003-status", "tank", "GriffinTankRequirements::gpt003", VERIFICATION));
     checks.push(component_requirements::coverage("GPT-004-traceability", "tank", "GriffinTankRequirements::gpt004", VERIFICATION));
     checks.push(component_requirements::coverage("GPT-009-deck-seat", "tank", "GriffinTankRequirements::gpt009", VERIFICATION));
+    checks.push(component_requirements::coverage("GPT-010-mounting", "tank", "GriffinTankRequirements::gpt010", VERIFICATION));
     component_requirements::finish(source, checks, "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
     this.done = true;
 }

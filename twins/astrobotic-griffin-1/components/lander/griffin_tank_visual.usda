@@ -14,7 +14,7 @@ def Xform "PropellantTank" (
     {
         double size = 1.0
         custom double3 xformOp:translate = (0.0, -0.93, 0.0)
-        double3 xformOp:scale = (0.72, 0.1, 0.72)
+        custom double3 xformOp:scale = (0.52, 0.08, 0.52)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
         uniform token purpose = "render"
@@ -202,5 +202,56 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         custom string lunco:visual:role = "tank_support"
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+    }
+    def Xform "TankMountBrackets"
+    {
+        def Cube "TankMountBracketPX" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.14, -0.6, 0.14)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:rotateXYZ = (-12.0, 0.0, -12.0)
+            custom double3 xformOp:scale = (0.05, 0.18, 0.05)
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+        }
+        def Cube "TankMountBracketNX" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (-0.14, -0.6, 0.14)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:rotateXYZ = (-12.0, 0.0, 12.0)
+            custom double3 xformOp:scale = (0.05, 0.18, 0.05)
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+        }
+        def Cube "TankMountBracketPZ" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.14, -0.6, -0.14)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:rotateXYZ = (12.0, 0.0, -12.0)
+            custom double3 xformOp:scale = (0.05, 0.18, 0.05)
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+        }
+        def Cube "TankMountBracketNZ" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (-0.14, -0.6, -0.14)
+            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:rotateXYZ = (12.0, 0.0, 12.0)
+            custom double3 xformOp:scale = (0.05, 0.18, 0.05)
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+        }
     }
 }

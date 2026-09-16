@@ -167,7 +167,7 @@ fn deploy_ramps(me) {
 }
 
 fn release_rover(me) {
-    if me.release_requested { return true; }
+    if this.release_requested { return true; }
     emit("griffin_ramp_deployment_settled");
 
     let joint = find(DOCK);
@@ -175,7 +175,7 @@ fn release_rover(me) {
         // The adapter is already absent. Keep the same completion gate as a
         // requested detach so the mission never treats a command acknowledgement
         // as proof of topology removal.
-        me.release_requested = true;
+        this.release_requested = true;
         return true;
     }
 
@@ -190,7 +190,7 @@ fn release_rover(me) {
         notify_kind("FLIP adapter release was rejected.", "error");
         return false;
     }
-    me.release_requested = true;
+    this.release_requested = true;
     print("[griffin] FLIP adapter detach requested; waiting for solver retirement");
     true
 }
@@ -201,7 +201,7 @@ fn adapter_detach_complete() {
 }
 
 fn complete_rover_release(me) {
-    me.rover_detached = true;
+    this.rover_detached = true;
     griffin_surface_ops::follow_rover();
     griffin_controls::show_rover_controls();
     emit("griffin_flip_released");
@@ -272,16 +272,16 @@ fn fail_phase(me, phase) {
 fn finish_surface_ops(me) {
     let source = sysml_requirements::source();
     let checks = [
-        #{id: "GR-004-lander-settled", component: "landing", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander", actual: me.lander_settled, expected: true, ok: me.lander_settled, error: "lander did not settle"},
-        #{id: "GR-003-ramps-deployed", component: "egress_ramps", requirement: "Griffin1Requirements::gr003", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander/EgressRampPort", actual: me.ramps_deployed, expected: true, ok: me.ramps_deployed, error: "ramps were not deployed"},
-        #{id: "GR-026-adapter-release", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: DOCK, actual: me.rover_detached, expected: true, ok: me.rover_detached, error: "FLIP adapter was not released"},
-        #{id: "GR-004-route-engaged", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: ROVER, actual: me.route_engaged, expected: true, ok: me.route_engaged, error: "FLIP route was not engaged"},
-        #{id: "GR-007-ramp-approach", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampApproach", actual: me.ramp_approach_reached, expected: true, ok: me.ramp_approach_reached, error: "ramp approach was not reached"},
-        #{id: "GR-007-ramp-exit", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampExit", actual: me.ramp_exit_reached, expected: true, ok: me.ramp_exit_reached, error: "ramp exit was not reached"},
-        #{id: "GR-004-waypoint-1", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget1", actual: me.waypoint_1_reached, expected: true, ok: me.waypoint_1_reached, error: "first survey waypoint was not reached"},
-        #{id: "GR-004-waypoint-2", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget2", actual: me.waypoint_2_reached, expected: true, ok: me.waypoint_2_reached, error: "second survey waypoint was not reached"},
-        #{id: "GR-004-base-site", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/BaseSite", actual: me.base_site_reached, expected: true, ok: me.base_site_reached, error: "base site was not reached"},
-        #{id: "GR-031-geometry", component: "mission", requirement: "Griffin1Requirements::gr031", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps", actual: me.geometry_valid, expected: true, ok: me.geometry_valid, error: "mission geometry gate failed"}
+        #{id: "GR-004-lander-settled", component: "landing", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander", actual: this.lander_settled, expected: true, ok: this.lander_settled, error: "lander did not settle"},
+        #{id: "GR-003-ramps-deployed", component: "egress_ramps", requirement: "Griffin1Requirements::gr003", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/Lander/EgressRampPort", actual: this.ramps_deployed, expected: true, ok: this.ramps_deployed, error: "ramps were not deployed"},
+        #{id: "GR-026-adapter-release", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: DOCK, actual: this.rover_detached, expected: true, ok: this.rover_detached, error: "FLIP adapter was not released"},
+        #{id: "GR-004-route-engaged", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: ROVER, actual: this.route_engaged, expected: true, ok: this.route_engaged, error: "FLIP route was not engaged"},
+        #{id: "GR-007-ramp-approach", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampApproach", actual: this.ramp_approach_reached, expected: true, ok: this.ramp_approach_reached, error: "ramp approach was not reached"},
+        #{id: "GR-007-ramp-exit", component: "rover", requirement: "Griffin1Requirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverRampExit", actual: this.ramp_exit_reached, expected: true, ok: this.ramp_exit_reached, error: "ramp exit was not reached"},
+        #{id: "GR-004-waypoint-1", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget1", actual: this.waypoint_1_reached, expected: true, ok: this.waypoint_1_reached, error: "first survey waypoint was not reached"},
+        #{id: "GR-004-waypoint-2", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/RoverTarget2", actual: this.waypoint_2_reached, expected: true, ok: this.waypoint_2_reached, error: "second survey waypoint was not reached"},
+        #{id: "GR-004-base-site", component: "rover", requirement: "Griffin1Requirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/BaseSite", actual: this.base_site_reached, expected: true, ok: this.base_site_reached, error: "base site was not reached"},
+        #{id: "GR-031-geometry", component: "mission", requirement: "Griffin1Requirements::gr031", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps", actual: this.geometry_valid, expected: true, ok: this.geometry_valid, error: "mission geometry gate failed"}
     ];
     let failures = [];
     for check in checks { if check.ok != true { failures.push(check); } }
