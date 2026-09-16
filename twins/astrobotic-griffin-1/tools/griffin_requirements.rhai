@@ -108,6 +108,23 @@ fn sysml_contract_report() {
             }
         }
     }
+    // The component→verification selection is a generic Rhai bridge over the
+    // Twin manifest. Exercise it here so every component acceptance run proves
+    // that its own requirement source and verification harness are resolvable;
+    // the script does not duplicate scene or script paths.
+    if report.components == () || report.components.len() == 0 {
+        missing.push("Twin component registry is empty");
+    } else {
+        for component in report.components {
+            let binding = sysml_requirements::component_binding(report, component.name);
+            if binding.ok != true {
+                let detail = if binding.error == () { "binding failed" } else { binding.error };
+                missing.push("Twin component binding " + component.name + ": " + detail);
+            } else if binding.verification.name != component.verification {
+                missing.push("Twin component verification drift " + component.name);
+            }
+        }
+    }
     let requirement_usages = 0;
     if requirements != () {
         for requirement in requirements {
