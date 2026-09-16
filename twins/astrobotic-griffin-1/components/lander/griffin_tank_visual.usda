@@ -189,4 +189,18 @@ def Xform "PropellantTank" (
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.11999999731779099, 0.12999999523162842, 0.1599999964237213)]
     }
+    def Cylinder "TankSupportPost" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:translate = (0.0, -0.79, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        double radius = 0.11
+        double height = 0.16
+        bool physics:collisionEnabled = false
+        uniform token axis = "Y"
+        uniform token purpose = "render"
+        custom string lunco:visual:role = "tank_support"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+    }
 }

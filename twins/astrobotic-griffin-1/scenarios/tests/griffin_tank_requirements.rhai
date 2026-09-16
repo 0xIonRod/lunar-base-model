@@ -88,6 +88,10 @@ fn on_tick(me) {
     let cradle_pad_width = sysml_requirements::number(source, own("cradlePadWidthM"));
     let cradle_pad_depth = sysml_requirements::number(source, own("cradlePadDepthM"));
     let cradle_pad_height = sysml_requirements::number(source, own("cradlePadHeightM"));
+    let support_name = sysml_requirements::text(source, own("supportName"));
+    let support_radius = sysml_requirements::number(source, own("supportRadiusM"));
+    let support_height = sysml_requirements::number(source, own("supportHeightM"));
+    let support_center_y = sysml_requirements::number(source, own("supportCenterYM"));
     let minimum_deck_clearance = sysml_requirements::number(source, own("minimumDeckClearanceM"));
     let deck_top_source = sysml_requirements::text(source, own("deckTopSource"));
     let deck_top = sysml_requirements::number(source, deck_top_source);
@@ -107,10 +111,12 @@ fn on_tick(me) {
     let missing_interface = cradle_local_y == () || cradle_half_height == ()
         || cradle_pad_local_y == () || cradle_pad_width == ()
         || cradle_pad_depth == () || cradle_pad_height == ()
+        || support_name == () || support_name == "" || support_radius == ()
+        || support_height == () || support_center_y == ()
         || minimum_deck_clearance == () || deck_top_source == ()
         || deck_top_source == "" || deck_top == ();
     let missing_topology = child_names.len() == 0 || end_hardware_names.len() != 2
-        || service_hardware_names.len() != 6 || axial_hardware_names.len() != 10;
+        || service_hardware_names.len() != 6 || axial_hardware_names.len() != 11;
     if missing_shape || missing_end || missing_service || missing_interface || missing_topology {
         component_requirements::finish(source, [component_requirements::coverage("GPT-006-source", "tank", "GriffinTankRequirements::gpt006", VERIFICATION)], "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
         this.done = true;
@@ -137,6 +143,7 @@ fn on_tick(me) {
             child_paths));
         checks.push(component_requirements::exists("GPT-002-" + name + "-cradle", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradle", "Cube"));
         checks.push(component_requirements::exists("GPT-002-" + name + "-cradle-pad", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradlePad", "Cube"));
+        checks.push(component_requirements::exists("GPT-009-" + name + "-support", "tank", "GriffinTankRequirements::gpt009", VERIFICATION, path + "/" + support_name, "Cylinder"));
         checks.push(component_requirements::children("GPT-006-" + name, "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path,
             end_hardware_paths));
         checks.push(component_requirements::exists("GPT-006-" + name + "-neck-top", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankNeckTop", "Cylinder"));
@@ -193,6 +200,9 @@ fn on_tick(me) {
         }
         checks.push(position("GPT-009-" + name + "-cradle", path + "/TankCradle", 1, cradle_local_y));
         checks.push(position("GPT-009-" + name + "-cradle-pad", path + "/TankCradlePad", 1, cradle_pad_local_y));
+        checks.push(position("GPT-009-" + name + "-support", path + "/" + support_name, 1, support_center_y));
+        checks.push(attribute("GPT-009-" + name + "-support-radius", "GriffinTankRequirements::gpt009", path + "/" + support_name, "radius", support_radius));
+        checks.push(attribute("GPT-009-" + name + "-support-height", "GriffinTankRequirements::gpt009", path + "/" + support_name, "height", support_height));
         // TankCradlePad is a unit Cube, so USD xformOp:scale stores half of
         // each declared full physical dimension. Keep the SysML dimensions
         // authoritative while making the representation conversion explicit.

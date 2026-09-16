@@ -7,10 +7,10 @@ package GriffinTankRequirements {
         attribute sourceComponent : String = "GriffinLanderRequirements::GriffinLanderComponent";
         attribute namesSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankNames";
         attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankCount";
-        attribute childNames : String = "TankBandA,TankBandB,TankBandC,TankCradle,TankCradlePad,TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom,MliTank";
+        attribute childNames : String = "TankBandA,TankBandB,TankBandC,TankCradle,TankCradlePad,TankSupportPost,TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom,MliTank";
         attribute endHardwareNames : String = "TankNeckTop,TankNeckBottom";
         attribute serviceHardwareNames : String = "TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
-        attribute axialHardwareNames : String = "TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom";
+        attribute axialHardwareNames : String = "TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom,TankSupportPost";
         attribute tankAxis : String = "Y";
         attribute bodyShape : String = "Sphere";
         attribute status : String = "metric visual study proxy; exact COPV dimensions and placement TBD";
@@ -41,7 +41,7 @@ package GriffinTankRequirements {
         attribute capCenterYM : Real = 0.84;
         attribute sourceReference : String = "https://www.astrobotic.com/media-kit/images/";
         attribute sourceFact : String = "Griffin reference imagery shows compact gold spherical propellant vessels; Astrobotic confirms four propellant tanks";
-        attribute sourceRationale : String = "Each tank is a repeated, independently inspectable spherical pressure-vessel visual component whose station and retention straps must not drift";
+        attribute sourceRationale : String = "Each tank is a repeated, independently inspectable spherical pressure-vessel visual component whose station, retention straps, and deck-to-neck support must not drift";
         // Strap radii follow the sphere latitude so each band sits on the
         // MLI envelope instead of appearing as a floating ring.  Order is
         // A/B/C and corresponds to bandCenterYM.
@@ -59,6 +59,10 @@ package GriffinTankRequirements {
         attribute cradlePadWidthM : Real = 0.52;
         attribute cradlePadDepthM : Real = 0.52;
         attribute cradlePadHeightM : Real = 0.08;
+        attribute supportName : String = "TankSupportPost";
+        attribute supportRadiusM : Real = 0.11;
+        attribute supportHeightM : Real = 0.16;
+        attribute supportCenterYM : Real = -0.79;
         attribute minimumDeckClearanceM : Real = 0.02;
         attribute deckTopSource : String = "GriffinLanderRequirements::GriffinLanderComponent::avionicsDeckTopY";
     }
@@ -88,7 +92,7 @@ package GriffinTankRequirements {
         doc /* GPT-008 [orientation] the spherical body and all axial tank hardware are Y-up; the authored envelope is centered on the tank datum without hidden rotations or through-geometry. */
     }
     requirement def GPT009_TankDeckSeat {
-        doc /* GPT-009 [interface] the lower cradle plate and adapter pad seat the tank above the avionics-deck top datum with no tank hardware penetrating the deck. */
+        doc /* GPT-009 [interface] the lower cradle plate and adapter pad seat the tank above the avionics-deck top datum; a coaxial support post bridges the pad to the lower neck without tank hardware penetrating the deck. */
     }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }
