@@ -1,0 +1,27 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinRoverDeliveryTest"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+# Reuse the production delivery composition. The only additional prim is a
+# Twin-owned Rhai observer; it does not duplicate the vehicle or joint.
+def Xform "GriffinRoverDeliveryTest" (
+    prepend references = @twin://astrobotic-griffin-1/scenes/griffin_1_rover_delivery_test.usda@</GriffinRoverDeliveryTest>
+    kind = "assembly"
+    documentation = "Post-release physics topology and performance regression fixture."
+)
+{
+    def Scope "Scenario"
+    {
+        def Scope "Mission" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_detach_stability.rhai@
+            uniform bool lunco:program:realtimeSafe = false
+        }
+    }
+}

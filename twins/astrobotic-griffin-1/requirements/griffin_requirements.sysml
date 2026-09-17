@@ -53,9 +53,19 @@ package Griffin1Requirements {
         // into a PASS by themselves.
         attribute landingPhaseTimeoutS : Real = 300.0;
         attribute roverSettleTimeoutS : Real = 30.0;
-        attribute roverSettleHeightLimitM : Real = 1.75;
+        // FLIP is released from the top-deck adapter, not dropped to the
+        // surface.  This is the maximum supported release/deck height for the
+        // pre-egress stability gate; the route then drives over the authored
+        // ramp to surface level.  A ground-height gate here would wait for a
+        // vehicle that is intentionally still on the deck and burn the full
+        // timeout while polling physics.
+        attribute roverSettleHeightLimitM : Real = 7.50;
         attribute roverSettleSpeedLimitMps : Real = 0.25;
         attribute surfaceRouteTimeoutS : Real = 900.0;
+        // A route that has no measurable horizontal progress is a physical
+        // integration fault (usually contact/steering geometry), not a reason
+        // to keep evaluating the same control law until the mission timeout.
+        attribute surfaceRouteStallTimeoutS : Real = 15.0;
         // Visual review contract.  These are intentionally small, stable
         // presentation datums, not a hidden CAD model: the Twin graphics test
         // reads them and compares them with composed USD geometry.
@@ -365,6 +375,12 @@ package Griffin1Requirements {
         verify gr008;
         verify gr026;
         verify gr031;
+    }
+
+    verification def Verify_GriffinAdapterRelease {
+        subject lander : Griffin1Lander;
+        subject rover : HostedRoverInterface;
+        verify gr026;
     }
 
     verification def Verify_GriffinLandingStability {

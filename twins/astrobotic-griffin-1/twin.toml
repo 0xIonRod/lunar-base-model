@@ -117,6 +117,12 @@ script = "scenarios/tests/griffin_surface_ops_contract.rhai"
 verdict_channel = "GRIFFIN_LANDING_STABILITY"
 
 [[verification.cases]]
+name = "Griffin1Requirements::Verify_GriffinAdapterRelease"
+scene = "scenes/griffin_1_detach_stability_test.usda"
+script = "scenarios/tests/griffin_detach_stability.rhai"
+verdict_channel = "GRIFFIN_ADAPTER_RELEASE"
+
+[[verification.cases]]
 name = "MoonBaseProjectRequirements::Verify_MoonBaseProjectRequirements"
 scene = "tests/griffin_requirements.usda"
 script = "scenarios/tests/griffin_requirements.rhai"
