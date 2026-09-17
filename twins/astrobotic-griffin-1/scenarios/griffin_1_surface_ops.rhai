@@ -64,7 +64,6 @@ fn on_start(me, ctx) {
     this.phase_timeout = false;
     this.rover_brake_held = false;
     this.route_started = false;
-    this.route_control_error = false;
     this.route_command_updates = 0;
     this.event_trace = [];
 }
