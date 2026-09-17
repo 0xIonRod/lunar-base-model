@@ -1,0 +1,10 @@
+{
+  "file": "FLIP_rover_v3_corrected.FCStd",
+  "sha256": "b552e2084004fbed67bf00df17e17fa32f256b98d553116af91ea239d2bcaae3",
+  "zip_crc_error": null,
+  "gui_xml": true,
+  "visual_review": [
+    "v3_closed.png",
+    "v3_deployed.png"
+  ]
+}

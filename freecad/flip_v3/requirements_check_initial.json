@@ -1,0 +1,494 @@
+{
+  "started_utc": "2026-09-17T08:49:00.192244+00:00",
+  "checks": [
+    {
+      "check": "saved closed",
+      "passed": true,
+      "actual": 0.0
+    },
+    {
+      "check": "named subject Chassis",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "named subject Exterior",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "named subject Equipment",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "named subject Mobility",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "named subject Power",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "named subject PayloadDeck",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "named subject BatteryEnclosure",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "named subject PowerControllerEnclosure",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "named subject SolarArrayPanelBody",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "wheel count",
+      "passed": true,
+      "actual": 4.0
+    },
+    {
+      "check": "LF lateral center",
+      "passed": true,
+      "actual": 1000.0
+    },
+    {
+      "check": "LF longitudinal center",
+      "passed": true,
+      "actual": 850.0
+    },
+    {
+      "check": "LF center height",
+      "passed": true,
+      "actual": 458.0
+    },
+    {
+      "check": "LF roll axis X",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "LF band radius",
+      "passed": true,
+      "actual": [
+        432.0,
+        450.0,
+        458.0
+      ]
+    },
+    {
+      "check": "LF rib radius",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "LF tire width",
+      "passed": true,
+      "actual": 280.0000000000001
+    },
+    {
+      "check": "LR lateral center",
+      "passed": true,
+      "actual": 1000.0
+    },
+    {
+      "check": "LR longitudinal center",
+      "passed": true,
+      "actual": 850.0
+    },
+    {
+      "check": "LR center height",
+      "passed": true,
+      "actual": 458.0
+    },
+    {
+      "check": "LR roll axis X",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "LR band radius",
+      "passed": true,
+      "actual": [
+        432.0,
+        450.0,
+        458.0
+      ]
+    },
+    {
+      "check": "LR rib radius",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "LR tire width",
+      "passed": true,
+      "actual": 280.0000000000001
+    },
+    {
+      "check": "RF lateral center",
+      "passed": true,
+      "actual": 1000.0
+    },
+    {
+      "check": "RF longitudinal center",
+      "passed": true,
+      "actual": 850.0
+    },
+    {
+      "check": "RF center height",
+      "passed": true,
+      "actual": 458.0
+    },
+    {
+      "check": "RF roll axis X",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "RF band radius",
+      "passed": true,
+      "actual": [
+        432.0,
+        450.0,
+        458.0
+      ]
+    },
+    {
+      "check": "RF rib radius",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "RF tire width",
+      "passed": true,
+      "actual": 280.0000000000001
+    },
+    {
+      "check": "RR lateral center",
+      "passed": true,
+      "actual": 1000.0
+    },
+    {
+      "check": "RR longitudinal center",
+      "passed": true,
+      "actual": 850.0
+    },
+    {
+      "check": "RR center height",
+      "passed": true,
+      "actual": 458.0
+    },
+    {
+      "check": "RR roll axis X",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "RR band radius",
+      "passed": true,
+      "actual": [
+        432.0,
+        450.0,
+        458.0
+      ]
+    },
+    {
+      "check": "RR rib radius",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "RR tire width",
+      "passed": true,
+      "actual": 280.0000000000001
+    },
+    {
+      "check": "Length baseplate",
+      "passed": true,
+      "actual": 1460.0
+    },
+    {
+      "check": "Width baseplate",
+      "passed": true,
+      "actual": 2100.0
+    },
+    {
+      "check": "Height baseplate",
+      "passed": true,
+      "actual": 20.0
+    },
+    {
+      "check": "body XLength",
+      "passed": true,
+      "actual": 1476.0
+    },
+    {
+      "check": "body YLength",
+      "passed": true,
+      "actual": 2116.0
+    },
+    {
+      "check": "body ZLength",
+      "passed": false,
+      "actual": 376.0
+    },
+    {
+      "check": "panel XLength",
+      "passed": true,
+      "actual": 1800.0
+    },
+    {
+      "check": "panel YLength",
+      "passed": true,
+      "actual": 1380.0
+    },
+    {
+      "check": "panel ZLength",
+      "passed": true,
+      "actual": 20.000000000000025
+    },
+    {
+      "check": "moving member SolarBackplate",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "moving member SolarFrameFront",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "moving member SolarFrameRear",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "moving member SolarFrameL",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "moving member SolarFrameR",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "moving member MovingHingeL",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "moving member MovingHingeR",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "moving member SensorBar",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "moving member CameraL",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "moving member CameraR",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "cell count",
+      "passed": true,
+      "actual": 120.0
+    },
+    {
+      "check": "0 hinge x",
+      "passed": true,
+      "actual": -690.0000000000001
+    },
+    {
+      "check": "0 hinge y",
+      "passed": true,
+      "actual": 0.0
+    },
+    {
+      "check": "0 hinge z",
+      "passed": true,
+      "actual": 950.0000000000002
+    },
+    {
+      "check": "0 hinge axis global Y",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "0 tip X",
+      "passed": true,
+      "actual": 690.0000000000001
+    },
+    {
+      "check": "0 tip Z",
+      "passed": true,
+      "actual": 950.0000000000002
+    },
+    {
+      "check": "0 all fixed parts unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "82.0 hinge x",
+      "passed": true,
+      "actual": -690.0000000000001
+    },
+    {
+      "check": "82.0 hinge y",
+      "passed": true,
+      "actual": 0.0
+    },
+    {
+      "check": "82.0 hinge z",
+      "passed": true,
+      "actual": 950.0000000000002
+    },
+    {
+      "check": "82.0 hinge axis global Y",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "82.0 tip X",
+      "passed": true,
+      "actual": -497.9411206751098
+    },
+    {
+      "check": "82.0 tip Z",
+      "passed": true,
+      "actual": 2316.5699348633675
+    },
+    {
+      "check": "82.0 all fixed parts unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "cameras follow panel",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "90.0 hinge x",
+      "passed": true,
+      "actual": -690.0000000000001
+    },
+    {
+      "check": "90.0 hinge y",
+      "passed": true,
+      "actual": 0.0
+    },
+    {
+      "check": "90.0 hinge z",
+      "passed": true,
+      "actual": 950.0000000000002
+    },
+    {
+      "check": "90.0 hinge axis global Y",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "90.0 tip X",
+      "passed": true,
+      "actual": -690.0000000000005
+    },
+    {
+      "check": "90.0 tip Z",
+      "passed": true,
+      "actual": 2330.0000000000005
+    },
+    {
+      "check": "90.0 all fixed parts unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "0 hinge x",
+      "passed": true,
+      "actual": -690.0000000000001
+    },
+    {
+      "check": "0 hinge y",
+      "passed": true,
+      "actual": 0.0
+    },
+    {
+      "check": "0 hinge z",
+      "passed": true,
+      "actual": 950.0000000000002
+    },
+    {
+      "check": "0 hinge axis global Y",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "0 tip X",
+      "passed": true,
+      "actual": 690.0000000000001
+    },
+    {
+      "check": "0 tip Z",
+      "passed": true,
+      "actual": 950.0000000000002
+    },
+    {
+      "check": "0 all fixed parts unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "bounded input -1",
+      "passed": false,
+      "actual": -1.0
+    },
+    {
+      "check": "bounded input 91",
+      "passed": false,
+      "actual": 91.0
+    },
+    {
+      "check": "LF independent side roll",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "LR independent side roll",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "RF independent side roll",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "RR independent side roll",
+      "passed": true,
+      "actual": null
+    }
+  ],
+  "contract": "flip_cad_requirements.sysml",
+  "model_sha256": "b552e2084004fbed67bf00df17e17fa32f256b98d553116af91ea239d2bcaae3",
+  "passed": false
+}

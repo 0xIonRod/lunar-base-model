@@ -1,0 +1,27 @@
+import FreeCAD as App,FreeCADGui as Gui
+from pathlib import Path
+from PySide import QtCore
+import json,traceback
+W=Path(__file__).resolve().parent
+def run():
+ try:
+  d=App.openDocument(str(W/'FLIP_rover_v3_side_hinge.FCStd'));App.setActiveDocument(d.Name);Gui.activateWorkbench('PartWorkbench')
+  for o in d.Objects:
+   if o.TypeId=='App::Part':o.ViewObject.Visibility=True
+   elif 'StudyColor' in o.PropertiesList:
+    o.ViewObject.Visibility=True;o.ViewObject.ShapeColor=tuple(o.StudyColor)[:3];o.ViewObject.DisplayMode='Flat Lines'
+   elif o.ViewObject:o.ViewObject.Visibility=False
+  d.recompute()
+  import tempfile, shutil
+  out=Path(tempfile.mkdtemp(prefix='flip_side_'))/'FLIP_rover_v3_corrected.FCStd'
+  d.saveAs(str(out))
+  shutil.copy2(out,W/'FLIP_rover_v3_corrected.FCStd')
+  App.closeDocument(d.Name);d=App.openDocument(str(out));App.setActiveDocument(d.Name)
+  v=Gui.activeDocument().activeView()
+  z=App.Vector(1,1,.75);z.normalize();x=App.Vector(0,0,1).cross(z);x.normalize();y=z.cross(x)
+  v.setCameraOrientation(App.Rotation(x,y,z,'ZXY').Q)
+  for angle,n in [(0,'closed'),(82,'deployed'),(0,'restowed')]:
+   d.Motion.SolarAngle=angle;d.recompute();Gui.updateGui();v.fitAll();v.saveImage(str(W/('v3_'+n+'.png')),1440,1100,'White')
+  (W/'v3_presentation.json').write_text(json.dumps({'reopened':True,'hidden_leaves':[o.Name for o in d.Objects if 'StudyColor' in o.PropertiesList and not o.ViewObject.Visibility],'angles':[0,82,0]}))
+ except Exception:(W/'v3_presentation.json').write_text(traceback.format_exc())
+QtCore.QTimer.singleShot(1500,run)

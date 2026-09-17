@@ -1,0 +1,1527 @@
+{
+  "started_utc": "2026-09-17T08:28:38.677152+00:00",
+  "gap_tolerance_mm": 0.01,
+  "penetration_tolerance_mm3": 1.0,
+  "model_sha256": "43d8c0f9d86f2ca087ed0ada744b0824abbeb10198cfceaf1cb3ac67c7e38600",
+  "shape_count": 224,
+  "invalid": [],
+  "multi_solid_objects": {
+    "SolarFrameRear": 3
+  },
+  "expressions": {
+    "WheelLF": [
+      [
+        ".Placement.Rotation.Angle",
+        "Motion.LeftWheelRoll"
+      ]
+    ],
+    "WheelLR": [
+      [
+        ".Placement.Rotation.Angle",
+        "Motion.LeftWheelRoll"
+      ]
+    ],
+    "WheelRF": [
+      [
+        ".Placement.Rotation.Angle",
+        "Motion.RightWheelRoll"
+      ]
+    ],
+    "WheelRR": [
+      [
+        ".Placement.Rotation.Angle",
+        "Motion.RightWheelRoll"
+      ]
+    ],
+    "SolarArrayPanelBody": [
+      [
+        ".Placement.Rotation.Angle",
+        "-Motion.SolarAngle * 1 deg"
+      ]
+    ]
+  },
+  "phase": "COMPLETE",
+  "interfaces": [
+    {
+      "part": "LowerRailL",
+      "solid": 0,
+      "mate": "Baseplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "UpperRailL",
+      "solid": 0,
+      "mate": "PostLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PostLF",
+      "solid": 0,
+      "mate": "LowerRailL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PostLR",
+      "solid": 0,
+      "mate": "LowerRailL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "LowerRailR",
+      "solid": 0,
+      "mate": "Baseplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "UpperRailR",
+      "solid": 0,
+      "mate": "PostRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PostRF",
+      "solid": 0,
+      "mate": "LowerRailR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PostRR",
+      "solid": 0,
+      "mate": "LowerRailR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "UpperCrossF",
+      "solid": 0,
+      "mate": "UpperRailL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "UpperCrossR",
+      "solid": 0,
+      "mate": "UpperRailL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "FloorCross0",
+      "solid": 0,
+      "mate": "Baseplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "FloorCross1",
+      "solid": 0,
+      "mate": "Baseplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "FloorCross2",
+      "solid": 0,
+      "mate": "Baseplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SkinL",
+      "solid": 0,
+      "mate": "LowerRailL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SkinR",
+      "solid": 0,
+      "mate": "LowerRailR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SkinFront",
+      "solid": 0,
+      "mate": "PostLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SkinRear",
+      "solid": 0,
+      "mate": "PostLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "TopDeck",
+      "solid": 0,
+      "mate": "UpperRailL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "BatteryTray",
+      "solid": 0,
+      "mate": "FloorCross1",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "BatteryEnclosure",
+      "solid": 0,
+      "mate": "BatteryTray",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "AvionicsTray",
+      "solid": 0,
+      "mate": "FloorCross1",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "AvionicsEnclosure",
+      "solid": 0,
+      "mate": "AvionicsTray",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PowerControllerTray",
+      "solid": 0,
+      "mate": "FloorCross2",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PowerControllerEnclosure",
+      "solid": 0,
+      "mate": "PowerControllerTray",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PayloadMount0",
+      "solid": 0,
+      "mate": "TopDeck",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PayloadMount1",
+      "solid": 0,
+      "mate": "TopDeck",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PayloadMount2",
+      "solid": 0,
+      "mate": "TopDeck",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PayloadMount3",
+      "solid": 0,
+      "mate": "TopDeck",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PayloadDeck",
+      "solid": 0,
+      "mate": "PayloadMount0",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PayloadRail0",
+      "solid": 0,
+      "mate": "PayloadDeck",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "PayloadRail1",
+      "solid": 0,
+      "mate": "PayloadDeck",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "LanderMount0",
+      "solid": 0,
+      "mate": "Baseplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "LanderMount1",
+      "solid": 0,
+      "mate": "Baseplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "LanderMount2",
+      "solid": 0,
+      "mate": "Baseplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "LanderMount3",
+      "solid": 0,
+      "mate": "Baseplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "DriveLF",
+      "solid": 0,
+      "mate": "SkinL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "TireLF",
+      "solid": 0,
+      "mate": "SpiderLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SpiderLF",
+      "solid": 0,
+      "mate": "DriveLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubCapLF",
+      "solid": 0,
+      "mate": "SpiderLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLF0",
+      "solid": 0,
+      "mate": "HubCapLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLF1",
+      "solid": 0,
+      "mate": "HubCapLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLF2",
+      "solid": 0,
+      "mate": "HubCapLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLF3",
+      "solid": 0,
+      "mate": "HubCapLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLF4",
+      "solid": 0,
+      "mate": "HubCapLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLF5",
+      "solid": 0,
+      "mate": "HubCapLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLF6",
+      "solid": 0,
+      "mate": "HubCapLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLF7",
+      "solid": 0,
+      "mate": "HubCapLF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "DriveLR",
+      "solid": 0,
+      "mate": "SkinL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "TireLR",
+      "solid": 0,
+      "mate": "SpiderLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SpiderLR",
+      "solid": 0,
+      "mate": "DriveLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubCapLR",
+      "solid": 0,
+      "mate": "SpiderLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLR0",
+      "solid": 0,
+      "mate": "HubCapLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLR1",
+      "solid": 0,
+      "mate": "HubCapLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLR2",
+      "solid": 0,
+      "mate": "HubCapLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLR3",
+      "solid": 0,
+      "mate": "HubCapLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLR4",
+      "solid": 0,
+      "mate": "HubCapLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLR5",
+      "solid": 0,
+      "mate": "HubCapLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLR6",
+      "solid": 0,
+      "mate": "HubCapLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltLR7",
+      "solid": 0,
+      "mate": "HubCapLR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "DriveRF",
+      "solid": 0,
+      "mate": "SkinR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "TireRF",
+      "solid": 0,
+      "mate": "SpiderRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SpiderRF",
+      "solid": 0,
+      "mate": "DriveRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubCapRF",
+      "solid": 0,
+      "mate": "SpiderRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRF0",
+      "solid": 0,
+      "mate": "HubCapRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRF1",
+      "solid": 0,
+      "mate": "HubCapRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRF2",
+      "solid": 0,
+      "mate": "HubCapRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRF3",
+      "solid": 0,
+      "mate": "HubCapRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRF4",
+      "solid": 0,
+      "mate": "HubCapRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRF5",
+      "solid": 0,
+      "mate": "HubCapRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRF6",
+      "solid": 0,
+      "mate": "HubCapRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRF7",
+      "solid": 0,
+      "mate": "HubCapRF",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "DriveRR",
+      "solid": 0,
+      "mate": "SkinR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "TireRR",
+      "solid": 0,
+      "mate": "SpiderRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SpiderRR",
+      "solid": 0,
+      "mate": "DriveRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubCapRR",
+      "solid": 0,
+      "mate": "SpiderRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRR0",
+      "solid": 0,
+      "mate": "HubCapRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRR1",
+      "solid": 0,
+      "mate": "HubCapRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRR2",
+      "solid": 0,
+      "mate": "HubCapRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRR3",
+      "solid": 0,
+      "mate": "HubCapRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRR4",
+      "solid": 0,
+      "mate": "HubCapRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRR5",
+      "solid": 0,
+      "mate": "HubCapRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRR6",
+      "solid": 0,
+      "mate": "HubCapRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HubBoltRR7",
+      "solid": 0,
+      "mate": "HubCapRR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SolarBackplate",
+      "solid": 0,
+      "mate": "MovingHingeL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SolarFrameFront",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 2.2737367544323206e-13
+    },
+    {
+      "part": "SolarFrameRear",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SolarFrameRear",
+      "solid": 1,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SolarFrameRear",
+      "solid": 2,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SolarFrameL",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 4.0990372275064023e-13
+    },
+    {
+      "part": "SolarFrameR",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 4.0990372275064023e-13
+    },
+    {
+      "part": "Cell00_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell00_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell00_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell00_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell00_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell00_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell00_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell00_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell00_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell00_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell01_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell02_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell03_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell04_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell05_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell06_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell07_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell08_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell09_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell10_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_00",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_01",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_02",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_03",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_04",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_05",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_06",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_07",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_08",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "Cell11_09",
+      "solid": 0,
+      "mate": "SolarBackplate",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HingeSupportL",
+      "solid": 0,
+      "mate": "TopDeck",
+      "gap_mm": 1.1368683772161603e-13
+    },
+    {
+      "part": "HingePinL",
+      "solid": 0,
+      "mate": "HingeSupportL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "MovingHingeL",
+      "solid": 0,
+      "mate": "HingePinL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "HingeSupportR",
+      "solid": 0,
+      "mate": "TopDeck",
+      "gap_mm": 1.1368683772161603e-13
+    },
+    {
+      "part": "HingePinR",
+      "solid": 0,
+      "mate": "HingeSupportR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "MovingHingeR",
+      "solid": 0,
+      "mate": "HingePinR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SensorBar",
+      "solid": 0,
+      "mate": "SolarFrameFront",
+      "gap_mm": 1.1368683772161603e-13
+    },
+    {
+      "part": "SensorFootL",
+      "solid": 0,
+      "mate": "SensorBar",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "CameraL",
+      "solid": 0,
+      "mate": "SensorFootL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "LensL",
+      "solid": 0,
+      "mate": "CameraL",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "SensorFootR",
+      "solid": 0,
+      "mate": "SensorBar",
+      "gap_mm": 1.1368683772161603e-13
+    },
+    {
+      "part": "CameraR",
+      "solid": 0,
+      "mate": "SensorFootR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "LensR",
+      "solid": 0,
+      "mate": "CameraR",
+      "gap_mm": 0.0
+    },
+    {
+      "part": "StowRestL",
+      "solid": 0,
+      "mate": "TopDeck",
+      "gap_mm": 1.1368683772161603e-13
+    },
+    {
+      "part": "StowRestR",
+      "solid": 0,
+      "mate": "TopDeck",
+      "gap_mm": 1.1368683772161603e-13
+    }
+  ],
+  "failed_interfaces": [],
+  "ungrounded_features": [],
+  "static_intersections": [],
+  "panel_samples": [
+    {
+      "degrees": 0,
+      "front_point_mm": [
+        690.0000000000001,
+        0.0,
+        950.0000000000002
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 5,
+      "front_point_mm": [
+        684.7486833666088,
+        0.0,
+        1070.2749249917688
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 10,
+      "front_point_mm": [
+        669.0346991568471,
+        0.0,
+        1189.6344851803642
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 20,
+      "front_point_mm": [
+        606.7758166845537,
+        0.0,
+        1421.987797789423
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 30,
+      "front_point_mm": [
+        505.115057222525,
+        0.0,
+        1640.000000000001
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 40,
+      "front_point_mm": [
+        367.14133150418945,
+        0.0,
+        1837.0469013674249
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 50,
+      "front_point_mm": [
+        197.04690136742408,
+        0.0,
+        2007.14133150419
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 60,
+      "front_point_mm": [
+        2.2737367544323206e-13,
+        -7.66053886991358e-14,
+        2145.1150572225256
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 70,
+      "front_point_mm": [
+        -218.01220221057815,
+        0.0,
+        2246.7758166845542
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 82,
+      "front_point_mm": [
+        -497.9411206751098,
+        0.0,
+        2316.5699348633675
+      ],
+      "penetrations": []
+    },
+    {
+      "degrees": 90,
+      "front_point_mm": [
+        -690.0000000000005,
+        0.0,
+        2330.0000000000005
+      ],
+      "penetrations": []
+    }
+  ],
+  "wheel_samples": [
+    {
+      "degrees": 0,
+      "penetrations": []
+    },
+    {
+      "degrees": 15,
+      "penetrations": []
+    },
+    {
+      "degrees": 45,
+      "penetrations": []
+    },
+    {
+      "degrees": 90,
+      "penetrations": []
+    },
+    {
+      "degrees": 180,
+      "penetrations": []
+    },
+    {
+      "degrees": 270,
+      "penetrations": []
+    }
+  ],
+  "passed": true
+}

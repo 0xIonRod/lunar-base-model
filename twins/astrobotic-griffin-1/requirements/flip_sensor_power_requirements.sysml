@@ -1,3 +1,6 @@
+// Legacy runtime visual-study contract; not the corrected FreeCAD v3 geometry.
+// See flip_cad_requirements.sysml for current CAD behavior and dimensions.
+// Runtime promotion remains OPEN; these builder-consumed values are unchanged.
 package FlipSensorPowerRequirements {
     private import ScalarValues::String;
 

@@ -1,3 +1,5 @@
+> Current FLIP CAD: [flip_v3](flip_v3/README.md), with corrected side hinge. The instructions below describe the historical v1 generator and do not reproduce v3.
+
 # FLIP rover FreeCAD model
 
 `FLIP_Rover.py` builds and saves `FLIP_Rover.FCStd` in this folder.

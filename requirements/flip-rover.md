@@ -1,82 +1,127 @@
-# FLIP Rover requirements
+# FLIP rover requirements
+Updated 2026-09-17. Current artifact: [FreeCAD v3](../freecad/flip_v3/README.md).
+Scope: editable reference-informed CAD study and requirements for later Twin promotion.
+Neither the CAD nor its sampled checks constitutes flight qualification.
+SysML contract: [FlipCadRequirements](../twins/astrobotic-griffin-1/requirements/flip_cad_requirements.sysml).
 
-**Last updated:** 2026-09-01
-**Scope:** FreeCAD packaging model plus corresponding LunCoSim vehicle asset.
-**Boundary:** This is a creation contract for a study proxy, not released
-as-built or flight-qualified FLIP CAD.
+## Sources and authority
+- S1: [Astrolab LPSC 2026 project update](https://www.hou.usra.edu/meetings/lpsc2026/pdf/1874.pdf):
+  four wheels, skid steer, and a 480 kg launch-mass constraint.
+- S2: [Astrolab official rendering](https://www.astrolab.space/wp-content/uploads/2025/06/Picture1-1.jpg):
+  deployed panel along one side. This is visual orientation evidence, not an engineering drawing.
+- S3: [Astrolab FLIP](https://www.astrolab.space/flip-rover/):
+  flexible wheels and battery-enclosure context.
+- S4: [Astrolab Griffin-1 announcement](https://www.astrolab.space/2025/02/05/astrolabs-flip-rover-joins-astrobotics-griffin-1-to-the-moon/):
+  historical public 30 kg payload capacity.
+- S5: [Astrolab mission announcement](https://www.astrolab.space/2026/05/18/astrolab-announces-nasa-payloads-for-upcoming-mission-to-the-moon/):
+  direct top-deck egress. Ramp use is a separate study scenario, not a required flight sequence.
+- D1: v3 CAD geometry and native controls; detailed dimensions are estimated study values.
+- L1: retained USD/Modelica/Editor visual-study configuration. It is not promoted to v3 by this change.
 
-## Requirements
+## Requirements and verification allocation
+All statements are requirements for the stated scope. PASS below means only the listed
+evidence supports the bounded CAD criterion; OPEN means not implemented or verified.
+IDs FR-001 through FR-008 are retained with corrected intent.
 
-| ID | Requirement | Status | Creation / acceptance note |
+| ID | Requirement | Allocated subject / basis | Verification and status |
 |---|---|---|---|
-| FR-001 | Model a low, broad rover body with a replaceable payload deck and visible avionics/battery enclosure. | MUST | Keep body, deck, enclosure, mast, and payload interface separately identifiable in FreeCAD and USD. |
-| FR-002 | Use four large wheels with airless/hyper-deformable-tire visual intent and all-wheel-steer study behavior. | STUDY PROXY | Four-wheel count and steering map remain unconfirmed FLIP flight data; preserve the proxy label. |
-| FR-003 | Model the top photovoltaic array as its own panel assembly, including frame, cell surface, hinge hardware, sensor bar, and deployed/stowed poses. | IMPLEMENTED IN FREECAD MACRO | The supplied visual shows a large framed dark-cell panel standing behind the body with top-mounted sensor hardware. Treat the image as visual evidence only. |
-| FR-004 | Connect the solar panel assembly to the rover body with an explicit revolute joint. | IMPLEMENTED IN FREECAD / OPEN RUNTIME | `SolarArrayPanelBody` is a separate child body driven by `SolarArrayJoint` about the X/lateral hinge axis; limits are 0–90 deg with an 82 deg deployed pose. |
-| FR-005 | Keep the battery pack and power controller body-mounted unless a source shows that the battery itself articulates. | REQUIREMENT CLARIFICATION | “Moving solar battery” is interpreted as a moving solar panel/array; do not invent a moving battery from that phrase. |
-| FR-006 | Preserve the Griffin payload interface: FLIP is fixed to the lander adapter during descent and released after touchdown/ramp deployment. | MUST | The physical release boundary belongs to the Griffin scene; FreeCAD should show the adapter datum and mounting points. |
-| FR-007 | Make major subassemblies easy to replace: chassis, each wheel station, solar panel/joint, payload deck, mast/sensors, battery, and power electronics. | MUST | Use named groups/parts and stable IDs in CAD and USD. |
-| FR-008 | Keep all sourced facts, study values, and unknowns traceable in this record. | MUST | Update this file whenever a source or tested implementation changes a creation-relevant value. |
+| FR-001 | The CAD shall identify chassis, removable skins, battery, power controller and payload deck as separate named components. | Chassis, Exterior, Equipment / D1 | V1 inventory; PASS CAD |
+| FR-002 | The CAD shall contain exactly four wheel stations with fixed lateral roll axes and independent left/right roll controls representing skid-steer kinematics. | Mobility, Motion / S1,D1 | V2 inventory and asymmetric roll poses; PASS CAD, traction dynamics OPEN |
+| FR-003 | The solar assembly shall contain backing, frame, cells, moving hinge members and a sensor bar whose sensors follow the panel. | SolarArrayPanelBody / S2,D1 | V1 membership and V3 pose cycle; PASS CAD |
+| FR-004 | The panel shall rotate about the longitudinal side hinge specified below, with bounded effective angle and saved closed pose. | Power, SolarArrayPanelBody, Motion / S2,D1 | V3 native expression and 0/82/0 reopen cycle; PASS CAD |
+| FR-005 | Battery and power-controller placements shall remain body-fixed throughout panel actuation. | Equipment / D1 | V3 global-placement comparison; PASS CAD |
+| FR-006 | A promoted Twin shall constrain FLIP to the lander before release and release only after touchdown and an authorized egress transition. | Future lander/rover interface / S5 | V6 integration test; OPEN, no CAD release mechanism or ramp interlock claim |
+| FR-007 | The CAD shall preserve separately selectable chassis, wheel stations, solar assembly, payload deck and equipment groups. | FLIP assembly / D1 | V1 inventory; PASS CAD |
+| FR-008 | Each specification shall identify units, applicable configuration, source or estimate, and verification status. | Requirements / S1-S5,D1,L1 | V7 independent AI review and static cross-check; review record linked below |
+| FR-009 | Wheel geometry shall match the explicitly defined CAD radii, width, track and wheelbase below within 0.01 mm numerical tolerance. | Mobility / D1 | V2 direct geometry measurements; PASS CAD study, supplier values OPEN |
+| FR-010 | The requirements shall distinguish the 480 kg source constraint, unknown actual mass and legacy 450 kg runtime assumption. | Mass record / S1,L1 | V7 provenance review; PASS documentation only, mass compliance OPEN |
+| FR-011 | The CAD shall match the chassis and panel dimensions below within 0.01 mm numerical tolerance. | Chassis, Power / D1 | V2 measurement; PASS CAD study |
+| FR-012 | Every modeled physical solid shall be valid and connected to the baseplate through its named attachment chain with gaps no larger than 0.01 mm. | Entire CAD / D1 | V4 per-solid attachment graph; PASS |
+| FR-013 | At the listed panel and wheel poses, tested geometry shall have no pair intersection exceeding 1 mm^3. | Panel versus fixed parts; wheel versus other parts; all stowed pairs / D1 | V4 sampled BRep checks; PASS, continuous clearance OPEN |
+| FR-014 | The delivered CAD shall reopen with visible physical components and retain native motion expressions. | Saved FCStd / D1 | V3 GUI cycle and V5 archive/geometry equality; PASS |
+| FR-015 | Future USD/Modelica promotion shall preserve the side hinge, units, separate panel identity and skid-steer behavior and verify release, drive, energy and telemetry behavior. | Future runtime / S1,D1 | V6 runtime tests; OPEN |
+| FR-016 | The handoff shall preserve the baseline and all non-Power geometry and placements. | v2 to v3 / D1 | V5 exact fingerprints of 84 non-Power components; PASS |
 
-## Active study values
+## Current CAD specification (D1)
+Coordinates: right-handed, millimetres, X lateral, Y longitudinal, front = -Y,
+Z up. Ground datum Z = 0. These are geometric study definitions, not manufacturer tolerances.
 
-| Parameter | Active value | Status / provenance |
+| Parameter | Value | Meaning / provenance |
 |---|---:|---|
-| Rover mass | 450 kg | Engineering midpoint around Astrolab’s public “nearly half a metric ton”; not measured. |
-| Envelope | 2.4 m × 1.8 m × 0.7 m | LunCoSim packaging assumption. |
-| Wheel count / steering | 4 / all-wheel-steer | Architecture proxy; FLIP-specific count is not published in the reviewed sources. |
-| Wheel radius / width | 0.45 m / 0.28 m | Simulator packaging proxy. |
-| Payload capacity | 30 kg | Public Astrolab description; retain source link in the research record. |
-| Battery | 28 V, 83.33 Ah, 85% initial SOC | Simulator electrical proxy; replace with the FLIP battery ICD. |
-| Solar array | 3.0 m², 30% efficiency | FLEX-family / simulator study proxy. FreeCAD now defaults closed and supports a hinged 0–90 deg panel motion. |
-| Motor / reduction | 0.9 N·m motor, 200:1, 400 N·m output limit | Simulator actuator proxy, not flight data. |
+| Wheel count | 4 | Source fact S1; CAD LF, LR, RF, RR |
+| Steering architecture | skid steer | Source S1; no steer-yaw joint in this CAD |
+| Wheel main-band radius / diameter | 450 / 900 mm | D1 estimate, excluding raised ribs |
+| Wheel maximum rib radius / diameter | 458 / 916 mm | D1 estimate, nominal rotational envelope |
+| Wheel tire width | 280 mm | D1 axial width; caps/bolts excluded |
+| Wheel center height | 458 mm | D1; rib-tip nominal ground envelope |
+| Wheelbase | 1700 mm | D1 front-to-rear center distance |
+| Track | 2000 mm | D1 left-to-right center distance |
+| Wheel centers | X = ±1000, Y = ±850, Z = 458 mm | D1 four combinations; front negative Y |
+| Wheel controls | LeftWheelRoll, RightWheelRoll (degrees) | D1; same value applied to both wheels on a side around +X; no imposed vehicle translation |
+| Baseplate plan / thickness | 1460 × 2100 / 20 mm | D1 X × Y; Z 360 to 380 |
+| Skinned body envelope | 1476 × 2116 × 396 mm | D1 X × Y × Z; Z 360 to 756; excludes wheels, panel, payload and lander mounts |
+| Wheel-band overall lateral span | 2280 mm | D1; full vehicle max span also includes caps/bolts |
+| Panel backing nominal plan / thickness | 1800 × 1380 / 20 mm | D1 along hinge × folding span; before hinge relief cuts |
+| Panel frame outer plan, closed | 1840 × 1420 mm | D1 along hinge × folding span; excludes sensors |
+| Panel nominal backing area | 2.484 m² | Derived gross rectangle; not active cell area or power rating |
+| Hinge origin | (-690, 0, 950) mm | D1 world coordinates |
+| Hinge axis | global Y, longitudinal | S2 orientation; location D1 estimate |
+| Panel angle control | SolarAngle = 0…90 degrees | D1; saved 0, example deployment 82; not flight limits |
+| Rotation convention | Rz(+90°) Rx(-clamp(SolarAngle,0,90)) | Native parent/local composition; positive control raises panel from deck, equivalent negative global-Y rotation |
+| Free-edge center | (690,0,950) mm at 0° | D1 hinge-frame point (0,-1380,0) |
+| Free-edge at 82° | approximately (-497.94,0,2316.57) mm | Derived pose, excluding frame and sensors |
 
-## Visual cues from the supplied reference
+The effective geometry angle is clamped to 0-90 degrees by the native expression,
+even if scripted assignments retain an out-of-range value in SolarAngle.
+The panel moves as one assembly; fixed bearings/pins and deck rests remain fixed.
+The moving knuckles rotate about the pins. The panel closes over the deck, rises
+along the rover side, and returns to the same closed pose. The sensor bar and both
+camera groups move with the panel. The underlying control is a native placement
+expression, not a solved dynamic revolute constraint, actuator model, latch or harness.
 
-The user-provided image is a visual reference, not an engineering source. It
-supports these presentation requirements: four very large wheels; a white,
-low-profile body; open/spoked wheel centers; a large white-framed dark solar
-panel with a dense cell pattern; panel-side hinge/edge hardware; small sensors
-above the panel; and a box-like payload/equipment volume between the wheels.
-The image does not establish dimensions, wheel count for the flight vehicle,
-joint limits, battery placement, or mechanical ICD values.
+## Mass, payload, power and unknown performance
+| Parameter | Value / status | Scope and evidence |
+|---|---|---|
+| Available launch-mass constraint | 480 kg | S1 mission constraint; not a measured actual rover mass and not a CAD mass calculation |
+| Actual rover launch / dry / loaded mass | TBD | Payload inclusion, consumables, margins and as-built breakdown require supplier data |
+| Payload capacity | 30 kg | Historical S4 public value; current ICD and allocation remain to be confirmed |
+| Per-wheel mass, chassis mass, panel mass | TBD | No densities or component mass properties assigned/validated |
+| Center of mass / inertia tensor | TBD | Must be established before predictive dynamics |
+| Legacy runtime mass | 450 kg | L1 historical assumption, unchanged; does not demonstrate 480 kg compliance |
+| Legacy battery | 28 V, 83.33 Ah, initial SOC 85% | L1 assumed values, not validated hardware specification |
+| Legacy solar input | 3.0 m², efficiency 30% | L1 power proxy; not the v3 backing area or measured power |
+| Legacy motor / gearbox | 0.9 N·m, 200:1, 400 N·m limit | L1 simulation assumptions, not measured torque |
+| Max speed, grade, payload load cases, suspension travel, tire stiffness | TBD | Supplier/test data required |
+| Battery energy, charging limits, thermal limits, panel deployment speed/torque | TBD | CAD actuation has no time/energy/thermal model |
+| Adapter dimensions, release hardware, latch and hinge flight range | TBD | Requires rover/lander ICD and mechanism data |
 
-## Solar-panel articulation contract
+## Verification records
+All paths below are under [freecad/flip_v3](../freecad/flip_v3/).
+- V1/V2/V3: requirements_check.py and requirements_check.json measure native objects,
+  dimensions, topology, controls and frame behavior after reopening.
+- V4: audit.py and v3_audit_latest.json: 224 components, 225 per-solid attachment checks;
+  panel angles 0,5,10,20,30,40,50,60,70,82,90 degrees; wheel angles
+  0,15,45,90,180,270 degrees (right = negative left), panel closed for wheel tests.
+  These are separate pose sets, not every combined panel/wheel configuration.
+- V3/V5: v3_presentation.json, v3_geometry_comparison.json, v3_delivery.json,
+  v3_change_report.json and published_geometry_comparison.json; rendered closed/deployed views.
+  The latter links final-file geometry at all 17 poses to audited_source.FCStd.
+  source_v3_delivery.json preserves pre-clamp provenance; v3_delivery.json identifies the final file.
+- V6: OPEN; no simulator export, dynamic integration, lander release, torque-port,
+  thermal, energy, terrain or telemetry acceptance run accompanies this CAD change.
+- V7: [independent AI SysML review](flip-sysml-review.md). This is a traceability review,
+  not a formal SysML parser or solver certification.
 
-The FreeCAD and runtime representations should expose the same named topology:
+## Existing Twin divergence
+Existing flip_requirements.sysml and component requirements remain the **legacy runtime**
+contract consumed by the Editor/Rhai pipeline. Their 4.40 m chassis width, 2.76 m
+length, directional steering, Y-up coordinates, fixed solar proxy and 450 kg mass
+must not be interpreted as v3 CAD facts. They are retained to avoid silently changing
+simulation behavior. The additive FlipCadRequirements package is the current CAD
+contract. Promotion requires an explicit frame conversion and updated runtime
+acceptance results; no existing runtime test proves the corrected CAD behavior.
 
-```text
-FLIP body (rigid body)
-└── SolarArrayPanelBody (separate rigid body)
-    └── SolarArrayJoint (revolute; X/lateral axis; 0–90 deg)
-```
-
-Acceptance checks:
-
-1. The panel has a distinct body identity and can be selected separately from
-   the chassis.
-2. The joint has an explicit hinge axis and bounded stowed/deployed angles.
-3. The default saved FreeCAD pose is closed at 0 deg; the deployed pose is 82
-   deg upright, with panel sensors moving with the panel.
-4. The panel moves without detaching from or silently becoming part of
-   chassis; in the deployed pose it clears the fixed mast and wheels, and in
-   the closed pose it nests over the payload deck.
-5. The same joint/release intent is represented in USD/physics when the
-   FreeCAD packaging model is promoted into the Twin.
-
-## Current FreeCAD implementation
-
-- `freecad/FLIP_Rover.py` creates the reference-inspired rover and saves it
-  closed/stowed as `freecad/FLIP_Rover.FCStd`.
-- `SolarArrayPanelBody` is the child rigid-body group; its backplate, white
-  frame, dark cell pattern, and moving sensor bar share the body placement.
-- `SolarArrayJoint` is the named FreeCAD revolute-joint controller. Edit its
-  `Angle` property or call `deploy_solar_panel()` / `stow_solar_panel()` in the
-  Python console.
-- The runtime USD asset still needs the equivalent articulated solar joint;
-  this remains a promotion task, not a claim that the current Twin has it.
-
-## Simulator import and integration findings
+## Historical runtime integration findings (2026-09-01; not rerun)
 
 The FreeCAD file is not imported directly by LunCoSim. The exporter selects the
 newest project-owned `*.FCStd`, opens it in FreeCAD, exports `Part::Feature`
@@ -111,26 +156,3 @@ Historical Modelica import issue and fix:
   registering the member file a second time. Modelica `record` classes are
   indexed and viewable but intentionally are not simulation roots; only
   model/block/plain class roots are offered for simulation.
-
-## Open questions
-
-- As-built wheel count, wheel dimensions, loads, steering map, tire stiffness,
-  motor constants, battery capacity, thermal limits, and panel joint limits.
-- Whether the flight solar array is one panel, two panels, or another
-  collapsible geometry; the current FreeCAD representation follows the supplied
-  large-panel reference while retaining the earlier two-wing packaging proxy as
-  an unresolved runtime question.
-- Exact FLIP-to-Griffin payload adapter geometry and release hardware.
-
-## Sources and implementation records
-
-- `research/flip_rover.md` — reviewed public facts and simulator boundary.
-- `twins/astrobotic-griffin-1/vehicles/flip.usda` — active four-wheel FLIP
-  proxy, EPS, thermal, and sensor composition.
-- `freecad/FLIP_Rover.py` — current reference-inspired FreeCAD packaging macro
-  with closed/deployed solar-panel articulation.
-- `tools/freecad/export_twin_assets_v2.py` — FCStd → OBJ → GLB exporter.
-- `luncosim-griffin-1/logs/griffin-1-open-cadfix.err.log` — current runtime
-  warnings and recovery evidence.
-- Astrolab FLIP: https://www.astrolab.space/flip-rover/
-- FLIP design video: https://www.youtube.com/watch?v=UFEMOrg27KE`n
