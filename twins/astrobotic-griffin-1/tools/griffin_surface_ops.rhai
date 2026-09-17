@@ -6,6 +6,19 @@
 // normal Rhai verbs. The functions are intentionally useful from other
 // Griffin scenarios as well as the production surface-operations scenario.
 
+// SetPorts is a persistent level command. Re-sending an unchanged route
+// setpoint every fixed tick only re-enters command reflection and flushing;
+// it does not improve control authority. Ten updates per simulated second
+// preserve the low-speed rover response while keeping command traffic bounded.
+// The cadence is derived from the admitted simulation clock, never wall time.
+fn route_command_rate_hz() { 10.0 }
+
+// A route leg is a physical operation, not an unbounded retry loop. If the
+// measured horizontal distance has not improved for this long, the Twin emits
+// a control fault and the scenario reports evidence immediately instead of
+// spending its full mission timeout in a solver/contact deadlock.
+fn route_stall_timeout_s() { griffin_spec::surface_route_stall_timeout_s() }
+
 /// Put the mission view on the lander while its authored GNC performs descent.
 fn follow_lander() {
     follow(find("/Griffin1SurfaceOps/Lander"));
@@ -36,11 +49,16 @@ fn landing_gate_report() {
     let rover = find("/Griffin1SurfaceOps/FLIP");
     let rover_physics = query("QueryPhysicsState", #{id: rover});
     let rover_settle = rover_route_settle_report(rover);
+    // Topology/performance is sampled only at an explicit diagnostic gate;
+    // keeping it out of per-tick control avoids turning a useful probe into a
+    // source of allocations during a mission.
+    let physics_performance = query("PhysicsPerformance", #{});
     let report = #{
         position: if pose == () { [] } else { pose.world_position },
         physics_state: physics,
         rover_physics_state: rover_physics,
         rover_settle: rover_settle,
+        physics_performance: physics_performance,
         rover_brake_command: get(rover, "brake"),
         rover_throttle_command: get(rover, "throttle"),
         rover_steer_command: get(rover, "steer"),
@@ -107,20 +125,43 @@ fn landing_gate_report() {
     report
 }
 
+/// Return the generic physics/topology snapshot used by Twin diagnostics.
+/// This is intentionally a thin Rhai name over the core query: no component
+/// count or detach bookkeeping is reimplemented in the Twin.
+fn physics_performance() {
+    query("PhysicsPerformance", #{})
+}
+
 // Small observation payload for fixed-clock acceptance tests.  Keep the
 // verbose landing_gate_report available for interactive diagnostics, but do
 // not retain its nested physics snapshots in a per-tick test state map.
 fn landing_stability_sample() {
     let lander = find("/Griffin1SurfaceOps/Lander");
+    if lander == () || lander < 0 { return (); }
     let pose = query("QueryUsdPrim", #{
         path: "/Griffin1SurfaceOps/Lander",
         attrs: ["xformOp:translate"]
     });
+    let physics = query("QueryPhysicsState", #{id: lander});
+    if pose == () || pose.ok == false || pose.world_position == ()
+        || physics == () || physics.ok == false
+        || physics.physics_state_ready != true {
+        return ();
+    }
+    let linear = physics.linear_velocity_mps;
+    let angular = physics.angular_velocity_radps;
+    let up = world_up3(lander);
+    if linear == () || linear.len() != 3 || angular == () || angular.len() != 3
+        || up == () {
+        return ();
+    }
+    let ground_speed = (linear[0] * linear[0] + linear[2] * linear[2]).sqrt();
+    let angular_speed = vlen(angular);
     #{
-        position: if pose == () || pose.world_position == () { [] } else { pose.world_position },
-        upright_axis_y: get(lander, "upright_axis_y"),
-        ground_speed: get(lander, "ground_speed"),
-        angular_speed: get(lander, "angular_speed"),
+        position: pose.world_position,
+        upright_axis_y: up.y,
+        ground_speed: ground_speed,
+        angular_speed: angular_speed,
         touchdown: get(lander, "touchdown")
     }
 }
@@ -213,14 +254,17 @@ fn drive_route_point(rover, target, speed, radius) {
     let command = nav_command(rover, target, speed, radius);
     if command == () {
         brake(rover);
-        return false;
+        return #{ok: false, arrived: false, error: "navigation command unavailable"};
     }
     if command.arrived || command.brake > 0.5 {
         brake(rover);
-        return true;
+        return #{ok: true, arrived: true};
     }
-    drive(rover, command.throttle, command.steer);
-    false
+    // SetPorts holds the latest command until it is replaced. The task leaf
+    // applies this command at a deterministic simulation-time cadence; this
+    // helper stays pure so it can be called from any Rhai function (where the
+    // task kernel's `this` state is intentionally not bound).
+    #{ok: true, arrived: false, throttle: command.throttle, steer: command.steer}
 }
 
 // The release adapter leaves FLIP as a live rigid body.  Keep the route gate
@@ -245,11 +289,31 @@ fn rover_route_settle_report(rover) {
     };
     let height_limit = griffin_spec::rover_settle_height_limit_m();
     let speed_limit = griffin_spec::rover_settle_speed_limit_mps();
+    let support_count = if physics == () || physics.support_contact_count == () {
+        ()
+    } else {
+        physics.support_contact_count
+    };
+    // Release is a deck-stability gate.  FLIP must still have authoritative
+    // support before the route controller releases its brake; it is not
+    // expected to reach surface height until it drives down the ramp.
     let ok = pose != () && speed != () && height_limit != () && speed_limit != ()
+        && support_count != () && support_count > 0
         && pose[1] <= height_limit && speed.abs() <= speed_limit;
     #{ok: ok,
       pose: pose, speed: speed, height_limit_m: height_limit,
-      speed_limit_mps: speed_limit}
+      speed_limit_mps: speed_limit, support_contact_count: support_count}
+}
+
+// The release-settle predicate is a diagnostic gate, not a force loop. A
+// free-body rover can remain unsupported for several seconds while it drops
+// from the deck; running two JSON-producing queries on every fixed tick during
+// that interval needlessly competes with the physics worker. Sample it at a
+// deterministic six-tick cadence (10 Hz at the authored 60 Hz clock) and keep
+// the last probe tick in the task's persistent state. A failed probe simply
+// leaves the wait active; the watchdog still owns the terminal timeout.
+fn rover_route_settle_ready(rover) {
+    rover_route_settle_report(rover).ok
 }
 
 /// Build the native task tree for the short, observable surface route.  Every
@@ -263,15 +327,69 @@ fn rover_route_settle_report(rover) {
 // bounded string/value budget.  Keeping the closure frame here makes each
 // leaf capture only the rover and this leg's datum, while `surface_route()`
 // remains the single source of route geometry.
-fn _surface_route_leg_task(rover, leg) {
+fn _surface_route_leg_task(rover, leg, stall_timeout) {
     let target = leg.target;
     let target_speed = leg.speed;
     let arrival_radius = leg.radius;
     let event = leg.event;
     seq([
-        step(|m| {
-            griffin_surface_ops::drive_route_point(rover, target, target_speed, arrival_radius)
-        }, |m| arrived(rover, target, arrival_radius)),
+        once(|m| {
+            this.route_last_distance = ();
+            this.route_progress_time = elapsed_seconds();
+            if this.route_started != true {
+                this.route_started = true;
+                emit("griffin_surface_route_started");
+                print("[griffin] surface route started; first target=" + target);
+            }
+            true
+        }),
+        step_every(1.0 / route_command_rate_hz(), |m| {
+            // The native task kernel gates this callback at the deterministic
+            // simulation-time cadence. Navigation and SetPorts therefore run
+            // together, while the last valid command is held by the vehicle
+            // controller between samples.
+            this.route_command_updates += 1;
+            let now = elapsed_seconds();
+            let command = griffin_surface_ops::drive_route_point(rover, target, target_speed, arrival_radius);
+            if command == () || command.ok != true {
+                if this.route_control_error != true {
+                    this.route_control_error = true;
+                    let detail = if command == () { "navigation command unavailable" } else { command.error };
+                    print("[griffin] surface route control failed: " + detail);
+                    emit("griffin_surface_route_control_failed");
+                }
+                return false;
+            }
+            if command.arrived { return true; }
+
+            let pose = world_pos3(rover);
+            if pose != () {
+                let delta = vsub(pose, vec3_from(target));
+                let horizontal_distance = vlen(vec3(delta.x, 0.0, delta.z));
+                if this.route_last_distance == ()
+                    || horizontal_distance < this.route_last_distance - 0.02 {
+                    this.route_last_distance = horizontal_distance;
+                    this.route_progress_time = now;
+                } else if this.route_progress_time != ()
+                    && now - this.route_progress_time >= stall_timeout {
+                    this.route_control_error = true;
+                    print("[griffin] surface route stalled before target=" + target);
+                    emit("griffin_surface_route_stalled");
+                    return false;
+                }
+            }
+            let result = drive(rover, command.throttle, command.steer);
+            if result == () || result.ok != true {
+                if this.route_control_error != true {
+                    this.route_control_error = true;
+                    let detail = if result == () { "SetPorts returned no result" } else { result.error };
+                    print("[griffin] surface route SetPorts failed: " + detail);
+                    emit("griffin_surface_route_control_failed");
+                }
+                return false;
+            }
+            false
+        }, |m| this.route_control_error == true || arrived(rover, target, arrival_radius)),
         once(|m| emit(event))
     ])
 }
@@ -280,9 +398,18 @@ fn surface_route_task(rover) {
     // Keep one source of route geometry: the returned sequence is also the
     // machine-readable route consumed by tools and review scripts.
     let legs = surface_route().children;
+    // Resolve SysML policy once while lowering the route. Calling the public
+    // source-backed accessor from a fixed-step leaf would re-read and resolve
+    // the complete Twin source set at every command cadence, turning a bounded
+    // control loop into an unbounded validation workload. Missing policy is a
+    // construction error, never a runtime default.
+    let stall_timeout = route_stall_timeout_s();
+    if stall_timeout == () {
+        throw("surface route stall timeout is missing from SysML");
+    }
     let steps = [];
     for leg in legs {
-        steps.push(_surface_route_leg_task(rover, leg));
+        steps.push(_surface_route_leg_task(rover, leg, stall_timeout));
     }
     seq(steps)
 }
