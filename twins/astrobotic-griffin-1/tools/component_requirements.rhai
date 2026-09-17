@@ -106,7 +106,11 @@ fn finish(source, checks, title, channel, root, package_name, verification) {
     let result = sysml_requirements::evaluate(source, checks);
     result.metrics = #{clock: clock_snapshot(), root: root,
                        component_package: package_name,
-                       verification: verification,
+                       // `evaluate` canonicalizes this identity from the
+                       // mounted SysML report.  Keep metrics and evidence on
+                       // that same source-backed name instead of preserving a
+                       // duplicated package prefix from the observer.
+                       verification: result.verification,
                        separate_component_document: true};
     report_structured_verdict(result, title, channel);
     result
