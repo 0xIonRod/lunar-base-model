@@ -93,6 +93,15 @@ fn coverage(id, component, requirement, verification) {
       verification: _short_identity(verification), kind: "coverage"}
 }
 
+// Build a pathless source-derived assertion for the shared SysML evaluator.
+// Component observers use this for interface equations and other checks that
+// combine typed requirements without pretending there is a single USD prim.
+fn assertion(id, component, requirement, verification, ok, error, actual, expected) {
+    #{id: id, component: component, requirement: _short_identity(requirement),
+      verification: _short_identity(verification), kind: "assert", ok: ok,
+      error: if ok { "" } else { error }, actual: actual, expected: expected}
+}
+
 fn finish(source, checks, title, channel, root, package_name, verification) {
     let result = sysml_requirements::evaluate(source, checks);
     result.metrics = #{clock: clock_snapshot(), root: root,

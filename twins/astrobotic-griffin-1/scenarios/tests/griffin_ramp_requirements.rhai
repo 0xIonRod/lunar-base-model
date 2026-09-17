@@ -46,12 +46,6 @@ fn _behavior_result(id, requirement, ok, message, actual, expected) {
       error: if ok { "" } else { message }, actual: actual, expected: expected}
 }
 
-fn _assert_result(id, requirement, ok, message, actual, expected) {
-    #{id: id, component: "ramp_flip_interface", requirement: requirement,
-      verification: VERIFICATION, kind: "assert", ok: ok,
-      error: if ok { "" } else { message }, actual: actual, expected: expected}
-}
-
 fn _maximum_abs(values) {
     if values == () || values.len() == 0 { return (); }
     let maximum = 0.0;
@@ -79,8 +73,8 @@ fn on_tick(me, ctx) {
         throw("GriffinRampRequirements ramp/FLIP clearance datums are incomplete");
     }
     let required_width = 2.0 * (half_track + wheel_radius + wheel_clearance);
-    checks.push(_assert_result("GRR-003-flip-wheel-clearance",
-        "GriffinRampRequirements::grr003",
+    checks.push(component_requirements::assertion("GRR-003-flip-wheel-clearance",
+        "ramp_flip_interface", "GriffinRampRequirements::grr003", VERIFICATION,
         ramp_width + 0.002 >= required_width,
         "ramp width does not clear both FLIP tyre envelopes and the authored wheel clearance",
         ramp_width, required_width));
