@@ -46,7 +46,9 @@ fn _qualified_attribute(name) {
     }
     let ramp = [
         "rampCount", "rampSurfaceLengthM", "rampSurfaceWidthM",
-        "rampSurfaceThicknessM", "rampMaxDeploymentAngleRad",
+        "rampWheelClearanceM", "rampSurfaceThicknessM", "rampRailHeightM",
+        "rampRailWidthM", "rampSurfaceCenterYM", "rampRailCenterYM",
+        "rampMaxDeploymentAngleRad",
         "rampPortMountX", "rampStarboardMountX", "rampMountY", "rampMountZ",
         "rampHingeOffsetX", "rampHingeOffsetY", "rampHingeOffsetZ",
         "rampSocketX", "rampSocketY", "rampSocketZ",
@@ -159,6 +161,7 @@ fn rover_settle_timeout_s() { _sysml_attribute("roverSettleTimeoutS") }
 fn rover_settle_height_limit_m() { _sysml_attribute("roverSettleHeightLimitM") }
 fn rover_settle_speed_limit_mps() { _sysml_attribute("roverSettleSpeedLimitMps") }
 fn surface_route_timeout_s() { _sysml_attribute("surfaceRouteTimeoutS") }
+fn surface_route_stall_timeout_s() { _sysml_attribute("surfaceRouteStallTimeoutS") }
 fn visual_requirement_usage_count() { _sysml_integer("visualRequirementUsageCount") }
 fn visual_verification_case_name() { _sysml_text("visualVerificationCaseName") }
 fn visual_camera_name() { _sysml_text("visualCameraName") }

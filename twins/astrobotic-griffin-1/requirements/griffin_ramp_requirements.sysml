@@ -9,8 +9,17 @@ package GriffinRampRequirements {
     part def GriffinEgressRamp {
         attribute rampCount : Integer = 2;
         attribute rampSurfaceLengthM : Real = 3.70;
-        attribute rampSurfaceWidthM : Real = 1.70;
+        // FLIP's wheel stations are 2.30 m track with 0.28 m tyres.  The
+        // egress surface therefore keeps a 0.15 m inboard clearance from
+        // either tyre; 2.90 m is the minimum operational envelope used by
+        // the composed ramp geometry below (study datum, not a supplier ICD).
+        attribute rampSurfaceWidthM : Real = 2.90;
+        attribute rampWheelClearanceM : Real = 0.15;
         attribute rampSurfaceThicknessM : Real = 0.18;
+        attribute rampRailHeightM : Real = 0.28;
+        attribute rampRailWidthM : Real = 0.14;
+        attribute rampSurfaceCenterYM : Real = -1.15;
+        attribute rampRailCenterYM : Real = -0.92;
         attribute rampMaxDeploymentAngleRad : Real = 0.58;
         attribute rampPortMountX : Real = 1.00;
         attribute rampStarboardMountX : Real = -1.00;
@@ -45,7 +54,7 @@ package GriffinRampRequirements {
     }
 
     requirement def GRR003_RampEnvelope {
-        doc /* GRR-003 [study] the visual ramp envelope shall use the metric length/width and deployment limit in this package; these values remain study proxies until the mechanical ICD is available. */
+        doc /* GRR-003 [study] the visual ramp envelope shall use the metric length/width and deployment limit in this package; its width shall clear the four FLIP wheel stations by the authored wheel-clearance datum. These values remain study proxies until the mechanical ICD is available. */
     }
 
     requirement def GRR004_RampPlacement {
@@ -57,7 +66,7 @@ package GriffinRampRequirements {
     }
 
     requirement def GRR006_RampGeometry {
-        doc /* GRR-006 [geometry] the composed ramp surface shall match the authored metric length, width, and thickness envelope; rails and support arm remain separately inspectable. */
+        doc /* GRR-006 [geometry] the composed ramp surface shall match the authored metric length, width, and thickness envelope; the width must be sufficient for the FLIP track plus two tyre envelopes and the wheel-clearance datum. Rails and support arm remain separately inspectable. */
     }
 
     requirement def GRR007_RampEvidence {

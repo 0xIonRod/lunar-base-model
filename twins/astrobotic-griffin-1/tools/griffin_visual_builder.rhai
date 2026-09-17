@@ -1687,6 +1687,84 @@ fn _isolated_ramp_contract_ops(edit_target, path, side) {
     ]
 }
 
+// Refine the physical ramp in its own vehicle document.  The surface and
+// rails are still ordinary USD component geometry, but all dimensions are
+// authored through the Editor's typed placement operations.  Keeping this
+// operation separate from `isolated_griffin_ramp_plan` matters: the latter
+// builds the render-only review component, while this one owns the collision
+// envelope used by the mission's FLIP egress.
+fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("isolated_griffin_physical_ramp_geometry_plan requires a document, edit target, and absolute root");
+    }
+    if side != "port" && side != "starboard" {
+        return plan_error("physical ramp side must be port or starboard");
+    }
+    let source = sysml_requirements::source();
+    let length = _sysml_number(source, "rampSurfaceLengthM");
+    let width = _sysml_number(source, "rampSurfaceWidthM");
+    let thickness = _sysml_number(source, "rampSurfaceThicknessM");
+    let rail_height = _sysml_number(source, "rampRailHeightM");
+    let rail_width = _sysml_number(source, "rampRailWidthM");
+    let surface_y = _sysml_number(source, "rampSurfaceCenterYM");
+    let rail_y = _sysml_number(source, "rampRailCenterYM");
+    let clearance = _sysml_number(source, "rampWheelClearanceM");
+    let angle_name = if side == "port" {
+        "rampPortDeploymentAngleRad"
+    } else {
+        "rampStarboardDeploymentAngleRad"
+    };
+    let angle = _sysml_number(source, angle_name);
+    if length == () || width == () || thickness == () || rail_height == ()
+        || rail_width == () || surface_y == () || rail_y == ()
+        || clearance == () || angle == ()
+        || length <= 0.0 || width <= 0.0 || thickness <= 0.0
+        || rail_height <= 0.0 || rail_width <= 0.0 || clearance <= 0.0 {
+        return plan_error("physical ramp geometry SysML datums are incomplete");
+    }
+    let surface = root + "/Surface";
+    let rail = root + "/EdgeRail";
+    let inner = root + "/EdgeRailInner";
+    for path in [surface, rail, inner] {
+        let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
+        if !query_ok(prim) || prim.type_name != "Cube" {
+            return plan_error(path + ": physical ramp geometry must be an existing Cube");
+        }
+    }
+    let angle_deg = angle * 180.0 / 3.141592653589793;
+    let rail_center = width / 2.0 - rail_width / 2.0;
+    let ops = [];
+    for item in [
+        #{path: surface, translation: [0.0, surface_y, 0.0],
+          scale: [length / 2.0, thickness / 2.0, width / 2.0]},
+        #{path: rail, translation: [0.0, rail_y, rail_center],
+          scale: [length / 2.0, rail_height / 2.0, rail_width / 2.0]},
+        #{path: inner, translation: [0.0, rail_y, -rail_center],
+          scale: [length / 2.0, rail_height / 2.0, rail_width / 2.0]},
+    ] {
+        let placement = assembly_builder::place_plan(edit_target, item.path,
+            item.translation, [0.0, 0.0, angle_deg], item.scale);
+        if !placement.ok { return placement; }
+        for op in placement.ops { ops.push(op); }
+    }
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
+        name: "lunco:operational_width_m", type_name: "double", value: width.to_string()}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
+        name: "lunco:wheel_clearance_m", type_name: "double", value: clearance.to_string()}});
+    #{ok: true, kind: "griffin_physical_ramp_geometry", root: root,
+      side: side, width_m: width, clearance_m: clearance, paths: [surface, rail, inner],
+      ops: ops, no_op: ops.len() == 0}
+}
+
+fn apply_isolated_griffin_physical_ramp_geometry(doc, edit_target, root, side, parent_gen) {
+    let plan = isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc,
+        "Refine isolated Griffin " + side + " physical ramp geometry", plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, command: command,
+      root: root, side: side, width_m: plan.width_m}
+}
+
 /// Build one ramp, its hinge datum, and its typed mount relation.  This is the
 /// preferred entry point when an agent is refining the ramp in the Editor;
 /// the full-vehicle plan is only a convenience that composes these same
