@@ -348,11 +348,6 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
             // simulation-time cadence. Navigation and SetPorts therefore run
             // together, while the last valid command is held by the vehicle
             // controller between samples.
-            // Once one leg has latched a control fault, stop issuing commands
-            // for the remaining legs.  The sequence still unwinds so the
-            // scenario's single structured failure gate can report the fault,
-            // but it must not keep touching navigation/ports after failure.
-            if this.route_control_error == true { return true; }
             this.route_command_updates += 1;
             let now = elapsed_seconds();
             let command = griffin_surface_ops::drive_route_point(rover, target, target_speed, arrival_radius);
@@ -395,14 +390,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
             }
             false
         }, |m| this.route_control_error == true || arrived(rover, target, arrival_radius)),
-        // A failed leg is a terminal route condition, not a success edge for
-        // every later waypoint.  Keep the task sequence structurally bounded
-        // while suppressing false mission milestones after the first fault.
-        once(|m| {
-            if this.route_control_error == true { return true; }
-            emit(event);
-            true
-        })
+        once(|m| emit(event))
     ])
 }
 
