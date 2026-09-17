@@ -277,7 +277,15 @@ fn rover_route_settle_report(rover) {
     // provider instead so this gate observes the same admitted rigid-body
     // state as every other Twin physics acceptance check.
     let physics = query("QueryPhysicsState", #{id: rover});
-    let velocity = if physics == () || physics.linear_velocity_mps == () {
+    let physics_ok = physics != () && physics.ok != false;
+    let physics_error = if physics == () {
+        "physics query returned no result"
+    } else if !physics_ok && physics.error != () {
+        physics.error
+    } else {
+        ""
+    };
+    let velocity = if !physics_ok || physics.linear_velocity_mps == () {
         ()
     } else {
         physics.linear_velocity_mps
@@ -289,21 +297,33 @@ fn rover_route_settle_report(rover) {
     };
     let height_limit = griffin_spec::rover_settle_height_limit_m();
     let speed_limit = griffin_spec::rover_settle_speed_limit_mps();
-    let support_count = if physics == () || physics.support_contact_count == () {
+    let support_count = if !physics_ok || physics.support_contact_count == () {
         ()
     } else {
         physics.support_contact_count
     };
+    let support_sample_tick = if !physics_ok || physics.support_sample_tick == () {
+        ()
+    } else {
+        physics.support_sample_tick
+    };
+    let now_tick = sim_tick();
+    let support_fresh = support_sample_tick != () && now_tick >= support_sample_tick
+        && now_tick - support_sample_tick <= 1;
     // Release is a ground-stability gate.  FLIP must have authoritative
     // support at the normalized surface datum before wheel torque is enabled;
     // a deck contact is not sufficient because the adapter has already been
     // detached and the rover is otherwise airborne.
     let ok = pose != () && speed != () && height_limit != () && speed_limit != ()
         && support_count != () && support_count > 0
+        && support_fresh
         && pose[1] <= height_limit && speed.abs() <= speed_limit;
     #{ok: ok,
       pose: pose, speed: speed, height_limit_m: height_limit,
-      speed_limit_mps: speed_limit, support_contact_count: support_count}
+      speed_limit_mps: speed_limit, support_footprint_count: if !physics_ok { () } else { physics.support_footprint_count },
+      support_contact_count: support_count, support_sample_tick: support_sample_tick,
+      support_fresh: support_fresh, physics_query_ok: physics_ok,
+      physics_query_error: physics_error}
 }
 
 // The release-settle predicate is a diagnostic gate, not a force loop. A
@@ -390,7 +410,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
                 return false;
             }
             false
-        }, |m| this.route_control_error == true || arrived(rover, target, arrival_radius)),
+        }, |m| arrived(rover, target, arrival_radius)),
         once(|m| emit(event))
     ])
 }

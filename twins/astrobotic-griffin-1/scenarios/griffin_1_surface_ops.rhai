@@ -65,6 +65,7 @@ fn on_start(me, ctx) {
     this.rover_brake_held = false;
     this.route_started = false;
     this.route_command_updates = 0;
+    this.rover_settle_probe_tick = ();
     this.event_trace = [];
 }
 
