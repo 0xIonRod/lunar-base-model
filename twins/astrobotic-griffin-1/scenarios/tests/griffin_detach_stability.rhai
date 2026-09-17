@@ -40,11 +40,6 @@ fn sample_performance() {
     if performance == () || performance.ok == false {
         return ();
     }
-    let step_ms = performance.step_time_ms;
-    if step_ms != () && step_ms.is_finite() {
-        if step_ms > this.max_step_ms { this.max_step_ms = step_ms; }
-        if step_ms < this.min_step_ms { this.min_step_ms = step_ms; }
-    }
     performance
 }
 
@@ -71,12 +66,12 @@ fn on_event(me, evt, ctx) {
     print("[griffin-detach-stability] detach accepted; waiting for topology retirement");
 }
 
-fn emit_verdict() {
-    if this.finished { return; }
-    this.finished = true;
+fn emit_verdict(me) {
+    if me.finished { return; }
+    me.finished = true;
     let source = sysml_requirements::source();
-    let post = this.post;
-    let pre = this.pre;
+    let post = me.post;
+    let pre = me.pre;
     let has_post = post != ();
     let topology_ok = has_post
         && post.detach_requests == 0
@@ -86,9 +81,9 @@ fn emit_verdict() {
         && post.joints + 1 == pre.joints
         && post.entities <= pre.entities;
     let checks = [
-        #{id: "GR-026-touchdown", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinAdapterRelease", kind: "lifecycle", path: LANDER, actual: this.touchdown, expected: true, ok: this.touchdown, error: "authored touchdown was not observed"},
-        #{id: "GR-026-detach-request", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinAdapterRelease", kind: "lifecycle", path: DOCK, actual: this.detach_requested, expected: true, ok: this.detach_requested, error: "detach request was not accepted"},
-        #{id: "GR-026-topology", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinAdapterRelease", kind: "topology", path: ROOT, actual: topology_ok, expected: true, ok: topology_ok, error: if this.failure == "" { "post-release topology did not retire exactly one edge" } else { this.failure }}
+        #{id: "GR-026-touchdown", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinAdapterRelease", kind: "lifecycle", path: LANDER, actual: me.touchdown, expected: true, ok: me.touchdown, error: "authored touchdown was not observed"},
+        #{id: "GR-026-detach-request", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinAdapterRelease", kind: "lifecycle", path: DOCK, actual: me.detach_requested, expected: true, ok: me.detach_requested, error: "detach request was not accepted"},
+        #{id: "GR-026-topology", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinAdapterRelease", kind: "topology", path: ROOT, actual: topology_ok, expected: true, ok: topology_ok, error: if me.failure == "" { "post-release topology did not retire exactly one edge" } else { me.failure }}
     ];
     let failures = [];
     for check in checks { if check.ok != true { failures.push(check); } }
@@ -103,15 +98,15 @@ fn emit_verdict() {
             clocks: clock_snapshot(),
             pre_release: pre,
             post_release: post,
-            post_samples: this.post_samples,
-            min_step_time_ms: this.min_step_ms,
-            max_step_time_ms: this.max_step_ms,
+            post_samples: me.post_samples,
+            min_step_time_ms: me.min_step_ms,
+            max_step_time_ms: me.max_step_ms,
             topology_invariants: topology_ok
         }
     };
     report_structured_verdict(report, "GRIFFIN ADAPTER RELEASE", "GRIFFIN_ADAPTER_RELEASE");
     print("[griffin-detach-stability] verdict=" + (if report.ok { "PASS" } else { "FAIL" })
-        + " post_samples=" + this.post_samples + " max_step_ms=" + this.max_step_ms);
+        + " post_samples=" + me.post_samples + " max_step_ms=" + me.max_step_ms);
 }
 
 fn on_tick(me, ctx) {
@@ -123,6 +118,11 @@ fn on_tick(me, ctx) {
         this.last_sample_tick = sim_tick();
         let performance = sample_performance();
         if performance != () {
+            let step_ms = performance.step_time_ms;
+            if step_ms != () && step_ms.is_finite() {
+                if step_ms > this.max_step_ms { this.max_step_ms = step_ms; }
+                if step_ms < this.min_step_ms { this.min_step_ms = step_ms; }
+            }
             if !this.detached {
                 this.pre = performance;
             } else {
@@ -136,7 +136,7 @@ fn on_tick(me, ctx) {
         print("[griffin-detach-stability] solver retirement observed");
     }
     if this.failed {
-        emit_verdict();
+        emit_verdict(this);
         return;
     }
     // Keep a post-release observation window long enough to catch a retained
@@ -147,6 +147,6 @@ fn on_tick(me, ctx) {
         release_tick = this.release_tick;
     }
     if this.detached && sim_tick() - release_tick >= 1800 {
-        emit_verdict();
+        emit_verdict(this);
     }
 }
