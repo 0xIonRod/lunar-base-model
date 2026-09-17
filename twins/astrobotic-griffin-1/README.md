@@ -166,6 +166,18 @@ rewrite the USDA text by hand. The ramp requirements and Rhai verification are
 intentionally separate so a ramp can be accepted without coupling it to FLIP's
 visual review.
 
+The combined `scenes/griffin_flip_visual.usda` review scene uses the same
+source-backed `environments/south_pole_surrogate.usda` as the mission scene.
+Its `Terrain` prim is bound to LunCoSim's canonical
+`lunco://shaders/terrain_layered.wgsl` shader and the old `Ground/RegolithPad`
+is retained only as an invisible, non-colliding measurement guide. To repair
+or reapply this contract in a live Editor document, use the Twin-local
+`griffin_visual_builder::apply_standard_terrain(doc_id, "@root@",
+"/GriffinFlipVisual", parent_generation)` entry point through `RunRhai`; it
+is idempotent, generation-checked, undoable, and persists through
+`SaveDocument`. The visual Rhai gate verifies the terrain prim and shader
+identity, so a flat proxy cannot silently replace the standard terrain.
+
 `assembly_builder` remains the shared LunCoSim tool library. Do not copy it into
 the Twin: a Twin-local file with that name would shadow the generic policy and
 silently diverge from the shared authoring substrate.

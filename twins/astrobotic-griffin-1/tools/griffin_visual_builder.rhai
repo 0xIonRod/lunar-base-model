@@ -1891,3 +1891,100 @@ fn apply_isolated_flip(doc, edit_target, root, parent_gen) {
     #{ok: command.ok != false, kind: plan.kind, command: command,
       component_count: plan.component_count, root: root}
 }
+
+// Standard terrain presentation -------------------------------------------
+//
+// The visual-review scene used to rely on a dark, flat RegolithPad proxy.  It
+// is useful as a dimension guide, but it must not be the visible terrain when
+// the Twin has a source-backed terrain asset.  This plan mounts the same
+// South-Pole surrogate used by the mission scene and hides the guide pad
+// through typed, journaled opinions.  The terrain asset owns its
+// LunCoTerrainAPI, DEM layer, physics material, and terrain_layered.wgsl
+// binding; this helper only owns the review-scene composition decision.
+fn standard_terrain_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("standard_terrain_plan requires a document, edit target, and absolute root");
+    }
+    let source = sysml_requirements::source();
+    let asset = sysml_requirements::text(source,
+        griffin_spec::qualified_attribute_name("visualTerrainAsset"));
+    let shader = sysml_requirements::text(source,
+        griffin_spec::qualified_attribute_name("visualTerrainShaderAsset"));
+    if asset == () || asset == "" || shader == () || shader == "" {
+        return plan_error("visual terrain asset and shader identities are missing from SysML");
+    }
+    if !asset.starts_with("twin://") && !asset.starts_with("lunco://") {
+        return plan_error("visual terrain asset must be a logical twin:// or lunco:// URI");
+    }
+    if !shader.starts_with("lunco://") {
+        return plan_error("visual terrain shader must be a canonical lunco:// shader URI");
+    }
+
+    let environment = root + "/Environment";
+    let existing = assembly_builder::composed_query(doc, #{path: environment, children: false});
+    let ops = [];
+    if query_ok(existing) {
+        if existing.type_name != "Xform" {
+            return plan_error(environment + ": existing terrain owner must be an Xform");
+        }
+        // A pre-existing owner is accepted only when it already composes the
+        // standard terrain child.  Do not silently overwrite another asset.
+        let terrain = assembly_builder::composed_query(doc,
+            #{path: environment + "/Terrain", children: false});
+        if !query_ok(terrain) {
+            return plan_error(environment + ": existing owner does not contain the standard Terrain prim");
+        }
+    } else {
+        let reference = assembly_builder::referenced_instance_targeted_plan(
+            doc, edit_target, root, "Environment", "Xform", asset,
+            (), (), (), (), (), ());
+        if !reference.ok { return reference; }
+        for op in reference.ops { ops.push(op); }
+    }
+
+    // Preserve the guide's authored dimensions for measurement checks, but
+    // make it invisible so it cannot occlude the standard terrain or create a
+    // second visual surface.  Its render purpose and disabled collision remain
+    // inspectable evidence of the review-only guide contract.
+    let guide = root + "/Ground/RegolithPad";
+    let guide_record = assembly_builder::composed_query(doc, #{path: guide, children: false});
+    if query_ok(guide_record) {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: guide,
+            name: "visibility", type_name: "token", value: "\"invisible\""}});
+    }
+    // The source terrain asset contains two optional synthetic berm markers
+    // for mission-scale route studies.  They are not part of the visual
+    // vehicle context and their 12–16 m radii can dominate a component review
+    // frame.  Keep the DEM and canonical terrain shader visible, but hide
+    // these optional markers in the vehicle review layer through reversible
+    // typed opinions.
+    for berm in [environment + "/VisualBerms/BermEast",
+                 environment + "/VisualBerms/BermWest"] {
+        let berm_record = assembly_builder::composed_query(doc, #{path: berm, children: false});
+        if query_ok(berm_record) {
+            ops.push(#{SetAttribute: #{edit_target: edit_target, path: berm,
+                name: "visibility", type_name: "token", value: "\"invisible\""}});
+        }
+    }
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
+        name: "lunco:visual:terrain_mode", type_name: "token",
+        value: "\"standard_layered\""}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
+        name: "lunco:visual:terrain_asset", type_name: "asset",
+        value: "@" + asset + "@"}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
+        name: "lunco:visual:terrain_shader", type_name: "asset",
+        value: "@" + shader + "@"}});
+    #{ok: true, kind: "standard_lunar_terrain", root: root,
+      environment: environment, asset: asset, shader: shader,
+      ops: ops, no_op: ops.len() == 0}
+}
+
+fn apply_standard_terrain(doc, edit_target, root, parent_gen) {
+    let plan = standard_terrain_plan(doc, edit_target, root);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc, "Use standard layered lunar terrain", plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, command: command,
+      root: root, environment: plan.environment, asset: plan.asset,
+      shader: plan.shader}
+}

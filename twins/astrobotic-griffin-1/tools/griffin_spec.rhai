@@ -197,6 +197,8 @@ fn rover_solar_array_mount() { _sysml_number_list("solarArrayMount") }
 fn rover_solar_array_tilt_deg() { _sysml_attribute("solarArrayTiltDeg") }
 fn visual_landing_pad_radius_m() { _sysml_attribute("visualLandingPadRadiusM") }
 fn visual_review_ground_width_m() { _sysml_attribute("visualReviewGroundWidthM") }
+fn visual_terrain_asset() { _sysml_text("visualTerrainAsset") }
+fn visual_terrain_shader_asset() { _sysml_text("visualTerrainShaderAsset") }
 fn visual_render_ownership() { _sysml_text("visualRenderOwnership") }
 fn pi_value() { 3.141592653589793 }
 

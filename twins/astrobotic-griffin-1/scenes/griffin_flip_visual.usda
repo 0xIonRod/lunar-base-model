@@ -14,6 +14,9 @@ def Xform "GriffinFlipVisual" (
     custom string lunco:visual:status = "review-ready proxy geometry, not flight CAD"
     custom string lunco:visual:ownership = "Twin USD owns topology/material placement; Rhai owns visual acceptance"
     custom string lunco:visual:camera = "VisualCamera"
+    custom token lunco:visual:terrain_mode = "standard_layered"
+    custom asset lunco:visual:terrain_asset = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@
+    custom asset lunco:visual:terrain_shader = @lunco://shaders/terrain_layered.wgsl@
     def Xform "Ground"
     {
         def Cube "RegolithPad"
@@ -25,6 +28,7 @@ def Xform "GriffinFlipVisual" (
             color3f[] primvars:displayColor = [(0.12999999523162842, 0.11999999731779099, 0.10999999940395355)]
             bool physics:collisionEnabled = false
             uniform token purpose = "render"
+            token visibility = "invisible"
         }
         def Cylinder "LandingPad"
         {
@@ -659,6 +663,22 @@ def Xform "GriffinFlipVisual" (
         {
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_flip_visual.rhai@
+        }
+    }
+    def Xform "Environment" (
+        references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@
+    )
+    {
+        over "VisualBerms"
+        {
+            def "BermEast"
+            {
+                token visibility = "invisible"
+            }
+            def "BermWest"
+            {
+                token visibility = "invisible"
+            }
         }
     }
 }

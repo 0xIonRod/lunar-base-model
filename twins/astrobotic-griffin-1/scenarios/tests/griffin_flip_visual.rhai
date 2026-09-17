@@ -49,6 +49,7 @@ fn on_start(me, ctx) {
     this.flip = find("/GriffinFlipVisual/FLIP");
     this.camera = find("/GriffinFlipVisual/VisualCamera");
     this.ground = find("/GriffinFlipVisual/Ground/RegolithPad");
+    this.terrain = find("/GriffinFlipVisual/Environment/Terrain");
     this.done = false;
 }
 
@@ -250,6 +251,10 @@ fn on_tick(me, ctx) {
         verification: "Verify_GriffinVisualRequirements",
         kind: "attribute_equals", path: root + "/Ground/RegolithPad", attr: "physics:collisionEnabled", expected: false };
     checks.push(collision);
+    checks.push(#{ id: "GV-005-ground-hidden", component: "context",
+        requirement: "gv005",
+        verification: "Verify_GriffinVisualRequirements",
+        kind: "attribute_equals", path: root + "/Ground/RegolithPad", attr: "visibility", expected: "invisible" });
     checks.push(#{ id: "GV-005-landing-pad-hidden", component: "context",
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",
@@ -258,7 +263,22 @@ fn on_tick(me, ctx) {
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",
         kind: "attribute_equals", path: root + "/Ground/PadRing", attr: "visibility", expected: "invisible" });
-    checks.push(visual_exists_check("GV-006-ground", "context", "gv006", "exists", root + "/Ground/RegolithPad"));
+    let terrain = visual_exists_check("GV-006-terrain", "context", "gv006", "exists", root + "/Environment/Terrain");
+    terrain.expected_type = "Xform";
+    checks.push(terrain);
+    checks.push(#{ id: "GV-006-terrain-shader", component: "context",
+        requirement: "gv006",
+        verification: "Verify_GriffinVisualRequirements",
+        kind: "attribute_equals",
+        path: root + "/Environment/Looks/RegolithSurface/Shader",
+        attr: "info:wgsl:sourceAsset",
+        expected: sysml_requirements::text(source,
+            griffin_spec::qualified_attribute_name("visualTerrainShaderAsset")) });
+    checks.push(#{ id: "GV-006-terrain-mode", component: "context",
+        requirement: "gv006",
+        verification: "Verify_GriffinVisualRequirements",
+        kind: "attribute_equals", path: root,
+        attr: "lunco:visual:terrain_mode", expected: "standard_layered" });
     checks.push(visual_exists_check("GV-006-light", "context", "gv006", "exists", root + "/Sun"));
     let report = sysml_requirements::evaluate(source, checks);
     print("[griffin-flip-visual] griffin=" + this.griffin +

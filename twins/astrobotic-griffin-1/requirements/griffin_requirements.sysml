@@ -76,6 +76,8 @@ package Griffin1Requirements {
         attribute visualLanderDeckWidthM : Real = 5.20;
         attribute visualLandingPadRadiusM : Real = 6.0;
         attribute visualReviewGroundWidthM : Real = 36.0;
+        attribute visualTerrainAsset : String = "twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda";
+        attribute visualTerrainShaderAsset : String = "lunco://shaders/terrain_layered.wgsl";
         attribute visualRenderOwnership : String = "render-only review layer; physics colliders remain authored by vehicle components";
         attribute manifestPartCount : Integer = 20;
         attribute canonicalPartNames : String = "BoxyAirframe,IsogridDeck,PayloadAdapter,MainPropulsion,Nozzle,SolarPanelPort,SolarPanelStarboard,LegPX,LegNX,LegPZ,LegNZ,EgressRampPort,EgressRampStarboard,PropellantTanks,EngineCluster";
@@ -269,7 +271,7 @@ package Griffin1Requirements {
     }
 
     requirement def GRV006_LunarContext {
-        doc /* GV-006 [visual] the review shall include an authored lunar surface context and a single project light, without introducing a second physics model. */
+        doc /* GV-006 [visual] the review shall include the source-backed South-Pole terrain asset using the canonical terrain_layered.wgsl shader and one project light, without introducing a second physics model. */
     }
 
     requirement def GRV007_VisualEvidence {
