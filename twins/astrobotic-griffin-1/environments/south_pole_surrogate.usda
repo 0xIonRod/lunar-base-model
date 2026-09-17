@@ -29,30 +29,17 @@ def Xform "SouthPoleSurrogate" (
     {
         def Material "RegolithSurface"
         {
+            token outputs:surface
             token outputs:surface.connect = </SouthPoleSurrogate/Looks/RegolithSurface/Shader.outputs:surface>
-
             def Shader "Shader"
             {
                 uniform token info:implementationSource = "sourceAsset"
                 uniform asset info:wgsl:sourceAsset = @lunco://shaders/terrain_layered.wgsl@
-                color3f inputs:albedo = (0.13, 0.13, 0.13)
+                color3f inputs:albedo = (0.12999999523162842, 0.12999999523162842, 0.12999999523162842)
                 token outputs:surface
+                asset info:wgsl:vertexAsset = @lunco://shaders/terrain_geomorph.wgsl@
             }
         }
-    }
-    def Cube "Ground" (
-        prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoTerrainAPI", "MaterialBindingAPI"]
-        active = false
-    )
-    {
-        token lunco:terrain:surfaceRole = "flat-site"
-        double size = 1.0
-        double3 xformOp:translate = (0.0, -0.5, 0.0)
-        double3 xformOp:scale = (200.0, 1.0, 200.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.12999999523162842, 0.125, 0.11999999731779099)]
-        bool physics:collisionEnabled = true
-        rel material:binding:physics = </SouthPoleSurrogate/PhysicsMaterials/RegolithSurrogate>
     }
     def Scope "VisualBerms"
     {
@@ -97,10 +84,26 @@ def Xform "SouthPoleSurrogate" (
             asset lunco:layer:demSource = @terrain/nobile03@
             float lunco:layer:windowM = 512.0
             int lunco:layer:targetRes = 129
-            bool lunco:layer:lodViz = false
-            bool lunco:layer:colliderRing = false
+            bool lunco:layer:lodViz = true
+            bool lunco:layer:colliderRing = true
             int lunco:layer:colliderDepth = 4
             int lunco:layer:colliderResolution = 65
         }
+    }
+    def Plane "Ground" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoTerrainAPI", "MaterialBindingAPI"]
+        active = false
+    )
+    {
+        uniform token lunco:terrain:surfaceRole = "flat-site"
+        double width = 2.0
+        double length = 2.0
+        uniform token axis = "Y"
+        double3 xformOp:translate = (0.0, 0.0, 0.0)
+        double3 xformOp:scale = (100.0, 1.0, 100.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.12999999523162842, 0.125, 0.11999999731779099)]
+        bool physics:collisionEnabled = true
+        custom rel material:binding:physics = </SouthPoleSurrogate/PhysicsMaterials/RegolithSurrogate>
     }
 }
