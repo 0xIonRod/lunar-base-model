@@ -1,7 +1,13 @@
 // Standalone egress-ramp component contract.
 // Read-only: it queries composed USD and never repairs, hides, or rewrites it.
 
-const PUBLIC_EGRESS_SOURCE = "https://www.astrobotic.com/astrobotic-griffin-lander-and-nasas-viper-moon-rover-complete-complex-test-drives/";
+const RAMP_SOURCE = "GriffinRampRequirements::GriffinEgressRamp::provenanceSource";
+
+fn _source_provenance() {
+    let source = sysml_requirements::source();
+    if source == () || source.ok != true { return (); }
+    sysml_requirements::text(source, RAMP_SOURCE)
+}
 
 fn _query(doc_id, path, attrs, children) {
     let request = #{path: path};
@@ -71,8 +77,11 @@ fn lint(doc_id, root) {
         }
     }
     let source = record.attrs["lunco:provenance:source"];
-    if source != () && source != PUBLIC_EGRESS_SOURCE {
-        findings.push(_finding(root, "component provenance must use the public egress source"));
+    let expected_source = _source_provenance();
+    if expected_source == () || expected_source == "" {
+        findings.push(_finding(root, "ramp SysML provenance source is unavailable"));
+    } else if source != expected_source {
+        findings.push(_finding(root, "component provenance disagrees with the ramp SysML source"));
     }
     let limit = record.attrs["lunco:deployment_angle_limit_rad"];
     if limit == () || limit <= 0.0 || limit > 1.57079632679 {
@@ -99,7 +108,7 @@ fn lint(doc_id, root) {
         errors.push(finding.path + ": " + finding.message);
     }
     #{ok: errors.len() == 0, root: root, findings: findings,
-      errors: errors, public_source: PUBLIC_EGRESS_SOURCE}
+      errors: errors, public_source: expected_source}
 }
 
 fn lint_live(doc_id, root) {

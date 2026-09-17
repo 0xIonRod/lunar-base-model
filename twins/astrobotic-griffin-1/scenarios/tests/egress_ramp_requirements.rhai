@@ -24,11 +24,20 @@ fn on_tick(me, ctx) {
     for finding in report.findings {
         failures.push(finding.path + ": " + finding.message);
     }
-    let limit = egress_ramp_requirements::deployment_check(0.58, 0.58);
+    let source = sysml_requirements::source();
+    let limit_rad = sysml_requirements::number(source,
+        "GriffinRampRequirements::GriffinEgressRamp::rampMaxDeploymentAngleRad");
+    if limit_rad == () || !limit_rad.is_finite() || limit_rad <= 0.0 {
+        throw("ramp SysML deployment limit is missing or invalid");
+    }
+    let limit = egress_ramp_requirements::deployment_check(limit_rad, limit_rad);
     failures.push(expected(limit.ok, "deployment limiter rejected its boundary"));
-    let over = egress_ramp_requirements::deployment_check(0.580001, 0.58);
+    let epsilon = if limit_rad.abs() * 0.000001 > 0.000001 {
+        limit_rad.abs() * 0.000001
+    } else { 0.000001 };
+    let over = egress_ramp_requirements::deployment_check(limit_rad + epsilon, limit_rad);
     failures.push(expected(!over.ok, "deployment limiter accepted an over-limit value"));
-    let at_zero = egress_ramp_requirements::deployment_check(0.0, 0.58);
+    let at_zero = egress_ramp_requirements::deployment_check(0.0, limit_rad);
     failures.push(expected(at_zero.ok, "deployment limiter rejected zero angle"));
 
     let count = 0;
