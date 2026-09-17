@@ -11,12 +11,12 @@ const LANDER = "/Griffin1SurfaceOps/Lander";
 const ROVER = "/Griffin1SurfaceOps/FLIP";
 const DOCK = "/Griffin1SurfaceOps/FLIPPayloadAdapterJoint";
 
-fn trace_event(evt) {
-    if this.event_trace == () || this.event_trace.len() >= 64 { return; }
+fn trace_event(state, evt) {
+    if state.event_trace == () || state.event_trace.len() >= 64 { return; }
     let source_id = if evt.source == () { () } else { evt.source };
     let source_path = ();
     if source_id != () { source_path = usd_path(source_id); }
-    this.event_trace.push(#{
+    state.event_trace.push(#{
         name: evt.name,
         source: source_id,
         source_path: if source_path == () { "" } else { source_path },
@@ -25,8 +25,32 @@ fn trace_event(evt) {
 }
 
 fn on_start(me, ctx) {
+    // This mission only reacts to these discrete control/phase edges. Opt into
+    // the event filter so unrelated wheel/terrain collision chatter does not
+    // enter the Rhai VM; the shared task/mission identity buffer remains
+    // bounded and deterministic.
+    // Scope vehicle events to their emitter. The source-scoped subscriptions
+    // keep the mission's lander/rover semantics while preventing unrelated
+    // controller traffic from entering this VM. The release edge is the
+    // controller-owned event; continuous SetPorts commands are not mission
+    // events and stay out of this hook entirely.
+    let lander_gid = find(LANDER);
+    let rover_gid = find(ROVER);
+    if lander_gid >= 0 {
+        subscribe_from("intent.edge", lander_gid);
+        subscribe_from("lander_touchdown", lander_gid);
+    }
+    if rover_gid >= 0 {
+        subscribe_from("waypoint.reached", rover_gid);
+    }
+    subscribe("key:KeyG");
+    for event_name in [
+        "griffin_ramp_exit_reached", "griffin_waypoint_1_reached",
+        "griffin_waypoint_2_reached", "griffin_base_site_reached",
+    ] {
+        subscribe(event_name);
+    }
     this.lander_settled = false;
-    this.release_latched = false;
     this.release_requested = false;
     this.rover_detached = false;
     this.ramps_deployed = false;
@@ -39,11 +63,14 @@ fn on_start(me, ctx) {
     this.geometry_valid = true;
     this.phase_timeout = false;
     this.rover_brake_held = false;
+    this.route_started = false;
+    this.route_control_error = false;
+    this.route_command_updates = 0;
     this.event_trace = [];
 }
 
 fn on_event(me, evt, ctx) {
-    trace_event(evt);
+    trace_event(this, evt);
     let lander = find(LANDER);
     let rover = find(ROVER);
 
@@ -71,18 +98,6 @@ fn on_event(me, evt, ctx) {
     if evt.name == "key:KeyG" &&
        owner_of(lander) == 0 && owner_of(rover) != 0 {
         if release_rover(me, this.release_requested) {
-            this.release_requested = true;
-        }
-        return;
-    }
-
-    // Retain the level-triggered compatibility path for older controller
-    // producers. It is idempotent with the semantic-edge path above.
-    if evt.name == "cmd:SetPorts" && evt.source == lander {
-        let transition = dock_release_edge(
-            lander, this.release_latched, true, this.rover_detached);
-        this.release_latched = transition.held;
-        if transition.fire && release_rover(me, this.release_requested) {
             this.release_requested = true;
         }
         return;
@@ -266,7 +281,7 @@ fn release_rover_settle_brake() {
     #{ok: true}
 }
 
-fn fail_phase(me, phase) {
+fn fail_phase(state, phase) {
     print("[griffin] phase timeout: " + phase);
     // Keep a typed, repeatable snapshot beside the phase failure.  This is
     // deliberately a read-only query: the mission must never turn a timeout
@@ -283,8 +298,9 @@ fn fail_phase(me, phase) {
         "Griffin1Requirements::Verify_GriffinSurfaceOperations",
         requirement_count: 1, source_revision: source.source_revision_hex,
         source_files: source.source_files, results: [failure], failures: [failure],
-        metrics: #{phase: phase, event_trace: this.event_trace,
-            clocks: clock_snapshot(), landing_gates: gates}},
+        metrics: #{phase: phase, event_trace: state.event_trace,
+            clocks: clock_snapshot(), landing_gates: gates,
+            route_command_updates: state.route_command_updates}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
     emit("griffin_phase_timeout");
 }
@@ -329,7 +345,7 @@ fn task(me, ctx) {
                 // physical event. It cannot create a PASS; the event branch
                 // must still complete the landing predicates.
                 wait(griffin_spec::landing_phase_timeout_s()),
-                once(|m| { this.phase_timeout = true; fail_phase(m, "landing"); true }),
+                once(|m| { this.phase_timeout = true; fail_phase(this, "landing"); true }),
             ]),
         ]),
         // `par_race` succeeds when the timeout branch completes; stop the
@@ -345,7 +361,7 @@ fn task(me, ctx) {
                 this.release_requested = true;
             } else {
                 this.phase_timeout = true;
-                fail_phase(m, "adapter-release");
+                fail_phase(this, "adapter-release");
             }
             true
         }),
@@ -366,26 +382,33 @@ fn task(me, ctx) {
                 this.rover_brake_held = true;
             } else {
                 this.phase_timeout = true;
-                fail_phase(m, "rover-engage");
+                fail_phase(this, "rover-engage");
             }
             true
         }),
         check(|m| this.phase_timeout != true),
         // The rover is released from a top-deck adapter several metres above
-        // the pad.  Wait on its authoritative pose/velocity rather than a
-        // guessed delay before issuing a horizontal route command; an
-        // airborne steering command creates an artificial roll impulse.
-        par_race([
-            wait_until(|m| {
-                let rover = find(ROVER);
-                griffin_surface_ops::rover_route_settle_report(rover).ok
-            }),
+        // the pad. Wait on authoritative ground support and velocity rather
+        // than a guessed delay before issuing wheel torque; an airborne
+        // steering command creates an artificial roll impulse. The height
+        // bound is the source-backed post-release surface envelope.
+            par_race([
+                wait_until(|m| {
+                    let rover = find(ROVER);
+                    let tick = sim_tick();
+                    let previous = this.rover_settle_probe_tick;
+                    if previous != () && tick >= previous && tick - previous < 6 {
+                        return false;
+                    }
+                    this.rover_settle_probe_tick = tick;
+                    griffin_surface_ops::rover_route_settle_ready(rover)
+                }),
             seq([
                 // A free-body release should settle within a few seconds. If
                 // it does not, report the physical state instead of allowing
                 // the route task to hang until the outer harness expires.
                 wait(griffin_spec::rover_settle_timeout_s()),
-                once(|m| { this.phase_timeout = true; fail_phase(m, "rover-settle"); true }),
+                once(|m| { this.phase_timeout = true; fail_phase(this, "rover-settle"); true }),
             ]),
         ]),
         check(|m| this.phase_timeout != true),
@@ -395,7 +418,7 @@ fn task(me, ctx) {
                 this.rover_brake_held = false;
             } else {
                 this.phase_timeout = true;
-                fail_phase(m, "rover-brake-release");
+                fail_phase(this, "rover-brake-release");
             }
             true
         }),
@@ -412,7 +435,7 @@ fn task(me, ctx) {
             ]),
             seq([
                 wait(griffin_spec::surface_route_timeout_s()),
-                once(|m| { this.phase_timeout = true; fail_phase(m, "surface-route"); true }),
+                once(|m| { this.phase_timeout = true; fail_phase(this, "surface-route"); true }),
             ]),
         ]),
         check(|m| this.phase_timeout != true),

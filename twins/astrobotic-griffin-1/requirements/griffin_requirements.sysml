@@ -53,13 +53,13 @@ package Griffin1Requirements {
         // into a PASS by themselves.
         attribute landingPhaseTimeoutS : Real = 300.0;
         attribute roverSettleTimeoutS : Real = 30.0;
-        // FLIP is released from the top-deck adapter, not dropped to the
-        // surface.  This is the maximum supported release/deck height for the
-        // pre-egress stability gate; the route then drives over the authored
-        // ramp to surface level.  A ground-height gate here would wait for a
-        // vehicle that is intentionally still on the deck and burn the full
-        // timeout while polling physics.
-        attribute roverSettleHeightLimitM : Real = 7.50;
+        // FLIP is released from the top-deck adapter and must fall/roll to
+        // the authored surface before wheel torque is enabled.  This is a
+        // conservative upper bound for the rover's settled body centre,
+        // derived from the metre-scale wheel radius and the normalized pad
+        // datum; accepting deck height here would start route control while
+        // the rover is airborne and create an artificial attitude impulse.
+        attribute roverSettleHeightLimitM : Real = 2.00;
         attribute roverSettleSpeedLimitMps : Real = 0.25;
         attribute surfaceRouteTimeoutS : Real = 900.0;
         // A route that has no measurable horizontal progress is a physical

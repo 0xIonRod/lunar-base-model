@@ -294,9 +294,10 @@ fn rover_route_settle_report(rover) {
     } else {
         physics.support_contact_count
     };
-    // Release is a deck-stability gate.  FLIP must still have authoritative
-    // support before the route controller releases its brake; it is not
-    // expected to reach surface height until it drives down the ramp.
+    // Release is a ground-stability gate.  FLIP must have authoritative
+    // support at the normalized surface datum before wheel torque is enabled;
+    // a deck contact is not sufficient because the adapter has already been
+    // detached and the rover is otherwise airborne.
     let ok = pose != () && speed != () && height_limit != () && speed_limit != ()
         && support_count != () && support_count > 0
         && pose[1] <= height_limit && speed.abs() <= speed_limit;

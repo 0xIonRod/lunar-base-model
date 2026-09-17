@@ -119,14 +119,20 @@ fn on_tick(me, ctx) {
     if relative_tick > 0 && relative_tick % 10 == 0 && tick != this.last_sample_tick {
         this.last_sample_tick = tick;
         let sample = griffin_surface_ops::landing_stability_sample();
-        if sample == () {
-            this.finite = false;
-            this.sample_count += 1;
-            this.last = #{};
-        } else {
+        // Scene projection and the first admitted physics pose can complete on
+        // different fixed updates.  A missing sample before that boundary is
+        // not a non-finite physics value; leave the sample counter untouched
+        // and let the explicit no-sample requirement fail if readiness never
+        // arrives.  Once all fields exist, NaN/inf still fails immediately.
+        let position = if sample == () { () } else { sample.position };
+        let ready = sample != () && position != () && position.len() == 3
+            && sample.upright_axis_y != () && sample.ground_speed != ()
+            && sample.angular_speed != ();
+        if !ready {
+            return;
+        }
         this.last = sample;
         this.sample_count += 1;
-        let position = sample.position;
         let finite = position != () && position.len() == 3
             && finite_number(position[0]) && finite_number(position[1])
             && finite_number(position[2])
@@ -150,7 +156,6 @@ fn on_tick(me, ctx) {
             if horizontal > this.max_horizontal {
                 this.max_horizontal = horizontal;
             }
-        }
         }
     }
 

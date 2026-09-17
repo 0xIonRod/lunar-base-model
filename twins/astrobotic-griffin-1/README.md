@@ -370,10 +370,25 @@ edge rails. Astrolab's public material describes direct top-deck egress, so the
 ramp branch is an optional Griffin study assumption rather than a FLIP ICD. The
 historical six-wheel wrapper is retained as
 `vehicles/flip.legacy-six-wheel.usda` for comparison, not as the active asset.
-The generic joint regression passes after detach, but the FLIP-specific
-vehicle body does not yet fall onto the surface or advance after release; a
-runtime body-promotion/wake feature is needed before route completion can be
-claimed. No timer-only PASS was added.
+The generic joint regression and the isolated FLIP adapter release now pass:
+the live detach retires the native joint and graph edge (7 → 6), leaves the
+28-body/30-collider population unchanged, wakes the released endpoint, and
+stays topologically stable over the post-release observation window. Full
+surface-route acceptance still requires the authored release input and route
+arrival events; no timer-only PASS was added.
+
+For long-run slowdown triage, sample the generic physics snapshot at phase
+boundaries from the Rhai console:
+
+    query("PhysicsPerformance", #{})
+
+Compare `step_time_ms` with `bodies`, `colliders`, `joints`, and
+`joint_graph_edges`. A detach must remove the native joint and graph edge while
+leaving the body/collider population unchanged; a rising step time with stable
+counts is solver/contact cost, while rising counts indicate lifecycle churn.
+The isolated Rhai joint regression asserts this topology invariant.
+The mission scenarios also declare exact event subscriptions, so high-rate
+collision pulses are not repeatedly entered into their Rhai `on_event` hooks.
 
 The headful Griffin-only Editor check exposed a second runtime boundary: the
 current USD projector admits child `PhysicsCollisionAPI` geometry as loose

@@ -14,13 +14,20 @@ const ROVER_PATH = ROOT + "/Rover";
 const DOCK_PATH = ROOT + "/PayloadDock";
 
 fn on_start(me, ctx) {
-    this.landed = false;
-    this.released = false;
-    this.release_was_high = false;
-    this.landing_notice_sent = false;
     this.lander = find(LANDER_PATH);
     this.rover = find(ROVER_PATH);
     this.dock = find(DOCK_PATH);
+    // Release control is edge-driven. Subscribe only to the authored control
+    // and touchdown events so trigger-volume chatter cannot repeatedly enter
+    // this Rhai hook while the vehicles settle.
+    if this.lander >= 0 {
+        subscribe_from("intent.edge", this.lander);
+        subscribe_from("lander_touchdown", this.lander);
+    }
+    subscribe("key:KeyG");
+    this.landed = false;
+    this.released = false;
+    this.landing_notice_sent = false;
     print("[griffin-delivery] lander=" + this.lander +
           " rover=" + this.rover + " dock=" + this.dock);
 }
@@ -76,11 +83,6 @@ fn on_event(me, evt, ctx) {
             && (value["edge"] == "pressed" || value["edge"] == "pulse");
     } else if evt.name == "key:KeyG" && owner_of(this.lander) == 0 {
         request = true;
-    } else if evt.name == "cmd:SetPorts" && evt.source == this.lander {
-        let transition = dock_release_edge(
-            this.lander, this.release_was_high, true, this.released);
-        this.release_was_high = transition.held;
-        request = transition.fire;
     }
     if request { release_rover(me); }
 }
