@@ -840,6 +840,9 @@ fn isolated_griffin_component_plan(doc, edit_target, root) {
         for op in _isolated_ramp_contract_ops(edit_target, ramp_path, side) {
             ops.push(op);
         }
+        let geometry = _isolated_ramp_visual_geometry_ops(doc, edit_target, ramp_path);
+        if !geometry.ok { return geometry; }
+        for op in geometry.ops { ops.push(op); }
     }
     #{ok: true, kind: "griffin_isolated_visual_assembly", root: root,
       component_count: specs.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
@@ -1687,6 +1690,48 @@ fn _isolated_ramp_contract_ops(edit_target, path, side) {
     ]
 }
 
+// Scale the referenced ramp children in the owning assembly layer. The
+// replaceable ramp asset remains untouched; this typed Editor override makes
+// the visual envelope agree with the SysML/FLIP interface contract.
+fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path) {
+    let source = sysml_requirements::source();
+    let length = _sysml_number(source, "rampSurfaceLengthM");
+    let width = _sysml_number(source, "rampSurfaceWidthM");
+    let thickness = _sysml_number(source, "rampSurfaceThicknessM");
+    let rail_height = _sysml_number(source, "rampRailHeightM");
+    let rail_width = _sysml_number(source, "rampRailWidthM");
+    let surface_y = _sysml_number(source, "rampSurfaceCenterYM");
+    let rail_y = _sysml_number(source, "rampRailCenterYM");
+    if length == () || width == () || thickness == () || rail_height == ()
+        || rail_width == () || surface_y == () || rail_y == ()
+        || length <= 0.0 || width <= 0.0 || thickness <= 0.0
+        || rail_height <= 0.0 || rail_width <= 0.0 {
+        return plan_error("ramp visual geometry SysML datums are incomplete");
+    }
+    let rail_center = width / 2.0 - rail_width / 2.0;
+    let children = [
+        #{path: path + "/RampSurface", translation: [length / 2.0, surface_y, 0.0],
+          scale: [length / 2.0, thickness / 2.0, width / 2.0]},
+        #{path: path + "/OuterRail", translation: [length / 2.0, rail_y, rail_center],
+          scale: [length / 2.0, rail_height / 2.0, rail_width / 2.0]},
+        #{path: path + "/InnerRail", translation: [length / 2.0, rail_y, -rail_center],
+          scale: [length / 2.0, rail_height / 2.0, rail_width / 2.0]},
+    ];
+    let ops = [];
+    for child in children {
+        let prim = assembly_builder::composed_query(doc, #{path: child.path, children: false});
+        if !query_ok(prim) || prim.type_name != "Cube" {
+            return plan_error(child.path + ": referenced ramp geometry must be an existing Cube");
+        }
+        let placement = assembly_builder::place_plan(edit_target, child.path,
+            child.translation, (), child.scale);
+        if !placement.ok { return placement; }
+        for op in placement.ops { ops.push(op); }
+    }
+    #{ok: true, kind: "griffin_ramp_visual_geometry", ops: ops,
+      width_m: width, length_m: length, no_op: ops.len() == 0}
+}
+
 // Refine the physical ramp in its own vehicle document.  The surface and
 // rails are still ordinary USD component geometry, but all dimensions are
 // authored through the Editor's typed placement operations.  Keeping this
@@ -1791,6 +1836,9 @@ fn isolated_griffin_ramp_plan(doc, edit_target, root, side) {
         for op in detail_plan.ops { ops.push(op); }
     }
     for op in _isolated_ramp_contract_ops(edit_target, path, side) { ops.push(op); }
+    let geometry = _isolated_ramp_visual_geometry_ops(doc, edit_target, path);
+    if !geometry.ok { return geometry; }
+    for op in geometry.ops { ops.push(op); }
     let socket = root + "/Bus/RampSocket" + (if side == "port" { "Port" } else { "Starboard" });
     let frame = path + "/MountFrame";
     let hinge_x = _ramp_number("rampHingeOffsetX");

@@ -513,14 +513,14 @@ def Xform "Griffin1" (
     )
     {
         custom double3 xformOp:translate = (1.0, 2.1, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -11.999999997747157)
         custom rel lunco:mount:frame = </Griffin1/EgressRampPort/MountFrame>
         uniform token lunco:mount:plug = "egress_ramp"
         custom token lunco:visual:side = "port"
         custom token lunco:visual:hinge_axis = "Z"
         custom double lunco:visual:surface_length_m = 3.7
-        custom double lunco:visual:surface_width_m = 1.7
+        custom double lunco:visual:surface_width_m = 3.5
         custom double lunco:visual:deployment_limit_rad = 0.58
         custom token lunco:visual:mount_datum = "Bus/RampSocket"
         custom double lunco:deployment_angle_rad = -0.2094395102
@@ -553,8 +553,26 @@ def Xform "Griffin1" (
         def Xform "MountFrame"
         {
             custom double3 xformOp:translate = (1.6, 0.0, 0.0)
-            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, -11.999999997747157)
+        }
+        over "RampSurface"
+        {
+            custom double3 xformOp:translate = (1.85, -1.15, 0.0)
+            custom double3 xformOp:scale = (1.85, 0.09, 1.75)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        over "OuterRail"
+        {
+            custom double3 xformOp:translate = (1.85, -0.92, 1.68)
+            custom double3 xformOp:scale = (1.85, 0.14, 0.07)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        over "InnerRail"
+        {
+            custom double3 xformOp:translate = (1.85, -0.92, -1.68)
+            custom double3 xformOp:scale = (1.85, 0.14, 0.07)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         }
     }
     def Xform "EgressRampStarboard" (
@@ -569,7 +587,7 @@ def Xform "Griffin1" (
         custom token lunco:visual:side = "starboard"
         custom token lunco:visual:hinge_axis = "Z"
         custom double lunco:visual:surface_length_m = 3.7
-        custom double lunco:visual:surface_width_m = 1.7
+        custom double lunco:visual:surface_width_m = 3.5
         custom double lunco:visual:deployment_limit_rad = 0.58
         custom token lunco:visual:mount_datum = "Bus/RampSocket"
         custom double lunco:deployment_angle_rad = 0.2094395102
@@ -602,8 +620,26 @@ def Xform "Griffin1" (
         def Xform "MountFrame"
         {
             custom double3 xformOp:translate = (1.6, 0.0, 0.0)
-            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 180.0, 11.999999997747157)
+        }
+        over "RampSurface"
+        {
+            custom double3 xformOp:translate = (1.85, -1.15, 0.0)
+            custom double3 xformOp:scale = (1.85, 0.09, 1.75)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        over "OuterRail"
+        {
+            custom double3 xformOp:translate = (1.85, -0.92, 1.68)
+            custom double3 xformOp:scale = (1.85, 0.14, 0.07)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        over "InnerRail"
+        {
+            custom double3 xformOp:translate = (1.85, -0.92, -1.68)
+            custom double3 xformOp:scale = (1.85, 0.14, 0.07)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         }
     }
 }

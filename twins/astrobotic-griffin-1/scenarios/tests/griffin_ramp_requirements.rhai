@@ -46,11 +46,44 @@ fn _behavior_result(id, requirement, ok, message, actual, expected) {
       error: if ok { "" } else { message }, actual: actual, expected: expected}
 }
 
+fn _assert_result(id, requirement, ok, message, actual, expected) {
+    #{id: id, component: "ramp_flip_interface", requirement: requirement,
+      verification: VERIFICATION, kind: "assert", ok: ok,
+      error: if ok { "" } else { message }, actual: actual, expected: expected}
+}
+
+fn _maximum_abs(values) {
+    if values == () || values.len() == 0 { return (); }
+    let maximum = 0.0;
+    for value in values {
+        if value.abs() > maximum { maximum = value.abs(); }
+    }
+    maximum
+}
+
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let checks = [];
     let limit = _source_number(source, "rampMaxDeploymentAngleRad");
+    let ramp_width = _source_number(source, "rampSurfaceWidthM");
+    let wheel_z = component_requirements::source_number_list(source,
+        "FlipRequirements::FlipRover::wheelStationZ");
+    let wheel_radius = sysml_requirements::number(source,
+        "FlipRequirements::FlipRover::visualRoverWheelRadiusM");
+    let wheel_clearance = _source_number(source, "rampWheelClearanceM");
+    let half_track = _maximum_abs(wheel_z);
+    if ramp_width == () || half_track == () || wheel_radius == ()
+        || wheel_clearance == () || wheel_z.len() != 4
+        || wheel_radius <= 0.0 || wheel_clearance <= 0.0 {
+        throw("GriffinRampRequirements ramp/FLIP clearance datums are incomplete");
+    }
+    let required_width = 2.0 * (half_track + wheel_radius + wheel_clearance);
+    checks.push(_assert_result("GRR-003-flip-wheel-clearance",
+        "GriffinRampRequirements::grr003",
+        ramp_width + 0.002 >= required_width,
+        "ramp width does not clear both FLIP tyre envelopes and the authored wheel clearance",
+        ramp_width, required_width));
     let pi = 3.141592653589793;
     for side in ["Port", "Starboard"] {
         let ramp = ROOT + "/EgressRamp" + side;

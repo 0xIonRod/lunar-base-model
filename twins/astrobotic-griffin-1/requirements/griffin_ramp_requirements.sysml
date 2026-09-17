@@ -9,11 +9,14 @@ package GriffinRampRequirements {
     part def GriffinEgressRamp {
         attribute rampCount : Integer = 2;
         attribute rampSurfaceLengthM : Real = 3.70;
-        // FLIP's wheel stations are 2.30 m track with 0.28 m tyres.  The
-        // egress surface therefore keeps a 0.15 m inboard clearance from
-        // either tyre; 2.90 m is the minimum operational envelope used by
-        // the composed ramp geometry below (study datum, not a supplier ICD).
-        attribute rampSurfaceWidthM : Real = 2.90;
+        // The operational width is derived in the Rhai verifier from the
+        // independent FLIP wheel-station and tyre datums:
+        // 2 * (maxAbs(FlipRover.wheelStationZ)
+        //      + FlipRover.visualRoverWheelRadiusM
+        //      + rampWheelClearanceM).
+        // Keep this package's value equal to that derived interface datum;
+        // it is still a visual study value, not a supplier mechanical ICD.
+        attribute rampSurfaceWidthM : Real = 3.50;
         attribute rampWheelClearanceM : Real = 0.15;
         attribute rampSurfaceThicknessM : Real = 0.18;
         attribute rampRailHeightM : Real = 0.28;
