@@ -36,9 +36,13 @@ fn on_start(me, ctx) {
 }
 
 fn emit_stability_verdict(me, contract, source, checks) {
-    let failures = [];
+    // Landing stability is a source-derived predicate. Normalize every
+    // observation into the shared assertion contract so requirement coverage,
+    // identity resolution, and evidence formatting stay generic.
     for check in checks {
-        if check.ok != true { failures.push(check); }
+        check.requirement = "gr031";
+        check.verification = "Verify_GriffinLandingStability";
+        check.kind = "assert";
     }
     let last_position = if me.last.position != () { me.last.position } else { [] };
     let last_upright = if me.last.upright_axis_y != () { me.last.upright_axis_y } else { 0.0 };
@@ -86,16 +90,9 @@ fn emit_stability_verdict(me, contract, source, checks) {
     // This compact line is parsed by the Twin-local repeatability harness.
     // The full typed result remains on the generic *_EVIDENCE telemetry event.
     print("GRIFFIN_LANDING_STABILITY_METRICS " + to_json(metrics));
-    let report = #{
-        ok: failures.len() == 0,
-        verification: "Griffin1Requirements::Verify_GriffinLandingStability",
-        requirement_count: 1,
-        source_revision: source.source_revision_hex,
-        results: checks,
-        failures: failures,
-        metrics: metrics,
-        contract: contract
-    };
+    let report = sysml_requirements::evaluate(source, checks);
+    report.metrics = metrics;
+    report.contract = contract;
     report_structured_verdict(report, "GRIFFIN LANDING STABILITY", "GRIFFIN_LANDING_STABILITY");
     me.stability_done = true;
 }

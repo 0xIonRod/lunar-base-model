@@ -2,13 +2,13 @@
 // are read from GriffinLanderRequirements; no leg names are duplicated here.
 
 const PACKAGE = "GriffinLandingLegRequirements";
-const VERIFICATION = "GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements";
+const VERIFICATION = "Verify_GriffinLandingLegRequirements";
 
 fn own(name) { PACKAGE + "::GriffinLandingLegAssembly::" + name }
 fn parent(name) { "GriffinLanderRequirements::GriffinLanderComponent::" + name }
 
 fn position(id, path, index, expected) {
-    #{id: id, component: "landing_leg", requirement: "GriffinLandingLegRequirements::gll005",
+    #{id: id, component: "landing_leg", requirement: "gll005",
       verification: VERIFICATION, kind: "attribute_component", path: path,
       attr: "xformOp:translate", index: index, expected: expected, tolerance: 0.002}
 }
@@ -29,17 +29,17 @@ fn on_tick(me, ctx) {
     let ys = component_requirements::source_number_list(source, parent("legStationY"));
     let zs = component_requirements::source_number_list(source, parent("legStationZ"));
     let checks = [];
-    checks.push(component_requirements::source_list_count("GLL-001-count", "landing_legs", "GriffinLandingLegRequirements::gll001", VERIFICATION, names_source, count_source));
+    checks.push(component_requirements::source_list_count("GLL-001-count", "landing_legs", "gll001", VERIFICATION, names_source, count_source));
     for axis in ["legStationX", "legStationY", "legStationZ"] {
         checks.push(component_requirements::source_list_count("GLL-005-" + axis,
-            "landing_leg", "GriffinLandingLegRequirements::gll005", VERIFICATION,
+            "landing_leg", "gll005", VERIFICATION,
             parent(axis), count_source));
     }
     for index in 0..names.len() {
         let name = names[index];
         let path = root + "/" + name;
-        checks.push(component_requirements::exists("GLL-001-" + name, "landing_leg", "GriffinLandingLegRequirements::gll001", VERIFICATION, path, "Xform"));
-        checks.push(component_requirements::children("GLL-002-" + name, "landing_leg", "GriffinLandingLegRequirements::gll002", VERIFICATION, path,
+        checks.push(component_requirements::exists("GLL-001-" + name, "landing_leg", "gll001", VERIFICATION, path, "Xform"));
+        checks.push(component_requirements::children("GLL-002-" + name, "landing_leg", "gll002", VERIFICATION, path,
             [path + "/StrutOuter", path + "/StrutInner", path + "/ShockPiston", path + "/FootPad"]));
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("GLL-005-" + name + "-x", path, 0, xs[index]));
@@ -47,8 +47,8 @@ fn on_tick(me, ctx) {
             checks.push(position("GLL-005-" + name + "-z", path, 2, zs[index]));
         }
     }
-    checks.push(component_requirements::coverage("GLL-003-frame", "landing_leg", "GriffinLandingLegRequirements::gll003", VERIFICATION));
-    checks.push(component_requirements::coverage("GLL-004-traceability", "landing_leg", "GriffinLandingLegRequirements::gll004", VERIFICATION));
+    checks.push(component_requirements::coverage("GLL-003-frame", "landing_leg", "gll003", VERIFICATION));
+    checks.push(component_requirements::coverage("GLL-004-traceability", "landing_leg", "gll004", VERIFICATION));
     component_requirements::finish(source, checks, "GRIFFIN LANDING LEG REQUIREMENTS", "GRIFFIN_LANDING_LEG_REQUIREMENTS", root, PACKAGE, VERIFICATION);
     this.done = true;
 }

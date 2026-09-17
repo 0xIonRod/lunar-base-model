@@ -1,13 +1,13 @@
 // Standalone Griffin dual solar-array visual verification.
 
 const PACKAGE = "GriffinSolarRequirements";
-const VERIFICATION = "GriffinSolarRequirements::Verify_GriffinSolarRequirements";
+const VERIFICATION = "Verify_GriffinSolarRequirements";
 
 fn own(name) { PACKAGE + "::GriffinSolarArrayAssembly::" + name }
 fn parent(name) { "GriffinLanderRequirements::GriffinLanderComponent::" + name }
 
 fn position(id, path, index, expected) {
-    #{id: id, component: "solar_array", requirement: "GriffinSolarRequirements::gsa005",
+    #{id: id, component: "solar_array", requirement: "gsa005",
       verification: VERIFICATION, kind: "attribute_component", path: path,
       attr: "xformOp:translate", index: index, expected: expected, tolerance: 0.002}
 }
@@ -28,17 +28,17 @@ fn on_tick(me, ctx) {
     let ys = component_requirements::source_number_list(source, parent("solarStationY"));
     let zs = component_requirements::source_number_list(source, parent("solarStationZ"));
     let checks = [];
-    checks.push(component_requirements::source_list_count("GSA-001-count", "lander_solar", "GriffinSolarRequirements::gsa001", VERIFICATION, names_source, count_source));
+    checks.push(component_requirements::source_list_count("GSA-001-count", "lander_solar", "gsa001", VERIFICATION, names_source, count_source));
     for axis in ["solarStationX", "solarStationY", "solarStationZ"] {
         checks.push(component_requirements::source_list_count("GSA-005-" + axis,
-            "solar_array", "GriffinSolarRequirements::gsa005", VERIFICATION,
+            "solar_array", "gsa005", VERIFICATION,
             parent(axis), count_source));
     }
     for index in 0..names.len() {
         let name = names[index];
         let path = root + "/" + name;
-        checks.push(component_requirements::exists("GSA-001-" + name, "solar_array", "GriffinSolarRequirements::gsa001", VERIFICATION, path, "Xform"));
-        checks.push(component_requirements::children("GSA-002-" + name, "solar_array", "GriffinSolarRequirements::gsa002", VERIFICATION, path,
+        checks.push(component_requirements::exists("GSA-001-" + name, "solar_array", "gsa001", VERIFICATION, path, "Xform"));
+        checks.push(component_requirements::children("GSA-002-" + name, "solar_array", "gsa002", VERIFICATION, path,
             [path + "/Frame", path + "/Cells"]));
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("GSA-005-" + name + "-x", path, 0, xs[index]));
@@ -46,8 +46,8 @@ fn on_tick(me, ctx) {
             checks.push(position("GSA-005-" + name + "-z", path, 2, zs[index]));
         }
     }
-    checks.push(component_requirements::coverage("GSA-003-symmetry", "solar_array", "GriffinSolarRequirements::gsa003", VERIFICATION));
-    checks.push(component_requirements::coverage("GSA-004-traceability", "solar_array", "GriffinSolarRequirements::gsa004", VERIFICATION));
+    checks.push(component_requirements::coverage("GSA-003-symmetry", "solar_array", "gsa003", VERIFICATION));
+    checks.push(component_requirements::coverage("GSA-004-traceability", "solar_array", "gsa004", VERIFICATION));
     component_requirements::finish(source, checks, "GRIFFIN SOLAR REQUIREMENTS", "GRIFFIN_SOLAR_REQUIREMENTS", root, PACKAGE, VERIFICATION);
     this.done = true;
 }

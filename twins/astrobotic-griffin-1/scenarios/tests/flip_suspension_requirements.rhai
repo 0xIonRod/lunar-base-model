@@ -6,7 +6,7 @@
 // document owner performs composition for this Twin-local asset identity.
 
 const PACKAGE = "FlipSuspensionRequirements";
-const VERIFICATION = "FlipSuspensionRequirements::Verify_FLIPSuspensionRequirements";
+const VERIFICATION = "Verify_FLIPSuspensionRequirements";
 fn own(name) { PACKAGE + "::FlipSuspensionComponent::" + name }
 
 fn query_ok(record) {
@@ -200,27 +200,27 @@ fn on_tick(me, ctx) {
     let knuckle = root + "/" + children[1];
     let strut = root + "/" + children[2];
     let checks = [];
-    checks.push(component_requirements::exists("FSR-003-root", "suspension", "FlipSuspensionRequirements::fsr003", VERIFICATION, root, "Xform"));
-    checks.push(component_requirements::children("FSR-003-children", "suspension", "FlipSuspensionRequirements::fsr003", VERIFICATION, root, [arm, knuckle, strut]));
-    checks.push(component_requirements::exists("FSR-003-arm", "suspension", "FlipSuspensionRequirements::fsr003", VERIFICATION, arm, "Cube"));
-    checks.push(component_requirements::exists("FSR-003-knuckle", "suspension", "FlipSuspensionRequirements::fsr003", VERIFICATION, knuckle, "Cylinder"));
-    checks.push(component_requirements::exists("FSR-003-strut", "suspension", "FlipSuspensionRequirements::fsr003", VERIFICATION, strut, "Cube"));
-    checks.push(component_requirements::attribute_equals("FSR-001-source", "suspension", "FlipSuspensionRequirements::fsr001", VERIFICATION, root, "lunco:visual:component", "flip_suspension"));
-    checks.push(component_requirements::attribute_equals("FSR-002-units", "suspension", "FlipSuspensionRequirements::fsr002", VERIFICATION, root, "lunco:visual:units", "SI metres, Y-up"));
+    checks.push(component_requirements::exists("FSR-003-root", "suspension", "fsr003", VERIFICATION, root, "Xform"));
+    checks.push(component_requirements::children("FSR-003-children", "suspension", "fsr003", VERIFICATION, root, [arm, knuckle, strut]));
+    checks.push(component_requirements::exists("FSR-003-arm", "suspension", "fsr003", VERIFICATION, arm, "Cube"));
+    checks.push(component_requirements::exists("FSR-003-knuckle", "suspension", "fsr003", VERIFICATION, knuckle, "Cylinder"));
+    checks.push(component_requirements::exists("FSR-003-strut", "suspension", "fsr003", VERIFICATION, strut, "Cube"));
+    checks.push(component_requirements::attribute_equals("FSR-001-source", "suspension", "fsr001", VERIFICATION, root, "lunco:visual:component", "flip_suspension"));
+    checks.push(component_requirements::attribute_equals("FSR-002-units", "suspension", "fsr002", VERIFICATION, root, "lunco:visual:units", "SI metres, Y-up"));
     for axis in 0..3 {
-        checks.push(#{id: "FSR-004-arm-scale-" + axis.to_string(), component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute_component", path: arm, attr: "xformOp:scale", index: axis, expected: arm_scale[axis], tolerance: 0.002});
-        checks.push(#{id: "FSR-004-strut-scale-" + axis.to_string(), component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute_component", path: strut, attr: "xformOp:scale", index: axis, expected: strut_scale[axis], tolerance: 0.002});
-        checks.push(#{id: "FSR-004-strut-offset-" + axis.to_string(), component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute_component", path: strut, attr: "xformOp:translate", index: axis, expected: strut_offset[axis], tolerance: 0.002});
+        checks.push(#{id: "FSR-004-arm-scale-" + axis.to_string(), component: "suspension", requirement: "fsr004", verification: VERIFICATION, kind: "attribute_component", path: arm, attr: "xformOp:scale", index: axis, expected: arm_scale[axis], tolerance: 0.002});
+        checks.push(#{id: "FSR-004-strut-scale-" + axis.to_string(), component: "suspension", requirement: "fsr004", verification: VERIFICATION, kind: "attribute_component", path: strut, attr: "xformOp:scale", index: axis, expected: strut_scale[axis], tolerance: 0.002});
+        checks.push(#{id: "FSR-004-strut-offset-" + axis.to_string(), component: "suspension", requirement: "fsr004", verification: VERIFICATION, kind: "attribute_component", path: strut, attr: "xformOp:translate", index: axis, expected: strut_offset[axis], tolerance: 0.002});
     }
-    checks.push(#{id: "FSR-004-arm-offset", component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute_component", path: arm, attr: "xformOp:translate", index: 0, expected: arm_offset, tolerance: 0.002});
-    checks.push(component_requirements::attribute_equals("FSR-006-arm-order", "suspension", "FlipSuspensionRequirements::fsr006", VERIFICATION, arm, "xformOpOrder", transform_order));
-    checks.push(component_requirements::attribute_equals("FSR-006-strut-order", "suspension", "FlipSuspensionRequirements::fsr006", VERIFICATION, strut, "xformOpOrder", transform_order));
-    checks.push(component_requirements::attribute_equals("FSR-004-knuckle-axis", "suspension", "FlipSuspensionRequirements::fsr004", VERIFICATION, knuckle, "axis", "X"));
-    checks.push(#{id: "FSR-004-knuckle-radius", component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "radius", expected: knuckle_radius, tolerance: 0.002});
-    checks.push(#{id: "FSR-004-knuckle-width", component: "suspension", requirement: "FlipSuspensionRequirements::fsr004", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "height", expected: knuckle_width, tolerance: 0.002});
+    checks.push(#{id: "FSR-004-arm-offset", component: "suspension", requirement: "fsr004", verification: VERIFICATION, kind: "attribute_component", path: arm, attr: "xformOp:translate", index: 0, expected: arm_offset, tolerance: 0.002});
+    checks.push(component_requirements::attribute_equals("FSR-006-arm-order", "suspension", "fsr006", VERIFICATION, arm, "xformOpOrder", transform_order));
+    checks.push(component_requirements::attribute_equals("FSR-006-strut-order", "suspension", "fsr006", VERIFICATION, strut, "xformOpOrder", transform_order));
+    checks.push(component_requirements::attribute_equals("FSR-004-knuckle-axis", "suspension", "fsr004", VERIFICATION, knuckle, "axis", "X"));
+    checks.push(#{id: "FSR-004-knuckle-radius", component: "suspension", requirement: "fsr004", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "radius", expected: knuckle_radius, tolerance: 0.002});
+    checks.push(#{id: "FSR-004-knuckle-width", component: "suspension", requirement: "fsr004", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "height", expected: knuckle_width, tolerance: 0.002});
     for path in [arm, knuckle, strut] {
-        checks.push(component_requirements::attribute_equals("FSR-005-purpose-" + path, "suspension", "FlipSuspensionRequirements::fsr005", VERIFICATION, path, "purpose", "render"));
-        checks.push(component_requirements::attribute_equals("FSR-005-collision-" + path, "suspension", "FlipSuspensionRequirements::fsr005", VERIFICATION, path, "physics:collisionEnabled", false));
+        checks.push(component_requirements::attribute_equals("FSR-005-purpose-" + path, "suspension", "fsr005", VERIFICATION, path, "purpose", "render"));
+        checks.push(component_requirements::attribute_equals("FSR-005-collision-" + path, "suspension", "fsr005", VERIFICATION, path, "physics:collisionEnabled", false));
     }
     component_requirements::finish(source, checks, "FLIP SUSPENSION REQUIREMENTS", "FLIP_SUSPENSION_REQUIREMENTS", root, PACKAGE, VERIFICATION);
     this.done = true;

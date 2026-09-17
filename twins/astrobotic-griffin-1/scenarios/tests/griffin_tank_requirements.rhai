@@ -1,7 +1,7 @@
 // Standalone Griffin propellant-tank visual verification.
 
 const PACKAGE = "GriffinTankRequirements";
-const VERIFICATION = "GriffinTankRequirements::Verify_GriffinTankRequirements";
+const VERIFICATION = "Verify_GriffinTankRequirements";
 
 fn own(name) { PACKAGE + "::GriffinPropellantTankAssembly::" + name }
 fn parent(name) { "GriffinLanderRequirements::GriffinLanderComponent::" + name }
@@ -138,15 +138,15 @@ fn on_tick(me, ctx) {
     let missing_topology = child_names.len() == 0 || end_hardware_names.len() != 2
         || service_hardware_names.len() != 6 || axial_hardware_names.len() != 11;
     if missing_shape || missing_end || missing_service || missing_interface || missing_brackets || missing_topology {
-        component_requirements::finish(source, [component_requirements::coverage("GPT-006-source", "tank", "GriffinTankRequirements::gpt006", VERIFICATION)], "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
+        component_requirements::finish(source, [component_requirements::coverage("GPT-006-source", "tank", "gpt006", VERIFICATION)], "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
         this.done = true;
         return;
     }
     let checks = [];
-    checks.push(component_requirements::source_list_count("GPT-001-count", "propellant_tank", "GriffinTankRequirements::gpt001", VERIFICATION, names_source, count_source));
+    checks.push(component_requirements::source_list_count("GPT-001-count", "propellant_tank", "gpt001", VERIFICATION, names_source, count_source));
     for axis in ["tankStationX", "tankStationY", "tankStationZ"] {
         checks.push(component_requirements::source_list_count("GPT-005-" + axis,
-            "tank", "GriffinTankRequirements::gpt005", VERIFICATION,
+            "tank", "gpt005", VERIFICATION,
             parent(axis), count_source));
     }
     for index in 0..names.len() {
@@ -158,35 +158,35 @@ fn on_tick(me, ctx) {
         for child_name in end_hardware_names { end_hardware_paths.push(path + "/" + child_name); }
         let service_hardware_paths = [];
         for child_name in service_hardware_names { service_hardware_paths.push(path + "/" + child_name); }
-        checks.push(component_requirements::exists("GPT-001-" + name, "tank", "GriffinTankRequirements::gpt001", VERIFICATION, path, "Xform"));
-        checks.push(component_requirements::children("GPT-002-" + name, "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path,
+        checks.push(component_requirements::exists("GPT-001-" + name, "tank", "gpt001", VERIFICATION, path, "Xform"));
+        checks.push(component_requirements::children("GPT-002-" + name, "tank", "gpt002", VERIFICATION, path,
             child_paths));
-        checks.push(component_requirements::exists("GPT-002-" + name + "-cradle", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradle", cradle_shape));
-        checks.push(component_requirements::exists("GPT-002-" + name + "-cradle-pad", "tank", "GriffinTankRequirements::gpt002", VERIFICATION, path + "/TankCradlePad", "Cube"));
-        checks.push(component_requirements::exists("GPT-009-" + name + "-support", "tank", "GriffinTankRequirements::gpt009", VERIFICATION, path + "/" + support_name, "Cylinder"));
-        checks.push(component_requirements::children("GPT-006-" + name, "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path,
+        checks.push(component_requirements::exists("GPT-002-" + name + "-cradle", "tank", "gpt002", VERIFICATION, path + "/TankCradle", cradle_shape));
+        checks.push(component_requirements::exists("GPT-002-" + name + "-cradle-pad", "tank", "gpt002", VERIFICATION, path + "/TankCradlePad", "Cube"));
+        checks.push(component_requirements::exists("GPT-009-" + name + "-support", "tank", "gpt009", VERIFICATION, path + "/" + support_name, "Cylinder"));
+        checks.push(component_requirements::children("GPT-006-" + name, "tank", "gpt006", VERIFICATION, path,
             end_hardware_paths));
-        checks.push(component_requirements::exists("GPT-006-" + name + "-neck-top", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankNeckTop", "Cylinder"));
-        checks.push(component_requirements::exists("GPT-006-" + name + "-neck-bottom", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankNeckBottom", "Cylinder"));
-        checks.push(component_requirements::exists("GPT-006-" + name + "-transition-top", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankTransitionTop", "Cone"));
-        checks.push(component_requirements::exists("GPT-006-" + name + "-transition-bottom", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/TankTransitionBottom", "Cone"));
-        checks.push(component_requirements::exists("GPT-006-" + name + "-body", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/MliTank", body_shape));
-        checks.push(attribute("GPT-006-" + name + "-body-radius", "GriffinTankRequirements::gpt006", path + "/MliTank", "radius", body_radius));
+        checks.push(component_requirements::exists("GPT-006-" + name + "-neck-top", "tank", "gpt006", VERIFICATION, path + "/TankNeckTop", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-006-" + name + "-neck-bottom", "tank", "gpt006", VERIFICATION, path + "/TankNeckBottom", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-006-" + name + "-transition-top", "tank", "gpt006", VERIFICATION, path + "/TankTransitionTop", "Cone"));
+        checks.push(component_requirements::exists("GPT-006-" + name + "-transition-bottom", "tank", "gpt006", VERIFICATION, path + "/TankTransitionBottom", "Cone"));
+        checks.push(component_requirements::exists("GPT-006-" + name + "-body", "tank", "gpt006", VERIFICATION, path + "/MliTank", body_shape));
+        checks.push(attribute("GPT-006-" + name + "-body-radius", "gpt006", path + "/MliTank", "radius", body_radius));
         if body_shape == "Cylinder" {
-            checks.push(attribute("GPT-006-" + name + "-body-height", "GriffinTankRequirements::gpt006", path + "/MliTank", "height", body_cylindrical_height));
+            checks.push(attribute("GPT-006-" + name + "-body-height", "gpt006", path + "/MliTank", "height", body_cylindrical_height));
         }
         // QueryUsdPrim reports half-extents.  The explicit factor of two
         // converts the geometric half-height back to the full SysML envelope.
-        checks.push(component_requirements::bounds_component("GPT-006-" + name + "-body-envelope", "tank", "GriffinTankRequirements::gpt006", VERIFICATION, path + "/MliTank", 1, own("bodyHeightM"), 2.0, 0.002));
-        checks.push(attribute("GPT-006-" + name + "-neck-radius", "GriffinTankRequirements::gpt006", path + "/TankNeckTop", "radius", neck_radius));
-        checks.push(attribute("GPT-006-" + name + "-transition-top-shoulder", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "radius1", transition_shoulder_radius));
-        checks.push(attribute("GPT-006-" + name + "-transition-top-neck", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "radius2", transition_neck_radius));
-        checks.push(attribute("GPT-006-" + name + "-transition-top-height", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "height", transition_height));
-        checks.push(attribute("GPT-006-" + name + "-transition-top-radius", "GriffinTankRequirements::gpt006", path + "/TankTransitionTop", "radius", transition_radius));
-        checks.push(attribute("GPT-006-" + name + "-transition-bottom-neck", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "radius1", transition_neck_radius));
-        checks.push(attribute("GPT-006-" + name + "-transition-bottom-shoulder", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "radius2", transition_shoulder_radius));
-        checks.push(attribute("GPT-006-" + name + "-transition-bottom-height", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "height", transition_height));
-        checks.push(attribute("GPT-006-" + name + "-transition-bottom-radius", "GriffinTankRequirements::gpt006", path + "/TankTransitionBottom", "radius", transition_radius));
+        checks.push(component_requirements::bounds_component("GPT-006-" + name + "-body-envelope", "tank", "gpt006", VERIFICATION, path + "/MliTank", 1, own("bodyHeightM"), 2.0, 0.002));
+        checks.push(attribute("GPT-006-" + name + "-neck-radius", "gpt006", path + "/TankNeckTop", "radius", neck_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-top-shoulder", "gpt006", path + "/TankTransitionTop", "radius1", transition_shoulder_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-top-neck", "gpt006", path + "/TankTransitionTop", "radius2", transition_neck_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-top-height", "gpt006", path + "/TankTransitionTop", "height", transition_height));
+        checks.push(attribute("GPT-006-" + name + "-transition-top-radius", "gpt006", path + "/TankTransitionTop", "radius", transition_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-bottom-neck", "gpt006", path + "/TankTransitionBottom", "radius1", transition_neck_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-bottom-shoulder", "gpt006", path + "/TankTransitionBottom", "radius2", transition_shoulder_radius));
+        checks.push(attribute("GPT-006-" + name + "-transition-bottom-height", "gpt006", path + "/TankTransitionBottom", "height", transition_height));
+        checks.push(attribute("GPT-006-" + name + "-transition-bottom-radius", "gpt006", path + "/TankTransitionBottom", "radius", transition_radius));
         checks.push(position("GPT-006-" + name + "-shoulder-top-center", path + "/TankShoulderTop", 1, shoulder_center_y));
         checks.push(position("GPT-006-" + name + "-shoulder-bottom-center", path + "/TankShoulderBottom", 1, -shoulder_center_y));
         checks.push(position("GPT-006-" + name + "-transition-top-center", path + "/TankTransitionTop", 1, transition_center_y));
@@ -197,35 +197,35 @@ fn on_tick(me, ctx) {
         checks.push(position("GPT-006-" + name + "-valve-bottom-center", path + "/TankValveBottom", 1, -valve_center_y));
         checks.push(position("GPT-006-" + name + "-cap-top-center", path + "/TankValveCapTop", 1, cap_center_y));
         checks.push(position("GPT-006-" + name + "-cap-bottom-center", path + "/TankValveCapBottom", 1, -cap_center_y));
-        checks.push(component_requirements::children("GPT-007-" + name, "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path,
+        checks.push(component_requirements::children("GPT-007-" + name, "tank", "gpt007", VERIFICATION, path,
             service_hardware_paths));
-        checks.push(component_requirements::exists("GPT-007-" + name + "-shoulder-top", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankShoulderTop", "Cylinder"));
-        checks.push(component_requirements::exists("GPT-007-" + name + "-shoulder-bottom", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankShoulderBottom", "Cylinder"));
-        checks.push(component_requirements::exists("GPT-007-" + name + "-valve-top", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankValveTop", "Cylinder"));
-        checks.push(component_requirements::exists("GPT-007-" + name + "-valve-bottom", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankValveBottom", "Cylinder"));
-        checks.push(component_requirements::exists("GPT-007-" + name + "-cap-top", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankValveCapTop", "Cylinder"));
-        checks.push(component_requirements::exists("GPT-007-" + name + "-cap-bottom", "tank", "GriffinTankRequirements::gpt007", VERIFICATION, path + "/TankValveCapBottom", "Cylinder"));
-        checks.push(attribute("GPT-007-" + name + "-shoulder-radius", "GriffinTankRequirements::gpt007", path + "/TankShoulderTop", "radius", shoulder_radius));
-        checks.push(attribute("GPT-007-" + name + "-shoulder-height", "GriffinTankRequirements::gpt007", path + "/TankShoulderTop", "height", shoulder_height));
-        checks.push(attribute("GPT-007-" + name + "-valve-radius", "GriffinTankRequirements::gpt007", path + "/TankValveTop", "radius", valve_radius));
-        checks.push(attribute("GPT-007-" + name + "-valve-height", "GriffinTankRequirements::gpt007", path + "/TankValveTop", "height", valve_height));
-        checks.push(attribute("GPT-007-" + name + "-cap-radius", "GriffinTankRequirements::gpt007", path + "/TankValveCapTop", "radius", valve_cap_radius));
-        checks.push(attribute("GPT-007-" + name + "-cap-height", "GriffinTankRequirements::gpt007", path + "/TankValveCapTop", "height", valve_cap_height));
-        checks.push(attribute("GPT-002-" + name + "-band-a-height", "GriffinTankRequirements::gpt002", path + "/TankBandA", "height", band_height));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-shoulder-top", "tank", "gpt007", VERIFICATION, path + "/TankShoulderTop", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-shoulder-bottom", "tank", "gpt007", VERIFICATION, path + "/TankShoulderBottom", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-valve-top", "tank", "gpt007", VERIFICATION, path + "/TankValveTop", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-valve-bottom", "tank", "gpt007", VERIFICATION, path + "/TankValveBottom", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-cap-top", "tank", "gpt007", VERIFICATION, path + "/TankValveCapTop", "Cylinder"));
+        checks.push(component_requirements::exists("GPT-007-" + name + "-cap-bottom", "tank", "gpt007", VERIFICATION, path + "/TankValveCapBottom", "Cylinder"));
+        checks.push(attribute("GPT-007-" + name + "-shoulder-radius", "gpt007", path + "/TankShoulderTop", "radius", shoulder_radius));
+        checks.push(attribute("GPT-007-" + name + "-shoulder-height", "gpt007", path + "/TankShoulderTop", "height", shoulder_height));
+        checks.push(attribute("GPT-007-" + name + "-valve-radius", "gpt007", path + "/TankValveTop", "radius", valve_radius));
+        checks.push(attribute("GPT-007-" + name + "-valve-height", "gpt007", path + "/TankValveTop", "height", valve_height));
+        checks.push(attribute("GPT-007-" + name + "-cap-radius", "gpt007", path + "/TankValveCapTop", "radius", valve_cap_radius));
+        checks.push(attribute("GPT-007-" + name + "-cap-height", "gpt007", path + "/TankValveCapTop", "height", valve_cap_height));
+        checks.push(attribute("GPT-002-" + name + "-band-a-height", "gpt002", path + "/TankBandA", "height", band_height));
         for band_index in 0..band_centers.len() {
             let band_name = ["TankBandA", "TankBandB", "TankBandC"][band_index];
-            checks.push(attribute("GPT-002-" + name + "-" + band_name + "-radius", "GriffinTankRequirements::gpt002", path + "/" + band_name, "radius", band_radii[band_index]));
-            checks.push(source_attribute("GPT-008-" + name + "-" + band_name + "-axis", "GriffinTankRequirements::gpt008", path + "/" + band_name, "axis", own("tankAxis")));
+            checks.push(attribute("GPT-002-" + name + "-" + band_name + "-radius", "gpt002", path + "/" + band_name, "radius", band_radii[band_index]));
+            checks.push(source_attribute("GPT-008-" + name + "-" + band_name + "-axis", "gpt008", path + "/" + band_name, "axis", own("tankAxis")));
             checks.push(position("GPT-002-" + name + "-" + band_name + "-center", path + "/" + band_name, 1, band_centers[band_index]));
-            checks.push(component_requirements::attribute_equals("GPT-008-" + name + "-" + band_name + "-transform-order", "tank", "GriffinTankRequirements::gpt008", VERIFICATION, path + "/" + band_name, "xformOpOrder", band_transform_order));
+            checks.push(component_requirements::attribute_equals("GPT-008-" + name + "-" + band_name + "-transform-order", "tank", "gpt008", VERIFICATION, path + "/" + band_name, "xformOpOrder", band_transform_order));
         }
         checks.push(position("GPT-009-" + name + "-cradle", path + "/TankCradle", 1, cradle_local_y));
         checks.push(position("GPT-009-" + name + "-cradle-pad", path + "/TankCradlePad", 1, cradle_pad_local_y));
         checks.push(position("GPT-009-" + name + "-support", path + "/" + support_name, 1, support_center_y));
-        checks.push(attribute("GPT-009-" + name + "-cradle-radius", "GriffinTankRequirements::gpt009", path + "/TankCradle", "radius", cradle_radius));
-        checks.push(attribute("GPT-009-" + name + "-cradle-height", "GriffinTankRequirements::gpt009", path + "/TankCradle", "height", cradle_height));
-        checks.push(attribute("GPT-009-" + name + "-support-radius", "GriffinTankRequirements::gpt009", path + "/" + support_name, "radius", support_radius));
-        checks.push(attribute("GPT-009-" + name + "-support-height", "GriffinTankRequirements::gpt009", path + "/" + support_name, "height", support_height));
+        checks.push(attribute("GPT-009-" + name + "-cradle-radius", "gpt009", path + "/TankCradle", "radius", cradle_radius));
+        checks.push(attribute("GPT-009-" + name + "-cradle-height", "gpt009", path + "/TankCradle", "height", cradle_height));
+        checks.push(attribute("GPT-009-" + name + "-support-radius", "gpt009", path + "/" + support_name, "radius", support_radius));
+        checks.push(attribute("GPT-009-" + name + "-support-height", "gpt009", path + "/" + support_name, "height", support_height));
         // TankCradlePad is a unit Cube, so USD xformOp:scale stores half of
         // each declared full physical dimension. Keep the SysML dimensions
         // authoritative while making the representation conversion explicit.
@@ -235,8 +235,8 @@ fn on_tick(me, ctx) {
         let bracket_group_path = path + "/" + bracket_group_name;
         let bracket_paths = [];
         for bracket_name in bracket_names { bracket_paths.push(bracket_group_path + "/" + bracket_name); }
-        checks.push(component_requirements::exists("GPT-010-" + name + "-group", "tank", "GriffinTankRequirements::gpt010", VERIFICATION, bracket_group_path, "Xform"));
-        checks.push(component_requirements::children("GPT-010-" + name + "-children", "tank", "GriffinTankRequirements::gpt010", VERIFICATION, bracket_group_path, bracket_paths));
+        checks.push(component_requirements::exists("GPT-010-" + name + "-group", "tank", "gpt010", VERIFICATION, bracket_group_path, "Xform"));
+        checks.push(component_requirements::children("GPT-010-" + name + "-children", "tank", "gpt010", VERIFICATION, bracket_group_path, bracket_paths));
         let bracket_x = [bracket_offset, -bracket_offset, bracket_offset, -bracket_offset];
         let bracket_z = [bracket_offset, bracket_offset, -bracket_offset, -bracket_offset];
         let bracket_rx = [-bracket_tilt, -bracket_tilt, bracket_tilt, bracket_tilt];
@@ -244,7 +244,7 @@ fn on_tick(me, ctx) {
         let bracket_index = 0;
         let bracket_path = bracket_paths[bracket_index];
         let bracket_name = bracket_names[bracket_index];
-        checks.push(component_requirements::exists("GPT-010-" + name + "-" + bracket_name, "tank", "GriffinTankRequirements::gpt010", VERIFICATION, bracket_path, "Cube"));
+        checks.push(component_requirements::exists("GPT-010-" + name + "-" + bracket_name, "tank", "gpt010", VERIFICATION, bracket_path, "Cube"));
         checks.push(position_for("GPT-010-" + name + "-" + bracket_name + "-x", "gpt010", bracket_path, 0, bracket_x[bracket_index]));
         checks.push(position_for("GPT-010-" + name + "-" + bracket_name + "-y", "gpt010", bracket_path, 1, bracket_center_y));
         checks.push(position_for("GPT-010-" + name + "-" + bracket_name + "-z", "gpt010", bracket_path, 2, bracket_z[bracket_index]));
@@ -262,11 +262,11 @@ fn on_tick(me, ctx) {
         }
         for hardware_name in axial_hardware_names {
             checks.push(source_attribute("GPT-008-" + name + "-" + hardware_name + "-axis",
-                "GriffinTankRequirements::gpt008", path + "/" + hardware_name,
+                "gpt008", path + "/" + hardware_name,
                 "axis", "tankAxis"));
         }
         checks.push(source_attribute("GPT-008-" + name + "-body-axis",
-            "GriffinTankRequirements::gpt008", path + "/MliTank",
+            "gpt008", path + "/MliTank",
             "axis", "tankAxis"));
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("GPT-005-" + name + "-x", path, 0, xs[index]));
@@ -274,10 +274,10 @@ fn on_tick(me, ctx) {
             checks.push(position("GPT-005-" + name + "-z", path, 2, zs[index]));
         }
     }
-    checks.push(component_requirements::coverage("GPT-003-status", "tank", "GriffinTankRequirements::gpt003", VERIFICATION));
-    checks.push(component_requirements::coverage("GPT-004-traceability", "tank", "GriffinTankRequirements::gpt004", VERIFICATION));
-    checks.push(component_requirements::coverage("GPT-009-deck-seat", "tank", "GriffinTankRequirements::gpt009", VERIFICATION));
-    checks.push(component_requirements::coverage("GPT-010-mounting", "tank", "GriffinTankRequirements::gpt010", VERIFICATION));
+    checks.push(component_requirements::coverage("GPT-003-status", "tank", "gpt003", VERIFICATION));
+    checks.push(component_requirements::coverage("GPT-004-traceability", "tank", "gpt004", VERIFICATION));
+    checks.push(component_requirements::coverage("GPT-009-deck-seat", "tank", "gpt009", VERIFICATION));
+    checks.push(component_requirements::coverage("GPT-010-mounting", "tank", "gpt010", VERIFICATION));
     component_requirements::finish(source, checks, "GRIFFIN TANK REQUIREMENTS", "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
     this.done = true;
 }

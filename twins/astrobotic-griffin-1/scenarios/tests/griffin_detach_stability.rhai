@@ -81,28 +81,19 @@ fn emit_verdict(me) {
         && post.joints + 1 == pre.joints
         && post.entities <= pre.entities;
     let checks = [
-        #{id: "GR-026-touchdown", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinAdapterRelease", kind: "lifecycle", path: LANDER, actual: me.touchdown, expected: true, ok: me.touchdown, error: "authored touchdown was not observed"},
-        #{id: "GR-026-detach-request", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinAdapterRelease", kind: "lifecycle", path: DOCK, actual: me.detach_requested, expected: true, ok: me.detach_requested, error: "detach request was not accepted"},
-        #{id: "GR-026-topology", component: "payload_adapter", requirement: "Griffin1Requirements::gr026", verification: "Griffin1Requirements::Verify_GriffinAdapterRelease", kind: "topology", path: ROOT, actual: topology_ok, expected: true, ok: topology_ok, error: if me.failure == "" { "post-release topology did not retire exactly one edge" } else { me.failure }}
+        #{id: "GR-026-touchdown", component: "payload_adapter", requirement: "gr026", verification: "Verify_GriffinAdapterRelease", kind: "assert", path: LANDER, actual: me.touchdown, expected: true, ok: me.touchdown, error: "authored touchdown was not observed"},
+        #{id: "GR-026-detach-request", component: "payload_adapter", requirement: "gr026", verification: "Verify_GriffinAdapterRelease", kind: "assert", path: DOCK, actual: me.detach_requested, expected: true, ok: me.detach_requested, error: "detach request was not accepted"},
+        #{id: "GR-026-topology", component: "payload_adapter", requirement: "gr026", verification: "Verify_GriffinAdapterRelease", kind: "assert", path: ROOT, actual: topology_ok, expected: true, ok: topology_ok, error: if me.failure == "" { "post-release topology did not retire exactly one edge" } else { me.failure }}
     ];
-    let failures = [];
-    for check in checks { if check.ok != true { failures.push(check); } }
-    let report = #{
-        ok: failures.len() == 0,
-        verification: "Griffin1Requirements::Verify_GriffinAdapterRelease",
-        requirement_count: checks.len(),
-        source_revision: source.source_revision_hex,
-        results: checks,
-        failures: failures,
-        metrics: #{
-            clocks: clock_snapshot(),
-            pre_release: pre,
-            post_release: post,
-            post_samples: me.post_samples,
-            min_step_time_ms: me.min_step_ms,
-            max_step_time_ms: me.max_step_ms,
-            topology_invariants: topology_ok
-        }
+    let report = sysml_requirements::evaluate(source, checks);
+    report.metrics = #{
+        clocks: clock_snapshot(),
+        pre_release: pre,
+        post_release: post,
+        post_samples: me.post_samples,
+        min_step_time_ms: me.min_step_ms,
+        max_step_time_ms: me.max_step_ms,
+        topology_invariants: topology_ok
     };
     report_structured_verdict(report, "GRIFFIN ADAPTER RELEASE", "GRIFFIN_ADAPTER_RELEASE");
     print("[griffin-detach-stability] verdict=" + (if report.ok { "PASS" } else { "FAIL" })

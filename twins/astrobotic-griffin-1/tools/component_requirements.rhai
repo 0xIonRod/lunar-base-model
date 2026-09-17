@@ -103,7 +103,11 @@ fn assertion(id, component, requirement, verification, ok, error, actual, expect
 }
 
 fn finish(source, checks, title, channel, root, package_name, verification) {
-    let result = sysml_requirements::evaluate(source, checks);
+    let result = if checks.len() > 64 {
+        sysml_requirements::evaluate_stream(source, checks, channel, title)
+    } else {
+        sysml_requirements::evaluate(source, checks)
+    };
     result.metrics = #{clock: clock_snapshot(), root: root,
                        component_package: package_name,
                        // `evaluate` canonicalizes this identity from the
