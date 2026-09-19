@@ -13,8 +13,8 @@ def Xform "PropellantTank" (
     def Cube "TankCradlePad"
     {
         custom double3 xformOp:translate = (0.0, -0.86, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (0.26, 0.04, 0.26)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.52, 0.08, 0.52)
         double size = 1.0
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
@@ -27,54 +27,58 @@ def Xform "PropellantTank" (
         )
         {
             custom double3 xformOp:translate = (0.2, -0.6, 0.2)
-            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (-12.0, 0.0, 12.0)
-            custom double3 xformOp:scale = (0.08, 0.26, 0.08)
+            custom double3 xformOp:scale = (0.16, 0.52, 0.16)
             double size = 1.0
             bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            uniform token purpose = "render"
         }
         def Cube "TankMountBracketNX" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
             custom double3 xformOp:translate = (-0.2, -0.6, 0.2)
-            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (-12.0, 0.0, -12.0)
-            custom double3 xformOp:scale = (0.08, 0.26, 0.08)
+            custom double3 xformOp:scale = (0.16, 0.52, 0.16)
             double size = 1.0
             bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            uniform token purpose = "render"
         }
         def Cube "TankMountBracketPZ" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
             custom double3 xformOp:translate = (0.2, -0.6, -0.2)
-            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (12.0, 0.0, 12.0)
-            custom double3 xformOp:scale = (0.08, 0.26, 0.08)
+            custom double3 xformOp:scale = (0.16, 0.52, 0.16)
             double size = 1.0
             bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            uniform token purpose = "render"
         }
         def Cube "TankMountBracketNZ" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
             custom double3 xformOp:translate = (-0.2, -0.6, -0.2)
-            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (12.0, 0.0, -12.0)
-            custom double3 xformOp:scale = (0.08, 0.26, 0.08)
+            custom double3 xformOp:scale = (0.16, 0.52, 0.16)
             double size = 1.0
             bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
+            uniform token purpose = "render"
         }
     }
     def Cylinder "MliTank"
     {
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.48
         double height = 0.92
         uniform token axis = "Y"
@@ -86,7 +90,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankBandA"
     {
         custom double3 xformOp:translate = (0.0, -0.24, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.505
         double height = 0.045
         uniform token axis = "Y"
@@ -98,7 +102,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankBandB"
     {
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.505
         double height = 0.045
         uniform token axis = "Y"
@@ -110,7 +114,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankBandC"
     {
         custom double3 xformOp:translate = (0.0, 0.24, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.505
         double height = 0.045
         uniform token axis = "Y"
@@ -122,7 +126,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankNeckTop"
     {
         custom double3 xformOp:translate = (0.0, 0.78, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.11
         double height = 0.12
         uniform token axis = "Y"
@@ -134,7 +138,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankNeckBottom"
     {
         custom double3 xformOp:translate = (0.0, -0.78, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.11
         double height = 0.12
         uniform token axis = "Y"
@@ -146,7 +150,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankShoulderTop"
     {
         custom double3 xformOp:translate = (0.0, 0.5, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.28
         double height = 0.12
         uniform token axis = "Y"
@@ -158,7 +162,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankShoulderBottom"
     {
         custom double3 xformOp:translate = (0.0, -0.5, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.28
         double height = 0.12
         uniform token axis = "Y"
@@ -170,7 +174,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankValveTop"
     {
         custom double3 xformOp:translate = (0.0, 0.88, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.045
         double height = 0.06
         uniform token axis = "Y"
@@ -182,7 +186,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankValveBottom"
     {
         custom double3 xformOp:translate = (0.0, -0.88, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.045
         double height = 0.06
         uniform token axis = "Y"
@@ -194,7 +198,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankValveCapTop"
     {
         custom double3 xformOp:translate = (0.0, 0.98, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.075
         double height = 0.12
         uniform token axis = "Y"
@@ -206,7 +210,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankValveCapBottom"
     {
         custom double3 xformOp:translate = (0.0, -0.98, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.075
         double height = 0.12
         uniform token axis = "Y"
@@ -218,7 +222,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankCradle"
     {
         custom double3 xformOp:translate = (0.0, -0.95, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.44
         double height = 0.14
         uniform token axis = "Y"
@@ -230,7 +234,7 @@ def Xform "PropellantTank" (
     def Cylinder "TankSupportPost"
     {
         custom double3 xformOp:translate = (0.0, -0.79, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.11
         double height = 0.16
         uniform token axis = "Y"
@@ -242,7 +246,7 @@ def Xform "PropellantTank" (
     def Cone "TankTransitionTop"
     {
         custom double3 xformOp:translate = (0.0, 0.63, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius1 = 0.28
         double radius2 = 0.11
         double radius = 0.28
@@ -255,7 +259,7 @@ def Xform "PropellantTank" (
     def Cone "TankTransitionBottom"
     {
         custom double3 xformOp:translate = (0.0, -0.63, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius1 = 0.11
         double radius2 = 0.28
         double radius = 0.28

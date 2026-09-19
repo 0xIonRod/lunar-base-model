@@ -141,6 +141,76 @@ def Xform "Griffin1SurfaceOps" (
             float inputs:descent_speed_limit_mps = 2.5
             float inputs:descent_braking_accel_mps2 = 6.0
         }
+        over "EgressRampPort"
+        {
+            custom double3 xformOp:translate = (3.2, 1.75, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            custom double lunco:operational_width_m = 3.5
+            custom double lunco:wheel_clearance_m = 0.25
+            custom float lunco:deployment_angle_rad = 0.0
+            over "Surface"
+            {
+                custom double3 xformOp:translate = (4.0, 0.0, 0.0)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (8.0, 0.18, 3.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+            over "EdgeRail"
+            {
+                custom double3 xformOp:translate = (4.0, 0.23, 1.68)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (8.0, 0.28, 0.14)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+            over "EdgeRailInner"
+            {
+                custom double3 xformOp:translate = (4.0, 0.23, -1.68)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (8.0, 0.28, 0.14)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+        }
+        def "RampHingePort"
+        {
+            point3f physics:localPos0 = (3.200000047683716, 1.75, 0.0)
+            float physics:lowerLimit = -50.0
+            float physics:upperLimit = 50.0
+        }
+        over "EgressRampStarboard"
+        {
+            custom double3 xformOp:translate = (-3.2, 1.75, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            custom double lunco:operational_width_m = 3.5
+            custom double lunco:wheel_clearance_m = 0.25
+            custom float lunco:deployment_angle_rad = 0.0
+            over "Surface"
+            {
+                custom double3 xformOp:translate = (-4.0, 0.0, 0.0)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (8.0, 0.18, 3.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+            over "EdgeRail"
+            {
+                custom double3 xformOp:translate = (-4.0, 0.23, 1.68)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (8.0, 0.28, 0.14)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+            over "EdgeRailInner"
+            {
+                custom double3 xformOp:translate = (-4.0, 0.23, -1.68)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (8.0, 0.28, 0.14)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+        }
+        def "RampHingeStarboard"
+        {
+            point3f physics:localPos0 = (-3.200000047683716, 1.75, 0.0)
+            float physics:lowerLimit = -50.0
+            float physics:upperLimit = 50.0
+        }
     }
     def "FLIP" (
         prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
@@ -152,6 +222,27 @@ def Xform "Griffin1SurfaceOps" (
         custom string lunco:mission:deployment_state = "top_deck_attached_until_touchdown"
         custom string lunco:mission:payload_mount = "Griffin top deck through four-point adapter; detach after both ramps deploy"
         custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+        float physxVehicleAckermannSteering:strength = 1.0
+        over "Suspension_FL"
+        {
+            double3 xformOp:translate = (-0.95, -0.75, -1.05)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        over "Suspension_RL"
+        {
+            double3 xformOp:translate = (-0.95, -0.75, 1.05)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        over "Suspension_FR"
+        {
+            double3 xformOp:translate = (0.95, -0.75, -1.05)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        over "Suspension_RR"
+        {
+            double3 xformOp:translate = (0.95, -0.75, 1.05)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
     }
     def PhysicsFixedJoint "FLIPPayloadAdapterJoint"
     {
@@ -173,7 +264,7 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        double3 xformOp:translate = (5.3, 6.2, 0.8)
+        custom double3 xformOp:translate = (2.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {
@@ -184,7 +275,7 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        double3 xformOp:translate = (8.2, 1.0, 0.0)
+        custom double3 xformOp:translate = (12.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {
@@ -195,7 +286,7 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        double3 xformOp:translate = (16.0, 0.0, 4.0)
+        custom double3 xformOp:translate = (16.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {
@@ -206,7 +297,7 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        double3 xformOp:translate = (19.0, 0.0, 2.0)
+        custom double3 xformOp:translate = (19.0, 0.0, 2.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {
@@ -217,7 +308,7 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        double3 xformOp:translate = (21.0, 0.0, 0.5)
+        custom double3 xformOp:translate = (21.0, 0.0, 0.5)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {
@@ -375,5 +466,21 @@ def Xform "Griffin1SurfaceOps" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/griffin_1_surface_ops.rhai@
         }
+    }
+    def Cube "EgressApron" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (10.0, 0.1, 8.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (13.5, -0.05, -1.0)
+        color3f[] primvars:displayColor = [(0.2199999988079071, 0.23999999463558197, 0.2800000011920929)]
+        custom token lunco:component = "GriffinEgressApron"
+        custom token lunco:requirement = "GR-035"
+        custom string lunco:source_status = '"study assumption"'
+        custom double lunco:egress:surfaceY = 0.0
+        custom rel material:binding:physics = </Griffin1SurfaceOps/PhysicsMaterials/Friction_1_0>
     }
 }

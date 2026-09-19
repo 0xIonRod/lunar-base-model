@@ -90,6 +90,8 @@ Sources:
 | requirements/griffin_propulsion_requirements.sysml | Propulsion-owned SysML v2 requirements and verification case |
 | requirements/griffin_tank_requirements.sysml | Tank-owned SysML v2 requirements and verification case |
 | requirements/griffin_solar_requirements.sysml | Griffin-array-owned SysML v2 requirements and verification case |
+| requirements/griffin_requirement_sources.sysml | Typed, requirement-ID-keyed source and rationale catalog for every mounted requirement definition |
+| tools/verify_requirement_sources.sh | Read-only authoring/CI gate for catalog coverage and complete typed evidence records |
 | requirements/flip_requirements.sysml | Rover-owned FLIP SysML v2 values and visual verification case |
 | requirements/flip_chassis_requirements.sysml | Chassis-owned SysML v2 requirements and verification case |
 | requirements/flip_wheel_requirements.sysml | Wheel-owned SysML v2 requirements and verification case |
@@ -98,7 +100,7 @@ Sources:
 | twin.toml `[verification]` | Single registry binding each qualified SysML verification to its Twin scene, Rhai observer, and verdict channel |
 | contracts/ | Part contracts, full active/planned check catalog, and typed authoring procedure |
 | tools/griffin_spec.rhai | Rhai compatibility projection of limits read from the SysML source |
-| tools/griffin_requirements.rhai | Stable public contract API, generic part/layout audit, payload/ramp gates, and typed live-edit gate |
+| tools/griffin_requirements.rhai | Stable public contract API, visual-only and physical part/layout audits, payload/ramp gates, and typed live-edit gate |
 | tools/check_landing_determinism.sh | Twin-local two-process harness comparing the Rhai landing trial at a fixed SI clock |
 | tools/griffin_visual_builder.rhai | Idempotent dry/apply runtime builder using generic `assembly_builder` + `assembly_edit` |
 | tools/griffin_controls.rhai | Twin-local possession, handoff, and control briefing helpers |
@@ -195,11 +197,23 @@ The PATH change is process-local and does not change the repository.
 
 ### Parse/lint the Twin files
 
-    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\requirements\griffin_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_lander_requirements.sysml twins\astrobotic-griffin-1\requirements\flip_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_ramp_requirements.sysml twins\astrobotic-griffin-1\requirements\moonbase_project_requirements.sysml twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_lander_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\flip_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_ramp_requirements.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai twins\astrobotic-griffin-1\behaviors\griffin_1_flip_patrol.btxml
+    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\requirements\griffin_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_lander_requirements.sysml twins\astrobotic-griffin-1\requirements\flip_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_ramp_requirements.sysml twins\astrobotic-griffin-1\requirements\moonbase_project_requirements.sysml twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_lander_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\flip_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_ramp_requirements.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai
 
-All listed source files must report OK; the Twin requirements test below is the
-composed-stage check rather than a text-only parse. The Rhai test also validates
-the same SysML source through `ValidateSysml` before checking USD facts.
+All supported source files listed above must report OK; `.btxml` is intentionally
+omitted because the current generic validator does not yet support that
+extension. The Twin requirements test below is the composed-stage check rather
+than a text-only parse. The Rhai test also validates the same SysML source
+through `ValidateSysml` before checking USD facts.
+
+The separate typed provenance catalog is covered by a read-only authoring gate:
+
+    bash twins/astrobotic-griffin-1/tools/verify_requirement_sources.sh
+
+It compares requirement IDs from the owning Griffin, FLIP, and Moon Base
+SysML documents with `RequirementEvidence` usages and checks that every usage
+has a typed requirement ID, qualified requirement, source reference, and
+rationale. This complements the runtime qualified lookup; it does not copy
+those values into the Twin manifest or the Rhai check table.
 
 ### Run the Twin requirements test
 
@@ -299,6 +313,13 @@ the requirement source aligned without baking a second identity catalog into
 Rhai. The test emits a structured `<channel>_EVIDENCE` event before its normal
 verdict line so the result can be paired with a same-generation composed query
 and frame.
+
+For the render-only Editor document, use
+`griffin_requirements::visual_report_live(doc_id, "/Griffin1")`. It reports the
+authored document generation, Edit perspective, SysML source revision,
+component roots, leg/panel station transforms, and ramp load-path children.
+The physical `lint_live`/`layout_report_live` functions remain intentionally
+separate because the render document does not own flight mass or colliders.
 
 The Twin scenario now calls `griffin_requirements::runtime_report((), root)`.
 That report first validates `requirements/griffin_requirements.sysml` and checks

@@ -2664,7 +2664,7 @@ def Xform "Griffin1" (
     {
         custom double3 xformOp:translate = (0.0, -1.55, 2.2)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
         custom rel physics:filteredPairs = </Griffin1>
         float physics:mass = 180.0
         float outputs:contact_force = 0.0
@@ -2706,7 +2706,7 @@ def Xform "Griffin1" (
     {
         custom double3 xformOp:translate = (0.0, -1.55, -2.2)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
         custom rel physics:filteredPairs = </Griffin1>
         float physics:mass = 180.0
         float outputs:contact_force = 0.0
@@ -3015,18 +3015,19 @@ def Xform "Griffin1" (
         float3 physics:diagonalInertia = (210.0, 34.0, 210.0)
         custom string lunco:mechanism = "port revolute egress ramp"
         custom float lunco:deployment_angle_rad = 0.0
-        double3 xformOp:translate = (3.55, -2.05, 0.0)
+        custom double3 xformOp:translate = (3.2, 1.75, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom double lunco:operational_width_m = 2.9
+        custom double lunco:operational_width_m = 3.5
+        custom double lunco:wheel_clearance_m = 0.25
         def Cube "Surface" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (0.0, -1.15, 0.0)
+            custom double3 xformOp:translate = (4.0, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
             double size = 1.0
-            double3 xformOp:scale = (1.85, 0.09, 1.45)
+            custom double3 xformOp:scale = (8.0, 0.18, 3.5)
             color3f[] primvars:displayColor = [(0.5, 0.38999998569488525, 0.23999999463558197)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
@@ -3036,26 +3037,26 @@ def Xform "Griffin1" (
         )
         {
             double size = 1.0
-            double3 xformOp:translate = (0.0, -0.92, 1.38)
-            double3 xformOp:scale = (1.85, 0.14, 0.07)
+            custom double3 xformOp:translate = (4.0, 0.23, 1.68)
+            custom double3 xformOp:scale = (8.0, 0.28, 0.14)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         }
         def Cube "EdgeRailInner" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
             double size = 1.0
-            double3 xformOp:translate = (0.0, -0.92, -1.38)
-            double3 xformOp:scale = (1.85, 0.14, 0.07)
+            custom double3 xformOp:translate = (4.0, 0.23, -1.68)
+            custom double3 xformOp:scale = (8.0, 0.28, 0.14)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         }
         def Cube "SupportArm" (
             prepend apiSchemas = "PhysicsCollisionAPI"
@@ -3069,6 +3070,43 @@ def Xform "Griffin1" (
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, -6.0)
             uniform token purpose = "render"
         }
+        def PhysicsFixedJoint "RampTransitionJointPort"
+        {
+            custom rel physics:body0 = </Griffin1>
+            custom rel physics:body1 = </Griffin1/EgressRampPort/TransitionPlate>
+            point3f physics:localPos0 = (2.5950000286102295, 1.75, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+            bool physics:collisionEnabled = false
+            custom string lunco:component_role = "fixed physical deck transition joint"
+            custom string lunco:requirement = "GriffinRampRequirements::GRR012_PhysicalDeckTransition"
+        }
+        def Xform "TransitionPlate" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (-0.605, 0.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            float physics:mass = 15.0
+            float3 physics:diagonalInertia = (15.350000381469727, 17.139999389648438, 1.8700000047683716)
+            custom string lunco:component_role = "physical ramp deck transition rigid-body frame"
+            custom string lunco:requirement = "GriffinRampRequirements::GRR012_PhysicalDeckTransition"
+            def Cube "ContactSurface" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.21, 0.18, 3.5)
+                double size = 1.0
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = true
+                color3f[] primvars:displayColor = [(0.41999998688697815, 0.25999999046325684, 0.11999999731779099)]
+                custom string lunco:component_role = "physical ramp deck transition contact surface"
+                custom string lunco:requirement = "GriffinRampRequirements::GRR012_PhysicalDeckTransition"
+            }
+        }
     }
     def Xform "EgressRampStarboard" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
@@ -3079,47 +3117,48 @@ def Xform "Griffin1" (
         float3 physics:diagonalInertia = (210.0, 34.0, 210.0)
         custom string lunco:mechanism = "starboard revolute egress ramp"
         custom float lunco:deployment_angle_rad = 0.0
-        double3 xformOp:translate = (-3.55, -2.05, 0.0)
+        custom double3 xformOp:translate = (-3.2, 1.75, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom double lunco:operational_width_m = 2.9
+        custom double lunco:operational_width_m = 3.5
+        custom double lunco:wheel_clearance_m = 0.25
         def Cube "Surface" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
             double size = 1.0
-            double3 xformOp:scale = (1.85, 0.09, 1.45)
+            custom double3 xformOp:scale = (8.0, 0.18, 3.5)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.5, 0.38999998569488525, 0.23999999463558197)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
-            custom double3 xformOp:translate = (0.0, -1.15, 0.0)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
+            custom double3 xformOp:translate = (-4.0, 0.0, 0.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         }
         def Cube "EdgeRail" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
             double size = 1.0
-            double3 xformOp:translate = (0.0, -0.92, 1.38)
-            double3 xformOp:scale = (1.85, 0.14, 0.07)
+            custom double3 xformOp:translate = (-4.0, 0.23, 1.68)
+            custom double3 xformOp:scale = (8.0, 0.28, 0.14)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         }
         def Cube "EdgeRailInner" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
             double size = 1.0
-            double3 xformOp:translate = (0.0, -0.92, -1.38)
-            double3 xformOp:scale = (1.85, 0.14, 0.07)
+            custom double3 xformOp:translate = (-4.0, 0.23, -1.68)
+            custom double3 xformOp:scale = (8.0, 0.28, 0.14)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         }
         def Cube "SupportArm" (
             prepend apiSchemas = "PhysicsCollisionAPI"
@@ -3133,15 +3172,52 @@ def Xform "Griffin1" (
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 6.0)
             uniform token purpose = "render"
         }
+        def PhysicsFixedJoint "RampTransitionJointStarboard"
+        {
+            custom rel physics:body0 = </Griffin1>
+            custom rel physics:body1 = </Griffin1/EgressRampStarboard/TransitionPlate>
+            point3f physics:localPos0 = (-2.5950000286102295, 1.75, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+            bool physics:collisionEnabled = false
+            custom string lunco:component_role = "fixed physical deck transition joint"
+            custom string lunco:requirement = "GriffinRampRequirements::GRR012_PhysicalDeckTransition"
+        }
+        def Xform "TransitionPlate" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (0.605, 0.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            float physics:mass = 15.0
+            float3 physics:diagonalInertia = (15.350000381469727, 17.139999389648438, 1.8700000047683716)
+            custom string lunco:component_role = "physical ramp deck transition rigid-body frame"
+            custom string lunco:requirement = "GriffinRampRequirements::GRR012_PhysicalDeckTransition"
+            def Cube "ContactSurface" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.21, 0.18, 3.5)
+                double size = 1.0
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = true
+                color3f[] primvars:displayColor = [(0.41999998688697815, 0.25999999046325684, 0.11999999731779099)]
+                custom string lunco:component_role = "physical ramp deck transition contact surface"
+                custom string lunco:requirement = "GriffinRampRequirements::GRR012_PhysicalDeckTransition"
+            }
+        }
     }
     def PhysicsRevoluteJoint "RampHingePort"
     {
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/EgressRampPort>
         uniform token physics:axis = "Z"
-        float physics:lowerLimit = -0.5799999833106995
-        float physics:upperLimit = 0.5799999833106995
-        point3f physics:localPos0 = (3.549999952316284, -2.049999952316284, 0.0)
+        float physics:lowerLimit = -50.0
+        float physics:upperLimit = 50.0
+        point3f physics:localPos0 = (3.200000047683716, 1.75, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -3152,9 +3228,9 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/EgressRampStarboard>
         uniform token physics:axis = "Z"
-        float physics:lowerLimit = -0.5799999833106995
-        float physics:upperLimit = 0.5799999833106995
-        point3f physics:localPos0 = (-3.549999952316284, -2.049999952316284, 0.0)
+        float physics:lowerLimit = -50.0
+        float physics:upperLimit = 50.0
+        point3f physics:localPos0 = (-3.200000047683716, 1.75, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)

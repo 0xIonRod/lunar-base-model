@@ -11,45 +11,59 @@ def Xform "GriffinBus" (
 {
     custom string lunco:visual:component = "lander_bus"
     custom string lunco:visual:status = "study proxy; replaceable component"
-    custom string lunco:visual:body_profile = "hexagonal-prism"
+    custom string lunco:visual:body_profile = '"hexagonal-prism"'
+    custom string lunco:visual:source = '"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration"'
     def Mesh "PerimeterFrame" (
         active = true
     )
     {
-        point3f[] points = [(0.0, -1.6200000047683716, 2.859999895095825), (2.799999952316284, -1.6200000047683716, 1.4299999475479126), (2.799999952316284, -1.6200000047683716, -1.4299999475479126), (0.0, -1.6200000047683716, -2.859999895095825), (-2.799999952316284, -1.6200000047683716, -1.4299999475479126), (-2.799999952316284, -1.6200000047683716, 1.4299999475479126), (0.0, 1.6200000047683716, 2.859999895095825), (2.799999952316284, 1.6200000047683716, 1.4299999475479126), (2.799999952316284, 1.6200000047683716, -1.4299999475479126), (0.0, 1.6200000047683716, -2.859999895095825), (-2.799999952316284, 1.6200000047683716, -1.4299999475479126), (-2.799999952316284, 1.6200000047683716, 1.4299999475479126)]
+        point3f[] points = [(0.0, -1.0, 2.25), (2.25, -1.0, 1.125), (2.25, -1.0, -1.125), (0.0, -1.0, -2.25), (-2.25, -1.0, -1.125), (-2.25, -1.0, 1.125), (0.0, 1.0, 2.25), (2.25, 1.0, 1.125), (2.25, 1.0, -1.125), (0.0, 1.0, -2.25), (-2.25, 1.0, -1.125), (-2.25, 1.0, 1.125)]
         int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
-        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 1, 7, 6, 1, 2, 8, 7, 2, 3, 9, 8, 3, 4, 10, 9, 4, 5, 11, 10, 5, 0, 6, 11]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
         uniform token subdivisionScheme = "none"
         color3f[] primvars:displayColor = [(0.2800000011920929, 0.3199999928474426, 0.3799999952316284)]
         uniform token purpose = "render"
         uniform bool doubleSided = true
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        bool physics:collisionEnabled = false
+        custom string lunco:visual:body_profile = '"hexagonal-prism"'
+        custom string lunco:visual:body_topology = '"6-gon caps + 6 quad sides"'
+        custom string lunco:visual:surface_winding = '"outward; bottom clockwise, top counter-clockwise; doubleSided render safety"'
     }
     def Mesh "WhiteEquipmentBox" (
         active = true
     )
     {
-        point3f[] points = [(0.0, -1.4500000476837158, 2.6500000953674316), (2.5999999046325684, -1.4500000476837158, 1.3250000476837158), (2.5999999046325684, -1.4500000476837158, -1.3250000476837158), (0.0, -1.4500000476837158, -2.6500000953674316), (-2.5999999046325684, -1.4500000476837158, -1.3250000476837158), (-2.5999999046325684, -1.4500000476837158, 1.3250000476837158), (0.0, 1.4500000476837158, 2.6500000953674316), (2.5999999046325684, 1.4500000476837158, 1.3250000476837158), (2.5999999046325684, 1.4500000476837158, -1.3250000476837158), (0.0, 1.4500000476837158, -2.6500000953674316), (-2.5999999046325684, 1.4500000476837158, -1.3250000476837158), (-2.5999999046325684, 1.4500000476837158, 1.3250000476837158)]
+        point3f[] points = [(0.0, -0.8999999761581421, 2.0999999046325684), (2.0999999046325684, -0.8999999761581421, 1.0499999523162842), (2.0999999046325684, -0.8999999761581421, -1.0499999523162842), (0.0, -0.8999999761581421, -2.0999999046325684), (-2.0999999046325684, -0.8999999761581421, -1.0499999523162842), (-2.0999999046325684, -0.8999999761581421, 1.0499999523162842), (0.0, 0.8999999761581421, 2.0999999046325684), (2.0999999046325684, 0.8999999761581421, 1.0499999523162842), (2.0999999046325684, 0.8999999761581421, -1.0499999523162842), (0.0, 0.8999999761581421, -2.0999999046325684), (-2.0999999046325684, 0.8999999761581421, -1.0499999523162842), (-2.0999999046325684, 0.8999999761581421, 1.0499999523162842)]
         int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
-        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 1, 7, 6, 1, 2, 8, 7, 2, 3, 9, 8, 3, 4, 10, 9, 4, 5, 11, 10, 5, 0, 6, 11]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
         uniform token subdivisionScheme = "none"
-        color3f[] primvars:displayColor = [(0.8199999928474426, 0.8500000238418579, 0.8899999856948853)]
+        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7400000095367432, 0.7699999809265137)]
         uniform token purpose = "render"
         uniform bool doubleSided = true
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        bool physics:collisionEnabled = false
+        custom string lunco:visual:body_profile = '"hexagonal-prism"'
+        custom string lunco:visual:body_topology = '"6-gon caps + 6 quad sides"'
+        custom string lunco:visual:surface_winding = '"outward; bottom clockwise, top counter-clockwise; doubleSided render safety"'
     }
     def Cube "FrontThermalPanel"
     {
         double size = 1.0
-        double3 xformOp:translate = (0.0, 0.0, 2.47)
-        double3 xformOp:scale = (1.6, 0.74, 0.035)
+        custom double3 xformOp:translate = (0.0, 0.0, 2.26)
+        custom double3 xformOp:scale = (1.35, 0.65, 0.035)
         color3f[] primvars:displayColor = [(0.9800000190734863, 0.9800000190734863, 0.9700000286102295)]
         uniform token purpose = "render"
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
     }
     def Cube "FrontLogoRedA"
     {
         double size = 1.0
-        double3 xformOp:translate = (-0.34, 0.0, 2.51)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, -18.0)
-        double3 xformOp:scale = (0.08, 0.36, 0.04)
+        custom double3 xformOp:translate = (-0.3, 0.0, 2.3)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -18.0)
+        custom double3 xformOp:scale = (0.08, 0.28, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.8600000143051147, 0.05999999865889549, 0.03500000014901161)]
         uniform token purpose = "render"
@@ -57,15 +71,15 @@ def Xform "GriffinBus" (
     def Cube "FrontLogoRedB"
     {
         double size = 1.0
-        double3 xformOp:translate = (0.34, 0.0, 2.51)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, 18.0)
-        double3 xformOp:scale = (0.08, 0.36, 0.04)
+        custom double3 xformOp:translate = (0.3, 0.0, 2.3)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 18.0)
+        custom double3 xformOp:scale = (0.08, 0.28, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.8600000143051147, 0.05999999865889549, 0.03500000014901161)]
         uniform token purpose = "render"
     }
     def Cube "TopDeck" (
-        active = true
+        active = false
     )
     {
         double size = 1.0
@@ -76,7 +90,7 @@ def Xform "GriffinBus" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
     }
     def Cube "LowerServiceSkirt" (
-        active = true
+        active = false
     )
     {
         double size = 1.0
@@ -89,26 +103,30 @@ def Xform "GriffinBus" (
     def Cube "AvionicsDeck"
     {
         double size = 1.0
-        double3 xformOp:translate = (0.0, 1.75, 0.0)
-        double3 xformOp:scale = (3.82, 0.1, 2.56)
+        custom double3 xformOp:translate = (0.0, 1.2, 0.0)
+        custom double3 xformOp:scale = (3.0, 0.1, 2.2)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.3400000035762787, 0.3799999952316284, 0.4300000071525574)]
         uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom string lunco:visual:source = '"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration"'
     }
     def Cube "AvionicsPod"
     {
         double size = 1.0
-        double3 xformOp:translate = (0.0, 1.96, 0.0)
-        double3 xformOp:scale = (0.72, 0.36, 0.72)
+        custom double3 xformOp:translate = (0.0, 1.41, 0.0)
+        custom double3 xformOp:scale = (0.72, 0.36, 0.72)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.75)]
+        color3f[] primvars:displayColor = [(0.6200000047683716, 0.6600000262260437, 0.7099999785423279)]
         uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom string lunco:visual:source = '"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration"'
     }
     def Cube "ServiceBayPort"
     {
         double size = 1.0
-        double3 xformOp:translate = (2.52, -0.16, -0.38)
-        double3 xformOp:scale = (0.1, 0.46, 0.7)
+        custom double3 xformOp:translate = (2.18, -0.12, -0.34)
+        custom double3 xformOp:scale = (0.08, 0.35, 0.55)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
         uniform token purpose = "render"
@@ -116,8 +134,8 @@ def Xform "GriffinBus" (
     def Cube "ServiceBayStarboard"
     {
         double size = 1.0
-        double3 xformOp:translate = (-2.52, -0.16, -0.38)
-        double3 xformOp:scale = (0.1, 0.46, 0.7)
+        custom double3 xformOp:translate = (-2.18, -0.12, -0.34)
+        custom double3 xformOp:scale = (0.08, 0.35, 0.55)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
         uniform token purpose = "render"
@@ -125,8 +143,8 @@ def Xform "GriffinBus" (
     def Cube "DeckRailFront"
     {
         double size = 1.0
-        double3 xformOp:translate = (0.0, 1.98, 2.04)
-        double3 xformOp:scale = (3.72, 0.08, 0.06)
+        custom double3 xformOp:translate = (0.0, 1.19, 2.05)
+        custom double3 xformOp:scale = (1.9, 0.06, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
         uniform token purpose = "render"
@@ -135,11 +153,11 @@ def Xform "GriffinBus" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.46, 1.45, 0.06)
+        custom double3 xformOp:scale = (1.26, 0.78, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.3, 0.0, 1.9875)
+        custom double3 xformOp:translate = (1.125, 0.0, 1.6875)
         custom double3 xformOp:rotateXYZ = (0.0, 27.0, 0.0)
         color3f[] primvars:displayColor = [(0.550000011920929, 0.6000000238418579, 0.6700000166893005)]
         uniform token purpose = "render"
@@ -148,11 +166,11 @@ def Xform "GriffinBus" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.46, 1.45, 0.06)
+        custom double3 xformOp:scale = (1.26, 0.78, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (2.6, 0.0, 0.0)
+        custom double3 xformOp:translate = (2.25, 0.0, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
         color3f[] primvars:displayColor = [(0.550000011920929, 0.6000000238418579, 0.6700000166893005)]
         uniform token purpose = "render"
@@ -161,11 +179,11 @@ def Xform "GriffinBus" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.46, 1.45, 0.06)
+        custom double3 xformOp:scale = (1.26, 0.78, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.3, 0.0, -1.9875)
+        custom double3 xformOp:translate = (1.125, 0.0, -1.6875)
         custom double3 xformOp:rotateXYZ = (0.0, 153.0, 0.0)
         color3f[] primvars:displayColor = [(0.550000011920929, 0.6000000238418579, 0.6700000166893005)]
         uniform token purpose = "render"
@@ -174,11 +192,11 @@ def Xform "GriffinBus" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.46, 1.45, 0.06)
+        custom double3 xformOp:scale = (1.26, 0.78, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-1.3, 0.0, -1.9875)
+        custom double3 xformOp:translate = (-1.125, 0.0, -1.6875)
         custom double3 xformOp:rotateXYZ = (0.0, 207.0, 0.0)
         color3f[] primvars:displayColor = [(0.550000011920929, 0.6000000238418579, 0.6700000166893005)]
         uniform token purpose = "render"
@@ -187,11 +205,11 @@ def Xform "GriffinBus" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.46, 1.45, 0.06)
+        custom double3 xformOp:scale = (1.26, 0.78, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-2.6, 0.0, 0.0)
+        custom double3 xformOp:translate = (-2.25, 0.0, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, 270.0, 0.0)
         color3f[] primvars:displayColor = [(0.550000011920929, 0.6000000238418579, 0.6700000166893005)]
         uniform token purpose = "render"
@@ -200,13 +218,168 @@ def Xform "GriffinBus" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.46, 1.45, 0.06)
+        custom double3 xformOp:scale = (1.26, 0.78, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-1.3, 0.0, 1.9875)
+        custom double3 xformOp:translate = (-1.125, 0.0, 1.6875)
         custom double3 xformOp:rotateXYZ = (0.0, 333.0, 0.0)
         color3f[] primvars:displayColor = [(0.550000011920929, 0.6000000238418579, 0.6700000166893005)]
         uniform token purpose = "render"
+    }
+    def Mesh "TopDeckHex" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+        active = true
+    )
+    {
+        point3f[] points = [(0.0, -0.07999999821186066, 2.200000047683716), (2.200000047683716, -0.07999999821186066, 1.100000023841858), (2.200000047683716, -0.07999999821186066, -1.100000023841858), (0.0, -0.07999999821186066, -2.200000047683716), (-2.200000047683716, -0.07999999821186066, -1.100000023841858), (-2.200000047683716, -0.07999999821186066, 1.100000023841858), (0.0, 0.07999999821186066, 2.200000047683716), (2.200000047683716, 0.07999999821186066, 1.100000023841858), (2.200000047683716, 0.07999999821186066, -1.100000023841858), (0.0, 0.07999999821186066, -2.200000047683716), (-2.200000047683716, 0.07999999821186066, -1.100000023841858), (-2.200000047683716, 0.07999999821186066, 1.100000023841858)]
+        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.2199999988079071, 0.25, 0.28999999165534973)]
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 1.03, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform bool doubleSided = true
+        custom string lunco:visual:body_profile = '"hexagonal-prism"'
+        custom string lunco:visual:body_topology = '"6-gon caps + 6 quad sides"'
+        custom string lunco:visual:surface_winding = '"outward; bottom clockwise, top counter-clockwise; doubleSided render safety"'
+    }
+    def Mesh "LowerServiceSkirtHex" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+        active = true
+    )
+    {
+        point3f[] points = [(0.0, -0.20999999344348907, 2.049999952316284), (2.049999952316284, -0.20999999344348907, 1.024999976158142), (2.049999952316284, -0.20999999344348907, -1.024999976158142), (0.0, -0.20999999344348907, -2.049999952316284), (-2.049999952316284, -0.20999999344348907, -1.024999976158142), (-2.049999952316284, -0.20999999344348907, 1.024999976158142), (0.0, 0.20999999344348907, 2.049999952316284), (2.049999952316284, 0.20999999344348907, 1.024999976158142), (2.049999952316284, 0.20999999344348907, -1.024999976158142), (0.0, 0.20999999344348907, -2.049999952316284), (-2.049999952316284, 0.20999999344348907, -1.024999976158142), (-2.049999952316284, 0.20999999344348907, 1.024999976158142)]
+        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, -1.02, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        uniform bool doubleSided = true
+        custom string lunco:visual:body_profile = '"hexagonal-prism"'
+        custom string lunco:visual:body_topology = '"6-gon caps + 6 quad sides"'
+        custom string lunco:visual:surface_winding = '"outward; bottom clockwise, top counter-clockwise; doubleSided render safety"'
+    }
+    def Cube "BoxyAirframe" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+        active = false
+    )
+    {
+        custom double3 xformOp:scale = (4.5, 2.0, 4.5)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.2800000011920929, 0.3199999928474426, 0.3799999952316284)]
+    }
+    def Cube "LowerServiceSkirtBox" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+        active = false
+    )
+    {
+        custom double3 xformOp:scale = (4.1, 0.42, 4.1)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, -1.02, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.07999999821186066, 0.10000000149011612, 0.12999999523162842)]
+    }
+    def Cube "IsogridDeck" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+        active = false
+    )
+    {
+        custom double3 xformOp:scale = (4.4, 0.16, 4.4)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 1.03, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.18000000715255737, 0.2199999988079071, 0.27000001072883606)]
+    }
+    def Cube "FrameRailFront" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.16, 2.34, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, -0.06, 2.16)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom string lunco:visual:source = '"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration"'
+    }
+    def Cube "FrameRailRear" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.16, 2.34, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, -0.06, -2.16)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom string lunco:visual:source = '"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration"'
+    }
+    def Cube "FrameRailPortFront" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.16, 2.34, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (2.16, -0.06, 1.08)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom string lunco:visual:source = '"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration"'
+    }
+    def Cube "FrameRailPortRear" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.16, 2.34, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (2.16, -0.06, -1.08)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom string lunco:visual:source = '"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration"'
+    }
+    def Cube "FrameRailStarboardFront" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.16, 2.34, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-2.16, -0.06, 1.08)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom string lunco:visual:source = '"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration"'
+    }
+    def Cube "FrameRailStarboardRear" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.16, 2.34, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-2.16, -0.06, -1.08)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom string lunco:visual:source = '"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration"'
     }
 }
