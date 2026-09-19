@@ -32,15 +32,8 @@ fn flip_visual_children_check(id, component, path, paths) {
 // passed to the generic evaluator.  The test owns only child geometry names;
 // it does not carry a second list of rover/lander station identities.
 fn _sysml_list(report, name) {
-    let value = sysml_requirements::text(report, griffin_spec::qualified_attribute_name(name));
-    if value == () || value == "" {
-        return [];
-    }
-    let items = [];
-    for item in value.split(",") {
-        item.trim();
-        if item != "" { items.push(item); }
-    }
+    let items = sysml_requirements::string_vector(report, griffin_spec::qualified_attribute_name(name));
+    if items == () { return []; }
     items
 }
 
@@ -74,13 +67,13 @@ fn on_tick(me, ctx) {
     checks.push(visual_children_check("GV-002-deck-subparts", "lander", "gv002",
         root + "/Griffin1/Bus",
         [root + "/Griffin1/Bus/PerimeterFrame",
-         root + "/Griffin1/Bus/WhiteEquipmentBox",
+         root + "/Griffin1/Bus/PerimeterFrame",
          root + "/Griffin1/Bus/FrontThermalPanel",
          root + "/Griffin1/Bus/FrontLogoRedA",
          root + "/Griffin1/Bus/FrontLogoRedB",
-         root + "/Griffin1/Bus/TopDeck"]));
+         root + "/Griffin1/Bus/TopDeckHex"]));
     let body_profile = visual_exists_check("GV-002-hex-body", "lander", "gv002",
-        "exists", root + "/Griffin1/Bus/WhiteEquipmentBox");
+        "exists", root + "/Griffin1/Bus/PerimeterFrame");
     body_profile.expected_type = "Mesh";
     checks.push(body_profile);
     checks.push(visual_exists_check("GV-002-nozzle", "engines", "gv002", "exists", root + "/Griffin1/Nozzle"));
@@ -224,7 +217,7 @@ fn on_tick(me, ctx) {
         verification: "Verify_GriffinVisualRequirements",
         kind: "relationship", path: starboard_socket, rel: "lunco:mount:part",
         targets: [root + "/Griffin1/EgressRampStarboard"] });
-    checks.push(visual_exists_check("GV-004-deck-width", "lander_deck", "gv004", "bounds_component", root + "/Griffin1/Bus/WhiteEquipmentBox"));
+    checks.push(visual_exists_check("GV-004-deck-width", "lander_deck", "gv004", "bounds_component", root + "/Griffin1/Bus/PerimeterFrame"));
     checks[checks.len() - 1].index = 0;
     checks[checks.len() - 1].multiplier = 2.0;
     checks[checks.len() - 1].expected_attr = griffin_spec::qualified_attribute_name("visualLanderDeckWidthM");
