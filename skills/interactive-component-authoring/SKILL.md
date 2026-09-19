@@ -128,6 +128,22 @@ collision envelope, or runtime contract.
     contract, stable seed/thread policy, no wall-clock sleeps in tests, and
     report the source revision, horizon, ticks, and tolerance in evidence.
 
+## Verification strategy
+
+Make positive conformance evidence the normal test shape: read the normative
+SysML/USD source, observe the composed result, and prove that the required
+component, geometry, relationship, datum, or runtime outcome is present and
+correct. Do not add a negative test merely to prove that an obsolete
+implementation name or old shape is absent; update the positive requirement
+and assert the required type/profile/topology instead.
+
+Use a negative case only when rejection or safe failure is itself a real
+contract, such as malformed source, non-finite data, a missing safety-critical
+relationship, stale-generation mutation, unsupported command, invalid units,
+or a required fail-safe response. Such a case must be bounded, non-destructive,
+and end at the public diagnostic/verdict boundary. A historical regression
+example is not enough by itself to justify a negative test.
+
 ## Visual review order
 
 At every component checkpoint inspect in this order:
