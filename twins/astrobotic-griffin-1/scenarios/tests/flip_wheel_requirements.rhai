@@ -61,6 +61,24 @@ fn on_tick(me, ctx) {
             requirement: "fww002", verification: VERIFICATION,
             kind: "attribute", path: wheel, attr: "physxVehicleWheel:radius",
             expected_attr: radius_source, tolerance: 0.002});
+        checks.push(#{id: "FWW-007-" + name + "-axis", component: "wheel",
+            requirement: "fww007", verification: VERIFICATION, kind: "attribute_equals",
+            path: wheel + "/Tire", attr: "axis", expected_attr: own("wheelAxis")});
+        checks.push(#{id: "FWW-007-" + name + "-tire-width", component: "wheel",
+            requirement: "fww007", verification: VERIFICATION, kind: "attribute",
+            path: wheel + "/Tire", attr: "height", expected_attr: own("tireWidthM"), tolerance: 0.002});
+        checks.push(#{id: "FWW-007-" + name + "-hub-radius", component: "wheel",
+            requirement: "fww007", verification: VERIFICATION, kind: "attribute",
+            path: wheel + "/MetalHub", attr: "radius", expected_attr: own("hubRadiusM"), tolerance: 0.002});
+        checks.push(#{id: "FWW-007-" + name + "-hub-width", component: "wheel",
+            requirement: "fww007", verification: VERIFICATION, kind: "attribute",
+            path: wheel + "/MetalHub", attr: "height", expected_attr: own("hubWidthM"), tolerance: 0.002});
+        checks.push(#{id: "FWW-007-" + name + "-cap-radius", component: "wheel",
+            requirement: "fww007", verification: VERIFICATION, kind: "attribute",
+            path: wheel + "/HubCap", attr: "radius", expected_attr: own("hubCapRadiusM"), tolerance: 0.002});
+        checks.push(#{id: "FWW-007-" + name + "-cap-width", component: "wheel",
+            requirement: "fww007", verification: VERIFICATION, kind: "attribute",
+            path: wheel + "/HubCap", attr: "height", expected_attr: own("hubCapWidthM"), tolerance: 0.002});
         let steering_source = if name.starts_with("F") { front_source } else { rear_source };
         checks.push(#{id: "FWW-003-" + name + "-steering", component: "wheel",
             requirement: "fww003", verification: VERIFICATION,

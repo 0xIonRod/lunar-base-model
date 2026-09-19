@@ -15,13 +15,8 @@ fn _source_attr(name) {
 }
 
 fn _list(source, name) {
-    let text = sysml_requirements::text(source, _source_attr(name));
-    if text == () || text == "" { return []; }
-    let values = [];
-    for value in text.split(",") {
-        value.trim();
-        if value != "" { values.push(value); }
-    }
+    let values = sysml_requirements::string_vector(source, _source_attr(name));
+    if values == () { return []; }
     values
 }
 

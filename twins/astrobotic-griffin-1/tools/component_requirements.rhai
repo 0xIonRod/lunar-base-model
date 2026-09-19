@@ -1,34 +1,51 @@
 // Shared observer helpers for component-owned Twin verification scripts.
 //
-// SysML remains the normative source for names, counts, and metric datums;
+// SysML remains the normative source for typed identities, counts, and metric datums;
 // this module only constructs generic evaluator records and emits the common
 // structured verdict shape.  It never edits USD and never supplies defaults.
 
 fn source_text_list(source, qualified_name) {
-    let text = sysml_requirements::text(source, qualified_name);
-    if text == () || text == "" { return []; }
-    let values = [];
-    for value in text.split(",") {
-        value.trim();
-        if value != "" { values.push(value); }
+    let values = sysml_requirements::native_value(source, qualified_name);
+    if values == () || type_of(values) != "array" { return []; }
+    let identifiers = [];
+    for value in values {
+        if type_of(value) == "EnumValue" {
+            identifiers.push(value.literal);
+        } else if type_of(value) == "string" {
+            identifiers.push(value);
+        } else {
+            return [];
+        }
     }
+    identifiers
+}
+
+fn source_enum_identifiers(source, qualified_name) {
+    let values = sysml_requirements::native_value(source, qualified_name);
+    if values == () || type_of(values) != "array" { return []; }
+    let identifiers = [];
+    for value in values {
+        if type_of(value) != "EnumValue" { return []; }
+        identifiers.push(value.literal);
+    }
+    identifiers
+}
+
+fn source_position_list(source, qualified_name) {
+    let values = sysml_requirements::native_value(source, qualified_name);
+    if values == () || type_of(values) != "array" { return []; }
+    for value in values { if type_of(value) != "Vec3" { return []; } }
     values
 }
 
-// Decode a comma-separated numeric station datum from the SysML source.  The
-// caller must check cardinality against the corresponding identity list
-// before indexing; an absent list is returned empty and a malformed numeric
-// token raises a Rhai error instead of being coerced or guessed.
+// Read the typed Real/Integer vector from the SysML projection. The values
+// remain numeric throughout; no CSV parsing or string coercion is involved.
+// Callers must check cardinality against the corresponding typed identity
+// collection before indexing.
 fn source_number_list(source, qualified_name) {
-    let text = sysml_requirements::text(source, qualified_name);
-    if text == () || text == "" { return []; }
-    let values = [];
-    for item in text.split(",") {
-        item.trim();
-        if item == "" { return []; }
-        values.push(parse_float(item));
-    }
-    values
+    let typed = sysml_requirements::vector(source, qualified_name);
+    if typed == () { return []; }
+    typed
 }
 
 // The SysML registry validates both qualified and short identities.  Store
@@ -40,6 +57,47 @@ fn _short_identity(name) {
     let parts = name.split("::");
     if parts.len() == 0 { return name; }
     parts[parts.len() - 1]
+}
+
+// Twin requirement usages use compact local names (`gll001`) in repeated
+// check tables. The separate SysML evidence catalog uses the authored ID
+// form (`GLL-001`); derive that lookup key once at the source boundary.
+fn _evidence_id(requirement) {
+    if requirement == () || requirement == "" { return (); }
+    let prefixes = [
+        ["fcc", "FCC"], ["fgv", "FGV"], ["fsp", "FSP"], ["fsr", "FSR"],
+        ["fww", "FWW"], ["gbc", "GBC"], ["ges", "GES"], ["gll", "GLL"],
+        ["glr", "GLR"], ["gpp", "GPP"], ["gpt", "GPT"], ["grr", "GRR"],
+        ["gsa", "GSA"], ["gvc", "GVC"], ["grv", "GRV"], ["mb", "MB"]
+    ];
+    for prefix in prefixes {
+        if requirement.starts_with(prefix[0]) {
+            return prefix[1] + "-" + requirement.sub_string(prefix[0].len());
+        }
+    }
+    ()
+}
+
+fn _source_evidence(source, checks) {
+    let records = [];
+    let failures = [];
+    let seen = #{};
+    for check in checks {
+        if check == () || check.requirement == () { continue; }
+        let local = _short_identity(check.requirement);
+        if seen[local] == true { continue; }
+        seen[local] = true;
+        let evidence_id = _evidence_id(local);
+        if evidence_id == () { continue; }
+        let selected = sysml_requirements::provenance(source, evidence_id);
+        if selected.ok == true {
+            records.push(selected.evidence);
+        } else {
+            failures.push(#{requirement: local, evidence_id: evidence_id,
+                error: selected.error});
+        }
+    }
+    #{records: records, failures: failures}
 }
 
 fn exists(id, component, requirement, verification, path, expected_type) {
@@ -108,6 +166,16 @@ fn finish(source, checks, title, channel, root, package_name, verification) {
     } else {
         sysml_requirements::evaluate(source, checks)
     };
+    let source_evidence = _source_evidence(source, checks);
+    result.source_evidence = source_evidence.records;
+    result.source_evidence_failures = source_evidence.failures;
+    if source_evidence.failures.len() > 0 {
+        result.ok = false;
+        if result.failures == () { result.failures = []; }
+        for failure in source_evidence.failures { result.failures.push(failure); }
+        result.failure_count = if result.failure_count == () { 0 } else { result.failure_count };
+        result.failure_count += source_evidence.failures.len();
+    }
     result.metrics = #{clock: clock_snapshot(), root: root,
                        component_package: package_name,
                        // `evaluate` canonicalizes this identity from the

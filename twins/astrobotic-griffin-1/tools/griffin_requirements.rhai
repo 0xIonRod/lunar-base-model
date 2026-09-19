@@ -27,13 +27,8 @@ fn _sysml_text(report, name) {
 }
 
 fn _sysml_list(report, name) {
-    let value = _sysml_text(report, name);
-    if value == () || value == "" { return []; }
-    let items = [];
-    for item in value.split(",") {
-        item.trim();
-        if item != "" { items.push(item); }
-    }
+    let items = sysml_requirements::string_vector(report, griffin_spec::qualified_attribute_name(name));
+    if items == () { return []; }
     items
 }
 
@@ -129,7 +124,8 @@ fn sysml_contract_report() {
     if requirements != () {
         for requirement in requirements {
             // Definitions (GR001_...) and usages (gr001) are both valid
-            // SysML records. The verification case covers the 33 usages,
+            // SysML records. The verification case covers the Griffin usage
+            // instances,
             // which are the stable instance-level contract for this gate.
             // Count only Griffin's instance usages.  Other Twin packages use
             // the same lowercase `gr...` naming convention (for example the
@@ -177,7 +173,8 @@ fn sysml_contract_report() {
     // look Griffin-compatible when the public architecture has drifted.
     for name in ["payloadCapacityKg", "landingLegCount", "mainEngineCount",
         "propellantTankCount", "rampCount", "solarArrayCount",
-        "flipPayloadCapacityKg", "wheelCount", "landingComTouchdownY"] {
+        "flipPayloadCapacityKg", "wheelCount", "landingComTouchdownY",
+        "physicalRampDeckTransitionMassKg"] {
         let actual = _sysml_number(report, name);
         if actual == () || actual <= 0.0 {
             missing.push("positive typed SysML fact " + name);
@@ -191,7 +188,9 @@ fn sysml_contract_report() {
         "rampStatus", "solarArrayStatus", "wheelCountStatus", "egressMode",
         "solarArrayMode", "mobilityStatus", "exactVehicleIcdStatus",
         "solarArrayNames", "landingLegNames", "landingPadNames", "rampNames",
-        "rampHingeNames", "propellantTankNames", "mainEngineNames", "visualWheelNames"] {
+        "rampHingeNames", "propellantTankNames", "mainEngineNames", "visualWheelNames",
+        "surfaceRouteMarkerNames", "surfaceRouteSpeedMps", "surfaceRouteArrivalRadiusM",
+        "physicalRampDeckTransitionInertiaKgM2", "physicalRampTransitionJointNamePrefix"] {
         let text = _sysml_text(report, name);
         if text == () || text == "" {
             missing.push("traceable SysML text fact " + name);
@@ -221,6 +220,27 @@ fn sysml_contract_report() {
     }
     if griffin_spec::main_engine_names().len() != griffin_spec::main_engine_count() {
         missing.push("main-engine identity list/count mismatch in SysML");
+    }
+    let transition_inertia = griffin_spec::physical_ramp_deck_transition_inertia_kg_m2();
+    if transition_inertia.len() != 3 {
+        missing.push("physical deck transition inertia must have three values in SysML");
+    }
+    if griffin_spec::physical_ramp_transition_joint_name_prefix() == () {
+        missing.push("physical deck transition joint identity is missing in SysML");
+    }
+    let route_names = griffin_spec::surface_route_marker_names();
+    let route_speeds = griffin_spec::surface_route_speed_mps();
+    let route_radii = griffin_spec::surface_route_arrival_radius_m();
+    if route_names.len() == 0 || route_speeds.len() != route_names.len()
+        || route_radii.len() != route_names.len() {
+        missing.push("surface route marker/speed/radius cardinality mismatch in SysML");
+    } else {
+        for i in 0..route_names.len() {
+            if route_speeds[i] <= 0.0 || route_radii[i] <= 0.0 {
+                missing.push("surface route speed/radius must be positive in SysML");
+                break;
+            }
+        }
     }
     let general_ids = _sysml_list(report, "moonbaseRequirementIds");
     let general_count = _sysml_number(report, "moonbaseRequirementUsageCount");
@@ -338,6 +358,18 @@ fn _query(doc_id, path, attrs, rels, children) {
     query("QueryUsdPrim", request)
 }
 
+// Schema projection is intentionally opt-in. Most requirement checks need only
+// a few authored values; this narrow helper asks for applied APIs only where a
+// topology contract depends on them, keeping the hot query path small.
+fn _query_schemas(doc_id, path, attrs, rels, children) {
+    let request = #{ path: path, schemas: true };
+    if doc_id != () { request.doc_id = doc_id; }
+    if attrs != () { request.attrs = attrs; }
+    if rels != () { request.rels = rels; }
+    if children != () { request.children = children; }
+    query("QueryUsdPrim", request)
+}
+
 fn _ok(record) {
     record != () && record.ok != false && record.path != ()
 }
@@ -396,6 +428,9 @@ fn _layout_query(doc_id, path, attrs, children) {
     _query(doc_id, path, attrs, (), children)
 }
 
+// Geometry-aware query used by the visual gate. The ordinary layout query is
+// intentionally cheap and only proves authored topology; it must not be used
+// as evidence that a component has the right metric envelope.
 fn _layout_finding(id, path, message) {
     _finding(id, path, message)
 }
@@ -770,10 +805,12 @@ fn _leg_layout_report(doc_id, root) {
     let findings = [];
     let names = griffin_spec::landing_leg_names();
     let pad_names = griffin_spec::landing_pad_names();
+    let expected_rotations = griffin_spec::component_leg_station_rotation_y_deg();
     let expected = landing_leg_count();
-    if names.len() != 4 || pad_names.len() != names.len() || expected != names.len() {
+    if names.len() != 4 || pad_names.len() != names.len()
+        || expected != names.len() || expected_rotations.len() != names.len() {
         findings.push(_layout_finding("GR-019", root,
-            "SysML landing-leg and pad identity lists must contain four paired names"));
+            "SysML landing-leg, pad, and radial-orientation lists must contain four paired entries"));
         return findings;
     }
     let legs = [];
@@ -804,6 +841,14 @@ fn _leg_layout_report(doc_id, root) {
         }
         if i == 3 && (pos[2] >= 0.0 || !_near(pos[0], 0.0, 0.02)) {
             findings.push(_layout_finding("GR-019", path, "LegNZ must attach on -Z"));
+        }
+        let rotation = leg.attrs["xformOp:rotateXYZ"];
+        if rotation == () || rotation.len() != 3 {
+            findings.push(_layout_finding("GR-019", path,
+                "landing leg radial orientation must publish xformOp:rotateXYZ"));
+        } else if !_near(rotation[1], expected_rotations[i], 0.02) {
+            findings.push(_layout_finding("GR-019", path,
+                "landing leg Y rotation disagrees with the SysML radial orientation datum"));
         }
         let pad_path = path + "/" + pad_names[i];
         let pad = _layout_query(doc_id, pad_path,
@@ -1332,6 +1377,11 @@ fn runtime_report(doc_id, root) {
     // facts consumed by a runtime verdict; otherwise the report itself can
     // exceed Rhai's bounded string/value transport.
     let sysml_summary = #{
+        // Preserve the Twin URI needed by bounded typed projections such as
+        // sysml_requirements::provenance().  The summary intentionally drops
+        // the large AST/attribute tables, but it must retain the source
+        // identity so evidence remains Twin-native in runtime tests.
+        path: sysml.path,
         ok: sysml.ok,
         error: if sysml.error == () { "" } else { sysml.error },
         kind: sysml.kind,
@@ -1582,12 +1632,88 @@ fn lint(doc_id, root) {
                 findings.push(_finding("GR-003", ramp_path,
                     "egress ramp needs an explicit mechanism description"));
             }
-            for child_name in ["Surface", "EdgeRail", "EdgeRailInner"] {
+            let physical_children = ["Surface", "EdgeRail", "EdgeRailInner"];
+            let transition_name = griffin_spec::physical_ramp_transition_child_name();
+            if transition_name != () && transition_name != "" {
+                // TransitionPlate is a rigid-body frame; its ContactSurface
+                // child owns the collision geometry. Keep that boundary
+                // explicit instead of making a scaled gprim itself a body.
+                let contact_name = griffin_spec::physical_ramp_transition_contact_child_name();
+                if contact_name == () || contact_name == "" {
+                    findings.push(_finding("GR-012", ramp_path,
+                        "physical deck transition contact child name is missing in SysML"));
+                }
+            }
+            for child_name in physical_children {
                 let child_path = ramp_path + "/" + child_name;
                 let child = _query(doc_id, child_path, ["physics:collisionEnabled"], (), false);
                 if !_ok(child) || child.attrs["physics:collisionEnabled"] != true {
                     findings.push(_finding("GR-003", child_path,
                         "ramp contact geometry must have collision enabled"));
+                }
+            }
+            if transition_name != () && transition_name != "" {
+                let contact_name = griffin_spec::physical_ramp_transition_contact_child_name();
+                let transition_path = ramp_path + "/" + transition_name;
+                let transition = _query_schemas(doc_id, transition_path,
+                    ["physics:mass", "physics:diagonalInertia"], (), true);
+                if !_ok(transition) || transition.type_name != "Xform" {
+                    findings.push(_finding("GR-012", transition_path,
+                        "physical deck transition must be an unscaled Xform rigid-body frame"));
+                } else {
+                    // QueryUsdPrim exposes the composed applied API list as
+                    // `api_schemas`; keep this check on the shared typed
+                    // provider contract instead of duplicating a Rhai-only
+                    // projection name.
+                    let schemas = transition.api_schemas;
+                    for schema in ["PhysicsRigidBodyAPI", "PhysicsMassAPI"] {
+                        if !_has(schemas, schema) {
+                            findings.push(_finding("GR-012", transition_path,
+                                "physical deck transition is missing " + schema));
+                        }
+                    }
+                    let mass = griffin_spec::physical_ramp_deck_transition_mass_kg();
+                    if transition.attrs["physics:mass"] == () || mass == ()
+                        || (transition.attrs["physics:mass"] - mass).abs() > 0.002 {
+                        findings.push(_finding("GR-012", transition_path,
+                            "transition mass must match the SysML study datum"));
+                    }
+                    let inertia = griffin_spec::physical_ramp_deck_transition_inertia_kg_m2();
+                    let authored_inertia = transition.attrs["physics:diagonalInertia"];
+                    if inertia.len() != 3 || authored_inertia == ()
+                        || authored_inertia.len() != 3 {
+                        findings.push(_finding("GR-012", transition_path,
+                            "transition diagonal inertia must be a typed three-value datum"));
+                    } else {
+                        for index in 0..3 {
+                            if (authored_inertia[index] - inertia[index]).abs() > 0.01 {
+                                findings.push(_finding("GR-012", transition_path,
+                                    "transition diagonal inertia must match SysML"));
+                                break;
+                            }
+                        }
+                    }
+                }
+                let contact_path = transition_path + "/" + contact_name;
+                let contact = _query_schemas(doc_id, contact_path,
+                    ["physics:collisionEnabled"], (), false);
+                if !_ok(contact) || contact.type_name != "Cube"
+                    || contact.attrs["physics:collisionEnabled"] != true
+                    || !_has(contact.api_schemas, "PhysicsCollisionAPI") {
+                    findings.push(_finding("GR-012", contact_path,
+                        "transition ContactSurface must be a collision-enabled Cube"));
+                }
+                let prefix = griffin_spec::physical_ramp_transition_joint_name_prefix();
+                let suffix = if i == 0 { "Port" } else { "Starboard" };
+                let joint_path = ramp_path + "/" + prefix + suffix;
+                let joint = _query(doc_id, joint_path,
+                    ["physics:localPos0", "physics:localPos1", "physics:collisionEnabled"],
+                    ["physics:body0", "physics:body1"], false);
+                if !_ok(joint) || joint.type_name != "PhysicsFixedJoint"
+                    || _relationship(joint, "physics:body0") != root
+                    || _relationship(joint, "physics:body1") != transition_path {
+                    findings.push(_finding("GR-012", joint_path,
+                        "transition must be fixed-jointed from the Griffin root to the named plate"));
                 }
             }
         }
@@ -1690,6 +1816,178 @@ fn part_report_live(doc_id, root) {
                 + finding.path + ": " + finding.message);
         }
     }
+    report
+}
+
+fn _lander_component_attr(name) {
+    "GriffinLanderRequirements::GriffinLanderComponent::" + name
+}
+
+fn _visual_configuration_attr(name) {
+    griffin_spec::qualified_attribute_name(name)
+}
+
+// Render-only visual acceptance.  The physical Griffin manifest above
+// intentionally expects mass/collider/flight prims that do not belong in the
+// render document. Keep this report separate so the active Editor visual can
+// prove component topology, typed station transforms, ramp load-path children,
+// and the SysML source revision without pretending that a presentation asset
+// is the flight model.
+fn visual_report(doc_id, root) {
+    if doc_id == () || root == () || root == "" {
+        return #{ok: false, error: "visual_report requires an explicit visual doc_id and root"};
+    }
+    let source = sysml_requirements::source();
+    if source == () || source.ok != true {
+        return #{ok: false, error: "visual_report cannot resolve the Twin SysML source"};
+    }
+    let findings = [];
+    let checks = [];
+    let root_record = _layout_query(doc_id, root,
+        ["lunco:visual:status", "lunco:visual:configuration"], true);
+    checks.push("GLR-009-root");
+    if !_ok(root_record) {
+        findings.push(_finding("GLR-009-root", root,
+            "visual Griffin root is missing from the composed Editor document"));
+    }
+
+    let required = [root + "/Bus", root + "/TankPX", root + "/TankNX",
+        root + "/TankPZ", root + "/TankNZ", root + "/LegPX",
+        root + "/LegNX", root + "/LegPZ", root + "/LegNZ",
+        root + "/SolarPanelPort", root + "/SolarPanelStarboard",
+        root + "/Nozzle", root + "/EgressRampPort",
+        root + "/EgressRampStarboard"];
+    for path in required {
+        checks.push("GLR-009-" + path);
+        if !_ok(_layout_query(doc_id, path, [], false)) {
+            findings.push(_finding("GLR-009-child", path,
+                "required visual component root is missing"));
+        }
+    }
+
+    let leg_names = griffin_spec::landing_leg_names();
+    let leg_stations = component_requirements::source_position_list(source, _visual_configuration_attr("legStations"));
+    let leg_rot = component_requirements::source_number_list(source, _visual_configuration_attr("legStationRotationYDeg"));
+    for index in 0..leg_names.len() {
+        let path = root + "/" + leg_names[index];
+        let record = _layout_query(doc_id, path,
+            ["xformOp:translate", "xformOp:rotateXYZ"], false);
+        checks.push("GLR-008-" + leg_names[index]);
+        if !_ok(record) {
+            findings.push(_finding("GLR-008-leg", path,
+                "landing-leg station root is missing"));
+            continue;
+        }
+        let position = record.attrs["xformOp:translate"];
+        let rotation = record.attrs["xformOp:rotateXYZ"];
+        if position == () || position.len() != 3 || leg_stations.len() != leg_names.len()
+            || !_near(position[0], leg_stations[index].x, 0.002)
+            || !_near(position[1], leg_stations[index].y, 0.002)
+            || !_near(position[2], leg_stations[index].z, 0.002) {
+            findings.push(_finding("GLR-008-leg-position", path,
+                "landing-leg station differs from the ordered SysML datum"));
+        }
+        if rotation == () || rotation.len() != 3 || leg_rot.len() != leg_names.len()
+            || !_near(rotation[1], leg_rot[index], 0.002) {
+            findings.push(_finding("GLR-008-leg-rotation", path,
+                "landing-leg radial orientation differs from the ordered SysML datum"));
+        }
+    }
+
+    let solar_names = griffin_spec::solar_array_names();
+    let solar_stations = component_requirements::source_position_list(source, _visual_configuration_attr("solarStations"));
+    let solar_rot_x = component_requirements::source_number_list(source, _visual_configuration_attr("solarStationRotationXDeg"));
+    let solar_rot = component_requirements::source_number_list(source, _visual_configuration_attr("solarStationRotationZDeg"));
+    for index in 0..solar_names.len() {
+        let path = root + "/" + solar_names[index];
+        let record = _layout_query(doc_id, path,
+            ["xformOp:translate", "xformOp:rotateXYZ"], false);
+        checks.push("GLR-011-" + solar_names[index]);
+        if !_ok(record) {
+            findings.push(_finding("GLR-011-array", path,
+                "solar-array station root is missing"));
+            continue;
+        }
+        let position = record.attrs["xformOp:translate"];
+        let rotation = record.attrs["xformOp:rotateXYZ"];
+        if position == () || position.len() != 3 || solar_stations.len() != solar_names.len()
+            || !_near(position[0], solar_stations[index].x, 0.002)
+            || !_near(position[1], solar_stations[index].y, 0.002)
+            || !_near(position[2], solar_stations[index].z, 0.002) {
+            findings.push(_finding("GLR-011-array-position", path,
+                "solar-array station differs from the ordered SysML datum"));
+        }
+        if rotation == () || rotation.len() != 3 || solar_rot_x.len() != solar_names.len()
+            || !_near(rotation[0], solar_rot_x[index], 0.002) {
+            findings.push(_finding("GLR-011-array-rotation-x", path,
+                "solar-array X rotation does not map the local cell face outward"));
+        }
+        if rotation == () || rotation.len() != 3 || solar_rot.len() != solar_names.len()
+            || !_near(rotation[2], solar_rot[index], 0.002) {
+            findings.push(_finding("GLR-011-array-rotation", path,
+                "solar-array outward orientation differs from the ordered SysML datum"));
+        }
+    }
+
+    let ramp_names = griffin_spec::ramp_names();
+    let ramp_children = _sysml_list(source, "assemblyChildNames");
+    for ramp_name in ramp_names {
+        let path = root + "/" + ramp_name;
+        let ramp = _layout_query(doc_id, path,
+            ["xformOp:translate", "xformOp:rotateXYZ", "lunco:visual:surface_length_m",
+             "lunco:visual:surface_width_m"], false);
+        checks.push("GRR-014-" + ramp_name);
+        if !_ok(ramp) {
+            findings.push(_finding("GRR-001-ramp", path,
+                "visual egress-ramp root is missing"));
+            continue;
+        }
+        for child_name in ["MountFrame", "RampSurface", "OuterRail", "InnerRail", "SupportArm"] {
+            let child_path = path + "/" + child_name;
+            checks.push("GRR-001-" + child_path);
+            if !_ok(_layout_query(doc_id, child_path, [], false)) {
+                findings.push(_finding("GRR-001-ramp-child", child_path,
+                    "required visual ramp child is missing"));
+            }
+        }
+        for child_name in ramp_children {
+            let child_path = path + "/" + child_name;
+            checks.push("GRR-014-" + child_path);
+            if !_ok(_layout_query(doc_id, child_path, [], false)) {
+                findings.push(_finding("GRR-014-ramp-load-path", child_path,
+                    "typed ramp load-path child is missing"));
+            }
+        }
+        if ramp.attrs["lunco:visual:surface_length_m"] == ()
+            || !_near(ramp.attrs["lunco:visual:surface_length_m"],
+                _sysml_number(source, "rampSurfaceLengthM"), 0.002)
+            || ramp.attrs["lunco:visual:surface_width_m"] == ()
+            || !_near(ramp.attrs["lunco:visual:surface_width_m"],
+                _sysml_number(source, "rampSurfaceWidthM"), 0.002) {
+            findings.push(_finding("GRR-003-ramp-envelope", path,
+                "visual ramp metadata differs from the typed SysML envelope"));
+        }
+    }
+    #{ok: findings.len() == 0, doc_id: doc_id, root: root,
+      source_revision: source.source_revision_hex, checks: checks.len(),
+      failures: findings.len(), findings: findings,
+      metrics: #{document_generation: root_record.generation,
+                 text_layer: "authored", perspective: "Edit"}}
+}
+
+fn visual_report_live(doc_id, root) {
+    let report = visual_report(doc_id, root);
+    if report.ok == () {
+        return report;
+    }
+    print("GRIFFIN_VISUAL_EVIDENCE source_revision=" + report.source_revision
+        + " checks=" + report.checks.to_string()
+        + " failures=" + report.failures.to_string());
+    for finding in report.findings {
+        print("[griffin-visual] ERROR " + finding.id + " "
+            + finding.path + ": " + finding.message);
+    }
+    print("GRIFFIN VISUAL: " + (if report.ok { "PASS" } else { "FAIL" }));
     report
 }
 

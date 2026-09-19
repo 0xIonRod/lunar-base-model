@@ -5,6 +5,7 @@ const VERIFICATION = "Verify_GriffinTankRequirements";
 
 fn own(name) { PACKAGE + "::GriffinPropellantTankAssembly::" + name }
 fn parent(name) { "GriffinLanderRequirements::GriffinLanderComponent::" + name }
+fn visual(name) { "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::" + name }
 
 fn position_for(id, requirement, path, index, expected) {
     #{id: id, component: "tank", requirement: requirement,
@@ -43,16 +44,13 @@ fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let root = sysml_requirements::text(source, own("usdRootPath"));
-    let names_source = sysml_requirements::text(source, own("namesSource"));
-    let count_source = sysml_requirements::text(source, own("countSource"));
-    let names = component_requirements::source_text_list(source, names_source);
+    let names = component_requirements::source_enum_identifiers(source, visual("tankInstances"));
+    let stations = component_requirements::source_position_list(source, visual("tankStations"));
+    let count = parent("tankCount");
     let child_names = component_requirements::source_text_list(source, own("childNames"));
     let end_hardware_names = component_requirements::source_text_list(source, own("endHardwareNames"));
     let service_hardware_names = component_requirements::source_text_list(source, own("serviceHardwareNames"));
     let axial_hardware_names = component_requirements::source_text_list(source, own("axialHardwareNames"));
-    let xs = component_requirements::source_number_list(source, parent("tankStationX"));
-    let ys = component_requirements::source_number_list(source, parent("tankStationY"));
-    let zs = component_requirements::source_number_list(source, parent("tankStationZ"));
     let body_radius = sysml_requirements::number(source, own("bodyRadiusM"));
     let body_height = sysml_requirements::number(source, own("bodyHeightM"));
     let body_shape = sysml_requirements::text(source, own("bodyShape"));
@@ -78,14 +76,8 @@ fn on_tick(me, ctx) {
     let tank_axis = sysml_requirements::text(source, own("tankAxis"));
     let band_centers = component_requirements::source_number_list(source, own("bandCenterYM"));
     let band_radii = component_requirements::source_number_list(source, own("bandRadiusByCenterM"));
-    let band_transform_order_text = sysml_requirements::text(source, own("bandTransformOrder"));
-    let band_transform_order = [];
-    if band_transform_order_text != () && band_transform_order_text != "" {
-        for token in band_transform_order_text.split(",") {
-            token.trim();
-            if token != "" { band_transform_order.push(token); }
-        }
-    }
+    let band_transform_order = sysml_requirements::string_vector(source, own("bandTransformOrder"));
+    let band_transform_order = if band_transform_order == () { [] } else { band_transform_order };
     let cradle_local_y = sysml_requirements::number(source, own("cradleLocalY"));
     let cradle_shape = sysml_requirements::text(source, own("cradleShape"));
     let cradle_radius = sysml_requirements::number(source, own("cradleRadiusM"));
@@ -100,8 +92,11 @@ fn on_tick(me, ctx) {
     let support_height = sysml_requirements::number(source, own("supportHeightM"));
     let support_center_y = sysml_requirements::number(source, own("supportCenterYM"));
     let minimum_deck_clearance = sysml_requirements::number(source, own("minimumDeckClearanceM"));
-    let deck_top_source = sysml_requirements::text(source, own("deckTopSource"));
-    let deck_top = sysml_requirements::number(source, deck_top_source);
+    let deck_center = sysml_requirements::native_value(source, visual("avionicsDeckCenter"));
+    let deck_dimensions = sysml_requirements::native_value(source, visual("avionicsDeckDimensions"));
+    let deck_top = if type_of(deck_center) == "Vec3" && type_of(deck_dimensions) == "Vec3" {
+        deck_center.y + deck_dimensions.y / 2.0
+    } else { () };
     let bracket_group_name = sysml_requirements::text(source, own("bracketGroupName"));
     let bracket_names = component_requirements::source_text_list(source, own("bracketNames"));
     let bracket_length = sysml_requirements::number(source, own("bracketLengthM"));
@@ -129,8 +124,7 @@ fn on_tick(me, ctx) {
         || cradle_pad_depth == () || cradle_pad_height == ()
         || support_name == () || support_name == "" || support_radius == ()
         || support_height == () || support_center_y == ()
-        || minimum_deck_clearance == () || deck_top_source == ()
-        || deck_top_source == "" || deck_top == ();
+        || minimum_deck_clearance == () || deck_top == ();
     let missing_brackets = bracket_group_name == () || bracket_group_name == ""
         || bracket_names.len() != 4 || bracket_length == () || bracket_width == ()
         || bracket_depth == () || bracket_offset == () || bracket_center_y == ()
@@ -143,12 +137,8 @@ fn on_tick(me, ctx) {
         return;
     }
     let checks = [];
-    checks.push(component_requirements::source_list_count("GPT-001-count", "propellant_tank", "gpt001", VERIFICATION, names_source, count_source));
-    for axis in ["tankStationX", "tankStationY", "tankStationZ"] {
-        checks.push(component_requirements::source_list_count("GPT-005-" + axis,
-            "tank", "gpt005", VERIFICATION,
-            parent(axis), count_source));
-    }
+    checks.push(component_requirements::source_list_count("GPT-001-count", "propellant_tank", "gpt001", VERIFICATION, visual("tankInstances"), count));
+    checks.push(component_requirements::source_list_count("GPT-005-stations", "tank", "gpt005", VERIFICATION, visual("tankStations"), count));
     for index in 0..names.len() {
         let name = names[index];
         let path = root + "/" + name;
@@ -253,11 +243,11 @@ fn on_tick(me, ctx) {
         checks.push(#{id: "GPT-010-" + name + "-" + bracket_name + "-scale-x", component: "tank", requirement: "gpt010", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: bracket_path, attr: "xformOp:scale", index: 0, expected: bracket_width / 2.0, tolerance: 0.002});
         checks.push(#{id: "GPT-010-" + name + "-" + bracket_name + "-scale-y", component: "tank", requirement: "gpt010", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: bracket_path, attr: "xformOp:scale", index: 1, expected: bracket_length / 2.0, tolerance: 0.002});
         checks.push(#{id: "GPT-010-" + name + "-" + bracket_name + "-scale-z", component: "tank", requirement: "gpt010", verification: "Verify_GriffinTankRequirements", kind: "attribute_component", path: bracket_path, attr: "xformOp:scale", index: 2, expected: bracket_depth / 2.0, tolerance: 0.002});
-        if ys.len() == names.len() {
+        if stations.len() == names.len() {
             // Derive the authored local cradle datum from the shared deck
             // datum. This verifies the physical interface, not just a copied
             // local coordinate.
-            let expected_cradle_local = deck_top - ys[index] - cradle_half_height + minimum_deck_clearance;
+            let expected_cradle_local = deck_top - stations[index].y - cradle_half_height + minimum_deck_clearance;
             checks.push(position("GPT-009-" + name + "-deck-clearance", path + "/TankCradle", 1, expected_cradle_local));
         }
         for hardware_name in axial_hardware_names {
@@ -268,10 +258,10 @@ fn on_tick(me, ctx) {
         checks.push(source_attribute("GPT-008-" + name + "-body-axis",
             "gpt008", path + "/MliTank",
             "axis", "tankAxis"));
-        if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
-            checks.push(position("GPT-005-" + name + "-x", path, 0, xs[index]));
-            checks.push(position("GPT-005-" + name + "-y", path, 1, ys[index]));
-            checks.push(position("GPT-005-" + name + "-z", path, 2, zs[index]));
+        if stations.len() == names.len() {
+            checks.push(position("GPT-005-" + name + "-x", path, 0, stations[index].x));
+            checks.push(position("GPT-005-" + name + "-y", path, 1, stations[index].y));
+            checks.push(position("GPT-005-" + name + "-z", path, 2, stations[index].z));
         }
     }
     checks.push(component_requirements::coverage("GPT-003-status", "tank", "gpt003", VERIFICATION));

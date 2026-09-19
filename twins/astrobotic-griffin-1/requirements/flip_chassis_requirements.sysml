@@ -1,12 +1,26 @@
 package FlipChassisRequirements {
+    private import ScalarValues::Real;
     private import ScalarValues::String;
 
     part def FlipChassisComponent {
         attribute usdPath : String = "/World/FLIP/Chassis";
+        attribute componentAsset : String = "components/rover/flip_chassis_visual.usda";
         attribute sourceComponent : String = "FlipRequirements::FlipRover";
         attribute widthSource : String = "FlipRequirements::FlipRover::chassisWidthM";
         attribute lengthSource : String = "FlipRequirements::FlipRover::chassisLengthM";
-        attribute childNames : String = "LowerFrame,WhiteEquipmentBox,PayloadDeck";
+        attribute childNames : String[5] = ("LowerFrame", "WhiteEquipmentBox", "FrontBumper", "PayloadDeck", "ServicePanel");
+        attribute lowerFrameWidthM : Real = 4.40;
+        attribute lowerFrameHeightM : Real = 0.76;
+        attribute lowerFrameLengthM : Real = 2.76;
+        attribute equipmentBoxWidthM : Real = 3.90;
+        attribute equipmentBoxHeightM : Real = 1.44;
+        attribute equipmentBoxLengthM : Real = 2.44;
+        attribute equipmentBoxCenterYM : Real = 0.45;
+        attribute payloadDeckWidthM : Real = 3.44;
+        attribute payloadDeckThicknessM : Real = 0.20;
+        attribute payloadDeckLengthM : Real = 2.16;
+        attribute payloadDeckCenterYM : Real = 0.92;
+        attribute presentationCollisionPolicy : String = "chassis component is render-only; dynamic rover body owns collision";
     }
 
     requirement def FCC001_ChassisIdentity {
@@ -21,11 +35,15 @@ package FlipChassisRequirements {
     requirement def FCC004_ChassisTraceability {
         doc /* FCC-004 [evidence] the chassis path and metric source names resolve from this package. */
     }
+    requirement def FCC005_ChassisEnvelope {
+        doc /* FCC-005 [geometry] the lower frame shall be 4.40 m by 0.76 m by 2.76 m, the equipment box 3.90 m by 1.44 m by 2.44 m at Y = 0.45 m, and the payload deck 3.44 m by 0.20 m by 2.16 m at Y = 0.92 m. */
+    }
 
     requirement fcc001 : FCC001_ChassisIdentity { subject chassis : FlipChassisComponent; }
     requirement fcc002 : FCC002_ChassisEnvelope { subject chassis : FlipChassisComponent; }
     requirement fcc003 : FCC003_ChassisOwnership { subject chassis : FlipChassisComponent; }
     requirement fcc004 : FCC004_ChassisTraceability { subject chassis : FlipChassisComponent; }
+    requirement fcc005 : FCC005_ChassisEnvelope { subject chassis : FlipChassisComponent; }
 
     verification def Verify_FLIPChassisRequirements {
         subject chassis : FlipChassisComponent;
@@ -33,5 +51,6 @@ package FlipChassisRequirements {
         verify fcc002;
         verify fcc003;
         verify fcc004;
+        verify fcc005;
     }
 }

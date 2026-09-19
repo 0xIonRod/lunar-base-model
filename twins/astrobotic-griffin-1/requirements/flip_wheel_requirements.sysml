@@ -1,15 +1,24 @@
 package FlipWheelRequirements {
+    private import ScalarValues::Real;
     private import ScalarValues::String;
 
     part def FlipDirectionalWheelAssembly {
         attribute usdRootPath : String = "/World/FLIP";
+        attribute componentAsset : String = "components/rover/flip_wheel_visual.usda";
         attribute sourceComponent : String = "FlipRequirements::FlipRover";
         attribute namesSource : String = "FlipRequirements::FlipRover::visualWheelNames";
         attribute countSource : String = "FlipRequirements::FlipRover::visualRoverWheelCount";
-        attribute childNames : String = "Tire,MetalHub,HubCap";
+        attribute childNames : String[3] = ("Tire", "MetalHub", "HubCap");
         attribute suspensionVisualChild : String = "Suspension/SuspensionStrut";
         attribute suspensionComponent : String = "FlipSuspensionRequirements::FlipSuspensionComponent";
-        attribute steeringSource : String = "frontSteeringAngleDeg,rearSteeringAngleDeg";
+        attribute steeringSource : String[2] = ("frontSteeringAngleDeg", "rearSteeringAngleDeg");
+        attribute tireRadiusM : Real = 0.45;
+        attribute tireWidthM : Real = 0.30;
+        attribute hubRadiusM : Real = 0.25;
+        attribute hubWidthM : Real = 0.33;
+        attribute hubCapRadiusM : Real = 0.10;
+        attribute hubCapWidthM : Real = 0.36;
+        attribute wheelAxis : String = "Z";
         attribute inactiveStationPolicy : String = "middle stations are authored inactive; exactly four directional wheels are acceptance scope";
     }
 
@@ -31,6 +40,9 @@ package FlipWheelRequirements {
     requirement def FWW006_SuspensionVisual {
         doc /* FWW-006 [integration] each active wheel station references the detached FlipSuspension component; its internal geometry and collision contract are verified by FlipSuspensionRequirements. */
     }
+    requirement def FWW007_WheelEnvelope {
+        doc /* FWW-007 [geometry] each wheel shall contain a Z-axis tire of radius 0.45 m and width 0.30 m, a hub of radius 0.25 m and width 0.33 m, and a cap of radius 0.10 m and width 0.36 m. */
+    }
 
     requirement fww001 : FWW001_WheelCount { subject wheels : FlipDirectionalWheelAssembly; }
     requirement fww002 : FWW002_WheelGeometry { subject wheels : FlipDirectionalWheelAssembly; }
@@ -38,6 +50,7 @@ package FlipWheelRequirements {
     requirement fww004 : FWW004_WheelTraceability { subject wheels : FlipDirectionalWheelAssembly; }
     requirement fww005 : FWW005_WheelPlacement { subject wheels : FlipDirectionalWheelAssembly; }
     requirement fww006 : FWW006_SuspensionVisual { subject wheels : FlipDirectionalWheelAssembly; }
+    requirement fww007 : FWW007_WheelEnvelope { subject wheels : FlipDirectionalWheelAssembly; }
 
     verification def Verify_FLIPWheelRequirements {
         subject wheels : FlipDirectionalWheelAssembly;
@@ -47,5 +60,6 @@ package FlipWheelRequirements {
         verify fww004;
         verify fww005;
         verify fww006;
+        verify fww007;
     }
 }

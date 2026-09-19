@@ -4,13 +4,11 @@ package GriffinTankRequirements {
 
     part def GriffinPropellantTankAssembly {
         attribute usdRootPath : String = "/World/Griffin1";
-        attribute sourceComponent : String = "GriffinLanderRequirements::GriffinLanderComponent";
-        attribute namesSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankNames";
-        attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::tankCount";
-        attribute childNames : String = "TankBandA,TankBandB,TankBandC,TankCradle,TankCradlePad,TankSupportPost,TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom,MliTank";
-        attribute endHardwareNames : String = "TankNeckTop,TankNeckBottom";
-        attribute serviceHardwareNames : String = "TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom";
-        attribute axialHardwareNames : String = "TankNeckTop,TankNeckBottom,TankShoulderTop,TankShoulderBottom,TankValveTop,TankValveBottom,TankValveCapTop,TankValveCapBottom,TankTransitionTop,TankTransitionBottom,TankSupportPost";
+        attribute componentAsset : String = "components/lander/griffin_tank_visual.usda";
+        attribute childNames : String[17] = ("TankBandA", "TankBandB", "TankBandC", "TankCradle", "TankCradlePad", "TankSupportPost", "TankNeckTop", "TankNeckBottom", "TankShoulderTop", "TankShoulderBottom", "TankValveTop", "TankValveBottom", "TankValveCapTop", "TankValveCapBottom", "TankTransitionTop", "TankTransitionBottom", "MliTank");
+        attribute endHardwareNames : String[2] = ("TankNeckTop", "TankNeckBottom");
+        attribute serviceHardwareNames : String[6] = ("TankShoulderTop", "TankShoulderBottom", "TankValveTop", "TankValveBottom", "TankValveCapTop", "TankValveCapBottom");
+        attribute axialHardwareNames : String[11] = ("TankNeckTop", "TankNeckBottom", "TankShoulderTop", "TankShoulderBottom", "TankValveTop", "TankValveBottom", "TankValveCapTop", "TankValveCapBottom", "TankTransitionTop", "TankTransitionBottom", "TankSupportPost");
         attribute tankAxis : String = "Y";
         attribute bodyShape : String = "Cylinder";
         attribute status : String = "metric visual envelope proxy; flight COPV ICD remains TBD";
@@ -41,10 +39,10 @@ package GriffinTankRequirements {
         attribute sourceFact : String = "Public Griffin reference imagery shows four vertically oriented gold-wrapped propellant vessels with end hardware and retention bands";
         attribute sourceRationale : String = "Each tank is a repeated, independently inspectable metric visual-envelope component; the flight pressure-vessel ICD is not asserted by this study";
         // Ring radii are explicit envelope datums for the cylindrical visual.
-        attribute bandRadiusByCenterM : String = "0.505,0.505,0.505";
+        attribute bandRadiusByCenterM : Real[3] = (0.505, 0.505, 0.505);
         attribute bandHeightM : Real = 0.045;
-        attribute bandCenterYM : String = "-0.24,0.0,0.24";
-        attribute bandTransformOrder : String = "xformOp:translate";
+        attribute bandCenterYM : Real[3] = (-0.24, 0.0, 0.24);
+        attribute bandTransformOrder : String[1] = ("xformOp:translate");
         // The cradle is a round seating ring, not a square placeholder plate.
         // Its radius/height are authored directly on a unit Cylinder, while
         // the half-height remains the interface datum used to derive the
@@ -63,13 +61,12 @@ package GriffinTankRequirements {
         attribute supportHeightM : Real = 0.16;
         attribute supportCenterYM : Real = -0.79;
         attribute minimumDeckClearanceM : Real = 0.02;
-        attribute deckTopSource : String = "GriffinLanderRequirements::GriffinLanderComponent::avionicsDeckTopY";
         // The public Griffin reference shows the spherical vessels carried by
         // a compact lower mounting structure rather than floating above a
         // flat deck.  These four visual gussets are a lightweight envelope
         // model of that interface; exact bracket ICD dimensions remain TBD.
         attribute bracketGroupName : String = "TankMountBrackets";
-        attribute bracketNames : String = "TankMountBracketPX,TankMountBracketNX,TankMountBracketPZ,TankMountBracketNZ";
+        attribute bracketNames : String[4] = ("TankMountBracketPX", "TankMountBracketNX", "TankMountBracketPZ", "TankMountBracketNZ");
         // The visual proxy spans the pad top to the lower spherical shell;
         // the earlier 0.60 m arm extended below the pad and read as detached.
         attribute bracketLengthM : Real = 0.52;
@@ -94,10 +91,10 @@ package GriffinTankRequirements {
         doc /* GPT-003 [traceability] tank geometry is labelled as a metric visual proxy until the mechanical ICD is available. */
     }
     requirement def GPT004_TankTraceability {
-        doc /* GPT-004 [evidence] tank identities and count resolve from the lander SysML source and are checked individually. */
+        doc /* GPT-004 [evidence] tank identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and each instance is checked individually. */
     }
     requirement def GPT005_TankPlacement {
-        doc /* GPT-005 [layout] each tank root transform matches the ordered metric station datums owned by GriffinLanderComponent and leaves the lower cradle seated above the avionics deck. */
+        doc /* GPT-005 [layout] each tank root transform matches the ordered native Position datums owned by GriffinVisualConfigurationRequirements and leaves the lower cradle seated above the avionics deck. */
     }
     requirement def GPT006_TankEndHardware {
         doc /* GPT-006 [visual] each tank body is a compact metric cylindrical envelope with gold-wrapped vessel bands, tapered end transitions, seated adapter hardware, and coaxial necks; no floating end hardware or disconnected flat-ended proxy is permitted. */
@@ -114,6 +111,9 @@ package GriffinTankRequirements {
     requirement def GPT010_TankMounting {
         doc /* GPT-010 [interface/visual] four compact metric mounting brackets bridge the lower tank shoulder/support to the adapter pad; each bracket is a 0.16 m x 0.16 m section with a 0.52 m axial envelope, mirrored about the tank datum and radially tilted so its upper end slopes inward toward the spherical vessel. The four signed X/Z tilts are part of the interface datum, so no brace may splay away from the tank or extend below the pad. */
     }
+    requirement def GPT011_ComponentIdentity {
+        doc /* GPT-011 [configuration] each tank instance shall use the declared replaceable tank asset, the Y-axis local frame, and the complete named child list from this component contract. */
+    }
 
     requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt002 : GPT002_TankRetention { subject tanks : GriffinPropellantTankAssembly; }
@@ -125,6 +125,7 @@ package GriffinTankRequirements {
     requirement gpt008 : GPT008_TankOrientation { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt009 : GPT009_TankDeckSeat { subject tanks : GriffinPropellantTankAssembly; }
     requirement gpt010 : GPT010_TankMounting { subject tanks : GriffinPropellantTankAssembly; }
+    requirement gpt011 : GPT011_ComponentIdentity { subject tanks : GriffinPropellantTankAssembly; }
 
     verification def Verify_GriffinTankRequirements {
         subject tanks : GriffinPropellantTankAssembly;
@@ -138,5 +139,6 @@ package GriffinTankRequirements {
         verify gpt008;
         verify gpt009;
         verify gpt010;
+        verify gpt011;
     }
 }

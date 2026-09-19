@@ -21,6 +21,12 @@ script = "scenarios/tests/griffin_requirements.rhai"
 verdict_channel = "GRIFFIN_REQUIREMENTS"
 
 [[verification.cases]]
+name = "GriffinVisualConfigurationRequirements::Verify_GriffinVisualConfiguration"
+scene = "tests/griffin_visual_configuration_types.usda"
+script = "scenarios/tests/griffin_visual_configuration_types.rhai"
+verdict_channel = "GRIFFIN_VISUAL_CONFIGURATION_TYPES"
+
+[[verification.cases]]
 name = "Griffin1Requirements::Verify_GriffinVisualRequirements"
 scene = "tests/griffin_flip_visual.usda"
 script = "scenarios/tests/griffin_flip_visual.rhai"
@@ -135,6 +141,12 @@ verdict_channel = "GRIFFIN_REQUIREMENTS"
 name = "griffin.lander"
 requirements = "requirements/griffin_lander_requirements.sysml"
 verification = "GriffinLanderRequirements::Verify_GriffinLanderRequirements"
+usd_path = "/World/Griffin1"
+
+[[components]]
+name = "griffin.visual_configuration"
+requirements = "requirements/griffin_visual_configuration.sysml"
+verification = "GriffinVisualConfigurationRequirements::Verify_GriffinVisualConfiguration"
 usd_path = "/World/Griffin1"
 
 [[components]]

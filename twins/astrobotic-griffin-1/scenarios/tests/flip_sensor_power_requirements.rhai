@@ -47,6 +47,43 @@ fn on_tick(me, ctx) {
             kind: "attribute_component", path: solar, attr: "xformOp:rotateXYZ", index: 0,
             expected: sysml_requirements::number(source, solar_tilt_source), tolerance: 0.002});
     }
+    checks.push(#{id: "FSP-005-post-radius", component: "sensor_mast", requirement: "fsp005",
+        verification: VERIFICATION, kind: "attribute", path: mast + "/MastPost", attr: "radius",
+        expected_attr: own("mastPostRadiusM"), tolerance: 0.002});
+    checks.push(#{id: "FSP-005-post-y", component: "sensor_mast", requirement: "fsp005",
+        verification: VERIFICATION, kind: "attribute_component", path: mast + "/MastPost",
+        attr: "xformOp:translate", index: 1, expected_attr: own("mastPostCenterYM"), tolerance: 0.002});
+    checks.push(#{id: "FSP-005-post-z", component: "sensor_mast", requirement: "fsp005",
+        verification: VERIFICATION, kind: "attribute_component", path: mast + "/MastPost",
+        attr: "xformOp:translate", index: 2, expected_attr: own("mastPostCenterZM"), tolerance: 0.002});
+    for field in [
+        #{id: "FSP-005-head-width", path: mast + "/SensorHead", index: 0, attr: "sensorHeadWidthM"},
+        #{id: "FSP-005-head-height", path: mast + "/SensorHead", index: 1, attr: "sensorHeadHeightM"},
+        #{id: "FSP-005-head-depth", path: mast + "/SensorHead", index: 2, attr: "sensorHeadDepthM"}
+    ] {
+        checks.push(component_requirements::extent_component(field.id, "sensor_mast", "fsp005", VERIFICATION,
+            field.path, field.index, own(field.attr), 2.0, 0.002));
+    }
+    checks.push(#{id: "FSP-005-antenna-radius", component: "sensor_mast", requirement: "fsp005",
+        verification: VERIFICATION, kind: "attribute", path: mast + "/SensorAntenna", attr: "radius",
+        expected_attr: own("antennaRadiusM"), tolerance: 0.002});
+    checks.push(#{id: "FSP-005-antenna-height", component: "sensor_mast", requirement: "fsp005",
+        verification: VERIFICATION, kind: "attribute", path: mast + "/SensorAntenna", attr: "height",
+        expected_attr: own("antennaHeightM"), tolerance: 0.002});
+    for field in [
+        #{id: "FSP-006-backsheet-width", path: solar + "/WhiteBacksheet", index: 0, attr: "solarBacksheetWidthM"},
+        #{id: "FSP-006-backsheet-thickness", path: solar + "/WhiteBacksheet", index: 1, attr: "solarBacksheetThicknessM"},
+        #{id: "FSP-006-backsheet-depth", path: solar + "/WhiteBacksheet", index: 2, attr: "solarBacksheetDepthM"},
+        #{id: "FSP-006-cells-width", path: solar + "/BlueCells", index: 0, attr: "solarCellWidthM"},
+        #{id: "FSP-006-cells-thickness", path: solar + "/BlueCells", index: 1, attr: "solarCellThicknessM"},
+        #{id: "FSP-006-cells-depth", path: solar + "/BlueCells", index: 2, attr: "solarCellDepthM"},
+        #{id: "FSP-006-hinge-width", path: solar + "/FoldHinge", index: 0, attr: "solarHingeWidthM"},
+        #{id: "FSP-006-hinge-thickness", path: solar + "/FoldHinge", index: 1, attr: "solarHingeThicknessM"},
+        #{id: "FSP-006-hinge-depth", path: solar + "/FoldHinge", index: 2, attr: "solarHingeDepthM"}
+    ] {
+        checks.push(component_requirements::extent_component(field.id, "solar_array", "fsp006", VERIFICATION,
+            field.path, field.index, own(field.attr), 2.0, 0.002));
+    }
     checks.push(component_requirements::coverage("FSP-004-traceability", "sensor_power", "fsp004", VERIFICATION));
     component_requirements::finish(source, checks, "FLIP SENSOR/POWER REQUIREMENTS", "FLIP_SENSOR_POWER_REQUIREMENTS", mast, PACKAGE, VERIFICATION);
     this.done = true;

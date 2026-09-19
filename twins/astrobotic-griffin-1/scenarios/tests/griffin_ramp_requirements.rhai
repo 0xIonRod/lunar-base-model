@@ -70,11 +70,66 @@ fn on_tick(me, ctx) {
     let wheel_radius = sysml_requirements::number(source,
         "FlipRequirements::FlipRover::visualRoverWheelRadiusM");
     let wheel_clearance = _source_number(source, "rampWheelClearanceM");
+    let transition_overlap = _source_number(source, "physicalRampDeckTransitionOverlapM");
+    let transition_name = _source_text(source, "physicalRampTransitionChildName");
+    let assembly_names = component_requirements::source_text_list(source,
+        _source_attr("assemblyChildNames"));
+    let tread_count = _source_number(source, "assemblyTreadCount");
+    let tread_width = _source_number(source, "assemblyTreadWidthM");
+    let tread_height = _source_number(source, "assemblyTreadHeightM");
+    let tread_span = _source_number(source, "assemblyTreadSpanM");
+    let tread_first_x = _source_number(source, "assemblyTreadFirstCenterXM");
+    let tread_pitch = _source_number(source, "assemblyTreadPitchM");
+    let tread_prefix = _source_text(source, "assemblyTreadNamePrefix");
+    let beam_width = _source_number(source, "assemblyUnderBeamWidthM");
+    let beam_height = _source_number(source, "assemblyUnderBeamHeightM");
+    let beam_y = _source_number(source, "assemblyUnderBeamCenterYM");
+    let beam_offset = _source_number(source, "assemblyUnderBeamCenterOffsetZM");
+    let post_count = _source_number(source, "assemblySidePostCountPerSide");
+    let post_width = _source_number(source, "assemblySidePostWidthM");
+    let post_height = _source_number(source, "assemblySidePostHeightM");
+    let post_depth = _source_number(source, "assemblySidePostDepthM");
+    let post_y = _source_number(source, "assemblySidePostCenterYM");
+    let post_first_x = _source_number(source, "assemblySidePostFirstCenterXM");
+    let post_pitch = _source_number(source, "assemblySidePostPitchM");
+    let collar_radius = _source_number(source, "assemblyHingeCollarRadiusM");
+    let collar_length = _source_number(source, "assemblyHingeCollarLengthM");
+    let collar_offset = _source_number(source, "assemblyHingeCollarOffsetZM");
+    let gusset_width = _source_number(source, "assemblyHingeGussetWidthM");
+    let gusset_height = _source_number(source, "assemblyHingeGussetHeightM");
+    let gusset_depth = _source_number(source, "assemblyHingeGussetDepthM");
+    let gusset_x = _source_number(source, "assemblyHingeGussetCenterXM");
+    let gusset_y = _source_number(source, "assemblyHingeGussetCenterYM");
+    let gusset_offset = _source_number(source, "assemblyHingeGussetOffsetZM");
     let half_track = _maximum_abs(wheel_z);
     if ramp_width == () || half_track == () || wheel_radius == ()
         || wheel_clearance == () || wheel_z.len() != 4
-        || wheel_radius <= 0.0 || wheel_clearance <= 0.0 {
+        || wheel_radius <= 0.0 || wheel_clearance <= 0.0
+        || transition_overlap == () || transition_name == ()
+        || transition_name == "" || assembly_names.len() == 0
+        || tread_count == () || tread_count < 2.0 || tread_width == ()
+        || tread_height == () || tread_span == () || tread_first_x == ()
+        || tread_pitch == () || tread_prefix == () || tread_prefix == ""
+        || tread_width <= 0.0 || tread_height <= 0.0 || tread_span <= 0.0
+        || tread_pitch <= 0.0 {
         throw("GriffinRampRequirements ramp/FLIP clearance datums are incomplete");
+    }
+    if beam_width == () || beam_height == ()
+        || beam_y == () || beam_offset == () || post_count == ()
+        || post_count < 2.0 || post_width == () || post_height == ()
+        || post_depth == () || post_y == () || post_first_x == ()
+        || post_pitch == () || collar_radius == () || collar_length == ()
+        || collar_offset == () || beam_width <= 0.0 || beam_height <= 0.0
+        || beam_offset <= 0.0 || post_width <= 0.0 || post_height <= 0.0
+        || post_depth <= 0.0 || post_pitch <= 0.0 || collar_radius <= 0.0
+        || collar_length <= 0.0 || collar_offset <= 0.0 {
+        throw("GriffinRampRequirements ramp/FLIP clearance datums are incomplete");
+    }
+    if gusset_width == () || gusset_height == () || gusset_depth == ()
+        || gusset_x == () || gusset_y == () || gusset_offset == ()
+        || gusset_width <= 0.0 || gusset_height <= 0.0 || gusset_depth <= 0.0
+        || gusset_offset <= 0.0 {
+        throw("GriffinRampRequirements hinge-gusset datums are incomplete");
     }
     let required_width = 2.0 * (half_track + wheel_radius + wheel_clearance);
     checks.push(component_requirements::assertion("GRR-003-flip-wheel-clearance",
@@ -82,6 +137,11 @@ fn on_tick(me, ctx) {
         ramp_width + 0.002 >= required_width,
         "ramp width does not clear both FLIP tyre envelopes and the authored wheel clearance",
         ramp_width, required_width));
+    checks.push(component_requirements::assertion(
+        "GRR-012-source-transition", "ramp", "grr012", VERIFICATION,
+        transition_overlap > 0.0 && transition_overlap < _source_number(source, "physicalRampSurfaceLengthM"),
+        "physical deck transition must be a positive sub-length named child: " + transition_name,
+        transition_overlap, "0 < overlap < physical ramp length"));
     let pi = 3.141592653589793;
     for side in ["Port", "Starboard"] {
         let ramp = ROOT + "/EgressRamp" + side;
@@ -97,10 +157,14 @@ fn on_tick(me, ctx) {
         let socket_x = _source_number(source, "rampSocketX");
         checks.push(_check("GRR-001-" + side + "-root", "ramp", "grr001", "exists", ramp));
         checks[checks.len() - 1].expected_type = "Xform";
+        let part_paths = [ramp + "/MountFrame", ramp + "/RampSurface",
+            ramp + "/OuterRail", ramp + "/InnerRail", ramp + "/SupportArm"];
+        for name in assembly_names {
+            part_paths.push(ramp + "/" + name);
+        }
         checks.push(#{id: "GRR-001-" + side + "-parts", component: "ramp",
             requirement: "grr001", verification: VERIFICATION,
-            kind: "children", path: ramp, paths: [ramp + "/RampSurface",
-                ramp + "/OuterRail", ramp + "/InnerRail", ramp + "/SupportArm"]});
+            kind: "children", path: ramp, paths: part_paths});
         checks.push(_check("GRR-002-" + side + "-hinge", "hinge", "grr002", "exists", ramp + "/MountFrame"));
         checks[checks.len() - 1].expected_type = "Xform";
         checks.push(#{id: "GRR-002-" + side + "-socket", component: "hinge",
@@ -173,6 +237,118 @@ fn on_tick(me, ctx) {
             requirement: "grr006", verification: VERIFICATION,
             kind: "extent_component", path: ramp + "/RampSurface", index: 2,
             multiplier: 2.0, expected_attr: _source_attr("rampSurfaceWidthM"), tolerance: 0.002});
+        for index in 0..tread_count.to_int() {
+            let tread = ramp + "/" + tread_prefix + (index + 1).to_string();
+            let x = tread_first_x + tread_pitch * index;
+            let y = _source_number(source, "rampSurfaceThicknessM") / 2.0
+                + tread_height / 2.0;
+            checks.push(#{id: "GRR-013-" + side + "-" + tread_prefix
+                    + (index + 1).to_string() + "-width", component: "ramp",
+                requirement: "grr013", verification: VERIFICATION,
+                kind: "extent_component", path: tread, index: 0,
+                multiplier: 2.0, expected_attr: _source_attr("assemblyTreadWidthM"), tolerance: 0.002});
+            checks.push(#{id: "GRR-013-" + side + "-" + tread_prefix
+                    + (index + 1).to_string() + "-height", component: "ramp",
+                requirement: "grr013", verification: VERIFICATION,
+                kind: "extent_component", path: tread, index: 1,
+                multiplier: 2.0, expected_attr: _source_attr("assemblyTreadHeightM"), tolerance: 0.002});
+            checks.push(#{id: "GRR-013-" + side + "-" + tread_prefix
+                    + (index + 1).to_string() + "-span", component: "ramp",
+                requirement: "grr013", verification: VERIFICATION,
+                kind: "extent_component", path: tread, index: 2,
+                multiplier: 2.0, expected_attr: _source_attr("assemblyTreadSpanM"), tolerance: 0.002});
+            checks.push(_attribute_component("GRR-013-" + side + "-" + tread_prefix
+                    + (index + 1).to_string() + "-x", "grr013", tread,
+                "xformOp:translate", 0, x));
+            checks.push(_attribute_component("GRR-013-" + side + "-" + tread_prefix
+                    + (index + 1).to_string() + "-y", "grr013", tread,
+                "xformOp:translate", 1, y));
+            checks.push(_attribute_component("GRR-013-" + side + "-" + tread_prefix
+                    + (index + 1).to_string() + "-z", "grr013", tread,
+                "xformOp:translate", 2, 0.0));
+            checks.push(#{id: "GRR-013-" + side + "-" + tread_prefix
+                    + (index + 1).to_string() + "-purpose", component: "ramp",
+                requirement: "grr013", verification: VERIFICATION,
+                kind: "attribute_equals", path: tread, attr: "purpose",
+                expected: "render"});
+        }
+        for beam in [
+            #{name: "UnderBeamPort", z: beam_offset},
+            #{name: "UnderBeamStarboard", z: -beam_offset},
+        ] {
+            let beam_path = ramp + "/" + beam.name;
+            checks.push(#{id: "GRR-014-" + side + "-" + beam.name + "-width", component: "ramp_load_path",
+                requirement: "grr014", verification: VERIFICATION,
+                kind: "extent_component", path: beam_path, index: 2,
+                multiplier: 2.0, expected_attr: _source_attr("assemblyUnderBeamWidthM"), tolerance: 0.002});
+            checks.push(#{id: "GRR-014-" + side + "-" + beam.name + "-height", component: "ramp_load_path",
+                requirement: "grr014", verification: VERIFICATION,
+                kind: "extent_component", path: beam_path, index: 1,
+                multiplier: 2.0, expected_attr: _source_attr("assemblyUnderBeamHeightM"), tolerance: 0.002});
+            checks.push(_attribute_component("GRR-014-" + side + "-" + beam.name + "-y",
+                "grr014", beam_path, "xformOp:translate", 1, beam_y));
+            checks.push(_attribute_component("GRR-014-" + side + "-" + beam.name + "-z",
+                "grr014", beam_path, "xformOp:translate", 2, beam.z));
+        }
+        for post_side in ["Port", "Starboard"] {
+            let post_z = if post_side == "Port" { _source_number(source, "rampRailOffsetZM") }
+                else { -_source_number(source, "rampRailOffsetZM") };
+            for index in 0..post_count.to_int() {
+                let post_path = ramp + "/SidePost" + post_side + (index + 1).to_string();
+                checks.push(#{id: "GRR-014-" + side + "-" + post_side + (index + 1).to_string() + "-height",
+                    component: "ramp_load_path", requirement: "grr014", verification: VERIFICATION,
+                    kind: "extent_component", path: post_path, index: 1,
+                    multiplier: 2.0, expected_attr: _source_attr("assemblySidePostHeightM"), tolerance: 0.002});
+                checks.push(_attribute_component("GRR-014-" + side + "-" + post_side + (index + 1).to_string() + "-x",
+                    "grr014", post_path, "xformOp:translate", 0,
+                    post_first_x + post_pitch * index));
+                checks.push(_attribute_component("GRR-014-" + side + "-" + post_side + (index + 1).to_string() + "-y",
+                    "grr014", post_path, "xformOp:translate", 1, post_y));
+                checks.push(_attribute_component("GRR-014-" + side + "-" + post_side + (index + 1).to_string() + "-z",
+                    "grr014", post_path, "xformOp:translate", 2, post_z));
+            }
+        }
+        for collar in [
+            #{name: "HingeCollarPort", z: collar_offset},
+            #{name: "HingeCollarStarboard", z: -collar_offset},
+        ] {
+            let collar_path = ramp + "/" + collar.name;
+            checks.push(#{id: "GRR-014-" + side + "-" + collar.name + "-radius", component: "ramp_hinge",
+                requirement: "grr014", verification: VERIFICATION,
+                kind: "attribute", path: collar_path, attr: "radius",
+                expected_attr: _source_attr("assemblyHingeCollarRadiusM"), tolerance: 0.002});
+            checks.push(#{id: "GRR-014-" + side + "-" + collar.name + "-length", component: "ramp_hinge",
+                requirement: "grr014", verification: VERIFICATION,
+                kind: "attribute", path: collar_path, attr: "height",
+                expected_attr: _source_attr("assemblyHingeCollarLengthM"), tolerance: 0.002});
+            checks.push(_attribute_component("GRR-014-" + side + "-" + collar.name + "-z",
+                "grr014", collar_path, "xformOp:translate", 2, collar.z));
+        }
+        for gusset in [
+            #{name: "HingeGussetPort", z: gusset_offset},
+            #{name: "HingeGussetStarboard", z: -gusset_offset},
+        ] {
+            let gusset_path = ramp + "/" + gusset.name;
+            for field in [
+                #{id: "GRR-015-" + side + "-" + gusset.name + "-width", index: 0,
+                  expected_attr: _source_attr("assemblyHingeGussetWidthM"), multiplier: 2.0},
+                #{id: "GRR-015-" + side + "-" + gusset.name + "-height", index: 1,
+                  expected_attr: _source_attr("assemblyHingeGussetHeightM"), multiplier: 2.0},
+                #{id: "GRR-015-" + side + "-" + gusset.name + "-depth", index: 2,
+                  expected_attr: _source_attr("assemblyHingeGussetDepthM"), multiplier: 2.0},
+            ] {
+                checks.push(#{id: field.id, component: "ramp_hinge", requirement: "grr015",
+                    verification: VERIFICATION, kind: "extent_component", path: gusset_path,
+                    index: field.index, multiplier: field.multiplier,
+                    expected_attr: field.expected_attr, tolerance: 0.002});
+            }
+            checks.push(_attribute_component("GRR-015-" + side + "-" + gusset.name + "-x",
+                "grr015", gusset_path, "xformOp:translate", 0, gusset_x));
+            checks.push(_attribute_component("GRR-015-" + side + "-" + gusset.name + "-y",
+                "grr015", gusset_path, "xformOp:translate", 1, gusset_y));
+            checks.push(_attribute_component("GRR-015-" + side + "-" + gusset.name + "-z",
+                "grr015", gusset_path, "xformOp:translate", 2, gusset.z));
+        }
     }
     // Evidence is a process gate: the source report must include the
     // independent package and its verification before any USD result counts.

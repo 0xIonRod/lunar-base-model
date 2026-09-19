@@ -9,56 +9,29 @@ package GriffinLanderRequirements {
     // tanks, legs, engines, and solar component assembly.
     part def GriffinLanderComponent {
         attribute componentName : String = "Griffin1";
-        attribute bodyProfile : String = "hexagonal-prism";
-        attribute bodyWidthM : Real = 5.20;
-        attribute bodyDepthM : Real = 5.30;
-        attribute bodyHeightM : Real = 2.90;
-        // Upper avionics-deck top datum used by tank seating checks.
-        attribute avionicsDeckTopY : Real = 5.00;
-        // Presentation station datums.  These are the single source of truth
-        // for the component roots in both the isolated Editor assembly and
-        // the component verifiers; the values are metre/Y-up study values,
-        // not hidden CAD dimensions.
-        attribute busMountY : Real = 3.20;
-        attribute tankStationX : String = "1.30,-1.30,1.30,-1.30";
-        // The tank datum is above the avionics deck.  The value includes the
-        // component-local cradle/end-fitting envelope, so no tank hardware
-        // intersects the deck in the composed stage.
-        attribute tankStationY : String = "5.90,5.90,5.90,5.90";
-        attribute tankStationZ : String = "-1.15,-1.15,1.15,1.15";
-        attribute legStationX : String = "1.75,-1.75,1.75,-1.75";
-        attribute legStationY : String = "2.35,2.35,2.35,2.35";
-        attribute legStationZ : String = "-1.25,-1.25,1.25,1.25";
-        attribute solarStationX : String = "2.70,-2.70";
-        attribute solarStationY : String = "3.35,3.35";
-        attribute solarStationZ : String = "0.0,0.0";
-        attribute engineStationX : String = "0.0,1.0,-1.0,0.0,0.0,0.9,-0.9";
-        attribute engineStationY : String = "1.75,1.75,1.75,1.75,1.75,1.75,1.75";
-        attribute engineStationZ : String = "0.0,0.0,0.0,1.0,-1.0,0.9,-0.9";
-        attribute engineClusterWidthM : Real = 3.20;
-        attribute engineClusterDepthM : Real = 3.20;
-        attribute engineSkirtHeightM : Real = 0.20;
-        attribute engineSkirtRailSectionM : Real = 0.20;
-        attribute engineBellClearanceM : Real = 0.10;
-        attribute engineMountYM : Real = 1.75;
+        attribute componentAsset : String = "vehicles/griffin_1_visual.usda";
+        attribute usdRootPath : String = "/Griffin1";
+        attribute localFrame : String = "Y-up, right-handed, SI metres; X/Z are signed body axes";
+        attribute visualOwnership : String = "component references own presentation geometry; flight model owns dynamics and colliders";
+        // Geometry configuration is owned by
+        // GriffinVisualConfigurationRequirements::GriffinVisualConfiguration.
+        // This part intentionally retains only identity, counts, and the
+        // render/flight ownership boundary; station and envelope literals are
+        // not duplicated here.
         attribute legCount : Integer = 4;
         attribute tankCount : Integer = 4;
         attribute engineCount : Integer = 7;
         attribute solarArrayCount : Integer = 2;
-        attribute legNames : String = "LegPX,LegNX,LegPZ,LegNZ";
-        attribute tankNames : String = "TankPX,TankNX,TankPZ,TankNZ";
-        attribute engineNames : String = "Engine01,Engine02,Engine03,Engine04,Engine05,Engine06,Engine07";
-        attribute solarArrayNames : String = "SolarPanelPort,SolarPanelStarboard";
         attribute geometryStatus : String = "metric visual study proxy; flight CAD/ICD TBD";
         attribute productReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute missionReference : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
         attribute dataSheetReference : String = "https://science.nasa.gov/wp-content/uploads/2023/11/astrobotic-lunar-landers-pug.pdf";
         attribute sourceFact : String = "Griffin is a medium-class, flexible-payload lander with four shock-absorbing legs, seven main engines and optional rover egress ramps";
-        attribute sourceRationale : String = "This package is the shared source for the reusable lander datum and ordered component station lists; subsystem contracts reference it rather than copying coordinates";
+        attribute sourceRationale : String = "This package owns reusable lander counts and presentation/flight ownership; typed instance identities and ordered spatial stations are owned once by GriffinVisualConfigurationRequirements";
     }
 
     requirement def GLR001_BusTopology {
-        doc /* GLR-001 [visual] the reusable lander shall expose a named hexagonal bus with a white equipment body and inspectable perimeter frame. */
+        doc /* GLR-001 [visual] the reusable lander shall expose the named hexagonal bus configuration with a faceted equipment body, lower service skirt, upper deck, and inspectable frame rails. */
     }
     requirement def GLR002_LandingLegs {
         doc /* GLR-002 [visual] exactly four named landing-leg components shall expose struts and a visible foot pad. */
@@ -76,10 +49,19 @@ package GriffinLanderRequirements {
         doc /* GLR-006 [geometry] the bus visual envelope shall match the authored metric width, depth, and height study datums. */
     }
     requirement def GLR007_Traceability {
-        doc /* GLR-007 [evidence] component names, counts, status, and public references shall come from this SysML package and be checked by a Twin Rhai observer. */
+        doc /* GLR-007 [evidence] component counts, status, and public references shall come from this SysML package; repeated instance identities shall use the typed enumerations in GriffinVisualConfigurationRequirements and be checked by a Twin Rhai observer. */
     }
     requirement def GLR008_StationPlacement {
-        doc /* GLR-008 [layout] every replaceable lander component root uses the ordered metric station datums in this package; no verifier or builder owns a second placement table. */
+        doc /* GLR-008 [layout] every replaceable lander component root uses the native Position and Direction values in GriffinVisualConfigurationRequirements; no verifier or builder owns a second placement table. The two Z-side legs rotate 90 degrees because the reusable leg asset's canted struts are authored in local X/Y. */
+    }
+    requirement def GLR009_ComponentIdentity {
+        doc /* GLR-009 [configuration] the Griffin visual assembly shall use the stage-root part /Griffin1 and expose the composed bus and subsystem parts. */
+    }
+    requirement def GLR010_LocalFrameAndOwnership {
+        doc /* GLR-010 [boundary] component transforms shall use the declared Y-up SI frame, while flight dynamics and collision authority remain outside the render-only component layer. */
+    }
+    requirement def GLR011_SolarOrientation {
+        doc /* GLR-011 [layout] the ordered solar-array roots shall use the signed station positions and outward-facing ordered +90/-90 degree X rotations declared by this component. The sign maps the panel component's +Y cell-face normal onto the +Z/-Z sides; this is a study-frame convention, not a released deployment ICD. */
     }
 
     requirement glr001 : GLR001_BusTopology { subject lander : GriffinLanderComponent; }
@@ -90,6 +72,9 @@ package GriffinLanderRequirements {
     requirement glr006 : GLR006_MetricEnvelope { subject lander : GriffinLanderComponent; }
     requirement glr007 : GLR007_Traceability { subject lander : GriffinLanderComponent; }
     requirement glr008 : GLR008_StationPlacement { subject lander : GriffinLanderComponent; }
+    requirement glr009 : GLR009_ComponentIdentity { subject lander : GriffinLanderComponent; }
+    requirement glr010 : GLR010_LocalFrameAndOwnership { subject lander : GriffinLanderComponent; }
+    requirement glr011 : GLR011_SolarOrientation { subject lander : GriffinLanderComponent; }
 
     verification def Verify_GriffinLanderRequirements {
         subject lander : GriffinLanderComponent;
@@ -101,5 +86,8 @@ package GriffinLanderRequirements {
         verify glr006;
         verify glr007;
         verify glr008;
+        verify glr009;
+        verify glr010;
+        verify glr011;
     }
 }

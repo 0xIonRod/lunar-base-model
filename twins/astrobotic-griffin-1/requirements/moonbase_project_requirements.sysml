@@ -14,7 +14,7 @@ package MoonBaseProjectRequirements {
         attribute frameUpAxis : String = "Y";
         attribute metersPerUnit : Real = 1.0;
         attribute moonbaseRequirementUsageCount : Integer = 4;
-        attribute moonbaseRequirementIds : String = "mb001,mb002,mb003,mb004";
+        attribute moonbaseRequirementIds : String[4] = ("mb001", "mb002", "mb003", "mb004");
         attribute moonbaseVerificationCaseName : String = "MoonBaseProjectRequirements::Verify_MoonBaseProjectRequirements";
     }
 

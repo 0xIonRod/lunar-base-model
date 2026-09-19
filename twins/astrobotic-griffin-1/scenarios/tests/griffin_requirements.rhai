@@ -30,6 +30,18 @@ fn on_tick(me, ctx) {
     // the sole executable test backend: it consumes the generic validation
     // snapshot, selects the required definitions, and emits this verdict.
     let sysml = report.sysml;
+    // Provenance is a separate typed SysML catalog. Select one requirement ID
+    // through the bounded native projection; the source/rationale/span arrive
+    // as structured evidence without duplicating catalog-qualified literals in
+    // the test.
+    let provenance = sysml_requirements::provenance(sysml, "GR-005");
+    let provenance_record = if provenance.ok == true { provenance.evidence } else { () };
+    let provenance_source = if provenance.ok == true {
+        provenance_record.source_reference
+    } else { () };
+    let provenance_rationale = if provenance.ok == true {
+        provenance_record.rationale
+    } else { () };
     print("[griffin-requirements] sysml_ok=" + sysml.sysml_ok
         + " requirements=" + sysml.sysml_required_count
         + " verification_cases=" + sysml.sysml_verification_count
@@ -41,6 +53,10 @@ fn on_tick(me, ctx) {
         + " missing=" + sysml.sysml_missing.len());
     failures.push(expected(sysml.ok == true && sysml.sysml_ok == true,
         "Griffin SysML requirement/verification source is not valid"));
+    failures.push(expected(provenance.ok == true
+        && provenance_source != () && provenance_source != ""
+        && provenance_rationale != () && provenance_rationale != "",
+        "typed Griffin requirement provenance catalog is unavailable"));
 
     // Prove that every executable rule was dispatched, not just that one
     // aggregate boolean happened to be true.
@@ -133,6 +149,20 @@ fn on_tick(me, ctx) {
         evidence_results.push(#{id: rule, kind: "runtime_rule", ok: true,
             verification: verification_name});
     }
+    let provenance_evidence_id = if provenance.ok == true {
+        provenance_record.requirement_id + "-provenance-catalog"
+    } else { "provenance-catalog" };
+    let provenance_requirement = if provenance.ok == true {
+        provenance_record.qualified_requirement
+    } else { "requirement-provenance" };
+    evidence_results.push(#{id: provenance_evidence_id,
+        component: "requirement-provenance",
+        requirement: provenance_requirement,
+        kind: "source", ok: provenance.ok == true
+            && provenance_source != () && provenance_rationale != (),
+        source_reference: provenance_source, rationale: provenance_rationale,
+        source_span: if provenance.ok == true { provenance_record.source_span } else { () },
+        verification: verification_name});
     for part in report.parts {
         part.verification = verification_name;
         evidence_results.push(part);
