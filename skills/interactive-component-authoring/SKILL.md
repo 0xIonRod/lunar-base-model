@@ -73,6 +73,49 @@ the exact values, and returns an error for missing or malformed values. A
 relationship or frame is preferable to a guessed absolute translation when
 the generic editor supports it.
 
+## Solve frame closure with Modelica when it earns its cost
+
+Use direct Rhai/vector arithmetic for a trivial one-step offset. Use the typed
+SysML-to-Modelica path when a placement depends on an explicit constraint
+relation that should be solved and checked independently. Keep coordinates as
+SysML `LengthValue[3]` facts and standard constraint bindings; do not encode
+station lists, vectors, or solved values as CSV or metadata strings.
+
+For the supported coincident-point translation policy:
+
+1. Read only the required SysML facts with
+   `sysml_modelica_constraints::analyze_selected(path, attribute_names)` and
+   choose the exact qualified constraint usage. Its standard binding
+   connectors identify the moving and fixed point features; do not duplicate
+   either point in the Rhai caller.
+2. Create a scratch Modelica document with
+   `modelica_editor::new_scratch(source, name)`, retain its returned `doc_id`,
+   and inspect the current source generation. Never assume the active document
+   is the scratch document.
+3. Call
+   `sysml_modelica_constraints::begin_coincident_translation(doc_id,
+   generation, report, usage_name)`. It generates the small Modelica source
+   from typed facts, verifies the Editor source readback, and returns a bounded
+   polling ticket tied to that source generation.
+4. Advance `poll_coincident_translation(ticket, generated)` on later editor or
+   simulation ticks while `pending` is true. Do not block with a Rhai loop or
+   wall-clock sleep. The ticket first resolves the deferred command
+   acknowledgement, then polls `RunStatus` and `GetExperimentResult` by their
+   exact command/run identities. It rejects a changed source generation and
+   checks finite native `f64` samples plus the relation residual.
+5. Feed the completed native `Vec3` into
+   `coincident_translation_placement_plan` with the exact USD document,
+   edit-target, path, and generation. Submit its operations through
+   `propose_coincident_translation_plan`; inspect the visible Editor proposal
+   and projected result before committing. A solve result is never an implicit
+   USD write.
+
+The Modelica source string is the compiler input boundary, not a data store:
+SysML facts and result vectors remain typed throughout Rhai and only become
+text while emitting valid Modelica syntax. This bounded policy solves one
+documented translation relation; it is not a general CAD constraint solver or
+an automatic placement engine.
+
 ## Lessons carried over from CAD and multiphysics tools
 
 The following principles are deliberately tool-neutral:
