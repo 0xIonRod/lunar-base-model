@@ -170,19 +170,15 @@ def Xform "GriffinFlipVisual" (
         }
         over "TankPX"
         {
-            custom double3 xformOp:translate = (1.3, 5.85, -1.15)
         }
         over "TankNX"
         {
-            custom double3 xformOp:translate = (-1.3, 5.85, -1.15)
         }
         over "TankPZ"
         {
-            custom double3 xformOp:translate = (1.3, 5.85, 1.15)
         }
         over "TankNZ"
         {
-            custom double3 xformOp:translate = (-1.3, 5.85, 1.15)
         }
         over "LegPX"
         {

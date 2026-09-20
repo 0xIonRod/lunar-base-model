@@ -62,6 +62,45 @@ fn _plan_record(plan, name) {
     ()
 }
 
+fn tank_station_layout_check(source) {
+    let body_mount = _native_value(source, "bodyMount");
+    let names = _native_value(source, "tankInstances");
+    let stations = _native_value(source, "tankStations");
+    let tank_count = if type_of(names) == "array" { names.len() } else { 0 };
+    let station_count = if type_of(stations) == "array" { stations.len() } else { 0 };
+    let ok = type_of(body_mount) == "Vec3" && vec3_is_finite(body_mount)
+        && tank_count == 4 && station_count == 4;
+    if ok {
+        let orbital_radius = if type_of(stations[0]) == "Vec3" {
+            (stations[0].x * stations[0].x + stations[0].z * stations[0].z).sqrt()
+        } else { -1.0 };
+        for index in 0..stations.len() {
+            let station = stations[index];
+            if type_of(station) != "Vec3" || !vec3_is_finite(station)
+                || (station.y - body_mount.y).abs() > 0.000001
+                || (station.x * station.z).abs() > 0.000001
+                || ((station.x * station.x + station.z * station.z).sqrt()
+                    - orbital_radius).abs() > 0.000001 {
+                ok = false;
+            }
+            let name = if type_of(names[index]) == "EnumValue" { names[index].literal } else { "" };
+            if (name == "TankPX" && !(station.x > 0.0 && station.z == 0.0))
+                || (name == "TankNX" && !(station.x < 0.0 && station.z == 0.0))
+                || (name == "TankPZ" && !(station.x == 0.0 && station.z > 0.0))
+                || (name == "TankNZ" && !(station.x == 0.0 && station.z < 0.0)) {
+                ok = false;
+            }
+        }
+    }
+    component_requirements::assertion("GVC-T-tank-layout", "griffin.typed_geometry",
+        "gvc007", VERIFICATION, ok,
+        "the four named tanks occupy equally spaced cardinal stations on the bus-origin plane",
+        #{tank_count: tank_count,
+          station_y: if station_count == 0 { () } else { stations[0].y },
+          body_mount_y: if body_mount == () { () } else { body_mount.y }},
+        #{tank_count: 4, station_y: if body_mount == () { () } else { body_mount.y }})
+}
+
 fn native_transform_plan_check() {
     let plan = griffin_spec::visual_component_transform_plan();
     let rails = griffin_spec::visual_rail_station_plan();
@@ -96,6 +135,7 @@ fn on_tick(me, ctx) {
         PART + "bodyDimensions", PART + "bodyMount", PART + "railDimensions",
         PART + "hexProfileCoordinates",
         PART + "railStations", PART + "legStations", PART + "tankStations",
+        PART + "bodyMount",
         PART + "solarStations", PART + "engineStations", PART + "frameRails",
         PART + "frameOpenBayPanels", PART + "tankInstances",
         PART + "landingLegInstances", PART + "solarArrayInstances",
@@ -112,6 +152,7 @@ fn on_tick(me, ctx) {
         typed_collection_check(source, "GVC-T-rail-stations", "gvc012", "railStations", "Position", 6, "Vec3"),
         typed_collection_check(source, "GVC-T-leg-stations", "gvc005", "legStations", "Position", 4, "Vec3"),
         typed_collection_check(source, "GVC-T-tank-stations", "gvc007", "tankStations", "Position", 4, "Vec3"),
+        tank_station_layout_check(source),
         typed_collection_check(source, "GVC-T-solar-stations", "gvc006", "solarStations", "Position", 2, "Vec3"),
         typed_collection_check(source, "GVC-T-engine-stations", "gvc008", "engineStations", "Position", 7, "Vec3"),
         typed_collection_check(source, "GVC-T-frame-rail-identities", "gvc012", "frameRails", "GriffinFrameRailNode", 6, "EnumValue"),

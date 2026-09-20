@@ -90,7 +90,7 @@ fn on_tick(me, ctx) {
             [root + "/Griffin1/Nozzle/MainEngineCluster/" + name + "/Bell",
              root + "/Griffin1/Nozzle/MainEngineCluster/" + name + "/Throat"]));
     }
-    let tank_names = _sysml_list(source, "propellantTankNames");
+    let tank_names = griffin_spec::propellant_tank_names();
     let tank_paths = [];
     for name in tank_names { tank_paths.push(root + "/Griffin1/" + name); }
     checks.push(visual_children_check("GV-002-tanks", "propellant_tanks", "gv002",

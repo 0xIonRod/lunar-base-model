@@ -142,7 +142,7 @@ fn _qualified_attribute(name) {
         "mainEngineInstances", "railStations", "railDimensions", "legStations",
         "legStationRotationYDeg", "solarStations", "solarStationRotationXDeg", "solarStationRotationZDeg",
         "solarArrayWidthM", "solarArrayDepthM", "solarStandoffM", "tankStations",
-        "tankStationRotationYDeg", "tankScale", "tankSeatClearanceM",
+        "tankStationRotationYDeg", "tankScale",
         "engineClusterMountYM", "engineBellDirection", "engineStations"
     ];
     if visual_configuration.contains(name) {

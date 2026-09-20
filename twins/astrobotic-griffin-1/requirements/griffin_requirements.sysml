@@ -89,7 +89,6 @@ package Griffin1Requirements {
         attribute landingPadNames : String[4] = ("PadPX", "PadNX", "PadPZ", "PadNZ");
         attribute rampNames : String[2] = ("EgressRampPort", "EgressRampStarboard");
         attribute rampHingeNames : String[2] = ("RampHingePort", "RampHingeStarboard");
-        attribute propellantTankNames : String[4] = ("TankPX", "TankNX", "TankPZ", "TankNZ");
         attribute mainEngineNames : String[7] = ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07");
         // Route markers are mission-interface datums, not navigation-code
         // constants.  Keep the complete marker table in SysML so the scene

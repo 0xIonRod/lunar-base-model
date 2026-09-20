@@ -306,11 +306,12 @@ the replaceable wheel asset remains responsible for tire/hub geometry. Both
 visual and dynamic assemblies use the source-backed four-wheel directional
 topology; a presentation-only proxy must not silently change that count.
 
-Station names are read from the SysML source (`landingLegNames`,
-`propellantTankNames`, `rampNames`, `solarArrayNames`, `mainEngineNames`, and
-`visualWheelNames`) at test time. This keeps the component decomposition and
-the requirement source aligned without baking a second identity catalog into
-Rhai. The test emits a structured `<channel>_EVIDENCE` event before its normal
+Station names are read from the SysML source (`landingLegNames`, the typed
+`GriffinTankInstanceName` enumeration `tankInstances`, `rampNames`,
+`solarArrayNames`, `mainEngineNames`, and `visualWheelNames`) at test time.
+This keeps the component decomposition and the requirement source aligned
+without baking a second identity catalog into Rhai. The test emits a
+structured `<channel>_EVIDENCE` event before its normal
 verdict line so the result can be paired with a same-generation composed query
 and frame.
 

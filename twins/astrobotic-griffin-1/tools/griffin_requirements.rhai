@@ -188,7 +188,7 @@ fn sysml_contract_report() {
         "rampStatus", "solarArrayStatus", "wheelCountStatus", "egressMode",
         "solarArrayMode", "mobilityStatus", "exactVehicleIcdStatus",
         "solarArrayNames", "landingLegNames", "landingPadNames", "rampNames",
-        "rampHingeNames", "propellantTankNames", "mainEngineNames", "visualWheelNames",
+        "rampHingeNames", "mainEngineNames", "visualWheelNames",
         "surfaceRouteMarkerNames", "surfaceRouteSpeedMps", "surfaceRouteArrivalRadiusM",
         "physicalRampDeckTransitionInertiaKgM2", "physicalRampTransitionJointNamePrefix"] {
         let text = _sysml_text(report, name);

@@ -140,12 +140,21 @@ package GriffinVisualConfigurationRequirements {
         attribute solarArrayDepthM : Real = 2.50;
         attribute solarStandoffM : Real = 0.16;
 
+        /* Four equally spaced cardinal stations give the 1.512 m installed
+         * COPV bodies useful scale while keeping their largest 1.548 m bands
+         * inside the 4.50 m footprint. At 1.15 m station radius, the bands
+         * retain about 0.078 m inter-tank clearance and 0.066 m to the 0.16 m
+         * hexagonal frame stock. The lower and upper caps retain about 0.04 m
+         * and 0.18 m skirt/deck clearance. Public material confirms four COPVs
+         * but publishes no coordinates or dimensions; these are replaceable
+         * visual-study assumptions. */
         attribute tankStations : Position[4] =
-            ((1.55, 4.25, -1.42), (-1.55, 4.25, -1.42),
-             (1.55, 4.25, 1.42), (-1.55, 4.25, 1.42));
+            ((1.15, 3.20, 0.0), (-1.15, 3.20, 0.0),
+             (0.0, 3.20, 1.15), (0.0, 3.20, -1.15));
         attribute tankStationRotationYDeg : Real[4] = (0.0, 0.0, 0.0, 0.0);
-        attribute tankScale : Real[4] = (0.78, 0.78, 0.78, 0.78);
-        attribute tankSeatClearanceM : Real = 0.04;
+        attribute tankScale : Real[4] = (0.90, 0.90, 0.90, 0.90);
+        attribute minimumTankInstanceClearanceM : Real = 0.06;
+        attribute minimumTankFrameClearanceM : Real = 0.06;
 
         attribute engineClusterMountYM : Real = 1.68;
         attribute engineBellDirection : Direction = (0.0, -1.0, 0.0);
@@ -174,7 +183,7 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-006 [layout] two broad solar arrays shall occupy opposite signed-Z side datums with panel faces rotated outward and a 0.16 m standoff. Source: NASA/Astrobotic User Guide describes side-mounted panels for polar Griffin missions. */
     }
     requirement def GVC007_TankPlacement {
-        doc /* GVC-007 [layout] four compact tank render proxies shall remain below the upper visual silhouette, seated near the deck with mirrored stations and 0.04 m seat clearance. Source: supplied Griffin imagery shows deck-mounted pressure-vessel hardware; exact vessel ICD is not public, so dimensions and stations are replaceable study assumptions. */
+        doc /* GVC-007 [layout] exactly four COPV visual proxies shall occupy equally spaced cardinal-axis stations in the Y=3.20 m bus-origin plane. A 0.84 m nominal tank radius at 0.90 assembly scale gives a 1.512 m installed vessel diameter and 1.548 m maximum band diameter. At the typed 1.15 m station radius, bands retain about 0.078 m inter-instance clearance and 0.066 m clearance to the open hexagonal frame, exceeding the 0.06 m study minimum; lower/upper cap clearance is approximately 0.04/0.18 m at the skirt and deck. Astrobotic identifies four COPV tanks but publishes no dimensional ICD. The selected vessel envelope and station radius are replaceable visual-study assumptions sized within the roughly 4.5 m Griffin footprint, not flight dimensions. */
     }
     requirement def GVC008_EngineAndSkirtDatum {
         doc /* GVC-008 [interface] the seven-engine cluster and skirt shall remain below the body/deck datum; the nozzle axis is a typed downward Direction and must not duplicate flight thrust ownership. Source: Astrobotic identifies seven main engines; skirt dimensions are visual-study assumptions. */

@@ -1042,15 +1042,15 @@ package GriffinRequirementSources {
     part evidence_gpt_005 : RequirementEvidence {
         attribute requirementId = "GPT-005";
         attribute qualifiedRequirement = "GriffinTankRequirements::GPT005_TankPlacement";
-        attribute sourceReference = "https://www.astrobotic.com/media-kit/images/; https://www.nasa.gov/gallery/astrobotics-griffin-1/";
-        attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
+        attribute sourceReference = "https://www.astrobotic.com/griffin-1-mission-update/; https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
+        attribute rationale = "The public update confirms four COPVs but gives no placement ICD. The four 1.15 m cardinal-axis stations are a replaceable study layout: 0.84 m local body radius at 0.90 scale gives 1.512 m installed body diameter, while the 1.548 m circumferential-band envelope leaves about 0.078 m between adjacent instances. The nearest frame segment is about 0.920 m from a tank station; subtracting the 0.774 m installed band radius and half the 0.16 m rail stock leaves about 0.066 m frame clearance. The typed study minima are 0.06 m for both envelopes. The common Y datum is derived from the bus mount and skirt/deck envelope.";
     }
 
     part evidence_gpt_006 : RequirementEvidence {
         attribute requirementId = "GPT-006";
         attribute qualifiedRequirement = "GriffinTankRequirements::GPT006_TankEndHardware";
-        attribute sourceReference = "https://www.astrobotic.com/media-kit/images/; https://www.nasa.gov/gallery/astrobotics-griffin-1/";
-        attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
+        attribute sourceReference = "https://www.astrobotic.com/griffin-1-mission-update/; https://www.astrobotic.com/media-kit/images/";
+        attribute rationale = "Astrobotic identifies four lightweight, structurally robust COPV propellant tanks, but publishes no vessel dimensions or surface profile. A near-spherical 0.84 m local radius is therefore an explicit visual-study assumption; the 0.90 assembly scale yields 1.512 m installed vessel diameter, 50 percent larger than the prior 1.008 m installed visual proxy. The 1.51 m typed minimum is checked against the composed sphere radius and instance scale. Retention-band radii follow the sphere cross-section at their typed Y stations.";
     }
 
     part evidence_gpt_007 : RequirementEvidence {
@@ -1071,14 +1071,14 @@ package GriffinRequirementSources {
         attribute requirementId = "GPT-009";
         attribute qualifiedRequirement = "GriffinTankRequirements::GPT009_TankDeckSeat";
         attribute sourceReference = "https://www.astrobotic.com/media-kit/images/; https://www.nasa.gov/gallery/astrobotics-griffin-1/";
-        attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
+        attribute rationale = "No public attachment ICD is available. The 0.74 m-radius cradle and 1.08 m square by 0.13 m pad are scaled once with the parent tank; their Editor-authored placement is derived from the shared skirt top plus the 0.02 m installation gap, and a coaxial post closes the remaining span to the lower neck.";
     }
 
     part evidence_gpt_010 : RequirementEvidence {
         attribute requirementId = "GPT-010";
         attribute qualifiedRequirement = "GriffinTankRequirements::GPT010_TankMounting";
         attribute sourceReference = "https://www.astrobotic.com/media-kit/images/; https://www.nasa.gov/gallery/astrobotics-griffin-1/";
-        attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
+        attribute rationale = "Public imagery establishes integrated tank mounting, not brace dimensions. Four 0.10 m square-section study braces use the typed 0.46 m pad offset and 12 degree inward tilt; a 0.18 m local span places their ends on the 0.84 m spherical envelope from the derived pad-top datum. The geometry is symmetric, scaled once with the tank, and replaceable when supplier data becomes available.";
     }
 
     part evidence_gpt_011 : RequirementEvidence {
@@ -1134,7 +1134,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GVC-007";
         attribute qualifiedRequirement = "GriffinVisualConfigurationRequirements::GVC007_TankPlacement";
         attribute sourceReference = "https://www.astrobotic.com/media-kit/images/; twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml";
-        attribute rationale = "Public imagery supports four deck-mounted vessel proxies, while vessel dimensions and stations remain explicit replaceable assumptions.";
+        attribute rationale = "Astrobotic confirms four COPVs while published imagery and text do not provide a vessel dimensional drawing. The 1.512 m installed shell diameter, 1.548 m band envelope, and 1.15 m cardinal station radius are explicit replaceable assumptions sized to retain more than 0.06 m tank/frame clearance within Griffin's roughly 4.5 m footprint.";
     }
 
     part evidence_gvc_008 : RequirementEvidence {

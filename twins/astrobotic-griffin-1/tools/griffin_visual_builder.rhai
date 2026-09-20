@@ -2155,8 +2155,26 @@ fn _tank_extent_literal(radius, height) {
         + ", " + half_height.to_string() + ", " + radius.to_string() + ")]"
 }
 
+fn _tank_enum_name(source, name) {
+    let value = sysml_requirements::native_value(source,
+        "GriffinTankRequirements::GriffinPropellantTankAssembly::" + name);
+    if type_of(value) == "EnumValue" { value.literal } else { () }
+}
+
+fn _tank_enum_names(source, name) {
+    let values = sysml_requirements::native_value(source,
+        "GriffinTankRequirements::GriffinPropellantTankAssembly::" + name);
+    let result = [];
+    if values == () || type_of(values) != "array" { return result; }
+    for value in values {
+        if type_of(value) != "EnumValue" { return []; }
+        result.push(value.literal);
+    }
+    result
+}
+
 fn _tank_cylinder_schema_ops(edit_target, parent, name, radius, height,
-    translation, color, add) {
+    translation, axis, color, add) {
     let path = parent + "/" + name;
     let ops = [];
     if add {
@@ -2171,7 +2189,7 @@ fn _tank_cylinder_schema_ops(edit_target, parent, name, radius, height,
     for item in [
         #{name: "radius", type_name: "double", value: radius.to_string()},
         #{name: "height", type_name: "double", value: height.to_string()},
-        #{name: "axis", type_name: "token", value: "\"Y\""},
+        #{name: "axis", type_name: "token", value: "\"" + axis + "\""},
         #{name: "extent", type_name: "float3[]", value: _tank_extent_literal(radius, height)},
         #{name: "purpose", type_name: "token", value: "\"render\""},
         #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
@@ -2185,8 +2203,37 @@ fn _tank_cylinder_schema_ops(edit_target, parent, name, radius, height,
     #{ok: true, path: path, ops: ops}
 }
 
+fn _tank_sphere_schema_ops(edit_target, parent, name, radius,
+    translation, color, add) {
+    let path = parent + "/" + name;
+    let ops = [];
+    if add {
+        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: parent,
+            name: name, type_name: "Sphere", reference: (),
+            reference_prim_path: ""}});
+    }
+    let placement = assembly_builder::place_plan(edit_target, path,
+        translation, (), ());
+    if !placement.ok { return placement; }
+    for op in placement.ops { ops.push(op); }
+    for item in [
+        #{name: "radius", type_name: "double", value: radius.to_string()},
+        #{name: "extent", type_name: "float3[]",
+          value: _tank_extent_literal(radius, 2.0 * radius)},
+        #{name: "purpose", type_name: "token", value: "\"render\""},
+        #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
+        #{name: "primvars:displayColor", type_name: "color3f[]",
+          value: "[(" + color[0].to_string() + ", " + color[1].to_string()
+              + ", " + color[2].to_string() + ")]"},
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+            name: item.name, type_name: item.type_name, value: item.value}});
+    }
+    #{ok: true, path: path, ops: ops}
+}
+
 fn _tank_cone_schema_ops(edit_target, parent, name, radius1, radius2,
-    height, translation, color, add) {
+    height, translation, axis, color, add) {
     let path = parent + "/" + name;
     let ops = [];
     if add {
@@ -2204,7 +2251,7 @@ fn _tank_cone_schema_ops(edit_target, parent, name, radius1, radius2,
         #{name: "radius2", type_name: "double", value: radius2.to_string()},
         #{name: "radius", type_name: "double", value: radius1.to_string()},
         #{name: "height", type_name: "double", value: height.to_string()},
-        #{name: "axis", type_name: "token", value: "\"Y\""},
+        #{name: "axis", type_name: "token", value: "\"" + axis + "\""},
         #{name: "extent", type_name: "float3[]",
           value: _tank_extent_literal(extent_radius, height)},
         #{name: "purpose", type_name: "token", value: "\"render\""},
@@ -2224,7 +2271,9 @@ fn _tank_schema_prim_ready(doc, path, type_name) {
         || inspection.prim.type != type_name {
         return false;
     }
-    let required = if type_name == "Cone" {
+    let required = if type_name == "Sphere" {
+        ["radius", "extent"]
+    } else if type_name == "Cone" {
         ["radius1", "radius2", "height", "extent"]
     } else {
         ["radius", "height", "extent"]
@@ -2253,9 +2302,45 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     if !query_ok(component) || component.type_name != "Xform" {
         return plan_error(root + ": propellant tank component root is missing or not Xform");
     }
-    let source = sysml_requirements::source();
-    let radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bodyRadiusM");
-    let body_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bodyCylindricalHeightM");
+    let tank = "GriffinTankRequirements::GriffinPropellantTankAssembly::";
+    let visual = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let source = sysml_requirements::source_with_attributes([
+        tank + "bodyName", tank + "bodyShape", tank + "bodyCenter", tank + "bodyRadiusM",
+        tank + "tankAxis", tank + "retentionBandNames", tank + "retentionBandShape",
+        tank + "axialHardwareShape", tank + "transitionShape", tank + "endHardwareNames",
+        tank + "serviceHardwareNames", tank + "axialHardwareNames", tank + "neckRadiusM",
+        tank + "neckHeightM", tank + "shoulderCollarRadiusM", tank + "shoulderCollarHeightM",
+        tank + "valveRadiusM", tank + "valveHeightM", tank + "valveCapRadiusM",
+        tank + "valveCapHeightM", tank + "transitionShoulderRadiusM",
+        tank + "transitionNeckRadiusM", tank + "transitionHeightM", tank + "transitionRadiusM",
+        tank + "shoulderCenterYM", tank + "transitionCenterYM", tank + "neckCenterYM",
+        tank + "valveCenterYM", tank + "capCenterYM", tank + "bandHeightM",
+        tank + "bandCenterYM", tank + "bandRadiusByCenterM", tank + "cradleName",
+        tank + "cradleShape", tank + "cradleRadiusM", tank + "cradleHeightM",
+        tank + "minimumSkirtClearanceM", tank + "cradlePadName", tank + "cradlePadShape",
+        tank + "cradlePadWidthM", tank + "cradlePadDepthM", tank + "cradlePadHeightM",
+        tank + "supportName", tank + "supportShape", tank + "supportRadiusM",
+        tank + "bracketGroupName", tank + "bracketNames", tank + "bracketShape",
+        tank + "bracketLengthM", tank + "bracketWidthM", tank + "bracketDepthM",
+        tank + "bracketCenterOffsetM", tank + "bracketTiltDeg",
+        visual + "bodyMount", visual + "lowerSkirtCenter",
+        visual + "lowerSkirtDimensions", visual + "tankStations", visual + "tankScale",
+    ]);
+    if source == () || source.ok != true {
+        return plan_error("tank authoring requires the mounted, selected SysML source facts");
+    }
+    let body_name = _tank_enum_name(source, "bodyName");
+    let body_shape = _tank_enum_name(source, "bodyShape");
+    let body_center = sysml_requirements::native_value(source, tank + "bodyCenter");
+    let radius = sysml_requirements::number(source, tank + "bodyRadiusM");
+    let axis = _tank_enum_name(source, "tankAxis");
+    let band_names = _tank_enum_names(source, "retentionBandNames");
+    let band_shape = _tank_enum_name(source, "retentionBandShape");
+    let axial_shape = _tank_enum_name(source, "axialHardwareShape");
+    let transition_shape = _tank_enum_name(source, "transitionShape");
+    let end_names = _tank_enum_names(source, "endHardwareNames");
+    let service_names = _tank_enum_names(source, "serviceHardwareNames");
+    let axial_names = _tank_enum_names(source, "axialHardwareNames");
     let neck_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::neckRadiusM");
     let neck_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::neckHeightM");
     let shoulder_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::shoulderCollarRadiusM");
@@ -2273,26 +2358,41 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     let neck_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::neckCenterYM");
     let valve_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::valveCenterYM");
     let cap_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::capCenterYM");
-    let band_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandHeightM");
+    let band_height = sysml_requirements::number(source, tank + "bandHeightM");
     let band_centers = component_requirements::source_number_list(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandCenterYM");
     let band_radii = component_requirements::source_number_list(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandRadiusByCenterM");
+    let cradle_name = _tank_enum_name(source, "cradleName");
+    let cradle_shape = _tank_enum_name(source, "cradleShape");
     let cradle_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradleRadiusM");
     let cradle_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradleHeightM");
-    let cradle_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradleLocalY");
-    let cradle_pad_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradlePadLocalY");
+    let minimum_skirt_clearance = sysml_requirements::number(source, tank + "minimumSkirtClearanceM");
+    let cradle_pad_name = _tank_enum_name(source, "cradlePadName");
+    let cradle_pad_shape = _tank_enum_name(source, "cradlePadShape");
     let cradle_pad_width = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradlePadWidthM");
     let cradle_pad_depth = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradlePadDepthM");
     let cradle_pad_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradlePadHeightM");
     let support_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::supportRadiusM");
-    let support_height = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::supportHeightM");
-    let support_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::supportCenterYM");
+    let support_name = _tank_enum_name(source, "supportName");
+    let support_shape = _tank_enum_name(source, "supportShape");
+    let body_mount = sysml_requirements::native_value(source, visual + "bodyMount");
+    let skirt_center = sysml_requirements::native_value(source, visual + "lowerSkirtCenter");
+    let skirt_dimensions = sysml_requirements::native_value(source, visual + "lowerSkirtDimensions");
+    let tank_stations = component_requirements::source_position_list(source, visual + "tankStations");
+    let tank_scales = component_requirements::source_number_list(source, visual + "tankScale");
     let bracket_length = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketLengthM");
     let bracket_width = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketWidthM");
     let bracket_depth = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketDepthM");
     let bracket_offset = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketCenterOffsetM");
-    let bracket_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketCenterYM");
+    let bracket_group_name = _tank_enum_name(source, "bracketGroupName");
+    let bracket_names = _tank_enum_names(source, "bracketNames");
+    let bracket_shape = _tank_enum_name(source, "bracketShape");
     let bracket_tilt = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketTiltDeg");
-    let missing_body = radius == () || body_height == ();
+    let missing_body = body_name == () || body_shape != "Sphere"
+        || type_of(body_center) != "Vec3" || !vec3_is_finite(body_center)
+        || radius == () || axis == () || band_names.len() != 3
+        || band_shape != "Cylinder" || axial_shape != "Cylinder"
+        || transition_shape != "Cone" || end_names.len() != 2
+        || service_names.len() != 6 || axial_names.len() != 11;
     let missing_end = neck_radius == () || neck_height == ()
         || shoulder_radius == () || shoulder_height == ()
         || valve_radius == () || valve_height == ()
@@ -2301,32 +2401,64 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
         || transition_height == () || transition_radius == ()
         || shoulder_y == () || transition_y == () || neck_y == ()
         || valve_y == () || cap_y == () || band_height == ();
-    let missing_interface = band_centers.len() != 3 || band_radii.len() != 3
-        || cradle_radius == () || cradle_height == () || cradle_y == ()
-        || cradle_pad_y == () || cradle_pad_width == () || cradle_pad_depth == ()
-        || cradle_pad_height == () || support_radius == () || support_height == () || support_y == ()
-        || bracket_length == () || bracket_width == () || bracket_depth == ()
-        || bracket_offset == () || bracket_y == () || bracket_tilt == ();
-    if missing_body || missing_end || missing_transitions || missing_interface {
+    let missing_interface_a = band_centers.len() != 3 || band_radii.len() != 3
+        || cradle_name == () || cradle_shape != "Cylinder"
+        || cradle_radius == () || cradle_height == () || minimum_skirt_clearance == ();
+    let missing_interface_b = cradle_pad_name == () || cradle_pad_shape != "Cube"
+        || cradle_pad_width == () || cradle_pad_depth == () || cradle_pad_height == ()
+        || support_name == () || support_shape != "Cylinder" || support_radius == ();
+    let missing_interface_c = type_of(body_mount) != "Vec3" || type_of(skirt_center) != "Vec3"
+        || type_of(skirt_dimensions) != "Vec3" || tank_stations == () || tank_scales.len() != 4;
+    let missing_brackets = bracket_group_name == () || bracket_names.len() != 4
+        || bracket_shape != "Cube" || bracket_length == () || bracket_width == ()
+        || bracket_depth == () || bracket_offset == () || bracket_tilt == ();
+    if missing_body || missing_end || missing_transitions || missing_interface_a
+        || missing_interface_b || missing_interface_c || missing_brackets {
         return plan_error("tank SysML double dimensions or axial datums are missing");
     }
+    if tank_stations.len() != 4 || tank_scales.len() != 4 {
+        return plan_error("tank station and scale arrays must each contain four typed entries");
+    }
+    for index in 0..tank_stations.len() {
+        if type_of(tank_stations[index]) != "Vec3" || !vec3_is_finite(tank_stations[index])
+            || (tank_stations[index].y - tank_stations[0].y).abs() > 0.000001
+            || (tank_scales[index] - tank_scales[0]).abs() > 0.000001 {
+            return plan_error("tank component instances must share one Y datum and uniform scale for a common authored cradle");
+        }
+    }
+    if tank_stations[0].y != body_mount.y || tank_scales[0] <= 0.0 {
+        return plan_error("tank mounting datum must share the bus origin and use a positive uniform scale");
+    }
+    let skirt_top_y = body_mount.y + skirt_center.y + skirt_dimensions.y / 2.0;
+    let cradle_top_local_y = (skirt_top_y + minimum_skirt_clearance
+        - tank_stations[0].y) / tank_scales[0];
+    let cradle_y = cradle_top_local_y - cradle_height / 2.0;
+    let cradle_pad_y = cradle_top_local_y + cradle_pad_height / 2.0;
+    let pad_top_local_y = cradle_top_local_y + cradle_pad_height;
+    let lower_neck_bottom_y = -neck_y - neck_height / 2.0;
+    let support_height = lower_neck_bottom_y - pad_top_local_y;
+    let support_y = (lower_neck_bottom_y + pad_top_local_y) / 2.0;
+    let bracket_y = pad_top_local_y + bracket_length / 2.0;
+    if support_height <= 0.0 || !support_height.is_finite() {
+        return plan_error("derived tank support span does not connect the cradle pad to the lower neck");
+    }
     let desired = [
-        #{path: root + "/MliTank", type_name: "Cylinder"},
-        #{path: root + "/TankBandA", type_name: "Cylinder"},
-        #{path: root + "/TankBandB", type_name: "Cylinder"},
-        #{path: root + "/TankBandC", type_name: "Cylinder"},
-        #{path: root + "/TankNeckTop", type_name: "Cylinder"},
-        #{path: root + "/TankNeckBottom", type_name: "Cylinder"},
-        #{path: root + "/TankShoulderTop", type_name: "Cylinder"},
-        #{path: root + "/TankShoulderBottom", type_name: "Cylinder"},
-        #{path: root + "/TankValveTop", type_name: "Cylinder"},
-        #{path: root + "/TankValveBottom", type_name: "Cylinder"},
-        #{path: root + "/TankValveCapTop", type_name: "Cylinder"},
-        #{path: root + "/TankValveCapBottom", type_name: "Cylinder"},
-        #{path: root + "/TankCradle", type_name: "Cylinder"},
-        #{path: root + "/TankSupportPost", type_name: "Cylinder"},
-        #{path: root + "/TankTransitionTop", type_name: "Cone"},
-        #{path: root + "/TankTransitionBottom", type_name: "Cone"},
+        #{path: root + "/" + body_name, type_name: body_shape},
+        #{path: root + "/" + band_names[0], type_name: band_shape},
+        #{path: root + "/" + band_names[1], type_name: band_shape},
+        #{path: root + "/" + band_names[2], type_name: band_shape},
+        #{path: root + "/" + end_names[0], type_name: axial_shape},
+        #{path: root + "/" + end_names[1], type_name: axial_shape},
+        #{path: root + "/" + service_names[0], type_name: axial_shape},
+        #{path: root + "/" + service_names[1], type_name: axial_shape},
+        #{path: root + "/" + service_names[2], type_name: axial_shape},
+        #{path: root + "/" + service_names[3], type_name: axial_shape},
+        #{path: root + "/" + service_names[4], type_name: axial_shape},
+        #{path: root + "/" + service_names[5], type_name: axial_shape},
+        #{path: root + "/" + cradle_name, type_name: cradle_shape},
+        #{path: root + "/" + support_name, type_name: support_shape},
+        #{path: root + "/" + axial_names[8], type_name: transition_shape},
+        #{path: root + "/" + axial_names[9], type_name: transition_shape},
     ];
     let existing_invalid = [];
     for item in desired {
@@ -2359,49 +2491,47 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     }
     // Once the removal transaction has committed, only absent prims are
     // added. Existing valid prims receive typed placement/attribute updates.
-    let body_path = root + "/MliTank";
-    let body = _tank_cylinder_schema_ops(edit_target, root, "MliTank", radius,
-        body_height, [0.0, 0.0, 0.0], [0.58, 0.43, 0.24],
+    let body_path = root + "/" + body_name;
+    let body = _tank_sphere_schema_ops(edit_target, root, body_name, radius,
+        body_center, [0.58, 0.43, 0.24],
         !query_ok(assembly_builder::composed_query(doc, #{path: body_path, children: false})));
     if !body.ok { return body; }
     for op in body.ops { ops.push(op); }
-    for band in [
-        #{name: "TankBandA", index: 0}, #{name: "TankBandB", index: 1},
-        #{name: "TankBandC", index: 2},
-    ] {
-        let ring = _tank_cylinder_schema_ops(edit_target, root, band.name,
-            band_radii[band.index], band_height,
-            [0.0, band_centers[band.index], 0.0], [0.10, 0.12, 0.15],
-            !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + band.name, children: false})));
+    for band in 0..band_names.len() {
+        let band_name = band_names[band];
+        let ring = _tank_cylinder_schema_ops(edit_target, root, band_name,
+            band_radii[band], band_height,
+            [0.0, band_centers[band], 0.0], axis, [0.10, 0.12, 0.15],
+            !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + band_name, children: false})));
         if !ring.ok { return ring; }
         for op in ring.ops { ops.push(op); }
     }
     let cylinders = [
-        #{name: "TankNeckTop", radius: neck_radius, height: neck_height, y: neck_y, color: [0.25, 0.19, 0.12]},
-        #{name: "TankNeckBottom", radius: neck_radius, height: neck_height, y: -neck_y, color: [0.25, 0.19, 0.12]},
-        #{name: "TankShoulderTop", radius: shoulder_radius, height: shoulder_height, y: shoulder_y, color: [0.28, 0.18, 0.08]},
-        #{name: "TankShoulderBottom", radius: shoulder_radius, height: shoulder_height, y: -shoulder_y, color: [0.28, 0.18, 0.08]},
-        #{name: "TankValveTop", radius: valve_radius, height: valve_height, y: valve_y, color: [0.48, 0.50, 0.53]},
-        #{name: "TankValveBottom", radius: valve_radius, height: valve_height, y: -valve_y, color: [0.48, 0.50, 0.53]},
-        #{name: "TankValveCapTop", radius: cap_radius, height: cap_height, y: cap_y, color: [0.20, 0.22, 0.25]},
-        #{name: "TankValveCapBottom", radius: cap_radius, height: cap_height, y: -cap_y, color: [0.20, 0.22, 0.25]},
-        #{name: "TankCradle", radius: cradle_radius, height: cradle_height, y: cradle_y, color: [0.20, 0.22, 0.25]},
-        #{name: "TankSupportPost", radius: support_radius, height: support_height, y: support_y, color: [0.10, 0.12, 0.15]},
+        #{name: end_names[0], radius: neck_radius, height: neck_height, y: neck_y, color: [0.25, 0.19, 0.12]},
+        #{name: end_names[1], radius: neck_radius, height: neck_height, y: -neck_y, color: [0.25, 0.19, 0.12]},
+        #{name: service_names[0], radius: shoulder_radius, height: shoulder_height, y: shoulder_y, color: [0.28, 0.18, 0.08]},
+        #{name: service_names[1], radius: shoulder_radius, height: shoulder_height, y: -shoulder_y, color: [0.28, 0.18, 0.08]},
+        #{name: service_names[2], radius: valve_radius, height: valve_height, y: valve_y, color: [0.48, 0.50, 0.53]},
+        #{name: service_names[3], radius: valve_radius, height: valve_height, y: -valve_y, color: [0.48, 0.50, 0.53]},
+        #{name: service_names[4], radius: cap_radius, height: cap_height, y: cap_y, color: [0.20, 0.22, 0.25]},
+        #{name: service_names[5], radius: cap_radius, height: cap_height, y: -cap_y, color: [0.20, 0.22, 0.25]},
+        #{name: cradle_name, radius: cradle_radius, height: cradle_height, y: cradle_y, color: [0.20, 0.22, 0.25]},
+        #{name: support_name, radius: support_radius, height: support_height, y: support_y, color: [0.10, 0.12, 0.15]},
     ];
     for item in cylinders {
         let part = _tank_cylinder_schema_ops(edit_target, root, item.name,
-            item.radius, item.height, [0.0, item.y, 0.0], item.color,
+            item.radius, item.height, [0.0, item.y, 0.0], axis, item.color,
             !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + item.name, children: false})));
         if !part.ok { return part; }
         for op in part.ops { ops.push(op); }
     }
     for cone in [
-        #{name: "TankTransitionTop", radius1: transition_shoulder, radius2: transition_neck, y: transition_y},
-        #{name: "TankTransitionBottom", radius1: transition_neck, radius2: transition_shoulder, y: -transition_y},
+        #{name: axial_names[8], radius1: transition_shoulder, radius2: transition_neck, y: transition_y},
+        #{name: axial_names[9], radius1: transition_neck, radius2: transition_shoulder, y: -transition_y},
     ] {
         let part = _tank_cone_schema_ops(edit_target, root, cone.name,
             cone.radius1, cone.radius2, transition_height,
-            [0.0, cone.y, 0.0], [0.28, 0.18, 0.08],
+            [0.0, cone.y, 0.0], axis, [0.28, 0.18, 0.08],
             !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + cone.name, children: false})));
         if !part.ok { return part; }
         for op in part.ops { ops.push(op); }
@@ -2411,13 +2541,13 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     // The lower tank interface is part of the reusable component, not an
     // assembly-local decoration.  Keep the pad and four radial braces typed
     // from SysML so a tank can be reviewed in isolation and in the vehicle.
-    let pad_path = root + "/TankCradlePad";
+    let pad_path = root + "/" + cradle_pad_name;
     let pad = assembly_builder::composed_query(doc, #{path: pad_path, children: false});
     if query_ok(pad) && pad.type_name != "Cube" {
         return plan_error(pad_path + ": expected Cube, got " + pad.type_name);
     }
     if !query_ok(pad) {
-        let shape = assembly_builder::cube_shape_plan(edit_target, root, "TankCradlePad", 1.0,
+        let shape = assembly_builder::cube_shape_plan(edit_target, root, cradle_pad_name, 1.0,
             [cradle_pad_width, cradle_pad_height, cradle_pad_depth], false);
         if !shape.ok { return shape; }
         for op in shape.ops { ops.push(op); }
@@ -2426,16 +2556,16 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
         [0.0, cradle_pad_y, 0.0], (), [cradle_pad_width, cradle_pad_height, cradle_pad_depth]);
     if !pad_placement.ok { return pad_placement; }
     for op in pad_placement.ops { ops.push(op); }
-    let bracket_group = root + "/TankMountBrackets";
+    let bracket_group = root + "/" + bracket_group_name;
     let group = assembly_builder::composed_query(doc, #{path: bracket_group, children: false});
     if !query_ok(group) || group.type_name != "Xform" {
         return plan_error(bracket_group + ": tank bracket group is missing or not Xform");
     }
     let bracket_specs = [
-        #{name: "TankMountBracketPX", translation: [bracket_offset, bracket_y, bracket_offset], rotation: [-bracket_tilt, 0.0, bracket_tilt]},
-        #{name: "TankMountBracketNX", translation: [-bracket_offset, bracket_y, bracket_offset], rotation: [-bracket_tilt, 0.0, -bracket_tilt]},
-        #{name: "TankMountBracketPZ", translation: [bracket_offset, bracket_y, -bracket_offset], rotation: [bracket_tilt, 0.0, bracket_tilt]},
-        #{name: "TankMountBracketNZ", translation: [-bracket_offset, bracket_y, -bracket_offset], rotation: [bracket_tilt, 0.0, -bracket_tilt]},
+        #{name: bracket_names[0], translation: [bracket_offset, bracket_y, bracket_offset], rotation: [-bracket_tilt, 0.0, -bracket_tilt]},
+        #{name: bracket_names[1], translation: [-bracket_offset, bracket_y, bracket_offset], rotation: [-bracket_tilt, 0.0, bracket_tilt]},
+        #{name: bracket_names[2], translation: [bracket_offset, bracket_y, -bracket_offset], rotation: [bracket_tilt, 0.0, -bracket_tilt]},
+        #{name: bracket_names[3], translation: [-bracket_offset, bracket_y, -bracket_offset], rotation: [bracket_tilt, 0.0, bracket_tilt]},
     ];
     for bracket in bracket_specs {
         let bracket_path = bracket_group + "/" + bracket.name;
@@ -2458,7 +2588,7 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: bracket_path,
             name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
     }
-    #{ok: true, kind: "griffin_tank_usd_double_schema", root: root,
+    #{ok: true, kind: "griffin_tank_usd_sphere_schema", root: root,
       component_count: 1, ops: ops, no_op: ops.len() == 0}
 }
 
