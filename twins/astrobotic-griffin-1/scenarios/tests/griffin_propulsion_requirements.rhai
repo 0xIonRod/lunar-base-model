@@ -51,7 +51,7 @@ fn on_tick(me, ctx) {
     let skirt_height = sysml_requirements::number(source, skirt("railHeightM"));
     let skirt_section = sysml_requirements::number(source, skirt("railWidthM"));
     let skirt_shell_depth = sysml_requirements::number(source, skirt("shellDepthM"));
-    let skirt_assembly_y = sysml_requirements::number(source, skirt("assemblyMountYM"));
+    let skirt_assembly_y = sysml_requirements::number(source, visual("engineClusterMountYM"));
     let adapter_name = sysml_requirements::text(source, skirt("adapterPlateName"));
     let adapter_width = sysml_requirements::number(source, skirt("adapterPlateWidthM"));
     let adapter_depth = sysml_requirements::number(source, skirt("adapterPlateDepthM"));

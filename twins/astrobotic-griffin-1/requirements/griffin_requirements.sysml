@@ -183,7 +183,7 @@ package Griffin1Requirements {
     }
 
     requirement def GR001_LanderArchitecture {
-        doc /* GR-001 [public+study] model a reusable Griffin body, four legs, and an isogrid payload deck; verify named USD topology. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Rationale: the product page establishes the lander architecture; the named component split is the Twin's inspectable study representation. */
+        doc /* GR-001 [public+study] model a reusable Griffin body, four legs, and an octagonal payload deck; verify named USD topology. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Rationale: the product page establishes the lander architecture; the named component split is the Twin's inspectable study representation. */
     }
 
     requirement def GR002_PayloadAdapter {
@@ -251,7 +251,7 @@ package Griffin1Requirements {
     }
 
     requirement def GR018_HullAndDeck {
-        doc /* GR-018 [visual+physics] keep a positive collidable Y-axis hull and a positive upper deck above it; exact flight dimensions remain TBD. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Assumption: the Twin's 4.50 m x 4.50 m x 2.00 m is a metre-scale study proxy, not released CAD. */
+        doc /* GR-018 [physics boundary] the powered Griffin body shall retain a positive, hidden flight-body collision proxy and a positive, hidden top-deck collision proxy. The current octagonal Bus component owns visible body and deck geometry; opaque BoxyAirframe and IsogridDeck presentation duplicates shall be absent. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Assumption: collider envelopes are simulation study proxies, not released CAD. */
     }
 
     requirement def GR019_LegPlacement {

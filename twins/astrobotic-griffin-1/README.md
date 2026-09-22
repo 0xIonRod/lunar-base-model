@@ -98,7 +98,8 @@ Sources:
 | requirements/flip_sensor_power_requirements.sysml | Sensor/power-owned SysML v2 requirements and verification case |
 | requirements/griffin_ramp_requirements.sysml | Dedicated Griffin ramp subsystem requirements, metric envelope, hinge contract, and independent verification case |
 | twin.toml `[verification]` | Single registry binding each qualified SysML verification to its Twin scene, Rhai observer, and verdict channel |
-| contracts/ | Part contracts, full active/planned check catalog, and typed authoring procedure |
+| contracts/ | Part contracts, current SysML verification boundary and missing generic execution features, and typed authoring procedure |
+| contracts/verification.md | Explicit migration status from Rhai predicates to source-authored SysML constraints and generic observation bindings |
 | tools/griffin_spec.rhai | Rhai compatibility projection of limits read from the SysML source |
 | tools/griffin_requirements.rhai | Stable public contract API, visual-only and physical part/layout audits, payload/ramp gates, and typed live-edit gate |
 | tools/check_landing_determinism.sh | Twin-local two-process harness comparing the Rhai landing trial at a fixed SI clock |
@@ -376,7 +377,7 @@ The current stable boundary demonstrates:
    waypoint markers, and mission metadata.
 5. The Griffin wrapper carries the source-backed public configuration that is
    useful for integration: 625 kg payload capacity, four landing legs, seven
-   main engines, four propellant tanks, and an isogrid deck. It also carries a
+   main engines, four propellant tanks, and an octagonal payload deck. It also carries a
    clearly labelled study configuration with side-mounted solar-array proxies,
    a top-deck adapter, and two optional ramps with paired rails. Geometry,
    mass properties, and mechanism details remain non-flight surrogates.
@@ -402,8 +403,8 @@ Fixed-joint cargo is prevented from consuming route sensors before that
 release. The ramps span the deck datum to the terrain plane and carry paired
 edge rails. Astrolab's public material describes direct top-deck egress, so the
 ramp branch is an optional Griffin study assumption rather than a FLIP ICD. The
-historical six-wheel wrapper is retained as
-`vehicles/flip.legacy-six-wheel.usda` for comparison, not as the active asset.
+obsolete six-wheel wrapper has been removed; the active FLIP source is
+`vehicles/flip.usda`.
 The generic joint regression and the isolated FLIP adapter release now pass:
 the live detach retires the native joint and graph edge (7 → 6), leaves the
 28-body/30-collider population unchanged, wakes the released endpoint, and

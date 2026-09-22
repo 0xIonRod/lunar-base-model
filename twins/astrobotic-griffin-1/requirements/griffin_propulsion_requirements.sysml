@@ -13,10 +13,6 @@ package GriffinPropulsionRequirements {
         attribute throatHeightM : Real = 0.16;
         attribute throatCenterYM : Real = 0.28;
         attribute bellAxis : String = "Y";
-        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
-        attribute sourceFact : String = "Seven main engines perform the lander's major maneuvers";
-        attribute sourceRationale : String = "The engine cluster is a separately replaceable visual subassembly; Modelica/physics remains the sole thrust owner";
-        attribute geometryStatus : String = "metric visual study proxy; engine ICD and bell profile are not public";
     }
 
     // The skirt is a visual/structural presentation component around the
@@ -26,7 +22,6 @@ package GriffinPropulsionRequirements {
     // datum for the Editor.
     part def GriffinEngineSkirtComponent {
         attribute usdRootPath : String = "/World/Griffin1/Nozzle/MainEngineCluster";
-        attribute memberNames : String[4] = ("EngineSkirtFront", "EngineSkirtRear", "EngineSkirtPort", "EngineSkirtStarboard");
         attribute componentRootName : String = "EngineSkirt";
         attribute componentMemberNames : String[4] = ("RailFront", "RailRear", "RailPort", "RailStarboard");
         attribute railFrontCenterZM : Real = 1.50;
@@ -46,18 +41,9 @@ package GriffinPropulsionRequirements {
         attribute shellUpperYM : Real = 0.10;
         attribute shellLowerYM : Real = -0.40;
         attribute componentLocalCenterYM : Real = 0.00;
-        attribute assemblyMountYM : Real = 1.68;
-        attribute metricEnvelope : String = "3.20 m x 3.20 m rail envelope; 0.50 m tapered shell depth; 0.20 m rail section";
-        attribute railSection : String = "0.20 m wide x 0.20 m tall nominal square rail";
-        attribute datum : String = "The component-relative skirt is placed at the engine adapter datum by assemblyMountYM; local geometry remains relative to the referenced asset origin";
         attribute clearance : String = "minimum 0.10 m radial clearance to every bell outer radius";
         attribute colliderPolicy : String = "render-only frame; no physics collision or thrust authority";
         attribute transformOrder : String[2] = ("xformOp:translate", "xformOp:scale");
-        attribute shellTopology : String = "beveled octagonal tapered open-ended mesh shroud";
-        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
-        attribute sourceFact : String = "the public Griffin material identifies a clustered propulsion system but does not publish an engine-skirt ICD";
-        attribute sourceRationale : String = "the frame is a transparent study-level interpretation, kept separate so an ICD can replace it without changing the engine owners";
-        attribute geometryStatus : String = "metric visual study proxy; confirm against released propulsion ICD when available";
     }
 
     requirement def GPP001_EngineCount {

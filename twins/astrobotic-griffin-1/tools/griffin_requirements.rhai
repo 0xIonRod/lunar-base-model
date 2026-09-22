@@ -5,6 +5,7 @@
 // Pass a numeric `doc_id` for an open Editor document; pass `()` for the one
 // mounted runtime stage. The same functions therefore exercise the model in
 // the headful Editor and in a Twin-owned scene test.
+import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 
 // Tool-library functions are used instead of top-level constants because the
 // production static-module binding resolves names from function scope.
@@ -411,14 +412,6 @@ fn _near(a, b, tolerance) {
     (a - b).abs() <= tolerance
 }
 
-fn _near_vec(a, b, tolerance) {
-    if a == () || b == () || a.len() != b.len() { return false; }
-    for i in 0..a.len() {
-        if !_near(a[i], b[i], tolerance) { return false; }
-    }
-    true
-}
-
 fn _horizontal_radius_squared(position) {
     if position == () || position.len() < 3 { return -1.0; }
     position[0] * position[0] + position[2] * position[2]
@@ -507,13 +500,6 @@ fn _authored_position(record) {
         if local != () && local.len() == 3 { return local; }
     }
     _position(record)
-}
-
-fn _layout_prim_exists(doc_id, root, name, rule, findings) {
-    let path = root + "/" + name;
-    if !_ok(_layout_query(doc_id, path, [], false)) {
-        findings.push(_layout_finding(rule, path, "required named part is missing"));
-    }
 }
 
 fn _pair_mirror_check(findings, rule, left_path, left, right_path, right,
@@ -656,61 +642,64 @@ fn _ramp_layout_report(doc_id, root) {
 
 fn _body_shape_report(doc_id, root) {
     let findings = [];
-    let body_path = root + "/BoxyAirframe";
-    let deck_path = root + "/IsogridDeck/DeckPlate";
+    let body_path = root + "/GriffinBody/BodyCollisionProxy";
+    let deck_path = root + "/TopDeckCollisionProxy";
     let body = _layout_query(doc_id, body_path,
-        ["size", "xformOp:scale", "physics:collisionEnabled", "visibility"], false);
+        ["size", "xformOp:scale", "physics:collisionEnabled", "visibility", "purpose"], false);
     let deck = _layout_query(doc_id, deck_path,
-        ["size", "xformOp:scale", "xformOp:translate", "physics:collisionEnabled"], false);
+        ["points", "physics:collisionEnabled", "visibility", "purpose"], false);
     if !_ok(body) {
         findings.push(_layout_finding("GR-018", body_path,
-            "visible boxy Griffin airframe is missing"));
+            "flight-body collision proxy is missing"));
     } else {
         if body.type_name != "Cube" {
             findings.push(_layout_finding("GR-018", body_path,
-                "primary Griffin airframe must be a boxy Cube study shape"));
+                "flight-body proxy must be a Cube collider"));
         }
         let scale = body.attrs["xformOp:scale"];
         let size = body.attrs["size"];
         if scale == () || scale.len() != 3 || size == () || size <= 0.0 {
             findings.push(_layout_finding("GR-018", body_path,
-                "boxy airframe needs positive three-axis dimensions"));
+                "flight-body proxy needs positive three-axis dimensions"));
         } else {
-            let width = scale[0].abs() * size;
-            let height = scale[1].abs() * size;
-            let depth = scale[2].abs() * size;
-            if width <= height || depth <= height {
+            if scale[0].abs() * size <= 0.0 || scale[1].abs() * size <= 0.0
+                || scale[2].abs() * size <= 0.0 {
                 findings.push(_layout_finding("GR-018", body_path,
-                    "Griffin body must be wider and deeper than it is tall"));
+                    "flight-body collider must have a positive envelope"));
             }
         }
         if body.attrs["physics:collisionEnabled"] != true {
             findings.push(_layout_finding("GR-018", body_path,
-                "boxy airframe must own an enabled collider"));
+                "flight-body proxy must own an enabled collider"));
         }
-        if body.attrs["visibility"] == "invisible" {
+        if body.attrs["visibility"] != "invisible" || body.attrs["purpose"] != "proxy" {
             findings.push(_layout_finding("GR-018", body_path,
-                "boxy airframe must be visible in the authored preview"));
+                "flight-body collider must be hidden proxy geometry"));
         }
     }
     if !_ok(deck) {
         findings.push(_layout_finding("GR-018", deck_path,
-            "rectangular isogrid deck plate is missing"));
+            "top-deck collision proxy is missing"));
     } else {
-        if deck.type_name != "Cube" {
+        if deck.type_name != "Mesh" || deck.attrs.points == () || deck.attrs.points.len() < 8 {
             findings.push(_layout_finding("GR-018", deck_path,
-                "payload deck plate must be a rectangular Cube"));
-        }
-        let deck_scale = deck.attrs["xformOp:scale"];
-        if deck_scale == () || deck_scale.len() != 3
-            || deck_scale[0] <= 0.0 || deck_scale[1] <= 0.0
-            || deck_scale[2] <= 0.0 {
-            findings.push(_layout_finding("GR-018", deck_path,
-                "payload deck plate needs positive dimensions"));
+                "top-deck collider must be a nonempty Mesh"));
         }
         if deck.attrs["physics:collisionEnabled"] != true {
             findings.push(_layout_finding("GR-018", deck_path,
-                "payload deck plate must own an enabled collider"));
+                "top-deck proxy must own an enabled collider"));
+        }
+        if deck.attrs["visibility"] != "invisible" || deck.attrs["purpose"] != "proxy" {
+            findings.push(_layout_finding("GR-018", deck_path,
+                "top-deck collider must be hidden proxy geometry"));
+        }
+    }
+    for old in ["BoxyAirframe", "IsogridDeck"] {
+        let path = root + "/" + old;
+        let obsolete = _layout_query(doc_id, path, [], false);
+        if _ok(obsolete) {
+            findings.push(_layout_finding("GR-018", path,
+                "obsolete visible body/deck assembly must be removed"));
         }
     }
     findings
@@ -1147,8 +1136,8 @@ fn part_manifest(root) {
                     "lunco:configuration", "lunco:parameter_status",
                     "lunco:provenance:source", "lunco:collision:contract"],
             expected_type: "Xform",
-            required_children: [root + "/BoxyAirframe",
-                root + "/IsogridDeck", root + "/PayloadAdapter",
+            required_children: [root + "/GriffinBody",
+                root + "/Bus", root + "/TopDeckCollisionProxy", root + "/PayloadAdapter",
                 root + "/MainPropulsion", root + "/SolarPanelPort",
                 root + "/SolarPanelStarboard", root + "/Nozzle",
                 root + "/TankPX", root + "/TankNX", root + "/TankPZ",
@@ -1165,39 +1154,37 @@ fn part_manifest(root) {
         },
         #{
             id: "deck",
-            label: "payload deck",
+            label: "octagonal visual payload deck",
             rule: "GR-001",
-            path: root + "/IsogridDeck",
+            path: root + "/Bus",
             attrs: ["visibility"],
             expected_type: "Xform",
             visible: true,
-            required_children: [root + "/IsogridDeck/DeckPlate"],
-            geometry_children: [#{label: "deck plate", path: root + "/IsogridDeck/DeckPlate", geometry: true, collider: true}],
-            parameter_status: "prototype deck dimensions; flight ICD TBD",
+            required_children: [root + "/Bus/TopDeckOctagon"],
+            geometry_children: [#{label: "octagonal deck", path: root + "/Bus/TopDeckOctagon", geometry: true, collider: false}],
+            parameter_status: "source-owned visual deck; flight ICD TBD",
         },
         #{
-            id: "boxy_airframe",
-            label: "boxy primary airframe",
+            id: "body_collider",
+            label: "flight-body collision proxy",
             rule: "GR-018",
-            path: root + "/BoxyAirframe",
-            attrs: ["visibility", "physics:collisionEnabled"],
+            path: root + "/GriffinBody/BodyCollisionProxy",
+            attrs: ["visibility", "purpose", "physics:collisionEnabled"],
             expected_type: "Cube",
             geometry: true,
-            visible: true,
             collider: true,
-            parameter_status: "public references establish a boxy frame; exact dimensions and mass are study values",
+            parameter_status: "hidden simulation collider; exact dimensions and mass are study values",
         },
         #{
-            id: "payload_deck_plate",
-            label: "rectangular isogrid deck plate",
-            rule: "GR-001",
-            path: root + "/IsogridDeck/DeckPlate",
-            attrs: ["visibility", "physics:collisionEnabled"],
-            expected_type: "Cube",
+            id: "deck_collider",
+            label: "top-deck collision proxy",
+            rule: "GR-018",
+            path: root + "/TopDeckCollisionProxy",
+            attrs: ["visibility", "purpose", "physics:collisionEnabled"],
+            expected_type: "Mesh",
             geometry: true,
-            visible: true,
             collider: true,
-            parameter_status: "public isogrid deck requirement; bolt pattern and exact dimensions TBD",
+            parameter_status: "hidden deck collider; flight ICD TBD",
         },
         #{
             id: "payload_adapter",
@@ -1747,16 +1734,16 @@ fn lint(doc_id, root) {
         }
     }
 
-    let deck = _query(doc_id, root + "/IsogridDeck", [], (), true);
-    if !_ok(deck) || !_has(deck.children, root + "/IsogridDeck/DeckPlate") {
-        findings.push(_finding("GR-001", root + "/IsogridDeck",
-            "top payload deck and deck plate are required"));
+    let deck = _query(doc_id, root + "/Bus", [], (), true);
+    if !_ok(deck) || !_has(deck.children, root + "/Bus/TopDeckOctagon") {
+        findings.push(_finding("GR-001", root + "/Bus",
+            "source-owned octagonal payload deck is required"));
     } else {
-        let plate = _query(doc_id, root + "/IsogridDeck/DeckPlate",
+        let plate = _query(doc_id, root + "/TopDeckCollisionProxy",
             ["physics:collisionEnabled"], (), false);
         if !_ok(plate) || plate.attrs["physics:collisionEnabled"] != true {
-            findings.push(_finding("GR-012", root + "/IsogridDeck/DeckPlate",
-                "deck plate must be an enabled collider"));
+            findings.push(_finding("GR-012", root + "/TopDeckCollisionProxy",
+                "top deck proxy must be an enabled collider"));
         }
     }
 
@@ -1819,10 +1806,6 @@ fn part_report_live(doc_id, root) {
     report
 }
 
-fn _lander_component_attr(name) {
-    "GriffinLanderRequirements::GriffinLanderComponent::" + name
-}
-
 fn _visual_configuration_attr(name) {
     griffin_spec::qualified_attribute_name(name)
 }
@@ -1843,8 +1826,7 @@ fn visual_report(doc_id, root) {
     }
     let findings = [];
     let checks = [];
-    let root_record = _layout_query(doc_id, root,
-        ["lunco:visual:status", "lunco:visual:configuration"], true);
+    let root_record = _layout_query(doc_id, root, [], true);
     checks.push("GLR-009-root");
     if !_ok(root_record) {
         findings.push(_finding("GLR-009-root", root,

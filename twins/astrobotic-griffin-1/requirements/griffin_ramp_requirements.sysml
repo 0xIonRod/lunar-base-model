@@ -173,8 +173,8 @@ package GriffinRampRequirements {
         // from the old 3.55 m visual-source socket datum.
         attribute physicalRampDeckEdgeXM : Real = 3.16;
         attribute physicalRampDeckToHingeClearanceM : Real = 0.04;
-        // The hexagonal deck narrows at the lateral wheel stations, so the
-        // The first contact surface needs a collision-enabled transition plate
+        // The six-sided physical collision deck narrows at the lateral wheel
+        // stations, so the first contact surface needs a transition plate
         // on the inboard side of each hinged ramp. At the FLIP lateral wheel
         // station |x| = 0.95 m, linear interpolation on the authored hex deck
         // gives an edge of 3.16 - (3.16 - 1.58) / 2.73664 * 0.95 = 2.6115 m.

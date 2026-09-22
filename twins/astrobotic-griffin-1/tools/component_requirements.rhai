@@ -1,8 +1,9 @@
 // Shared observer helpers for component-owned Twin verification scripts.
 //
 // SysML remains the normative source for typed identities, counts, and metric datums;
-// this module only constructs generic evaluator records and emits the common
-// structured verdict shape.  It never edits USD and never supplies defaults.
+// this module binds observations to source-authored constraints, constructs
+// generic evaluator records, and emits the common structured verdict shape.
+// It never edits USD and never supplies defaults.
 
 fn source_text_list(source, qualified_name) {
     let values = sysml_requirements::native_value(source, qualified_name);
@@ -158,6 +159,40 @@ fn assertion(id, component, requirement, verification, ok, error, actual, expect
     #{id: id, component: component, requirement: _short_identity(requirement),
       verification: _short_identity(verification), kind: "assert", ok: ok,
       error: if ok { "" } else { error }, actual: actual, expected: expected}
+}
+
+// Evaluate a source-authored scalar predicate. The caller supplies observed
+// values by SysML parameter name; this adapter only binds providers and
+// returns requirement-linked evidence.
+fn constraint_assertion(id, component, requirement, verification,
+    source_path, qualified_constraint, bindings, tolerance) {
+    let ir = sysml_constraint_ir(source_path, qualified_constraint);
+    if ir == () || ir.valid != true {
+        return assertion(id, component, requirement, verification, false,
+            "SysML constraint is unavailable or invalid", ir, qualified_constraint);
+    }
+    let observations = #{};
+    for parameter in ir.constraint.parameters {
+        let value = bindings[parameter.name];
+        if value != () {
+            observations[parameter.qualified_name] =
+                #{provider: "external", state: "value", value: value};
+        }
+    }
+    let evaluation = sysml_evaluate_constraint(source_path,
+        qualified_constraint, observations, tolerance, tolerance);
+    assertion(id, component, requirement, verification,
+        evaluation.verdict == "pass", "SysML constraint verdict: " + evaluation.verdict,
+        #{constraint: qualified_constraint, verdict: evaluation.verdict,
+          observations: bindings, diagnostics: evaluation.diagnostics},
+        #{constraint: qualified_constraint, source: source_path})
+}
+
+fn observed_count_constraint(id, component, requirement, verification,
+    source_path, qualified_constraint, observed_count, expected_count, tolerance) {
+    constraint_assertion(id, component, requirement, verification,
+        source_path, qualified_constraint,
+        #{observedCount: observed_count, expectedCount: expected_count}, tolerance)
 }
 
 fn finish(source, checks, title, channel, root, package_name, verification) {

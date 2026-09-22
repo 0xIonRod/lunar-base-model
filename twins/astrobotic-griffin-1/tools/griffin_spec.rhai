@@ -7,13 +7,6 @@ import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 // Rhai still owns the executable test policy while contracts/*.md records
 // meaning and provenance.
 
-fn _sysml_source() {
-    // The generic helper is the one source-set admission point. It carries
-    // qualified attributes, collision diagnostics, and the source revision;
-    // this Twin policy must not recreate that lookup or choose a fallback.
-    sysml_requirements::source()
-}
-
 // Keep repeated Griffin lookups on one Rust-owned, revision-pinned SysML
 // session. The qualified name is an identifier boundary; the engineering
 // value itself remains a native Rust/Rhai value.
@@ -160,7 +153,7 @@ fn _qualified_attribute(name) {
     }
     let visual_configuration = [
         "configuration", "bodyProfile", "rampState", "origin", "axisUp", "axisPort", "axisForward",
-        "verificationToleranceM",
+        "verificationToleranceM", "visualReviewGriffinStation", "visualReviewFlipStation",
         "bodyDimensions", "bodyMount", "bodyGroundClearanceM",
         "lowerSkirtDimensions", "lowerSkirtCenter", "deckDimensions", "deckCenter",
         "avionicsDeckDimensions", "avionicsDeckCenter", "outerBodyProfileCoordinates",
@@ -170,10 +163,10 @@ fn _qualified_attribute(name) {
         "frameRingCenterY", "frameRingSectionM",
         "frameRails", "tankInstances", "landingLegInstances", "solarArrayInstances",
         "mainEngineInstances", "railStations", "railDimensions",
-        "tankSupportPerimeterProfileCoordinates", "tankSupportPerimeterRadiusM",
+        "tankSupportPerimeterRadiusM",
         "tankSupportPerimeterSectionM", "tankSupportPlaneCenterYM",
         "tankSupportOpeningInnerRadiusM", "tankSupportOpeningOuterRadiusM",
-        "tankSupportOpeningSegments", "tankSupportOpeningClearanceM", "legStations",
+        "tankSupportOpeningSegments", "legStations",
         "legStationRotationYDeg", "solarStations", "solarStationRotationXDeg", "solarStationRotationZDeg",
         "solarArrayWidthM", "solarArrayDepthM", "solarStandoffM", "tankStations",
         "tankStationRotationYDeg", "tankScale",
@@ -408,14 +401,12 @@ fn visual_avionics_pod_display_color() { _sysml_number_list("avionicsPodDisplayC
 fn visual_rail_display_color() { _sysml_number_list("railDisplayColor") }
 fn visual_tank_support_display_color() { _sysml_number_list("tankSupportDisplayColor") }
 fn visual_tank_collar_display_color() { _sysml_number_list("tankCollarDisplayColor") }
-fn visual_tank_support_profile_coordinates() { _sysml_native_list("tankSupportPerimeterProfileCoordinates") }
 fn visual_tank_support_perimeter_radius_m() { _sysml_attribute("tankSupportPerimeterRadiusM") }
 fn visual_tank_support_perimeter_section_m() { _sysml_attribute("tankSupportPerimeterSectionM") }
 fn visual_tank_support_plane_center_y_m() { _sysml_attribute("tankSupportPlaneCenterYM") }
 fn visual_tank_opening_inner_radius_m() { _sysml_attribute("tankSupportOpeningInnerRadiusM") }
 fn visual_tank_opening_outer_radius_m() { _sysml_attribute("tankSupportOpeningOuterRadiusM") }
 fn visual_tank_opening_segments() { _sysml_integer("tankSupportOpeningSegments") }
-fn visual_tank_opening_clearance_m() { _sysml_attribute("tankSupportOpeningClearanceM") }
 fn legacy_bus_prim_names() {
     ["BoxyAirframe", "LowerServiceSkirtBox", "IsogridDeck", "WhiteEquipmentBox",
      "TopDeck", "LowerServiceSkirt", "TopDeckHex", "LowerServiceSkirtHex",
@@ -446,7 +437,9 @@ fn _visual_transform_record(name, parent_role, asset, x, y, z, rx, ry, rz, unifo
     _visual_pose_record(name, parent_role, asset, pose, scale_enabled)
 }
 
-fn visual_engine_skirt_mount_y() { _sysml_number("engineClusterMountYM") }
+fn visual_engine_skirt_mount_y() { _sysml_attribute("engineClusterMountYM") }
+fn visual_review_griffin_station() { _sysml_native("visualReviewGriffinStation") }
+fn visual_review_flip_station() { _sysml_native("visualReviewFlipStation") }
 
 fn _visual_plan_lengths_match(values, expected) {
     values != () && values.len() == expected

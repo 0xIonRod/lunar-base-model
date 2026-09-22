@@ -68,9 +68,11 @@ Griffin package is under `twins/astrobotic-griffin-1/` and currently contains:
 ```text
 twin.toml
 scenes/griffin_1_surface_ops.usda
+scenes/griffin_flip_visual.usda
 vehicles/griffin_1.usda
+vehicles/griffin_1_visual.usda
 vehicles/flip.usda
-vehicles/flip.legacy-six-wheel.usda
+vehicles/flip_visual.usda
 environments/south_pole_surrogate.usda
 environments/lunar_surface_base.usda
 behaviors/griffin_1_flip_patrol.btxml

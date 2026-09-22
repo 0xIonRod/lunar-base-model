@@ -34,30 +34,6 @@ fn plan_error(message) {
     #{ ok: false, kind: "griffin_visual_component_assembly", error: message, ops: [] }
 }
 
-// Remove obsolete Twin-local visual annotations from the Editor-owned layer.
-// Geometry and behavior are defined by typed SysML values plus authored USD
-// geometry/transforms; custom visual strings are not a second source of truth.
-fn _clear_bus_label_ops(doc, edit_target, path, ops) {
-    let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
-    if !query_ok(prim) || prim.attrs == () { return; }
-    for name in prim.attrs.keys() {
-        if name.starts_with("lunco:visual:") {
-            ops.push(#{RemoveAttribute: #{edit_target: edit_target, path: path, name: name}});
-        }
-    }
-}
-
-fn _clear_bus_label_tree(doc, edit_target, path, ops) {
-    let prim = assembly_builder::composed_query(doc, #{path: path, children: true});
-    if !query_ok(prim) { return; }
-    _clear_bus_label_ops(doc, edit_target, path, ops);
-    if prim.children != () {
-        for child_path in prim.children {
-            _clear_bus_label_tree(doc, edit_target, child_path, ops);
-        }
-    }
-}
-
 fn absolute_root(root) {
     root != () && type_of(root) == "string" && root != ""
         && root.starts_with("/") && !(root.ends_with("/") && root != "/")
@@ -100,83 +76,23 @@ fn flip_steering_angles() {
     [front, rear]
 }
 
-fn _visual_component_parent(root, record) {
-    if record.parent_role == "lander" { return root + "/Griffin1"; }
-    if record.parent_role == "rover" { return root + "/FLIP"; }
-    if record.parent_role == "wheel" {
-        return root + "/FLIP/Suspension_" + record.station;
-    }
-    root + "/Griffin1/Nozzle/MainEngineCluster"
-}
-
-// Native spatial values remain native until this final command adapter. The
-// USD editor command currently accepts its compatibility array form, so the
-// lowering is explicit and local rather than leaking array reconstruction into
-// every component recipe.
-fn _visual_component_spec(root, record) {
-    let scale = if record.scale_enabled { vec3_array(record.pose.scale) } else { () };
-    #{parent: _visual_component_parent(root, record), name: record.name,
-      type_name: "Xform", asset: component_asset(record.asset),
-      translation: vec3_array(record.pose.translation),
-      rotation: vec3_array(quat_to_euler_xyz_deg(record.pose.rotation)), scale: scale}
-}
-
 fn visual_component_specs(root) {
-    let records = griffin_spec::visual_component_transform_plan();
-    if records.len() == 0 { return []; }
-    let specs = [];
-    for record in records { specs.push(_visual_component_spec(root, record)); }
-    specs
+    let griffin = griffin_spec::visual_review_griffin_station();
+    let flip = griffin_spec::visual_review_flip_station();
+    if !vec3_is_native(griffin) || !vec3_is_native(flip) { return []; }
+    [
+        #{parent: root, name: "Griffin1", type_name: "Xform",
+          asset: "twin://" + twin_name() + "/vehicles/griffin_1_visual.usda",
+          translation: vec3_array(griffin), rotation: (), scale: ()},
+        #{parent: root, name: "FLIP", type_name: "Xform",
+          asset: "twin://" + twin_name() + "/vehicles/flip_visual.usda",
+          translation: vec3_array(flip), rotation: (), scale: ()}
+    ]
 }
 
 fn _color_literal(color) {
     "[(" + color[0].to_string() + ", " + color[1].to_string()
         + ", " + color[2].to_string() + ")]"
-}
-
-// Detail geometry is authored in the assembly document through typed
-// AddPrim/SetAttribute operations.  It is deliberately separate from the
-// replaceable component assets: a renderer can replace the bus/chassis asset
-// without losing the semantic placement recipe or adding a second USD writer.
-fn visual_detail_specs(root) {
-    let lander = root + "/Griffin1";
-    let bus = lander + "/Bus";
-    let details = [];
-    // Rail identity, stations, and envelope are already one native typed plan;
-    // only the primitive command's array wire format is produced here.
-    for rail in griffin_spec::visual_rail_station_plan() {
-        details.push(#{parent: bus, name: rail.name, shape: "cube",
-            translation: vec3_array(rail.pose.translation), scale: vec3_array(rail.pose.scale),
-            color: griffin_spec::visual_rail_display_color()});
-    }
-    for detail in [
-        // FLIP's camera pod gets a lens barrel and the chassis gets side
-        // guards, making the four-wheel directional rover legible at a glance.
-        #{parent: root + "/FLIP/Chassis", name: "SideGuardLeft", shape: "cube", translation: [-1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
-        #{parent: root + "/FLIP/Chassis", name: "SideGuardRight", shape: "cube", translation: [1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
-        #{parent: root + "/FLIP/SensorMast", name: "SensorLens", shape: "cylinder", translation: [0.0, 1.88, -0.55], radius: 0.12, height: 0.16, axis: "Z", color: [0.04, 0.08, 0.12]},
-    ] { details.push(detail); }
-    details
-}
-
-fn _engine_radius_ops(edit_target, root) {
-    let cluster = root + "/Griffin1/Nozzle/MainEngineCluster";
-    let ops = [];
-    // Keep the standard radius1/radius2 opinions in the component asset while
-    // providing an explicit effective radius to the lightweight primitive
-    // viewer until frustum tessellation is available there.
-    for entry in griffin_spec::main_engine_names() {
-        ops.push(#{SetAttribute: #{edit_target: edit_target,
-            path: cluster + "/" + entry + "/Bell", name: "radius1",
-            type_name: "float", value: "0.34"}});
-        ops.push(#{SetAttribute: #{edit_target: edit_target,
-            path: cluster + "/" + entry + "/Bell", name: "radius2",
-            type_name: "float", value: "0.16"}});
-        ops.push(#{SetAttribute: #{edit_target: edit_target,
-            path: cluster + "/" + entry + "/Bell", name: "radius",
-            type_name: "double", value: "0.34"}});
-    }
-    ops
 }
 
 fn _detail_ops(edit_target, detail) {
@@ -350,17 +266,14 @@ fn _component_plan(doc, edit_target, spec) {
     #{ok: true, path: path, existing: false, ops: plan.ops}
 }
 
-/// Return a dry, idempotent typed plan for the visual components. All parent
-/// frames must already exist in the target document; this avoids guessing
-/// authored namespace ownership and makes a stale target fail before submit.
+/// Reference each maintained vehicle once. Child component geometry belongs
+/// to the vehicle source assets, never to this combined review scene.
 fn visual_component_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
         return plan_error("visual_component_plan requires a document, edit target, and absolute root");
     }
     let specs = visual_component_specs(root);
-    if specs.len() == 0 {
-        return plan_error("cannot build visual assembly: required SysML FLIP steering angles are missing");
-    }
+    if specs.len() != 2 { return plan_error("typed visual review stations are missing"); }
     let ops = [];
     let paths = [];
     let existing = [];
@@ -376,56 +289,8 @@ fn visual_component_plan(doc, edit_target, root) {
             added.push(result.path);
         }
     }
-    let rover = root + "/FLIP";
-    // Keep the four wheel station roots in the same authored frame as the
-    // SysML source.  This is separate from adding the wheel instance so a
-    // source vehicle with stale station transforms is corrected idempotently.
-    let wheel_names = griffin_spec::visual_rover_wheel_names();
-    let wheel_x = griffin_spec::rover_wheel_station_x();
-    let wheel_y = griffin_spec::rover_wheel_station_y();
-    let wheel_z = griffin_spec::rover_wheel_station_z();
-    if wheel_names.len() != 4 || wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4 {
-        return plan_error("FLIP wheel station datums must contain four entries");
-    }
-    for index in 0..wheel_names.len() {
-        let station = rover + "/Suspension_" + wheel_names[index];
-        let placement = assembly_builder::place_plan(edit_target, station,
-            [wheel_x[index], wheel_y[index], wheel_z[index]], (), ());
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
-    }
-    // Deactivate obsolete middle stations from older six-wheel visual
-    // revisions through a reversible authored opinion.  RemovePrim would be
-    // invalid here because those children are owned by the referenced vehicle
-    // source layer; SetActive is the generic USD override for that case.
-    for obsolete in [rover + "/Suspension_ML", rover + "/Suspension_MR"] {
-        let old = assembly_builder::composed_query(doc, #{path: obsolete, children: false});
-        if query_ok(old) {
-            ops.push(#{SetActive: #{edit_target: edit_target, path: obsolete, active: false}});
-        }
-    }
-    let detail_paths = [];
-    let detail_added = [];
-    // Keep the presentation contract in the authored assembly layer even
-    // though the referenced source asset predates the four-wheel study.
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: rover,
-        name: "lunco:visual:wheel_count", type_name: "int", value: "4"}});
-    for detail in visual_detail_specs(root) {
-        let path = detail.parent + "/" + detail.name;
-        detail_paths.push(path);
-        let existing_detail = assembly_builder::composed_query(doc, #{path: path, children: false});
-        if query_ok(existing_detail) {
-            continue;
-        }
-        let detail_plan = _detail_ops(edit_target, detail);
-        if !detail_plan.ok { return detail_plan; }
-        detail_added.push(path);
-        for op in detail_plan.ops { ops.push(op); }
-    }
-    for op in _engine_radius_ops(edit_target, root) { ops.push(op); }
     #{ok: true, kind: "griffin_visual_component_assembly", root: root,
       component_count: specs.len(), paths: paths, existing: existing, added: added,
-      detail_paths: detail_paths, detail_added: detail_added,
       no_op: ops.len() == 0, ops: ops}
 }
 
@@ -435,7 +300,7 @@ fn visual_component_plan(doc, edit_target, root) {
 fn apply_visual_components(doc, edit_target, root, parent_gen) {
     let plan = visual_component_plan(doc, edit_target, root);
     if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc, "Build componentized Griffin and FLIP visuals",
+    let command = assembly_edit::batch(doc, "Reference Griffin and FLIP visual assemblies",
         plan.ops, parent_gen);
     #{ok: command.ok != false, kind: plan.kind, root: root,
       component_count: plan.component_count, added: plan.added,
@@ -736,39 +601,6 @@ fn _isolated_flip_suspension_specs(root) {
     specs
 }
 
-fn _isolated_details_plan(doc, edit_target, details) {
-    let ops = [];
-    let paths = [];
-    for detail in details {
-        let path = detail.parent + "/" + detail.name;
-        paths.push(path);
-        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
-        let plan = _detail_ops(edit_target, detail);
-        if !plan.ok { return plan; }
-        for op in plan.ops { ops.push(op); }
-    }
-    #{ok: true, paths: paths, ops: ops}
-}
-
-fn _isolated_engine_radius_ops(edit_target, root) {
-    let ops = [];
-    let cluster = root + "/Nozzle/MainEngineCluster";
-    for entry in griffin_spec::main_engine_names() {
-        // USD Cone radius1 is the -Y end.  The bell's wide lip belongs at the
-        // nozzle exit (downward), with the narrow throat toward the deck.
-        ops.push(#{SetAttribute: #{edit_target: edit_target,
-            path: cluster + "/" + entry + "/Bell", name: "radius1",
-            type_name: "float", value: "0.34"}});
-        ops.push(#{SetAttribute: #{edit_target: edit_target,
-            path: cluster + "/" + entry + "/Bell", name: "radius2",
-            type_name: "float", value: "0.16"}});
-        ops.push(#{SetAttribute: #{edit_target: edit_target,
-            path: cluster + "/" + entry + "/Bell", name: "radius",
-            type_name: "double", value: "0.34"}});
-    }
-    ops
-}
-
 fn _isolated_mount_ops(doc, edit_target, root) {
     let bus = root + "/Bus";
     let socket_x = _ramp_number("rampSocketX");
@@ -845,7 +677,6 @@ fn isolated_griffin_component_plan(doc, edit_target, root) {
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
     }
-    for op in _isolated_engine_radius_ops(edit_target, root) { ops.push(op); }
     let mount = _isolated_mount_ops(doc, edit_target, root);
     if !mount.ok { return mount; }
     for op in mount.ops { ops.push(op); }
@@ -862,17 +693,7 @@ fn isolated_griffin_component_plan(doc, edit_target, root) {
       component_count: specs.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
 }
 
-fn _flip_suspension_cleanup_and_refs(doc, edit_target, root, names, ops, paths) {
-    for name in names {
-        let station = root + "/Suspension_" + name;
-        // These struts were authored by the pre-component vehicle source.
-        // Remove only an actually composed prim; a rejected source-layer edit
-        // must remain a loud error rather than silently duplicating geometry.
-        let obsolete = station + "/SuspensionStrut";
-        if query_ok(assembly_builder::composed_query(doc, #{path: obsolete, children: false})) {
-            ops.push(#{RemovePrim: #{edit_target: edit_target, path: obsolete}});
-        }
-    }
+fn _flip_suspension_refs(doc, edit_target, root, ops, paths) {
     for spec in _isolated_flip_suspension_specs(root) {
         let result = _component_plan(doc, edit_target, spec);
         if !result.ok { return result; }
@@ -914,22 +735,10 @@ fn isolated_flip_component_plan(doc, edit_target, root) {
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
     }
-    let suspension = _flip_suspension_cleanup_and_refs(doc, edit_target, root, names, ops, paths);
+    let suspension = _flip_suspension_refs(doc, edit_target, root, ops, paths);
     if !suspension.ok { return suspension; }
     ops = suspension.ops;
     paths = suspension.paths;
-    // The source vehicle predates the four-wheel SysML study.  Preserve its
-    // authored history, but make the isolated presentation loud and typed.
-    for obsolete in [root + "/Suspension_ML", root + "/Suspension_MR"] {
-        if query_ok(assembly_builder::composed_query(doc, #{path: obsolete, children: false})) {
-            ops.push(#{SetActive: #{edit_target: edit_target, path: obsolete, active: false}});
-        }
-    }
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
-        name: "lunco:visual:wheel_count", type_name: "int", value: "4"}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
-        name: "lunco:visual:configuration", type_name: "string",
-        value: "four directional wheels, white equipment box, sensor mast, fixed solar-array proxy"}});
     for detail in _isolated_flip_detail_specs(root) {
         let path = detail.parent + "/" + detail.name;
         if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
@@ -1004,9 +813,6 @@ fn isolated_griffin_component_plan_for(doc, edit_target, root, task) {
         if !detail_plan.ok { return detail_plan; }
         for op in detail_plan.ops { ops.push(op); }
     }
-    if task == "MainEngineCluster" {
-        for op in _isolated_engine_radius_ops(edit_target, root) { ops.push(op); }
-    }
     #{ok: true, kind: "griffin_component_task", root: root, component: task,
       component_count: selected.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
 }
@@ -1041,11 +847,6 @@ fn _outer_body_prism_geometry(width, depth, height) {
     #{ok: true, points: points, face_counts: mesh.face_vertex_counts,
       face_indices: mesh.face_vertex_indices, vertex_count: mesh.vertex_count,
       face_count: mesh.face_count}
-}
-
-fn _griffin_bus_number(source, name) {
-    sysml_requirements::number(source,
-        "GriffinBusRequirements::GriffinBusComponent::" + name)
 }
 
 // Resize an existing component-owned profile mesh in place. The operation is
@@ -1152,7 +953,7 @@ fn _tank_support_annulus_mesh_plan(doc, edit_target, parent, name, center,
 }
 
 fn _tank_support_plan(doc, edit_target, root) {
-    let perimeter_profile = griffin_spec::visual_tank_support_profile_coordinates();
+    let perimeter_profile = griffin_spec::visual_outer_body_profile_coordinates();
     let perimeter_radius = griffin_spec::visual_tank_support_perimeter_radius_m();
     let perimeter_section = griffin_spec::visual_tank_support_perimeter_section_m();
     let center_y = griffin_spec::visual_tank_support_plane_center_y_m();
@@ -1161,7 +962,7 @@ fn _tank_support_plan(doc, edit_target, root) {
     let segments = griffin_spec::visual_tank_opening_segments();
     let tanks = griffin_spec::component_tank_stations();
     let names = griffin_spec::propellant_tank_names();
-    if perimeter_profile.len() != 6 || perimeter_radius <= 0.0
+    if perimeter_profile.len() != 8 || perimeter_radius <= 0.0
         || perimeter_section <= 0.0 || center_y == () || inner_radius <= 0.0
         || outer_radius <= inner_radius || segments < 8 || tanks.len() != 4 || names.len() != 4 {
         return plan_error("typed Griffin four-opening tank-support datums are incomplete");
@@ -1179,12 +980,12 @@ fn _tank_support_plan(doc, edit_target, root) {
     let perimeter_stations = [];
     for point in perimeter_profile {
         if type_of(point) != "Vec2" || !vec2_is_finite(point) {
-            return plan_error("tank-support perimeter profile must contain six finite typed Vec2 values");
+            return plan_error("tank-support perimeter profile must contain eight finite typed Vec2 values");
         }
         perimeter_stations.push(vec3(point.x * perimeter_radius, 0.0,
             point.y * perimeter_radius));
     }
-    let perimeter_geometry = _octagonal_open_frame_geometry(perimeter_stations,
+    let perimeter_geometry = _perimeter_beam_geometry(perimeter_stations,
         [center_y], perimeter_section);
     if perimeter_geometry.ok == false { return perimeter_geometry; }
     let perimeter_path = path + "/TankSupportPerimeter";
@@ -1236,7 +1037,7 @@ fn _tank_support_plan(doc, edit_target, root) {
 // mesh: eight upper and eight lower perimeter members. Each beam uses a local
 // right-handed (along, up, across) basis and outward-wound quad faces, so the
 // open bays are real openings rather than a transparent/one-sided prism.
-fn _octagonal_open_frame_geometry(stations, ring_y, section) {
+fn _perimeter_beam_geometry(stations, ring_y, section) {
     let points = [];
     let face_counts = [];
     let face_indices = [];
@@ -1291,7 +1092,7 @@ fn _octagonal_open_frame_geometry(stations, ring_y, section) {
 fn _octagonal_open_frame_mesh_plan(doc, edit_target, root, name, stations, ring_y, section, color) {
     let path = root + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
-    let geometry = _octagonal_open_frame_geometry(stations, ring_y, section);
+    let geometry = _perimeter_beam_geometry(stations, ring_y, section);
     if geometry.ok == false { return geometry; }
     let ops = [];
     if query_ok(current) {
@@ -1386,8 +1187,7 @@ fn _bus_detail_cube_plan(doc, edit_target, parent, name, size, scale, translatio
 
 // Author the actual Griffin bus geometry from the typed SysML visual
 // configuration. The primary body is an open eight-sided frame mesh; the outer
-// deck and skirt reuse the same profile, while the tank-support plate remains a
-// separate six-sided feature.
+// deck, skirt, and tank-support perimeter reuse the same octagonal profile.
 fn _outer_body_component_mesh_plan(doc, edit_target, parent, name, width, depth,
     height, translation, color) {
     let path = parent + "/" + name;
@@ -1455,15 +1255,6 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
         return plan_error("typed Griffin octagonal body datums are incomplete");
     }
     let ops = [];
-    // Remove the authored legacy solids from the layer that owns them. Never
-    // leave old legacy skins and rails beside the replacement geometry.
-    for legacy in griffin_spec::legacy_bus_prim_names() {
-        let path = root + "/" + legacy;
-        let existing = assembly_builder::composed_query(doc, #{path: path, children: false});
-        if query_ok(existing) {
-            ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
-        }
-    }
     let rail_names = griffin_spec::visual_rail_names();
     let rail_stations = griffin_spec::visual_rail_station_positions();
     let rail_width = griffin_spec::visual_rail_width_m();
@@ -1513,11 +1304,6 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
     let support = _tank_support_plan(doc, edit_target, root);
     if !support.ok { return support; }
     for op in support.ops { ops.push(op); }
-    _clear_bus_label_tree(doc, edit_target, root, ops);
-    if root.ends_with("/Bus") {
-        let vehicle_root = root.sub_string(0, root.len() - 4);
-        _clear_bus_label_ops(doc, edit_target, vehicle_root, ops);
-    }
     #{ok: true, kind: "griffin_octagonal_bus_component", root: root,
       paths: [root + "/" + body_name, root + "/TopDeckOctagon", root + "/" + skirt_name],
       ops: ops, no_op: ops.len() == 0}
@@ -2397,26 +2183,18 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
             }
         }
     }
-    let stale_paths = [];
-    for old_name in ["TankBodyVisual", "TankBandAVisual", "TankBandBVisual", "TankBandCVisual"] {
-        let old_path = root + "/" + old_name;
-        if query_ok(assembly_builder::composed_query(doc, #{path: old_path, children: false})) {
-            stale_paths.push(old_path);
-        }
-    }
     let ops = [];
     // OpenUSD validates a typed attribute against the composed prim before
-    // applying a batch.  A malformed legacy prim therefore needs its own
+    // applying a batch. A prim with the wrong schema therefore needs its own
     // transaction: removing it and recreating it in the same batch is not
     // valid because the AddPrim still sees the old schema.  Return an
     // explicit removal phase so callers cannot accidentally hide this state.
-    if existing_invalid.len() > 0 || stale_paths.len() > 0 {
+    if existing_invalid.len() > 0 {
         for path in existing_invalid { ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}}); }
-        for path in stale_paths { ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}}); }
         return #{ok: true, kind: "griffin_tank_usd_double_schema_remove_required",
             phase: "remove", root: root, component_count: 1, ops: ops,
             no_op: ops.len() == 0,
-            diagnostic: "legacy tank prims must be removed in a separate Editor transaction before rebuilding"};
+            diagnostic: "mismatched tank schemas require a separate Editor removal transaction"};
     }
     // Once the removal transaction has committed, only absent prims are
     // added. Existing valid prims receive typed placement/attribute updates.
@@ -2572,7 +2350,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     let rail_x = width / 2.0 - section / 2.0;
     let rail_z = depth / 2.0 - section / 2.0;
     // This document is the reusable component asset.  Its parent instance
-    // owns the global assemblyMountYM; applying that global value here would
+    // owns the global engineClusterMountYM; applying that global value here would
     // double-translate every rail when the component is referenced.
     let rail_y = local_center_y;
     let specs = [
@@ -2656,9 +2434,6 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         name: "purpose", type_name: "token", value: "\"render\""}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
         name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
-        name: "lunco:visual:skirt_metric_envelope", type_name: "string",
-        value: "\"3.20 m x 3.20 m x 0.20 m; 0.20 m rails; centered on engine adapter datum\""}});
     paths.push(shell_path);
     #{ok: true, kind: "griffin_engine_skirt_refinement", root: root,
       paths: paths, ops: ops, no_op: ops.len() == 0}
@@ -2727,11 +2502,6 @@ fn isolated_flip_component_plan_for(doc, edit_target, root, task) {
         for index in 0..names.len() {
             let wheel_name = "Wheel_" + names[index];
             if task != "DirectionalWheels" && wheel_name != task { continue; }
-            let station = root + "/Suspension_" + names[index];
-            let obsolete = station + "/SuspensionStrut";
-            if query_ok(assembly_builder::composed_query(doc, #{path: obsolete, children: false})) {
-                ops.push(#{RemovePrim: #{edit_target: edit_target, path: obsolete}});
-            }
             let result = _component_plan(doc, edit_target, suspension_specs[index]);
             if !result.ok { return result; }
             paths.push(result.path);

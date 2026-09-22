@@ -67,11 +67,9 @@ fn on_tick(me, ctx) {
     checks.push(visual_children_check("GV-002-deck-subparts", "lander", "gv002",
         root + "/Griffin1/Bus",
         [root + "/Griffin1/Bus/PerimeterFrame",
-         root + "/Griffin1/Bus/PerimeterFrame",
-         root + "/Griffin1/Bus/FrontThermalPanel",
-         root + "/Griffin1/Bus/FrontLogoRedA",
-         root + "/Griffin1/Bus/FrontLogoRedB",
-         root + "/Griffin1/Bus/TopDeckOctagon"]));
+         root + "/Griffin1/Bus/TopDeckOctagon",
+         root + "/Griffin1/Bus/LowerServiceSkirtOctagon",
+         root + "/Griffin1/Bus/TankSupportPlate"]));
     let body_profile = visual_exists_check("GV-002-octagonal-body", "lander", "gv002",
         "exists", root + "/Griffin1/Bus/PerimeterFrame");
     body_profile.expected_type = "Mesh";
@@ -222,6 +220,19 @@ fn on_tick(me, ctx) {
     checks[checks.len() - 1].multiplier = 2.0;
     checks[checks.len() - 1].expected_attr = griffin_spec::qualified_attribute_name("visualLanderDeckWidthM");
     checks[checks.len() - 1].tolerance = 0.001;
+    for placement in [
+        #{name: "Griffin1", expected: vec3_array(griffin_spec::visual_review_griffin_station())},
+        #{name: "FLIP", expected: vec3_array(griffin_spec::visual_review_flip_station())}
+    ] {
+        for axis in 0..3 {
+            checks.push(#{id: "GV-004-" + placement.name + "-station-" + axis.to_string(),
+                component: placement.name, requirement: "gv004",
+                verification: "Verify_GriffinVisualRequirements",
+                kind: "attribute_component", path: root + "/" + placement.name,
+                attr: "xformOp:translate", index: axis,
+                expected: placement.expected[axis], tolerance: 0.002});
+        }
+    }
     let pad = #{ id: "GV-004-pad-radius", component: "context",
         requirement: "gv004",
         verification: "Verify_GriffinVisualRequirements",

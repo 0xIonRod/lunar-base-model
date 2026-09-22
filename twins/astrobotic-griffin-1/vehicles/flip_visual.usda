@@ -95,21 +95,6 @@ def Xform "FLIP" (
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         }
     }
-    def Xform "Suspension_ML" (
-        active = false
-    )
-    {
-        double3 xformOp:translate = (-1.75, -0.42, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        def Xform "Wheel_ML" (
-            prepend references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@</FlipWheel>
-        )
-        {
-            custom float physxVehicleWheel:radius = 0.44999998807907104
-            custom float physxVehicleWheel:width = 0.30000001192092896
-            custom int physxVehicleWheelAttachment:index = 1
-        }
-    }
     def Xform "Suspension_RL"
     {
         custom double3 xformOp:translate = (-1.75, -0.42, 1.15)
@@ -156,21 +141,6 @@ def Xform "FLIP" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
-        }
-    }
-    def Xform "Suspension_MR" (
-        active = false
-    )
-    {
-        double3 xformOp:translate = (1.75, -0.42, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        def Xform "Wheel_MR" (
-            prepend references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@</FlipWheel>
-        )
-        {
-            custom float physxVehicleWheel:radius = 0.44999998807907104
-            custom float physxVehicleWheel:width = 0.30000001192092896
-            custom int physxVehicleWheelAttachment:index = 4
         }
     }
     def Xform "Suspension_RR"

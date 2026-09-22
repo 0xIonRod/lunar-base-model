@@ -139,7 +139,13 @@ fn native_transform_plan_check() {
     let tank = _plan_record(plan, "TankPX");
     let solar = _plan_record(plan, "SolarPanelPort");
     let engine = _plan_record(plan, "Engine01");
-    let ok = plan.len() == 27 && rails.len() == 6
+    let expected_component_count = 1 + griffin_spec::propellant_tank_names().len()
+        + griffin_spec::landing_leg_names().len()
+        + griffin_spec::solar_array_names().len() + griffin_spec::ramp_names().len()
+        + 3 + griffin_spec::visual_rover_wheel_names().len()
+        + griffin_spec::main_engine_names().len() + 1;
+    let expected_rail_count = griffin_spec::visual_rail_names().len();
+    let ok = plan.len() == expected_component_count && rails.len() == expected_rail_count
         && bus != () && tank != () && solar != () && engine != ()
         && transform_is_finite(bus.pose) && transform_is_finite(tank.pose)
         && transform_is_finite(solar.pose) && transform_is_finite(engine.pose)
@@ -152,7 +158,7 @@ fn native_transform_plan_check() {
         "gvc002", VERIFICATION, ok,
         "SysML-derived plan must carry native f64 Transform and Vec3 values to the builder",
         #{component_count: plan.len(), rail_count: rails.len()},
-        #{component_count: 27, rail_count: 6})
+        #{component_count: expected_component_count, rail_count: expected_rail_count})
 }
 
 fn typed_relation_check(source) {

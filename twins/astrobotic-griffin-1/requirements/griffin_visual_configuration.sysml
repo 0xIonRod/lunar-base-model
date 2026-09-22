@@ -76,6 +76,8 @@ package GriffinVisualConfigurationRequirements {
         // Shared numerical tolerance for source-backed geometric relations.
         // It is a review-policy datum, not a hidden Rust or Rhai literal.
         attribute verificationToleranceM : Real = 1.0e-6;
+        attribute visualReviewGriffinStation : Position = (-2.70, -0.38, 0.0);
+        attribute visualReviewFlipStation : Position = (7.0, 1.0, 0.5);
 
         attribute bodyDimensions : Dimensions = (4.50, 2.00, 4.50);
         attribute bodyMount : Position = (0.0, 3.20, 0.0);
@@ -134,17 +136,14 @@ package GriffinVisualConfigurationRequirements {
          * derived from tankStations and tankInstances. The polygonal bore
          * radius clears the maximum scaled retention-band envelope by the
          * same 0.06 m study margin used by the tank/frame contract. */
-        attribute tankSupportPerimeterProfileCoordinates : CartesianVectorValue[6] =
-            ((0.0, -1.0), (0.8660254037844386, -0.5),
-             (0.8660254037844386, 0.5), (0.0, 1.0),
-             (-0.8660254037844386, 0.5), (-0.8660254037844386, -0.5));
+        /* The central perimeter uses outerBodyProfileCoordinates at this
+         * separate radius, so both structures share one octagonal profile. */
         attribute tankSupportPerimeterRadiusM : Real = 2.10;
         attribute tankSupportPerimeterSectionM : Real = 0.12;
         attribute tankSupportPlaneCenterYM : Real = 0.0;
         attribute tankSupportOpeningInnerRadiusM : Real = 0.86;
         attribute tankSupportOpeningOuterRadiusM : Real = 1.00;
         attribute tankSupportOpeningSegments : Integer = 16;
-        attribute tankSupportOpeningClearanceM : Real = 0.06;
 
         attribute legStations : Position[4] =
             ((2.20, 2.20, 0.0), (-2.20, 2.20, 0.0),
@@ -192,8 +191,8 @@ package GriffinVisualConfigurationRequirements {
     requirement def GVC003_OctagonalAirframe {
         doc /* GVC-003 [geometry] the primary airframe shall use an open eight-sided clipped-square perimeter with eight corner posts and eight upper plus eight lower perimeter beams. Its 4.50 m x 4.50 m plan envelope and 2.00 m core height are visual-study datums. Lower service skirt, outer deck, and central tank-support plate remain separate features. Public references show a faceted bus but no released structural CAD; member stock and stations are replaceable study assumptions. */
     }
-    requirement def GVC004_IsogridDeck {
-        doc /* GVC-004 [interface] the bus shall expose a separate 4.40 m x 4.40 m x 0.16 m isogrid deck at the upper bus datum. Source: Astrobotic Griffin product description identifies the main isogrid payload deck; dimensions are visual-study assumptions. */
+    requirement def GVC004_OctagonalPayloadDeck {
+        doc /* GVC-004 [interface] the bus shall expose a separate 4.40 m x 4.40 m x 0.16 m octagonal payload-deck study surface at the upper bus datum. Source: Astrobotic Griffin product description identifies the main payload deck; these dimensions and the visual surface are study assumptions, not a modeled internal isogrid lattice. */
     }
     requirement def GVC005_LegStations {
         doc /* GVC-005 [layout] four leg roots shall occupy mirrored axial X/Z corner stations with local radial rotations and at least 0.20 m body-to-ground visual clearance. Source: Griffin's four shock-absorbing legs; exact station ICD is not public. */
@@ -223,7 +222,7 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-013 [rendering] every authored frame, skirt, and deck face shall point outward and render single-sided. Verification computes normals from the actual composed mesh. Source: OpenUSD UsdGeomMesh winding convention and the observed Edit-perspective surface issue. Rationale: correct topology is durable; double-sided rendering would only hide bad winding. */
     }
     requirement def GVC014_ParametricProfile {
-        doc /* GVC-014 [geometry] outer deck and skirt use the eight normalized Cartesian vectors declared in this configuration, scaled by typed Dimensions and extruded by typed Y thickness. The central tank-support assembly is a separate six-sided perimeter frame with four annular, through-opening collars concentric with the tank stations; it shall not inherit the outer-body profile. */
+        doc /* GVC-014 [geometry] outer deck, skirt, and central tank-support perimeter use the eight normalized Cartesian vectors declared once in this configuration, scaled by their typed dimensions. The central support has four annular, through-opening collars concentric with the tank stations. */
     }
     requirement def GVC015_SurfaceAppearance {
         doc /* GVC-015 [appearance] frame, deck, service skirt, avionics, rails, and tank-support features shall take their linear display colors from this configuration. Each color channel shall remain in the [0,1] interval; Rhai and USD material adapters must not duplicate palette literals. */
@@ -232,7 +231,7 @@ package GriffinVisualConfigurationRequirements {
     requirement gvc001 : GVC001_ConfigurationSelection { subject configuration : GriffinVisualConfiguration; }
     requirement gvc002 : GVC002_FrameAndOrigin { subject configuration : GriffinVisualConfiguration; }
     requirement gvc003 : GVC003_OctagonalAirframe { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc004 : GVC004_IsogridDeck { subject configuration : GriffinVisualConfiguration; }
+    requirement gvc004 : GVC004_OctagonalPayloadDeck { subject configuration : GriffinVisualConfiguration; }
     requirement gvc005 : GVC005_LegStations { subject configuration : GriffinVisualConfiguration; }
     requirement gvc006 : GVC006_SolarStations { subject configuration : GriffinVisualConfiguration; }
     requirement gvc007 : GVC007_TankPlacement { subject configuration : GriffinVisualConfiguration; }

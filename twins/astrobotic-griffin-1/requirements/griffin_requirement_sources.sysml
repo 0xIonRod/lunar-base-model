@@ -315,7 +315,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GBC-007";
         attribute qualifiedRequirement = "GriffinBusRequirements::GBC007_AssemblyRailGeometry";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; composed Griffin visual assembly";
-        attribute rationale = "The active assembly replaces the legacy perimeter frame with six explicit rail envelopes; one source-owned length and station set prevents drift in the composed bus.";
+        attribute rationale = "The open bus has eight named corner posts and an octagonal ring; source-owned dimensions and stations prevent drift in the composed assembly.";
     }
 
     part evidence_gbc_008 : RequirementEvidence {
@@ -1111,7 +1111,7 @@ package GriffinRequirementSources {
 
     part evidence_gvc_004 : RequirementEvidence {
         attribute requirementId = "GVC-004";
-        attribute qualifiedRequirement = "GriffinVisualConfigurationRequirements::GVC004_IsogridDeck";
+        attribute qualifiedRequirement = "GriffinVisualConfigurationRequirements::GVC004_OctagonalPayloadDeck";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml";
         attribute rationale = "The payload deck is a public Griffin architectural cue; thickness and exact dimensions are marked study assumptions in the typed source.";
     }

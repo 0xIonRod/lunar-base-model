@@ -180,6 +180,11 @@ fn outward_profile_prism_face_count(points, counts, indices, profile_count) {
 fn verify_bus(doc, source, bus_root) {
     let checks = [];
     let root = bus_root;
+    let bus_source_path = "twin://" + twin_name()
+        + "/requirements/griffin_bus_requirements.sysml";
+    let source_tolerance = sysml_requirements::number(source,
+        visual("verificationToleranceM"));
+    let count_constraint = "GriffinBusRequirements::GBC_ObservedCountEquals";
     let root_prim = assembly_builder::composed_query(doc, #{path: root, children: false});
     let frame_prim = assembly_builder::composed_query(doc, #{path: root + "/PerimeterFrame", children: false});
     let deck_prim = assembly_builder::composed_query(doc, #{path: root + "/TopDeckOctagon", children: false});
@@ -214,7 +219,19 @@ fn verify_bus(doc, source, bus_root) {
     if frame_topology_ok {
         for count in frame_counts { if count != 4 { frame_topology_ok = false; } }
     }
-    checks.push(component_requirements::assertion("GBC-008-open-octagonal-frame", "bus",
+    checks.push(component_requirements::observed_count_constraint(
+        "GBC-008-frame-points", "bus", "gbc008", verification_name(),
+        bus_source_path, count_constraint, frame_points.len(), beam_count * 8,
+        source_tolerance));
+    checks.push(component_requirements::observed_count_constraint(
+        "GBC-008-frame-faces", "bus", "gbc008", verification_name(),
+        bus_source_path, count_constraint, frame_counts.len(), beam_count * 6,
+        source_tolerance));
+    checks.push(component_requirements::observed_count_constraint(
+        "GBC-008-frame-indices", "bus", "gbc008", verification_name(),
+        bus_source_path, count_constraint, frame_indices.len(), beam_count * 24,
+        source_tolerance));
+    checks.push(component_requirements::assertion("GBC-008-frame-quad-faces", "bus",
         "gbc008", verification_name(), frame_topology_ok,
         "frame mesh shall contain two octagonal rings of closed beam solids with quad faces",
         #{points: frame_points.len(), faces: frame_counts.len(), indices: frame_indices.len()},
@@ -310,12 +327,10 @@ fn verify_bus(doc, source, bus_root) {
         "TopDeckOctagon-to-LowerServiceSkirtOctagon",
         deck_center, deck_dims, quat_identity(),
         skirt_center, skirt_dims, quat_identity(), 0.0);
-    checks.push(component_requirements::assertion("GBC-010-deck-skirt-clearance", "bus",
-        "gbc010", verification_name(), deck_skirt_clearance.ok == true,
-        "typed deck and service-skirt envelopes shall have a positive SAT separation",
-        deck_skirt_clearance,
-        #{minimum_clearance_m: 0.0, deck_center: deck_center,
-          skirt_center: skirt_center}));
+    checks.push(component_requirements::constraint_assertion(
+        "GBC-010-deck-skirt-clearance", "bus", "gbc010", verification_name(),
+        bus_source_path, "GriffinBusRequirements::GBC010_PositiveDeckSkirtClearance",
+        #{separationM: deck_skirt_clearance.signed_axis_margin_m}, source_tolerance));
 
     let support = assembly_builder::composed_query(doc,
         #{path: root + "/TankSupportPlate", children: false});
@@ -326,17 +341,17 @@ fn verify_bus(doc, source, bus_root) {
     let segments = griffin_spec::visual_tank_opening_segments();
     let inner_radius = griffin_spec::visual_tank_opening_inner_radius_m();
     let outer_radius = griffin_spec::visual_tank_opening_outer_radius_m();
-    let support_profile = griffin_spec::visual_tank_support_profile_coordinates();
+    let support_profile = griffin_spec::visual_outer_body_profile_coordinates();
     let support_radius = griffin_spec::visual_tank_support_perimeter_radius_m();
     let support_section = griffin_spec::visual_tank_support_perimeter_section_m();
     let support_center_y = griffin_spec::visual_tank_support_plane_center_y_m();
     let support_points = if _query_ok(support_frame) { support_frame.attrs.points } else { [] };
     let support_counts = if _query_ok(support_frame) { support_frame.attrs.faceVertexCounts } else { [] };
     let support_indices = if _query_ok(support_frame) { support_frame.attrs.faceVertexIndices } else { [] };
-    let support_topology_ok = support_profile.len() == 6 && support_radius > 0.0
+    let support_topology_ok = support_profile.len() == 8 && support_radius > 0.0
         && support_section > 0.0 && support_center_y != ()
-        && support_points.len() == 48 && support_counts.len() == 36
-        && support_indices.len() == 144 && _query_ok(support_frame)
+        && support_points.len() == 64 && support_counts.len() == 48
+        && support_indices.len() == 192 && _query_ok(support_frame)
         && support_frame.type_name == "Mesh" && support_frame.attrs.doubleSided == false
         && support_frame.attrs.purpose == "render"
         && support_frame.attrs["physics:collisionEnabled"] == false;
@@ -351,16 +366,28 @@ fn verify_bus(doc, source, bus_root) {
         }
     }
     let support_outward = if support_topology_ok {
-        outward_quad_face_count(support_points, support_counts, support_indices, 6)
+        outward_quad_face_count(support_points, support_counts, support_indices, 8)
     } else { 0 };
-    support_topology_ok = support_topology_ok && support_outward == 36
+    support_topology_ok = support_topology_ok && support_outward == 48
         && _display_color_matches(support_frame, griffin_spec::visual_tank_support_display_color());
-    checks.push(component_requirements::assertion("GBC-011-six-sided-support-frame", "bus",
+    checks.push(component_requirements::observed_count_constraint(
+        "GBC-011-support-points", "bus", "gbc011", verification_name(),
+        bus_source_path, count_constraint, support_points.len(), support_profile.len() * 8,
+        source_tolerance));
+    checks.push(component_requirements::observed_count_constraint(
+        "GBC-011-support-faces", "bus", "gbc011", verification_name(),
+        bus_source_path, count_constraint, support_counts.len(), support_profile.len() * 6,
+        source_tolerance));
+    checks.push(component_requirements::observed_count_constraint(
+        "GBC-011-support-indices", "bus", "gbc011", verification_name(),
+        bus_source_path, count_constraint, support_indices.len(), support_profile.len() * 24,
+        source_tolerance));
+    checks.push(component_requirements::assertion("GBC-011-octagonal-support-frame", "bus",
         "gbc011", verification_name(), support_topology_ok,
-        "six-sided tank support shall be six outward-wound quad beam solids at the typed plane and section, render-only and source-colored",
+        "octagonal tank support shall be eight outward-wound quad beam solids at the typed plane and section, render-only and source-colored",
         #{points: support_points.len(), faces: support_counts.len(), indices: support_indices.len(),
           outward_faces: support_outward, color: if _query_ok(support_frame) { support_frame.attrs["primvars:displayColor"] } else { () }},
-        #{points: 48, faces: 36, indices: 144, outward_faces: 36,
+        #{points: 64, faces: 48, indices: 192, outward_faces: 48,
           center_y_m: support_center_y, section_m: support_section,
           color: griffin_spec::visual_tank_support_display_color()}));
     let opening_evidence = [];
@@ -410,6 +437,25 @@ fn verify_bus(doc, source, bus_root) {
         opening_evidence,
         #{count: 4, segments_per_bore: segments, inner_radius_m: inner_radius,
           outer_radius_m: outer_radius, all_bores_open: true}));
+
+    let band_radii = component_requirements::source_number_list(source,
+        "GriffinTankRequirements::GriffinPropellantTankAssembly::bandRadiusByCenterM");
+    let tank_scales = griffin_spec::component_tank_scale();
+    let minimum_bore_clearance = sysml_requirements::number(source,
+        visual("minimumTankFrameClearanceM"));
+    let maximum_band_radius = 0.0;
+    for radius in band_radii {
+        if radius > maximum_band_radius { maximum_band_radius = radius; }
+    }
+    for index in 0..tank_names.len() {
+        checks.push(component_requirements::constraint_assertion(
+            "GBC-011-bore-clearance-" + tank_names[index], "bus", "gbc011",
+            verification_name(), bus_source_path,
+            "GriffinBusRequirements::GBC011_TankBoreClearance",
+            #{boreRadiusM: inner_radius, maximumBandRadiusM: maximum_band_radius,
+              tankScale: tank_scales[index], minimumClearanceM: minimum_bore_clearance},
+            source_tolerance));
+    }
 
     let source_colors_match = _display_color_matches(frame, griffin_spec::visual_frame_display_color())
         && _display_color_matches(deck, griffin_spec::visual_deck_display_color())

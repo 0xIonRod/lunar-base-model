@@ -9,7 +9,6 @@ def Xform "Griffin1" (
     kind = "assembly"
 )
 {
-    custom string lunco:visual:status = "componentized review proxy; no flight CAD"
     def Xform "Bus" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda@</GriffinBus>
     )
@@ -162,7 +161,6 @@ def Xform "Griffin1" (
     {
         def Xform "MainEngineCluster"
         {
-            custom string lunco:visual:skirt_metric_envelope = '"3.20 m x 3.20 m x 0.20 m; 0.20 m rails; centered on engine adapter datum"'
             def Xform "Engine01" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )

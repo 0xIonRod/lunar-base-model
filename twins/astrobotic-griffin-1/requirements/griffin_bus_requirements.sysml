@@ -1,4 +1,5 @@
 package GriffinBusRequirements {
+    private import ScalarValues::Real;
     /* The bus is a real SysML composition, not a String list of child names.
      * Metric design values are owned by GriffinVisualConfiguration. */
     part def GriffinBusFrameStructure;
@@ -6,7 +7,6 @@ package GriffinBusRequirements {
     part def GriffinLowerServiceSkirt;
     part def GriffinAvionicsDeck;
     part def GriffinAvionicsPod;
-    part def GriffinServiceBay;
 
     part def GriffinBusComponent {
         part perimeterFrame : GriffinBusFrameStructure;
@@ -14,8 +14,25 @@ package GriffinBusRequirements {
         part lowerServiceSkirt : GriffinLowerServiceSkirt;
         part avionicsDeck : GriffinAvionicsDeck;
         part avionicsPod : GriffinAvionicsPod;
-        part serviceBayPort : GriffinServiceBay;
-        part serviceBayStarboard : GriffinServiceBay;
+    }
+
+    constraint def GBC010_PositiveDeckSkirtClearance {
+        in separationM : Real;
+        separationM > 0.0;
+    }
+
+    constraint def GBC011_TankBoreClearance {
+        in boreRadiusM : Real;
+        in maximumBandRadiusM : Real;
+        in tankScale : Real;
+        in minimumClearanceM : Real;
+        boreRadiusM - maximumBandRadiusM * tankScale >= minimumClearanceM;
+    }
+
+    constraint def GBC_ObservedCountEquals {
+        in observedCount : Real;
+        in expectedCount : Real;
+        observedCount == expectedCount;
     }
 
     requirement def GBC001_BusIdentity {
@@ -49,7 +66,7 @@ package GriffinBusRequirements {
         doc /* GBC-010 [assembly geometry] the upper payload deck and lower service skirt shall remain distinct, non-intersecting envelopes in the bus frame. Verification uses the oriented-box separating-axis margin computed from their typed SysML Dimensions and Position values. Rationale: this preserves a real service bay instead of allowing two separately named solids to collapse into an overlapping slab. The spacing is derived from the authored centers and thicknesses, not duplicated as another clearance literal. */
     }
     requirement def GBC011_TankSupportOpenings {
-        doc /* GBC-011 [assembly geometry] the bus shall contain a separate six-sided tank-support perimeter with four annular through-opening collars whose centers and bore clearance are derived from the typed tank stations and support dimensions in GriffinVisualConfiguration. The collars shall preserve open bores and remain render-only. These are explicitly replaceable visual-study assumptions because the supplier interface drawing is not public. */
+        doc /* GBC-011 [assembly geometry] the bus shall contain a separate octagonal tank-support perimeter using the shared bus profile, with four annular through-opening collars whose centers and bore radii follow the typed tank stations and support dimensions in GriffinVisualConfiguration. Each bore shall clear its scaled retention bands by the shared minimumTankFrameClearanceM datum. The collars shall preserve open bores and remain render-only. These are explicitly replaceable visual-study assumptions because the supplier interface drawing is not public. */
     }
     requirement def GBC012_SourceOwnedAppearance {
         doc /* GBC-012 [appearance] the composed bus display colors shall match the linear values declared once in GriffinVisualConfiguration; scene builders shall not author an independent palette. */

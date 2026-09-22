@@ -2835,54 +2835,6 @@ def Xform "Griffin1" (
             uniform token purpose = "guide"
         }
     }
-    def Cube "BoxyAirframe" (
-        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-    )
-    {
-        double size = 1.0
-        double3 xformOp:scale = (3.2, 1.45, 3.2)
-        uniform token[] xformOpOrder = ["xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.3199999928474426, 0.36000001430511475, 0.41999998688697815)]
-        bool physics:collisionEnabled = true
-        uniform token purpose = "render"
-    }
-    def Xform "IsogridDeck"
-    {
-        token visibility = "inherited"
-        custom string lunco:component_role = "payload deck"
-        def Cube "DeckPlate" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 1.58, 0.0)
-            double3 xformOp:scale = (3.05, 0.16, 3.05)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.47999998927116394, 0.5099999904632568, 0.5699999928474426)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-        }
-        def Cube "DeckRibX"
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 1.78, 0.0)
-            double3 xformOp:scale = (2.8, 0.035, 0.035)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.7400000095367432, 0.6100000143051147, 0.23999999463558197)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "DeckRibZ"
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 1.78, 0.0)
-            double3 xformOp:scale = (0.035, 0.035, 2.8)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.7400000095367432, 0.6100000143051147, 0.23999999463558197)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-    }
     def Xform "PayloadAdapter"
     {
         token visibility = "inherited"
