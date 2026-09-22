@@ -11,7 +11,7 @@ canonical wrapper is hidden, empty, or mounted on the wrong datum.
 | `GriffinBusComponent` | open octagonal frame, payload deck, lower service skirt, avionics, central tank support | referenced component owns render geometry; the descent lander owns flight collision and mass | `GriffinVisualConfiguration` owns dimensions, stations, and appearance; no duplicate authored hex shell |
 | `GriffinBody` | `BodyCollisionProxy` and four side collision proxies | Hidden flight-body colliders; visible structure comes from `Bus` | Flight collider geometry remains a simulator study envelope |
 | `TopDeckCollisionProxy` | One convex deck mesh | Hidden enabled collider; visible `Bus/TopDeckOctagon` is render-only | Deck contact geometry remains a simulator study envelope |
-| `TankPX/NX/PZ/NZ` | None beyond each tank shape owner | Four visible Y-axis Capsule study geometries; visual-only unless a body contract says otherwise | Four-tank integration is public; exact tank dimensions TBD |
+| `TankPX/NX/PZ/NZ` | `components/lander/griffin_tank_visual.usda` through four source references | Four render-only COPV study assemblies at the ordered SysML stations; MainPropulsion owns flight propellant mass | Four-tank integration is public; exact tank dimensions TBD |
 | `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider | FLIP interface/release datum TBD |
 | `MainPropulsion` | Chamber, fuel tank, oxidizer tank | Named propulsion interface | Thrust, propellant, mass, and engine count TBD |
 | `Nozzle` | `MainEngineCluster/Engine01..07` | Seven visible non-colliding engine-bell geometries; no single-bell design placeholder | Seven main engines are public; bell contour and spacing TBD |

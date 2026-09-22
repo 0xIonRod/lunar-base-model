@@ -311,7 +311,7 @@ package Griffin1Requirements {
     }
 
     requirement def GR033_PropellantTanks {
-        doc /* GR-033 [public integration value] model four visible propellant-tank owners; exact COPV dimensions and placement remain TBD. Source: https://www.astrobotic.com/griffin-1-mission-update/. Rationale: four repeated tank owners are needed to represent the visible system, but public material does not provide a certified tank ICD. */
+        doc /* GR-033 [public integration value] model four visible, source-owned COPV study assemblies at the ordered GriffinVisualConfiguration tank stations and scales. The vessel skin and retention bands are render-only; flight propellant mass remains in MainPropulsion. Exact COPV dimensions and placement remain TBD. Source: https://www.astrobotic.com/griffin-1-mission-update/. Rationale: four repeated tank owners represent the visible system without retaining incompatible Capsule placeholders; public material does not provide a certified tank ICD. */
     }
 
     requirement def GR034_SurfaceRouteDatums {

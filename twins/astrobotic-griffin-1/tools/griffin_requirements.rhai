@@ -709,31 +709,47 @@ fn _tank_layout_report(doc_id, root) {
     let findings = [];
     let names = griffin_spec::propellant_tank_names();
     let expected = griffin_spec::propellant_tank_count();
-    if names.len() != 4 || expected != names.len() {
+    let stations = griffin_spec::component_tank_stations();
+    let scales = griffin_spec::component_tank_scale();
+    if names.len() != 4 || expected != names.len()
+        || stations.len() != names.len() || scales.len() != names.len() {
         findings.push(_layout_finding("GR-033", root,
-            "SysML propellant-tank identity list must contain exactly four names"));
+            "SysML tank identities, stations, and scales must contain four entries"));
         return findings;
     }
     let records = [];
-    for name in names {
+    for index in 0..names.len() {
+        let name = names[index];
         let path = root + "/" + name;
         let record = _layout_query(doc_id, path,
-            ["visibility", "radius", "height", "axis", "xformOp:translate"], false);
+            ["visibility", "xformOp:translate", "xformOp:scale"], false);
         records.push(record);
         if !_ok(record) {
             findings.push(_layout_finding("GR-033", path,
-                "required propellant tank is missing"));
+                "required source-owned propellant tank is missing"));
             continue;
         }
         if !_visible(record) {
             findings.push(_layout_finding("GR-033", path,
                 "all four Griffin propellant tanks must be visible"));
         }
-        if record.type_name != "Capsule" || record.attrs["axis"] != "Y"
-            || record.attrs["radius"] == () || record.attrs["radius"] <= 0.0
-            || record.attrs["height"] == () || record.attrs["height"] <= 0.0 {
+        if record.type_name != "Xform"
+            || !_ok(_layout_query(doc_id, path + "/MliTank", [], false))
+            || !_ok(_layout_query(doc_id, path + "/TankBandA", [], false)) {
             findings.push(_layout_finding("GR-033", path,
-                "propellant tank must be a positive Y-axis Capsule"));
+                "tank must compose the maintained vessel and band geometry"));
+        }
+        let position = record.attrs["xformOp:translate"];
+        let scale = record.attrs["xformOp:scale"];
+        if position == () || position.len() != 3 || scale == () || scale.len() != 3
+            || !_near(position[0], stations[index].x, 0.002)
+            || !_near(position[1], stations[index].y, 0.002)
+            || !_near(position[2], stations[index].z, 0.002)
+            || !_near(scale[0], scales[index], 0.002)
+            || !_near(scale[1], scales[index], 0.002)
+            || !_near(scale[2], scales[index], 0.002) {
+            findings.push(_layout_finding("GR-033", path,
+                "tank placement and scale must match the ordered SysML station"));
         }
     }
     if _ok(records[0]) && _ok(records[1]) {
@@ -1112,17 +1128,19 @@ fn part_manifest(root) {
 
     let tanks = [];
     for name in griffin_spec::propellant_tank_names() {
+        let path = root + "/" + name;
         tanks.push(#{
             id: "propellant_" + name,
             label: "propellant tank " + name,
             rule: "GR-033",
-            path: root + "/" + name,
-            attrs: ["visibility", "radius", "height", "axis"],
-            expected_type: "Capsule",
-            geometry: true,
+            path: path,
+            attrs: ["visibility", "xformOp:translate", "xformOp:scale"],
+            expected_type: "Xform",
             visible: true,
-            collider: false,
-            parameter_status: "four-tank public integration fact; exact tank dimensions TBD",
+            required_children: [path + "/MliTank", path + "/TankBandA"],
+            geometry_children: [#{label: "vessel skin", path: path + "/MliTank",
+                geometry: true, visible: true, collider: false}],
+            parameter_status: "source-owned COPV study visual; flight tank ICD TBD",
         });
     }
 

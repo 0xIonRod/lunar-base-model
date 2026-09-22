@@ -1325,46 +1325,6 @@ def Xform "Griffin1" (
     {
         token visibility = "invisible"
     }
-    def Capsule "TankPX"
-    {
-        uniform token axis = "Y"
-        double radius = 0.4
-        double height = 2.4
-        double3 xformOp:translate = (2.2, 0.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.75, 0.7200000286102295, 0.6499999761581421)]
-        bool physics:collisionEnabled = false
-    }
-    def Capsule "TankNX"
-    {
-        uniform token axis = "Y"
-        double radius = 0.4
-        double height = 2.4
-        double3 xformOp:translate = (-2.2, 0.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.75, 0.7200000286102295, 0.6499999761581421)]
-        bool physics:collisionEnabled = false
-    }
-    def Capsule "TankPZ"
-    {
-        uniform token axis = "Y"
-        double radius = 0.4
-        double height = 2.4
-        double3 xformOp:translate = (0.0, 0.0, 2.2)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.75, 0.7200000286102295, 0.6499999761581421)]
-        bool physics:collisionEnabled = false
-    }
-    def Capsule "TankNZ"
-    {
-        uniform token axis = "Y"
-        double radius = 0.4
-        double height = 2.4
-        double3 xformOp:translate = (0.0, 0.0, -2.2)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.75, 0.7200000286102295, 0.6499999761581421)]
-        bool physics:collisionEnabled = false
-    }
     def Cube "RcsQuadPXPZ"
     {
         double size = 1.0
@@ -3195,5 +3155,37 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (0.0, 3.2, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+    }
+    def Xform "TankPX" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (1.15, 3.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+    }
+    def Xform "TankNX" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (-1.15, 3.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+    }
+    def Xform "TankPZ" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 3.2, 1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+    }
+    def Xform "TankNZ" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 3.2, -1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
     }
 }
