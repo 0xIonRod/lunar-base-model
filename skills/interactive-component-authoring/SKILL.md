@@ -64,6 +64,11 @@ Before authoring a component, write down:
 - mount socket and plug frames, allowed degrees of freedom, and relationship
   to the parent datum;
 - visual geometry, collision geometry, mass/inertia owner, and physics role;
+- physical material assignment for every relevant role (structure, pressure
+  boundary, thermal, electrical, or contact), with typed material identity,
+  property units, operating conditions, provenance, and confidence; represent
+  a COPV liner and composite overwrap as separate materials, not one sphere
+  label;
 - ports, controls, deployment limits, variants, and expected initial state;
 - component requirement IDs, verification function, and evidence to collect.
 
@@ -73,15 +78,57 @@ the exact values, and returns an error for missing or malformed values. A
 relationship or frame is preferable to a guessed absolute translation when
 the generic editor supports it.
 
-## Solve frame closure with Modelica when it earns its cost
+Do not store engineering material assignments or property vectors in free-form
+strings, CSV fields, shader inputs, or comments. USD appearance (`UsdShade`) and
+contact material (`UsdPhysicsMaterialAPI`) are separate from structural,
+thermal, and electrical properties. Until the shared typed material catalogue
+and its cross-domain bindings exist, keep one sourced, typed material record in
+the Twin's SysML source set and refer to it from component requirements; record
+the missing generic adapter instead of inventing an external library resolver.
+Do not create independent numeric copies in USD, Rhai, and Modelica. A visual
+sphere's outer radius is not a pressure-wall thickness or a validated pressure
+boundary.
 
-Use direct Rhai/vector arithmetic for a trivial one-step offset. Use the typed
-SysML-to-Modelica path when a placement depends on an explicit constraint
-relation that should be solved and checked independently. Keep coordinates as
-SysML `LengthValue[3]` facts and standard constraint bindings; do not encode
-station lists, vectors, or solved values as CSV or metadata strings.
+Keep material definitions reusable and separate from their component-role
+assignments. Record grade/product form/temper or composite layup and direction;
+give each used property its unit, operating range, source revision and status
+(sourced, derived, or assumed). Separate candidate grades from the selected
+material, and do not promote a study assumption into a qualified allowable.
+Use one indexed SysML material package as the catalogue source when supported;
+until typed import/resolution and downstream projection are available, expose
+that as a generic tool gap instead of encoding a material name or property
+vector in a string.
 
-For the supported coincident-point translation policy:
+Model a surface finish or coating as a separate typed selection layered on the
+substrate, with assignments scoped to the actual component face or region. One
+substrate may have several finish options; the selected finish can carry
+coating stack/order, thickness or areal mass, process, and environmental limits
+when relevant. Keep its sourced optical/thermal properties in the engineering
+record. A typed renderer mapping may select a LunCo shader preset for the
+finish, but shader color/metallic/roughness are visual controls and never
+substitute for absorptance, infrared emittance, coating thickness, or Modelica
+thermal inputs. The generic finish catalog and `UsdShade` mapping remain
+explicit tooling gaps until implemented.
+
+## Resolve spatial relations in Rhai first; use Modelica when needed
+
+For an anchored placement over typed frames, use the shared
+`spatial_relations` Rhai tool rather than repeating coordinate arithmetic:
+`coincident` aligns complete datums, `offset` applies a `Vec3` in the fixed
+datum frame, `coincident_translation` preserves the moving orientation, and
+`point_on_axis` derives a station from a frame, native `Vec3` axis, and metric
+distance. Measure the resulting translation/rotation residual with the same
+tool. The values stay native `Transform`/`Vec3` throughout; do not encode
+stations, vectors, or solved values as CSV or metadata strings.
+
+This is an anchored direct-placement API, not a persistent relation graph or a
+general constraint solver. Its current arguments are typed transforms rather
+than projected SysML datum handles. Keep dimensions and datum values in SysML;
+do not copy them into the Rhai call as an independent source. Use the typed
+SysML-to-Modelica path when an explicit SysML constraint usage must be resolved
+or coupled equations must be solved and checked independently.
+
+For the supported Modelica coincident-point translation policy:
 
 1. Read only the required SysML facts with
    `sysml_modelica_constraints::analyze_selected(path, attribute_names)` and
@@ -115,6 +162,24 @@ SysML facts and result vectors remain typed throughout Rhai and only become
 text while emitting valid Modelica syntax. This bounded policy solves one
 documented translation relation; it is not a general CAD constraint solver or
 an automatic placement engine.
+
+## Reuse typed parametric geometry
+
+Build repeated, axisymmetric, or profile-based solids with the shared native
+geometry API before writing component-specific vertex loops. `extrude_profile`
+and `revolve_profile` consume native `Vec2` coordinates and return typed mesh
+topology; `DVec3`/`DTransform` remain the geometry and placement values until
+the Editor's standard `UsdGeomMesh` operation boundary. The design dimensions
+come from SysML, while segment counts and sampling density are rendering
+policy. Keep the mesh's axis, face winding, normals, bounds, and contact datum
+in the positive component gate. Hand-built topology in Twin Rhai is appropriate
+only when it represents a genuinely novel, named profile not covered by the
+shared primitives; if it recurs, promote the generic operation to Rust and
+expose its native type to Rhai.
+
+Do not create a general `ParametricCAD` USD schema for dimensions or mate
+equations. Standard USD geometry records the result; SysML remains the design
+source, and Modelica remains the solver for coupled physical constraints.
 
 ## Lessons carried over from CAD and multiphysics tools
 
@@ -186,6 +251,12 @@ relationship, stale-generation mutation, unsupported command, invalid units,
 or a required fail-safe response. Such a case must be bounded, non-destructive,
 and end at the public diagnostic/verdict boundary. A historical regression
 example is not enough by itself to justify a negative test.
+
+Write geometry, SysML-projection, and Twin-model acceptance checks as Rhai test
+assets in the production scripting/scene gate. Do not embed Griffin dimensions,
+mesh expectations, or relationship scenarios in Rust tests. Rust owns reusable
+typed algorithms and API registration; Rhai owns positive contract evidence at
+the public model/tool boundary.
 
 ## Visual review order
 
