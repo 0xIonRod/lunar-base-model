@@ -21,7 +21,7 @@ fn _sysml_model() {
 
 fn _sysml_model_value(name) {
     let model = _sysml_model();
-    if model == () || type_of(model) != "SysmlModel" { return (); }
+    if model == () || !sysml_model_is(model) { return (); }
     let value = model.value(_qualified_attribute(name));
     if value == () { return (); }
     value
@@ -31,8 +31,9 @@ fn _sysml_attribute(name) {
     let qualified = _qualified_attribute(name);
     let native = _sysml_model_value(name);
     if native != () {
-        if type_of(native) == "Quantity" { return native.value; }
-        if type_of(native) == "float" || type_of(native) == "int" { return native; }
+        if sysml_quantity_is(native) { return f64_from(native.value); }
+        let scalar = f64_from(native);
+        if scalar != () { return scalar; }
     }
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return (); }
@@ -49,8 +50,8 @@ fn _sysml_text(name) {
     let qualified = _qualified_attribute(name);
     let native = _sysml_model_value(name);
     if native != () {
-        if type_of(native) == "string" { return native; }
-        if type_of(native) == "EnumValue" { return native.literal; }
+        if string_is(native) { return native; }
+        if sysml_enum_is(native) { return native.literal; }
     }
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return (); }
@@ -157,6 +158,7 @@ fn _qualified_attribute(name) {
     }
     let visual_configuration = [
         "configuration", "bodyProfile", "rampState", "origin", "axisUp", "axisPort", "axisForward",
+        "verificationToleranceM",
         "bodyDimensions", "bodyMount", "bodyGroundClearanceM",
         "lowerSkirtDimensions", "lowerSkirtCenter", "deckDimensions", "deckCenter",
         "avionicsDeckDimensions", "avionicsDeckCenter", "hexVertexCount", "hexCornerCutRatio",
@@ -182,11 +184,11 @@ fn qualified_attribute_name(name) { _qualified_attribute(name) }
 
 fn _sysml_list(name) {
     let native = _sysml_model_value(name);
-    if native != () && type_of(native) == "array" {
+    if native != () && array_is(native) {
         let items = [];
         for value in native {
-            if type_of(value) == "EnumValue" { items.push(value.literal); }
-            else if type_of(value) == "string" { items.push(value); }
+        if sysml_enum_is(value) { items.push(value.literal); }
+            else if string_is(value) { items.push(value); }
             else { return []; }
         }
         return items;
@@ -205,11 +207,12 @@ fn _sysml_list(name) {
 // loudly instead of silently inventing a placement.
 fn _sysml_number_list(name) {
     let native = _sysml_model_value(name);
-    if native != () && type_of(native) == "array" {
+    if native != () && array_is(native) {
         let values = [];
         for value in native {
-            if type_of(value) != "float" && type_of(value) != "int" { return []; }
-            values.push(value.to_float());
+            let scalar = f64_from(value);
+            if scalar == () { return []; }
+            values.push(scalar);
         }
         return values;
     }
@@ -235,7 +238,7 @@ fn _sysml_native(name) {
 
 fn _sysml_native_list(name) {
     let value = _sysml_native(name);
-    if value == () || type_of(value) != "array" { return []; }
+    if value == () || !array_is(value) { return []; }
     value
 }
 
@@ -243,7 +246,7 @@ fn _sysml_enum_names(name) {
     let values = _sysml_native_list(name);
     let labels = [];
     for value in values {
-        if type_of(value) != "EnumValue" { return []; }
+        if !sysml_enum_is(value) { return []; }
         labels.push(value.literal);
     }
     labels
@@ -253,7 +256,7 @@ fn _position_axis(name, axis) {
     let positions = _sysml_native_list(name);
     let values = [];
     for position in positions {
-        if type_of(position) != "Vec3" { return []; }
+        if !vec3_is_native(position) { return []; }
         values.push(if axis == "x" { position.x } else if axis == "y" {
             position.y
         } else { position.z });
@@ -263,7 +266,7 @@ fn _position_axis(name, axis) {
 
 fn _dimensions_component(name, axis) {
     let dimensions = _sysml_native(name);
-    if dimensions == () || type_of(dimensions) != "Vec3" { return (); }
+    if dimensions == () || !vec3_is_native(dimensions) { return (); }
     if axis == "x" { return dimensions.x; }
     if axis == "y" { return dimensions.y; }
     dimensions.z
@@ -422,7 +425,7 @@ fn _visual_plan_lengths_match(values, expected) {
 fn _native_positions_match(values, expected) {
     if values == () || values.len() != expected { return false; }
     for position in values {
-        if type_of(position) != "Vec3" || !vec3_is_finite(position) { return false; }
+        if !vec3_is_native(position) || !vec3_is_finite(position) { return false; }
     }
     true
 }
@@ -470,7 +473,7 @@ fn visual_component_transform_plan() {
         || wheel_names.len() != 4 || !_visual_plan_lengths_match(wheel_x, 4)
         || !_visual_plan_lengths_match(wheel_y, 4) || !_visual_plan_lengths_match(wheel_z, 4);
     let bus_mount = component_bus_mount();
-    let bad_core = bus_mount == () || type_of(bus_mount) != "Vec3";
+    let bad_core = bus_mount == () || !vec3_is_native(bus_mount);
     if bad_core || bad_tanks || bad_legs || bad_solar || bad_engines || bad_ramps || bad_rover {
         return [];
     }
@@ -541,7 +544,7 @@ fn visual_rail_station_plan() {
     let stations = visual_rail_station_positions();
     let dimensions = _sysml_native("railDimensions");
     if names.len() != 6 || !_native_positions_match(stations, 6)
-        || dimensions == () || type_of(dimensions) != "Vec3" {
+        || dimensions == () || !vec3_is_native(dimensions) {
         return [];
     }
     let result = [];

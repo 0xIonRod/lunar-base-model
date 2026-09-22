@@ -79,6 +79,9 @@ package GriffinVisualConfigurationRequirements {
         attribute axisUp : Direction = (0.0, 1.0, 0.0);
         attribute axisPort : Direction = (-1.0, 0.0, 0.0);
         attribute axisForward : Direction = (0.0, 0.0, 1.0);
+        // Shared numerical tolerance for source-backed geometric relations.
+        // It is a review-policy datum, not a hidden Rust or Rhai literal.
+        attribute verificationToleranceM : Real = 1.0e-6;
 
         attribute bodyDimensions : Dimensions = (4.50, 2.00, 4.50);
         attribute bodyMount : Position = (0.0, 3.20, 0.0);

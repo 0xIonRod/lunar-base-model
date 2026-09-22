@@ -1,6 +1,8 @@
 // Twin-level positive verification for native SysML-to-Rhai geometry values.
 // Engineering stations and envelopes cross as f64 vectors and typed enums.
 
+import "/scripting/tools/mechanical_relations" as mechanical_relations;
+
 const PACKAGE = "GriffinVisualConfigurationRequirements";
 const VERIFICATION = "Verify_GriffinVisualConfiguration";
 const PART = PACKAGE + "::GriffinVisualConfiguration::";
@@ -18,16 +20,21 @@ fn _native_value(source, name) {
 fn typed_collection_check(source, id, requirement, field, base, count, item_type) {
     let resolved = _resolved(source, field);
     let values = _native_value(source, field);
-    let ok = resolved.ok == true && values != () && type_of(values) == "array"
+    let ok = resolved.ok == true && values != () && array_is(values)
         && resolved.record.declared_type.base == base
         && resolved.record.declared_type.dimensions.len() == 1
         && resolved.record.declared_type.dimensions[0] == count
         && values.len() == count;
     if ok {
         for value in values {
-            if type_of(value) != item_type { ok = false; }
-            if item_type == "Vec3" && !vec3_is_finite(value) { ok = false; }
-            if item_type == "Vec2" && !vec2_is_finite(value) { ok = false; }
+            let item_ok = if item_type == "Vec3" {
+                vec3_is_native(value) && vec3_is_finite(value)
+            } else if item_type == "Vec2" {
+                vec2_is_native(value) && vec2_is_finite(value)
+            } else if item_type == "EnumValue" {
+                sysml_enum_is(value)
+            } else { false };
+            if !item_ok { ok = false; }
         }
     }
     component_requirements::assertion(id, "griffin.typed_geometry",
@@ -40,7 +47,7 @@ fn typed_collection_check(source, id, requirement, field, base, count, item_type
 
 fn typed_spatial_scalar_check(source, id, requirement, field) {
     let value = _native_value(source, field);
-    let ok = value != () && type_of(value) == "Vec3" && vec3_is_finite(value);
+    let ok = value != () && vec3_is_native(value) && vec3_is_finite(value);
     component_requirements::assertion(id, "griffin.typed_geometry",
         requirement, VERIFICATION, ok,
         "SysML spatial value must project to the shared finite f64 Vec3: " + field,
@@ -49,7 +56,7 @@ fn typed_spatial_scalar_check(source, id, requirement, field) {
 
 fn typed_enum_check(source, id, requirement, field, expected_literal) {
     let value = _native_value(source, field);
-    let ok = value != () && type_of(value) == "EnumValue"
+    let ok = value != () && sysml_enum_is(value)
         && value.literal == expected_literal;
     component_requirements::assertion(id, "griffin.typed_configuration",
         requirement, VERIFICATION, ok,
@@ -66,24 +73,24 @@ fn tank_station_layout_check(source) {
     let body_mount = _native_value(source, "bodyMount");
     let names = _native_value(source, "tankInstances");
     let stations = _native_value(source, "tankStations");
-    let tank_count = if type_of(names) == "array" { names.len() } else { 0 };
-    let station_count = if type_of(stations) == "array" { stations.len() } else { 0 };
-    let ok = type_of(body_mount) == "Vec3" && vec3_is_finite(body_mount)
+    let tank_count = if array_is(names) { names.len() } else { 0 };
+    let station_count = if array_is(stations) { stations.len() } else { 0 };
+    let ok = vec3_is_native(body_mount) && vec3_is_finite(body_mount)
         && tank_count == 4 && station_count == 4;
     if ok {
-        let orbital_radius = if type_of(stations[0]) == "Vec3" {
+        let orbital_radius = if vec3_is_native(stations[0]) {
             (stations[0].x * stations[0].x + stations[0].z * stations[0].z).sqrt()
         } else { -1.0 };
         for index in 0..stations.len() {
             let station = stations[index];
-            if type_of(station) != "Vec3" || !vec3_is_finite(station)
+            if !vec3_is_native(station) || !vec3_is_finite(station)
                 || (station.y - body_mount.y).abs() > 0.000001
                 || (station.x * station.z).abs() > 0.000001
                 || ((station.x * station.x + station.z * station.z).sqrt()
                     - orbital_radius).abs() > 0.000001 {
                 ok = false;
             }
-            let name = if type_of(names[index]) == "EnumValue" { names[index].literal } else { "" };
+            let name = if sysml_enum_is(names[index]) { names[index].literal } else { "" };
             if (name == "TankPX" && !(station.x > 0.0 && station.z == 0.0))
                 || (name == "TankNX" && !(station.x < 0.0 && station.z == 0.0))
                 || (name == "TankPZ" && !(station.x == 0.0 && station.z > 0.0))
@@ -124,6 +131,86 @@ fn native_transform_plan_check() {
         #{component_count: 27, rail_count: 6})
 }
 
+fn typed_relation_check(source) {
+    let body_mount = _native_value(source, "bodyMount");
+    let axis_up = _native_value(source, "axisUp");
+    let tank_stations = _native_value(source, "tankStations");
+    let leg_stations = _native_value(source, "legStations");
+    let engine_stations = _native_value(source, "engineStations");
+    let tolerance = sysml_requirements::number(source, PART + "verificationToleranceM");
+    let ok = vec3_is_native(body_mount) && vec3_is_native(axis_up)
+        && array_is(tank_stations) && array_is(leg_stations)
+        && array_is(engine_stations) && tolerance != ()
+        && vec3_is_finite(body_mount) && vec3_is_finite(axis_up)
+        && vlen(axis_up) > 1.0e-12;
+    let plane_relations = [];
+    let under_relations = [];
+    if ok {
+        for station in tank_stations {
+            let distance = mechanical_relations::plane_signed_distance(
+                station, body_mount, axis_up);
+            let relation = mechanical_relations::equal(distance, 0.0, tolerance);
+            plane_relations.push(relation);
+            if relation == () || relation.status != "passed" { ok = false; }
+        }
+        for station in leg_stations {
+            let distance = mechanical_relations::plane_signed_distance(
+                body_mount, station, axis_up);
+            let relation = mechanical_relations::at_least(distance, 0.0, tolerance);
+            under_relations.push(relation);
+            if relation == () || relation.status != "passed" { ok = false; }
+        }
+        for station in engine_stations {
+            let distance = mechanical_relations::plane_signed_distance(
+                body_mount, station, axis_up);
+            let relation = mechanical_relations::at_least(distance, 0.0, tolerance);
+            under_relations.push(relation);
+            if relation == () || relation.status != "passed" { ok = false; }
+        }
+    }
+    component_requirements::assertion("GVC-T-relations", "griffin.typed_geometry",
+        "gvc010", VERIFICATION, ok,
+        "source-backed stations must satisfy generic plane-coincidence and under relations",
+        #{plane_relations: plane_relations, under_relations: under_relations,
+          tolerance_m: tolerance},
+        #{tank_plane_distance_m: 0.0, legs_and_engines_under_body: true,
+          tolerance_m: tolerance})
+}
+
+fn typed_symmetry_check(source) {
+    let body_mount = _native_value(source, "bodyMount");
+    let axis_port = _native_value(source, "axisPort");
+    let axis_forward = _native_value(source, "axisForward");
+    let tank_stations = _native_value(source, "tankStations");
+    let leg_stations = _native_value(source, "legStations");
+    let tolerance = sysml_requirements::number(source, PART + "verificationToleranceM");
+    let ok = vec3_is_native(body_mount) && vec3_is_native(axis_port)
+        && vec3_is_native(axis_forward) && array_is(tank_stations)
+        && array_is(leg_stations) && tank_stations.len() == 4
+        && leg_stations.len() == 4 && tolerance != ()
+        && vec3_is_finite(body_mount) && vec3_is_finite(axis_port)
+        && vec3_is_finite(axis_forward);
+    let relations = [];
+    if ok {
+        relations.push(mechanical_relations::symmetric_pairs_about_plane(
+            [tank_stations[0]], [tank_stations[1]], body_mount, axis_port, tolerance));
+        relations.push(mechanical_relations::symmetric_pairs_about_plane(
+            [tank_stations[2]], [tank_stations[3]], body_mount, axis_forward, tolerance));
+        relations.push(mechanical_relations::symmetric_pairs_about_plane(
+            [leg_stations[0]], [leg_stations[1]], body_mount, axis_port, tolerance));
+        relations.push(mechanical_relations::symmetric_pairs_about_plane(
+            [leg_stations[2]], [leg_stations[3]], body_mount, axis_forward, tolerance));
+        for relation in relations {
+            if relation == () || relation.status != "passed" { ok = false; }
+        }
+    }
+    component_requirements::assertion("GVC-T-symmetry", "griffin.typed_geometry",
+        "gvc010", VERIFICATION, ok,
+        "ordered component stations must be mirrored across their authored symmetry planes",
+        #{relations: relations, tolerance_m: tolerance},
+        #{tank_pairs: 2, leg_pairs: 2, tolerance_m: tolerance})
+}
+
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
@@ -131,8 +218,9 @@ fn on_start(me, ctx) {
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
-    let source = sysml_requirements::source_with_attributes([
-        PART + "bodyDimensions", PART + "bodyMount", PART + "railDimensions",
+    let source = sysml_requirements::source_with_selection([
+        PART + "bodyDimensions", PART + "bodyMount", PART + "axisPort",
+        PART + "axisForward", PART + "axisUp", PART + "railDimensions",
         PART + "hexProfileCoordinates",
         PART + "railStations", PART + "legStations", PART + "tankStations",
         PART + "bodyMount",
@@ -140,9 +228,16 @@ fn on_tick(me, ctx) {
         PART + "frameOpenBayPanels", PART + "tankInstances",
         PART + "landingLegInstances", PART + "solarArrayInstances",
         PART + "mainEngineInstances", PART + "bodyProfile", PART + "rampState",
+        PART + "verificationToleranceM",
         "GriffinRampRequirements::GriffinEgressRamp::rampPortMountX",
         "GriffinRampRequirements::GriffinEgressRamp::rampStarboardMountX"
-    ]);
+    ], [
+        PACKAGE + "::gvc001", PACKAGE + "::gvc002", PACKAGE + "::gvc003",
+        PACKAGE + "::gvc004", PACKAGE + "::gvc005", PACKAGE + "::gvc006",
+        PACKAGE + "::gvc007", PACKAGE + "::gvc008", PACKAGE + "::gvc009",
+        PACKAGE + "::gvc010", PACKAGE + "::gvc011", PACKAGE + "::gvc012",
+        PACKAGE + "::gvc013", PACKAGE + "::gvc014"
+    ], [PACKAGE + "::" + VERIFICATION]);
     let checks = [
         typed_spatial_scalar_check(source, "GVC-T-body-dimensions", "gvc003", "bodyDimensions"),
         typed_spatial_scalar_check(source, "GVC-T-body-mount", "gvc002", "bodyMount"),
@@ -153,6 +248,8 @@ fn on_tick(me, ctx) {
         typed_collection_check(source, "GVC-T-leg-stations", "gvc005", "legStations", "Position", 4, "Vec3"),
         typed_collection_check(source, "GVC-T-tank-stations", "gvc007", "tankStations", "Position", 4, "Vec3"),
         tank_station_layout_check(source),
+        typed_relation_check(source),
+        typed_symmetry_check(source),
         typed_collection_check(source, "GVC-T-solar-stations", "gvc006", "solarStations", "Position", 2, "Vec3"),
         typed_collection_check(source, "GVC-T-engine-stations", "gvc008", "engineStations", "Position", 7, "Vec3"),
         typed_collection_check(source, "GVC-T-frame-rail-identities", "gvc012", "frameRails", "GriffinFrameRailNode", 6, "EnumValue"),

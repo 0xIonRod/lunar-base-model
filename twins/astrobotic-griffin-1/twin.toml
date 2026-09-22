@@ -217,3 +217,7 @@ usd_path = "/World/FLIP"
 
 [settings]
 "usd.runtime_persistence" = true
+"numerics.comparison.length_abs_m" = 1.0e-6
+"numerics.comparison.scalar_abs" = 1.0e-9
+"numerics.comparison.angle_abs_rad" = 1.0e-9
+"numerics.solver.residual_abs" = 1.0e-9
