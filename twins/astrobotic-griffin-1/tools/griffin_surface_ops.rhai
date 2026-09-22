@@ -768,6 +768,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
         once(|m| {
             this.route_last_distance = ();
             this.route_progress_time = elapsed_seconds();
+            this.route_next_command_at = ();
             if this.route_started != true {
                 this.route_started = true;
                 emit("griffin_surface_route_started");
@@ -775,13 +776,16 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
             }
             true
         }),
-        step_every(1.0 / route_command_rate_hz(), |m| {
-            // The native task kernel gates this callback at the deterministic
-            // simulation-time cadence. Navigation and SetPorts therefore run
-            // together, while the last valid command is held by the vehicle
-            // controller between samples.
-            this.route_command_updates += 1;
+        step(|m| {
+            // `step` is the supported native task node. Keep the route's
+            // source-owned command cadence here so policy remains at 10 Hz
+            // while the generic task kernel advances at the simulation rate.
             let now = elapsed_seconds();
+            if this.route_next_command_at != () && now < this.route_next_command_at {
+                return;
+            }
+            this.route_next_command_at = now + 1.0 / route_command_rate_hz();
+            this.route_command_updates += 1;
             let command = griffin_surface_ops::drive_route_point(rover, target, target_speed, arrival_radius);
             if command == () || command.ok != true {
                 if this.route_control_error != true {
