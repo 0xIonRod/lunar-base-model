@@ -1,7 +1,7 @@
 // The bus gate evaluates actual composed geometry against typed SysML
 // Positions and Dimensions. No custom label is accepted as proof of shape.
 
-import "assembly_audit" as assembly_audit;
+import "lunco://scripting/tools/assembly_audit" as assembly_audit;
 
 fn visual(name) { "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::" + name }
 fn package_name() { "GriffinBusRequirements" }

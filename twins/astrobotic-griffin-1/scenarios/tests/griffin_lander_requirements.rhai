@@ -69,7 +69,15 @@ fn _rotation_y(id, requirement, path, expected) {
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
-    let source = sysml_requirements::source_with_attributes([
+    let source = sysml_requirements::source_with_selection([], [
+        "GriffinLanderRequirements::glr001", "GriffinLanderRequirements::glr002",
+        "GriffinLanderRequirements::glr003", "GriffinLanderRequirements::glr004",
+        "GriffinLanderRequirements::glr005", "GriffinLanderRequirements::glr006",
+        "GriffinLanderRequirements::glr007", "GriffinLanderRequirements::glr008",
+        "GriffinLanderRequirements::glr009", "GriffinLanderRequirements::glr010",
+        "GriffinLanderRequirements::glr011"
+    ], ["GriffinLanderRequirements::Verify_GriffinLanderRequirements"]);
+    let values = sysml_requirements::source_with_attributes([
         _configuration_attr("landingLegInstances"), _configuration_attr("tankInstances"),
         _configuration_attr("mainEngineInstances"), _configuration_attr("solarArrayInstances"),
         _configuration_attr("legStations"), _configuration_attr("tankStations"),
@@ -84,16 +92,16 @@ fn on_tick(me, ctx) {
     checks.push(_exists("GLR-001-root", "glr001", ROOT, "Xform"));
     checks.push(_children("GLR-001-bus", "glr001", ROOT + "/Bus",
         [ROOT + "/Bus/PerimeterFrame", ROOT + "/Bus/LowerServiceSkirtHex", ROOT + "/Bus/TopDeckHex"]));
-    let body_mount = sysml_requirements::native_value(source,
+    let body_mount = sysml_requirements::native_value(values,
         _configuration_attr("bodyMount"));
     checks.push(#{id: "GLR-008-bus-y", component: "bus",
         requirement: "glr008", verification: VERIFICATION,
         kind: "attribute_component", path: ROOT + "/Bus", attr: "xformOp:translate",
         index: 1, expected: body_mount.y, tolerance: 0.002});
 
-    let leg_names = _enum_names(source, "landingLegInstances");
-    let leg_stations = _position_values(source, "legStations");
-    let leg_rot_y = component_requirements::source_number_list(source,
+    let leg_names = _enum_names(values, "landingLegInstances");
+    let leg_stations = _position_values(values, "legStations");
+    let leg_rot_y = component_requirements::source_number_list(values,
         _configuration_attr("legStationRotationYDeg"));
     for index in 0..leg_names.len() {
         let name = leg_names[index];
@@ -111,8 +119,8 @@ fn on_tick(me, ctx) {
                 "glr008", path, leg_rot_y[index]));
         }
     }
-    let tank_names = _enum_names(source, "tankInstances");
-    let tank_stations = _position_values(source, "tankStations");
+    let tank_names = _enum_names(values, "tankInstances");
+    let tank_stations = _position_values(values, "tankStations");
     for index in 0..tank_names.len() {
         let name = tank_names[index];
         let path = ROOT + "/" + name;
@@ -125,8 +133,8 @@ fn on_tick(me, ctx) {
             checks.push(_position("GLR-008-" + name + "-z", "glr008", path, 2, tank_stations[index].z));
         }
     }
-    let engine_names = _enum_names(source, "mainEngineInstances");
-    let engine_stations = _position_values(source, "engineStations");
+    let engine_names = _enum_names(values, "mainEngineInstances");
+    let engine_stations = _position_values(values, "engineStations");
     for index in 0..engine_names.len() {
         let name = engine_names[index];
         let path = ROOT + "/Nozzle/MainEngineCluster/" + name;
@@ -139,9 +147,9 @@ fn on_tick(me, ctx) {
             checks.push(_position("GLR-008-" + name + "-z", "glr008", path, 2, engine_stations[index].z));
         }
     }
-    let solar_names = _enum_names(source, "solarArrayInstances");
-    let solar_stations = _position_values(source, "solarStations");
-    let solar_rz = component_requirements::source_number_list(source,
+    let solar_names = _enum_names(values, "solarArrayInstances");
+    let solar_stations = _position_values(values, "solarStations");
+    let solar_rz = component_requirements::source_number_list(values,
         _configuration_attr("solarStationRotationZDeg"));
     for index in 0..solar_names.len() {
         let name = solar_names[index];
@@ -165,27 +173,27 @@ fn on_tick(me, ctx) {
     checks.push(component_requirements::coverage("GLR-010-frame-ownership", "lander",
         "glr010", VERIFICATION));
 
-    let body_dimensions = sysml_requirements::native_value(source,
+    let body_dimensions = sysml_requirements::native_value(values,
         _configuration_attr("bodyDimensions"));
     checks.push(#{id: "GLR-006-width", component: "bus",
         requirement: "glr006", verification: VERIFICATION,
         kind: "bounds_component", path: ROOT + "/Bus/PerimeterFrame", index: 0,
-        multiplier: 1.0, expected: body_dimensions.x, tolerance: 0.002});
+        multiplier: 2.0, expected: body_dimensions.x, tolerance: 0.002});
     checks.push(#{id: "GLR-006-depth", component: "bus",
         requirement: "glr006", verification: VERIFICATION,
         kind: "bounds_component", path: ROOT + "/Bus/PerimeterFrame", index: 2,
-        multiplier: 1.0, expected: body_dimensions.z, tolerance: 0.002});
+        multiplier: 2.0, expected: body_dimensions.z, tolerance: 0.002});
     checks.push(#{id: "GLR-006-height", component: "bus",
         requirement: "glr006", verification: VERIFICATION,
         kind: "bounds_component", path: ROOT + "/Bus/PerimeterFrame", index: 1,
-        multiplier: 1.0, expected: body_dimensions.y, tolerance: 0.002});
+        multiplier: 2.0, expected: body_dimensions.y, tolerance: 0.002});
     for pair in [
         #{id: "GLR-007-leg-count", names: leg_names, stations: leg_stations, count: "legCount"},
         #{id: "GLR-007-tank-count", names: tank_names, stations: tank_stations, count: "tankCount"},
         #{id: "GLR-007-engine-count", names: engine_names, stations: engine_stations, count: "engineCount"},
         #{id: "GLR-007-solar-count", names: solar_names, stations: solar_stations, count: "solarArrayCount"}
     ] {
-        let expected = sysml_requirements::native_value(source, _source_attr(pair.count));
+        let expected = sysml_requirements::native_value(values, _source_attr(pair.count));
         checks.push(component_requirements::assertion(pair.id, "griffin.component_identity",
             "glr007", VERIFICATION,
             expected != () && pair.names.len() == expected
