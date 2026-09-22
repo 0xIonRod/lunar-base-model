@@ -45,8 +45,9 @@ def Xform "Griffin1SurfaceOps" (
     {
         uniform bool lunco:avatar = true
         uniform token lunco:cameraMode = "freeflight"
-        double3 xformOp:translate = (18.0, 12.0, 20.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
+        custom double3 xformOp:translate = (30.0, 30.0, 30.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (-31.65, 45.0, 0.0)
     }
     def Scope "CameraTrack" (
         prepend apiSchemas = "LunCoCameraTrackAPI"
@@ -297,7 +298,7 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (19.0, 0.0, 2.0)
+        custom double3 xformOp:translate = (19.0, 0.0, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {

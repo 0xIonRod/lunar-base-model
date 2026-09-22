@@ -23,6 +23,12 @@ package GriffinLanderRequirements {
         attribute engineCount : Integer = 7;
         attribute solarArrayCount : Integer = 2;
         attribute geometryStatus : String = "metric visual study proxy; flight CAD/ICD TBD";
+        // The open-frame mesh is a render study made from bounded member
+        // sections. Its composed envelope may differ slightly from the
+        // nominal station datum at clipped beam corners. This tolerance is
+        // for that visual realization only; it is not a flight-structure
+        // clearance or manufacturing tolerance.
+        attribute visualEnvelopeToleranceM : Real = 0.02;
         attribute productReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute missionReference : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
         attribute dataSheetReference : String = "https://science.nasa.gov/wp-content/uploads/2023/11/astrobotic-lunar-landers-pug.pdf";
@@ -46,7 +52,7 @@ package GriffinLanderRequirements {
         doc /* GLR-005 [visual] two named solar-array components shall expose frame and cell geometry. */
     }
     requirement def GLR006_MetricEnvelope {
-        doc /* GLR-006 [geometry] the bus visual envelope shall match the authored metric width, depth, and height study datums. */
+        doc /* GLR-006 [geometry] the render-only bus envelope shall match the authored metric width, depth, and height study datums within visualEnvelopeToleranceM; this tolerance does not qualify flight geometry. */
     }
     requirement def GLR007_Traceability {
         doc /* GLR-007 [evidence] component counts, status, and public references shall come from this SysML package; repeated instance identities shall use the typed enumerations in GriffinVisualConfigurationRequirements and be checked by a Twin Rhai observer. */

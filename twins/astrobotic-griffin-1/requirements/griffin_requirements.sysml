@@ -105,9 +105,11 @@ package Griffin1Requirements {
         // (12.00, 0.00) m so the rover continues on the ramp centreline until
         // its trailing axle clears the ramp instead of steering laterally
         // toward a marker that is still inside the transition. The first
-        // survey datum stays on the x lane so FLIP can regain four-wheel
-        // ground support before taking the first diagonal turn; this is an
-        // operational route assumption, not supplier data.
+        // first survey transit was moved from z=2.00 m to z=1.00 m after
+        // runtime evidence showed FLIP stalled 1.83 m from the old marker
+        // with one support ray outside the 1.20 m envelope. This keeps the
+        // first post-egress turn inside the measured supported lane; it is
+        // an operational route assumption, not supplier data.
         attribute surfaceRouteMarkerX : Real[15] = (2.00, 12.00, 16.00, 19.00, 21.00, 22.50, 23.70, 24.60, 25.20, 25.40, 25.80, 26.70, 28.00, 29.50, 31.00);
         // Route navigation is authored in the terrain x/z plane.  The first
         // marker used to carry the 6.92 m deck-height value in Y, but the
@@ -117,7 +119,7 @@ package Griffin1Requirements {
         // agree; deck height belongs to the ramp/lander interface, not this
         // horizontal route table.
     attribute surfaceRouteMarkerY : Real[15] = (0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
-    attribute surfaceRouteMarkerZ : Real[15] = (0.00, 0.00, 0.00, 2.00, 0.50, 0.20, -0.30, -1.20, -2.30, -3.60, -4.90, -6.10, -7.20, -8.50, -10.00);
+    attribute surfaceRouteMarkerZ : Real[15] = (0.00, 0.00, 0.00, 1.00, 0.50, 0.20, -0.30, -1.20, -2.30, -3.60, -4.90, -6.10, -7.20, -8.50, -10.00);
         // Route commands are part of the mission interface, not controller
         // implementation constants.  The first radius is a 0.35 m approach
         // lane around the centerline: it is tight enough to require the

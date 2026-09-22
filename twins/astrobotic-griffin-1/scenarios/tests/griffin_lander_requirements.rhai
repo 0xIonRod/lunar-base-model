@@ -84,7 +84,7 @@ fn on_tick(me, ctx) {
         _configuration_attr("engineStations"), _configuration_attr("solarStations"),
         _configuration_attr("legStationRotationYDeg"), _configuration_attr("solarStationRotationZDeg"),
         _configuration_attr("bodyMount"), _configuration_attr("bodyDimensions"),
-        _source_attr("legCount"), _source_attr("tankCount"),
+        _source_attr("visualEnvelopeToleranceM"), _source_attr("legCount"), _source_attr("tankCount"),
         _source_attr("engineCount"), _source_attr("solarArrayCount")
     ]);
     let checks = [];
@@ -175,18 +175,20 @@ fn on_tick(me, ctx) {
 
     let body_dimensions = sysml_requirements::native_value(values,
         _configuration_attr("bodyDimensions"));
+    let envelope_tolerance = sysml_requirements::native_value(values,
+        _source_attr("visualEnvelopeToleranceM"));
     checks.push(#{id: "GLR-006-width", component: "bus",
         requirement: "glr006", verification: VERIFICATION,
         kind: "bounds_component", path: ROOT + "/Bus/PerimeterFrame", index: 0,
-        multiplier: 2.0, expected: body_dimensions.x, tolerance: 0.002});
+        multiplier: 2.0, expected: body_dimensions.x, tolerance: envelope_tolerance});
     checks.push(#{id: "GLR-006-depth", component: "bus",
         requirement: "glr006", verification: VERIFICATION,
         kind: "bounds_component", path: ROOT + "/Bus/PerimeterFrame", index: 2,
-        multiplier: 2.0, expected: body_dimensions.z, tolerance: 0.002});
+        multiplier: 2.0, expected: body_dimensions.z, tolerance: envelope_tolerance});
     checks.push(#{id: "GLR-006-height", component: "bus",
         requirement: "glr006", verification: VERIFICATION,
         kind: "bounds_component", path: ROOT + "/Bus/PerimeterFrame", index: 1,
-        multiplier: 2.0, expected: body_dimensions.y, tolerance: 0.002});
+        multiplier: 2.0, expected: body_dimensions.y, tolerance: envelope_tolerance});
     for pair in [
         #{id: "GLR-007-leg-count", names: leg_names, stations: leg_stations, count: "legCount"},
         #{id: "GLR-007-tank-count", names: tank_names, stations: tank_stations, count: "tankCount"},

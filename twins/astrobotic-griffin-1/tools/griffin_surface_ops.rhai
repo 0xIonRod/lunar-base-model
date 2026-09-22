@@ -334,7 +334,12 @@ fn _surface_route_events() {
 fn surface_route() {
     let preflight = surface_route_preflight();
     if preflight.ok != true {
-        throw("Griffin surface route preflight failed: " + preflight.findings.join("; "));
+        let findings_text = "";
+        for finding in preflight.findings {
+            if findings_text != "" { findings_text += "; "; }
+            findings_text += finding;
+        }
+        throw("Griffin surface route preflight failed: " + findings_text);
     }
     let names = griffin_spec::surface_route_marker_names();
     let speeds = griffin_spec::surface_route_speed_mps();
