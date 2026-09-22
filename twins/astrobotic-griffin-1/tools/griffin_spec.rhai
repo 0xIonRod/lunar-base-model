@@ -1,3 +1,5 @@
+import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
+
 // Machine-readable Griffin study policy.
 //
 // Keep this module free of USD queries and edits. Numeric policy is read from
@@ -161,12 +163,17 @@ fn _qualified_attribute(name) {
         "verificationToleranceM",
         "bodyDimensions", "bodyMount", "bodyGroundClearanceM",
         "lowerSkirtDimensions", "lowerSkirtCenter", "deckDimensions", "deckCenter",
-        "avionicsDeckDimensions", "avionicsDeckCenter", "hexVertexCount", "hexCornerCutRatio",
-        "hexProfileCoordinates",
-        "framePerimeterStationOrder", "frameRingCenterY",
-        "frameRingMemberCount", "frameRingSectionM", "frameOpenBayPanels",
+        "avionicsDeckDimensions", "avionicsDeckCenter", "outerBodyProfileCoordinates",
+        "frameDisplayColor", "deckDisplayColor", "lowerSkirtDisplayColor",
+        "avionicsDeckDisplayColor", "avionicsPodDisplayColor", "railDisplayColor",
+        "tankSupportDisplayColor", "tankCollarDisplayColor",
+        "frameRingCenterY", "frameRingSectionM",
         "frameRails", "tankInstances", "landingLegInstances", "solarArrayInstances",
-        "mainEngineInstances", "railStations", "railDimensions", "legStations",
+        "mainEngineInstances", "railStations", "railDimensions",
+        "tankSupportPerimeterProfileCoordinates", "tankSupportPerimeterRadiusM",
+        "tankSupportPerimeterSectionM", "tankSupportPlaneCenterYM",
+        "tankSupportOpeningInnerRadiusM", "tankSupportOpeningOuterRadiusM",
+        "tankSupportOpeningSegments", "tankSupportOpeningClearanceM", "legStations",
         "legStationRotationYDeg", "solarStations", "solarStationRotationXDeg", "solarStationRotationZDeg",
         "solarArrayWidthM", "solarArrayDepthM", "solarStandoffM", "tankStations",
         "tankStationRotationYDeg", "tankScale",
@@ -364,7 +371,7 @@ fn visual_ramp_stowed_rotation(side) {
     }
 }
 fn visual_body_profile() { _sysml_native("bodyProfile") }
-fn visual_hex_profile_coordinates() { _sysml_native_list("hexProfileCoordinates") }
+fn visual_outer_body_profile_coordinates() { _sysml_native_list("outerBodyProfileCoordinates") }
 fn visual_body_dimensions() { _sysml_native("bodyDimensions") }
 fn visual_body_mount() { _sysml_native("bodyMount") }
 fn visual_body_width_m() { _dimensions_component("bodyDimensions", "x") }
@@ -391,11 +398,32 @@ fn visual_rail_station_z() { _position_axis("railStations", "z") }
 fn visual_rail_width_m() { _dimensions_component("railDimensions", "x") }
 fn visual_rail_length_m() { _dimensions_component("railDimensions", "y") }
 fn visual_rail_depth_m() { _dimensions_component("railDimensions", "z") }
-fn visual_frame_perimeter_station_order() { _sysml_number_list("framePerimeterStationOrder") }
 fn visual_frame_ring_center_y_m() { _sysml_number_list("frameRingCenterY") }
-fn visual_frame_ring_member_count() { _sysml_integer("frameRingMemberCount") }
 fn visual_frame_ring_section_m() { _sysml_attribute("frameRingSectionM") }
-fn visual_frame_open_bay_panel_names() { _sysml_enum_names("frameOpenBayPanels") }
+fn visual_frame_display_color() { _sysml_number_list("frameDisplayColor") }
+fn visual_deck_display_color() { _sysml_number_list("deckDisplayColor") }
+fn visual_lower_skirt_display_color() { _sysml_number_list("lowerSkirtDisplayColor") }
+fn visual_avionics_deck_display_color() { _sysml_number_list("avionicsDeckDisplayColor") }
+fn visual_avionics_pod_display_color() { _sysml_number_list("avionicsPodDisplayColor") }
+fn visual_rail_display_color() { _sysml_number_list("railDisplayColor") }
+fn visual_tank_support_display_color() { _sysml_number_list("tankSupportDisplayColor") }
+fn visual_tank_collar_display_color() { _sysml_number_list("tankCollarDisplayColor") }
+fn visual_tank_support_profile_coordinates() { _sysml_native_list("tankSupportPerimeterProfileCoordinates") }
+fn visual_tank_support_perimeter_radius_m() { _sysml_attribute("tankSupportPerimeterRadiusM") }
+fn visual_tank_support_perimeter_section_m() { _sysml_attribute("tankSupportPerimeterSectionM") }
+fn visual_tank_support_plane_center_y_m() { _sysml_attribute("tankSupportPlaneCenterYM") }
+fn visual_tank_opening_inner_radius_m() { _sysml_attribute("tankSupportOpeningInnerRadiusM") }
+fn visual_tank_opening_outer_radius_m() { _sysml_attribute("tankSupportOpeningOuterRadiusM") }
+fn visual_tank_opening_segments() { _sysml_integer("tankSupportOpeningSegments") }
+fn visual_tank_opening_clearance_m() { _sysml_attribute("tankSupportOpeningClearanceM") }
+fn legacy_bus_prim_names() {
+    ["BoxyAirframe", "LowerServiceSkirtBox", "IsogridDeck", "WhiteEquipmentBox",
+     "TopDeck", "LowerServiceSkirt", "TopDeckHex", "LowerServiceSkirtHex",
+     "HexPanelFrontRight", "HexPanelRightRear", "HexPanelRearRight",
+     "HexPanelRearLeft", "HexPanelLeftFront", "HexPanelFrontLeft",
+     "FrameRailFront", "FrameRailRear"]
+}
+
 
 // Structured, native geometry plan consumed by the visual builder.  The
 // source attributes remain SysML-owned. Typed Position collections are used
@@ -417,6 +445,8 @@ fn _visual_transform_record(name, parent_role, asset, x, y, z, rx, ry, rz, unifo
         quat_from_euler_xyz_deg(vec3(rx, ry, rz)), scale);
     _visual_pose_record(name, parent_role, asset, pose, scale_enabled)
 }
+
+fn visual_engine_skirt_mount_y() { _sysml_number("engineClusterMountYM") }
 
 fn _visual_plan_lengths_match(values, expected) {
     values != () && values.len() == expected
@@ -466,7 +496,9 @@ fn visual_component_transform_plan() {
     let bad_solar = !_native_positions_match(solar_stations, 2)
         || !_visual_plan_lengths_match(solar_rot_x, 2)
         || !_visual_plan_lengths_match(solar_rot_z, 2) || solar_names.len() != 2;
-    let bad_engines = !_native_positions_match(engine_stations, 7) || engine_names.len() != 7;
+    let engine_skirt_y = visual_engine_skirt_mount_y();
+    let bad_engines = !_native_positions_match(engine_stations, 7) || engine_names.len() != 7
+        || engine_skirt_y == ();
     let bad_ramps = ramp_x.len() != 2 || ramp_y == () || ramp_z == () || ramp_scale == ();
     let bad_rover = sensor_mount.len() != 2 || rover_solar_mount.len() != 3
         || rover_solar_tilt == () || front_steering == () || rear_steering == ()
@@ -533,6 +565,9 @@ fn visual_component_transform_plan() {
             "lander/griffin_engine_bell_visual.usda", pose, false);
         plan.push(record);
     }
+    plan.push(_visual_transform_record("EngineSkirt", "engine_cluster",
+        "lander/griffin_engine_skirt_visual.usda", 0.0, engine_skirt_y, 0.0,
+        0.0, 0.0, 0.0, ()));
     plan
 }
 
@@ -543,7 +578,7 @@ fn visual_rail_station_plan() {
     let names = visual_rail_names();
     let stations = visual_rail_station_positions();
     let dimensions = _sysml_native("railDimensions");
-    if names.len() != 6 || !_native_positions_match(stations, 6)
+    if names.len() == 0 || !_native_positions_match(stations, names.len())
         || dimensions == () || !vec3_is_native(dimensions) {
         return [];
     }
@@ -596,10 +631,6 @@ fn pi_value() { 3.141592653589793 }
 fn frame() {
     #{ units: _sysml_text("frameUnits"), up_axis: _sysml_text("frameUpAxis"),
        root_datum: _sysml_text("frameRootDatum") }
-}
-
-fn canonical_parts() {
-    _sysml_list("canonicalPartNames")
 }
 
 fn solar_array_names() { _sysml_enum_names("solarArrayInstances") }

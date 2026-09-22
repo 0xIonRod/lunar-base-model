@@ -80,7 +80,6 @@ package Griffin1Requirements {
         attribute visualTerrainShaderAsset : String = "lunco://shaders/terrain_layered.wgsl";
         attribute visualRenderOwnership : String = "render-only review layer; physics colliders remain authored by vehicle components";
         attribute manifestPartCount : Integer = 20;
-        attribute canonicalPartNames : String[15] = ("BoxyAirframe", "IsogridDeck", "PayloadAdapter", "MainPropulsion", "Nozzle", "SolarPanelPort", "SolarPanelStarboard", "LegPX", "LegNX", "LegPZ", "LegNZ", "EgressRampPort", "EgressRampStarboard", "PropellantTanks", "EngineCluster");
         // Reusable assembly identities are source data as well. Rhai derives
         // paths and pair checks from these names instead of carrying a second
         // list of Griffin topology constants.
@@ -328,7 +327,7 @@ package Griffin1Requirements {
     }
 
     requirement def GRV002_LanderPresentation {
-        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognisable faceted hexagonal lander with its four legs, payload deck, and seven-engine cluster. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Rationale: these are the public architectural cues that let a reviewer identify the vehicle in the scene; the exact structural profile remains a replaceable study assumption. */
+        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognizable faceted lander with its four legs, payload deck, and seven-engine cluster. The active review profile is the octagonal open frame selected in GriffinVisualConfiguration; do not describe or instantiate the superseded six-sided visual proxy. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. */
     }
 
     requirement def GRV003_GriffinSolarAssemblies {

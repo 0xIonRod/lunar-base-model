@@ -18,7 +18,7 @@ fn on_tick(me, ctx) {
     }
     if doc_id < 0 { return; }
     let result = griffin_bus_verification::verify_bus(doc_id,
-        sysml_requirements::source());
+        sysml_requirements::source(), griffin_bus_verification::default_root_path());
     print(#{verdict: if result.ok { "PASS" } else { "FAIL" },
         checks: result.check_count, failures: result.failure_count,
         evidence: result.evidence});

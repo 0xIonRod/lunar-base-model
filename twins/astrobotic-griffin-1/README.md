@@ -66,7 +66,7 @@ Sources:
 | scenarios/griffin_1_surface_ops.rhai | Mission sequencing and route policy |
 | scenarios/tests/griffin_requirements.rhai | Twin-owned structural/parameter verdict and boundary checks |
 | scenarios/tests/griffin_lander_requirements.rhai | Rhai observer for the standalone lander-component contract |
-| scenarios/tests/griffin_bus_requirements.rhai | Component-owned Rhai gate for the hexagonal bus |
+| scenarios/tests/griffin_bus_requirements.rhai | Component-owned Rhai gate for bus geometry, tank-support openings, and source-owned appearance |
 | scenarios/tests/griffin_landing_legs_requirements.rhai | Component-owned Rhai gate for the four landing legs |
 | scenarios/tests/griffin_propulsion_requirements.rhai | Component-owned Rhai gate for the seven-engine bell cluster |
 | scenarios/tests/griffin_tank_requirements.rhai | Component-owned Rhai gate for the four propellant tanks |

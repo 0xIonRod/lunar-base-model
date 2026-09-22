@@ -71,8 +71,8 @@ fn on_tick(me, ctx) {
          root + "/Griffin1/Bus/FrontThermalPanel",
          root + "/Griffin1/Bus/FrontLogoRedA",
          root + "/Griffin1/Bus/FrontLogoRedB",
-         root + "/Griffin1/Bus/TopDeckHex"]));
-    let body_profile = visual_exists_check("GV-002-hex-body", "lander", "gv002",
+         root + "/Griffin1/Bus/TopDeckOctagon"]));
+    let body_profile = visual_exists_check("GV-002-octagonal-body", "lander", "gv002",
         "exists", root + "/Griffin1/Bus/PerimeterFrame");
     body_profile.expected_type = "Mesh";
     checks.push(body_profile);

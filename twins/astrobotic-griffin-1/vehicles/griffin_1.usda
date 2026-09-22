@@ -3236,4 +3236,12 @@ def Xform "Griffin1" (
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
         bool physics:collisionEnabled = false
     }
+    def Xform "Bus" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 3.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+    }
 }

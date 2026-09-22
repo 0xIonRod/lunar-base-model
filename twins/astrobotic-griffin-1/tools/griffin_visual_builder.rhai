@@ -1,3 +1,8 @@
+import "lunco://scripting/tools/assembly_builder" as assembly_builder;
+import "lunco://scripting/tools/assembly_edit" as assembly_edit;
+import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
+import "component_requirements" as component_requirements;
+
 // Twin-local runtime visual assembly builder.
 //
 // This is deliberately a thin policy layer over LunCoSim's generic
@@ -136,44 +141,21 @@ fn _color_literal(color) {
 fn visual_detail_specs(root) {
     let lander = root + "/Griffin1";
     let bus = lander + "/Bus";
-    let cluster = lander + "/Nozzle/MainEngineCluster";
     let details = [];
     // Rail identity, stations, and envelope are already one native typed plan;
     // only the primitive command's array wire format is produced here.
     for rail in griffin_spec::visual_rail_station_plan() {
         details.push(#{parent: bus, name: rail.name, shape: "cube",
             translation: vec3_array(rail.pose.translation), scale: vec3_array(rail.pose.scale),
-            color: [0.16, 0.18, 0.21]});
+            color: griffin_spec::visual_rail_display_color()});
     }
     for detail in [
-        // The engine skirt is a four-beam frame around the seven bells; it
-        // keeps the nozzles visually attached to the lower bus deck.
-        #{parent: cluster, name: "EngineSkirtFront", shape: "cube", translation: [0.0, 1.68, 1.50], scale: [3.20, 0.20, 0.20], color: [0.10, 0.12, 0.15]},
-        #{parent: cluster, name: "EngineSkirtRear", shape: "cube", translation: [0.0, 1.68, -1.50], scale: [3.20, 0.20, 0.20], color: [0.10, 0.12, 0.15]},
-        #{parent: cluster, name: "EngineSkirtPort", shape: "cube", translation: [1.50, 1.68, 0.0], scale: [0.20, 0.20, 3.20], color: [0.10, 0.12, 0.15]},
-        #{parent: cluster, name: "EngineSkirtStarboard", shape: "cube", translation: [-1.50, 1.68, 0.0], scale: [0.20, 0.20, 3.20], color: [0.10, 0.12, 0.15]},
-        #{parent: cluster, name: "EngineAdapterPlate", shape: "cube", translation: [0.0, 1.76, 0.0], scale: [2.84, 0.12, 2.84], color: [0.18, 0.20, 0.23]},
-        // Hinge plates and pins are assembly-owned mounting evidence.  The
-        // component origin remains untouched; the parent transform places the
-        // ramp surface against the bus side.
-        #{parent: lander + "/EgressRampPort", name: "MountPlate", shape: "cube", translation: [0.70, 0.0, 0.0], scale: [0.12, 0.22, 0.92], color: [0.12, 0.14, 0.17]},
-        #{parent: lander + "/EgressRampPort", name: "HingePin", shape: "cylinder", translation: [0.70, 0.0, 0.0], radius: 0.12, height: 0.92, axis: "Z", color: [0.10, 0.12, 0.15]},
-        #{parent: lander + "/EgressRampStarboard", name: "MountPlate", shape: "cube", translation: [0.70, 0.0, 0.0], scale: [0.12, 0.22, 0.92], color: [0.12, 0.14, 0.17]},
-        #{parent: lander + "/EgressRampStarboard", name: "HingePin", shape: "cylinder", translation: [0.70, 0.0, 0.0], radius: 0.12, height: 0.92, axis: "Z", color: [0.10, 0.12, 0.15]},
         // FLIP's camera pod gets a lens barrel and the chassis gets side
         // guards, making the four-wheel directional rover legible at a glance.
         #{parent: root + "/FLIP/Chassis", name: "SideGuardLeft", shape: "cube", translation: [-1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
         #{parent: root + "/FLIP/Chassis", name: "SideGuardRight", shape: "cube", translation: [1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
         #{parent: root + "/FLIP/SensorMast", name: "SensorLens", shape: "cylinder", translation: [0.0, 1.88, -0.55], radius: 0.12, height: 0.16, axis: "Z", color: [0.04, 0.08, 0.12]},
     ] { details.push(detail); }
-    // USD Cone exposes radius1/radius2 while the current lightweight viewer
-    // uses one effective radius. Keep a thin typed collar at every bell so
-    // the engine throat remains legible at every mesh quality.
-    for entry in griffin_spec::main_engine_names() {
-        details.push(#{parent: cluster + "/" + entry, name: "BellCollar", shape: "cylinder",
-            translation: [0.0, -0.23, 0.0], radius: 0.38, height: 0.08, axis: "Y",
-            color: [0.24, 0.27, 0.31]});
-    }
     details
 }
 
@@ -424,19 +406,10 @@ fn visual_component_plan(doc, edit_target, root) {
     }
     let detail_paths = [];
     let detail_added = [];
-    // A warm MLI-white finish is an authored visual opinion on the referenced
-    // mesh, keeping the faceted bus readable against the dark service skirt.
-    ops.push(#{SetAttribute: #{edit_target: edit_target,
-        path: root + "/Griffin1/Bus/WhiteEquipmentBox",
-        name: "primvars:displayColor", type_name: "color3f[]",
-        value: "[(0.72, 0.74, 0.77)]"}});
     // Keep the presentation contract in the authored assembly layer even
     // though the referenced source asset predates the four-wheel study.
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: rover,
         name: "lunco:visual:wheel_count", type_name: "int", value: "4"}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: rover,
-        name: "lunco:visual:configuration", type_name: "string",
-        value: "four directional wheels, white equipment box, sensor mast, fixed solar-array proxy"}});
     for detail in visual_detail_specs(root) {
         let path = detail.parent + "/" + detail.name;
         detail_paths.push(path);
@@ -722,32 +695,11 @@ fn _isolated_flip_specs(root) {
 
 fn _isolated_griffin_detail_specs(root) {
     let bus = root + "/Bus";
-    let cluster = root + "/Nozzle/MainEngineCluster";
     let details = [];
     for rail in griffin_spec::visual_rail_station_plan() {
         details.push(#{parent: bus, name: rail.name, shape: "cube",
             translation: vec3_array(rail.pose.translation), scale: vec3_array(rail.pose.scale),
-            color: [0.16, 0.18, 0.21]});
-    }
-    for detail in [
-        // A dark adapter/skirt makes the seven engine bells read as one
-        // mounted propulsion module instead of disconnected cones.
-        #{parent: cluster, name: "EngineSkirtFront", shape: "cube", translation: [0.0, 1.68, 1.50], scale: [3.20, 0.20, 0.20], color: [0.10, 0.12, 0.15]},
-        #{parent: cluster, name: "EngineSkirtRear", shape: "cube", translation: [0.0, 1.68, -1.50], scale: [3.20, 0.20, 0.20], color: [0.10, 0.12, 0.15]},
-        #{parent: cluster, name: "EngineSkirtPort", shape: "cube", translation: [1.50, 1.68, 0.0], scale: [0.20, 0.20, 3.20], color: [0.10, 0.12, 0.15]},
-        #{parent: cluster, name: "EngineSkirtStarboard", shape: "cube", translation: [-1.50, 1.68, 0.0], scale: [0.20, 0.20, 3.20], color: [0.10, 0.12, 0.15]},
-        #{parent: cluster, name: "EngineAdapterPlate", shape: "cube", translation: [0.0, 1.76, 0.0], scale: [2.84, 0.12, 2.84], color: [0.18, 0.20, 0.23]},
-        // Mount plate/pin at the actual ramp hinge datum.  This avoids the
-        // old offset that left the ramp rail visibly detached from the bus.
-        #{parent: root + "/EgressRampPort", name: "MountPlate", shape: "cube", translation: [1.60, 0.0, 0.0], scale: [0.12, 0.22, 0.92], color: [0.12, 0.14, 0.17]},
-        #{parent: root + "/EgressRampPort", name: "HingePin", shape: "cylinder", translation: [1.60, 0.0, 0.0], radius: 0.12, height: 0.92, axis: "Z", color: [0.10, 0.12, 0.15]},
-        #{parent: root + "/EgressRampStarboard", name: "MountPlate", shape: "cube", translation: [1.60, 0.0, 0.0], scale: [0.12, 0.22, 0.92], color: [0.12, 0.14, 0.17]},
-        #{parent: root + "/EgressRampStarboard", name: "HingePin", shape: "cylinder", translation: [1.60, 0.0, 0.0], radius: 0.12, height: 0.92, axis: "Z", color: [0.10, 0.12, 0.15]},
-    ] { details.push(detail); }
-    for entry in griffin_spec::main_engine_names() {
-        details.push(#{parent: cluster + "/" + entry, name: "BellCollar", shape: "cylinder",
-            translation: [0.0, -0.23, 0.0], radius: 0.38, height: 0.08, axis: "Y",
-            color: [0.24, 0.27, 0.31]});
+            color: griffin_spec::visual_rail_display_color()});
     }
     details
 }
@@ -1007,7 +959,7 @@ fn _griffin_task_match(name, task) {
 
 fn _detail_matches_task(detail, task) {
     let parent = detail.parent;
-    if task == "Bus" { return parent.ends_with("/Bus"); }
+    if task == "Bus" { return false; }
     if task == "MainEngineCluster" {
         return parent.ends_with("/MainEngineCluster") || parent.contains("/MainEngineCluster/");
     }
@@ -1071,15 +1023,15 @@ fn apply_isolated_griffin_component(doc, edit_target, root, task, parent_gen) {
 // Use the source-owned normalized Cartesian profile and a shared Rust
 // extrusion. The only serialization below is the typed USD point/index
 // literal emitted at the authoring boundary.
-fn _hex_prism_geometry(width, depth, height) {
-    let source_profile = griffin_spec::visual_hex_profile_coordinates();
-    if source_profile.len() != 6 || width <= 0.0 || depth <= 0.0 || height <= 0.0 {
-        return plan_error("hex prism requires six typed SysML profile points and positive dimensions");
+fn _outer_body_prism_geometry(width, depth, height) {
+    let source_profile = griffin_spec::visual_outer_body_profile_coordinates();
+    if source_profile.len() != 8 || width <= 0.0 || depth <= 0.0 || height <= 0.0 {
+        return plan_error("outer-body prism requires eight typed SysML profile points and positive dimensions");
     }
     let profile = [];
     for point in source_profile {
         if type_of(point) != "Vec2" || !vec2_is_finite(point) {
-            return plan_error("hex profile coordinates must project as finite native Vec2 values");
+            return plan_error("outer-body profile coordinates must project as finite native Vec2 values");
         }
         profile.push(vec2(point.x * width / 2.0, point.y * depth / 2.0));
     }
@@ -1096,30 +1048,10 @@ fn _griffin_bus_number(source, name) {
         "GriffinBusRequirements::GriffinBusComponent::" + name)
 }
 
-// Resize an existing component-owned hex mesh in place.  The operation is
+// Resize an existing component-owned profile mesh in place. The operation is
 // deliberately a typed SetAttribute plan: the bus remains one replaceable
 // component, while its dimensions stay visible in the SysML-backed builder
 // rather than being hidden in a hand-edited USDA layer.
-fn _resize_existing_hex_mesh_plan(doc, edit_target, path, width, depth, height) {
-    let current = assembly_builder::composed_query(doc, #{path: path, children: false});
-    if !query_ok(current) || current.type_name != "Mesh" {
-        return plan_error(path + ": expected an existing Mesh owned by the bus component");
-    }
-    let geometry = _hex_prism_geometry(width, depth, height);
-    if !geometry.ok { return geometry; }
-    let ops = [
-        #{SetAttribute: #{edit_target: edit_target, path: path, name: "points",
-            type_name: "point3f[]", value: _mesh_points_literal(geometry.points)}},
-        #{SetAttribute: #{edit_target: edit_target, path: path, name: "faceVertexCounts",
-            type_name: "int[]", value: _mesh_ints_literal(geometry.face_counts)}},
-        #{SetAttribute: #{edit_target: edit_target, path: path, name: "faceVertexIndices",
-            type_name: "int[]", value: _mesh_ints_literal(geometry.face_indices)}},
-        #{SetAttribute: #{edit_target: edit_target, path: path, name: "subdivisionScheme",
-            type_name: "token", value: "\"none\""}}
-    ];
-    #{ok: true, ops: ops}
-}
-
 fn _mesh_points_literal(points) {
     let literal = "[";
     for index in 0..points.len() {
@@ -1140,23 +1072,182 @@ fn _mesh_ints_literal(values) {
     literal + "]"
 }
 
-// Build twelve individually closed beam solids as one replaceable airframe
-// mesh: six upper and six lower perimeter members. Each beam uses a local
+fn _tank_support_annulus_geometry(center, inner_radius, outer_radius, thickness, segments) {
+    if center == () || !vec3_is_native(center) || inner_radius <= 0.0
+        || outer_radius <= inner_radius || thickness <= 0.0 || segments < 8 {
+        return plan_error("tank-support annulus needs a typed center, ordered radii, positive stock, and at least eight segments");
+    }
+    let points = [];
+    let half = thickness / 2.0;
+    for radius in [outer_radius, outer_radius, inner_radius, inner_radius] {
+        let y = if radius == outer_radius {
+            if points.len() == 0 { half } else { -half }
+        } else { if points.len() == segments * 2 { half } else { -half } };
+        for index in 0..segments {
+            let angle = 2.0 * griffin_spec::pi_value() * index / segments;
+            points.push([center.x + radius * cos(angle), y,
+                center.z + radius * sin(angle)]);
+        }
+    }
+    let counts = [];
+    let indices = [];
+    for index in 0..segments {
+        let next = (index + 1) % segments;
+        let ot = index; let ot_next = next;
+        let ob = segments + index; let ob_next = segments + next;
+        let it = 2 * segments + index; let it_next = 2 * segments + next;
+        let ib = 3 * segments + index; let ib_next = 3 * segments + next;
+        for face in [
+            [ot, it, it_next, ot_next],
+            [ob, ob_next, ib_next, ib],
+            [ot, ot_next, ob_next, ob],
+            [it, ib, ib_next, it_next]
+        ] {
+            counts.push(4);
+            for vertex in face { indices.push(vertex); }
+        }
+    }
+    #{ok: true, points: points, face_counts: counts, face_indices: indices,
+      segments: segments, inner_radius: inner_radius, outer_radius: outer_radius}
+}
+
+fn _tank_support_annulus_mesh_plan(doc, edit_target, parent, name, center,
+    inner_radius, outer_radius, thickness, segments, color) {
+    let path = parent + "/" + name;
+    let current = assembly_builder::composed_query(doc, #{path: path, children: false});
+    let geometry = _tank_support_annulus_geometry(center, inner_radius,
+        outer_radius, thickness, segments);
+    if geometry.ok == false { return geometry; }
+    let ops = [];
+    if query_ok(current) {
+        if current.type_name != "Mesh" {
+            return plan_error(path + ": tank opening collar must resolve to Mesh");
+        }
+        ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
+    } else {
+        let shape = assembly_builder::mesh_shape_plan(edit_target, parent, name,
+            geometry.points, geometry.face_counts, geometry.face_indices, color, false);
+        if !shape.ok { return shape; }
+        for op in shape.ops { ops.push(op); }
+    }
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "points", type_name: "point3f[]", value: _mesh_points_literal(geometry.points)}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "faceVertexCounts", type_name: "int[]", value: _mesh_ints_literal(geometry.face_counts)}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "faceVertexIndices", type_name: "int[]", value: _mesh_ints_literal(geometry.face_indices)}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "subdivisionScheme", type_name: "token", value: "\"none\""}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "doubleSided", type_name: "bool", value: "false"}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "purpose", type_name: "token", value: "\"render\""}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "primvars:displayColor", type_name: "color3f[]",
+        value: _color_literal(color)}});
+    ops.push(#{SetTranslate: #{edit_target: edit_target, path: path, value: [0.0, 0.0, 0.0]}});
+    #{ok: true, path: path, ops: ops, geometry: geometry}
+}
+
+fn _tank_support_plan(doc, edit_target, root) {
+    let perimeter_profile = griffin_spec::visual_tank_support_profile_coordinates();
+    let perimeter_radius = griffin_spec::visual_tank_support_perimeter_radius_m();
+    let perimeter_section = griffin_spec::visual_tank_support_perimeter_section_m();
+    let center_y = griffin_spec::visual_tank_support_plane_center_y_m();
+    let inner_radius = griffin_spec::visual_tank_opening_inner_radius_m();
+    let outer_radius = griffin_spec::visual_tank_opening_outer_radius_m();
+    let segments = griffin_spec::visual_tank_opening_segments();
+    let tanks = griffin_spec::component_tank_stations();
+    let names = griffin_spec::propellant_tank_names();
+    if perimeter_profile.len() != 6 || perimeter_radius <= 0.0
+        || perimeter_section <= 0.0 || center_y == () || inner_radius <= 0.0
+        || outer_radius <= inner_radius || segments < 8 || tanks.len() != 4 || names.len() != 4 {
+        return plan_error("typed Griffin four-opening tank-support datums are incomplete");
+    }
+    let path = root + "/TankSupportPlate";
+    let current = assembly_builder::composed_query(doc, #{path: path, children: false});
+    let ops = [];
+    if query_ok(current) {
+        if current.type_name != "Xform" { return plan_error(path + ": support assembly must be Xform"); }
+    } else {
+        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: root,
+            name: "TankSupportPlate", type_name: "Xform", reference: (),
+            reference_prim_path: ""}});
+    }
+    let perimeter_stations = [];
+    for point in perimeter_profile {
+        if type_of(point) != "Vec2" || !vec2_is_finite(point) {
+            return plan_error("tank-support perimeter profile must contain six finite typed Vec2 values");
+        }
+        perimeter_stations.push(vec3(point.x * perimeter_radius, 0.0,
+            point.y * perimeter_radius));
+    }
+    let perimeter_geometry = _octagonal_open_frame_geometry(perimeter_stations,
+        [center_y], perimeter_section);
+    if perimeter_geometry.ok == false { return perimeter_geometry; }
+    let perimeter_path = path + "/TankSupportPerimeter";
+    let perimeter = assembly_builder::composed_query(doc,
+        #{path: perimeter_path, children: false});
+    if query_ok(perimeter) && perimeter.type_name != "Mesh" {
+        return plan_error(perimeter_path + ": support perimeter must resolve to Mesh");
+    }
+    if !query_ok(perimeter) {
+        let shape = assembly_builder::mesh_shape_plan(edit_target, path, "TankSupportPerimeter",
+            perimeter_geometry.points, perimeter_geometry.face_counts,
+            perimeter_geometry.face_indices,
+            griffin_spec::visual_tank_support_display_color(), false);
+        if !shape.ok { return shape; }
+        for op in shape.ops { ops.push(op); }
+    }
+    for pair in [
+        ["points", "point3f[]", _mesh_points_literal(perimeter_geometry.points)],
+        ["faceVertexCounts", "int[]", _mesh_ints_literal(perimeter_geometry.face_counts)],
+        ["faceVertexIndices", "int[]", _mesh_ints_literal(perimeter_geometry.face_indices)]
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: perimeter_path,
+            name: pair[0], type_name: pair[1], value: pair[2]}});
+    }
+    for property in [
+        #{name: "doubleSided", type_name: "bool", value: "false"},
+        #{name: "subdivisionScheme", type_name: "token", value: "\"none\""},
+        #{name: "purpose", type_name: "token", value: "\"render\""},
+        #{name: "physics:collisionEnabled", type_name: "bool", value: "false"}
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: perimeter_path,
+            name: property.name, type_name: property.type_name, value: property.value}});
+    }
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: perimeter_path,
+        name: "primvars:displayColor", type_name: "color3f[]",
+        value: _color_literal(griffin_spec::visual_tank_support_display_color())}});
+    for index in 0..tanks.len() {
+        let collar = _tank_support_annulus_mesh_plan(doc, edit_target, path,
+            "Opening" + names[index], tanks[index], inner_radius, outer_radius,
+            perimeter_section, segments, griffin_spec::visual_tank_collar_display_color());
+        if !collar.ok { return collar; }
+        for op in collar.ops { ops.push(op); }
+    }
+    #{ok: true, kind: "griffin_tank_support_plate", root: path,
+      opening_names: names, opening_count: names.len(), ops: ops}
+}
+
+// Build sixteen individually closed beam solids as one replaceable airframe
+// mesh: eight upper and eight lower perimeter members. Each beam uses a local
 // right-handed (along, up, across) basis and outward-wound quad faces, so the
 // open bays are real openings rather than a transparent/one-sided prism.
-fn _hexagonal_open_frame_geometry(stations, station_order, ring_y, section) {
+fn _octagonal_open_frame_geometry(stations, ring_y, section) {
     let points = [];
     let face_counts = [];
     let face_indices = [];
     let half_section = section / 2.0;
     for ring_index in 0..ring_y.len() {
-        for edge in 0..station_order.len() {
-            let start_index = station_order[edge].to_int() - 1;
-            let end_order_index = (edge + 1) % station_order.len();
-            let end_index = station_order[end_order_index].to_int() - 1;
+        for edge in 0..stations.len() {
+            let start_index = edge;
+            let end_index = (edge + 1) % stations.len();
             if start_index < 0 || end_index < 0 || start_index >= stations.len()
                 || end_index >= stations.len() {
-                return plan_error("SysML perimeter station order is outside the typed rail vector");
+                return plan_error("typed rail station is outside the perimeter vector");
             }
             let ax = stations[start_index].x;
             let az = stations[start_index].z;
@@ -1197,22 +1288,21 @@ fn _hexagonal_open_frame_geometry(stations, station_order, ring_y, section) {
     #{points: points, face_counts: face_counts, face_indices: face_indices}
 }
 
-fn _hexagonal_open_frame_mesh_plan(doc, edit_target, root, name, stations,
-    station_order, ring_y, section) {
+fn _octagonal_open_frame_mesh_plan(doc, edit_target, root, name, stations, ring_y, section, color) {
     let path = root + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
-    let geometry = _hexagonal_open_frame_geometry(stations, station_order, ring_y, section);
+    let geometry = _octagonal_open_frame_geometry(stations, ring_y, section);
     if geometry.ok == false { return geometry; }
     let ops = [];
     if query_ok(current) {
         if current.type_name != "Mesh" {
-            return plan_error(path + ": open hexagonal frame must resolve to a Mesh");
+            return plan_error(path + ": open octagonal frame must resolve to a Mesh");
         }
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
     } else {
         let shape = assembly_builder::mesh_shape_plan(edit_target, root, name,
             geometry.points, geometry.face_counts, geometry.face_indices,
-            [0.55, 0.59, 0.64], false);
+            color, false);
         if !shape.ok { return shape; }
         for op in shape.ops { ops.push(op); }
     }
@@ -1237,152 +1327,13 @@ fn _hexagonal_open_frame_mesh_plan(doc, edit_target, root, name, stations,
         name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
         name: "primvars:displayColor", type_name: "color3f[]",
-        value: _color_literal([0.55, 0.59, 0.64])}});
+        value: _color_literal(color)}});
     #{ok: true, path: path, ops: ops,
       point_count: geometry.points.len(), face_count: geometry.face_counts.len()}
 }
 
-fn _refine_hex_slab(doc, edit_target, parent, name, width, depth, height, translation, color) {
-    let path = parent + "/" + name;
-    let current = assembly_builder::composed_query(doc, #{path: path, children: false});
-    if !query_ok(current) { return plan_error(path + ": bus slab is missing"); }
-    // Referenced component children are owned by their source layer.  A
-    // runtime assembly must not try to RemovePrim them from @root@ (that
-    // would reject the whole compound edit).  Instead, mute the inherited
-    // slab with a typed active opinion and add a sibling mesh owned by this
-    // assembly.  This preserves source ownership while making the refinement
-    // reversible and journaled.
-    let replacement_name = name + "Hex";
-    let replacement_path = parent + "/" + replacement_name;
-    let replacement = assembly_builder::composed_query(doc, #{path: replacement_path, children: false});
-    if query_ok(replacement) {
-        if replacement.type_name != "Mesh" {
-            return plan_error(replacement_path + ": existing refinement must be Mesh, got " + replacement.type_name);
-        }
-        return #{ok: true, path: replacement_path, ops: [], no_op: true};
-    }
-    if current.type_name != "Cube" && current.type_name != "Mesh" {
-        return plan_error(path + ": expected the referenced slab to be Cube or Mesh, got " + current.type_name);
-    }
-    let geometry = _hex_prism_geometry(width, depth, height);
-    if !geometry.ok { return geometry; }
-    let mesh = assembly_builder::mesh_shape_plan(edit_target, parent, name,
-        geometry.points, geometry.face_counts, geometry.face_indices, color, false);
-    if !mesh.ok { return mesh; }
-    // mesh_shape_plan targets the requested name, so retarget its operations
-    // to the assembly-owned sibling before submission.
-    let ops = [#{SetActive: #{edit_target: edit_target, path: path, active: false}}];
-    for op in mesh.ops {
-        if op.AddPrim != () {
-            let add = op.AddPrim;
-            add.name = replacement_name;
-            add.parent_path = parent;
-            ops.push(#{AddPrim: add});
-        } else if op.SetAttribute != () {
-            let attr = op.SetAttribute;
-            attr.path = replacement_path;
-            ops.push(#{SetAttribute: attr});
-        } else if op.SetApiSchemas != () {
-            let schema = op.SetApiSchemas;
-            schema.path = replacement_path;
-            ops.push(#{SetApiSchemas: schema});
-        } else {
-            ops.push(op);
-        }
-    }
-    ops.push(#{SetTranslate: #{edit_target: edit_target, path: replacement_path, value: translation}});
-    #{ok: true, path: replacement_path, ops: ops, no_op: false}
-}
-
 fn refine_griffin_bus_component_plan(doc, edit_target, root) {
-    // Keep the public refinement entry point on the same positive, typed
-    // hexagonal contract as the component builder.  The old body below is
-    // retained only as historical source context until the next cleanup; it
-    // is unreachable and cannot author a competing geometry recipe.
-    return hexagonal_griffin_bus_component_plan(doc, edit_target, root);
-    /*
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("refine_griffin_bus_component_plan requires a document, edit target, and absolute root");
-    }
-    let source = sysml_requirements::source();
-    let width = _sysml_number(source, "bodyWidthM");
-    let depth = _sysml_number(source, "bodyDepthM");
-    let height = _sysml_number(source, "bodyHeightM");
-    let frame_width = _griffin_bus_number(source, "perimeterFrameWidthM");
-    let frame_depth = _griffin_bus_number(source, "perimeterFrameDepthM");
-    let frame_height = _griffin_bus_number(source, "perimeterFrameHeightM");
-    let equipment_width = _griffin_bus_number(source, "equipmentBodyWidthM");
-    let equipment_depth = _griffin_bus_number(source, "equipmentBodyDepthM");
-    let equipment_height = _griffin_bus_number(source, "equipmentBodyHeightM");
-    let top_width = _griffin_bus_number(source, "topDeckWidthM");
-    let top_depth = _griffin_bus_number(source, "topDeckDepthM");
-    let top_thickness = _griffin_bus_number(source, "topDeckThicknessM");
-    let top_y = _griffin_bus_number(source, "topDeckCenterYM");
-    let avionics_width = _griffin_bus_number(source, "avionicsDeckWidthM");
-    let avionics_depth = _griffin_bus_number(source, "avionicsDeckDepthM");
-    let avionics_thickness = _griffin_bus_number(source, "avionicsDeckThicknessM");
-    let avionics_y = _griffin_bus_number(source, "avionicsDeckCenterYM");
-    if width == () || depth == () || height == () || frame_width == ()
-        || frame_depth == () || frame_height == () || equipment_width == ()
-        || equipment_depth == () || equipment_height == () || top_width == ()
-        || top_depth == () || top_thickness == () || top_y == ()
-        || avionics_width == () || avionics_depth == ()
-        || avionics_thickness == () || avionics_y == ()
-        || width <= 0.0 || depth <= 0.0 || height <= 0.0 {
-        return plan_error("Griffin lander metric bus envelope is missing");
-    }
-    let ops = [];
-    for mesh in [
-        #{path: root + "/PerimeterFrame", width: frame_width, depth: frame_depth, height: frame_height},
-        #{path: root + "/WhiteEquipmentBox", width: equipment_width, depth: equipment_depth, height: equipment_height},
-        #{path: root + "/TopDeckHex", width: top_width, depth: top_depth, height: top_thickness},
-        #{path: root + "/LowerServiceSkirtHex", width: width - 0.15, depth: depth - 0.15, height: 0.22}
-    ] {
-        let resize = _resize_existing_hex_mesh_plan(doc, edit_target, mesh.path,
-            mesh.width, mesh.depth, mesh.height);
-        if !resize.ok { return resize; }
-        for op in resize.ops { ops.push(op); }
-    }
-    ops.push(#{SetTranslate: #{edit_target: edit_target, path: root + "/TopDeckHex", value: [0.0, top_y, 0.0]}});
-    ops.push(#{SetTranslate: #{edit_target: edit_target, path: root + "/LowerServiceSkirtHex", value: [0.0, -(height / 2.0 + 0.11), 0.0]}});
-    let deck = assembly_builder::place_plan(edit_target, root + "/AvionicsDeck",
-        [0.0, avionics_y, 0.0], (), [avionics_width, avionics_thickness, avionics_depth]);
-    if !deck.ok { return deck; }
-    for op in deck.ops { ops.push(op); }
-    let pod = assembly_builder::place_plan(edit_target, root + "/AvionicsPod",
-        [0.0, avionics_y + 0.21, 0.0], (), [0.72, 0.36, 0.72]);
-    if !pod.ok { return pod; }
-    for op in pod.ops { ops.push(op); }
-    // The component's legacy detail layer was authored for the old 5.6 m
-    // frame.  Keep those named details, but seat every one against the new
-    // 4.50 m x 4.50 m x 2.00 m envelope so no rail or panel floats outside
-    // the bus after the dimension correction.
-    let detail_specs = [
-        #{path: root + "/FrontThermalPanel", translation: [0.0, 0.0, 2.26], rotation: (), scale: [1.35, 0.65, 0.035]},
-        #{path: root + "/FrontLogoRedA", translation: [-0.30, 0.0, 2.30], rotation: [0.0, 0.0, -18.0], scale: [0.08, 0.28, 0.04]},
-        #{path: root + "/FrontLogoRedB", translation: [0.30, 0.0, 2.30], rotation: [0.0, 0.0, 18.0], scale: [0.08, 0.28, 0.04]},
-        #{path: root + "/DeckRailFront", translation: [0.0, 1.19, 2.05], rotation: (), scale: [1.90, 0.06, 0.06]},
-        #{path: root + "/ServiceBayPort", translation: [2.18, -0.12, -0.34], rotation: (), scale: [0.08, 0.35, 0.55]},
-        #{path: root + "/ServiceBayStarboard", translation: [-2.18, -0.12, -0.34], rotation: (), scale: [0.08, 0.35, 0.55]},
-        #{path: root + "/HexPanelFrontRight", translation: [1.125, 0.0, 1.6875], rotation: [0.0, 27.0, 0.0], scale: [1.26, 0.78, 0.06]},
-        #{path: root + "/HexPanelRightRear", translation: [2.25, 0.0, 0.0], rotation: [0.0, 90.0, 0.0], scale: [1.26, 0.78, 0.06]},
-        #{path: root + "/HexPanelRearRight", translation: [1.125, 0.0, -1.6875], rotation: [0.0, 153.0, 0.0], scale: [1.26, 0.78, 0.06]},
-        #{path: root + "/HexPanelRearLeft", translation: [-1.125, 0.0, -1.6875], rotation: [0.0, 207.0, 0.0], scale: [1.26, 0.78, 0.06]},
-        #{path: root + "/HexPanelLeftFront", translation: [-2.25, 0.0, 0.0], rotation: [0.0, 270.0, 0.0], scale: [1.26, 0.78, 0.06]},
-        #{path: root + "/HexPanelFrontLeft", translation: [-1.125, 0.0, 1.6875], rotation: [0.0, 333.0, 0.0], scale: [1.26, 0.78, 0.06]}
-    ];
-    for detail in detail_specs {
-        let placement = assembly_builder::place_plan(edit_target, detail.path,
-            detail.translation, detail.rotation, detail.scale);
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
-    }
-    #{ok: true, kind: "griffin_bus_hex_refinement", root: root,
-      paths: [root + "/PerimeterFrame", root + "/WhiteEquipmentBox",
-              root + "/TopDeckHex", root + "/LowerServiceSkirtHex",
-              root + "/AvionicsDeck", root + "/AvionicsPod"],
-      ops: ops, no_op: ops.len() == 0}
-    */
+    octagonal_griffin_bus_component_plan(doc, edit_target, root)
 }
 
 // Assembly convenience wrapper. It is intentionally a dry diagnostic only:
@@ -1396,29 +1347,14 @@ fn refine_griffin_bus_plan(doc, edit_target, root) {
 fn apply_refined_griffin_bus(doc, edit_target, root, parent_gen) {
     let plan = refine_griffin_bus_component_plan(doc, edit_target, root);
     if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc, "Refine Griffin bus hexagonal shell", plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, command: command,
-      root: root, paths: plan.paths}
-}
-
-fn boxy_griffin_bus_component_plan(doc, edit_target, root) {
-    // Compatibility name for existing scenario calls.  The implementation is
-    // intentionally routed to the positive hexagonal component contract so an
-    // old caller cannot recreate a box-shaped bus.
-    return hexagonal_griffin_bus_component_plan(doc, edit_target, root);
-}
-
-fn apply_boxy_griffin_bus_component(doc, edit_target, root, parent_gen) {
-    let plan = hexagonal_griffin_bus_component_plan(doc, edit_target, root);
-    if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc, "Build typed hexagonal Griffin bus", plan.ops, parent_gen);
+    let command = assembly_edit::batch(doc, "Refine Griffin bus octagonal frame", plan.ops, parent_gen);
     #{ok: command.ok != false, kind: plan.kind, command: command,
       root: root, paths: plan.paths}
 }
 
 // The bus has a few genuinely cuboidal equipment details (avionics shelf and
 // rails). Keep this primitive helper local to those details; the load-bearing
-// body itself is authored by the typed hexagonal mesh plan below.
+// body itself is authored from the typed octagonal profile below.
 fn _bus_detail_cube_plan(doc, edit_target, parent, name, size, scale, translation, color) {
     let path = parent + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
@@ -1427,16 +1363,17 @@ fn _bus_detail_cube_plan(doc, edit_target, parent, name, size, scale, translatio
         if current.type_name != "Cube" {
             return plan_error(path + ": bus equipment detail must resolve to Cube, got " + current.type_name);
         }
+        let placement = assembly_builder::place_plan(edit_target, path,
+            translation, (), scale);
+        if !placement.ok { return placement; }
+        for op in placement.ops { ops.push(op); }
     } else {
         let shape = assembly_builder::cube_shape_plan(edit_target, parent, name,
             size, scale, false);
         if !shape.ok { return shape; }
         for op in shape.ops { ops.push(op); }
+        ops.push(#{SetTranslate: #{edit_target: edit_target, path: path, value: translation}});
     }
-    let placement = assembly_builder::place_plan(edit_target, path,
-        translation, (), scale);
-    if !placement.ok { return placement; }
-    for op in placement.ops { ops.push(op); }
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
         name: "purpose", type_name: "token", value: "\"render\""}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
@@ -1448,19 +1385,19 @@ fn _bus_detail_cube_plan(doc, edit_target, parent, name, size, scale, translatio
 }
 
 // Author the actual Griffin bus geometry from the typed SysML visual
-// configuration. The primary body is an open six-sided frame mesh; the deck
-// and skirt remain separate hex meshes, and the six corner rails stay
-// individually named Cube details.
-fn _hex_component_mesh_plan(doc, edit_target, parent, name, width, depth,
+// configuration. The primary body is an open eight-sided frame mesh; the outer
+// deck and skirt reuse the same profile, while the tank-support plate remains a
+// separate six-sided feature.
+fn _outer_body_component_mesh_plan(doc, edit_target, parent, name, width, depth,
     height, translation, color) {
     let path = parent + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
-    let geometry = _hex_prism_geometry(width, depth, height);
+    let geometry = _outer_body_prism_geometry(width, depth, height);
     if !geometry.ok { return geometry; }
     let ops = [];
     if query_ok(current) {
         if current.type_name != "Mesh" {
-            return plan_error(path + ": typed hex geometry must resolve to Mesh, got " + current.type_name);
+            return plan_error(path + ": typed outer-body profile must resolve to Mesh, got " + current.type_name);
         }
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
     } else {
@@ -1492,9 +1429,9 @@ fn _hex_component_mesh_plan(doc, edit_target, parent, name, width, depth,
     #{ok: true, path: path, ops: ops}
 }
 
-fn hexagonal_griffin_bus_component_plan(doc, edit_target, root) {
+fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("hexagonal_griffin_bus_component_plan requires a document, edit target, and absolute root");
+        return plan_error("octagonal_griffin_bus_component_plan requires a document, edit target, and absolute root");
     }
     let body_width = griffin_spec::visual_body_width_m();
     let body_depth = griffin_spec::visual_body_depth_m();
@@ -1508,37 +1445,23 @@ fn hexagonal_griffin_bus_component_plan(doc, edit_target, root) {
     let skirt_height = griffin_spec::visual_lower_skirt_height_m();
     let skirt_y = griffin_spec::visual_lower_skirt_center_y_m();
     let body_name = "PerimeterFrame";
-    let skirt_name = "LowerServiceSkirtHex";
-    let ring_order = griffin_spec::visual_frame_perimeter_station_order();
-    let ring_y = griffin_spec::visual_frame_ring_center_y_m();
-    let ring_member_count = griffin_spec::visual_frame_ring_member_count();
-    let ring_section = griffin_spec::visual_frame_ring_section_m();
+    let skirt_name = "LowerServiceSkirtOctagon";
+        let ring_y = griffin_spec::visual_frame_ring_center_y_m();
+        let ring_section = griffin_spec::visual_frame_ring_section_m();
     if body_width == () || body_depth == () || body_height == () || deck_width == ()
         || deck_depth == () || deck_thickness == () || deck_y == () || skirt_width == ()
         || skirt_depth == () || skirt_height == () || skirt_y == ()
-        || ring_member_count == () || ring_section == () {
-        return plan_error("typed Griffin hexagonal body datums are incomplete");
+        || ring_section == () {
+        return plan_error("typed Griffin octagonal body datums are incomplete");
     }
     let ops = [];
-    for legacy in ["BoxyAirframe", "LowerServiceSkirtBox", "IsogridDeck", "WhiteEquipmentBox"] {
+    // Remove the authored legacy solids from the layer that owns them. Never
+    // leave old legacy skins and rails beside the replacement geometry.
+    for legacy in griffin_spec::legacy_bus_prim_names() {
         let path = root + "/" + legacy;
         let existing = assembly_builder::composed_query(doc, #{path: path, children: false});
         if query_ok(existing) {
-            ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: false}});
-        }
-    }
-    let open_bay_panels = griffin_spec::visual_frame_open_bay_panel_names();
-    if open_bay_panels.len() != 6 {
-        return plan_error("typed Griffin open-bay panel identities must contain six source names");
-    }
-    for panel_name in open_bay_panels {
-        let panel_path = root + "/" + panel_name;
-        let panel = assembly_builder::composed_query(doc, #{path: panel_path, children: false});
-        if !query_ok(panel) || panel.type_name != "Cube" {
-            return plan_error(panel_path + ": source-named side bay skin must resolve to a Cube");
-        }
-        if panel.active != false {
-            ops.push(#{SetActive: #{edit_target: edit_target, path: panel_path, active: false}});
+            ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
         }
     }
     let rail_names = griffin_spec::visual_rail_names();
@@ -1546,55 +1469,61 @@ fn hexagonal_griffin_bus_component_plan(doc, edit_target, root) {
     let rail_width = griffin_spec::visual_rail_width_m();
     let rail_length = griffin_spec::visual_rail_length_m();
     let rail_depth = griffin_spec::visual_rail_depth_m();
-    if rail_names.len() != 6 || rail_stations.len() != rail_names.len()
-        || ring_order.len() != 6 || ring_y.len() != 2 || ring_member_count != 12
+    if rail_names.len() != 8 || rail_stations.len() != rail_names.len()
+        || ring_y.len() != 2
         || ring_section <= 0.0 || rail_width == () || rail_length == () || rail_depth == () {
         return plan_error("typed Griffin open-frame station vectors or member dimensions are incomplete");
     }
-    let frame = _hexagonal_open_frame_mesh_plan(doc, edit_target, root,
-        body_name, rail_stations, ring_order, ring_y, ring_section);
+    let frame = _octagonal_open_frame_mesh_plan(doc, edit_target, root,
+        body_name, rail_stations, ring_y, ring_section,
+        griffin_spec::visual_frame_display_color());
     if !frame.ok { return frame; }
     for op in frame.ops { ops.push(op); }
     let meshes = [
-        #{name: "TopDeckHex", width: deck_width, depth: deck_depth, height: deck_thickness,
-            translation: [0.0, deck_y, 0.0], color: [0.22, 0.25, 0.29]},
+        #{name: "TopDeckOctagon", width: deck_width, depth: deck_depth, height: deck_thickness,
+            translation: [0.0, deck_y, 0.0], color: griffin_spec::visual_deck_display_color()},
         #{name: skirt_name, width: skirt_width, depth: skirt_depth, height: skirt_height,
-            translation: [0.0, skirt_y, 0.0], color: [0.10, 0.12, 0.15]}
+            translation: [0.0, skirt_y, 0.0], color: griffin_spec::visual_lower_skirt_display_color()}
     ];
     for mesh in meshes {
-        let plan = _hex_component_mesh_plan(doc, edit_target, root, mesh.name,
+        let plan = _outer_body_component_mesh_plan(doc, edit_target, root, mesh.name,
             mesh.width, mesh.depth, mesh.height, mesh.translation, mesh.color);
         if !plan.ok { return plan; }
         for op in plan.ops { ops.push(op); }
     }
     let avionics = _bus_detail_cube_plan(doc, edit_target, root, "AvionicsDeck", 1.0,
         [griffin_spec::visual_avionics_deck_width_m(), griffin_spec::visual_avionics_deck_thickness_m(), griffin_spec::visual_avionics_deck_depth_m()],
-        [0.0, griffin_spec::visual_avionics_deck_center_y_m(), 0.0], [0.34, 0.38, 0.43]);
+        [0.0, griffin_spec::visual_avionics_deck_center_y_m(), 0.0],
+        griffin_spec::visual_avionics_deck_display_color());
     if !avionics.ok { return avionics; }
     for op in avionics.ops { ops.push(op); }
     let pod = _bus_detail_cube_plan(doc, edit_target, root, "AvionicsPod", 1.0,
-        [0.72, 0.36, 0.72], [0.0, griffin_spec::visual_avionics_deck_center_y_m() + 0.21, 0.0], [0.62, 0.66, 0.71]);
+        [0.72, 0.36, 0.72], [0.0, griffin_spec::visual_avionics_deck_center_y_m() + 0.21, 0.0],
+        griffin_spec::visual_avionics_pod_display_color());
     if !pod.ok { return pod; }
     for op in pod.ops { ops.push(op); }
     for index in 0..rail_names.len() {
         let station = rail_stations[index];
         let plan = _bus_detail_cube_plan(doc, edit_target, root, rail_names[index], 1.0,
             [rail_width, rail_length, rail_depth], [station.x, station.y, station.z],
-            [0.10, 0.12, 0.15]);
+            griffin_spec::visual_rail_display_color());
         if !plan.ok { return plan; }
         for op in plan.ops { ops.push(op); }
     }
+    let support = _tank_support_plan(doc, edit_target, root);
+    if !support.ok { return support; }
+    for op in support.ops { ops.push(op); }
     _clear_bus_label_tree(doc, edit_target, root, ops);
     if root.ends_with("/Bus") {
         let vehicle_root = root.sub_string(0, root.len() - 4);
         _clear_bus_label_ops(doc, edit_target, vehicle_root, ops);
     }
-    #{ok: true, kind: "griffin_hexagonal_bus_component", root: root,
-      paths: [root + "/" + body_name, root + "/TopDeckHex", root + "/" + skirt_name],
+    #{ok: true, kind: "griffin_octagonal_bus_component", root: root,
+      paths: [root + "/" + body_name, root + "/TopDeckOctagon", root + "/" + skirt_name],
       ops: ops, no_op: ops.len() == 0}
 }
 
-// Update the six assembly-owned corner rails in-place.  These rails are not
+// Update the eight assembly-owned corner posts in-place. These posts are not
 // part of the replaceable bus asset: they are visual-review detail geometry
 // authored in the vehicle document, so their metric contract must be applied
 // against the same document through the typed Editor journal.
@@ -2634,9 +2563,8 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         || adapter_width <= 0.0 || adapter_depth <= 0.0 || adapter_height <= 0.0 {
         return plan_error("engine-skirt SysML metric dimensions are missing");
     }
-    // The isolated component owns the canonical rail names.  The older
-    // assembly-local EngineSkirtFront/... opinions are inactive migration
-    // remnants and must never be targeted by a component refinement.
+    // The isolated component owns the skirt geometry; assembly-local legacy
+    // beam opinions are removed during the one-time Editor migration.
     let paths = [
         root + "/RailFront", root + "/RailRear",
         root + "/RailPort", root + "/RailStarboard",

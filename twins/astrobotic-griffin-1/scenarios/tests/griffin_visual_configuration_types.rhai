@@ -64,6 +64,30 @@ fn typed_enum_check(source, id, requirement, field, expected_literal) {
         #{field: field, value: value}, expected_literal)
 }
 
+fn display_color_check(source) {
+    let fields = ["frameDisplayColor", "deckDisplayColor", "lowerSkirtDisplayColor",
+        "avionicsDeckDisplayColor", "avionicsPodDisplayColor", "railDisplayColor",
+        "tankSupportDisplayColor", "tankCollarDisplayColor"];
+    let evidence = [];
+    let ok = true;
+    for field in fields {
+        let values = _native_value(source, field);
+        let valid = array_is(values) && values.len() == 3;
+        if valid {
+            for channel in values {
+                let scalar = f64_from(channel);
+                if scalar == () || scalar < 0.0 || scalar > 1.0 { valid = false; }
+            }
+        }
+        evidence.push(#{field: field, values: values, valid: valid});
+        if !valid { ok = false; }
+    }
+    component_requirements::assertion("GVC-T-linear-display-colors",
+        "griffin.typed_configuration", "gvc015", VERIFICATION, ok,
+        "all component display colors must be source-owned three-channel linear values in [0,1]",
+        evidence, #{fields: fields, channels: 3, range: [0.0, 1.0]})
+}
+
 fn _plan_record(plan, name) {
     for record in plan { if record.name == name { return record; } }
     ()
@@ -221,13 +245,16 @@ fn on_tick(me, ctx) {
     let source = sysml_requirements::source_with_selection([
         PART + "bodyDimensions", PART + "bodyMount", PART + "axisPort",
         PART + "axisForward", PART + "axisUp", PART + "railDimensions",
-        PART + "hexProfileCoordinates",
+        PART + "outerBodyProfileCoordinates",
         PART + "railStations", PART + "legStations", PART + "tankStations",
         PART + "bodyMount",
         PART + "solarStations", PART + "engineStations", PART + "frameRails",
-        PART + "frameOpenBayPanels", PART + "tankInstances",
+        PART + "tankInstances",
         PART + "landingLegInstances", PART + "solarArrayInstances",
         PART + "mainEngineInstances", PART + "bodyProfile", PART + "rampState",
+        PART + "frameDisplayColor", PART + "deckDisplayColor", PART + "lowerSkirtDisplayColor",
+        PART + "avionicsDeckDisplayColor", PART + "avionicsPodDisplayColor",
+        PART + "railDisplayColor", PART + "tankSupportDisplayColor", PART + "tankCollarDisplayColor",
         PART + "verificationToleranceM",
         "GriffinRampRequirements::GriffinEgressRamp::rampPortMountX",
         "GriffinRampRequirements::GriffinEgressRamp::rampStarboardMountX"
@@ -236,15 +263,15 @@ fn on_tick(me, ctx) {
         PACKAGE + "::gvc004", PACKAGE + "::gvc005", PACKAGE + "::gvc006",
         PACKAGE + "::gvc007", PACKAGE + "::gvc008", PACKAGE + "::gvc009",
         PACKAGE + "::gvc010", PACKAGE + "::gvc011", PACKAGE + "::gvc012",
-        PACKAGE + "::gvc013", PACKAGE + "::gvc014"
+        PACKAGE + "::gvc013", PACKAGE + "::gvc014", PACKAGE + "::gvc015"
     ], [PACKAGE + "::" + VERIFICATION]);
     let checks = [
         typed_spatial_scalar_check(source, "GVC-T-body-dimensions", "gvc003", "bodyDimensions"),
         typed_spatial_scalar_check(source, "GVC-T-body-mount", "gvc002", "bodyMount"),
         typed_spatial_scalar_check(source, "GVC-T-rail-dimensions", "gvc012", "railDimensions"),
-        typed_collection_check(source, "GVC-T-hex-profile", "gvc014",
-            "hexProfileCoordinates", "CartesianVectorValue", 6, "Vec2"),
-        typed_collection_check(source, "GVC-T-rail-stations", "gvc012", "railStations", "Position", 6, "Vec3"),
+        typed_collection_check(source, "GVC-T-octagonal-profile", "gvc014",
+            "outerBodyProfileCoordinates", "CartesianVectorValue", 8, "Vec2"),
+        typed_collection_check(source, "GVC-T-rail-stations", "gvc012", "railStations", "Position", 8, "Vec3"),
         typed_collection_check(source, "GVC-T-leg-stations", "gvc005", "legStations", "Position", 4, "Vec3"),
         typed_collection_check(source, "GVC-T-tank-stations", "gvc007", "tankStations", "Position", 4, "Vec3"),
         tank_station_layout_check(source),
@@ -252,14 +279,14 @@ fn on_tick(me, ctx) {
         typed_symmetry_check(source),
         typed_collection_check(source, "GVC-T-solar-stations", "gvc006", "solarStations", "Position", 2, "Vec3"),
         typed_collection_check(source, "GVC-T-engine-stations", "gvc008", "engineStations", "Position", 7, "Vec3"),
-        typed_collection_check(source, "GVC-T-frame-rail-identities", "gvc012", "frameRails", "GriffinFrameRailNode", 6, "EnumValue"),
-        typed_collection_check(source, "GVC-T-open-bay-identities", "gvc009", "frameOpenBayPanels", "GriffinOpenBayPanelNode", 6, "EnumValue"),
+        typed_collection_check(source, "GVC-T-frame-rail-identities", "gvc012", "frameRails", "GriffinFrameRailNode", 8, "EnumValue"),
         typed_collection_check(source, "GVC-T-tank-identities", "gvc007", "tankInstances", "GriffinTankInstanceName", 4, "EnumValue"),
         typed_collection_check(source, "GVC-T-leg-identities", "gvc005", "landingLegInstances", "GriffinLandingLegInstanceName", 4, "EnumValue"),
         typed_collection_check(source, "GVC-T-solar-identities", "gvc006", "solarArrayInstances", "GriffinSolarArrayInstanceName", 2, "EnumValue"),
         typed_collection_check(source, "GVC-T-engine-identities", "gvc008", "mainEngineInstances", "GriffinMainEngineInstanceName", 7, "EnumValue"),
-        typed_enum_check(source, "GVC-T-body-profile", "gvc003", "bodyProfile", "HexagonalOpenFrame"),
+        typed_enum_check(source, "GVC-T-body-profile", "gvc003", "bodyProfile", "OctagonalOpenFrame"),
         typed_enum_check(source, "GVC-T-ramp-state", "gvc009", "rampState", "Stowed"),
+        display_color_check(source),
         native_transform_plan_check(),
         component_requirements::assertion("GVC-T-ramp-source", "griffin.typed_configuration",
             "gvc009", VERIFICATION,

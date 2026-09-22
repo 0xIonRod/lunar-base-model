@@ -320,9 +320,9 @@ package GriffinRequirementSources {
 
     part evidence_gbc_008 : RequirementEvidence {
         attribute requirementId = "GBC-008";
-        attribute qualifiedRequirement = "GriffinBusRequirements::GBC008_HexagonalBodyShape";
+        attribute qualifiedRequirement = "GriffinBusRequirements::GBC008_OctagonalBodyShape";
         attribute sourceReference = "https://openusd.org/release/api/class_usd_geom_mesh.html; twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml";
-        attribute rationale = "The body gate positively verifies the open six-sided member topology, face winding, and metric frame rather than relying on silhouette alone.";
+        attribute rationale = "The body gate positively verifies the open eight-sided, sixteen-member topology, face winding, and metric frame rather than relying on silhouette alone.";
     }
 
     part evidence_gbc_009 : RequirementEvidence {
@@ -1104,9 +1104,9 @@ package GriffinRequirementSources {
 
     part evidence_gvc_003 : RequirementEvidence {
         attribute requirementId = "GVC-003";
-        attribute qualifiedRequirement = "GriffinVisualConfigurationRequirements::GVC003_HexagonalAirframe";
+        attribute qualifiedRequirement = "GriffinVisualConfigurationRequirements::GVC003_OctagonalAirframe";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml";
-        attribute rationale = "Public Griffin imagery supplies the faceted silhouette anchor; the six-sided planform and exact 4.50 m study envelope are explicit replaceable assumptions because the structural ICD is not public.";
+        attribute rationale = "Public Griffin imagery supplies the faceted silhouette anchor; the octagonal planform and exact 4.50 m study envelope are explicit replaceable assumptions because the structural ICD is not public.";
     }
 
     part evidence_gvc_004 : RequirementEvidence {
@@ -1176,14 +1176,21 @@ package GriffinRequirementSources {
         attribute requirementId = "GVC-013";
         attribute qualifiedRequirement = "GriffinVisualConfigurationRequirements::GVC013_SurfaceOrientation";
         attribute sourceReference = "https://openusd.org/release/api/class_usd_geom_mesh.html; twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml";
-        attribute rationale = "Outward winding is the geometry source of truth; doubleSided is an explicit temporary presentation safeguard for the known surface-orientation failure mode.";
+        attribute rationale = "Outward winding and single-sided rendering are checked from composed mesh topology; material sidedness does not hide a winding defect.";
     }
 
     part evidence_gvc_014 : RequirementEvidence {
         attribute requirementId = "GVC-014";
         attribute qualifiedRequirement = "GriffinVisualConfigurationRequirements::GVC014_ParametricProfile";
         attribute sourceReference = "https://openusd.org/release/api/class_usd_geom_mesh.html; twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml";
-        attribute rationale = "A single standard Cartesian vector profile is scaled by the independently required deck/skirt dimensions, then extruded by the shared f64 geometry kernel; the six normalized points remain replaceable source-owned assumptions.";
+        attribute rationale = "The eight-point outer profile and six-point central support profile are separate typed assumptions; their envelopes are scaled from source-owned dimensions and extruded through the shared geometry kernel.";
+    }
+
+    part evidence_gvc_015 : RequirementEvidence {
+        attribute requirementId = "GVC-015";
+        attribute qualifiedRequirement = "GriffinVisualConfigurationRequirements::GVC015_SurfaceAppearance";
+        attribute sourceReference = "twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml";
+        attribute rationale = "The display palette is a view-only linear-color study assumption; it is not an optical, coating, or flight-material specification.";
     }
 
     part evidence_gbc_010 : RequirementEvidence {
@@ -1191,6 +1198,20 @@ package GriffinRequirementSources {
         attribute qualifiedRequirement = "GriffinBusRequirements::GBC010_DeckSkirtSeparation";
         attribute sourceReference = "twin://astrobotic-griffin-1/requirements/griffin_bus_requirements.sysml; twin://astrobotic-griffin-1/scenarios/tests/griffin_bus_requirements.rhai";
         attribute rationale = "The service-bay gap is derived from the deck/skirt centers and dimensions and checked by the shared oriented-box SAT calculation; no second clearance dimension is invented.";
+    }
+
+    part evidence_gbc_011 : RequirementEvidence {
+        attribute requirementId = "GBC-011";
+        attribute qualifiedRequirement = "GriffinBusRequirements::GBC011_TankSupportOpenings";
+        attribute sourceReference = "twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml; twin://astrobotic-griffin-1/scenarios/tests/griffin_bus_requirements.rhai";
+        attribute rationale = "The central support profile, four collar centers, bore radii, and topology are read from the visual configuration and checked against the tank station table; the dimensions remain study assumptions.";
+    }
+
+    part evidence_gbc_012 : RequirementEvidence {
+        attribute requirementId = "GBC-012";
+        attribute qualifiedRequirement = "GriffinBusRequirements::GBC012_SourceOwnedAppearance";
+        attribute sourceReference = "twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml; twin://astrobotic-griffin-1/scenarios/tests/griffin_bus_requirements.rhai";
+        attribute rationale = "The composed display colors are compared to the single SysML palette; the visual values do not assert real Griffin coating data.";
     }
 
     part evidence_mb_001 : RequirementEvidence {

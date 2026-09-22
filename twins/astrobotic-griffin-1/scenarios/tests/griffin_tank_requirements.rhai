@@ -58,8 +58,7 @@ fn _point_segment_distance_xz(point, start, end) {
     (offset_x * offset_x + offset_z * offset_z).sqrt()
 }
 
-fn _tank_clearances(stations, perimeter_stations, perimeter_order,
-    frame_section, installed_envelope_radius) {
+fn _tank_clearances(stations, perimeter_stations, frame_section, installed_envelope_radius) {
     let min_instance_clearance = 1000000.0;
     let min_frame_centerline_distance = 1000000.0;
     for index in 0..stations.len() {
@@ -72,14 +71,9 @@ fn _tank_clearances(stations, perimeter_stations, perimeter_order,
                 min_instance_clearance = clearance;
             }
         }
-        for edge_index in 0..perimeter_order.len() {
-            let next_edge_index = if edge_index + 1 == perimeter_order.len() {
-                0
-            } else {
-                edge_index + 1
-            };
-            let start_index = perimeter_order[edge_index] - 1;
-            let end_index = perimeter_order[next_edge_index] - 1;
+        for edge_index in 0..perimeter_stations.len() {
+            let start_index = edge_index;
+            let end_index = (edge_index + 1) % perimeter_stations.len();
             let distance = _point_segment_distance_xz(stations[index],
                 perimeter_stations[start_index], perimeter_stations[end_index]);
             if distance < min_frame_centerline_distance {
@@ -108,7 +102,7 @@ fn on_tick(me, ctx) {
         parent("tankCount"), visual("tankInstances"), visual("tankStations"),
         visual("tankScale"), visual("bodyMount"), visual("lowerSkirtCenter"),
         visual("lowerSkirtDimensions"), visual("railStations"),
-        visual("framePerimeterStationOrder"), visual("frameRingSectionM"),
+        visual("frameRingSectionM"),
         visual("minimumTankInstanceClearanceM"), visual("minimumTankFrameClearanceM"),
         own("usdRootPath"), own("bodyName"), own("bodyShape"), own("bodyCenter"),
         own("bodyRadiusM"), own("minimumInstalledBodyDiameterM"), own("tankAxis"),
@@ -138,7 +132,6 @@ fn on_tick(me, ctx) {
     let tank_stations = component_requirements::source_position_list(source, visual("tankStations"));
     let tank_scales = component_requirements::source_number_list(source, visual("tankScale"));
     let perimeter_stations = component_requirements::source_position_list(source, visual("railStations"));
-    let perimeter_order = sysml_requirements::native_value(source, visual("framePerimeterStationOrder"));
     let frame_section = sysml_requirements::number(source, visual("frameRingSectionM"));
     let minimum_instance_clearance = sysml_requirements::number(source, visual("minimumTankInstanceClearanceM"));
     let minimum_frame_clearance = sysml_requirements::number(source, visual("minimumTankFrameClearanceM"));
@@ -238,9 +231,7 @@ fn on_tick(me, ctx) {
     let brackets_ready = bracket_group_name != () && bracket_shape == "Cube"
         && bracket_length != () && bracket_width != () && bracket_depth != ()
         && bracket_offset != () && bracket_tilt != ();
-    let clearance_contract_ready = perimeter_stations.len() == 6
-        && perimeter_order != () && type_of(perimeter_order) == "array"
-        && perimeter_order.len() == 6 && frame_section != ()
+    let clearance_contract_ready = perimeter_stations.len() == 8 && frame_section != ()
         && minimum_instance_clearance != () && minimum_frame_clearance != ();
     let complete = source_ready && identities_ready && body_ready && band_ready
         && hardware_ready && transition_ready && cradle_ready && pad_ready
@@ -286,7 +277,7 @@ fn on_tick(me, ctx) {
     if pad_corner_radius > local_envelope_radius { local_envelope_radius = pad_corner_radius; }
     if brace_corner_radius > local_envelope_radius { local_envelope_radius = brace_corner_radius; }
     let tank_clearances = _tank_clearances(tank_stations, perimeter_stations,
-        perimeter_order, frame_section,
+        frame_section,
         local_envelope_radius * tank_scales[0]);
 
     for tank_index in 0..tank_names.len() {
@@ -309,7 +300,7 @@ fn on_tick(me, ctx) {
             checks.push(component_requirements::assertion("GPT-005-frame-clearance", "tank",
                 "gpt005", VERIFICATION,
                 tank_clearances.frame >= minimum_frame_clearance,
-                "the composed tank envelopes clear every typed hexagonal frame rail",
+                "the composed tank envelopes clear every typed octagonal frame rail",
                 #{minimum_clearance_m: tank_clearances.frame},
                 #{required_clearance_m: minimum_frame_clearance}));
             checks.push(component_requirements::assertion("GPT-006-installed-diameter", "tank",

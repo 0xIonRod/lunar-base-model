@@ -7,8 +7,8 @@ canonical wrapper is hidden, empty, or mounted on the wrong datum.
 
 | Part | Required topology | Required geometry / physics | Known study requirement |
 |---|---|---|---|
-| `Griffin1` | `BoxyAirframe`, `IsogridDeck`, `PayloadAdapter`, `MainPropulsion`, four tanks, both arrays, `Nozzle`, four legs, optional two ramps | Xform root with capacity, collision, status, and provenance metadata | Public 625 kg capacity, four legs, seven engines, four tanks; dimensions and dynamics TBD |
-| `BoxyAirframe` | Primary body shell | Visible rectangular Cube with positive dimensions and enabled collider | Global Griffin references establish the boxy frame; exact dimensions, dry mass, and inertia TBD |
+| `Griffin1` | component-owned octagonal bus, payload adapter, seven-engine propulsion, four tanks, two arrays, four legs, optional two ramps | Xform root with capacity, collision, status, and provenance metadata | Public system counts are modeled once in SysML; visual dimensions remain explicitly labeled assumptions |
+| `GriffinBusComponent` | open octagonal frame, payload deck, lower service skirt, avionics, central tank support | referenced component owns render geometry; the descent lander owns flight collision and mass | `GriffinVisualConfiguration` owns dimensions, stations, and appearance; no duplicate authored hex shell |
 | `IsogridDeck` | `DeckPlate` | Visible plate with enabled collider | Payload deck dimensions TBD |
 | `TankPX/NX/PZ/NZ` | None beyond each tank shape owner | Four visible Y-axis Capsule study geometries; visual-only unless a body contract says otherwise | Four-tank integration is public; exact tank dimensions TBD |
 | `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider | FLIP interface/release datum TBD |

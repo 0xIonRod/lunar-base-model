@@ -37,7 +37,7 @@ package GriffinLanderRequirements {
     }
 
     requirement def GLR001_BusTopology {
-        doc /* GLR-001 [visual] the reusable lander shall expose the named hexagonal bus configuration with a faceted equipment body, lower service skirt, upper deck, and inspectable frame rails. */
+        doc /* GLR-001 [visual] the reusable lander shall expose the named octagonal open-frame bus configuration, lower service skirt, upper deck, and inspectable frame rails. */
     }
     requirement def GLR002_LandingLegs {
         doc /* GLR-002 [visual] exactly four named landing-leg components shall expose struts and a visible foot pad. */

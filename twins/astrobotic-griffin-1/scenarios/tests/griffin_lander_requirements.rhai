@@ -91,7 +91,7 @@ fn on_tick(me, ctx) {
 
     checks.push(_exists("GLR-001-root", "glr001", ROOT, "Xform"));
     checks.push(_children("GLR-001-bus", "glr001", ROOT + "/Bus",
-        [ROOT + "/Bus/PerimeterFrame", ROOT + "/Bus/LowerServiceSkirtHex", ROOT + "/Bus/TopDeckHex"]));
+        [ROOT + "/Bus/PerimeterFrame", ROOT + "/Bus/LowerServiceSkirtOctagon", ROOT + "/Bus/TopDeckOctagon"]));
     let body_mount = sysml_requirements::native_value(values,
         _configuration_attr("bodyMount"));
     checks.push(#{id: "GLR-008-bus-y", component: "bus",
