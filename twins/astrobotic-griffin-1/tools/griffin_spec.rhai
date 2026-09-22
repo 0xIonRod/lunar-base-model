@@ -12,8 +12,28 @@ fn _sysml_source() {
     sysml_requirements::source()
 }
 
+// Keep repeated Griffin lookups on one Rust-owned, revision-pinned SysML
+// session. The qualified name is an identifier boundary; the engineering
+// value itself remains a native Rust/Rhai value.
+fn _sysml_model() {
+    sysml_requirements::model()
+}
+
+fn _sysml_model_value(name) {
+    let model = _sysml_model();
+    if model == () || type_of(model) != "SysmlModel" { return (); }
+    let value = model.value(_qualified_attribute(name));
+    if value == () { return (); }
+    value
+}
+
 fn _sysml_attribute(name) {
     let qualified = _qualified_attribute(name);
+    let native = _sysml_model_value(name);
+    if native != () {
+        if type_of(native) == "Quantity" { return native.value; }
+        if type_of(native) == "float" || type_of(native) == "int" { return native; }
+    }
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return (); }
     sysml_requirements::number(source, qualified)
@@ -27,6 +47,11 @@ fn _sysml_integer(name) {
 
 fn _sysml_text(name) {
     let qualified = _qualified_attribute(name);
+    let native = _sysml_model_value(name);
+    if native != () {
+        if type_of(native) == "string" { return native; }
+        if type_of(native) == "EnumValue" { return native.literal; }
+    }
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return (); }
     sysml_requirements::text(source, qualified)
@@ -156,6 +181,16 @@ fn _qualified_attribute(name) {
 fn qualified_attribute_name(name) { _qualified_attribute(name) }
 
 fn _sysml_list(name) {
+    let native = _sysml_model_value(name);
+    if native != () && type_of(native) == "array" {
+        let items = [];
+        for value in native {
+            if type_of(value) == "EnumValue" { items.push(value.literal); }
+            else if type_of(value) == "string" { items.push(value); }
+            else { return []; }
+        }
+        return items;
+    }
     let qualified = _qualified_attribute(name);
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return []; }
@@ -169,6 +204,15 @@ fn _sysml_list(name) {
 // the expected cardinality before indexing, so malformed station data fails
 // loudly instead of silently inventing a placement.
 fn _sysml_number_list(name) {
+    let native = _sysml_model_value(name);
+    if native != () && type_of(native) == "array" {
+        let values = [];
+        for value in native {
+            if type_of(value) != "float" && type_of(value) != "int" { return []; }
+            values.push(value.to_float());
+        }
+        return values;
+    }
     let qualified = _qualified_attribute(name);
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return []; }
@@ -181,6 +225,8 @@ fn _sysml_number_list(name) {
 // Structured vectors remain DVec3, quaternions DQuat, transforms DTransform,
 // and enumeration values remain their SysmlEnumValue wrapper in Rhai.
 fn _sysml_native(name) {
+    let native = _sysml_model_value(name);
+    if native != () { return native; }
     let qualified = _qualified_attribute(name);
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return (); }
