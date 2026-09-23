@@ -113,7 +113,7 @@ def Xform "Griffin1" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
     )
     {
-        custom double3 xformOp:translate = (2.2, 2.2, 0.0)
+        custom double3 xformOp:translate = (3.1, 2.2, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
@@ -121,7 +121,7 @@ def Xform "Griffin1" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
     )
     {
-        custom double3 xformOp:translate = (-2.2, 2.2, 0.0)
+        custom double3 xformOp:translate = (-3.1, 2.2, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
@@ -129,32 +129,32 @@ def Xform "Griffin1" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
     )
     {
-        custom double3 xformOp:translate = (0.0, 2.2, 2.2)
+        custom double3 xformOp:translate = (0.0, 2.2, 3.1)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 89.99999999999999, 0.0)
     }
     def Xform "LegNZ" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
     )
     {
-        custom double3 xformOp:translate = (0.0, 2.2, -2.2)
+        custom double3 xformOp:translate = (0.0, 2.2, -3.1)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 89.99999999999999, 0.0)
     }
     def Xform "SolarPanelPort" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (0.0, 3.2, 2.36)
-        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
+        custom double3 xformOp:translate = (0.0, 3.2, 2.9)
+        custom double3 xformOp:rotateXYZ = (89.99999999999999, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
     }
     def Xform "SolarPanelStarboard" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (0.0, 3.2, -2.36)
-        custom double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
+        custom double3 xformOp:translate = (0.0, 3.2, -2.9)
+        custom double3 xformOp:rotateXYZ = (-89.99999999999999, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
     }
     def Xform "Nozzle"
@@ -165,8 +165,9 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (0.0, 1.75, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 def "Bell"
                 {
                     double radius = 0.34
@@ -178,8 +179,9 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (1.0, 1.75, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                custom double3 xformOp:translate = (1.0, 1.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 def "Bell"
                 {
                     double radius = 0.34
@@ -191,8 +193,9 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (-1.0, 1.75, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                custom double3 xformOp:translate = (-1.0, 1.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 def "Bell"
                 {
                     double radius = 0.34
@@ -204,8 +207,9 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (0.0, 1.75, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                custom double3 xformOp:translate = (0.0, 1.0, 1.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 def "Bell"
                 {
                     double radius = 0.34
@@ -217,8 +221,9 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (0.0, 1.75, -1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                custom double3 xformOp:translate = (0.0, 1.0, -1.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 def "Bell"
                 {
                     double radius = 0.34
@@ -230,8 +235,9 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (0.9, 1.75, 0.9)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                custom double3 xformOp:translate = (0.9, 1.0, 0.9)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 def "Bell"
                 {
                     double radius = 0.34
@@ -243,8 +249,9 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (-0.9, 1.75, -0.9)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                custom double3 xformOp:translate = (-0.9, 1.0, -0.9)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 def "Bell"
                 {
                     double radius = 0.34
@@ -270,8 +277,9 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
             )
             {
-                custom double3 xformOp:translate = (0.0, 1.68, 0.0)
-                custom token[] xformOpOrder = ["xformOp:translate"]
+                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
             }
         }
     }

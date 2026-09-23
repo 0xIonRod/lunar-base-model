@@ -60,17 +60,17 @@ fn _maximum_abs(values) {
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source_with_selection([
-        "GriffinRampRequirements::GriffinEgressRamp::assemblyChildNames",
+        "GriffinRampRequirements::GriffinEgressRamp::childNames",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceLengthM",
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceWidthM",
         "GriffinRampRequirements::GriffinEgressRamp::rampWheelClearanceM",
         "GriffinRampRequirements::GriffinEgressRamp::physicalRampDeckTransitionOverlapM",
-        "GriffinRampRequirements::GriffinEgressRamp::physicalRampSurfaceLengthM",
         "GriffinRampRequirements::GriffinEgressRamp::physicalRampTransitionChildName",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadCount",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadNamePrefix",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadWidthM",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadHeightM",
-        "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadSpanM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadFirstCenterXM",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadPitchM",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyUnderBeamWidthM",
@@ -104,8 +104,9 @@ fn on_tick(me, ctx) {
         "GriffinRampRequirements::GriffinEgressRamp::rampSocketY",
         "GriffinRampRequirements::GriffinEgressRamp::rampSocketZ",
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceThicknessM",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceCenterYM",
         "FlipRequirements::FlipRover::wheelStationZ",
-        "FlipRequirements::FlipRover::visualRoverWheelRadiusM"
+        "FlipRequirements::FlipRover::visualRoverWheelWidthM"
     ], [
         "GriffinRampRequirements::grr001", "GriffinRampRequirements::grr002",
         "GriffinRampRequirements::grr003", "GriffinRampRequirements::grr004",
@@ -121,18 +122,18 @@ fn on_tick(me, ctx) {
     let ramp_width = _source_number(source, "rampSurfaceWidthM");
     let wheel_z = sysml_requirement_checks::source_number_list(source,
         "FlipRequirements::FlipRover::wheelStationZ");
-    let wheel_radius = sysml_requirements::number(source,
-        "FlipRequirements::FlipRover::visualRoverWheelRadiusM");
+    let wheel_width = sysml_requirements::number(source,
+        "FlipRequirements::FlipRover::visualRoverWheelWidthM");
     let wheel_clearance = _source_number(source, "rampWheelClearanceM");
     let transition_overlap = _source_number(source, "physicalRampDeckTransitionOverlapM");
-    let physical_surface_length = _source_number(source, "physicalRampSurfaceLengthM");
+    let ramp_surface_length = _source_number(source, "rampSurfaceLengthM");
     let transition_name = _source_text(source, "physicalRampTransitionChildName");
-    let assembly_names = sysml_requirement_checks::source_text_list(source,
-        _source_attr("assemblyChildNames"));
+    let child_names = sysml_requirement_checks::source_text_list(source,
+        _source_attr("childNames"));
     let tread_count = _source_number(source, "assemblyTreadCount");
     let tread_width = _source_number(source, "assemblyTreadWidthM");
     let tread_height = _source_number(source, "assemblyTreadHeightM");
-    let tread_span = _source_number(source, "assemblyTreadSpanM");
+    let track_width = _source_number(source, "assemblyTrackWidthM");
     let tread_first_x = _source_number(source, "assemblyTreadFirstCenterXM");
     let tread_pitch = _source_number(source, "assemblyTreadPitchM");
     let tread_prefix = _source_text(source, "assemblyTreadNamePrefix");
@@ -157,15 +158,15 @@ fn on_tick(me, ctx) {
     let gusset_y = _source_number(source, "assemblyHingeGussetCenterYM");
     let gusset_offset = _source_number(source, "assemblyHingeGussetOffsetZM");
     let half_track = _maximum_abs(wheel_z);
-    if ramp_width == () || half_track == () || wheel_radius == ()
+    if ramp_width == () || half_track == () || wheel_width == ()
         || wheel_clearance == () || wheel_z.len() != 4
-        || wheel_radius <= 0.0 || wheel_clearance <= 0.0
-        || transition_overlap == () || physical_surface_length == () || transition_name == ()
-        || transition_name == "" || assembly_names.len() == 0
+        || wheel_width <= 0.0 || wheel_clearance <= 0.0
+        || transition_overlap == () || ramp_surface_length == () || transition_name == ()
+        || transition_name == "" || child_names.len() == 0
         || tread_count == () || tread_count < 2.0 || tread_width == ()
-        || tread_height == () || tread_span == () || tread_first_x == ()
+        || tread_height == () || track_width == () || tread_first_x == ()
         || tread_pitch == () || tread_prefix == () || tread_prefix == ""
-        || tread_width <= 0.0 || tread_height <= 0.0 || tread_span <= 0.0
+        || tread_width <= 0.0 || tread_height <= 0.0 || track_width <= 0.0
         || tread_pitch <= 0.0 {
         throw("GriffinRampRequirements ramp/FLIP clearance datums are incomplete");
     }
@@ -186,21 +187,32 @@ fn on_tick(me, ctx) {
         || gusset_offset <= 0.0 {
         throw("GriffinRampRequirements hinge-gusset datums are incomplete");
     }
-    let required_width = 2.0 * (half_track + wheel_radius + wheel_clearance);
     checks.push(_constraint("GRR-003-flip-wheel-clearance", "grr003",
         "GRC003_WidthClearsFlipWheelEnvelope",
         #{rampWidthM: ramp_width, wheelHalfTrackM: half_track,
-          wheelRadiusM: wheel_radius, wheelClearanceM: wheel_clearance}));
+          wheelHalfWidthM: wheel_width / 2.0, wheelClearanceM: wheel_clearance}));
+    checks.push(_constraint("GRR-006-contact-track-clearance", "grr006",
+        "GRC016_ContactTrackClearsTire",
+        #{trackWidthM: track_width, wheelWidthM: wheel_width,
+          wheelClearanceM: wheel_clearance}));
+    let deck_observation = griffin_visual_builder::physical_top_deck_collider_observation(
+        (), ROOT);
+    let deck_profile_compatible = if deck_observation.ok == true
+        && deck_observation.state == "pass" {
+        #{provider: "usd", state: "value", value: true}
+    } else {
+        #{provider: "usd", state: "unavailable",
+          detail: "source-derived perimeter and rover platform colliders have not passed composed Editor readback"}
+    };
     checks.push(_constraint("GRR-012-source-transition", "grr012",
         "GRC012_TransitionOverlapWithinSurface",
         #{overlapM: #{provider: "usd", state: "unavailable",
               detail: "composed TransitionPlate dimensions are not exposed by a typed USD provider"},
           requiredOverlapM: #{provider: "derived_geometry", state: "unavailable",
-              detail: "required overlap must be recomputed from the octagonal deck, hinge, and FLIP wheel envelope"},
+              detail: "required transition length must be bound to composed adapter edge, hinge, and source contact overlap"},
           surfaceLengthM: #{provider: "source_literal", state: "value",
-              value: physical_surface_length},
-          deckProfileCompatible: #{provider: "usd", state: "unavailable",
-              detail: "TopDeckCollisionProxy octagonal profile has not been authored and read back in Editor"}}));
+              value: ramp_surface_length},
+          deckProfileCompatible: deck_profile_compatible}));
     let pi = 3.141592653589793;
     for side in ["Port", "Starboard"] {
         let ramp = ROOT + "/EgressRamp" + side;
@@ -216,9 +228,8 @@ fn on_tick(me, ctx) {
         let socket_x = _source_number(source, "rampSocketX");
         checks.push(_check("GRR-001-" + side + "-root", "ramp", "grr001", "exists", ramp));
         checks[checks.len() - 1].expected_type = "Xform";
-        let part_paths = [ramp + "/MountFrame", ramp + "/RampSurface",
-            ramp + "/OuterRail", ramp + "/InnerRail", ramp + "/SupportArm"];
-        for name in assembly_names {
+        let part_paths = [];
+        for name in child_names {
             part_paths.push(ramp + "/" + name);
         }
         checks.push(#{id: "GRR-001-" + side + "-parts", component: "ramp",
@@ -284,52 +295,63 @@ fn on_tick(me, ctx) {
                 attr: field.attr, expected_attr: field.expected_attr, tolerance: 0.001};
             checks.push(check);
         }
-        checks.push(#{id: "GRR-006-" + side + "-length", component: "geometry",
-            requirement: "grr006", verification: VERIFICATION,
-            kind: "extent_component", path: ramp + "/RampSurface", index: 0,
-            multiplier: 2.0, expected_attr: _source_attr("rampSurfaceLengthM"), tolerance: 0.002});
-        checks.push(#{id: "GRR-006-" + side + "-thickness", component: "geometry",
-            requirement: "grr006", verification: VERIFICATION,
-            kind: "extent_component", path: ramp + "/RampSurface", index: 1,
-            multiplier: 2.0, expected_attr: _source_attr("rampSurfaceThicknessM"), tolerance: 0.002});
-        checks.push(#{id: "GRR-006-" + side + "-width", component: "geometry",
-            requirement: "grr006", verification: VERIFICATION,
-            kind: "extent_component", path: ramp + "/RampSurface", index: 2,
-            multiplier: 2.0, expected_attr: _source_attr("rampSurfaceWidthM"), tolerance: 0.002});
+        for track in [
+            #{name: "RampTrackPort", center_z: half_track},
+            #{name: "RampTrackStarboard", center_z: -half_track},
+        ] {
+            let track_path = ramp + "/" + track.name;
+            for dim in [
+                #{name: "length", index: 0, expected_attr: "rampSurfaceLengthM"},
+                #{name: "thickness", index: 1, expected_attr: "rampSurfaceThicknessM"},
+                #{name: "width", index: 2, expected_attr: "assemblyTrackWidthM"},
+            ] {
+                checks.push(#{id: "GRR-006-" + side + "-" + track.name + "-" + dim.name,
+                    component: "geometry", requirement: "grr006", verification: VERIFICATION,
+                    kind: "extent_component", path: track_path, index: dim.index,
+                    multiplier: 2.0, expected_attr: _source_attr(dim.expected_attr), tolerance: 0.002});
+            }
+            checks.push(_attribute_component("GRR-006-" + side + "-" + track.name + "-hinge-station",
+                "grr006", track_path, "xformOp:translate", 0,
+                _source_number(source, "rampSurfaceLengthM") / 2.0));
+            checks.push(_attribute_component("GRR-006-" + side + "-" + track.name + "-vertical-station",
+                "grr006", track_path, "xformOp:translate", 1,
+                _source_number(source, "rampSurfaceCenterYM")));
+            checks.push(_attribute_component("GRR-006-" + side + "-" + track.name + "-station",
+                "grr006", track_path, "xformOp:translate", 2, track.center_z));
+        }
         for index in 0..tread_count.to_int() {
-            let tread = ramp + "/" + tread_prefix + (index + 1).to_string();
             let x = tread_first_x + tread_pitch * index;
             let y = _source_number(source, "rampSurfaceThicknessM") / 2.0
                 + tread_height / 2.0;
-            checks.push(#{id: "GRR-013-" + side + "-" + tread_prefix
-                    + (index + 1).to_string() + "-width", component: "ramp",
+            for track in [
+                #{name: "Port", center_z: half_track},
+                #{name: "Starboard", center_z: -half_track},
+            ] {
+            let tread_name = tread_prefix + track.name + (index + 1).to_string();
+            let tread = ramp + "/" + tread_name;
+            checks.push(#{id: "GRR-013-" + side + "-" + tread_name + "-width", component: "ramp",
                 requirement: "grr013", verification: VERIFICATION,
                 kind: "extent_component", path: tread, index: 0,
                 multiplier: 2.0, expected_attr: _source_attr("assemblyTreadWidthM"), tolerance: 0.002});
-            checks.push(#{id: "GRR-013-" + side + "-" + tread_prefix
-                    + (index + 1).to_string() + "-height", component: "ramp",
+            checks.push(#{id: "GRR-013-" + side + "-" + tread_name + "-height", component: "ramp",
                 requirement: "grr013", verification: VERIFICATION,
                 kind: "extent_component", path: tread, index: 1,
                 multiplier: 2.0, expected_attr: _source_attr("assemblyTreadHeightM"), tolerance: 0.002});
-            checks.push(#{id: "GRR-013-" + side + "-" + tread_prefix
-                    + (index + 1).to_string() + "-span", component: "ramp",
+            checks.push(#{id: "GRR-013-" + side + "-" + tread_name + "-span", component: "ramp",
                 requirement: "grr013", verification: VERIFICATION,
                 kind: "extent_component", path: tread, index: 2,
-                multiplier: 2.0, expected_attr: _source_attr("assemblyTreadSpanM"), tolerance: 0.002});
-            checks.push(_attribute_component("GRR-013-" + side + "-" + tread_prefix
-                    + (index + 1).to_string() + "-x", "grr013", tread,
+                multiplier: 2.0, expected_attr: _source_attr("assemblyTrackWidthM"), tolerance: 0.002});
+            checks.push(_attribute_component("GRR-013-" + side + "-" + tread_name + "-x", "grr013", tread,
                 "xformOp:translate", 0, x));
-            checks.push(_attribute_component("GRR-013-" + side + "-" + tread_prefix
-                    + (index + 1).to_string() + "-y", "grr013", tread,
+            checks.push(_attribute_component("GRR-013-" + side + "-" + tread_name + "-y", "grr013", tread,
                 "xformOp:translate", 1, y));
-            checks.push(_attribute_component("GRR-013-" + side + "-" + tread_prefix
-                    + (index + 1).to_string() + "-z", "grr013", tread,
-                "xformOp:translate", 2, 0.0));
-            checks.push(#{id: "GRR-013-" + side + "-" + tread_prefix
-                    + (index + 1).to_string() + "-purpose", component: "ramp",
+            checks.push(_attribute_component("GRR-013-" + side + "-" + tread_name + "-z", "grr013", tread,
+                "xformOp:translate", 2, track.center_z));
+            checks.push(#{id: "GRR-013-" + side + "-" + tread_name + "-purpose", component: "ramp",
                 requirement: "grr013", verification: VERIFICATION,
                 kind: "attribute_equals", path: tread, attr: "purpose",
                 expected: "render"});
+            }
         }
         for beam in [
             #{name: "UnderBeamPort", z: beam_offset},

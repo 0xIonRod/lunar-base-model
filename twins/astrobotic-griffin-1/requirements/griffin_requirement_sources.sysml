@@ -560,7 +560,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GRR-001";
         attribute qualifiedRequirement = "GriffinRampRequirements::GRR001_RampTopology";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml";
-        attribute rationale = "Astrobotic establishes optional rover egress, but not a released ramp assembly tree. The named surface, rails, hinge hardware, supports, and render-only traction bars are therefore explicit Twin-owned members so the Editor can inspect and replace each load-path element independently.";
+        attribute rationale = "Astrobotic establishes optional rover egress, but not a released ramp assembly tree. The two wheel-contact tracks, rails, hinge hardware, supports, and render-only traction bars are therefore explicit Twin-owned members so the Editor can inspect and replace each load-path element independently while leaving the centre open.";
     }
 
     part evidence_grr_002 : RequirementEvidence {
@@ -574,7 +574,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GRR-003";
         attribute qualifiedRequirement = "GriffinRampRequirements::GRR003_RampEnvelope";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml; twin://astrobotic-griffin-1/requirements/flip_requirements.sysml";
-        attribute rationale = "The 8.00 m length and 3.50 m clear width are replaceable study values. Width is derived from the current FLIP lateral wheel station, conservative tyre envelope, and 0.15 m route clearance on each side, so the interface is wider than the rover without retaining the old oversized 5.50 m placeholder.";
+        attribute rationale = "The 8.00 m length and 3.50 m outside rail envelope are replaceable study values. The envelope clears the source-owned +/-1.15 m FLIP wheel stations, 0.15 m wheel half-width, and 0.15 m lateral clearance on each side. Each contact track is independently sized from wheel width and two clearances by GRC016; the 3.50 m value is not the walking-surface width.";
     }
 
     part evidence_grr_004 : RequirementEvidence {
@@ -595,7 +595,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GRR-006";
         attribute qualifiedRequirement = "GriffinRampRequirements::GRR006_RampGeometry";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml";
-        attribute rationale = "Public material does not publish ramp CAD, so the composed surface extent is checked directly against the typed 8.00 m x 3.50 m x 0.18 m study envelope; rails, supports, and treads remain separately inspectable geometry.";
+        attribute rationale = "Public material does not publish ramp CAD, so each composed contact track is checked against the typed 8.00 m x 0.60 m x 0.18 m study envelope and source wheel station. The 3.50 m value describes the outside rail envelope; the open centre, rails, supports, and treads remain separately inspectable geometry.";
     }
 
     part evidence_grr_007 : RequirementEvidence {
@@ -609,7 +609,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GRR-008";
         attribute qualifiedRequirement = "GriffinRampRequirements::GRR008_RailGeometry";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml";
-        attribute rationale = "A 0.28 m raised rail with 0.14 m width at +/-1.68 m leaves the FLIP wheel-clear span inside the 3.50 m surface. These are explicit visibility and route-containment assumptions, not claimed supplier dimensions.";
+        attribute rationale = "A 0.28 m raised rail with 0.14 m width at +/-1.68 m bounds the 3.50 m outside envelope while leaving the two 0.60 m FLIP-aligned tracks clear inside it. These are explicit visibility and route-containment assumptions, not claimed supplier dimensions.";
     }
 
     part evidence_grr_009 : RequirementEvidence {
@@ -623,7 +623,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GRR-010";
         attribute qualifiedRequirement = "GriffinRampRequirements::GRR010_PhysicalEgressEnvelope";
         attribute sourceReference = "https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/; https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/research/griffin_1_assumptions.md";
-        attribute rationale = "Astrobotic confirms the egress concept but does not publish an as-built ramp ICD. The 8 m length and 3.5 m physical clear width are explicit Twin study assumptions: the width clears the FLIP wheel envelope (1.15 m station plus 0.45 m conservative tyre radius and 0.15 m route clearance on each side). The ramp is hinged at its inboard edge, so its surface centre is 4.00 m in the ramp body frame and its contact span is 0.00..8.00 m; asin((3.98 + 1.75)/8.00) = 45.7457 degrees then reaches the normalized terrain datum at the tip. The hinge is placed at the 3.16 m composed deck edge plus 0.04 m clearance. The deck transition is a separate GRR-012 plate, not a duplicated overlap in the main ramp surface. The visual and physical study envelopes now share the same 3.5 m width so Editor review and collision review cannot silently diverge.";
+        attribute rationale = "Astrobotic confirms the egress concept but does not publish an as-built ramp ICD. The 8 m contact-track length and 3.5 m outside rail envelope are explicit Twin study assumptions. Two 0.60 m tracks follow the source-owned +/-1.15 m FLIP wheel stations and clear the 0.30 m wheel width by 0.15 m on either side under GRC016. The ramp is hinged at its inboard edge, so each track centre is 4.00 m in the ramp body frame and its contact span is 0.00..8.00 m; asin((3.98 + 1.75)/8.00) = 45.7457 degrees reaches the normalized terrain datum at the tip. The physical hinge is at x=3.20 m; a separate 1.05 m deck transition bridges from the 2.20 m adapter half-width with 0.05 m contact overlap. The visual and physical assets share the contact-track dimensions while retaining the wider outer rail envelope.";
     }
 
     part evidence_grr_011 : RequirementEvidence {
@@ -637,14 +637,14 @@ package GriffinRequirementSources {
         attribute requirementId = "GRR-012";
         attribute qualifiedRequirement = "GriffinRampRequirements::GRR012_PhysicalDeckTransition";
         attribute sourceReference = "https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/; https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/research/griffin_1_assumptions.md; twin://astrobotic-griffin-1/vehicles/griffin_1.usda";
-        attribute rationale = "The existing 1.21 m TransitionPlate datum was derived from a six-sided TopDeckCollisionProxy and is retained only to describe the current legacy asset. The intended Griffin deck and tank-support perimeter are octagonal; the old overlap calculation is not valid acceptance evidence. Recompute overlap from an Editor-authored and composed-readback octagonal collider, ramp hinge, terrain contact plane, and FLIP wheel envelope. The generic evaluator requires a measured overlap and positive octagonal-profile compatibility observation; neither is available from the current provider, so GRR-012 remains inconclusive. Transition mass and inertia remain replaceable simulator assumptions pending a mechanical ICD.";
+        attribute rationale = "The transition spans from the 2.20 m half-width of the source-owned central rover deck to the 3.20 m ramp hinge and carries a separate 0.05 m contact overlap. The geometry must be checked against the eight-beam octagonal perimeter and the distinct payload-deck collider; a single convex hull across the ring would close the tank openings. The generic evaluator still needs composed transition/contact measurements before GRR-012 can pass. Transition mass and inertia remain replaceable simulator assumptions pending a mechanical ICD.";
     }
 
     part evidence_grr_013 : RequirementEvidence {
         attribute requirementId = "GRR-013";
         attribute qualifiedRequirement = "GriffinRampRequirements::GRR013_TractionTreadGeometry";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml";
-        attribute rationale = "Public Griffin material identifies optional rover egress but does not publish tread count, spacing, or ramp surface CAD. Eight 0.12 m wide by 0.05 m high transverse bars at 1.00 m pitch are therefore explicit render-only study datums, sized to remain inside the 3.50 m wheel-clear span; they make the ramp readable without adding a second collision owner.";
+        attribute rationale = "Public Griffin material identifies optional rover egress but does not publish tread count, spacing, or ramp surface CAD. Eight 0.12 m by 0.05 m transverse bars on each 0.60 m contact track at 1.00 m pitch are explicit render-only study datums. They leave the centre open and add no second collision owner.";
     }
 
     part evidence_grr_014 : RequirementEvidence {
@@ -896,7 +896,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GR-034";
         attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR034_SurfaceRouteDatums";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml; twin://astrobotic-griffin-1/requirements/griffin_requirements.sysml";
-        attribute rationale = "Keeps marker names, speeds, and arrival radii in one ordered SysML interface table. The current 0.35 m approach-lane radius and 1.21 m transition are provisional values from a route study using the obsolete six-sided deck collider; both must be revalidated against the octagonal composed collider before acceptance. The 0.30 m exit radius is placed at (12.00,0.00) m on the ramp centreline so the trailing axle can clear the ramp without a lateral Ackermann reversal. Later 0.22..0.14 m/s corner speeds remain replaceable study limits. The deterministic replay is historical evidence and does not validate the current physical deck/ramp interface.";
+        attribute rationale = "Keeps marker names, speeds, and arrival radii in one ordered SysML interface table. The 0.35 m approach-lane radius remains a route-study value. The physical deck now uses eight source-profile perimeter colliders and a separate payload-deck collider; its 1.05 m transition datum spans the 2.20 m adapter half-width to the 3.20 m hinge with 0.05 m overlap. Composed transition/contact measurements are still required before route acceptance. The 0.30 m exit radius is placed at (12.00,0.00) m on the ramp centreline so the trailing axle can clear the ramp without a lateral Ackermann reversal. Later 0.22..0.14 m/s corner speeds remain replaceable study limits. The deterministic replay is historical evidence and does not validate the current physical deck/ramp interface.";
     }
 
     part evidence_gr_035 : RequirementEvidence {
@@ -1190,7 +1190,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GVC-014";
         attribute qualifiedRequirement = "GriffinVisualConfigurationRequirements::GVC014_ParametricProfile";
         attribute sourceReference = "https://openusd.org/release/api/class_usd_geom_mesh.html; twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml";
-        attribute rationale = "The eight-point outer profile and six-point central support profile are separate typed assumptions; their envelopes are scaled from source-owned dimensions and extruded through the shared geometry kernel.";
+        attribute rationale = "The outer frame and central tank-support perimeter use the same eight-point octagonal profile at separate source-owned radii; the geometry kernel extrudes both from the typed profile and dimensions.";
     }
 
     part evidence_gvc_015 : RequirementEvidence {

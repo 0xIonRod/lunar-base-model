@@ -24,12 +24,9 @@ table unchanged.
 
 ## Step 1: prepare the repository
 
-Use a clean LunCoSim main checkout. The package was authored against:
-
-    042f024679900c9916dc23ee52f0485ceae5392f
-
-Do not copy files from the old dirty worktree into the clean checkout. Confirm
-that the checkout contains Cargo.toml, assets/, crates/, and twins/.
+Use a current LunCoSim main checkout with the typed SysML, USD Editor, and
+generic requirement-evaluation APIs used by this Twin. Confirm that the
+checkout contains Cargo.toml, assets/, crates/, and twins/.
 
 ## Step 2: place the Twin
 
@@ -53,7 +50,6 @@ Keep this structure:
     research/griffin_1_assumptions.md
     README.md
     handover.md
-    agent_to_agent_missing.md
 
 The Twin-local references use twin://astrobotic-griffin-1/. Do not change them
 to absolute Windows paths.
@@ -198,7 +194,7 @@ When a mission owner or public source supplies data:
    or unknown.
 3. Update the relevant USD or Modelica input.
 4. Add a focused runtime or numerical check.
-5. Update README.md, handover.md, and agent_to_agent_missing.md.
+5. Update README.md, handover.md, and contracts/implementation_gaps.md.
 6. Record any changed verdict bounds separately from physics changes.
 
 ## Step 10: final product definition

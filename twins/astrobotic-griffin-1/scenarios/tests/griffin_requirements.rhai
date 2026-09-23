@@ -5,7 +5,11 @@
 // and ramp limiters at both sides of their boundaries. The same linter is used
 // against an open Editor document through griffin_requirements::lint_live().
 
+import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
+import "griffin_visual_builder" as griffin_visual_builder;
+
 const ROOT = "/GriffinRequirementsTest/Griffin1";
+const VERIFICATION = "Verify_GriffinRequirements";
 
 fn expected(ok, message) {
     if ok { "" } else { message }
@@ -18,6 +22,16 @@ fn constraint_boundary_evidence(id, requirement, actual, expected, result,
       expected_verdict: expected_verdict,
       ok: result.verdict == expected_verdict,
       constraint_result: result, verification: result.verification}
+}
+
+fn usd_observation_binding(observation, field, label) {
+    if observation == () || observation.ok != true || observation[field] == () {
+        return #{provider: "usd", state: "unavailable",
+            detail: if observation == () || observation.detail == () {
+                label + " composed observation is unavailable"
+            } else { observation.detail }};
+    }
+    #{provider: "usd", state: "value", value: observation[field]}
 }
 
 fn on_start(me, ctx) {
@@ -87,6 +101,151 @@ fn on_tick(me, ctx) {
     // that exists only for a future UI. The limit comes from the typed SysML
     // snapshot; Rhai supplies only observations around that value.
     let constraint_evidence = [];
+
+    // GR-018 evaluates physical deck collision facts from the same source mesh
+    // and SysML deck datums as the visible octagon. Rhai reads and measures
+    // composed USD; SysML owns the acceptance predicates and tolerance.
+    let deck_requirement = sysml_requirements::source_with_selection([
+        "GriffinMechanicalRequirements::GR018_HullAndDeck::topDeckProfileToleranceM"
+    ], ["GriffinMechanicalRequirements::gr018"],
+       ["Griffin1Requirements::Verify_GriffinRequirements"]);
+    let deck_tolerance = if deck_requirement.ok == true {
+        sysml_requirements::number(deck_requirement,
+            "GriffinMechanicalRequirements::GR018_HullAndDeck::topDeckProfileToleranceM")
+    } else { () };
+    let deck_observation = griffin_visual_builder::physical_top_deck_collider_observation(
+        (), ROOT);
+    let deck_bindings = #{
+        topologyMatches: usd_observation_binding(deck_observation,
+            "topology_matches", "GR-018 topology"),
+        profileDeviationM: usd_observation_binding(deck_observation,
+            "profile_deviation_m", "GR-018 profile deviation"),
+        toleranceM: if deck_tolerance == () {
+            #{provider: "sysml", state: "unavailable",
+              detail: "GR-018 source tolerance is unavailable"}
+        } else { #{provider: "sysml", state: "value", value: deck_tolerance} },
+        collisionEnabled: usd_observation_binding(deck_observation,
+            "collision_enabled", "GR-018 collision ownership"),
+        proxyHidden: usd_observation_binding(deck_observation,
+            "proxy_hidden", "GR-018 proxy visibility"),
+        convexHullApproximation: usd_observation_binding(deck_observation,
+            "convex_hull_approximation", "GR-018 collision approximation")
+    };
+    let deck_checks = [
+        sysml_requirements::constraint_check("GR-018-source-topology", "lander",
+            "gr018", VERIFICATION,
+            "GriffinMechanicalRequirements::GRC018_TopDeckColliderTopologyMatchesSource",
+            #{topologyMatches: deck_bindings.topologyMatches}, "usd", 0.0),
+        sysml_requirements::constraint_check("GR-018-source-profile", "lander",
+            "gr018", VERIFICATION,
+            "GriffinMechanicalRequirements::GRC018_TopDeckColliderProfileWithinTolerance",
+            #{profileDeviationM: deck_bindings.profileDeviationM,
+              toleranceM: deck_bindings.toleranceM}, "usd", 0.0),
+        sysml_requirements::constraint_check("GR-018-collision-role", "lander",
+            "gr018", VERIFICATION,
+            "GriffinMechanicalRequirements::GRC018_TopDeckColliderOwnsContact",
+            #{collisionEnabled: deck_bindings.collisionEnabled,
+              proxyHidden: deck_bindings.proxyHidden,
+              convexHullApproximation: deck_bindings.convexHullApproximation},
+            "usd", 0.0)
+    ];
+    let deck_constraint_report = if deck_requirement.ok == true {
+        sysml_requirements::evaluate(deck_requirement, deck_checks)
+    } else { #{ok: false, error: "GR-018 requirement source is unavailable", results: []} };
+    for result in deck_constraint_report.results {
+        failures.push(expected(result.verdict == "pass",
+            "GR-018 physical deck collider constraint " + result.id
+                + " returned " + result.verdict));
+        constraint_evidence.push(result);
+    }
+    if deck_constraint_report.results == () || deck_constraint_report.results.len() != 3 {
+        failures.push("GR-018 physical deck collider did not produce all three formal constraint results");
+    }
+
+    // The four dynamics legs use the same SysML foot-pad geometry as the
+    // visible LandingLeg components. The generic evaluator applies the GLL-008
+    // predicates; this Twin tool only binds composed geometry measurements.
+    let pad_requirement = sysml_requirements::source_with_selection([
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::footPadRadiusM",
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::footPadHeightM",
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::footPadCenterYM",
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::physicalLegStations",
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::physicalLegStationRotationYDeg",
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::physicalLegPlacementToleranceM",
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::padColliderToleranceM"
+    ], ["GriffinLandingLegRequirements::gll008"],
+       ["GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements"]);
+    let pad_tolerance = if pad_requirement.ok == true {
+        sysml_requirements::number(pad_requirement,
+            "GriffinLandingLegRequirements::GriffinLandingLegAssembly::padColliderToleranceM")
+    } else { () };
+    let station_tolerance = if pad_requirement.ok == true {
+        sysml_requirements::number(pad_requirement,
+            "GriffinLandingLegRequirements::GriffinLandingLegAssembly::physicalLegPlacementToleranceM")
+    } else { () };
+    let pad_observation = griffin_visual_builder::physical_landing_leg_pad_observation(
+        (), ROOT);
+    let pad_bindings = #{
+        geometryDeviationM: usd_observation_binding(pad_observation,
+            "geometry_deviation_m", "GLL-008 pad geometry"),
+        toleranceM: if pad_tolerance == () {
+            #{provider: "sysml", state: "unavailable",
+              detail: "GLL-008 source tolerance is unavailable"}
+        } else { #{provider: "sysml", state: "value", value: pad_tolerance} },
+        stationDeviationM: usd_observation_binding(pad_observation,
+            "station_deviation_m", "GLL-008 COM-frame leg stations"),
+        stationToleranceM: if station_tolerance == () {
+            #{provider: "sysml", state: "unavailable",
+              detail: "GLL-008 physical station tolerance is unavailable"}
+        } else { #{provider: "sysml", state: "value", value: station_tolerance} },
+        rotationMatches: usd_observation_binding(pad_observation,
+            "rotation_matches", "GLL-008 leg orientation"),
+        collisionEnabled: usd_observation_binding(pad_observation,
+            "collision_enabled", "GLL-008 contact ownership"),
+        proxyHidden: usd_observation_binding(pad_observation,
+            "proxy_hidden", "GLL-008 proxy visibility"),
+        visualCollisionDisabled: usd_observation_binding(pad_observation,
+            "visual_collision_disabled", "GLL-008 visual separation"),
+        collisionMatchesVisual: usd_observation_binding(pad_observation,
+            "collision_matches_visual", "GLL-008 collider correspondence"),
+        legacyCollisionDisabled: usd_observation_binding(pad_observation,
+            "legacy_collision_disabled", "GLL-008 stale collider ownership")
+    };
+    let pad_checks = [
+        sysml_requirements::constraint_check("GLL-008-pad-geometry", "landing_leg",
+            "gll008", "Verify_GriffinLandingLegRequirements",
+            "GriffinLandingLegRequirements::GLLC008_PadColliderMatchesVisual",
+            #{geometryDeviationM: pad_bindings.geometryDeviationM,
+              toleranceM: pad_bindings.toleranceM}, "usd", 0.0),
+        sysml_requirements::constraint_check("GLL-008-contact-ownership", "landing_leg",
+            "gll008", "Verify_GriffinLandingLegRequirements",
+            "GriffinLandingLegRequirements::GLLC008_PadColliderOwnsContact",
+            #{collisionEnabled: pad_bindings.collisionEnabled,
+              proxyHidden: pad_bindings.proxyHidden,
+              visualCollisionDisabled: pad_bindings.visualCollisionDisabled,
+              collisionMatchesVisual: pad_bindings.collisionMatchesVisual,
+              legacyCollisionDisabled: pad_bindings.legacyCollisionDisabled},
+            "usd", 0.0)
+        ,sysml_requirements::constraint_check("GLL-008-physical-stations", "landing_leg",
+            "gll008", "Verify_GriffinLandingLegRequirements",
+            "GriffinLandingLegRequirements::GLLC008_PadColliderStationMatchesSource",
+            #{stationDeviationM: pad_bindings.stationDeviationM,
+              toleranceM: pad_bindings.stationToleranceM,
+              rotationMatches: pad_bindings.rotationMatches}, "usd", 0.0)
+    ];
+    let pad_constraint_report = if pad_requirement.ok == true {
+        sysml_requirements::evaluate(pad_requirement, pad_checks)
+    } else { #{ok: false, error: "GLL-008 requirement source is unavailable", results: []} };
+    for result in pad_constraint_report.results {
+        failures.push(expected(result.verdict == "pass",
+            "GLL-008 physical leg pad constraint " + result.id
+                + " returned " + result.verdict));
+        constraint_evidence.push(result);
+    }
+    if pad_constraint_report.results == () || pad_constraint_report.results.len() != 3 {
+        failures.push("GLL-008 physical leg pads did not produce all three formal constraint results");
+    }
+
     let max_payload = griffin_requirements::max_payload_kg();
     let zero_payload = griffin_requirements::payload_load_check(0.0);
     failures.push(expected(zero_payload.verdict == "pass",
@@ -204,7 +363,7 @@ fn on_tick(me, ctx) {
     report_structured_verdict(#{ok: failure_count == 0, failures: failures,
         results: evidence_results,
         verification: griffin_spec::verification_case_name(),
-        requirement_count: 2,
+        requirement_count: 4,
         source_files: sysml.source_files,
         source_revision: sysml.source_revision_hex},
         "GRIFFIN REQUIREMENTS", "GRIFFIN_REQUIREMENTS");

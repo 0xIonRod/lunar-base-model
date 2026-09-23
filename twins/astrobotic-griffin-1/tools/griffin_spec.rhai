@@ -70,7 +70,6 @@ fn _qualified_attribute(name) {
     let ramp = [
         "rampCount", "rampSurfaceLengthM", "rampSurfaceWidthM",
         "childNames",
-        "assemblyChildNames",
         "rampWheelClearanceM", "rampSurfaceThicknessM", "rampRailHeightM",
         "rampRailWidthM", "rampRailOffsetZM", "rampSurfaceCenterYM", "rampRailCenterYM",
         "rampMaxDeploymentAngleRad",
@@ -79,7 +78,7 @@ fn _qualified_attribute(name) {
         "supportArmCenterXM", "supportArmCenterYM", "supportArmHalfWidthM",
         "supportArmHalfHeightM", "supportArmHalfDepthM", "supportArmPairOffsetZM",
         "supportArmTiltZDeg", "assemblyTreadNamePrefix", "assemblyTreadCount",
-        "assemblyTreadWidthM", "assemblyTreadHeightM", "assemblyTreadSpanM",
+        "assemblyTreadWidthM", "assemblyTreadHeightM", "assemblyTrackWidthM",
         "assemblyTreadFirstCenterXM", "assemblyTreadPitchM",
         "assemblyUnderBeamWidthM", "assemblyUnderBeamHeightM",
         "assemblyUnderBeamCenterYM", "assemblyUnderBeamCenterOffsetZM",
@@ -96,18 +95,14 @@ fn _qualified_attribute(name) {
         "rampBehavior", "hingeAxis", "mountDatum", "rampStowedScale",
         "rampStowedPortRotationZDeg", "rampStowedStarboardRotationYDeg",
         "rampStowedStarboardRotationZDeg", "rampGeometryStatus",
-        "physicalRampSurfaceLengthM", "physicalRampSurfaceWidthM",
-        "physicalRampSurfaceThicknessM", "physicalRampRailHeightM",
-        "physicalRampRailWidthM", "physicalRampSurfaceCenterYM",
-        "physicalRampRailCenterYM", "physicalRampDeckEdgeXM",
-        "physicalRampDeckToHingeClearanceM", "physicalRampDeckTransitionOverlapM",
+        "physicalRampDeckTransitionContactOverlapM",
+        "physicalRampDeckTransitionOverlapM",
         "physicalRampTransitionChildName", "physicalRampTransitionContactChildName",
         "physicalRampPortMountX",
         "physicalRampStarboardMountX", "physicalRampMountY",
         "physicalRampMountZ", "physicalRampPortDeploymentAngleRad",
-        "physicalRampStarboardDeploymentAngleRad", "physicalRampRouteClearanceM",
-        "physicalRampStowedSurfaceCenterXM", "physicalRampStowedSurfaceCenterYM",
-        "physicalRampStowedRailCenterYM", "physicalRampStowedAngleRad",
+        "physicalRampStarboardDeploymentAngleRad",
+        "physicalRampStowedAngleRad",
         "physicalRampHingeLimitDeg", "physicalRampDeckTransitionMassKg",
         "physicalRampDeckTransitionInertiaKgM2", "physicalRampTransitionJointNamePrefix",
         "provenanceSource", "referenceImage"
@@ -119,6 +114,7 @@ fn _qualified_attribute(name) {
         "flipMassStudyKg", "flipPayloadCapacityKg", "wheelCount",
         "wheelCountStatus", "egressMode", "solarArrayMode", "mobilityStatus",
         "exactVehicleIcdStatus", "visualRoverName", "visualRoverWheelRadiusM",
+        "visualRoverWheelWidthM",
         "visualRoverWheelCount", "visualWheelNames", "frontSteeringAngleDeg",
         "rearSteeringAngleDeg", "missionSteeringMode", "chassisWidthM", "chassisLengthM",
         "sensorMastHeightM", "wheelStationX", "wheelStationY",
@@ -153,7 +149,10 @@ fn _qualified_attribute(name) {
     }
     let visual_configuration = [
         "configuration", "bodyProfile", "rampState", "origin", "axisUp", "axisPort", "axisForward",
-        "verificationToleranceM", "visualReviewGriffinStation", "visualReviewFlipStation",
+        "verificationToleranceM", "geometryVerificationToleranceM",
+        "appearanceVerificationTolerance", "doubleSidedFacesMust",
+        "renderOnlyCollisionEnabled", "renderPurpose",
+        "visualReviewGriffinStation", "visualReviewFlipStation",
         "bodyDimensions", "bodyMount", "bodyGroundClearanceM",
         "lowerSkirtDimensions", "lowerSkirtCenter", "deckDimensions", "deckCenter",
         "avionicsDeckDimensions", "avionicsDeckCenter", "outerBodyProfileCoordinates",
@@ -164,9 +163,17 @@ fn _qualified_attribute(name) {
         "frameRails", "tankInstances", "landingLegInstances", "solarArrayInstances",
         "mainEngineInstances", "railStations", "railDimensions",
         "tankSupportPerimeterRadiusM",
-        "tankSupportPerimeterSectionM", "tankSupportPlaneCenterYM",
+        "tankSupportPerimeterSectionM", "tankSupportPlanes",
         "tankSupportOpeningInnerRadiusM", "tankSupportOpeningOuterRadiusM",
-        "tankSupportOpeningSegments", "legStations",
+        "tankSupportOpeningSegments", "centralBucketSegments",
+        "centralBucketShellThicknessM", "upperBucketInnerBottomRadiusM",
+        "upperBucketOuterBottomRadiusM", "upperBucketInnerTopRadiusM",
+        "upperBucketOuterTopRadiusM", "upperBucketBottomCenterYM",
+        "upperBucketTopCenterYM", "lowerBucketInnerTopRadiusM",
+        "lowerBucketOuterTopRadiusM", "lowerBucketInnerBottomRadiusM",
+        "lowerBucketOuterBottomRadiusM", "lowerBucketTopCenterYM",
+        "lowerBucketBottomCenterYM", "payloadAdapterDimensions",
+        "payloadAdapterCenterYM", "legStations",
         "legStationRotationYDeg", "solarStations", "solarStationRotationXDeg", "solarStationRotationZDeg",
         "solarArrayWidthM", "solarArrayDepthM", "solarStandoffM", "tankStations",
         "tankStationRotationYDeg", "tankScale",
@@ -382,6 +389,10 @@ fn visual_deck_width_m() { _dimensions_component("deckDimensions", "x") }
 fn visual_deck_depth_m() { _dimensions_component("deckDimensions", "z") }
 fn visual_deck_thickness_m() { _dimensions_component("deckDimensions", "y") }
 fn visual_deck_center_y_m() { _sysml_native("deckCenter").y }
+fn visual_payload_adapter_width_m() { _dimensions_component("payloadAdapterDimensions", "x") }
+fn visual_payload_adapter_depth_m() { _dimensions_component("payloadAdapterDimensions", "z") }
+fn visual_payload_adapter_thickness_m() { _dimensions_component("payloadAdapterDimensions", "y") }
+fn visual_payload_adapter_center_y_m() { _sysml_attribute("payloadAdapterCenterYM") }
 fn visual_avionics_deck_width_m() { _dimensions_component("avionicsDeckDimensions", "x") }
 fn visual_avionics_deck_depth_m() { _dimensions_component("avionicsDeckDimensions", "z") }
 fn visual_avionics_deck_thickness_m() { _dimensions_component("avionicsDeckDimensions", "y") }
@@ -411,7 +422,11 @@ fn visual_tank_support_display_color() { _sysml_number_list("tankSupportDisplayC
 fn visual_tank_collar_display_color() { _sysml_number_list("tankCollarDisplayColor") }
 fn visual_tank_support_perimeter_radius_m() { _sysml_attribute("tankSupportPerimeterRadiusM") }
 fn visual_tank_support_perimeter_section_m() { _sysml_attribute("tankSupportPerimeterSectionM") }
-fn visual_tank_support_plane_center_y_m() { _sysml_attribute("tankSupportPlaneCenterYM") }
+fn visual_tank_support_planes_m() { _sysml_number_list("tankSupportPlanes") }
+fn visual_tank_support_plane_center_y_m() {
+    let planes = visual_tank_support_planes_m();
+    if planes.len() == 3 { planes[1] } else { () }
+}
 fn visual_tank_opening_inner_radius_m() { _sysml_attribute("tankSupportOpeningInnerRadiusM") }
 fn visual_tank_opening_outer_radius_m() { _sysml_attribute("tankSupportOpeningOuterRadiusM") }
 fn visual_tank_opening_segments() { _sysml_integer("tankSupportOpeningSegments") }
@@ -448,6 +463,11 @@ fn _visual_transform_record(name, parent_role, asset, x, y, z, rx, ry, rz, unifo
 fn visual_engine_skirt_mount_y() { _sysml_attribute("engineClusterMountYM") }
 fn visual_review_griffin_station() { _sysml_native("visualReviewGriffinStation") }
 fn visual_review_flip_station() { _sysml_native("visualReviewFlipStation") }
+fn rover_visual_wheel_radius_m() { _sysml_attribute("visualRoverWheelRadiusM") }
+fn rover_visual_wheel_width_m() { _sysml_attribute("visualRoverWheelWidthM") }
+fn rover_visual_wheel_station_x() { rover_wheel_station_x() }
+fn rover_visual_wheel_station_y() { rover_wheel_station_y() }
+fn rover_visual_wheel_station_z() { rover_wheel_station_z() }
 
 fn _visual_plan_lengths_match(values, expected) {
     values != () && values.len() == expected
@@ -643,7 +663,7 @@ fn ramp_tread_name_prefix() { _sysml_text("assemblyTreadNamePrefix") }
 fn ramp_tread_count() { _sysml_integer("assemblyTreadCount") }
 fn ramp_tread_width_m() { _sysml_attribute("assemblyTreadWidthM") }
 fn ramp_tread_height_m() { _sysml_attribute("assemblyTreadHeightM") }
-fn ramp_tread_span_m() { _sysml_attribute("assemblyTreadSpanM") }
+fn ramp_contact_track_width_m() { _sysml_attribute("assemblyTrackWidthM") }
 fn ramp_tread_first_center_x_m() { _sysml_attribute("assemblyTreadFirstCenterXM") }
 fn ramp_tread_pitch_m() { _sysml_attribute("assemblyTreadPitchM") }
 fn ramp_under_beam_width_m() { _sysml_attribute("assemblyUnderBeamWidthM") }

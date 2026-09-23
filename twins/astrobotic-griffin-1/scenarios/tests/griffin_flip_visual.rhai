@@ -69,7 +69,12 @@ fn on_tick(me, ctx) {
         [root + "/Griffin1/Bus/PerimeterFrame",
          root + "/Griffin1/Bus/TopDeckOctagon",
          root + "/Griffin1/Bus/LowerServiceSkirtOctagon",
-         root + "/Griffin1/Bus/TankSupportPlate"]));
+         root + "/Griffin1/Bus/TankSupportPlate",
+         root + "/Griffin1/Bus/RoverPayloadDeck"]));
+    let payload_deck = visual_exists_check("GV-004-rover-payload-deck", "lander_deck",
+        "gv004", "exists", root + "/Griffin1/Bus/RoverPayloadDeck");
+    payload_deck.expected_type = "Mesh";
+    checks.push(payload_deck);
     let body_profile = visual_exists_check("GV-002-octagonal-body", "lander", "gv002",
         "exists", root + "/Griffin1/Bus/PerimeterFrame");
     body_profile.expected_type = "Mesh";
@@ -109,7 +114,8 @@ fn on_tick(me, ctx) {
     for name in ramp_names {
         checks.push(visual_children_check("GV-002-" + name + "-subparts", "egress_ramps",
             "gv002", root + "/Griffin1/" + name,
-            [root + "/Griffin1/" + name + "/RampSurface",
+            [root + "/Griffin1/" + name + "/RampTrackPort",
+             root + "/Griffin1/" + name + "/RampTrackStarboard",
              root + "/Griffin1/" + name + "/OuterRail",
              root + "/Griffin1/" + name + "/InnerRail",
              root + "/Griffin1/" + name + "/SupportArm"]));

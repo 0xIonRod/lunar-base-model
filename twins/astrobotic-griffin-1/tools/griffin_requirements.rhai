@@ -639,10 +639,12 @@ fn _ramp_layout_report(doc_id, root) {
                 "ramp transform rotation and deployment metadata disagree"));
         }
     }
-    if !_has(port.children, port_path + "/Surface")
-        || !_has(starboard.children, starboard_path + "/Surface") {
+    if !_has(port.children, port_path + "/RampTrackPort")
+        || !_has(port.children, port_path + "/RampTrackStarboard")
+        || !_has(starboard.children, starboard_path + "/RampTrackPort")
+        || !_has(starboard.children, starboard_path + "/RampTrackStarboard") {
         findings.push(_layout_finding("GR-017", root,
-            "each ramp must have its own named contact surface"));
+            "each ramp must contain both source-aligned FLIP wheel tracks"));
     }
     findings
 }
@@ -650,11 +652,9 @@ fn _ramp_layout_report(doc_id, root) {
 fn _body_shape_report(doc_id, root) {
     let findings = [];
     let body_path = root + "/GriffinBody/BodyCollisionProxy";
-    let deck_path = root + "/TopDeckCollisionProxy";
+    let deck_path = root + "/RoverPayloadDeckCollider";
     let body = _layout_query(doc_id, body_path,
         ["size", "xformOp:scale", "physics:collisionEnabled", "visibility", "purpose"], false);
-    let deck = _layout_query(doc_id, deck_path,
-        ["points", "physics:collisionEnabled", "visibility", "purpose"], false);
     if !_ok(body) {
         findings.push(_layout_finding("GR-018", body_path,
             "flight-body collision proxy is missing"));
@@ -684,22 +684,10 @@ fn _body_shape_report(doc_id, root) {
                 "flight-body collider must be hidden proxy geometry"));
         }
     }
-    if !_ok(deck) {
+    let deck = griffin_visual_builder::physical_top_deck_collider_observation(doc_id, root);
+    if deck.ok != true || deck.state != "pass" {
         findings.push(_layout_finding("GR-018", deck_path,
-            "top-deck collision proxy is missing"));
-    } else {
-        if deck.type_name != "Mesh" || deck.attrs.points == () || deck.attrs.points.len() < 8 {
-            findings.push(_layout_finding("GR-018", deck_path,
-                "top-deck collider must be a nonempty Mesh"));
-        }
-        if deck.attrs["physics:collisionEnabled"] != true {
-            findings.push(_layout_finding("GR-018", deck_path,
-                "top-deck proxy must own an enabled collider"));
-        }
-        if deck.attrs["visibility"] != "invisible" || deck.attrs["purpose"] != "proxy" {
-            findings.push(_layout_finding("GR-018", deck_path,
-                "top-deck collider must be hidden proxy geometry"));
-        }
+            "open octagonal perimeter and rover platform colliders do not match the SysML source readback"));
     }
     for old in ["BoxyAirframe", "IsogridDeck"] {
         let path = root + "/" + old;
@@ -1115,12 +1103,14 @@ fn part_manifest(root) {
             expected_type: "Xform",
             visible: true,
             required_children: [
-                ramp_path + "/Surface",
+                ramp_path + "/RampTrackPort",
+                ramp_path + "/RampTrackStarboard",
                 ramp_path + "/EdgeRail",
                 ramp_path + "/EdgeRailInner",
             ],
             geometry_children: [
-                #{label: "surface", path: ramp_path + "/Surface", geometry: true, visible: true, collider: true},
+                #{label: "port wheel track", path: ramp_path + "/RampTrackPort", geometry: true, visible: true, collider: true},
+                #{label: "starboard wheel track", path: ramp_path + "/RampTrackStarboard", geometry: true, visible: true, collider: true},
                 #{label: "outer edge rail", path: ramp_path + "/EdgeRail", geometry: true, visible: true, collider: true},
                 #{label: "inner edge rail", path: ramp_path + "/EdgeRailInner", geometry: true, visible: true, collider: true},
             ],
@@ -1161,8 +1151,12 @@ fn part_manifest(root) {
                     "lunco:configuration", "lunco:parameter_status",
                     "lunco:provenance:source", "lunco:collision:contract"],
             expected_type: "Xform",
-            required_children: [root + "/GriffinBody",
-                root + "/Bus", root + "/TopDeckCollisionProxy", root + "/PayloadAdapter",
+            required_children: [root + "/GriffinBody", root + "/Bus",
+                root + "/TopDeckBeamCollider0", root + "/TopDeckBeamCollider1",
+                root + "/TopDeckBeamCollider2", root + "/TopDeckBeamCollider3",
+                root + "/TopDeckBeamCollider4", root + "/TopDeckBeamCollider5",
+                root + "/TopDeckBeamCollider6", root + "/TopDeckBeamCollider7",
+                root + "/RoverPayloadDeckCollider", root + "/PayloadAdapter",
                 root + "/MainPropulsion", root + "/SolarPanelPort",
                 root + "/SolarPanelStarboard", root + "/Nozzle",
                 root + "/TankPX", root + "/TankNX", root + "/TankPZ",
@@ -1202,14 +1196,14 @@ fn part_manifest(root) {
         },
         #{
             id: "deck_collider",
-            label: "top-deck collision proxy",
+            label: "rover payload platform collision proxy",
             rule: "GR-018",
-            path: root + "/TopDeckCollisionProxy",
+            path: root + "/RoverPayloadDeckCollider",
             attrs: ["visibility", "purpose", "physics:collisionEnabled"],
             expected_type: "Mesh",
             geometry: true,
             collider: true,
-            parameter_status: "hidden deck collider; flight ICD TBD",
+            parameter_status: "hidden central payload deck collider; geometry is generated from Griffin SysML",
         },
         #{
             id: "payload_adapter",
@@ -1505,6 +1499,16 @@ fn _ramp_requirement_source() {
         ["GriffinRampRequirements::Verify_GriffinRampCommandEnvelope"])
 }
 
+fn _physical_ramp_geometry_source() {
+    sysml_requirements::source_with_selection([
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceLengthM",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceThicknessM",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceCenterYM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM",
+        "FlipRequirements::FlipRover::wheelStationZ"
+    ], [], [])
+}
+
 fn ramp_command_check(angle_rad) {
     let source = _ramp_requirement_source();
     let limit = sysml_requirements::number(source,
@@ -1648,6 +1652,23 @@ fn lint(doc_id, root) {
         }
     }
 
+    let ramp_source = _physical_ramp_geometry_source();
+    let ramp_length = sysml_requirements::number(ramp_source,
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceLengthM");
+    let ramp_thickness = sysml_requirements::number(ramp_source,
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceThicknessM");
+    let ramp_center_y = sysml_requirements::number(ramp_source,
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceCenterYM");
+    let track_width = sysml_requirements::number(ramp_source,
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM");
+    let wheel_stations_z = sysml_requirement_checks::source_number_list(ramp_source,
+        "FlipRequirements::FlipRover::wheelStationZ");
+    let half_track = 0.0;
+    if wheel_stations_z != () {
+        for station in wheel_stations_z {
+            if station.abs() > half_track { half_track = station.abs(); }
+        }
+    }
     let ramp_names = griffin_spec::ramp_names();
     let hinge_names = griffin_spec::ramp_hinge_names();
     for i in 0..ramp_names.len() {
@@ -1669,7 +1690,8 @@ fn lint(doc_id, root) {
                 findings.push(_finding("GR-003", ramp_path,
                     "egress ramp needs an explicit mechanism description"));
             }
-            let physical_children = ["Surface", "EdgeRail", "EdgeRailInner"];
+            let physical_children = ["RampTrackPort", "RampTrackStarboard",
+                "EdgeRail", "EdgeRailInner"];
             let transition_name = griffin_spec::physical_ramp_transition_child_name();
             if transition_name != () && transition_name != "" {
                 // TransitionPlate is a rigid-body frame; its ContactSurface
@@ -1683,10 +1705,42 @@ fn lint(doc_id, root) {
             }
             for child_name in physical_children {
                 let child_path = ramp_path + "/" + child_name;
-                let child = _query(doc_id, child_path, ["physics:collisionEnabled"], (), false);
+                let child = _query(doc_id, child_path,
+                    ["physics:collisionEnabled", "xformOp:translate", "xformOp:scale",
+                     "lunco:collider:geometrySource"], (), false);
                 if !_ok(child) || child.attrs["physics:collisionEnabled"] != true {
                     findings.push(_finding("GR-003", child_path,
                         "ramp contact geometry must have collision enabled"));
+                }
+                if child_name == "RampTrackPort" || child_name == "RampTrackStarboard" {
+                    let expected_z = if child_name == "RampTrackPort" { half_track } else { -half_track };
+                    let expected_x = if i == 0 { ramp_length / 2.0 } else { -ramp_length / 2.0 };
+                    let translation = child.attrs["xformOp:translate"];
+                    let scale = child.attrs["xformOp:scale"];
+                    let geometry_source = child.attrs["lunco:collider:geometrySource"];
+                    let source_missing = ramp_length == () || ramp_thickness == ()
+                        || ramp_center_y == () || track_width == ()
+                        || wheel_stations_z == () || wheel_stations_z.len() != 4;
+                    let geometry_missing = translation == () || translation.len() != 3
+                        || scale == () || scale.len() != 3;
+                    if source_missing || geometry_missing {
+                        findings.push(_finding("GR-006", child_path,
+                            "physical contact track must match the SysML length, thickness, width, and FLIP wheel station"));
+                    } else {
+                        let station_matches = _near(translation[0], expected_x, 0.002)
+                            && _near(translation[1], ramp_center_y, 0.002)
+                            && _near(translation[2], expected_z, 0.002);
+                        let dimensions_match = _near(scale[0], ramp_length, 0.002)
+                            && _near(scale[1], ramp_thickness, 0.002)
+                            && _near(scale[2], track_width, 0.002);
+                        let source_matches = geometry_source != ()
+                            && geometry_source.contains("wheelStationZ")
+                            && geometry_source.contains("assemblyTrackWidthM");
+                        if !station_matches || !dimensions_match || !source_matches {
+                            findings.push(_finding("GR-006", child_path,
+                                "physical contact track must match the SysML length, thickness, width, and FLIP wheel station"));
+                        }
+                    }
                 }
             }
             if transition_name != () && transition_name != "" {
@@ -1789,11 +1843,11 @@ fn lint(doc_id, root) {
         findings.push(_finding("GR-001", root + "/Bus",
             "source-owned octagonal payload deck is required"));
     } else {
-        let plate = _query(doc_id, root + "/TopDeckCollisionProxy",
-            ["physics:collisionEnabled"], (), false);
-        if !_ok(plate) || plate.attrs["physics:collisionEnabled"] != true {
-            findings.push(_finding("GR-012", root + "/TopDeckCollisionProxy",
-                "top deck proxy must be an enabled collider"));
+        let plate = griffin_visual_builder::physical_top_deck_collider_observation(
+            doc_id, root);
+        if plate.ok != true || plate.state != "pass" {
+            findings.push(_finding("GR-012", root + "/RoverPayloadDeckCollider",
+                "octagonal perimeter and rover payload platform colliders must match source geometry"));
         }
     }
 
@@ -1962,7 +2016,7 @@ fn visual_report(doc_id, root) {
     }
 
     let ramp_names = griffin_spec::ramp_names();
-    let ramp_children = _sysml_list(source, "assemblyChildNames");
+    let ramp_children = _sysml_list(source, "childNames");
     for ramp_name in ramp_names {
         let path = root + "/" + ramp_name;
         let ramp = _layout_query(doc_id, path,
@@ -1973,14 +2027,6 @@ fn visual_report(doc_id, root) {
             findings.push(_finding("GRR-001-ramp", path,
                 "visual egress-ramp root is missing"));
             continue;
-        }
-        for child_name in ["MountFrame", "RampSurface", "OuterRail", "InnerRail", "SupportArm"] {
-            let child_path = path + "/" + child_name;
-            checks.push("GRR-001-" + child_path);
-            if !_ok(_layout_query(doc_id, child_path, [], false)) {
-                findings.push(_finding("GRR-001-ramp-child", child_path,
-                    "required visual ramp child is missing"));
-            }
         }
         for child_name in ramp_children {
             let child_path = path + "/" + child_name;

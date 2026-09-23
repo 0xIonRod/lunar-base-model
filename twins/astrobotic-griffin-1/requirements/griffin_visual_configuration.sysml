@@ -83,15 +83,18 @@ package GriffinVisualConfigurationRequirements {
         attribute doubleSidedFacesMustBe : Boolean = false;
         attribute renderOnlyCollisionEnabled : Boolean = false;
         attribute renderPurpose : String = "render";
-        attribute visualReviewGriffinStation : Position = (-2.70, -0.38, 0.0);
-        attribute visualReviewFlipStation : Position = (7.0, 1.0, 0.5);
+        attribute visualReviewGriffinStation : Position = (0.0, 0.0, 0.0);
+        // FLIP is mounted on the payload adapter. Its wheel bottoms (station
+        // -0.42 m plus 0.45 m tire radius) meet the adapter top at 5.28 m.
+        // This station is the one review-scene placement source.
+        attribute visualReviewFlipStation : Position = (0.0, 6.15, 0.0);
 
-        attribute bodyDimensions : Dimensions = (4.50, 2.00, 4.50);
+        attribute bodyDimensions : Dimensions = (5.40, 2.00, 5.40);
         attribute bodyMount : Position = (0.0, 3.20, 0.0);
         attribute bodyGroundClearanceM : Real = 0.20;
-        attribute lowerSkirtDimensions : Dimensions = (4.10, 0.42, 4.10);
+        attribute lowerSkirtDimensions : Dimensions = (5.00, 0.42, 5.00);
         attribute lowerSkirtCenter : Position = (0.0, -1.02, 0.0);
-        attribute deckDimensions : Dimensions = (4.40, 0.16, 4.40);
+        attribute deckDimensions : Dimensions = (5.15, 0.16, 5.15);
         attribute deckCenter : Position = (0.0, 1.03, 0.0);
         attribute avionicsDeckDimensions : Dimensions = (3.00, 0.10, 2.20);
         attribute avionicsDeckCenter : Position = (0.0, 1.20, 0.0);
@@ -133,10 +136,10 @@ package GriffinVisualConfigurationRequirements {
         attribute mainEngineInstances : GriffinMainEngineInstanceName[7] =
             ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07");
         attribute railStations : Position[8] =
-            ((-1.272, 0.0, 2.17), (1.272, 0.0, 2.17),
-             (2.17, 0.0, 1.272), (2.17, 0.0, -1.272),
-             (1.272, 0.0, -2.17), (-1.272, 0.0, -2.17),
-             (-2.17, 0.0, -1.272), (-2.17, 0.0, 1.272));
+            ((-1.526, 0.0, 2.604), (1.526, 0.0, 2.604),
+             (2.604, 0.0, 1.526), (2.604, 0.0, -1.526),
+             (1.526, 0.0, -2.604), (-1.526, 0.0, -2.604),
+             (-2.604, 0.0, -1.526), (-2.604, 0.0, 1.526));
         attribute railDimensions : Dimensions = (0.16, 2.00, 0.16);
 
         /* Separate central tank-support assembly. The four bore centres are
@@ -145,25 +148,46 @@ package GriffinVisualConfigurationRequirements {
          * same 0.06 m study margin used by the tank/frame contract. */
         /* The central perimeter uses outerBodyProfileCoordinates at this
          * separate radius, so both structures share one octagonal profile. */
-        attribute tankSupportPerimeterRadiusM : Real = 2.10;
+        attribute tankSupportPerimeterRadiusM : Real = 2.46;
         attribute tankSupportPerimeterSectionM : Real = 0.12;
-        attribute tankSupportPlaneCenterYM : Real = 0.0;
         attribute tankSupportOpeningInnerRadiusM : Real = 0.86;
         attribute tankSupportOpeningOuterRadiusM : Real = 1.00;
         attribute tankSupportOpeningSegments : Integer = 16;
+        attribute tankSupportPlanes : Real[3] = (1.03, 0.0, -1.03);
+
+        /* Open eight-sided upper and lower buckets bridge the tank rings;
+         * neither shell crosses the four COPV columns. These are replaceable
+         * presentation assumptions because the supplier structural ICD is
+         * not public. */
+        attribute centralBucketSegments : Integer = 8;
+        attribute centralBucketShellThicknessM : Real = 0.12;
+        attribute upperBucketInnerBottomRadiusM : Real = 0.52;
+        attribute upperBucketOuterBottomRadiusM : Real = 0.64;
+        attribute upperBucketInnerTopRadiusM : Real = 1.42;
+        attribute upperBucketOuterTopRadiusM : Real = 1.54;
+        attribute upperBucketBottomCenterYM : Real = 1.08;
+        attribute upperBucketTopCenterYM : Real = 1.92;
+        attribute lowerBucketInnerTopRadiusM : Real = 0.52;
+        attribute lowerBucketOuterTopRadiusM : Real = 0.64;
+        attribute lowerBucketInnerBottomRadiusM : Real = 1.42;
+        attribute lowerBucketOuterBottomRadiusM : Real = 1.54;
+        attribute lowerBucketTopCenterYM : Real = -1.08;
+        attribute lowerBucketBottomCenterYM : Real = -1.92;
+        attribute payloadAdapterDimensions : Dimensions = (4.40, 0.16, 3.20);
+        attribute payloadAdapterCenterYM : Real = 5.20;
 
         attribute legStations : Position[4] =
-            ((2.20, 2.20, 0.0), (-2.20, 2.20, 0.0),
-             (0.0, 2.20, 2.20), (0.0, 2.20, -2.20));
+            ((3.10, 2.20, 0.0), (-3.10, 2.20, 0.0),
+             (0.0, 2.20, 3.10), (0.0, 2.20, -3.10));
         attribute legStationRotationYDeg : Real[4] = (0.0, 0.0, 90.0, 90.0);
 
         attribute solarStations : Position[2] =
-            ((0.0, 3.20, 2.36), (0.0, 3.20, -2.36));
+            ((0.0, 3.20, 2.90), (0.0, 3.20, -2.90));
         attribute solarStationRotationXDeg : Real[2] = (90.0, -90.0);
         attribute solarStationRotationZDeg : Real[2] = (0.0, 0.0);
-        attribute solarArrayWidthM : Real = 3.70;
-        attribute solarArrayDepthM : Real = 2.50;
-        attribute solarStandoffM : Real = 0.16;
+        attribute solarArrayWidthM : Real = 4.80;
+        attribute solarArrayDepthM : Real = 3.00;
+        attribute solarStandoffM : Real = 0.20;
 
         /* Four equally spaced cardinal stations give the 1.512 m installed
          * COPV bodies useful scale while keeping their largest 1.548 m bands
@@ -181,12 +205,12 @@ package GriffinVisualConfigurationRequirements {
         attribute minimumTankInstanceClearanceM : Real = 0.06;
         attribute minimumTankFrameClearanceM : Real = 0.06;
 
-        attribute engineClusterMountYM : Real = 1.68;
+        attribute engineClusterMountYM : Real = 1.00;
         attribute engineBellDirection : Direction = (0.0, -1.0, 0.0);
         attribute engineStations : Position[7] =
-            ((0.0, 1.75, 0.0), (1.0, 1.75, 0.0), (-1.0, 1.75, 0.0),
-             (0.0, 1.75, 1.0), (0.0, 1.75, -1.0),
-             (0.9, 1.75, 0.9), (-0.9, 1.75, -0.9));
+            ((0.0, 1.00, 0.0), (1.0, 1.00, 0.0), (-1.0, 1.00, 0.0),
+             (0.0, 1.00, 1.0), (0.0, 1.00, -1.0),
+             (0.9, 1.00, 0.9), (-0.9, 1.00, -0.9));
     }
 
     requirement def GVC001_ConfigurationSelection {
@@ -196,22 +220,22 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-002 [datum] every component station shall use the declared native Position/Direction assembly frame and origin; this shared frame makes mirror, clearance, and Editor readback checks meaningful. Rationale: the prior diagonal/axis mismatch let the builder and verifier accept different layouts. */
     }
     requirement def GVC003_OctagonalAirframe {
-        doc /* GVC-003 [geometry] the primary airframe shall use an open eight-sided clipped-square perimeter with eight corner posts and eight upper plus eight lower perimeter beams. Its 4.50 m x 4.50 m plan envelope and 2.00 m core height are visual-study datums. Lower service skirt, outer deck, and central tank-support plate remain separate features. Public references show a faceted bus but no released structural CAD; member stock and stations are replaceable study assumptions. */
+        doc /* GVC-003 [geometry] the primary airframe shall use an open eight-sided clipped-square perimeter with eight corner posts and eight upper plus eight lower perimeter beams. Its 5.40 m x 5.40 m plan envelope and 2.00 m core height are visual-study datums. Lower service skirt, open payload ring, and central tank-support structure remain separate features. Public references show a faceted bus but no released structural CAD; member stock and stations are replaceable study assumptions. */
     }
     requirement def GVC004_OctagonalPayloadDeck {
-        doc /* GVC-004 [interface] the bus shall expose a separate 4.40 m x 4.40 m x 0.16 m octagonal payload-deck study surface at the upper bus datum. Source: Astrobotic Griffin product description identifies the main payload deck; these dimensions and the visual surface are study assumptions, not a modeled internal isogrid lattice. */
+        doc /* GVC-004 [interface] the upper bus datum shall expose a 5.15 m octagonal perimeter deck ring with four tank through-openings; it shall not be a solid plate across the COPV cluster. A raised central payload adapter is supported by the upper flared bucket and shall carry the linked FLIP review asset with all four tire bottoms resting on the adapter. The lander and rover review stations, adapter footprint, and member stock are replaceable study assumptions, not released supplier CAD. */
     }
     requirement def GVC005_LegStations {
-        doc /* GVC-005 [layout] four leg roots shall occupy mirrored axial X/Z corner stations with local radial rotations and at least 0.20 m body-to-ground visual clearance. Source: Griffin's four shock-absorbing legs; exact station ICD is not public. */
+        doc /* GVC-005 [layout] four leg roots shall occupy mirrored axial X/Z stations at a 3.10 m radial offset beyond the enlarged octagonal body, with local radial rotations and at least 0.20 m body-to-ground visual clearance. Source: Griffin's four shock-absorbing legs; exact station ICD is not public. */
     }
     requirement def GVC006_SolarStations {
-        doc /* GVC-006 [layout] two broad solar arrays shall occupy opposite signed-Z side datums with panel faces rotated outward and a 0.16 m standoff. Source: NASA/Astrobotic User Guide describes side-mounted panels for polar Griffin missions. */
+        doc /* GVC-006 [layout] two segmented solar wings shall occupy opposite signed-Z side datums with panel faces rotated outward and a 0.20 m standoff. The 4.80 m by 3.00 m study envelope replaces the retired single-sheet panel. Source: NASA/Astrobotic User Guide describes side-mounted panels for polar Griffin missions; panel CAD and hinge ICD are not public. */
     }
     requirement def GVC007_TankPlacement {
-        doc /* GVC-007 [layout] exactly four COPV visual proxies shall occupy equally spaced cardinal-axis stations in the Y=3.20 m bus-origin plane. A 0.84 m nominal tank radius at 0.90 assembly scale gives a 1.512 m installed vessel diameter and 1.548 m maximum band diameter. At the typed 1.15 m station radius, bands retain about 0.078 m inter-instance clearance and 0.066 m clearance to the open octagonal frame, exceeding the 0.06 m study minimum; lower/upper cap clearance is approximately 0.04/0.18 m at the skirt and deck. Astrobotic identifies four COPV tanks but publishes no dimensional ICD. The selected vessel envelope and station radius are replaceable visual-study assumptions sized within the roughly 4.5 m Griffin footprint, not flight dimensions. */
+        doc /* GVC-007 [layout] exactly four COPV visual proxies shall occupy equally spaced cardinal-axis stations in the Y=3.20 m bus-origin plane and pass through the upper and lower support-ring openings. A 0.84 m nominal tank radius at 0.90 assembly scale gives a 1.512 m installed vessel diameter and 1.548 m maximum band diameter. The openings retain at least 0.06 m radial clearance from the bands; tank stations and vessel envelope remain replaceable study assumptions because Astrobotic publishes no dimensional ICD. */
     }
     requirement def GVC008_EngineAndSkirtDatum {
-        doc /* GVC-008 [interface] the seven-engine cluster and skirt shall remain below the body/deck datum; the nozzle axis is a typed downward Direction and must not duplicate flight thrust ownership. Source: Astrobotic identifies seven main engines; skirt dimensions are visual-study assumptions. */
+        doc /* GVC-008 [interface] the seven-engine cluster shall remain visibly below the lower flared bucket and bus; the nozzle axis is a typed downward Direction and must not duplicate flight thrust ownership. Source: Astrobotic identifies seven main engines; bucket and skirt dimensions are visual-study assumptions. */
     }
     requirement def GVC009_RampState {
         doc /* GVC-009 [configuration] the visual review shall use the typed Stowed ramp state while the physical mission scene may command the deployed state after touchdown. Rationale: optional egress ramps are payload interfaces, not the primary landed silhouette. */
@@ -223,13 +247,13 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-011 [evidence] selected configuration assumptions and their reasons/sources shall be available from the separate SysML provenance catalog; geometry itself is verified from typed source values and composed shape, not scene-side text tags. */
     }
     requirement def GVC012_FrameRails {
-        doc /* GVC-012 [geometry] eight named vertical corner posts shall use the eight typed Position stations and a 0.16 m x 2.00 m x 0.16 m Dimensions envelope. The octagonal frame ring derives eight upper and eight lower members. These remain explicit replaceable visual-study assumptions; the supplier frame ICD is not public. */
+        doc /* GVC-012 [geometry] eight named vertical corner posts shall use the eight typed Position stations and a 0.16 m x 2.00 m x 0.16 m Dimensions envelope. The octagonal frame ring derives eight upper and eight lower members around the enlarged 5.40 m body. These remain explicit replaceable visual-study assumptions; the supplier frame ICD is not public. */
     }
     requirement def GVC013_SurfaceOrientation {
         doc /* GVC-013 [rendering] every authored frame, skirt, and deck face shall point outward and render single-sided. Verification computes normals from the actual composed mesh. Source: OpenUSD UsdGeomMesh winding convention and the observed Edit-perspective surface issue. Rationale: correct topology is durable; double-sided rendering would only hide bad winding. */
     }
     requirement def GVC014_ParametricProfile {
-        doc /* GVC-014 [geometry] outer deck, skirt, and central tank-support perimeter use the eight normalized Cartesian vectors declared once in this configuration, scaled by their typed dimensions. The central support has four annular, through-opening collars concentric with the tank stations. */
+        doc /* GVC-014 [geometry] outer deck, skirt, and central tank-support perimeters use the eight normalized Cartesian vectors declared once in this configuration, scaled by their typed dimensions. Upper, middle, and lower support planes carry four annular tank collars; open upper and lower eight-sided buckets connect the central structure without covering the tanks. */
     }
     requirement def GVC015_SurfaceAppearance {
         doc /* GVC-015 [appearance] frame, deck, service skirt, avionics, rails, and tank-support features shall take their linear display colors from this configuration. Each color channel shall remain in the [0,1] interval; Rhai and USD material adapters must not duplicate palette literals. */

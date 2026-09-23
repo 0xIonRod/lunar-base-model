@@ -87,7 +87,7 @@ Primary sources:
 | controls | tools/griffin_controls.rhai | Twin-local lander/FLIP possession, release, and autopilot helpers |
 | assumptions | research/griffin_1_assumptions.md | facts, surrogate values, and confidence boundaries |
 | instructions | README.md | setup, build, parse, run, and replacement-data sequence |
-| follow-up | agent_to_agent_missing.md | missing code and acceptance tests |
+| follow-up | contracts/implementation_gaps.md | current unresolved implementation and evidence gaps |
 
 ## Twelve implementation actions
 

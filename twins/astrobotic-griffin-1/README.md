@@ -105,7 +105,7 @@ Sources:
 | twin.toml `[verification]` | Single registry binding each qualified SysML verification to its Twin scene, Rhai observer, and verdict channel |
 | contracts/ | Part contracts, verification boundary, standards/gap audit, and typed authoring procedure |
 | contracts/implementation_gaps.md | SysML standards alignment, workaround inventory, Rust/Editor feature gaps, and Griffin migration order |
-| contracts/verification.md | Active verification boundary, current constraint slice, and open physical deck migration |
+| contracts/verification.md | Active verification boundary, current constraint slice, and open physical-interface evidence gap |
 | tools/griffin_spec.rhai | Rhai compatibility projection of limits read from the SysML source |
 | tools/griffin_requirements.rhai | Stable public contract API, visual-only and physical part/layout audits, payload/ramp gates, and typed live-edit gate |
 | tools/check_landing_determinism.sh | Twin-local two-process harness comparing the Rhai landing trial at a fixed SI clock |
@@ -115,7 +115,6 @@ Sources:
 | ../../requirements/griffin-lander.md | Human-readable requirement IDs, provenance, and executable-check traceability |
 | research/griffin_1_assumptions.md | Public facts, surrogate values, and confidence boundaries |
 | handover.md | Detailed implementation and verification handover |
-| agent_to_agent_missing.md | Concrete follow-up work for the next coding agent |
 | instructions.md | Step-by-step setup and completion procedure |
 
 Each component has the same three-part acceptance contract: its own SysML v2

@@ -134,9 +134,11 @@ package Griffin1Requirements {
         // can be regenerated through the typed Editor bridge without a
         // second literal table in Rhai or a hand-edited USDA file.
         attribute surfaceRouteMarkerNames : String[15] = ("RoverRampApproach", "RoverRampExit", "RoverTarget1", "RoverTransit1", "RoverTransit2", "RoverTransit3", "RoverTransit4", "RoverTransit5", "RoverTransit6", "RoverTarget2", "RoverBaseArc1", "RoverBaseArc2", "RoverBaseApproach", "RoverBaseFinal", "BaseSite");
-        // The approach marker is the rover-centre datum just before the
-        // 3.16 m deck edge. With FLIP's roughly 1.2 m forward half-envelope,
-        // x=2.00 m brings the front wheels onto the hinge transition without
+        // The approach marker is the rover-centre datum before the
+        // 3.20 m ramp hinge. The separate 1.05 m transition bridges the
+        // 2.20 m adapter half-width and includes 0.05 m contact overlap.
+        // With FLIP's roughly 1.2 m forward half-envelope, x=2.00 m brings
+        // the front wheels onto the transition without
         // placing the route target itself on the moving ramp body. The
         // deployed ramp tip is near x=8.76 m, but the released rover's
         // measured two-wheel ground-transition pose is approximately
@@ -162,9 +164,10 @@ package Griffin1Requirements {
         // Route commands are part of the mission interface, not controller
         // implementation constants. The first radius is a 0.35 m approach
         // lane around the centerline and must reach the composed deck-to-ramp
-        // transition. Its 1.21 m placeholder comes from the obsolete
-        // six-sided deck collider and is not accepted until recomputed from
-        // the octagonal composed geometry. The second radius remains 0.30 m at the forward
+        // transition. The 1.05 m transition datum is derived from the
+        // 2.20 m payload-deck half-width, 3.20 m hinge station, and 0.05 m
+        // contact overlap; it remains a study value until composed contact
+        // measurements are exposed. The second radius remains 0.30 m at the forward
         // (12.00,0.00) exit gate, after the trailing axle clears the ramp;
         // its forward centreline placement avoids asking Ackermann guidance
         // to reverse toward a lateral marker during the transition. The later diagonal legs deliberately reduce

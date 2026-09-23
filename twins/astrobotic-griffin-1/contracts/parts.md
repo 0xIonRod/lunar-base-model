@@ -10,7 +10,8 @@ canonical wrapper is hidden, empty, or mounted on the wrong datum.
 | `Griffin1` | component-owned octagonal bus, payload adapter, seven-engine propulsion, four tanks, two arrays, four legs, optional two ramps | Xform root with capacity, collision, status, and provenance metadata | Public system counts are modeled once in SysML; visual dimensions remain explicitly labeled assumptions |
 | `GriffinBusComponent` | open octagonal frame, octagonal payload deck, lower service skirt, avionics, and a separate octagonal central tank-support perimeter | referenced component owns render geometry; the descent lander owns flight collision and mass | `GriffinVisualConfiguration` owns dimensions, stations, and appearance; the support perimeter has eight sides |
 | `GriffinBody` | `BodyCollisionProxy` and four side collision proxies | Hidden flight-body colliders; visible structure comes from `Bus` | Flight collider geometry remains a simulator study envelope |
-| `TopDeckCollisionProxy` | Hidden flight collider corresponding to the octagonal deck footprint | Enabled collider; visible `Bus/TopDeckOctagon` is render-only | Collider topology must be migrated to the octagonal source profile and checked in the Editor; it remains a simulator study envelope |
+| `TopDeckBeamCollider0..7` | Eight hidden convex beams following the eight source-owned octagon edges | Enabled perimeter colliders; no hull closes the tank-support opening | Editor readback checks beam count, profile-derived dimensions, and collider state; dimensions remain a simulator study envelope |
+| `RoverPayloadDeckCollider` | Hidden clipped-square convex collider matching the central FLIP payload adapter | Enabled, separate from the octagonal perimeter ring | Geometry is derived from adapter dimensions; supplier interface and load rating remain TBD |
 | `TankPX/NX/PZ/NZ` | `components/lander/griffin_tank_visual.usda` through four source references | Four render-only COPV study assemblies at the ordered SysML stations; MainPropulsion owns flight propellant mass | Four-tank integration is public; exact tank dimensions TBD |
 | `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider | FLIP interface/release datum TBD |
 | `MainPropulsion` | Chamber, fuel tank, oxidizer tank | Named propulsion interface | Thrust, propellant, mass, and engine count TBD |
@@ -18,7 +19,7 @@ canonical wrapper is hidden, empty, or mounted on the wrong datum.
 | `SolarPanelPort` | `Cells` plus frame/borders | Visible side array with explicit installation metadata; exactly one port array | Electrical ICD TBD |
 | `SolarPanelStarboard` | `Cells` plus frame/borders | Visible mirrored side array; exactly one starboard array | Electrical ICD TBD |
 | `LegPX/NX/PZ/NZ` | `Strut` and matching `PadPX/NX/PZ/NZ` | Positive mass body, visible strut, enabled pad collider | Four functional legs; dimensions and damping TBD |
-| `EgressRampPort/Starboard` | Surface and two edge rails | Positive-mass Xform, colliding contact geometry, named hinge | Optional Griffin hardware; study command bound is +/-0.872664626 rad (50 degrees), owned by `GriffinRampRequirements` |
+| `EgressRampPort/Starboard` | Two source-aligned wheel tracks, open centre, two edge rails, and named hinge | Positive-mass Xform; both geometry-derived track colliders enabled | Track stations follow FLIP wheel datums; width and clearance remain replaceable study values |
 | `RampHingePort/Starboard` | Body relationships to root and matching ramp | `PhysicsRevoluteJoint`, Z axis, ordered limits | Actuator/lock behavior TBD |
 
 ## Canonical frame
@@ -39,12 +40,12 @@ through the runtime authoring tools.
 
 | Component asset | Stable child geometry | Policy |
 |---|---|---|
-| `components/lander/griffin_bus_visual.usda` | perimeter frame, white equipment box, thermal panel, logo marks, top deck | rectangular Griffin silhouette; render-only |
+| `components/lander/griffin_bus_visual.usda` | octagonal open perimeter frame, white equipment box, thermal panel, logo marks, top deck | octagonal Griffin silhouette with open tank-support centre; render-only |
 | `components/lander/griffin_landing_leg_visual.usda` | outer/inner strut, shock piston, foot pad | four repeated outboard strut assemblies; render-only |
 | `components/lander/griffin_tank_visual.usda` | MLI tank and three bands | horizontal gold tank study; render-only |
 | `components/lander/griffin_solar_panel_visual.usda` | frame, cells, dividers | side-mounted array pair; render-only |
 | `components/lander/griffin_engine_bell_visual.usda` | bell and throat | seven repeated non-colliding bells; render-only |
-| `components/lander/griffin_ramp_visual.usda` | ramp surface, rails, paired supports, underside beams, posts, hinge collars, gussets, and treads | referenced port/starboard visual component; render-only |
+| `components/lander/griffin_ramp_visual.usda` | paired wheel tracks, rails, paired supports, underside beams, posts, hinge collars, gussets, and per-track treads | referenced port/starboard visual component owns its geometry; render-only |
 | `components/rover/flip_chassis_visual.usda` | lower frame, equipment box, bumper, payload deck, service panel | low white FLIP body; render-only |
 | `components/rover/flip_wheel_visual.usda` | tire, metal hub, hub cap | four repeated directional wheels in the visual assembly; render-only |
 | `components/rover/flip_sensor_mast_visual.usda` | mast post, sensor head, antenna | front sensor silhouette; render-only |

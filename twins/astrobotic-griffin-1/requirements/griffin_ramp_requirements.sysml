@@ -13,9 +13,16 @@ package GriffinRampRequirements {
     constraint def GRC003_WidthClearsFlipWheelEnvelope {
         in rampWidthM : Real;
         in wheelHalfTrackM : Real;
-        in wheelRadiusM : Real;
+        in wheelHalfWidthM : Real;
         in wheelClearanceM : Real;
-        rampWidthM >= 2.0 * (wheelHalfTrackM + wheelRadiusM + wheelClearanceM);
+        rampWidthM >= 2.0 * (wheelHalfTrackM + wheelHalfWidthM + wheelClearanceM);
+    }
+
+    constraint def GRC016_ContactTrackClearsTire {
+        in trackWidthM : Real;
+        in wheelWidthM : Real;
+        in wheelClearanceM : Real;
+        trackWidthM >= wheelWidthM + 2.0 * wheelClearanceM;
     }
 
     constraint def GRC012_TransitionOverlapWithinSurface {
@@ -37,19 +44,23 @@ package GriffinRampRequirements {
     part def GriffinEgressRamp {
         attribute componentAsset : String = "components/lander/griffin_ramp_visual.usda";
         attribute usdRootPath : String = "/World/Griffin1";
-        // The saved component owns the complete replaceable ramp topology,
-        // including the edge-support posts. `assemblyChildNames` remains a
-        // focused load-path verification list below; it is not a second
-        // geometry owner or a legacy assembly overlay.
-        attribute childNames : String[32] = ("MountFrame", "RampSurface", "OuterRail", "InnerRail", "SupportArm", "SupportArmOuter", "SupportArmInner", "UnderBeamPort", "UnderBeamStarboard", "SidePostPort1", "SidePostPort2", "SidePostPort3", "SidePostPort4", "SidePostStarboard1", "SidePostStarboard2", "SidePostStarboard3", "SidePostStarboard4", "HingeCollarPort", "HingeCollarStarboard", "HingeGussetPort", "HingeGussetStarboard", "Tread1", "Tread2", "Tread3", "Tread4", "Tread5", "Tread6", "Tread7", "Tread8", "MountPlate", "HingePin");
-        attribute assemblyChildNames : String[28] = ("MountPlate", "HingePin", "SupportArm", "SupportArmOuter", "SupportArmInner", "UnderBeamPort", "UnderBeamStarboard", "SidePostPort1", "SidePostPort2", "SidePostPort3", "SidePostPort4", "SidePostStarboard1", "SidePostStarboard2", "SidePostStarboard3", "SidePostStarboard4", "HingeCollarPort", "HingeCollarStarboard", "HingeGussetPort", "HingeGussetStarboard", "Tread1", "Tread2", "Tread3", "Tread4", "Tread5", "Tread6", "Tread7", "Tread8");
+        // This ordered source list owns the replaceable ramp topology and is
+        // the shared child inventory for builders and composed-stage checks.
+        attribute childNames : String[40] = (
+            "MountFrame", "RampTrackPort", "RampTrackStarboard", "OuterRail", "InnerRail",
+            "SupportArm", "SupportArmOuter", "SupportArmInner",
+            "UnderBeamPort", "UnderBeamStarboard",
+            "SidePostPort1", "SidePostPort2", "SidePostPort3", "SidePostPort4",
+            "SidePostStarboard1", "SidePostStarboard2", "SidePostStarboard3", "SidePostStarboard4",
+            "HingeCollarPort", "HingeCollarStarboard", "HingeGussetPort", "HingeGussetStarboard",
+            "TreadPort1", "TreadPort2", "TreadPort3", "TreadPort4", "TreadPort5", "TreadPort6", "TreadPort7", "TreadPort8",
+            "TreadStarboard1", "TreadStarboard2", "TreadStarboard3", "TreadStarboard4", "TreadStarboard5", "TreadStarboard6", "TreadStarboard7", "TreadStarboard8",
+            "MountPlate", "HingePin");
         attribute rampCount : Integer = 2;
         attribute rampSurfaceLengthM : Real = 8.00;
-        // The operational width is derived in the Rhai verifier from the
-        // independent FLIP wheel-station and tyre datums:
-        // 2 * (maxAbs(FlipRover.wheelStationZ)
-        //      + FlipRover.visualRoverWheelRadiusM
-        //      + rampWheelClearanceM).
+        // This is the outside-to-outside rail envelope. The wheel-contact
+        // surfaces are two narrower tracks centered on FLIP's source-owned
+        // wheel stations; track width is wheel width plus twice the clearance.
         // Keep this package's value equal to that derived interface datum;
         // it is still a visual study value, not a supplier mechanical ICD.
         attribute rampSurfaceWidthM : Real = 3.50;
@@ -65,15 +76,16 @@ package GriffinRampRequirements {
         attribute supportArmHalfDepthM : Real = 0.12;
         attribute supportArmPairOffsetZM : Real = 1.05;
         attribute supportArmTiltZDeg : Real = -18.0;
-        // Transverse traction bars make the full-scale review ramp read as a
-        // drive surface instead of a featureless slab.  Their count and
-        // pitch are visual study assumptions because Astrobotic has not
-        // published the Griffin ramp tread ICD.
+        // Separate traction bars on each wheel track leave the centre open.
+        // Count and pitch are visual study assumptions because Astrobotic has
+        // not published the Griffin ramp tread ICD.
         attribute assemblyTreadNamePrefix : String = "Tread";
         attribute assemblyTreadCount : Integer = 8;
         attribute assemblyTreadWidthM : Real = 0.12;
         attribute assemblyTreadHeightM : Real = 0.05;
-        attribute assemblyTreadSpanM : Real = 3.10;
+        // Source-owned track width; GRC016 constrains it against FLIP's wheel
+        // width and the required clearance. Geometry builders use this value.
+        attribute assemblyTrackWidthM : Real = 0.60;
         attribute assemblyTreadFirstCenterXM : Real = 0.50;
         attribute assemblyTreadPitchM : Real = 1.00;
         // A full-scale ramp needs a visible load path below the walking
@@ -110,9 +122,9 @@ package GriffinRampRequirements {
         attribute rampSurfaceCenterYM : Real = 0.00;
         attribute rampRailCenterYM : Real = 0.23;
         attribute rampMaxDeploymentAngleRad : Real = 0.872664626;
-        // Render-only mount: the 5.55 m hex deck reaches x = +/-2.775 m,
-        // so the visual hinge is placed at +/-2.80 m with a 25 mm seam
-        // allowance. The bus visual root is at Y=3.20 m; the top deck's
+        // Render-only mount: the 5.15 m octagonal top deck reaches x =
+        // +/-2.575 m, so the visual hinge is placed at +/-2.80 m beyond the
+        // clipped corner profile. The bus visual root is at Y=3.20 m; the top deck's
         // local top face is Y=1.67 m. Put the ramp centre 0.09 m below that
         // face so the 0.18 m surface top meets the deck instead of appearing
         // halfway down the equipment box. The visual and physical frames are
@@ -156,16 +168,9 @@ package GriffinRampRequirements {
         // egress concept but does not publish an as-built ramp ICD, so these
         // values are explicit, replaceable study assumptions rather than
         // disguised product facts.
-        attribute physicalRampSurfaceLengthM : Real = 8.00;
-        // The physical collision study must clear the current FLIP lateral
-        // wheel envelope: +/-1.15 m wheel stations, a conservative +/-0.45 m
-        // tyre envelope, and 0.15 m route clearance on each side produce a
-        // 3.50 m full-width ramp. This is a mission study datum, not supplier
-        // CAD; it avoids the visibly oversized 5.50 m placeholder.
-        attribute physicalRampSurfaceWidthM : Real = 3.50;
-        attribute physicalRampSurfaceThicknessM : Real = 0.18;
-        attribute physicalRampRailHeightM : Real = 0.28;
-        attribute physicalRampRailWidthM : Real = 0.14;
+        // Physical contact geometry reuses the shared ramp length, outside
+        // envelope, thickness, and rail dimensions above. This package owns
+        // only the physical hinge, transition, and safe stowed pose.
         // The physical ramp is stowed horizontally until touchdown.  These
         // are local component-frame datums: the port ramp uses +X and the
         // starboard ramp mirrors the X sign in the Editor recipe.  Keeping
@@ -174,48 +179,32 @@ package GriffinRampRequirements {
         // The physical ramp is hinged at the inboard edge, not at its centre:
         // the 8.00 m contact surface therefore occupies x=0.00..8.00 m in
         // the ramp body frame.  Its centre is 8.00/2 = 4.00 m.  The hinge
-        // sits at x=3.20 m on the lander, only 0.04 m beyond the authored
-        // deck edge x=3.16 m; keeping the inboard edge at the hinge makes the
-        // deployed slope continuous instead of lifting an overlapped inboard
-        // section above the deck.
-        attribute physicalRampStowedSurfaceCenterXM : Real = 4.00;
-        attribute physicalRampStowedSurfaceCenterYM : Real = 0.00;
-        attribute physicalRampStowedRailCenterYM : Real = 0.23;
+        // sits at x=3.20 m on the lander. The separate deck transition bridges
+        // from the central payload deck and carries the defined contact
+        // overlap, so the ramp body begins at its hinge datum.
         attribute physicalRampStowedAngleRad : Real = 0.00;
         // USD PhysicsRevoluteJoint limits are authored in degrees by the
         // standard USD reader; the command port remains radians.  The 50 deg
         // limit is actuator travel allowance, not the deployed ramp slope.
         attribute physicalRampHingeLimitDeg : Real = 50.0;
-        // The surface cube is centred half-way along the deployed ramp.  The
-        // hinge rotation supplies the vertical drop, so the component-local
-        // Y datum remains zero; putting the drop here as well would apply the
-        // same slope twice and leave a gap between deck and ramp.
-        attribute physicalRampSurfaceCenterYM : Real = 0.00;
-        attribute physicalRampRailCenterYM : Real = 0.23;
-        // Historical six-sided collider measurement. The +/-3.16 m edge and
-        // 0.04 m hinge clearance are provisional and must be recomputed from
-        // the octagonal composed collider before physical acceptance.
-        attribute physicalRampDeckEdgeXM : Real = 3.16;
-        attribute physicalRampDeckToHingeClearanceM : Real = 0.04;
-        // Historical placeholder: 1.21 m was derived from the old six-sided
-        // TopDeckCollisionProxy. The intended bus/deck footprint is octagonal.
-        // Keep this value only to describe the current authored asset; it is
-        // not a required overlap or an acceptance limit. Recompute it from
-        // the composed octagonal collider, ramp hinge, and FLIP wheel envelope
-        // after Editor authoring and typed geometry readback.
-        attribute physicalRampDeckTransitionOverlapM : Real = 1.21;
+        // The local ramp geometry remains horizontal in its stowed pose; the
+        // revolute joint, not child transforms, supplies deployment rotation.
+        // The adapter extends 2.20 m from the centre and the physical ramp
+        // hinge is at 3.20 m. Add a 0.05 m contact overlap onto the adapter,
+        // giving a 1.05 m transition plate. This remains a replaceable study
+        // datum until the supplier mechanical ICD is available.
+        attribute physicalRampDeckTransitionContactOverlapM : Real = 0.05;
+        attribute physicalRampDeckTransitionOverlapM : Real = 1.05;
         attribute physicalRampTransitionChildName : String = "TransitionPlate";
         attribute physicalRampTransitionContactChildName : String = "ContactSurface";
         // The transition is a separate rigid-body child, fixed to the Griffin
         // deck frame.  Its mass is an explicit simulator assumption because
         // Astrobotic has not released a ramp/transition structural ICD.  The
         // inertia list is the rectangular-prism result for
-        // m=15 kg, dimensions (1.21, 0.18, 3.50) m:
-        // Ixx=m*(0.18^2+3.50^2)/12=15.35,
-        // Iyy=m*(1.21^2+3.50^2)/12=17.14,
-        // Izz=m*(1.21^2+0.18^2)/12=1.87 kg m^2.
+        // m=15 kg, dimensions (1.05, 0.18, 3.50) m:
+        // Ixx=15.35, Iyy=16.69, Izz=1.42 kg m^2.
         attribute physicalRampDeckTransitionMassKg : Real = 15.0;
-        attribute physicalRampDeckTransitionInertiaKgM2 : Real[3] = (15.35, 17.14, 1.87);
+        attribute physicalRampDeckTransitionInertiaKgM2 : Real[3] = (15.35, 16.69, 1.42);
         attribute physicalRampTransitionJointNamePrefix : String = "RampTransitionJoint";
         attribute physicalRampPortMountX : Real = 3.20;
         attribute physicalRampStarboardMountX : Real = -3.20;
@@ -230,7 +219,6 @@ package GriffinRampRequirements {
         // render-only rampMountY/rampPortDeploymentAngleRad values above.
         attribute physicalRampPortDeploymentAngleRad : Real = -0.7984136958;
         attribute physicalRampStarboardDeploymentAngleRad : Real = 0.7984136958;
-        attribute physicalRampRouteClearanceM : Real = 0.25;
         attribute provenanceSource : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute missionReference : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
         attribute productReference : String = "https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/";
@@ -240,7 +228,7 @@ package GriffinRampRequirements {
     }
 
     requirement def GRR001_RampTopology {
-        doc /* GRR-001 [visual] each side ramp shall be a named replaceable component with a full-scale surface, two edge rails, paired support arms, hinge pin, and mount plate. The paired supports are a presentation-level load-path assumption, not supplier CAD. */
+        doc /* GRR-001 [visual] each side ramp shall be a named replaceable component with two full-scale wheel-contact tracks, two edge rails, paired support arms, hinge pin, and mount plate. The open centre is retained; paired supports are a presentation-level load-path assumption, not supplier CAD. */
     }
 
     requirement def GRR002_RampHinge {
@@ -248,7 +236,7 @@ package GriffinRampRequirements {
     }
 
     requirement def GRR003_RampEnvelope {
-        doc /* GRR-003 [study] the visual ramp envelope shall use the metric length/width and deployment limit in this package; its width shall clear the four FLIP wheel stations by the authored wheel-clearance datum. These values remain study proxies until the mechanical ICD is available. */
+        doc /* GRR-003 [study] the visual ramp rail envelope shall use the metric length/width and deployment limit in this package; its outside width shall clear the four FLIP tyre stations by the authored lateral wheel-clearance datum. These values remain study proxies until the mechanical ICD is available. */
         require GRC003_WidthClearsFlipWheelEnvelope;
     }
 
@@ -262,7 +250,8 @@ package GriffinRampRequirements {
     }
 
     requirement def GRR006_RampGeometry {
-        doc /* GRR-006 [geometry] the composed ramp surface shall match the authored metric length, width, and thickness envelope; the width must be sufficient for the FLIP track plus two tyre envelopes and the wheel-clearance datum. Rails and support arm remain separately inspectable. */
+        doc /* GRR-006 [geometry] each composed ramp shall provide two continuous contact tracks whose length and thickness match the SysML study values. Their lateral centres shall equal the source FLIP wheel stations, and their width shall equal the source wheel width plus twice the wheel clearance. The centre remains open between the tracks; rails and support load paths remain separately inspectable. */
+        require GRC016_ContactTrackClearsTire;
     }
 
     requirement def GRR007_RampEvidence {
@@ -275,7 +264,7 @@ package GriffinRampRequirements {
         doc /* GRR-009 [geometry] each ramp shall expose a centre support and a mirrored support pair, each with a 0.16 m by 1.90 m by 0.24 m envelope, centre at (1.60, 0.50, 0.0) m and signed Z offsets +/-1.05 m, using local Z rotation -18 degrees in the port template. */
     }
     requirement def GRR013_TractionTreadGeometry {
-        doc /* GRR-013 [visual geometry] each full-scale visual ramp shall expose eight named transverse traction bars, each 0.12 m in travel width, 0.05 m high, and 3.10 m spanning between the rails; the first bar is centered 0.50 m from the hinge and the pitch is 1.00 m. These are a presentation-level rover-driving assumption until a supplier ramp ICD is available. */
+        doc /* GRR-013 [visual geometry] each full-scale visual ramp shall expose eight named transverse traction bars on each contact track. Each bar has 0.12 m travel width, 0.05 m height, and spans exactly one track; its lateral station follows the FLIP wheel station. The first bar is centered 0.50 m from the hinge and pitch is 1.00 m. The centre gap remains open. These are presentation-level rover-driving assumptions pending a supplier ramp ICD. */
     }
     requirement def GRR014_RampLoadPathGeometry {
         doc /* GRR-014 [visual geometry] each visual ramp shall expose two typed longitudinal underside beams, four typed upright edge supports per side, and two typed hinge collars. The beam/post/collar sizes and stations are explicit SysML study assumptions that make the rover load path and revolute interface inspectable without claiming supplier CAD. */
@@ -284,13 +273,13 @@ package GriffinRampRequirements {
         doc /* GRR-015 [visual geometry] each visual ramp shall expose two named inboard hinge gussets that bridge the hinge/underside load path to the raised edge rails. Their width, height, depth, station, and signed edge offsets are explicit render-only study assumptions because the supplier ramp structural ICD is not public. */
     }
     requirement def GRR010_PhysicalEgressEnvelope {
-        doc /* GRR-010 [mission integration] the selected physical ramp shall bridge the Griffin top-deck datum to the normalized terrain plane with an 8.00 m x 3.50 m contact surface, paired rails, and a geometry-derived 45.7457 degree deployed slope; the exact mechanical ICD remains TBD. Source: https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/ and https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Rationale: public material supports optional rover egress but does not publish dimensions; the explicit 3.50 m envelope is a simulation assumption based on the current +/-1.15 m FLIP wheel stations, a conservative +/-0.45 m tyre envelope, and 0.15 m route clearance on each side. asin((3.98 + 1.75)/8.00) reaches the normalized terrain plane from the landed Griffin body without leaving the rover above the ramp or dropping the ramp below it. The render-only ramp has a separate 4.78 m visual hinge datum and 37.3329 degree presentation slope because its standalone vehicle root is already on the normalized visual ground plane. The deck transition is specified separately by GRR-012 so the 8.00 m physical ramp remains a hinge-to-tip surface. */
+        doc /* GRR-010 [mission integration] the selected physical ramp shall bridge the Griffin top-deck datum to the normalized terrain plane with two 8.00 m wheel-contact tracks inside a 3.50 m outside rail envelope, paired rails, and a geometry-derived 45.7457 degree deployed slope; the exact mechanical ICD remains TBD. Source: https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/ and https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Rationale: public material supports optional rover egress but does not publish dimensions; the 3.50 m outside envelope is a simulation study allowance around the source-owned +/-1.15 m FLIP wheel stations, 0.30 m wheel width, and 0.15 m lateral clearance. GRC016 requires each 0.60 m track to clear one tyre and its two side clearances. asin((3.98 + 1.75)/8.00) reaches the normalized terrain plane from the landed Griffin body without leaving the rover above the ramp or dropping the ramp below it. The render-only ramp has a separate 4.78 m visual hinge datum and 37.3329 degree presentation slope because its standalone vehicle root is already on the normalized visual ground plane. The deck transition is specified separately by GRR-012 so the 8.00 m physical ramp remains a hinge-to-tip contact track. */
     }
     requirement def GRR011_PhysicalDeploymentLifecycle {
         doc /* GRR-011 [mission lifecycle] physical ramp colliders shall be authored in a horizontal stowed pose for descent and commanded through the typed revolute-joint angle port only after touchdown; the port/starboard deployed commands are -0.7984136958 and +0.7984136958 rad within a 50 degree USD joint limit. Source: LunCoSim PhysicsRevoluteJoint angle-port contract and the Griffin physical-ramp study in this package. Rationale: a full-length deployed ramp reaches the terrain plane before the lander legs; stowing it prevents premature lander/ramp terrain contact, while a post-touchdown typed joint command preserves a real hinged deployment instead of a pose teleport. The 45.7457 degree command is physical COM-relative geometry; the standalone render assembly uses the separately documented visual slope. */
     }
     requirement def GRR012_PhysicalDeckTransition {
-        doc /* GRR-012 [blocked physical interface] each physical ramp shall have a separate horizontal deck-frame TransitionPlate with a ContactSurface collider, explicit rigid-body ownership, and a fixed attachment to the Griffin deck. Its overlap and width shall be derived from the composed octagonal TopDeckCollisionProxy, ramp hinge, terrain contact plane, and FLIP wheel envelope. The current 1.21 m value is a historical placeholder calculated from the obsolete six-sided collider; it is not a requirement value and shall not be accepted. Verification requires composed geometry observations and must remain inconclusive until the octagonal collider is authored in Editor, read back, and used to recompute the transition. Source: https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/; https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/research/griffin_1_assumptions.md. The transition remains a separate component rather than geometry parented to the rotating ramp. Mass and inertia values remain replaceable simulator assumptions pending a mechanical ICD. */
+        doc /* GRR-012 [physical interface] each physical ramp shall have a separate horizontal deck-frame TransitionPlate with a ContactSurface collider, explicit rigid-body ownership, and a fixed attachment to the Griffin deck. Its length bridges the 2.20 m half-width of the central RoverPayloadDeck to the 3.20 m ramp hinge with the source-owned 0.05 m contact overlap. The octagonal outer deck ring is represented by eight convex beam colliders, while the central rover platform has its own geometry-derived convex collider; one hull across the ring is prohibited. Editor readback must confirm the transition, hinge anchor, and wheel contact envelope before acceptance. Source: https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/; https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/research/griffin_1_assumptions.md. The transition remains a separate component rather than geometry parented to the rotating ramp. Mass and inertia values remain replaceable simulator assumptions pending a mechanical ICD. */
         require GRC012_TransitionOverlapWithinSurface;
     }
 

@@ -6,17 +6,19 @@ package GriffinSolarRequirements {
     part def GriffinSolarArrayAssembly {
         attribute usdRootPath : String = "/World/Griffin1";
         attribute componentAsset : String = "components/lander/griffin_solar_panel_visual.usda";
-        attribute childNames : String[12] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX", "CellDividerXLeft", "CellDividerXRight", "CellDividerZ", "CellDividerZUpper", "CellDividerZLower", "MountBracket", "HingeBar", "MountLink");
-        attribute frameWidthM : Real = 3.70;
+        attribute childNames : String[14] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "MountBracket", "HingeBar", "MountLink");
+        attribute frameWidthM : Real = 4.80;
         attribute frameThicknessM : Real = 0.14;
-        attribute frameDepthM : Real = 2.50;
-        attribute cellWidthM : Real = 3.40;
+        attribute frameDepthM : Real = 3.00;
+        attribute cellWidthM : Real = 4.45;
         attribute cellThicknessM : Real = 0.05;
-        attribute cellDepthM : Real = 2.20;
+        attribute cellDepthM : Real = 2.65;
         attribute cellOffsetYM : Real = 0.075;
-        attribute dividerXWidthM : Real = 0.05;
+        attribute arrayBackplaneThicknessM : Real = 0.04;
+        attribute arrayBackplaneCenterYM : Real = 0.03;
+        attribute dividerXWidthM : Real = 0.04;
         attribute dividerXThicknessM : Real = 0.04;
-        attribute dividerZWidthM : Real = 3.40;
+        attribute dividerZWidthM : Real = 0.04;
         attribute dividerZThicknessM : Real = 0.04;
         attribute mountBracketWidthM : Real = 0.44;
         attribute mountBracketThicknessM : Real = 0.32;
@@ -35,8 +37,8 @@ package GriffinSolarRequirements {
         attribute mountLinkCenterXM : Real = 0.00;
         attribute mountLinkCenterYM : Real = -0.08;
         attribute mountLinkCenterZM : Real = 0.00;
-        attribute gridColumnCount : Integer = 3;
-        attribute gridRowCount : Integer = 3;
+        attribute gridColumnCount : Integer = 6;
+        attribute gridRowCount : Integer = 4;
         attribute cellFaceNormal : String = "+Y in component frame; outward after signed root X rotation onto the signed Z side";
         attribute collisionPolicy : String = "panel, cells, dividers, and bracket are render-only; electrical power owner is separate";
         attribute deploymentStatus : String = "fixed visual study state; flight deployment state TBD";
@@ -62,10 +64,10 @@ package GriffinSolarRequirements {
         doc /* GSA-005 [layout] each array root transform matches the ordered native Position datum owned by GriffinVisualConfigurationRequirements. */
     }
     requirement def GSA006_PanelEnvelope {
-        doc /* GSA-006 [geometry] each panel frame shall be 3.70 m wide, 0.14 m thick, and 2.50 m deep; the cell surface shall be 3.40 m by 0.05 m by 2.20 m and offset +0.075 m in local Y. */
+        doc /* GSA-006 [geometry] each panel shall use an open 4.80 m by 3.00 m perimeter frame with 0.14 m stock; its 4.45 m by 2.65 m cell field rests on a 0.04 m backplane at local Y=0.03 m and has a 0.05 m cell surface centered at Y=+0.075 m. These are expanded study dimensions, not public panel ICD values. */
     }
     requirement def GSA007_CellGridAndMount {
-        doc /* GSA-007 [geometry] each panel shall contain a 3 by 3 cell grid with named divider members and a 0.44 m by 0.32 m by 0.44 m mount bracket, all as named child geometry. The grid is a visual study assumption because public Griffin material identifies solar cells but does not publish panel CAD. */
+        doc /* GSA-007 [geometry] each panel shall contain a 6 by 4 cell-module grid with five X dividers, three Z dividers, and a 0.44 m by 0.32 m by 0.44 m mount bracket, all as named child geometry. The segmented wing is a visual study assumption because public Griffin material identifies solar cells but does not publish panel CAD. */
     }
     requirement def GSA008_HingeAndStandoff {
         doc /* GSA-008 [interface geometry] each panel shall expose a render-only Z-axis hinge bar of radius 0.10 m and length 2.10 m at local Y = -0.18 m, plus a 0.20 m by 0.36 m by 0.18 m mount link at the declared local datum. These are explicit study assumptions because the public Griffin source confirms the solar-array concept but does not publish the deployment/hinge ICD. */

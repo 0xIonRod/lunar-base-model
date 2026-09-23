@@ -12,43 +12,13 @@ def Xform "SolarPanel" (
     custom string lunco:visual:component = "solar_panel"
     custom string lunco:visual:requirement = '"GriffinSolarRequirements::GSA001-GSA008"'
     custom token lunco:visual:cell_face_normal = "+Y; outward after signed assembly X rotation onto the signed Z side"
-    def Cube "Frame"
-    {
-        double size = 1.0
-        custom double3 xformOp:scale = (1.85, 0.07, 1.25)
-        color3f[] primvars:displayColor = [(0.4399999976158142, 0.47999998927116394, 0.550000011920929)]
-        uniform token purpose = "render"
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
-        bool physics:collisionEnabled = false
-    }
     def Cube "Cells"
     {
         double size = 1.0
         custom double3 xformOp:translate = (0.0, 0.075, 0.0)
-        custom double3 xformOp:scale = (1.7, 0.025, 1.1)
+        custom double3 xformOp:scale = (2.225, 0.025, 1.325)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.014999999664723873, 0.1599999964237213, 0.6200000047683716)]
-        uniform token purpose = "render"
-        bool physics:collisionEnabled = false
-    }
-    def Cube "CellDividerX"
-    {
-        double size = 1.0
-        custom double3 xformOp:translate = (0.0, 0.1, 0.0)
-        custom double3 xformOp:scale = (0.025, 0.02, 1.1)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
-        uniform token purpose = "render"
-        bool physics:collisionEnabled = false
-    }
-    def Cube "CellDividerZ"
-    {
-        double size = 1.0
-        custom double3 xformOp:translate = (0.0, 0.103, 0.0)
-        custom double3 xformOp:scale = (1.7, 0.02, 0.025)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.11999999731779099, 0.47999998927116394)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
     }
@@ -66,61 +36,13 @@ def Xform "SolarPanel" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.7, 0.018, 1.1)
+        custom double3 xformOp:scale = (2.225, 0.02, 1.325)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.0, -0.075, 0.0)
+        custom double3 xformOp:translate = (0.0, 0.03, 0.0)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.014999999664723873, 0.03500000014901161, 0.11999999731779099)]
-    }
-    def Cube "CellDividerXLeft" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
-    )
-    {
-        custom double3 xformOp:scale = (0.025, 0.02, 1.1)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        double size = 1.0
-        bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-0.5666666666666667, 0.103, 0.0)
-        uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
-    }
-    def Cube "CellDividerXRight" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
-    )
-    {
-        custom double3 xformOp:scale = (0.025, 0.02, 1.1)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        double size = 1.0
-        bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.5666666666666667, 0.103, 0.0)
-        uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
-    }
-    def Cube "CellDividerZUpper" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
-    )
-    {
-        custom double3 xformOp:scale = (1.7, 0.02, 0.025)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        double size = 1.0
-        bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.0, 0.105, 0.3666666666666667)
-        uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
-    }
-    def Cube "CellDividerZLower" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
-    )
-    {
-        custom double3 xformOp:scale = (1.7, 0.02, 0.025)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        double size = 1.0
-        bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.0, 0.105, -0.3666666666666667)
-        uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
     }
     def Cylinder "HingeBar" (
         prepend apiSchemas = "PhysicsCollisionAPI"
@@ -147,5 +69,116 @@ def Xform "SolarPanel" (
         custom double3 xformOp:translate = (0.0, -0.08, 0.0)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
+    }
+    def Mesh "Frame" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        point3f[] points = [(-2.3299999237060547, -0.07000000029802322, -1.5), (2.3299999237060547, -0.07000000029802322, -1.5), (2.3299999237060547, 0.07000000029802322, -1.5), (-2.3299999237060547, 0.07000000029802322, -1.5), (-2.3299999237060547, -0.07000000029802322, -1.3600000143051147), (2.3299999237060547, -0.07000000029802322, -1.3600000143051147), (2.3299999237060547, 0.07000000029802322, -1.3600000143051147), (-2.3299999237060547, 0.07000000029802322, -1.3600000143051147), (2.4000000953674316, -0.07000000029802322, -1.4299999475479126), (2.4000000953674316, -0.07000000029802322, 1.4299999475479126), (2.4000000953674316, 0.07000000029802322, 1.4299999475479126), (2.4000000953674316, 0.07000000029802322, -1.4299999475479126), (2.259999990463257, -0.07000000029802322, -1.4299999475479126), (2.259999990463257, -0.07000000029802322, 1.4299999475479126), (2.259999990463257, 0.07000000029802322, 1.4299999475479126), (2.259999990463257, 0.07000000029802322, -1.4299999475479126), (2.3299999237060547, -0.07000000029802322, 1.5), (-2.3299999237060547, -0.07000000029802322, 1.5), (-2.3299999237060547, 0.07000000029802322, 1.5), (2.3299999237060547, 0.07000000029802322, 1.5), (2.3299999237060547, -0.07000000029802322, 1.3600000143051147), (-2.3299999237060547, -0.07000000029802322, 1.3600000143051147), (-2.3299999237060547, 0.07000000029802322, 1.3600000143051147), (2.3299999237060547, 0.07000000029802322, 1.3600000143051147), (-2.4000000953674316, -0.07000000029802322, 1.4299999475479126), (-2.4000000953674316, -0.07000000029802322, -1.4299999475479126), (-2.4000000953674316, 0.07000000029802322, -1.4299999475479126), (-2.4000000953674316, 0.07000000029802322, 1.4299999475479126), (-2.259999990463257, -0.07000000029802322, 1.4299999475479126), (-2.259999990463257, -0.07000000029802322, -1.4299999475479126), (-2.259999990463257, 0.07000000029802322, -1.4299999475479126), (-2.259999990463257, 0.07000000029802322, 1.4299999475479126)]
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 4, 7, 3, 1, 2, 6, 5, 0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 3, 7, 6, 2, 8, 12, 15, 11, 9, 10, 14, 13, 8, 11, 10, 9, 12, 13, 14, 15, 8, 9, 13, 12, 11, 15, 14, 10, 16, 20, 23, 19, 17, 18, 22, 21, 16, 19, 18, 17, 20, 21, 22, 23, 16, 17, 21, 20, 19, 23, 22, 18, 24, 28, 31, 27, 25, 26, 30, 29, 24, 27, 26, 25, 28, 29, 30, 31, 24, 25, 29, 28, 27, 31, 30, 26]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.4399999976158142, 0.47999998927116394, 0.550000011920929)]
+        bool physics:collisionEnabled = false
+        uniform bool doubleSided = false
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Cube "CellDividerX1" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-1.4833333333333334, 0.1, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+    }
+    def Cube "CellDividerX2" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-0.7416666666666667, 0.1, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+    }
+    def Cube "CellDividerX3" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.1, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+    }
+    def Cube "CellDividerX4" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.7416666666666667, 0.1, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+    }
+    def Cube "CellDividerX5" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.4833333333333334, 0.1, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+    }
+    def Cube "CellDividerZ1" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (2.225, 0.02, 0.02)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.1, -0.6625)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+    }
+    def Cube "CellDividerZ2" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (2.225, 0.02, 0.02)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.1, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+    }
+    def Cube "CellDividerZ3" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (2.225, 0.02, 0.02)
+        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.1, 0.6624999999999999)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
     }
 }

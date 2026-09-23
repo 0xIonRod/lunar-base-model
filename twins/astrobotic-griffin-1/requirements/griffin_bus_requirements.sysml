@@ -94,7 +94,7 @@ package GriffinBusRequirements {
         require GBC010_PositiveDeckSkirtClearance;
     }
     requirement def GBC011_TankSupportOpenings {
-        doc /* GBC-011 [assembly geometry] the bus shall contain a separate octagonal tank-support perimeter using the shared bus profile, with four annular through-opening collars whose centers and bore radii follow the typed tank stations and support dimensions in GriffinVisualConfiguration. Each bore shall clear its scaled retention bands by the shared minimumTankFrameClearanceM datum. The collars shall preserve open bores and remain render-only. These are explicitly replaceable visual-study assumptions because the supplier interface drawing is not public. */
+        doc /* GBC-011 [assembly geometry] the bus shall contain three separate octagonal tank-support rings on the typed upper, middle, and lower support planes, all using the shared bus profile. Each ring shall carry four annular through-opening collars whose centers and bore radii follow the typed tank stations. All twelve collars shall clear the scaled retention bands by the shared minimumTankFrameClearanceM datum, preserve open bores, and remain render-only. These are explicitly replaceable visual-study assumptions because the supplier interface drawing is not public. */
         require GBC_ObservedCountEquals;
         require GBC_MeasurementWithinTolerance;
         require GBC011_TankBoreClearance;

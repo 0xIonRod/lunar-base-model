@@ -1,5 +1,8 @@
 package GriffinMechanicalRequirements {
     private import Griffin1Requirements::Griffin1Lander;
+    private import ScalarValues::Boolean;
+    private import ScalarValues::Integer;
+    private import ScalarValues::Real;
 
     // Domain-owned requirement definitions. Griffin1Requirements owns only
     // the integrated system subject, requirement usages, and verification.
@@ -20,8 +23,30 @@ package GriffinMechanicalRequirements {
         doc /* GR-017 [layout] optional ramps mirror in side placement, hinge rotation, and angle metadata when the ramp branch is selected. Source: Twin ramp component contract. Rationale: mirrored signs make port/starboard behavior deterministic and prevent one side from inheriting an accidental transform. */
     }
 
+    constraint def GRC018_TopDeckColliderTopologyMatchesSource {
+        in topologyMatches : Boolean;
+        topologyMatches;
+    }
+
+    constraint def GRC018_TopDeckColliderProfileWithinTolerance {
+        in profileDeviationM : Real;
+        in toleranceM : Real;
+        profileDeviationM <= toleranceM;
+    }
+
+    constraint def GRC018_TopDeckColliderOwnsContact {
+        in collisionEnabled : Boolean;
+        in proxyHidden : Boolean;
+        in convexHullApproximation : Boolean;
+        collisionEnabled and proxyHidden and convexHullApproximation;
+    }
+
     requirement def GR018_HullAndDeck {
-        doc /* GR-018 [physics boundary] the powered Griffin body shall retain a positive, hidden flight-body collision proxy and a positive, hidden top-deck collision proxy. The current octagonal Bus component owns visible body and deck geometry; opaque BoxyAirframe and IsogridDeck presentation duplicates shall be absent. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Assumption: collider envelopes are simulation study proxies, not released CAD. */
+        attribute topDeckProfileToleranceM : Real = 0.001;
+        require GRC018_TopDeckColliderTopologyMatchesSource;
+        require GRC018_TopDeckColliderProfileWithinTolerance;
+        require GRC018_TopDeckColliderOwnsContact;
+        doc /* GR-018 [mechanical and collision] the powered body and its load-bearing deck geometry shall have explicit collision ownership. The octagonal outer deck ring shall use eight individually convex beam colliders derived from the visible Bus/TopDeckOctagon profile; a single convex hull across this open perimeter is prohibited because it closes the tank openings. The central rover payload platform shall have a separate hidden convex collider derived from RoverPayloadDeck dimensions and profile. Composed transforms, mesh points, collision state, and hidden proxy role shall match the SysML source within topDeckProfileToleranceM. The one-millimetre correspondence tolerance is a Twin geometry bound, not a supplier manufacturing tolerance. Public Griffin material confirms a main payload deck and optional rover interface but does not provide its mechanical ICD, so the dimensions remain replaceable simulation-study assumptions. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. */
     }
 
     requirement def GR019_LegPlacement {

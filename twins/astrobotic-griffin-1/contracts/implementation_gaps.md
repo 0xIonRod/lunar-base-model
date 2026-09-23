@@ -71,19 +71,18 @@ become Griffin's permanent source semantics.
 - Visual and flight geometry are separate assets, which is a sound ownership
   boundary, but their correspondence is not yet generated or proved from one
   typed feature mapping. The octagonal visual deck and central octagonal tank
-  support are source-owned. The physical top-deck collider still follows a
-  six-sided ramp study and is an open, material simulation mismatch; see
-  [`verification.md`](verification.md).
-- Historical verification wrappers and local requirement helpers duplicated
-  generic evaluator behavior. The old `component_requirements` bridge and
-  standalone ramp assembly have been removed. Continue removing callers only
-  after the corresponding generic replacement has production evidence.
-- The first GRR-012 check bound the source placeholder `1.21 m` and only tested
-  that it was shorter than the ramp, which could pass without observing the
-  transition or deck. It now requires composed transition overlap, a derived
-  minimum overlap, and octagonal-profile compatibility. The current provider
-  marks all three geometry observations unavailable, so GRR-012 is
-  inconclusive pending Editor authoring and readback.
+  support are source-owned. Editor has migrated the physical deck to eight
+  octagonal perimeter colliders plus a separate payload-deck collider; GRR-012
+  remains blocked on composed transition/contact observation, not deck topology.
+- Twin verification observers bind authored requirements to composed source
+  and USD observations. The generic evaluator owns requirement membership,
+  constraint evaluation, and verdict classification; observers supply the
+  component-specific measurements that the shared provider surface exposes.
+- GRR-012's 1.05 m transition length is now a SysML study datum spanning the
+  2.20 m payload-deck half-width to the 3.20 m hinge with 0.05 m contact
+  overlap. The generic provider still cannot observe the composed transition
+  contact or wheel envelope, so GRR-012 remains inconclusive; geometry authoring
+  alone is not acceptance evidence.
 - Requirement status and check catalogs are still parallel string arrays in
   SysML. Their label is now explicit and they are not used as per-run verdicts,
   but they remain a manual status table. A generic coverage report should
@@ -175,10 +174,10 @@ become Griffin's permanent source semantics.
    constraint; `GR-031` remains the execution determinism gate. Rust projects
    formal requirement constraint memberships, and the stability observer uses
    the generic evaluator.
-2. Migrate the physical deck collider from the current six-sided study shape
-   to the source-owned octagonal profile through the Editor. Recompute the ramp
-   transition and contact path from the composed geometry, then capture a
-   composed readback. Do not hand-edit the USDA.
+2. **Completed in Editor:** migrate the physical deck collider to eight
+   source-profile perimeter beams plus the separate payload-deck collider.
+   Readback confirms source deviation within 0.001 m and leaves the tank
+   opening clear. GRR-012 still needs a typed composed contact observer.
 3. Build a typed Griffin assembly graph: octagonal bus and deck, separate
    octagonal tank-support perimeter, four tank usages, seven engine usages,
    four landing-leg usages, solar assemblies, ramp options, adapter interface,

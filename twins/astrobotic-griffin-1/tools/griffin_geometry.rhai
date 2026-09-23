@@ -2,6 +2,13 @@
 // builder and the read-only requirement observer. The source datums are
 // inputs; this module supplies the deterministic geometric realization.
 
+fn scalar_is_finite(value) {
+    let scalar = f64_from(value);
+    if scalar == () { return false; }
+    scalar == scalar && scalar < 1.7976931348623157e308
+        && scalar > -1.7976931348623157e308
+}
+
 fn perimeter_beam_geometry(stations, ring_y, section) {
     if type_of(stations) != "array" || stations.len() < 3
         || type_of(ring_y) != "array" || ring_y.len() == 0
@@ -14,7 +21,7 @@ fn perimeter_beam_geometry(stations, ring_y, section) {
         }
     }
     for center_y in ring_y {
-        if center_y == () || !center_y.is_finite() {
+        if !scalar_is_finite(center_y) {
             return #{ok: false, error: "perimeter ring planes must be finite values"};
         }
     }
@@ -83,5 +90,6 @@ fn tank_support_perimeter_geometry(profile, radius, center_y, section) {
         }
         stations.push(vec3(point.x * radius, 0.0, point.y * radius));
     }
-    perimeter_beam_geometry(stations, [center_y], section)
+    let levels = if type_of(center_y) == "array" { center_y } else { [center_y] };
+    perimeter_beam_geometry(stations, levels, section)
 }

@@ -30,7 +30,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV002_LanderPresentation {
-        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognizable faceted lander with its four legs, payload deck, and seven-engine cluster. The active review profile is the octagonal open frame selected in GriffinVisualConfiguration; do not describe or instantiate the superseded six-sided visual proxy. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. */
+        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognizable faceted lander with its four legs, payload deck, and seven-engine cluster. The visual configuration uses an octagonal open frame and a separate octagonal tank-support perimeter with four tank openings. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. */
     }
 
     requirement def GRV003_GriffinSolarAssemblies {

@@ -15,18 +15,23 @@ SysML/USD requirements evaluator.
   child identities, and port/starboard deployment datums.
 - `GRC005_DeploymentCommandWithinLimit` owns the symmetric command acceptance
   boundary in radians.
-- `GRC003_WidthClearsFlipWheelEnvelope` checks the FLIP wheel stations, wheel
-  radius, and authored clearance against the ramp width.
+- `GRC003_WidthClearsFlipWheelEnvelope` checks the FLIP lateral wheel stations,
+  half wheel width, and authored clearance against the outside rail envelope.
+- `GRC016_ContactTrackClearsTire` checks each separate contact-track width
+  against the source wheel width and two side clearances.
 - The physical ramp bodies, hinge joints, and deck transition belong to the
   physical Griffin model and its separate requirements. The render component
   does not provide a collider, mass, inertia, or a second physical body.
 - FLIP remains a referenced rover component; the ramp requirement reads FLIP's
   wheel datums through its SysML source.
-- The physical `TopDeckCollisionProxy` currently uses the obsolete six-sided
-  study footprint, while the required bus/deck profile is octagonal. The
-  existing 1.21 m deck transition is a legacy value and not acceptance data;
-  GRR-012 stays inconclusive until Editor readback provides a recomputed
-  overlap and confirms the octagonal collider.
+- The physical top deck uses eight hidden convex perimeter-beam colliders and
+  a separate payload-deck collider. GRR-012 still stays inconclusive until the
+  composed transition/contact geometry is available to the typed observer.
+  The transition length is a SysML study datum derived from adapter half-width,
+  hinge station, and contact overlap; it is not itself acceptance evidence.
+- The ramp contact geometry uses two FLIP-aligned tracks, not a solid plate
+  across the open centre. The same source wheel stations and track width drive
+  render geometry and physical colliders.
 
 ## Evidence
 

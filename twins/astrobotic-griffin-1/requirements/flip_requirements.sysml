@@ -24,6 +24,7 @@ package FlipRequirements {
         attribute exactVehicleIcdStatus : String = "TBD";
         attribute visualRoverName : String = "FLIP";
         attribute visualRoverWheelRadiusM : Real = 0.45;
+        attribute visualRoverWheelWidthM : Real = 0.30;
         attribute visualRoverWheelCount : Integer = 4;
         attribute visualWheelNames : String[4] = ("FL", "RL", "FR", "RR");
         attribute frontSteeringAngleDeg : Real = -12.0;

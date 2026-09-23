@@ -60,7 +60,7 @@ def Xform "GriffinFlipVisual" (
     )
     {
         bool physics:rigidBodyEnabled = false
-        double3 xformOp:translate = (-2.7, -0.38, 0.0)
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "FLIP" (
@@ -68,7 +68,7 @@ def Xform "GriffinFlipVisual" (
     )
     {
         bool physics:rigidBodyEnabled = false
-        double3 xformOp:translate = (7.0, 1.0, 0.5)
+        custom double3 xformOp:translate = (0.0, 6.15, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Scope "ContextRocks"

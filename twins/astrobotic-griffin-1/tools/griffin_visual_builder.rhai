@@ -854,13 +854,19 @@ fn _outer_body_prism_geometry(width, depth, height) {
 // deliberately a typed SetAttribute plan: the bus remains one replaceable
 // component, while its dimensions stay visible in the SysML-backed builder
 // rather than being hidden in a hand-edited USDA layer.
+fn _mesh_scalar_literal(value) {
+    let scaled = if value >= 0.0 { (value * 1000000.0 + 0.5).to_int() }
+        else { (value * 1000000.0 - 0.5).to_int() };
+    (f64_from(scaled) / 1000000.0).to_string()
+}
+
 fn _mesh_points_literal(points) {
     let literal = "[";
     for index in 0..points.len() {
         if index > 0 { literal += ", "; }
-        literal += "(" + points[index][0].to_string() + ", "
-            + points[index][1].to_string() + ", "
-            + points[index][2].to_string() + ")";
+        literal += "(" + _mesh_scalar_literal(points[index][0]) + ", "
+            + _mesh_scalar_literal(points[index][1]) + ", "
+            + _mesh_scalar_literal(points[index][2]) + ")";
     }
     literal + "]"
 }
@@ -872,6 +878,583 @@ fn _mesh_ints_literal(values) {
         literal += values[index].to_string();
     }
     literal + "]"
+}
+
+// Decompose the open octagonal payload perimeter into eight convex beams and
+// derive the separate central rover platform collider from its visible mesh
+// profile. A single convex hull around the perimeter would fill the tank
+// openings, so it is never an acceptable collider for this geometry.
+fn physical_top_deck_collider_geometry() {
+    let width = griffin_spec::visual_deck_width_m();
+    let depth = griffin_spec::visual_deck_depth_m();
+    let thickness = griffin_spec::visual_deck_thickness_m();
+    let section = griffin_spec::visual_frame_ring_section_m();
+    let profile = griffin_spec::visual_outer_body_profile_coordinates();
+    let bus_mount = griffin_spec::component_bus_mount();
+    let deck_center_y = griffin_spec::visual_deck_center_y_m();
+    if width == () || depth == () || thickness == ()
+        || !griffin_geometry::scalar_is_finite(width)
+        || !griffin_geometry::scalar_is_finite(depth)
+        || !griffin_geometry::scalar_is_finite(thickness)
+        || section == () || section <= 0.0 || profile.len() != 8
+        || width <= 0.0 || depth <= 0.0 || thickness <= 0.0
+        || bus_mount == () || !vec3_is_native(bus_mount)
+        || deck_center_y == () || !griffin_geometry::scalar_is_finite(deck_center_y) {
+        return plan_error("source-owned top-deck dimensions and COM-frame mount are incomplete");
+    }
+    let ring_center_y = bus_mount.y + deck_center_y;
+    let ring_beams = [];
+    for index in 0..profile.len() {
+        let a = profile[index];
+        let b = profile[(index + 1) % profile.len()];
+        if type_of(a) != "Vec2" || type_of(b) != "Vec2"
+            || !vec2_is_finite(a) || !vec2_is_finite(b) {
+            return plan_error("top-deck perimeter requires finite native SysML profile points");
+        }
+        let ax = a.x * width / 2.0;
+        let az = a.y * depth / 2.0;
+        let bx = b.x * width / 2.0;
+        let bz = b.y * depth / 2.0;
+        let dx = bx - ax;
+        let dz = bz - az;
+        let edge_length = (dx * dx + dz * dz).sqrt();
+        if edge_length <= 0.0 { return plan_error("top-deck profile has a zero-length edge"); }
+        // Cube local X rotates toward -Z about Y. atan(dz/dx) is sufficient
+        // for an undirected beam axis; reversing an edge leaves the same box.
+        let rotation_y = if dx.abs() <= 1.0e-12 { -90.0 }
+            else { (-dz / dx).atan() * 180.0 / 3.141592653589793 };
+        ring_beams.push(#{name: "TopDeckBeamCollider" + index.to_string(),
+            translation: [(ax + bx) / 2.0, ring_center_y, (az + bz) / 2.0],
+            rotation: [0.0, rotation_y, 0.0],
+            dimensions: [edge_length + section, thickness, section]});
+    }
+    let adapter_width = griffin_spec::visual_payload_adapter_width_m();
+    let adapter_depth = griffin_spec::visual_payload_adapter_depth_m();
+    let adapter_thickness = griffin_spec::visual_payload_adapter_thickness_m();
+    let adapter_center_y = griffin_spec::visual_payload_adapter_center_y_m();
+    if adapter_width == () || adapter_depth == () || adapter_thickness == ()
+        || adapter_center_y == () || adapter_width <= 0.0
+        || adapter_depth <= 0.0 || adapter_thickness <= 0.0 {
+        return plan_error("source-owned rover payload adapter dimensions are incomplete");
+    }
+    let adapter_mesh = _outer_body_prism_geometry(adapter_width,
+        adapter_depth, adapter_thickness);
+    if adapter_mesh.ok != true { return adapter_mesh; }
+    let adapter_points = adapter_mesh.points;
+    for index in 0..adapter_points.len() { adapter_points[index][1] += adapter_center_y; }
+    #{ok: true, ring_beams: ring_beams, ring_center_y_m: ring_center_y,
+      ring_section_m: section, deck_width_m: width, deck_depth_m: depth,
+      deck_thickness_m: thickness, profile_vertex_count: profile.len(),
+      adapter_points: adapter_points, adapter_face_counts: adapter_mesh.face_counts,
+      adapter_face_indices: adapter_mesh.face_indices,
+      adapter_width_m: adapter_width, adapter_depth_m: adapter_depth,
+      adapter_thickness_m: adapter_thickness, adapter_center_y_m: adapter_center_y}
+}
+
+/// Return one generation-bound Editor plan for the octagonal perimeter and
+/// rover platform. The obsolete solid convex hull is removed before any new
+/// colliders are authored through the typed Editor journal.
+fn physical_top_deck_collider_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("physical_top_deck_collider_plan requires a document, edit target, and absolute root");
+    }
+    let geometry = physical_top_deck_collider_geometry();
+    if geometry.ok != true { return geometry; }
+    let ops = [];
+    let legacy_path = root + "/TopDeckCollisionProxy";
+    if query_ok(assembly_builder::composed_query(doc,
+        #{path: legacy_path, children: false})) {
+        ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_path}});
+    }
+    for beam in geometry.ring_beams {
+        let path = root + "/" + beam.name;
+        let current = assembly_builder::composed_query(doc, #{path: path, children: false});
+        if query_ok(current) && current.type_name != "Cube" {
+            return plan_error(path + ": octagonal ring collider must be a Cube");
+        }
+        if !query_ok(current) {
+            let shape = assembly_builder::cube_shape_plan(edit_target, root,
+                beam.name, 1.0, beam.dimensions, true);
+            if !shape.ok { return shape; }
+            for op in shape.ops { ops.push(op); }
+        }
+        let placement = assembly_builder::place_plan(edit_target, path,
+            beam.translation, beam.rotation, beam.dimensions);
+        if !placement.ok { return placement; }
+        for op in placement.ops { ops.push(op); }
+        for attribute in [
+            #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
+            #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
+            #{name: "purpose", type_name: "token", value: "\"proxy\""},
+            #{name: "visibility", type_name: "token", value: "\"invisible\""},
+            #{name: "lunco:collider:geometrySource", type_name: "string",
+              value: "\"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::outerBodyProfileCoordinates+deckDimensions+frameRingSectionM\""},
+            #{name: "lunco:requirement", type_name: "string",
+              value: "\"GriffinMechanicalRequirements::GR018_PhysicalDeckCollider\""}
+        ] {
+            ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+                name: attribute.name, type_name: attribute.type_name,
+                value: attribute.value}});
+        }
+    }
+    let adapter_path = root + "/RoverPayloadDeckCollider";
+    let adapter_current = assembly_builder::composed_query(doc,
+        #{path: adapter_path, children: false});
+    if query_ok(adapter_current) && adapter_current.type_name != "Mesh" {
+        return plan_error(adapter_path + ": rover platform collider must be a Mesh");
+    }
+    if !query_ok(adapter_current) {
+        let shape = assembly_builder::mesh_shape_plan(edit_target, root,
+            "RoverPayloadDeckCollider", geometry.adapter_points,
+            geometry.adapter_face_counts, geometry.adapter_face_indices,
+            griffin_spec::visual_deck_display_color(), true);
+        if !shape.ok { return shape; }
+        for op in shape.ops { ops.push(op); }
+    }
+    for pair in [
+        ["points", "point3f[]", _mesh_points_literal(geometry.adapter_points)],
+        ["faceVertexCounts", "int[]", _mesh_ints_literal(geometry.adapter_face_counts)],
+        ["faceVertexIndices", "int[]", _mesh_ints_literal(geometry.adapter_face_indices)],
+        ["subdivisionScheme", "token", "\"none\""]
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: adapter_path,
+            name: pair[0], type_name: pair[1], value: pair[2]}});
+    }
+    for attribute in [
+        #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
+        #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
+        #{name: "purpose", type_name: "token", value: "\"proxy\""},
+        #{name: "visibility", type_name: "token", value: "\"invisible\""},
+        #{name: "lunco:collider:geometrySource", type_name: "string",
+          value: "\"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::outerBodyProfileCoordinates+payloadAdapterDimensions+payloadAdapterCenterYM\""},
+        #{name: "lunco:requirement", type_name: "string",
+          value: "\"GriffinMechanicalRequirements::GR018_PhysicalDeckCollider\""}
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: adapter_path,
+            name: attribute.name, type_name: attribute.type_name,
+            value: attribute.value}});
+    }
+    #{ok: true, kind: "griffin_physical_top_deck_collider", doc_id: doc,
+      removed_legacy_path: legacy_path, ring_beam_count: geometry.ring_beams.len(),
+      adapter_path: adapter_path, profile_vertex_count: geometry.profile_vertex_count,
+      ring_center_y_m: geometry.ring_center_y_m,
+      ring_section_m: geometry.ring_section_m,
+      adapter_dimensions_m: [geometry.adapter_width_m, geometry.adapter_thickness_m,
+        geometry.adapter_depth_m], adapter_center_y_m: geometry.adapter_center_y_m,
+      ops: ops}
+}
+
+/// Measure all nine colliders against their source-derived transforms and
+/// mesh topology. The central opening is preserved by using eight separate
+/// convex perimeter members rather than one convex hull.
+fn physical_top_deck_collider_observation(doc, root) {
+    let expected = physical_top_deck_collider_geometry();
+    if expected.ok != true {
+        return #{ok: false, state: "invalid", detail: expected.error};
+    }
+    let legacy = assembly_builder::composed_query(doc,
+        #{path: root + "/TopDeckCollisionProxy", children: false});
+    let old_hull_removed = !query_ok(legacy);
+    let tolerance = sysml_requirements::number(sysml_requirements::source(),
+        "GriffinMechanicalRequirements::GR018_HullAndDeck::topDeckProfileToleranceM");
+    if tolerance == () || tolerance <= 0.0 {
+        return #{ok: false, state: "invalid", detail: "shared geometry tolerance is missing from SysML"};
+    }
+    let all_beams_match = true;
+    let all_beams_collide = true;
+    let all_beams_hidden = true;
+    let max_transform_error = 0.0;
+    let open_interior_radius = 1.0e30;
+    for beam in expected.ring_beams {
+        let path = root + "/" + beam.name;
+        let record = assembly_builder::composed_query(doc, #{path: path,
+            children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ",
+                "xformOp:scale", "physics:collisionEnabled", "visibility",
+                "purpose", "physics:approximation"]});
+        if !query_ok(record) || record.type_name != "Cube" || record.attrs == () {
+            all_beams_match = false;
+            all_beams_collide = false;
+            all_beams_hidden = false;
+            continue;
+        }
+        let translation = record.attrs["xformOp:translate"];
+        let rotation = record.attrs["xformOp:rotateXYZ"];
+        let scale = record.attrs["xformOp:scale"];
+        if translation == () || rotation == () || scale == () {
+            all_beams_match = false;
+            continue;
+        }
+        let actual = [_native_vec3_axis(translation, 0), _native_vec3_axis(translation, 1),
+            _native_vec3_axis(translation, 2), _native_vec3_axis(rotation, 1),
+            _native_vec3_axis(scale, 0), _native_vec3_axis(scale, 1),
+            _native_vec3_axis(scale, 2)];
+        let wanted = [beam.translation[0], beam.translation[1], beam.translation[2],
+            beam.rotation[1], beam.dimensions[0], beam.dimensions[1], beam.dimensions[2]];
+        for index in 0..actual.len() {
+            let error = (actual[index] - wanted[index]).abs();
+            if index == 3 { error *= 3.141592653589793 / 180.0 * beam.dimensions[0] / 2.0; }
+            if error > max_transform_error { max_transform_error = error; }
+            if error > tolerance { all_beams_match = false; }
+        }
+        if record.attrs["physics:collisionEnabled"] != true
+            || record.attrs["physics:approximation"] != "convexHull" {
+            all_beams_collide = false;
+        }
+        if record.attrs["visibility"] != "invisible" || record.attrs["purpose"] != "proxy" {
+            all_beams_hidden = false;
+        }
+        let inner_radius = (beam.translation[0] * beam.translation[0]
+            + beam.translation[2] * beam.translation[2]).sqrt()
+            - beam.dimensions[2] / 2.0;
+        if inner_radius < open_interior_radius { open_interior_radius = inner_radius; }
+    }
+    let adapter_path = root + "/RoverPayloadDeckCollider";
+    let adapter = assembly_builder::composed_query(doc, #{path: adapter_path,
+        children: false, attrs: ["points", "faceVertexCounts", "faceVertexIndices",
+            "physics:approximation", "physics:collisionEnabled", "visibility", "purpose"]});
+    let adapter_matches = query_ok(adapter) && adapter.type_name == "Mesh"
+        && adapter.attrs != ()
+        && adapter.attrs["faceVertexCounts"] == expected.adapter_face_counts
+        && adapter.attrs["faceVertexIndices"] == expected.adapter_face_indices;
+    let adapter_point_deviation = 0.0;
+    if adapter_matches {
+        let observed_points = adapter.attrs["points"];
+        if observed_points == () || observed_points.len() != expected.adapter_points.len() {
+            adapter_matches = false;
+        } else {
+            for index in 0..observed_points.len() {
+                let dx = _native_vec3_axis(observed_points[index], 0)
+                    - _native_vec3_axis(expected.adapter_points[index], 0);
+                let dy = _native_vec3_axis(observed_points[index], 1)
+                    - _native_vec3_axis(expected.adapter_points[index], 1);
+                let dz = _native_vec3_axis(observed_points[index], 2)
+                    - _native_vec3_axis(expected.adapter_points[index], 2);
+                let deviation = (dx * dx + dy * dy + dz * dz).sqrt();
+                if deviation > adapter_point_deviation { adapter_point_deviation = deviation; }
+            }
+            if adapter_point_deviation > tolerance { adapter_matches = false; }
+        }
+    }
+    let adapter_collides = query_ok(adapter) && adapter.attrs != ()
+        && adapter.attrs["physics:collisionEnabled"] == true
+        && adapter.attrs["physics:approximation"] == "convexHull";
+    let adapter_hidden = query_ok(adapter) && adapter.attrs != ()
+        && adapter.attrs["visibility"] == "invisible"
+        && adapter.attrs["purpose"] == "proxy";
+    let topology_matches = old_hull_removed && expected.ring_beams.len() == 8
+        && all_beams_match && adapter_matches && open_interior_radius > 0.0;
+    let collision_enabled = all_beams_collide && adapter_collides;
+    let proxy_hidden = all_beams_hidden && adapter_hidden;
+    let convex_hull_approximation = all_beams_collide && adapter_collides;
+    let profile_deviation = if adapter_point_deviation > max_transform_error {
+        adapter_point_deviation
+    } else { max_transform_error };
+    let ok = topology_matches && collision_enabled && proxy_hidden
+        && convex_hull_approximation;
+    #{ok: true, state: if ok { "pass" } else { "fail" },
+      legacy_hull_removed: old_hull_removed, ring_beam_count: expected.ring_beams.len(),
+      topology_matches: topology_matches, profile_deviation_m: profile_deviation,
+      collision_enabled: collision_enabled, proxy_hidden: proxy_hidden,
+      convex_hull_approximation: convex_hull_approximation,
+      ring_geometry_matches_source: all_beams_match,
+      ring_collision_enabled: all_beams_collide, ring_proxy_hidden: all_beams_hidden,
+      open_interior_radius_m: open_interior_radius,
+      payload_adapter_geometry_matches_source: adapter_matches,
+      payload_adapter_max_point_deviation_m: adapter_point_deviation,
+      payload_adapter_collision_enabled: adapter_collides,
+      payload_adapter_proxy_hidden: adapter_hidden,
+      maximum_transform_error_m: max_transform_error,
+      tolerance_m: tolerance}
+}
+
+// The simulation lander's legacy leg roots own dynamics and joints; their
+// obsolete visible cylinders/capsules are replaced by the requirement-owned
+// LandingLeg visual component plus one hidden cylinder contact proxy. Both
+// shapes use the same SysML foot-pad dimensions and leg-local datum.
+fn physical_landing_leg_pad_geometry() {
+    let visual = "GriffinLandingLegRequirements::GriffinLandingLegAssembly::";
+    let source = sysml_requirements::source_with_selection([
+        visual + "footPadRadiusM", visual + "footPadHeightM",
+        visual + "footPadCenterYM", visual + "physicalLegStations",
+        visual + "physicalLegStationRotationYDeg",
+        visual + "physicalLegPlacementToleranceM",
+        visual + "padColliderToleranceM"
+    ], ["GriffinLandingLegRequirements::gll005",
+        "GriffinLandingLegRequirements::gll008"],
+       ["GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements"]);
+    if source.ok != true {
+        return plan_error("SysML landing-leg geometry source is unavailable");
+    }
+    let radius = sysml_requirements::number(source, visual + "footPadRadiusM");
+    let height = sysml_requirements::number(source, visual + "footPadHeightM");
+    let center_y = sysml_requirements::number(source, visual + "footPadCenterYM");
+    let stations = sysml_requirement_checks::source_position_list(source,
+        visual + "physicalLegStations");
+    let rotations = sysml_requirements::vector(source,
+        visual + "physicalLegStationRotationYDeg");
+    let station_tolerance = sysml_requirements::number(source,
+        visual + "physicalLegPlacementToleranceM");
+    let tolerance = sysml_requirements::number(source,
+        visual + "padColliderToleranceM");
+    if radius == () || height == () || center_y == () || tolerance == ()
+        || station_tolerance == ()
+        || stations.len() != 4 || rotations.len() != 4
+        || radius <= 0.0 || height <= 0.0 || tolerance <= 0.0
+        || station_tolerance <= 0.0 {
+        return plan_error("SysML landing-leg pad or COM-frame station datums are incomplete");
+    }
+    #{ok: true, radius_m: radius, height_m: height, center_y_m: center_y,
+      stations: stations, rotations_y_deg: rotations,
+      tolerance_m: tolerance, station_tolerance_m: station_tolerance}
+}
+
+fn physical_landing_leg_pad_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("physical_landing_leg_pad_plan requires a document, edit target, and absolute root");
+    }
+    let geometry = physical_landing_leg_pad_geometry();
+    if geometry.ok != true { return geometry; }
+    let suffixes = ["PX", "NX", "PZ", "NZ"];
+    let ops = [];
+    let added_visuals = 0;
+    let removed_legacy = [];
+    for index in 0..suffixes.len() {
+        let leg_path = root + "/Leg" + suffixes[index];
+        let leg = assembly_builder::composed_query(doc,
+            #{path: leg_path, children: false});
+        if !query_ok(leg) || leg.type_name != "Xform" {
+            return plan_error(leg_path + ": dynamics leg body is missing or is not an Xform");
+        }
+        let station = geometry.stations[index];
+        let placement = assembly_builder::place_plan(edit_target, leg_path,
+            vec3_array(station), [0.0, geometry.rotations_y_deg[index], 0.0], ());
+        if !placement.ok { return placement; }
+        for op in placement.ops { ops.push(op); }
+
+        // Remove the assembly-local legacy presentation and pad capsule; the
+        // referenced physical leg body, mass, joint, and outputs remain.
+        for name in ["Strut", "Pad" + suffixes[index]] {
+            let legacy_path = leg_path + "/" + name;
+            if query_ok(assembly_builder::composed_query(doc,
+                #{path: legacy_path, children: false})) {
+                ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_path}});
+                removed_legacy.push(legacy_path);
+            }
+        }
+        // Disable and hide the old source component's coarse render/collision
+        // primitives. The shared, requirement-driven visual reference below
+        // owns presentation; the new FootPadCollider owns terrain contact.
+        for name in ["TopMount", "OuterStrut", "ShockHousing", "Piston", "FootHub", "FootPad"] {
+            let old_path = leg_path + "/" + name;
+            if query_ok(assembly_builder::composed_query(doc,
+                #{path: old_path, children: false})) {
+                ops.push(#{SetAttribute: #{edit_target: edit_target, path: old_path,
+                    name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
+                ops.push(#{SetAttribute: #{edit_target: edit_target, path: old_path,
+                    name: "visibility", type_name: "token", value: "\"invisible\""}});
+            }
+        }
+
+        let visual_path = leg_path + "/LandingLegVisual";
+        let visual_prim = assembly_builder::composed_query(doc,
+            #{path: visual_path, children: false});
+        if query_ok(visual_prim) {
+            if visual_prim.type_name != "Xform" {
+                return plan_error(visual_path + ": existing visual component must be an Xform");
+            }
+        } else {
+            ops.push(#{AddPrim: #{edit_target: edit_target,
+                parent_path: leg_path, name: "LandingLegVisual", type_name: "Xform",
+                reference: component_asset("lander/griffin_landing_leg_visual.usda"),
+                reference_prim_path: "/LandingLeg"}});
+            added_visuals += 1;
+        }
+
+        let collider_path = leg_path + "/FootPadCollider";
+        let collider = assembly_builder::composed_query(doc,
+            #{path: collider_path, children: false});
+        if query_ok(collider) && collider.type_name != "Cylinder" {
+            return plan_error(collider_path + ": contact proxy must remain a UsdGeomCylinder");
+        }
+        if !query_ok(collider) {
+            let shape = assembly_builder::cylinder_shape_plan_axis(edit_target,
+                leg_path, "FootPadCollider", geometry.radius_m, geometry.height_m,
+                [0.0, geometry.center_y_m, 0.0], (), (), "Y", true);
+            if !shape.ok { return shape; }
+            for op in shape.ops { ops.push(op); }
+        } else {
+            for item in [
+                #{name: "radius", type_name: "double", value: geometry.radius_m.to_string()},
+                #{name: "height", type_name: "double", value: geometry.height_m.to_string()},
+                #{name: "axis", type_name: "token", value: "\"Y\""},
+                #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
+                #{name: "purpose", type_name: "token", value: "\"proxy\""},
+                #{name: "visibility", type_name: "token", value: "\"invisible\""}
+            ] {
+                ops.push(#{SetAttribute: #{edit_target: edit_target, path: collider_path,
+                    name: item.name, type_name: item.type_name, value: item.value}});
+            }
+            let collider_placement = assembly_builder::place_plan(edit_target,
+                collider_path, [0.0, geometry.center_y_m, 0.0], (), ());
+            if !collider_placement.ok { return collider_placement; }
+            for op in collider_placement.ops { ops.push(op); }
+        }
+        for attribute in [
+            #{name: "purpose", type_name: "token", value: "\"proxy\""},
+            #{name: "visibility", type_name: "token", value: "\"invisible\""},
+            #{name: "lunco:collider:geometrySource", type_name: "string",
+              value: "\"" + visual_path + "/FootPad\""},
+            #{name: "lunco:requirement", type_name: "string",
+              value: "\"GriffinLandingLegRequirements::GLL008_FootPadGeometry\""}
+        ] {
+            ops.push(#{SetAttribute: #{edit_target: edit_target, path: collider_path,
+                name: attribute.name, type_name: attribute.type_name,
+                value: attribute.value}});
+        }
+    }
+    #{ok: true, kind: "griffin_physical_landing_leg_pads", root: root,
+      radius_m: geometry.radius_m, height_m: geometry.height_m,
+      center_y_m: geometry.center_y_m, tolerance_m: geometry.tolerance_m,
+      added_visuals: added_visuals, removed_legacy_paths: removed_legacy,
+      collider_paths: [root + "/LegPX/FootPadCollider",
+        root + "/LegNX/FootPadCollider", root + "/LegPZ/FootPadCollider",
+        root + "/LegNZ/FootPadCollider"], ops: ops}
+}
+
+fn physical_landing_leg_pad_observation(doc, root) {
+    let geometry = physical_landing_leg_pad_geometry();
+    if geometry.ok != true {
+        return #{ok: false, state: "invalid", detail: geometry.error};
+    }
+    let suffixes = ["PX", "NX", "PZ", "NZ"];
+    let maximum = 0.0;
+    let all_topology = true;
+    let all_collision_enabled = true;
+    let all_proxy_hidden = true;
+    let all_visual_disabled = true;
+    let all_legacy_disabled = true;
+    let station_deviation = 0.0;
+    let rotations_match = true;
+    let details = [];
+    for index in 0..suffixes.len() {
+        let leg_path = root + "/Leg" + suffixes[index];
+        let collider_path = leg_path + "/FootPadCollider";
+        let visual_path = leg_path + "/LandingLegVisual/FootPad";
+        let collider = assembly_builder::composed_query(doc, #{path: collider_path,
+            children: false, attrs: ["radius", "height", "axis", "xformOp:translate",
+                "physics:collisionEnabled", "visibility", "purpose"]});
+        let visual = assembly_builder::composed_query(doc, #{path: visual_path,
+            children: false, attrs: ["radius", "height", "axis", "xformOp:translate",
+                "physics:collisionEnabled", "purpose"]});
+        let leg_pose = assembly_builder::composed_query(doc, #{path: leg_path,
+            children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ"]});
+        if !query_ok(collider) || !query_ok(visual)
+            || !query_ok(leg_pose) || collider.attrs == () || visual.attrs == ()
+            || leg_pose.attrs == () {
+            return #{ok: false, state: "unavailable",
+                detail: leg_path + ": composed pad proxy or visual source geometry is missing"};
+        }
+        let actual_station = leg_pose.attrs["xformOp:translate"];
+        let actual_rotation = leg_pose.attrs["xformOp:rotateXYZ"];
+        if actual_station == () || actual_rotation == () {
+            return #{ok: false, state: "unavailable",
+                detail: leg_path + ": composed physical station or orientation is missing"};
+        }
+        let expected_station = geometry.stations[index];
+        let station_errors = [actual_station[0] - expected_station.x,
+            actual_station[1] - expected_station.y,
+            actual_station[2] - expected_station.z];
+        for error in station_errors {
+            if error.abs() > station_deviation { station_deviation = error.abs(); }
+        }
+        if actual_rotation[0].abs() > geometry.station_tolerance_m
+            || (actual_rotation[1] - geometry.rotations_y_deg[index]).abs()
+                > geometry.station_tolerance_m
+            || actual_rotation[2].abs() > geometry.station_tolerance_m {
+            rotations_match = false;
+        }
+        if collider.type_name != "Cylinder" || visual.type_name != "Cylinder" {
+            all_topology = false;
+        }
+        let expected_center = geometry.center_y_m;
+        for pair in [
+            [collider.attrs["radius"], geometry.radius_m],
+            [visual.attrs["radius"], geometry.radius_m],
+            [collider.attrs["height"], geometry.height_m],
+            [visual.attrs["height"], geometry.height_m],
+            [collider.attrs["xformOp:translate"][1], expected_center],
+            [visual.attrs["xformOp:translate"][1], expected_center]
+        ] {
+            if pair[0] == () { return #{ok: false, state: "unavailable",
+                detail: leg_path + ": pad dimension or placement is missing"}; }
+            let deviation = (pair[0] - pair[1]).abs();
+            if deviation > maximum { maximum = deviation; }
+        }
+        if collider.attrs["axis"] != "Y" || visual.attrs["axis"] != "Y"
+            || collider.attrs["xformOp:translate"][0].abs() > geometry.tolerance_m
+            || collider.attrs["xformOp:translate"][2].abs() > geometry.tolerance_m
+            || visual.attrs["xformOp:translate"][0].abs() > geometry.tolerance_m
+            || visual.attrs["xformOp:translate"][2].abs() > geometry.tolerance_m {
+            all_topology = false;
+        }
+        if collider.attrs["physics:collisionEnabled"] != true {
+            all_collision_enabled = false;
+        }
+        if collider.attrs["visibility"] != "invisible"
+            || collider.attrs["purpose"] != "proxy" {
+            all_proxy_hidden = false;
+        }
+        if visual.attrs["physics:collisionEnabled"] != false {
+            all_visual_disabled = false;
+        }
+        for legacy_name in ["OuterStrut", "FootPad"] {
+            let legacy = assembly_builder::composed_query(doc,
+                #{path: leg_path + "/" + legacy_name, children: false,
+                  attrs: ["physics:collisionEnabled", "visibility"]});
+            if !query_ok(legacy) || legacy.attrs == ()
+                || legacy.attrs["physics:collisionEnabled"] != false
+                || legacy.attrs["visibility"] != "invisible" {
+                all_legacy_disabled = false;
+            }
+        }
+        details.push(#{leg: leg_path, proxy: collider_path, visual: visual_path,
+            collision_enabled: collider.attrs["physics:collisionEnabled"],
+            proxy_hidden: collider.attrs["visibility"] == "invisible",
+            station: actual_station, rotation_y_deg: actual_rotation[1]});
+    }
+    #{ok: true, state: "available", geometry_deviation_m: maximum,
+      station_deviation_m: station_deviation,
+      rotation_matches: rotations_match,
+      topology_matches: all_topology,
+      collision_enabled: all_collision_enabled,
+      proxy_hidden: all_proxy_hidden,
+      visual_collision_disabled: all_visual_disabled,
+      legacy_collision_disabled: all_legacy_disabled,
+      collision_matches_visual: maximum <= geometry.tolerance_m,
+      tolerance_m: geometry.tolerance_m, details: details}
+}
+
+/// Compose the source-derived deck and leg contact plans into one Editor edit.
+fn physical_collision_plan(doc, edit_target, root) {
+    let deck = physical_top_deck_collider_plan(doc, edit_target, root);
+    if deck.ok != true { return deck; }
+    let legs = physical_landing_leg_pad_plan(doc, edit_target, root);
+    if legs.ok != true { return legs; }
+    let ops = [];
+    for op in deck.ops { ops.push(op); }
+    for op in legs.ops { ops.push(op); }
+    #{ok: true, kind: "griffin_physical_collision_geometry", root: root,
+      deck_op_count: deck.ops.len(), leg_op_count: legs.ops.len(),
+      deck_collider_count: 9, collider_count: 13, ops: ops}
+}
+
+fn apply_physical_colliders(doc, edit_target, root, parent_gen) {
+    let plan = physical_collision_plan(doc, edit_target, root);
+    if plan.ok != true || plan.ops.len() == 0 { return plan; }
+    let command = assembly_edit::batch(doc,
+        "Derive Griffin physical colliders from source geometry", plan.ops, parent_gen);
+    #{ok: command.ok == true, kind: plan.kind, command: command,
+      root: root, collider_count: plan.collider_count}
 }
 
 fn _tank_support_annulus_geometry(center, inner_radius, outer_radius, thickness, segments) {
@@ -887,7 +1470,7 @@ fn _tank_support_annulus_geometry(center, inner_radius, outer_radius, thickness,
         } else { if points.len() == segments * 2 { half } else { -half } };
         for index in 0..segments {
             let angle = 2.0 * griffin_spec::pi_value() * index / segments;
-            points.push([center.x + radius * cos(angle), y,
+            points.push([center.x + radius * cos(angle), center.y + y,
                 center.z + radius * sin(angle)]);
         }
     }
@@ -953,77 +1536,58 @@ fn _tank_support_annulus_mesh_plan(doc, edit_target, parent, name, center,
     #{ok: true, path: path, ops: ops, geometry: geometry}
 }
 
-fn _tank_support_plan(doc, edit_target, root) {
-    let perimeter_profile = griffin_spec::visual_outer_body_profile_coordinates();
-    let perimeter_radius = griffin_spec::visual_tank_support_perimeter_radius_m();
-    let perimeter_section = griffin_spec::visual_tank_support_perimeter_section_m();
-    let center_y = griffin_spec::visual_tank_support_plane_center_y_m();
-    let inner_radius = griffin_spec::visual_tank_opening_inner_radius_m();
-    let outer_radius = griffin_spec::visual_tank_opening_outer_radius_m();
-    let segments = griffin_spec::visual_tank_opening_segments();
+fn tank_support_perimeter_plan(doc, edit_target, root, plane_index) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("tank_support_perimeter_plan requires a document, edit target, and absolute root");
+    }
+    let profile = griffin_spec::visual_outer_body_profile_coordinates();
+    let radius = griffin_spec::visual_tank_support_perimeter_radius_m();
+    let section = griffin_spec::visual_tank_support_perimeter_section_m();
+    let planes = griffin_spec::visual_tank_support_planes_m();
+    if profile.len() != 8 || radius <= 0.0 || section <= 0.0
+        || planes.len() != 3 || plane_index < 0 || plane_index >= planes.len() {
+        return plan_error("typed Griffin tank-support perimeter datums or plane index are invalid");
+    }
+    for plane_y in planes {
+        if !griffin_geometry::scalar_is_finite(plane_y) {
+            return plan_error("tank-support ring planes must be finite SysML scalars");
+        }
+    }
+    let parent = root + "/TankSupportPlate";
+    let assembly = assembly_builder::composed_query(doc, #{path: parent, children: false});
+    if !query_ok(assembly) || assembly.type_name != "Xform" {
+        return plan_error(parent + ": source-owned support assembly must be an Xform");
+    }
+    let names = ["TankSupportPerimeterUpper", "TankSupportPerimeter",
+        "TankSupportPerimeterLower"];
+    _octagonal_perimeter_mesh_plan(doc, edit_target, parent, names[plane_index],
+        profile, radius, planes[plane_index], section,
+        griffin_spec::visual_tank_support_display_color())
+}
+
+fn tank_support_opening_plan(doc, edit_target, root, tank_index, plane_index) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("tank_support_opening_plan requires a document, edit target, and absolute root");
+    }
     let tanks = griffin_spec::component_tank_stations();
     let names = griffin_spec::propellant_tank_names();
-    if perimeter_profile.len() != 8 || perimeter_radius <= 0.0
-        || perimeter_section <= 0.0 || center_y == () || inner_radius <= 0.0
-        || outer_radius <= inner_radius || segments < 8 || tanks.len() != 4 || names.len() != 4 {
-        return plan_error("typed Griffin four-opening tank-support datums are incomplete");
+    let planes = griffin_spec::visual_tank_support_planes_m();
+    let inner = griffin_spec::visual_tank_opening_inner_radius_m();
+    let outer = griffin_spec::visual_tank_opening_outer_radius_m();
+    let section = griffin_spec::visual_tank_support_perimeter_section_m();
+    let segments = griffin_spec::visual_tank_opening_segments();
+    if tanks.len() != 4 || names.len() != 4 || planes.len() != 3
+        || tank_index < 0 || tank_index >= tanks.len()
+        || plane_index < 0 || plane_index >= planes.len()
+        || inner <= 0.0 || outer <= inner || section <= 0.0 || segments < 8 {
+        return plan_error("typed Griffin annular-opening datums or indices are invalid");
     }
-    let path = root + "/TankSupportPlate";
-    let current = assembly_builder::composed_query(doc, #{path: path, children: false});
-    let ops = [];
-    if query_ok(current) {
-        if current.type_name != "Xform" { return plan_error(path + ": support assembly must be Xform"); }
-    } else {
-        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: root,
-            name: "TankSupportPlate", type_name: "Xform", reference: (),
-            reference_prim_path: ""}});
-    }
-    let perimeter_geometry = griffin_geometry::tank_support_perimeter_geometry(
-        perimeter_profile, perimeter_radius, center_y, perimeter_section);
-    if perimeter_geometry.ok == false { return plan_error(perimeter_geometry.error); }
-    let perimeter_path = path + "/TankSupportPerimeter";
-    let perimeter = assembly_builder::composed_query(doc,
-        #{path: perimeter_path, children: false});
-    if query_ok(perimeter) && perimeter.type_name != "Mesh" {
-        return plan_error(perimeter_path + ": support perimeter must resolve to Mesh");
-    }
-    if !query_ok(perimeter) {
-        let shape = assembly_builder::mesh_shape_plan(edit_target, path, "TankSupportPerimeter",
-            perimeter_geometry.points, perimeter_geometry.face_counts,
-            perimeter_geometry.face_indices,
-            griffin_spec::visual_tank_support_display_color(), false);
-        if !shape.ok { return shape; }
-        for op in shape.ops { ops.push(op); }
-    }
-    for pair in [
-        ["points", "point3f[]", _mesh_points_literal(perimeter_geometry.points)],
-        ["faceVertexCounts", "int[]", _mesh_ints_literal(perimeter_geometry.face_counts)],
-        ["faceVertexIndices", "int[]", _mesh_ints_literal(perimeter_geometry.face_indices)]
-    ] {
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: perimeter_path,
-            name: pair[0], type_name: pair[1], value: pair[2]}});
-    }
-    for property in [
-        #{name: "doubleSided", type_name: "bool", value: "false"},
-        #{name: "subdivisionScheme", type_name: "token", value: "\"none\""},
-        #{name: "purpose", type_name: "token", value: "\"render\""},
-        #{name: "physics:collisionEnabled", type_name: "bool", value: "false"}
-    ] {
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: perimeter_path,
-            name: property.name, type_name: property.type_name, value: property.value}});
-    }
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: perimeter_path,
-        name: "primvars:displayColor", type_name: "color3f[]",
-        value: _color_literal(griffin_spec::visual_tank_support_display_color())}});
-    for index in 0..tanks.len() {
-        let collar = _tank_support_annulus_mesh_plan(doc, edit_target, path,
-            "Opening" + names[index], tanks[index], inner_radius, outer_radius,
-            perimeter_section, segments, griffin_spec::visual_tank_collar_display_color());
-        if !collar.ok { return collar; }
-        for op in collar.ops { ops.push(op); }
-    }
-    #{ok: true, kind: "griffin_tank_support_plate", root: path,
-      opening_names: names, opening_count: names.len(), ops: ops}
+    let suffix = if plane_index == 0 { "Upper" }
+        else if plane_index == 1 { "" } else { "Lower" };
+    let center = vec3(tanks[tank_index].x, planes[plane_index], tanks[tank_index].z);
+    _tank_support_annulus_mesh_plan(doc, edit_target, root + "/TankSupportPlate",
+        "Opening" + names[tank_index] + suffix, center, inner, outer,
+        section, segments, griffin_spec::visual_tank_collar_display_color())
 }
 
 fn _octagonal_open_frame_mesh_plan(doc, edit_target, root, name, stations, ring_y, section, color) {
@@ -1068,6 +1632,73 @@ fn _octagonal_open_frame_mesh_plan(doc, edit_target, root, name, stations, ring_
         value: _color_literal(color)}});
     #{ok: true, path: path, ops: ops,
       point_count: geometry.points.len(), face_count: geometry.face_counts.len()}
+}
+
+fn _octagonal_perimeter_mesh_plan(doc, edit_target, root, name,
+    profile, radius, center_y, section, color) {
+    let path = root + "/" + name;
+    let current = assembly_builder::composed_query(doc, #{path: path, children: false});
+    let geometry = griffin_geometry::tank_support_perimeter_geometry(
+        profile, radius, center_y, section);
+    if geometry.ok == false { return plan_error(geometry.error); }
+    let ops = [];
+    if query_ok(current) {
+        if current.type_name != "Mesh" {
+            return plan_error(path + ": octagonal perimeter must resolve to Mesh");
+        }
+        ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
+    } else {
+        let shape = assembly_builder::mesh_shape_plan(edit_target, root, name,
+            geometry.points, geometry.face_counts, geometry.face_indices, color, false);
+        if !shape.ok { return shape; }
+        for op in shape.ops { ops.push(op); }
+    }
+    for pair in [
+        ["points", "point3f[]", _mesh_points_literal(geometry.points)],
+        ["faceVertexCounts", "int[]", _mesh_ints_literal(geometry.face_counts)],
+        ["faceVertexIndices", "int[]", _mesh_ints_literal(geometry.face_indices)]
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+            name: pair[0], type_name: pair[1], value: pair[2]}});
+    }
+    for property in [
+        #{name: "doubleSided", type_name: "bool", value: "false"},
+        #{name: "subdivisionScheme", type_name: "token", value: "\"none\""},
+        #{name: "purpose", type_name: "token", value: "\"render\""},
+        #{name: "physics:collisionEnabled", type_name: "bool", value: "false"}
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+            name: property.name, type_name: property.type_name, value: property.value}});
+    }
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "primvars:displayColor", type_name: "color3f[]",
+        value: _color_literal(color)}});
+    ops.push(#{SetTranslate: #{edit_target: edit_target, path: path, value: [0.0, 0.0, 0.0]}});
+    #{ok: true, path: path, ops: ops,
+      point_count: geometry.points.len(), face_count: geometry.face_counts.len()}
+}
+
+fn _central_bucket_mesh_plan(doc, edit_target, root, name, profile, segments, color) {
+    let path = root + "/" + name;
+    let current = assembly_builder::composed_query(doc, #{path: path, children: false});
+    let ops = [];
+    if query_ok(current) {
+        if current.type_name != "Mesh" {
+            return plan_error(path + ": central bucket must resolve to Mesh");
+        }
+        ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
+    } else {
+        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: root,
+            name: name, type_name: "Mesh", reference: (), reference_prim_path: ""}});
+    }
+    ops.push(#{RevolveProfileMesh: #{edit_target: edit_target, path: path,
+        profile: profile, angular_segments: segments.to_int(), display_color: color,
+        collision_enabled: false}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "purpose", type_name: "token", value: "\"render\""}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
+    #{ok: true, path: path, ops: ops}
 }
 
 fn refine_griffin_bus_component_plan(doc, edit_target, root) {
@@ -1183,8 +1814,8 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
     let skirt_y = griffin_spec::visual_lower_skirt_center_y_m();
     let body_name = "PerimeterFrame";
     let skirt_name = "LowerServiceSkirtOctagon";
-        let ring_y = griffin_spec::visual_frame_ring_center_y_m();
-        let ring_section = griffin_spec::visual_frame_ring_section_m();
+    let ring_y = griffin_spec::visual_frame_ring_center_y_m();
+    let ring_section = griffin_spec::visual_frame_ring_section_m();
     if body_width == () || body_depth == () || body_height == () || deck_width == ()
         || deck_depth == () || deck_thickness == () || deck_y == () || skirt_width == ()
         || skirt_depth == () || skirt_height == () || skirt_y == ()
@@ -1207,15 +1838,20 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
         griffin_spec::visual_frame_display_color());
     if !frame.ok { return frame; }
     for op in frame.ops { ops.push(op); }
-    let meshes = [
-        #{name: "TopDeckOctagon", width: deck_width, depth: deck_depth, height: deck_thickness,
-            translation: [0.0, deck_y, 0.0], color: griffin_spec::visual_deck_display_color()},
-        #{name: skirt_name, width: skirt_width, depth: skirt_depth, height: skirt_height,
-            translation: [0.0, skirt_y, 0.0], color: griffin_spec::visual_lower_skirt_display_color()}
+    if (deck_width - deck_depth).abs() > 1.0e-6
+        || (skirt_width - skirt_depth).abs() > 1.0e-6 {
+        return plan_error("Griffin deck and service-skirt plan profiles must remain octagonal and square");
+    }
+    let profile = griffin_spec::visual_outer_body_profile_coordinates();
+    let rings = [
+        #{name: "TopDeckOctagon", radius: deck_width / 2.0, center_y: deck_y,
+          section: deck_thickness, color: griffin_spec::visual_deck_display_color()},
+        #{name: skirt_name, radius: skirt_width / 2.0, center_y: skirt_y,
+          section: skirt_height, color: griffin_spec::visual_lower_skirt_display_color()}
     ];
-    for mesh in meshes {
-        let plan = _outer_body_component_mesh_plan(doc, edit_target, root, mesh.name,
-            mesh.width, mesh.depth, mesh.height, mesh.translation, mesh.color);
+    for ring in rings {
+        let plan = _octagonal_perimeter_mesh_plan(doc, edit_target, root, ring.name,
+            profile, ring.radius, ring.center_y, ring.section, ring.color);
         if !plan.ok { return plan; }
         for op in plan.ops { ops.push(op); }
     }
@@ -1238,12 +1874,181 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
         if !plan.ok { return plan; }
         for op in plan.ops { ops.push(op); }
     }
-    let support = _tank_support_plan(doc, edit_target, root);
-    if !support.ok { return support; }
-    for op in support.ops { ops.push(op); }
+    let source = sysml_requirements::source();
+    let bucket_segments = _sysml_number(source, "centralBucketSegments");
+    let bucket_thickness = _sysml_number(source, "centralBucketShellThicknessM");
+    let upper_inner_bottom = _sysml_number(source, "upperBucketInnerBottomRadiusM");
+    let upper_outer_bottom = _sysml_number(source, "upperBucketOuterBottomRadiusM");
+    let upper_inner_top = _sysml_number(source, "upperBucketInnerTopRadiusM");
+    let upper_outer_top = _sysml_number(source, "upperBucketOuterTopRadiusM");
+    let upper_bottom_y = _sysml_number(source, "upperBucketBottomCenterYM");
+    let upper_top_y = _sysml_number(source, "upperBucketTopCenterYM");
+    let lower_inner_top = _sysml_number(source, "lowerBucketInnerTopRadiusM");
+    let lower_outer_top = _sysml_number(source, "lowerBucketOuterTopRadiusM");
+    let lower_inner_bottom = _sysml_number(source, "lowerBucketInnerBottomRadiusM");
+    let lower_outer_bottom = _sysml_number(source, "lowerBucketOuterBottomRadiusM");
+    let lower_top_y = _sysml_number(source, "lowerBucketTopCenterYM");
+    let lower_bottom_y = _sysml_number(source, "lowerBucketBottomCenterYM");
+    if bucket_segments < 8 || bucket_thickness <= 0.0
+        || upper_inner_bottom <= 0.0 || upper_outer_bottom <= upper_inner_bottom
+        || upper_inner_top <= 0.0 || upper_outer_top <= upper_inner_top
+        || upper_bottom_y >= upper_top_y || lower_inner_top <= 0.0
+        || lower_outer_top <= lower_inner_top || lower_inner_bottom <= 0.0
+        || lower_outer_bottom <= lower_inner_bottom || lower_bottom_y >= lower_top_y {
+        return plan_error("typed Griffin upper/lower bucket profile datums are incomplete or invalid");
+    }
+    for bucket in [
+        #{name: "UpperCentralBucket",
+          profile: [[upper_inner_bottom, upper_bottom_y],
+              [upper_outer_bottom, upper_bottom_y], [upper_outer_top, upper_top_y],
+              [upper_inner_top, upper_top_y]]},
+        #{name: "LowerCentralBucket",
+          profile: [[lower_inner_top, lower_top_y],
+              [lower_outer_top, lower_top_y], [lower_outer_bottom, lower_bottom_y],
+              [lower_inner_bottom, lower_bottom_y]]}
+    ] {
+        let plan = _central_bucket_mesh_plan(doc, edit_target, root,
+            bucket.name, bucket.profile, bucket_segments,
+            griffin_spec::visual_tank_support_display_color());
+        if !plan.ok { return plan; }
+        for op in plan.ops { ops.push(op); }
+    }
+    // The central bucket carries a dedicated FLIP deck. Keep the platform
+    // geometry in the same component and derive its local placement from the
+    // Griffin-frame SysML datum and the bus mount, so the rover and adapter
+    // cannot drift onto separate hard-coded coordinate systems.
+    let adapter_width = griffin_spec::visual_payload_adapter_width_m();
+    let adapter_depth = griffin_spec::visual_payload_adapter_depth_m();
+    let adapter_thickness = griffin_spec::visual_payload_adapter_thickness_m();
+    let adapter_center_y = griffin_spec::visual_payload_adapter_center_y_m();
+    let bus_mount_y = griffin_spec::component_bus_mount_y();
+    if adapter_width == () || adapter_depth == () || adapter_thickness == ()
+        || adapter_center_y == () || bus_mount_y == ()
+        || adapter_width <= 0.0 || adapter_depth <= 0.0 || adapter_thickness <= 0.0
+        || adapter_center_y - bus_mount_y - adapter_thickness / 2.0
+            < upper_top_y - 1.0e-6 {
+        return plan_error("FLIP payload-adapter footprint or upper-bucket contact datum is invalid");
+    }
+    let adapter = _outer_body_component_mesh_plan(doc, edit_target, root,
+        "RoverPayloadDeck", adapter_width, adapter_depth, adapter_thickness,
+        [0.0, adapter_center_y - bus_mount_y, 0.0],
+        griffin_spec::visual_deck_display_color());
+    if !adapter.ok { return adapter; }
+    for op in adapter.ops { ops.push(op); }
     #{ok: true, kind: "griffin_octagonal_bus_component", root: root,
-      paths: [root + "/" + body_name, root + "/TopDeckOctagon", root + "/" + skirt_name],
+      paths: [root + "/" + body_name, root + "/TopDeckOctagon", root + "/" + skirt_name,
+        root + "/TankSupportPlate", root + "/UpperCentralBucket", root + "/LowerCentralBucket",
+        root + "/RoverPayloadDeck"],
       ops: ops, no_op: ops.len() == 0}
+}
+
+fn _native_vec3_axis(value, axis) {
+    if vec3_is_native(value) {
+        return if axis == 0 { value.x } else if axis == 1 { value.y } else { value.z };
+    }
+    if array_is(value) && value.len() == 3 { return value[axis]; }
+    ()
+}
+
+// Read the payload deck mesh and both linked assembly roots back from the
+// composed Editor document. The check measures tire-to-deck contact and the
+// wheel footprint from SysML wheel stations, so a matching scene transform
+// alone cannot pass when the adapter geometry or source wheel envelope drifts.
+fn flip_payload_interface_observation(doc, root) {
+    if doc == () || !absolute_root(root) {
+        return #{ok: false, state: "invalid", error: "payload observation requires a document and absolute scene root"};
+    }
+    let source = sysml_requirements::source();
+    let adapter = assembly_builder::composed_query(doc, #{
+        path: root + "/Griffin1/Bus/RoverPayloadDeck", children: false,
+        attrs: ["points", "xformOp:translate"]});
+    let bus = assembly_builder::composed_query(doc, #{
+        path: root + "/Griffin1/Bus", children: false,
+        attrs: ["xformOp:translate"]});
+    let lander = assembly_builder::composed_query(doc, #{
+        path: root + "/Griffin1", children: false,
+        attrs: ["xformOp:translate"]});
+    let rover = assembly_builder::composed_query(doc, #{
+        path: root + "/FLIP", children: false,
+        attrs: ["xformOp:translate"]});
+    if !query_ok(adapter) || adapter.type_name != "Mesh" || adapter.attrs == ()
+        || !query_ok(bus) || bus.attrs == () || !query_ok(lander) || lander.attrs == ()
+        || !query_ok(rover) || rover.attrs == () {
+        return #{ok: false, state: "unavailable", error: "composed payload adapter or linked vehicle transforms are unavailable"};
+    }
+    let points = adapter.attrs["points"];
+    let adapter_t = adapter.attrs["xformOp:translate"];
+    let bus_t = bus.attrs["xformOp:translate"];
+    let lander_t = lander.attrs["xformOp:translate"];
+    let rover_t = rover.attrs["xformOp:translate"];
+    if points == () || points.len() < 8 || adapter_t == () || bus_t == ()
+        || lander_t == () || rover_t == () {
+        return #{ok: false, state: "unavailable", error: "adapter mesh or composed translations are incomplete"};
+    }
+    let min_x = 1.0e30;
+    let max_x = -1.0e30;
+    let min_y = 1.0e30;
+    let max_y = -1.0e30;
+    let min_z = 1.0e30;
+    let max_z = -1.0e30;
+    for point in points {
+        let x = _native_vec3_axis(point, 0);
+        let y = _native_vec3_axis(point, 1);
+        let z = _native_vec3_axis(point, 2);
+        if x == () || y == () || z == () {
+            return #{ok: false, state: "unavailable", error: "adapter mesh points are not native 3D vectors"};
+        }
+        if x < min_x { min_x = x; }
+        if x > max_x { max_x = x; }
+        if y < min_y { min_y = y; }
+        if y > max_y { max_y = y; }
+        if z < min_z { min_z = z; }
+        if z > max_z { max_z = z; }
+    }
+    let wheel_x = griffin_spec::rover_visual_wheel_station_x();
+    let wheel_y = griffin_spec::rover_visual_wheel_station_y();
+    let wheel_z = griffin_spec::rover_visual_wheel_station_z();
+    let radius = griffin_spec::rover_visual_wheel_radius_m();
+    let width = griffin_spec::rover_visual_wheel_width_m();
+    let tolerance = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("geometryVerificationToleranceM"));
+    if wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4
+        || radius == () || width == () || tolerance == () {
+        return #{ok: false, state: "invalid", error: "FLIP wheel geometry or shared tolerance is missing from SysML"};
+    }
+    let minimum_wheel_y = wheel_y[0];
+    for index in 1..wheel_y.len() {
+        if wheel_y[index] < minimum_wheel_y { minimum_wheel_y = wheel_y[index]; }
+    }
+    let adapter_top = _native_vec3_axis(lander_t, 1)
+        + _native_vec3_axis(bus_t, 1) + _native_vec3_axis(adapter_t, 1) + max_y;
+    let wheel_bottom = _native_vec3_axis(rover_t, 1) + minimum_wheel_y - radius;
+    let vertical_error = wheel_bottom - adapter_top;
+    let deck_center_x = _native_vec3_axis(lander_t, 0)
+        + _native_vec3_axis(bus_t, 0) + _native_vec3_axis(adapter_t, 0);
+    let deck_center_z = _native_vec3_axis(lander_t, 2)
+        + _native_vec3_axis(bus_t, 2) + _native_vec3_axis(adapter_t, 2);
+    let deck_min_x = deck_center_x + min_x;
+    let deck_max_x = deck_center_x + max_x;
+    let deck_min_z = deck_center_z + min_z;
+    let deck_max_z = deck_center_z + max_z;
+    let rover_x = _native_vec3_axis(rover_t, 0);
+    let rover_z = _native_vec3_axis(rover_t, 2);
+    let footprint_fits = true;
+    for index in 0..4 {
+        if rover_x + wheel_x[index] - radius < deck_min_x - tolerance
+            || rover_x + wheel_x[index] + radius > deck_max_x + tolerance
+            || rover_z + wheel_z[index] - width / 2.0 < deck_min_z - tolerance
+            || rover_z + wheel_z[index] + width / 2.0 > deck_max_z + tolerance {
+            footprint_fits = false;
+        }
+    }
+    #{ok: true, state: if vertical_error.abs() <= tolerance && footprint_fits { "pass" } else { "fail" },
+      path: root + "/Griffin1/Bus/RoverPayloadDeck", tire_bottom_y_m: wheel_bottom,
+      adapter_top_y_m: adapter_top, vertical_error_m: vertical_error,
+      adapter_bounds_x_m: [deck_min_x, deck_max_x],
+      adapter_bounds_z_m: [deck_min_z, deck_max_z],
+      wheel_footprint_fits: footprint_fits, tolerance_m: tolerance}
 }
 
 // Update the eight assembly-owned corner posts in-place. These posts are not
@@ -1677,6 +2482,48 @@ fn _solar_number(source, name) {
         "GriffinSolarRequirements::GriffinSolarArrayAssembly::" + name)
 }
 
+fn _solar_frame_plan(doc, edit_target, root, width, depth, section, color) {
+    let path = root + "/Frame";
+    let offset_x = width / 2.0 - section / 2.0;
+    let offset_z = depth / 2.0 - section / 2.0;
+    let stations = [vec3(-offset_x, 0.0, -offset_z),
+        vec3(offset_x, 0.0, -offset_z), vec3(offset_x, 0.0, offset_z),
+        vec3(-offset_x, 0.0, offset_z)];
+    let geometry = griffin_geometry::perimeter_beam_geometry(stations, [0.0], section);
+    if geometry.ok != true { return plan_error(geometry.error); }
+    let current = assembly_builder::composed_query(doc, #{path: path, children: false});
+    let ops = [];
+    if query_ok(current) && current.type_name != "Mesh" {
+        ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
+        let shape = assembly_builder::mesh_shape_plan(edit_target, root, "Frame",
+            geometry.points, geometry.face_counts, geometry.face_indices, color, false);
+        if !shape.ok { return shape; }
+        for op in shape.ops { ops.push(op); }
+    } else if query_ok(current) {
+        ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
+    } else {
+        let shape = assembly_builder::mesh_shape_plan(edit_target, root, "Frame",
+            geometry.points, geometry.face_counts, geometry.face_indices, color, false);
+        if !shape.ok { return shape; }
+        for op in shape.ops { ops.push(op); }
+    }
+    for item in [
+        #{name: "points", type_name: "point3f[]", value: _mesh_points_literal(geometry.points)},
+        #{name: "faceVertexCounts", type_name: "int[]", value: _mesh_ints_literal(geometry.face_counts)},
+        #{name: "faceVertexIndices", type_name: "int[]", value: _mesh_ints_literal(geometry.face_indices)},
+        #{name: "subdivisionScheme", type_name: "token", value: "\"none\""},
+        #{name: "doubleSided", type_name: "bool", value: "false"},
+        #{name: "purpose", type_name: "token", value: "\"render\""},
+        #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
+        #{name: "primvars:displayColor", type_name: "color3f[]", value: _color_literal(color)}
+    ] {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+            name: item.name, type_name: item.type_name, value: item.value}});
+    }
+    ops.push(#{SetTranslate: #{edit_target: edit_target, path: path, value: [0.0, 0.0, 0.0]}});
+    #{ok: true, path: path, ops: ops}
+}
+
 // Refine the reusable solar-array component in its own document.  The
 // outward-facing root rotation is owned by GriffinLanderComponent; this
 // operation owns only the panel's local frame, blue cell face, grid members,
@@ -1697,6 +2544,12 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     let cell_thickness = _solar_number(source, "cellThicknessM");
     let cell_depth = _solar_number(source, "cellDepthM");
     let cell_offset = _solar_number(source, "cellOffsetYM");
+    let backplane_thickness = _solar_number(source, "arrayBackplaneThicknessM");
+    let backplane_center = _solar_number(source, "arrayBackplaneCenterYM");
+    let columns_value = _solar_number(source, "gridColumnCount");
+    let rows_value = _solar_number(source, "gridRowCount");
+    let columns = if columns_value == () { 0 } else { columns_value.to_int() };
+    let rows = if rows_value == () { 0 } else { rows_value.to_int() };
     let divider_width = _solar_number(source, "dividerXWidthM");
     let divider_thickness = _solar_number(source, "dividerXThicknessM");
     let divider_span = _solar_number(source, "dividerZWidthM");
@@ -1715,43 +2568,33 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     let link_z = _solar_number(source, "mountLinkCenterZM");
     if frame_width == () || frame_thickness == () || frame_depth == ()
         || cell_width == () || cell_thickness == () || cell_depth == ()
-        || cell_offset == () || divider_width == () || divider_thickness == ()
-        || divider_span == () || bracket_width == () || bracket_thickness == ()
-        || bracket_depth == () || hinge_radius == () || hinge_length == ()
-        || hinge_y == () || hinge_z == () || link_width == ()
-        || link_height == () || link_depth == () || link_x == ()
-        || link_y == () || link_z == () {
+        || cell_offset == () || backplane_thickness == () || backplane_center == () {
         return plan_error("solar-panel SysML geometry datums are incomplete");
     }
+    if columns < 2 || rows < 2 {
+        return plan_error("solar-panel grid must have at least two columns and rows");
+    }
+    if divider_width == () || divider_thickness == () || divider_span == ()
+        || bracket_width == () || bracket_thickness == () || bracket_depth == () {
+        return plan_error("solar-panel divider or bracket datums are incomplete");
+    }
+    if hinge_radius == () || hinge_length == () || hinge_y == () || hinge_z == ()
+        || link_width == () || link_height == () || link_depth == ()
+        || link_x == () || link_y == () || link_z == () {
+        return plan_error("solar-panel hinge or mount-link datums are incomplete");
+    }
     let ops = [];
+    let frame = _solar_frame_plan(doc, edit_target, root,
+        frame_width, frame_depth, frame_thickness, [0.44, 0.48, 0.55]);
+    if !frame.ok { return frame; }
+    for op in frame.ops { ops.push(op); }
     let cubes = [
-        #{name: "Frame", translation: [0.0, 0.0, 0.0], rotation: (),
-          scale: [frame_width / 2.0, frame_thickness / 2.0, frame_depth / 2.0],
-          color: [0.44, 0.48, 0.55]},
-        #{name: "ArrayBackplane", translation: [0.0, -0.075, 0.0], rotation: (),
-          scale: [cell_width / 2.0, 0.018, cell_depth / 2.0],
+        #{name: "ArrayBackplane", translation: [0.0, backplane_center, 0.0], rotation: (),
+          scale: [cell_width / 2.0, backplane_thickness / 2.0, cell_depth / 2.0],
           color: [0.015, 0.035, 0.12]},
         #{name: "Cells", translation: [0.0, cell_offset, 0.0], rotation: (),
           scale: [cell_width / 2.0, cell_thickness / 2.0, cell_depth / 2.0],
-          color: [0.015, 0.16, 0.62]},
-        #{name: "CellDividerX", translation: [0.0, cell_offset + 0.025, 0.0], rotation: (),
-          scale: [divider_width / 2.0, divider_thickness / 2.0, cell_depth / 2.0],
-          color: [0.72, 0.78, 0.88]},
-        #{name: "CellDividerXLeft", translation: [-cell_width / 6.0, cell_offset + 0.028, 0.0], rotation: (),
-          scale: [divider_width / 2.0, divider_thickness / 2.0, cell_depth / 2.0],
-          color: [0.72, 0.78, 0.88]},
-        #{name: "CellDividerXRight", translation: [cell_width / 6.0, cell_offset + 0.028, 0.0], rotation: (),
-          scale: [divider_width / 2.0, divider_thickness / 2.0, cell_depth / 2.0],
-          color: [0.72, 0.78, 0.88]},
-        #{name: "CellDividerZ", translation: [0.0, cell_offset + 0.028, 0.0], rotation: (),
-          scale: [divider_span / 2.0, divider_thickness / 2.0, divider_width / 2.0],
-          color: [0.72, 0.78, 0.88]},
-        #{name: "CellDividerZUpper", translation: [0.0, cell_offset + 0.03, cell_depth / 6.0], rotation: (),
-          scale: [divider_span / 2.0, divider_thickness / 2.0, divider_width / 2.0],
-          color: [0.72, 0.78, 0.88]},
-        #{name: "CellDividerZLower", translation: [0.0, cell_offset + 0.03, -cell_depth / 6.0], rotation: (),
-          scale: [divider_span / 2.0, divider_thickness / 2.0, divider_width / 2.0],
-          color: [0.72, 0.78, 0.88]},
+          color: [0.025, 0.12, 0.48]},
         #{name: "MountBracket", translation: [0.0, -bracket_thickness / 2.0, 0.0], rotation: (),
           scale: [bracket_width / 2.0, bracket_thickness / 2.0, bracket_depth / 2.0],
           color: [0.12, 0.15, 0.20]},
@@ -1761,6 +2604,32 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
             item.name, item.translation, item.rotation, item.scale, item.color);
         if !part.ok { return part; }
         for op in part.ops { ops.push(op); }
+    }
+    let divider_y = cell_offset + cell_thickness / 2.0;
+    for index in 1..columns {
+        let name = "CellDividerX" + index.to_string();
+        let divider = _component_cube_visual_ops(doc, edit_target, root, name,
+            [-cell_width / 2.0 + cell_width * index / columns, divider_y, 0.0], (),
+            [divider_width / 2.0, divider_thickness / 2.0, cell_depth / 2.0],
+            [0.72, 0.78, 0.88]);
+        if !divider.ok { return divider; }
+        for op in divider.ops { ops.push(op); }
+    }
+    for index in 1..rows {
+        let name = "CellDividerZ" + index.to_string();
+        let divider = _component_cube_visual_ops(doc, edit_target, root, name,
+            [0.0, divider_y, -cell_depth / 2.0 + cell_depth * index / rows], (),
+            [cell_width / 2.0, divider_thickness / 2.0, divider_span / 2.0],
+            [0.72, 0.78, 0.88]);
+        if !divider.ok { return divider; }
+        for op in divider.ops { ops.push(op); }
+    }
+    for name in ["CellDividerX", "CellDividerXLeft", "CellDividerXRight",
+        "CellDividerZ", "CellDividerZUpper", "CellDividerZLower"] {
+        let path = root + "/" + name;
+        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) {
+            ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
+        }
     }
     let hinge = _component_cylinder_visual_ops(doc, edit_target, root,
         "HingeBar", [0.0, hinge_y, hinge_z], (), hinge_radius,
@@ -1779,13 +2648,14 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
         name: "lunco:visual:cell_face_normal", type_name: "token",
         value: "\"+Y; outward after signed assembly X rotation onto the signed Z side\""}});
+    let paths = [root + "/Frame", root + "/ArrayBackplane", root + "/Cells"];
+    for index in 1..columns { paths.push(root + "/CellDividerX" + index.to_string()); }
+    for index in 1..rows { paths.push(root + "/CellDividerZ" + index.to_string()); }
+    paths.push(root + "/MountBracket");
+    paths.push(root + "/HingeBar");
+    paths.push(root + "/MountLink");
     #{ok: true, kind: "griffin_solar_panel_component_refinement",
-      root: root, paths: [root + "/Frame", root + "/Cells",
-        root + "/ArrayBackplane", root + "/CellDividerX",
-        root + "/CellDividerXLeft", root + "/CellDividerXRight",
-        root + "/CellDividerZ", root + "/CellDividerZUpper",
-        root + "/CellDividerZLower", root + "/MountBracket",
-        root + "/HingeBar", root + "/MountLink"],
+      root: root, paths: paths,
       ops: ops, no_op: ops.len() == 0}
 }
 
@@ -2091,7 +2961,7 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     let support_height = lower_neck_bottom_y - pad_top_local_y;
     let support_y = (lower_neck_bottom_y + pad_top_local_y) / 2.0;
     let bracket_y = pad_top_local_y + bracket_length / 2.0;
-    if support_height <= 0.0 || !support_height.is_finite() {
+    if support_height <= 0.0 || !griffin_geometry::scalar_is_finite(support_height) {
         return plan_error("derived tank support span does not connect the cradle pad to the lower neck");
     }
     let desired = [
@@ -2542,9 +3412,86 @@ fn _isolated_ramp_contract_ops(edit_target, path, side) {
     ]
 }
 
-// Scale the referenced ramp children in the owning assembly layer. The
-// replaceable ramp asset remains untouched; this typed Editor override makes
-// the visual envelope agree with the SysML/FLIP interface contract.
+// Derive the two contact tracks from the FLIP wheel stations and wheel width.
+// This same geometry recipe feeds the render assembly and physical colliders.
+fn _ramp_contact_track_datums(source, length, thickness) {
+    let wheel_z = sysml_requirement_checks::source_number_list(source,
+        "FlipRequirements::FlipRover::wheelStationZ");
+    let wheel_width = _sysml_number(source, "visualRoverWheelWidthM");
+    let clearance = _sysml_number(source, "rampWheelClearanceM");
+    let width = _sysml_number(source, "assemblyTrackWidthM");
+    if wheel_z == () || wheel_z.len() != 4 || wheel_width == ()
+        || clearance == () || width == () || wheel_width <= 0.0
+        || clearance <= 0.0 || width < wheel_width + 2.0 * clearance {
+        return plan_error("FLIP wheel stations, wheel width, or ramp clearance is unavailable");
+    }
+    let center = 0.0;
+    for station in wheel_z {
+        if station.abs() > center { center = station.abs(); }
+    }
+    if length <= 0.0 || thickness <= 0.0 || width <= 0.0 {
+        return plan_error("source-derived wheel track dimensions must be positive");
+    }
+    #{ok: true, width_m: width, center_offset_z_m: center,
+      port: #{name: "RampTrackPort", center_z: center},
+      starboard: #{name: "RampTrackStarboard", center_z: -center}}
+}
+
+// Geometry-derived physical counterpart of the render tracks. The source
+// asset's single broad Surface is removed through the Editor journal; both
+// contact colliders use the same FLIP station and SysML track-width datums as
+// the visible ramp.
+fn _physical_ramp_contact_track_ops(doc, edit_target, root, source,
+    length, thickness, center_x, surface_y, body_rotation_deg) {
+    let datums = _ramp_contact_track_datums(source, length, thickness);
+    if datums.ok != true { return datums; }
+    let ops = [];
+    let legacy_surface = root + "/Surface";
+    if query_ok(assembly_builder::composed_query(doc,
+        #{path: legacy_surface, children: false})) {
+        ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_surface}});
+    }
+    for track in [datums.port, datums.starboard] {
+        let path = root + "/" + track.name;
+        let current = assembly_builder::composed_query(doc,
+            #{path: path, children: false});
+        if query_ok(current) && current.type_name != "Cube" {
+            return plan_error(path + ": physical wheel track must be a Cube collider");
+        }
+        if !query_ok(current) {
+            let shape = assembly_builder::cube_shape_plan(edit_target, root,
+                track.name, 1.0, [length, thickness, datums.width_m], true);
+            if !shape.ok { return shape; }
+            for op in shape.ops { ops.push(op); }
+        }
+        let placement = assembly_builder::place_plan(edit_target, path,
+            [center_x, surface_y, track.center_z], [0.0, 0.0, body_rotation_deg],
+            [length, thickness, datums.width_m]);
+        if !placement.ok { return placement; }
+        for op in placement.ops { ops.push(op); }
+        ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path,
+            schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
+        for attribute in [
+            #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
+            #{name: "purpose", type_name: "token", value: "\"render\""},
+            #{name: "primvars:displayColor", type_name: "color3f[]", value: "[(0.34, 0.38, 0.44)]"},
+            #{name: "lunco:collider:geometrySource", type_name: "string",
+              value: "\"FlipRequirements::FlipRover::wheelStationZ+visualRoverWheelWidthM; GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM+rampSurfaceLengthM+rampSurfaceThicknessM\""},
+            #{name: "lunco:requirement", type_name: "string",
+              value: "\"GriffinRampRequirements::GRR006_RampGeometry\""}
+        ] {
+            ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+                name: attribute.name, type_name: attribute.type_name,
+                value: attribute.value}});
+        }
+    }
+    #{ok: true, kind: "griffin_physical_ramp_contact_tracks", ops: ops,
+      width_m: datums.width_m, center_offset_z_m: datums.center_offset_z_m}
+}
+
+// Replace the inherited full-width plate with two wheel-contact tracks in the
+// owning Editor layer. FLIP remains linked as its own component, and the open
+// centre between tracks exposes the Griffin tank support structure.
 fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path) {
     let source = sysml_requirements::source();
     let length = _sysml_number(source, "rampSurfaceLengthM");
@@ -2562,18 +3509,29 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path) {
         return plan_error("ramp visual geometry SysML datums are incomplete");
     }
     let rail_center = rail_offset;
+    let track_geometry = _ramp_contact_track_datums(source, length, thickness);
+    if track_geometry.ok != true { return track_geometry; }
+    let ops = [];
+    let old_surface = path + "/RampSurface";
+    if query_ok(assembly_builder::composed_query(doc,
+        #{path: old_surface, children: false})) {
+        ops.push(#{RemovePrim: #{edit_target: edit_target, path: old_surface}});
+    }
+    // The referenced component's old bars crossed the open centre; remove
+    // that obsolete pattern before creating source-derived bar pairs.
+    for index in 0..8 {
+        let old_tread = path + "/Tread" + (index + 1).to_string();
+        if query_ok(assembly_builder::composed_query(doc,
+            #{path: old_tread, children: false})) {
+            ops.push(#{RemovePrim: #{edit_target: edit_target, path: old_tread}});
+        }
+    }
     let children = [
-        #{path: path + "/RampSurface", translation: [length / 2.0, surface_y, 0.0],
-          // Cube placement takes the full authored envelope; the half-length
-          // appears only in the center translation because the component
-          // origin is the hinge and the surface spans x=0..length.
-          scale: [length, thickness, width]},
         #{path: path + "/OuterRail", translation: [length / 2.0, rail_y, rail_center],
           scale: [length, rail_height, rail_width]},
         #{path: path + "/InnerRail", translation: [length / 2.0, rail_y, -rail_center],
           scale: [length, rail_height, rail_width]},
     ];
-    let ops = [];
     for child in children {
         let prim = assembly_builder::composed_query(doc, #{path: child.path, children: false});
         if !query_ok(prim) || prim.type_name != "Cube" {
@@ -2583,14 +3541,17 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path) {
             child.translation, (), child.scale);
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
-        let color = if child.path.ends_with("/RampSurface") {
-            [0.34, 0.38, 0.44]
-        } else {
-            [0.18, 0.21, 0.26]
-        };
+        let color = [0.18, 0.21, 0.26];
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: child.path,
             name: "primvars:displayColor", type_name: "color3f[]",
             value: _color_literal(color)}});
+    }
+    for track in [track_geometry.port, track_geometry.starboard] {
+        let result = _component_cube_visual_ops(doc, edit_target, path,
+            track.name, [length / 2.0, surface_y, track.center_z], (),
+            [length, thickness, track_geometry.width_m], [0.34, 0.38, 0.44]);
+        if !result.ok { return result; }
+        for op in result.ops { ops.push(op); }
     }
     // The full-scale ramp needs a readable structural load path.  Update the
     // inherited centre support and add a mirrored outboard support pair in
@@ -2607,7 +3568,6 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path) {
     let tread_count = griffin_spec::ramp_tread_count();
     let tread_width = griffin_spec::ramp_tread_width_m();
     let tread_height = griffin_spec::ramp_tread_height_m();
-    let tread_span = griffin_spec::ramp_tread_span_m();
     let tread_first_x = griffin_spec::ramp_tread_first_center_x_m();
     let tread_pitch = griffin_spec::ramp_tread_pitch_m();
     let beam_width = griffin_spec::ramp_under_beam_width_m();
@@ -2634,9 +3594,9 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path) {
         || support_h == () || support_d == () || support_offset == ()
         || support_tilt == () || tread_prefix == () || tread_prefix == ""
         || tread_count == () || tread_count < 2 || tread_width == ()
-        || tread_height == () || tread_span == () || tread_first_x == ()
+        || tread_height == () || tread_first_x == ()
         || tread_pitch == () || tread_width <= 0.0 || tread_height <= 0.0
-        || tread_span <= 0.0 || tread_pitch <= 0.0 {
+        || tread_pitch <= 0.0 {
         return plan_error("ramp support-arm SysML datums are incomplete");
     }
     if beam_width == () || beam_height == () || beam_y == () || beam_offset == ()
@@ -2687,18 +3647,19 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path) {
             name: "primvars:displayColor", type_name: "color3f[]",
             value: "[(0.10, 0.12, 0.15)]"}});
     }
-    // Add named transverse traction bars to the visual ramp.  They are
-    // assembly-owned render geometry, not collision, so the reusable ramp
-    // component can still be replaced without changing the physical egress
-    // contract. Their spacing and envelope are read from SysML.
+    // Add traction bars independently to both wheel tracks. The open centre
+    // stays clear, and each bar width follows the wheel track computed above.
     for index in 0..tread_count {
-        let tread_name = tread_prefix + (index + 1).to_string();
-        let tread = _component_cube_visual_ops(doc, edit_target, path,
-            tread_name, [tread_first_x + tread_pitch * index, thickness / 2.0 + tread_height / 2.0, 0.0], (),
-            [tread_width, tread_height, tread_span],
-            [0.10, 0.12, 0.16]);
-        if !tread.ok { return tread; }
-        for op in tread.ops { ops.push(op); }
+        let x = tread_first_x + tread_pitch * index;
+        for track in [track_geometry.port, track_geometry.starboard] {
+            let tread = _component_cube_visual_ops(doc, edit_target, path,
+                tread_prefix + (if track.center_z > 0.0 { "Port" } else { "Starboard" })
+                    + (index + 1).to_string(),
+                [x, surface_y + thickness / 2.0 + tread_height / 2.0, track.center_z], (),
+                [tread_width, tread_height, track_geometry.width_m], [0.10, 0.12, 0.16]);
+            if !tread.ok { return tread; }
+            for op in tread.ops { ops.push(op); }
+        }
     }
     // Add two longitudinal underside beams. They are deliberately below the
     // walking surface, where the viewer can read a real load path instead of
@@ -2767,7 +3728,9 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path) {
         }
     }
     #{ok: true, kind: "griffin_ramp_visual_geometry", ops: ops,
-      width_m: width, length_m: length, no_op: ops.len() == 0}
+      width_m: width, track_width_m: track_geometry.width_m,
+      track_center_offset_z_m: track_geometry.center_offset_z_m,
+      length_m: length, no_op: ops.len() == 0}
 }
 
 // Author the safe pre-landing state of the physical ramp bodies.  The ramp
@@ -2930,14 +3893,14 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
         return plan_error("physical ramp side must be port or starboard");
     }
     let source = sysml_requirements::source();
-    let length = _sysml_number(source, "physicalRampSurfaceLengthM");
-    let width = _sysml_number(source, "physicalRampSurfaceWidthM");
-    let thickness = _sysml_number(source, "physicalRampSurfaceThicknessM");
-    let rail_height = _sysml_number(source, "physicalRampRailHeightM");
-    let rail_width = _sysml_number(source, "physicalRampRailWidthM");
-    let stowed_x = _sysml_number(source, "physicalRampStowedSurfaceCenterXM");
-    let surface_y = _sysml_number(source, "physicalRampStowedSurfaceCenterYM");
-    let rail_y = _sysml_number(source, "physicalRampStowedRailCenterYM");
+    let length = _sysml_number(source, "rampSurfaceLengthM");
+    let width = _sysml_number(source, "rampSurfaceWidthM");
+    let thickness = _sysml_number(source, "rampSurfaceThicknessM");
+    let rail_height = _sysml_number(source, "rampRailHeightM");
+    let rail_width = _sysml_number(source, "rampRailWidthM");
+    let stowed_x = length / 2.0;
+    let surface_y = _sysml_number(source, "rampSurfaceCenterYM");
+    let rail_y = _sysml_number(source, "rampRailCenterYM");
     let stowed_angle = _sysml_number(source, "physicalRampStowedAngleRad");
     let transition_overlap = _sysml_number(source, "physicalRampDeckTransitionOverlapM");
     let mount_x = _sysml_number(source, if side == "port" {
@@ -2958,10 +3921,9 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
         || transition_overlap <= 0.0 || transition_overlap >= length {
         return plan_error("stowed physical ramp SysML datums are incomplete");
     }
-    let surface = root + "/Surface";
     let rail = root + "/EdgeRail";
     let inner = root + "/EdgeRailInner";
-    for path in [surface, rail, inner] {
+    for path in [rail, inner] {
         let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
         if !query_ok(prim) || prim.type_name != "Cube" {
             return plan_error(path + ": physical ramp geometry must be an existing Cube");
@@ -2975,8 +3937,6 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
     if !root_placement.ok { return root_placement; }
     for op in root_placement.ops { ops.push(op); }
     for item in [
-        #{path: surface, translation: [signed_x, surface_y, 0.0],
-          rotation: [0.0, 0.0, 0.0], scale: [length, thickness, width]},
         #{path: rail, translation: [signed_x, rail_y, rail_center],
           rotation: [0.0, 0.0, 0.0], scale: [length, rail_height, rail_width]},
         #{path: inner, translation: [signed_x, rail_y, -rail_center],
@@ -2987,6 +3947,10 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
     }
+    let tracks = _physical_ramp_contact_track_ops(doc, edit_target, root,
+        source, length, thickness, signed_x, surface_y, 0.0);
+    if !tracks.ok { return tracks; }
+    for op in tracks.ops { ops.push(op); }
     let transition = _physical_ramp_transition_ops(doc, edit_target, root, side,
         transition_overlap, thickness, width, surface_y);
     if !transition.ok { return transition; }
@@ -3030,8 +3994,8 @@ fn apply_isolated_griffin_physical_ramp_stowed(doc, edit_target, root, side, par
       root: root, side: side, length_m: plan.length_m, width_m: plan.width_m}
 }
 
-// Refine the physical ramp in its own vehicle document.  The surface and
-// rails are still ordinary USD component geometry, but all dimensions are
+// Refine the physical ramp in its own vehicle document. The paired contact
+// tracks and rails are ordinary USD geometry, but all dimensions are
 // authored through the Editor's typed placement operations.  Keeping this
 // operation separate from `isolated_griffin_ramp_plan` matters: the latter
 // builds the render-only review component, while this one owns the collision
@@ -3044,21 +4008,16 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
         return plan_error("physical ramp side must be port or starboard");
     }
     let source = sysml_requirements::source();
-    let length = _sysml_number(source, "physicalRampSurfaceLengthM");
-    let width = _sysml_number(source, "physicalRampSurfaceWidthM");
-    let thickness = _sysml_number(source, "physicalRampSurfaceThicknessM");
-    let rail_height = _sysml_number(source, "physicalRampRailHeightM");
-    let rail_width = _sysml_number(source, "physicalRampRailWidthM");
-    let surface_y = _sysml_number(source, "physicalRampSurfaceCenterYM");
-    let rail_y = _sysml_number(source, "physicalRampRailCenterYM");
-    let clearance = _sysml_number(source, "physicalRampRouteClearanceM");
+    let length = _sysml_number(source, "rampSurfaceLengthM");
+    let width = _sysml_number(source, "rampSurfaceWidthM");
+    let thickness = _sysml_number(source, "rampSurfaceThicknessM");
+    let rail_height = _sysml_number(source, "rampRailHeightM");
+    let rail_width = _sysml_number(source, "rampRailWidthM");
+    let surface_y = _sysml_number(source, "rampSurfaceCenterYM");
+    let rail_y = _sysml_number(source, "rampRailCenterYM");
+    let clearance = _sysml_number(source, "rampWheelClearanceM");
     let transition_overlap = _sysml_number(source, "physicalRampDeckTransitionOverlapM");
-    let angle_name = if side == "port" {
-        "physicalRampPortDeploymentAngleRad"
-    } else {
-        "physicalRampStarboardDeploymentAngleRad"
-    };
-    let angle = _sysml_number(source, angle_name);
+    let stowed_angle = _sysml_number(source, "physicalRampStowedAngleRad");
     let mount_x = _sysml_number(source, if side == "port" {
         "physicalRampPortMountX"
     } else {
@@ -3068,7 +4027,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
     let mount_z = _sysml_number(source, "physicalRampMountZ");
     if length == () || width == () || thickness == () || rail_height == ()
         || rail_width == () || surface_y == () || rail_y == ()
-        || clearance == () || angle == () || mount_x == ()
+        || clearance == () || stowed_angle == () || mount_x == ()
         || mount_y == () || mount_z == ()
         || transition_overlap == ()
         || length <= 0.0 || width <= 0.0 || thickness <= 0.0
@@ -3076,30 +4035,21 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
         || transition_overlap <= 0.0 || transition_overlap >= length {
         return plan_error("physical ramp geometry SysML datums are incomplete");
     }
-    let surface = root + "/Surface";
     let rail = root + "/EdgeRail";
     let inner = root + "/EdgeRailInner";
-    for path in [surface, rail, inner] {
+    for path in [rail, inner] {
         let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
         if !query_ok(prim) || prim.type_name != "Cube" {
             return plan_error(path + ": physical ramp geometry must be an existing Cube");
         }
     }
-    let angle_deg = angle * 180.0 / 3.141592653589793;
-    // The physical source uses the ramp-local +X axis as the deployed travel
-    // axis.  Mirror that local frame for starboard so both ramps start at
-    // their hinge and descend away from the deck; the positive SysML angle
-    // remains the side-local deployment magnitude.
-    let travel_angle_deg = if side == "port" {
-        angle_deg
-    } else {
-        180.0 + angle_deg
-    };
-    // Translation is expressed in the ramp body's local frame, before the
-    // child's own rotation is applied. The cosine projection belongs only to
-    // a world-space diagnostic, not to the authored USD xform. This keeps the
-    // contact span exactly 0..8 m from the port hinge and -8..0 m from the
-    // mirrored starboard hinge.
+    // The root is a hinged rigid body. Keep its local geometry horizontal in
+    // the stowed source pose; the revolute joint applies the deployment angle
+    // after touchdown. Baking that angle into each child would leave a ramp
+    // sloped before the joint moves and apply the deployment twice.
+    let body_rotation_deg = 0.0;
+    // The contact span starts at the hinge and runs outward in each body's
+    // local frame. Port uses +X; starboard mirrors the span across the lander.
     let center_x = if side == "port" { length / 2.0 } else { -length / 2.0 };
     let rail_center = width / 2.0 - rail_width / 2.0;
     let ops = [];
@@ -3108,22 +4058,20 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
     if !root_placement.ok { return root_placement; }
     for op in root_placement.ops { ops.push(op); }
     for item in [
-        #{path: surface, translation: [center_x, surface_y, 0.0],
-          // Cube scale is the authored full dimension in the physical source
-          // (the source ramp is 3.70 m long at scale x=1.85).  Keep the
-          // Editor recipe in the same convention as the USD component and
-          // the SysML physical study envelope.
-          scale: [length, thickness, width]},
         #{path: rail, translation: [center_x, rail_y, rail_center],
           scale: [length, rail_height, rail_width]},
         #{path: inner, translation: [center_x, rail_y, -rail_center],
           scale: [length, rail_height, rail_width]},
     ] {
         let placement = assembly_builder::place_plan(edit_target, item.path,
-            item.translation, [0.0, 0.0, travel_angle_deg], item.scale);
+            item.translation, [0.0, 0.0, body_rotation_deg], item.scale);
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
     }
+    let tracks = _physical_ramp_contact_track_ops(doc, edit_target, root,
+        source, length, thickness, center_x, surface_y, body_rotation_deg);
+    if !tracks.ok { return tracks; }
+    for op in tracks.ops { ops.push(op); }
     let transition = _physical_ramp_transition_ops(doc, edit_target, root, side,
         transition_overlap, thickness, width, surface_y);
     if !transition.ok { return transition; }
@@ -3135,7 +4083,8 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
         // The physical ramp source declares this custom attribute as float;
         // keep the typed Editor operation aligned with the composed schema.
-        name: "lunco:deployment_angle_rad", type_name: "float", value: angle.to_string()}});
+        // The stowed pose is the asset default; deployment is joint state.
+        name: "lunco:deployment_angle_rad", type_name: "float", value: stowed_angle.to_string()}});
     // The physical source joint is a sibling of the ramp body. Keep its
     // lander-frame anchor coherent with the SysML hinge mount when the ramp is
     // promoted from the low visual proxy to the deck-to-ground study envelope.
@@ -3154,7 +4103,8 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
     #{ok: true, kind: "griffin_physical_ramp_geometry", root: root,
       side: side, width_m: width, clearance_m: clearance,
       transition_overlap_m: transition_overlap,
-      paths: [surface, rail, inner, transition.path],
+      paths: [root + "/RampTrackPort", root + "/RampTrackStarboard",
+        rail, inner, transition.path],
       ops: ops, no_op: ops.len() == 0}
 }
 
@@ -3257,8 +4207,8 @@ fn apply_isolated_griffin_ramp(doc, edit_target, root, side, parent_gen) {
 }
 
 // Reconcile a referenced ramp instance after the old assembly-layer overlay
-// recipe has been removed.  The component file owns RampSurface, rails,
-// treads, support members, and the mount frame; the assembly owns only the
+// recipe has been removed. The component file owns paired RampTrack geometry,
+// rails, treads, support members, and the mount frame; the assembly owns only the
 // instance transform and state.  This plan removes authored child opinions
 // from the assembly layer so the referenced component becomes the single
 // geometry owner, then applies the typed stowed pose with SetScale so the

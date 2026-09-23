@@ -27,22 +27,24 @@ shared Rust/Rhai evaluator executes the supported scalar constraint subset.
   These measurements are provider observations; their geometry extraction,
   frame conversion, temporal sampling, and collection reductions are not yet a
   generic Rust provider surface.
-- The old standalone ramp assembly and custom component assertion bridge have
-  been removed. FLIP remains a separately sourced and loaded Twin component.
+- The ramp geometry is owned by the replaceable Twin component and its SysML
+  child inventory. FLIP remains a separately sourced and loaded component.
 
-## Active geometry migration
+## Geometry migration status
 
-The bus visual source and tank-support perimeter are octagonal. The physical
-`TopDeckCollisionProxy` is a different object: its current six-sided footprint
-is misaligned with the chosen octagonal deck requirement. The 1.21 m transition
-and +/-3.16 m deck edge are legacy measurements from that footprint, not
-acceptance values. GRR-012 now requires typed observations for the composed
-transition overlap, required geometric overlap, and octagonal profile
-compatibility. Those observations are unavailable, so its verdict must remain
-inconclusive until the collider is re-authored through the typed Editor path,
-read back, and used to recompute the ramp-to-deck contact, hinge gap, transition
-length, and FLIP wheel path. The tank-support perimeter remains octagonal
-throughout; it is not the collision proxy.
+The physical top deck uses eight hidden convex beam colliders following the
+SysML octagonal profile, and the central rover platform has a separate
+geometry-derived collider. Composed Editor readback passed profile, topology,
+and source-deviation checks. The render ramp uses two FLIP-aligned
+wheel tracks with an open centre, using the same wheel stations and track-width
+datum as the physical contact geometry.
+
+GRR-012 remains inconclusive because the generic typed USD provider does not
+yet expose the composed transition contact overlap. The 1.05 m SysML study
+datum bridges the 2.20 m payload-deck half-width to the 3.20 m hinge with 0.05 m
+overlap, but it is not acceptance evidence until the transition and wheel
+contact envelope are observed together. The separate octagonal tank-support
+perimeter remains distinct from the outer deck collider.
 
 ## Remaining acceptance boundary
 
