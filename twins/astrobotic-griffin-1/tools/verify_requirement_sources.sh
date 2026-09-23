@@ -1,77 +1,109 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Authoring-time gate for the separate typed SysML provenance catalog.
-#
-# The native bridge can resolve qualified source fields efficiently, but the
-# current Rhai surface intentionally does not expose an unbounded catalog
-# enumeration. This small read-only gate therefore checks the source files at
-# authoring/CI time. It compares requirement IDs from the owning SysML docs
-# with the typed RequirementEvidence usages and verifies that every evidence
-# usage has all four required fields.
-
+# Check the authored shape of the Twin's typed evidence catalog. SysML parsing
+# and reference resolution remain the responsibility of the production parser;
+# this gate checks coverage and rejects legacy string-backed evidence fields.
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 requirements_dir="$script_dir/../requirements"
-catalog="$requirements_dir/griffin_requirement_sources.sysml"
+python3 - "$requirements_dir" <<'PY'
+from pathlib import Path
+import re
+import sys
 
-if [[ ! -f "$catalog" ]]; then
-    printf 'ERROR: missing typed provenance catalog: %s\n' "$catalog" >&2
-    exit 1
-fi
+root = Path(sys.argv[1])
+catalog_path = root / "griffin_requirement_sources.sysml"
+if not catalog_path.is_file():
+    raise SystemExit(f"ERROR: missing typed provenance catalog: {catalog_path}")
+catalog = catalog_path.read_text()
 
-requirement_ids=$(
-    rg -o 'doc /\* [A-Z][A-Z0-9]*-[0-9]+' \
-        "$requirements_dir"/griffin_*.sysml \
-        "$requirements_dir"/flip_*.sysml \
-        "$requirements_dir"/moonbase_project_requirements.sysml \
-        --glob '!griffin_requirement_sources.sysml' \
-        | sed -E 's/.*doc \/\* //' \
-        | sort -u
-)
 
-catalog_ids=$(
-    rg -o 'attribute requirementId = "[A-Z][A-Z0-9]*-[0-9]+";' "$catalog" \
-        | sed -E 's/.*"([A-Z][A-Z0-9]*-[0-9]+)".*/\1/' \
-        | sort -u
-)
+def require(condition, message):
+    if not condition:
+        raise SystemExit("ERROR: " + message)
 
-missing_ids=$(comm -23 <(printf '%s\n' "$requirement_ids") <(printf '%s\n' "$catalog_ids"))
-extra_ids=$(comm -13 <(printf '%s\n' "$requirement_ids") <(printf '%s\n' "$catalog_ids"))
 
-evidence_count=$(rg -c '^    part evidence_[a-z0-9_]+ : RequirementEvidence \{' "$catalog" || true)
-id_count=$(rg -c '^        attribute requirementId = ' "$catalog" || true)
-qualified_count=$(rg -c '^        attribute qualifiedRequirement = ' "$catalog" || true)
-source_count=$(rg -c '^        attribute sourceReference = ' "$catalog" || true)
-rationale_count=$(rg -c '^        attribute rationale = ' "$catalog" || true)
-catalog_unique_count=$(printf '%s\n' "$catalog_ids" | sed '/^$/d' | wc -l)
-empty_fields=$(rg -n '^        attribute (sourceReference|rationale) = "";' "$catalog" || true)
+require(re.search(r"enum\s+def\s+EvidenceSourceRole\s*\{([^}]+)\}", catalog),
+        "EvidenceSourceRole enum definition is missing")
+role_match = re.search(r"enum\s+def\s+EvidenceSourceRole\s*\{([^}]+)\}", catalog)
+roles = set(re.findall(r"\b[A-Z][A-Za-z0-9_]*\b", role_match.group(1)))
+require(roles, "EvidenceSourceRole has no literals")
 
-failed=0
-if [[ -n "$missing_ids" ]]; then
-    printf 'ERROR: requirement IDs missing from typed catalog:\n%s\n' "$missing_ids" >&2
-    failed=1
-fi
-if [[ -n "$extra_ids" ]]; then
-    printf 'ERROR: typed catalog contains IDs without an owning requirement:\n%s\n' "$extra_ids" >&2
-    failed=1
-fi
-if [[ "$evidence_count" -eq 0 || "$evidence_count" -ne "$id_count" \
-    || "$evidence_count" -ne "$qualified_count" \
-    || "$evidence_count" -ne "$source_count" \
-    || "$evidence_count" -ne "$rationale_count" \
-    || "$evidence_count" -ne "$catalog_unique_count" ]]; then
-    printf 'ERROR: typed catalog field counts disagree: evidence=%s id=%s qualified=%s source=%s rationale=%s\n' \
-        "$evidence_count" "$id_count" "$qualified_count" "$source_count" "$rationale_count" >&2
-    failed=1
-fi
-if [[ -n "$empty_fields" ]]; then
-    printf 'ERROR: typed catalog contains an empty source or rationale:\n%s\n' "$empty_fields" >&2
-    failed=1
-fi
+source_type = re.search(r"part\s+def\s+EvidenceSource\s*\{([^{}]*)\}", catalog)
+evidence_type = re.search(r"part\s+def\s+RequirementEvidence\s*\{([^{}]*)\}", catalog)
+require(source_type is not None, "typed EvidenceSource definition is missing")
+require(evidence_type is not None, "typed RequirementEvidence definition is missing")
+require(re.search(r"attribute\s+role\s*:\s*EvidenceSourceRole\s*;", source_type.group(1)),
+        "EvidenceSource.role must use EvidenceSourceRole")
+require(re.search(r"attribute\s+locator\s*:\s*SourceLocator\s*;", source_type.group(1)),
+        "EvidenceSource.locator must use SourceLocator")
+require(re.search(r"ref\s+targetRequirement\s*:\s*SysML::RequirementUsage\s*;", evidence_type.group(1)),
+        "RequirementEvidence.targetRequirement must be a SysML requirement reference")
+require(re.search(r"ref\s+part\s+sources\s*:\s*EvidenceSource\[0\.\.\*\]\s*;", evidence_type.group(1)),
+        "RequirementEvidence.sources must be a typed EvidenceSource collection")
 
-if [[ "$failed" -ne 0 ]]; then
-    exit 1
-fi
+for legacy in ("requirementId", "qualifiedRequirement", "sourceReference", "rationale"):
+    require(not re.search(rf"\b{legacy}\b", catalog),
+            f"legacy duplicate evidence field remains: {legacy}")
 
-printf 'OK: typed Griffin provenance catalog covers %s requirement IDs with %s complete evidence records.\n' \
-    "$(printf '%s\n' "$requirement_ids" | sed '/^$/d' | wc -l)" "$evidence_count"
+source_parts = {}
+for match in re.finditer(r"\bpart\s+(source_[A-Za-z0-9_]+)\s*:\s*EvidenceSource\s*\{([^{}]*)\}", catalog):
+    name, body = match.groups()
+    require(name not in source_parts, f"duplicate source element: {name}")
+    role_values = re.findall(r"attribute\s+role\s*:\s*EvidenceSourceRole\s*=\s*\"([^\"]+)\"\s*;", body)
+    locators = re.findall(r"attribute\s+locator\s*:\s*SourceLocator\s*=\s*\"([^\"]+)\"\s*;", body)
+    require(len(role_values) == 1 and role_values[0] in roles,
+            f"{name} must have exactly one valid typed role")
+    require(len(locators) == 1 and ";" not in locators[0],
+            f"{name} must have exactly one atomic SourceLocator")
+    source_parts[name] = locators[0]
+require(source_parts, "catalog contains no EvidenceSource instances")
+
+requirement_targets = {}
+for path in sorted(root.glob("*.sysml")):
+    if path == catalog_path:
+        continue
+    text = path.read_text()
+    package_match = re.search(r"\bpackage\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{", text)
+    if not package_match:
+        continue
+    package = package_match.group(1)
+    for short_name, usage_name in re.findall(
+        r"\brequirement\s+<'([A-Z][A-Z0-9]*-[0-9]+)'>\s+([A-Za-z_][A-Za-z0-9_]*)\s*:", text
+    ):
+        target = f"{package}::{usage_name}"
+        require(target not in requirement_targets,
+                f"duplicate requirement target declaration: {target}")
+        requirement_targets[target] = short_name
+require(requirement_targets, "no standard SysML requirement short names found")
+
+evidence_targets = {}
+evidence_count = 0
+for match in re.finditer(r"\bpart\s+(evidence_[A-Za-z0-9_]+)\s*:\s*RequirementEvidence\s*\{([^{}]*)\}", catalog):
+    evidence_name, body = match.groups()
+    evidence_count += 1
+    targets = re.findall(r"\bref\s+targetRequirement\s*=\s*([A-Za-z_][A-Za-z0-9_:]*)\s*;", body)
+    require(len(targets) == 1, f"{evidence_name} must have one typed targetRequirement reference")
+    target = targets[0]
+    require(target in requirement_targets,
+            f"{evidence_name} points to undeclared requirement usage {target}")
+    require(target not in evidence_targets,
+            f"requirement {target} has multiple evidence records")
+    evidence_targets[target] = evidence_name
+    source_lists = re.findall(r"\bref\s+sources\s*=\s*\(([^)]*)\)\s*;", body)
+    require(len(source_lists) <= 1, f"{evidence_name} has multiple source collections")
+    if source_lists:
+        names = [name.strip() for name in source_lists[0].split(",") if name.strip()]
+        require(names, f"{evidence_name} has an empty source collection")
+        for name in names:
+            require(name in source_parts,
+                    f"{evidence_name} points to undeclared source element {name}")
+
+missing = sorted(set(requirement_targets) - set(evidence_targets))
+extra = sorted(set(evidence_targets) - set(requirement_targets))
+require(not missing, "requirements without evidence records: " + ", ".join(missing))
+require(not extra, "evidence records without requirements: " + ", ".join(extra))
+require(evidence_count == len(requirement_targets),
+        f"evidence count {evidence_count} does not match requirement count {len(requirement_targets)}")
+print(f"OK: {len(requirement_targets)} typed requirement targets, {evidence_count} evidence records, {len(source_parts)} typed source elements, {len(roles)} source roles")
+PY

@@ -54,7 +54,7 @@ fn _sysml_text(name) {
 }
 
 // The Twin intentionally composes several SysML packages that reuse local
-// names such as `solarArrayCount` and `missionReference`.  Resolve every
+// names such as `solarArrayCount` and `geometryStatus`. Resolve every
 // public accessor to its owning package before crossing the generic bridge;
 // an ambiguous short-name lookup must never silently select another
 // component's value.
@@ -95,17 +95,21 @@ fn _qualified_attribute(name) {
         "rampBehavior", "hingeAxis", "mountDatum", "rampStowedScale",
         "rampStowedPortRotationZDeg", "rampStowedStarboardRotationYDeg",
         "rampStowedStarboardRotationZDeg", "rampGeometryStatus",
-        "physicalRampDeckTransitionContactOverlapM",
-        "physicalRampDeckTransitionOverlapM",
+        "physicalRampDeckTransitionRequiredOverlapM",
+        "physicalRampDeckTransitionLengthM",
+        "physicalRampDeckTransitionInterfaceToleranceM",
+        "physicalRampTerrainContactToleranceM",
         "physicalRampTransitionChildName", "physicalRampTransitionContactChildName",
         "physicalRampPortMountX",
         "physicalRampStarboardMountX", "physicalRampMountY",
         "physicalRampMountZ", "physicalRampPortDeploymentAngleRad",
         "physicalRampStarboardDeploymentAngleRad",
+        "physicalRampMassKg", "physicalRampInertiaXKgM2",
+        "physicalRampInertiaYKgM2", "physicalRampInertiaZKgM2",
+        "physicalRampMassPropertiesStatus",
         "physicalRampStowedAngleRad",
-        "physicalRampHingeLimitDeg", "physicalRampDeckTransitionMassKg",
+        "physicalRampDeckTransitionMassKg",
         "physicalRampDeckTransitionInertiaKgM2", "physicalRampTransitionJointNamePrefix",
-        "provenanceSource", "referenceImage"
     ];
     if ramp.contains(name) {
         return "GriffinRampRequirements::GriffinEgressRamp::" + name;
@@ -123,8 +127,7 @@ fn _qualified_attribute(name) {
         "solarArrayMount", "solarArrayTiltDeg",
         "suspensionStrutScale", "suspensionStrutOffset",
         "suspensionArmScale", "suspensionArmOffsetM",
-        "suspensionKnuckleRadiusM", "suspensionKnuckleWidthM",
-        "componentReference", "missionReference"
+        "suspensionKnuckleRadiusM", "suspensionKnuckleWidthM"
     ];
     if rover.contains(name) {
         return "FlipRequirements::FlipRover::" + name;
@@ -135,8 +138,7 @@ fn _qualified_attribute(name) {
     }
     let project = [
         "unitSystem", "lengthUnit", "massUnit", "angleUnit", "timeUnit",
-        "frameUpAxis", "metersPerUnit", "moonbaseRequirementUsageCount",
-        "moonbaseRequirementIds", "moonbaseVerificationCaseName"
+        "frameUpAxis", "metersPerUnit"
     ];
     if project.contains(name) {
         return "MoonBaseProjectRequirements::ProjectSimulationContract::" + name;
@@ -329,7 +331,6 @@ fn surface_route_marker_z() { _sysml_number_list("surfaceRouteMarkerZ") }
 fn surface_route_speed_mps() { _sysml_number_list("surfaceRouteSpeedMps") }
 fn surface_route_arrival_radius_m() { _sysml_number_list("surfaceRouteArrivalRadiusM") }
 fn egress_apron_name() { _sysml_text("egressApronName") }
-fn egress_apron_requirement_id() { _sysml_text("egressApronRequirementId") }
 fn egress_apron_center_x_m() { _sysml_attribute("egressApronCenterX") }
 fn egress_apron_center_y_m() { _sysml_attribute("egressApronCenterY") }
 fn egress_apron_center_z_m() { _sysml_attribute("egressApronCenterZ") }
@@ -337,10 +338,6 @@ fn egress_apron_length_m() { _sysml_attribute("egressApronLengthM") }
 fn egress_apron_width_m() { _sysml_attribute("egressApronWidthM") }
 fn egress_apron_thickness_m() { _sysml_attribute("egressApronThicknessM") }
 fn egress_apron_surface_y_m() { _sysml_attribute("egressApronSurfaceY") }
-fn egress_apron_source() { _sysml_text("egressApronSource") }
-fn egress_apron_rationale() { _sysml_text("egressApronRationale") }
-fn visual_requirement_usage_count() { _sysml_integer("visualRequirementUsageCount") }
-fn visual_verification_case_name() { _sysml_text("visualVerificationCaseName") }
 fn visual_camera_name() { _sysml_text("visualCameraName") }
 fn visual_lander_name() { _sysml_text("visualLanderName") }
 fn visual_rover_name() { _sysml_text("visualRoverName") }
@@ -617,7 +614,13 @@ fn physical_rover_wheel_station_x() { _sysml_number_list("physicalWheelStationX"
 fn physical_rover_wheel_station_y() { _sysml_number_list("physicalWheelStationY") }
 fn physical_rover_wheel_station_z() { _sysml_number_list("physicalWheelStationZ") }
 fn physical_suspension_rest_length_m() { _sysml_attribute("physicalSuspensionRestLengthM") }
-fn physical_ramp_deck_transition_overlap_m() { _sysml_attribute("physicalRampDeckTransitionOverlapM") }
+fn physical_ramp_deck_transition_length_m() { _sysml_attribute("physicalRampDeckTransitionLengthM") }
+fn physical_ramp_deck_transition_required_overlap_m() {
+    _sysml_attribute("physicalRampDeckTransitionRequiredOverlapM")
+}
+fn physical_ramp_deck_transition_interface_tolerance_m() {
+    _sysml_attribute("physicalRampDeckTransitionInterfaceToleranceM")
+}
 fn physical_ramp_transition_child_name() { _sysml_text("physicalRampTransitionChildName") }
 fn physical_ramp_transition_contact_child_name() {
     _sysml_text("physicalRampTransitionContactChildName")
@@ -644,8 +647,29 @@ fn rover_sensor_mast_mount() {
 }
 fn visual_landing_pad_radius_m() { _sysml_attribute("visualLandingPadRadiusM") }
 fn visual_review_ground_width_m() { _sysml_attribute("visualReviewGroundWidthM") }
-fn visual_terrain_asset() { _sysml_text("visualTerrainAsset") }
-fn visual_terrain_shader_asset() { _sysml_text("visualTerrainShaderAsset") }
+
+// GV-006 links each visual asset as a typed EvidenceSource with an enum role.
+// Resolve the source through the same revision-scoped requirement/evidence API
+// used by generic verifiers; the URI remains only the locator leaf.
+fn _visual_asset_locator(role_literal) {
+    let report = sysml_requirements::source();
+    if report == () || report.ok != true { return (); }
+    let requirement = sysml_requirements::requirement_handle_by_short_name(report, "GV-006");
+    if requirement.ok != true { return (); }
+    let evidence = sysml_requirements::provenance(report, requirement.handle);
+    if evidence.ok != true { return (); }
+    for source in evidence.evidence.sources {
+        if source.role.type == "GriffinRequirementSources::EvidenceSourceRole"
+            && source.role.literal == role_literal
+            && source.locator_type == "GriffinRequirementSources::SourceLocator" {
+            return source.locator;
+        }
+    }
+    ()
+}
+
+fn visual_terrain_asset() { _visual_asset_locator("VisualAsset") }
+fn visual_terrain_shader_asset() { _visual_asset_locator("ShaderAsset") }
 fn visual_render_ownership() { _sysml_text("visualRenderOwnership") }
 fn pi_value() { 3.141592653589793 }
 
@@ -688,14 +712,3 @@ fn ramp_hinge_gusset_center_y_m() { _sysml_attribute("assemblyHingeGussetCenterY
 fn ramp_hinge_gusset_offset_z_m() { _sysml_attribute("assemblyHingeGussetOffsetZM") }
 fn propellant_tank_names() { _sysml_enum_names("tankInstances") }
 fn main_engine_names() { _sysml_enum_names("mainEngineInstances") }
-
-fn catalogued_requirement_checks() {
-    _sysml_list("cataloguedRequirementCheckIds")
-}
-
-fn requirement_usage_count() { _sysml_integer("requirementUsageCount") }
-fn manifest_part_count() { _sysml_integer("manifestPartCount") }
-fn verification_case_name() { _sysml_text("verificationCaseName") }
-fn planned_rules() { _sysml_list("plannedRequirementIds") }
-fn mission_scope_rules() { _sysml_list("missionScopeRequirementIds") }
-fn process_gate_rules() { _sysml_list("processGateRequirementIds") }

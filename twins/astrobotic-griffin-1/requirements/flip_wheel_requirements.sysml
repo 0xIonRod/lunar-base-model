@@ -5,13 +5,15 @@ package FlipWheelRequirements {
     part def FlipDirectionalWheelAssembly {
         attribute usdRootPath : String = "/World/FLIP";
         attribute componentAsset : String = "components/rover/flip_wheel_visual.usda";
-        attribute sourceComponent : String = "FlipRequirements::FlipRover";
-        attribute namesSource : String = "FlipRequirements::FlipRover::visualWheelNames";
-        attribute countSource : String = "FlipRequirements::FlipRover::visualRoverWheelCount";
+        ref part sourceRover : FlipRequirements::FlipRover;
+        ref attribute wheelNames : FlipRequirements::FlipRover::visualWheelNames;
+        ref attribute wheelCount : FlipRequirements::FlipRover::visualRoverWheelCount;
+        ref attribute wheelRadius : FlipRequirements::FlipRover::visualRoverWheelRadiusM;
         attribute childNames : String[3] = ("Tire", "MetalHub", "HubCap");
         attribute suspensionVisualChild : String = "Suspension/SuspensionStrut";
-        attribute suspensionComponent : String = "FlipSuspensionRequirements::FlipSuspensionComponent";
-        attribute steeringSource : String[2] = ("frontSteeringAngleDeg", "rearSteeringAngleDeg");
+        ref part suspension : FlipSuspensionRequirements::FlipSuspensionComponent;
+        ref attribute frontSteeringAngle : FlipRequirements::FlipRover::frontSteeringAngleDeg;
+        ref attribute rearSteeringAngle : FlipRequirements::FlipRover::rearSteeringAngleDeg;
         attribute tireRadiusM : Real = 0.45;
         attribute tireWidthM : Real = 0.30;
         attribute hubRadiusM : Real = 0.25;
@@ -44,13 +46,13 @@ package FlipWheelRequirements {
         doc /* FWW-007 [geometry] each wheel shall contain a Z-axis tire of radius 0.45 m and width 0.30 m, a hub of radius 0.25 m and width 0.33 m, and a cap of radius 0.10 m and width 0.36 m. */
     }
 
-    requirement fww001 : FWW001_WheelCount { subject wheels : FlipDirectionalWheelAssembly; }
-    requirement fww002 : FWW002_WheelGeometry { subject wheels : FlipDirectionalWheelAssembly; }
-    requirement fww003 : FWW003_AllWheelSteering { subject wheels : FlipDirectionalWheelAssembly; }
-    requirement fww004 : FWW004_WheelTraceability { subject wheels : FlipDirectionalWheelAssembly; }
-    requirement fww005 : FWW005_WheelPlacement { subject wheels : FlipDirectionalWheelAssembly; }
-    requirement fww006 : FWW006_SuspensionVisual { subject wheels : FlipDirectionalWheelAssembly; }
-    requirement fww007 : FWW007_WheelEnvelope { subject wheels : FlipDirectionalWheelAssembly; }
+    requirement <'FWW-001'> fww001 : FWW001_WheelCount { subject wheels : FlipDirectionalWheelAssembly; }
+    requirement <'FWW-002'> fww002 : FWW002_WheelGeometry { subject wheels : FlipDirectionalWheelAssembly; }
+    requirement <'FWW-003'> fww003 : FWW003_AllWheelSteering { subject wheels : FlipDirectionalWheelAssembly; }
+    requirement <'FWW-004'> fww004 : FWW004_WheelTraceability { subject wheels : FlipDirectionalWheelAssembly; }
+    requirement <'FWW-005'> fww005 : FWW005_WheelPlacement { subject wheels : FlipDirectionalWheelAssembly; }
+    requirement <'FWW-006'> fww006 : FWW006_SuspensionVisual { subject wheels : FlipDirectionalWheelAssembly; }
+    requirement <'FWW-007'> fww007 : FWW007_WheelEnvelope { subject wheels : FlipDirectionalWheelAssembly; }
 
     verification def Verify_FLIPWheelRequirements {
         subject wheels : FlipDirectionalWheelAssembly;

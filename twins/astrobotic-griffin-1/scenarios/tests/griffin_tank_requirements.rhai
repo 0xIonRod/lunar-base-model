@@ -554,7 +554,7 @@ fn on_tick(me, ctx) {
         requirement_names: aggregate_requirement_names,
         requirement_summary: aggregate_requirement_summary,
         failure_count: aggregate_failure_count, verification: aggregate_verification,
-        source_revision: source.source_revision_hex, source_files: source.source_files,
+        source_revision: source.source_revision, source_files: source.source_files,
         evidence_result_events: 0, evidence_channels: tank_channels,
         metrics: #{root: root, component_package: PACKAGE,
             verification: aggregate_verification, components: tank_results,

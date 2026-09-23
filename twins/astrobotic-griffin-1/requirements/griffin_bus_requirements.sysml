@@ -106,18 +106,18 @@ package GriffinBusRequirements {
         require GBC_MeasurementWithinTolerance;
     }
 
-    requirement gbc001 : GBC001_BusIdentity { subject bus : GriffinBusComponent; }
-    requirement gbc002 : GBC002_BusEnvelope { subject bus : GriffinBusComponent; }
-    requirement gbc003 : GBC003_BusPresentationOwnership { subject bus : GriffinBusComponent; }
-    requirement gbc004 : GBC004_BusTraceability { subject bus : GriffinBusComponent; }
-    requirement gbc005 : GBC005_BusFrameGeometry { subject bus : GriffinBusComponent; }
-    requirement gbc006 : GBC006_DeckGeometry { subject bus : GriffinBusComponent; }
-    requirement gbc007 : GBC007_AssemblyRailGeometry { subject bus : GriffinBusComponent; }
-    requirement gbc008 : GBC008_OctagonalBodyShape { subject bus : GriffinBusComponent; }
-    requirement gbc009 : GBC009_OpenSideBays { subject bus : GriffinBusComponent; }
-    requirement gbc010 : GBC010_DeckSkirtSeparation { subject bus : GriffinBusComponent; }
-    requirement gbc011 : GBC011_TankSupportOpenings { subject bus : GriffinBusComponent; }
-    requirement gbc012 : GBC012_SourceOwnedAppearance { subject bus : GriffinBusComponent; }
+    requirement <'GBC-001'> gbc001 : GBC001_BusIdentity { subject bus : GriffinBusComponent; }
+    requirement <'GBC-002'> gbc002 : GBC002_BusEnvelope { subject bus : GriffinBusComponent; }
+    requirement <'GBC-003'> gbc003 : GBC003_BusPresentationOwnership { subject bus : GriffinBusComponent; }
+    requirement <'GBC-004'> gbc004 : GBC004_BusTraceability { subject bus : GriffinBusComponent; }
+    requirement <'GBC-005'> gbc005 : GBC005_BusFrameGeometry { subject bus : GriffinBusComponent; }
+    requirement <'GBC-006'> gbc006 : GBC006_DeckGeometry { subject bus : GriffinBusComponent; }
+    requirement <'GBC-007'> gbc007 : GBC007_AssemblyRailGeometry { subject bus : GriffinBusComponent; }
+    requirement <'GBC-008'> gbc008 : GBC008_OctagonalBodyShape { subject bus : GriffinBusComponent; }
+    requirement <'GBC-009'> gbc009 : GBC009_OpenSideBays { subject bus : GriffinBusComponent; }
+    requirement <'GBC-010'> gbc010 : GBC010_DeckSkirtSeparation { subject bus : GriffinBusComponent; }
+    requirement <'GBC-011'> gbc011 : GBC011_TankSupportOpenings { subject bus : GriffinBusComponent; }
+    requirement <'GBC-012'> gbc012 : GBC012_SourceOwnedAppearance { subject bus : GriffinBusComponent; }
 
     verification def Verify_GriffinBusRequirements {
         subject bus : GriffinBusComponent;

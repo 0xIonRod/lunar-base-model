@@ -46,6 +46,13 @@ fn _qualified(record) {
     ""
 }
 
+fn _short_name(name) {
+    if name == () { return ""; }
+    let parts = name.split("::");
+    if parts.len() == 0 { return name; }
+    parts[parts.len() - 1]
+}
+
 // Read the normative SysML source through the existing generic validation
 // query. This is intentionally a read-only Rhai seam: the parser/resolver is
 // Rust-owned, but the Griffin test selects the verification key and emits the
@@ -182,27 +189,51 @@ fn sysml_contract_report() {
     for name in ["payloadCapacityKg", "landingLegCount", "mainEngineCount",
         "propellantTankCount", "rampCount", "solarArrayCount",
         "flipPayloadCapacityKg", "wheelCount", "landingComTouchdownY",
-        "physicalRampDeckTransitionMassKg"] {
+        "rampSurfaceLengthM", "rampSurfaceThicknessM",
+        "physicalRampTerrainContactToleranceM",
+        "physicalRampMassKg", "physicalRampInertiaXKgM2",
+        "physicalRampInertiaYKgM2", "physicalRampInertiaZKgM2",
+        "physicalRampDeckTransitionMassKg", "physicalRampDeckTransitionLengthM",
+        "physicalRampDeckTransitionRequiredOverlapM",
+        "physicalRampDeckTransitionInterfaceToleranceM"] {
         let actual = _sysml_number(report, name);
         if actual == () || actual <= 0.0 {
             missing.push("positive typed SysML fact " + name);
         }
     }
-    for name in ["missionName", "landingRegion", "primaryRover",
-        "griffinProductSource", "nasaMissionSource", "nasaLanderFactsSource",
-        "astroboticMissionManifestSource", "griffinPressReference",
-        "flipProductSource", "flipEgressSource",
-        "tankSource", "geometryStatus", "massPropertiesStatus",
+    let transition_length = _sysml_number(report, "physicalRampDeckTransitionLengthM");
+    let transition_overlap = _sysml_number(report,
+        "physicalRampDeckTransitionRequiredOverlapM");
+    if transition_length != () && transition_overlap != ()
+        && transition_overlap >= transition_length {
+        missing.push("required physical deck overlap must be less than the transition length");
+    }
+    for name in ["mission", "landingRegion", "hostedRover",
+        "geometryStatus", "massPropertiesStatus",
         "rampStatus", "solarArrayStatus", "wheelCountStatus", "egressMode",
         "solarArrayMode", "mobilityStatus", "exactVehicleIcdStatus",
         "solarArrayNames", "landingLegNames", "landingPadNames", "rampNames",
         "rampHingeNames", "mainEngineNames", "visualWheelNames",
         "surfaceRouteMarkerNames", "surfaceRouteSpeedMps", "surfaceRouteArrivalRadiusM",
-        "physicalRampDeckTransitionInertiaKgM2", "physicalRampTransitionJointNamePrefix"] {
+        "physicalRampDeckTransitionInertiaKgM2", "physicalRampTransitionJointNamePrefix",
+        "physicalRampMassPropertiesStatus"] {
         let text = _sysml_text(report, name);
         if text == () || text == "" {
             missing.push("traceable SysML text fact " + name);
         }
+    }
+    let cargo_lower_bound = _sysml_number(report, "cargoMassLowerBoundKg");
+    let cargo_bound_exclusive = sysml_requirements::boolean(report,
+        griffin_spec::qualified_attribute_name("cargoMassLowerBoundIsExclusive"));
+    if cargo_lower_bound == () || cargo_lower_bound != 499.0
+        || cargo_bound_exclusive != true {
+        missing.push("public cargo lower bound must remain the exclusive 499 kg threshold");
+    }
+    let ramp_mass_properties_status = _sysml_text(report,
+        "physicalRampMassPropertiesStatus");
+    if ramp_mass_properties_status == () || ramp_mass_properties_status == ""
+        || !ramp_mass_properties_status.contains("study proxy") {
+        missing.push("explicit study-proxy label for physical ramp mass properties");
     }
     let egress_mode = _sysml_text(report, "egressMode");
     if egress_mode != () && !egress_mode.contains("direct top-deck") {
@@ -250,27 +281,43 @@ fn sysml_contract_report() {
             }
         }
     }
-    let general_ids = _sysml_list(report, "moonbaseRequirementIds");
-    let general_count = _sysml_number(report, "moonbaseRequirementUsageCount");
-    if general_count == () || general_count != general_ids.len() {
-        missing.push("general requirement identity list/count mismatch in SysML");
-    }
-    let general_case_name = _sysml_text(report, "moonbaseVerificationCaseName");
-    let general_case = ();
-    if verification_cases != () && general_case_name != () {
-        for verification_case in verification_cases {
-            if _qualified(verification_case) == general_case_name {
-                general_case = verification_case;
-                break;
+    let general_requirements = [];
+    if report.requirement_records != () {
+        for requirement in report.requirement_records {
+            if requirement.element != () && requirement.element.short_name != ()
+                && requirement.element.short_name.starts_with("MB-") {
+                general_requirements.push(requirement);
             }
         }
     }
-    if general_case == () || general_case.verifies == ()
-        || general_count == () || general_case.verifies.len() != general_count {
-        missing.push("Moon Base project SysML verification case does not cover all project requirements");
+    let general_count = general_requirements.len();
+    let general_case = ();
+    let general_case_ambiguous = false;
+    if verification_cases != () && general_count > 0 {
+        for verification_case in verification_cases {
+            if verification_case.verifies == () { continue; }
+            let covers_project = true;
+            for requirement in general_requirements {
+                let covered = false;
+                for target in verification_case.verifies {
+                    if _short_name(target) == _short_name(requirement.qualified_name) {
+                        covered = true;
+                        break;
+                    }
+                }
+                if !covered { covers_project = false; break; }
+            }
+            if covers_project {
+                if general_case != () {
+                    general_case_ambiguous = true;
+                    break;
+                }
+                general_case = verification_case;
+            }
+        }
     }
-    if general_case_name == () || general_case_name == "" {
-        missing.push("Moon Base project SysML verification case name");
+    if general_case == () || general_case_ambiguous || general_case.verifies == () {
+        missing.push("Moon Base project SysML verification case does not cover all project requirements");
     }
     // MB-001/MB-002 are executable source checks, not just coverage rows:
     // every geometry and simulation datum must remain SI, and the composed
@@ -336,14 +383,16 @@ fn sysml_contract_report() {
     if visual_wheel_count == () || visual_wheel_count <= 0 {
         missing.push("positive visual SysML datum visualRoverWheelCount");
     }
-    if report.source_revision_hex == () || report.source_revision_hex == "" {
+    if report.source_revision == () {
         missing.push("non-zero SysML source revision");
     }
     report.sysml_required_count = requirement_usages;
     report.sysml_verification_count = if verification_cases == () { 0 } else { verification_cases.len() };
     report.sysml_verifies = if verification == () { 0 } else { verification.verifies.len() };
     report.sysml_general_required_count = if general_count == () { 0 } else { general_count };
-    report.sysml_general_verifies = if general_case == () { 0 } else { general_case.verifies.len() };
+    report.sysml_general_verifies = if general_case == () || general_case_ambiguous {
+        0
+    } else { general_case.verifies.len() };
     report.sysml_visual_required_count = visual_usages;
     report.sysml_visual_verifies = if visual_case == () { 0 } else { visual_case.verifies.len() };
     report.sysml_visual_wheel_count = visual_wheel_count;
@@ -1391,7 +1440,6 @@ fn runtime_report(doc_id, root) {
         source_files: sysml.source_files,
         source_file_count: if sysml.source_files == () { 0 } else { sysml.source_files.len() },
         source_revision: sysml.source_revision,
-        source_revision_hex: sysml.source_revision_hex,
     };
 
     #{
@@ -1409,7 +1457,6 @@ fn runtime_report(doc_id, root) {
         source_files: sysml_summary.source_files,
         sysml_source_file_count: sysml_summary.source_file_count,
         sysml_source_revision: sysml_summary.source_revision,
-        sysml_source_revision_hex: sysml_summary.source_revision_hex,
         parts: parts.parts,
         part_failures: part_failures,
         layout: layout,
@@ -2047,7 +2094,7 @@ fn visual_report(doc_id, root) {
         }
     }
     #{ok: findings.len() == 0, doc_id: doc_id, root: root,
-      source_revision: source.source_revision_hex, checks: checks.len(),
+      source_revision: source.source_revision, checks: checks.len(),
       failures: findings.len(), findings: findings,
       metrics: #{document_generation: root_record.generation,
                  text_layer: "authored", perspective: "Edit"}}
@@ -2058,7 +2105,7 @@ fn visual_report_live(doc_id, root) {
     if report.ok == () {
         return report;
     }
-    print("GRIFFIN_VISUAL_EVIDENCE source_revision=" + report.source_revision
+    print("GRIFFIN_VISUAL_EVIDENCE source_revision=" + report.source_revision.to_string()
         + " checks=" + report.checks.to_string()
         + " failures=" + report.failures.to_string());
     for finding in report.findings {

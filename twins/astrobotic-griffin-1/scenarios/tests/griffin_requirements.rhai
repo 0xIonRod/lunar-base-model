@@ -55,18 +55,15 @@ fn on_tick(me, ctx) {
     // remaining structural predicates are still Twin Rhai and are not yet a
     // generic typed USD-provider implementation.
     let sysml = report.sysml;
-    // Provenance is a separate typed SysML catalog. Select one requirement ID
-    // through the bounded native projection; the source/rationale/span arrive
-    // as structured evidence without duplicating catalog-qualified literals in
-    // the test.
-    let provenance = sysml_requirements::provenance(sysml, "GR-005");
+    // Provenance follows source-scoped SysML handles. The emitted evidence
+    // retains the requirement handle and each typed source, rather than
+    // copying target identities, locators, or rationale into parallel fields.
+    let provenance_requirement = sysml_requirements::requirement_handle_by_short_name(
+        sysml, "GR-005");
+    let provenance = sysml_requirements::provenance(sysml,
+        if provenance_requirement.ok == true { provenance_requirement.handle } else { () });
     let provenance_record = if provenance.ok == true { provenance.evidence } else { () };
-    let provenance_source = if provenance.ok == true {
-        provenance_record.source_reference
-    } else { () };
-    let provenance_rationale = if provenance.ok == true {
-        provenance_record.rationale
-    } else { () };
+    let provenance_sources = if provenance.ok == true { provenance_record.sources } else { [] };
     print("[griffin-requirements] sysml_ok=" + sysml.sysml_ok
         + " requirements=" + sysml.sysml_required_count
         + " verification_cases=" + sysml.sysml_verification_count
@@ -74,13 +71,11 @@ fn on_tick(me, ctx) {
         + " moonbase_requirements=" + sysml.sysml_general_required_count
         + " moonbase_verifies=" + sysml.sysml_general_verifies
         + " source_files=" + sysml.source_file_count
-        + " source_revision=" + sysml.source_revision_hex
+        + " source_revision=" + sysml.source_revision.to_string()
         + " missing=" + sysml.sysml_missing.len());
     failures.push(expected(sysml.ok == true && sysml.sysml_ok == true,
         "Griffin SysML requirement/verification source is not valid"));
-    failures.push(expected(provenance.ok == true
-        && provenance_source != () && provenance_source != ""
-        && provenance_rationale != () && provenance_rationale != "",
+    failures.push(expected(provenance.ok == true && provenance_sources.len() > 0,
         "typed Griffin requirement provenance catalog is unavailable"));
 
     // Every manifest entry is an individual part test.
@@ -339,18 +334,11 @@ fn on_tick(me, ctx) {
     for result in constraint_evidence {
         evidence_results.push(result);
     }
-    let provenance_evidence_id = if provenance.ok == true {
-        provenance_record.requirement_id + "-provenance-catalog"
-    } else { "provenance-catalog" };
-    let provenance_requirement = if provenance.ok == true {
-        provenance_record.qualified_requirement
-    } else { "requirement-provenance" };
-    evidence_results.push(#{id: provenance_evidence_id,
+    evidence_results.push(#{id: "GR-005-provenance-catalog",
         component: "requirement-provenance",
-        requirement: provenance_requirement,
-        kind: "source", ok: provenance.ok == true
-            && provenance_source != () && provenance_rationale != (),
-        source_reference: provenance_source, rationale: provenance_rationale,
+        requirement: if provenance.ok == true { provenance_record.requirement } else { () },
+        kind: "source", ok: provenance.ok == true && provenance_sources.len() > 0,
+        sources: provenance_sources,
         source_span: if provenance.ok == true { provenance_record.source_span } else { () },
         verification: griffin_spec::verification_case_name()});
     for part in report.parts {
@@ -365,7 +353,7 @@ fn on_tick(me, ctx) {
         verification: griffin_spec::verification_case_name(),
         requirement_count: 4,
         source_files: sysml.source_files,
-        source_revision: sysml.source_revision_hex},
+        source_revision: sysml.source_revision},
         "GRIFFIN REQUIREMENTS", "GRIFFIN_REQUIREMENTS");
     this.done = true;
 }

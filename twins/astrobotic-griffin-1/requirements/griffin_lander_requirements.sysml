@@ -8,6 +8,7 @@ package GriffinLanderRequirements {
     // owns the optional deployable ramp; this file owns the reusable bus,
     // tanks, legs, engines, and solar component assembly.
     part def GriffinLanderComponent {
+        doc /* Public Griffin material describes a medium-class flexible-payload lander with four shock-absorbing legs, seven main engines, and optional rover egress ramps. This package owns reusable lander counts and the presentation/flight ownership boundary; typed component identities and spatial stations are owned by GriffinVisualConfigurationRequirements. */
         attribute componentName : String = "Griffin1";
         attribute componentAsset : String = "vehicles/griffin_1_visual.usda";
         attribute usdRootPath : String = "/Griffin1";
@@ -29,11 +30,6 @@ package GriffinLanderRequirements {
         // for that visual realization only; it is not a flight-structure
         // clearance or manufacturing tolerance.
         attribute visualEnvelopeToleranceM : Real = 0.02;
-        attribute productReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
-        attribute missionReference : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
-        attribute dataSheetReference : String = "https://science.nasa.gov/wp-content/uploads/2023/11/astrobotic-lunar-landers-pug.pdf";
-        attribute sourceFact : String = "Griffin is a medium-class, flexible-payload lander with four shock-absorbing legs, seven main engines and optional rover egress ramps";
-        attribute sourceRationale : String = "This package owns reusable lander counts and presentation/flight ownership; typed instance identities and ordered spatial stations are owned once by GriffinVisualConfigurationRequirements";
     }
 
     requirement def GLR001_BusTopology {
@@ -70,17 +66,17 @@ package GriffinLanderRequirements {
         doc /* GLR-011 [layout] the ordered solar-array roots shall use the signed station positions and outward-facing ordered +90/-90 degree X rotations declared by this component. The sign maps the panel component's +Y cell-face normal onto the +Z/-Z sides; this is a study-frame convention, not a released deployment ICD. */
     }
 
-    requirement glr001 : GLR001_BusTopology { subject lander : GriffinLanderComponent; }
-    requirement glr002 : GLR002_LandingLegs { subject lander : GriffinLanderComponent; }
-    requirement glr003 : GLR003_PropellantTanks { subject lander : GriffinLanderComponent; }
-    requirement glr004 : GLR004_EngineCluster { subject lander : GriffinLanderComponent; }
-    requirement glr005 : GLR005_SolarArrays { subject lander : GriffinLanderComponent; }
-    requirement glr006 : GLR006_MetricEnvelope { subject lander : GriffinLanderComponent; }
-    requirement glr007 : GLR007_Traceability { subject lander : GriffinLanderComponent; }
-    requirement glr008 : GLR008_StationPlacement { subject lander : GriffinLanderComponent; }
-    requirement glr009 : GLR009_ComponentIdentity { subject lander : GriffinLanderComponent; }
-    requirement glr010 : GLR010_LocalFrameAndOwnership { subject lander : GriffinLanderComponent; }
-    requirement glr011 : GLR011_SolarOrientation { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-001'> glr001 : GLR001_BusTopology { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-002'> glr002 : GLR002_LandingLegs { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-003'> glr003 : GLR003_PropellantTanks { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-004'> glr004 : GLR004_EngineCluster { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-005'> glr005 : GLR005_SolarArrays { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-006'> glr006 : GLR006_MetricEnvelope { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-007'> glr007 : GLR007_Traceability { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-008'> glr008 : GLR008_StationPlacement { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-009'> glr009 : GLR009_ComponentIdentity { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-010'> glr010 : GLR010_LocalFrameAndOwnership { subject lander : GriffinLanderComponent; }
+    requirement <'GLR-011'> glr011 : GLR011_SolarOrientation { subject lander : GriffinLanderComponent; }
 
     verification def Verify_GriffinLanderRequirements {
         subject lander : GriffinLanderComponent;

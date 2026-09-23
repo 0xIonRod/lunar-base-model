@@ -86,19 +86,19 @@ package GriffinPropulsionRequirements {
         doc /* GES-007 [geometry] the tapered shell shall span local Y = -0.40 m to +0.10 m, and the adapter plate shall be 2.84 m by 2.84 m by 0.12 m at its declared adapter datum. */
     }
 
-    requirement gpp001 : GPP001_EngineCount { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement gpp002 : GPP002_BellGeometry { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement gpp003 : GPP003_ThrustOwnership { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement gpp004 : GPP004_PropulsionTraceability { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement gpp005 : GPP005_EnginePlacement { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement gpp006 : GPP006_BellAndThroatEnvelope { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement ges001 : GES001_SkirtTopology { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges002 : GES002_SkirtEnvelope { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges003 : GES003_SkirtDatum { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges004 : GES004_BellClearance { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges005 : GES005_SkirtOwnership { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges006 : GES006_RailGeometry { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges007 : GES007_ShellAndAdapterEnvelope { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GPP-001'> gpp001 : GPP001_EngineCount { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-002'> gpp002 : GPP002_BellGeometry { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-003'> gpp003 : GPP003_ThrustOwnership { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-004'> gpp004 : GPP004_PropulsionTraceability { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-005'> gpp005 : GPP005_EnginePlacement { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-006'> gpp006 : GPP006_BellAndThroatEnvelope { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GES-001'> ges001 : GES001_SkirtTopology { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-002'> ges002 : GES002_SkirtEnvelope { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-003'> ges003 : GES003_SkirtDatum { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-004'> ges004 : GES004_BellClearance { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-005'> ges005 : GES005_SkirtOwnership { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-006'> ges006 : GES006_RailGeometry { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-007'> ges007 : GES007_ShellAndAdapterEnvelope { subject skirt : GriffinEngineSkirtComponent; }
 
     verification def Verify_GriffinPropulsionRequirements {
         subject propulsion : GriffinMainPropulsionAssembly;

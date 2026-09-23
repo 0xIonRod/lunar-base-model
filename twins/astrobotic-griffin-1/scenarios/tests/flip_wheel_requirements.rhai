@@ -24,28 +24,32 @@ fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let root = sysml_requirements::text(source, own("usdRootPath"));
-    let names_source = sysml_requirements::text(source, own("namesSource"));
-    let count_source = sysml_requirements::text(source, own("countSource"));
+    let source_owner = sysml_requirements::attribute(source, own("usdRootPath")).record.owner_handle;
+    let names_source = sysml_requirements::string_vector_from_reference(source,
+        source_owner, "wheelNames");
+    let count_source = sysml_requirements::number_from_reference(source,
+        source_owner, "wheelCount");
+    let radius_source = sysml_requirements::number_from_reference(source,
+        source_owner, "wheelRadius");
+    let front_source = sysml_requirements::number_from_reference(source,
+        source_owner, "frontSteeringAngle");
+    let rear_source = sysml_requirements::number_from_reference(source,
+        source_owner, "rearSteeringAngle");
     let strut_name = sysml_requirements::text(source, own("suspensionVisualChild"));
     if strut_name == () || strut_name == "" {
         throw("FlipWheelRequirements::suspensionVisualChild is required");
     }
-    let names = sysml_requirement_checks::source_text_list(source, names_source);
-    let radius_source = rover("visualRoverWheelRadiusM");
-    let front_source = rover("frontSteeringAngleDeg");
-    let rear_source = rover("rearSteeringAngleDeg");
+    let names = if names_source.ok == true { names_source.value } else { [] };
     let xs = sysml_requirement_checks::source_number_list(source, rover("wheelStationX"));
     let ys = sysml_requirement_checks::source_number_list(source, rover("wheelStationY"));
     let zs = sysml_requirement_checks::source_number_list(source, rover("wheelStationZ"));
-    let suspension_component = sysml_requirements::text(source, own("suspensionComponent"));
-    if suspension_component == () || suspension_component == "" {
-        throw("FlipWheelRequirements::suspensionComponent is required");
-    }
     if xs.len() != names.len() || ys.len() != names.len() || zs.len() != names.len() {
         throw("FlipWheelRequirements wheel station datums must match visualWheelNames");
     }
     let checks = [];
-    checks.push(sysml_requirement_checks::source_list_count("FWW-001-count", "wheels", "fww001", VERIFICATION, names_source, count_source));
+    checks.push(#{id: "FWW-001-count", component: "wheels", requirement: "fww001",
+        verification: VERIFICATION, kind: "source_collection_count",
+        actual_count: names.len(), expected_count: count_source.value});
     for axis in ["wheelStationX", "wheelStationY", "wheelStationZ"] {
         checks.push(sysml_requirement_checks::source_list_count("FWW-005-" + axis,
             "wheel", "fww005", VERIFICATION,
@@ -61,7 +65,7 @@ fn on_tick(me, ctx) {
         checks.push(#{id: "FWW-002-" + name + "-radius", component: "wheel",
             requirement: "fww002", verification: VERIFICATION,
             kind: "attribute", path: wheel, attr: "physxVehicleWheel:radius",
-            expected_attr: radius_source, tolerance: 0.002});
+            expected: radius_source.value, tolerance: 0.002});
         checks.push(#{id: "FWW-007-" + name + "-axis", component: "wheel",
             requirement: "fww007", verification: VERIFICATION, kind: "attribute_equals",
             path: wheel + "/Tire", attr: "axis", expected_attr: own("wheelAxis")});
@@ -80,11 +84,13 @@ fn on_tick(me, ctx) {
         checks.push(#{id: "FWW-007-" + name + "-cap-width", component: "wheel",
             requirement: "fww007", verification: VERIFICATION, kind: "attribute",
             path: wheel + "/HubCap", attr: "height", expected_attr: own("hubCapWidthM"), tolerance: 0.002});
-        let steering_source = if name.starts_with("F") { front_source } else { rear_source };
+        let steering_source = if name.starts_with("F") {
+            front_source.value
+        } else { rear_source.value };
         checks.push(#{id: "FWW-003-" + name + "-steering", component: "wheel",
             requirement: "fww003", verification: VERIFICATION,
             kind: "attribute_component", path: wheel, attr: "xformOp:rotateXYZ",
-            index: 1, expected_attr: steering_source, tolerance: 0.002});
+            index: 1, expected: steering_source, tolerance: 0.002});
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("FWW-005-" + name + "-x", station, 0, xs[index]));
             checks.push(position("FWW-005-" + name + "-y", station, 1, ys[index]));

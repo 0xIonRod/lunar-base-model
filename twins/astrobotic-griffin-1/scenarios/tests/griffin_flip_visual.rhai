@@ -282,8 +282,7 @@ fn on_tick(me, ctx) {
         kind: "attribute_equals",
         path: root + "/Environment/Looks/RegolithSurface/Shader",
         attr: "info:wgsl:sourceAsset",
-        expected: sysml_requirements::text(source,
-            griffin_spec::qualified_attribute_name("visualTerrainShaderAsset")) });
+        expected: griffin_spec::visual_terrain_shader_asset() });
     checks.push(#{ id: "GV-006-terrain-mode", component: "context",
         requirement: "gv006",
         verification: "Verify_GriffinVisualRequirements",

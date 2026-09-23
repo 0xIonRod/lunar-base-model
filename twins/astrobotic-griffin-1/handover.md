@@ -9,6 +9,24 @@ Status: temporary implementation handover; **Griffin rebuild not complete**
 Working branch: `codex/astrobotic-griffin-1-twin`
 Package: `twins/astrobotic-griffin-1`
 
+## Current agent continuation
+
+For the current SysML/KerML and LunCoSim implementation state, read these
+repository-level reports before editing the Twin:
+
+1. [`handover/griffin-kerml-architecture-and-implementation-report-2026-09-22.md`](../../handover/griffin-kerml-architecture-and-implementation-report-2026-09-22.md)
+   — current bounded neutral IR, exact tool/API boundary, validation commands,
+   and the ordered Griffin implementation plan.
+2. [`handover/griffin-sysml-driven-workflow-2026-09-22.md`](../../handover/griffin-sysml-driven-workflow-2026-09-22.md)
+   — Twin definition of done, source-of-truth rules, model decomposition, and
+   acceptance evidence requirements.
+
+The first report supersedes any older statement that the neutral constraint IR
+is merely future work. LunCoSim `main` contains the bounded implementation at
+`f244cf683`; full KerML semantics remain a generic follow-up. These handover
+reports are working-tree continuity notes and are intentionally not committed
+by the current agent.
+
 ## Executive result
 
 The latest incremental pass keeps the runtime boundary generic: raw altimeter

@@ -6,13 +6,13 @@ package FlipSensorPowerRequirements {
         attribute usdRootPath : String = "/World/FLIP";
         attribute componentAsset : String = "components/rover/flip_sensor_mast_visual.usda";
         attribute solarComponentAsset : String = "components/rover/flip_solar_panel_visual.usda";
-        attribute sourceComponent : String = "FlipRequirements::FlipRover";
+        ref part sourceRover : FlipRequirements::FlipRover;
         attribute mastPath : String = "/World/FLIP/SensorMast";
         attribute solarPath : String = "/World/FLIP/SolarArray";
-        attribute mastHeightSource : String = "FlipRequirements::FlipRover::sensorMastHeightM";
-        attribute solarMountSource : String = "FlipRequirements::FlipRover::solarArrayMount";
-        attribute solarTiltSource : String = "FlipRequirements::FlipRover::solarArrayTiltDeg";
-        attribute solarStatusSource : String = "FlipRequirements::FlipRover::solarArrayMode";
+        ref attribute mastHeight : FlipRequirements::FlipRover::sensorMastHeightM;
+        ref attribute solarMount : FlipRequirements::FlipRover::solarArrayMount;
+        ref attribute solarTilt : FlipRequirements::FlipRover::solarArrayTiltDeg;
+        ref attribute solarStatus : FlipRequirements::FlipRover::solarArrayMode;
         attribute mastMountCenterYM : Real = 0.46;
         attribute mastMountCenterZM : Real = -0.28;
         attribute mastChildNames : String[3] = ("MastPost", "SensorHead", "SensorAntenna");
@@ -61,12 +61,12 @@ package FlipSensorPowerRequirements {
         doc /* FSP-006 [geometry] the rover panel shall expose a 3.30 m by 0.12 m by 2.10 m backsheet, a 2.84 m by 0.04 m by 1.64 m cell surface, and a 3.40 m by 0.16 m by 0.16 m fold hinge. */
     }
 
-    requirement fsp001 : FSP001_MastStructure { subject sensorPower : FlipSensorPowerAssembly; }
-    requirement fsp002 : FSP002_SolarStructure { subject sensorPower : FlipSensorPowerAssembly; }
-    requirement fsp003 : FSP003_MastDatum { subject sensorPower : FlipSensorPowerAssembly; }
-    requirement fsp004 : FSP004_SensorPowerTraceability { subject sensorPower : FlipSensorPowerAssembly; }
-    requirement fsp005 : FSP005_MastGeometry { subject sensorPower : FlipSensorPowerAssembly; }
-    requirement fsp006 : FSP006_SolarPanelGeometry { subject sensorPower : FlipSensorPowerAssembly; }
+    requirement <'FSP-001'> fsp001 : FSP001_MastStructure { subject sensorPower : FlipSensorPowerAssembly; }
+    requirement <'FSP-002'> fsp002 : FSP002_SolarStructure { subject sensorPower : FlipSensorPowerAssembly; }
+    requirement <'FSP-003'> fsp003 : FSP003_MastDatum { subject sensorPower : FlipSensorPowerAssembly; }
+    requirement <'FSP-004'> fsp004 : FSP004_SensorPowerTraceability { subject sensorPower : FlipSensorPowerAssembly; }
+    requirement <'FSP-005'> fsp005 : FSP005_MastGeometry { subject sensorPower : FlipSensorPowerAssembly; }
+    requirement <'FSP-006'> fsp006 : FSP006_SolarPanelGeometry { subject sensorPower : FlipSensorPowerAssembly; }
 
     verification def Verify_FLIPSensorPowerRequirements {
         subject sensorPower : FlipSensorPowerAssembly;

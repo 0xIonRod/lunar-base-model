@@ -1,4 +1,6 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
+import "lunco://scripting/tools/authoring_measurements" as authoring_measurements;
+import "lunco://scripting/tools/mechanical_relations" as mechanical_relations;
 // Twin-owned independent Griffin ramp verification.
 // SysML supplies the normative constraints and values; Rhai binds FLIP and
 // composed-USD observations to the generic structured requirements evaluator.
@@ -48,6 +50,16 @@ fn _constraint(id, requirement, name, bindings) {
         bindings, "derived", 0.0)
 }
 
+fn _measurement_value(observation, field, label) {
+    if observation == () || observation.ok != true || observation[field] == () {
+        return #{provider: "derived_geometry", state: "unavailable",
+            detail: if observation == () || observation.message == () {
+                label + " composed collider measurement is unavailable"
+            } else { observation.message }};
+    }
+    #{provider: "derived_geometry", state: "value", value: observation[field]}
+}
+
 fn _maximum_abs(values) {
     if values == () || values.len() == 0 { return (); }
     let maximum = 0.0;
@@ -64,8 +76,23 @@ fn on_tick(me, ctx) {
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceLengthM",
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceWidthM",
         "GriffinRampRequirements::GriffinEgressRamp::rampWheelClearanceM",
-        "GriffinRampRequirements::GriffinEgressRamp::physicalRampDeckTransitionOverlapM",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampDeckTransitionRequiredOverlapM",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampDeckTransitionLengthM",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampDeckTransitionInterfaceToleranceM",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampTerrainContactToleranceM",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampMountY",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampPortDeploymentAngleRad",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampStarboardDeploymentAngleRad",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampMassKg",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampInertiaXKgM2",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampInertiaYKgM2",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampInertiaZKgM2",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceCenterYM",
+        "Griffin1Requirements::PublicMissionContext::landingComTouchdownY",
+        "Griffin1Requirements::PublicMissionContext::egressApronSurfaceY",
         "GriffinRampRequirements::GriffinEgressRamp::physicalRampTransitionChildName",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampTransitionContactChildName",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampTransitionJointNamePrefix",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadCount",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadNamePrefix",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadWidthM",
@@ -125,9 +152,27 @@ fn on_tick(me, ctx) {
     let wheel_width = sysml_requirements::number(source,
         "FlipRequirements::FlipRover::visualRoverWheelWidthM");
     let wheel_clearance = _source_number(source, "rampWheelClearanceM");
-    let transition_overlap = _source_number(source, "physicalRampDeckTransitionOverlapM");
-    let ramp_surface_length = _source_number(source, "rampSurfaceLengthM");
+    let transition_required_overlap = _source_number(source,
+        "physicalRampDeckTransitionRequiredOverlapM");
+    let transition_length = _source_number(source, "physicalRampDeckTransitionLengthM");
+    let transition_tolerance = _source_number(source,
+        "physicalRampDeckTransitionInterfaceToleranceM");
+    let terrain_contact_tolerance = _source_number(source,
+        "physicalRampTerrainContactToleranceM");
+    let touchdown_com_y = sysml_requirements::number(source,
+        "Griffin1Requirements::PublicMissionContext::landingComTouchdownY");
+    let terrain_surface_y = sysml_requirements::number(source,
+        "Griffin1Requirements::PublicMissionContext::egressApronSurfaceY");
+    let physical_mount_y = _source_number(source, "physicalRampMountY");
+    let surface_center_y = _source_number(source, "rampSurfaceCenterYM");
+    let physical_hinge_limit_rad = _source_number(source, "rampMaxDeploymentAngleRad");
+    let physical_ramp_mass = _source_number(source, "physicalRampMassKg");
+    let physical_ramp_inertia_x = _source_number(source, "physicalRampInertiaXKgM2");
+    let physical_ramp_inertia_y = _source_number(source, "physicalRampInertiaYKgM2");
+    let physical_ramp_inertia_z = _source_number(source, "physicalRampInertiaZKgM2");
     let transition_name = _source_text(source, "physicalRampTransitionChildName");
+    let transition_contact_name = _source_text(source, "physicalRampTransitionContactChildName");
+    let transition_joint_prefix = _source_text(source, "physicalRampTransitionJointNamePrefix");
     let child_names = sysml_requirement_checks::source_text_list(source,
         _source_attr("childNames"));
     let tread_count = _source_number(source, "assemblyTreadCount");
@@ -158,16 +203,43 @@ fn on_tick(me, ctx) {
     let gusset_y = _source_number(source, "assemblyHingeGussetCenterYM");
     let gusset_offset = _source_number(source, "assemblyHingeGussetOffsetZM");
     let half_track = _maximum_abs(wheel_z);
-    if ramp_width == () || half_track == () || wheel_width == ()
-        || wheel_clearance == () || wheel_z.len() != 4
-        || wheel_width <= 0.0 || wheel_clearance <= 0.0
-        || transition_overlap == () || ramp_surface_length == () || transition_name == ()
-        || transition_name == "" || child_names.len() == 0
-        || tread_count == () || tread_count < 2.0 || tread_width == ()
-        || tread_height == () || track_width == () || tread_first_x == ()
-        || tread_pitch == () || tread_prefix == () || tread_prefix == ""
-        || tread_width <= 0.0 || tread_height <= 0.0 || track_width <= 0.0
-        || tread_pitch <= 0.0 {
+    let missing_vehicle_datums = ramp_width == () || half_track == ()
+        || wheel_width == () || wheel_clearance == () || wheel_z.len() != 4
+        || touchdown_com_y == () || terrain_surface_y == ()
+        || physical_mount_y == () || surface_center_y == ();
+    if missing_vehicle_datums {
+        throw("GriffinRampRequirements Griffin/FLIP datums are incomplete");
+    }
+    let invalid_transition_datums = transition_required_overlap == ()
+        || transition_length == () || transition_tolerance == ()
+        || terrain_contact_tolerance == () || physical_hinge_limit_rad == ()
+        || physical_ramp_mass == () || physical_ramp_inertia_x == ()
+        || physical_ramp_inertia_y == () || physical_ramp_inertia_z == ()
+        || transition_name == () || transition_contact_name == ()
+        || transition_joint_prefix == ();
+    if invalid_transition_datums {
+        throw("GriffinRampRequirements transition/mass datums are incomplete");
+    }
+    let invalid_transition_values = transition_required_overlap <= 0.0
+        || transition_required_overlap >= transition_length
+        || transition_tolerance <= 0.0 || terrain_contact_tolerance <= 0.0
+        || physical_hinge_limit_rad <= 0.0 || transition_name == ""
+        || transition_contact_name == "" || transition_joint_prefix == "";
+    if invalid_transition_values {
+        throw("GriffinRampRequirements transition datums are invalid");
+    }
+    let missing_track_datums = child_names.len() == 0 || tread_count == ()
+        || tread_width == () || tread_height == () || track_width == ()
+        || tread_first_x == () || tread_pitch == () || tread_prefix == ();
+    if missing_track_datums {
+        throw("GriffinRampRequirements track datums are incomplete");
+    }
+    let invalid_track_datums = tread_count < 2.0 || tread_width <= 0.0
+        || tread_height <= 0.0 || track_width <= 0.0 || tread_pitch <= 0.0
+        || tread_prefix == "" || wheel_width <= 0.0 || wheel_clearance <= 0.0
+        || physical_ramp_mass <= 0.0 || physical_ramp_inertia_x <= 0.0
+        || physical_ramp_inertia_y <= 0.0 || physical_ramp_inertia_z <= 0.0;
+    if invalid_track_datums {
         throw("GriffinRampRequirements ramp/FLIP clearance datums are incomplete");
     }
     if beam_width == () || beam_height == ()
@@ -198,22 +270,108 @@ fn on_tick(me, ctx) {
     let deck_observation = griffin_visual_builder::physical_top_deck_collider_observation(
         (), ROOT);
     let deck_profile_compatible = if deck_observation.ok == true
-        && deck_observation.state == "pass" {
-        #{provider: "usd", state: "value", value: true}
+        && (deck_observation.state == "pass" || deck_observation.state == "fail") {
+        #{provider: "usd", state: "value", value: deck_observation.state == "pass"}
     } else {
         #{provider: "usd", state: "unavailable",
           detail: "source-derived perimeter and rover platform colliders have not passed composed Editor readback"}
     };
-    checks.push(_constraint("GRR-012-source-transition", "grr012",
-        "GRC012_TransitionOverlapWithinSurface",
-        #{overlapM: #{provider: "usd", state: "unavailable",
-              detail: "composed TransitionPlate dimensions are not exposed by a typed USD provider"},
-          requiredOverlapM: #{provider: "derived_geometry", state: "unavailable",
-              detail: "required transition length must be bound to composed adapter edge, hinge, and source contact overlap"},
-          surfaceLengthM: #{provider: "source_literal", state: "value",
-              value: ramp_surface_length},
-          deckProfileCompatible: deck_profile_compatible}));
     let pi = 3.141592653589793;
+    for side in ["port", "starboard"] {
+        let side_name = if side == "port" { "Port" } else { "Starboard" };
+        let ramp = ROOT + "/EgressRamp" + side_name;
+        let transition_root = ramp + "/" + transition_name;
+        let transition_contact = transition_root + "/" + transition_contact_name;
+        let ramp_track = ramp + "/RampTrackPort";
+        let observation = authoring_measurements::interface_geometry_observation((), #{
+            kind: "interface_geometry",
+            deck_path: ROOT + "/RoverPayloadDeckCollider",
+            transition_path: transition_contact,
+            ramp_path: ramp_track,
+            side: side,
+            travel_axis: 0,
+            face_axis: 1,
+            lateral_axis: 2,
+        });
+        checks.push(_constraint("GRR-012-" + side + "-transition-interface", "grr012",
+            "GRC012_ComposedDeckTransitionFit",
+            #{measuredOverlapM: _measurement_value(observation, "measured_overlap_m", side + " deck overlap"),
+              requiredOverlapM: transition_required_overlap,
+              measuredTransitionLengthM: _measurement_value(observation,
+                  "measured_transition_length_m", side + " transition length"),
+              requiredTransitionLengthM: transition_length,
+              transitionLengthToleranceM: transition_tolerance,
+              deckTopStepM: _measurement_value(observation, "deck_top_step_m", side + " deck top step"),
+              interfaceToleranceM: transition_tolerance,
+              hingeGapM: _measurement_value(observation, "hinge_gap_m", side + " hinge seam"),
+              lateralCoverageM: _measurement_value(observation,
+                  "lateral_coverage_m", side + " lateral coverage"),
+              requiredLateralCoverageM: _measurement_value(observation,
+                  "deck_lateral_span_m", side + " adapter width"),
+              deckProfileCompatible: deck_profile_compatible}));
+
+        let physical_angle = _source_number(source,
+            if side == "port" { "physicalRampPortDeploymentAngleRad" }
+            else { "physicalRampStarboardDeploymentAngleRad" });
+        let side_root = ROOT + "/EgressRamp" + side_name;
+        checks.push(_constraint("GRR-011-" + side + "-mass-properties", "grr011",
+            "GRC011_RampMassPropertiesArePositive",
+            #{massKg: physical_ramp_mass,
+              inertiaXKgM2: physical_ramp_inertia_x,
+              inertiaYKgM2: physical_ramp_inertia_y,
+              inertiaZKgM2: physical_ramp_inertia_z}));
+        checks.push(#{id: "GRR-011-" + side + "-mass-realization", component: "ramp",
+            requirement: "grr011", verification: VERIFICATION, kind: "attribute",
+            path: side_root, attr: "physics:mass",
+            expected_attr: _source_attr("physicalRampMassKg"), tolerance: 0.002});
+        for inertia_component in [
+            #{index: 0, attr: "physicalRampInertiaXKgM2"},
+            #{index: 1, attr: "physicalRampInertiaYKgM2"},
+            #{index: 2, attr: "physicalRampInertiaZKgM2"},
+        ] {
+            checks.push(#{id: "GRR-011-" + side + "-inertia-" + inertia_component.index.to_string(),
+                component: "ramp", requirement: "grr011", verification: VERIFICATION,
+                kind: "attribute_component", path: side_root,
+                attr: "physics:diagonalInertia", index: inertia_component.index,
+                expected_attr: _source_attr(inertia_component.attr), tolerance: 0.02});
+        }
+        checks.push(_constraint("GRR-011-" + side + "-deployment-limit", "grr011",
+            "GRC005_DeploymentCommandWithinLimit",
+            #{commandRad: physical_angle,
+              limitRad: physical_hinge_limit_rad}));
+        let local_tip_x = if side == "port" { _source_number(source, "rampSurfaceLengthM") }
+            else { -_source_number(source, "rampSurfaceLengthM") };
+        let track_thickness = _source_number(source, "rampSurfaceThicknessM");
+        let bevel_run = if physical_angle == () || track_thickness == () { () }
+            else { mechanical_relations::planar_horizontal_face_bevel_run(
+                track_thickness, physical_angle) };
+        let tip_top = if physical_angle == () || track_thickness == () { () } else {
+            mechanical_relations::planar_rigid_transform_point(
+                vec3(0.0, touchdown_com_y + physical_mount_y, 0.0),
+                vec3(local_tip_x, surface_center_y + track_thickness / 2.0, 0.0),
+                physical_angle)
+        };
+        let direction = if side == "port" { 1.0 } else { -1.0 };
+        let tip_bottom_x = if bevel_run == () { () } else {
+            direction * (_source_number(source, "rampSurfaceLengthM") - bevel_run)
+        };
+        let tip_bottom = if tip_bottom_x == () || track_thickness == () { () } else {
+            mechanical_relations::planar_rigid_transform_point(
+                vec3(0.0, touchdown_com_y + physical_mount_y, 0.0),
+                vec3(tip_bottom_x, surface_center_y - track_thickness / 2.0, 0.0),
+                physical_angle)
+        };
+        checks.push(_constraint("GRR-010-" + side + "-tip-contact", "grr010",
+            "GRC010_PhysicalRampReachesTerrain",
+            #{rampTipTopYM: _measurement_value(
+                  if tip_top == () { () } else { #{ok: true, ramp_tip_top_y_m: tip_top.y} },
+                  "ramp_tip_top_y_m", side + " ramp-tip top height"),
+              rampTipBottomYM: _measurement_value(
+                  if tip_bottom == () { () } else { #{ok: true, ramp_tip_bottom_y_m: tip_bottom.y} },
+                  "ramp_tip_bottom_y_m", side + " ramp-tip bottom height"),
+              terrainSurfaceYM: terrain_surface_y,
+              contactToleranceM: terrain_contact_tolerance}));
+    }
     for side in ["Port", "Starboard"] {
         let ramp = ROOT + "/EgressRamp" + side;
         let side_lower = if side == "Port" { "port" } else { "starboard" };
@@ -300,24 +458,64 @@ fn on_tick(me, ctx) {
             #{name: "RampTrackStarboard", center_z: -half_track},
         ] {
             let track_path = ramp + "/" + track.name;
+            let track_direction = if side == "Port" { 1.0 } else { -1.0 };
+            checks.push(_check("GRR-006-" + side + "-" + track.name + "-mesh",
+                "geometry", "grr006", "exists", track_path));
+            checks[checks.len() - 1].expected_type = "Mesh";
+            checks.push(#{id: "GRR-006-" + side + "-" + track.name + "-collision",
+                component: "geometry", requirement: "grr006", verification: VERIFICATION,
+                kind: "attribute_equals", path: track_path,
+                attr: "physics:collisionEnabled", expected: true});
+            checks.push(#{id: "GRR-006-" + side + "-" + track.name + "-approximation",
+                component: "geometry", requirement: "grr006", verification: VERIFICATION,
+                kind: "attribute_equals", path: track_path,
+                attr: "physics:approximation", expected: "convexHull"});
             for dim in [
                 #{name: "length", index: 0, expected_attr: "rampSurfaceLengthM"},
                 #{name: "thickness", index: 1, expected_attr: "rampSurfaceThicknessM"},
                 #{name: "width", index: 2, expected_attr: "assemblyTrackWidthM"},
             ] {
-                checks.push(#{id: "GRR-006-" + side + "-" + track.name + "-" + dim.name,
-                    component: "geometry", requirement: "grr006", verification: VERIFICATION,
-                    kind: "extent_component", path: track_path, index: dim.index,
-                    multiplier: 2.0, expected_attr: _source_attr(dim.expected_attr), tolerance: 0.002});
+                checks.push(sysml_requirement_checks::collision_bounds_component(
+                    "GRR-006-" + side + "-" + track.name + "-" + dim.name,
+                    "geometry", "grr006", VERIFICATION, track_path, dim.index,
+                    _source_attr(dim.expected_attr), 2.0, 0.002));
+            }
+            let half_length = _source_number(source, "rampSurfaceLengthM") / 2.0;
+            let half_thickness = _source_number(source, "rampSurfaceThicknessM") / 2.0;
+            let toe_bevel_run = mechanical_relations::planar_horizontal_face_bevel_run(
+                _source_number(source, "rampSurfaceThicknessM"),
+                _source_number(source, if side == "Port" {
+                    "physicalRampPortDeploymentAngleRad"
+                } else { "physicalRampStarboardDeploymentAngleRad" }));
+            for point_check in [
+                #{name: "toe-top-x", point: 2, component: 0,
+                  expected: track_direction * half_length},
+                #{name: "toe-bottom-x", point: 3, component: 0,
+                  expected: track_direction * (half_length - toe_bevel_run)},
+                #{name: "toe-top-y", point: 2, component: 1,
+                  expected: half_thickness},
+                #{name: "toe-bottom-y", point: 3, component: 1,
+                  expected: -half_thickness},
+            ] {
+                checks.push(sysml_requirement_checks::array_component(
+                    "GRR-006-" + side + "-" + track.name + "-" + point_check.name,
+                    "geometry", "grr006", VERIFICATION, track_path,
+                    "points", [point_check.point, point_check.component],
+                    point_check.expected, 0.002));
             }
             checks.push(_attribute_component("GRR-006-" + side + "-" + track.name + "-hinge-station",
                 "grr006", track_path, "xformOp:translate", 0,
-                _source_number(source, "rampSurfaceLengthM") / 2.0));
+                track_direction * half_length));
             checks.push(_attribute_component("GRR-006-" + side + "-" + track.name + "-vertical-station",
                 "grr006", track_path, "xformOp:translate", 1,
                 _source_number(source, "rampSurfaceCenterYM")));
             checks.push(_attribute_component("GRR-006-" + side + "-" + track.name + "-station",
                 "grr006", track_path, "xformOp:translate", 2, track.center_z));
+            for index in 0..3 {
+                checks.push(_attribute_component(
+                    "GRR-006-" + side + "-" + track.name + "-unit-scale-" + index.to_string(),
+                    "geometry", "grr006", track_path, "xformOp:scale", index, 1.0));
+            }
         }
         for index in 0..tread_count.to_int() {
             let x = tread_first_x + tread_pitch * index;

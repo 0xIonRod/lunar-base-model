@@ -19,6 +19,7 @@ package GriffinLandingLegRequirements {
     }
 
     part def GriffinLandingLegAssembly {
+        doc /* Public Griffin material confirms four shock-absorbing legs. The legs are a repeated load-bearing subassembly with an independent visual/collision contract and a mount datum at each bus corner; source links are owned by the typed requirement-evidence catalog. */
         attribute usdRootPath : String = "/World/Griffin1";
         attribute componentAsset : String = "components/lander/griffin_landing_leg_visual.usda";
         attribute childNames : GriffinLandingLegChild[8] =
@@ -68,9 +69,6 @@ package GriffinLandingLegRequirements {
         attribute footPadPlateCenterYM : Real = -1.93;
         attribute collisionPolicy : String = "flight leg and pad colliders own contact; visual struts remain presentation geometry";
         attribute placementFrame : String = "signed X/Z body axes; local Y is vertical";
-        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
-        attribute sourceFact : String = "Griffin has four legs that absorb shock and stabilize the lander during touchdown";
-        attribute sourceRationale : String = "Legs are a repeated load-bearing subassembly with an independent visual/collision contract and a mount datum at each bus corner";
         attribute geometryStatus : String = "metric visual study proxy; shock absorber dimensions are not public";
     }
 
@@ -125,14 +123,14 @@ package GriffinLandingLegRequirements {
         doc /* GLL-008 [contact geometry] each dynamics leg root shall match the ordered COM-frame physicalLegStations and physicalLegStationRotationYDeg, and shall use a hidden Y-axis cylinder contact proxy whose radius, height, and leg-local center exactly match the source-owned visible FootPad cylinder within the authored tolerances. The visual LandingLeg component and hidden contact proxy are both derived from these SysML datums; legacy strut and capsule proxies shall not also own terrain contact. The 0.92 m by 0.72 m load plate remains visible geometry above the pad. These are replaceable study dimensions because the supplier leg ICD is not public. */
     }
 
-    requirement gll001 : GLL001_LegCount { subject legs : GriffinLandingLegAssembly; }
-    requirement gll002 : GLL002_LegStructure { subject legs : GriffinLandingLegAssembly; }
-    requirement gll003 : GLL003_LegFrame { subject legs : GriffinLandingLegAssembly; }
-    requirement gll004 : GLL004_LegTraceability { subject legs : GriffinLandingLegAssembly; }
-    requirement gll005 : GLL005_LegPlacement { subject legs : GriffinLandingLegAssembly; }
-    requirement gll006 : GLL006_StrutGeometry { subject legs : GriffinLandingLegAssembly; }
-    requirement gll007 : GLL007_ShockPistonGeometry { subject legs : GriffinLandingLegAssembly; }
-    requirement gll008 : GLL008_FootPadGeometry { subject legs : GriffinLandingLegAssembly; }
+    requirement <'GLL-001'> gll001 : GLL001_LegCount { subject legs : GriffinLandingLegAssembly; }
+    requirement <'GLL-002'> gll002 : GLL002_LegStructure { subject legs : GriffinLandingLegAssembly; }
+    requirement <'GLL-003'> gll003 : GLL003_LegFrame { subject legs : GriffinLandingLegAssembly; }
+    requirement <'GLL-004'> gll004 : GLL004_LegTraceability { subject legs : GriffinLandingLegAssembly; }
+    requirement <'GLL-005'> gll005 : GLL005_LegPlacement { subject legs : GriffinLandingLegAssembly; }
+    requirement <'GLL-006'> gll006 : GLL006_StrutGeometry { subject legs : GriffinLandingLegAssembly; }
+    requirement <'GLL-007'> gll007 : GLL007_ShockPistonGeometry { subject legs : GriffinLandingLegAssembly; }
+    requirement <'GLL-008'> gll008 : GLL008_FootPadGeometry { subject legs : GriffinLandingLegAssembly; }
 
     verification def Verify_GriffinLandingLegRequirements {
         subject legs : GriffinLandingLegAssembly;

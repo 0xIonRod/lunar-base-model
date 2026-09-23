@@ -22,6 +22,14 @@ package GriffinSimulationAccuracyRequirements {
             and maximumHorizontalDriftM <= maximumHorizontalDriftLimitM;
     }
 
+    constraint def GR037_LandingTargetDatumMatchesSource {
+        in authoredTargetY : Real;
+        in sourceTargetY : Real;
+        in toleranceM : Real;
+        authoredTargetY >= sourceTargetY - toleranceM
+            and authoredTargetY <= sourceTargetY + toleranceM;
+    }
+
     // Domain-owned requirement definitions. Griffin1Requirements owns only
     // the integrated system subject, requirement usages, and verification.
 
@@ -30,7 +38,7 @@ package GriffinSimulationAccuracyRequirements {
     }
 
     requirement def GR021_MassProperties {
-        doc /* GR-021 [physics planned] every dynamic body has finite positive mass, center of mass, and inertia; report planned until the generic query exposes all fields. Source: rigid-body physics contract. Assumption: the current inherited mass proxy is temporary; no flight acceptance is claimed until all fields are queryable and checked. */
+        doc /* GR-021 [physics planned] every dynamic body has finite positive mass, center of mass, and inertia in its declared body frame. QueryUsdPrim can read authored mass-property fields; this requirement remains planned until each body's COM and inertia are sourced, composed, frame-checked, and verified against the model. The Griffin ramp's mass and diagonal inertia are now explicit replaceable Twin study proxies, not supplier data or acceptance evidence. Source: rigid-body physics contract. */
     }
 
     requirement def GR022_SupportPolygon {
@@ -59,21 +67,35 @@ package GriffinSimulationAccuracyRequirements {
         require GR036_LandingStabilityWithinBounds;
     }
 
+    requirement def GR037_LandingTargetDatum {
+        doc /* GR-037 [simulation setup] the mission's authored landing-target Y datum shall agree with the SysML touchdown COM datum within the source-owned tolerance before descent starts. This is a setup consistency check, not evidence that the vehicle has landed or that the touchdown dynamics are accurate. */
+        attribute landingTargetDatumToleranceM : Real = 0.001;
+        require GR037_LandingTargetDatumMatchesSource;
+    }
+
 
     // System integration requirement usages owned by this domain.
-    requirement gr008 : GR008_AttitudeCases { subject rover : HostedRoverInterface; }
-    requirement gr021 : GR021_MassProperties { subject lander : Griffin1Lander; }
-    requirement gr022 : GR022_SupportPolygon { subject lander : Griffin1Lander; }
-    requirement gr023 : GR023_ContactContinuity { subject lander : Griffin1Lander; }
-    requirement gr027 : GR027_PropulsionAlignment { subject lander : Griffin1Lander; }
-    requirement gr031 : GR031_DeterministicVerdict { subject rover : HostedRoverInterface; }
-    requirement gr036 : GR036_LandingStability { subject lander : Griffin1Lander; }
+    requirement <'GR-008'> gr008 : GR008_AttitudeCases { subject rover : HostedRoverInterface; }
+    requirement <'GR-021'> gr021 : GR021_MassProperties { subject lander : Griffin1Lander; }
+    requirement <'GR-022'> gr022 : GR022_SupportPolygon { subject lander : Griffin1Lander; }
+    requirement <'GR-023'> gr023 : GR023_ContactContinuity { subject lander : Griffin1Lander; }
+    requirement <'GR-027'> gr027 : GR027_PropulsionAlignment { subject lander : Griffin1Lander; }
+    requirement <'GR-031'> gr031 : GR031_DeterministicVerdict { subject rover : HostedRoverInterface; }
+    requirement <'GR-036'> gr036 : GR036_LandingStability { subject lander : Griffin1Lander; }
+    requirement <'GR-037'> gr037 : GR037_LandingTargetDatum { subject lander : Griffin1Lander; }
 
 
     verification def Verify_GriffinLandingStability {
         subject lander : Griffin1Lander;
         objective {
             verify GriffinSimulationAccuracyRequirements::gr036;
+        }
+    }
+
+    verification def Verify_GriffinLandingTargetDatum {
+        subject lander : Griffin1Lander;
+        objective {
+            verify gr037;
         }
     }
 

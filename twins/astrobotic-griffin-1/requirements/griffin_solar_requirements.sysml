@@ -4,6 +4,7 @@ package GriffinSolarRequirements {
     private import ScalarValues::String;
 
     part def GriffinSolarArrayAssembly {
+        doc /* Public Griffin material identifies the triple-junction solar-cell and lithium-ion power concept. The solar arrays remain an independently replaceable visual/power interface with a mirrored pair and explicit station datums; source links are owned by the typed requirement-evidence catalog. */
         attribute usdRootPath : String = "/World/Griffin1";
         attribute componentAsset : String = "components/lander/griffin_solar_panel_visual.usda";
         attribute childNames : String[14] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "MountBracket", "HingeBar", "MountLink");
@@ -42,9 +43,6 @@ package GriffinSolarRequirements {
         attribute cellFaceNormal : String = "+Y in component frame; outward after signed root X rotation onto the signed Z side";
         attribute collisionPolicy : String = "panel, cells, dividers, and bracket are render-only; electrical power owner is separate";
         attribute deploymentStatus : String = "fixed visual study state; flight deployment state TBD";
-        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
-        attribute sourceFact : String = "Griffin uses triple-junction solar cells and a lithium-ion battery";
-        attribute sourceRationale : String = "Solar panels are an independently replaceable visual/power interface with a mirrored pair and explicit station datums";
         attribute geometryStatus : String = "metric visual study proxy; panel cell layout and deployment kinematics are not public";
     }
 
@@ -73,14 +71,14 @@ package GriffinSolarRequirements {
         doc /* GSA-008 [interface geometry] each panel shall expose a render-only Z-axis hinge bar of radius 0.10 m and length 2.10 m at local Y = -0.18 m, plus a 0.20 m by 0.36 m by 0.18 m mount link at the declared local datum. These are explicit study assumptions because the public Griffin source confirms the solar-array concept but does not publish the deployment/hinge ICD. */
     }
 
-    requirement gsa001 : GSA001_ArrayCount { subject arrays : GriffinSolarArrayAssembly; }
-    requirement gsa002 : GSA002_ArrayStructure { subject arrays : GriffinSolarArrayAssembly; }
-    requirement gsa003 : GSA003_ArraySymmetry { subject arrays : GriffinSolarArrayAssembly; }
-    requirement gsa004 : GSA004_ArrayTraceability { subject arrays : GriffinSolarArrayAssembly; }
-    requirement gsa005 : GSA005_ArrayPlacement { subject arrays : GriffinSolarArrayAssembly; }
-    requirement gsa006 : GSA006_PanelEnvelope { subject arrays : GriffinSolarArrayAssembly; }
-    requirement gsa007 : GSA007_CellGridAndMount { subject arrays : GriffinSolarArrayAssembly; }
-    requirement gsa008 : GSA008_HingeAndStandoff { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-001'> gsa001 : GSA001_ArrayCount { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-002'> gsa002 : GSA002_ArrayStructure { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-003'> gsa003 : GSA003_ArraySymmetry { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-004'> gsa004 : GSA004_ArrayTraceability { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-005'> gsa005 : GSA005_ArrayPlacement { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-006'> gsa006 : GSA006_PanelEnvelope { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-007'> gsa007 : GSA007_CellGridAndMount { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-008'> gsa008 : GSA008_HingeAndStandoff { subject arrays : GriffinSolarArrayAssembly; }
 
     verification def Verify_GriffinSolarRequirements {
         subject arrays : GriffinSolarArrayAssembly;

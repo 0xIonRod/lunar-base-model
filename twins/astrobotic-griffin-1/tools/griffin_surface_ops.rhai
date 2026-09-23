@@ -193,7 +193,7 @@ fn repeatability_contract() {
     let source = query("ValidateSysml", #{path: "twin://" + twin_name()});
     #{
         twin: twin_name(),
-        source_revision: if source == () { "" } else { source.source_revision_hex },
+        source_revision: if source == () { () } else { source.source_revision },
         scene: "scenes/griffin_1_surface_ops.usda",
         threads: 1,
         jitter: 0.0,
@@ -606,8 +606,8 @@ fn egress_apron_runtime_evidence(rover) {
     let apron = query("QueryUsdPrim", #{
         path: path,
         attrs: ["size", "xformOp:scale", "xformOp:translate",
-            "physics:collisionEnabled", "lunco:requirement",
-            "lunco:source_status", "lunco:egress:surfaceY"],
+            "physics:collisionEnabled", "lunco:source_status",
+            "lunco:egress:surfaceY"],
         schemas: true,
         collision_bounds: true
     });
@@ -651,14 +651,11 @@ fn egress_apron_runtime_evidence(rover) {
     let geometry_ok = apron != () && apron.path == path
         && apron.type_name == "Cube"
         && apron.attrs["physics:collisionEnabled"] == true
-        && apron.attrs["lunco:requirement"] == "GR-035"
         && apron.api_schemas != ()
         && dimensions_match;
     #{ok: geometry_ok && apron_contacts.len() > 0,
       path: path,
       requirement: "GR-035",
-      source: griffin_spec::egress_apron_source(),
-      rationale: griffin_spec::egress_apron_rationale(),
       authored_geometry: apron,
       collision_bounds: bounds,
       expected_center_m: expected_center,
@@ -709,7 +706,7 @@ fn report_route_failure(id, error, path, evidence) {
         expected: "route reaches the authored target", ok: false, error: error};
     report_structured_verdict(#{ok: false,
         verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
-        requirement_count: 1, source_revision: source.source_revision_hex,
+        requirement_count: 1, source_revision: source.source_revision,
         source_files: source.source_files, results: [failure], failures: [failure],
         metrics: #{route_failure: evidence}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");

@@ -16,8 +16,13 @@ fn on_tick(me, ctx) {
     let source = sysml_requirements::source();
     let mast = sysml_requirements::text(source, own("mastPath"));
     let solar = sysml_requirements::text(source, own("solarPath"));
-    let solar_mount_source = sysml_requirements::text(source, own("solarMountSource"));
-    let solar_tilt_source = sysml_requirements::text(source, own("solarTiltSource"));
+    let source_owner = sysml_requirements::attribute(source, own("mastPath")).record.owner_handle;
+    let mast_height = sysml_requirements::number_from_reference(source,
+        source_owner, "mastHeight");
+    let solar_mount = sysml_requirements::vector_from_reference(source,
+        source_owner, "solarMount");
+    let solar_tilt = sysml_requirements::number_from_reference(source,
+        source_owner, "solarTilt");
     let checks = [];
     checks.push(sysml_requirement_checks::exists("FSP-001-mast", "sensor_mast", "fsp001", VERIFICATION, mast, "Xform"));
     checks.push(sysml_requirement_checks::children("FSP-001-mast-parts", "sensor_mast", "fsp001", VERIFICATION, mast,
@@ -28,25 +33,24 @@ fn on_tick(me, ctx) {
     checks.push(#{id: "FSP-003-mast-height", component: "sensor_mast",
         requirement: "fsp003", verification: VERIFICATION,
         kind: "attribute", path: mast + "/MastPost", attr: "height",
-        expected_attr: sysml_requirements::text(source, own("mastHeightSource")), tolerance: 0.002});
-    let solar_mount = sysml_requirement_checks::source_number_list(source, solar_mount_source);
-    if solar_mount.len() == 3 {
+        expected: mast_height.value, tolerance: 0.002});
+    if solar_mount.ok == true && solar_tilt.ok == true && solar_mount.value.len() == 3 {
         checks.push(#{id: "FSP-004-solar-x", component: "solar_array",
             requirement: "fsp004", verification: VERIFICATION,
             kind: "attribute_component", path: solar, attr: "xformOp:translate", index: 0,
-            expected: solar_mount[0], tolerance: 0.002});
+            expected: solar_mount.value[0], tolerance: 0.002});
         checks.push(#{id: "FSP-004-solar-y", component: "solar_array",
             requirement: "fsp004", verification: VERIFICATION,
             kind: "attribute_component", path: solar, attr: "xformOp:translate", index: 1,
-            expected: solar_mount[1], tolerance: 0.002});
+            expected: solar_mount.value[1], tolerance: 0.002});
         checks.push(#{id: "FSP-004-solar-z", component: "solar_array",
             requirement: "fsp004", verification: VERIFICATION,
             kind: "attribute_component", path: solar, attr: "xformOp:translate", index: 2,
-            expected: solar_mount[2], tolerance: 0.002});
+            expected: solar_mount.value[2], tolerance: 0.002});
         checks.push(#{id: "FSP-004-solar-tilt", component: "solar_array",
             requirement: "fsp004", verification: VERIFICATION,
             kind: "attribute_component", path: solar, attr: "xformOp:rotateXYZ", index: 0,
-            expected: sysml_requirements::number(source, solar_tilt_source), tolerance: 0.002});
+            expected: solar_tilt.value, tolerance: 0.002});
     }
     checks.push(#{id: "FSP-005-post-radius", component: "sensor_mast", requirement: "fsp005",
         verification: VERIFICATION, kind: "attribute", path: mast + "/MastPost", attr: "radius",
@@ -85,6 +89,9 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirement_checks::extent_component(field.id, "solar_array", "fsp006", VERIFICATION,
             field.path, field.index, own(field.attr), 2.0, 0.002));
     }
+    checks.push(#{id: "FSP-004-traceability", component: "sensor_power",
+        requirement: "fsp004", verification: VERIFICATION, kind: "source_reference_available",
+        source_owner: source_owner, reference_feature: "solarStatus"});
     checks.push(sysml_requirement_checks::coverage("FSP-004-traceability", "sensor_power", "fsp004", VERIFICATION));
     sysml_requirement_checks::finish(source, checks, "FLIP SENSOR/POWER REQUIREMENTS", "FLIP_SENSOR_POWER_REQUIREMENTS", mast, PACKAGE, VERIFICATION);
     this.done = true;

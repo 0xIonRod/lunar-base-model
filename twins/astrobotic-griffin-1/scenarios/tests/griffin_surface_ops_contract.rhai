@@ -77,7 +77,7 @@ fn emit_stability_verdict(me, contract, source) {
         max_horizontal_drift_m: me.max_horizontal,
         finite: me.finite,
         touchdown: if me.last.touchdown != () { me.last.touchdown } else { 0.0 },
-        source_revision: source.source_revision_hex,
+        source_revision: source.source_revision,
         divergence_tolerance_m: contract.divergence_tolerance_m,
         divergence_tolerance_upright: contract.divergence_tolerance_upright,
         divergence_tolerance_speed_mps: contract.divergence_tolerance_speed_mps,

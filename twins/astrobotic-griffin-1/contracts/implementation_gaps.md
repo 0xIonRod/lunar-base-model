@@ -72,36 +72,60 @@ become Griffin's permanent source semantics.
   boundary, but their correspondence is not yet generated or proved from one
   typed feature mapping. The octagonal visual deck and central octagonal tank
   support are source-owned. Editor has migrated the physical deck to eight
-  octagonal perimeter colliders plus a separate payload-deck collider; GRR-012
-  remains blocked on composed transition/contact observation, not deck topology.
+  octagonal perimeter colliders plus a separate payload-deck collider. GRR-012
+  now has a shared composed-collider observation path; the source changes and
+  port/starboard Editor readback are still pending.
 - Twin verification observers bind authored requirements to composed source
   and USD observations. The generic evaluator owns requirement membership,
   constraint evaluation, and verdict classification; observers supply the
   component-specific measurements that the shared provider surface exposes.
-- GRR-012's 1.05 m transition length is now a SysML study datum spanning the
-  2.20 m payload-deck half-width to the 3.20 m hinge with 0.05 m contact
-  overlap. The generic provider still cannot observe the composed transition
-  contact or wheel envelope, so GRR-012 remains inconclusive; geometry authoring
-  alone is not acceptance evidence.
+- Aggregate AABBs overstate adapter contact: the clipped octagon narrows near
+  its full-width lateral corners, so contact must be checked across every
+  lateral cross-section. SysML owns the transition length, derived from the
+  octagonal source profile, adapter width, hinge station, required overlap,
+  and interface margin. Generic `QueryUsdPrims` now returns exact
+  canonical-stage collision vertices for one Mesh or Cube. The shared
+  measurement library builds convex footprints and measures the minimum
+  cross-section overlap across the adapter span, alongside transition length,
+  top-face step, and hinge seam. This is static geometry evidence only; the
+  Editor update and rover traversal are still pending.
+- GRR-006/010 now specify a mitered convex-mesh track toe. The standard
+  mechanical relation derives the bevel run from track thickness and the
+  commanded ramp angle; generic SysML/USD checks read collision bounds and the
+  composed mesh's upper/lower toe vertices. The Editor builder plans the Mesh
+  migration, but it has not yet been applied or read back in the composed
+  vehicle document.
+- The exact footprint calculation still uses a general convex-hull and
+  cross-section algorithm in Rhai. This is shared authoring-measurement code,
+  not Griffin policy, but it exposes a core Rust gap: LunCoSim can return an
+  AABB or raw collider vertices, yet it has no native convex-footprint
+  intersection/coverage relation that can return typed residuals and explicit
+  unsupported-geometry states. Move that common algorithm into the Rust
+  geometry/measurement contract once its generic shape and result semantics
+  are agreed; until then the Rhai library must reject non-Mesh/Cube and
+  non-convexHull inputs.
+- GRR-011 moves ramp mass and diagonal-inertia literals into SysML and checks
+  their composed realization. They are explicitly labeled study proxies.
+  GR-021 remains planned: authoring queries can read mass-property attributes,
+  but Griffin still lacks sourced per-body center of mass and full-frame
+  mass-property evidence for acceptance.
 - Requirement status and check catalogs are still parallel string arrays in
   SysML. Their label is now explicit and they are not used as per-run verdicts,
   but they remain a manual status table. A generic coverage report should
   derive checked, unverified, planned, and blocked views from resolved
   requirement, verification, realization, and evidence records.
-- A previous runtime report echoed its expected requirement-ID catalog as
-  `checked_rules`, and the test emitted a synthetic pass row for each ID.
-  That was not execution evidence. The field and fabricated rows are removed;
-  the authored check catalog is labeled separately, and payload/ramp boundary
-  results now carry focused SysML verification-case identities. Structural
-  reports remain report-level evidence rather than per-requirement verdicts.
 
 ## Generic Rust features Griffin needs
 
 ### P0 — semantic source and requirement graph
 
-- Resolve feature chains, owned/inherited members, type/specialization,
-  redefinition, subsetting, multiplicity, and stable source handles across the
-  full project and standard library.
+- `lunco-sysml-ast` and `lunco-sysml-ir` already provide source handles,
+  source-linked expression IR, scalar/quantity types, multiplicity metadata,
+  and four-state results. They do not yet resolve feature chains,
+  owned/inherited members, specialization, redefinition, or subsetting across
+  the full project and standard library. Griffin currently works around this
+  with qualified-name strings and manually maintained attribute-name lists in
+  `griffin_spec.rhai`.
 - Project requirement, `require`/`assume`, verification `objective`, `verify`,
   `satisfy`, `refine`, and realization relationships as typed graph edges, not
   short-name strings. The current membership projection is an initial slice;
@@ -111,25 +135,43 @@ become Griffin's permanent source semantics.
   duplicate/missing IDs, absent subjects, unverified required constraints,
   invalid objective links, and source members that cannot be resolved.
 - Execute reusable constraint definitions through typed usage bindings and
-  argument/default/direction/result checks. The evaluator currently binds a
-  named parameter map from Rhai; it does not yet execute SysML binding
+  argument/default/direction/result checks. The evaluator accepts named
+  parameter maps from Rhai; Griffin manually builds each map and selects
+  constraints by string name. Rust does not yet execute SysML binding
   relationships or general constraint invocations.
 
-### P1 — quantities, frames, and provider observations
+### P1 — quantities, geometry, and provider observations
 
-- Add quantity kinds and unit definitions/conversion with dimensional type
-  checking; do not infer dimension from attribute suffixes.
-- Represent points, directions, lengths, angles, mass properties, frames,
-  time-validity, and coordinate transforms as typed values with explicit
-  errors for incompatible operations.
-- Add a generic USD feature provider for composed attributes, relationships,
-  transforms, mesh points/indices, topology, purpose, material assignment,
-  collision ownership, and document generation. Provider queries should
-  resolve source feature handles to targets and return provenance with each
-  value.
-- Add a physics provider for mass, center of mass, inertia, collider identity,
-  contacts, impulses, solver configuration, and body ownership, including
-  sample time and readiness/staleness.
+- `lunco-engineering-values` has dimension-safe conversion, and the IR carries
+  quantity and binding metadata. The constraint evaluator still requires
+  matching unit strings for arithmetic/comparison; it does not resolve the
+  declared unit contract and convert compatible values during evaluation.
+  Griffin currently authors normalized metre/radian values and relies on
+  field names for unit hints. Connect resolved `Unit` values to IR checking
+  before using mixed providers or imported supplier data.
+- `QueryUsdPrims` reads one composed snapshot and now exposes exact canonical
+  stage points for active collision Mesh/Cube prims. It does not bind SysML
+  feature handles to USD targets or retain a complete provider/document
+  revision envelope in each observation. Griffin's observer supplies explicit
+  paths and manually labels frame/unit; current evidence loses source revision
+  and query generation when the live-stage path is used.
+- `QueryPhysics` already exposes mass, center of mass, principal inertia,
+  readiness, support state, and FLIP wheel-ray samples with sample ticks. It
+  does not expose general collider-pair manifolds, per-point impulses, full
+  inertia tensors with their body frame, or the solver configuration needed
+  to qualify those observations. A real FLIP run can inspect wheel hit target,
+  normal force, tire force, and suspension compression; what is still missing
+  is an evidence recorder and temporal reducer that proves the required wheels
+  contacted the ramp over the full traversal interval. A static fit check is
+  not traversal acceptance.
+- Add native convex-footprint overlap, full-span coverage, signed seam gap,
+  and contact-area relations. The Rust query added for this change returns
+  exact Mesh/Cube points; the shared convex-hull/cross-section algorithm and
+  relation residuals still live in `authoring_measurements.rhai`. That is the
+  current generic workaround. A Rust geometry contract should return typed
+  residuals, frame/units, source paths, supported-shape semantics, and explicit
+  unsupported states; exact non-convex/curved contact can follow as a separate
+  capability.
 - Preserve provider result states end to end. Inconclusive and error are not
   false requirements and must not be collapsed into a boolean.
 
@@ -144,10 +186,19 @@ become Griffin's permanent source semantics.
   stale source revision must be rejected.
 - Carry one evidence identity across SysML revision, compiled constraint
   fingerprint, provider snapshot/document generation, physics configuration,
-  and visual/run artifacts.
+  sample tick/time interval, and visual/run artifacts.
+- Generate requirement coverage from resolved requirement/verification/
+  realization/evidence records. The current Twin status/check catalog is
+  manually maintained, while each Rhai observer separately constructs its
+  qualified-name bindings and result records.
 
 ## Editor and workflow tools still missing
 
+- An offline Twin-wide SysML validation command that loads the complete source
+  set and standard library before resolving imports and requirement links.
+  `luncosim --validate` currently checks each file in isolation, so importing
+  Griffin requirement files report unresolved cross-package names unless the
+  Twin is loaded through the Workspace validation provider.
 - A model browser that navigates the resolved SysML feature graph beside its
   USD/Modelica realizations and shows unresolved/multiple provider mappings.
 - A source impact view from edited feature to affected constraints, USD
@@ -177,7 +228,8 @@ become Griffin's permanent source semantics.
 2. **Completed in Editor:** migrate the physical deck collider to eight
    source-profile perimeter beams plus the separate payload-deck collider.
    Readback confirms source deviation within 0.001 m and leaves the tank
-   opening clear. GRR-012 still needs a typed composed contact observer.
+   opening clear. GRR-012 now has a shared composed-collider measurement path;
+   its current port/starboard results still need Editor readback.
 3. Build a typed Griffin assembly graph: octagonal bus and deck, separate
    octagonal tank-support perimeter, four tank usages, seven engine usages,
    four landing-leg usages, solar assemblies, ramp options, adapter interface,

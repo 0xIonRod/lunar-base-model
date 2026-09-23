@@ -15,15 +15,24 @@ fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let root = sysml_requirements::text(source, own("usdPath"));
+    let source_owner = sysml_requirements::attribute(source, own("usdPath")).record.owner_handle;
+    let chassis_width = sysml_requirements::number_from_reference(source,
+        source_owner, "chassisWidth");
+    let chassis_length = sysml_requirements::number_from_reference(source,
+        source_owner, "chassisLength");
     let checks = [];
     checks.push(sysml_requirement_checks::exists("FCC-001-root", "chassis", "fcc001", VERIFICATION, root, "Xform"));
     checks.push(sysml_requirement_checks::children("FCC-001-structure", "chassis", "fcc001", VERIFICATION, root,
         [root + "/LowerFrame", root + "/WhiteEquipmentBox", root + "/FrontBumper",
          root + "/PayloadDeck", root + "/ServicePanel"]));
-    checks.push(sysml_requirement_checks::extent_component("FCC-002-width", "chassis", "fcc002", VERIFICATION,
-        root + "/LowerFrame", 0, sysml_requirements::text(source, own("widthSource")), 2.0, 0.002));
-    checks.push(sysml_requirement_checks::extent_component("FCC-002-length", "chassis", "fcc002", VERIFICATION,
-        root + "/LowerFrame", 2, sysml_requirements::text(source, own("lengthSource")), 2.0, 0.002));
+    checks.push(#{id: "FCC-002-width", component: "chassis", requirement: "fcc002",
+        verification: VERIFICATION, kind: "extent_component", path: root + "/LowerFrame",
+        index: 0, multiplier: 2.0, expected: chassis_width.value,
+        tolerance: 0.002});
+    checks.push(#{id: "FCC-002-length", component: "chassis", requirement: "fcc002",
+        verification: VERIFICATION, kind: "extent_component", path: root + "/LowerFrame",
+        index: 2, multiplier: 2.0, expected: chassis_length.value,
+        tolerance: 0.002});
     for field in [
         #{id: "FCC-005-box-width", path: root + "/WhiteEquipmentBox", index: 0, attr: "equipmentBoxWidthM"},
         #{id: "FCC-005-box-height", path: root + "/WhiteEquipmentBox", index: 1, attr: "equipmentBoxHeightM"},

@@ -334,7 +334,7 @@ fn fail_phase(state, phase) {
         expected: "completed", ok: false, error: "phase timed out"};
     report_structured_verdict(#{ok: false, verification:
         "Griffin1Requirements::Verify_GriffinSurfaceOperations",
-        requirement_count: 1, source_revision: source.source_revision_hex,
+        requirement_count: 1, source_revision: source.source_revision,
         source_files: source.source_files, results: [failure], failures: [failure],
         metrics: #{phase: phase, event_trace: state.event_trace,
             clocks: clock_snapshot(), landing_gates: gates,
@@ -369,7 +369,7 @@ fn finish_surface_ops(state) {
     for check in checks { if check.ok != true { failures.push(check); } }
     report_structured_verdict(#{ok: failures.len() == 0,
         verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
-        requirement_count: checks.len(), source_revision: source.source_revision_hex,
+        requirement_count: checks.len(), source_revision: source.source_revision,
         source_files: source.source_files, results: checks, failures: failures,
         metrics: #{event_trace: state.event_trace, clocks: clock_snapshot(),
             route_preflight: state.route_preflight,

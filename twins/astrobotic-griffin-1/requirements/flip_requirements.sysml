@@ -55,12 +55,11 @@ package FlipRequirements {
         // like visualWheelNames.  These are current simulation-study values:
         // The body/chassis and wheel are a study proxy, not an as-built FLIP
         // ICD.  The -0.75 m station is the authored ramp-compatible study
-        // datum for the 0.45 m wheel.  The deployed physical ramp is a
-        // 45.7457 degree study slope; a 0.70 m ray could not reach its first
-        // downhill contact from the released deck envelope, so the physical
-        // realization uses the explicitly separate 1.20 m ramp-transition
-        // suspension envelope below.  This is a Twin study assumption, not
-        // an as-built FLIP datum.
+        // datum for the 0.45 m wheel. The physical egress ramp now meets the
+        // top-deck transition and reaches terrain at its 49 degree study
+        // deployment. The separate 1.20 m suspension envelope below remains
+        // a Twin assumption and needs runtime replay with the corrected ramp;
+        // it is not an as-built FLIP datum.
         attribute physicalWheelStationX : Real[4] = (-0.95, -0.95, 0.95, 0.95);
         attribute physicalWheelStationY : Real[4] = (-0.75, -0.75, -0.75, -0.75);
         attribute physicalWheelStationZ : Real[4] = (-1.05, 1.05, -1.05, 1.05);
@@ -84,8 +83,6 @@ package FlipRequirements {
                         attribute solarArrayMount : Real[3] = (0.0, 1.30, 0.00);
                 // The 18 degree tilt is a conservative review-study angle above the local deck: it keeps a fixed panel readable to a high solar-elevation camera without implying a supplier-certified deployment joint; optimize it when the vehicle ICD is available.
         attribute solarArrayTiltDeg : Real = 18.0;
-        attribute componentReference : String = "https://www.astrolab.space/flip/";
-        attribute missionReference : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
   }
 
     requirement def FLIPV001_RoverPresentation {
@@ -120,19 +117,19 @@ package FlipRequirements {
         doc /* FGV-009 [behavior] the authored Griffin surface route shall select the finite-turn Ackermann steering mode before issuing route torque; parallel/crab steering remains an explicit operator experiment. */
     }
     requirement def FLIPV010_PhysicalWheelSupportEnvelope {
-        doc /* FGV-010 [physics boundary] the four physical FLIP suspension station datums shall be explicit and separate from visual presentation stations; the ramp-transition study realization shall use a 1.20 m support-ray envelope so the front axle can acquire the authored 45.7457 degree, 8.00 m deck-to-terrain ramp before the chassis falls through the suspension envelope. Source: the composed Griffin physical-ramp and FLIP wheel geometry in this Twin. Rationale: the 0.70 m baseline ray was observed to end above the first downhill ramp contact; 1.20 m is the smallest rounded study value that covers the measured deck-to-ramp transition without changing the wheel station, while supplier suspension data remains unknown. */
+        doc /* FGV-010 [physics boundary] the four physical FLIP suspension station datums shall be explicit and separate from visual presentation stations; the 1.20 m support-ray envelope is a replaceable Twin assumption for the corrected 12.228605 m deck-to-terrain ramp and must pass a fresh deployed wheel-contact replay. Source: the Griffin physical-ramp and FLIP wheel interface in this Twin. Rationale: supplier suspension data is unavailable, so runtime wheel support rather than a stale ray estimate determines acceptance. */
     }
 
-    requirement fvg001 : FLIPV001_RoverPresentation { subject rover : FlipRover; }
-    requirement fvg002 : FLIPV002_ChassisEnvelope { subject rover : FlipRover; }
-    requirement fvg003 : FLIPV003_WheelStations { subject rover : FlipRover; }
-    requirement fvg004 : FLIPV004_SensorAndPower { subject rover : FlipRover; }
-    requirement fvg005 : FLIPV005_Traceability { subject rover : FlipRover; }
-    requirement fvg006 : FLIPV006_ChassisGeometry { subject rover : FlipRover; }
-    requirement fvg007 : FLIPV007_MassPropertyDatum { subject rover : FlipRover; }
-    requirement fvg008 : FLIPV008_WheelEnvelope { subject rover : FlipRover; }
-    requirement fvg009 : FLIPV009_MissionSteeringMode { subject rover : FlipRover; }
-    requirement fvg010 : FLIPV010_PhysicalWheelSupportEnvelope { subject rover : FlipRover; }
+    requirement <'FGV-001'> fvg001 : FLIPV001_RoverPresentation { subject rover : FlipRover; }
+    requirement <'FGV-002'> fvg002 : FLIPV002_ChassisEnvelope { subject rover : FlipRover; }
+    requirement <'FGV-003'> fvg003 : FLIPV003_WheelStations { subject rover : FlipRover; }
+    requirement <'FGV-004'> fvg004 : FLIPV004_SensorAndPower { subject rover : FlipRover; }
+    requirement <'FGV-005'> fvg005 : FLIPV005_Traceability { subject rover : FlipRover; }
+    requirement <'FGV-006'> fvg006 : FLIPV006_ChassisGeometry { subject rover : FlipRover; }
+    requirement <'FGV-007'> fvg007 : FLIPV007_MassPropertyDatum { subject rover : FlipRover; }
+    requirement <'FGV-008'> fvg008 : FLIPV008_WheelEnvelope { subject rover : FlipRover; }
+    requirement <'FGV-009'> fvg009 : FLIPV009_MissionSteeringMode { subject rover : FlipRover; }
+    requirement <'FGV-010'> fvg010 : FLIPV010_PhysicalWheelSupportEnvelope { subject rover : FlipRover; }
 
     verification def Verify_FLIPVisualRequirements {
         subject rover : FlipRover;

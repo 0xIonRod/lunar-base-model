@@ -179,22 +179,26 @@ fn on_tick(me, ctx) {
     let knuckle_width = sysml_requirements::number(source, own("knuckleWidthM"));
     let strut_scale = sysml_requirement_checks::source_number_list(source, own("strutScale"));
     let strut_offset = sysml_requirement_checks::source_number_list(source, own("strutOffset"));
-    let physical_rest_requirement = sysml_requirements::text(source, own("physicalRestLengthRequirement"));
-    let physical_rest_length = if physical_rest_requirement != () && physical_rest_requirement != "" {
-        sysml_requirements::number(source, physical_rest_requirement)
+    let source_owner = sysml_requirements::attribute(source, own("usdRootPath")).record.owner_handle;
+    let physical_rest_source = sysml_requirements::number_from_reference(
+        source, source_owner, "physicalRestLength");
+    let physical_rest_length = if physical_rest_source.ok == true {
+        physical_rest_source.value
     } else { () };
     let physical_rest_status = sysml_requirements::text(source, own("physicalRestLengthStatus"));
     let transform_order = sysml_requirements::string_vector(source, own("transformOrder"));
     let transform_order = if transform_order == () { [] } else { transform_order };
-    let source_ref = sysml_requirements::text(source, own("sourceReference"));
-    let rationale = sysml_requirements::text(source, own("sourceRationale"));
+    let requirement_handle = sysml_requirements::requirement_handle_by_short_name(source, "FSR-001");
+    let provenance = if requirement_handle.ok == true {
+        sysml_requirements::provenance(source, requirement_handle.handle)
+    } else { requirement_handle };
     if root == () || root == "" || children.len() != 3 || arm_scale.len() != 3
         || strut_scale.len() != 3 || strut_offset.len() != 3
         || transform_order.len() != 2
         || arm_offset == () || knuckle_radius == () || knuckle_width == ()
-        || physical_rest_requirement == () || physical_rest_requirement == ""
         || physical_rest_length == () || physical_rest_status == () || physical_rest_status == ""
-        || source_ref == () || source_ref == "" || rationale == () || rationale == "" {
+        || physical_rest_source.ok != true || provenance.ok != true
+        || provenance.evidence.sources.len() != 2 {
         fail(this, "FlipSuspensionRequirements source contract is incomplete");
         return;
     }

@@ -13,9 +13,6 @@ package MoonBaseProjectRequirements {
         attribute timeUnit : String = "seconds";
         attribute frameUpAxis : String = "Y";
         attribute metersPerUnit : Real = 1.0;
-        attribute moonbaseRequirementUsageCount : Integer = 4;
-        attribute moonbaseRequirementIds : String[4] = ("mb001", "mb002", "mb003", "mb004");
-        attribute moonbaseVerificationCaseName : String = "MoonBaseProjectRequirements::Verify_MoonBaseProjectRequirements";
     }
 
     requirement def MB001_MetricSystem {
@@ -34,10 +31,10 @@ package MoonBaseProjectRequirements {
         doc /* MB-004 [project] changed visual assemblies require fresh headful/offscreen evidence plus a composed USD query from the same source revision. */
     }
 
-    requirement mb001 : MB001_MetricSystem { subject simulation : ProjectSimulationContract; }
-    requirement mb002 : MB002_YUpFrame { subject simulation : ProjectSimulationContract; }
-    requirement mb003 : MB003_DeterministicRhai { subject simulation : ProjectSimulationContract; }
-    requirement mb004 : MB004_VisualEvidence { subject simulation : ProjectSimulationContract; }
+    requirement <'MB-001'> mb001 : MB001_MetricSystem { subject simulation : ProjectSimulationContract; }
+    requirement <'MB-002'> mb002 : MB002_YUpFrame { subject simulation : ProjectSimulationContract; }
+    requirement <'MB-003'> mb003 : MB003_DeterministicRhai { subject simulation : ProjectSimulationContract; }
+    requirement <'MB-004'> mb004 : MB004_VisualEvidence { subject simulation : ProjectSimulationContract; }
 
     verification def Verify_MoonBaseProjectRequirements {
         subject simulation : ProjectSimulationContract;

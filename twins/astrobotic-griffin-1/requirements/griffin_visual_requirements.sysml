@@ -6,11 +6,11 @@ package GriffinVisualRequirements {
     // the integrated system subject, requirement usages, and verification.
 
     requirement def GR015_NozzleGeometry {
-        doc /* GR-015 [visual+physics] each named lander part resolves to geometry and the nozzle owns visible bell geometry that is not a collider. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ and the Twin visual ownership contract. Rationale: visible propulsion detail must remain replaceable presentation while thrust/collision stay with the flight model. */
+        doc /* GR-015 [visual+physics] each named lander part resolves to geometry and the nozzle owns visible bell geometry that is not a collider. Rationale: visible propulsion detail must remain replaceable presentation while thrust/collision stay with the flight model. */
     }
 
     requirement def GR016_SolarSymmetry {
-        doc /* GR-016 [layout] keep exactly two named Griffin solar-array owners on signed sides with mirrored placement and owned cell geometry. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Assumption: the mirrored two-array layout is the current visual study interpretation; exact flight deployment geometry is TBD. */
+        doc /* GR-016 [layout] keep exactly two named Griffin solar-array owners on signed sides with mirrored placement and owned cell geometry. Assumption: the mirrored two-array layout is the current visual study interpretation; exact flight deployment geometry is TBD. */
     }
 
     requirement def GR020_ProxySuppression {
@@ -18,11 +18,11 @@ package GriffinVisualRequirements {
     }
 
     requirement def GR032_MainEngineBells {
-        doc /* GR-032 [public product value] model exactly seven visible, non-colliding main-engine bell geometries. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Rationale: the public seven-engine architecture fixes the count; bell dimensions remain a separately labeled visual proxy. */
+        doc /* GR-032 [public product value] model exactly seven visible, non-colliding main-engine bell geometries. Rationale: the public seven-engine architecture fixes the count; bell dimensions remain a separately labeled visual proxy. */
     }
 
     requirement def GR033_PropellantTanks {
-        doc /* GR-033 [public integration value] model four visible, source-owned COPV study assemblies at the ordered GriffinVisualConfiguration tank stations and scales. The vessel skin and retention bands are render-only; flight propellant mass remains in MainPropulsion. Exact COPV dimensions and placement remain TBD. Source: https://www.astrobotic.com/griffin-1-mission-update/. Rationale: four repeated tank owners represent the visible system without retaining incompatible Capsule placeholders; public material does not provide a certified tank ICD. */
+        doc /* GR-033 [public integration value] model four visible, source-owned COPV study assemblies at the ordered GriffinVisualConfiguration tank stations and scales. The vessel skin and retention bands are render-only; flight propellant mass remains in MainPropulsion. Exact COPV dimensions and placement remain TBD. Rationale: four repeated tank owners represent the visible system without retaining incompatible Capsule placeholders; public material does not provide a certified tank ICD. */
     }
 
     requirement def GRV001_PresentationFrame {
@@ -30,11 +30,11 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV002_LanderPresentation {
-        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognizable faceted lander with its four legs, payload deck, and seven-engine cluster. The visual configuration uses an octagonal open frame and a separate octagonal tank-support perimeter with four tank openings. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. */
+        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognizable faceted lander with its four legs, payload deck, and seven-engine cluster. The visual configuration uses an octagonal open frame and a separate octagonal tank-support perimeter with four tank openings. */
     }
 
     requirement def GRV003_GriffinSolarAssemblies {
-        doc /* GV-003 [visual] the review shall show Griffin's two mirrored side solar arrays as named frame/cell assemblies. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Assumption: the mirrored two-panel layout is the current visual proxy and may be replaced by flight layout data. */
+        doc /* GV-003 [visual] the review shall show Griffin's two mirrored side solar arrays as named frame/cell assemblies. Assumption: the mirrored two-panel layout is the current visual proxy and may be replaced by flight layout data. */
     }
 
     requirement def GRV004_ScaleDatums {
@@ -46,7 +46,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV006_LunarContext {
-        doc /* GV-006 [visual] the review shall include the source-backed South-Pole terrain asset using the canonical terrain_layered.wgsl shader and one project light, without introducing a second physics model. Source: https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/ and the Twin terrain asset manifest. Rationale: the context supports mission readability while keeping terrain physics owned by the simulator. */
+        doc /* GV-006 [visual] the review shall include the South-Pole terrain asset using the canonical terrain_layered.wgsl shader and one project light, without introducing a second physics model. Rationale: the context supports mission readability while keeping terrain physics owned by the simulator. */
     }
 
     requirement def GRV007_VisualEvidence {
@@ -55,18 +55,18 @@ package GriffinVisualRequirements {
 
 
     // System integration requirement usages owned by this domain.
-    requirement gr015 : GR015_NozzleGeometry { subject lander : Griffin1Lander; }
-    requirement gr016 : GR016_SolarSymmetry { subject lander : Griffin1Lander; }
-    requirement gr020 : GR020_ProxySuppression { subject lander : Griffin1Lander; }
-    requirement gr032 : GR032_MainEngineBells { subject lander : Griffin1Lander; }
-    requirement gr033 : GR033_PropellantTanks { subject lander : Griffin1Lander; }
-    requirement gv001 : GRV001_PresentationFrame { subject lander : Griffin1Lander; }
-    requirement gv002 : GRV002_LanderPresentation { subject lander : Griffin1Lander; }
-    requirement gv003 : GRV003_GriffinSolarAssemblies { subject lander : Griffin1Lander; }
-    requirement gv004 : GRV004_ScaleDatums { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
-    requirement gv005 : GRV005_RenderOwnership { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
-    requirement gv006 : GRV006_LunarContext { subject lander : Griffin1Lander; }
-    requirement gv007 : GRV007_VisualEvidence { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
+    requirement <'GR-015'> gr015 : GR015_NozzleGeometry { subject lander : Griffin1Lander; }
+    requirement <'GR-016'> gr016 : GR016_SolarSymmetry { subject lander : Griffin1Lander; }
+    requirement <'GR-020'> gr020 : GR020_ProxySuppression { subject lander : Griffin1Lander; }
+    requirement <'GR-032'> gr032 : GR032_MainEngineBells { subject lander : Griffin1Lander; }
+    requirement <'GR-033'> gr033 : GR033_PropellantTanks { subject lander : Griffin1Lander; }
+    requirement <'GV-001'> gv001 : GRV001_PresentationFrame { subject lander : Griffin1Lander; }
+    requirement <'GV-002'> gv002 : GRV002_LanderPresentation { subject lander : Griffin1Lander; }
+    requirement <'GV-003'> gv003 : GRV003_GriffinSolarAssemblies { subject lander : Griffin1Lander; }
+    requirement <'GV-004'> gv004 : GRV004_ScaleDatums { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
+    requirement <'GV-005'> gv005 : GRV005_RenderOwnership { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
+    requirement <'GV-006'> gv006 : GRV006_LunarContext { subject lander : Griffin1Lander; }
+    requirement <'GV-007'> gv007 : GRV007_VisualEvidence { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
 
 
 

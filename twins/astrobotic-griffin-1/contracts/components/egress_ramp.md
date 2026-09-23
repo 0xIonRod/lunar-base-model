@@ -25,10 +25,27 @@ SysML/USD requirements evaluator.
 - FLIP remains a referenced rover component; the ramp requirement reads FLIP's
   wheel datums through its SysML source.
 - The physical top deck uses eight hidden convex perimeter-beam colliders and
-  a separate payload-deck collider. GRR-012 still stays inconclusive until the
-  composed transition/contact geometry is available to the typed observer.
-  The transition length is a SysML study datum derived from adapter half-width,
-  hinge station, and contact overlap; it is not itself acceptance evidence.
+  a separate payload-deck collider. GRR-012 reads exact composed collider
+  vertices for the adapter, transition, and ramp track together from one USD
+  snapshot for each side. It measures minimum cross-section overlap across the
+  adapter's complete lateral span, transition length, top-face step, and hinge
+  seam. The clipped octagonal adapter makes AABB intersection too coarse to
+  prove overlap. SysML owns the transition length and minimum actual overlap.
+  The result is static interface evidence; rover traversal still needs
+  runtime wheel-contact evidence.
+- GRR-006 checks the composed physical track's convex collision bounds and toe
+  mesh vertices against SysML geometry. A shared mechanical relation derives
+  the toe bevel from track thickness and deployment angle; it is not another
+  Twin-owned length literal.
+- GRR-010 checks both toe edges against the authored terrain height. Source
+  geometry places the physical track centre at Y=5.19 m, aligns its top to the
+  adapter at Y=5.28 m, and uses a 12.228605 m top face at 49 degrees from the
+  3.98 m touchdown COM datum. These are replaceable study values; the typed
+  Editor update and deployed runtime traversal have not been read back yet.
+- GRR-011 owns the existing ramp-body mass and diagonal inertia in SysML and
+  checks the composed body matches those values. They remain labeled Twin
+  study proxies; center of mass and supplier mass properties are still open
+  under GR-021.
 - The ramp contact geometry uses two FLIP-aligned tracks, not a solid plate
   across the open centre. The same source wheel stations and track width drive
   render geometry and physical colliders.

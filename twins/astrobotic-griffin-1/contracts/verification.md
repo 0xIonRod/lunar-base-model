@@ -39,18 +39,36 @@ and source-deviation checks. The render ramp uses two FLIP-aligned
 wheel tracks with an open centre, using the same wheel stations and track-width
 datum as the physical contact geometry.
 
-GRR-012 remains inconclusive because the generic typed USD provider does not
-yet expose the composed transition contact overlap. The 1.05 m SysML study
-datum bridges the 2.20 m payload-deck half-width to the 3.20 m hinge with 0.05 m
-overlap, but it is not acceptance evidence until the transition and wheel
-contact envelope are observed together. The separate octagonal tank-support
-perimeter remains distinct from the outer deck collider.
+GRR-012 uses the shared `QueryUsdPrims` exact collider-geometry observation to
+measure, from one composed snapshot per side, minimum adapter overlap at every
+lateral cross-section, transition length, deck top-face step, and hinge seam
+gap. Aggregate AABB intersection cannot prove overlap on the clipped octagonal
+adapter profile. SysML owns the transition length needed to retain the
+required overlap across the full adapter width; interface tolerance is a
+separate datum. GRR-006 requires each physical track to be a convex mesh and
+checks its composed collision bounds and upper/lower toe vertices against the
+same SysML length, thickness, deployment angle, and FLIP track-width datums. A
+shared mechanical relation derives the miter run from thickness and deployment angle.
+GRR-010 checks both transformed toe edges against terrain; the top face is
+12.228605 m, the track centre is 5.19 m, the adapter top is 5.28 m, and the
+touchdown COM datum is 3.98 m. These remain explicit study values, not accepted
+supplier dimensions. The source changes still need typed Editor application,
+fresh composed readback on both sides, and deployed FLIP traversal with
+wheel-contact evidence. The separate octagonal tank-support perimeter remains
+distinct from the outer deck collider.
+
+GRR-011 now owns the existing 95 kg ramp-body mass and (210, 34, 210) kg m²
+diagonal-inertia study values in SysML; its composed checks only confirm the
+builder uses that source. The values are not mass-properties acceptance. GR-021
+remains planned until center of mass and inertia are sourced and frame-checked
+for every dynamic body.
 
 ## Remaining acceptance boundary
 
-1. Promote mesh, transform, material, and physics observations into generic
-   typed USD providers. Rhai should choose a SysML feature and provider target,
-   not reconstruct a geometric verdict from path strings and arrays.
+1. `QueryUsdPrims` supplies one-snapshot collision bounds and composed mesh
+   point arrays. The standard mechanical relation and SysML/USD check helpers
+   now expose the reusable calculations; the Twin observer chooses feature
+   paths and SysML supplies required dimensions and tolerances.
 2. Add resolved SysML feature navigation, constraint invocation/bindings,
    collection/index/aggregate operations, and quantity/unit/frame validation.
 3. Map dynamic-body mass, center of mass, inertia, collider ownership,

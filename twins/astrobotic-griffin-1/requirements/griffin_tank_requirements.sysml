@@ -178,17 +178,17 @@ package GriffinTankRequirements {
         doc /* GPT-011 [configuration] each tank instance shall use the declared replaceable tank asset, the Y-axis local frame, and the complete named child list from this component contract. */
     }
 
-    requirement gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt002 : GPT002_TankRetention { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt003 : GPT003_TankStatus { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt004 : GPT004_TankTraceability { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt005 : GPT005_TankPlacement { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt006 : GPT006_TankEndHardware { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt007 : GPT007_TankServiceHardware { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt008 : GPT008_TankOrientation { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt009 : GPT009_TankDeckSeat { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt010 : GPT010_TankMounting { subject tanks : GriffinPropellantTankAssembly; }
-    requirement gpt011 : GPT011_ComponentIdentity { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-001'> gpt001 : GPT001_TankCount { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-002'> gpt002 : GPT002_TankRetention { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-003'> gpt003 : GPT003_TankStatus { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-004'> gpt004 : GPT004_TankTraceability { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-005'> gpt005 : GPT005_TankPlacement { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-006'> gpt006 : GPT006_TankEndHardware { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-007'> gpt007 : GPT007_TankServiceHardware { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-008'> gpt008 : GPT008_TankOrientation { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-009'> gpt009 : GPT009_TankDeckSeat { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-010'> gpt010 : GPT010_TankMounting { subject tanks : GriffinPropellantTankAssembly; }
+    requirement <'GPT-011'> gpt011 : GPT011_ComponentIdentity { subject tanks : GriffinPropellantTankAssembly; }
 
     verification def Verify_GriffinTankRequirements {
         subject tanks : GriffinPropellantTankAssembly;

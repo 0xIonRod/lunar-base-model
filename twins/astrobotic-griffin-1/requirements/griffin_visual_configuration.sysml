@@ -259,21 +259,21 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-015 [appearance] frame, deck, service skirt, avionics, rails, and tank-support features shall take their linear display colors from this configuration. Each color channel shall remain in the [0,1] interval; Rhai and USD material adapters must not duplicate palette literals. */
     }
 
-    requirement gvc001 : GVC001_ConfigurationSelection { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc002 : GVC002_FrameAndOrigin { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc003 : GVC003_OctagonalAirframe { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc004 : GVC004_OctagonalPayloadDeck { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc005 : GVC005_LegStations { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc006 : GVC006_SolarStations { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc007 : GVC007_TankPlacement { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc008 : GVC008_EngineAndSkirtDatum { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc009 : GVC009_RampState { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc010 : GVC010_ClearanceAndSymmetry { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc011 : GVC011_Traceability { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc012 : GVC012_FrameRails { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc013 : GVC013_SurfaceOrientation { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc014 : GVC014_ParametricProfile { subject configuration : GriffinVisualConfiguration; }
-    requirement gvc015 : GVC015_SurfaceAppearance { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-001'> gvc001 : GVC001_ConfigurationSelection { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-002'> gvc002 : GVC002_FrameAndOrigin { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-003'> gvc003 : GVC003_OctagonalAirframe { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-004'> gvc004 : GVC004_OctagonalPayloadDeck { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-005'> gvc005 : GVC005_LegStations { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-006'> gvc006 : GVC006_SolarStations { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-007'> gvc007 : GVC007_TankPlacement { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-008'> gvc008 : GVC008_EngineAndSkirtDatum { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-009'> gvc009 : GVC009_RampState { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-010'> gvc010 : GVC010_ClearanceAndSymmetry { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-011'> gvc011 : GVC011_Traceability { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-012'> gvc012 : GVC012_FrameRails { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-013'> gvc013 : GVC013_SurfaceOrientation { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-014'> gvc014 : GVC014_ParametricProfile { subject configuration : GriffinVisualConfiguration; }
+    requirement <'GVC-015'> gvc015 : GVC015_SurfaceAppearance { subject configuration : GriffinVisualConfiguration; }
 
     verification def Verify_GriffinVisualConfiguration {
         subject configuration : GriffinVisualConfiguration;

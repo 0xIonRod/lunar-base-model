@@ -8,11 +8,11 @@ package GriffinMechanicalRequirements {
     // the integrated system subject, requirement usages, and verification.
 
     requirement def GR010_FunctionalLegs {
-        doc /* GR-010 [public product value] retain exactly four visible functional landing-leg bodies with struts and pad colliders. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Rationale: the public four-leg architecture determines count/topology; the visual strut and pad envelopes are separate study assumptions until an ICD is available. */
+        doc /* GR-010 [public product value] retain exactly four visible functional landing-leg bodies with struts and pad colliders. Rationale: the public four-leg architecture determines count/topology; the visual strut and pad envelopes are separate study assumptions until an ICD is available. */
     }
 
     requirement def GR011_RampBodies {
-        doc /* GR-011 [study control] retain two side-ramp bodies with contact geometry and revolute hinges; the command bound is a proxy, not a released mechanical limit. The current 50 degree (0.872664626 rad) command envelope comes from GriffinRampRequirements::rampMaxDeploymentAngleRad and is evaluated by its source-defined deployment constraint. Replace it when the mechanical ICD is released. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. */
+        doc /* GR-011 [study control] retain two side-ramp bodies with contact geometry and revolute hinges; the command bound is a proxy, not a released mechanical limit. The current 50 degree (0.872664626 rad) command envelope comes from GriffinRampRequirements::rampMaxDeploymentAngleRad and is evaluated by its source-defined deployment constraint. Replace it when the mechanical ICD is released. */
     }
 
     requirement def GR012_LoadBearingMass {
@@ -46,11 +46,11 @@ package GriffinMechanicalRequirements {
         require GRC018_TopDeckColliderTopologyMatchesSource;
         require GRC018_TopDeckColliderProfileWithinTolerance;
         require GRC018_TopDeckColliderOwnsContact;
-        doc /* GR-018 [mechanical and collision] the powered body and its load-bearing deck geometry shall have explicit collision ownership. The octagonal outer deck ring shall use eight individually convex beam colliders derived from the visible Bus/TopDeckOctagon profile; a single convex hull across this open perimeter is prohibited because it closes the tank openings. The central rover payload platform shall have a separate hidden convex collider derived from RoverPayloadDeck dimensions and profile. Composed transforms, mesh points, collision state, and hidden proxy role shall match the SysML source within topDeckProfileToleranceM. The one-millimetre correspondence tolerance is a Twin geometry bound, not a supplier manufacturing tolerance. Public Griffin material confirms a main payload deck and optional rover interface but does not provide its mechanical ICD, so the dimensions remain replaceable simulation-study assumptions. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. */
+        doc /* GR-018 [mechanical and collision] the powered body and its load-bearing deck geometry shall have explicit collision ownership. The octagonal outer deck ring shall use eight individually convex beam colliders derived from the visible Bus/TopDeckOctagon profile; a single convex hull across this open perimeter is prohibited because it closes the tank openings. The central rover payload platform shall have a separate hidden convex collider derived from RoverPayloadDeck dimensions and profile. Composed transforms, mesh points, collision state, and hidden proxy role shall match the SysML source within topDeckProfileToleranceM. The one-millimetre correspondence tolerance is a Twin geometry bound, not a supplier manufacturing tolerance. Public Griffin material confirms a main payload deck and optional rover interface but does not provide its mechanical ICD, so the dimensions remain replaceable simulation-study assumptions. */
     }
 
     requirement def GR019_LegPlacement {
-        doc /* GR-019 [layout] mount four legs on signed horizontal body axes with mirrored pads and a documented local frame. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/. Rationale: signed stations expose the four-leg support pattern and make symmetry errors observable in the composed stage. */
+        doc /* GR-019 [layout] mount four legs on signed horizontal body axes with mirrored pads and a documented local frame. Rationale: signed stations expose the four-leg support pattern and make symmetry errors observable in the composed stage. */
     }
 
     requirement def GR024_HingeFrames {
@@ -63,13 +63,13 @@ package GriffinMechanicalRequirements {
 
 
     // System integration requirement usages owned by this domain.
-    requirement gr010 : GR010_FunctionalLegs { subject lander : Griffin1Lander; }
-    requirement gr011 : GR011_RampBodies { subject lander : Griffin1Lander; }
-    requirement gr012 : GR012_LoadBearingMass { subject lander : Griffin1Lander; }
-    requirement gr017 : GR017_RampSymmetry { subject lander : Griffin1Lander; }
-    requirement gr018 : GR018_HullAndDeck { subject lander : Griffin1Lander; }
-    requirement gr019 : GR019_LegPlacement { subject lander : Griffin1Lander; }
-    requirement gr024 : GR024_HingeFrames { subject lander : Griffin1Lander; }
-    requirement gr025 : GR025_SolarClearance { subject lander : Griffin1Lander; }
+    requirement <'GR-010'> gr010 : GR010_FunctionalLegs { subject lander : Griffin1Lander; }
+    requirement <'GR-011'> gr011 : GR011_RampBodies { subject lander : Griffin1Lander; }
+    requirement <'GR-012'> gr012 : GR012_LoadBearingMass { subject lander : Griffin1Lander; }
+    requirement <'GR-017'> gr017 : GR017_RampSymmetry { subject lander : Griffin1Lander; }
+    requirement <'GR-018'> gr018 : GR018_HullAndDeck { subject lander : Griffin1Lander; }
+    requirement <'GR-019'> gr019 : GR019_LegPlacement { subject lander : Griffin1Lander; }
+    requirement <'GR-024'> gr024 : GR024_HingeFrames { subject lander : Griffin1Lander; }
+    requirement <'GR-025'> gr025 : GR025_SolarClearance { subject lander : Griffin1Lander; }
 
 }

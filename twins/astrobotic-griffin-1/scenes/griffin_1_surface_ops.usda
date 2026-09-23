@@ -7,7 +7,7 @@
 
 def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
-    prepend apiSchemas = "LunCoCatalogAPI"
+    prepend apiSchemas = ["LunCoCatalogAPI", "LunCoEpochAPI"]
     kind = "assembly"
     documentation = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
 )

@@ -27,10 +27,10 @@ package GriffinAssuranceRequirements {
 
 
     // System integration requirement usages owned by this domain.
-    requirement gr005 : GR005_TraceableValues { subject lander : Griffin1Lander; }
-    requirement gr013 : GR013_ParameterProvenance { subject lander : Griffin1Lander; }
-    requirement gr014 : GR014_TypedAuthoring { subject lander : Griffin1Lander; }
-    requirement gr029 : GR029_PartProvenance { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
-    requirement gr030 : GR030_EvidenceGate { subject lander : Griffin1Lander; }
+    requirement <'GR-005'> gr005 : GR005_TraceableValues { subject lander : Griffin1Lander; }
+    requirement <'GR-013'> gr013 : GR013_ParameterProvenance { subject lander : Griffin1Lander; }
+    requirement <'GR-014'> gr014 : GR014_TypedAuthoring { subject lander : Griffin1Lander; }
+    requirement <'GR-029'> gr029 : GR029_PartProvenance { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
+    requirement <'GR-030'> gr030 : GR030_EvidenceGate { subject lander : Griffin1Lander; }
 
 }

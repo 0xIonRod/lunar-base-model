@@ -1,6 +1,7 @@
 import "lunco://scripting/tools/assembly_builder" as assembly_builder;
 import "lunco://scripting/tools/assembly_edit" as assembly_edit;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
+import "lunco://scripting/tools/mechanical_relations" as mechanical_relations;
 import "griffin_geometry" as griffin_geometry;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 
@@ -410,15 +411,15 @@ fn apply_surface_route_markers(doc, edit_target, root, parent_gen) {
 // The physical ramp ends before the original landing pad.  Author the
 // prepared egress surface as a named scene component so the route can prove
 // four-wheel support after the ramp instead of relying on a route-coordinate
-// exception or a rover teleport.  All dimensions, placement, source, and
-// rationale cross the typed SysML bridge; this function only projects them
+// exception or a rover teleport. All geometry datums cross the typed SysML bridge;
+// requirement provenance remains in the requirement source model rather than
+// being copied into scene string metadata. This function only projects them
 // into the active scene through the journaled Editor command.
 fn egress_apron_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
         return plan_error("egress_apron_plan requires a document, edit target, and absolute root");
     }
     let name = griffin_spec::egress_apron_name();
-    let requirement_id = griffin_spec::egress_apron_requirement_id();
     let cx = griffin_spec::egress_apron_center_x_m();
     let cy = griffin_spec::egress_apron_center_y_m();
     let cz = griffin_spec::egress_apron_center_z_m();
@@ -426,7 +427,7 @@ fn egress_apron_plan(doc, edit_target, root) {
     let width = griffin_spec::egress_apron_width_m();
     let thickness = griffin_spec::egress_apron_thickness_m();
     let surface_y = griffin_spec::egress_apron_surface_y_m();
-    if name == () || name == "" || requirement_id == () || requirement_id == ""
+    if name == () || name == ""
         || cx == () || cy == () || cz == ()
         || length == () || width == () || thickness == () || surface_y == ()
         || length <= 0.0 || width <= 0.0 || thickness <= 0.0 {
@@ -463,8 +464,6 @@ fn egress_apron_plan(doc, edit_target, root) {
         value: _color_literal([0.22, 0.24, 0.28])}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
         name: "lunco:component", type_name: "token", value: "\"Griffin" + name + "\""}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "lunco:requirement", type_name: "token", value: "\"" + requirement_id + "\""}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
         name: "lunco:source_status", type_name: "string", value: "\"study assumption\""}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
@@ -3437,14 +3436,66 @@ fn _ramp_contact_track_datums(source, length, thickness) {
       starboard: #{name: "RampTrackStarboard", center_z: -center}}
 }
 
+fn _physical_ramp_mitered_track_profile(side, length, thickness, width,
+                                        center_x, center_z, bevel_run) {
+    if (side != "port" && side != "starboard") || length <= 0.0
+        || thickness <= 0.0 || width <= 0.0 || bevel_run <= 0.0
+        || bevel_run >= length {
+        return plan_error("mitered ramp track profile has invalid source dimensions");
+    }
+    let direction = if side == "port" { 1.0 } else { -1.0 };
+    let half_thickness = thickness / 2.0;
+    let half_width = width / 2.0;
+    let inboard_x = -center_x;
+    let top_tip_x = direction * length - center_x;
+    let bottom_tip_x = direction * (length - bevel_run) - center_x;
+    let points = [
+        [inboard_x, -half_thickness, -half_width],
+        [inboard_x, half_thickness, -half_width],
+        [top_tip_x, half_thickness, -half_width],
+        [bottom_tip_x, -half_thickness, -half_width],
+        [inboard_x, -half_thickness, half_width],
+        [inboard_x, half_thickness, half_width],
+        [top_tip_x, half_thickness, half_width],
+        [bottom_tip_x, -half_thickness, half_width],
+    ];
+    let faces = [
+        [0, 1, 2, 3], [4, 7, 6, 5], [0, 4, 5, 1],
+        [3, 7, 6, 2], [1, 5, 6, 2], [0, 3, 7, 4],
+    ];
+    let indices = [];
+    for face in faces {
+        if direction > 0.0 {
+            for index in face { indices.push(index); }
+        } else {
+            for index in 0..face.len() {
+                indices.push(face[face.len() - 1 - index]);
+            }
+        }
+    }
+    #{ok: true, points: points,
+      face_counts: [4, 4, 4, 4, 4, 4], face_indices: indices}
+}
+
 // Geometry-derived physical counterpart of the render tracks. The source
-// asset's single broad Surface is removed through the Editor journal; both
-// contact colliders use the same FLIP station and SysML track-width datums as
-// the visible ramp.
-fn _physical_ramp_contact_track_ops(doc, edit_target, root, source,
+// asset's broad Surface is removed through the Editor journal. Each physical
+// track is an authored convex mesh whose toe is mitered from its thickness
+// and commanded deployment angle, so the whole toe face reaches terrain
+// without driving the lower edge through the plane.
+fn _physical_ramp_contact_track_ops(doc, edit_target, root, source, side,
     length, thickness, center_x, surface_y, body_rotation_deg) {
     let datums = _ramp_contact_track_datums(source, length, thickness);
     if datums.ok != true { return datums; }
+    let deployment_angle = _sysml_number(source, if side == "port" {
+        "physicalRampPortDeploymentAngleRad"
+    } else {
+        "physicalRampStarboardDeploymentAngleRad"
+    });
+    let bevel_run = mechanical_relations::planar_horizontal_face_bevel_run(
+        thickness, deployment_angle);
+    if bevel_run == () || bevel_run >= length {
+        return plan_error("physical ramp angle cannot produce a finite toe bevel");
+    }
     let ops = [];
     let legacy_surface = root + "/Surface";
     if query_ok(assembly_builder::composed_query(doc,
@@ -3455,18 +3506,36 @@ fn _physical_ramp_contact_track_ops(doc, edit_target, root, source,
         let path = root + "/" + track.name;
         let current = assembly_builder::composed_query(doc,
             #{path: path, children: false});
-        if query_ok(current) && current.type_name != "Cube" {
-            return plan_error(path + ": physical wheel track must be a Cube collider");
+        if query_ok(current) && current.type_name != "Cube"
+            && current.type_name != "Mesh" {
+            return plan_error(path + ": physical wheel track must be a Cube or Mesh collider");
         }
-        if !query_ok(current) {
-            let shape = assembly_builder::cube_shape_plan(edit_target, root,
-                track.name, 1.0, [length, thickness, datums.width_m], true);
+        let profile = _physical_ramp_mitered_track_profile(side, length,
+            thickness, datums.width_m, center_x, track.center_z, bevel_run);
+        if !profile.ok { return profile; }
+        let create_mesh = !query_ok(current) || current.type_name != "Mesh";
+        if query_ok(current) && current.type_name == "Cube" {
+            ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
+        }
+        if create_mesh {
+            let shape = assembly_builder::mesh_shape_plan(edit_target, root,
+                track.name, profile.points, profile.face_counts,
+                profile.face_indices, [0.34, 0.38, 0.44], true);
             if !shape.ok { return shape; }
             for op in shape.ops { ops.push(op); }
+            ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+                name: "physics:approximation", type_name: "token",
+                value: "\"convexHull\""}});
+        } else {
+            let update = assembly_builder::mesh_shape_update_plan(edit_target,
+                path, profile.points, profile.face_counts, profile.face_indices,
+                [0.34, 0.38, 0.44], true, "convexHull");
+            if !update.ok { return update; }
+            for op in update.ops { ops.push(op); }
         }
         let placement = assembly_builder::place_plan(edit_target, path,
-            [center_x, surface_y, track.center_z], [0.0, 0.0, body_rotation_deg],
-            [length, thickness, datums.width_m]);
+            [center_x, surface_y, track.center_z],
+            [0.0, 0.0, body_rotation_deg], [1.0, 1.0, 1.0]);
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
         ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path,
@@ -3476,7 +3545,7 @@ fn _physical_ramp_contact_track_ops(doc, edit_target, root, source,
             #{name: "purpose", type_name: "token", value: "\"render\""},
             #{name: "primvars:displayColor", type_name: "color3f[]", value: "[(0.34, 0.38, 0.44)]"},
             #{name: "lunco:collider:geometrySource", type_name: "string",
-              value: "\"FlipRequirements::FlipRover::wheelStationZ+visualRoverWheelWidthM; GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM+rampSurfaceLengthM+rampSurfaceThicknessM\""},
+              value: "\"FlipRequirements::FlipRover::wheelStationZ+visualRoverWheelWidthM; GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM+rampSurfaceLengthM+rampSurfaceThicknessM+physicalRampPortDeploymentAngleRad+physicalRampStarboardDeploymentAngleRad\""},
             #{name: "lunco:requirement", type_name: "string",
               value: "\"GriffinRampRequirements::GRR006_RampGeometry\""}
         ] {
@@ -3733,14 +3802,14 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path) {
       length_m: length, no_op: ops.len() == 0}
 }
 
-// Author the safe pre-landing state of the physical ramp bodies.  The ramp
-// geometry remains full-size and collision-enabled, but lies horizontally at
-// its hinge so the 8 m body cannot contact terrain while Griffin is descending.
+// Author the safe pre-landing state of the physical ramp bodies. The full
+// collision meshes, including their deployment-angle-derived toe miters, lie
+// horizontally at the hinge so they cannot contact terrain during descent.
 // Deployment is then a native PhysicsRevoluteJoint angle command from the
 // mission scenario.  This keeps the scene source authoritative without trying
 // to mutate a live collider through an authored transform edit.
 fn _physical_ramp_transition_ops(doc, edit_target, root, side,
-    overlap, thickness, width, surface_y) {
+    transition_length, thickness, width, surface_y) {
     let source = sysml_requirements::source();
     let name = griffin_spec::physical_ramp_transition_child_name();
     let mass = griffin_spec::physical_ramp_deck_transition_mass_kg();
@@ -3771,9 +3840,9 @@ fn _physical_ramp_transition_ops(doc, edit_target, root, side,
     }
     let ops = [];
     if migrate_scaled_body {
-        // The earlier study authored the scaled Cube as the body itself. It is
-        // safe to replace that local subtree in one undoable Editor change set
-        // because the fixed joint and both body endpoints are re-authored below.
+        // A scaled Cube cannot serve as the rigid-body frame. Replace it with
+        // the required Xform and author its contact child and fixed joint in
+        // the same undoable Editor change set.
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
         ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: root,
             name: name, type_name: "Xform", reference: (), reference_prim_path: ""}});
@@ -3790,7 +3859,11 @@ fn _physical_ramp_transition_ops(doc, edit_target, root, side,
     // local authored placement is also the fixed-joint body1 origin. Once the
     // joint is admitted, the physics projector owns this nested body and keeps
     // it horizontal at the Griffin deck anchor while the parent ramp rotates.
-    let center_x = if side == "port" { -overlap / 2.0 } else { overlap / 2.0 };
+    let center_x = if side == "port" {
+        -transition_length / 2.0
+    } else {
+        transition_length / 2.0
+    };
     let placement = assembly_builder::place_plan(edit_target, path,
         [center_x, surface_y, 0.0], [0.0, 0.0, 0.0], ());
     if !placement.ok { return placement; }
@@ -3821,7 +3894,7 @@ fn _physical_ramp_transition_ops(doc, edit_target, root, side,
     ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: contact_path,
         schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
     let contact_placement = assembly_builder::place_plan(edit_target, contact_path,
-        [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [overlap, thickness, width]);
+        [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [transition_length, thickness, width]);
     if !contact_placement.ok { return contact_placement; }
     for op in contact_placement.ops { ops.push(op); }
     for item in [
@@ -3854,8 +3927,7 @@ fn _physical_ramp_transition_ops(doc, edit_target, root, side,
     // The fixed joint is deliberately attached to the lander root rather than
     // the rotating ramp body. body1 remains the named nested TransitionPlate;
     // localPos0 is the deck-frame centre and localPos1 is its own origin.
-    let anchor_x = if side == "port" { mount_x - overlap / 2.0 }
-        else { mount_x + overlap / 2.0 };
+    let anchor_x = mount_x + center_x;
     for relation in [
         #{name: "physics:body0", targets: ["/Griffin1"]},
         #{name: "physics:body1", targets: ["/Griffin1/" +
@@ -3880,9 +3952,34 @@ fn _physical_ramp_transition_ops(doc, edit_target, root, side,
             name: item.name, type_name: item.type_name, value: item.value}});
     }
     #{ok: true, path: path, name: name, center_x_m: center_x,
-      overlap_m: overlap, mass_kg: mass, inertia_kg_m2: inertia,
+      transition_length_m: transition_length, mass_kg: mass, inertia_kg_m2: inertia,
       contact_path: contact_path, joint_path: joint_path,
       joint_anchor_x_m: anchor_x, ops: ops}
+}
+
+fn _physical_ramp_mass_property_ops(edit_target, root, source) {
+    let mass = _sysml_number(source, "physicalRampMassKg");
+    let inertia_x = _sysml_number(source, "physicalRampInertiaXKgM2");
+    let inertia_y = _sysml_number(source, "physicalRampInertiaYKgM2");
+    let inertia_z = _sysml_number(source, "physicalRampInertiaZKgM2");
+    let status = sysml_requirements::text(source,
+        griffin_spec::qualified_attribute_name("physicalRampMassPropertiesStatus"));
+    if mass == () || inertia_x == () || inertia_y == () || inertia_z == ()
+        || status == () || status == "" || mass <= 0.0
+        || inertia_x <= 0.0 || inertia_y <= 0.0 || inertia_z <= 0.0 {
+        return plan_error("physical ramp mass-property study datums are incomplete");
+    }
+    #{ok: true, ops: [
+        #{SetAttribute: #{edit_target: edit_target, path: root,
+            name: "physics:mass", type_name: "float", value: mass.to_string()}},
+        #{SetAttribute: #{edit_target: edit_target, path: root,
+            name: "physics:diagonalInertia", type_name: "float3",
+            value: "(" + inertia_x.to_string() + ", " + inertia_y.to_string()
+                + ", " + inertia_z.to_string() + ")"}},
+        #{SetAttribute: #{edit_target: edit_target, path: root,
+            name: "lunco:mass_properties_status", type_name: "string",
+            value: "\"" + status + "\""}},
+      ]}
 }
 
 fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
@@ -3902,7 +3999,9 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
     let surface_y = _sysml_number(source, "rampSurfaceCenterYM");
     let rail_y = _sysml_number(source, "rampRailCenterYM");
     let stowed_angle = _sysml_number(source, "physicalRampStowedAngleRad");
-    let transition_overlap = _sysml_number(source, "physicalRampDeckTransitionOverlapM");
+    let transition_length = _sysml_number(source, "physicalRampDeckTransitionLengthM");
+    let required_transition_overlap = griffin_spec::physical_ramp_deck_transition_required_overlap_m();
+    let interface_tolerance = griffin_spec::physical_ramp_deck_transition_interface_tolerance_m();
     let mount_x = _sysml_number(source, if side == "port" {
         "physicalRampPortMountX"
     } else {
@@ -3910,16 +4009,28 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
     });
     let mount_y = _sysml_number(source, "physicalRampMountY");
     let mount_z = _sysml_number(source, "physicalRampMountZ");
-    let hinge_limit_deg = _sysml_number(source, "physicalRampHingeLimitDeg");
-    if length == () || width == () || thickness == () || rail_height == ()
-        || rail_width == () || stowed_x == () || surface_y == ()
-        || rail_y == () || stowed_angle == () || mount_x == ()
-        || mount_y == () || mount_z == () || hinge_limit_deg == ()
-        || transition_overlap == ()
-        || length <= 0.0 || width <= 0.0 || thickness <= 0.0
-        || rail_height <= 0.0 || rail_width <= 0.0 || hinge_limit_deg <= 0.0
-        || transition_overlap <= 0.0 || transition_overlap >= length {
+    let hinge_limit_rad = _sysml_number(source, "rampMaxDeploymentAngleRad");
+    let hinge_limit_deg = if hinge_limit_rad == () { () }
+        else { hinge_limit_rad * 180.0 / 3.141592653589793 };
+    let missing_ramp_datums = length == () || width == () || thickness == ()
+        || rail_height == () || rail_width == () || stowed_x == ()
+        || surface_y == () || rail_y == () || stowed_angle == ()
+        || mount_x == () || mount_y == () || mount_z == () || hinge_limit_deg == ();
+    if missing_ramp_datums {
         return plan_error("stowed physical ramp SysML datums are incomplete");
+    }
+    let invalid_ramp_dimensions = length <= 0.0 || width <= 0.0 || thickness <= 0.0
+        || rail_height <= 0.0 || rail_width <= 0.0 || hinge_limit_deg <= 0.0;
+    if invalid_ramp_dimensions {
+        return plan_error("stowed physical ramp dimensions must be positive");
+    }
+    let invalid_transition = transition_length == () || required_transition_overlap == ()
+        || interface_tolerance == () || interface_tolerance <= 0.0
+        || transition_length <= 0.0 || transition_length >= length
+        || required_transition_overlap <= 0.0
+        || required_transition_overlap >= transition_length;
+    if invalid_transition {
+        return plan_error("stowed physical ramp transition datums are invalid");
     }
     let rail = root + "/EdgeRail";
     let inner = root + "/EdgeRailInner";
@@ -3936,6 +4047,9 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
         [mount_x, mount_y, mount_z], (), ());
     if !root_placement.ok { return root_placement; }
     for op in root_placement.ops { ops.push(op); }
+    let mass_properties = _physical_ramp_mass_property_ops(edit_target, root, source);
+    if !mass_properties.ok { return mass_properties; }
+    for op in mass_properties.ops { ops.push(op); }
     for item in [
         #{path: rail, translation: [signed_x, rail_y, rail_center],
           rotation: [0.0, 0.0, 0.0], scale: [length, rail_height, rail_width]},
@@ -3948,11 +4062,11 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
         for op in placement.ops { ops.push(op); }
     }
     let tracks = _physical_ramp_contact_track_ops(doc, edit_target, root,
-        source, length, thickness, signed_x, surface_y, 0.0);
+        source, side, length, thickness, signed_x, surface_y, 0.0);
     if !tracks.ok { return tracks; }
     for op in tracks.ops { ops.push(op); }
     let transition = _physical_ramp_transition_ops(doc, edit_target, root, side,
-        transition_overlap, thickness, width, surface_y);
+        transition_length, thickness, width, surface_y);
     if !transition.ok { return transition; }
     for op in transition.ops { ops.push(op); }
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
@@ -3966,8 +4080,8 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
     let joint_check = assembly_builder::composed_query(doc, #{path: joint, children: false});
     if query_ok(joint_check) {
         // USD PhysicsRevoluteJoint limits are degrees; SetPorts angle is
-        // radians.  Author both the native travel bound and the hinge anchor
-        // in the same generation as the stowed geometry.
+        // radians. Convert the single SysML limit at this boundary, then
+        // author the native travel bound and hinge anchor in one generation.
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: joint,
             name: "physics:lowerLimit", type_name: "float",
             value: (-hinge_limit_deg).to_string()}});
@@ -3981,7 +4095,7 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
     }
     #{ok: true, kind: "griffin_physical_ramp_stowed_geometry", root: root,
       side: side, length_m: length, width_m: width,
-      transition_overlap_m: transition_overlap, hinge_limit_deg: hinge_limit_deg,
+      transition_length_m: transition_length, hinge_limit_deg: hinge_limit_deg,
       ops: ops, no_op: ops.len() == 0}
 }
 
@@ -4016,7 +4130,10 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
     let surface_y = _sysml_number(source, "rampSurfaceCenterYM");
     let rail_y = _sysml_number(source, "rampRailCenterYM");
     let clearance = _sysml_number(source, "rampWheelClearanceM");
-    let transition_overlap = _sysml_number(source, "physicalRampDeckTransitionOverlapM");
+    let mass_properties = _physical_ramp_mass_property_ops(edit_target, root, source);
+    let transition_length = _sysml_number(source, "physicalRampDeckTransitionLengthM");
+    let required_transition_overlap = griffin_spec::physical_ramp_deck_transition_required_overlap_m();
+    let interface_tolerance = griffin_spec::physical_ramp_deck_transition_interface_tolerance_m();
     let stowed_angle = _sysml_number(source, "physicalRampStowedAngleRad");
     let mount_x = _sysml_number(source, if side == "port" {
         "physicalRampPortMountX"
@@ -4025,15 +4142,26 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
     });
     let mount_y = _sysml_number(source, "physicalRampMountY");
     let mount_z = _sysml_number(source, "physicalRampMountZ");
-    if length == () || width == () || thickness == () || rail_height == ()
-        || rail_width == () || surface_y == () || rail_y == ()
+    let missing_geometry_datums = length == () || width == () || thickness == ()
+        || rail_height == () || rail_width == () || surface_y == () || rail_y == ()
         || clearance == () || stowed_angle == () || mount_x == ()
-        || mount_y == () || mount_z == ()
-        || transition_overlap == ()
-        || length <= 0.0 || width <= 0.0 || thickness <= 0.0
-        || rail_height <= 0.0 || rail_width <= 0.0 || clearance <= 0.0
-        || transition_overlap <= 0.0 || transition_overlap >= length {
+        || mount_y == () || mount_z == () || mass_properties.ok != true;
+    if missing_geometry_datums {
         return plan_error("physical ramp geometry SysML datums are incomplete");
+    }
+    let invalid_geometry_dimensions = length <= 0.0 || width <= 0.0
+        || thickness <= 0.0 || rail_height <= 0.0 || rail_width <= 0.0
+        || clearance <= 0.0;
+    if invalid_geometry_dimensions {
+        return plan_error("physical ramp geometry dimensions must be positive");
+    }
+    let invalid_transition = transition_length == ()
+        || required_transition_overlap == () || interface_tolerance == ()
+        || interface_tolerance <= 0.0 || transition_length <= 0.0
+        || transition_length >= length || required_transition_overlap <= 0.0
+        || required_transition_overlap >= transition_length;
+    if invalid_transition {
+        return plan_error("physical ramp transition datums are invalid");
     }
     let rail = root + "/EdgeRail";
     let inner = root + "/EdgeRailInner";
@@ -4057,6 +4185,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
         [mount_x, mount_y, mount_z], (), ());
     if !root_placement.ok { return root_placement; }
     for op in root_placement.ops { ops.push(op); }
+    for op in mass_properties.ops { ops.push(op); }
     for item in [
         #{path: rail, translation: [center_x, rail_y, rail_center],
           scale: [length, rail_height, rail_width]},
@@ -4069,11 +4198,11 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
         for op in placement.ops { ops.push(op); }
     }
     let tracks = _physical_ramp_contact_track_ops(doc, edit_target, root,
-        source, length, thickness, center_x, surface_y, body_rotation_deg);
+        source, side, length, thickness, center_x, surface_y, body_rotation_deg);
     if !tracks.ok { return tracks; }
     for op in tracks.ops { ops.push(op); }
     let transition = _physical_ramp_transition_ops(doc, edit_target, root, side,
-        transition_overlap, thickness, width, surface_y);
+        transition_length, thickness, width, surface_y);
     if !transition.ok { return transition; }
     for op in transition.ops { ops.push(op); }
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
@@ -4102,7 +4231,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, root, side) {
     }
     #{ok: true, kind: "griffin_physical_ramp_geometry", root: root,
       side: side, width_m: width, clearance_m: clearance,
-      transition_overlap_m: transition_overlap,
+      transition_length_m: transition_length,
       paths: [root + "/RampTrackPort", root + "/RampTrackStarboard",
         rail, inner, transition.path],
       ops: ops, no_op: ops.len() == 0}
@@ -4307,11 +4436,8 @@ fn standard_terrain_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
         return plan_error("standard_terrain_plan requires a document, edit target, and absolute root");
     }
-    let source = sysml_requirements::source();
-    let asset = sysml_requirements::text(source,
-        griffin_spec::qualified_attribute_name("visualTerrainAsset"));
-    let shader = sysml_requirements::text(source,
-        griffin_spec::qualified_attribute_name("visualTerrainShaderAsset"));
+    let asset = griffin_spec::visual_terrain_asset();
+    let shader = griffin_spec::visual_terrain_shader_asset();
     if asset == () || asset == "" || shader == () || shader == "" {
         return plan_error("visual terrain asset and shader identities are missing from SysML");
     }

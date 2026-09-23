@@ -103,28 +103,27 @@ they are not substitutes for the published Griffin/FLIP facts above:
 - four landing legs, isogrid top deck, and side-mounted solar arrays;
 - FLIP mounted on the top deck through a payload adapter during descent;
 - two solid integrated side ramps with physical collision surfaces and paired
-  edge rails; the accepted runtime pose is authored from the deck datum to the
-  terrain plane, while stable articulated folding remains future work;
+  edge rails; a typed hinge command is modeled, while deployed runtime
+  stability and rover traversal remain unaccepted;
 - landing → ramp deployment → adapter release → rover egress → base-site route.
 
-For the current bounded contact study, each ramp is an 8 m solid collision
-surface with paired edge rails, authored at ±50° from the deck datum so its
-working span reaches the landing plane. Those dimensions and angles are
-geometry/control surrogates chosen to keep the 4.8 m-wide FLIP proxy on the
-physical ramp; they are not a released Griffin mechanical ICD. The accepted
-runtime keeps the ramps integrated with the lander compound; the previous
-independent rigid-body hinge attempt was rejected because it could escape the
-bounded physics world. The top-deck adapter plate and restraints are
-visual-only after release, while the deck, ramps, and rails remain the contact
-path. The shared waypoint consumer also ignores waypoint sensors for fixed-joint
-cargo, so FLIP cannot consume the surface route before the adapter release
-boundary.
+The current SysML and Editor-builder study uses a 12.228605 m top contact face,
+a 0.18 m track thickness, and mirrored 49 degree deployment commands from the
+3.98 m touchdown COM datum. Each physical track is authored as a convex mesh;
+its toe miter is derived from track thickness and deployment angle so the
+upper and lower toe edges meet the terrain plane together. The 3.50 m rail
+envelope, paired tracks, hinge, transition, and apron remain explicit Twin
+assumptions because Astrobotic has not published a ramp or site-interface ICD.
+The 95 kg body mass and (210, 34, 210) kg m² diagonal inertia are also
+source-owned study proxies; supplier mass properties and body center of mass
+remain unverified.
 
-These requirements are now authored in `vehicles/griffin_1.usda` and
-`scenes/griffin_1_surface_ops.usda`. They are a simulation prototype, not a
-claim about the released Griffin flight configuration. In particular, Astrolab's
-public mission material describes direct top-deck egress and does not publish an
-egress-ramp ICD; the two ramps are therefore a deliberate project assumption.
+These values and the typed geometry plan are not yet confirmed in the composed
+Editor stage. The checked-in vehicle layer still requires the Editor migration,
+composed readback of both track meshes and deck transitions, and deployed FLIP
+wheel-contact evidence before any ramp or egress acceptance is claimed. Public
+mission material describes optional rover egress but does not provide the
+as-built ramp geometry or site-apron design.
 
 These values are suitable for Modelica coupling, control-flow, power-budget,
 thermal, and mobility sensitivity studies. They are not flight data.
