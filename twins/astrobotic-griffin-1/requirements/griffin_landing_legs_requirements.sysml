@@ -100,13 +100,15 @@ package GriffinLandingLegRequirements {
 
     verification def Verify_GriffinLandingLegRequirements {
         subject legs : GriffinLandingLegAssembly;
-        verify gll001;
-        verify gll002;
-        verify gll003;
-        verify gll004;
-        verify gll005;
-        verify gll006;
-        verify gll007;
-        verify gll008;
+        objective {
+            verify gll001;
+            verify gll002;
+            verify gll003;
+            verify gll004;
+            verify gll005;
+            verify gll006;
+            verify gll007;
+            verify gll008;
+        }
     }
 }

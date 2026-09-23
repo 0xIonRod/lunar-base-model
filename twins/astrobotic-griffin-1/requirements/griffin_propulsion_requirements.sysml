@@ -103,18 +103,20 @@ package GriffinPropulsionRequirements {
     verification def Verify_GriffinPropulsionRequirements {
         subject propulsion : GriffinMainPropulsionAssembly;
         subject skirt : GriffinEngineSkirtComponent;
-        verify gpp001;
-        verify gpp002;
-        verify gpp003;
-        verify gpp004;
-        verify gpp005;
-        verify gpp006;
-        verify ges001;
-        verify ges002;
-        verify ges003;
-        verify ges004;
-        verify ges005;
-        verify ges006;
-        verify ges007;
+        objective {
+            verify gpp001;
+            verify gpp002;
+            verify gpp003;
+            verify gpp004;
+            verify gpp005;
+            verify gpp006;
+            verify ges001;
+            verify ges002;
+            verify ges003;
+            verify ges004;
+            verify ges005;
+            verify ges006;
+            verify ges007;
+        }
     }
 }

@@ -35,6 +35,28 @@ package GriffinBusRequirements {
         observedCount == expectedCount;
     }
 
+    constraint def GBC_MeasurementWithinTolerance {
+        in absoluteError : Real;
+        in allowedTolerance : Real;
+        absoluteError >= 0.0 and absoluteError <= allowedTolerance;
+    }
+
+    constraint def GBC011_AnnularOpeningTopology {
+        in observedPointCount : Real;
+        in observedFaceCount : Real;
+        in observedIndexCount : Real;
+        in segmentCount : Real;
+        observedPointCount == 4.0 * segmentCount
+            and observedFaceCount == 4.0 * segmentCount
+            and observedIndexCount == 16.0 * segmentCount;
+    }
+
+    constraint def GBC011_OpeningQuadsCoverSurface {
+        in quadFaceCount : Real;
+        in faceCount : Real;
+        quadFaceCount == faceCount;
+    }
+
     requirement def GBC001_BusIdentity {
         doc /* GBC-001 [topology] the bus is a named, visible octagonal open-frame visual component with an octagonal lower service skirt and upper deck. */
     }
@@ -49,27 +71,39 @@ package GriffinBusRequirements {
     }
     requirement def GBC005_BusFrameGeometry {
         doc /* GBC-005 [geometry] the open eight-sided frame shall comprise eight upper and eight lower perimeter beams plus eight named corner posts. The rail outside faces define the 4.50 m X/Z plan envelope; the perimeter mesh spans the 2.00 m core-frame height and meets the deck and lower skirt. Source: public Griffin imagery establishes a faceted structural bus, not released CAD. Rationale: a connected, open member layout reveals subsystem placement and removes the visually opaque prism; 0.16 m section stock is a replaceable study assumption shared by ring members and posts. */
+        require GBC_MeasurementWithinTolerance;
     }
     requirement def GBC006_DeckGeometry {
         doc /* GBC-006 [geometry] the active TopDeckOctagon shall use the typed deck width, depth, thickness, and center-Y datums resolved from GriffinVisualConfiguration; the separate avionics deck remains a smaller service platform. These are derived presentation datums inside the 4.50 m x 4.50 m x 2.00 m octagonal bus envelope. */
+        require GBC_ObservedCountEquals;
+        require GBC_MeasurementWithinTolerance;
     }
     requirement def GBC007_AssemblyRailGeometry {
         doc /* GBC-007 [geometry] the composed bus shall expose the eight named Y-axis frame rails, with dimensions and signed X/Y/Z stations resolved from the typed visual configuration; the rails are render-only. */
+        require GBC_MeasurementWithinTolerance;
     }
     requirement def GBC008_OctagonalBodyShape {
         doc /* GBC-008 [geometry] the primary body shall be an eight-sided open frame built from sixteen perimeter members, with outward-wound quad faces and single-sided rendering. Its eight bays shall expose the internal subsystems. Source: GriffinVisualConfigurationRequirements::GriffinVisualConfiguration and OpenUSD UsdGeomMesh topology. Rationale: verify physical mesh topology and normals directly; a scene label cannot prove geometry. */
+        require GBC_ObservedCountEquals;
     }
     requirement def GBC009_OpenSideBays {
         doc /* GBC-009 [configuration] legacy side-bay panel parts shall be removed in the open-frame review configuration so all eight bays expose interior structure and hardware. Legacy panel prims are removed from their owning source layer using typed Editor operations. Rationale: inherited skins otherwise reconstruct an opaque shell around an open primary frame. */
     }
     requirement def GBC010_DeckSkirtSeparation {
         doc /* GBC-010 [assembly geometry] the upper payload deck and lower service skirt shall remain distinct, non-intersecting envelopes in the bus frame. Verification uses the oriented-box separating-axis margin computed from their typed SysML Dimensions and Position values. Rationale: this preserves a real service bay instead of allowing two separately named solids to collapse into an overlapping slab. The spacing is derived from the authored centers and thicknesses, not duplicated as another clearance literal. */
+        require GBC010_PositiveDeckSkirtClearance;
     }
     requirement def GBC011_TankSupportOpenings {
         doc /* GBC-011 [assembly geometry] the bus shall contain a separate octagonal tank-support perimeter using the shared bus profile, with four annular through-opening collars whose centers and bore radii follow the typed tank stations and support dimensions in GriffinVisualConfiguration. Each bore shall clear its scaled retention bands by the shared minimumTankFrameClearanceM datum. The collars shall preserve open bores and remain render-only. These are explicitly replaceable visual-study assumptions because the supplier interface drawing is not public. */
+        require GBC_ObservedCountEquals;
+        require GBC_MeasurementWithinTolerance;
+        require GBC011_TankBoreClearance;
+        require GBC011_AnnularOpeningTopology;
+        require GBC011_OpeningQuadsCoverSurface;
     }
     requirement def GBC012_SourceOwnedAppearance {
         doc /* GBC-012 [appearance] the composed bus display colors shall match the linear values declared once in GriffinVisualConfiguration; scene builders shall not author an independent palette. */
+        require GBC_MeasurementWithinTolerance;
     }
 
     requirement gbc001 : GBC001_BusIdentity { subject bus : GriffinBusComponent; }
@@ -87,17 +121,19 @@ package GriffinBusRequirements {
 
     verification def Verify_GriffinBusRequirements {
         subject bus : GriffinBusComponent;
-        verify gbc001;
-        verify gbc002;
-        verify gbc003;
-        verify gbc004;
-        verify gbc005;
-        verify gbc006;
-        verify gbc007;
-        verify gbc008;
-        verify gbc009;
-        verify gbc010;
-        verify gbc011;
-        verify gbc012;
+        objective {
+            verify gbc001;
+            verify gbc002;
+            verify gbc003;
+            verify gbc004;
+            verify gbc005;
+            verify gbc006;
+            verify gbc007;
+            verify gbc008;
+            verify gbc009;
+            verify gbc010;
+            verify gbc011;
+            verify gbc012;
+        }
     }
 }

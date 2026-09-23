@@ -135,20 +135,24 @@ package FlipRequirements {
 
     verification def Verify_FLIPVisualRequirements {
         subject rover : FlipRover;
-        verify fvg001;
+        objective {
+            verify fvg001;
+        }
     }
 
     verification def Verify_FLIPComponentRequirements {
         subject rover : FlipRover;
-        verify fvg001;
-        verify fvg002;
-        verify fvg003;
-        verify fvg004;
-        verify fvg005;
-        verify fvg006;
-        verify fvg007;
-        verify fvg008;
-        verify fvg009;
-        verify fvg010;
+        objective {
+            verify fvg001;
+            verify fvg002;
+            verify fvg003;
+            verify fvg004;
+            verify fvg005;
+            verify fvg006;
+            verify fvg007;
+            verify fvg008;
+            verify fvg009;
+            verify fvg010;
+        }
     }
 }

@@ -41,9 +41,11 @@ package MoonBaseProjectRequirements {
 
     verification def Verify_MoonBaseProjectRequirements {
         subject simulation : ProjectSimulationContract;
-        verify mb001;
-        verify mb002;
-        verify mb003;
-        verify mb004;
+        objective {
+            verify mb001;
+            verify mb002;
+            verify mb003;
+            verify mb004;
+        }
     }
 }

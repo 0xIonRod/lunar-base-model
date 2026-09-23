@@ -11,6 +11,15 @@ fn expected(ok, message) {
     if ok { "" } else { message }
 }
 
+fn constraint_boundary_evidence(id, requirement, actual, expected, result,
+                                expected_verdict) {
+    #{id: id, requirement: requirement, kind: "sysml_constraint_boundary",
+      actual: actual, expected: expected, verdict: result.verdict,
+      expected_verdict: expected_verdict,
+      ok: result.verdict == expected_verdict,
+      constraint_result: result, verification: result.verification}
+}
+
 fn on_start(me, ctx) {
     this.start_elapsed = elapsed_seconds();
     this.elapsed = 0.0;
@@ -26,9 +35,11 @@ fn on_tick(me, ctx) {
     let failures = [];
     for error in report.errors { failures.push(error); }
 
-    // SysML owns the normative requirement/verification intent. Rhai remains
-    // the sole executable test backend: it consumes the generic validation
-    // snapshot, selects the required definitions, and emits this verdict.
+    // SysML owns the normative requirement and verification intent. The
+    // shared Rust/Rhai evaluator executes its supported constraint subset;
+    // this Twin script supplies observations and assembles evidence. The
+    // remaining structural predicates are still Twin Rhai and are not yet a
+    // generic typed USD-provider implementation.
     let sysml = report.sysml;
     // Provenance is a separate typed SysML catalog. Select one requirement ID
     // through the bounded native projection; the source/rationale/span arrive
@@ -58,14 +69,6 @@ fn on_tick(me, ctx) {
         && provenance_rationale != () && provenance_rationale != "",
         "typed Griffin requirement provenance catalog is unavailable"));
 
-    // Prove that every executable rule was dispatched, not just that one
-    // aggregate boolean happened to be true.
-    for rule in report.expected_rules {
-        failures.push(expected(
-            griffin_requirements::_has(report.checked_rules, rule),
-            "runtime did not execute " + rule));
-    }
-
     // Every manifest entry is an individual part test.
     for part in report.parts {
         failures.push(expected(part.ok, part.id + " part contract failed"));
@@ -83,40 +86,66 @@ fn on_tick(me, ctx) {
     // Boundary tests make the limiter itself executable policy, not a helper
     // that exists only for a future UI. The limit comes from the typed SysML
     // snapshot; Rhai supplies only observations around that value.
+    let constraint_evidence = [];
     let max_payload = griffin_requirements::max_payload_kg();
-    let zero_payload = griffin_requirements::payload_load_check(0.0, max_payload);
-    failures.push(expected(zero_payload.ok,
+    let zero_payload = griffin_requirements::payload_load_check(0.0);
+    failures.push(expected(zero_payload.verdict == "pass",
         "GR-009 payload limiter rejected the zero-load boundary"));
-    let at_capacity = griffin_requirements::payload_load_check(max_payload, max_payload);
-    failures.push(expected(at_capacity.ok,
+    constraint_evidence.push(constraint_boundary_evidence("GR-009-zero-payload",
+        "GriffinFunctionalRequirements::gr009", 0.0, max_payload,
+        zero_payload, "pass"));
+    let at_capacity = griffin_requirements::payload_load_check(max_payload);
+    failures.push(expected(at_capacity.verdict == "pass",
         "GR-009 payload limiter rejected the 625 kg boundary"));
-    let negative_payload = griffin_requirements::payload_load_check(-0.001, max_payload);
-    failures.push(expected(!negative_payload.ok,
+    constraint_evidence.push(constraint_boundary_evidence("GR-009-at-capacity",
+        "GriffinFunctionalRequirements::gr009", max_payload, max_payload,
+        at_capacity, "pass"));
+    let negative_payload = griffin_requirements::payload_load_check(-0.001);
+    failures.push(expected(negative_payload.verdict == "fail",
         "GR-009 payload limiter accepted a negative payload"));
-    let over_capacity = griffin_requirements::payload_load_check(max_payload + 0.001, max_payload);
-    failures.push(expected(!over_capacity.ok,
+    constraint_evidence.push(constraint_boundary_evidence("GR-009-negative-payload",
+        "GriffinFunctionalRequirements::gr009", -0.001, max_payload,
+        negative_payload, "fail"));
+    let over_capacity = griffin_requirements::payload_load_check(max_payload + 0.001);
+    failures.push(expected(over_capacity.verdict == "fail",
         "GR-009 payload limiter accepted a load above 625 kg"));
+    constraint_evidence.push(constraint_boundary_evidence("GR-009-over-capacity",
+        "GriffinFunctionalRequirements::gr009", max_payload + 0.001, max_payload,
+        over_capacity, "fail"));
 
     let max_ramp = griffin_requirements::max_ramp_command_rad();
     let at_negative_ramp_limit = griffin_requirements::ramp_command_check(-max_ramp);
-    failures.push(expected(at_negative_ramp_limit.ok,
-        "GR-011 ramp limiter rejected the negative SysML ramp boundary"));
+    failures.push(expected(at_negative_ramp_limit.verdict == "pass",
+        "GRR-005 ramp limiter rejected the negative SysML ramp boundary"));
+    constraint_evidence.push(constraint_boundary_evidence("GRR-005-at-negative-limit",
+        "GriffinRampRequirements::grr005", -max_ramp, max_ramp,
+        at_negative_ramp_limit, "pass"));
     let at_ramp_limit = griffin_requirements::ramp_command_check(max_ramp);
-    failures.push(expected(at_ramp_limit.ok,
-        "GR-011 ramp limiter rejected the positive SysML ramp boundary"));
+    failures.push(expected(at_ramp_limit.verdict == "pass",
+        "GRR-005 ramp limiter rejected the positive SysML ramp boundary"));
+    constraint_evidence.push(constraint_boundary_evidence("GRR-005-at-positive-limit",
+        "GriffinRampRequirements::grr005", max_ramp, max_ramp,
+        at_ramp_limit, "pass"));
     let over_negative_ramp_limit = griffin_requirements::ramp_command_check(-max_ramp - 0.000001);
-    failures.push(expected(!over_negative_ramp_limit.ok,
-        "GR-011 ramp limiter accepted a command below the SysML ramp limit"));
+    failures.push(expected(over_negative_ramp_limit.verdict == "fail",
+        "GRR-005 ramp limiter accepted a command below the SysML ramp limit"));
+    constraint_evidence.push(constraint_boundary_evidence("GRR-005-below-limit",
+        "GriffinRampRequirements::grr005", -max_ramp - 0.000001, max_ramp,
+        over_negative_ramp_limit, "fail"));
     let over_ramp_limit = griffin_requirements::ramp_command_check(max_ramp + 0.000001);
-    failures.push(expected(!over_ramp_limit.ok,
-        "GR-011 ramp limiter accepted a command above the SysML ramp limit"));
+    failures.push(expected(over_ramp_limit.verdict == "fail",
+        "GRR-005 ramp limiter accepted a command above the SysML ramp limit"));
+    constraint_evidence.push(constraint_boundary_evidence("GRR-005-above-limit",
+        "GriffinRampRequirements::grr005", max_ramp + 0.000001, max_ramp,
+        over_ramp_limit, "fail"));
 
     print("[griffin-requirements] structural_errors=" + report.structural.errors.len()
-        + " rules=" + report.checked_rules.len()
+        + " catalogued_rules=" + report.catalogued_rules.len()
+        + " source_constraint_results=" + constraint_evidence.len()
         + " parts=" + report.parts.len()
         + " assertions=" + failures.len());
-    for rule in report.checked_rules {
-        print("[griffin-requirements] " + rule + "=PASS");
+    for rule in report.catalogued_rules {
+        print("[griffin-requirements] " + rule + "=CATALOGUED_NOT_RUNTIME_VERDICT");
     }
     for rule in report.planned_rules {
         print("[griffin-requirements] " + rule + "=PLANNED_UNEXECUTED");
@@ -134,20 +163,22 @@ fn on_tick(me, ctx) {
     this.assertion_count = failures.len();
     this.failure_count = failure_count;
     this.failures = failures;
-    this.rule_count = report.checked_rules.len();
+    this.rule_count = constraint_evidence.len();
     this.part_count = report.parts.len();
     this.planned_count = report.planned_rules.len();
     this.mission_scope_count = report.mission_scope_rules.len();
     this.process_gate_count = report.process_gate_rules.len();
     this.verdict = if failure_count == 0 { "PASS" } else { "FAIL" };
-    // Preserve structured evidence for every executed rule and every
-    // component. Passing only `checked_rules` would discard the per-part
-    // observations from the generic verdict envelope.
-    let evidence_results = [];
-    let verification_name = griffin_spec::verification_case_name();
-    for rule in report.checked_rules {
-        evidence_results.push(#{id: rule, kind: "runtime_rule", ok: true,
-            verification: verification_name});
+    // Preserve measurements and report results. A catalog entry is not a
+    // runtime check and must not be emitted as a passing evidence row.
+    let evidence_results = [
+        #{id: "GR-structural-report", kind: "structural_report",
+          ok: report.structural.ok, errors: report.structural.errors},
+        #{id: "GR-relational-layout", kind: "layout_report",
+          ok: report.layout.ok, findings: report.layout.findings}
+    ];
+    for result in constraint_evidence {
+        evidence_results.push(result);
     }
     let provenance_evidence_id = if provenance.ok == true {
         provenance_record.requirement_id + "-provenance-catalog"
@@ -162,17 +193,18 @@ fn on_tick(me, ctx) {
             && provenance_source != () && provenance_rationale != (),
         source_reference: provenance_source, rationale: provenance_rationale,
         source_span: if provenance.ok == true { provenance_record.source_span } else { () },
-        verification: verification_name});
+        verification: griffin_spec::verification_case_name()});
     for part in report.parts {
-        part.verification = verification_name;
+        part.verification = griffin_spec::verification_case_name();
         evidence_results.push(part);
     }
     // Keep verdict/evidence formatting in the generic test prelude. The Twin
     // owns observations and rule dispatch; the shared helper owns stable
     // PASS/FAIL output and machine-readable evidence.
     report_structured_verdict(#{ok: failure_count == 0, failures: failures,
-        results: evidence_results, verification: verification_name,
-        requirement_count: report.checked_rules.len(),
+        results: evidence_results,
+        verification: griffin_spec::verification_case_name(),
+        requirement_count: 2,
         source_files: sysml.source_files,
         source_revision: sysml.source_revision_hex},
         "GRIFFIN REQUIREMENTS", "GRIFFIN_REQUIREMENTS");

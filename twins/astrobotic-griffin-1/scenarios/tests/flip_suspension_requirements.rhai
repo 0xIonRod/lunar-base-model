@@ -1,3 +1,4 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Detached FLIP suspension component gate.
 //
 // The fixture contains only the Mission harness. This test deliberately loads
@@ -148,7 +149,7 @@ fn on_tick(me, ctx) {
     if this.phase == 2 {
         if document.generation <= this.load_generation { return; }
         let source = this.source;
-        let children = component_requirements::source_text_list(source, own("childNames"));
+        let children = sysml_requirement_checks::source_text_list(source, own("childNames"));
         if children.len() != 3 { fail(this, "FLIP suspension childNames source datum is incomplete"); return; }
         let root_record = query("QueryUsdPrim", #{
             doc_id: this.doc, path: this.root, children: true,
@@ -171,13 +172,13 @@ fn on_tick(me, ctx) {
     // datums or writes a USD source file.
     let source = this.source;
     let root = this.root;
-    let children = component_requirements::source_text_list(source, own("childNames"));
-    let arm_scale = component_requirements::source_number_list(source, own("armScale"));
+    let children = sysml_requirement_checks::source_text_list(source, own("childNames"));
+    let arm_scale = sysml_requirement_checks::source_number_list(source, own("armScale"));
     let arm_offset = sysml_requirements::number(source, own("armOffsetM"));
     let knuckle_radius = sysml_requirements::number(source, own("knuckleRadiusM"));
     let knuckle_width = sysml_requirements::number(source, own("knuckleWidthM"));
-    let strut_scale = component_requirements::source_number_list(source, own("strutScale"));
-    let strut_offset = component_requirements::source_number_list(source, own("strutOffset"));
+    let strut_scale = sysml_requirement_checks::source_number_list(source, own("strutScale"));
+    let strut_offset = sysml_requirement_checks::source_number_list(source, own("strutOffset"));
     let physical_rest_requirement = sysml_requirements::text(source, own("physicalRestLengthRequirement"));
     let physical_rest_length = if physical_rest_requirement != () && physical_rest_requirement != "" {
         sysml_requirements::number(source, physical_rest_requirement)
@@ -201,34 +202,33 @@ fn on_tick(me, ctx) {
     let knuckle = root + "/" + children[1];
     let strut = root + "/" + children[2];
     let checks = [];
-    checks.push(component_requirements::exists("FSR-003-root", "suspension", "fsr003", VERIFICATION, root, "Xform"));
-    checks.push(component_requirements::children("FSR-003-children", "suspension", "fsr003", VERIFICATION, root, [arm, knuckle, strut]));
-    checks.push(component_requirements::exists("FSR-003-arm", "suspension", "fsr003", VERIFICATION, arm, "Cube"));
-    checks.push(component_requirements::exists("FSR-003-knuckle", "suspension", "fsr003", VERIFICATION, knuckle, "Cylinder"));
-    checks.push(component_requirements::exists("FSR-003-strut", "suspension", "fsr003", VERIFICATION, strut, "Cube"));
-    checks.push(component_requirements::attribute_equals("FSR-001-source", "suspension", "fsr001", VERIFICATION, root, "lunco:visual:component", "flip_suspension"));
-    checks.push(component_requirements::attribute_equals("FSR-002-units", "suspension", "fsr002", VERIFICATION, root, "lunco:visual:units", "SI metres, Y-up"));
+    checks.push(sysml_requirement_checks::exists("FSR-003-root", "suspension", "fsr003", VERIFICATION, root, "Xform"));
+    checks.push(sysml_requirement_checks::children("FSR-003-children", "suspension", "fsr003", VERIFICATION, root, [arm, knuckle, strut]));
+    checks.push(sysml_requirement_checks::exists("FSR-003-arm", "suspension", "fsr003", VERIFICATION, arm, "Cube"));
+    checks.push(sysml_requirement_checks::exists("FSR-003-knuckle", "suspension", "fsr003", VERIFICATION, knuckle, "Cylinder"));
+    checks.push(sysml_requirement_checks::exists("FSR-003-strut", "suspension", "fsr003", VERIFICATION, strut, "Cube"));
+    checks.push(sysml_requirement_checks::attribute_equals("FSR-001-source", "suspension", "fsr001", VERIFICATION, root, "lunco:visual:component", "flip_suspension"));
+    checks.push(sysml_requirement_checks::attribute_equals("FSR-002-units", "suspension", "fsr002", VERIFICATION, root, "lunco:visual:units", "SI metres, Y-up"));
     for axis in 0..3 {
         checks.push(#{id: "FSR-007-arm-scale-" + axis.to_string(), component: "suspension", requirement: "fsr007", verification: VERIFICATION, kind: "attribute_component", path: arm, attr: "xformOp:scale", index: axis, expected: arm_scale[axis], tolerance: 0.002});
         checks.push(#{id: "FSR-007-strut-scale-" + axis.to_string(), component: "suspension", requirement: "fsr007", verification: VERIFICATION, kind: "attribute_component", path: strut, attr: "xformOp:scale", index: axis, expected: strut_scale[axis], tolerance: 0.002});
         checks.push(#{id: "FSR-007-strut-offset-" + axis.to_string(), component: "suspension", requirement: "fsr007", verification: VERIFICATION, kind: "attribute_component", path: strut, attr: "xformOp:translate", index: axis, expected: strut_offset[axis], tolerance: 0.002});
     }
     checks.push(#{id: "FSR-007-arm-offset", component: "suspension", requirement: "fsr007", verification: VERIFICATION, kind: "attribute_component", path: arm, attr: "xformOp:translate", index: 0, expected: arm_offset, tolerance: 0.002});
-    checks.push(component_requirements::attribute_equals("FSR-006-arm-order", "suspension", "fsr006", VERIFICATION, arm, "xformOpOrder", transform_order));
-    checks.push(component_requirements::attribute_equals("FSR-006-strut-order", "suspension", "fsr006", VERIFICATION, strut, "xformOpOrder", transform_order));
-    checks.push(component_requirements::attribute_equals("FSR-007-knuckle-axis", "suspension", "fsr007", VERIFICATION, knuckle, "axis", "X"));
+    checks.push(sysml_requirement_checks::attribute_equals("FSR-006-arm-order", "suspension", "fsr006", VERIFICATION, arm, "xformOpOrder", transform_order));
+    checks.push(sysml_requirement_checks::attribute_equals("FSR-006-strut-order", "suspension", "fsr006", VERIFICATION, strut, "xformOpOrder", transform_order));
+    checks.push(sysml_requirement_checks::attribute_equals("FSR-007-knuckle-axis", "suspension", "fsr007", VERIFICATION, knuckle, "axis", "X"));
     checks.push(#{id: "FSR-007-knuckle-radius", component: "suspension", requirement: "fsr007", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "radius", expected: knuckle_radius, tolerance: 0.002});
     checks.push(#{id: "FSR-007-knuckle-width", component: "suspension", requirement: "fsr007", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "height", expected: knuckle_width, tolerance: 0.002});
-    checks.push(component_requirements::assertion(
+    checks.push(sysml_requirements::constraint_check(
         "FSR-008-physical-rest-length", "suspension", "fsr008", VERIFICATION,
-        physical_rest_length > 0.0,
-        "physical suspension transition datum must be positive: " + physical_rest_requirement,
-        physical_rest_length, "positive SI metres"));
-    checks.push(component_requirements::coverage("FSR-004-dimensions", "suspension", "fsr004", VERIFICATION));
+        "FlipSuspensionRequirements::FSRC008_PositiveRestLength",
+        #{restLengthM: physical_rest_length}, "source_sysml", 0.0));
+    checks.push(sysml_requirement_checks::coverage("FSR-004-dimensions", "suspension", "fsr004", VERIFICATION));
     for path in [arm, knuckle, strut] {
-        checks.push(component_requirements::attribute_equals("FSR-005-purpose-" + path, "suspension", "fsr005", VERIFICATION, path, "purpose", "render"));
-        checks.push(component_requirements::attribute_equals("FSR-005-collision-" + path, "suspension", "fsr005", VERIFICATION, path, "physics:collisionEnabled", false));
+        checks.push(sysml_requirement_checks::attribute_equals("FSR-005-purpose-" + path, "suspension", "fsr005", VERIFICATION, path, "purpose", "render"));
+        checks.push(sysml_requirement_checks::attribute_equals("FSR-005-collision-" + path, "suspension", "fsr005", VERIFICATION, path, "physics:collisionEnabled", false));
     }
-    component_requirements::finish(source, checks, "FLIP SUSPENSION REQUIREMENTS", "FLIP_SUSPENSION_REQUIREMENTS", root, PACKAGE, VERIFICATION);
+    sysml_requirement_checks::finish(source, checks, "FLIP SUSPENSION REQUIREMENTS", "FLIP_SUSPENSION_REQUIREMENTS", root, PACKAGE, VERIFICATION);
     this.done = true;
 }

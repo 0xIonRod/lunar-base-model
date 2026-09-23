@@ -10,10 +10,8 @@ runtime discovers `tools/*.rhai` at the top level only.
 | Layer | Owner | Purpose |
 |---|---|---|
 | `contracts/*.md` | Twin authors | Explain part obligations, units, provenance, and acceptance policy. |
-| `requirements/griffin_requirements.sysml` | Twin authors | Normative Griffin lander/integration SysML v2 requirement/verification definitions, usages, and study limits. |
-| `requirements/griffin_lander_requirements.sysml` | Twin authors | Standalone lander-component values, identity lists, metric envelope, and seven-requirement verification case. |
-| `requirements/flip_requirements.sysml` | Twin authors | Rover-owned FLIP values and the four-wheel visual verification case. |
-| `requirements/griffin_ramp_requirements.sysml` | Twin authors | Standalone ramp geometry, hinge, placement, deployment, and evidence requirements. |
+| `requirements/*.sysml` | Twin authors | Domain-split Griffin requirements, integration usages, component contracts, study limits, and verification cases. |
+| `requirements/flip_*.sysml` | Twin authors | Separately owned FLIP rover and subsystem requirements; FLIP remains an independently loaded component. |
 | `tools/griffin_spec.rhai` | Twin authors | Read-only compatibility projection of SysML values for the Rhai test API. |
 | `tools/griffin_requirements.rhai` | Twin authors | Stable Rhai API for lint, reports, live gates, and command limiters. |
 | `tools/griffin_visual_builder.rhai` | Twin authors | Dry/apply component assembly recipe over the generic typed USD tools. |
@@ -23,12 +21,10 @@ runtime discovers `tools/*.rhai` at the top level only.
 | Rust runtime | generic simulator | Supplies query, typed edit, projection, and test seams; no Griffin-specific policy. |
 
 Do not duplicate a numeric requirement in a scene file and a script. A value
-belongs in the owning component SysML package (`griffin_requirements.sysml`,
-`griffin_lander_requirements.sysml`, `flip_requirements.sysml`, or
-`griffin_ramp_requirements.sysml`); the Rhai observers read that source through
-the compact `ValidateSysml` query and the generic evaluator. The Markdown
-records meaning and provenance. A value that is not source-backed must remain
-explicitly marked as a study proxy or `TBD`.
+belongs in its domain or component SysML package; Rhai observers read that
+source through the generic SysML query and evaluator. The Markdown records the
+ownership and migration boundary. A value that is not source-backed must
+remain explicitly marked as a study proxy or `TBD`.
 
 ## Check execution
 
@@ -37,17 +33,19 @@ The same check functions are used in two contexts:
 1. `griffin_requirements::lint((), root)` runs against the mounted Twin stage
    in a production scene test.
 2. `griffin_requirements::runtime_report((), root)` is the runtime suite: it
-   enumerates every executable rule, audits all 20 manifest parts, runs the
-   relational layout report, and returns machine-readable failures for the
-   Twin scenario to turn into one verdict.
+   returns the current structural findings, audits all 20 manifest parts,
+   runs the relational layout report, and returns machine-readable results
+   for the Twin scenario to combine with named constraint observations.
 3. `griffin_requirements::lint_live(doc_id, root)` and the focused reports run
    against an already open headful Editor document.
 
-Before the structural assertions run, the production Rhai test validates the
+Before the structural checks run, the production evaluator validates the
 co-located SysML source and confirms the selected
-`Griffin1Requirements::Verify_GriffinRequirements` case exists. Rhai is still
-the only executable Griffin test backend; SysML supplies intent, IDs, and
-thresholds, while the generic Rust bridge only parses and reports the source.
+`Griffin1Requirements::Verify_GriffinRequirements` case exists. Supported
+source-defined scalar predicates execute through the generic constraint IR.
+Rhai selects providers, reads composed observations, orchestrates checks, and
+formats evidence; structural geometry predicates still need generic Rust USD
+providers before their migration is complete.
 
 Live authoring must use typed `ApplyUsdOps` plans through the Editor tools. A
 check failure is evidence for the next edit; it is never repaired by hiding a
@@ -55,10 +53,11 @@ proxy, clamping a pose in Rust, or rewriting USDA on disk.
 
 The runtime suite is driven through the existing headful session's
 `RunRhai`/`RunScenario` path. It must not start a second simulator process.
-The suite reports the executable contract set only; checks marked Planned in
-`checks.md` remain outside the green verdict until a generic runtime seam
-exists. Mission-only checks and process gates are returned in separate report
-lists, so they are visible without being mislabeled as structural passes.
+The authored check catalog and Planned/mission/process groupings are status
+metadata, not execution receipts. A green result covers only the structural,
+layout, part, provenance, and explicit payload/ramp boundary observations
+emitted by that run; it does not imply that all requirements in the aggregate
+verification objective passed.
 
 The visual suite follows the same boundary. `griffin_flip_visual.rhai` reads
 the componentized presentation stage, checks every named child, and compares

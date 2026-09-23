@@ -27,7 +27,7 @@ script = "scenarios/tests/griffin_visual_configuration_types.rhai"
 verdict_channel = "GRIFFIN_VISUAL_CONFIGURATION_TYPES"
 
 [[verification.cases]]
-name = "Griffin1Requirements::Verify_GriffinVisualRequirements"
+name = "GriffinVisualRequirements::Verify_GriffinVisualRequirements"
 scene = "tests/griffin_flip_visual.usda"
 script = "scenarios/tests/griffin_flip_visual.rhai"
 verdict_channel = "GRIFFIN_FLIP_VISUAL"
@@ -117,13 +117,13 @@ script = "scenarios/griffin_1_surface_ops.rhai"
 verdict_channel = "GRIFFIN_SURFACE_OPS"
 
 [[verification.cases]]
-name = "Griffin1Requirements::Verify_GriffinLandingStability"
+name = "GriffinSimulationAccuracyRequirements::Verify_GriffinLandingStability"
 scene = "tests/griffin_surface_ops_contract.usda"
 script = "scenarios/tests/griffin_surface_ops_contract.rhai"
 verdict_channel = "GRIFFIN_LANDING_STABILITY"
 
 [[verification.cases]]
-name = "Griffin1Requirements::Verify_GriffinAdapterRelease"
+name = "GriffinFunctionalRequirements::Verify_GriffinAdapterRelease"
 scene = "scenes/griffin_1_detach_stability_test.usda"
 script = "scenarios/tests/griffin_detach_stability.rhai"
 verdict_channel = "GRIFFIN_ADAPTER_RELEASE"

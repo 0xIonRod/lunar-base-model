@@ -2,6 +2,11 @@ package FlipSuspensionRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::String;
 
+    constraint def FSRC008_PositiveRestLength {
+        in restLengthM : Real;
+        restLengthM > 0.0;
+    }
+
     // The public FLIP sources describe four-wheel mobility and independent
     // suspension technology.  Exact arm/knuckle/strut dimensions below are
     // explicitly labelled Twin visual-study values until an ICD is released.
@@ -57,6 +62,7 @@ package FlipSuspensionRequirements {
     }
     requirement def FSR008_PhysicalTransitionEnvelope {
         doc /* FSR-008 [physics boundary] the physical FLIP realization shall expose the 1.20 m ramp-transition suspension rest length as a separate study datum from the 0.70 m generic suspension default. Source: Griffin physical-ramp replay evidence. Rationale: the longer envelope is required to acquire the steep ramp surface before the released chassis loses support; it is explicitly replaceable when supplier data arrives. */
+        require FSRC008_PositiveRestLength;
     }
 
     requirement fsr001 : FSR001_SourceTraceability { subject suspension : FlipSuspensionComponent; }
@@ -70,13 +76,15 @@ package FlipSuspensionRequirements {
 
     verification def Verify_FLIPSuspensionRequirements {
         subject suspension : FlipSuspensionComponent;
-        verify fsr001;
-        verify fsr002;
-        verify fsr003;
-        verify fsr004;
-        verify fsr005;
-        verify fsr006;
-        verify fsr007;
-        verify fsr008;
+        objective {
+            verify fsr001;
+            verify fsr002;
+            verify fsr003;
+            verify fsr004;
+            verify fsr005;
+            verify fsr006;
+            verify fsr007;
+            verify fsr008;
+        }
     }
 }

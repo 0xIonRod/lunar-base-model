@@ -76,14 +76,19 @@ Sources:
 | scenarios/tests/flip_wheel_requirements.rhai | Component-owned Rhai gate for the four directional wheel stations |
 | scenarios/tests/flip_sensor_power_requirements.rhai | Component-owned Rhai gate for the FLIP sensor mast and solar array |
 | scenarios/tests/griffin_ramp_requirements.rhai | Rhai observer for independent port/starboard ramp topology, placement, geometry, and deployment checks |
-| tools/component_requirements.rhai | Shared generic SysML/USD component-check constructors and verdict metadata |
+| LunCoSim `sysml_requirement_checks` | Shared typed observation records, SysML source helpers, provenance linking, and structured verdict formatting |
 | tests/griffin_requirements.usda | Minimal composed fixture for the Griffin contract test |
 | tests/griffin_lander_requirements.usda | Minimal Griffin-only fixture for the lander-component gate |
 | tests/flip_requirements.usda | Minimal FLIP-only fixture for the rover-component gate |
 | tests/griffin_*_requirements.usda | Editor-authored, one-component lander verification fixtures |
 | tests/flip_*_requirements.usda | Editor-authored, one-component FLIP verification fixtures |
 | tests/griffin_ramp_requirements.usda | Griffin-only fixture for the independent ramp gate |
-| requirements/griffin_requirements.sysml | Normative Griffin lander/integration SysML v2 requirements, usages, study values, and verification case |
+| requirements/griffin_requirements.sysml | Griffin integration subjects, system requirement usages, mission context, and aggregate verification |
+| requirements/griffin_functional_requirements.sysml | Functional and mission-interface requirements, including payload and adapter-release constraints |
+| requirements/griffin_visual_requirements.sysml | Griffin visual presentation and evidence requirements |
+| requirements/griffin_mechanical_requirements.sysml | Mechanical and physical-interface requirements |
+| requirements/griffin_simulation_accuracy_requirements.sysml | Simulation accuracy, landing stability, and determinism requirements |
+| requirements/griffin_assurance_requirements.sysml | Provenance, authoring, and evidence assurance requirements |
 | requirements/griffin_lander_requirements.sysml | Standalone Griffin lander-component SysML v2 contract for bus, legs, tanks, engines, and solar arrays |
 | requirements/griffin_bus_requirements.sysml | Bus-owned SysML v2 requirements and verification case |
 | requirements/griffin_landing_legs_requirements.sysml | Landing-leg-owned SysML v2 requirements and verification case |
@@ -98,8 +103,9 @@ Sources:
 | requirements/flip_sensor_power_requirements.sysml | Sensor/power-owned SysML v2 requirements and verification case |
 | requirements/griffin_ramp_requirements.sysml | Dedicated Griffin ramp subsystem requirements, metric envelope, hinge contract, and independent verification case |
 | twin.toml `[verification]` | Single registry binding each qualified SysML verification to its Twin scene, Rhai observer, and verdict channel |
-| contracts/ | Part contracts, current SysML verification boundary and missing generic execution features, and typed authoring procedure |
-| contracts/verification.md | Explicit migration status from Rhai predicates to source-authored SysML constraints and generic observation bindings |
+| contracts/ | Part contracts, verification boundary, standards/gap audit, and typed authoring procedure |
+| contracts/implementation_gaps.md | SysML standards alignment, workaround inventory, Rust/Editor feature gaps, and Griffin migration order |
+| contracts/verification.md | Active verification boundary, current constraint slice, and open physical deck migration |
 | tools/griffin_spec.rhai | Rhai compatibility projection of limits read from the SysML source |
 | tools/griffin_requirements.rhai | Stable public contract API, visual-only and physical part/layout audits, payload/ramp gates, and typed live-edit gate |
 | tools/check_landing_determinism.sh | Twin-local two-process harness comparing the Rhai landing trial at a fixed SI clock |
@@ -222,7 +228,7 @@ The Griffin-specific structural lint is a Rhai tool owned by this Twin. It
 checks the composed wrapper rather than parsing USDA text, and the test fixture
 does not load terrain, FLIP, guidance, or the mission timeline:
 
-    /home/rod/Documents/luncosim-workspace/terrain/target/debug/luncosim test --scene /home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_requirements.usda --verification Griffin1Requirements::Verify_GriffinRequirements --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    target/debug/luncosim test --scene /home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_requirements.usda --verification Griffin1Requirements::Verify_GriffinRequirements --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
 
 The `[verification]` registry in `twin.toml` is the only execution binding:
 the qualified SysML verification name selects the Twin-relative `.usda` scene,
@@ -268,8 +274,9 @@ lander, rover, or ramp can be reviewed and diagnosed independently.
 
 ### Check landing divergence
 
-`requirements/griffin_requirements.sysml` owns the landing-stability horizon,
-tilt/speed/drift bounds, and repeatability tolerances. The Rhai contract test
+`requirements/griffin_simulation_accuracy_requirements.sysml` owns the
+landing-stability horizon and speed/drift/upright-axis bounds. The integration
+source owns the separate repeatability tolerances. The Rhai contract test
 (`scenarios/tests/griffin_surface_ops_contract.rhai`) samples the composed
 lander every ten fixed ticks and emits a `GRIFFIN_LANDING_STABILITY` verdict
 plus a `GRIFFIN_LANDING_STABILITY_METRICS` JSON line. Run two fresh processes
@@ -324,13 +331,17 @@ The physical `lint_live`/`layout_report_live` functions remain intentionally
 separate because the render document does not own flight mass or colliders.
 
 The Twin scenario now calls `griffin_requirements::runtime_report((), root)`.
-That report first validates `requirements/griffin_requirements.sysml` and checks
-for the selected `Verify_GriffinRequirements` case. Rhai remains the executable
-test backend; SysML is the normative requirement and threshold source.
-That runtime suite enumerates all executable rule IDs, checks all 20 manifest
-parts individually, verifies the relational layout report, executes the Moon
-Base SI metric/metres/Y-up contract, validates the metres/Y-up policy catalog,
-and exercises both sides of the payload and ramp limiter boundaries. Run it
+That report validates the Twin SysML source set and checks for the selected
+`Verify_GriffinRequirements` case. The shared evaluator executes the supported
+SysML constraint subset; Rhai binds composed observations and still owns
+structural predicates whose generic USD-provider migration remains open.
+The report distinguishes the authored requirement-check catalog from results
+actually measured in this run. Payload and ramp boundary rows use their
+focused SysML verification cases. The current suite checks all 20 manifest parts
+individually, verifies the relational layout report, executes the Moon Base SI
+metric/metres/Y-up contract, validates the metres/Y-up policy catalog, and
+exercises both sides of the payload and ramp limiter boundaries. These results
+do not imply that every requirement in the catalog was verified. Run it
 through the already-running headful session with
 the `RunScenario`/`RunRhai` API path; do not launch a second simulator just to
 execute the suite.

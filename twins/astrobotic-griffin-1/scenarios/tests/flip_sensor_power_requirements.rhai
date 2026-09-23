@@ -1,3 +1,4 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Standalone FLIP sensor mast and solar-power visual verification.
 
 const PACKAGE = "FlipSensorPowerRequirements";
@@ -18,17 +19,17 @@ fn on_tick(me, ctx) {
     let solar_mount_source = sysml_requirements::text(source, own("solarMountSource"));
     let solar_tilt_source = sysml_requirements::text(source, own("solarTiltSource"));
     let checks = [];
-    checks.push(component_requirements::exists("FSP-001-mast", "sensor_mast", "fsp001", VERIFICATION, mast, "Xform"));
-    checks.push(component_requirements::children("FSP-001-mast-parts", "sensor_mast", "fsp001", VERIFICATION, mast,
+    checks.push(sysml_requirement_checks::exists("FSP-001-mast", "sensor_mast", "fsp001", VERIFICATION, mast, "Xform"));
+    checks.push(sysml_requirement_checks::children("FSP-001-mast-parts", "sensor_mast", "fsp001", VERIFICATION, mast,
         [mast + "/MastPost", mast + "/SensorHead", mast + "/SensorAntenna"]));
-    checks.push(component_requirements::exists("FSP-002-solar", "solar_array", "fsp002", VERIFICATION, solar, "Xform"));
-    checks.push(component_requirements::children("FSP-002-solar-parts", "solar_array", "fsp002", VERIFICATION, solar,
+    checks.push(sysml_requirement_checks::exists("FSP-002-solar", "solar_array", "fsp002", VERIFICATION, solar, "Xform"));
+    checks.push(sysml_requirement_checks::children("FSP-002-solar-parts", "solar_array", "fsp002", VERIFICATION, solar,
         [solar + "/WhiteBacksheet", solar + "/BlueCells", solar + "/FoldHinge"]));
     checks.push(#{id: "FSP-003-mast-height", component: "sensor_mast",
         requirement: "fsp003", verification: VERIFICATION,
         kind: "attribute", path: mast + "/MastPost", attr: "height",
         expected_attr: sysml_requirements::text(source, own("mastHeightSource")), tolerance: 0.002});
-    let solar_mount = component_requirements::source_number_list(source, solar_mount_source);
+    let solar_mount = sysml_requirement_checks::source_number_list(source, solar_mount_source);
     if solar_mount.len() == 3 {
         checks.push(#{id: "FSP-004-solar-x", component: "solar_array",
             requirement: "fsp004", verification: VERIFICATION,
@@ -61,7 +62,7 @@ fn on_tick(me, ctx) {
         #{id: "FSP-005-head-height", path: mast + "/SensorHead", index: 1, attr: "sensorHeadHeightM"},
         #{id: "FSP-005-head-depth", path: mast + "/SensorHead", index: 2, attr: "sensorHeadDepthM"}
     ] {
-        checks.push(component_requirements::extent_component(field.id, "sensor_mast", "fsp005", VERIFICATION,
+        checks.push(sysml_requirement_checks::extent_component(field.id, "sensor_mast", "fsp005", VERIFICATION,
             field.path, field.index, own(field.attr), 2.0, 0.002));
     }
     checks.push(#{id: "FSP-005-antenna-radius", component: "sensor_mast", requirement: "fsp005",
@@ -81,10 +82,10 @@ fn on_tick(me, ctx) {
         #{id: "FSP-006-hinge-thickness", path: solar + "/FoldHinge", index: 1, attr: "solarHingeThicknessM"},
         #{id: "FSP-006-hinge-depth", path: solar + "/FoldHinge", index: 2, attr: "solarHingeDepthM"}
     ] {
-        checks.push(component_requirements::extent_component(field.id, "solar_array", "fsp006", VERIFICATION,
+        checks.push(sysml_requirement_checks::extent_component(field.id, "solar_array", "fsp006", VERIFICATION,
             field.path, field.index, own(field.attr), 2.0, 0.002));
     }
-    checks.push(component_requirements::coverage("FSP-004-traceability", "sensor_power", "fsp004", VERIFICATION));
-    component_requirements::finish(source, checks, "FLIP SENSOR/POWER REQUIREMENTS", "FLIP_SENSOR_POWER_REQUIREMENTS", mast, PACKAGE, VERIFICATION);
+    checks.push(sysml_requirement_checks::coverage("FSP-004-traceability", "sensor_power", "fsp004", VERIFICATION));
+    sysml_requirement_checks::finish(source, checks, "FLIP SENSOR/POWER REQUIREMENTS", "FLIP_SENSOR_POWER_REQUIREMENTS", mast, PACKAGE, VERIFICATION);
     this.done = true;
 }

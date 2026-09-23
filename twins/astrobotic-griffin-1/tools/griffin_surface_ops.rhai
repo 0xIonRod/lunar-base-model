@@ -169,11 +169,9 @@ fn landing_stability_sample() {
 // Stable, source-backed acceptance limits for a fixed-clock landing trial.
 // SysML owns the limits; Rhai owns only the observation and verdict.
 fn landing_stability_contract() {
-    let max_tilt = griffin_spec::landing_max_tilt_rad();
     #{
         horizon_s: griffin_spec::landing_stability_horizon_s(),
-        max_tilt_rad: max_tilt,
-        min_upright_axis_y: if max_tilt == () { () } else { max_tilt.cos() },
+        min_upright_axis_y: griffin_spec::landing_minimum_upright_axis_y(),
         max_ground_speed_mps: griffin_spec::landing_max_ground_speed_mps(),
         max_angular_speed_rad_per_sec: griffin_spec::landing_max_angular_speed_rad_per_sec(),
         max_horizontal_drift_m: griffin_spec::landing_max_horizontal_drift_m(),
@@ -705,7 +703,7 @@ fn report_route_failure(id, error, path, evidence) {
     let source = sysml_requirements::source();
     if source == () || source.ok != true { return; }
     let failure = #{id: id, component: "rover",
-        requirement: "Griffin1Requirements::gr004",
+        requirement: "GriffinFunctionalRequirements::gr004",
         verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
         kind: "route", path: path, actual: evidence,
         expected: "route reaches the authored target", ok: false, error: error};

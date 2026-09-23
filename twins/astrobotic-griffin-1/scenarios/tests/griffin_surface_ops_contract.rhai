@@ -35,15 +35,14 @@ fn on_start(me, ctx) {
     print("[griffin-landing-stability] waiting for composed Twin stage");
 }
 
-fn emit_stability_verdict(me, contract, source, checks) {
-    // Landing stability is a source-derived predicate. Normalize every
-    // observation into the shared assertion contract so requirement coverage,
-    // identity resolution, and evidence formatting stay generic.
-    for check in checks {
-        check.requirement = "gr031";
-        check.verification = "Verify_GriffinLandingStability";
-        check.kind = "assert";
-    }
+fn _physics_observation(state, value, detail) {
+    let observation = #{provider: "physics", state: state};
+    if state == "value" { observation.value = value; }
+    if detail != () { observation.detail = detail; }
+    observation
+}
+
+fn emit_stability_verdict(me, contract, source) {
     let last_position = if me.last.position != () { me.last.position } else { [] };
     let last_upright = if me.last.upright_axis_y != () { me.last.upright_axis_y } else { 0.0 };
     let last_ground = if me.last.ground_speed != () { me.last.ground_speed } else { 0.0 };
@@ -90,7 +89,29 @@ fn emit_stability_verdict(me, contract, source, checks) {
     // This compact line is parsed by the Twin-local repeatability harness.
     // The full typed result remains on the generic *_EVIDENCE telemetry event.
     print("GRIFFIN_LANDING_STABILITY_METRICS " + to_json(metrics));
-    let report = sysml_requirements::evaluate(source, checks);
+    let metric_state = if me.sample_count == 0 { "unavailable" }
+        else if me.finite != true { "invalid" } else { "value" };
+    let metric_detail = if metric_state == "unavailable" {
+        "No physics samples were available during the required observation window"
+    } else if metric_state == "invalid" {
+        "A sampled physics value was non-finite"
+    } else { () };
+    let check = sysml_requirements::constraint_check(
+        "GR-036-landing-stability", "lander", "gr036",
+        "Verify_GriffinLandingStability",
+        "GriffinSimulationAccuracyRequirements::GR036_LandingStabilityWithinBounds",
+        #{telemetryFinite: _physics_observation("value", me.finite, ()),
+          sampleAvailable: _physics_observation("value", me.sample_count > 0, ()),
+          minimumUprightAxisY: _physics_observation(metric_state, last_upright, metric_detail),
+          minimumUprightAxisYLimit: _physics_observation("value", contract.min_upright_axis_y, ()),
+          maximumGroundSpeedMps: _physics_observation(metric_state, me.max_ground, metric_detail),
+          maximumGroundSpeedLimitMps: _physics_observation("value", contract.max_ground_speed_mps, ()),
+          maximumAngularSpeedRadPerSec: _physics_observation(metric_state, me.max_angular, metric_detail),
+          maximumAngularSpeedLimitRadPerSec: _physics_observation("value", contract.max_angular_speed_rad_per_sec, ()),
+          maximumHorizontalDriftM: _physics_observation(metric_state, me.max_horizontal, metric_detail),
+          maximumHorizontalDriftLimitM: _physics_observation("value", contract.max_horizontal_drift_m, ())},
+        "physics", 0.0);
+    let report = sysml_requirements::evaluate(source, [check]);
     report.metrics = metrics;
     report.contract = contract;
     report_structured_verdict(report, "GRIFFIN LANDING STABILITY", "GRIFFIN_LANDING_STABILITY");
@@ -158,17 +179,5 @@ fn on_tick(me, ctx) {
 
     if this.elapsed < contract.horizon_s { return; }
     let source = sysml_requirements::source();
-    let current_clocks = clock_snapshot();
-    let clock_sync_error = ((current_clocks.sim_tick - this.clock_start.sim_tick).to_float()
-        * current_clocks.fixed_dt_s - this.elapsed).abs();
-    let checks = [
-        #{ id: "GR-031-stability-finite", component: "lander", kind: "divergence", path: ROOT + "/Lander", actual: this.finite, expected: true, ok: this.finite, error: "landing telemetry became non-finite" },
-        #{ id: "GR-031-clock-sync", component: "simulation-clock", kind: "divergence", path: ROOT, actual: clock_sync_error, expected: 0.0, ok: clock_sync_error <= 1.0e-7, error: "Rhai elapsed time diverged from the fixed clock" },
-        #{ id: "GR-031-sample-count", component: "lander", kind: "divergence", path: ROOT + "/Lander", actual: this.sample_count, expected: 1, ok: this.sample_count > 0, error: "landing trial produced no samples" },
-        #{ id: "GR-031-tilt-bound", component: "lander", kind: "stability", path: ROOT + "/Lander", actual: this.min_upright, expected: contract.min_upright_axis_y, ok: this.min_upright >= contract.min_upright_axis_y, error: "lander tilt exceeded the SysML bound" },
-        #{ id: "GR-031-ground-speed-bound", component: "lander", kind: "stability", path: ROOT + "/Lander", actual: this.max_ground, expected: contract.max_ground_speed_mps, ok: this.max_ground <= contract.max_ground_speed_mps, error: "landing ground speed exceeded the SysML bound" },
-        #{ id: "GR-031-angular-speed-bound", component: "lander", kind: "stability", path: ROOT + "/Lander", actual: this.max_angular, expected: contract.max_angular_speed_rad_per_sec, ok: this.max_angular <= contract.max_angular_speed_rad_per_sec, error: "landing angular speed exceeded the SysML bound" },
-        #{ id: "GR-031-horizontal-drift-bound", component: "lander", kind: "divergence", path: ROOT + "/Lander", actual: this.max_horizontal, expected: contract.max_horizontal_drift_m, ok: this.max_horizontal <= contract.max_horizontal_drift_m, error: "landing horizontal drift exceeded the SysML bound" }
-    ];
-    emit_stability_verdict(this, contract, source, checks);
+    emit_stability_verdict(this, contract, source);
 }

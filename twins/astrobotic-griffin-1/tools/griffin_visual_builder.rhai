@@ -1,7 +1,8 @@
 import "lunco://scripting/tools/assembly_builder" as assembly_builder;
 import "lunco://scripting/tools/assembly_edit" as assembly_edit;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
-import "component_requirements" as component_requirements;
+import "griffin_geometry" as griffin_geometry;
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 
 // Twin-local runtime visual assembly builder.
 //
@@ -977,17 +978,9 @@ fn _tank_support_plan(doc, edit_target, root) {
             name: "TankSupportPlate", type_name: "Xform", reference: (),
             reference_prim_path: ""}});
     }
-    let perimeter_stations = [];
-    for point in perimeter_profile {
-        if type_of(point) != "Vec2" || !vec2_is_finite(point) {
-            return plan_error("tank-support perimeter profile must contain eight finite typed Vec2 values");
-        }
-        perimeter_stations.push(vec3(point.x * perimeter_radius, 0.0,
-            point.y * perimeter_radius));
-    }
-    let perimeter_geometry = _perimeter_beam_geometry(perimeter_stations,
-        [center_y], perimeter_section);
-    if perimeter_geometry.ok == false { return perimeter_geometry; }
+    let perimeter_geometry = griffin_geometry::tank_support_perimeter_geometry(
+        perimeter_profile, perimeter_radius, center_y, perimeter_section);
+    if perimeter_geometry.ok == false { return plan_error(perimeter_geometry.error); }
     let perimeter_path = path + "/TankSupportPerimeter";
     let perimeter = assembly_builder::composed_query(doc,
         #{path: perimeter_path, children: false});
@@ -1033,67 +1026,11 @@ fn _tank_support_plan(doc, edit_target, root) {
       opening_names: names, opening_count: names.len(), ops: ops}
 }
 
-// Build sixteen individually closed beam solids as one replaceable airframe
-// mesh: eight upper and eight lower perimeter members. Each beam uses a local
-// right-handed (along, up, across) basis and outward-wound quad faces, so the
-// open bays are real openings rather than a transparent/one-sided prism.
-fn _perimeter_beam_geometry(stations, ring_y, section) {
-    let points = [];
-    let face_counts = [];
-    let face_indices = [];
-    let half_section = section / 2.0;
-    for ring_index in 0..ring_y.len() {
-        for edge in 0..stations.len() {
-            let start_index = edge;
-            let end_index = (edge + 1) % stations.len();
-            if start_index < 0 || end_index < 0 || start_index >= stations.len()
-                || end_index >= stations.len() {
-                return plan_error("typed rail station is outside the perimeter vector");
-            }
-            let ax = stations[start_index].x;
-            let az = stations[start_index].z;
-            let bx = stations[end_index].x;
-            let bz = stations[end_index].z;
-            let dx = bx - ax;
-            let dz = bz - az;
-            let length = (dx * dx + dz * dz).sqrt();
-            if length <= 0.0 { return plan_error("SysML perimeter contains a zero-length edge"); }
-            let tx = dx / length;
-            let tz = dz / length;
-            let nx = -tz;
-            let nz = tx;
-            let mx = (ax + bx) / 2.0;
-            let mz = (az + bz) / 2.0;
-            let half_length = length / 2.0;
-            let cy = ring_y[ring_index];
-            let base = points.len();
-            for vertex in [
-                [-tx * half_length - nx * half_section, cy - half_section, -tz * half_length - nz * half_section],
-                [ tx * half_length - nx * half_section, cy - half_section,  tz * half_length - nz * half_section],
-                [ tx * half_length - nx * half_section, cy + half_section,  tz * half_length - nz * half_section],
-                [-tx * half_length - nx * half_section, cy + half_section, -tz * half_length - nz * half_section],
-                [-tx * half_length + nx * half_section, cy - half_section, -tz * half_length + nz * half_section],
-                [ tx * half_length + nx * half_section, cy - half_section,  tz * half_length + nz * half_section],
-                [ tx * half_length + nx * half_section, cy + half_section,  tz * half_length + nz * half_section],
-                [-tx * half_length + nx * half_section, cy + half_section, -tz * half_length + nz * half_section]
-            ] {
-                points.push([mx + vertex[0], vertex[1], mz + vertex[2]]);
-            }
-            for face_index in 0..6 { face_counts.push(4); }
-            for index in [0, 4, 7, 3, 1, 2, 6, 5, 0, 3, 2, 1,
-                4, 5, 6, 7, 0, 1, 5, 4, 3, 7, 6, 2] {
-                face_indices.push(base + index);
-            }
-        }
-    }
-    #{points: points, face_counts: face_counts, face_indices: face_indices}
-}
-
 fn _octagonal_open_frame_mesh_plan(doc, edit_target, root, name, stations, ring_y, section, color) {
     let path = root + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
-    let geometry = _perimeter_beam_geometry(stations, ring_y, section);
-    if geometry.ok == false { return geometry; }
+    let geometry = griffin_geometry::perimeter_beam_geometry(stations, ring_y, section);
+    if geometry.ok == false { return plan_error(geometry.error); }
     let ops = [];
     if query_ok(current) {
         if current.type_name != "Mesh" {
@@ -2074,8 +2011,8 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     let valve_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::valveCenterYM");
     let cap_y = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::capCenterYM");
     let band_height = sysml_requirements::number(source, tank + "bandHeightM");
-    let band_centers = component_requirements::source_number_list(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandCenterYM");
-    let band_radii = component_requirements::source_number_list(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandRadiusByCenterM");
+    let band_centers = sysml_requirement_checks::source_number_list(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandCenterYM");
+    let band_radii = sysml_requirement_checks::source_number_list(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bandRadiusByCenterM");
     let cradle_name = _tank_enum_name(source, "cradleName");
     let cradle_shape = _tank_enum_name(source, "cradleShape");
     let cradle_radius = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::cradleRadiusM");
@@ -2092,8 +2029,8 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     let body_mount = sysml_requirements::native_value(source, visual + "bodyMount");
     let skirt_center = sysml_requirements::native_value(source, visual + "lowerSkirtCenter");
     let skirt_dimensions = sysml_requirements::native_value(source, visual + "lowerSkirtDimensions");
-    let tank_stations = component_requirements::source_position_list(source, visual + "tankStations");
-    let tank_scales = component_requirements::source_number_list(source, visual + "tankScale");
+    let tank_stations = sysml_requirement_checks::source_position_list(source, visual + "tankStations");
+    let tank_scales = sysml_requirement_checks::source_number_list(source, visual + "tankScale");
     let bracket_length = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketLengthM");
     let bracket_width = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketWidthM");
     let bracket_depth = sysml_requirements::number(source, "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketDepthM");

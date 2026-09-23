@@ -1,3 +1,4 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Standalone Griffin landing-leg verification. Typed identities and stations
 // come from GriffinVisualConfigurationRequirements; the lander owns the count.
 
@@ -31,29 +32,29 @@ fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let root = sysml_requirements::text(source, own("usdRootPath"));
-    let names = component_requirements::source_enum_identifiers(source, visual("landingLegInstances"));
-    let part_names = component_requirements::source_enum_identifiers(source, own("childNames"));
-    let stations = component_requirements::source_position_list(source, visual("legStations"));
+    let names = sysml_requirement_checks::source_enum_identifiers(source, visual("landingLegInstances"));
+    let part_names = sysml_requirement_checks::source_enum_identifiers(source, own("childNames"));
+    let stations = sysml_requirement_checks::source_position_list(source, visual("legStations"));
     let strut_axis = usd_axis(sysml_requirements::native_value(source, own("strutAxis")));
     let count = parent("legCount");
     let checks = [];
-    checks.push(component_requirements::source_list_count("GLL-001-count", "landing_legs", "gll001", VERIFICATION, visual("landingLegInstances"), count));
-    checks.push(component_requirements::source_list_count("GLL-005-stations", "landing_leg", "gll005", VERIFICATION, visual("legStations"), count));
+    checks.push(sysml_requirement_checks::source_list_count("GLL-001-count", "landing_legs", "gll001", VERIFICATION, visual("landingLegInstances"), count));
+    checks.push(sysml_requirement_checks::source_list_count("GLL-005-stations", "landing_leg", "gll005", VERIFICATION, visual("legStations"), count));
     for index in 0..names.len() {
         let name = names[index];
         let path = root + "/" + name;
-        checks.push(component_requirements::exists("GLL-001-" + name, "landing_leg", "gll001", VERIFICATION, path, "Xform"));
+        checks.push(sysml_requirement_checks::exists("GLL-001-" + name, "landing_leg", "gll001", VERIFICATION, path, "Xform"));
         let required_children = [];
         for part_name in part_names { required_children.push(path + "/" + part_name); }
-        checks.push(component_requirements::children("GLL-002-" + name, "landing_leg", "gll002", VERIFICATION, path, required_children));
+        checks.push(sysml_requirement_checks::children("GLL-002-" + name, "landing_leg", "gll002", VERIFICATION, path, required_children));
         for strut in ["StrutOuter", "StrutInner"] {
             let strut_path = path + "/" + strut;
-            checks.push(component_requirements::exists("GLL-006-" + name + "-" + strut + "-type", "landing_leg", "gll006", VERIFICATION, strut_path, "Cylinder"));
-            checks.push(component_requirements::attribute_check("GLL-006-" + name + "-" + strut + "-radius", "landing_leg", "gll006", VERIFICATION,
+            checks.push(sysml_requirement_checks::exists("GLL-006-" + name + "-" + strut + "-type", "landing_leg", "gll006", VERIFICATION, strut_path, "Cylinder"));
+            checks.push(sysml_requirement_checks::attribute_check("GLL-006-" + name + "-" + strut + "-radius", "landing_leg", "gll006", VERIFICATION,
                 strut_path, "radius", own("strutRadiusM"), 0.002));
-            checks.push(component_requirements::attribute_check("GLL-006-" + name + "-" + strut + "-height", "landing_leg", "gll006", VERIFICATION,
+            checks.push(sysml_requirement_checks::attribute_check("GLL-006-" + name + "-" + strut + "-height", "landing_leg", "gll006", VERIFICATION,
                 strut_path, "height", own("strutHeightM"), 0.002));
-            checks.push(component_requirements::attribute_equals("GLL-006-" + name + "-" + strut + "-axis", "landing_leg", "gll006", VERIFICATION,
+            checks.push(sysml_requirement_checks::attribute_equals("GLL-006-" + name + "-" + strut + "-axis", "landing_leg", "gll006", VERIFICATION,
                 strut_path, "axis", strut_axis));
         }
         checks.push(#{id: "GLL-006-" + name + "-outer-center", component: "landing_leg",
@@ -90,8 +91,8 @@ fn on_tick(me, ctx) {
             checks.push(position("GLL-005-" + name + "-z", path, 2, stations[index].z));
         }
     }
-    checks.push(component_requirements::coverage("GLL-003-frame", "landing_leg", "gll003", VERIFICATION));
-    checks.push(component_requirements::coverage("GLL-004-traceability", "landing_leg", "gll004", VERIFICATION));
-    component_requirements::finish(source, checks, "GRIFFIN LANDING LEG REQUIREMENTS", "GRIFFIN_LANDING_LEG_REQUIREMENTS", root, PACKAGE, VERIFICATION);
+    checks.push(sysml_requirement_checks::coverage("GLL-003-frame", "landing_leg", "gll003", VERIFICATION));
+    checks.push(sysml_requirement_checks::coverage("GLL-004-traceability", "landing_leg", "gll004", VERIFICATION));
+    sysml_requirement_checks::finish(source, checks, "GRIFFIN LANDING LEG REQUIREMENTS", "GRIFFIN_LANDING_LEG_REQUIREMENTS", root, PACKAGE, VERIFICATION);
     this.done = true;
 }

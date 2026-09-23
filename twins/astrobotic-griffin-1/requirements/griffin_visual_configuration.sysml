@@ -1,6 +1,8 @@
 package GriffinVisualConfigurationRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
+    private import ScalarValues::Boolean;
+    private import ScalarValues::String;
     private import VectorValues::CartesianThreeVectorValue;
     private import VectorValues::CartesianVectorValue;
 
@@ -76,6 +78,11 @@ package GriffinVisualConfigurationRequirements {
         // Shared numerical tolerance for source-backed geometric relations.
         // It is a review-policy datum, not a hidden Rust or Rhai literal.
         attribute verificationToleranceM : Real = 1.0e-6;
+        attribute geometryVerificationToleranceM : Real = 0.002;
+        attribute appearanceVerificationTolerance : Real = 1.0e-6;
+        attribute doubleSidedFacesMustBe : Boolean = false;
+        attribute renderOnlyCollisionEnabled : Boolean = false;
+        attribute renderPurpose : String = "render";
         attribute visualReviewGriffinStation : Position = (-2.70, -0.38, 0.0);
         attribute visualReviewFlipStation : Position = (7.0, 1.0, 0.5);
 
@@ -246,20 +253,22 @@ package GriffinVisualConfigurationRequirements {
 
     verification def Verify_GriffinVisualConfiguration {
         subject configuration : GriffinVisualConfiguration;
-        verify gvc001;
-        verify gvc002;
-        verify gvc003;
-        verify gvc004;
-        verify gvc005;
-        verify gvc006;
-        verify gvc007;
-        verify gvc008;
-        verify gvc009;
-        verify gvc010;
-        verify gvc011;
-        verify gvc012;
-        verify gvc013;
-        verify gvc014;
-        verify gvc015;
+        objective {
+            verify gvc001;
+            verify gvc002;
+            verify gvc003;
+            verify gvc004;
+            verify gvc005;
+            verify gvc006;
+            verify gvc007;
+            verify gvc008;
+            verify gvc009;
+            verify gvc010;
+            verify gvc011;
+            verify gvc012;
+            verify gvc013;
+            verify gvc014;
+            verify gvc015;
+        }
     }
 }

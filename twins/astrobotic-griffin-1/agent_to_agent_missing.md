@@ -1,5 +1,14 @@
 # Agent-to-agent missing-code report: Griffin-1 Twin
 
+> **Historical handover; superseded for current model status.** Its earlier
+> mission-pass and 1.21 m transition claims describe a prior tree. The physical
+> top-deck collider still follows the obsolete six-sided study and has not been
+> migrated to the octagonal deck in Editor. The 1.21 m transition is provisional
+> and GRR-012 remains inconclusive until typed composed-geometry evidence is
+> available. Use [`contracts/verification.md`](contracts/verification.md) and
+> [`contracts/implementation_gaps.md`](contracts/implementation_gaps.md) for
+> the current boundary. No mission scenario was run in this migration.
+
 Date: 2026-09-18
 Owner of this handover: implementation agent
 Next owner: LunCoSim mission/Twin agent

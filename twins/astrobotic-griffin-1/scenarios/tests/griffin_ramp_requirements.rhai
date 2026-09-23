@@ -1,7 +1,7 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Twin-owned independent Griffin ramp verification.
-// The test is intentionally Rhai-backed: SysML supplies the normative
-// requirement names and metric values, while this observer queries the
-// composed USD component and emits a generic structured verdict.
+// SysML supplies the normative constraints and values; Rhai binds FLIP and
+// composed-USD observations to the generic structured requirements evaluator.
 
 const ROOT = "/World/Griffin1";
 // The source report resolves this short identity to the canonical SysML case
@@ -42,12 +42,10 @@ fn _relationship(id, requirement, path, rel, target) {
       rel: rel, targets: [target]}
 }
 
-fn _behavior_result(id, requirement, verification, ok, message, actual, expected) {
-    #{id: id, component: "ramp", requirement: requirement,
-      // Runtime behavior is a source-derived predicate, so use the generic
-      // evaluator's pathless assertion contract rather than a private kind.
-      verification: verification, kind: "assert", ok: ok,
-      error: if ok { "" } else { message }, actual: actual, expected: expected}
+fn _constraint(id, requirement, name, bindings) {
+    sysml_requirements::constraint_check(id, "ramp", requirement,
+        VERIFICATION, "GriffinRampRequirements::" + name,
+        bindings, "derived", 0.0)
 }
 
 fn _maximum_abs(values) {
@@ -61,18 +59,75 @@ fn _maximum_abs(values) {
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
-    let source = sysml_requirements::source();
+    let source = sysml_requirements::source_with_selection([
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyChildNames",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceWidthM",
+        "GriffinRampRequirements::GriffinEgressRamp::rampWheelClearanceM",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampDeckTransitionOverlapM",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampSurfaceLengthM",
+        "GriffinRampRequirements::GriffinEgressRamp::physicalRampTransitionChildName",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadCount",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadNamePrefix",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadWidthM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadHeightM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadSpanM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadFirstCenterXM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadPitchM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyUnderBeamWidthM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyUnderBeamHeightM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyUnderBeamCenterYM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyUnderBeamCenterOffsetZM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblySidePostCountPerSide",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblySidePostWidthM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblySidePostHeightM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblySidePostDepthM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblySidePostCenterYM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblySidePostFirstCenterXM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblySidePostPitchM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyHingeCollarRadiusM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyHingeCollarLengthM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyHingeCollarOffsetZM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyHingeGussetWidthM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyHingeGussetHeightM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyHingeGussetDepthM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyHingeGussetCenterXM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyHingeGussetCenterYM",
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyHingeGussetOffsetZM",
+        "GriffinRampRequirements::GriffinEgressRamp::rampMaxDeploymentAngleRad",
+        "GriffinRampRequirements::GriffinEgressRamp::rampHingeOffsetX",
+        "GriffinRampRequirements::GriffinEgressRamp::rampHingeOffsetY",
+        "GriffinRampRequirements::GriffinEgressRamp::rampHingeOffsetZ",
+        "GriffinRampRequirements::GriffinEgressRamp::rampMountY",
+        "GriffinRampRequirements::GriffinEgressRamp::rampMountZ",
+        "GriffinRampRequirements::GriffinEgressRamp::rampRailOffsetZM",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSocketX",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSocketY",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSocketZ",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceThicknessM",
+        "FlipRequirements::FlipRover::wheelStationZ",
+        "FlipRequirements::FlipRover::visualRoverWheelRadiusM"
+    ], [
+        "GriffinRampRequirements::grr001", "GriffinRampRequirements::grr002",
+        "GriffinRampRequirements::grr003", "GriffinRampRequirements::grr004",
+        "GriffinRampRequirements::grr005", "GriffinRampRequirements::grr006",
+        "GriffinRampRequirements::grr007", "GriffinRampRequirements::grr008",
+        "GriffinRampRequirements::grr009", "GriffinRampRequirements::grr010",
+        "GriffinRampRequirements::grr011", "GriffinRampRequirements::grr012",
+        "GriffinRampRequirements::grr013", "GriffinRampRequirements::grr014",
+        "GriffinRampRequirements::grr015"
+    ], ["GriffinRampRequirements::Verify_GriffinRampRequirements"]);
     let checks = [];
     let limit = _source_number(source, "rampMaxDeploymentAngleRad");
     let ramp_width = _source_number(source, "rampSurfaceWidthM");
-    let wheel_z = component_requirements::source_number_list(source,
+    let wheel_z = sysml_requirement_checks::source_number_list(source,
         "FlipRequirements::FlipRover::wheelStationZ");
     let wheel_radius = sysml_requirements::number(source,
         "FlipRequirements::FlipRover::visualRoverWheelRadiusM");
     let wheel_clearance = _source_number(source, "rampWheelClearanceM");
     let transition_overlap = _source_number(source, "physicalRampDeckTransitionOverlapM");
+    let physical_surface_length = _source_number(source, "physicalRampSurfaceLengthM");
     let transition_name = _source_text(source, "physicalRampTransitionChildName");
-    let assembly_names = component_requirements::source_text_list(source,
+    let assembly_names = sysml_requirement_checks::source_text_list(source,
         _source_attr("assemblyChildNames"));
     let tread_count = _source_number(source, "assemblyTreadCount");
     let tread_width = _source_number(source, "assemblyTreadWidthM");
@@ -105,7 +160,7 @@ fn on_tick(me, ctx) {
     if ramp_width == () || half_track == () || wheel_radius == ()
         || wheel_clearance == () || wheel_z.len() != 4
         || wheel_radius <= 0.0 || wheel_clearance <= 0.0
-        || transition_overlap == () || transition_name == ()
+        || transition_overlap == () || physical_surface_length == () || transition_name == ()
         || transition_name == "" || assembly_names.len() == 0
         || tread_count == () || tread_count < 2.0 || tread_width == ()
         || tread_height == () || tread_span == () || tread_first_x == ()
@@ -132,16 +187,20 @@ fn on_tick(me, ctx) {
         throw("GriffinRampRequirements hinge-gusset datums are incomplete");
     }
     let required_width = 2.0 * (half_track + wheel_radius + wheel_clearance);
-    checks.push(component_requirements::assertion("GRR-003-flip-wheel-clearance",
-        "ramp_flip_interface", "grr003", VERIFICATION,
-        ramp_width + 0.002 >= required_width,
-        "ramp width does not clear both FLIP tyre envelopes and the authored wheel clearance",
-        ramp_width, required_width));
-    checks.push(component_requirements::assertion(
-        "GRR-012-source-transition", "ramp", "grr012", VERIFICATION,
-        transition_overlap > 0.0 && transition_overlap < _source_number(source, "physicalRampSurfaceLengthM"),
-        "physical deck transition must be a positive sub-length named child: " + transition_name,
-        transition_overlap, "0 < overlap < physical ramp length"));
+    checks.push(_constraint("GRR-003-flip-wheel-clearance", "grr003",
+        "GRC003_WidthClearsFlipWheelEnvelope",
+        #{rampWidthM: ramp_width, wheelHalfTrackM: half_track,
+          wheelRadiusM: wheel_radius, wheelClearanceM: wheel_clearance}));
+    checks.push(_constraint("GRR-012-source-transition", "grr012",
+        "GRC012_TransitionOverlapWithinSurface",
+        #{overlapM: #{provider: "usd", state: "unavailable",
+              detail: "composed TransitionPlate dimensions are not exposed by a typed USD provider"},
+          requiredOverlapM: #{provider: "derived_geometry", state: "unavailable",
+              detail: "required overlap must be recomputed from the octagonal deck, hinge, and FLIP wheel envelope"},
+          surfaceLengthM: #{provider: "source_literal", state: "value",
+              value: physical_surface_length},
+          deckProfileCompatible: #{provider: "usd", state: "unavailable",
+              detail: "TopDeckCollisionProxy octagonal profile has not been authored and read back in Editor"}}));
     let pi = 3.141592653589793;
     for side in ["Port", "Starboard"] {
         let ramp = ROOT + "/EgressRamp" + side;
@@ -354,35 +413,20 @@ fn on_tick(me, ctx) {
     // independent package and its verification before any USD result counts.
     checks.push(#{id: "GRR-007-source", component: "ramp", requirement: "grr007",
         verification: VERIFICATION, kind: "coverage"});
-    let result = sysml_requirements::evaluate(source, checks);
-    let behavior_requirement = sysml_requirements::requirement_name(source, "grr005");
-    if behavior_requirement.ok != true || result.verification == () {
-        throw("ramp behavior evidence identity is missing from the SysML source report");
-    }
-    // Behavioral boundary checks use the reusable generic ramp helper. They
-    // operate on SysML values, so no command angle or limit is duplicated in
-    // this test and the composed USD remains read-only evidence.
     for side in ["Port", "Starboard"] {
         let angle = _source_number(source, if side == "Port" {
             "rampPortDeploymentAngleRad"
         } else {
             "rampStarboardDeploymentAngleRad"
         });
-        let nominal = egress_ramp_requirements::deployment_check(angle, limit);
-        let boundary = egress_ramp_requirements::deployment_check(limit, limit);
-        let over = egress_ramp_requirements::deployment_check(limit + 0.001, limit);
-        for behavior in [
-            _behavior_result("GRR-005-" + side + "-nominal", behavior_requirement.name, result.verification,
-                nominal.ok, "nominal deployment was rejected", angle, limit),
-            _behavior_result("GRR-005-" + side + "-boundary", behavior_requirement.name, result.verification,
-                boundary.ok, "deployment limit boundary was rejected", limit, limit),
-            _behavior_result("GRR-005-" + side + "-over-limit", behavior_requirement.name, result.verification,
-                !over.ok, "over-limit deployment was accepted", limit + 0.001, limit),
-        ] {
-            result.results.push(behavior);
-            if !behavior.ok { result.failures.push(behavior); }
-        }
+        checks.push(_constraint("GRR-005-" + side + "-nominal-command", "grr005",
+            "GRC005_DeploymentCommandWithinLimit",
+            #{commandRad: angle, limitRad: limit}));
+        checks.push(_constraint("GRR-005-" + side + "-limit-command", "grr005",
+            "GRC005_DeploymentCommandWithinLimit",
+            #{commandRad: limit, limitRad: limit}));
     }
+    let result = sysml_requirements::evaluate(source, checks);
     result.metrics = #{clock: clock_snapshot(), root: ROOT,
                        verification: result.verification,
                        separate_vehicle_document: true};

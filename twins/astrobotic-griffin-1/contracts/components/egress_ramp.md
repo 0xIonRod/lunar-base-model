@@ -1,49 +1,36 @@
-# Egress ramp component contract
+# Griffin ramp model contract
 
-Component: `components/lander/egress_ramp.usda`
+Visual component: `components/lander/griffin_ramp_visual.usda`
+Requirements and visual dimensions: `requirements/griffin_ramp_requirements.sysml`
 
-Status: Twin study component; public reference establishes the two-side ramp
-concept and the tested egress angle, not a complete mechanical ICD.
-
-Public reference:
-
-- https://www.astrobotic.com/astrobotic-griffin-lander-and-nasas-viper-moon-rover-complete-complex-test-drives/
+The two Griffin ramps reference the same replaceable visual component from the
+vehicle assembly. The visual asset contains render geometry only. Its identity,
+child names, dimensions, support members, appearance, wheel clearance, and
+deployment limit are owned by the SysML source and checked by the shared
+SysML/USD requirements evaluator.
 
 ## Ownership
 
-The component root owns its local geometry, mass/collision envelope, hinge
-datum, mount socket, deployment-limit metadata, and provenance. The Griffin
-assembly owns each instance's placement, side identity, host-facing revolute
-joint, and cross-component wiring.
+- `GriffinRampRequirements::GriffinEgressRamp` owns the shared visual dimensions,
+  child identities, and port/starboard deployment datums.
+- `GRC005_DeploymentCommandWithinLimit` owns the symmetric command acceptance
+  boundary in radians.
+- `GRC003_WidthClearsFlipWheelEnvelope` checks the FLIP wheel stations, wheel
+  radius, and authored clearance against the ramp width.
+- The physical ramp bodies, hinge joints, and deck transition belong to the
+  physical Griffin model and its separate requirements. The render component
+  does not provide a collider, mass, inertia, or a second physical body.
+- FLIP remains a referenced rover component; the ramp requirement reads FLIP's
+  wheel datums through its SysML source.
+- The physical `TopDeckCollisionProxy` currently uses the obsolete six-sided
+  study footprint, while the required bus/deck profile is octagonal. The
+  existing 1.21 m deck transition is a legacy value and not acceptance data;
+  GRR-012 stays inconclusive until Editor readback provides a recomputed
+  overlap and confirms the octagonal collider.
 
-## Local frame and topology
+## Evidence
 
-- Y-up, right-handed, SI metres; component origin is the hinge axis.
-- Root: `/EgressRamp`, type `Xform`, one independently reusable component.
-- Required geometry: `Surface`, `EdgeRail`, `EdgeRailInner`, `HingeBlock`, and
-  `MountSocket`.
-- `Surface` and both rails are solid contact geometry with enabled collision.
-- `MountSocket` is a visual/mount datum and does not create a second body.
-- The component has one rigid body; the parent assembly supplies the
-  host-facing revolute joint when the component is mounted.
-
-## Parameters and limits
-
-- positive authored `physics:mass` and diagonal inertia;
-- `lunco:deployment_angle_limit_rad` is positive and bounded by the Twin
-  study limit;
-- each deployed instance publishes `lunco:deployment_angle_rad` in radians;
-- the transform angle is in degrees because USD `rotateXYZ` is degrees; the
-  Rhai command/lint boundary checks the conversion and does not duplicate it in
-  Modelica or Rust.
-
-The 33-degree egress value is a public test reference. The component's exact
-length, width, mass, inertia, rail section, hinge dimensions, and placement are
-study values and must remain labelled as such.
-
-## Required evidence
-
-The component test is read-only and must report exact missing/malformed paths.
-It checks topology, types, visibility, positive mass/inertia, contact collider
-flags, provenance, deployment limit, and boundary values at the limit and just
-outside the limit. It does not repair the stage or prove assembly placement.
+`scenarios/tests/griffin_ramp_requirements.rhai` observes the composed ramp
+instances in the Griffin vehicle document. It supplies typed USD facts and FLIP
+wheel measurements to generic source constraints; it does not author a second
+ramp limit or reinterpret a boolean Rhai predicate as requirement evidence.

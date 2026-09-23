@@ -1,3 +1,4 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Standalone Griffin lander component verification.
 // SysML owns names/counts/dimensions and references; this Rhai observer only
 // queries the composed USD and emits the generic structured verdict.
@@ -69,15 +70,7 @@ fn _rotation_y(id, requirement, path, expected) {
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
-    let source = sysml_requirements::source_with_selection([], [
-        "GriffinLanderRequirements::glr001", "GriffinLanderRequirements::glr002",
-        "GriffinLanderRequirements::glr003", "GriffinLanderRequirements::glr004",
-        "GriffinLanderRequirements::glr005", "GriffinLanderRequirements::glr006",
-        "GriffinLanderRequirements::glr007", "GriffinLanderRequirements::glr008",
-        "GriffinLanderRequirements::glr009", "GriffinLanderRequirements::glr010",
-        "GriffinLanderRequirements::glr011"
-    ], ["GriffinLanderRequirements::Verify_GriffinLanderRequirements"]);
-    let values = sysml_requirements::source_with_attributes([
+    let selected_attributes = [
         _configuration_attr("landingLegInstances"), _configuration_attr("tankInstances"),
         _configuration_attr("mainEngineInstances"), _configuration_attr("solarArrayInstances"),
         _configuration_attr("legStations"), _configuration_attr("tankStations"),
@@ -86,7 +79,16 @@ fn on_tick(me, ctx) {
         _configuration_attr("bodyMount"), _configuration_attr("bodyDimensions"),
         _source_attr("visualEnvelopeToleranceM"), _source_attr("legCount"), _source_attr("tankCount"),
         _source_attr("engineCount"), _source_attr("solarArrayCount")
-    ]);
+    ];
+    let source = sysml_requirements::source_with_selection(selected_attributes, [
+        "GriffinLanderRequirements::glr001", "GriffinLanderRequirements::glr002",
+        "GriffinLanderRequirements::glr003", "GriffinLanderRequirements::glr004",
+        "GriffinLanderRequirements::glr005", "GriffinLanderRequirements::glr006",
+        "GriffinLanderRequirements::glr007", "GriffinLanderRequirements::glr008",
+        "GriffinLanderRequirements::glr009", "GriffinLanderRequirements::glr010",
+        "GriffinLanderRequirements::glr011"
+    ], ["GriffinLanderRequirements::Verify_GriffinLanderRequirements"]);
+    let values = source;
     let checks = [];
 
     checks.push(_exists("GLR-001-root", "glr001", ROOT, "Xform"));
@@ -101,7 +103,7 @@ fn on_tick(me, ctx) {
 
     let leg_names = _enum_names(values, "landingLegInstances");
     let leg_stations = _position_values(values, "legStations");
-    let leg_rot_y = component_requirements::source_number_list(values,
+    let leg_rot_y = sysml_requirement_checks::source_number_list(values,
         _configuration_attr("legStationRotationYDeg"));
     for index in 0..leg_names.len() {
         let name = leg_names[index];
@@ -149,7 +151,7 @@ fn on_tick(me, ctx) {
     }
     let solar_names = _enum_names(values, "solarArrayInstances");
     let solar_stations = _position_values(values, "solarStations");
-    let solar_rz = component_requirements::source_number_list(values,
+    let solar_rz = sysml_requirement_checks::source_number_list(values,
         _configuration_attr("solarStationRotationZDeg"));
     for index in 0..solar_names.len() {
         let name = solar_names[index];
@@ -170,7 +172,7 @@ fn on_tick(me, ctx) {
         }
     }
 
-    checks.push(component_requirements::coverage("GLR-010-frame-ownership", "lander",
+    checks.push(sysml_requirement_checks::coverage("GLR-010-frame-ownership", "lander",
         "glr010", VERIFICATION));
 
     let body_dimensions = sysml_requirements::native_value(values,
@@ -189,20 +191,20 @@ fn on_tick(me, ctx) {
         requirement: "glr006", verification: VERIFICATION,
         kind: "bounds_component", path: ROOT + "/Bus/PerimeterFrame", index: 1,
         multiplier: 2.0, expected: body_dimensions.y, tolerance: envelope_tolerance});
-    for pair in [
-        #{id: "GLR-007-leg-count", names: leg_names, stations: leg_stations, count: "legCount"},
-        #{id: "GLR-007-tank-count", names: tank_names, stations: tank_stations, count: "tankCount"},
-        #{id: "GLR-007-engine-count", names: engine_names, stations: engine_stations, count: "engineCount"},
-        #{id: "GLR-007-solar-count", names: solar_names, stations: solar_stations, count: "solarArrayCount"}
+    for subsystem in [
+        #{id: "legs", identities: "landingLegInstances", stations: "legStations", count: "legCount"},
+        #{id: "tanks", identities: "tankInstances", stations: "tankStations", count: "tankCount"},
+        #{id: "engines", identities: "mainEngineInstances", stations: "engineStations", count: "engineCount"},
+        #{id: "solar", identities: "solarArrayInstances", stations: "solarStations", count: "solarArrayCount"}
     ] {
-        let expected = sysml_requirements::native_value(values, _source_attr(pair.count));
-        checks.push(component_requirements::assertion(pair.id, "griffin.component_identity",
-            "glr007", VERIFICATION,
-            expected != () && pair.names.len() == expected
-                && pair.stations.len() == pair.names.len(),
-            "typed subsystem identities and native Position stations match the SysML cardinality",
-            #{identity_count: pair.names.len(), station_count: pair.stations.len()},
-            #{required_count: expected}));
+        checks.push(sysml_requirement_checks::source_list_count(
+            "GLR-007-" + subsystem.id + "-identity-count", "lander", "glr007",
+            VERIFICATION, _configuration_attr(subsystem.identities),
+            _source_attr(subsystem.count)));
+        checks.push(sysml_requirement_checks::source_list_count(
+            "GLR-007-" + subsystem.id + "-station-count", "lander", "glr007",
+            VERIFICATION, _configuration_attr(subsystem.stations),
+            _source_attr(subsystem.count)));
     }
     checks.push(_coverage("GLR-007-source", "glr007"));
 

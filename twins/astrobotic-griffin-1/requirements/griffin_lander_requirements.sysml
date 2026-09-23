@@ -84,16 +84,18 @@ package GriffinLanderRequirements {
 
     verification def Verify_GriffinLanderRequirements {
         subject lander : GriffinLanderComponent;
-        verify glr001;
-        verify glr002;
-        verify glr003;
-        verify glr004;
-        verify glr005;
-        verify glr006;
-        verify glr007;
-        verify glr008;
-        verify glr009;
-        verify glr010;
-        verify glr011;
+        objective {
+            verify glr001;
+            verify glr002;
+            verify glr003;
+            verify glr004;
+            verify glr005;
+            verify glr006;
+            verify glr007;
+            verify glr008;
+            verify glr009;
+            verify glr010;
+            verify glr011;
+        }
     }
 }

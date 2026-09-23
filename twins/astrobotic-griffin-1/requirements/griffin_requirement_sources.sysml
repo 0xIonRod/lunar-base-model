@@ -637,7 +637,7 @@ package GriffinRequirementSources {
         attribute requirementId = "GRR-012";
         attribute qualifiedRequirement = "GriffinRampRequirements::GRR012_PhysicalDeckTransition";
         attribute sourceReference = "https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/; https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/research/griffin_1_assumptions.md; twin://astrobotic-griffin-1/vehicles/griffin_1.usda";
-        attribute rationale = "The public sources establish optional rover egress but not the as-built interface. In the current Twin, TopDeckCollisionProxy tapers to x = +/-3.16 m at the FLIP wheel lateral plane and the physical ramp hinges are at x = +/-3.20 m. Interpolating the hex edge at the FLIP lateral station |x| = 0.95 m gives x = 2.6115 m, so the hinge gap is 0.5885 m. Adding the 0.25 m route margin and projecting through the 45.7457 degree ramp slope requires 1.2015 m along the ramp; the SysML datum rounds up to 1.21 m. The TransitionPlate is an unscaled Xform rigid-body child with a ContactSurface collider, fixed to the Griffin deck root, so it remains horizontal while the 8.00 m ramp rotates. The 15.0 kg mass is an explicit replaceable simulator assumption; 15.35/17.14/1.87 kg m^2 is the rectangular-prism inertia derived from that mass and the typed 1.21 x 0.18 x 3.50 m dimensions. The collision/API schemas, fixed-joint endpoints, mass, inertia, and authored dimensions are checked by the full Griffin lint and authored through the typed Editor builder.";
+        attribute rationale = "The existing 1.21 m TransitionPlate datum was derived from a six-sided TopDeckCollisionProxy and is retained only to describe the current legacy asset. The intended Griffin deck and tank-support perimeter are octagonal; the old overlap calculation is not valid acceptance evidence. Recompute overlap from an Editor-authored and composed-readback octagonal collider, ramp hinge, terrain contact plane, and FLIP wheel envelope. The generic evaluator requires a measured overlap and positive octagonal-profile compatibility observation; neither is available from the current provider, so GRR-012 remains inconclusive. Transition mass and inertia remain replaceable simulator assumptions pending a mechanical ICD.";
     }
 
     part evidence_grr_013 : RequirementEvidence {
@@ -663,294 +663,301 @@ package GriffinRequirementSources {
 
     part evidence_gr_001 : RequirementEvidence {
         attribute requirementId = "GR-001";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR001_LanderArchitecture";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR001_LanderArchitecture";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_002 : RequirementEvidence {
         attribute requirementId = "GR-002";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR002_PayloadAdapter";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR002_PayloadAdapter";
         attribute sourceReference = "Twin adapter/release contract and https://www.astrolab.space/flip/";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_003 : RequirementEvidence {
         attribute requirementId = "GR-003";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR003_DeployableRamps";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR003_DeployableRamps";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_004 : RequirementEvidence {
         attribute requirementId = "GR-004";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR004_SurfaceSequence";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR004_SurfaceSequence";
         attribute sourceReference = "Twin mission scenario contract";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_005 : RequirementEvidence {
         attribute requirementId = "GR-005";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR005_TraceableValues";
+        attribute qualifiedRequirement = "GriffinAssuranceRequirements::GR005_TraceableValues";
         attribute sourceReference = "SysML/Rhai verification policy";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_006 : RequirementEvidence {
         attribute requirementId = "GR-006";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR006_SolarAssemblies";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR006_SolarAssemblies";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ and https://www.astrolab.space/flip/";
         attribute rationale = "Prevents duplicate dynamics by keeping render and physics ownership explicit.";
     }
 
     part evidence_gr_007 : RequirementEvidence {
         attribute requirementId = "GR-007";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR007_GatedEgress";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR007_GatedEgress";
         attribute sourceReference = "Twin egress runtime contract";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_008 : RequirementEvidence {
         attribute requirementId = "GR-008";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR008_AttitudeCases";
+        attribute qualifiedRequirement = "GriffinSimulationAccuracyRequirements::GR008_AttitudeCases";
         attribute sourceReference = "Twin mission verification plan";
         attribute rationale = "Makes count, identity, and provenance inspectable and replaceable.";
     }
 
     part evidence_gr_009 : RequirementEvidence {
         attribute requirementId = "GR-009";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR009_PayloadCapacity";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR009_PayloadCapacity";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_010 : RequirementEvidence {
         attribute requirementId = "GR-010";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR010_FunctionalLegs";
+        attribute qualifiedRequirement = "GriffinMechanicalRequirements::GR010_FunctionalLegs";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_011 : RequirementEvidence {
         attribute requirementId = "GR-011";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR011_RampBodies";
+        attribute qualifiedRequirement = "GriffinMechanicalRequirements::GR011_RampBodies";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_012 : RequirementEvidence {
         attribute requirementId = "GR-012";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR012_LoadBearingMass";
+        attribute qualifiedRequirement = "GriffinMechanicalRequirements::GR012_LoadBearingMass";
         attribute sourceReference = "LunCoSim physics admission contract";
         attribute rationale = "Prevents duplicate dynamics by keeping render and physics ownership explicit.";
     }
 
     part evidence_gr_013 : RequirementEvidence {
         attribute requirementId = "GR-013";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR013_ParameterProvenance";
+        attribute qualifiedRequirement = "GriffinAssuranceRequirements::GR013_ParameterProvenance";
         attribute sourceReference = "SysML/Rhai provenance policy";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_014 : RequirementEvidence {
         attribute requirementId = "GR-014";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR014_TypedAuthoring";
+        attribute qualifiedRequirement = "GriffinAssuranceRequirements::GR014_TypedAuthoring";
         attribute sourceReference = "LunCoSim typed Editor authoring contract";
         attribute rationale = "Makes count, identity, and provenance inspectable and replaceable.";
     }
 
     part evidence_gr_015 : RequirementEvidence {
         attribute requirementId = "GR-015";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR015_NozzleGeometry";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GR015_NozzleGeometry";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ and the Twin visual ownership contract";
         attribute rationale = "Prevents duplicate dynamics by keeping render and physics ownership explicit.";
     }
 
     part evidence_gr_016 : RequirementEvidence {
         attribute requirementId = "GR-016";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR016_SolarSymmetry";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GR016_SolarSymmetry";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_017 : RequirementEvidence {
         attribute requirementId = "GR-017";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR017_RampSymmetry";
+        attribute qualifiedRequirement = "GriffinMechanicalRequirements::GR017_RampSymmetry";
         attribute sourceReference = "Twin ramp component contract";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_018 : RequirementEvidence {
         attribute requirementId = "GR-018";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR018_HullAndDeck";
+        attribute qualifiedRequirement = "GriffinMechanicalRequirements::GR018_HullAndDeck";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_019 : RequirementEvidence {
         attribute requirementId = "GR-019";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR019_LegPlacement";
+        attribute qualifiedRequirement = "GriffinMechanicalRequirements::GR019_LegPlacement";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_020 : RequirementEvidence {
         attribute requirementId = "GR-020";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR020_ProxySuppression";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GR020_ProxySuppression";
         attribute sourceReference = "Twin component ownership policy";
         attribute rationale = "Prevents duplicate dynamics by keeping render and physics ownership explicit.";
     }
 
     part evidence_gr_021 : RequirementEvidence {
         attribute requirementId = "GR-021";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR021_MassProperties";
+        attribute qualifiedRequirement = "GriffinSimulationAccuracyRequirements::GR021_MassProperties";
         attribute sourceReference = "rigid-body physics contract";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_022 : RequirementEvidence {
         attribute requirementId = "GR-022";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR022_SupportPolygon";
+        attribute qualifiedRequirement = "GriffinSimulationAccuracyRequirements::GR022_SupportPolygon";
         attribute sourceReference = "rigid-body stability criterion";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_023 : RequirementEvidence {
         attribute requirementId = "GR-023";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR023_ContactContinuity";
+        attribute qualifiedRequirement = "GriffinSimulationAccuracyRequirements::GR023_ContactContinuity";
         attribute sourceReference = "contact/terrain acceptance contract";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_024 : RequirementEvidence {
         attribute requirementId = "GR-024";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR024_HingeFrames";
+        attribute qualifiedRequirement = "GriffinMechanicalRequirements::GR024_HingeFrames";
         attribute sourceReference = "Twin mount-socket and revolute-joint contract";
         attribute rationale = "Prevents duplicate dynamics by keeping render and physics ownership explicit.";
     }
 
     part evidence_gr_025 : RequirementEvidence {
         attribute requirementId = "GR-025";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR025_SolarClearance";
+        attribute qualifiedRequirement = "GriffinMechanicalRequirements::GR025_SolarClearance";
         attribute sourceReference = "spacecraft deployable-clearance practice";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_026 : RequirementEvidence {
         attribute requirementId = "GR-026";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR026_AdapterRelease";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR026_AdapterRelease";
         attribute sourceReference = "Twin adapter-release runtime contract";
         attribute rationale = "Prevents duplicate dynamics by keeping render and physics ownership explicit.";
     }
 
     part evidence_gr_027 : RequirementEvidence {
         attribute requirementId = "GR-027";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR027_PropulsionAlignment";
+        attribute qualifiedRequirement = "GriffinSimulationAccuracyRequirements::GR027_PropulsionAlignment";
         attribute sourceReference = "propulsion presentation/flight-model boundary";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_028 : RequirementEvidence {
         attribute requirementId = "GR-028";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR028_InterfaceResolution";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR028_InterfaceResolution";
         attribute sourceReference = "Twin subsystem interface registry";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_029 : RequirementEvidence {
         attribute requirementId = "GR-029";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR029_PartProvenance";
+        attribute qualifiedRequirement = "GriffinAssuranceRequirements::GR029_PartProvenance";
         attribute sourceReference = "SysML provenance policy and the public Griffin/FLIP references listed on the parts";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_030 : RequirementEvidence {
         attribute requirementId = "GR-030";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR030_EvidenceGate";
+        attribute qualifiedRequirement = "GriffinAssuranceRequirements::GR030_EvidenceGate";
         attribute sourceReference = "Twin evidence gate";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_031 : RequirementEvidence {
         attribute requirementId = "GR-031";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR031_DeterministicVerdict";
+        attribute qualifiedRequirement = "GriffinSimulationAccuracyRequirements::GR031_DeterministicVerdict";
         attribute sourceReference = "LunCoSim deterministic test runner contract";
         attribute rationale = "Makes control, contact, or state transfer observable in the mission test.";
     }
 
     part evidence_gr_032 : RequirementEvidence {
         attribute requirementId = "GR-032";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR032_MainEngineBells";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GR032_MainEngineBells";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_033 : RequirementEvidence {
         attribute requirementId = "GR-033";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR033_PropellantTanks";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GR033_PropellantTanks";
         attribute sourceReference = "https://www.astrobotic.com/griffin-1-mission-update/";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gr_034 : RequirementEvidence {
         attribute requirementId = "GR-034";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR034_SurfaceRouteDatums";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR034_SurfaceRouteDatums";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml; twin://astrobotic-griffin-1/requirements/griffin_requirements.sysml";
-        attribute rationale = "Keeps marker names, speeds, and arrival radii in one ordered SysML interface table. The 0.35 m approach-lane radius requires FLIP's front wheels to reach the separately modeled 1.21 m transition while accepting the measured low-speed steering drift. The 0.30 m exit radius remains tight, but the exit datum is placed at (12.00,0.00) m on the ramp centreline: the corrected headful replay observed the released rover near (11.15,-0.13) m with two front contacts, so the forward centreline gate lets the trailing axle clear the ramp without commanding Ackermann guidance into a lateral reversal. RoverTarget2 uses a 1.20 m gate because the deterministic replay crossed its centerline at 1.05 m with all four wheel contacts valid; the later 0.22..0.14 m/s corner speeds are conservative study-vehicle limits selected from the observed Ackermann overshoot at the diagonal survey sequence. This prevents stale coordinates, excessive corner speed, or an oversized tolerance from declaring egress complete while FLIP remains on the deck.";
+        attribute rationale = "Keeps marker names, speeds, and arrival radii in one ordered SysML interface table. The current 0.35 m approach-lane radius and 1.21 m transition are provisional values from a route study using the obsolete six-sided deck collider; both must be revalidated against the octagonal composed collider before acceptance. The 0.30 m exit radius is placed at (12.00,0.00) m on the ramp centreline so the trailing axle can clear the ramp without a lateral Ackermann reversal. Later 0.22..0.14 m/s corner speeds remain replaceable study limits. The deterministic replay is historical evidence and does not validate the current physical deck/ramp interface.";
     }
 
     part evidence_gr_035 : RequirementEvidence {
         attribute requirementId = "GR-035";
-        attribute qualifiedRequirement = "Griffin1Requirements::GR035_EgressApronContact";
+        attribute qualifiedRequirement = "GriffinFunctionalRequirements::GR035_EgressApronContact";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/; https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/; twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda; twin://astrobotic-griffin-1/tools/griffin_visual_builder.rhai";
         attribute rationale = "The public Griffin and mission sources establish the vehicle and egress context but do not publish an as-built site-apron ICD. The 10.00 m x 8.00 m x 0.10 m EgressApron at (13.50,-0.05,-1.00) is therefore an explicit, replaceable Twin study component: its top y=0.00 m matches the normalized ramp-tip datum, it overlaps the 8.00 m ramp tip near x=11.20 m, extends beyond the (12.00,0.00) centreline exit gate, and avoids introducing a second raised site datum while FLIP clears the ramp. The typed Editor operation and composed wheel-contact evidence make the assumption visible instead of hiding it in a route literal or comment-only verdict.";
     }
 
+    part evidence_gr_036 : RequirementEvidence {
+        attribute requirementId = "GR-036";
+        attribute qualifiedRequirement = "GriffinSimulationAccuracyRequirements::GR036_LandingStability";
+        attribute sourceReference = "twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml; LunCoSim fixed-clock physics observation contract";
+        attribute rationale = "Separates the landing-stability observation bounds from GR-031 execution determinism. The upright-axis threshold is the cosine of the explicit 0.35 rad study tilt envelope; other bounds are replaceable Twin assumptions until a Griffin performance specification is available.";
+    }
+
     part evidence_gv_001 : RequirementEvidence {
         attribute requirementId = "GV-001";
-        attribute qualifiedRequirement = "Griffin1Requirements::GRV001_PresentationFrame";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GRV001_PresentationFrame";
         attribute sourceReference = "LunCoSim visual review contract";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gv_002 : RequirementEvidence {
         attribute requirementId = "GV-002";
-        attribute qualifiedRequirement = "Griffin1Requirements::GRV002_LanderPresentation";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GRV002_LanderPresentation";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gv_003 : RequirementEvidence {
         attribute requirementId = "GV-003";
-        attribute qualifiedRequirement = "Griffin1Requirements::GRV003_GriffinSolarAssemblies";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GRV003_GriffinSolarAssemblies";
         attribute sourceReference = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gv_004 : RequirementEvidence {
         attribute requirementId = "GV-004";
-        attribute qualifiedRequirement = "Griffin1Requirements::GRV004_ScaleDatums";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GRV004_ScaleDatums";
         attribute sourceReference = "Moon Base SI/Y-up project contract";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }
 
     part evidence_gv_005 : RequirementEvidence {
         attribute requirementId = "GV-005";
-        attribute qualifiedRequirement = "Griffin1Requirements::GRV005_RenderOwnership";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GRV005_RenderOwnership";
         attribute sourceReference = "LunCoSim visual/physics ownership policy";
         attribute rationale = "Prevents duplicate dynamics by keeping render and physics ownership explicit.";
     }
 
     part evidence_gv_006 : RequirementEvidence {
         attribute requirementId = "GV-006";
-        attribute qualifiedRequirement = "Griffin1Requirements::GRV006_LunarContext";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GRV006_LunarContext";
         attribute sourceReference = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/ and the Twin terrain asset manifest";
         attribute rationale = "Makes count, identity, and provenance inspectable and replaceable.";
     }
 
     part evidence_gv_007 : RequirementEvidence {
         attribute requirementId = "GV-007";
-        attribute qualifiedRequirement = "Griffin1Requirements::GRV007_VisualEvidence";
+        attribute qualifiedRequirement = "GriffinVisualRequirements::GRV007_VisualEvidence";
         attribute sourceReference = "Twin visual evidence gate";
         attribute rationale = "Provides one measurable datum for composed-USD geometry inspection.";
     }

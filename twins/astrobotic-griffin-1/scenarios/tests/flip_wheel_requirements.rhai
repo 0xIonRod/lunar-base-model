@@ -1,3 +1,4 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Standalone FLIP four-wheel directional verification.  The source list is
 // the acceptance topology; inactive middle-station proxies are deliberately
 // outside the list and therefore cannot inflate the count.
@@ -29,13 +30,13 @@ fn on_tick(me, ctx) {
     if strut_name == () || strut_name == "" {
         throw("FlipWheelRequirements::suspensionVisualChild is required");
     }
-    let names = component_requirements::source_text_list(source, names_source);
+    let names = sysml_requirement_checks::source_text_list(source, names_source);
     let radius_source = rover("visualRoverWheelRadiusM");
     let front_source = rover("frontSteeringAngleDeg");
     let rear_source = rover("rearSteeringAngleDeg");
-    let xs = component_requirements::source_number_list(source, rover("wheelStationX"));
-    let ys = component_requirements::source_number_list(source, rover("wheelStationY"));
-    let zs = component_requirements::source_number_list(source, rover("wheelStationZ"));
+    let xs = sysml_requirement_checks::source_number_list(source, rover("wheelStationX"));
+    let ys = sysml_requirement_checks::source_number_list(source, rover("wheelStationY"));
+    let zs = sysml_requirement_checks::source_number_list(source, rover("wheelStationZ"));
     let suspension_component = sysml_requirements::text(source, own("suspensionComponent"));
     if suspension_component == () || suspension_component == "" {
         throw("FlipWheelRequirements::suspensionComponent is required");
@@ -44,9 +45,9 @@ fn on_tick(me, ctx) {
         throw("FlipWheelRequirements wheel station datums must match visualWheelNames");
     }
     let checks = [];
-    checks.push(component_requirements::source_list_count("FWW-001-count", "wheels", "fww001", VERIFICATION, names_source, count_source));
+    checks.push(sysml_requirement_checks::source_list_count("FWW-001-count", "wheels", "fww001", VERIFICATION, names_source, count_source));
     for axis in ["wheelStationX", "wheelStationY", "wheelStationZ"] {
-        checks.push(component_requirements::source_list_count("FWW-005-" + axis,
+        checks.push(sysml_requirement_checks::source_list_count("FWW-005-" + axis,
             "wheel", "fww005", VERIFICATION,
             rover(axis), count_source));
     }
@@ -54,8 +55,8 @@ fn on_tick(me, ctx) {
         let name = names[index];
         let station = root + "/Suspension_" + name;
         let wheel = station + "/Wheel_" + name;
-        checks.push(component_requirements::exists("FWW-001-" + name, "wheel", "fww001", VERIFICATION, wheel, "Xform"));
-        checks.push(component_requirements::children("FWW-002-" + name, "wheel", "fww002", VERIFICATION, wheel,
+        checks.push(sysml_requirement_checks::exists("FWW-001-" + name, "wheel", "fww001", VERIFICATION, wheel, "Xform"));
+        checks.push(sysml_requirement_checks::children("FWW-002-" + name, "wheel", "fww002", VERIFICATION, wheel,
             [wheel + "/Tire", wheel + "/MetalHub", wheel + "/HubCap"]));
         checks.push(#{id: "FWW-002-" + name + "-radius", component: "wheel",
             requirement: "fww002", verification: VERIFICATION,
@@ -90,10 +91,10 @@ fn on_tick(me, ctx) {
             checks.push(position("FWW-005-" + name + "-z", station, 2, zs[index]));
         }
         let suspension = station + "/Suspension";
-        checks.push(component_requirements::exists("FWW-006-" + name,
+        checks.push(sysml_requirement_checks::exists("FWW-006-" + name,
             "suspension", "fww006", VERIFICATION,
             suspension, "Xform"));
-        checks.push(component_requirements::attribute_equals("FWW-006-" + name + "-source",
+        checks.push(sysml_requirement_checks::attribute_equals("FWW-006-" + name + "-source",
             "suspension", "fww006", VERIFICATION,
             suspension, "lunco:visual:component", "flip_suspension"));
         checks.push(#{id: "FWW-006-" + name + "-mirror", component: "suspension",
@@ -101,7 +102,7 @@ fn on_tick(me, ctx) {
             kind: "attribute_component", path: suspension, attr: "xformOp:rotateXYZ",
             index: 1, expected: if xs[index] < 0.0 { 0.0 } else { 180.0 }, tolerance: 0.002});
     }
-    checks.push(component_requirements::coverage("FWW-004-traceability", "wheels", "fww004", VERIFICATION));
-    component_requirements::finish(source, checks, "FLIP WHEEL REQUIREMENTS", "FLIP_WHEEL_REQUIREMENTS", root, PACKAGE, VERIFICATION);
+    checks.push(sysml_requirement_checks::coverage("FWW-004-traceability", "wheels", "fww004", VERIFICATION));
+    sysml_requirement_checks::finish(source, checks, "FLIP WHEEL REQUIREMENTS", "FLIP_WHEEL_REQUIREMENTS", root, PACKAGE, VERIFICATION);
     this.done = true;
 }

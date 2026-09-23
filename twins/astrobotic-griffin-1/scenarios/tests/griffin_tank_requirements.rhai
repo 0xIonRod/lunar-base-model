@@ -1,6 +1,7 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Positive, source-backed verification of the reusable Griffin tank assembly.
-// SysML owns dimensions, identities and datum values; Rhai derives the simple
-// seating constraints and checks the projected USD component in the Twin.
+// SysML owns requirements and acceptance constraints; Rhai extracts typed
+// source values and composed-USD observations for the generic evaluator.
 
 const PACKAGE = "GriffinTankRequirements";
 const VERIFICATION = "Verify_GriffinTankRequirements";
@@ -35,6 +36,11 @@ fn _attribute(id, requirement, path, name, expected) {
     #{id: id, component: "tank", requirement: requirement,
       verification: VERIFICATION, kind: "attribute", path: path,
       attr: name, expected: expected, tolerance: 0.002}
+}
+
+fn _constraint(id, requirement, name, bindings) {
+    sysml_requirements::constraint_check(id, "tank", requirement,
+        VERIFICATION, PACKAGE + "::" + name, bindings, "derived", 0.0)
 }
 
 fn _position3(checks, id, requirement, path, value) {
@@ -121,26 +127,27 @@ fn on_tick(me, ctx) {
         own("supportName"), own("supportShape"), own("supportRadiusM"),
         own("minimumSkirtClearanceM"), own("bracketGroupName"), own("bracketNames"),
         own("bracketShape"), own("bracketLengthM"), own("bracketWidthM"),
-        own("bracketDepthM"), own("bracketCenterOffsetM"), own("bracketTiltDeg")
+        own("bracketDepthM"), own("bracketCenterOffsetM"), own("bracketTiltDeg"),
+        own("bracketShellContactToleranceM"), visual("verificationToleranceM")
     ], [PACKAGE + "::gpt001", PACKAGE + "::gpt002", PACKAGE + "::gpt003",
         PACKAGE + "::gpt004", PACKAGE + "::gpt005", PACKAGE + "::gpt006",
         PACKAGE + "::gpt007", PACKAGE + "::gpt008", PACKAGE + "::gpt009",
         PACKAGE + "::gpt010", PACKAGE + "::gpt011"],
         [PACKAGE + "::" + VERIFICATION]);
     let root = sysml_requirements::text(source, own("usdRootPath"));
-    let tank_names = component_requirements::source_enum_identifiers(source, visual("tankInstances"));
-    let tank_stations = component_requirements::source_position_list(source, visual("tankStations"));
-    let tank_scales = component_requirements::source_number_list(source, visual("tankScale"));
-    let perimeter_stations = component_requirements::source_position_list(source, visual("railStations"));
+    let tank_names = sysml_requirement_checks::source_enum_identifiers(source, visual("tankInstances"));
+    let tank_stations = sysml_requirement_checks::source_position_list(source, visual("tankStations"));
+    let tank_scales = sysml_requirement_checks::source_number_list(source, visual("tankScale"));
+    let perimeter_stations = sysml_requirement_checks::source_position_list(source, visual("railStations"));
     let frame_section = sysml_requirements::number(source, visual("frameRingSectionM"));
     let minimum_instance_clearance = sysml_requirements::number(source, visual("minimumTankInstanceClearanceM"));
     let minimum_frame_clearance = sysml_requirements::number(source, visual("minimumTankFrameClearanceM"));
-    let child_names = component_requirements::source_enum_identifiers(source, own("childNames"));
-    let band_names = component_requirements::source_enum_identifiers(source, own("retentionBandNames"));
-    let end_names = component_requirements::source_enum_identifiers(source, own("endHardwareNames"));
-    let service_names = component_requirements::source_enum_identifiers(source, own("serviceHardwareNames"));
-    let axial_names = component_requirements::source_enum_identifiers(source, own("axialHardwareNames"));
-    let bracket_names = component_requirements::source_enum_identifiers(source, own("bracketNames"));
+    let child_names = sysml_requirement_checks::source_enum_identifiers(source, own("childNames"));
+    let band_names = sysml_requirement_checks::source_enum_identifiers(source, own("retentionBandNames"));
+    let end_names = sysml_requirement_checks::source_enum_identifiers(source, own("endHardwareNames"));
+    let service_names = sysml_requirement_checks::source_enum_identifiers(source, own("serviceHardwareNames"));
+    let axial_names = sysml_requirement_checks::source_enum_identifiers(source, own("axialHardwareNames"));
+    let bracket_names = sysml_requirement_checks::source_enum_identifiers(source, own("bracketNames"));
 
     let body_name = _enum_name(source, "bodyName");
     let body_shape = _enum_name(source, "bodyShape");
@@ -151,8 +158,8 @@ fn on_tick(me, ctx) {
     let band_shape = _enum_name(source, "retentionBandShape");
     let axial_shape = _enum_name(source, "axialHardwareShape");
     let transition_shape = _enum_name(source, "transitionShape");
-    let band_centers = component_requirements::source_number_list(source, own("bandCenterYM"));
-    let band_radii = component_requirements::source_number_list(source, own("bandRadiusByCenterM"));
+    let band_centers = sysml_requirement_checks::source_number_list(source, own("bandCenterYM"));
+    let band_radii = sysml_requirement_checks::source_number_list(source, own("bandRadiusByCenterM"));
     let band_height = sysml_requirements::number(source, own("bandHeightM"));
 
     let neck_radius = sysml_requirements::number(source, own("neckRadiusM"));
@@ -197,6 +204,10 @@ fn on_tick(me, ctx) {
     let bracket_depth = sysml_requirements::number(source, own("bracketDepthM"));
     let bracket_offset = sysml_requirements::number(source, own("bracketCenterOffsetM"));
     let bracket_tilt = sysml_requirements::number(source, own("bracketTiltDeg"));
+    let shell_contact_tolerance = sysml_requirements::number(source,
+        own("bracketShellContactToleranceM"));
+    let verification_tolerance = sysml_requirements::number(source,
+        visual("verificationToleranceM"));
 
     let source_ready = source != () && source.ok == true && root != ();
     let identities_ready = tank_names.len() == 4 && tank_stations.len() == 4
@@ -232,18 +243,19 @@ fn on_tick(me, ctx) {
         && bracket_length != () && bracket_width != () && bracket_depth != ()
         && bracket_offset != () && bracket_tilt != ();
     let clearance_contract_ready = perimeter_stations.len() == 8 && frame_section != ()
-        && minimum_instance_clearance != () && minimum_frame_clearance != ();
+        && minimum_instance_clearance != () && minimum_frame_clearance != ()
+        && shell_contact_tolerance != () && verification_tolerance != ();
     let complete = source_ready && identities_ready && body_ready && band_ready
         && hardware_ready && transition_ready && cradle_ready && pad_ready
         && support_ready && skirt_ready && brackets_ready && clearance_contract_ready;
     if !complete {
-        let checks = [component_requirements::assertion("GPT-source", "tank", "gpt006",
-            VERIFICATION, false, "typed tank source facts are incomplete or have the wrong shape",
+        let checks = [sysml_requirement_checks::preflight("GPT-source", false,
+            "typed tank source facts are incomplete or have the wrong shape",
             #{tank_count: tank_names.len(), station_count: tank_stations.len(),
               body_shape: body_shape},
             #{tank_count: 4, station_count: 4, body_shape: "Sphere"})];
-        component_requirements::finish(source, checks, "GRIFFIN TANK REQUIREMENTS",
-            "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE, VERIFICATION);
+        sysml_requirement_checks::finish_preflight(checks, "GRIFFIN TANK REQUIREMENTS",
+            "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE);
         this.done = true;
         return;
     }
@@ -287,35 +299,29 @@ fn on_tick(me, ctx) {
         let station = tank_stations[tank_index];
         let tank_scale = tank_scales[tank_index];
         if tank_index == 0 {
-            checks.push(component_requirements::source_list_count("GPT-001-count", "tank", "gpt001",
+            checks.push(sysml_requirement_checks::source_list_count("GPT-001-count", "tank", "gpt001",
                 VERIFICATION, visual("tankInstances"), tank_count));
-            checks.push(component_requirements::source_list_count("GPT-005-stations", "tank", "gpt005",
+            checks.push(sysml_requirement_checks::source_list_count("GPT-005-stations", "tank", "gpt005",
                 VERIFICATION, visual("tankStations"), tank_count));
-            checks.push(component_requirements::assertion("GPT-005-instance-clearance", "tank",
-                "gpt005", VERIFICATION,
-                tank_clearances.instance >= minimum_instance_clearance,
-                "the four composed tank envelopes retain the typed minimum gap",
-                #{minimum_clearance_m: tank_clearances.instance},
-                #{required_clearance_m: minimum_instance_clearance}));
-            checks.push(component_requirements::assertion("GPT-005-frame-clearance", "tank",
-                "gpt005", VERIFICATION,
-                tank_clearances.frame >= minimum_frame_clearance,
-                "the composed tank envelopes clear every typed octagonal frame rail",
-                #{minimum_clearance_m: tank_clearances.frame},
-                #{required_clearance_m: minimum_frame_clearance}));
-            checks.push(component_requirements::assertion("GPT-006-installed-diameter", "tank",
-                "gpt006", VERIFICATION,
-                2.0 * body_radius * tank_scale >= minimum_installed_diameter,
-                "the composed vessel has the required installed-scale visual envelope",
-                #{installed_body_diameter_m: 2.0 * body_radius * tank_scale},
-                #{minimum_diameter_m: minimum_installed_diameter}));
+            checks.push(_constraint("GPT-005-instance-clearance", "gpt005",
+                "GPT005_MinimumClearance",
+                #{actualClearanceM: tank_clearances.instance,
+                  requiredClearanceM: minimum_instance_clearance}));
+            checks.push(_constraint("GPT-005-frame-clearance", "gpt005",
+                "GPT005_MinimumClearance",
+                #{actualClearanceM: tank_clearances.frame,
+                  requiredClearanceM: minimum_frame_clearance}));
+            checks.push(_constraint("GPT-006-installed-diameter", "gpt006",
+                "GPT006_MinimumInstalledDiameter",
+                #{installedDiameterM: 2.0 * body_radius * tank_scale,
+                  requiredDiameterM: minimum_installed_diameter}));
         }
         let direct_children = [];
         for child_name in child_names { direct_children.push(tank_path + "/" + child_name); }
         direct_children.push(tank_path + "/" + bracket_group_name_text);
-        checks.push(component_requirements::exists("GPT-001-" + tank_name, "tank", "gpt001",
+        checks.push(sysml_requirement_checks::exists("GPT-001-" + tank_name, "tank", "gpt001",
             VERIFICATION, tank_path, "Xform"));
-        checks.push(component_requirements::children("GPT-002-" + tank_name, "tank", "gpt002",
+        checks.push(sysml_requirement_checks::children("GPT-002-" + tank_name, "tank", "gpt002",
             VERIFICATION, tank_path, direct_children));
         checks.push(_position("GPT-005-" + tank_name + "-x", "gpt005", tank_path, 0, station.x));
         checks.push(_position("GPT-005-" + tank_name + "-y", "gpt005", tank_path, 1, station.y));
@@ -331,7 +337,7 @@ fn on_tick(me, ctx) {
             path: tank_path, attr: "xformOp:scale", index: 2, expected: tank_scale, tolerance: 0.002});
 
         let body_path = tank_path + "/" + body_name;
-        checks.push(component_requirements::exists("GPT-006-" + tank_name + "-spherical-body",
+        checks.push(sysml_requirement_checks::exists("GPT-006-" + tank_name + "-spherical-body",
             "tank", "gpt006", VERIFICATION, body_path, "Sphere"));
         checks.push(_attribute("GPT-006-" + tank_name + "-radius", "gpt006",
             body_path, "radius", body_radius));
@@ -341,7 +347,7 @@ fn on_tick(me, ctx) {
         for band_index in 0..band_names.len() {
             let band_name = band_names[band_index];
             let band_path = tank_path + "/" + band_name;
-            checks.push(component_requirements::exists("GPT-002-" + tank_name + "-" + band_name,
+            checks.push(sysml_requirement_checks::exists("GPT-002-" + tank_name + "-" + band_name,
                 "tank", "gpt002", VERIFICATION, band_path, band_shape));
             checks.push(_attribute("GPT-002-" + tank_name + "-" + band_name + "-radius",
                 "gpt002", band_path, "radius", band_radii[band_index]));
@@ -349,7 +355,7 @@ fn on_tick(me, ctx) {
                 "gpt002", band_path, "height", band_height));
             checks.push(_position("GPT-002-" + tank_name + "-" + band_name + "-y",
                 "gpt002", band_path, 1, band_centers[band_index]));
-            checks.push(component_requirements::attribute_equals(
+            checks.push(sysml_requirement_checks::attribute_equals(
                 "GPT-008-" + tank_name + "-" + band_name + "-axis", "tank", "gpt008",
                 VERIFICATION, band_path, "axis", tank_axis));
         }
@@ -366,7 +372,7 @@ fn on_tick(me, ctx) {
         ];
         for hardware in symmetric_hardware {
             let hardware_path = tank_path + "/" + hardware.name;
-            checks.push(component_requirements::exists("GPT-006-" + tank_name + "-" + hardware.name,
+            checks.push(sysml_requirement_checks::exists("GPT-006-" + tank_name + "-" + hardware.name,
                 "tank", "gpt006", VERIFICATION, hardware_path, hardware.shape));
             checks.push(_attribute("GPT-006-" + tank_name + "-" + hardware.name + "-radius",
                 "gpt006", hardware_path, "radius", hardware.radius));
@@ -374,7 +380,7 @@ fn on_tick(me, ctx) {
                 "gpt006", hardware_path, "height", hardware.height));
             checks.push(_position("GPT-006-" + tank_name + "-" + hardware.name + "-y",
                 "gpt006", hardware_path, 1, hardware.y));
-            checks.push(component_requirements::attribute_equals(
+            checks.push(sysml_requirement_checks::attribute_equals(
                 "GPT-008-" + tank_name + "-" + hardware.name + "-axis", "tank", "gpt008",
                 VERIFICATION, hardware_path, "axis", tank_axis));
         }
@@ -383,7 +389,7 @@ fn on_tick(me, ctx) {
             let transition_name = axial_names[8 + transition_index];
             let transition_path = tank_path + "/" + transition_name;
             let top = transition_index == 0;
-            checks.push(component_requirements::exists("GPT-006-" + tank_name + "-" + transition_name,
+            checks.push(sysml_requirement_checks::exists("GPT-006-" + tank_name + "-" + transition_name,
                 "tank", "gpt006", VERIFICATION, transition_path, transition_shape));
             checks.push(_attribute("GPT-006-" + tank_name + "-" + transition_name + "-radius1",
                 "gpt006", transition_path, "radius1",
@@ -395,7 +401,7 @@ fn on_tick(me, ctx) {
                 "gpt006", transition_path, "height", transition_height));
             checks.push(_position("GPT-006-" + tank_name + "-" + transition_name + "-y",
                 "gpt006", transition_path, 1, if top { transition_center_y } else { -transition_center_y }));
-            checks.push(component_requirements::attribute_equals(
+            checks.push(sysml_requirement_checks::attribute_equals(
                 "GPT-008-" + tank_name + "-" + transition_name + "-axis", "tank", "gpt008",
                 VERIFICATION, transition_path, "axis", tank_axis));
         }
@@ -413,7 +419,7 @@ fn on_tick(me, ctx) {
         let bracket_center_local_y = pad_top_local_y + bracket_length / 2.0;
 
         let cradle_path = tank_path + "/" + cradle_name;
-        checks.push(component_requirements::exists("GPT-009-" + tank_name + "-cradle",
+        checks.push(sysml_requirement_checks::exists("GPT-009-" + tank_name + "-cradle",
             "tank", "gpt009", VERIFICATION, cradle_path, "Cylinder"));
         checks.push(_attribute("GPT-009-" + tank_name + "-cradle-radius", "gpt009",
             cradle_path, "radius", cradle_radius));
@@ -423,7 +429,7 @@ fn on_tick(me, ctx) {
             cradle_path, 1, cradle_center_local_y));
 
         let pad_path = tank_path + "/" + pad_name;
-        checks.push(component_requirements::exists("GPT-009-" + tank_name + "-pad",
+        checks.push(sysml_requirement_checks::exists("GPT-009-" + tank_name + "-pad",
             "tank", "gpt009", VERIFICATION, pad_path, "Cube"));
         checks.push(_position("GPT-009-" + tank_name + "-pad-y", "gpt009",
             pad_path, 1, pad_center_local_y));
@@ -438,7 +444,7 @@ fn on_tick(me, ctx) {
             path: pad_path, attr: "xformOp:scale", index: 2, expected: pad_depth, tolerance: 0.002});
 
         let support_path = tank_path + "/" + support_name;
-        checks.push(component_requirements::exists("GPT-009-" + tank_name + "-support",
+        checks.push(sysml_requirement_checks::exists("GPT-009-" + tank_name + "-support",
             "tank", "gpt009", VERIFICATION, support_path, "Cylinder"));
         checks.push(_attribute("GPT-009-" + tank_name + "-support-radius", "gpt009",
             support_path, "radius", support_radius));
@@ -450,9 +456,9 @@ fn on_tick(me, ctx) {
         let bracket_group_path = tank_path + "/" + bracket_group_name_text;
         let bracket_paths = [];
         for bracket_name in bracket_names { bracket_paths.push(bracket_group_path + "/" + bracket_name); }
-        checks.push(component_requirements::exists("GPT-010-" + tank_name + "-group", "tank",
+        checks.push(sysml_requirement_checks::exists("GPT-010-" + tank_name + "-group", "tank",
             "gpt010", VERIFICATION, bracket_group_path, "Xform"));
-        checks.push(component_requirements::children("GPT-010-" + tank_name + "-brackets", "tank",
+        checks.push(sysml_requirement_checks::children("GPT-010-" + tank_name + "-brackets", "tank",
             "gpt010", VERIFICATION, bracket_group_path, bracket_paths));
         let bracket_x = [bracket_offset, -bracket_offset, bracket_offset, -bracket_offset];
         let bracket_z = [bracket_offset, bracket_offset, -bracket_offset, -bracket_offset];
@@ -461,7 +467,7 @@ fn on_tick(me, ctx) {
         for bracket_index in 0..bracket_names.len() {
             let bracket_name = bracket_names[bracket_index];
             let bracket_path = bracket_paths[bracket_index];
-            checks.push(component_requirements::exists("GPT-010-" + tank_name + "-" + bracket_name,
+            checks.push(sysml_requirement_checks::exists("GPT-010-" + tank_name + "-" + bracket_name,
                 "tank", "gpt010", VERIFICATION, bracket_path, "Cube"));
             checks.push(_position("GPT-010-" + tank_name + "-" + bracket_name + "-x", "gpt010",
                 bracket_path, 0, bracket_x[bracket_index]));
@@ -493,35 +499,34 @@ fn on_tick(me, ctx) {
 
         let skirt_clearance = station.y + tank_scale * (cradle_center_local_y + cradle_height / 2.0)
             - skirt_top_world_y;
-        checks.push(component_requirements::assertion("GPT-009-" + tank_name + "-skirt-clearance",
-            "tank", "gpt009", VERIFICATION,
-            (skirt_clearance - minimum_skirt_clearance).abs() <= 0.002,
-            "the assembled lower cradle preserves the declared skirt gap",
-            #{clearance_m: skirt_clearance}, #{minimum_clearance_m: minimum_skirt_clearance}));
-        checks.push(component_requirements::assertion("GPT-009-" + tank_name + "-support-span",
-            "tank", "gpt009", VERIFICATION,
-            support_height > 0.0 && (support_bottom_local_y + support_height - support_top_local_y).abs() <= 0.002,
-            "the coaxial support bridges the pad top to the lower neck face",
-            #{bottom_y: support_bottom_local_y, top_y: support_top_local_y, height_m: support_height},
-            #{bottom_y: pad_top_local_y, top_y: -neck_center_y - neck_height / 2.0}));
+        checks.push(_constraint("GPT-009-" + tank_name + "-skirt-clearance",
+            "gpt009", "GPT009_SkirtClearanceMatchesDatum",
+            #{actualClearanceM: skirt_clearance,
+              requiredClearanceM: minimum_skirt_clearance,
+              toleranceM: verification_tolerance}));
+        checks.push(_constraint("GPT-009-" + tank_name + "-support-span",
+            "gpt009", "GPT009_SupportPostSpansSeat",
+            #{lowerSeatYM: support_bottom_local_y,
+              upperContactYM: support_top_local_y,
+              supportHeightM: support_height,
+              toleranceM: verification_tolerance}));
         let angle = bracket_tilt * 3.141592653589793 / 180.0;
         let shell_tip_x = bracket_offset - bracket_length * angle.sin() * angle.cos();
         let shell_tip_y = pad_top_local_y + bracket_length * angle.cos() * angle.cos();
         let shell_tip_radius = (2.0 * shell_tip_x * shell_tip_x + shell_tip_y * shell_tip_y).sqrt();
-        checks.push(component_requirements::assertion("GPT-010-" + tank_name + "-shell-contact",
-            "tank", "gpt010", VERIFICATION,
-            (shell_tip_radius - body_radius).abs() <= 0.015,
-            "the inward-tilted bracket endpoint meets the lower spherical vessel envelope",
-            #{tip_radius_m: shell_tip_radius}, #{vessel_radius_m: body_radius}));
+        checks.push(_constraint("GPT-010-" + tank_name + "-shell-contact",
+            "gpt010", "GPT010_BraceContactsVesselEnvelope",
+            #{radialErrorM: shell_tip_radius - body_radius,
+              toleranceM: shell_contact_tolerance}));
 
         if tank_index + 1 == tank_names.len() {
-            checks.push(component_requirements::coverage("GPT-003-status", "tank", "gpt003", VERIFICATION));
-            checks.push(component_requirements::coverage("GPT-004-traceability", "tank", "gpt004", VERIFICATION));
-            checks.push(component_requirements::coverage("GPT-011-component-identity", "tank", "gpt011", VERIFICATION));
+            checks.push(sysml_requirement_checks::coverage("GPT-003-status", "tank", "gpt003", VERIFICATION));
+            checks.push(sysml_requirement_checks::coverage("GPT-004-traceability", "tank", "gpt004", VERIFICATION));
+            checks.push(sysml_requirement_checks::coverage("GPT-011-component-identity", "tank", "gpt011", VERIFICATION));
         }
         let tank_channel = "GRIFFIN_TANK_REQUIREMENTS_" + tank_name;
         tank_channels.push(tank_channel);
-        let tank_result = component_requirements::finish(source, checks,
+        let tank_result = sysml_requirement_checks::finish(source, checks,
             "GRIFFIN TANK REQUIREMENTS " + tank_name, tank_channel,
             root + "/" + tank_name, PACKAGE, VERIFICATION);
         aggregate_ok = aggregate_ok && tank_result.ok == true;

@@ -54,12 +54,14 @@ package FlipWheelRequirements {
 
     verification def Verify_FLIPWheelRequirements {
         subject wheels : FlipDirectionalWheelAssembly;
-        verify fww001;
-        verify fww002;
-        verify fww003;
-        verify fww004;
-        verify fww005;
-        verify fww006;
-        verify fww007;
+        objective {
+            verify fww001;
+            verify fww002;
+            verify fww003;
+            verify fww004;
+            verify fww005;
+            verify fww006;
+            verify fww007;
+        }
     }
 }

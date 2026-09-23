@@ -1,3 +1,4 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Standalone FLIP rover component verification.
 // The integration scene still has a combined visual gate; this component gate
 // is independent and can be opened in Editor Perspective without the lander.
@@ -61,7 +62,7 @@ fn on_tick(me, ctx) {
     checks.push(_exists("FGV-004-solar", "fvg004", ROOT + "/SolarArray", "Xform"));
     checks.push(_children("FGV-004-solar-parts", "fvg004", ROOT + "/SolarArray",
         [ROOT + "/SolarArray/WhiteBacksheet", ROOT + "/SolarArray/BlueCells", ROOT + "/SolarArray/FoldHinge"]));
-    let solar_mount = component_requirements::source_number_list(source, _source_attr("solarArrayMount"));
+    let solar_mount = sysml_requirement_checks::source_number_list(source, _source_attr("solarArrayMount"));
     if solar_mount.len() == 3 {
         checks.push(_attribute_component("FGV-004-solar-x", "fvg004", ROOT + "/SolarArray", "xformOp:translate", 0, solar_mount[0]));
         checks.push(_attribute_component("FGV-004-solar-y", "fvg004", ROOT + "/SolarArray", "xformOp:translate", 1, solar_mount[1]));
@@ -84,11 +85,11 @@ fn on_tick(me, ctx) {
         expected_attr: _source_attr("sensorMastHeightM"), tolerance: 0.002});
 
     let wheel_names = _list(source, "visualWheelNames");
-    let wheel_x = component_requirements::source_number_list(source, _source_attr("wheelStationX"));
-    let wheel_y = component_requirements::source_number_list(source, _source_attr("wheelStationY"));
-    let wheel_z = component_requirements::source_number_list(source, _source_attr("wheelStationZ"));
+    let wheel_x = sysml_requirement_checks::source_number_list(source, _source_attr("wheelStationX"));
+    let wheel_y = sysml_requirement_checks::source_number_list(source, _source_attr("wheelStationY"));
+    let wheel_z = sysml_requirement_checks::source_number_list(source, _source_attr("wheelStationZ"));
     for axis in ["wheelStationX", "wheelStationY", "wheelStationZ"] {
-        checks.push(component_requirements::source_list_count("FGV-003-" + axis,
+        checks.push(sysml_requirement_checks::source_list_count("FGV-003-" + axis,
             "wheel", "fvg003", VERIFICATION,
             _source_attr(axis), _source_attr("visualRoverWheelCount")));
     }

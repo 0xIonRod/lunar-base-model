@@ -17,8 +17,33 @@ fn on_tick(me, ctx) {
         }
     }
     if doc_id < 0 { return; }
+    let source = sysml_requirements::source_with_selection([
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::verificationToleranceM",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::appearanceVerificationTolerance",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::doubleSidedFacesMustBe",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::renderOnlyCollisionEnabled",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::renderPurpose",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::bodyDimensions",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::railDimensions",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::railStations",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::frameRingCenterY",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::deckDimensions",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::deckCenter",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::lowerSkirtDimensions",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::lowerSkirtCenter",
+        "GriffinTankRequirements::GriffinPropellantTankAssembly::bandRadiusByCenterM",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::minimumTankFrameClearanceM"
+    ], [
+        "GriffinBusRequirements::gbc001", "GriffinBusRequirements::gbc002",
+        "GriffinBusRequirements::gbc003", "GriffinBusRequirements::gbc004",
+        "GriffinBusRequirements::gbc005", "GriffinBusRequirements::gbc006",
+        "GriffinBusRequirements::gbc007", "GriffinBusRequirements::gbc008",
+        "GriffinBusRequirements::gbc009", "GriffinBusRequirements::gbc010",
+        "GriffinBusRequirements::gbc011", "GriffinBusRequirements::gbc012"
+    ], ["GriffinBusRequirements::Verify_GriffinBusRequirements"]);
     let result = griffin_bus_verification::verify_bus(doc_id,
-        sysml_requirements::source(), griffin_bus_verification::default_root_path());
+        source, griffin_bus_verification::default_root_path());
     print(#{verdict: if result.ok { "PASS" } else { "FAIL" },
         checks: result.check_count, failures: result.failure_count,
         evidence: result.evidence});

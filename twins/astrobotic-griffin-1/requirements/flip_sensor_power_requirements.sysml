@@ -70,11 +70,13 @@ package FlipSensorPowerRequirements {
 
     verification def Verify_FLIPSensorPowerRequirements {
         subject sensorPower : FlipSensorPowerAssembly;
-        verify fsp001;
-        verify fsp002;
-        verify fsp003;
-        verify fsp004;
-        verify fsp005;
-        verify fsp006;
+        objective {
+            verify fsp001;
+            verify fsp002;
+            verify fsp003;
+            verify fsp004;
+            verify fsp005;
+            verify fsp006;
+        }
     }
 }

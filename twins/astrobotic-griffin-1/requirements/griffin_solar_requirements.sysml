@@ -82,13 +82,15 @@ package GriffinSolarRequirements {
 
     verification def Verify_GriffinSolarRequirements {
         subject arrays : GriffinSolarArrayAssembly;
-        verify gsa001;
-        verify gsa002;
-        verify gsa003;
-        verify gsa004;
-        verify gsa005;
-        verify gsa006;
-        verify gsa007;
-        verify gsa008;
+        objective {
+            verify gsa001;
+            verify gsa002;
+            verify gsa003;
+            verify gsa004;
+            verify gsa005;
+            verify gsa006;
+            verify gsa007;
+            verify gsa008;
+        }
     }
 }

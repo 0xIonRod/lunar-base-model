@@ -15,6 +15,42 @@ package GriffinTankRequirements {
         TankMountBracketPZ; TankMountBracketNZ;
     }
 
+    constraint def GPT005_MinimumClearance {
+        in actualClearanceM : Real;
+        in requiredClearanceM : Real;
+        actualClearanceM >= requiredClearanceM;
+    }
+
+    constraint def GPT006_MinimumInstalledDiameter {
+        in installedDiameterM : Real;
+        in requiredDiameterM : Real;
+        installedDiameterM >= requiredDiameterM;
+    }
+
+    constraint def GPT009_SkirtClearanceMatchesDatum {
+        in actualClearanceM : Real;
+        in requiredClearanceM : Real;
+        in toleranceM : Real;
+        actualClearanceM >= requiredClearanceM - toleranceM
+            and actualClearanceM <= requiredClearanceM + toleranceM;
+    }
+
+    constraint def GPT009_SupportPostSpansSeat {
+        in lowerSeatYM : Real;
+        in upperContactYM : Real;
+        in supportHeightM : Real;
+        in toleranceM : Real;
+        supportHeightM > 0.0
+            and lowerSeatYM + supportHeightM >= upperContactYM - toleranceM
+            and lowerSeatYM + supportHeightM <= upperContactYM + toleranceM;
+    }
+
+    constraint def GPT010_BraceContactsVesselEnvelope {
+        in radialErrorM : Real;
+        in toleranceM : Real;
+        radialErrorM >= -toleranceM and radialErrorM <= toleranceM;
+    }
+
     part def GriffinPropellantTankAssembly {
         attribute usdRootPath : String = "/World/Griffin1";
         attribute componentAsset : String = "components/lander/griffin_tank_visual.usda";
@@ -99,6 +135,7 @@ package GriffinTankRequirements {
         attribute bracketDepthM : Real = 0.10;
         attribute bracketCenterOffsetM : Real = 0.46;
         attribute bracketTiltDeg : Real = 12.0;
+        attribute bracketShellContactToleranceM : Real = 0.015;
         attribute bracketOrientationConvention : String = "radial: each brace top slopes inward toward the tank datum; PX/NX/PZ/NZ use X rotation signs (-,-,+,+) and Z rotation signs (-,+,-,+) degrees";
     }
 
@@ -116,9 +153,11 @@ package GriffinTankRequirements {
     }
     requirement def GPT005_TankPlacement {
         doc /* GPT-005 [layout] each tank root transform matches its ordered typed cardinal-axis Position datum; all four tanks share the bus-origin plane and provide at least 0.06 m inter-instance and frame-envelope clearance while fitting within the published 4.5 m Griffin footprint. Station coordinates and installed envelope are replaceable study assumptions, not a flight ICD. */
+        require GPT005_MinimumClearance;
     }
     requirement def GPT006_TankEndHardware {
         doc /* GPT-006 [visual] each tank body is a near-spherical 0.84 m nominal-radius metric proxy with three shell-conforming retention bands, tapered polar transitions, seated adapter hardware, and coaxial necks. Its 0.90 assembly scale gives a 1.512 m installed body diameter, satisfying the typed 1.51 m minimum. Astrobotic identifies four Griffin-1 COPV propellant tanks, but does not publish their vessel geometry; the vessel size, assembly scale, and interface details are explicit replaceable study assumptions, not flight data. */
+        require GPT006_MinimumInstalledDiameter;
     }
     requirement def GPT007_TankServiceHardware {
         doc /* GPT-007 [visual] each tank includes three thin cylindrical retention bands plus the shoulder collars and valve/cap hardware with the metric proxy dimensions defined by the component. */
@@ -128,9 +167,12 @@ package GriffinTankRequirements {
     }
     requirement def GPT009_TankDeckSeat {
         doc /* GPT-009 [interface] the component-local lower cradle is a 0.74 m radius x 0.16 m high Cylinder and its 1.08 m x 1.08 m x 0.13 m adapter pad seats above the lower service-skirt datum; the assembly scale is applied once to this local envelope. A coaxial support post bridges the pad to the lower neck, preserving the typed skirt gap. These mount sizes are study assumptions because the attachment ICD is unpublished. */
+        require GPT009_SkirtClearanceMatchesDatum;
+        require GPT009_SupportPostSpansSeat;
     }
     requirement def GPT010_TankMounting {
         doc /* GPT-010 [interface/visual] four 0.10 m square-section, 0.18 m component-local braces bridge the adapter pad to the 0.84 m nominal-radius spherical shell. Their four signed X/Z rotations are mirrored and slope inward by 12 degrees; each endpoint closes to the spherical envelope from the typed pad top and 0.46 m radial offset. The local sizes are scaled once at assembly and remain replaceable study assumptions, since exact flight attachment details are unpublished. */
+        require GPT010_BraceContactsVesselEnvelope;
     }
     requirement def GPT011_ComponentIdentity {
         doc /* GPT-011 [configuration] each tank instance shall use the declared replaceable tank asset, the Y-axis local frame, and the complete named child list from this component contract. */
@@ -150,16 +192,18 @@ package GriffinTankRequirements {
 
     verification def Verify_GriffinTankRequirements {
         subject tanks : GriffinPropellantTankAssembly;
-        verify gpt001;
-        verify gpt002;
-        verify gpt003;
-        verify gpt004;
-        verify gpt005;
-        verify gpt006;
-        verify gpt007;
-        verify gpt008;
-        verify gpt009;
-        verify gpt010;
-        verify gpt011;
+        objective {
+            verify gpt001;
+            verify gpt002;
+            verify gpt003;
+            verify gpt004;
+            verify gpt005;
+            verify gpt006;
+            verify gpt007;
+            verify gpt008;
+            verify gpt009;
+            verify gpt010;
+            verify gpt011;
+        }
     }
 }

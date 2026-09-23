@@ -175,6 +175,14 @@ fn _qualified_attribute(name) {
     if visual_configuration.contains(name) {
         return "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::" + name;
     }
+    let landing_stability = [
+        "landingStabilityHorizonS", "landingMinimumUprightAxisY",
+        "landingMaxGroundSpeedMps", "landingMaxAngularSpeedRadPerSec",
+        "landingMaxHorizontalDriftM"
+    ];
+    if landing_stability.contains(name) {
+        return "GriffinSimulationAccuracyRequirements::GR036_LandingStability::" + name;
+    }
     "Griffin1Requirements::PublicMissionContext::" + name
 }
 
@@ -287,7 +295,7 @@ fn solar_array_count() { _sysml_integer("solarArrayCount") }
 fn route_steering_mode() { _sysml_text("missionSteeringMode") }
 fn landing_com_touchdown_y() { _sysml_attribute("landingComTouchdownY") }
 fn landing_stability_horizon_s() { _sysml_attribute("landingStabilityHorizonS") }
-fn landing_max_tilt_rad() { _sysml_attribute("landingMaxTiltRad") }
+fn landing_minimum_upright_axis_y() { _sysml_attribute("landingMinimumUprightAxisY") }
 fn landing_max_ground_speed_mps() { _sysml_attribute("landingMaxGroundSpeedMps") }
 fn landing_max_angular_speed_rad_per_sec() { _sysml_attribute("landingMaxAngularSpeedRadPerSec") }
 fn landing_max_horizontal_drift_m() { _sysml_attribute("landingMaxHorizontalDriftM") }
@@ -661,8 +669,8 @@ fn ramp_hinge_gusset_offset_z_m() { _sysml_attribute("assemblyHingeGussetOffsetZ
 fn propellant_tank_names() { _sysml_enum_names("tankInstances") }
 fn main_engine_names() { _sysml_enum_names("mainEngineInstances") }
 
-fn check_catalog() {
-    _sysml_list("executableRequirementIds")
+fn catalogued_requirement_checks() {
+    _sysml_list("cataloguedRequirementCheckIds")
 }
 
 fn requirement_usage_count() { _sysml_integer("requirementUsageCount") }

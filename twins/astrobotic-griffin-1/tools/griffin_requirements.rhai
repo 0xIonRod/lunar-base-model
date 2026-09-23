@@ -1,3 +1,4 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Griffin-1 Twin requirements, lints, and live-edit gates.
 //
 // This is Twin policy, not a second USD reader. Every model fact comes from
@@ -132,8 +133,14 @@ fn sysml_contract_report() {
             // the same lowercase `gr...` naming convention (for example the
             // dedicated ramp package), but they have their own verification
             // declarations and must not inflate this Griffin count.
-            if _qualified(requirement).starts_with("Griffin1Requirements::gr") {
-                requirement_usages += 1;
+            let name = _qualified(requirement);
+            for domain in ["GriffinFunctionalRequirements", "GriffinVisualRequirements",
+                "GriffinMechanicalRequirements", "GriffinSimulationAccuracyRequirements",
+                "GriffinAssuranceRequirements"] {
+                if name.starts_with(domain + "::gr") {
+                    requirement_usages += 1;
+                    break;
+                }
             }
         }
     }
@@ -1316,10 +1323,10 @@ fn part_report(doc_id, root) {
     #{ok: findings.len() == 0, root: root, doc_id: doc_id, parts: parts, findings: findings}
 }
 
-/// Return the executable structural rule set. Keep this list next to the
-/// runtime report so a new check cannot silently exist only in a document.
-fn executable_rules() {
-    griffin_spec::check_catalog()
+/// Return the authored requirement-check catalog. Its entries describe
+/// implementation status; this list is never treated as a run's evidence.
+fn catalogued_rules() {
+    griffin_spec::catalogued_requirement_checks()
 }
 
 /// These status lists are authored in SysML and projected by griffin_spec.
@@ -1329,33 +1336,19 @@ fn planned_rules() { griffin_spec::planned_rules() }
 fn mission_scope_rules() { griffin_spec::mission_scope_rules() }
 fn process_gate_rules() { griffin_spec::process_gate_rules() }
 
-fn _missing_rule_ids(expected, actual) {
-    let missing = [];
-    for id in expected {
-        if !_has(actual, id) { missing.push(id); }
-    }
-    missing
-}
-
 /// Compose one machine-readable report for the live runtime test. This is a
-/// report rather than a second linter: `lint` remains the authoritative
-/// structural implementation, while this function proves that the runtime
-/// exercised every executable rule, every named part, and relational layout.
+/// report rather than a second linter: `lint` remains the current structural
+/// implementation. The runtime report contains its measured results and a
+/// separate authored check catalog; it does not claim catalog-wide execution.
 fn runtime_report(doc_id, root) {
     let sysml = sysml_contract_report();
     let lint_report = lint(doc_id, root);
     let parts = part_report(doc_id, root);
     let layout = layout_report(doc_id, root);
-    let expected_rules = executable_rules();
+    let catalogued = catalogued_rules();
     let errors = [];
 
     for error in lint_report.errors { errors.push(error); }
-    for id in _missing_rule_ids(expected_rules, lint_report.checked_rules) {
-        errors.push("runtime did not execute " + id);
-    }
-    for id in _missing_rule_ids(expected_rules, griffin_spec::check_catalog()) {
-        errors.push("spec catalog is missing executable rule " + id);
-    }
     if sysml.ok != true || sysml.sysml_ok != true {
         let message = sysml.error;
         if message == () { message = "SysML requirement source failed validation"; }
@@ -1412,8 +1405,9 @@ fn runtime_report(doc_id, root) {
         root: root,
         doc_id: doc_id,
         errors: errors,
-        checked_rules: lint_report.checked_rules,
-        expected_rules: expected_rules,
+        // These IDs are the authored rule catalog, not an execution trace.
+        // Only concrete report results below constitute runtime evidence.
+        catalogued_rules: catalogued,
         planned_rules: planned_rules(),
         mission_scope_rules: mission_scope_rules(),
         process_gate_rules: process_gate_rules(),
@@ -1441,52 +1435,88 @@ fn _report(doc_id, root, findings) {
         findings: findings,
         errors: errors,
         warnings: [],
-        checked_rules: griffin_spec::check_catalog(),
+        catalogued_rules: griffin_spec::catalogued_requirement_checks(),
     }
 }
 
-/// Return whether a payload load is inside the authored capacity boundary.
-/// This pure predicate is also used by the negative-boundary test.
-fn payload_load_allowed(payload_kg, max_payload_kg) {
-    payload_kg != () && max_payload_kg != ()
-        && payload_kg >= 0.0 && payload_kg <= max_payload_kg
+// Route static engineering predicates through the source-pinned generic
+// SysML evaluator. This wrapper supplies requirement identity and observations;
+// the constraint expression and four-state verdict are owned by SysML/IR.
+fn _evaluate_source_constraint(source, id, requirement, verification,
+                               constraint_name, bindings) {
+    if source == () || source.ok != true {
+        return #{ok: false, verdict: "error",
+            error: "SysML source report is unavailable for constraint evaluation"};
+    }
+    let check = sysml_requirements::constraint_check(id, "lander", requirement,
+        verification, constraint_name, bindings, "derived", 0.0);
+    let report = sysml_requirements::evaluate(source, [check]);
+    if report.results == () || report.results.len() != 1 {
+        return #{ok: false, verdict: "error",
+            error: if report.error == () { "SysML constraint produced no check result" } else { report.error },
+            report: report};
+    }
+    report.results[0]
 }
 
-fn payload_load_check(payload_kg, max_payload_kg) {
-    if payload_kg == () || max_payload_kg == () {
-        return #{ ok: false, error: "payload mass and max payload are required" };
-    }
-    if payload_load_allowed(payload_kg, max_payload_kg) {
-        return #{ ok: true, payload_kg: payload_kg, max_payload_kg: max_payload_kg };
-    }
-    #{
-        ok: false,
-        payload_kg: payload_kg,
-        max_payload_kg: max_payload_kg,
-        error: "payload load exceeds the Griffin Twin capacity boundary",
-    }
+fn payload_load_check(payload_kg) {
+    let source = _payload_requirement_source();
+    let capacity = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("payloadCapacityKg"));
+    let result = _evaluate_source_constraint(source, "GR-009-payload-capacity", "gr009",
+        "Verify_GriffinPayloadCapacity",
+        "GriffinFunctionalRequirements::GR009_PayloadWithinCapacity",
+        #{payloadKg: #{provider: "external", state: if payload_kg == () { "unavailable" } else { "value" }, value: payload_kg},
+          capacityKg: #{provider: "source_literal", state: if capacity == () { "unavailable" } else { "value" }, value: capacity}});
+    result.payload_kg = payload_kg;
+    result.capacity_kg = capacity;
+    result
 }
 
-/// Runtime commands may request a ramp angle in radians, but the authored USD
-/// transform remains degrees. Keep that unit conversion at this gate so an
-/// editor tool cannot silently widen the control envelope.
-fn ramp_command_allowed(angle_rad) {
-    angle_rad != () && angle_rad.abs() <= max_ramp_command_rad()
+fn _payload_scene_checks(root, payload_kg, capacity_kg) {
+    let capacity_attribute = griffin_spec::qualified_attribute_name("payloadCapacityKg");
+    [
+        #{id: "GR-009-authored-capacity", component: "lander",
+          requirement: "gr009", verification: "Verify_GriffinPayloadCapacity",
+          kind: "attribute", path: root, attr: "lunco:payload_class_kg",
+          expected_attr: capacity_attribute, tolerance: 0.0},
+        sysml_requirements::constraint_check("GR-009-payload-load", "lander",
+            "gr009", "Verify_GriffinPayloadCapacity",
+            "GriffinFunctionalRequirements::GR009_PayloadWithinCapacity",
+            #{payloadKg: #{provider: "usd", state: if payload_kg == () { "unavailable" } else { "value" }, value: payload_kg},
+              capacityKg: #{provider: "source_literal", state: if capacity_kg == () { "unavailable" } else { "value" }, value: capacity_kg}},
+            "derived", 0.0),
+    ]
+}
+
+fn _payload_requirement_source() {
+    sysml_requirements::source_with_selection([
+        griffin_spec::qualified_attribute_name("payloadCapacityKg")
+    ], ["GriffinFunctionalRequirements::gr009"],
+        ["GriffinFunctionalRequirements::Verify_GriffinPayloadCapacity"])
+}
+
+/// Runtime command acceptance uses the source-defined SysML constraint. USD
+/// transform conversion remains at the authoring boundary.
+fn _ramp_requirement_source() {
+    sysml_requirements::source_with_selection([
+        "GriffinRampRequirements::GriffinEgressRamp::rampMaxDeploymentAngleRad"
+    ], ["GriffinRampRequirements::grr005"],
+        ["GriffinRampRequirements::Verify_GriffinRampCommandEnvelope"])
 }
 
 fn ramp_command_check(angle_rad) {
-    if angle_rad == () {
-        return #{ ok: false, error: "ramp command angle is required" };
-    }
-    if ramp_command_allowed(angle_rad) {
-        return #{ ok: true, angle_rad: angle_rad, limit_rad: max_ramp_command_rad() };
-    }
-    #{
-        ok: false,
-        angle_rad: angle_rad,
-        limit_rad: max_ramp_command_rad(),
-        error: "ramp command exceeds the Griffin Twin angular limit",
-    }
+    let source = _ramp_requirement_source();
+    let limit = sysml_requirements::number(source,
+        "GriffinRampRequirements::GriffinEgressRamp::rampMaxDeploymentAngleRad");
+    let result = _evaluate_source_constraint(source, "GRR-005-deployment-command",
+        "grr005", "Verify_GriffinRampCommandEnvelope",
+        "GriffinRampRequirements::GRC005_DeploymentCommandWithinLimit",
+        #{commandRad: #{provider: "external", state: if angle_rad == () { "unavailable" } else { "value" }, value: angle_rad},
+          limitRad: #{provider: "source_literal", state: if limit == () { "unavailable" } else { "value" }, value: limit}});
+    result.angle_rad = angle_rad;
+    result.limit_rad = limit;
+    result
 }
 
 /// Lint the composed Griffin contract. `root` is an absolute composed USD
@@ -1524,14 +1554,16 @@ fn lint(doc_id, root) {
 
     let attrs = root_record.attrs;
     let payload = attrs["lunco:payload_class_kg"];
-    let max_payload = max_payload_kg();
-    if payload == () {
-        findings.push(_finding("GR-009", root, "missing lunco:payload_class_kg capacity"));
-    } else if payload != max_payload {
-        findings.push(_finding("GR-009", root,
-            "payload capacity must match the SysML source value"));
-    } else if !payload_load_allowed(payload, max_payload) {
-        findings.push(_finding("GR-009", root, "payload capacity is outside the valid mass range"));
+    let requirement_source = _payload_requirement_source();
+    let payload_capacity = sysml_requirements::number(requirement_source,
+        griffin_spec::qualified_attribute_name("payloadCapacityKg"));
+    let payload_report = sysml_requirements::evaluate_document(requirement_source,
+        doc_id, _payload_scene_checks(root, payload, payload_capacity));
+    for result in payload_report.results {
+        if result.ok != true {
+            findings.push(_finding("GR-009", root,
+                if result.error == () { "payload capacity constraint verdict: " + result.verdict } else { result.error }));
+        }
     }
 
     let payload_status = attrs["lunco:payload_class_status"];
@@ -1866,8 +1898,8 @@ fn visual_report(doc_id, root) {
     }
 
     let leg_names = griffin_spec::landing_leg_names();
-    let leg_stations = component_requirements::source_position_list(source, _visual_configuration_attr("legStations"));
-    let leg_rot = component_requirements::source_number_list(source, _visual_configuration_attr("legStationRotationYDeg"));
+    let leg_stations = sysml_requirement_checks::source_position_list(source, _visual_configuration_attr("legStations"));
+    let leg_rot = sysml_requirement_checks::source_number_list(source, _visual_configuration_attr("legStationRotationYDeg"));
     for index in 0..leg_names.len() {
         let path = root + "/" + leg_names[index];
         let record = _layout_query(doc_id, path,
@@ -1895,9 +1927,9 @@ fn visual_report(doc_id, root) {
     }
 
     let solar_names = griffin_spec::solar_array_names();
-    let solar_stations = component_requirements::source_position_list(source, _visual_configuration_attr("solarStations"));
-    let solar_rot_x = component_requirements::source_number_list(source, _visual_configuration_attr("solarStationRotationXDeg"));
-    let solar_rot = component_requirements::source_number_list(source, _visual_configuration_attr("solarStationRotationZDeg"));
+    let solar_stations = sysml_requirement_checks::source_position_list(source, _visual_configuration_attr("solarStations"));
+    let solar_rot_x = sysml_requirement_checks::source_number_list(source, _visual_configuration_attr("solarStationRotationXDeg"));
+    let solar_rot = sysml_requirement_checks::source_number_list(source, _visual_configuration_attr("solarStationRotationZDeg"));
     for index in 0..solar_names.len() {
         let path = root + "/" + solar_names[index];
         let record = _layout_query(doc_id, path,
@@ -2013,13 +2045,14 @@ fn layout_report_live(doc_id, root) {
 /// It is intentionally read-only: the payload mass belongs to the composed
 /// payload/mission instance, while the capacity belongs to the Griffin asset.
 fn payload_limit_live(doc_id, root, payload_kg) {
-    let record = _query(doc_id, root, ["lunco:payload_class_kg"], (), false);
-    if !_ok(record) || record.attrs["lunco:payload_class_kg"] == () {
-        return #{ ok: false, error: "live Griffin capacity is missing" };
-    }
-    let result = payload_load_check(payload_kg, record.attrs["lunco:payload_class_kg"]);
+    if doc_id == () { return #{ok: false, error: "payload_limit_live requires an explicit USD doc_id"}; }
+    let source = _payload_requirement_source();
+    let capacity = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("payloadCapacityKg"));
+    let checks = _payload_scene_checks(root, payload_kg, capacity);
+    let result = sysml_requirements::evaluate_document(source, doc_id, checks);
     print("[griffin-lint] payload=" + payload_kg + "kg max="
-        + record.attrs["lunco:payload_class_kg"] + "kg result="
+        + max_payload_kg() + "kg result="
         + (if result.ok { "PASS" } else { "FAIL" }));
     result
 }

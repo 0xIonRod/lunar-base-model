@@ -6,6 +6,8 @@
 // on host hardware.  The timing samples are retained in the verdict as a
 // diagnostic signal while topology invariants are the portable acceptance.
 
+import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
+
 const ROOT = "/GriffinRoverDeliveryTest";
 const LANDER = ROOT + "/Lander";
 const DOCK = ROOT + "/PayloadDock";
@@ -80,11 +82,23 @@ fn emit_verdict(me) {
         && pre != ()
         && post.joints + 1 == pre.joints
         && post.entities <= pre.entities;
-    let checks = [
-        #{id: "GR-026-touchdown", component: "payload_adapter", requirement: "gr026", verification: "Verify_GriffinAdapterRelease", kind: "assert", path: LANDER, actual: me.touchdown, expected: true, ok: me.touchdown, error: "authored touchdown was not observed"},
-        #{id: "GR-026-detach-request", component: "payload_adapter", requirement: "gr026", verification: "Verify_GriffinAdapterRelease", kind: "assert", path: DOCK, actual: me.detach_requested, expected: true, ok: me.detach_requested, error: "detach request was not accepted"},
-        #{id: "GR-026-topology", component: "payload_adapter", requirement: "gr026", verification: "Verify_GriffinAdapterRelease", kind: "assert", path: ROOT, actual: topology_ok, expected: true, ok: topology_ok, error: if me.failure == "" { "post-release topology did not retire exactly one edge" } else { me.failure }}
-    ];
+    let topology_observation = if has_post {
+        topology_ok
+    } else {
+        #{provider: "physics_topology", state: "unavailable",
+          detail: if me.failure == "" {
+              "No post-release physics topology sample was produced"
+          } else { me.failure }}
+    };
+    let checks = [sysml_requirements::constraint_check(
+        "GR-026-release-evidence", "payload_adapter",
+        "GriffinFunctionalRequirements::gr026",
+        "GriffinFunctionalRequirements::Verify_GriffinAdapterRelease",
+        "GriffinFunctionalRequirements::GR026_ReleaseEvidenceComplete",
+        #{touchdownObserved: me.touchdown,
+          detachAccepted: me.detach_requested,
+          releaseTopologyValid: topology_observation},
+        "physics_and_command_observation", 0.0)];
     let report = sysml_requirements::evaluate(source, checks);
     report.metrics = #{
         clocks: clock_snapshot(),

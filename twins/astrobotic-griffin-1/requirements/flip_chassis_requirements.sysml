@@ -47,10 +47,12 @@ package FlipChassisRequirements {
 
     verification def Verify_FLIPChassisRequirements {
         subject chassis : FlipChassisComponent;
-        verify fcc001;
-        verify fcc002;
-        verify fcc003;
-        verify fcc004;
-        verify fcc005;
+        objective {
+            verify fcc001;
+            verify fcc002;
+            verify fcc003;
+            verify fcc004;
+            verify fcc005;
+        }
     }
 }

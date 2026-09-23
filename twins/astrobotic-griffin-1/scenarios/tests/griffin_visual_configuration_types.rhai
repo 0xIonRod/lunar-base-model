@@ -1,10 +1,10 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Twin-level positive verification for native SysML-to-Rhai geometry values.
 // Engineering stations and envelopes cross as f64 vectors and typed enums.
 
 import "/scripting/tools/mechanical_relations" as mechanical_relations;
 
 const PACKAGE = "GriffinVisualConfigurationRequirements";
-const VERIFICATION = "Verify_GriffinVisualConfiguration";
 const PART = PACKAGE + "::GriffinVisualConfiguration::";
 
 fn _resolved(source, name) {
@@ -17,7 +17,7 @@ fn _native_value(source, name) {
     sysml_requirements::native_value(source, PART + name)
 }
 
-fn typed_collection_check(source, id, requirement, field, base, count, item_type) {
+fn typed_collection_check(source, id, field, base, count, item_type) {
     let resolved = _resolved(source, field);
     let values = _native_value(source, field);
     let ok = resolved.ok == true && values != () && array_is(values)
@@ -37,29 +37,26 @@ fn typed_collection_check(source, id, requirement, field, base, count, item_type
             if !item_ok { ok = false; }
         }
     }
-    component_requirements::assertion(id, "griffin.typed_geometry",
-        requirement, VERIFICATION, ok,
+    sysml_requirement_checks::preflight(id, ok,
         "SysML collection must retain its declared native element type: " + field,
         #{field: field, declared_base: if resolved.ok { resolved.record.declared_type.base } else { "" },
           count: if values == () { 0 } else { values.len() }, item_type: item_type},
         #{base: base, count: count, item_type: item_type})
 }
 
-fn typed_spatial_scalar_check(source, id, requirement, field) {
+fn typed_spatial_scalar_check(source, id, field) {
     let value = _native_value(source, field);
     let ok = value != () && vec3_is_native(value) && vec3_is_finite(value);
-    component_requirements::assertion(id, "griffin.typed_geometry",
-        requirement, VERIFICATION, ok,
+    sysml_requirement_checks::preflight(id, ok,
         "SysML spatial value must project to the shared finite f64 Vec3: " + field,
         #{field: field, value: value}, "finite Vec3")
 }
 
-fn typed_enum_check(source, id, requirement, field, expected_literal) {
+fn typed_enum_check(source, id, field, expected_literal) {
     let value = _native_value(source, field);
     let ok = value != () && sysml_enum_is(value)
         && value.literal == expected_literal;
-    component_requirements::assertion(id, "griffin.typed_configuration",
-        requirement, VERIFICATION, ok,
+    sysml_requirement_checks::preflight(id, ok,
         "configuration choice must remain a SysML enumeration: " + field,
         #{field: field, value: value}, expected_literal)
 }
@@ -82,8 +79,7 @@ fn display_color_check(source) {
         evidence.push(#{field: field, values: values, valid: valid});
         if !valid { ok = false; }
     }
-    component_requirements::assertion("GVC-T-linear-display-colors",
-        "griffin.typed_configuration", "gvc015", VERIFICATION, ok,
+    sysml_requirement_checks::preflight("GVC-T-linear-display-colors", ok,
         "all component display colors must be source-owned three-channel linear values in [0,1]",
         evidence, #{fields: fields, channels: 3, range: [0.0, 1.0]})
 }
@@ -123,8 +119,7 @@ fn tank_station_layout_check(source) {
             }
         }
     }
-    component_requirements::assertion("GVC-T-tank-layout", "griffin.typed_geometry",
-        "gvc007", VERIFICATION, ok,
+    sysml_requirement_checks::preflight("GVC-T-tank-layout", ok,
         "the four named tanks occupy equally spaced cardinal stations on the bus-origin plane",
         #{tank_count: tank_count,
           station_y: if station_count == 0 { () } else { stations[0].y },
@@ -154,8 +149,7 @@ fn native_transform_plan_check() {
         && vec3_is_finite(solar.translation) && quat_is_finite(solar.rotation)
         && vec3_is_finite(engine.translation) && quat_is_finite(engine.rotation)
         && vec3_is_finite(rails[0].translation) && vec3_is_finite(rails[0].scale);
-    component_requirements::assertion("GVC-T-native-plan", "griffin.typed_geometry",
-        "gvc002", VERIFICATION, ok,
+    sysml_requirement_checks::preflight("GVC-T-native-plan", ok,
         "SysML-derived plan must carry native f64 Transform and Vec3 values to the builder",
         #{component_count: plan.len(), rail_count: rails.len()},
         #{component_count: expected_component_count, rail_count: expected_rail_count})
@@ -198,8 +192,7 @@ fn typed_relation_check(source) {
             if relation == () || relation.status != "passed" { ok = false; }
         }
     }
-    component_requirements::assertion("GVC-T-relations", "griffin.typed_geometry",
-        "gvc010", VERIFICATION, ok,
+    sysml_requirement_checks::preflight("GVC-T-relations", ok,
         "source-backed stations must satisfy generic plane-coincidence and under relations",
         #{plane_relations: plane_relations, under_relations: under_relations,
           tolerance_m: tolerance},
@@ -234,8 +227,7 @@ fn typed_symmetry_check(source) {
             if relation == () || relation.status != "passed" { ok = false; }
         }
     }
-    component_requirements::assertion("GVC-T-symmetry", "griffin.typed_geometry",
-        "gvc010", VERIFICATION, ok,
+    sysml_requirement_checks::preflight("GVC-T-symmetry", ok,
         "ordered component stations must be mirrored across their authored symmetry planes",
         #{relations: relations, tolerance_m: tolerance},
         #{tank_pairs: 2, leg_pairs: 2, tolerance_m: tolerance})
@@ -272,30 +264,29 @@ fn on_tick(me, ctx) {
         PACKAGE + "::gvc013", PACKAGE + "::gvc014", PACKAGE + "::gvc015"
     ], [PACKAGE + "::" + VERIFICATION]);
     let checks = [
-        typed_spatial_scalar_check(source, "GVC-T-body-dimensions", "gvc003", "bodyDimensions"),
-        typed_spatial_scalar_check(source, "GVC-T-body-mount", "gvc002", "bodyMount"),
-        typed_spatial_scalar_check(source, "GVC-T-rail-dimensions", "gvc012", "railDimensions"),
-        typed_collection_check(source, "GVC-T-octagonal-profile", "gvc014",
+        typed_spatial_scalar_check(source, "GVC-T-body-dimensions", "bodyDimensions"),
+        typed_spatial_scalar_check(source, "GVC-T-body-mount", "bodyMount"),
+        typed_spatial_scalar_check(source, "GVC-T-rail-dimensions", "railDimensions"),
+        typed_collection_check(source, "GVC-T-octagonal-profile",
             "outerBodyProfileCoordinates", "CartesianVectorValue", 8, "Vec2"),
-        typed_collection_check(source, "GVC-T-rail-stations", "gvc012", "railStations", "Position", 8, "Vec3"),
-        typed_collection_check(source, "GVC-T-leg-stations", "gvc005", "legStations", "Position", 4, "Vec3"),
-        typed_collection_check(source, "GVC-T-tank-stations", "gvc007", "tankStations", "Position", 4, "Vec3"),
+        typed_collection_check(source, "GVC-T-rail-stations", "railStations", "Position", 8, "Vec3"),
+        typed_collection_check(source, "GVC-T-leg-stations", "legStations", "Position", 4, "Vec3"),
+        typed_collection_check(source, "GVC-T-tank-stations", "tankStations", "Position", 4, "Vec3"),
         tank_station_layout_check(source),
         typed_relation_check(source),
         typed_symmetry_check(source),
-        typed_collection_check(source, "GVC-T-solar-stations", "gvc006", "solarStations", "Position", 2, "Vec3"),
-        typed_collection_check(source, "GVC-T-engine-stations", "gvc008", "engineStations", "Position", 7, "Vec3"),
-        typed_collection_check(source, "GVC-T-frame-rail-identities", "gvc012", "frameRails", "GriffinFrameRailNode", 8, "EnumValue"),
-        typed_collection_check(source, "GVC-T-tank-identities", "gvc007", "tankInstances", "GriffinTankInstanceName", 4, "EnumValue"),
-        typed_collection_check(source, "GVC-T-leg-identities", "gvc005", "landingLegInstances", "GriffinLandingLegInstanceName", 4, "EnumValue"),
-        typed_collection_check(source, "GVC-T-solar-identities", "gvc006", "solarArrayInstances", "GriffinSolarArrayInstanceName", 2, "EnumValue"),
-        typed_collection_check(source, "GVC-T-engine-identities", "gvc008", "mainEngineInstances", "GriffinMainEngineInstanceName", 7, "EnumValue"),
-        typed_enum_check(source, "GVC-T-body-profile", "gvc003", "bodyProfile", "OctagonalOpenFrame"),
-        typed_enum_check(source, "GVC-T-ramp-state", "gvc009", "rampState", "Stowed"),
+        typed_collection_check(source, "GVC-T-solar-stations", "solarStations", "Position", 2, "Vec3"),
+        typed_collection_check(source, "GVC-T-engine-stations", "engineStations", "Position", 7, "Vec3"),
+        typed_collection_check(source, "GVC-T-frame-rail-identities", "frameRails", "GriffinFrameRailNode", 8, "EnumValue"),
+        typed_collection_check(source, "GVC-T-tank-identities", "tankInstances", "GriffinTankInstanceName", 4, "EnumValue"),
+        typed_collection_check(source, "GVC-T-leg-identities", "landingLegInstances", "GriffinLandingLegInstanceName", 4, "EnumValue"),
+        typed_collection_check(source, "GVC-T-solar-identities", "solarArrayInstances", "GriffinSolarArrayInstanceName", 2, "EnumValue"),
+        typed_collection_check(source, "GVC-T-engine-identities", "mainEngineInstances", "GriffinMainEngineInstanceName", 7, "EnumValue"),
+        typed_enum_check(source, "GVC-T-body-profile", "bodyProfile", "OctagonalOpenFrame"),
+        typed_enum_check(source, "GVC-T-ramp-state", "rampState", "Stowed"),
         display_color_check(source),
         native_transform_plan_check(),
-        component_requirements::assertion("GVC-T-ramp-source", "griffin.typed_configuration",
-            "gvc009", VERIFICATION,
+        sysml_requirement_checks::preflight("GVC-T-ramp-source",
             sysml_requirements::number(source,
                 "GriffinRampRequirements::GriffinEgressRamp::rampPortMountX") != ()
                 && sysml_requirements::number(source,
@@ -303,8 +294,8 @@ fn on_tick(me, ctx) {
             "ramp placement resolves from the dedicated Griffin ramp subsystem contract",
             "GriffinRampRequirements::GriffinEgressRamp", "typed ramp mount datums")
     ];
-    component_requirements::finish(source, checks,
+    sysml_requirement_checks::finish_preflight(checks,
         "GRIFFIN VISUAL CONFIGURATION TYPES", "GRIFFIN_VISUAL_CONFIGURATION_TYPES",
-        "/Griffin1", PACKAGE, VERIFICATION);
+        "/Griffin1", PACKAGE);
     this.done = true;
 }
