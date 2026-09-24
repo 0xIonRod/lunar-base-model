@@ -35,7 +35,7 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links | Coverage evaluation now compares resolved handles. The Twin status/check catalogs remain authored execution metadata, and `twin.toml`, provider selection, and USD query paths remain configuration. Replace duplicate semantic identity/status catalogs with reports derived from typed requirement, verification, realization, and evidence links |
 | Units and frames | `lunco-engineering-values` supports dimension-safe conversion from caller-resolved `Unit` values; the constraint IR and observation contracts still carry unit identity as text, while Griffin often relies on SI field-name suffixes | The unit primitive is present but is not wired from SysML unit resolution through IR type checking and provider values. Names and comments do not prevent dimensional mistakes; frame identity and conversion provenance also need typed contracts |
-| Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, and exact Mesh/Cube collider points exist | No complete semantic part-usage graph binds every source feature to a USD realization. NURBS patches are tessellated for rendering, but the physics adapter does not cook them into standard USD Mesh collision proxies |
+| Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, exact Mesh/Cube collider points, and a generic NURBS-to-USD-Mesh collision cook exist | No complete semantic part-usage graph binds every source feature to a USD realization. Griffin currently has no authored NURBS patch to cook. The first cook uses explicit deterministic subdivisions, not a geometric error tolerance |
 | Behavioral applicability | Mission order, sampling horizon, route phases, and release are mostly Rhai orchestration | The model cannot yet state and evaluate configuration, mode, phase, or temporal applicability as part of a reusable source-defined verification objective |
 | Modelica relationship | Continuous models and parameters are selected through Twin tooling | No complete standard realization/parameter provenance graph ties each equation set and result back to the source feature and requirement revision |
 
@@ -104,31 +104,30 @@ become Griffin's permanent source semantics.
   to return exact collider geometry, coordinate frame, and source generation.
   Promote a footprint primitive only if independent Twins need the same
   relation or profiling shows the authored implementation is a bottleneck.
-- NURBS patches currently have a rendering tessellator, but the Avian adapter
-  consumes `UsdGeomMesh` and primitive colliders and rejects unsupported
-  geometry. Rendering tessellation is not a safe physics fallback: it is
-  selected by render quality, narrows coordinates, and does not define a
-  collision error bound. OpenUSD permits `UsdPhysicsCollisionAPI` on an
-  `UsdGeomXformable`, but restricts `UsdPhysicsMeshCollisionAPI` and its
-  `physics:approximation` to `UsdGeomMesh`; do not apply the mesh API directly
-  to a `NurbsPatch`. The standards-aligned route is to derive a collision
-  `UsdGeomMesh` proxy from the source patch, then use the standard mesh
-  approximation on that proxy ([`UsdPhysicsCollisionAPI`](https://openusd.org/dev/api/class_usd_physics_collision_a_p_i.html),
-  [`UsdPhysicsMeshCollisionAPI`](https://openusd.org/dev/api/class_usd_physics_mesh_collision_a_p_i.html)).
-  The cook must retain a typed source relationship and source/document
-  generation so edits invalidate it. Physics owns its tessellation tolerance
-  and error bound; render quality remains independent.
+- NURBS collision derivation now uses the shared USD NURBS parser and trim
+  handling, but a separate physical tessellation profile; it never reuses the
+  Graphics quality setting. `PlanNurbsCollisionProxy` returns a read-only
+  plan for an explicit document generation. `nurbs.rhai` turns it into normal
+  `CreateUsdProposal` operations, so the generated child `UsdGeomMesh` is
+  reviewable, journaled, and refreshable through the Editor. The proxy carries
+  `PhysicsCollisionAPI`, `PhysicsMeshCollisionAPI`, `purpose = "proxy"`, and
+  `visibility = "invisible"`; its typed `lunco:derived:source` relationship,
+  cook settings, and `uint64` geometry fingerprint are authored on the proxy.
+  Avian re-cooks the source, checks the generated fingerprint against the
+  recorded value, and compares the authored proxy mesh before admission,
+  rejecting stale or modified proxies. `boundingCube` now
+  maps to a real local-axis-aligned box; `none` is rejected on dynamic bodies.
+  Supported approximation tokens are `none` (static/kinematic mesh),
+  `convexHull`, `convexDecomposition`, and `boundingCube`; other standard USD
+  modes remain explicitly unsupported by Avian.
 
-  There is no universally correct box for an arbitrary NURBS surface. The
-  derived mesh can request standard `boundingCube` when a coarse box is the
-  intended collider, `convexHull` when filling concavities is acceptable,
-  `convexDecomposition` for a suitable closed volume, or `none` for an exact
-  triangle surface on static geometry. The tool must require or clearly show
-  that approximation choice instead of silently treating every patch as a
-  solid box. A compound fitted box set needs a semantic split into meaningful
-  parts; surface tessellation alone cannot infer that intent. The generated
-  proxy must be inspectable and refreshable from Editor, with malformed,
-  open-volume, or unsupported inputs reported explicitly.
+  The cook currently records fixed U/V, trim-curve, and trim-grid subdivision
+  counts. These are reproducible physics inputs but do not prove a maximum
+  geometric deviation. A tolerance-driven adaptive cook and measured deviation
+  readback remain open. A collision API cannot infer meaningful fitted box
+  partitions from a surface alone. Griffin itself currently contains no
+  `UsdGeomNurbsPatch`/`LunCoLatheAPI` source, so no Griffin geometry was changed
+  to exercise the new generic path.
 - GRR-011 moves ramp mass and diagonal-inertia literals into SysML and checks
   their composed realization. They are explicitly labeled study proxies.
   GR-021 remains planned: authoring queries can read mass-property attributes,
@@ -192,11 +191,11 @@ become Griffin's permanent source semantics.
   is an evidence recorder and temporal reducer that proves the required wheels
   contacted the ramp over the full traversal interval. A static fit check is
   not traversal acceptance.
-- Physics collision cooking from `UsdGeomNurbsPatch` is absent. Add a
-  source-generation-aware derived `UsdGeomMesh` cook with physics-owned
-  tessellation tolerance, collider approximation selection, explicit cook
-  errors, and an Editor preview/readback path. Do not use render tessellation
-  quality as a physics accuracy setting.
+- The first generic `UsdGeomNurbsPatch` collision cook is implemented. Remaining
+  work is tolerance-driven adaptive tessellation with measured deviation,
+  Editor preview/readback of that error, and applying the tool to a real Griffin
+  NURBS source if one is authored. Do not treat fixed subdivisions as a
+  certified collision accuracy bound.
 - Preserve provider result states end to end. Inconclusive and error are not
   false requirements and must not be collapsed into a boolean.
 
@@ -234,9 +233,10 @@ become Griffin's permanent source semantics.
 - A geometry comparison view that overlays the source-derived design envelope
   with composed render and collision geometry, including an explicit physical
   versus visual discrepancy report.
-- A NURBS collider cook/preview workflow that exposes the source patch,
-  generated collision mesh or box/decomposition, physics tolerance, source
-  generation, and collider readback together.
+- An Editor panel that previews the NURBS source beside the generated collider,
+  reports measured geometric deviation and cooked collider readback, and makes
+  an explicitly selected approximation easy to inspect. The Rhai planner and
+  proposal path exist; the joined visual readback and tolerance report do not.
 - A requirements matrix generated from SysML relations, with pass/fail/
   inconclusive/error/unverified shown separately and links to evidence.
 - Editor verification actions for structural checks and controlled physics
