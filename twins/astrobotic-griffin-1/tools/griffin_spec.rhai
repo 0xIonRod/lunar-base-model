@@ -54,19 +54,18 @@ fn _sysml_text(name) {
     sysml_requirements::text(source, qualified)
 }
 
-// The Twin intentionally composes several SysML packages that reuse local
-// names such as `solarArrayCount`. Resolve every
-// public accessor to its owning package before crossing the generic bridge;
-// an ambiguous short-name lookup must never silently select another
-// component's value.
+// Lander component counts have one canonical owner in
+// GriffinLanderRequirements. Griffin1Requirements owns the integrated
+// mission subject and payload-capacity value only. Keep these API aliases
+// explicit while the component contract uses concise local names.
 fn _qualified_attribute(name) {
-    let lander = [
-        "payloadCapacityKg", "landingLegCount", "mainEngineCount",
-        "propellantTankCount", "solarArrayCount"
-    ];
-    if lander.contains(name) {
+    if name == "payloadCapacityKg" {
         return "Griffin1Requirements::Griffin1Lander::" + name;
     }
+    if name == "landingLegCount" { return "GriffinLanderRequirements::GriffinLanderComponent::legCount"; }
+    if name == "propellantTankCount" { return "GriffinLanderRequirements::GriffinLanderComponent::tankCount"; }
+    if name == "mainEngineCount" { return "GriffinLanderRequirements::GriffinLanderComponent::engineCount"; }
+    if name == "solarArrayCount" { return "GriffinLanderRequirements::GriffinLanderComponent::solarArrayCount"; }
     let ramp = [
         "rampCount", "rampSurfaceLengthM", "rampSurfaceWidthM",
         "childNames",

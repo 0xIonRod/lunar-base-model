@@ -25,7 +25,13 @@ The leg assembly therefore attaches to the bus structure. `Nozzle/MainEngineClus
 
 ## Current Editor state
 
-Reuse the existing headful Editor process at `http://127.0.0.1:43117`; inspect `ListOpenDocuments` for current document ids and generations before editing. Do not start another simulator or a Tracy session.
+The prior headful Editor endpoint at `http://127.0.0.1:43117` was not running
+or reachable during the 2026-09-24 requirements review, and no Editor surface
+was available to this session. Do not assume its earlier document IDs or
+generations are still valid. Reopen the Griffin Editor scene and query current
+documents/generations before the next geometry edit. This review changed
+SysML requirements, reports, and Rhai verification/tool policy only; it did
+not author or save geometry.
 
 Completed in the current authoring session:
 
@@ -39,10 +45,11 @@ These are Editor and composed-readback observations. They do not establish missi
 
 ## Next work
 
-1. Compose the saved ramp visual component under the integrated port and starboard physical ramp roots. Preserve the physical track colliders, avoid duplicate visible geometry, and derive both poses from the ramp SysML configuration.
-2. Review the leg-to-bus mount appearance in the Editor against current Griffin-1 references. Define any additional visual bracing as a source-backed study requirement derived from the bus and leg interfaces.
-3. Continue checking the complete Griffin source against the functional, visual, mechanical, power, propulsion, and simulation-accuracy requirements. Record unresolved implementation limits in the owning requirement or gap report, not in duplicated scene metadata.
-4. Use one dry Rhai plan, one generation-checked typed Editor batch, composed readback, and save for each geometry edit. Separate focused requirement observations from full Twin/runtime acceptance.
+1. Rebuild the nonconforming solar-array proxy as three upright panel assemblies across adjacent lander sides, with visible structural support members and the lower clearance-shaped outlines shown in current Astrobotic integration imagery. Use explicitly replaceable photo-derived visual dimensions for this presentation study, and keep exact stations, panel contours, mounts, hinges, and power behavior marked unknown until the controlled mission package is available. Apply through the Editor, then read back all three composed assemblies and support paths.
+2. Compose the saved ramp visual component under the integrated port and starboard physical ramp roots. Preserve the physical track colliders, avoid duplicate visible geometry, and derive both poses from the ramp SysML configuration.
+3. Review the leg-to-bus mount appearance in the Editor against current Griffin-1 references. Define any additional visual bracing as a source-backed study requirement derived from the bus and leg interfaces.
+4. Continue checking the complete Griffin source against the functional, visual, mechanical, power, propulsion, and simulation-accuracy requirements. Record unresolved implementation limits in the owning requirement or gap report, not in duplicated scene metadata.
+5. Use one dry Rhai plan, one generation-checked typed Editor batch, composed readback, and save for each geometry edit. Separate focused requirement observations from full Twin/runtime acceptance.
 
 ## Repository integration
 

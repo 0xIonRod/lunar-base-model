@@ -19,6 +19,15 @@ number changes.
 - Public status at handoff: lander environmental testing and late-2026 launch
   planning; exact flight state and final surface coordinates remain subject to
   change.
+- Griffin-1 solar integration: Astrobotic's public post states that two of
+  three solar panels are integrated and that the mission-window Sun path
+  crosses the quadrant where the panels are positioned. Astrobotic's June 2026
+  integration photograph shows three upright panel faces on adjacent sides
+  of one lander sector. This supports count and qualitative arrangement only;
+  the image has no engineering scale or complete view of hidden interfaces.
+- Griffin propulsion baseline: Astrobotic's current Griffin product page says
+  seven main engines. The older polar/VIPER Griffin User Guide describes a
+  five-engine baseline, so the older count is not applied to Griffin-1.
 
 ## Simulator assumptions
 
@@ -28,8 +37,8 @@ mission-owner data is supplied, do not present these as Griffin flight values:
 | Parameter | Status | Treatment |
 |---|---|---|
 | Griffin dimensions and geometry | unknown | inherited visual/physical surrogate; public material describes a stout aluminum frame and isogrid deck, not an as-built dimension set |
-| dry mass, propellant load, inertia, center of mass | unknown | inherited lander values; replace with sourced opinions |
-| engine thrust and throttle envelope | unknown | inherited powered-descent model |
+| dry mass, propellant load, inertia, center of mass | unknown | NASA says Griffin-1 completed mass-properties testing but public numerical values were not found; inherited lander values remain proxies |
+| engine thrust, throttle, station and cant angles | unknown | inherited powered-descent model; current product page supports seven main engines, while older Griffin/VIPER guidance describes five |
 | FLIP wheel count, geometry, wheel loads, motor data, battery ICD | mostly unknown | active four-wheel all-wheel-steer study proxy; Astrolab confirms full-size wheels/battery but not the station ICD; replace from supplier data |
 | exact landing coordinates | unresolved | reproducible NOBILE03 regional study anchor; not a flight touchdown coordinate |
 | terrain relief | source-backed regional product | 512 m NOBILE03 crop, locally reprojected and vertically normalized for the Twin |
@@ -37,7 +46,8 @@ mission-owner data is supplied, do not present these as Griffin flight values:
 | FLIP flight-stack attachment | unresolved in public data and previous solver trial | active prototype now uses a scene-level fixed top-deck adapter joint, detached after touchdown; validate against the next runtime test |
 | Griffin payload capacity | source-backed product value | 625 kg published by Astrobotic; integrated mission load is a separate manifest quantity |
 | deck and egress | public mechanical ICD not released | four-leg wrapper with isogrid deck and optional side ramps; FLIP's public concept supports direct top-deck egress |
-| Griffin solar layout | public structural data incomplete | two side-mounted visual arrays; electrical sizing remains a Modelica study input |
+| Griffin-1 solar layout | count and quadrant are source-backed; exact installation geometry is unknown | three upright panels are shown across adjacent lander sides in current integration imagery; current Twin still composes two opposite-side arrays and is nonconforming. Stations, azimuths, dimensions, support/hinge geometry, cell layout, electrical data, and deployment states are unresolved |
+| propellant tank count/type | unknown | four COPV-style visual assemblies are a Twin study assumption, not a published Griffin-1 tank ICD |
 
 ## NOBILE03 terrain processing record
 

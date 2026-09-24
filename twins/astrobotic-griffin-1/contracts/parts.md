@@ -7,17 +7,16 @@ canonical wrapper is hidden, empty, or mounted on the wrong datum.
 
 | Part | Required topology | Required geometry / physics | Known study requirement |
 |---|---|---|---|
-| `Griffin1` | component-owned octagonal bus, payload adapter, seven-engine propulsion, four tanks, two arrays, four legs, optional two ramps | Xform root with capacity, collision, status, and provenance metadata | Public system counts are modeled once in SysML; visual dimensions remain explicitly labeled assumptions |
+| `Griffin1` | component-owned octagonal bus, payload adapter, seven-engine propulsion, four-leg landing system, three Griffin-1 solar arrays, optional two ramps | Xform root with capacity, collision, status, and provenance metadata | Current source scene has only two arrays and is nonconforming; four visual tank assemblies are a Twin study assumption |
 | `GriffinBusComponent` | open octagonal frame, octagonal payload deck, lower service skirt, avionics, and a separate octagonal central tank-support perimeter | referenced component owns render geometry; the descent lander owns flight collision and mass | `GriffinVisualConfiguration` owns dimensions, stations, and appearance; the support perimeter has eight sides |
 | `GriffinBody` | `BodyCollisionProxy` and four side collision proxies | Hidden flight-body colliders; visible structure comes from `Bus` | Flight collider geometry remains a simulator study envelope |
 | `TopDeckBeamCollider0..7` | Eight hidden convex beams following the eight source-owned octagon edges | Enabled perimeter colliders; no hull closes the tank-support opening | Editor readback checks beam count, profile-derived dimensions, and collider state; dimensions remain a simulator study envelope |
 | `RoverPayloadDeckCollider` | Hidden clipped-square convex collider matching the central FLIP payload adapter | Enabled, separate from the octagonal perimeter ring | Geometry is derived from adapter dimensions; supplier interface and load rating remain TBD |
-| `TankPX/NX/PZ/NZ` | `components/lander/griffin_tank_visual.usda` through four source references | Four render-only COPV study assemblies at the ordered SysML stations; MainPropulsion owns flight propellant mass | Four-tank integration is public; exact tank dimensions TBD |
+| `TankPX/NX/PZ/NZ` | `components/lander/griffin_tank_visual.usda` through four source references | Four render-only COPV study assemblies at the ordered SysML stations; MainPropulsion owns flight propellant mass | Tank count, type, dimensions, and stations are not established by a public Griffin-1 ICD |
 | `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider | FLIP interface/release datum TBD |
 | `MainPropulsion` | Chamber, fuel tank, oxidizer tank | Named propulsion interface | Thrust, propellant, mass, and engine count TBD |
 | `Nozzle` | `MainEngineCluster/Engine01..07` | Seven visible non-colliding engine-bell geometries; no single-bell design placeholder | Seven main engines are public; bell contour and spacing TBD |
-| `SolarPanelPort` | `Cells` plus frame/borders | Visible side array with explicit installation metadata; exactly one port array | Electrical ICD TBD |
-| `SolarPanelStarboard` | `Cells` plus frame/borders | Visible mirrored side array; exactly one starboard array | Electrical ICD TBD |
+| `SolarPanelPort` / `SolarPanelStarboard` | Current two study roots with `Cells`, frame, and borders | Opposite signed-Z proxy geometry; not the Griffin-1 mission arrangement | Griffin-1 imagery shows three upright panels across adjacent sides in one quadrant. Identities, stations, cell outlines, supports, hinges, and electrical data await controlled design sources |
 | `LegPX/NX/PZ/NZ` | `Strut` and matching `PadPX/NX/PZ/NZ` | Positive mass body, visible strut, enabled pad collider | Four functional legs; dimensions and damping TBD |
 | `EgressRampPort/Starboard` | Two source-aligned wheel tracks, open centre, two edge rails, and named hinge | Positive-mass Xform; both geometry-derived track colliders enabled | Track stations follow FLIP wheel datums; width and clearance remain replaceable study values |
 | `RampHingePort/Starboard` | Body relationships to root and matching ramp | `PhysicsRevoluteJoint`, Z axis, ordered limits | Actuator/lock behavior TBD |
@@ -25,7 +24,10 @@ canonical wrapper is hidden, empty, or mounted on the wrong datum.
 ## Canonical frame
 
 The study frame is metres, Y-up, with the lander body datum at the Griffin root.
-Port/starboard arrays occupy opposite signed Z sides. The optional egress ramps
+The current solar-array proxy occupies opposite signed Z sides; Griffin-1
+integration imagery instead shows three upright panels across adjacent sides
+in one azimuth sector. The solar arrangement in the study frame is not a flight
+installation. The optional egress ramps
 occupy opposite signed X sides. FLIP's nominal public path is direct top-deck
 egress; the ramp path is an alternate study branch. The four leg attachment
 points occupy the four cardinal X/Z directions and their pads are below and

@@ -56,6 +56,11 @@ package GriffinRequirementSources {
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_requirements.sysml";
     }
 
+    part source_astrobotic_griffin_1_requirements_griffin_lander_requirements_sysml : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml";
+    }
+
     part source_astrobotic_griffin_1_requirements_griffin_simulation_accuracy_requiremen : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml";
@@ -144,6 +149,16 @@ package GriffinRequirementSources {
     part source_www_astrobotic_com_griffin_lander : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
+    }
+
+    part source_astrobotic_griffin_1_integration_photo_2026_06_15 : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg";
+    }
+
+    part source_linkedin_astrobotic_griffin_solar_setup : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.linkedin.com/posts/astrobotic_two-solar-panels-integrated-to-griffin-just-activity-7450595533745975296-qBEA";
     }
 
     part source_www_astrobotic_com_images : EvidenceSource {
@@ -438,7 +453,7 @@ package GriffinRequirementSources {
 
     part evidence_glr_003 : RequirementEvidence {
         ref targetRequirement = GriffinLanderRequirements::glr003;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_lander_requirements_sysml, source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
     }
 
     part evidence_glr_004 : RequirementEvidence {
@@ -448,7 +463,7 @@ package GriffinRequirementSources {
 
     part evidence_glr_005 : RequirementEvidence {
         ref targetRequirement = GriffinLanderRequirements::glr005;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_astrobotic_griffin_1_integration_photo_2026_06_15, source_linkedin_astrobotic_griffin_solar_setup);
     }
 
     part evidence_glr_006 : RequirementEvidence {
@@ -743,7 +758,7 @@ package GriffinRequirementSources {
 
     part evidence_gr_016 : RequirementEvidence {
         ref targetRequirement = GriffinVisualRequirements::gr016;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_astrobotic_griffin_1_integration_photo_2026_06_15, source_linkedin_astrobotic_griffin_solar_setup);
     }
 
     part evidence_gr_017 : RequirementEvidence {
@@ -844,7 +859,7 @@ package GriffinRequirementSources {
 
     part evidence_gv_003 : RequirementEvidence {
         ref targetRequirement = GriffinVisualRequirements::gv003;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_astrobotic_griffin_1_integration_photo_2026_06_15, source_linkedin_astrobotic_griffin_solar_setup);
     }
 
     part evidence_gv_004 : RequirementEvidence {
@@ -866,7 +881,7 @@ package GriffinRequirementSources {
 
     part evidence_gsa_001 : RequirementEvidence {
         ref targetRequirement = GriffinSolarRequirements::gsa001;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_astrobotic_griffin_1_integration_photo_2026_06_15, source_linkedin_astrobotic_griffin_solar_setup);
     }
 
     part evidence_gsa_002 : RequirementEvidence {
@@ -876,7 +891,7 @@ package GriffinRequirementSources {
 
     part evidence_gsa_003 : RequirementEvidence {
         ref targetRequirement = GriffinSolarRequirements::gsa003;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_astrobotic_griffin_1_integration_photo_2026_06_15, source_linkedin_astrobotic_griffin_solar_setup);
     }
 
     part evidence_gsa_004 : RequirementEvidence {
@@ -886,7 +901,7 @@ package GriffinRequirementSources {
 
     part evidence_gsa_005 : RequirementEvidence {
         ref targetRequirement = GriffinSolarRequirements::gsa005;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_astrobotic_griffin_1_integration_photo_2026_06_15, source_linkedin_astrobotic_griffin_solar_setup, source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
     }
 
     part evidence_gsa_006 : RequirementEvidence {
@@ -992,7 +1007,7 @@ package GriffinRequirementSources {
 
     part evidence_gvc_006 : RequirementEvidence {
         ref targetRequirement = GriffinVisualConfigurationRequirements::gvc006;
-        ref sources = (source_science_nasa_gov_astrobotic_lunar_landers_pug_pdf, source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
+        ref sources = (source_astrobotic_griffin_1_integration_photo_2026_06_15, source_linkedin_astrobotic_griffin_solar_setup, source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
     }
 
     part evidence_gvc_007 : RequirementEvidence {

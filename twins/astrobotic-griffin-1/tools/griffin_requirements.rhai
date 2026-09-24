@@ -646,43 +646,36 @@ fn _solar_layout_report(doc_id, root) {
     let findings = [];
     let names = griffin_spec::solar_array_names();
     let expected = solar_array_count();
-    if names.len() != 2 || expected != names.len() {
+    if expected == () || names.len() != expected {
         findings.push(_layout_finding("GR-016", root,
-            "SysML solar-array identity list must contain exactly two names"));
+            "solar-array identities do not match the Griffin-1 required count"));
+    }
+    if names.len() == 0 {
+        findings.push(_layout_finding("GR-016", root,
+            "no solar-array component identities are configured"));
         return findings;
     }
-    let port_path = root + "/" + names[0];
-    let starboard_path = root + "/" + names[1];
-    let port = _layout_query(doc_id, port_path,
-        ["visibility", "xformOp:translate", "xformOp:rotateXYZ"], true);
-    let starboard = _layout_query(doc_id, starboard_path,
-        ["visibility", "xformOp:translate", "xformOp:rotateXYZ"], true);
-    if !_ok(port) || !_ok(starboard) {
-        return findings;
+    for name in names {
+        let path = root + "/" + name;
+        let panel = _layout_query(doc_id, path,
+            ["visibility", "xformOp:translate", "xformOp:rotateXYZ"], true);
+        if !_ok(panel) {
+            findings.push(_layout_finding("GR-016", path,
+                "configured solar-array component is missing from the composed stage"));
+            continue;
+        }
+        if !_visible(panel) {
+            findings.push(_layout_finding("GR-016", path,
+                "required solar panel is hidden"));
+        }
+        if !_has(panel.children, path + "/Cells") {
+            findings.push(_layout_finding("GR-016", path,
+                "solar panel must contain its named Cells geometry"));
+        }
     }
-    _pair_mirror_check(findings, "GR-016", starboard_path, starboard,
-        port_path, port, "Z", "solar arrays");
-    let port_pos = _authored_position(port);
-    let starboard_pos = _authored_position(starboard);
-    if port_pos == () || starboard_pos == ()
-        || port_pos.len() != 3 || starboard_pos.len() != 3 {
-        findings.push(_layout_finding("GR-016", root,
-            "solar-array world placement is unavailable in the composed stage"));
-        return findings;
-    }
-    if port_pos[2] >= 0.0 || starboard_pos[2] <= 0.0 {
-        findings.push(_layout_finding("GR-016", root,
-            "port/starboard solar arrays must occupy opposite signed Z sides"));
-    }
-    if !_near(port_pos[0], 0.0, 0.02) || !_near(starboard_pos[0], 0.0, 0.02) {
-        findings.push(_layout_finding("GR-016", root,
-            "solar arrays must attach to the side-wall datum, not the fore/aft axis"));
-    }
-    if !_has(port.children, port_path + "/Cells")
-        || !_has(starboard.children, starboard_path + "/Cells") {
-        findings.push(_layout_finding("GR-016", root,
-            "each solar panel must have exactly its named Cells geometry"));
-    }
+    // This generic layout check intentionally does not infer the Sun-facing
+    // quadrant from a render pose. That mission constraint needs the approved
+    // Griffin-1 installation datums and a time-tagged Sun-direction provider.
     findings
 }
 
@@ -1258,6 +1251,22 @@ fn part_manifest(root) {
         });
     }
 
+    let solar_arrays = [];
+    for name in griffin_spec::solar_array_names() {
+        let path = root + "/" + name;
+        solar_arrays.push(#{
+            id: "solar_array_" + name,
+            label: "solar array " + name,
+            rule: "GR-016",
+            path: path,
+            attrs: ["visibility"],
+            expected_type: "Xform",
+            visible: true,
+            required_children: [path + "/Cells"],
+            geometry_children: [#{label: "solar cells", path: path + "/Cells", geometry: true, collider: false}],
+        });
+    }
+
     [
         #{
             id: "lander",
@@ -1272,10 +1281,10 @@ fn part_manifest(root) {
                 root + "/TopDeckBeamCollider4", root + "/TopDeckBeamCollider5",
                 root + "/TopDeckBeamCollider6", root + "/TopDeckBeamCollider7",
                 root + "/RoverPayloadDeckCollider", root + "/PayloadAdapter",
-                root + "/MainPropulsion", root + "/SolarPanelPort",
-                root + "/SolarPanelStarboard", root + "/Nozzle",
-                root + "/TankPX", root + "/TankNX", root + "/TankPZ",
-                root + "/TankNZ"],
+                root + "/MainPropulsion"]
+                + _named_paths(root, griffin_spec::solar_array_names())
+                + [root + "/Nozzle"]
+                + _named_paths(root, griffin_spec::propellant_tank_names()),
             parameters: [#{name: "payload capacity", attr: "lunco:payload_class_kg", exact: max_payload_kg()}],
         },
         #{
@@ -1330,28 +1339,6 @@ fn part_manifest(root) {
                 root + "/MainPropulsion/FuelTank", root + "/MainPropulsion/OxidizerTank"],
         },
         #{
-            id: "solar_port",
-            label: "port solar array",
-            rule: "GR-006",
-            path: root + "/SolarPanelPort",
-            attrs: ["visibility"],
-            expected_type: "Xform",
-            visible: true,
-            required_children: [root + "/SolarPanelPort/Cells"],
-            geometry_children: [#{label: "solar cells", path: root + "/SolarPanelPort/Cells", geometry: true, collider: false}],
-        },
-        #{
-            id: "solar_starboard",
-            label: "starboard solar array",
-            rule: "GR-006",
-            path: root + "/SolarPanelStarboard",
-            attrs: ["visibility"],
-            expected_type: "Xform",
-            visible: true,
-            required_children: [root + "/SolarPanelStarboard/Cells"],
-            geometry_children: [#{label: "solar cells", path: root + "/SolarPanelStarboard/Cells", geometry: true, collider: false}],
-        },
-        #{
             id: "nozzle",
             label: "main engine nozzle",
             rule: "GR-015",
@@ -1374,7 +1361,7 @@ fn part_manifest(root) {
                 griffin_spec::main_engine_names()),
             geometry_children: [],
         },
-    ] + tanks + legs + ramps
+    ] + solar_arrays + tanks + legs + ramps
 }
 
 fn _part_report(doc_id, spec) {
@@ -2128,12 +2115,12 @@ fn visual_report(doc_id, root) {
             "visual Griffin root is missing from the composed Editor document"));
     }
 
-    let required = [root + "/Bus", root + "/TankPX", root + "/TankNX",
-        root + "/TankPZ", root + "/TankNZ", root + "/LegPX",
-        root + "/LegNX", root + "/LegPZ", root + "/LegNZ",
-        root + "/SolarPanelPort", root + "/SolarPanelStarboard",
-        root + "/Nozzle", root + "/EgressRampPort",
-        root + "/EgressRampStarboard"];
+    let required = [root + "/Bus"]
+        + _named_paths(root, griffin_spec::propellant_tank_names())
+        + _named_paths(root, griffin_spec::landing_leg_names())
+        + _named_paths(root, griffin_spec::solar_array_names())
+        + [root + "/Nozzle"]
+        + _named_paths(root, griffin_spec::ramp_names());
     for path in required {
         checks.push("GLR-009-" + path);
         if !_ok(_layout_query(doc_id, path, [], false)) {

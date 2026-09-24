@@ -139,10 +139,6 @@ package Griffin1Requirements {
     part def Griffin1Lander {
         // Public product/mission values.
         attribute payloadCapacityKg : Real = 625.0;
-        attribute landingLegCount : Integer = 4;
-        attribute mainEngineCount : Integer = 7;
-        attribute propellantTankCount : Integer = 4;
-        attribute solarArrayCount : Integer = 2;
     }
 
     // Generic integration subject.  Rover-owned values and rover visual

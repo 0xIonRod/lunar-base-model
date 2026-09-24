@@ -14,7 +14,7 @@ package GriffinSolarRequirements {
     }
 
     part def GriffinSolarArrayAssembly {
-        doc /* Public Griffin material identifies the triple-junction solar-cell and lithium-ion power concept. The solar arrays remain an independently replaceable visual/power interface with a mirrored pair and explicit station datums; source links are owned by the typed requirement-evidence catalog. */
+        doc /* Astrobotic's current Griffin-1 integration post reports three arrays (two installed, one remaining) and states that all are positioned within the mission-window Sun-path quadrant. The 2026 integration photograph shows three upright panel faces across adjacent sides of one lander sector, attached through structural supports. The current Twin geometry is a two-array opposite-side proxy and is not the mission arrangement. Source links are owned by the typed requirement-evidence catalog. */
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_solar_panel_visual.usda";
         attribute childNames : GriffinSolarVisualMember[16] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "MountBracketPort", "MountBracketStarboard", "HingeBar", "MountLinkPort", "MountLinkStarboard");
@@ -53,28 +53,28 @@ package GriffinSolarRequirements {
     }
 
     requirement def GSA001_ArrayCount {
-        doc /* GSA-001 [topology] every instance in the typed solar-array identity collection is present and visible. */
+        doc /* GSA-001 [mission configuration] the typed solar-array identity collection and composed installed components shall match the canonical GriffinLanderRequirements::GriffinLanderComponent::solarArrayCount. The source post reports two installed panels with one remaining; the current two-array Twin assembly is incomplete. */
     }
     requirement def GSA002_ArrayStructure {
         doc /* GSA-002 [visual] each array exposes a frame and cell surface with owned geometry. */
     }
-    requirement def GSA003_ArraySymmetry {
-        doc /* GSA-003 [layout] the two arrays occupy mirrored signed side stations in the authored SI/Y-up frame. */
+    requirement def GSA003_SunQuadrantLayout {
+        doc /* GSA-003 [mission layout] all configured upright arrays occupy adjacent azimuth stations within the single Sun-path quadrant selected for the Griffin-1 mission window. The integration image supports a same-sector arrangement; exact facet assignments and azimuths require the mission installation drawing. Opposite-side mirror symmetry is not a Griffin-1 requirement. */
     }
     requirement def GSA004_ArrayTraceability {
         doc /* GSA-004 [evidence] array identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and deployment status is explicit. */
     }
     requirement def GSA005_ArrayPlacement {
-        doc /* GSA-005 [layout] each array root transform matches the ordered native Position datum owned by GriffinVisualConfigurationRequirements. */
+        doc /* GSA-005 [installation interface] each array root transform, azimuth, panel normal, support attachment, and stowed/deployed state shall match the controlled Griffin-1 installation/interface drawing. Public images do not provide dimensional datums. The existing two-station signed-Z list is a replaceable visual study proxy and cannot verify this mission requirement. */
     }
     requirement def GSA006_PanelEnvelope {
-        doc /* GSA-006 [geometry] each panel shall use an open 4.80 m by 3.00 m perimeter frame with 0.14 m stock; its 4.45 m by 2.65 m cell field rests on a 0.04 m backplane at local Y=0.03 m and has a 0.05 m cell surface centered at Y=+0.075 m. These are expanded study dimensions, not public panel ICD values. */
+        doc /* GSA-006 [geometry] each array shall preserve the installed panel outline, cell field, and visible clearance cutouts from the controlled mission geometry. The current 4.80 m by 3.00 m frame, 4.45 m by 2.65 m cell field, and thicknesses are render-study values only; the public photographs do not establish dimensions or manufacturing tolerances. */
     }
     requirement def GSA007_CellGridAndMount {
-        doc /* GSA-007 [geometry] each panel shall contain a 6 by 4 cell-module grid with five X dividers, three Z dividers, and a 0.44 m by 0.32 m by 0.44 m mount bracket, all as named child geometry. The segmented wing is a visual study assumption because public Griffin material identifies solar cells but does not publish panel CAD. */
+        doc /* GSA-007 [geometry] each array shall show its cell modules and perimeter frame, with module segmentation following the released panel layout. The current 6 by 4 grid and bracket dimensions are render-study values; the integration photos are insufficient to determine cell count, frame section, or bracket dimensions. */
     }
     requirement def GSA008_HingeAndStandoff {
-        doc /* GSA-008 [interface geometry] each panel shall expose a render-only X-axis hinge shaft of radius 0.10 m and length 3.10 m at local Y = -0.18 m. Two mount links bridge the corner-post stations to the panel side rails; their spans and overlap are derived from the shared bus rail stations, panel frame width, and minimumMountOverlapM. These are explicit study assumptions because the public Griffin source confirms the solar-array concept but does not publish the deployment/hinge ICD. */
+        doc /* GSA-008 [mechanical interface] panel pivots, restraints, support links, deployment envelope, and load path shall follow the released Griffin-1 mechanism and structural interface definition. The current X-axis hinge bar and two-link bracket are visual proxies inferred from incomplete views, not verified flight mechanisms. */
     }
     constraint def GSAC009_MountPathOverlap {
         in busToBracketOverlapM : Real;
@@ -87,12 +87,12 @@ package GriffinSolarRequirements {
     }
     requirement def GSA009_BusMountConnection {
         require GSAC009_MountPathOverlap;
-        doc /* GSA-009 [mechanical interface] each deployed side array shall have a continuous render-only mount path from the octagonal bus PerimeterFrame through MountBracket and MountLink into the panel Frame. Every adjacent geometry pair shall overlap by at least minimumMountOverlapM in the composed SI frame. Both arrays remain mounted at the signed-Z stations in GriffinVisualConfiguration. */
+        doc /* GSA-009 [visual integration] each modeled array shall have a continuous visible support path into the lander structure. The current overlap check proves only that study meshes touch in the composed SI frame; it does not prove the Griffin-1 attachment, load path, fasteners, clearances, or deployed mechanism. */
     }
 
     requirement <'GSA-001'> gsa001 : GSA001_ArrayCount { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-002'> gsa002 : GSA002_ArrayStructure { subject arrays : GriffinSolarArrayAssembly; }
-    requirement <'GSA-003'> gsa003 : GSA003_ArraySymmetry { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-003'> gsa003 : GSA003_SunQuadrantLayout { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-004'> gsa004 : GSA004_ArrayTraceability { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-005'> gsa005 : GSA005_ArrayPlacement { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-006'> gsa006 : GSA006_PanelEnvelope { subject arrays : GriffinSolarArrayAssembly; }

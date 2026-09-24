@@ -24,6 +24,13 @@ The latest primary-source baseline used for this package is:
 - NASA's August 2026 update says Griffin-1 is undergoing environmental testing
   at NASA's Jet Propulsion Laboratory, has completed mass-properties testing,
   and is planned for a late-2026 launch.
+- Astrobotic's current Griffin-1 integration post says two of three solar
+  panels are installed and places all panels in the mission-window Sun-path
+  quadrant. Its June 2026 press image shows the three upright panels across
+  adjacent lander sides. The Twin still has an explicitly nonconforming
+  two-array proxy; the Editor rebuild can use explicitly approximate,
+  photo-derived visual dimensions, while exact engineering acceptance needs
+  the controlled installation drawing.
 - Astrobotic's June 2026 update says the integrated lander is moving through
   environmental testing, with FLIP to be integrated at the Florida launch
   processing site.
@@ -41,6 +48,9 @@ Sources:
 - NASA, [Moon Base II: Astrobotic Griffin-1](https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/)
 - NASA, [NASA Provides Updates on Moon Base Cargo Landers and Tech Demonstrations](https://www.nasa.gov/missions/moon-base/nasa-provides-updates-on-moon-base-cargo-landers-tech-demonstrations/)
 - Astrobotic, [Griffin-1 Lunar Lander Unveiled Ahead of Environmental Testing](https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/)
+- Astrobotic, [Griffin-1 integration photo, June 15, 2026](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg)
+- Astrobotic, [Griffin's Solar Setup for Space and Moon Missions](https://www.linkedin.com/posts/astrobotic_two-solar-panels-integrated-to-griffin-just-activity-7450595533745975296-qBEA)
+- Astrobotic, [Griffin lander current product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
 - Astrolab/Astrobotic, [FLIP rover joins Griffin-1](https://www.astrobotic.com/astrolabs-flip-rover-joins-astrobotics-griffin-1-to-the-moon/)
 
 ## Package layout
@@ -69,7 +79,7 @@ Sources:
 | scenarios/tests/griffin_landing_legs_requirements.rhai | Component-owned Rhai gate for the four landing legs |
 | scenarios/tests/griffin_propulsion_requirements.rhai | Component-owned Rhai gate for the seven-engine bell cluster |
 | scenarios/tests/griffin_tank_requirements.rhai | Component-owned Rhai gate for the four propellant tanks |
-| scenarios/tests/griffin_solar_requirements.rhai | Component-owned Rhai gate for the two Griffin solar arrays |
+| scenarios/tests/griffin_solar_requirements.rhai | Component-owned Rhai gate for solar component geometry; mission placement is inconclusive until the Griffin-1 installation datums exist |
 | scenarios/tests/flip_requirements.rhai | Rhai observer for the standalone four-wheel FLIP contract |
 | scenarios/tests/flip_chassis_requirements.rhai | Component-owned Rhai gate for the FLIP chassis |
 | scenarios/tests/flip_wheel_requirements.rhai | Component-owned Rhai gate for the four directional wheel stations |
@@ -387,10 +397,14 @@ The current stable boundary demonstrates:
    contracts.
 4. The mission scene owns guidance wiring, landing target, camera, anchors,
    waypoint markers, and mission metadata.
-5. The Griffin wrapper carries the source-backed public configuration that is
-   useful for integration: 625 kg payload capacity, four landing legs, seven
-   main engines, four propellant tanks, and an octagonal payload deck. It also carries a
-   clearly labelled study configuration with side-mounted solar-array proxies,
+5. The Griffin wrapper carries source-backed values useful for integration:
+   625 kg payload capacity, four landing legs, seven main engines, and an
+   octagonal payload deck. Current Astrobotic Griffin-1 integration evidence
+   shows three solar panels within one azimuth quadrant. The composed Twin
+   still contains a nonconforming two-array proxy on opposite signed-Z sides;
+   the four-tank set is also a Twin study assumption, not published flight
+   configuration data. The wrapper carries a clearly labelled study
+   configuration with solar-array proxies,
    a top-deck adapter, and two optional ramps with paired rails. Geometry,
    mass properties, and mechanism details remain non-flight surrogates.
 6. FLIP uses a four-wheel all-wheel-steer study topology with compound chassis

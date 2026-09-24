@@ -44,6 +44,67 @@ standards violation. The mismatch is claiming implementation or verification
 coverage where that prose has not been connected to a resolved predicate,
 realized feature, and evidence result.
 
+## Griffin-1 evidence and construction blockers
+
+Astrobotic's current Griffin product page gives a seven-main-engine design,
+four shock-absorbing legs, a flexible isogrid payload deck, and optional
+egress ramps. Its 2026 Griffin-1 integration post says two solar panels are
+installed with one remaining, and places the panels in the quadrant crossed
+by the mission-window Sun path. The June 2026 integration photograph shows
+three upright panel faces across adjacent sides of one lander sector, with
+structural supports and clearance-shaped lower outlines. That is useful
+qualitative installation evidence; perspective, occlusion, and the lack of a
+scale datum prevent extracting exact panel dimensions, mount stations, hinge
+axes, or load paths. Sources: [Astrobotic Griffin-1 integration photo](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg), [Astrobotic solar integration post](https://www.linkedin.com/posts/astrobotic_two-solar-panels-integrated-to-griffin-just-activity-7450595533745975296-qBEA), and [current Griffin product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/).
+
+This evidence supersedes the Twin's former mirrored two-array visual
+interpretation. The current source configuration and composed vehicle still
+contain only two opposite-signed-Z arrays. They are now explicitly a
+nonconforming visual proxy; the array count requirement is three and the
+old mirror check has been removed. The station list, panel dimensions,
+identities, supports, hinges, cell layout, and material/finish still need
+controlled mission data before a three-panel assembly can be built accurately.
+The image is not a substitute for the Editor-authored geometry update or the
+installation drawing.
+
+### Data package needed to make the vehicle construction-ready
+
+The next model update should be driven by a Griffin-1 configuration-controlled
+engineering package. Requirements should bind every measurement to that
+baseline and declare one of `as-built`, `as-designed`, `mission requirement`,
+or `replaceable study assumption` status.
+
+| Requirement area | Required source data and acceptance evidence |
+|---|---|
+| Configuration and applicability | Vehicle/mission identifier, hardware revision, document revision/date, applicability, supersession, units, frames, uncertainty, and evidence role for each datum. Keep the Griffin-1 flight vehicle distinct from earlier Griffin/VIPER user-guide configurations. |
+| As-built geometry | Controlled 3D CAD or dimensioned orthographic drawings; root datum/orientation; leg, tank, engine, solar, adapter, and payload stations; member profiles; panel cutouts; hole/bolt patterns; tolerances; and view/camera references. Compare composed mesh and collider against that source geometry with stated deviation tolerances. |
+| Solar installation and power | Three panel identities, panel-local frames/normals, installed transforms on adjacent lander sides, support/hinge/lock geometry, stowed/deployed and cruise/surface states, keep-out envelopes, harness/electrical interfaces, panel I-V/temperature behavior, battery usable capacity, and time-tagged mission Sun azimuth/elevation. The post gives the count and mission Sun quadrant, not those engineering values. |
+| Mechanical interfaces | Payload-deck isogrid/bolt pattern and rated load; Griffin-to-FLIP adapter, release datum and loads; leg joints, travel/damping and foot contact; engine and attitude-thruster stations/cant/loads; tank vessels/restraints; and optional ramp hinge and rover-clearance interfaces. Preserve source-mesh-derived collision and prove clearances after composition. |
+| Mass properties | Measured total/dry/propellant/payload masses, center of mass, full inertia tensor with declared body frame, uncertainty, and configuration/propellant state. NASA says Griffin-1 completed mass-properties testing, but public numerical results are unavailable. |
+| Flight and surface behavior | Engine thrust and throttle maps, propellant properties, RCS thrust/impulse locations, GNC/landing state transitions, terminal velocities/attitude/drift criteria, payload release sequence, and the operational mode each value applies to. |
+| Site, lighting, and hazard detection | Confirmed touchdown coordinates and local frame; terrain coverage and resolution appropriate to the 15 cm hazard-detection threshold; time/epoch and Sun ephemeris; thermal and shadow/eclipses; and communications visibility. The current 4 m/pixel regional DEM cannot verify a 15 cm hazard threshold. |
+| Verification record | Requirement-specific acceptance procedure, measured source and configuration revision, uncertainty/tolerance, provider/document generation, sample interval where dynamic, raw evidence link, and distinct pass/fail/inconclusive/error outcomes. Image comparison can verify qualitative silhouette only unless calibrated. |
+
+### Configuration conflicts to resolve
+
+- Astrobotic's current product page specifies seven main engines. The earlier
+  [Griffin lunar-lander User Guide](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf)
+  describes a five-engine propulsion baseline for its then-current
+  polar/VIPER configuration. Do not blend those
+  configurations: retain seven for the current product baseline, and require
+  Griffin-1-specific propulsion drawings before asserting the as-built count,
+  engine stations, or cant angles.
+- The product page supports four legs but does not publish their station
+  coordinates, shock travel, stiffness, damping, foot size, or structural
+  loads. The Twin's four study stations are not installation data.
+- Public photos establish the three-array silhouette and qualitative sector
+  arrangement, but the two-array opposite-side Twin assembly remains what is
+  actually composed. It must be rebuilt in Editor from the mission installation
+  data before any scene can be called image-conforming.
+- NASA confirms completion of Griffin-1 mass-properties testing, but no public
+  mass/CG/inertia table was found. Keep inherited lander values explicitly
+  surrogate until that measured dataset is supplied.
+
 ## Workarounds found
 
 These mechanisms are currently useful migration scaffolding. They must not
@@ -246,6 +307,15 @@ become Griffin's permanent source semantics.
   contact proxies, interfaces, and joints. Builders should consume typed source
   values and return previewable, undoable `ApplyUsdOps` plans; Griffin-local
   Rhai should only select and compose these generic builders.
+- The current Griffin solar-panel refiner is a two-array signed-Z study
+  builder: it expects two stations, four corner-post rails, X-axis face
+  rotations, and one shared bracket datum. It cannot express three
+  independently oriented panels on adjacent faces or per-array support and
+  clearance geometry. Replace it with an instance-driven assembly plan that
+  consumes N typed local frames, panel outlines, support interfaces, and
+  state-specific keep-outs; preview the plan against the official integration
+  image before Editor application. The image can guide a visual study proxy,
+  but dimensional/as-built acceptance still requires the mission drawing.
 
 ## Griffin-specific model work, in order
 

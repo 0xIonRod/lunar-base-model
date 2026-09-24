@@ -68,7 +68,7 @@ authoring/evidence pair. The visual suite emits its complete structured result
 set on the generic `<channel>_EVIDENCE` telemetry event before the stable
 verdict line, so a frame and composed query can be paired by source revision.
 The presentation assembly uses four compact tank pods (`TankPX`, `TankNX`,
-`TankPZ`, `TankNZ`) to match the four-tank SysML integration identity; these
+`TankPZ`, `TankNZ`) to match the four-tank SysML study configuration; these
 remain render-only and do not replace the dynamic tank bodies.
 
 ## Planned evolution

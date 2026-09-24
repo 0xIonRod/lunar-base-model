@@ -1,5 +1,6 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
-// Standalone Griffin dual solar-array visual verification.
+// Standalone Griffin solar-array component verification. Mission placement
+// remains inconclusive until the controlled installation datums are available.
 
 const PACKAGE = "GriffinSolarRequirements";
 const VERIFICATION = "Verify_GriffinSolarRequirements";
@@ -119,7 +120,7 @@ fn on_tick(me, ctx) {
                 bracket_path, 1, own("mountBracketThicknessM"), 1.0, geometry_tolerance));
             checks.push(sysml_requirement_checks::extent_component("GSA-007-" + name + "-" + side + "-mount-depth", "solar_array", "gsa007", VERIFICATION,
                 bracket_path, 2, own("mountBracketDepthM"), 1.0, geometry_tolerance));
-            if mount_rail_x.len() == 4 && mount_rail_z.len() == 4 {
+            if mount_rail_x.len() == names.len() * 2 && mount_rail_z.len() == names.len() * 2 {
                 let mount_index = if side == "Port" { 0 } else { 1 };
                 let rail_index = index * 2 + mount_index;
                 let expected_x = mount_rail_x[rail_index];
@@ -154,7 +155,7 @@ fn on_tick(me, ctx) {
                 link_path, 1, own("mountLinkHeightM"), 1.0, geometry_tolerance));
             checks.push(sysml_requirement_checks::extent_component("GSA-008-" + name + "-" + side + "-link-depth", "solar_array", "gsa008", VERIFICATION,
                 link_path, 2, own("mountLinkDepthM"), 1.0, geometry_tolerance));
-            if mount_rail_x.len() == 4 {
+            if mount_rail_x.len() == names.len() * 2 {
                 let mount_index = if side == "Port" { 0 } else { 1 };
                 let rail_index = index * 2 + mount_index;
                 let rail_x = mount_rail_x[rail_index];
@@ -172,13 +173,14 @@ fn on_tick(me, ctx) {
             }
         }
     }
-    if mount_overlap != () && mount_rail_x.len() == 4
-        && mount_rail_z.len() == 4 && names.len() == 2 {
+    if mount_overlap != () && mount_rail_x.len() == names.len() * 2
+        && mount_rail_z.len() == names.len() * 2 && names.len() > 0 {
         let bus_rails = [];
         for mount_rail in mount_rails {
             bus_rails.push(root + "/Bus/" + mount_rail);
         }
-        let paths = [bus_rails[0], bus_rails[1], bus_rails[2], bus_rails[3]];
+        let paths = [];
+        for bus_rail in bus_rails { paths.push(bus_rail); }
         for name in names {
             for side in ["Port", "Starboard"] {
                 paths.push(root + "/" + name + "/MountBracket" + side);
@@ -225,7 +227,10 @@ fn on_tick(me, ctx) {
               linkToFrameOverlapM: if available { #{provider: "usd", state: "value", value: link_to_frame} } else { #{provider: "usd", state: "unavailable", detail: "composed link/frame bounds unavailable"} },
               requiredOverlapM: #{provider: "sysml", state: "value", value: mount_overlap}}, "usd", 0.0));
     }
-    checks.push(sysml_requirement_checks::coverage("GSA-003-symmetry", "solar_array", "gsa003", VERIFICATION));
+    // This is requirement/verification-link coverage only. It does not verify
+    // the panel quadrant; that needs mission solar ephemeris and approved
+    // installation frames, neither of which is in the current Twin sources.
+    checks.push(sysml_requirement_checks::coverage("GSA-003-verification-link-coverage", "solar_array", "gsa003", VERIFICATION));
     checks.push(sysml_requirement_checks::coverage("GSA-004-traceability", "solar_array", "gsa004", VERIFICATION));
     sysml_requirement_checks::finish(source, checks, "GRIFFIN SOLAR REQUIREMENTS", "GRIFFIN_SOLAR_REQUIREMENTS", root, PACKAGE, VERIFICATION);
     this.done = true;

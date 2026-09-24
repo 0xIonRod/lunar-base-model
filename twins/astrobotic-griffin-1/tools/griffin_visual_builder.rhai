@@ -2945,7 +2945,7 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         || link_height == () || link_depth == () || link_y == () || link_z == ()
         || mount_rail_x.len() != 4 || mount_rail_z.len() != 4
         || solar_stations.len() != 2 || solar_rotations_x.len() != 2 {
-        return plan_error("solar-panel hinge or mount-link datums are incomplete");
+        return plan_error("solar panel refinement supports only the current two-array signed-Z study proxy; Griffin-1 requires three mission installation stations, azimuths, and support datums");
     }
     let ops = [];
     let frame = _solar_frame_plan(doc, edit_target, root,
@@ -3015,7 +3015,7 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         bracket_center_y.push((left_y + right_y) / 2.0);
     }
     if (bracket_center_y[0] - bracket_center_y[1]).abs() > minimum_overlap {
-        return plan_error("mirrored solar arrays do not share one component bracket datum");
+        return plan_error("the current two-array proxy expects a shared reusable bracket datum; mission-specific array supports are not available");
     }
     for index in 0..mount_names.len() {
         let rail_x = mount_rail_x[index];

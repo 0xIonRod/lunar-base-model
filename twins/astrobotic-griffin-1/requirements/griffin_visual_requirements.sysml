@@ -9,8 +9,8 @@ package GriffinVisualRequirements {
         doc /* GR-015 [visual+physics] each named lander part resolves to geometry and the nozzle owns visible bell geometry that is not a collider. Rationale: visible propulsion detail must remain replaceable presentation while thrust/collision stay with the flight model. */
     }
 
-    requirement def GR016_SolarSymmetry {
-        doc /* GR-016 [layout] keep exactly two named Griffin solar-array owners on signed sides with mirrored placement and owned cell geometry. Assumption: the mirrored two-array layout is the current visual study interpretation; exact flight deployment geometry is TBD. */
+    requirement def GR016_SolarLayout {
+        doc /* GR-016 [mission configuration] realize the array count and Sun-quadrant arrangement defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout, with every panel supported from the bus structure. Astrobotic's integration image shows upright panel faces on adjacent lander sides. The current opposite-side visual proxy is nonconforming; exact stations, angles, dimensions, and supports await the installation drawing. */
     }
 
     requirement def GR020_ProxySuppression {
@@ -30,11 +30,11 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV002_LanderPresentation {
-        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognizable faceted lander with its four legs, payload deck, and seven-engine cluster. The visual configuration uses an octagonal open frame and a separate octagonal tank-support perimeter with four tank openings. */
+        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognizable faceted lander with its four legs, payload deck, and seven-engine cluster. The current visual study uses an octagonal open frame and a separate octagonal tank-support perimeter with four study tank openings; this is not a published tank ICD. */
     }
 
     requirement def GRV003_GriffinSolarAssemblies {
-        doc /* GV-003 [visual] the review shall show Griffin's two mirrored side solar arrays as named frame/cell assemblies. Assumption: the mirrored two-panel layout is the current visual proxy and may be replaced by flight layout data. */
+        doc /* GV-003 [visual] the review shall show the solar configuration defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout as upright frame/cell assemblies across adjacent lander sides, each with a visible structural support path and the clearance-shaped outline shown in current Griffin-1 integration imagery. The current Twin render has two arrays on opposite signed-Z sides and fails this visual configuration. Image-derived placement and outline are qualitative only; do not infer dimensions or hinge kinematics from perspective photographs. */
     }
 
     requirement def GRV004_ScaleDatums {
@@ -56,7 +56,7 @@ package GriffinVisualRequirements {
 
     // System integration requirement usages owned by this domain.
     requirement <'GR-015'> gr015 : GR015_NozzleGeometry { subject lander : Griffin1Lander; }
-    requirement <'GR-016'> gr016 : GR016_SolarSymmetry { subject lander : Griffin1Lander; }
+    requirement <'GR-016'> gr016 : GR016_SolarLayout { subject lander : Griffin1Lander; }
     requirement <'GR-020'> gr020 : GR020_ProxySuppression { subject lander : Griffin1Lander; }
     requirement <'GR-032'> gr032 : GR032_MainEngineBells { subject lander : Griffin1Lander; }
     requirement <'GR-033'> gr033 : GR033_PropellantTanks { subject lander : Griffin1Lander; }

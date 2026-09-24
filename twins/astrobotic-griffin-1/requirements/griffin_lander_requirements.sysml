@@ -10,7 +10,7 @@ package GriffinLanderRequirements {
     // vehicle file composes flight dynamics, collision geometry, and the
     // reusable visual component assets into one Griffin source assembly.
     part def GriffinLanderComponent {
-        doc /* Public Griffin material describes a medium-class flexible-payload lander with four shock-absorbing legs, seven main engines, and optional rover egress ramps. This package owns reusable lander counts and the presentation/flight ownership boundary; typed component identities and spatial stations are owned by GriffinVisualConfigurationRequirements. */
+        doc /* This package owns the canonical reusable lander component counts and presentation/flight ownership boundary; typed identities and study stations are owned by GriffinVisualConfigurationRequirements. Astrobotic's current Griffin product page supports four legs and seven main engines. Astrobotic's Griffin-1 integration post says two solar panels are integrated with one remaining, establishing the mission array cardinality; the released mount stations are not public. The four-tank visual count remains a Twin study assumption, not a published Griffin-1 tank ICD. */
         attribute componentName : GriffinReviewLanderName = "Griffin1";
         attribute componentAsset : TwinAssetPath = "vehicles/griffin_1.usda";
         attribute usdRootPath : UsdPrimPath = "/Griffin1";
@@ -22,7 +22,7 @@ package GriffinLanderRequirements {
         attribute legCount : Integer = 4;
         attribute tankCount : Integer = 4;
         attribute engineCount : Integer = 7;
-        attribute solarArrayCount : Integer = 2;
+        attribute solarArrayCount : Integer = 3;
         // The open-frame mesh is a render study made from bounded member
         // sections. Its composed envelope may differ slightly from the
         // nominal station datum at clipped beam corners. This tolerance is
@@ -38,13 +38,13 @@ package GriffinLanderRequirements {
         doc /* GLR-002 [visual] exactly four named landing-leg components shall expose struts and a visible foot pad. */
     }
     requirement def GLR003_PropellantTanks {
-        doc /* GLR-003 [visual] exactly four named propellant-tank components shall expose a tank body and retention bands/cradle. */
+        doc /* GLR-003 [visual study] exactly four named propellant-tank study assemblies shall expose a tank body and retention bands/cradle. Four is a replaceable Twin visualization assumption; public Griffin-1 sources do not publish tank count, type, stations, or dimensions. */
     }
     requirement def GLR004_EngineCluster {
         doc /* GLR-004 [visual] exactly seven named main-engine components shall expose a visible bell and throat. */
     }
     requirement def GLR005_SolarArrays {
-        doc /* GLR-005 [visual] two named solar-array components shall expose frame and cell geometry. */
+        doc /* GLR-005 [configuration] the lander component's installed array identities shall match the canonical solarArrayCount and the system-level array configuration owned by GriffinSolarRequirements. The current two-array visual source is incomplete; exact mission identities, mount stations, orientations, hinge states, and panel envelopes remain unverified pending the structural/power interface package. */
     }
     requirement def GLR006_MetricEnvelope {
         doc /* GLR-006 [geometry] the render-only bus envelope shall match the authored metric width, depth, and height study datums within visualEnvelopeToleranceM; this tolerance does not qualify flight geometry. */
@@ -62,7 +62,7 @@ package GriffinLanderRequirements {
         doc /* GLR-010 [boundary] component transforms shall use the declared Y-up SI frame, while flight dynamics and collision authority remain outside the render-only component layer. */
     }
     requirement def GLR011_SolarOrientation {
-        doc /* GLR-011 [layout] the ordered solar-array roots shall use the signed station positions and outward-facing ordered +90/-90 degree X rotations declared by this component. The sign maps the panel component's +Y cell-face normal onto the +Z/-Z sides; this is a study-frame convention, not a released deployment ICD. */
+        doc /* GLR-011 [layout study] the current two-array proxy uses its declared signed-Z stations and outward-facing rotations only as a replaceable study layout. It is not the Griffin-1 flight arrangement and shall not be used to claim solar pointing or power performance. */
     }
 
     requirement <'GLR-001'> glr001 : GLR001_BusTopology { subject lander : GriffinLanderComponent; }
