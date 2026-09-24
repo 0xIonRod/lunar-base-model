@@ -108,16 +108,27 @@ become Griffin's permanent source semantics.
   consumes `UsdGeomMesh` and primitive colliders and rejects unsupported
   geometry. Rendering tessellation is not a safe physics fallback: it is
   selected by render quality, narrows coordinates, and does not define a
-  collision error bound. A generic physics cook should derive a collision
-  `UsdGeomMesh` proxy from the source patch, apply the standard
-  `UsdPhysicsMeshCollisionAPI` approximation, and retain source path plus
-  source/document generation so edits invalidate the cook. Physics owns its
-  tessellation tolerance and error bound; render quality remains independent.
-  A conservative bounding box is useful for broad phase or a declared
-  `boundingCube` approximation, while convex decomposition or a fitted box set
-  is needed when the surface shape matters. The proxy must be inspectable and
-  refreshable from Editor, with malformed or unsupported NURBS reported as an
-  explicit collider error.
+  collision error bound. OpenUSD permits `UsdPhysicsCollisionAPI` on an
+  `UsdGeomXformable`, but restricts `UsdPhysicsMeshCollisionAPI` and its
+  `physics:approximation` to `UsdGeomMesh`; do not apply the mesh API directly
+  to a `NurbsPatch`. The standards-aligned route is to derive a collision
+  `UsdGeomMesh` proxy from the source patch, then use the standard mesh
+  approximation on that proxy ([`UsdPhysicsCollisionAPI`](https://openusd.org/dev/api/class_usd_physics_collision_a_p_i.html),
+  [`UsdPhysicsMeshCollisionAPI`](https://openusd.org/dev/api/class_usd_physics_mesh_collision_a_p_i.html)).
+  The cook must retain a typed source relationship and source/document
+  generation so edits invalidate it. Physics owns its tessellation tolerance
+  and error bound; render quality remains independent.
+
+  There is no universally correct box for an arbitrary NURBS surface. The
+  derived mesh can request standard `boundingCube` when a coarse box is the
+  intended collider, `convexHull` when filling concavities is acceptable,
+  `convexDecomposition` for a suitable closed volume, or `none` for an exact
+  triangle surface on static geometry. The tool must require or clearly show
+  that approximation choice instead of silently treating every patch as a
+  solid box. A compound fitted box set needs a semantic split into meaningful
+  parts; surface tessellation alone cannot infer that intent. The generated
+  proxy must be inspectable and refreshable from Editor, with malformed,
+  open-volume, or unsupported inputs reported explicitly.
 - GRR-011 moves ramp mass and diagonal-inertia literals into SysML and checks
   their composed realization. They are explicitly labeled study proxies.
   GR-021 remains planned: authoring queries can read mass-property attributes,
