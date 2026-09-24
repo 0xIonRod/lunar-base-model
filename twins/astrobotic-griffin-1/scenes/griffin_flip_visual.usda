@@ -56,7 +56,7 @@ def Xform "GriffinFlipVisual" (
         }
     }
     def Xform "Griffin1" (
-        prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1_visual.usda@</Griffin1>
+        references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
     )
     {
         bool physics:rigidBodyEnabled = false
@@ -70,29 +70,6 @@ def Xform "GriffinFlipVisual" (
         bool physics:rigidBodyEnabled = false
         custom double3 xformOp:translate = (0.0, 6.15, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-    }
-    def Scope "ContextRocks"
-    {
-        def Sphere "RockA"
-        {
-            float radius = 0.75
-            double3 xformOp:translate = (12.0, 0.72, -3.0)
-            double3 xformOp:scale = (1.2, 0.8, 0.9)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.23999999463558197, 0.2199999988079071, 0.20000000298023224)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Sphere "RockB"
-        {
-            float radius = 0.44999998807907104
-            double3 xformOp:translate = (-10.0, 0.42, 3.8)
-            double3 xformOp:scale = (1.4, 0.8, 1.0)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.20000000298023224, 0.1899999976158142, 0.18000000715255737)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
     }
     def DomeLight "ReviewFill"
     {

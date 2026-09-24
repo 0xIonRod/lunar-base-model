@@ -33,10 +33,9 @@ farther outboard than the body attachment points.
 
 ## Presentation component contracts
 
-The render-only review assembly does not replace the dynamic contracts above.
-It is composed from small Twin-local USDA assets so a bus, leg, panel, tank,
-ramp, engine bell, wheel, mast, or chassis can be replaced independently
-through the runtime authoring tools.
+The integrated Griffin vehicle composes Twin-local USDA assets so a bus, leg,
+panel, tank, ramp, engine bell, wheel, mast, or chassis can be replaced
+independently through the runtime authoring tools.
 
 | Component asset | Stable child geometry | Policy |
 |---|---|---|

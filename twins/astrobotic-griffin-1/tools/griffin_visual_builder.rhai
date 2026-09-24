@@ -110,7 +110,7 @@ fn visual_component_specs(root) {
     if !vec3_is_native(griffin) || !vec3_is_native(flip) { return []; }
     [
         #{parent: root, name: "Griffin1", type_name: "Xform",
-          asset: "twin://" + twin_name() + "/vehicles/griffin_1_visual.usda",
+          asset: "twin://" + twin_name() + "/vehicles/griffin_1.usda",
           translation: vec3_array(griffin), rotation: (), scale: ()},
         #{parent: root, name: "FLIP", type_name: "Xform",
           asset: "twin://" + twin_name() + "/vehicles/flip_visual.usda",

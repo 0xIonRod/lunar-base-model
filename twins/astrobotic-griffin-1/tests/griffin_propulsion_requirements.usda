@@ -6,7 +6,7 @@
 def Xform "World"
 {
     def Xform "Griffin1" (
-        references = @twin://astrobotic-griffin-1/vehicles/griffin_1_visual.usda@
+        references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
     )
     {
     }

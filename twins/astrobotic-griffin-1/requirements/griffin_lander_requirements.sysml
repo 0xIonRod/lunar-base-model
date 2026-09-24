@@ -6,14 +6,13 @@ package GriffinLanderRequirements {
     private import GriffinRequirementSources::UsdPrimPath;
     private import GriffinVisualConfigurationRequirements::GriffinReviewLanderName;
 
-    // This package owns the standalone lander visual-component contract. The
-    // Griffin integration package owns mission sequencing; the ramp package
-    // owns the optional deployable ramp; this file owns the reusable bus,
-    // tanks, legs, engines, and solar component assembly.
+    // This package owns the integrated lander realization contract. The
+    // vehicle file composes flight dynamics, collision geometry, and the
+    // reusable visual component assets into one Griffin source assembly.
     part def GriffinLanderComponent {
         doc /* Public Griffin material describes a medium-class flexible-payload lander with four shock-absorbing legs, seven main engines, and optional rover egress ramps. This package owns reusable lander counts and the presentation/flight ownership boundary; typed component identities and spatial stations are owned by GriffinVisualConfigurationRequirements. */
         attribute componentName : GriffinReviewLanderName = "Griffin1";
-        attribute componentAsset : TwinAssetPath = "vehicles/griffin_1_visual.usda";
+        attribute componentAsset : TwinAssetPath = "vehicles/griffin_1.usda";
         attribute usdRootPath : UsdPrimPath = "/Griffin1";
         // Geometry configuration is owned by
         // GriffinVisualConfigurationRequirements::GriffinVisualConfiguration.

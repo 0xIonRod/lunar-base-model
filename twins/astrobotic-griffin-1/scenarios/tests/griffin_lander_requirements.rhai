@@ -109,8 +109,10 @@ fn on_tick(me, ctx) {
         let name = leg_names[index];
         let path = ROOT + "/" + name;
         checks.push(_exists("GLR-002-" + name, "glr002", path, "Xform"));
-        checks.push(_children("GLR-002-" + name + "-parts", "glr002", path,
-            [path + "/StrutOuter", path + "/StrutInner", path + "/ShockPiston", path + "/FootPad"]));
+        let visual_path = path + "/LandingLegVisual";
+        checks.push(_children("GLR-002-" + name + "-parts", "glr002", visual_path,
+            [visual_path + "/StrutOuter", visual_path + "/StrutInner",
+             visual_path + "/ShockPiston", visual_path + "/FootPad"]));
         if leg_stations.len() == leg_names.len() {
             checks.push(_position("GLR-008-" + name + "-x", "glr008", path, 0, leg_stations[index].x));
             checks.push(_position("GLR-008-" + name + "-y", "glr008", path, 1, leg_stations[index].y));
@@ -209,7 +211,7 @@ fn on_tick(me, ctx) {
     checks.push(_coverage("GLR-007-source", "glr007"));
 
     let result = sysml_requirements::evaluate(source, checks);
-    result.metrics = #{clock: clock_snapshot(), root: ROOT, separate_component_document: true};
+    result.metrics = #{clock: clock_snapshot(), root: ROOT, integrated_vehicle_document: true};
     report_structured_verdict(result, "GRIFFIN LANDER REQUIREMENTS", "GRIFFIN_LANDER_REQUIREMENTS");
     this.done = true;
 }

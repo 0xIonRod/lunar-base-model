@@ -54,7 +54,6 @@ Sources:
 | scenes/griffin_flip_visual.usda | Componentized headful review composition for Griffin and FLIP |
 | scenes/griffin_1_editor.usda | Clean derived headful Editor scene containing only the Griffin lander reference |
 | vehicles/griffin_1.usda | Reusable Griffin lander wrapper around the LunCoSim descent lander |
-| vehicles/griffin_1_visual.usda | Render-only Griffin assembly of replaceable bus, leg, tank, panel, bell, and ramp components |
 | vehicles/flip.usda | Reusable FLIP study asset with four-wheel all-wheel-steer mobility, EPS, and thermal networks |
 | vehicles/flip_visual.usda | Render-only FLIP assembly with four directional wheel stations, chassis, mast, and solar-array components |
 | components/lander/ | Twin-local visual components for the bus, landing legs, tanks, panels, bells, and ramps |
@@ -161,18 +160,20 @@ mission/tutorial scenario do not obscure the lander. Keep that scene for
 visual authoring; use `scenes/griffin_1_surface_ops.usda` for integration and
 runtime acceptance.
 
-For render-only component work, open `vehicles/griffin_1_visual.usda` and
-`vehicles/flip_visual.usda` as two independent USD previews in Editor
-Perspective. Follow the repository-local
+For Griffin work, open the integrated `vehicles/griffin_1.usda` source through
+`scenes/griffin_1_editor.usda`; its visual components remain replaceable assets
+under `components/lander/`. Edit one component at a time through a dry Rhai
+plan and typed Editor batch, then inspect the composed result. Open
+`vehicles/flip_visual.usda` separately only when editing the FLIP visual asset.
+Follow the repository-local
 [`interactive-component-authoring`](../../skills/interactive-component-authoring/SKILL.md)
 cycle: one component plan, one Editor batch, one projection/readback, one
 focused visual check, and one Rhai/SysML gate before moving on. The Twin
 `griffin_visual_builder` library is a dry-plan and typed-apply facade; use its
 component-scoped entry points for the current task rather than applying a whole
 vehicle recipe. Each operation is journaled and saved through the Editor; never
-rewrite the USDA text by hand. The ramp requirements and Rhai verification are
-intentionally separate so a ramp can be accepted without coupling it to FLIP's
-visual review.
+rewrite scene or component USDA text by hand. Ramp geometry and FLIP wheel-path
+verification remain tied to their shared SysML interface datums.
 
 The combined `scenes/griffin_flip_visual.usda` review scene uses the same
 source-backed `environments/south_pole_surrogate.usda` as the mission scene.

@@ -43,12 +43,13 @@ fn on_tick(me, ctx) {
     for index in 0..names.len() {
         let name = names[index];
         let path = root + "/" + name;
+        let visual_path = path + "/LandingLegVisual";
         checks.push(sysml_requirement_checks::exists("GLL-001-" + name, "landing_leg", "gll001", VERIFICATION, path, "Xform"));
         let required_children = [];
-        for part_name in part_names { required_children.push(path + "/" + part_name); }
-        checks.push(sysml_requirement_checks::children("GLL-002-" + name, "landing_leg", "gll002", VERIFICATION, path, required_children));
+        for part_name in part_names { required_children.push(visual_path + "/" + part_name); }
+        checks.push(sysml_requirement_checks::children("GLL-002-" + name, "landing_leg", "gll002", VERIFICATION, visual_path, required_children));
         for strut in ["StrutOuter", "StrutInner"] {
-            let strut_path = path + "/" + strut;
+            let strut_path = visual_path + "/" + strut;
             checks.push(sysml_requirement_checks::exists("GLL-006-" + name + "-" + strut + "-type", "landing_leg", "gll006", VERIFICATION, strut_path, "Cylinder"));
             checks.push(sysml_requirement_checks::attribute_check("GLL-006-" + name + "-" + strut + "-radius", "landing_leg", "gll006", VERIFICATION,
                 strut_path, "radius", own("strutRadiusM"), 0.002));
@@ -59,32 +60,32 @@ fn on_tick(me, ctx) {
         }
         checks.push(#{id: "GLL-006-" + name + "-outer-center", component: "landing_leg",
             requirement: "gll006", verification: VERIFICATION, kind: "attribute_component",
-            path: path + "/StrutOuter", attr: "xformOp:translate", index: 0,
+            path: visual_path + "/StrutOuter", attr: "xformOp:translate", index: 0,
             expected_attr: own("strutOuterCenterXM"), tolerance: 0.002});
         checks.push(#{id: "GLL-006-" + name + "-outer-tilt", component: "landing_leg",
             requirement: "gll006", verification: VERIFICATION, kind: "attribute_component",
-            path: path + "/StrutOuter", attr: "xformOp:rotateXYZ", index: 2,
+            path: visual_path + "/StrutOuter", attr: "xformOp:rotateXYZ", index: 2,
             expected_attr: own("strutOuterTiltZDeg"), tolerance: 0.002});
         checks.push(#{id: "GLL-006-" + name + "-inner-center", component: "landing_leg",
             requirement: "gll006", verification: VERIFICATION, kind: "attribute_component",
-            path: path + "/StrutInner", attr: "xformOp:translate", index: 0,
+            path: visual_path + "/StrutInner", attr: "xformOp:translate", index: 0,
             expected_attr: own("strutInnerCenterXM"), tolerance: 0.002});
         checks.push(#{id: "GLL-006-" + name + "-inner-tilt", component: "landing_leg",
             requirement: "gll006", verification: VERIFICATION, kind: "attribute_component",
-            path: path + "/StrutInner", attr: "xformOp:rotateXYZ", index: 2,
+            path: visual_path + "/StrutInner", attr: "xformOp:rotateXYZ", index: 2,
             expected_attr: own("strutInnerTiltZDeg"), tolerance: 0.002});
         checks.push(#{id: "GLL-007-" + name + "-radius", component: "landing_leg",
             requirement: "gll007", verification: VERIFICATION, kind: "attribute",
-            path: path + "/ShockPiston", attr: "radius", expected_attr: own("shockPistonRadiusM"), tolerance: 0.002});
+            path: visual_path + "/ShockPiston", attr: "radius", expected_attr: own("shockPistonRadiusM"), tolerance: 0.002});
         checks.push(#{id: "GLL-007-" + name + "-height", component: "landing_leg",
             requirement: "gll007", verification: VERIFICATION, kind: "attribute",
-            path: path + "/ShockPiston", attr: "height", expected_attr: own("shockPistonHeightM"), tolerance: 0.002});
+            path: visual_path + "/ShockPiston", attr: "height", expected_attr: own("shockPistonHeightM"), tolerance: 0.002});
         checks.push(#{id: "GLL-008-" + name + "-radius", component: "landing_leg",
             requirement: "gll008", verification: VERIFICATION, kind: "attribute",
-            path: path + "/FootPad", attr: "radius", expected_attr: own("footPadRadiusM"), tolerance: 0.002});
+            path: visual_path + "/FootPad", attr: "radius", expected_attr: own("footPadRadiusM"), tolerance: 0.002});
         checks.push(#{id: "GLL-008-" + name + "-height", component: "landing_leg",
             requirement: "gll008", verification: VERIFICATION, kind: "attribute",
-            path: path + "/FootPad", attr: "height", expected_attr: own("footPadHeightM"), tolerance: 0.002});
+            path: visual_path + "/FootPad", attr: "height", expected_attr: own("footPadHeightM"), tolerance: 0.002});
         if stations.len() == names.len() {
             checks.push(position("GLL-005-" + name + "-x", path, 0, stations[index].x));
             checks.push(position("GLL-005-" + name + "-y", path, 1, stations[index].y));
