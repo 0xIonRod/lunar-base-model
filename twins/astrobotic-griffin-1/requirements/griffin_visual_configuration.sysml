@@ -2,7 +2,6 @@ package GriffinVisualConfigurationRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
     private import ScalarValues::Boolean;
-    private import ScalarValues::String;
     private import VectorValues::CartesianThreeVectorValue;
     private import VectorValues::CartesianVectorValue;
 
@@ -55,6 +54,17 @@ package GriffinVisualConfigurationRequirements {
         SolarPanelPort;
         SolarPanelStarboard;
     }
+    enum def GriffinRampInstanceName {
+        EgressRampPort;
+        EgressRampStarboard;
+    }
+    enum def GriffinRampHingeInstanceName {
+        RampHingePort;
+        RampHingeStarboard;
+    }
+    enum def GriffinReviewCameraName { VisualCamera; }
+    enum def GriffinReviewLanderName { Griffin1; }
+    enum def UsdGeomPurpose { Render; Proxy; Guide; }
     enum def GriffinMainEngineInstanceName {
         Engine01;
         Engine02;
@@ -82,7 +92,9 @@ package GriffinVisualConfigurationRequirements {
         attribute appearanceVerificationTolerance : Real = 1.0e-6;
         attribute doubleSidedFacesMustBe : Boolean = false;
         attribute renderOnlyCollisionEnabled : Boolean = false;
-        attribute renderPurpose : String = "render";
+        attribute renderPurpose : UsdGeomPurpose = "Render";
+        attribute reviewCameraName : GriffinReviewCameraName = "VisualCamera";
+        attribute reviewLanderName : GriffinReviewLanderName = "Griffin1";
         attribute visualReviewGriffinStation : Position = (0.0, 0.0, 0.0);
         // FLIP is mounted on the payload adapter. Its wheel bottoms (station
         // -0.42 m plus 0.45 m tire radius) meet the adapter top at 5.28 m.
@@ -135,6 +147,10 @@ package GriffinVisualConfigurationRequirements {
             ("SolarPanelPort", "SolarPanelStarboard");
         attribute mainEngineInstances : GriffinMainEngineInstanceName[7] =
             ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07");
+        attribute rampInstances : GriffinRampInstanceName[2] =
+            ("EgressRampPort", "EgressRampStarboard");
+        attribute rampHingeInstances : GriffinRampHingeInstanceName[2] =
+            ("RampHingePort", "RampHingeStarboard");
         attribute railStations : Position[8] =
             ((-1.526, 0.0, 2.604), (1.526, 0.0, 2.604),
              (2.604, 0.0, 1.526), (2.604, 0.0, -1.526),
@@ -179,10 +195,17 @@ package GriffinVisualConfigurationRequirements {
         attribute legStations : Position[4] =
             ((3.10, 2.20, 0.0), (-3.10, 2.20, 0.0),
              (0.0, 2.20, 3.10), (0.0, 2.20, -3.10));
-        attribute legStationRotationYDeg : Real[4] = (0.0, 0.0, 90.0, 90.0);
+        /* Each local +X axis points radially outward. This gives the shared
+         * leg mount interface one canonical orientation at every bus side. */
+        attribute legStationRotationYDeg : Real[4] = (0.0, 180.0, -90.0, 90.0);
 
         attribute solarStations : Position[2] =
             ((0.0, 3.20, 2.90), (0.0, 3.20, -2.90));
+        // Each solar array maps its two local X mounts to the corner posts on
+        // its signed-Z side. Ordering is port/starboard for each array.
+        attribute solarMountRails : GriffinFrameRailNode[4] =
+            ("FrameRailFrontPort", "FrameRailFrontStarboard",
+             "FrameRailRearPort", "FrameRailRearStarboard");
         attribute solarStationRotationXDeg : Real[2] = (90.0, -90.0);
         attribute solarStationRotationZDeg : Real[2] = (0.0, 0.0);
         attribute solarArrayWidthM : Real = 4.80;
@@ -207,10 +230,15 @@ package GriffinVisualConfigurationRequirements {
 
         attribute engineClusterMountYM : Real = 1.00;
         attribute engineBellDirection : Direction = (0.0, -1.0, 0.0);
+        /* One center engine and six equally spaced bells on a 1.05 m radius.
+         * The 0.34 m exit radius leaves 0.37 m between adjacent bell envelopes
+         * and keeps all seven inside the lower bucket's 1.54 m outer radius. */
         attribute engineStations : Position[7] =
-            ((0.0, 1.00, 0.0), (1.0, 1.00, 0.0), (-1.0, 1.00, 0.0),
-             (0.0, 1.00, 1.0), (0.0, 1.00, -1.0),
-             (0.9, 1.00, 0.9), (-0.9, 1.00, -0.9));
+            ((0.0, 1.00, 0.0), (1.05, 1.00, 0.0), (-1.05, 1.00, 0.0),
+             (0.525, 1.00, 0.9093266739736606),
+             (-0.525, 1.00, -0.9093266739736606),
+             (-0.525, 1.00, 0.9093266739736606),
+             (0.525, 1.00, -0.9093266739736606));
     }
 
     requirement def GVC001_ConfigurationSelection {

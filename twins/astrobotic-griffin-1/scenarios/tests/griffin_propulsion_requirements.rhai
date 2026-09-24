@@ -11,22 +11,55 @@ fn skirt(name) { PACKAGE + "::GriffinEngineSkirtComponent::" + name }
 fn parent(name) { "GriffinLanderRequirements::GriffinLanderComponent::" + name }
 fn visual(name) { "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::" + name }
 
-fn position(id, path, index, expected) {
+fn position(id, path, index, expected, tolerance) {
     #{id: id, component: "engine", requirement: "gpp005",
       verification: VERIFICATION, kind: "attribute_component", path: path,
-      attr: "xformOp:translate", index: index, expected: expected, tolerance: 0.002}
+      attr: "xformOp:translate", index: index, expected: expected, tolerance: tolerance}
 }
 
-fn component_position(id, path, index, expected) {
+fn component_position(id, path, index, expected, tolerance) {
     #{id: id, component: "engine_skirt", requirement: "ges003",
       verification: VERIFICATION, kind: "attribute_component", path: path,
-      attr: "xformOp:translate", index: index, expected: expected, tolerance: 0.002}
+      attr: "xformOp:translate", index: index, expected: expected, tolerance: tolerance}
 }
 
-fn attribute(id, requirement, path, attr, expected) {
+fn attribute(id, requirement, path, attr, expected, tolerance) {
     #{id: id, component: "engine", requirement: requirement,
       verification: VERIFICATION, kind: "attribute", path: path,
-      attr: attr, expected: expected, tolerance: 0.002}
+      attr: attr, expected: expected, tolerance: tolerance}
+}
+
+fn absolute(value) { if value < 0.0 { -value } else { value } }
+
+fn station_ring_is_centered_hexagon(stations, tolerance) {
+    if stations.len() != 7 { return false; }
+    if absolute(stations[0].x) > tolerance || absolute(stations[0].z) > tolerance {
+        return false;
+    }
+    let radius = (stations[1].x * stations[1].x
+        + stations[1].z * stations[1].z).sqrt();
+    if radius <= tolerance { return false; }
+    for index in 1..stations.len() {
+        let station_radius = (stations[index].x * stations[index].x
+            + stations[index].z * stations[index].z).sqrt();
+        if absolute(station_radius - radius) > tolerance { return false; }
+    }
+    let chord = [radius, radius * (3.0).sqrt(), radius * 2.0];
+    let counts = [0, 0, 0];
+    for left in 1..stations.len() {
+        for right in left + 1..stations.len() {
+            let dx = stations[left].x - stations[right].x;
+            let dz = stations[left].z - stations[right].z;
+            let distance = (dx * dx + dz * dz).sqrt();
+            let matched = if absolute(distance - chord[0]) <= tolerance { 0 }
+                else if absolute(distance - chord[1]) <= tolerance { 1 }
+                else if absolute(distance - chord[2]) <= tolerance { 2 }
+                else { -1 };
+            if matched < 0 { return false; }
+            counts[matched] += 1;
+        }
+    }
+    counts[0] == 6 && counts[1] == 6 && counts[2] == 3
 }
 
 fn on_start(me, ctx) {
@@ -44,6 +77,9 @@ fn on_tick(me, ctx) {
     let throat_height = sysml_requirements::number(source, own("throatHeightM"));
     let names = sysml_requirement_checks::source_enum_identifiers(source, visual("mainEngineInstances"));
     let stations = sysml_requirement_checks::source_position_list(source, visual("engineStations"));
+    let geometry_tolerance = sysml_requirements::number(source, visual("geometryVerificationToleranceM"));
+    let required_clearance = sysml_requirements::number(source, own("minimumBellClearanceM"));
+    let bucket_outer_radius = sysml_requirements::number(source, visual("lowerBucketOuterBottomRadiusM"));
     let skirt_root = root + "/" + sysml_requirements::text(source, skirt("componentRootName"));
     let skirt_names = sysml_requirement_checks::source_text_list(source, skirt("componentMemberNames"));
     let skirt_shell = skirt_root + "/" + sysml_requirements::text(source, skirt("shellName"));
@@ -68,26 +104,86 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirement_checks::exists("GPP-001-" + name, "engine", "gpp001", VERIFICATION, path, "Xform"));
         checks.push(sysml_requirement_checks::children("GPP-002-" + name, "engine", "gpp002", VERIFICATION, path,
             [path + "/Bell", path + "/Throat"]));
-            checks.push(sysml_requirement_checks::attribute_equals("GPP-002-" + name + "-purpose", "engine", "gpp002", VERIFICATION,
-                path + "/Bell", "purpose", "render"));
+        checks.push(sysml_requirement_checks::attribute_equals("GPP-002-" + name + "-purpose", "engine", "gpp002", VERIFICATION,
+            path + "/Bell", "purpose", "render"));
         if bell_radius != () && bell_height != () && throat_radius != () && throat_height != () {
-            checks.push(attribute("GPP-006-" + name + "-bell-radius", "gpp006", path + "/Bell", "radius", bell_radius));
-            checks.push(attribute("GPP-006-" + name + "-bell-height", "gpp006", path + "/Bell", "height", bell_height));
-            checks.push(attribute("GPP-006-" + name + "-throat-radius", "gpp006", path + "/Throat", "radius", throat_radius));
-            checks.push(attribute("GPP-006-" + name + "-throat-height", "gpp006", path + "/Throat", "height", throat_height));
+            checks.push(attribute("GPP-006-" + name + "-bell-radius", "gpp006", path + "/Bell", "radius", bell_radius, geometry_tolerance));
+            checks.push(attribute("GPP-006-" + name + "-bell-height", "gpp006", path + "/Bell", "height", bell_height, geometry_tolerance));
+            checks.push(attribute("GPP-006-" + name + "-throat-radius", "gpp006", path + "/Throat", "radius", throat_radius, geometry_tolerance));
+            checks.push(attribute("GPP-006-" + name + "-throat-height", "gpp006", path + "/Throat", "height", throat_height, geometry_tolerance));
             checks.push(sysml_requirement_checks::attribute_equals("GPP-006-" + name + "-bell-axis", "engine", "gpp006", VERIFICATION,
                 path + "/Bell", "axis", "Y"));
             checks.push(#{id: "GPP-006-" + name + "-throat-center", component: "engine",
                 requirement: "gpp006", verification: VERIFICATION, kind: "attribute_component",
                 path: path + "/Throat", attr: "xformOp:translate", index: 1,
-                expected_attr: own("throatCenterYM"), tolerance: 0.002});
+                expected_attr: own("throatCenterYM"), tolerance: geometry_tolerance});
         }
         if stations.len() == names.len() {
-            checks.push(position("GPP-005-" + name + "-x", path, 0, stations[index].x));
-            checks.push(position("GPP-005-" + name + "-y", path, 1, stations[index].y));
-            checks.push(position("GPP-005-" + name + "-z", path, 2, stations[index].z));
+            checks.push(position("GPP-005-" + name + "-x", path, 0, stations[index].x, geometry_tolerance));
+            checks.push(position("GPP-005-" + name + "-y", path, 1, stations[index].y, geometry_tolerance));
+            checks.push(position("GPP-005-" + name + "-z", path, 2, stations[index].z, geometry_tolerance));
         }
     }
+    let engine_paths = [];
+    for name in names { engine_paths.push(root + "/" + name); }
+    let observed_engines = query("QueryUsdPrims", #{paths: engine_paths,
+        attrs: ["xformOp:translate"], geometry_bounds: true});
+    let actual_stations = [];
+    let measurement_available = observed_engines.records != ()
+        && observed_engines.records.len() == names.len()
+        && names.len() == 7 && stations.len() == names.len()
+        && bell_radius != () && required_clearance != ()
+        && bucket_outer_radius != () && geometry_tolerance != ();
+    if measurement_available {
+        for record in observed_engines.records {
+            if record.world_position == () || record.world_position.len() != 3 {
+                measurement_available = false;
+            } else {
+                actual_stations.push(vec3(record.world_position[0],
+                    record.world_position[1], record.world_position[2]));
+            }
+        }
+    }
+    let measured_clearance = 0.0;
+    let maximum_radial_extent = 0.0;
+    let typed_stations_match = true;
+    if measurement_available && actual_stations.len() == stations.len() {
+        measured_clearance = 1.0e30;
+        for index in 0..actual_stations.len() {
+            let actual = actual_stations[index];
+            let expected = stations[index];
+            if (actual.x - expected.x).abs() > geometry_tolerance
+                || (actual.y - expected.y).abs() > geometry_tolerance
+                || (actual.z - expected.z).abs() > geometry_tolerance {
+                typed_stations_match = false;
+            }
+            let radial_extent = (actual.x * actual.x
+                + actual.z * actual.z).sqrt() + bell_radius;
+            if radial_extent > maximum_radial_extent {
+                maximum_radial_extent = radial_extent;
+            }
+            for other in index + 1..actual_stations.len() {
+                let dx = actual.x - actual_stations[other].x;
+                let dz = actual.z - actual_stations[other].z;
+                let clearance = (dx * dx + dz * dz).sqrt() - 2.0 * bell_radius;
+                if clearance < measured_clearance { measured_clearance = clearance; }
+            }
+        }
+        typed_stations_match = station_ring_is_centered_hexagon(stations,
+            geometry_tolerance)
+            && station_ring_is_centered_hexagon(actual_stations,
+                geometry_tolerance)
+            && typed_stations_match;
+    }
+    checks.push(sysml_requirements::constraint_check("GPP-007-bell-separation",
+        "engine", "gpp007", VERIFICATION,
+        "GriffinPropulsionRequirements::GPPC007_BellSeparation",
+        #{measuredMinimumClearanceM: if measurement_available { #{provider: "usd", state: "value", value: measured_clearance} } else { #{provider: "usd", state: "unavailable", detail: "composed engine station readback unavailable"} },
+          requiredMinimumClearanceM: if required_clearance != () { #{provider: "sysml", state: "value", value: required_clearance} } else { #{provider: "sysml", state: "unavailable", detail: "minimum bell clearance missing"} },
+          maximumRadialExtentM: if measurement_available { #{provider: "usd", state: "value", value: maximum_radial_extent} } else { #{provider: "usd", state: "unavailable", detail: "composed engine station readback unavailable"} },
+          bucketOuterRadiusM: if bucket_outer_radius != () { #{provider: "sysml", state: "value", value: bucket_outer_radius} } else { #{provider: "sysml", state: "unavailable", detail: "lower bucket envelope missing"} },
+          typedStationsMatch: if measurement_available { #{provider: "usd", state: "value", value: typed_stations_match} } else { #{provider: "usd", state: "unavailable", detail: "typed engine stations unavailable"} }},
+        "usd", 0.0));
     // The skirt is a separate referenced component.  Validate its four rails
     // and shell in the composed assembly; the source file remains the only
     // owner of the component geometry.
@@ -101,7 +197,7 @@ fn on_tick(me, ctx) {
         for name in skirt_names { rail_paths.push(skirt_root + "/" + name); }
         checks.push(sysml_requirement_checks::exists("GES-001-component", "engine_skirt", "ges001", VERIFICATION, skirt_root, "Xform"));
         checks.push(sysml_requirement_checks::children("GES-001-rails", "engine_skirt", "ges001", VERIFICATION, skirt_root, rail_paths));
-        checks.push(component_position("GES-003-assembly-y", skirt_root, 1, skirt_assembly_y));
+        checks.push(component_position("GES-003-assembly-y", skirt_root, 1, skirt_assembly_y, geometry_tolerance));
         for index in 0..skirt_names.len() {
             let rail = rail_paths[index];
             checks.push(sysml_requirement_checks::exists("GES-001-" + skirt_names[index], "engine_skirt", "ges001", VERIFICATION, rail, "Cube"));
@@ -109,26 +205,26 @@ fn on_tick(me, ctx) {
             checks.push(sysml_requirement_checks::attribute_equals("GES-005-" + skirt_names[index] + "-collision", "engine_skirt", "ges005", VERIFICATION, rail, "physics:collisionEnabled", false));
             checks.push(sysml_requirement_checks::attribute_equals("GES-005-" + skirt_names[index] + "-order", "engine_skirt", "ges005", VERIFICATION, rail, "xformOpOrder", skirt_transform_order));
             if index < 2 {
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-length", "engine_skirt", "ges006", VERIFICATION, rail, 0, skirt("railLengthM"), 1.0, 0.002));
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-height", "engine_skirt", "ges006", VERIFICATION, rail, 1, skirt("railHeightM"), 1.0, 0.002));
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-width", "engine_skirt", "ges006", VERIFICATION, rail, 2, skirt("railWidthM"), 1.0, 0.002));
-                checks.push(component_position("GES-006-" + skirt_names[index] + "-z", rail, 2, if index == 0 { sysml_requirements::number(source, skirt("railFrontCenterZM")) } else { sysml_requirements::number(source, skirt("railRearCenterZM")) }));
+                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-length", "engine_skirt", "ges006", VERIFICATION, rail, 0, skirt("railLengthM"), 1.0, geometry_tolerance));
+                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-height", "engine_skirt", "ges006", VERIFICATION, rail, 1, skirt("railHeightM"), 1.0, geometry_tolerance));
+                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-width", "engine_skirt", "ges006", VERIFICATION, rail, 2, skirt("railWidthM"), 1.0, geometry_tolerance));
+                checks.push(component_position("GES-006-" + skirt_names[index] + "-z", rail, 2, if index == 0 { sysml_requirements::number(source, skirt("railFrontCenterZM")) } else { sysml_requirements::number(source, skirt("railRearCenterZM")) }, geometry_tolerance));
             } else {
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-length", "engine_skirt", "ges006", VERIFICATION, rail, 2, skirt("railLengthM"), 1.0, 0.002));
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-height", "engine_skirt", "ges006", VERIFICATION, rail, 1, skirt("railHeightM"), 1.0, 0.002));
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-width", "engine_skirt", "ges006", VERIFICATION, rail, 0, skirt("railWidthM"), 1.0, 0.002));
-                checks.push(component_position("GES-006-" + skirt_names[index] + "-x", rail, 0, if index == 2 { sysml_requirements::number(source, skirt("railPortCenterXM")) } else { sysml_requirements::number(source, skirt("railStarboardCenterXM")) }));
+                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-length", "engine_skirt", "ges006", VERIFICATION, rail, 2, skirt("railLengthM"), 1.0, geometry_tolerance));
+                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-height", "engine_skirt", "ges006", VERIFICATION, rail, 1, skirt("railHeightM"), 1.0, geometry_tolerance));
+                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-width", "engine_skirt", "ges006", VERIFICATION, rail, 0, skirt("railWidthM"), 1.0, geometry_tolerance));
+                checks.push(component_position("GES-006-" + skirt_names[index] + "-x", rail, 0, if index == 2 { sysml_requirements::number(source, skirt("railPortCenterXM")) } else { sysml_requirements::number(source, skirt("railStarboardCenterXM")) }, geometry_tolerance));
             }
         }
         checks.push(sysml_requirement_checks::exists("GES-002-shell", "engine_skirt", "ges002", VERIFICATION, skirt_shell, "Mesh"));
-        checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-width", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 0, skirt("railLengthM"), 2.0, 0.002));
-        checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-depth-y", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 1, skirt("shellDepthM"), 2.0, 0.002));
-        checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-envelope-depth", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 2, skirt("railLengthM"), 2.0, 0.002));
+        checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-width", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 0, skirt("railLengthM"), 2.0, geometry_tolerance));
+        checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-depth-y", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 1, skirt("shellDepthM"), 2.0, geometry_tolerance));
+        checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-envelope-depth", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 2, skirt("railLengthM"), 2.0, geometry_tolerance));
         let adapter_path = skirt_root + "/" + adapter_name;
         checks.push(sysml_requirement_checks::exists("GES-007-adapter-plate", "engine_skirt", "ges007", VERIFICATION, adapter_path, "Cube"));
-        checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-width", "engine_skirt", "ges007", VERIFICATION, adapter_path, 0, skirt("adapterPlateWidthM"), 1.0, 0.002));
-        checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-height", "engine_skirt", "ges007", VERIFICATION, adapter_path, 1, skirt("adapterPlateHeightM"), 1.0, 0.002));
-        checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-depth", "engine_skirt", "ges007", VERIFICATION, adapter_path, 2, skirt("adapterPlateDepthM"), 1.0, 0.002));
+        checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-width", "engine_skirt", "ges007", VERIFICATION, adapter_path, 0, skirt("adapterPlateWidthM"), 1.0, geometry_tolerance));
+        checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-height", "engine_skirt", "ges007", VERIFICATION, adapter_path, 1, skirt("adapterPlateHeightM"), 1.0, geometry_tolerance));
+        checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-depth", "engine_skirt", "ges007", VERIFICATION, adapter_path, 2, skirt("adapterPlateDepthM"), 1.0, geometry_tolerance));
         checks.push(sysml_requirement_checks::attribute_equals("GES-005-adapter-purpose", "engine_skirt", "ges005", VERIFICATION, adapter_path, "purpose", "render"));
         checks.push(sysml_requirement_checks::attribute_equals("GES-005-adapter-collision", "engine_skirt", "ges005", VERIFICATION, adapter_path, "physics:collisionEnabled", false));
         checks.push(sysml_requirement_checks::attribute_equals("GES-005-shell-purpose", "engine_skirt", "ges005", VERIFICATION, skirt_shell, "purpose", "render"));

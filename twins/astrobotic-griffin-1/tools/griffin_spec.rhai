@@ -1,4 +1,5 @@
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 
 // Machine-readable Griffin study policy.
 //
@@ -54,15 +55,14 @@ fn _sysml_text(name) {
 }
 
 // The Twin intentionally composes several SysML packages that reuse local
-// names such as `solarArrayCount` and `geometryStatus`. Resolve every
+// names such as `solarArrayCount`. Resolve every
 // public accessor to its owning package before crossing the generic bridge;
 // an ambiguous short-name lookup must never silently select another
 // component's value.
 fn _qualified_attribute(name) {
     let lander = [
         "payloadCapacityKg", "landingLegCount", "mainEngineCount",
-        "propellantTankCount", "solarArrayCount", "geometryStatus",
-        "massPropertiesStatus", "rampStatus", "solarArrayStatus"
+        "propellantTankCount", "solarArrayCount"
     ];
     if lander.contains(name) {
         return "Griffin1Requirements::Griffin1Lander::" + name;
@@ -151,6 +151,7 @@ fn _qualified_attribute(name) {
     }
     let visual_configuration = [
         "configuration", "bodyProfile", "rampState", "origin", "axisUp", "axisPort", "axisForward",
+        "reviewCameraName", "reviewLanderName",
         "verificationToleranceM", "geometryVerificationToleranceM",
         "appearanceVerificationTolerance", "doubleSidedFacesMust",
         "renderOnlyCollisionEnabled", "renderPurpose",
@@ -163,7 +164,8 @@ fn _qualified_attribute(name) {
         "tankSupportDisplayColor", "tankCollarDisplayColor",
         "frameRingCenterY", "frameRingSectionM",
         "frameRails", "tankInstances", "landingLegInstances", "solarArrayInstances",
-        "mainEngineInstances", "railStations", "railDimensions",
+        "mainEngineInstances", "rampInstances", "rampHingeInstances",
+        "railStations", "railDimensions",
         "tankSupportPerimeterRadiusM",
         "tankSupportPerimeterSectionM", "tankSupportPlanes",
         "tankSupportOpeningInnerRadiusM", "tankSupportOpeningOuterRadiusM",
@@ -213,7 +215,11 @@ fn _sysml_list(name) {
     let qualified = _qualified_attribute(name);
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return []; }
-    let items = sysml_requirements::string_vector(source, qualified);
+    let items = if name == "visualWheelNames" {
+        sysml_requirement_checks::source_text_list(source, qualified)
+    } else {
+        sysml_requirement_checks::source_enum_identifiers(source, qualified)
+    };
     if items == () { return []; }
     items
 }
@@ -338,8 +344,8 @@ fn egress_apron_length_m() { _sysml_attribute("egressApronLengthM") }
 fn egress_apron_width_m() { _sysml_attribute("egressApronWidthM") }
 fn egress_apron_thickness_m() { _sysml_attribute("egressApronThicknessM") }
 fn egress_apron_surface_y_m() { _sysml_attribute("egressApronSurfaceY") }
-fn visual_camera_name() { _sysml_text("visualCameraName") }
-fn visual_lander_name() { _sysml_text("visualLanderName") }
+fn visual_camera_name() { _sysml_text("reviewCameraName") }
+fn visual_lander_name() { _sysml_text("reviewLanderName") }
 fn visual_rover_name() { _sysml_text("visualRoverName") }
 fn visual_lander_deck_width_m() { _sysml_attribute("visualLanderDeckWidthM") }
 fn visual_rover_wheel_radius_m() { _sysml_attribute("visualRoverWheelRadiusM") }
@@ -670,19 +676,17 @@ fn _visual_asset_locator(role_literal) {
 
 fn visual_terrain_asset() { _visual_asset_locator("VisualAsset") }
 fn visual_terrain_shader_asset() { _visual_asset_locator("ShaderAsset") }
-fn visual_render_ownership() { _sysml_text("visualRenderOwnership") }
 fn pi_value() { 3.141592653589793 }
 
 fn frame() {
-    #{ units: _sysml_text("frameUnits"), up_axis: _sysml_text("frameUpAxis"),
-       root_datum: _sysml_text("frameRootDatum") }
+    #{ units: _sysml_text("lengthUnit"), up_axis: _sysml_text("frameUpAxis"),
+       root_datum: _sysml_text("reviewLanderName") }
 }
 
 fn solar_array_names() { _sysml_enum_names("solarArrayInstances") }
 fn landing_leg_names() { _sysml_enum_names("landingLegInstances") }
-fn landing_pad_names() { _sysml_list("landingPadNames") }
-fn ramp_names() { _sysml_list("rampNames") }
-fn ramp_hinge_names() { _sysml_list("rampHingeNames") }
+fn ramp_names() { _sysml_list("rampInstances") }
+fn ramp_hinge_names() { _sysml_list("rampHingeInstances") }
 fn ramp_tread_name_prefix() { _sysml_text("assemblyTreadNamePrefix") }
 fn ramp_tread_count() { _sysml_integer("assemblyTreadCount") }
 fn ramp_tread_width_m() { _sysml_attribute("assemblyTreadWidthM") }

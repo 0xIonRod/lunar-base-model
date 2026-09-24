@@ -1,3 +1,5 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
+
 // Twin-owned visual contract.  It checks the authored presentation topology
 // and key SI dimensions; it never hard-codes engine internals or mutates USD.
 const TEST_KIND = "graphics";
@@ -32,7 +34,12 @@ fn flip_visual_children_check(id, component, path, paths) {
 // passed to the generic evaluator.  The test owns only child geometry names;
 // it does not carry a second list of rover/lander station identities.
 fn _sysml_list(report, name) {
-    let items = sysml_requirements::string_vector(report, griffin_spec::qualified_attribute_name(name));
+    let qualified = griffin_spec::qualified_attribute_name(name);
+    let items = if name == "visualWheelNames" {
+        sysml_requirement_checks::source_text_list(report, qualified)
+    } else {
+        sysml_requirement_checks::source_enum_identifiers(report, qualified)
+    };
     if items == () { return []; }
     items
 }
@@ -53,7 +60,7 @@ fn on_tick(me, ctx) {
     let root = "/GriffinFlipVisual";
     let checks = [];
     checks.push(visual_exists_check("GV-001-camera", "camera", "gv001", "exists", root + "/VisualCamera"));
-    let leg_names = _sysml_list(source, "landingLegNames");
+    let leg_names = _sysml_list(source, "landingLegInstances");
     for name in leg_names {
         checks.push(visual_exists_check("GV-002-" + name, "legs", "gv002", "exists", root + "/Griffin1/" + name));
         checks.push(visual_children_check("GV-002-" + name + "-subparts", "legs", "gv002",
@@ -80,7 +87,7 @@ fn on_tick(me, ctx) {
     body_profile.expected_type = "Mesh";
     checks.push(body_profile);
     checks.push(visual_exists_check("GV-002-nozzle", "engines", "gv002", "exists", root + "/Griffin1/Nozzle"));
-    let engine_names = _sysml_list(source, "mainEngineNames");
+    let engine_names = _sysml_list(source, "mainEngineInstances");
     let engine_paths = [];
     for name in engine_names {
         engine_paths.push(root + "/Griffin1/Nozzle/MainEngineCluster/" + name);
@@ -106,7 +113,7 @@ fn on_tick(me, ctx) {
              root + "/Griffin1/" + name + "/TankBandB",
              root + "/Griffin1/" + name + "/TankBandC"]));
     }
-    let ramp_names = _sysml_list(source, "rampNames");
+    let ramp_names = _sysml_list(source, "rampInstances");
     let ramp_paths = [];
     for name in ramp_names { ramp_paths.push(root + "/Griffin1/" + name); }
     checks.push(visual_children_check("GV-002-ramps", "egress_ramps", "gv002",
@@ -120,15 +127,18 @@ fn on_tick(me, ctx) {
              root + "/Griffin1/" + name + "/InnerRail",
              root + "/Griffin1/" + name + "/SupportArm"]));
     }
-    let solar_names = _sysml_list(source, "solarArrayNames");
+    let solar_names = _sysml_list(source, "solarArrayInstances");
+    let solar_member_names = sysml_requirement_checks::source_enum_identifiers(source,
+        "GriffinSolarRequirements::GriffinSolarArrayAssembly::childNames");
     for name in solar_names {
         checks.push(visual_exists_check("GV-003-solar-" + name, "solar_panels", "gv003", "exists", root + "/Griffin1/" + name));
+        let solar_children = [];
+        for member in solar_member_names {
+            solar_children.push(root + "/Griffin1/" + name + "/" + member);
+        }
         checks.push(visual_children_check("GV-003-solar-" + name + "-layers", "solar_panels", "gv003",
             root + "/Griffin1/" + name,
-            [root + "/Griffin1/" + name + "/Frame",
-             root + "/Griffin1/" + name + "/Cells",
-             root + "/Griffin1/" + name + "/CellDividerX",
-             root + "/Griffin1/" + name + "/CellDividerZ"]));
+            solar_children));
     }
     checks.push(flip_visual_exists_check("GV-003-mast", "rover", "exists", root + "/FLIP/SensorMast"));
     checks.push(flip_visual_children_check("GV-003-mast-subparts", "rover",
@@ -296,3 +306,4 @@ fn on_tick(me, ctx) {
           + " evaluated=" + report.results.len());
     report_structured_verdict(report, "GRIFFIN FLIP VISUAL", "GRIFFIN_FLIP_VISUAL");
 }
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;

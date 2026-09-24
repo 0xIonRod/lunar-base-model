@@ -9,7 +9,6 @@ def Xform "EngineBell" (
     kind = "component"
 )
 {
-    custom string lunco:visual:component = "main_engine_bell"
     def Cone "Bell"
     {
         uniform token axis = "Y"

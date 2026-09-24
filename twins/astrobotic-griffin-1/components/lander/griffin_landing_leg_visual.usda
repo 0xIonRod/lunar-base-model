@@ -9,9 +9,6 @@ def Xform "LandingLeg" (
     kind = "component"
 )
 {
-    custom string lunco:visual:component = "landing_leg"
-    custom string lunco:visual:requirement = '"GriffinLandingLegRequirements::GLL001-GLL008"'
-    custom string lunco:visual:configuration = '"two canted load struts, clevis and axle, shock piston, load plate, foot pad"'
     def Cylinder "StrutOuter" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
@@ -19,7 +16,7 @@ def Xform "LandingLeg" (
         custom double3 xformOp:translate = (0.34, -1.15, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 16.0)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         color3f[] primvars:displayColor = [(0.07999999821186066, 0.10000000149011612, 0.12999999523162842)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
@@ -35,7 +32,7 @@ def Xform "LandingLeg" (
         custom double3 xformOp:translate = (-0.34, -1.15, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -16.0)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         color3f[] primvars:displayColor = [(0.07999999821186066, 0.10000000149011612, 0.12999999523162842)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
@@ -115,5 +112,17 @@ def Xform "LandingLeg" (
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.47999998927116394, 0.5199999809265137, 0.5799999833106995)]
+    }
+    def Cube "BodyMountArm" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.4599999999999995, 0.24, 0.42)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-0.30000000000000027, 0.12, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.2800000011920929, 0.3199999928474426, 0.3799999952316284)]
     }
 }

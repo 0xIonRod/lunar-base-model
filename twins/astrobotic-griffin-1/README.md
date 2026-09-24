@@ -313,9 +313,10 @@ the replaceable wheel asset remains responsible for tire/hub geometry. Both
 visual and dynamic assemblies use the source-backed four-wheel directional
 topology; a presentation-only proxy must not silently change that count.
 
-Station names are read from the SysML source (`landingLegNames`, the typed
-`GriffinTankInstanceName` enumeration `tankInstances`, `rampNames`,
-`solarArrayNames`, `mainEngineNames`, and `visualWheelNames`) at test time.
+Assembly identities are read from typed SysML enumerations (`landingLegInstances`,
+`tankInstances`, `rampInstances`, `solarArrayInstances`, and
+`mainEngineInstances`) at test time. FLIP's own wheel identities remain owned
+by its source model.
 This keeps the component decomposition and the requirement source aligned
 without baking a second identity catalog into Rhai. The test emits a
 structured `<channel>_EVIDENCE` event before its normal

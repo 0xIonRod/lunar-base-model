@@ -113,6 +113,8 @@ fn on_tick(me, ctx) {
     let deck_bindings = #{
         topologyMatches: usd_observation_binding(deck_observation,
             "topology_matches", "GR-018 topology"),
+        sourceGeometryLinked: usd_observation_binding(deck_observation,
+            "source_geometry_linked", "GR-018 typed geometry source"),
         profileDeviationM: usd_observation_binding(deck_observation,
             "profile_deviation_m", "GR-018 profile deviation"),
         toleranceM: if deck_tolerance == () {
@@ -130,7 +132,8 @@ fn on_tick(me, ctx) {
         sysml_requirements::constraint_check("GR-018-source-topology", "lander",
             "gr018", VERIFICATION,
             "GriffinMechanicalRequirements::GRC018_TopDeckColliderTopologyMatchesSource",
-            #{topologyMatches: deck_bindings.topologyMatches}, "usd", 0.0),
+            #{topologyMatches: deck_bindings.topologyMatches,
+              sourceGeometryLinked: deck_bindings.sourceGeometryLinked}, "usd", 0.0),
         sysml_requirements::constraint_check("GR-018-source-profile", "lander",
             "gr018", VERIFICATION,
             "GriffinMechanicalRequirements::GRC018_TopDeckColliderProfileWithinTolerance",
@@ -164,11 +167,15 @@ fn on_tick(me, ctx) {
         "GriffinLandingLegRequirements::GriffinLandingLegAssembly::footPadRadiusM",
         "GriffinLandingLegRequirements::GriffinLandingLegAssembly::footPadHeightM",
         "GriffinLandingLegRequirements::GriffinLandingLegAssembly::footPadCenterYM",
-        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::physicalLegStations",
-        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::physicalLegStationRotationYDeg",
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::physicalLegRotationToleranceDeg",
         "GriffinLandingLegRequirements::GriffinLandingLegAssembly::physicalLegPlacementToleranceM",
-        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::padColliderToleranceM"
-    ], ["GriffinLandingLegRequirements::gll008"],
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::padColliderToleranceM",
+        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::bodyMountOverlapM",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::legStations",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::legStationRotationYDeg"
+    ], ["GriffinLandingLegRequirements::gll005",
+        "GriffinLandingLegRequirements::gll008",
+        "GriffinLandingLegRequirements::gll009"],
        ["GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements"]);
     let pad_tolerance = if pad_requirement.ok == true {
         sysml_requirements::number(pad_requirement,
@@ -178,11 +185,23 @@ fn on_tick(me, ctx) {
         sysml_requirements::number(pad_requirement,
             "GriffinLandingLegRequirements::GriffinLandingLegAssembly::physicalLegPlacementToleranceM")
     } else { () };
+    let body_mount_overlap = if pad_requirement.ok == true {
+        sysml_requirements::number(pad_requirement,
+            "GriffinLandingLegRequirements::GriffinLandingLegAssembly::bodyMountOverlapM")
+    } else { () };
     let pad_observation = griffin_visual_builder::physical_landing_leg_pad_observation(
         (), ROOT);
     let pad_bindings = #{
         geometryDeviationM: usd_observation_binding(pad_observation,
             "geometry_deviation_m", "GLL-008 pad geometry"),
+        sourceRadiusDeviationM: usd_observation_binding(pad_observation,
+            "source_radius_deviation_m", "GLL-008 visible pad radius"),
+        sourceHeightDeviationM: usd_observation_binding(pad_observation,
+            "source_height_deviation_m", "GLL-008 visible pad height"),
+        sourceCenterDeviationM: usd_observation_binding(pad_observation,
+            "source_center_deviation_m", "GLL-008 visible pad local center"),
+        padGeometrySemanticsMatch: usd_observation_binding(pad_observation,
+            "pad_geometry_semantics_match", "GLL-008 cylinder axis and transform"),
         toleranceM: if pad_tolerance == () {
             #{provider: "sysml", state: "unavailable",
               detail: "GLL-008 source tolerance is unavailable"}
@@ -203,6 +222,10 @@ fn on_tick(me, ctx) {
             "visual_collision_disabled", "GLL-008 visual separation"),
         collisionMatchesVisual: usd_observation_binding(pad_observation,
             "collision_matches_visual", "GLL-008 collider correspondence"),
+        geometrySourceLinked: usd_observation_binding(pad_observation,
+            "source_relationships_valid", "GLL-008 typed geometry source"),
+        selfCollisionFilterClear: usd_observation_binding(pad_observation,
+            "self_collision_filter_clear", "GLL-008 compound-body collision filtering"),
         legacyCollisionDisabled: usd_observation_binding(pad_observation,
             "legacy_collision_disabled", "GLL-008 stale collider ownership")
     };
@@ -211,6 +234,10 @@ fn on_tick(me, ctx) {
             "gll008", "Verify_GriffinLandingLegRequirements",
             "GriffinLandingLegRequirements::GLLC008_PadColliderMatchesVisual",
             #{geometryDeviationM: pad_bindings.geometryDeviationM,
+              sourceRadiusDeviationM: pad_bindings.sourceRadiusDeviationM,
+              sourceHeightDeviationM: pad_bindings.sourceHeightDeviationM,
+              sourceCenterDeviationM: pad_bindings.sourceCenterDeviationM,
+              padGeometrySemanticsMatch: pad_bindings.padGeometrySemanticsMatch,
               toleranceM: pad_bindings.toleranceM}, "usd", 0.0),
         sysml_requirements::constraint_check("GLL-008-contact-ownership", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
@@ -219,14 +246,30 @@ fn on_tick(me, ctx) {
               proxyHidden: pad_bindings.proxyHidden,
               visualCollisionDisabled: pad_bindings.visualCollisionDisabled,
               collisionMatchesVisual: pad_bindings.collisionMatchesVisual,
+              geometrySourceLinked: pad_bindings.geometrySourceLinked,
+              selfCollisionFilterClear: pad_bindings.selfCollisionFilterClear,
               legacyCollisionDisabled: pad_bindings.legacyCollisionDisabled},
             "usd", 0.0)
-        ,sysml_requirements::constraint_check("GLL-008-physical-stations", "landing_leg",
+        sysml_requirements::constraint_check("GLL-008-physical-stations", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             "GriffinLandingLegRequirements::GLLC008_PadColliderStationMatchesSource",
             #{stationDeviationM: pad_bindings.stationDeviationM,
               toleranceM: pad_bindings.stationToleranceM,
               rotationMatches: pad_bindings.rotationMatches}, "usd", 0.0)
+        ,sysml_requirements::constraint_check("GLL-009-body-mount-path", "landing_leg",
+            "gll009", "Verify_GriffinLandingLegRequirements",
+            "GriffinLandingLegRequirements::GLLC009_BusAndAxleOverlap",
+            #{measuredBusOverlapM: usd_observation_binding(pad_observation,
+                  "bus_mount_overlap_m", "GLL-009 leg arm to bus frame"),
+              measuredAxleOverlapM: usd_observation_binding(pad_observation,
+                  "mount_axle_overlap_m", "GLL-009 leg arm to clevis axle"),
+              requiredOverlapM: if body_mount_overlap == () {
+                  #{provider: "sysml", state: "unavailable",
+                    detail: "GLL-009 mount overlap requirement is unavailable"}
+              } else { #{provider: "sysml", state: "value", value: body_mount_overlap} },
+              physicalJointStationMatches: usd_observation_binding(pad_observation,
+                  "physical_joints_match", "GLL-009 physical attachment joints")},
+            "usd", 0.0)
     ];
     let pad_constraint_report = if pad_requirement.ok == true {
         sysml_requirements::evaluate(pad_requirement, pad_checks)
@@ -237,8 +280,8 @@ fn on_tick(me, ctx) {
                 + " returned " + result.verdict));
         constraint_evidence.push(result);
     }
-    if pad_constraint_report.results == () || pad_constraint_report.results.len() != 3 {
-        failures.push("GLL-008 physical leg pads did not produce all three formal constraint results");
+    if pad_constraint_report.results == () || pad_constraint_report.results.len() != 4 {
+        failures.push("GLL-008/GLL-009 physical leg criteria did not produce all four formal constraint results");
     }
 
     let max_payload = griffin_requirements::max_payload_kg();
@@ -294,22 +337,9 @@ fn on_tick(me, ctx) {
         over_ramp_limit, "fail"));
 
     print("[griffin-requirements] structural_errors=" + report.structural.errors.len()
-        + " catalogued_rules=" + report.catalogued_rules.len()
         + " source_constraint_results=" + constraint_evidence.len()
         + " parts=" + report.parts.len()
         + " assertions=" + failures.len());
-    for rule in report.catalogued_rules {
-        print("[griffin-requirements] " + rule + "=CATALOGUED_NOT_RUNTIME_VERDICT");
-    }
-    for rule in report.planned_rules {
-        print("[griffin-requirements] " + rule + "=PLANNED_UNEXECUTED");
-    }
-    for rule in report.mission_scope_rules {
-        print("[griffin-requirements] " + rule + "=MISSION_SCOPE");
-    }
-    for rule in report.process_gate_rules {
-        print("[griffin-requirements] " + rule + "=PROCESS_GATE");
-    }
     let failure_count = 0;
     for failure in failures {
         if failure != "" { failure_count += 1; }
@@ -319,12 +349,9 @@ fn on_tick(me, ctx) {
     this.failures = failures;
     this.rule_count = constraint_evidence.len();
     this.part_count = report.parts.len();
-    this.planned_count = report.planned_rules.len();
-    this.mission_scope_count = report.mission_scope_rules.len();
-    this.process_gate_count = report.process_gate_rules.len();
     this.verdict = if failure_count == 0 { "PASS" } else { "FAIL" };
-    // Preserve measurements and report results. A catalog entry is not a
-    // runtime check and must not be emitted as a passing evidence row.
+    // Preserve measured requirement results; authored status labels are not
+    // emitted as run evidence.
     let evidence_results = [
         #{id: "GR-structural-report", kind: "structural_report",
           ok: report.structural.ok, errors: report.structural.errors},
@@ -351,7 +378,7 @@ fn on_tick(me, ctx) {
     report_structured_verdict(#{ok: failure_count == 0, failures: failures,
         results: evidence_results,
         verification: griffin_spec::verification_case_name(),
-        requirement_count: 4,
+        requirement_count: sysml.sysml_required_count,
         source_files: sysml.source_files,
         source_revision: sysml.source_revision},
         "GRIFFIN REQUIREMENTS", "GRIFFIN_REQUIREMENTS");

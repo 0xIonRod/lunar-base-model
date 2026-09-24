@@ -15,7 +15,7 @@ are listed in `README.md`.
 | Simulation accuracy | `requirements/griffin_simulation_accuracy_requirements.sysml` | `GriffinSimulationAccuracyRequirements::Verify_GriffinLandingStability`; integrated coverage in `Griffin1Requirements::Verify_GriffinRequirements` |
 | Assurance and evidence | `requirements/griffin_assurance_requirements.sysml` | Integrated coverage in `Griffin1Requirements::Verify_GriffinRequirements` |
 
-The top-level integration case contains `verify` memberships for all 36 `GR`
+The top-level integration case contains `verify` memberships for all 37 `GR`
 usages; that is traceability intent, not proof that every requirement has a
 current runtime result. The visual case contains `verify` memberships for
 seven `GRV` usages. Domain packages own their requirement definitions and

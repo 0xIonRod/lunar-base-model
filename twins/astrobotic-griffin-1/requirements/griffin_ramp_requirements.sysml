@@ -25,6 +25,15 @@ package GriffinRampRequirements {
         trackWidthM >= wheelWidthM + 2.0 * wheelClearanceM;
     }
 
+    constraint def GRC017_ComposedContactTrackMatchesSource {
+        in maximumDimensionDeviationM : Real;
+        in maximumPlacementDeviationM : Real;
+        in toleranceM : Real;
+        toleranceM >= 0.0
+            and maximumDimensionDeviationM <= toleranceM
+            and maximumPlacementDeviationM <= toleranceM;
+    }
+
     constraint def GRC010_PhysicalRampReachesTerrain {
         in rampTipTopYM : Real;
         in rampTipBottomYM : Real;
@@ -124,6 +133,7 @@ package GriffinRampRequirements {
         // Source-owned track width; GRC016 constrains it against FLIP's wheel
         // width and the required clearance. Geometry builders use this value.
         attribute assemblyTrackWidthM : Real = 0.60;
+        attribute contactTrackGeometryToleranceM : Real = 0.002;
         attribute assemblyTreadFirstCenterXM : Real = 0.50;
         attribute assemblyTreadPitchM : Real = 1.00;
         // A full-scale ramp needs a visible load path below the walking
@@ -296,6 +306,7 @@ package GriffinRampRequirements {
     requirement def GRR006_RampGeometry {
         doc /* GRR-006 [geometry/physics] each composed physical ramp shall provide two continuous convex-mesh contact tracks whose top-face length and thickness match the SysML study values. Their lateral centres shall equal the source FLIP wheel stations, and their width shall equal the source wheel width plus twice the wheel clearance. The outer toe face shall be mitered from the track thickness and deployed angle so its upper and lower edges meet the terrain plane together. The centre remains open between tracks; rails and support load paths remain separately inspectable. */
         require GRC016_ContactTrackClearsTire;
+        require GRC017_ComposedContactTrackMatchesSource;
     }
 
     requirement def GRR007_RampEvidence {

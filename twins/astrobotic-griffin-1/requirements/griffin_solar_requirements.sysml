@@ -1,13 +1,23 @@
 package GriffinSolarRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
-    private import ScalarValues::String;
+    private import VectorValues::CartesianThreeVectorValue;
+    private import GriffinRequirementSources::TwinAssetPath;
+    private import GriffinRequirementSources::UsdPrimPath;
+
+    attribute def Direction :> CartesianThreeVectorValue;
+    enum def GriffinSolarVisualMember {
+        Frame; Cells; ArrayBackplane; CellDividerX1; CellDividerX2;
+        CellDividerX3; CellDividerX4; CellDividerX5; CellDividerZ1;
+        CellDividerZ2; CellDividerZ3; MountBracketPort;
+        MountBracketStarboard; HingeBar; MountLinkPort; MountLinkStarboard;
+    }
 
     part def GriffinSolarArrayAssembly {
         doc /* Public Griffin material identifies the triple-junction solar-cell and lithium-ion power concept. The solar arrays remain an independently replaceable visual/power interface with a mirrored pair and explicit station datums; source links are owned by the typed requirement-evidence catalog. */
-        attribute usdRootPath : String = "/World/Griffin1";
-        attribute componentAsset : String = "components/lander/griffin_solar_panel_visual.usda";
-        attribute childNames : String[14] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "MountBracket", "HingeBar", "MountLink");
+        attribute usdRootPath : UsdPrimPath = "/World/Griffin1";
+        attribute componentAsset : TwinAssetPath = "components/lander/griffin_solar_panel_visual.usda";
+        attribute childNames : GriffinSolarVisualMember[16] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "MountBracketPort", "MountBracketStarboard", "HingeBar", "MountLinkPort", "MountLinkStarboard");
         attribute frameWidthM : Real = 4.80;
         attribute frameThicknessM : Real = 0.14;
         attribute frameDepthM : Real = 3.00;
@@ -29,21 +39,17 @@ package GriffinSolarRequirements {
         // replacement boundary for the flight mechanism rather than letting
         // the panel float on an unexplained bracket.
         attribute hingeBarRadiusM : Real = 0.10;
-        attribute hingeBarLengthM : Real = 2.10;
+        attribute hingeBarLengthM : Real = 3.10;
         attribute hingeBarCenterYM : Real = -0.18;
         attribute hingeBarCenterZM : Real = 0.00;
-        attribute mountLinkWidthM : Real = 0.20;
-        attribute mountLinkHeightM : Real = 0.36;
+        attribute mountLinkHeightM : Real = 0.44;
         attribute mountLinkDepthM : Real = 0.18;
-        attribute mountLinkCenterXM : Real = 0.00;
         attribute mountLinkCenterYM : Real = -0.08;
         attribute mountLinkCenterZM : Real = 0.00;
         attribute gridColumnCount : Integer = 6;
         attribute gridRowCount : Integer = 4;
-        attribute cellFaceNormal : String = "+Y in component frame; outward after signed root X rotation onto the signed Z side";
-        attribute collisionPolicy : String = "panel, cells, dividers, and bracket are render-only; electrical power owner is separate";
-        attribute deploymentStatus : String = "fixed visual study state; flight deployment state TBD";
-        attribute geometryStatus : String = "metric visual study proxy; panel cell layout and deployment kinematics are not public";
+        attribute cellFaceNormal : Direction = (0.0, 1.0, 0.0);
+        attribute minimumMountOverlapM : Real = 0.05;
     }
 
     requirement def GSA001_ArrayCount {
@@ -68,7 +74,20 @@ package GriffinSolarRequirements {
         doc /* GSA-007 [geometry] each panel shall contain a 6 by 4 cell-module grid with five X dividers, three Z dividers, and a 0.44 m by 0.32 m by 0.44 m mount bracket, all as named child geometry. The segmented wing is a visual study assumption because public Griffin material identifies solar cells but does not publish panel CAD. */
     }
     requirement def GSA008_HingeAndStandoff {
-        doc /* GSA-008 [interface geometry] each panel shall expose a render-only Z-axis hinge bar of radius 0.10 m and length 2.10 m at local Y = -0.18 m, plus a 0.20 m by 0.36 m by 0.18 m mount link at the declared local datum. These are explicit study assumptions because the public Griffin source confirms the solar-array concept but does not publish the deployment/hinge ICD. */
+        doc /* GSA-008 [interface geometry] each panel shall expose a render-only X-axis hinge shaft of radius 0.10 m and length 3.10 m at local Y = -0.18 m. Two mount links bridge the corner-post stations to the panel side rails; their spans and overlap are derived from the shared bus rail stations, panel frame width, and minimumMountOverlapM. These are explicit study assumptions because the public Griffin source confirms the solar-array concept but does not publish the deployment/hinge ICD. */
+    }
+    constraint def GSAC009_MountPathOverlap {
+        in busToBracketOverlapM : Real;
+        in bracketToLinkOverlapM : Real;
+        in linkToFrameOverlapM : Real;
+        in requiredOverlapM : Real;
+        busToBracketOverlapM >= requiredOverlapM
+            and bracketToLinkOverlapM >= requiredOverlapM
+            and linkToFrameOverlapM >= requiredOverlapM;
+    }
+    requirement def GSA009_BusMountConnection {
+        require GSAC009_MountPathOverlap;
+        doc /* GSA-009 [mechanical interface] each deployed side array shall have a continuous render-only mount path from the octagonal bus PerimeterFrame through MountBracket and MountLink into the panel Frame. Every adjacent geometry pair shall overlap by at least minimumMountOverlapM in the composed SI frame. Both arrays remain mounted at the signed-Z stations in GriffinVisualConfiguration. */
     }
 
     requirement <'GSA-001'> gsa001 : GSA001_ArrayCount { subject arrays : GriffinSolarArrayAssembly; }
@@ -79,6 +98,7 @@ package GriffinSolarRequirements {
     requirement <'GSA-006'> gsa006 : GSA006_PanelEnvelope { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-007'> gsa007 : GSA007_CellGridAndMount { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-008'> gsa008 : GSA008_HingeAndStandoff { subject arrays : GriffinSolarArrayAssembly; }
+    requirement <'GSA-009'> gsa009 : GSA009_BusMountConnection { subject arrays : GriffinSolarArrayAssembly; }
 
     verification def Verify_GriffinSolarRequirements {
         subject arrays : GriffinSolarArrayAssembly;
@@ -91,6 +111,7 @@ package GriffinSolarRequirements {
             verify gsa006;
             verify gsa007;
             verify gsa008;
+            verify gsa009;
         }
     }
 }

@@ -2,6 +2,8 @@ package GriffinRequirementSources {
     private import ScalarValues::String;
 
     attribute def SourceLocator :> String;
+    attribute def TwinAssetPath :> String;
+    attribute def UsdPrimPath :> String;
     enum def EvidenceSourceRole { Reference; VisualAsset; ShaderAsset; }
 
     part def EvidenceSource {
@@ -159,6 +161,11 @@ package GriffinRequirementSources {
         attribute locator : SourceLocator = "https://www.astrolab.space/flip-rover/";
     }
 
+    part source_linkedin_astrolab_flip_power_post : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.linkedin.com/posts/astrolabspace_our-flip-rover-is-equipped-with-a-622-kwh-activity-7508563602279309312-W5Le";
+    }
+
     part source_www_nasa_gov_astrobotics_griffin_1 : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "https://www.nasa.gov/gallery/astrobotics-griffin-1/";
@@ -177,6 +184,11 @@ package GriffinRequirementSources {
     part source_lunco_terrain_layered_shader : EvidenceSource {
         attribute role : EvidenceSourceRole = "ShaderAsset";
         attribute locator : SourceLocator = "lunco://shaders/terrain_layered.wgsl";
+    }
+
+    part source_griffin_solar_panel_visual_asset : EvidenceSource {
+        attribute role : EvidenceSourceRole = "VisualAsset";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda";
     }
 
     part evidence_fcc_001 : RequirementEvidence {
@@ -282,6 +294,16 @@ package GriffinRequirementSources {
     part evidence_fsp_006 : RequirementEvidence {
         ref targetRequirement = FlipSensorPowerRequirements::fsp006;
         ref sources = (source_www_astrolab_space_flip);
+    }
+
+    part evidence_fsp_007 : RequirementEvidence {
+        ref targetRequirement = FlipSensorPowerRequirements::fsp007;
+        ref sources = (source_linkedin_astrolab_flip_power_post);
+    }
+
+    part evidence_fsp_008 : RequirementEvidence {
+        ref targetRequirement = FlipSensorPowerRequirements::fsp008;
+        ref sources = (source_linkedin_astrolab_flip_power_post);
     }
 
     part evidence_fsr_001 : RequirementEvidence {
@@ -499,6 +521,12 @@ package GriffinRequirementSources {
         ref sources = (source_www_astrobotic_com_griffin_lander);
     }
 
+    part evidence_gll_009 : RequirementEvidence {
+        ref targetRequirement = GriffinLandingLegRequirements::gll009;
+        ref sources = (source_www_astrobotic_com_griffin_lander,
+            source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
+    }
+
     part evidence_gpp_001 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp001;
         ref sources = (source_www_astrobotic_com_griffin_lander);
@@ -527,6 +555,12 @@ package GriffinRequirementSources {
     part evidence_gpp_006 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp006;
         ref sources = (source_www_astrobotic_com_griffin_lander);
+    }
+
+    part evidence_gpp_007 : RequirementEvidence {
+        ref targetRequirement = GriffinPropulsionRequirements::gpp007;
+        ref sources = (source_www_astrobotic_com_griffin_lander,
+            source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
     }
 
     part evidence_ges_001 : RequirementEvidence {
@@ -868,6 +902,12 @@ package GriffinRequirementSources {
     part evidence_gsa_008 : RequirementEvidence {
         ref targetRequirement = GriffinSolarRequirements::gsa008;
         ref sources = (source_www_astrobotic_com_griffin_lander);
+    }
+
+    part evidence_gsa_009 : RequirementEvidence {
+        ref targetRequirement = GriffinSolarRequirements::gsa009;
+        ref sources = (source_www_astrobotic_com_griffin_lander,
+            source_griffin_solar_panel_visual_asset);
     }
 
     part evidence_gpt_001 : RequirementEvidence {

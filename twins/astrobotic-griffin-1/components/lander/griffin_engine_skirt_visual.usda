@@ -11,9 +11,6 @@ def Xform "World"
         kind = "component"
     )
     {
-        custom string lunco:visual:component = "engine_skirt"
-        custom string lunco:visual:datum = "centered on engine adapter; local Y-up"
-        custom string lunco:visual:skirt_metric_envelope = '"3.20 m x 3.20 m x 0.20 m; 0.20 m rails; centered on engine adapter datum"'
         def Cube "RailFront" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )

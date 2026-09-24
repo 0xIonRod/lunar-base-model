@@ -9,34 +9,21 @@ def Xform "SolarPanel" (
     kind = "component"
 )
 {
-    custom string lunco:visual:component = "solar_panel"
-    custom string lunco:visual:requirement = '"GriffinSolarRequirements::GSA001-GSA008"'
-    custom token lunco:visual:cell_face_normal = "+Y; outward after signed assembly X rotation onto the signed Z side"
     def Cube "Cells"
     {
         double size = 1.0
         custom double3 xformOp:translate = (0.0, 0.075, 0.0)
-        custom double3 xformOp:scale = (2.225, 0.025, 1.325)
+        custom double3 xformOp:scale = (4.45, 0.05, 2.65)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.02500000037252903, 0.11999999731779099, 0.47999998927116394)]
         uniform token purpose = "render"
-        bool physics:collisionEnabled = false
-    }
-    def Cube "MountBracket"
-    {
-        double size = 1.0
-        custom double3 xformOp:scale = (0.22, 0.16, 0.22)
-        color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
-        uniform token purpose = "render"
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:translate = (0.0, -0.16, 0.0)
         bool physics:collisionEnabled = false
     }
     def Cube "ArrayBackplane" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (2.225, 0.02, 1.325)
+        custom double3 xformOp:scale = (4.45, 0.04, 2.65)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
@@ -51,27 +38,16 @@ def Xform "SolarPanel" (
         custom double3 xformOp:translate = (0.0, -0.18, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         double radius = 0.1
-        double height = 2.1
-        uniform token axis = "Z"
+        double height = 3.1
+        uniform token axis = "X"
         float3[] extent = [(-0.10000000149011612, -0.10000000149011612, -1.0499999523162842), (0.10000000149011612, 0.10000000149011612, 1.0499999523162842)]
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.1899999976158142, 0.23999999463558197)]
     }
-    def Cube "MountLink" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
-    )
-    {
-        custom double3 xformOp:scale = (0.1, 0.18, 0.09)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        double size = 1.0
-        bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.0, -0.08, 0.0)
-        uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
-    }
     def Mesh "Frame" (
         prepend apiSchemas = "PhysicsCollisionAPI"
+        active = true
     )
     {
         point3f[] points = [(-2.3299999237060547, -0.07000000029802322, -1.5), (2.3299999237060547, -0.07000000029802322, -1.5), (2.3299999237060547, 0.07000000029802322, -1.5), (-2.3299999237060547, 0.07000000029802322, -1.5), (-2.3299999237060547, -0.07000000029802322, -1.3600000143051147), (2.3299999237060547, -0.07000000029802322, -1.3600000143051147), (2.3299999237060547, 0.07000000029802322, -1.3600000143051147), (-2.3299999237060547, 0.07000000029802322, -1.3600000143051147), (2.4000000953674316, -0.07000000029802322, -1.4299999475479126), (2.4000000953674316, -0.07000000029802322, 1.4299999475479126), (2.4000000953674316, 0.07000000029802322, 1.4299999475479126), (2.4000000953674316, 0.07000000029802322, -1.4299999475479126), (2.259999990463257, -0.07000000029802322, -1.4299999475479126), (2.259999990463257, -0.07000000029802322, 1.4299999475479126), (2.259999990463257, 0.07000000029802322, 1.4299999475479126), (2.259999990463257, 0.07000000029802322, -1.4299999475479126), (2.3299999237060547, -0.07000000029802322, 1.5), (-2.3299999237060547, -0.07000000029802322, 1.5), (-2.3299999237060547, 0.07000000029802322, 1.5), (2.3299999237060547, 0.07000000029802322, 1.5), (2.3299999237060547, -0.07000000029802322, 1.3600000143051147), (-2.3299999237060547, -0.07000000029802322, 1.3600000143051147), (-2.3299999237060547, 0.07000000029802322, 1.3600000143051147), (2.3299999237060547, 0.07000000029802322, 1.3600000143051147), (-2.4000000953674316, -0.07000000029802322, 1.4299999475479126), (-2.4000000953674316, -0.07000000029802322, -1.4299999475479126), (-2.4000000953674316, 0.07000000029802322, -1.4299999475479126), (-2.4000000953674316, 0.07000000029802322, 1.4299999475479126), (-2.259999990463257, -0.07000000029802322, 1.4299999475479126), (-2.259999990463257, -0.07000000029802322, -1.4299999475479126), (-2.259999990463257, 0.07000000029802322, -1.4299999475479126), (-2.259999990463257, 0.07000000029802322, 1.4299999475479126)]
@@ -89,8 +65,8 @@ def Xform "SolarPanel" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:scale = (0.04, 0.04, 2.65)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (-1.4833333333333334, 0.1, 0.0)
@@ -101,8 +77,8 @@ def Xform "SolarPanel" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:scale = (0.04, 0.04, 2.65)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (-0.7416666666666667, 0.1, 0.0)
@@ -113,8 +89,8 @@ def Xform "SolarPanel" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:scale = (0.04, 0.04, 2.65)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (0.0, 0.1, 0.0)
@@ -125,8 +101,8 @@ def Xform "SolarPanel" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:scale = (0.04, 0.04, 2.65)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (0.7416666666666667, 0.1, 0.0)
@@ -137,8 +113,8 @@ def Xform "SolarPanel" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.02, 0.02, 1.325)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:scale = (0.04, 0.04, 2.65)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (1.4833333333333334, 0.1, 0.0)
@@ -149,8 +125,8 @@ def Xform "SolarPanel" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (2.225, 0.02, 0.02)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:scale = (4.45, 0.04, 0.04)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (0.0, 0.1, -0.6625)
@@ -161,8 +137,8 @@ def Xform "SolarPanel" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (2.225, 0.02, 0.02)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:scale = (4.45, 0.04, 0.04)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (0.0, 0.1, 0.0)
@@ -173,12 +149,60 @@ def Xform "SolarPanel" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (2.225, 0.02, 0.02)
-        custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
+        custom double3 xformOp:scale = (4.45, 0.04, 0.04)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (0.0, 0.1, 0.6624999999999999)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+    }
+    def Cube "MountBracketPort" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.44, 0.32, 0.44)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-1.526, -0.2959999999999998, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
+    }
+    def Cube "MountLinkPort" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.9739999999999999, 0.44, 0.18)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-1.913, -0.08, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
+    }
+    def Cube "MountBracketStarboard" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.44, 0.32, 0.44)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.526, -0.2959999999999998, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
+    }
+    def Cube "MountLinkStarboard" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.9739999999999999, 0.44, 0.18)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.913, -0.08, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
     }
 }

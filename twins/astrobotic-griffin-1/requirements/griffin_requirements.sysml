@@ -3,12 +3,19 @@ package Griffin1Requirements {
     // owns integration subjects, source-backed context, and mission interfaces.
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
-    private import ScalarValues::String;
     private import ScalarValues::Boolean;
 
     enum def GriffinMissionDesignation { AstroboticGriffinMissionOne; }
     enum def GriffinLandingRegion { NobileSouthPole; }
     enum def HostedRoverDesignation { AstrolabFLIP; }
+    enum def GriffinSurfaceRouteMarkerName {
+        RoverRampApproach; RoverRampExit; RoverTarget1;
+        RoverTransit1; RoverTransit2; RoverTransit3; RoverTransit4;
+        RoverTransit5; RoverTransit6; RoverTarget2;
+        RoverBaseArc1; RoverBaseArc2; RoverBaseApproach;
+        RoverBaseFinal; BaseSite;
+    }
+    enum def GriffinSurfaceFeatureName { EgressApron; }
 
     // Public mission context uses typed designations and numeric bounds. The
     // evidence catalog owns external citations; this part stores no URL or
@@ -20,8 +27,6 @@ package Griffin1Requirements {
         attribute hostedRover : HostedRoverDesignation = "AstrolabFLIP";
         attribute cargoMassLowerBoundKg : Real = 499.0;
         attribute cargoMassLowerBoundIsExclusive : Boolean = true;
-        attribute frameUnits : String = "metres";
-        attribute frameRootDatum : String = "Griffin1";
         // Geometry-derived COM target for the vertical landing study.  The
         // inline pad/compound colliders settle at this composed contact datum
         // above the authored 0.35 m pad surface; keep the value in SysML so
@@ -62,26 +67,19 @@ package Griffin1Requirements {
         // Visual review contract.  These are intentionally small, stable
         // presentation datums, not a hidden CAD model: the Twin graphics test
         // reads them and compares them with composed USD geometry.
-        attribute visualCameraName : String = "VisualCamera";
-        attribute visualLanderName : String = "Griffin1";
         attribute visualLanderDeckWidthM : Real = 4.50;
         attribute visualLandingPadRadiusM : Real = 6.0;
         attribute visualReviewGroundWidthM : Real = 36.0;
-        attribute visualRenderOwnership : String = "render-only review layer; physics colliders remain authored by vehicle components";
-        // Reusable assembly identities are source data as well. Rhai derives
-        // paths and pair checks from these names instead of carrying a second
-        // list of Griffin topology constants.
-        attribute solarArrayNames : String[2] = ("SolarPanelPort", "SolarPanelStarboard");
-        attribute landingLegNames : String[4] = ("LegPX", "LegNX", "LegPZ", "LegNZ");
-        attribute landingPadNames : String[4] = ("PadPX", "PadNX", "PadPZ", "PadNZ");
-        attribute rampNames : String[2] = ("EgressRampPort", "EgressRampStarboard");
-        attribute rampHingeNames : String[2] = ("RampHingePort", "RampHingeStarboard");
-        attribute mainEngineNames : String[7] = ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07");
         // Route markers are mission-interface datums, not navigation-code
         // constants.  Keep the complete marker table in SysML so the scene
         // can be regenerated through the typed Editor bridge without a
         // second literal table in Rhai or a hand-edited USDA file.
-        attribute surfaceRouteMarkerNames : String[15] = ("RoverRampApproach", "RoverRampExit", "RoverTarget1", "RoverTransit1", "RoverTransit2", "RoverTransit3", "RoverTransit4", "RoverTransit5", "RoverTransit6", "RoverTarget2", "RoverBaseArc1", "RoverBaseArc2", "RoverBaseApproach", "RoverBaseFinal", "BaseSite");
+        attribute surfaceRouteMarkerNames : GriffinSurfaceRouteMarkerName[15] =
+            ("RoverRampApproach", "RoverRampExit", "RoverTarget1",
+             "RoverTransit1", "RoverTransit2", "RoverTransit3", "RoverTransit4",
+             "RoverTransit5", "RoverTransit6", "RoverTarget2",
+             "RoverBaseArc1", "RoverBaseArc2", "RoverBaseApproach",
+             "RoverBaseFinal", "BaseSite");
         // The approach marker is the rover-centre datum before the
         // 3.20 m ramp hinge. The source-owned transition length reaches the
         // adapter's full-width octagonal corners with the required overlap.
@@ -128,7 +126,7 @@ package Griffin1Requirements {
         // all four wheels a continuous collision plane before survey route
         // control begins.  Its dimensions are replaceable Twin study values
         // until the Griffin site ICD is available.
-        attribute egressApronName : String = "EgressApron";
+        attribute egressApronName : GriffinSurfaceFeatureName = "EgressApron";
         attribute egressApronCenterX : Real = 13.50;
         attribute egressApronCenterY : Real = -0.05;
         attribute egressApronCenterZ : Real = -1.00;
@@ -145,19 +143,12 @@ package Griffin1Requirements {
         attribute mainEngineCount : Integer = 7;
         attribute propellantTankCount : Integer = 4;
         attribute solarArrayCount : Integer = 2;
-        // Mechanical ICD values remain explicit study inputs until supplied.
-        attribute geometryStatus : String = "study surrogate; Griffin ICD TBD";
-        attribute massPropertiesStatus : String = "replaceable simulator mass-property proxies; component center-of-mass and as-built data TBD";
-        attribute rampStatus : String = "optional Griffin egress hardware; mechanism ICD TBD";
-        attribute solarArrayStatus : String = "visual/power study proxy; flight layout TBD";
     }
 
     // Generic integration subject.  Rover-owned values and rover visual
     // requirements live in requirements/flip_requirements.sysml; Griffin only
     // verifies that a hosted vehicle interface exists at the release boundary.
-    part def HostedRoverInterface {
-        attribute interfaceName : String = "hosted rover interface";
-    }
+    part def HostedRoverInterface;
 
 
 
@@ -208,6 +199,53 @@ package Griffin1Requirements {
             verify GriffinFunctionalRequirements::gr004;
             verify GriffinFunctionalRequirements::gr007;
             verify GriffinFunctionalRequirements::gr026;
+        }
+    }
+
+    // The integration case owns traceability across the 37 system-level GR
+    // usages. Domain and visual component cases remain separately executable;
+    // this aggregate case does not claim that membership alone is test proof.
+    verification def Verify_GriffinRequirements {
+        subject lander : Griffin1Lander;
+        subject rover : HostedRoverInterface;
+        objective {
+            verify GriffinFunctionalRequirements::gr001;
+            verify GriffinFunctionalRequirements::gr002;
+            verify GriffinFunctionalRequirements::gr003;
+            verify GriffinFunctionalRequirements::gr004;
+            verify GriffinAssuranceRequirements::gr005;
+            verify GriffinFunctionalRequirements::gr006;
+            verify GriffinFunctionalRequirements::gr007;
+            verify GriffinSimulationAccuracyRequirements::gr008;
+            verify GriffinFunctionalRequirements::gr009;
+            verify GriffinMechanicalRequirements::gr010;
+            verify GriffinMechanicalRequirements::gr011;
+            verify GriffinMechanicalRequirements::gr012;
+            verify GriffinAssuranceRequirements::gr013;
+            verify GriffinAssuranceRequirements::gr014;
+            verify GriffinVisualRequirements::gr015;
+            verify GriffinVisualRequirements::gr016;
+            verify GriffinMechanicalRequirements::gr017;
+            verify GriffinMechanicalRequirements::gr018;
+            verify GriffinMechanicalRequirements::gr019;
+            verify GriffinVisualRequirements::gr020;
+            verify GriffinSimulationAccuracyRequirements::gr021;
+            verify GriffinSimulationAccuracyRequirements::gr022;
+            verify GriffinSimulationAccuracyRequirements::gr023;
+            verify GriffinMechanicalRequirements::gr024;
+            verify GriffinMechanicalRequirements::gr025;
+            verify GriffinFunctionalRequirements::gr026;
+            verify GriffinSimulationAccuracyRequirements::gr027;
+            verify GriffinFunctionalRequirements::gr028;
+            verify GriffinAssuranceRequirements::gr029;
+            verify GriffinAssuranceRequirements::gr030;
+            verify GriffinSimulationAccuracyRequirements::gr031;
+            verify GriffinVisualRequirements::gr032;
+            verify GriffinVisualRequirements::gr033;
+            verify GriffinFunctionalRequirements::gr034;
+            verify GriffinFunctionalRequirements::gr035;
+            verify GriffinSimulationAccuracyRequirements::gr036;
+            verify GriffinSimulationAccuracyRequirements::gr037;
         }
     }
 

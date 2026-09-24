@@ -1,18 +1,25 @@
 package GriffinPropulsionRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::String;
+    private import ScalarValues::Boolean;
+    private import VectorValues::CartesianThreeVectorValue;
+    private import GriffinRequirementSources::TwinAssetPath;
+    private import GriffinRequirementSources::UsdPrimPath;
+
+    attribute def Direction :> CartesianThreeVectorValue;
+    enum def GriffinEngineVisualMember { Bell; Throat; }
 
     part def GriffinMainPropulsionAssembly {
-        attribute usdRootPath : String = "/World/Griffin1/Nozzle/MainEngineCluster";
-        attribute componentAsset : String = "components/lander/griffin_engine_bell_visual.usda";
-        attribute childNames : String[2] = ("Bell", "Throat");
-        attribute colliderPolicy : String = "render-only bell and throat; thrust/collision stay with flight model";
+        attribute usdRootPath : UsdPrimPath = "/World/Griffin1/Nozzle/MainEngineCluster";
+        attribute componentAsset : TwinAssetPath = "components/lander/griffin_engine_bell_visual.usda";
+        attribute childNames : GriffinEngineVisualMember[2] = ("Bell", "Throat");
         attribute bellRadiusM : Real = 0.34;
         attribute bellHeightM : Real = 0.52;
         attribute throatRadiusM : Real = 0.12;
         attribute throatHeightM : Real = 0.16;
         attribute throatCenterYM : Real = 0.28;
-        attribute bellAxis : String = "Y";
+        attribute bellAxis : Direction = (0.0, 1.0, 0.0);
+        attribute minimumBellClearanceM : Real = 0.20;
     }
 
     // The skirt is a visual/structural presentation component around the
@@ -64,6 +71,20 @@ package GriffinPropulsionRequirements {
     requirement def GPP006_BellAndThroatEnvelope {
         doc /* GPP-006 [geometry] each engine shall expose a Y-axis bell with 0.16 m base radius, 0.34 m exit radius, and 0.52 m height plus a 0.12 m radius by 0.16 m throat centered at local Y = 0.28 m. */
     }
+    constraint def GPPC007_BellSeparation {
+        in measuredMinimumClearanceM : Real;
+        in requiredMinimumClearanceM : Real;
+        in maximumRadialExtentM : Real;
+        in bucketOuterRadiusM : Real;
+        in typedStationsMatch : Boolean;
+        measuredMinimumClearanceM >= requiredMinimumClearanceM
+            and maximumRadialExtentM <= bucketOuterRadiusM
+            and typedStationsMatch;
+    }
+    requirement def GPP007_BellSeparation {
+        require GPPC007_BellSeparation;
+        doc /* GPP-007 [layout] the seven bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and six equally spaced perimeter engines, and remain inside the lower central bucket envelope. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
+    }
     requirement def GES001_SkirtTopology {
         doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the seven-engine cluster. */
     }
@@ -92,6 +113,7 @@ package GriffinPropulsionRequirements {
     requirement <'GPP-004'> gpp004 : GPP004_PropulsionTraceability { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GPP-005'> gpp005 : GPP005_EnginePlacement { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GPP-006'> gpp006 : GPP006_BellAndThroatEnvelope { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-007'> gpp007 : GPP007_BellSeparation { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GES-001'> ges001 : GES001_SkirtTopology { subject skirt : GriffinEngineSkirtComponent; }
     requirement <'GES-002'> ges002 : GES002_SkirtEnvelope { subject skirt : GriffinEngineSkirtComponent; }
     requirement <'GES-003'> ges003 : GES003_SkirtDatum { subject skirt : GriffinEngineSkirtComponent; }
@@ -110,6 +132,7 @@ package GriffinPropulsionRequirements {
             verify gpp004;
             verify gpp005;
             verify gpp006;
+            verify gpp007;
             verify ges001;
             verify ges002;
             verify ges003;

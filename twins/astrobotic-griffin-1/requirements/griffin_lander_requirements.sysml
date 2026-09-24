@@ -2,6 +2,9 @@ package GriffinLanderRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
     private import ScalarValues::String;
+    private import GriffinRequirementSources::TwinAssetPath;
+    private import GriffinRequirementSources::UsdPrimPath;
+    private import GriffinVisualConfigurationRequirements::GriffinReviewLanderName;
 
     // This package owns the standalone lander visual-component contract. The
     // Griffin integration package owns mission sequencing; the ramp package
@@ -9,11 +12,9 @@ package GriffinLanderRequirements {
     // tanks, legs, engines, and solar component assembly.
     part def GriffinLanderComponent {
         doc /* Public Griffin material describes a medium-class flexible-payload lander with four shock-absorbing legs, seven main engines, and optional rover egress ramps. This package owns reusable lander counts and the presentation/flight ownership boundary; typed component identities and spatial stations are owned by GriffinVisualConfigurationRequirements. */
-        attribute componentName : String = "Griffin1";
-        attribute componentAsset : String = "vehicles/griffin_1_visual.usda";
-        attribute usdRootPath : String = "/Griffin1";
-        attribute localFrame : String = "Y-up, right-handed, SI metres; X/Z are signed body axes";
-        attribute visualOwnership : String = "component references own presentation geometry; flight model owns dynamics and colliders";
+        attribute componentName : GriffinReviewLanderName = "Griffin1";
+        attribute componentAsset : TwinAssetPath = "vehicles/griffin_1_visual.usda";
+        attribute usdRootPath : UsdPrimPath = "/Griffin1";
         // Geometry configuration is owned by
         // GriffinVisualConfigurationRequirements::GriffinVisualConfiguration.
         // This part intentionally retains only identity, counts, and the
@@ -23,7 +24,6 @@ package GriffinLanderRequirements {
         attribute tankCount : Integer = 4;
         attribute engineCount : Integer = 7;
         attribute solarArrayCount : Integer = 2;
-        attribute geometryStatus : String = "metric visual study proxy; flight CAD/ICD TBD";
         // The open-frame mesh is a render study made from bounded member
         // sections. Its composed envelope may differ slightly from the
         // nominal station datum at clipped beam corners. This tolerance is

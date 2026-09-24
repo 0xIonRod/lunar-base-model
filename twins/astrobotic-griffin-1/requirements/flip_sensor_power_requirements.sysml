@@ -39,6 +39,10 @@ package FlipSensorPowerRequirements {
         attribute solarHingeWidthM : Real = 3.40;
         attribute solarHingeThicknessM : Real = 0.16;
         attribute solarHingeDepthM : Real = 0.16;
+        // Astrolab publishes 6.22 kWh of onboard battery energy and a
+        // deployable panel with peak power nearly 270 W for FLIP.
+        attribute batteryEnergyKWh : Real = 6.22;
+        attribute solarArrayPeakPowerW : Real = 270.0;
         attribute visualOwnership : String = "mast and panel are render-only; rover sensor and electrical models own behavior";
     }
 
@@ -60,6 +64,12 @@ package FlipSensorPowerRequirements {
     requirement def FSP006_SolarPanelGeometry {
         doc /* FSP-006 [geometry] the rover panel shall expose a 3.30 m by 0.12 m by 2.10 m backsheet, a 2.84 m by 0.04 m by 1.64 m cell surface, and a 3.40 m by 0.16 m by 0.16 m fold hinge. */
     }
+    requirement def FSP007_BatteryEnergyCapacity {
+        doc /* FSP-007 [power] the FLIP power model shall record the published 6.22 kWh battery energy capacity. */
+    }
+    requirement def FSP008_SolarArrayPeakPower {
+        doc /* FSP-008 [power] the FLIP power model shall record the deployable solar array's published peak power of nearly 270 W. */
+    }
 
     requirement <'FSP-001'> fsp001 : FSP001_MastStructure { subject sensorPower : FlipSensorPowerAssembly; }
     requirement <'FSP-002'> fsp002 : FSP002_SolarStructure { subject sensorPower : FlipSensorPowerAssembly; }
@@ -67,6 +77,8 @@ package FlipSensorPowerRequirements {
     requirement <'FSP-004'> fsp004 : FSP004_SensorPowerTraceability { subject sensorPower : FlipSensorPowerAssembly; }
     requirement <'FSP-005'> fsp005 : FSP005_MastGeometry { subject sensorPower : FlipSensorPowerAssembly; }
     requirement <'FSP-006'> fsp006 : FSP006_SolarPanelGeometry { subject sensorPower : FlipSensorPowerAssembly; }
+    requirement <'FSP-007'> fsp007 : FSP007_BatteryEnergyCapacity { subject sensorPower : FlipSensorPowerAssembly; }
+    requirement <'FSP-008'> fsp008 : FSP008_SolarArrayPeakPower { subject sensorPower : FlipSensorPowerAssembly; }
 
     verification def Verify_FLIPSensorPowerRequirements {
         subject sensorPower : FlipSensorPowerAssembly;
@@ -77,6 +89,8 @@ package FlipSensorPowerRequirements {
             verify fsp004;
             verify fsp005;
             verify fsp006;
+            verify fsp007;
+            verify fsp008;
         }
     }
 }

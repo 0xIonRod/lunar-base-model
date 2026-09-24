@@ -18,6 +18,26 @@ fn query_ok(record) {
     record != () && record.ok != false
 }
 
+fn remove_legacy_semantic_string_ops(doc, edit_target, path) {
+    let record = assembly_builder::composed_query(doc, #{path: path,
+        attrs: ["lunco:collider:geometrySource", "lunco:requirement",
+            "lunco:component_role", "lunco:mechanism",
+            "lunco:mass_properties_status"],
+        children: false});
+    let ops = [];
+    if query_ok(record) && record.attrs != () {
+        for name in ["lunco:collider:geometrySource", "lunco:requirement",
+            "lunco:component_role", "lunco:mechanism",
+            "lunco:mass_properties_status"] {
+            if record.attrs[name] != () {
+                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+                    path: path, name: name}});
+            }
+        }
+    }
+    ops
+}
+
 // Use the shared composed query for both source-component documents and
 // referenced children in an assembly.  The Editor inspection facade is
 // selection-oriented and can return an empty type for a composed descendant;
@@ -46,6 +66,12 @@ fn component_asset(relative) {
 }
 
 fn _sysml_number(report, name) {
+    // A full Twin audit can be incomplete for unrelated requirement or source
+    // registry issues while the revision-pinned SysML model still resolves
+    // this engineering datum. Read the typed model first; only use a clean,
+    // explicitly supplied source projection as a fallback.
+    let value = griffin_spec::_sysml_attribute(name);
+    if value != () { return value; }
     if report == () || report.ok != true { return (); }
     sysml_requirements::number(report, griffin_spec::qualified_attribute_name(name))
 }
@@ -960,6 +986,22 @@ fn physical_top_deck_collider_plan(doc, edit_target, root) {
     let geometry = physical_top_deck_collider_geometry();
     if geometry.ok != true { return geometry; }
     let ops = [];
+    let perimeter_source_path = root + "/Bus/TopDeckOctagon";
+    let perimeter_source = assembly_builder::composed_query(doc,
+        #{path: perimeter_source_path, children: false});
+    if !query_ok(perimeter_source) || perimeter_source.type_name != "Mesh" {
+        return plan_error(perimeter_source_path + ": source-owned octagonal deck mesh is required");
+    }
+    let adapter_source_path = root + "/Bus/RoverPayloadDeck";
+    let adapter_source = assembly_builder::composed_query(doc,
+        #{path: adapter_source_path, children: false});
+    if !query_ok(adapter_source) || adapter_source.type_name != "Mesh" {
+        return plan_error(adapter_source_path + ": source-owned rover platform mesh is required");
+    }
+    for op in remove_legacy_semantic_string_ops(doc, edit_target,
+        root + "/PayloadAdapter") {
+        ops.push(op);
+    }
     let legacy_path = root + "/TopDeckCollisionProxy";
     if query_ok(assembly_builder::composed_query(doc,
         #{path: legacy_path, children: false})) {
@@ -986,15 +1028,17 @@ fn physical_top_deck_collider_plan(doc, edit_target, root) {
             #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
             #{name: "purpose", type_name: "token", value: "\"proxy\""},
             #{name: "visibility", type_name: "token", value: "\"invisible\""},
-            #{name: "lunco:collider:geometrySource", type_name: "string",
-              value: "\"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::outerBodyProfileCoordinates+deckDimensions+frameRingSectionM\""},
-            #{name: "lunco:requirement", type_name: "string",
-              value: "\"GriffinMechanicalRequirements::GR018_PhysicalDeckCollider\""}
         ] {
             ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
                 name: attribute.name, type_name: attribute.type_name,
                 value: attribute.value}});
         }
+        for op in remove_legacy_semantic_string_ops(doc, edit_target, path) {
+            ops.push(op);
+        }
+        ops.push(#{SetRelationship: #{edit_target: edit_target, path: path,
+            name: "lunco:collider:geometrySource",
+            targets: [perimeter_source_path]}});
     }
     let adapter_path = root + "/RoverPayloadDeckCollider";
     let adapter_current = assembly_builder::composed_query(doc,
@@ -1023,16 +1067,19 @@ fn physical_top_deck_collider_plan(doc, edit_target, root) {
         #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
         #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
         #{name: "purpose", type_name: "token", value: "\"proxy\""},
-        #{name: "visibility", type_name: "token", value: "\"invisible\""},
-        #{name: "lunco:collider:geometrySource", type_name: "string",
-          value: "\"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::outerBodyProfileCoordinates+payloadAdapterDimensions+payloadAdapterCenterYM\""},
-        #{name: "lunco:requirement", type_name: "string",
-          value: "\"GriffinMechanicalRequirements::GR018_PhysicalDeckCollider\""}
+        #{name: "visibility", type_name: "token", value: "\"invisible\""}
     ] {
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: adapter_path,
             name: attribute.name, type_name: attribute.type_name,
-            value: attribute.value}});
+                value: attribute.value}});
     }
+    for op in remove_legacy_semantic_string_ops(doc, edit_target, adapter_path) {
+        ops.push(op);
+    }
+    ops.push(#{SetRelationship: #{edit_target: edit_target, path: adapter_path,
+        name: "lunco:collider:geometrySource", targets: [adapter_source_path]}});
+    ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: adapter_path,
+        schemas: ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]}});
     #{ok: true, kind: "griffin_physical_top_deck_collider", doc_id: doc,
       removed_legacy_path: legacy_path, ring_beam_count: geometry.ring_beams.len(),
       adapter_path: adapter_path, profile_vertex_count: geometry.profile_vertex_count,
@@ -1062,6 +1109,7 @@ fn physical_top_deck_collider_observation(doc, root) {
     let all_beams_match = true;
     let all_beams_collide = true;
     let all_beams_hidden = true;
+    let all_beams_source_linked = true;
     let max_transform_error = 0.0;
     let open_interior_radius = 1.0e30;
     for beam in expected.ring_beams {
@@ -1069,11 +1117,13 @@ fn physical_top_deck_collider_observation(doc, root) {
         let record = assembly_builder::composed_query(doc, #{path: path,
             children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ",
                 "xformOp:scale", "physics:collisionEnabled", "visibility",
-                "purpose", "physics:approximation"]});
+                "purpose", "physics:approximation"],
+            rels: ["lunco:collider:geometrySource"]});
         if !query_ok(record) || record.type_name != "Cube" || record.attrs == () {
             all_beams_match = false;
             all_beams_collide = false;
             all_beams_hidden = false;
+            all_beams_source_linked = false;
             continue;
         }
         let translation = record.attrs["xformOp:translate"];
@@ -1081,6 +1131,7 @@ fn physical_top_deck_collider_observation(doc, root) {
         let scale = record.attrs["xformOp:scale"];
         if translation == () || rotation == () || scale == () {
             all_beams_match = false;
+            all_beams_source_linked = false;
             continue;
         }
         let actual = [_native_vec3_axis(translation, 0), _native_vec3_axis(translation, 1),
@@ -1102,6 +1153,12 @@ fn physical_top_deck_collider_observation(doc, root) {
         if record.attrs["visibility"] != "invisible" || record.attrs["purpose"] != "proxy" {
             all_beams_hidden = false;
         }
+        let source_targets = if record.relationships == () { () }
+            else { record.relationships["lunco:collider:geometrySource"] };
+        if source_targets == () || source_targets.len() != 1
+            || source_targets[0] != root + "/Bus/TopDeckOctagon" {
+            all_beams_source_linked = false;
+        }
         let inner_radius = (beam.translation[0] * beam.translation[0]
             + beam.translation[2] * beam.translation[2]).sqrt()
             - beam.dimensions[2] / 2.0;
@@ -1110,7 +1167,8 @@ fn physical_top_deck_collider_observation(doc, root) {
     let adapter_path = root + "/RoverPayloadDeckCollider";
     let adapter = assembly_builder::composed_query(doc, #{path: adapter_path,
         children: false, attrs: ["points", "faceVertexCounts", "faceVertexIndices",
-            "physics:approximation", "physics:collisionEnabled", "visibility", "purpose"]});
+            "physics:approximation", "physics:collisionEnabled", "visibility", "purpose"],
+        rels: ["lunco:collider:geometrySource"], schemas: true});
     let adapter_matches = query_ok(adapter) && adapter.type_name == "Mesh"
         && adapter.attrs != ()
         && adapter.attrs["faceVertexCounts"] == expected.adapter_face_counts
@@ -1136,10 +1194,19 @@ fn physical_top_deck_collider_observation(doc, root) {
     }
     let adapter_collides = query_ok(adapter) && adapter.attrs != ()
         && adapter.attrs["physics:collisionEnabled"] == true
-        && adapter.attrs["physics:approximation"] == "convexHull";
+        && adapter.attrs["physics:approximation"] == "convexHull"
+        && adapter.api_schemas.contains("PhysicsCollisionAPI")
+        && adapter.api_schemas.contains("PhysicsMeshCollisionAPI");
     let adapter_hidden = query_ok(adapter) && adapter.attrs != ()
         && adapter.attrs["visibility"] == "invisible"
         && adapter.attrs["purpose"] == "proxy";
+    let adapter_targets = if query_ok(adapter) && adapter.relationships != () {
+        adapter.relationships["lunco:collider:geometrySource"]
+    } else { () };
+    let adapter_source_linked = adapter_targets != ()
+        && adapter_targets.len() == 1
+        && adapter_targets[0] == root + "/Bus/RoverPayloadDeck";
+    let source_geometry_linked = all_beams_source_linked && adapter_source_linked;
     let topology_matches = old_hull_removed && expected.ring_beams.len() == 8
         && all_beams_match && adapter_matches && open_interior_radius > 0.0;
     let collision_enabled = all_beams_collide && adapter_collides;
@@ -1149,10 +1216,13 @@ fn physical_top_deck_collider_observation(doc, root) {
         adapter_point_deviation
     } else { max_transform_error };
     let ok = topology_matches && collision_enabled && proxy_hidden
-        && convex_hull_approximation;
+        && convex_hull_approximation && source_geometry_linked;
     #{ok: true, state: if ok { "pass" } else { "fail" },
       legacy_hull_removed: old_hull_removed, ring_beam_count: expected.ring_beams.len(),
       topology_matches: topology_matches, profile_deviation_m: profile_deviation,
+      source_geometry_linked: source_geometry_linked,
+      ring_source_geometry_linked: all_beams_source_linked,
+      payload_source_geometry_linked: adapter_source_linked,
       collision_enabled: collision_enabled, proxy_hidden: proxy_hidden,
       convex_hull_approximation: convex_hull_approximation,
       ring_geometry_matches_source: all_beams_match,
@@ -1172,11 +1242,13 @@ fn physical_top_deck_collider_observation(doc, root) {
 // shapes use the same SysML foot-pad dimensions and leg-local datum.
 fn physical_landing_leg_pad_geometry() {
     let visual = "GriffinLandingLegRequirements::GriffinLandingLegAssembly::";
+    let configuration = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let source = sysml_requirements::source_with_selection([
         visual + "footPadRadiusM", visual + "footPadHeightM",
-        visual + "footPadCenterYM", visual + "physicalLegStations",
-        visual + "physicalLegStationRotationYDeg",
+        visual + "footPadCenterYM",
+        configuration + "legStations", configuration + "legStationRotationYDeg",
         visual + "physicalLegPlacementToleranceM",
+        visual + "physicalLegRotationToleranceDeg",
         visual + "padColliderToleranceM"
     ], ["GriffinLandingLegRequirements::gll005",
         "GriffinLandingLegRequirements::gll008"],
@@ -1188,23 +1260,26 @@ fn physical_landing_leg_pad_geometry() {
     let height = sysml_requirements::number(source, visual + "footPadHeightM");
     let center_y = sysml_requirements::number(source, visual + "footPadCenterYM");
     let stations = sysml_requirement_checks::source_position_list(source,
-        visual + "physicalLegStations");
+        configuration + "legStations");
     let rotations = sysml_requirements::vector(source,
-        visual + "physicalLegStationRotationYDeg");
+        configuration + "legStationRotationYDeg");
     let station_tolerance = sysml_requirements::number(source,
         visual + "physicalLegPlacementToleranceM");
+    let rotation_tolerance = sysml_requirements::number(source,
+        visual + "physicalLegRotationToleranceDeg");
     let tolerance = sysml_requirements::number(source,
         visual + "padColliderToleranceM");
     if radius == () || height == () || center_y == () || tolerance == ()
-        || station_tolerance == ()
+        || station_tolerance == () || rotation_tolerance == ()
         || stations.len() != 4 || rotations.len() != 4
         || radius <= 0.0 || height <= 0.0 || tolerance <= 0.0
-        || station_tolerance <= 0.0 {
+        || station_tolerance <= 0.0 || rotation_tolerance <= 0.0 {
         return plan_error("SysML landing-leg pad or COM-frame station datums are incomplete");
     }
     #{ok: true, radius_m: radius, height_m: height, center_y_m: center_y,
       stations: stations, rotations_y_deg: rotations,
-      tolerance_m: tolerance, station_tolerance_m: station_tolerance}
+      tolerance_m: tolerance, station_tolerance_m: station_tolerance,
+      rotation_tolerance_deg: rotation_tolerance}
 }
 
 fn physical_landing_leg_pad_plan(doc, edit_target, root) {
@@ -1215,7 +1290,6 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
     if geometry.ok != true { return geometry; }
     let suffixes = ["PX", "NX", "PZ", "NZ"];
     let ops = [];
-    let added_visuals = 0;
     let removed_legacy = [];
     for index in 0..suffixes.len() {
         let leg_path = root + "/Leg" + suffixes[index];
@@ -1224,11 +1298,37 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         if !query_ok(leg) || leg.type_name != "Xform" {
             return plan_error(leg_path + ": dynamics leg body is missing or is not an Xform");
         }
+        // This relation targeted the enclosing compound body, so it filtered
+        // no distinct rigid body. Clear its target list through the typed USD
+        // relationship operation and remove its empty applied schema; the root
+        // owns all four leg colliders.
+        ops.push(#{SetRelationship: #{edit_target: edit_target,
+            path: leg_path, name: "physics:filteredPairs", targets: []}});
+        ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: leg_path,
+            schemas: ["PhysicsRigidBodyAPI"]}});
         let station = geometry.stations[index];
         let placement = assembly_builder::place_plan(edit_target, leg_path,
             vec3_array(station), [0.0, geometry.rotations_y_deg[index], 0.0], ());
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
+
+        // The suspension joint's body-side anchor and the referenced leg
+        // body now share the one SysML leg station. This preserves a real
+        // articulated attachment after correcting the legacy low leg pose.
+        let joint_path = root + "/Leg" + suffixes[index] + "_Spring";
+        let joint = assembly_builder::composed_query(doc,
+            #{path: joint_path, children: false});
+        if query_ok(joint) {
+            ops.push(#{SetAttribute: #{edit_target: edit_target,
+                path: joint_path, name: "physics:localPos0", type_name: "point3f",
+                value: "(" + station.x.to_string() + ", "
+                    + station.y.to_string() + ", " + station.z.to_string() + ")"}});
+            ops.push(#{SetAttribute: #{edit_target: edit_target,
+                path: joint_path, name: "physics:localPos1", type_name: "point3f",
+                value: "(0.0, 0.0, 0.0)"}});
+        } else {
+            return plan_error(joint_path + ": physical suspension joint is missing");
+        }
 
         // Remove the assembly-local legacy presentation and pad capsule; the
         // referenced physical leg body, mass, joint, and outputs remain.
@@ -1257,35 +1357,69 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         let visual_path = leg_path + "/LandingLegVisual";
         let visual_prim = assembly_builder::composed_query(doc,
             #{path: visual_path, children: false});
-        if query_ok(visual_prim) {
-            if visual_prim.type_name != "Xform" {
-                return plan_error(visual_path + ": existing visual component must be an Xform");
-            }
-        } else {
-            ops.push(#{AddPrim: #{edit_target: edit_target,
-                parent_path: leg_path, name: "LandingLegVisual", type_name: "Xform",
-                reference: component_asset("lander/griffin_landing_leg_visual.usda"),
-                reference_prim_path: "/LandingLeg"}});
-            added_visuals += 1;
+        if !query_ok(visual_prim) || visual_prim.type_name != "Xform" {
+            return plan_error(visual_path + ": compose the source visual component before deriving its contact geometry");
         }
+        let source_path = visual_path + "/FootPad";
+        let source_shape = assembly_builder::composed_query(doc,
+            #{path: source_path, children: false,
+              attrs: ["radius", "height", "axis", "xformOp:translate",
+                "xformOp:rotateXYZ", "xformOp:scale", "physics:collisionEnabled"]});
+        if !query_ok(source_shape) || source_shape.type_name != "Cylinder"
+            || source_shape.attrs == () {
+            return plan_error(source_path + ": source FootPad must compose as a typed Cylinder before collider derivation");
+        }
+        let source_radius = source_shape.attrs["radius"];
+        let source_height = source_shape.attrs["height"];
+        let source_axis = source_shape.attrs["axis"];
+        let source_translation = source_shape.attrs["xformOp:translate"];
+        let source_rotation = source_shape.attrs["xformOp:rotateXYZ"];
+        let source_scale = source_shape.attrs["xformOp:scale"];
+        if source_radius == () || source_height == () || source_axis != "Y"
+            || source_translation == () || source_translation.len() != 3
+            || source_shape.attrs["physics:collisionEnabled"] != false {
+            return plan_error(source_path + ": source FootPad dimensions, Y axis, transform, and render-only ownership are required");
+        }
+        if (source_radius - geometry.radius_m).abs() > geometry.tolerance_m
+            || (source_height - geometry.height_m).abs() > geometry.tolerance_m
+            || (source_translation[1] - geometry.center_y_m).abs() > geometry.tolerance_m
+            || source_translation[0].abs() > geometry.tolerance_m
+            || source_translation[2].abs() > geometry.tolerance_m {
+            return plan_error(source_path + ": composed visual pad no longer matches its SysML geometry datums");
+        }
+        if source_rotation == () { source_rotation = [0.0, 0.0, 0.0]; }
+        if source_scale == () { source_scale = [1.0, 1.0, 1.0]; }
 
-        let collider_path = leg_path + "/FootPadCollider";
+        // The proxy is a sibling of the visual pad under the same referenced
+        // component frame. Its primitive, dimensions, and local transform are
+        // copied from composed geometry; a typed relationship preserves the
+        // source edge without encoding a prim path in a string attribute.
+        let collider_path = visual_path + "/FootPadCollider";
         let collider = assembly_builder::composed_query(doc,
-            #{path: collider_path, children: false});
+            #{path: collider_path, children: false,
+              attrs: ["lunco:collider:geometrySource", "lunco:requirement"]});
         if query_ok(collider) && collider.type_name != "Cylinder" {
             return plan_error(collider_path + ": contact proxy must remain a UsdGeomCylinder");
         }
+        let legacy_collider_path = leg_path + "/FootPadCollider";
+        if query_ok(assembly_builder::composed_query(doc,
+            #{path: legacy_collider_path, children: false})) {
+            ops.push(#{RemovePrim: #{edit_target: edit_target,
+                path: legacy_collider_path}});
+            removed_legacy.push(legacy_collider_path);
+        }
         if !query_ok(collider) {
             let shape = assembly_builder::cylinder_shape_plan_axis(edit_target,
-                leg_path, "FootPadCollider", geometry.radius_m, geometry.height_m,
-                [0.0, geometry.center_y_m, 0.0], (), (), "Y", true);
+                visual_path, "FootPadCollider", source_radius, source_height,
+                source_translation, source_rotation, source_scale, source_axis, true);
             if !shape.ok { return shape; }
             for op in shape.ops { ops.push(op); }
         } else {
             for item in [
-                #{name: "radius", type_name: "double", value: geometry.radius_m.to_string()},
-                #{name: "height", type_name: "double", value: geometry.height_m.to_string()},
-                #{name: "axis", type_name: "token", value: "\"Y\""},
+                #{name: "radius", type_name: "double", value: source_radius.to_string()},
+                #{name: "height", type_name: "double", value: source_height.to_string()},
+                #{name: "axis", type_name: "token", value: "\"" + source_axis + "\""},
+                #{name: "extent", type_name: "float3[]", value: "[(-" + source_radius.to_string() + ", -" + (source_height / 2.0).to_string() + ", -" + source_radius.to_string() + "), (" + source_radius.to_string() + ", " + (source_height / 2.0).to_string() + ", " + source_radius.to_string() + ")]"},
                 #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
                 #{name: "purpose", type_name: "token", value: "\"proxy\""},
                 #{name: "visibility", type_name: "token", value: "\"invisible\""}
@@ -1293,31 +1427,97 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
                 ops.push(#{SetAttribute: #{edit_target: edit_target, path: collider_path,
                     name: item.name, type_name: item.type_name, value: item.value}});
             }
+            ops.push(#{SetApiSchemas: #{edit_target: edit_target,
+                path: collider_path, schemas: ["PhysicsCollisionAPI"]}});
             let collider_placement = assembly_builder::place_plan(edit_target,
-                collider_path, [0.0, geometry.center_y_m, 0.0], (), ());
+                collider_path, source_translation, source_rotation, source_scale);
             if !collider_placement.ok { return collider_placement; }
             for op in collider_placement.ops { ops.push(op); }
+            if collider.attrs["lunco:collider:geometrySource"] != () {
+                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+                    path: collider_path, name: "lunco:collider:geometrySource"}});
+            }
+            if collider.attrs["lunco:requirement"] != () {
+                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+                    path: collider_path, name: "lunco:requirement"}});
+            }
         }
         for attribute in [
             #{name: "purpose", type_name: "token", value: "\"proxy\""},
-            #{name: "visibility", type_name: "token", value: "\"invisible\""},
-            #{name: "lunco:collider:geometrySource", type_name: "string",
-              value: "\"" + visual_path + "/FootPad\""},
-            #{name: "lunco:requirement", type_name: "string",
-              value: "\"GriffinLandingLegRequirements::GLL008_FootPadGeometry\""}
+            #{name: "visibility", type_name: "token", value: "\"invisible\""}
         ] {
-            ops.push(#{SetAttribute: #{edit_target: edit_target, path: collider_path,
-                name: attribute.name, type_name: attribute.type_name,
-                value: attribute.value}});
+            ops.push(#{SetAttribute: #{edit_target: edit_target,
+                path: collider_path, name: attribute.name,
+                type_name: attribute.type_name, value: attribute.value}});
         }
+        ops.push(#{SetRelationship: #{edit_target: edit_target,
+            path: collider_path, name: "lunco:collider:geometrySource",
+            targets: [source_path]}});
     }
     #{ok: true, kind: "griffin_physical_landing_leg_pads", root: root,
       radius_m: geometry.radius_m, height_m: geometry.height_m,
       center_y_m: geometry.center_y_m, tolerance_m: geometry.tolerance_m,
-      added_visuals: added_visuals, removed_legacy_paths: removed_legacy,
-      collider_paths: [root + "/LegPX/FootPadCollider",
-        root + "/LegNX/FootPadCollider", root + "/LegPZ/FootPadCollider",
-        root + "/LegNZ/FootPadCollider"], ops: ops}
+      removed_legacy_paths: removed_legacy,
+      collider_paths: [root + "/LegPX/LandingLegVisual/FootPadCollider",
+        root + "/LegNX/LandingLegVisual/FootPadCollider",
+        root + "/LegPZ/LandingLegVisual/FootPadCollider",
+        root + "/LegNZ/LandingLegVisual/FootPadCollider"], ops: ops}
+}
+
+fn physical_pad_bounds_deviation(left, right) {
+    if left == () || right == ()
+        || left.frame != "canonical_stage"
+        || right.frame != "canonical_stage" { return (); }
+    let maximum = 0.0;
+    for key in ["min", "max", "center", "half_extents"] {
+        let a = left[key];
+        let b = right[key];
+        if a == () || b == () || a.len() != 3 || b.len() != 3 { return (); }
+        for axis in 0..3 {
+            let delta = (a[axis] - b[axis]).abs();
+            if delta > maximum { maximum = delta; }
+        }
+    }
+    maximum
+}
+
+fn physical_vector_deviation(left, right) {
+    if left == () || right == () || left.len() != right.len() { return (); }
+    let maximum = 0.0;
+    for index in 0..left.len() {
+        let deviation = (left[index] - right[index]).abs();
+        if deviation > maximum { maximum = deviation; }
+    }
+    maximum
+}
+
+fn physical_transform_or_identity(attrs, name, identity) {
+    let value = attrs[name];
+    if value == () { return identity; }
+    if value.len() != identity.len() { return (); }
+    value
+}
+
+fn physical_bounds_overlap_depth(left, right) {
+    if left == () || right == () || left.min == () || right.min == ()
+        || left.max == () || right.max == ()
+        || left.min.len() != 3 || right.min.len() != 3
+        || left.max.len() != 3 || right.max.len() != 3 {
+        return ();
+    }
+    let depths = [];
+    for axis in 0..3 {
+        let lower = if left.min[axis] > right.min[axis] {
+            left.min[axis] } else { right.min[axis] };
+        let upper = if left.max[axis] < right.max[axis] {
+            left.max[axis] } else { right.max[axis] };
+        let depth = upper - lower;
+        if depth < 0.0 { return 0.0; }
+        depths.push(depth);
+    }
+    if depths[0] < depths[1] && depths[0] < depths[2] { return depths[0]; }
+    if depths[1] < depths[2] { return depths[1]; }
+    depths[2]
 }
 
 fn physical_landing_leg_pad_observation(doc, root) {
@@ -1326,38 +1526,93 @@ fn physical_landing_leg_pad_observation(doc, root) {
         return #{ok: false, state: "invalid", detail: geometry.error};
     }
     let suffixes = ["PX", "NX", "PZ", "NZ"];
-    let maximum = 0.0;
+    let geometry_deviation = 0.0;
+    let source_radius_deviation = 0.0;
+    let source_height_deviation = 0.0;
+    let source_center_deviation = 0.0;
     let all_topology = true;
     let all_collision_enabled = true;
     let all_proxy_hidden = true;
     let all_visual_disabled = true;
     let all_legacy_disabled = true;
+    let all_source_relationships = true;
+    let all_self_collision_filters_clear = true;
+    let all_geometry_available = true;
+    let all_axes_match = true;
+    let all_geometry_semantics_match = true;
     let station_deviation = 0.0;
     let rotations_match = true;
+    let minimum_bus_overlap = 1.0e30;
+    let minimum_axle_overlap = 1.0e30;
+    let physical_joints_match = true;
+    let bus_frame = assembly_builder::composed_query(doc,
+        #{path: root + "/Bus/PerimeterFrame", children: false,
+          geometry_bounds: true});
+    if !query_ok(bus_frame) || bus_frame.geometry_bounds == () {
+        return #{ok: false, state: "unavailable",
+            detail: root + ": composed octagonal bus frame geometry is unavailable"};
+    }
     let details = [];
     for index in 0..suffixes.len() {
         let leg_path = root + "/Leg" + suffixes[index];
-        let collider_path = leg_path + "/FootPadCollider";
-        let visual_path = leg_path + "/LandingLegVisual/FootPad";
+        let visual_root = leg_path + "/LandingLegVisual";
+        let collider_path = visual_root + "/FootPadCollider";
+        let visual_path = visual_root + "/FootPad";
         let collider = assembly_builder::composed_query(doc, #{path: collider_path,
-            children: false, attrs: ["radius", "height", "axis", "xformOp:translate",
-                "physics:collisionEnabled", "visibility", "purpose"]});
+            children: false, schemas: true, geometry_bounds: true,
+            attrs: ["radius", "height", "axis", "xformOp:translate",
+                "xformOp:rotateXYZ", "xformOp:scale",
+                "physics:collisionEnabled", "visibility", "purpose",
+                "lunco:collider:geometrySource", "lunco:requirement"],
+            rels: ["lunco:collider:geometrySource"]});
         let visual = assembly_builder::composed_query(doc, #{path: visual_path,
-            children: false, attrs: ["radius", "height", "axis", "xformOp:translate",
+            children: false, geometry_bounds: true,
+            attrs: ["radius", "height", "axis", "xformOp:translate",
+                "xformOp:rotateXYZ", "xformOp:scale",
                 "physics:collisionEnabled", "purpose"]});
+        let mount_arm = assembly_builder::composed_query(doc,
+            #{path: visual_root + "/BodyMountArm", children: false,
+              geometry_bounds: true});
+        let mount_axle = assembly_builder::composed_query(doc,
+            #{path: visual_root + "/MountAxle", children: false,
+              geometry_bounds: true});
         let leg_pose = assembly_builder::composed_query(doc, #{path: leg_path,
-            children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ"]});
+            children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ"],
+            rels: ["physics:filteredPairs"], schemas: true});
+        let joint_path = root + "/Leg" + suffixes[index] + "_Spring";
+        let joint = assembly_builder::composed_query(doc, #{path: joint_path,
+            children: false, attrs: ["physics:localPos0", "physics:localPos1"],
+            rels: ["physics:body0", "physics:body1"]});
         if !query_ok(collider) || !query_ok(visual)
-            || !query_ok(leg_pose) || collider.attrs == () || visual.attrs == ()
+            || !query_ok(mount_arm) || !query_ok(mount_axle)
+            || !query_ok(leg_pose) || !query_ok(joint)
+            || mount_arm.geometry_bounds == () || mount_axle.geometry_bounds == ()
+            || collider.attrs == () || visual.attrs == ()
             || leg_pose.attrs == () {
             return #{ok: false, state: "unavailable",
                 detail: leg_path + ": composed pad proxy or visual source geometry is missing"};
         }
         let actual_station = leg_pose.attrs["xformOp:translate"];
         let actual_rotation = leg_pose.attrs["xformOp:rotateXYZ"];
+        let filtered_pairs = if leg_pose.relationships == () { () }
+            else { leg_pose.relationships["physics:filteredPairs"] };
+        if filtered_pairs != () && filtered_pairs.len() > 0 {
+            all_self_collision_filters_clear = false;
+        }
+        if leg_pose.api_schemas.contains("PhysicsFilteredPairsAPI") {
+            all_self_collision_filters_clear = false;
+        }
         if actual_station == () || actual_rotation == () {
             return #{ok: false, state: "unavailable",
                 detail: leg_path + ": composed physical station or orientation is missing"};
+        }
+        for attrs in [collider.attrs, visual.attrs] {
+            if attrs["radius"] == () || attrs["height"] == ()
+                || attrs["axis"] == () || attrs["xformOp:translate"] == ()
+                || attrs["xformOp:translate"].len() != 3 {
+                return #{ok: false, state: "unavailable",
+                    detail: leg_path + ": pad dimensions or local transform are incomplete"};
+            }
         }
         let expected_station = geometry.stations[index];
         let station_errors = [actual_station[0] - expected_station.x,
@@ -1366,28 +1621,103 @@ fn physical_landing_leg_pad_observation(doc, root) {
         for error in station_errors {
             if error.abs() > station_deviation { station_deviation = error.abs(); }
         }
-        if actual_rotation[0].abs() > geometry.station_tolerance_m
+        if actual_rotation[0].abs() > geometry.rotation_tolerance_deg
             || (actual_rotation[1] - geometry.rotations_y_deg[index]).abs()
-                > geometry.station_tolerance_m
-            || actual_rotation[2].abs() > geometry.station_tolerance_m {
+                > geometry.rotation_tolerance_deg
+            || actual_rotation[2].abs() > geometry.rotation_tolerance_deg {
             rotations_match = false;
+        }
+        let bus_overlap = physical_bounds_overlap_depth(bus_frame.geometry_bounds,
+            mount_arm.geometry_bounds);
+        let axle_overlap = physical_bounds_overlap_depth(mount_arm.geometry_bounds,
+            mount_axle.geometry_bounds);
+        if bus_overlap == () || axle_overlap == () {
+            return #{ok: false, state: "unavailable",
+                detail: leg_path + ": composed bus-mount overlap could not be measured"};
+        }
+        if bus_overlap < minimum_bus_overlap { minimum_bus_overlap = bus_overlap; }
+        if axle_overlap < minimum_axle_overlap { minimum_axle_overlap = axle_overlap; }
+        let joint_targets = if joint.relationships == () { () } else { joint.relationships };
+        let body0_targets = if joint_targets == () { () } else { joint_targets["physics:body0"] };
+        let body1_targets = if joint_targets == () { () } else { joint_targets["physics:body1"] };
+        let expected_joint_anchor = [expected_station.x, expected_station.y, expected_station.z];
+        let joint_anchor = if joint.attrs == () { () } else { joint.attrs["physics:localPos0"] };
+        let joint_other_anchor = if joint.attrs == () { () } else { joint.attrs["physics:localPos1"] };
+        let joint_anchor_error = physical_vector_deviation(joint_anchor, expected_joint_anchor);
+        let joint_other_anchor_error = physical_vector_deviation(joint_other_anchor, [0.0, 0.0, 0.0]);
+        if body0_targets == () || body0_targets.len() != 1 || body0_targets[0] != root
+            || body1_targets == () || body1_targets.len() != 1 || body1_targets[0] != leg_path
+            || joint_anchor == () || joint_other_anchor == ()
+            || joint_anchor_error == () || joint_anchor_error > geometry.station_tolerance_m
+            || joint_other_anchor_error == () || joint_other_anchor_error > geometry.station_tolerance_m {
+            physical_joints_match = false;
         }
         if collider.type_name != "Cylinder" || visual.type_name != "Cylinder" {
             all_topology = false;
         }
         let expected_center = geometry.center_y_m;
-        for pair in [
-            [collider.attrs["radius"], geometry.radius_m],
-            [visual.attrs["radius"], geometry.radius_m],
-            [collider.attrs["height"], geometry.height_m],
-            [visual.attrs["height"], geometry.height_m],
-            [collider.attrs["xformOp:translate"][1], expected_center],
-            [visual.attrs["xformOp:translate"][1], expected_center]
-        ] {
-            if pair[0] == () { return #{ok: false, state: "unavailable",
-                detail: leg_path + ": pad dimension or placement is missing"}; }
-            let deviation = (pair[0] - pair[1]).abs();
-            if deviation > maximum { maximum = deviation; }
+        let source_radius_error = (visual.attrs["radius"] - geometry.radius_m).abs();
+        let source_height_error = (visual.attrs["height"] - geometry.height_m).abs();
+        let source_center_error = physical_vector_deviation(
+            visual.attrs["xformOp:translate"], [0.0, expected_center, 0.0]);
+        let proxy_radius_error = (collider.attrs["radius"] - visual.attrs["radius"]).abs();
+        let proxy_height_error = (collider.attrs["height"] - visual.attrs["height"]).abs();
+        let proxy_center_error = physical_vector_deviation(
+            collider.attrs["xformOp:translate"], visual.attrs["xformOp:translate"]);
+        if source_center_error == () || proxy_center_error == () {
+            return #{ok: false, state: "unavailable",
+                detail: leg_path + ": pad-local source or proxy placement is incomplete"};
+        }
+        let collider_rotation = physical_transform_or_identity(collider.attrs,
+            "xformOp:rotateXYZ", [0.0, 0.0, 0.0]);
+        let visual_rotation = physical_transform_or_identity(visual.attrs,
+            "xformOp:rotateXYZ", [0.0, 0.0, 0.0]);
+        let collider_scale = physical_transform_or_identity(collider.attrs,
+            "xformOp:scale", [1.0, 1.0, 1.0]);
+        let visual_scale = physical_transform_or_identity(visual.attrs,
+            "xformOp:scale", [1.0, 1.0, 1.0]);
+        let collider_rotation_error = physical_vector_deviation(collider_rotation,
+            [0.0, 0.0, 0.0]);
+        let visual_rotation_error = physical_vector_deviation(visual_rotation,
+            [0.0, 0.0, 0.0]);
+        let collider_scale_error = physical_vector_deviation(collider_scale,
+            [1.0, 1.0, 1.0]);
+        let visual_scale_error = physical_vector_deviation(visual_scale,
+            [1.0, 1.0, 1.0]);
+        if collider_rotation_error == () || visual_rotation_error == ()
+            || collider_scale_error == () || visual_scale_error == () {
+            return #{ok: false, state: "unavailable",
+                detail: leg_path + ": pad source or proxy orientation and scale are malformed"};
+        }
+        if source_radius_error > source_radius_deviation {
+            source_radius_deviation = source_radius_error;
+        }
+        if source_height_error > source_height_deviation {
+            source_height_deviation = source_height_error;
+        }
+        if source_center_error > source_center_deviation {
+            source_center_deviation = source_center_error;
+        }
+        for deviation in [proxy_radius_error, proxy_height_error, proxy_center_error] {
+            if deviation > geometry_deviation { geometry_deviation = deviation; }
+        }
+        let bounds_deviation = physical_pad_bounds_deviation(
+            collider.geometry_bounds, visual.geometry_bounds);
+        if bounds_deviation == () {
+            all_topology = false;
+            all_geometry_available = false;
+        } else if bounds_deviation > geometry_deviation {
+            geometry_deviation = bounds_deviation;
+        }
+        if collider.attrs["axis"] != "Y" || visual.attrs["axis"] != "Y" {
+            all_axes_match = false;
+        }
+        if collider.type_name != "Cylinder" || visual.type_name != "Cylinder"
+            || collider.attrs["axis"] != "Y" || visual.attrs["axis"] != "Y"
+            || collider_rotation_error > geometry.rotation_tolerance_deg
+            || visual_rotation_error > geometry.rotation_tolerance_deg
+            || collider_scale_error != 0.0 || visual_scale_error != 0.0 {
+            all_geometry_semantics_match = false;
         }
         if collider.attrs["axis"] != "Y" || visual.attrs["axis"] != "Y"
             || collider.attrs["xformOp:translate"][0].abs() > geometry.tolerance_m
@@ -1403,6 +1733,15 @@ fn physical_landing_leg_pad_observation(doc, root) {
             || collider.attrs["purpose"] != "proxy" {
             all_proxy_hidden = false;
         }
+        if !collider.api_schemas.contains("PhysicsCollisionAPI") {
+            all_collision_enabled = false;
+        }
+        let targets = collider.relationships["lunco:collider:geometrySource"];
+        if targets == () || targets.len() != 1 || targets[0] != visual_path
+            || collider.attrs["lunco:collider:geometrySource"] != ()
+            || collider.attrs["lunco:requirement"] != () {
+            all_source_relationships = false;
+        }
         if visual.attrs["physics:collisionEnabled"] != false {
             all_visual_disabled = false;
         }
@@ -1416,20 +1755,40 @@ fn physical_landing_leg_pad_observation(doc, root) {
                 all_legacy_disabled = false;
             }
         }
+        let legacy_proxy = assembly_builder::composed_query(doc,
+            #{path: leg_path + "/FootPadCollider", children: false});
+        if query_ok(legacy_proxy) { all_legacy_disabled = false; }
         details.push(#{leg: leg_path, proxy: collider_path, visual: visual_path,
             collision_enabled: collider.attrs["physics:collisionEnabled"],
             proxy_hidden: collider.attrs["visibility"] == "invisible",
+            source_relationship: targets, composed_geometry_deviation_m: bounds_deviation,
+            filtered_pairs: filtered_pairs, bus_mount_overlap_m: bus_overlap,
+            mount_axle_overlap_m: axle_overlap, joint_targets: joint_targets,
+            joint_anchor: joint_anchor,
             station: actual_station, rotation_y_deg: actual_rotation[1]});
     }
-    #{ok: true, state: "available", geometry_deviation_m: maximum,
+    #{ok: true, state: "available",
+      geometry_deviation_m: if all_geometry_available { geometry_deviation } else { () },
+      source_radius_deviation_m: source_radius_deviation,
+      source_height_deviation_m: source_height_deviation,
+      source_center_deviation_m: source_center_deviation,
       station_deviation_m: station_deviation,
       rotation_matches: rotations_match,
+      bus_mount_overlap_m: minimum_bus_overlap,
+      mount_axle_overlap_m: minimum_axle_overlap,
+      physical_joints_match: physical_joints_match,
       topology_matches: all_topology,
       collision_enabled: all_collision_enabled,
+      pad_axes_match: all_axes_match,
+      pad_geometry_semantics_match: all_geometry_semantics_match,
       proxy_hidden: all_proxy_hidden,
+      source_relationships_valid: all_source_relationships,
+      self_collision_filter_clear: all_self_collision_filters_clear,
       visual_collision_disabled: all_visual_disabled,
       legacy_collision_disabled: all_legacy_disabled,
-      collision_matches_visual: maximum <= geometry.tolerance_m,
+      collision_matches_visual: all_geometry_available && all_axes_match
+        && all_geometry_semantics_match
+        && geometry_deviation <= geometry.tolerance_m,
       tolerance_m: geometry.tolerance_m, details: details}
 }
 
@@ -2099,53 +2458,6 @@ fn apply_refined_griffin_bus_assembly_rails(doc, edit_target, root, parent_gen) 
       root: root, paths: plan.paths}
 }
 
-// Ensure the standalone Griffin vehicle preview carries its own render intent.
-// The vehicle is deliberately a portable assembly and therefore does not own
-// a terrain scene, sun, or dome light.  Without an authored LunCoEnvironment
-// prim the Editor falls back to the host presentation defaults; a white PBR
-// proxy then saturates and bloom makes the close-up unreadable.  Keep the
-// correction as typed USD operations so the same intent is visible in Edit
-// perspective, journaled, and reloadable instead of hiding it in a viewport
-// preference.
-fn ensure_griffin_visual_environment_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("ensure_griffin_visual_environment_plan requires a document, edit target, and absolute root");
-    }
-    let path = root + "/Environment";
-    let existing = assembly_builder::composed_query(doc, #{path: path, children: false});
-    let ops = [];
-    if query_ok(existing) {
-        if existing.type_name != "LunCoEnvironment" {
-            return plan_error(path + ": expected LunCoEnvironment, got " + existing.type_name);
-        }
-    } else {
-        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: root,
-            name: "Environment", type_name: "LunCoEnvironment",
-            reference: (), reference_prim_path: ""}});
-    }
-    // EV100=16 is the current visual-review calibration for the 128 klx lunar
-    // key used by LunCoSim. EV14 washed out the white proxy and erased the
-    // deck/tank detail in the headful runtime. Keep this builder
-    // datum aligned with the saved vehicle visual source so regeneration does
-    // not reintroduce either failure mode.
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "lunco:env:exposureEv100", type_name: "float", value: "16.0"}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "lunco:env:bloomIntensity", type_name: "float", value: "0.0"}});
-    #{ok: true, kind: "griffin_visual_environment", path: path,
-      exposure_ev100: 16.0, bloom_intensity: 0.0, ops: ops,
-      no_op: false}
-}
-
-fn ensure_griffin_visual_environment(doc, edit_target, root, parent_gen) {
-    let plan = ensure_griffin_visual_environment_plan(doc, edit_target, root);
-    if !plan.ok { return plan; }
-    let command = assembly_edit::batch(doc, "Author Griffin visual environment", plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, command: command,
-      path: plan.path, exposure_ev100: plan.exposure_ev100,
-      bloom_intensity: plan.bloom_intensity}
-}
-
 // Component-local helpers for presentation refinements.  They deliberately
 // use the same typed shape/placement planners as assembly authoring, so a
 // reusable component can be improved in its own Editor document without
@@ -2304,15 +2616,36 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
     let plate_height = _leg_number(source, "footPadPlateHeightM");
     let plate_depth = _leg_number(source, "footPadPlateDepthM");
     let plate_y = _leg_number(source, "footPadPlateCenterYM");
-    if strut_radius == () || strut_height == () || strut_axis == ()
-        || outer_x == () || inner_x == () || strut_y == ()
-        || outer_tilt == () || inner_tilt == () || piston_radius == ()
-        || piston_height == () || piston_y == () || pad_radius == ()
-        || pad_height == () || pad_y == () || clevis_width == ()
-        || clevis_height == () || clevis_depth == () || clevis_y == ()
-        || plate_width == () || plate_height == () || plate_depth == ()
-        || plate_y == () {
+    let overlap = _leg_number(source, "bodyMountOverlapM");
+    let visual = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let body_dimensions = sysml_requirements::native_value(source, visual + "bodyDimensions");
+    let frame_section = sysml_requirements::number(source, visual + "frameRingSectionM");
+    let leg_stations = sysml_requirement_checks::source_position_list(source, visual + "legStations");
+    let missing_strut = strut_radius == () || strut_height == ()
+        || strut_axis == () || outer_x == () || inner_x == ()
+        || strut_y == () || outer_tilt == () || inner_tilt == ();
+    let missing_shock = piston_radius == () || piston_height == ()
+        || piston_y == () || pad_radius == () || pad_height == ()
+        || pad_y == ();
+    let missing_mount = clevis_width == () || clevis_height == ()
+        || clevis_depth == () || clevis_y == () || plate_width == ()
+        || plate_height == () || plate_depth == () || plate_y == ()
+        || overlap == () || body_dimensions == () || frame_section == ();
+    let invalid_mount_source = body_dimensions != ()
+        && type_of(body_dimensions) != "Vec3";
+    if missing_strut || missing_shock || missing_mount || invalid_mount_source
+        || leg_stations.len() != 4 || (overlap != () && overlap <= 0.0) {
         return plan_error("landing-leg SysML geometry datums are incomplete");
+    }
+    let radial_station = (leg_stations[0].x * leg_stations[0].x
+        + leg_stations[0].z * leg_stations[0].z).sqrt();
+    let bus_inner_edge = body_dimensions.x / 2.0 - frame_section / 2.0 - overlap;
+    let axle_inner_edge = radial_station - clevis_height / 2.0;
+    let arm_outer_edge = axle_inner_edge + overlap;
+    let arm_length = arm_outer_edge - bus_inner_edge;
+    let arm_center_x = (bus_inner_edge + arm_outer_edge) / 2.0 - radial_station;
+    if radial_station <= 0.0 || arm_length <= 0.0 {
+        return plan_error("landing-leg mount does not span the bus frame to the clevis axle");
     }
     let ops = [];
     for item in [
@@ -2325,6 +2658,9 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
         #{name: "FootPadPlate", translation: [0.0, plate_y, 0.0],
           rotation: (), scale: [plate_width, plate_height, plate_depth],
           color: [0.20, 0.23, 0.27]},
+        #{name: "BodyMountArm", translation: [arm_center_x, clevis_y, 0.0],
+          rotation: (), scale: [arm_length, clevis_height, clevis_width],
+          color: [0.28, 0.32, 0.38]},
     ] {
         let part = _component_cube_visual_ops(doc, edit_target, root,
             item.name, item.translation, item.rotation, item.scale, item.color);
@@ -2354,16 +2690,23 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
         if !part.ok { return part; }
         for op in part.ops { ops.push(op); }
     }
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
-        name: "lunco:visual:requirement", type_name: "string",
-        value: "\"GriffinLandingLegRequirements::GLL001-GLL008\""}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
-        name: "lunco:visual:configuration", type_name: "string",
-        value: "\"two canted load struts, clevis and axle, shock piston, load plate, foot pad\""}});
+    let root_record = assembly_builder::composed_query(doc, #{path: root,
+        attrs: ["lunco:visual:component", "lunco:visual:requirement",
+            "lunco:visual:configuration"], children: false});
+    if query_ok(root_record) && root_record.attrs != () {
+        for name in ["lunco:visual:component", "lunco:visual:requirement",
+            "lunco:visual:configuration"] {
+            if root_record.attrs[name] != () {
+                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+                    path: root, name: name}});
+            }
+        }
+    }
     #{ok: true, kind: "griffin_landing_leg_component_refinement",
       root: root, paths: [root + "/StrutOuter", root + "/StrutInner",
         root + "/ShockPiston", root + "/FootPad", root + "/MountClevisOuter",
-        root + "/MountClevisInner", root + "/MountAxle", root + "/FootPadPlate"],
+        root + "/MountClevisInner", root + "/MountAxle", root + "/FootPadPlate",
+        root + "/BodyMountArm"],
       ops: ops, no_op: ops.len() == 0}
 }
 
@@ -2559,12 +2902,33 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     let hinge_length = _solar_number(source, "hingeBarLengthM");
     let hinge_y = _solar_number(source, "hingeBarCenterYM");
     let hinge_z = _solar_number(source, "hingeBarCenterZM");
-    let link_width = _solar_number(source, "mountLinkWidthM");
     let link_height = _solar_number(source, "mountLinkHeightM");
     let link_depth = _solar_number(source, "mountLinkDepthM");
-    let link_x = _solar_number(source, "mountLinkCenterXM");
     let link_y = _solar_number(source, "mountLinkCenterYM");
     let link_z = _solar_number(source, "mountLinkCenterZM");
+    let visual = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let frame_rail_names = sysml_requirement_checks::source_enum_identifiers(source,
+        visual + "frameRails");
+    let frame_rail_stations = sysml_requirement_checks::source_position_list(source,
+        visual + "railStations");
+    let solar_stations = sysml_requirement_checks::source_position_list(source,
+        visual + "solarStations");
+    let solar_rotations_x = sysml_requirement_checks::source_number_list(source,
+        visual + "solarStationRotationXDeg");
+    let mount_rail_names = sysml_requirement_checks::source_enum_identifiers(source,
+        visual + "solarMountRails");
+    let mount_rail_x = [];
+    let mount_rail_z = [];
+    if frame_rail_names.len() == frame_rail_stations.len() {
+        for mount_name in mount_rail_names {
+            for index in 0..frame_rail_names.len() {
+                if frame_rail_names[index] == mount_name {
+                    mount_rail_x.push(frame_rail_stations[index].x);
+                    mount_rail_z.push(frame_rail_stations[index].z);
+                }
+            }
+        }
+    }
     if frame_width == () || frame_thickness == () || frame_depth == ()
         || cell_width == () || cell_thickness == () || cell_depth == ()
         || cell_offset == () || backplane_thickness == () || backplane_center == () {
@@ -2578,8 +2942,9 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         return plan_error("solar-panel divider or bracket datums are incomplete");
     }
     if hinge_radius == () || hinge_length == () || hinge_y == () || hinge_z == ()
-        || link_width == () || link_height == () || link_depth == ()
-        || link_x == () || link_y == () || link_z == () {
+        || link_height == () || link_depth == () || link_y == () || link_z == ()
+        || mount_rail_x.len() != 4 || mount_rail_z.len() != 4
+        || solar_stations.len() != 2 || solar_rotations_x.len() != 2 {
         return plan_error("solar-panel hinge or mount-link datums are incomplete");
     }
     let ops = [];
@@ -2589,14 +2954,11 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     for op in frame.ops { ops.push(op); }
     let cubes = [
         #{name: "ArrayBackplane", translation: [0.0, backplane_center, 0.0], rotation: (),
-          scale: [cell_width / 2.0, backplane_thickness / 2.0, cell_depth / 2.0],
+          scale: [cell_width, backplane_thickness, cell_depth],
           color: [0.015, 0.035, 0.12]},
         #{name: "Cells", translation: [0.0, cell_offset, 0.0], rotation: (),
-          scale: [cell_width / 2.0, cell_thickness / 2.0, cell_depth / 2.0],
+          scale: [cell_width, cell_thickness, cell_depth],
           color: [0.025, 0.12, 0.48]},
-        #{name: "MountBracket", translation: [0.0, -bracket_thickness / 2.0, 0.0], rotation: (),
-          scale: [bracket_width / 2.0, bracket_thickness / 2.0, bracket_depth / 2.0],
-          color: [0.12, 0.15, 0.20]},
     ];
     for item in cubes {
         let part = _component_cube_visual_ops(doc, edit_target, root,
@@ -2609,7 +2971,7 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         let name = "CellDividerX" + index.to_string();
         let divider = _component_cube_visual_ops(doc, edit_target, root, name,
             [-cell_width / 2.0 + cell_width * index / columns, divider_y, 0.0], (),
-            [divider_width / 2.0, divider_thickness / 2.0, cell_depth / 2.0],
+            [divider_width, divider_thickness, cell_depth],
             [0.72, 0.78, 0.88]);
         if !divider.ok { return divider; }
         for op in divider.ops { ops.push(op); }
@@ -2618,7 +2980,7 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         let name = "CellDividerZ" + index.to_string();
         let divider = _component_cube_visual_ops(doc, edit_target, root, name,
             [0.0, divider_y, -cell_depth / 2.0 + cell_depth * index / rows], (),
-            [cell_width / 2.0, divider_thickness / 2.0, divider_span / 2.0],
+            [cell_width, divider_thickness, divider_span],
             [0.72, 0.78, 0.88]);
         if !divider.ok { return divider; }
         for op in divider.ops { ops.push(op); }
@@ -2632,27 +2994,74 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     }
     let hinge = _component_cylinder_visual_ops(doc, edit_target, root,
         "HingeBar", [0.0, hinge_y, hinge_z], (), hinge_radius,
-        hinge_length, "Z", [0.16, 0.19, 0.24]);
+        hinge_length, "X", [0.16, 0.19, 0.24]);
     if !hinge.ok { return hinge; }
     for op in hinge.ops { ops.push(op); }
-    let link = _component_cube_visual_ops(doc, edit_target, root,
-        "MountLink", [link_x, link_y, link_z], (),
-        [link_width / 2.0, link_height / 2.0, link_depth / 2.0],
-        [0.10, 0.13, 0.18]);
-    if !link.ok { return link; }
-    for op in link.ops { ops.push(op); }
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
-        name: "lunco:visual:requirement", type_name: "string",
-        value: "\"GriffinSolarRequirements::GSA001-GSA008\""}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: root,
-        name: "lunco:visual:cell_face_normal", type_name: "token",
-        value: "\"+Y; outward after signed assembly X rotation onto the signed Z side\""}});
+    let mount_names = ["Port", "Starboard"];
+    let half_frame_width = frame_width / 2.0;
+    let minimum_overlap = _solar_number(source, "minimumMountOverlapM");
+    if minimum_overlap == () || minimum_overlap <= 0.0 {
+        return plan_error("solar-panel minimum mount overlap is missing from SysML");
+    }
+    let bracket_center_y = [];
+    for array_index in 0..solar_stations.len() {
+        let pair = array_index * 2;
+        let sign = if solar_rotations_x[array_index] > 0.0 { 1.0 } else { -1.0 };
+        let left_y = (mount_rail_z[pair] - solar_stations[array_index].z) / sign;
+        let right_y = (mount_rail_z[pair + 1] - solar_stations[array_index].z) / sign;
+        if (left_y - right_y).abs() > minimum_overlap {
+            return plan_error("each solar array must align both brackets to its signed-Z corner posts");
+        }
+        bracket_center_y.push((left_y + right_y) / 2.0);
+    }
+    if (bracket_center_y[0] - bracket_center_y[1]).abs() > minimum_overlap {
+        return plan_error("mirrored solar arrays do not share one component bracket datum");
+    }
+    for index in 0..mount_names.len() {
+        let rail_x = mount_rail_x[index];
+        let side = mount_names[index];
+        let bracket = _component_cube_visual_ops(doc, edit_target, root,
+            "MountBracket" + side, [rail_x, bracket_center_y[0], 0.0], (),
+            [bracket_width, bracket_thickness, bracket_depth],
+            [0.12, 0.15, 0.20]);
+        if !bracket.ok { return bracket; }
+        for op in bracket.ops { ops.push(op); }
+        let overlap_extension = minimum_overlap * 2.0;
+        let link_width = half_frame_width - rail_x.abs() + overlap_extension;
+        let link_x = (half_frame_width + rail_x.abs() - overlap_extension) / 2.0;
+        let link = _component_cube_visual_ops(doc, edit_target, root,
+            "MountLink" + side, [if rail_x < 0.0 { -link_x } else { link_x }, link_y, link_z], (),
+            [link_width, link_height, link_depth],
+            [0.10, 0.13, 0.18]);
+        if !link.ok { return link; }
+        for op in link.ops { ops.push(op); }
+    }
+    for name in ["MountBracket", "MountLink"] {
+        let path = root + "/" + name;
+        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) {
+            ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
+        }
+    }
+    let root_record = assembly_builder::composed_query(doc, #{path: root,
+        attrs: ["lunco:visual:component", "lunco:visual:requirement",
+            "lunco:visual:cell_face_normal"], children: false});
+    if query_ok(root_record) && root_record.attrs != () {
+        for name in ["lunco:visual:component", "lunco:visual:requirement",
+            "lunco:visual:cell_face_normal"] {
+            if root_record.attrs[name] != () {
+                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+                    path: root, name: name}});
+            }
+        }
+    }
     let paths = [root + "/Frame", root + "/ArrayBackplane", root + "/Cells"];
     for index in 1..columns { paths.push(root + "/CellDividerX" + index.to_string()); }
     for index in 1..rows { paths.push(root + "/CellDividerZ" + index.to_string()); }
-    paths.push(root + "/MountBracket");
     paths.push(root + "/HingeBar");
-    paths.push(root + "/MountLink");
+    for side in ["Port", "Starboard"] {
+        paths.push(root + "/MountBracket" + side);
+        paths.push(root + "/MountLink" + side);
+    }
     #{ok: true, kind: "griffin_solar_panel_component_refinement",
       root: root, paths: paths,
       ops: ops, no_op: ops.len() == 0}
@@ -3240,6 +3649,19 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         name: "purpose", type_name: "token", value: "\"render\""}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
         name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
+    let component_record = assembly_builder::composed_query(doc,
+        #{path: root, attrs: ["lunco:visual:component",
+            "lunco:visual:datum", "lunco:visual:skirt_metric_envelope"],
+          children: false});
+    if query_ok(component_record) && component_record.attrs != () {
+        for name in ["lunco:visual:component", "lunco:visual:datum",
+            "lunco:visual:skirt_metric_envelope"] {
+            if component_record.attrs[name] != () {
+                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+                    path: root, name: name}});
+            }
+        }
+    }
     paths.push(shell_path);
     #{ok: true, kind: "griffin_engine_skirt_refinement", root: root,
       paths: paths, ops: ops, no_op: ops.len() == 0}
@@ -3249,6 +3671,35 @@ fn apply_refined_griffin_engine_skirt(doc, edit_target, root, parent_gen) {
     let plan = refine_griffin_engine_skirt_plan(doc, edit_target, root);
     if !plan.ok || plan.no_op { return plan; }
     let command = assembly_edit::batch(doc, "Refine Griffin engine skirt", plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, command: command,
+      root: root, paths: plan.paths}
+}
+
+fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("refine_griffin_engine_bell_component_plan requires a document, edit target, and absolute root");
+    }
+    let component = _component_query(doc, root);
+    if !component.ok || component.type_name != "Xform" {
+        return plan_error(root + ": engine-bell component root is missing or not Xform");
+    }
+    let record = assembly_builder::composed_query(doc, #{path: root,
+        attrs: ["lunco:visual:component"], children: false});
+    let ops = [];
+    if query_ok(record) && record.attrs != ()
+        && record.attrs["lunco:visual:component"] != () {
+        ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+            path: root, name: "lunco:visual:component"}});
+    }
+    #{ok: true, kind: "griffin_engine_bell_component_refinement",
+      root: root, paths: [root], ops: ops, no_op: ops.len() == 0}
+}
+
+fn apply_refined_griffin_engine_bell(doc, edit_target, root, parent_gen) {
+    let plan = refine_griffin_engine_bell_component_plan(doc, edit_target, root);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc,
+        "Remove stale Griffin engine-bell string metadata", plan.ops, parent_gen);
     #{ok: command.ok != false, kind: plan.kind, command: command,
       root: root, paths: plan.paths}
 }
@@ -3539,19 +3990,19 @@ fn _physical_ramp_contact_track_ops(doc, edit_target, root, source, side,
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
         ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path,
-            schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
+            schemas: ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI",
+                "MaterialBindingAPI"]}});
         for attribute in [
             #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
             #{name: "purpose", type_name: "token", value: "\"render\""},
-            #{name: "primvars:displayColor", type_name: "color3f[]", value: "[(0.34, 0.38, 0.44)]"},
-            #{name: "lunco:collider:geometrySource", type_name: "string",
-              value: "\"FlipRequirements::FlipRover::wheelStationZ+visualRoverWheelWidthM; GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM+rampSurfaceLengthM+rampSurfaceThicknessM+physicalRampPortDeploymentAngleRad+physicalRampStarboardDeploymentAngleRad\""},
-            #{name: "lunco:requirement", type_name: "string",
-              value: "\"GriffinRampRequirements::GRR006_RampGeometry\""}
+            #{name: "primvars:displayColor", type_name: "color3f[]", value: "[(0.34, 0.38, 0.44)]"}
         ] {
             ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
                 name: attribute.name, type_name: attribute.type_name,
                 value: attribute.value}});
+        }
+        for op in remove_legacy_semantic_string_ops(doc, edit_target, path) {
+            ops.push(op);
         }
     }
     #{ok: true, kind: "griffin_physical_ramp_contact_tracks", ops: ops,
@@ -3872,14 +4323,13 @@ fn _physical_ramp_transition_ops(doc, edit_target, root, side,
         #{name: "physics:mass", type_name: "float", value: mass.to_string()},
         #{name: "physics:diagonalInertia", type_name: "float3",
           value: "(" + inertia[0].to_string() + ", " + inertia[1].to_string()
-            + ", " + inertia[2].to_string() + ")"},
-        #{name: "lunco:component_role", type_name: "string",
-          value: "physical ramp deck transition rigid-body frame"},
-        #{name: "lunco:requirement", type_name: "string",
-          value: "GriffinRampRequirements::GRR012_PhysicalDeckTransition"},
+            + ", " + inertia[2].to_string() + ")"}
     ] {
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
             name: item.name, type_name: item.type_name, value: item.value}});
+    }
+    for op in remove_legacy_semantic_string_ops(doc, edit_target, path) {
+        ops.push(op);
     }
     let existing_contact = assembly_builder::composed_query(doc,
         #{path: contact_path, children: false});
@@ -3902,14 +4352,13 @@ fn _physical_ramp_transition_ops(doc, edit_target, root, side,
         #{name: "purpose", type_name: "token", value: "\"render\""},
         #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
         #{name: "primvars:displayColor", type_name: "color3f[]",
-          value: "[(0.42, 0.26, 0.12)]"},
-        #{name: "lunco:component_role", type_name: "string",
-          value: "physical ramp deck transition contact surface"},
-        #{name: "lunco:requirement", type_name: "string",
-          value: "GriffinRampRequirements::GRR012_PhysicalDeckTransition"},
+          value: "[(0.42, 0.26, 0.12)]"}
     ] {
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: contact_path,
             name: item.name, type_name: item.type_name, value: item.value}});
+    }
+    for op in remove_legacy_semantic_string_ops(doc, edit_target, contact_path) {
+        ops.push(op);
     }
     let suffix = if side == "port" { "Port" } else { "Starboard" };
     let joint_name = joint_prefix + suffix;
@@ -3942,14 +4391,13 @@ fn _physical_ramp_transition_ops(doc, edit_target, root, side,
           value: "(" + anchor_x.to_string() + ", " + mount_y.to_string()
             + ", " + mount_z.to_string() + ")"},
         #{name: "physics:localPos1", type_name: "point3f", value: "(0.0, 0.0, 0.0)"},
-        #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
-        #{name: "lunco:component_role", type_name: "string",
-          value: "fixed physical deck transition joint"},
-        #{name: "lunco:requirement", type_name: "string",
-          value: "GriffinRampRequirements::GRR012_PhysicalDeckTransition"},
+        #{name: "physics:collisionEnabled", type_name: "bool", value: "false"}
     ] {
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: joint_path,
             name: item.name, type_name: item.type_name, value: item.value}});
+    }
+    for op in remove_legacy_semantic_string_ops(doc, edit_target, joint_path) {
+        ops.push(op);
     }
     #{ok: true, path: path, name: name, center_x_m: center_x,
       transition_length_m: transition_length, mass_kg: mass, inertia_kg_m2: inertia,
@@ -3995,7 +4443,7 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
     let thickness = _sysml_number(source, "rampSurfaceThicknessM");
     let rail_height = _sysml_number(source, "rampRailHeightM");
     let rail_width = _sysml_number(source, "rampRailWidthM");
-    let stowed_x = length / 2.0;
+    let stowed_x = if length == () { () } else { length / 2.0 };
     let surface_y = _sysml_number(source, "rampSurfaceCenterYM");
     let rail_y = _sysml_number(source, "rampRailCenterYM");
     let stowed_angle = _sysml_number(source, "physicalRampStowedAngleRad");
@@ -4047,6 +4495,9 @@ fn isolated_griffin_physical_ramp_stowed_plan(doc, edit_target, root, side) {
         [mount_x, mount_y, mount_z], (), ());
     if !root_placement.ok { return root_placement; }
     for op in root_placement.ops { ops.push(op); }
+    for op in remove_legacy_semantic_string_ops(doc, edit_target, root) {
+        ops.push(op);
+    }
     let mass_properties = _physical_ramp_mass_property_ops(edit_target, root, source);
     if !mass_properties.ok { return mass_properties; }
     for op in mass_properties.ops { ops.push(op); }
@@ -4405,6 +4856,159 @@ fn apply_normalize_griffin_visual_ramp(doc, edit_target, root, side, parent_gen)
     #{ok: command.ok != false, kind: plan.kind, command: command,
       root: root, side: side, state: plan.state,
       removed_overlay_children: plan.removed_overlay_children}
+}
+
+// Replace obsolete inline flight-model render primitives with references to
+// the same maintained component assets used by the visual review assembly.
+// Engine and solar stations are read from GriffinVisualConfiguration; shared
+// component files remain the only owners of their shapes and dimensions.
+fn _migrate_griffin_component_reference(doc, edit_target, parent, name,
+    asset, asset_root, translation, rotation, required_children) {
+    let path = parent + "/" + name;
+    let existing = assembly_builder::composed_query(doc,
+        #{path: path, children: true});
+    if query_ok(existing) && existing.type_name == "Xform"
+        && existing.children != () {
+        let complete = true;
+        for child in required_children {
+            if !existing.children.contains(path + "/" + child) {
+                complete = false;
+            }
+        }
+        if complete {
+            let placement = assembly_builder::place_plan(edit_target, path,
+                translation, rotation, ());
+            if !placement.ok { return placement; }
+            return #{ok: true, path: path, ops: placement.ops,
+                replaced: false};
+        }
+    }
+
+    let ops = [];
+    if query_ok(existing) {
+        ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
+    }
+    let temporary_name = "__GriffinComponentMigration_" + name;
+    let temporary_path = parent + "/" + temporary_name;
+    let temporary = assembly_builder::composed_query(doc,
+        #{path: temporary_path, children: false});
+    if query_ok(temporary) {
+        ops.push(#{RemovePrim: #{edit_target: edit_target,
+            path: temporary_path}});
+    }
+    let reference = assembly_builder::referenced_instance_targeted_plan(
+        doc, edit_target, parent, temporary_name, "Xform", asset,
+        asset_root, translation, rotation, (), (), ());
+    if !reference.ok { return reference; }
+    for op in reference.ops { ops.push(op); }
+    ops.push(#{MovePrim: #{edit_target: edit_target,
+        from_path: temporary_path, to_path: path}});
+    #{ok: true, path: path, ops: ops, replaced: true}
+}
+
+fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("migrate_griffin_physical_visuals_plan requires a document, edit target, and absolute root");
+    }
+    let solar_names = griffin_spec::solar_array_names();
+    let solar_stations = griffin_spec::component_solar_stations();
+    let solar_rot_x = griffin_spec::component_solar_station_rotation_x_deg();
+    let solar_rot_z = griffin_spec::component_solar_station_rotation_z_deg();
+    let engine_names = griffin_spec::main_engine_names();
+    let engine_stations = griffin_spec::component_engine_stations();
+    let source = sysml_requirements::source();
+    let solar_members = sysml_requirement_checks::source_enum_identifiers(source,
+        "GriffinSolarRequirements::GriffinSolarArrayAssembly::childNames");
+    let engine_members = sysml_requirement_checks::source_enum_identifiers(source,
+        "GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::childNames");
+    let skirt_package = "GriffinPropulsionRequirements::GriffinEngineSkirtComponent::";
+    let skirt_name = sysml_requirements::text(source, skirt_package + "componentRootName");
+    let skirt_members = sysml_requirement_checks::source_text_list(source,
+        skirt_package + "componentMemberNames");
+    let skirt_shell = sysml_requirements::text(source, skirt_package + "shellName");
+    let skirt_adapter = sysml_requirements::text(source, skirt_package + "adapterPlateName");
+    let skirt_y = sysml_requirements::number(source,
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::engineClusterMountYM");
+    skirt_members.push(skirt_shell);
+    skirt_members.push(skirt_adapter);
+    if solar_names.len() != 2 || solar_members.len() == 0
+        || solar_stations.len() != solar_names.len()
+        || solar_rot_x.len() != solar_names.len()
+        || solar_rot_z.len() != solar_names.len()
+        || engine_names.len() != 7 || engine_stations.len() != engine_names.len()
+        || engine_members.len() != 2 || skirt_name == () || skirt_name == ""
+        || skirt_members.len() != 6 || skirt_y == () {
+        return plan_error("typed Griffin leg, solar, or propulsion stations are incomplete");
+    }
+    let ops = [];
+    let migrated = [];
+    let solar_asset = component_asset("lander/griffin_solar_panel_visual.usda");
+    for index in 0..solar_names.len() {
+        let result = _migrate_griffin_component_reference(doc, edit_target,
+            root, solar_names[index], solar_asset, "/SolarPanel",
+            vec3_array(solar_stations[index]),
+            [solar_rot_x[index], 0.0, solar_rot_z[index]],
+            solar_members);
+        if !result.ok { return result; }
+        for op in result.ops { ops.push(op); }
+        migrated.push(result.path);
+    }
+
+    let engine_parent = root + "/Nozzle/MainEngineCluster";
+    let engine_asset = component_asset("lander/griffin_engine_bell_visual.usda");
+    for index in 0..engine_names.len() {
+        let result = _migrate_griffin_component_reference(doc, edit_target,
+            engine_parent, engine_names[index], engine_asset, "/EngineBell",
+            vec3_array(engine_stations[index]), (), engine_members);
+        if !result.ok { return result; }
+        for op in result.ops { ops.push(op); }
+        migrated.push(result.path);
+    }
+
+    let skirt_asset = component_asset("lander/griffin_engine_skirt_visual.usda");
+    let skirt_result = _migrate_griffin_component_reference(doc, edit_target,
+        engine_parent, skirt_name, skirt_asset, "/World/EngineSkirt",
+        [0.0, skirt_y, 0.0], (), skirt_members);
+    if !skirt_result.ok { return skirt_result; }
+    for op in skirt_result.ops { ops.push(op); }
+    migrated.push(skirt_result.path);
+
+    // MainEngineVisual remains the flight force actuator. Its seven guide
+    // cones were a second, non-source-owned nozzle layout and are obsolete.
+    let actuator = root + "/MainEngineVisual";
+    for name in ["NozzleCenter", "NozzlePX", "NozzleNX", "NozzlePZ",
+        "NozzleNZ", "NozzleDiagP", "NozzleDiagN"] {
+        let path = actuator + "/" + name;
+        if query_ok(assembly_builder::composed_query(doc,
+            #{path: path, children: false})) {
+            ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
+        }
+    }
+    let nozzle = root + "/Nozzle";
+    let nozzle_record = assembly_builder::composed_query(doc,
+        #{path: nozzle, attrs: ["lunco:parameter_status",
+            "lunco:provenance:source"], children: false});
+    if query_ok(nozzle_record) && nozzle_record.attrs != () {
+        for name in ["lunco:parameter_status", "lunco:provenance:source"] {
+            if nozzle_record.attrs[name] != () {
+                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+                    path: nozzle, name: name}});
+            }
+        }
+    }
+    #{ok: true, kind: "griffin_physical_visual_component_migration",
+      root: root, migrated_paths: migrated, ops: ops,
+      no_op: ops.len() == 0}
+}
+
+fn apply_migrated_griffin_physical_visuals(doc, edit_target, root, parent_gen) {
+    let plan = migrate_griffin_physical_visuals_plan(doc, edit_target, root);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc,
+        "Migrate Griffin solar arrays and main engines to shared components",
+        plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, root: root,
+      migrated_paths: plan.migrated_paths, command: command}
 }
 
 fn apply_isolated_griffin(doc, edit_target, root, parent_gen) {
