@@ -19,12 +19,21 @@ number changes.
 - Public status at handoff: lander environmental testing and late-2026 launch
   planning; exact flight state and final surface coordinates remain subject to
   change.
-- Griffin-1 solar integration: Astrobotic's public post states that two of
-  three solar panels are integrated and that the mission-window Sun path
-  crosses the quadrant where the panels are positioned. Astrobotic's June 2026
-  integration photograph shows three upright panel faces on adjacent sides
-  of one lander sector. This supports count and qualitative arrangement only;
-  the image has no engineering scale or complete view of hidden interfaces.
+- Astrobotic's [manifest](https://www.astrobotic.com/lunar-delivery/manifest/)
+  lists the Griffin destination as Nobile Region 2026; NASA's [Moon Base
+  update](https://www.nasa.gov/news-release/nasa-provides-update-on-moon-base-rovers-landers-missions/)
+  describes launch as planned later in 2026. Public material reviewed here
+  does not provide the launch UTC or lunar landing epoch. The scene's authored
+  epoch is a repeatable study condition, not a flight date.
+- Griffin-1 solar configuration: Astrobotic's [solar setup post](https://lnkd.in/p/dJHz9duN)
+  describes transit Sun-pointing and places the surface panels in the single
+  quadrant traversed by the mission-window Sun path. Its two-installed,
+  one-remaining wording records build status at publication; the mission
+  configuration requirement remains the canonical `solarArrayCount` in
+  `griffin_lander_requirements.sysml`. The June 2026 [integration image](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg)
+  shows upright panels across adjacent sides of one lander sector. Image
+  evidence supports qualitative layout only, not scale, exact normals, mount
+  interfaces, or performance tolerances.
 - Griffin propulsion baseline: Astrobotic's current Griffin product page says
   seven main engines. The older polar/VIPER Griffin User Guide describes a
   five-engine baseline, so the older count is not applied to Griffin-1.
@@ -42,11 +51,12 @@ mission-owner data is supplied, do not present these as Griffin flight values:
 | FLIP wheel count, geometry, wheel loads, motor data, battery ICD | mostly unknown | active four-wheel all-wheel-steer study proxy; Astrolab confirms full-size wheels/battery but not the station ICD; replace from supplier data |
 | exact landing coordinates | unresolved | reproducible NOBILE03 regional study anchor; not a flight touchdown coordinate |
 | terrain relief | source-backed regional product | 512 m NOBILE03 crop, locally reprojected and vertically normalized for the Twin |
-| lighting, epoch, communications geometry | study setup | deterministic local environment |
+| lighting / epoch | deterministic study condition | scene root TDB JD 2461395.5; the NOBILE03 regional anchor gives Sun azimuth 7.52° clockwise from north and elevation 6.49° at that epoch using the simulator ephemeris. Runtime ephemeris drives the scene Sun from the authored epoch and site anchor; this does not assert a flight landing time. Reproduce with `cargo run -p lunco-celestial-ephemeris --example sun_at_site -- -84.72672255 29.14428685 2461395.5 1.0 0.125` |
+| communications geometry | study setup | deterministic local environment |
 | FLIP flight-stack attachment | unresolved in public data and previous solver trial | active prototype now uses a scene-level fixed top-deck adapter joint, detached after touchdown; validate against the next runtime test |
 | Griffin payload capacity | source-backed product value | 625 kg published by Astrobotic; integrated mission load is a separate manifest quantity |
 | deck and egress | public mechanical ICD not released | four-leg wrapper with isogrid deck and optional side ramps; FLIP's public concept supports direct top-deck egress |
-| Griffin-1 solar layout | count and quadrant are source-backed; exact installation geometry is unknown | three upright panels are shown across adjacent lander sides in current integration imagery; current Twin still composes two opposite-side arrays and is nonconforming. Stations, azimuths, dimensions, support/hinge geometry, cell layout, electrical data, and deployment states are unresolved |
+| Griffin-1 solar configuration | count, transit Sun-pointing intent, and surface quadrant are source-backed; exact engineering values are unknown | SysML requires the canonical array count, adjacent-side installation within the mission Sun quadrant, and transit Sun-pointing when constraints permit. Current Twin still composes two opposite-side arrays and is nonconforming. Stations, panel normals, dimensions, support/hinge geometry, cell layout, control limits, electrical data, and deployment states are unresolved |
 | propellant tank count/type | unknown | four COPV-style visual assemblies are a Twin study assumption, not a published Griffin-1 tank ICD |
 
 ## NOBILE03 terrain processing record

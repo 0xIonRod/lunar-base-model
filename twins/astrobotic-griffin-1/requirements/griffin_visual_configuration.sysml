@@ -51,7 +51,6 @@ package GriffinVisualConfigurationRequirements {
         LegNZ;
     }
     enum def GriffinSolarArrayInstanceName {
-        /* These are the two currently authored proxy roots, not the Griffin-1 mission panel identity set. */
         SolarPanelPort;
         SolarPanelStarboard;
     }
@@ -144,9 +143,6 @@ package GriffinVisualConfigurationRequirements {
             ("TankPX", "TankNX", "TankPZ", "TankNZ");
         attribute landingLegInstances : GriffinLandingLegInstanceName[4] =
             ("LegPX", "LegNX", "LegPZ", "LegNZ");
-        /* This is the existing two-array visual proxy identity list. The
-         * mission requirement expects three panels; do not infer the third
-         * identity or placement without the controlled installation package. */
         attribute solarArrayInstances : GriffinSolarArrayInstanceName[2] =
             ("SolarPanelPort", "SolarPanelStarboard");
         attribute mainEngineInstances : GriffinMainEngineInstanceName[7] =
@@ -203,8 +199,8 @@ package GriffinVisualConfigurationRequirements {
          * leg mount interface one canonical orientation at every bus side. */
         attribute legStationRotationYDeg : Real[4] = (0.0, 180.0, -90.0, 90.0);
 
-        /* The following transforms and bracket rails describe only the
-         * opposite-side proxy. They are not Griffin-1 installation datums. */
+        /* Station, orientation, and mount-rail lists use the same index order
+         * as solarArrayInstances. */
         attribute solarStations : Position[2] =
             ((0.0, 3.20, 2.90), (0.0, 3.20, -2.90));
         // Each solar array maps its two local X mounts to the corner posts on
@@ -248,7 +244,7 @@ package GriffinVisualConfigurationRequirements {
     }
 
     requirement def GVC001_ConfigurationSelection {
-        doc /* GVC-001 [configuration] the review model shall identify the landed polar side-array configuration and stowed ramp state with SysML enumerations, keeping optional deployed egress geometry out of the primary silhouette. Source: Astrobotic Griffin product material and NASA/Astrobotic Lunar Landers User Guide. */
+        doc /* GVC-001 [configuration] the review model shall identify the landed polar side-array configuration and stowed ramp state with SysML enumerations, keeping optional deployed egress geometry out of the primary silhouette. */
     }
     requirement def GVC002_FrameAndOrigin {
         doc /* GVC-002 [datum] every component station shall use the declared native Position/Direction assembly frame and origin; this shared frame makes mirror, clearance, and Editor readback checks meaningful. Rationale: the prior diagonal/axis mismatch let the builder and verifier accept different layouts. */
@@ -263,7 +259,7 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-005 [layout] four leg roots shall occupy mirrored axial X/Z stations at a 3.10 m radial offset beyond the enlarged octagonal body, with local radial rotations and at least 0.20 m body-to-ground visual clearance. Source: Griffin's four shock-absorbing legs; exact station ICD is not public. */
     }
     requirement def GVC006_SolarStations {
-        doc /* GVC-006 [study configuration] the currently authored two-panel, opposite-signed-Z stations and 4.80 m by 3.00 m envelopes are retained only as a replaceable visual proxy. They do not represent Griffin-1: current Astrobotic integration imagery shows three upright panels across adjacent lander sides in one azimuth sector. Replace the proxy with three mission-identified panel assemblies and the controlled station/orientation/support data before claiming compliance. */
+        doc /* GVC-006 [configuration] for each solar-array identity, the configuration shall provide one assembly-frame station, panel orientation, and supporting bus-rail mapping. The configured stations shall satisfy the adjacent-side Sun-quadrant relationship defined by GriffinSolarRequirements. */
     }
     requirement def GVC007_TankPlacement {
         doc /* GVC-007 [layout] exactly four COPV visual proxies shall occupy equally spaced cardinal-axis stations in the Y=3.20 m bus-origin plane and pass through the upper and lower support-ring openings. A 0.84 m nominal tank radius at 0.90 assembly scale gives a 1.512 m installed vessel diameter and 1.548 m maximum band diameter. The openings retain at least 0.06 m radial clearance from the bands; tank stations and vessel envelope remain replaceable study assumptions because Astrobotic publishes no dimensional ICD. */

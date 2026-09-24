@@ -24,13 +24,18 @@ The latest primary-source baseline used for this package is:
 - NASA's August 2026 update says Griffin-1 is undergoing environmental testing
   at NASA's Jet Propulsion Laboratory, has completed mass-properties testing,
   and is planned for a late-2026 launch.
-- Astrobotic's current Griffin-1 integration post says two of three solar
-  panels are installed and places all panels in the mission-window Sun-path
-  quadrant. Its June 2026 press image shows the three upright panels across
-  adjacent lander sides. The Twin still has an explicitly nonconforming
-  two-array proxy; the Editor rebuild can use explicitly approximate,
-  photo-derived visual dimensions, while exact engineering acceptance needs
-  the controlled installation drawing.
+- Astrobotic's current manifest lists the destination as Nobile Region 2026,
+  while NASA describes launch as planned later this year. Neither publishes a
+  surface landing timestamp. The scene's JD 2461395.5 TDB is therefore a
+  deterministic study epoch, not a flight schedule.
+- Astrobotic's Griffin-1 solar post records three arrays, transit Sun-pointing,
+  and a surface Sun path contained in one mission quadrant. Its “two installed,
+  one remaining” statement is a dated integration milestone, not a mission
+  requirement. The June 2026 integration image shows upright panels across
+  adjacent lander sides in one sector. The Twin still has an explicitly
+  nonconforming two-array proxy; the Editor rebuild can use approximate
+  photo-derived geometry, while exact dimensions, angles, interfaces, and
+  performance acceptance need controlled mission data.
 - Astrobotic's June 2026 update says the integrated lander is moving through
   environmental testing, with FLIP to be integrated at the Florida launch
   processing site.
@@ -47,9 +52,11 @@ Sources:
 
 - NASA, [Moon Base II: Astrobotic Griffin-1](https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/)
 - NASA, [NASA Provides Updates on Moon Base Cargo Landers and Tech Demonstrations](https://www.nasa.gov/missions/moon-base/nasa-provides-updates-on-moon-base-cargo-landers-tech-demonstrations/)
+- NASA, [NASA Provides Update on Moon Base Rovers, Landers, Missions](https://www.nasa.gov/news-release/nasa-provides-update-on-moon-base-rovers-landers-missions/)
+- Astrobotic, [Moon Manifest: Nobile Region 2026](https://www.astrobotic.com/lunar-delivery/manifest/)
 - Astrobotic, [Griffin-1 Lunar Lander Unveiled Ahead of Environmental Testing](https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/)
 - Astrobotic, [Griffin-1 integration photo, June 15, 2026](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg)
-- Astrobotic, [Griffin's Solar Setup for Space and Moon Missions](https://www.linkedin.com/posts/astrobotic_two-solar-panels-integrated-to-griffin-just-activity-7450595533745975296-qBEA)
+- Astrobotic, [Griffin's Solar Setup for Space and Moon Missions](https://lnkd.in/p/dJHz9duN) ([canonical LinkedIn activity](https://www.linkedin.com/posts/astrobotic_two-solar-panels-integrated-to-griffin-just-activity-7450595533745975296-qBEA))
 - Astrobotic, [Griffin lander current product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
 - Astrolab/Astrobotic, [FLIP rover joins Griffin-1](https://www.astrobotic.com/astrolabs-flip-rover-joins-astrobotics-griffin-1-to-the-moon/)
 
@@ -79,7 +86,7 @@ Sources:
 | scenarios/tests/griffin_landing_legs_requirements.rhai | Component-owned Rhai gate for the four landing legs |
 | scenarios/tests/griffin_propulsion_requirements.rhai | Component-owned Rhai gate for the seven-engine bell cluster |
 | scenarios/tests/griffin_tank_requirements.rhai | Component-owned Rhai gate for the four propellant tanks |
-| scenarios/tests/griffin_solar_requirements.rhai | Component-owned Rhai gate for solar component geometry; mission placement is inconclusive until the Griffin-1 installation datums exist |
+| scenarios/tests/griffin_solar_requirements.rhai | Component-owned Rhai gate for solar geometry; mission-window placement and transit attitude/power evidence are tracked in the implementation gap report |
 | scenarios/tests/flip_requirements.rhai | Rhai observer for the standalone four-wheel FLIP contract |
 | scenarios/tests/flip_chassis_requirements.rhai | Component-owned Rhai gate for the FLIP chassis |
 | scenarios/tests/flip_wheel_requirements.rhai | Component-owned Rhai gate for the four directional wheel stations |

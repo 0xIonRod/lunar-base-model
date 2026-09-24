@@ -925,6 +925,12 @@ package GriffinRequirementSources {
             source_griffin_solar_panel_visual_asset);
     }
 
+    part evidence_gsa_010 : RequirementEvidence {
+        ref targetRequirement = GriffinSolarRequirements::gsa010;
+        ref sources = (source_linkedin_astrobotic_griffin_solar_setup,
+            source_www_astrobotic_com_griffin_lander);
+    }
+
     part evidence_gpt_001 : RequirementEvidence {
         ref targetRequirement = GriffinTankRequirements::gpt001;
         ref sources = (source_www_astrobotic_com_images, source_www_nasa_gov_astrobotics_griffin_1);

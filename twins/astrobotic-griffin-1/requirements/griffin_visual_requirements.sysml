@@ -10,7 +10,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GR016_SolarLayout {
-        doc /* GR-016 [mission configuration] realize the array count and Sun-quadrant arrangement defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout, with every panel supported from the bus structure. Astrobotic's integration image shows upright panel faces on adjacent lander sides. The current opposite-side visual proxy is nonconforming; exact stations, angles, dimensions, and supports await the installation drawing. */
+        doc /* GR-016 [mission configuration] realize the array count and Sun-quadrant arrangement defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout, with every panel supported from the bus structure. */
     }
 
     requirement def GR020_ProxySuppression {
@@ -34,7 +34,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV003_GriffinSolarAssemblies {
-        doc /* GV-003 [visual] the review shall show the solar configuration defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout as upright frame/cell assemblies across adjacent lander sides, each with a visible structural support path and the clearance-shaped outline shown in current Griffin-1 integration imagery. The current Twin render has two arrays on opposite signed-Z sides and fails this visual configuration. Image-derived placement and outline are qualitative only; do not infer dimensions or hinge kinematics from perspective photographs. */
+        doc /* GV-003 [visual] the review shall show the solar configuration defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout as upright frame/cell assemblies across adjacent lander sides, each with a visible structural support path and the approved panel outline and clearances. */
     }
 
     requirement def GRV004_ScaleDatums {

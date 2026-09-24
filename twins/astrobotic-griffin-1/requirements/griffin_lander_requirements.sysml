@@ -10,7 +10,7 @@ package GriffinLanderRequirements {
     // vehicle file composes flight dynamics, collision geometry, and the
     // reusable visual component assets into one Griffin source assembly.
     part def GriffinLanderComponent {
-        doc /* This package owns the canonical reusable lander component counts and presentation/flight ownership boundary; typed identities and study stations are owned by GriffinVisualConfigurationRequirements. Astrobotic's current Griffin product page supports four legs and seven main engines. Astrobotic's Griffin-1 integration post says two solar panels are integrated with one remaining, establishing the mission array cardinality; the released mount stations are not public. The four-tank visual count remains a Twin study assumption, not a published Griffin-1 tank ICD. */
+        doc /* This package owns the canonical reusable lander component counts and presentation/flight ownership boundary. Typed component identities and configuration stations are owned by GriffinVisualConfigurationRequirements. */
         attribute componentName : GriffinReviewLanderName = "Griffin1";
         attribute componentAsset : TwinAssetPath = "vehicles/griffin_1.usda";
         attribute usdRootPath : UsdPrimPath = "/Griffin1";
@@ -44,7 +44,7 @@ package GriffinLanderRequirements {
         doc /* GLR-004 [visual] exactly seven named main-engine components shall expose a visible bell and throat. */
     }
     requirement def GLR005_SolarArrays {
-        doc /* GLR-005 [configuration] the lander component's installed array identities shall match the canonical solarArrayCount and the system-level array configuration owned by GriffinSolarRequirements. The current two-array visual source is incomplete; exact mission identities, mount stations, orientations, hinge states, and panel envelopes remain unverified pending the structural/power interface package. */
+        doc /* GLR-005 [configuration] installed array identities shall match the canonical solarArrayCount and the array configuration defined by GriffinSolarRequirements. Each array shall use the approved installation frame, orientation, deployment state, and panel envelope. */
     }
     requirement def GLR006_MetricEnvelope {
         doc /* GLR-006 [geometry] the render-only bus envelope shall match the authored metric width, depth, and height study datums within visualEnvelopeToleranceM; this tolerance does not qualify flight geometry. */
@@ -62,7 +62,7 @@ package GriffinLanderRequirements {
         doc /* GLR-010 [boundary] component transforms shall use the declared Y-up SI frame, while flight dynamics and collision authority remain outside the render-only component layer. */
     }
     requirement def GLR011_SolarOrientation {
-        doc /* GLR-011 [layout study] the current two-array proxy uses its declared signed-Z stations and outward-facing rotations only as a replaceable study layout. It is not the Griffin-1 flight arrangement and shall not be used to claim solar pointing or power performance. */
+        doc /* GLR-011 [configuration consistency] each composed solar-array root shall match its typed station and orientation in GriffinVisualConfigurationRequirements. */
     }
 
     requirement <'GLR-001'> glr001 : GLR001_BusTopology { subject lander : GriffinLanderComponent; }
