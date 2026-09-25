@@ -1,0 +1,1381 @@
+{
+  "source": "C:\\Users\\salek\\OneDrive\\Desktop\\NASA-lunar-base-model\\freecad\\FLIP_Rover.FCStd",
+  "sha256": "241babb3157fc6c8f2ef37942261d494af5ac0e7755880a7dfa59151c729e9f9",
+  "freecad": [
+    "1",
+    "1",
+    "1",
+    "20260414 (Git shallow)",
+    "Unknown",
+    "2026/04/14 22:09:59",
+    "(HEAD detached at 0108fd4b4)",
+    "0108fd4b4850cc46e625b60e53cea7a7bbe69f8d"
+  ],
+  "units": "mm; mm^3 for volumes",
+  "label": "FLIP_Rover",
+  "object_count": 69,
+  "objects": [
+    {
+      "name": "Parameters",
+      "label": "FLIP Rover Parameters (study proxy)",
+      "type": "Spreadsheet::Sheet",
+      "parents": [
+        "FLIP_Rover_Assembly"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "FLIP_Rover_Assembly",
+      "label": "FLIP Rover - four-wheel all-wheel-steer study proxy",
+      "type": "App::Part",
+      "parents": [],
+      "properties": {
+        "CoordinateConvention": "X lateral / track, Y up, Z longitudinal",
+        "Description": "Low broad lunar rover packaging model based on the project FLIP study definition.",
+        "ParameterBoundary": "Public envelope plus explicit simulator assumptions; replace with as-built CAD and test data.",
+        "Provenance": "https://www.astrolab.space/flip-rover/"
+      }
+    },
+    {
+      "name": "Origin",
+      "label": "Origin",
+      "type": "App::Origin",
+      "parents": [
+        "FLIP_Rover_Assembly"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "X_Axis",
+      "label": "X-axis",
+      "type": "App::Line",
+      "parents": [
+        "Origin"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Y_Axis",
+      "label": "Y-axis",
+      "type": "App::Line",
+      "parents": [
+        "Origin"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Z_Axis",
+      "label": "Z-axis",
+      "type": "App::Line",
+      "parents": [
+        "Origin"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XY_Plane",
+      "label": "XY-plane",
+      "type": "App::Plane",
+      "parents": [
+        "Origin"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XZ_Plane",
+      "label": "XZ-plane",
+      "type": "App::Plane",
+      "parents": [
+        "Origin"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "YZ_Plane",
+      "label": "YZ-plane",
+      "type": "App::Plane",
+      "parents": [
+        "Origin"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Origin001",
+      "label": "Origin001",
+      "type": "App::Point",
+      "parents": [
+        "Origin"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Chassis",
+      "label": "01 - Chassis and protective structure",
+      "type": "App::Part",
+      "parents": [
+        "FLIP_Rover_Assembly"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Origin002",
+      "label": "Origin004",
+      "type": "App::Origin",
+      "parents": [
+        "Chassis"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "X_Axis001",
+      "label": "X-axis001",
+      "type": "App::Line",
+      "parents": [
+        "Origin002"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Y_Axis001",
+      "label": "Y-axis001",
+      "type": "App::Line",
+      "parents": [
+        "Origin002"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Z_Axis001",
+      "label": "Z-axis001",
+      "type": "App::Line",
+      "parents": [
+        "Origin002"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XY_Plane001",
+      "label": "XY-plane001",
+      "type": "App::Plane",
+      "parents": [
+        "Origin002"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XZ_Plane001",
+      "label": "XZ-plane001",
+      "type": "App::Plane",
+      "parents": [
+        "Origin002"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "YZ_Plane001",
+      "label": "YZ-plane001",
+      "type": "App::Plane",
+      "parents": [
+        "Origin002"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Origin003",
+      "label": "Origin003",
+      "type": "App::Point",
+      "parents": [
+        "Origin002"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Mobility",
+      "label": "02 - Mobility (four wheels + suspension proxy)",
+      "type": "App::Part",
+      "parents": [
+        "FLIP_Rover_Assembly"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Origin004",
+      "label": "Origin007",
+      "type": "App::Origin",
+      "parents": [
+        "Mobility"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "X_Axis002",
+      "label": "X-axis002",
+      "type": "App::Line",
+      "parents": [
+        "Origin004"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Y_Axis002",
+      "label": "Y-axis002",
+      "type": "App::Line",
+      "parents": [
+        "Origin004"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Z_Axis002",
+      "label": "Z-axis002",
+      "type": "App::Line",
+      "parents": [
+        "Origin004"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XY_Plane002",
+      "label": "XY-plane002",
+      "type": "App::Plane",
+      "parents": [
+        "Origin004"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XZ_Plane002",
+      "label": "XZ-plane002",
+      "type": "App::Plane",
+      "parents": [
+        "Origin004"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "YZ_Plane002",
+      "label": "YZ-plane002",
+      "type": "App::Plane",
+      "parents": [
+        "Origin004"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Origin005",
+      "label": "Origin006",
+      "type": "App::Point",
+      "parents": [
+        "Origin004"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Payload",
+      "label": "03 - Payload deck and sensor mast",
+      "type": "App::Part",
+      "parents": [
+        "FLIP_Rover_Assembly"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Origin006",
+      "label": "Origin010",
+      "type": "App::Origin",
+      "parents": [
+        "Payload"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "X_Axis003",
+      "label": "X-axis003",
+      "type": "App::Line",
+      "parents": [
+        "Origin006"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Y_Axis003",
+      "label": "Y-axis003",
+      "type": "App::Line",
+      "parents": [
+        "Origin006"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Z_Axis003",
+      "label": "Z-axis003",
+      "type": "App::Line",
+      "parents": [
+        "Origin006"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XY_Plane003",
+      "label": "XY-plane003",
+      "type": "App::Plane",
+      "parents": [
+        "Origin006"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XZ_Plane003",
+      "label": "XZ-plane003",
+      "type": "App::Plane",
+      "parents": [
+        "Origin006"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "YZ_Plane003",
+      "label": "YZ-plane003",
+      "type": "App::Plane",
+      "parents": [
+        "Origin006"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Origin007",
+      "label": "Origin009",
+      "type": "App::Point",
+      "parents": [
+        "Origin006"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Power",
+      "label": "04 - Deployable solar array and battery proxy",
+      "type": "App::Part",
+      "parents": [
+        "FLIP_Rover_Assembly"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Origin008",
+      "label": "Origin012",
+      "type": "App::Origin",
+      "parents": [
+        "Power"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "X_Axis004",
+      "label": "X-axis004",
+      "type": "App::Line",
+      "parents": [
+        "Origin008"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Y_Axis004",
+      "label": "Y-axis004",
+      "type": "App::Line",
+      "parents": [
+        "Origin008"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Z_Axis004",
+      "label": "Z-axis004",
+      "type": "App::Line",
+      "parents": [
+        "Origin008"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XY_Plane004",
+      "label": "XY-plane004",
+      "type": "App::Plane",
+      "parents": [
+        "Origin008"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "XZ_Plane004",
+      "label": "XZ-plane004",
+      "type": "App::Plane",
+      "parents": [
+        "Origin008"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "YZ_Plane004",
+      "label": "YZ-plane004",
+      "type": "App::Plane",
+      "parents": [
+        "Origin008"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Origin009",
+      "label": "Origin011",
+      "type": "App::Point",
+      "parents": [
+        "Origin008"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "EngineeringNotes",
+      "label": "05 - Engineering notes and provenance",
+      "type": "App::DocumentObjectGroup",
+      "parents": [
+        "FLIP_Rover_Assembly"
+      ],
+      "properties": {}
+    },
+    {
+      "name": "MainChassis",
+      "label": "Main chassis shell",
+      "type": "Part::Feature",
+      "parents": [
+        "Chassis"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Height": "700.0 mm",
+        "Length": "2400.0 mm",
+        "Width": "1800.0 mm"
+      },
+      "min_mm": [
+        -940.0,
+        300.0,
+        -1235.0
+      ],
+      "max_mm": [
+        940.0,
+        1000.0,
+        1235.0
+      ],
+      "size_mm": [
+        1880.0,
+        700.0,
+        2470.0
+      ],
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 3037717999.9999995
+    },
+    {
+      "name": "SideProtectionRails",
+      "label": "Side protection rails",
+      "type": "Part::Feature",
+      "parents": [
+        "Chassis"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry"
+      },
+      "min_mm": [
+        -935.0,
+        370.0,
+        -1110.0
+      ],
+      "max_mm": [
+        935.0,
+        500.0,
+        1110.0
+      ],
+      "size_mm": [
+        1870.0,
+        130.0,
+        2220.0
+      ],
+      "valid": true,
+      "solids": 2,
+      "volume_mm3": 46176000.0
+    },
+    {
+      "name": "BellySkid",
+      "label": "Central belly skid",
+      "type": "Part::Feature",
+      "parents": [
+        "Chassis"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Height": "65.0 mm",
+        "Length": "1700.0 mm",
+        "Width": "1320.0 mm"
+      },
+      "min_mm": [
+        -660.0,
+        235.0,
+        -850.0
+      ],
+      "max_mm": [
+        660.0,
+        300.0,
+        850.0
+      ],
+      "size_mm": [
+        1320.0,
+        65.0,
+        1700.0
+      ],
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 145860000.0
+    },
+    {
+      "name": "Wheel_FL",
+      "label": "Wheel FL - airless tire proxy",
+      "type": "Part::Feature",
+      "parents": [
+        "Mobility"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Radius": "450.0 mm",
+        "Station": "FL",
+        "Steering": "All-wheel-steer input",
+        "Width": "280.0 mm"
+      },
+      "min_mm": [
+        -1103.0000000000005,
+        -37.076490131577316,
+        -1537.0764901315774
+      ],
+      "max_mm": [
+        -797.0,
+        937.0764901315773,
+        -562.9235098684227
+      ],
+      "size_mm": [
+        306.00000000000045,
+        974.1529802631546,
+        974.1529802631547
+      ],
+      "valid": true,
+      "solids": 19,
+      "volume_mm3": 136624448.4332265
+    },
+    {
+      "name": "Suspension_FL",
+      "label": "Suspension carrier FL",
+      "type": "Part::Feature",
+      "parents": [
+        "Mobility"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Station": "FL",
+        "WheelCenterHeight": "450.0 mm"
+      },
+      "min_mm": [
+        -997.5,
+        355.0,
+        -1330.0
+      ],
+      "max_mm": [
+        -85.0,
+        545.0,
+        -770.0
+      ],
+      "size_mm": [
+        912.5,
+        190.0,
+        560.0
+      ],
+      "valid": true,
+      "solids": 2,
+      "volume_mm3": 8293523.001371549
+    },
+    {
+      "name": "Wheel_FR",
+      "label": "Wheel FR - airless tire proxy",
+      "type": "Part::Feature",
+      "parents": [
+        "Mobility"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Radius": "450.0 mm",
+        "Station": "FR",
+        "Steering": "All-wheel-steer input",
+        "Width": "280.0 mm"
+      },
+      "min_mm": [
+        797.0,
+        -37.076490131577316,
+        -1537.0764901315774
+      ],
+      "max_mm": [
+        1103.0000000000005,
+        937.0764901315773,
+        -562.9235098684227
+      ],
+      "size_mm": [
+        306.00000000000045,
+        974.1529802631546,
+        974.1529802631547
+      ],
+      "valid": true,
+      "solids": 19,
+      "volume_mm3": 136624448.4332265
+    },
+    {
+      "name": "Suspension_FR",
+      "label": "Suspension carrier FR",
+      "type": "Part::Feature",
+      "parents": [
+        "Mobility"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Station": "FR",
+        "WheelCenterHeight": "450.0 mm"
+      },
+      "min_mm": [
+        85.0,
+        355.0,
+        -1330.0
+      ],
+      "max_mm": [
+        997.5,
+        545.0,
+        -770.0
+      ],
+      "size_mm": [
+        912.5,
+        190.0,
+        560.0
+      ],
+      "valid": true,
+      "solids": 2,
+      "volume_mm3": 8293523.0013715485
+    },
+    {
+      "name": "Wheel_RL",
+      "label": "Wheel RL - airless tire proxy",
+      "type": "Part::Feature",
+      "parents": [
+        "Mobility"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Radius": "450.0 mm",
+        "Station": "RL",
+        "Steering": "All-wheel-steer input",
+        "Width": "280.0 mm"
+      },
+      "min_mm": [
+        -1103.0000000000005,
+        -37.076490131577316,
+        562.9235098684227
+      ],
+      "max_mm": [
+        -797.0,
+        937.0764901315773,
+        1537.0764901315774
+      ],
+      "size_mm": [
+        306.00000000000045,
+        974.1529802631546,
+        974.1529802631547
+      ],
+      "valid": true,
+      "solids": 19,
+      "volume_mm3": 136624448.4332265
+    },
+    {
+      "name": "Suspension_RL",
+      "label": "Suspension carrier RL",
+      "type": "Part::Feature",
+      "parents": [
+        "Mobility"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Station": "RL",
+        "WheelCenterHeight": "450.0 mm"
+      },
+      "min_mm": [
+        -997.5,
+        355.0,
+        770.0
+      ],
+      "max_mm": [
+        -85.0,
+        545.0,
+        1330.0
+      ],
+      "size_mm": [
+        912.5,
+        190.0,
+        560.0
+      ],
+      "valid": true,
+      "solids": 2,
+      "volume_mm3": 8293523.0013715485
+    },
+    {
+      "name": "Wheel_RR",
+      "label": "Wheel RR - airless tire proxy",
+      "type": "Part::Feature",
+      "parents": [
+        "Mobility"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Radius": "450.0 mm",
+        "Station": "RR",
+        "Steering": "All-wheel-steer input",
+        "Width": "280.0 mm"
+      },
+      "min_mm": [
+        797.0,
+        -37.076490131577316,
+        562.9235098684227
+      ],
+      "max_mm": [
+        1103.0000000000005,
+        937.0764901315773,
+        1537.0764901315774
+      ],
+      "size_mm": [
+        306.00000000000045,
+        974.1529802631546,
+        974.1529802631547
+      ],
+      "valid": true,
+      "solids": 19,
+      "volume_mm3": 136624448.4332265
+    },
+    {
+      "name": "Suspension_RR",
+      "label": "Suspension carrier RR",
+      "type": "Part::Feature",
+      "parents": [
+        "Mobility"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Station": "RR",
+        "WheelCenterHeight": "450.0 mm"
+      },
+      "min_mm": [
+        85.0,
+        355.0,
+        770.0
+      ],
+      "max_mm": [
+        997.5,
+        545.0,
+        1330.0
+      ],
+      "size_mm": [
+        912.5,
+        190.0,
+        560.0
+      ],
+      "valid": true,
+      "solids": 2,
+      "volume_mm3": 8293523.0013715485
+    },
+    {
+      "name": "PayloadDeck",
+      "label": "Payload deck",
+      "type": "Part::Feature",
+      "parents": [
+        "Payload"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "Length": "1900.0 mm",
+        "Thickness": "120.0 mm",
+        "Width": "1400.0 mm"
+      },
+      "min_mm": [
+        -700.0,
+        1000.0,
+        -950.0
+      ],
+      "max_mm": [
+        700.0,
+        1120.0,
+        950.0
+      ],
+      "size_mm": [
+        1400.0,
+        120.0,
+        1900.0
+      ],
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 319200000.0
+    },
+    {
+      "name": "PayloadRails",
+      "label": "Payload interface rails",
+      "type": "Part::Feature",
+      "parents": [
+        "Payload"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry"
+      },
+      "min_mm": [
+        -665.0,
+        1120.0,
+        -950.0
+      ],
+      "max_mm": [
+        665.0,
+        1215.0,
+        950.0
+      ],
+      "size_mm": [
+        1330.0,
+        95.0,
+        1900.0
+      ],
+      "valid": true,
+      "solids": 2,
+      "volume_mm3": 25269999.999999993
+    },
+    {
+      "name": "BatteryBox",
+      "label": "Battery / avionics enclosure",
+      "type": "Part::Feature",
+      "parents": [
+        "Payload"
+      ],
+      "properties": {
+        "ElectricalStudyValue": "28 V / 83.33 Ah proxy",
+        "GeometryStatus": "Study proxy geometry",
+        "Height": "260.0 mm",
+        "Length": "820.0 mm",
+        "Width": "620.0 mm"
+      },
+      "min_mm": [
+        -310.0,
+        1120.0,
+        40.0
+      ],
+      "max_mm": [
+        310.0,
+        1490.0,
+        860.0
+      ],
+      "size_mm": [
+        620.0,
+        370.0,
+        820.0
+      ],
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 136034000.00000003
+    },
+    {
+      "name": "SensorMast",
+      "label": "Sensor mast and crossbar",
+      "type": "Part::Feature",
+      "parents": [
+        "Payload"
+      ],
+      "properties": {
+        "Function": "Cameras / navigation sensors - replaceable visual detail",
+        "GeometryStatus": "Study proxy geometry",
+        "Height": "550.0 mm"
+      },
+      "min_mm": [
+        -420.0,
+        1120.0,
+        -355.0
+      ],
+      "max_mm": [
+        420.0,
+        1835.0,
+        -145.0
+      ],
+      "size_mm": [
+        840.0,
+        715.0,
+        210.0
+      ],
+      "valid": true,
+      "solids": 3,
+      "volume_mm3": 24253336.699428305
+    },
+    {
+      "name": "NavigationCameras",
+      "label": "Navigation camera pair",
+      "type": "Part::Feature",
+      "parents": [
+        "Payload"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry"
+      },
+      "min_mm": [
+        -347.0,
+        1668.0,
+        -583.0
+      ],
+      "max_mm": [
+        347.0,
+        1812.0,
+        -395.0
+      ],
+      "size_mm": [
+        694.0,
+        144.0,
+        188.0
+      ],
+      "valid": true,
+      "solids": 2,
+      "volume_mm3": 5225733.597561667
+    },
+    {
+      "name": "SolarArrayPanels",
+      "label": "Solar array - two deployed wings",
+      "type": "Part::Feature",
+      "parents": [
+        "Power"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry",
+        "PanelLength": "1300.0 mm",
+        "PanelWidth": "1150.0 mm"
+      },
+      "min_mm": [
+        -1170.0,
+        1680.0,
+        -650.0
+      ],
+      "max_mm": [
+        1170.0,
+        1730.0,
+        650.0
+      ],
+      "size_mm": [
+        2340.0,
+        50.0,
+        1300.0
+      ],
+      "valid": true,
+      "solids": 2,
+      "volume_mm3": 149500000.0
+    },
+    {
+      "name": "SolarCellSurfaces",
+      "label": "Solar-cell surface bands",
+      "type": "Part::Feature",
+      "parents": [
+        "Power"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry"
+      },
+      "min_mm": [
+        -1154.0,
+        1732.0,
+        -634.0
+      ],
+      "max_mm": [
+        1154.0,
+        1739.0,
+        634.0
+      ],
+      "size_mm": [
+        2308.0,
+        7.0,
+        1268.0
+      ],
+      "valid": true,
+      "solids": 8,
+      "volume_mm3": 18994639.999999996
+    },
+    {
+      "name": "SolarArrayFrames",
+      "label": "Solar-array perimeter frames",
+      "type": "Part::Feature",
+      "parents": [
+        "Power"
+      ],
+      "properties": {
+        "GeometryStatus": "Study proxy geometry"
+      },
+      "min_mm": [
+        -1188.0,
+        1730.0,
+        -668.0
+      ],
+      "max_mm": [
+        1188.0,
+        1764.0,
+        668.0
+      ],
+      "size_mm": [
+        2376.0,
+        34.0,
+        1336.0
+      ],
+      "valid": true,
+      "solids": 4,
+      "volume_mm3": 5484064.000000002
+    },
+    {
+      "name": "SolarHinges",
+      "label": "Solar wing hinge pair",
+      "type": "Part::Feature",
+      "parents": [
+        "Power"
+      ],
+      "properties": {
+        "DeploymentState": "Deployed surface-operations pose",
+        "GeometryStatus": "Study proxy geometry"
+      },
+      "min_mm": [
+        -65.0,
+        1500.0,
+        -65.0
+      ],
+      "max_mm": [
+        65.0,
+        1590.0,
+        65.0
+      ],
+      "size_mm": [
+        130.0,
+        90.0,
+        130.0
+      ],
+      "valid": true,
+      "solids": 2,
+      "volume_mm3": 1654048.532115026
+    },
+    {
+      "name": "PowerController",
+      "label": "Power controller enclosure",
+      "type": "Part::Feature",
+      "parents": [
+        "Power"
+      ],
+      "properties": {
+        "ArrayStudyValue": "3.0 m^2 / 30% efficiency proxy",
+        "GeometryStatus": "Study proxy geometry",
+        "Height": "160.0 mm",
+        "Length": "420.0 mm",
+        "Width": "360.0 mm"
+      },
+      "min_mm": [
+        300.0,
+        1120.0,
+        260.0
+      ],
+      "max_mm": [
+        660.0,
+        1280.0,
+        680.0
+      ],
+      "size_mm": [
+        360.0,
+        160.0,
+        420.0
+      ],
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 24192000.0
+    },
+    {
+      "name": "StudyMetadata",
+      "label": "FLIP study boundary - read before reuse",
+      "type": "App::FeaturePython",
+      "parents": [
+        "FLIP_Rover_Assembly",
+        "EngineeringNotes"
+      ],
+      "properties": {
+        "DesignVideo": "https://www.youtube.com/watch?v=UFEMOrg27KE",
+        "Source": "https://www.astrolab.space/flip-rover/",
+        "Status": "Study proxy; public material does not provide as-built FLIP CAD or full vehicle ICD",
+        "UseBoundary": "Packaging and visualization only until as-built CAD and test data are available",
+        "Vehicle": "Astrolab FLIP / FLEX Lunar Innovation Platform"
+      }
+    }
+  ],
+  "intersections": [
+    {
+      "a": "MainChassis",
+      "b": "SideProtectionRails",
+      "volume_mm3": 25974000.0
+    },
+    {
+      "a": "MainChassis",
+      "b": "Wheel_FL",
+      "volume_mm3": 6707028.599647321
+    },
+    {
+      "a": "MainChassis",
+      "b": "Suspension_FL",
+      "volume_mm3": 4437401.309605729
+    },
+    {
+      "a": "MainChassis",
+      "b": "Wheel_FR",
+      "volume_mm3": 6707028.59964732
+    },
+    {
+      "a": "MainChassis",
+      "b": "Suspension_FR",
+      "volume_mm3": 4437401.309605728
+    },
+    {
+      "a": "MainChassis",
+      "b": "Wheel_RL",
+      "volume_mm3": 6707028.599647321
+    },
+    {
+      "a": "MainChassis",
+      "b": "Suspension_RL",
+      "volume_mm3": 4437401.309605729
+    },
+    {
+      "a": "MainChassis",
+      "b": "Wheel_RR",
+      "volume_mm3": 6707028.599647322
+    },
+    {
+      "a": "MainChassis",
+      "b": "Suspension_RR",
+      "volume_mm3": 4437401.309605729
+    },
+    {
+      "a": "SideProtectionRails",
+      "b": "Wheel_FL",
+      "volume_mm3": 2070785.5538937775
+    },
+    {
+      "a": "SideProtectionRails",
+      "b": "Suspension_FL",
+      "volume_mm3": 612983.7594877185
+    },
+    {
+      "a": "SideProtectionRails",
+      "b": "Wheel_FR",
+      "volume_mm3": 2070785.5538937775
+    },
+    {
+      "a": "SideProtectionRails",
+      "b": "Suspension_FR",
+      "volume_mm3": 612983.7594877186
+    },
+    {
+      "a": "SideProtectionRails",
+      "b": "Wheel_RL",
+      "volume_mm3": 2070785.5538937766
+    },
+    {
+      "a": "SideProtectionRails",
+      "b": "Suspension_RL",
+      "volume_mm3": 612983.7594877187
+    },
+    {
+      "a": "SideProtectionRails",
+      "b": "Wheel_RR",
+      "volume_mm3": 2070785.5538937768
+    },
+    {
+      "a": "SideProtectionRails",
+      "b": "Suspension_RR",
+      "volume_mm3": 612983.7594877187
+    },
+    {
+      "a": "Wheel_FL",
+      "b": "Suspension_FL",
+      "volume_mm3": 2693523.001371549
+    },
+    {
+      "a": "Wheel_FR",
+      "b": "Suspension_FR",
+      "volume_mm3": 2693523.001371549
+    },
+    {
+      "a": "Wheel_RL",
+      "b": "Suspension_RL",
+      "volume_mm3": 2693523.001371549
+    },
+    {
+      "a": "Wheel_RR",
+      "b": "Suspension_RR",
+      "volume_mm3": 2693523.001371549
+    },
+    {
+      "a": "PayloadRails",
+      "b": "PowerController",
+      "volume_mm3": 2593500.0
+    },
+    {
+      "a": "BatteryBox",
+      "b": "PowerController",
+      "volume_mm3": 672000.0000000001
+    },
+    {
+      "a": "SensorMast",
+      "b": "SolarArrayPanels",
+      "volume_mm3": 2151005.813676982
+    },
+    {
+      "a": "SensorMast",
+      "b": "SolarCellSurfaces",
+      "volume_mm3": 824320.0000000002
+    },
+    {
+      "a": "NavigationCameras",
+      "b": "SolarArrayPanels",
+      "volume_mm3": 1955451.2525093178
+    },
+    {
+      "a": "NavigationCameras",
+      "b": "SolarCellSurfaces",
+      "volume_mm3": 302864.7710212675
+    }
+  ],
+  "suspension_connectivity": [
+    {
+      "name": "Suspension_FL",
+      "solids": 2,
+      "pair_distances_mm": [
+        737.5
+      ]
+    },
+    {
+      "name": "Suspension_FR",
+      "solids": 2,
+      "pair_distances_mm": [
+        737.5
+      ]
+    },
+    {
+      "name": "Suspension_RL",
+      "solids": 2,
+      "pair_distances_mm": [
+        737.5
+      ]
+    },
+    {
+      "name": "Suspension_RR",
+      "solids": 2,
+      "pair_distances_mm": [
+        737.5
+      ]
+    }
+  ],
+  "overall": {
+    "min_mm": [
+      -1188.0,
+      -37.076490131577316,
+      -1537.0764901315774
+    ],
+    "max_mm": [
+      1188.0,
+      1835.0,
+      1537.0764901315774
+    ],
+    "size_mm": [
+      2376.0,
+      1872.0764901315774,
+      3074.152980263155
+    ]
+  },
+  "parameters": [
+    [
+      "Parameter",
+      "Value",
+      "Status"
+    ],
+    [
+      "Chassis length",
+      "2400.0 mm",
+      "Envelope assumption"
+    ],
+    [
+      "Chassis width",
+      "1800.0 mm",
+      "Envelope assumption"
+    ],
+    [
+      "Chassis height",
+      "700.0 mm",
+      "Envelope assumption"
+    ],
+    [
+      "Wheelbase",
+      "2100.0 mm",
+      "Packaging proxy"
+    ],
+    [
+      "Track",
+      "1900.0 mm",
+      "Packaging proxy"
+    ],
+    [
+      "Wheel radius",
+      "450.0 mm",
+      "Inherited study proxy"
+    ],
+    [
+      "Wheel width",
+      "280.0 mm",
+      "Inherited study proxy"
+    ],
+    [
+      "Payload deck length",
+      "1900.0 mm",
+      "Visual packaging"
+    ],
+    [
+      "Payload deck width",
+      "1400.0 mm",
+      "Visual packaging"
+    ],
+    [
+      "Payload deck thickness",
+      "120.0 mm",
+      "Visual packaging"
+    ],
+    [
+      "Mast height",
+      "550.0 mm",
+      "Replaceable visual detail"
+    ],
+    [
+      "Solar array area",
+      "3.0 m^2",
+      "Study assumption"
+    ],
+    [
+      "Battery nominal",
+      "28 V / 83.33 Ah",
+      "Simulator assumption"
+    ],
+    [
+      "Mass",
+      "450.0 kg",
+      "Engineering midpoint"
+    ]
+  ],
+  "solar_joint_present": false,
+  "solar_child_body_present": false,
+  "mass_property_objects": [],
+  "source_unchanged": true
+}

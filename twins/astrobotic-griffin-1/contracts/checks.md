@@ -1,5 +1,13 @@
 # Griffin executable check catalog
 
+FVB-001 through FVB-020 define the next visual-build target in
+[flip_visual_build_requirements.sysml](../requirements/flip_visual_build_requirements.sysml).
+They are Planned; see the [component build sequence](flip_visual_build.md).
+
+FLIP engineering checks FBL, FMO, FMB, FEP, FSD, FTE, FAV and FIF are Planned.
+See [implementation steps](../requirements/FLIP_IMPLEMENTATION_STEPS.md).
+Their new SysML declarations have no runtime bindings or passing evidence yet.
+
 The check IDs below are the acceptance contract. `Active` means the current
 Rhai fixture can evaluate it against the composed stage. The normative intent
 and study thresholds are declared in

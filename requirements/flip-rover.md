@@ -7,6 +7,16 @@ as-built or flight-qualified FLIP CAD.
 
 ## Requirements
 
+**Current visual-build focus:** use the
+[visual build contract](../twins/astrobotic-griffin-1/contracts/flip_visual_build.md)
+and its 20 FVB requirements for the next reference-based CAD build.
+The FR table below records the older study contract; implementation claims
+describe the generator and do not establish compliance of the saved FCStd.
+
+Engineering extensions and the ordered implementation procedure are in
+[FLIP implementation steps](../twins/astrobotic-griffin-1/requirements/FLIP_IMPLEMENTATION_STEPS.md).
+These proposed SysML contracts have planned verification and unresolved limits.
+
 | ID | Requirement | Status | Creation / acceptance note |
 |---|---|---|---|
 | FR-001 | Model a low, broad rover body with a replaceable payload deck and visible avionics/battery enclosure. | MUST | Keep body, deck, enclosure, mast, and payload interface separately identifiable in FreeCAD and USD. |
