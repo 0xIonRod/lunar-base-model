@@ -233,9 +233,13 @@ become Griffin's permanent source semantics.
 - `lunco-sysml-ast` already projects snapshot-scoped element/feature handles,
   resolved references, and typed relationship endpoints; the IR provides
   source-linked expressions, scalar/quantity types, multiplicity metadata,
-  and four-state results. This is not full-project KerML navigation: feature
-  chains, inherited/owned members, specialization, redefinition, and subsetting
-  are not resolved as a complete reusable graph. Griffin still has
+  and four-state results. Dotted feature chains and navigation through a
+  path-valued argument to a scalar structured predicate input now preserve the
+  resolved call-site path and provider dependency; the latter is compile-
+  checked but not yet runtime-verified. Whole structured values and
+  collection-valued navigation remain unsupported. This is not full-project
+  KerML navigation: inherited/owned members, specialization, redefinition, and
+  subsetting are not resolved as a complete reusable graph. Griffin still has
   qualified-name selection and manually maintained attribute-name lists in
   `griffin_spec.rhai`.
 - The parser projects requirement `require`/`assume` memberships, verification
@@ -264,9 +268,11 @@ become Griffin's permanent source semantics.
   names to prepare provider values keyed by parameter names because the
   current requirement usages have no actual argument bindings. The generic
   AST/IR path now projects standard feature-value bindings and substitutes
-  supported scalar and feature-path expressions. Defaults, output parameters,
-  and broader redefinition traversal remain open; no Editor/runtime run was
-  made in this review.
+  supported scalar and feature-path expressions. User-defined predicate calls
+  also rebase structured member paths onto resolved feature-valued actuals;
+  this has compile evidence only. Defaults, output parameters, and broader
+  redefinition traversal remain open; no Editor/runtime run was made in this
+  review.
 - The opt-in generic requirement audit is implemented and exposed from the
   Griffin requirements tool. Run it explicitly and review findings before
   using its policy as a gate. Text-only requirements are reported separately
@@ -307,8 +313,13 @@ become Griffin's permanent source semantics.
 
 ### P2 — collections, behavior, and cross-tool provenance
 
-- Add typed collection indexing, selection, cardinality, equality, min/max,
-  sum, and reductions with defined ordering and empty-set behavior.
+- The generic IR already supports homogeneous scalar collections,
+  one-based indexing, `size`, emptiness, `sum`, `product`, Boolean aggregates,
+  and scalar `min`/`max`. Remaining collection work is feature-valued and
+  structured collections, collection navigation, filtering/selection, and
+  reusable reductions over modeled part usages. Apply the remaining semantics
+  only when the Griffin source model needs them; keep cardinality and ordering
+  from the resolved SysML multiplicity.
 - Add configuration/mode/phase/time applicability and temporal sampling
   primitives before relying on scenario state machines for requirement meaning.
 - Tie SysML realization/parameter identities to Modelica models, generated
@@ -325,11 +336,6 @@ become Griffin's permanent source semantics.
 
 ## Editor and workflow tools still missing
 
-- An offline Twin-wide SysML validation command that loads the complete source
-  set and standard library before resolving imports and requirement links.
-  `luncosim --validate` currently checks each file in isolation, so importing
-  Griffin requirement files report unresolved cross-package names unless the
-  Twin is loaded through the Workspace validation provider.
 - A model browser that navigates the resolved SysML feature graph beside its
   USD/Modelica realizations and shows unresolved/multiple provider mappings.
 - A source impact view from edited feature to affected constraints, USD
@@ -363,11 +369,12 @@ become Griffin's permanent source semantics.
   The visual component now models a matching lower clearance opening through
   the frame, backplane, and cell field, using source-owned study fractions.
   Replace those fractions and refine the contour from the controlled panel
-  drawing before as-built acceptance. The standalone solar
-  requirement scenario still checks signed-Z stations and Port/Starboard
-  mounts; update it before treating its output as evidence for this
-  three-face configuration. The visual-configuration type scenario now reads
-  the canonical solar count and checks the forward identity.
+  drawing before as-built acceptance. The standalone solar observer now reads
+  the three configured panel identities/stations and their paired bus rails;
+  GSA-003 remains verification-link coverage only until the approved
+  installation frames and mission-window Sun envelope are authored. The
+  visual-configuration type scenario reads the canonical solar count and
+  checks the forward identity.
 
 ## Griffin-specific model work, in order
 
