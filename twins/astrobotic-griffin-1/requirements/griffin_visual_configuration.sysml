@@ -51,7 +51,8 @@ package GriffinVisualConfigurationRequirements {
         LegNZ;
     }
     enum def GriffinSolarArrayInstanceName {
-        SolarPanelPort;
+        SolarPanelForward;
+        SolarPanelFrontStarboard;
         SolarPanelStarboard;
     }
     enum def GriffinRampInstanceName {
@@ -143,8 +144,8 @@ package GriffinVisualConfigurationRequirements {
             ("TankPX", "TankNX", "TankPZ", "TankNZ");
         attribute landingLegInstances : GriffinLandingLegInstanceName[4] =
             ("LegPX", "LegNX", "LegPZ", "LegNZ");
-        attribute solarArrayInstances : GriffinSolarArrayInstanceName[2] =
-            ("SolarPanelPort", "SolarPanelStarboard");
+        attribute solarArrayInstances : GriffinSolarArrayInstanceName[3] =
+            ("SolarPanelForward", "SolarPanelFrontStarboard", "SolarPanelStarboard");
         attribute mainEngineInstances : GriffinMainEngineInstanceName[7] =
             ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07");
         attribute rampInstances : GriffinRampInstanceName[2] =
@@ -199,20 +200,22 @@ package GriffinVisualConfigurationRequirements {
          * leg mount interface one canonical orientation at every bus side. */
         attribute legStationRotationYDeg : Real[4] = (0.0, 180.0, -90.0, 90.0);
 
-        /* Station, orientation, and mount-rail lists use the same index order
-         * as solarArrayInstances. */
-        attribute solarStations : Position[2] =
-            ((0.0, 3.20, 2.90), (0.0, 3.20, -2.90));
-        // Each solar array maps its two local X mounts to the corner posts on
-        // its signed-Z side. Ordering is port/starboard for each array.
-        attribute solarMountRails : GriffinFrameRailNode[4] =
+        /* The three panel instances occupy consecutive forward, diagonal,
+         * and starboard bus faces in the mission Sun quadrant. Stations and
+         * orientations use lander coordinates; rail stations are Bus-local.
+         * The diagonal station follows the beveled octagonal face normal.
+         * Each pair maps local panel -X then +X to the corresponding rails.
+         * Panel width derives from each rail pair's spacing minus the common
+         * edge clearance; the component's maximum width is owned by GSA. */
+        attribute solarStations : Position[3] =
+            ((0.0, 3.20, 2.90), (2.2819, 3.20, 2.2819), (2.90, 3.20, 0.0));
+        attribute solarMountRails : GriffinFrameRailNode[6] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard",
-             "FrameRailRearPort", "FrameRailRearStarboard");
-        attribute solarStationRotationXDeg : Real[2] = (90.0, -90.0);
-        attribute solarStationRotationZDeg : Real[2] = (0.0, 0.0);
-        attribute solarArrayWidthM : Real = 4.80;
-        attribute solarArrayDepthM : Real = 3.00;
-        attribute solarStandoffM : Real = 0.20;
+             "FrameRailFrontStarboard", "FrameRailStarboardFront",
+             "FrameRailStarboardFront", "FrameRailStarboardRear");
+        attribute solarStationRotationXDeg : Real[3] = (90.0, 90.0, 90.0);
+        attribute solarStationRotationZDeg : Real[3] = (0.0, -45.0, -90.0);
+        attribute solarArrayEdgeClearanceM : Real = 0.15;
 
         /* Four equally spaced cardinal stations give the 1.512 m installed
          * COPV bodies useful scale while keeping their largest 1.548 m bands

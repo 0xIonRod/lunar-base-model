@@ -132,7 +132,7 @@ fn native_transform_plan_check() {
     let rails = griffin_spec::visual_rail_station_plan();
     let bus = _plan_record(plan, "Bus");
     let tank = _plan_record(plan, "TankPX");
-    let solar = _plan_record(plan, "SolarPanelPort");
+    let solar = _plan_record(plan, "SolarPanelForward");
     let engine = _plan_record(plan, "Engine01");
     let expected_component_count = 1 + griffin_spec::propellant_tank_names().len()
         + griffin_spec::landing_leg_names().len()
@@ -275,12 +275,14 @@ fn on_tick(me, ctx) {
         tank_station_layout_check(source),
         typed_relation_check(source),
         typed_symmetry_check(source),
-        typed_collection_check(source, "GVC-T-solar-stations", "solarStations", "Position", 2, "Vec3"),
+        typed_collection_check(source, "GVC-T-solar-stations", "solarStations", "Position",
+            griffin_spec::solar_array_count(), "Vec3"),
         typed_collection_check(source, "GVC-T-engine-stations", "engineStations", "Position", 7, "Vec3"),
         typed_collection_check(source, "GVC-T-frame-rail-identities", "frameRails", "GriffinFrameRailNode", 8, "EnumValue"),
         typed_collection_check(source, "GVC-T-tank-identities", "tankInstances", "GriffinTankInstanceName", 4, "EnumValue"),
         typed_collection_check(source, "GVC-T-leg-identities", "landingLegInstances", "GriffinLandingLegInstanceName", 4, "EnumValue"),
-        typed_collection_check(source, "GVC-T-solar-identities", "solarArrayInstances", "GriffinSolarArrayInstanceName", 2, "EnumValue"),
+        typed_collection_check(source, "GVC-T-solar-identities", "solarArrayInstances",
+            "GriffinSolarArrayInstanceName", griffin_spec::solar_array_count(), "EnumValue"),
         typed_collection_check(source, "GVC-T-engine-identities", "mainEngineInstances", "GriffinMainEngineInstanceName", 7, "EnumValue"),
         typed_enum_check(source, "GVC-T-body-profile", "bodyProfile", "OctagonalOpenFrame"),
         typed_enum_check(source, "GVC-T-ramp-state", "rampState", "Stowed"),

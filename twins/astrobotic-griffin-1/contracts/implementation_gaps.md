@@ -1,6 +1,6 @@
 # Griffin implementation and standards gap review
 
-**Reviewed:** 2026-09-24
+**Reviewed:** 2026-09-25
 **Scope:** Griffin as the active model, FLIP as a separately loaded hosted
 vehicle, and the generic Rust/Rhai/Editor capabilities needed to build and
 verify the model.
@@ -58,15 +58,15 @@ qualitative installation evidence; perspective, occlusion, and the lack of a
 scale datum prevent extracting exact panel dimensions, mount stations, hinge
 axes, or load paths. Sources: [Astrobotic Griffin-1 integration photo](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg), [Astrobotic solar integration post](https://lnkd.in/p/dJHz9duN) ([canonical LinkedIn activity](https://www.linkedin.com/posts/astrobotic_two-solar-panels-integrated-to-griffin-just-activity-7450595533745975296-qBEA)), and [current Griffin product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/).
 
-This evidence supersedes the Twin's former mirrored two-array visual
-interpretation. The current source configuration and composed vehicle still
-contain only two opposite-signed-Z arrays. They are now explicitly a
-nonconforming visual proxy; the array count requirement is three and the
-old mirror check has been removed. The station list, panel dimensions,
-identities, supports, hinges, cell layout, and material/finish still need
-controlled mission data before a three-panel assembly can be built accurately.
-The image is not a substitute for the Editor-authored geometry update or the
-installation drawing.
+The authored source configuration and composed vehicle now contain three
+referenced panel instances on consecutive forward, forward-starboard bevel,
+and starboard faces. Their identities and stations come from SysML; each
+instance's width is computed from its ordered pair of source-owned bus rails.
+The reusable panel asset provides the frame, cell field, dividers, hinge,
+brackets, and support links. This implements the qualitative arrangement in
+the public image. The exact installed station offsets, panel outline and lower
+clearance cutout, support dimensions, hinge/lock details, and electrical
+behavior still require controlled mission data.
 
 ### Data package needed to make the vehicle construction-ready
 
@@ -116,9 +116,10 @@ transit attitude and EPS data.
   coordinates, shock travel, stiffness, damping, foot size, or structural
   loads. The Twin's four study stations are not installation data.
 - Public photos establish the three-array silhouette and qualitative sector
-  arrangement, but the two-array opposite-side Twin assembly remains what is
-  actually composed. It must be rebuilt in Editor from the mission installation
-  data before any scene can be called image-conforming.
+  arrangement. The Twin now composes the three adjacent faces through one
+  reusable referenced panel asset, with rail-pair-derived widths and connected
+  study support geometry. The lower clearance cutout and exact installation
+  geometry remain unresolved; the study model is not an as-built reconstruction.
 - NASA confirms completion of Griffin-1 mass-properties testing, but no public
   mass/CG/inertia table was found. Keep inherited lander values explicitly
   surrogate until that measured dataset is supplied.
@@ -325,15 +326,21 @@ become Griffin's permanent source semantics.
   contact proxies, interfaces, and joints. Builders should consume typed source
   values and return previewable, undoable `ApplyUsdOps` plans; Griffin-local
   Rhai should only select and compose these generic builders.
-- The current Griffin solar-panel refiner is a two-array signed-Z study
-  builder: it expects two stations, four corner-post rails, X-axis face
-  rotations, and one shared bracket datum. It cannot express three
-  independently oriented panels on adjacent faces or per-array support and
-  clearance geometry. Replace it with an instance-driven assembly plan that
-  consumes N typed local frames, panel outlines, support interfaces, and
-  state-specific keep-outs; preview the plan against the official integration
-  image before Editor application. The image can guide a visual study proxy,
-  but dimensional/as-built acceptance still requires the mission drawing.
+- The solar-panel refiner is now instance-driven: it consumes canonical typed
+  identities, stations, orientations, ordered bus-rail pairs, and a shared
+  component asset, then computes each panel width and local support attachment
+  from those source values. The active Editor's `SysmlModel::value` projection
+  omits semantic `Position[n]` arrays even though `AnalyzeSysml` retains their
+  typed numeric AST values; the Twin bridge currently converts those numbers
+  into native `Vec3` values. Add direct structured-collection projection to the
+  generic Rust/SysML bridge so vehicle builders do not need this Rhai adapter.
+  The visual component still needs the integration image's lower clearance
+  notch and controlled panel contour; exact geometry and as-built acceptance
+  require the mission installation definition. The standalone solar
+  requirement scenario still checks signed-Z stations and Port/Starboard
+  mounts; update it before treating its output as evidence for this
+  three-face configuration. The visual-configuration type scenario now reads
+  the canonical solar count and checks the forward identity.
 
 ## Griffin-specific model work, in order
 

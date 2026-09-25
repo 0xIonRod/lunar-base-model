@@ -48,16 +48,19 @@ Completed in the current authoring session:
 - All Griffin requirement fixtures now reference `/Griffin1` from the integrated vehicle.
 - Landing-leg readback returned `ok`, with visual-to-proxy pad geometry matching within 0.001 m and all four bus mount/joint observations available.
 - The visual-review scene now shares the surface-operations scene's typed site/epoch and celestial-system reference. Its composed root and solar-system child were queried after projection, visually inspected, and saved.
+- The solar configuration now has three typed identities and stations on the forward, beveled forward-starboard, and starboard faces. The panel component was rebuilt through typed Editor operations with paired local brackets and support links; each vehicle instance references that shared asset, uses its own rail-derived width, and was read back at the configured station and orientation. The old port-side proxy was removed.
+- The three-array layout has been visually inspected in the open Editor. The released installation dimensions and the lower clearance-shaped panel outline visible in public imagery are not yet modeled; current array envelope and support datums remain replaceable study values.
 
 These are Editor and composed-readback observations. They do not establish mission-level landing or egress acceptance. No test suite was run during this authoring pass.
 
 ## Next work
 
-1. Rebuild the nonconforming solar-array proxy as three upright panel assemblies across adjacent lander sides, with visible structural support members and the lower clearance-shaped outlines shown in current Astrobotic integration imagery. Use explicitly replaceable photo-derived visual dimensions for this presentation study, and keep exact stations, panel contours, mounts, hinges, and power behavior marked unknown until the controlled mission package is available. Apply through the Editor, then read back all three composed assemblies and support paths.
-2. Compose the saved ramp visual component under the integrated port and starboard physical ramp roots. Preserve the physical track colliders, avoid duplicate visible geometry, and derive both poses from the ramp SysML configuration.
-3. Review the leg-to-bus mount appearance in the Editor against current Griffin-1 references. Define any additional visual bracing as a source-backed study requirement derived from the bus and leg interfaces.
-4. Continue checking the complete Griffin source against the functional, visual, mechanical, power, propulsion, and simulation-accuracy requirements. Record unresolved implementation limits in the owning requirement or gap report, not in duplicated scene metadata.
-5. Use one dry Rhai plan, one generation-checked typed Editor batch, composed readback, and save for each geometry edit. Separate focused requirement observations from full Twin/runtime acceptance.
+1. Shape the shared solar-panel mesh and cell surface to include the lower clearance notch visible in the integration image. Keep the outline and cutout controlled by typed panel geometry, and retain explicit tolerances for mesh and collision derived from that shape.
+2. Update the standalone solar requirement scenario for the three canonical panel identities, rail-derived widths, and paired rail interfaces. The visual-configuration type scenario already uses the canonical count; neither scenario was run in this authoring pass.
+3. Compose the saved ramp visual component under the integrated port and starboard physical ramp roots. Preserve the physical track colliders, avoid duplicate visible geometry, and derive both poses from the ramp SysML configuration.
+4. Review the leg-to-bus mount appearance in the Editor against current Griffin-1 references. Define any additional visual bracing as a source-backed study requirement derived from the bus and leg interfaces.
+5. Continue checking the complete Griffin source against the functional, visual, mechanical, power, propulsion, and simulation-accuracy requirements. Record unresolved implementation limits in the gap report, not in duplicated scene metadata.
+6. Use one dry Rhai plan, one generation-checked typed Editor batch, composed readback, and save for each geometry edit. Separate focused requirement observations from full Twin/runtime acceptance.
 
 ## Repository integration
 

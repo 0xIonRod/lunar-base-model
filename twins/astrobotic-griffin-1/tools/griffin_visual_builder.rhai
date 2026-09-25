@@ -2818,10 +2818,8 @@ fn apply_refined_griffin_landing_leg_struts(doc, edit_target, root, parent_gen) 
       root: root, paths: plan.paths}
 }
 
-fn _solar_number(source, name) {
-    if source == () || source.ok != true { return (); }
-    sysml_requirements::number(source,
-        "GriffinSolarRequirements::GriffinSolarArrayAssembly::" + name)
+fn _solar_number(name) {
+    griffin_spec::solar_component_number(name)
 }
 
 fn _solar_frame_plan(doc, edit_target, root, width, depth, section, color) {
@@ -2878,57 +2876,43 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     if !component.ok || component.type_name != "Xform" {
         return plan_error(root + ": solar-panel component root is missing or not Xform");
     }
-    let source = sysml_requirements::source();
-    let frame_width = _solar_number(source, "frameWidthM");
-    let frame_thickness = _solar_number(source, "frameThicknessM");
-    let frame_depth = _solar_number(source, "frameDepthM");
-    let cell_width = _solar_number(source, "cellWidthM");
-    let cell_thickness = _solar_number(source, "cellThicknessM");
-    let cell_depth = _solar_number(source, "cellDepthM");
-    let cell_offset = _solar_number(source, "cellOffsetYM");
-    let backplane_thickness = _solar_number(source, "arrayBackplaneThicknessM");
-    let backplane_center = _solar_number(source, "arrayBackplaneCenterYM");
-    let columns_value = _solar_number(source, "gridColumnCount");
-    let rows_value = _solar_number(source, "gridRowCount");
+    let frame_width = _solar_number("frameWidthM");
+    let frame_thickness = _solar_number("frameThicknessM");
+    let frame_depth = _solar_number("frameDepthM");
+    let cell_width = _solar_number("cellWidthM");
+    let cell_thickness = _solar_number("cellThicknessM");
+    let cell_depth = _solar_number("cellDepthM");
+    let cell_offset = _solar_number("cellOffsetYM");
+    let backplane_thickness = _solar_number("arrayBackplaneThicknessM");
+    let backplane_center = _solar_number("arrayBackplaneCenterYM");
+    let columns_value = _solar_number("gridColumnCount");
+    let rows_value = _solar_number("gridRowCount");
     let columns = if columns_value == () { 0 } else { columns_value.to_int() };
     let rows = if rows_value == () { 0 } else { rows_value.to_int() };
-    let divider_width = _solar_number(source, "dividerXWidthM");
-    let divider_thickness = _solar_number(source, "dividerXThicknessM");
-    let divider_span = _solar_number(source, "dividerZWidthM");
-    let bracket_width = _solar_number(source, "mountBracketWidthM");
-    let bracket_thickness = _solar_number(source, "mountBracketThicknessM");
-    let bracket_depth = _solar_number(source, "mountBracketDepthM");
-    let hinge_radius = _solar_number(source, "hingeBarRadiusM");
-    let hinge_length = _solar_number(source, "hingeBarLengthM");
-    let hinge_y = _solar_number(source, "hingeBarCenterYM");
-    let hinge_z = _solar_number(source, "hingeBarCenterZM");
-    let link_height = _solar_number(source, "mountLinkHeightM");
-    let link_depth = _solar_number(source, "mountLinkDepthM");
-    let link_y = _solar_number(source, "mountLinkCenterYM");
-    let link_z = _solar_number(source, "mountLinkCenterZM");
-    let visual = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
-    let frame_rail_names = sysml_requirement_checks::source_enum_identifiers(source,
-        visual + "frameRails");
-    let frame_rail_stations = sysml_requirement_checks::source_position_list(source,
-        visual + "railStations");
-    let solar_stations = sysml_requirement_checks::source_position_list(source,
-        visual + "solarStations");
-    let solar_rotations_x = sysml_requirement_checks::source_number_list(source,
-        visual + "solarStationRotationXDeg");
-    let mount_rail_names = sysml_requirement_checks::source_enum_identifiers(source,
-        visual + "solarMountRails");
-    let mount_rail_x = [];
-    let mount_rail_z = [];
-    if frame_rail_names.len() == frame_rail_stations.len() {
-        for mount_name in mount_rail_names {
-            for index in 0..frame_rail_names.len() {
-                if frame_rail_names[index] == mount_name {
-                    mount_rail_x.push(frame_rail_stations[index].x);
-                    mount_rail_z.push(frame_rail_stations[index].z);
-                }
-            }
-        }
-    }
+    let divider_width = _solar_number("dividerXWidthM");
+    let divider_x_thickness = _solar_number("dividerXThicknessM");
+    let divider_span = _solar_number("dividerZWidthM");
+    let divider_z_thickness = _solar_number("dividerZThicknessM");
+    let bracket_width = _solar_number("mountBracketWidthM");
+    let bracket_thickness = _solar_number("mountBracketThicknessM");
+    let bracket_depth = _solar_number("mountBracketDepthM");
+    let hinge_radius = _solar_number("hingeBarRadiusM");
+    let hinge_length = _solar_number("hingeBarLengthM");
+    let hinge_y = _solar_number("hingeBarCenterYM");
+    let hinge_z = _solar_number("hingeBarCenterZM");
+    let link_height = _solar_number("mountLinkHeightM");
+    let link_depth = _solar_number("mountLinkDepthM");
+    let link_y = _solar_number("mountLinkCenterYM");
+    let link_z = _solar_number("mountLinkCenterZM");
+    let frame_rail_names = griffin_spec::visual_rail_names();
+    let frame_rail_stations = griffin_spec::visual_rail_station_positions();
+    let solar_stations = griffin_spec::component_solar_stations();
+    let solar_rotations_x = griffin_spec::component_solar_station_rotation_x_deg();
+    let solar_rotations_z = griffin_spec::component_solar_station_rotation_z_deg();
+    let mount_rail_names = griffin_spec::solar_mount_rail_names();
+    let solar_count = griffin_spec::solar_array_count();
+    let solar_widths = griffin_spec::component_solar_array_widths_m();
+    let bus_mount = griffin_spec::component_bus_mount();
     if frame_width == () || frame_thickness == () || frame_depth == ()
         || cell_width == () || cell_thickness == () || cell_depth == ()
         || cell_offset == () || backplane_thickness == () || backplane_center == () {
@@ -2937,15 +2921,19 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     if columns < 2 || rows < 2 {
         return plan_error("solar-panel grid must have at least two columns and rows");
     }
-    if divider_width == () || divider_thickness == () || divider_span == ()
+    if divider_width == () || divider_x_thickness == () || divider_span == ()
+        || divider_z_thickness == ()
         || bracket_width == () || bracket_thickness == () || bracket_depth == () {
         return plan_error("solar-panel divider or bracket datums are incomplete");
     }
     if hinge_radius == () || hinge_length == () || hinge_y == () || hinge_z == ()
         || link_height == () || link_depth == () || link_y == () || link_z == ()
-        || mount_rail_x.len() != 4 || mount_rail_z.len() != 4
-        || solar_stations.len() != 2 || solar_rotations_x.len() != 2 {
-        return plan_error("solar panel refinement supports only the current two-array signed-Z study proxy; Griffin-1 requires three mission installation stations, azimuths, and support datums");
+        || solar_count <= 0 || solar_stations.len() != solar_count
+        || solar_rotations_x.len() != solar_count || solar_rotations_z.len() != solar_count
+        || solar_widths.len() != solar_count || mount_rail_names.len() != solar_count * 2
+        || frame_rail_names.len() != frame_rail_stations.len()
+        || bus_mount == () || !vec3_is_native(bus_mount) {
+        return plan_error("solar-panel installation requires one typed station, orientation, and bus-rail pair per canonical array");
     }
     let ops = [];
     let frame = _solar_frame_plan(doc, edit_target, root,
@@ -2971,7 +2959,7 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         let name = "CellDividerX" + index.to_string();
         let divider = _component_cube_visual_ops(doc, edit_target, root, name,
             [-cell_width / 2.0 + cell_width * index / columns, divider_y, 0.0], (),
-            [divider_width, divider_thickness, cell_depth],
+            [divider_width, divider_x_thickness, cell_depth],
             [0.72, 0.78, 0.88]);
         if !divider.ok { return divider; }
         for op in divider.ops { ops.push(op); }
@@ -2980,7 +2968,7 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         let name = "CellDividerZ" + index.to_string();
         let divider = _component_cube_visual_ops(doc, edit_target, root, name,
             [0.0, divider_y, -cell_depth / 2.0 + cell_depth * index / rows], (),
-            [cell_width, divider_thickness, divider_span],
+            [cell_width, divider_z_thickness, divider_span],
             [0.72, 0.78, 0.88]);
         if !divider.ok { return divider; }
         for op in divider.ops { ops.push(op); }
@@ -2997,50 +2985,73 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         hinge_length, "X", [0.16, 0.19, 0.24]);
     if !hinge.ok { return hinge; }
     for op in hinge.ops { ops.push(op); }
-    let mount_names = ["Port", "Starboard"];
+    let mount_names = ["NegativeX", "PositiveX"];
     let half_frame_width = frame_width / 2.0;
-    let minimum_overlap = _solar_number(source, "minimumMountOverlapM");
+    let minimum_overlap = _solar_number("minimumMountOverlapM");
     if minimum_overlap == () || minimum_overlap <= 0.0 {
         return plan_error("solar-panel minimum mount overlap is missing from SysML");
     }
-    let bracket_center_y = [];
-    for array_index in 0..solar_stations.len() {
-        let pair = array_index * 2;
-        let sign = if solar_rotations_x[array_index] > 0.0 { 1.0 } else { -1.0 };
-        let left_y = (mount_rail_z[pair] - solar_stations[array_index].z) / sign;
-        let right_y = (mount_rail_z[pair + 1] - solar_stations[array_index].z) / sign;
-        if (left_y - right_y).abs() > minimum_overlap {
-            return plan_error("each solar array must align both brackets to its signed-Z corner posts");
+    let bracket_center_y_values = [];
+    let bracket_center_z_values = [];
+    for array_index in 0..solar_count {
+        if (solar_rotations_x[array_index] - 90.0).abs() > 0.001 {
+            return plan_error("all upright Griffin panel faces use the shared +90 degree X orientation");
         }
-        bracket_center_y.push((left_y + right_y) / 2.0);
+        let alpha = solar_rotations_z[array_index] * griffin_spec::pi_value() / 180.0;
+        let c = cos(alpha);
+        let s = sin(alpha);
+        let pair_local = [];
+        for endpoint in 0..2 {
+            let rail_name = mount_rail_names[array_index * 2 + endpoint];
+            let rail_station = ();
+            for rail_index in 0..frame_rail_names.len() {
+                if frame_rail_names[rail_index] == rail_name {
+                    rail_station = frame_rail_stations[rail_index];
+                    break;
+                }
+            }
+            if rail_station == () {
+                return plan_error("solar installation references an unknown bus rail station");
+            }
+            let dx = rail_station.x + bus_mount.x - solar_stations[array_index].x;
+            let dy = rail_station.y + bus_mount.y - solar_stations[array_index].y;
+            let dz = rail_station.z + bus_mount.z - solar_stations[array_index].z;
+            let local = vec3(c * dx + s * dz, -s * dx + c * dz, -dy);
+            pair_local.push(local);
+        }
+        if pair_local[0].x >= 0.0 || pair_local[1].x <= 0.0
+            || (pair_local[0].y - pair_local[1].y).abs() > minimum_overlap
+            || pair_local[0].z.abs() > minimum_overlap
+            || pair_local[1].z.abs() > minimum_overlap {
+            return plan_error("each adjacent-face panel must map its negative and positive local X mounts to coplanar bus rails");
+        }
+        bracket_center_y_values.push((pair_local[0].y + pair_local[1].y) / 2.0);
+        bracket_center_z_values.push((pair_local[0].z + pair_local[1].z) / 2.0);
     }
-    if (bracket_center_y[0] - bracket_center_y[1]).abs() > minimum_overlap {
-        return plan_error("the current two-array proxy expects a shared reusable bracket datum; mission-specific array supports are not available");
+    let bracket_center_y = bracket_center_y_values[0];
+    let bracket_center_z = bracket_center_z_values[0];
+    for index in 1..solar_count {
+        if (bracket_center_y_values[index] - bracket_center_y).abs() > minimum_overlap
+            || (bracket_center_z_values[index] - bracket_center_z).abs() > minimum_overlap {
+            return plan_error("adjacent solar panel mount rails do not share the reusable component attachment plane");
+        }
     }
     for index in 0..mount_names.len() {
-        let rail_x = mount_rail_x[index];
         let side = mount_names[index];
+        let sign = if index == 0 { -1.0 } else { 1.0 };
+        let bracket_x = sign * half_frame_width;
         let bracket = _component_cube_visual_ops(doc, edit_target, root,
-            "MountBracket" + side, [rail_x, bracket_center_y[0], 0.0], (),
+            "MountBracket" + side, [bracket_x, bracket_center_y, bracket_center_z], (),
             [bracket_width, bracket_thickness, bracket_depth],
             [0.12, 0.15, 0.20]);
         if !bracket.ok { return bracket; }
         for op in bracket.ops { ops.push(op); }
-        let overlap_extension = minimum_overlap * 2.0;
-        let link_width = half_frame_width - rail_x.abs() + overlap_extension;
-        let link_x = (half_frame_width + rail_x.abs() - overlap_extension) / 2.0;
         let link = _component_cube_visual_ops(doc, edit_target, root,
-            "MountLink" + side, [if rail_x < 0.0 { -link_x } else { link_x }, link_y, link_z], (),
-            [link_width, link_height, link_depth],
+            "MountLink" + side, [bracket_x, link_y, link_z], (),
+            [bracket_width, link_height, link_depth],
             [0.10, 0.13, 0.18]);
         if !link.ok { return link; }
         for op in link.ops { ops.push(op); }
-    }
-    for name in ["MountBracket", "MountLink"] {
-        let path = root + "/" + name;
-        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) {
-            ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
-        }
     }
     let root_record = assembly_builder::composed_query(doc, #{path: root,
         attrs: ["lunco:visual:component", "lunco:visual:requirement",
@@ -3058,7 +3069,7 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     for index in 1..columns { paths.push(root + "/CellDividerX" + index.to_string()); }
     for index in 1..rows { paths.push(root + "/CellDividerZ" + index.to_string()); }
     paths.push(root + "/HingeBar");
-    for side in ["Port", "Starboard"] {
+    for side in ["NegativeX", "PositiveX"] {
         paths.push(root + "/MountBracket" + side);
         paths.push(root + "/MountLink" + side);
     }
@@ -4863,7 +4874,7 @@ fn apply_normalize_griffin_visual_ramp(doc, edit_target, root, side, parent_gen)
 // Engine and solar stations are read from GriffinVisualConfiguration; shared
 // component files remain the only owners of their shapes and dimensions.
 fn _migrate_griffin_component_reference(doc, edit_target, parent, name,
-    asset, asset_root, translation, rotation, required_children) {
+    asset, asset_root, translation, rotation, scale, required_children) {
     let path = parent + "/" + name;
     let existing = assembly_builder::composed_query(doc,
         #{path: path, children: true});
@@ -4877,7 +4888,7 @@ fn _migrate_griffin_component_reference(doc, edit_target, parent, name,
         }
         if complete {
             let placement = assembly_builder::place_plan(edit_target, path,
-                translation, rotation, ());
+                translation, rotation, scale);
             if !placement.ok { return placement; }
             return #{ok: true, path: path, ops: placement.ops,
                 replaced: false};
@@ -4898,7 +4909,7 @@ fn _migrate_griffin_component_reference(doc, edit_target, parent, name,
     }
     let reference = assembly_builder::referenced_instance_targeted_plan(
         doc, edit_target, parent, temporary_name, "Xform", asset,
-        asset_root, translation, rotation, (), (), ());
+        asset_root, translation, rotation, scale, (), ());
     if !reference.ok { return reference; }
     for op in reference.ops { ops.push(op); }
     ops.push(#{MovePrim: #{edit_target: edit_target,
@@ -4914,27 +4925,24 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     let solar_stations = griffin_spec::component_solar_stations();
     let solar_rot_x = griffin_spec::component_solar_station_rotation_x_deg();
     let solar_rot_z = griffin_spec::component_solar_station_rotation_z_deg();
+    let solar_widths = griffin_spec::component_solar_array_widths_m();
+    let solar_frame_width = griffin_spec::solar_panel_frame_width_m();
     let engine_names = griffin_spec::main_engine_names();
     let engine_stations = griffin_spec::component_engine_stations();
-    let source = sysml_requirements::source();
-    let solar_members = sysml_requirement_checks::source_enum_identifiers(source,
-        "GriffinSolarRequirements::GriffinSolarArrayAssembly::childNames");
-    let engine_members = sysml_requirement_checks::source_enum_identifiers(source,
-        "GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::childNames");
-    let skirt_package = "GriffinPropulsionRequirements::GriffinEngineSkirtComponent::";
-    let skirt_name = sysml_requirements::text(source, skirt_package + "componentRootName");
-    let skirt_members = sysml_requirement_checks::source_text_list(source,
-        skirt_package + "componentMemberNames");
-    let skirt_shell = sysml_requirements::text(source, skirt_package + "shellName");
-    let skirt_adapter = sysml_requirements::text(source, skirt_package + "adapterPlateName");
-    let skirt_y = sysml_requirements::number(source,
-        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::engineClusterMountYM");
+    let solar_members = griffin_spec::solar_component_child_names();
+    let engine_members = griffin_spec::main_engine_component_child_names();
+    let skirt_name = griffin_spec::engine_skirt_component_root_name();
+    let skirt_members = griffin_spec::engine_skirt_component_member_names();
+    let skirt_shell = griffin_spec::engine_skirt_component_shell_name();
+    let skirt_adapter = griffin_spec::engine_skirt_component_adapter_name();
+    let skirt_y = griffin_spec::visual_engine_skirt_mount_y();
     skirt_members.push(skirt_shell);
     skirt_members.push(skirt_adapter);
-    if solar_names.len() != 2 || solar_members.len() == 0
+    if solar_names.len() != griffin_spec::solar_array_count() || solar_names.len() == 0
         || solar_stations.len() != solar_names.len()
         || solar_rot_x.len() != solar_names.len()
         || solar_rot_z.len() != solar_names.len()
+        || solar_widths.len() != solar_names.len() || solar_frame_width == ()
         || engine_names.len() != 7 || engine_stations.len() != engine_names.len()
         || engine_members.len() != 2 || skirt_name == () || skirt_name == ""
         || skirt_members.len() != 6 || skirt_y == () {
@@ -4948,18 +4956,18 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
             root, solar_names[index], solar_asset, "/SolarPanel",
             vec3_array(solar_stations[index]),
             [solar_rot_x[index], 0.0, solar_rot_z[index]],
+            [solar_widths[index] / solar_frame_width, 1.0, 1.0],
             solar_members);
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
         migrated.push(result.path);
     }
-
     let engine_parent = root + "/Nozzle/MainEngineCluster";
     let engine_asset = component_asset("lander/griffin_engine_bell_visual.usda");
     for index in 0..engine_names.len() {
         let result = _migrate_griffin_component_reference(doc, edit_target,
             engine_parent, engine_names[index], engine_asset, "/EngineBell",
-            vec3_array(engine_stations[index]), (), engine_members);
+            vec3_array(engine_stations[index]), (), (), engine_members);
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
         migrated.push(result.path);
@@ -4968,7 +4976,7 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     let skirt_asset = component_asset("lander/griffin_engine_skirt_visual.usda");
     let skirt_result = _migrate_griffin_component_reference(doc, edit_target,
         engine_parent, skirt_name, skirt_asset, "/World/EngineSkirt",
-        [0.0, skirt_y, 0.0], (), skirt_members);
+        [0.0, skirt_y, 0.0], (), (), skirt_members);
     if !skirt_result.ok { return skirt_result; }
     for op in skirt_result.ops { ops.push(op); }
     migrated.push(skirt_result.path);

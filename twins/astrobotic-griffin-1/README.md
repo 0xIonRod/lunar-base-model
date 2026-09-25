@@ -29,13 +29,12 @@ The latest primary-source baseline used for this package is:
   surface landing timestamp. The scene's JD 2461395.5 TDB is therefore a
   deterministic study epoch, not a flight schedule.
 - Astrobotic's Griffin-1 solar post records three arrays, transit Sun-pointing,
-  and a surface Sun path contained in one mission quadrant. Its “two installed,
-  one remaining” statement is a dated integration milestone, not a mission
-  requirement. The June 2026 integration image shows upright panels across
-  adjacent lander sides in one sector. The Twin still has an explicitly
-  nonconforming two-array proxy; the Editor rebuild can use approximate
-  photo-derived geometry, while exact dimensions, angles, interfaces, and
-  performance acceptance need controlled mission data.
+  and a surface Sun path contained in one mission quadrant. The June 2026
+  integration image shows upright panels across adjacent lander faces in one
+  sector. The Twin composes three referenced panel assemblies on the forward,
+  beveled forward-starboard, and starboard faces. Their study stations, widths,
+  support geometry, and surface appearance do not replace released installation
+  dimensions, deployment limits, or electrical performance data.
 - Astrobotic's June 2026 update says the integrated lander is moving through
   environmental testing, with FLIP to be integrated at the Florida launch
   processing site.
@@ -406,14 +405,14 @@ The current stable boundary demonstrates:
    waypoint markers, and mission metadata.
 5. The Griffin wrapper carries source-backed values useful for integration:
    625 kg payload capacity, four landing legs, seven main engines, and an
-   octagonal payload deck. Current Astrobotic Griffin-1 integration evidence
-   shows three solar panels within one azimuth quadrant. The composed Twin
-   still contains a nonconforming two-array proxy on opposite signed-Z sides;
-   the four-tank set is also a Twin study assumption, not published flight
-   configuration data. The wrapper carries a clearly labelled study
-   configuration with solar-array proxies,
-   a top-deck adapter, and two optional ramps with paired rails. Geometry,
-   mass properties, and mechanism details remain non-flight surrogates.
+   octagonal payload deck. It composes the three adjacent solar-array faces
+   shown in Griffin-1 integration imagery through one reusable referenced
+   panel component. Their installed widths derive from ordered bus-rail pairs;
+   stations and supports remain visual-study values. The four-tank set is
+   also a Twin study assumption, not published flight configuration data.
+   The wrapper includes a top-deck adapter and two optional ramps with paired
+   rails. Geometry, mass properties, and mechanism details remain non-flight
+   surrogates.
 6. FLIP uses a four-wheel all-wheel-steer study topology with compound chassis
    collision, explicit wheel geometry, a vertical rear-deck solar-panel proxy,
    motor/gearbox, finite-EPS, and motor-thermal Modelica contracts. The wheel

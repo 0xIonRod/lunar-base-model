@@ -2162,10 +2162,12 @@ fn visual_report(doc_id, root) {
     let solar_stations = sysml_requirement_checks::source_position_list(source, _visual_configuration_attr("solarStations"));
     let solar_rot_x = sysml_requirement_checks::source_number_list(source, _visual_configuration_attr("solarStationRotationXDeg"));
     let solar_rot = sysml_requirement_checks::source_number_list(source, _visual_configuration_attr("solarStationRotationZDeg"));
+    let solar_widths = griffin_spec::component_solar_array_widths_m();
+    let solar_frame_width = griffin_spec::solar_panel_frame_width_m();
     for index in 0..solar_names.len() {
         let path = root + "/" + solar_names[index];
         let record = _layout_query(doc_id, path,
-            ["xformOp:translate", "xformOp:rotateXYZ"], false);
+            ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"], false);
         checks.push("GLR-011-" + solar_names[index]);
         if !_ok(record) {
             findings.push(_finding("GLR-011-array", path,
@@ -2174,6 +2176,7 @@ fn visual_report(doc_id, root) {
         }
         let position = record.attrs["xformOp:translate"];
         let rotation = record.attrs["xformOp:rotateXYZ"];
+        let scale = record.attrs["xformOp:scale"];
         if position == () || position.len() != 3 || solar_stations.len() != solar_names.len()
             || !_near(position[0], solar_stations[index].x, 0.002)
             || !_near(position[1], solar_stations[index].y, 0.002)
@@ -2190,6 +2193,13 @@ fn visual_report(doc_id, root) {
             || !_near(rotation[2], solar_rot[index], 0.002) {
             findings.push(_finding("GLR-011-array-rotation", path,
                 "solar-array outward orientation differs from the ordered SysML datum"));
+        }
+        if scale == () || scale.len() != 3 || solar_widths.len() != solar_names.len()
+            || solar_frame_width == ()
+            || !_near(scale[0], solar_widths[index] / solar_frame_width, 0.002)
+            || !_near(scale[1], 1.0, 0.002) || !_near(scale[2], 1.0, 0.002) {
+            findings.push(_finding("GLR-011-array-width", path,
+                "panel width scale does not fit its paired bus-rail span"));
         }
     }
 

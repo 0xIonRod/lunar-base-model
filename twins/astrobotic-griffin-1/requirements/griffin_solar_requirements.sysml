@@ -10,19 +10,19 @@ package GriffinSolarRequirements {
     enum def GriffinSolarVisualMember {
         Frame; Cells; ArrayBackplane; CellDividerX1; CellDividerX2;
         CellDividerX3; CellDividerX4; CellDividerX5; CellDividerZ1;
-        CellDividerZ2; CellDividerZ3; MountBracketPort;
-        MountBracketStarboard; HingeBar; MountLinkPort; MountLinkStarboard;
+        CellDividerZ2; CellDividerZ3; MountBracketNegativeX;
+        MountBracketPositiveX; HingeBar; MountLinkNegativeX; MountLinkPositiveX;
     }
 
     part def GriffinSolarArrayAssembly {
         doc /* One Griffin-1 solar-array assembly, including its panel, collection surface, and structural attachment interface. */
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_solar_panel_visual.usda";
-        attribute childNames : GriffinSolarVisualMember[16] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "MountBracketPort", "MountBracketStarboard", "HingeBar", "MountLinkPort", "MountLinkStarboard");
-        attribute frameWidthM : Real = 4.80;
+        attribute childNames : GriffinSolarVisualMember[16] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "MountBracketNegativeX", "MountBracketPositiveX", "HingeBar", "MountLinkNegativeX", "MountLinkPositiveX");
+        attribute frameWidthM : Real = 2.902;
         attribute frameThicknessM : Real = 0.14;
         attribute frameDepthM : Real = 3.00;
-        attribute cellWidthM : Real = 4.45;
+        attribute cellWidthM : Real = 2.62;
         attribute cellThicknessM : Real = 0.05;
         attribute cellDepthM : Real = 2.65;
         attribute cellOffsetYM : Real = 0.075;
@@ -56,7 +56,7 @@ package GriffinSolarRequirements {
         doc /* GSA-002 [visual] each array exposes a frame and cell surface with owned geometry. */
     }
     requirement def GSA003_SunQuadrantLayout {
-        doc /* GSA-003 [mission layout] in the Griffin-1 surface configuration, array assemblies shall occupy adjacent lander side faces within the azimuth quadrant traversed by the mission-window Sun path. Verify their installed frames and panel normals against the site-local Sun azimuth/elevation envelope and approved installation configuration. */
+        doc /* GSA-003 [mission layout] the three array assemblies shall occupy the consecutive forward, forward-starboard bevel, and starboard lander faces within the surface quadrant traversed by the mission-window Sun path. Their installed frames and panel normals shall satisfy the site-local Sun azimuth/elevation envelope and the approved installation configuration. */
     }
     requirement def GSA004_ArrayTraceability {
         doc /* GSA-004 [evidence] array identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and deployment status is explicit. */

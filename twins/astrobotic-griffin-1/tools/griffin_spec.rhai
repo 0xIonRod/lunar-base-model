@@ -3,10 +3,11 @@ import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_c
 
 // Machine-readable Griffin study policy.
 //
-// Keep this module free of USD queries and edits. Numeric policy is read from
-// the co-located standard SysML source through the compact ValidateSysml query;
-// Rhai still owns the executable test policy while contracts/*.md records
-// meaning and provenance.
+// Keep this module free of USD queries and edits. Numeric policy comes from
+// the Twin's typed SysML model; the parsed attribute projection supplies
+// native vectors for semantic Position collections that the current compact
+// model bridge does not expose. Rhai owns reusable planning policy while
+// contracts/*.md records meaning and provenance.
 
 // Keep repeated Griffin lookups on one Rust-owned, revision-pinned SysML
 // session. The qualified name is an identifier boundary; the engineering
@@ -16,11 +17,78 @@ fn _sysml_model() {
 }
 
 fn _sysml_model_value(name) {
+    _typed_model_value(_qualified_attribute(name))
+}
+
+fn _typed_model_value(qualified) {
     let model = _sysml_model();
     if model == () || !sysml_model_is(model) { return (); }
-    let value = model.value(_qualified_attribute(name));
+    let value = model.value(qualified);
     if value == () { return (); }
     value
+}
+
+// The compact Rhai projection omits some semantic alias arrays (for
+// example Position[3]) from SysmlModel::value even though the parsed SysML
+// analysis retains their typed numeric elements. Project those elements
+// directly from AnalyzeSysml's numeric value fields; never parse literals.
+fn _analyzed_attribute_value(qualified) {
+    let result = query("AnalyzeSysml", #{path: "twin://astrobotic-griffin-1",
+        tables: ["attributes"], attribute_names: [qualified]});
+    if result == () || result.ok != true || result.analysis == ()
+        || result.analysis.attributes == () {
+        return ();
+    }
+    for attribute in result.analysis.attributes {
+        if attribute.qualified_name == qualified { return attribute.value; }
+    }
+    ()
+}
+
+fn _analyzed_position_list(qualified) {
+    let value = _analyzed_attribute_value(qualified);
+    if value == () || value.kind != "vector" || value.elements == () { return []; }
+    let positions = [];
+    for item in value.elements {
+        if item.kind != "vector" || item.elements == () || item.elements.len() != 3 {
+            return [];
+        }
+        let coordinates = [];
+        for coordinate in item.elements {
+            if coordinate.kind != "real" || coordinate.number_value == () {
+                return [];
+            }
+            coordinates.push(coordinate.number_value);
+        }
+        positions.push(vec3(coordinates[0], coordinates[1], coordinates[2]));
+    }
+    positions
+}
+
+fn _typed_model_number(qualified) {
+    let native = _typed_model_value(qualified);
+    if native != () {
+        if sysml_quantity_is(native) { return f64_from(native.value); }
+        let scalar = f64_from(native);
+        if scalar != () { return scalar; }
+    }
+    let value = _analyzed_attribute_value(qualified);
+    if value == () { return (); }
+    if value.number_value != () { return value.number_value; }
+    if value.integer_value != () { return f64_from(value.integer_value); }
+    ()
+}
+
+fn _typed_model_text_list(qualified) {
+    let value = _typed_model_value(qualified);
+    if value == () || !array_is(value) { return []; }
+    let items = [];
+    for item in value {
+        if string_is(item) { items.push(item); }
+        else if sysml_enum_is(item) { items.push(item.literal); }
+        else { return []; }
+    }
+    items
 }
 
 fn _sysml_attribute(name) {
@@ -177,8 +245,9 @@ fn _qualified_attribute(name) {
         "lowerBucketOuterBottomRadiusM", "lowerBucketTopCenterYM",
         "lowerBucketBottomCenterYM", "payloadAdapterDimensions",
         "payloadAdapterCenterYM", "legStations",
-        "legStationRotationYDeg", "solarStations", "solarStationRotationXDeg", "solarStationRotationZDeg",
-        "solarArrayWidthM", "solarArrayDepthM", "solarStandoffM", "tankStations",
+        "legStationRotationYDeg", "solarStations", "solarMountRails",
+        "solarStationRotationXDeg", "solarStationRotationZDeg",
+        "solarArrayEdgeClearanceM", "tankStations",
         "tankStationRotationYDeg", "tankScale",
         "engineClusterMountYM", "engineBellDirection", "engineStations"
     ];
@@ -259,9 +328,14 @@ fn _sysml_native(name) {
 }
 
 fn _sysml_native_list(name) {
-    let value = _sysml_native(name);
-    if value == () || !array_is(value) { return []; }
-    value
+    let value = _sysml_model_value(name);
+    if value != () && array_is(value) { return value; }
+    let position_lists = ["solarStations", "railStations", "tankStations",
+        "legStations", "engineStations"];
+    if position_lists.contains(name) {
+        return _analyzed_position_list(_qualified_attribute(name));
+    }
+    []
 }
 
 fn _sysml_enum_names(name) {
@@ -360,6 +434,72 @@ fn component_leg_station_rotation_y_deg() { _sysml_number_list("legStationRotati
 fn component_solar_stations() { _sysml_native_list("solarStations") }
 fn component_solar_station_rotation_x_deg() { _sysml_number_list("solarStationRotationXDeg") }
 fn component_solar_station_rotation_z_deg() { _sysml_number_list("solarStationRotationZDeg") }
+fn solar_component_number(name) {
+    let fields = ["frameWidthM", "frameThicknessM", "frameDepthM",
+        "cellWidthM", "cellThicknessM", "cellDepthM", "cellOffsetYM",
+        "arrayBackplaneThicknessM", "arrayBackplaneCenterYM",
+        "gridColumnCount", "gridRowCount", "dividerXWidthM",
+        "dividerXThicknessM", "dividerZWidthM", "dividerZThicknessM",
+        "mountBracketWidthM", "mountBracketThicknessM", "mountBracketDepthM",
+        "hingeBarRadiusM", "hingeBarLengthM", "hingeBarCenterYM",
+        "hingeBarCenterZM", "mountLinkHeightM", "mountLinkDepthM",
+        "mountLinkCenterYM", "mountLinkCenterZM", "minimumMountOverlapM"];
+    if !fields.contains(name) { return (); }
+    _typed_model_number("GriffinSolarRequirements::GriffinSolarArrayAssembly::" + name)
+}
+fn solar_component_child_names() {
+    _typed_model_text_list("GriffinSolarRequirements::GriffinSolarArrayAssembly::childNames")
+}
+fn main_engine_component_child_names() {
+    _typed_model_text_list("GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::childNames")
+}
+fn engine_skirt_component_root_name() {
+    _typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::componentRootName")
+}
+fn engine_skirt_component_member_names() {
+    _typed_model_text_list("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::componentMemberNames")
+}
+fn engine_skirt_component_shell_name() {
+    _typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::shellName")
+}
+fn engine_skirt_component_adapter_name() {
+    _typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::adapterPlateName")
+}
+fn solar_mount_rail_names() { _sysml_enum_names("solarMountRails") }
+fn solar_panel_frame_width_m() { solar_component_number("frameWidthM") }
+fn component_solar_array_widths_m() {
+    let count = solar_array_count();
+    let mounts = solar_mount_rail_names();
+    let rail_names = _sysml_enum_names("frameRails");
+    let rail_stations = _sysml_native_list("railStations");
+    let clearance = _sysml_attribute("solarArrayEdgeClearanceM");
+    if count <= 0 || mounts.len() != count * 2 || rail_names.len() != rail_stations.len()
+        || clearance == () || clearance < 0.0 {
+        return [];
+    }
+    let widths = [];
+    for index in 0..count {
+        let endpoints = [];
+        for endpoint in 0..2 {
+            let target = mounts[index * 2 + endpoint];
+            let found = false;
+            for rail_index in 0..rail_names.len() {
+                if rail_names[rail_index] == target {
+                    endpoints.push(rail_stations[rail_index]);
+                    found = true;
+                    break;
+                }
+            }
+            if !found { return []; }
+        }
+        let dx = endpoints[1].x - endpoints[0].x;
+        let dz = endpoints[1].z - endpoints[0].z;
+        let width = sqrt(dx * dx + dz * dz) - clearance;
+        if width <= 0.0 { return []; }
+        widths.push(width);
+    }
+    widths
+}
 fn component_engine_stations() { _sysml_native_list("engineStations") }
 fn rover_front_steering_angle_deg() { _sysml_attribute("frontSteeringAngleDeg") }
 fn rover_rear_steering_angle_deg() { _sysml_attribute("rearSteeringAngleDeg") }
@@ -516,9 +656,13 @@ fn visual_component_transform_plan() {
         || !_visual_plan_lengths_match(tank_scale, 4) || tank_names.len() != 4;
     let bad_legs = !_native_positions_match(leg_stations, 4)
         || !_visual_plan_lengths_match(leg_rot_y, 4) || leg_names.len() != 4;
-    let bad_solar = !_native_positions_match(solar_stations, 2)
-        || !_visual_plan_lengths_match(solar_rot_x, 2)
-        || !_visual_plan_lengths_match(solar_rot_z, 2) || solar_names.len() != 2;
+    let solar_count = solar_array_count();
+    let solar_widths = component_solar_array_widths_m();
+    let bad_solar = solar_count <= 0
+        || !_native_positions_match(solar_stations, solar_count)
+        || !_visual_plan_lengths_match(solar_rot_x, solar_count)
+        || !_visual_plan_lengths_match(solar_rot_z, solar_count)
+        || solar_names.len() != solar_count || solar_widths.len() != solar_count;
     let engine_skirt_y = visual_engine_skirt_mount_y();
     let bad_engines = !_native_positions_match(engine_stations, 7) || engine_names.len() != 7
         || engine_skirt_y == ();
@@ -551,9 +695,10 @@ fn visual_component_transform_plan() {
             "lander/griffin_landing_leg_visual.usda", pose, false));
     }
     for index in 0..solar_names.len() {
+        let scale = vec3(solar_widths[index] / solar_panel_frame_width_m(), 1.0, 1.0);
         let pose = transform(solar_stations[index],
             quat_from_euler_xyz_deg(vec3(solar_rot_x[index], 0.0, solar_rot_z[index])),
-            vec3(1.0, 1.0, 1.0));
+            scale);
         plan.push(_visual_pose_record(solar_names[index], "lander",
             "lander/griffin_solar_panel_visual.usda", pose, false));
     }

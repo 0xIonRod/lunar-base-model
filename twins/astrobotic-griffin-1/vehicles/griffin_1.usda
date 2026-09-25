@@ -3067,20 +3067,31 @@ def Xform "Griffin1" (
         token visibility = "invisible"
         custom rel lunco:collider:geometrySource = </Griffin1/Bus/RoverPayloadDeck>
     }
-    def Xform "SolarPanelPort" (
-        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
-    )
-    {
-        custom double3 xformOp:translate = (0.0, 3.2, 2.9)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
-    }
     def Xform "SolarPanelStarboard" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (0.0, 3.2, -2.9)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
+        custom double3 xformOp:translate = (2.9, 3.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, -90.0)
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+    }
+    def Xform "SolarPanelForward" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 3.2, 2.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+    }
+    def Xform "SolarPanelFrontStarboard" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
+    )
+    {
+        custom double3 xformOp:translate = (2.2819, 3.2, 2.2819)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, -45.0)
+        custom double3 xformOp:scale = (0.4736465266155053, 1.0, 1.0)
     }
 }

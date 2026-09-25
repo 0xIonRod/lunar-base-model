@@ -97,7 +97,8 @@ Check:
 - the camera and landing target are present;
 - the four-wheel FLIP study proxy is visible on the lander top deck during
   descent;
-- the isogrid deck, clean top deck, matched vertical side solar arrays, two
+- the isogrid deck, clean top deck, three adjacent vertical solar arrays on the
+  forward, beveled forward-starboard, and starboard faces, two
   collision-safe ramps, and the ordered route markers are present;
 - the runtime has no unresolved twin:// asset error.
 
