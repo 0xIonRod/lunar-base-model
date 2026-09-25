@@ -31,7 +31,7 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 | Area | Current state | Gap / consequence |
 |---|---|---|
 | Requirement meaning | Five Griffin domain packages plus separate subsystem packages; several requirements still contain only `doc` text | Valid as textual requirements, but no executable acceptance predicate or requirement-level evidence mapping exists for most of them |
-| Formal constraint ownership | Requirement membership roles are typed as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates every `require` on a requirement, and checks verification through resolved `verify` links. The Griffin solar geometry observer now uses the grouped path for GSA-005, GSA-006, and GSA-009 | Other Griffin observers still use the per-constraint path and select definitions by qualified name; providers still supply values by parameter name. Usage-level argument/binding relationships, default arguments, specialization/redefinition traversal, and migration of remaining Twin checks to handle-based evaluation remain |
+| Formal constraint ownership | Requirement membership roles are projected as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates required memberships, and checks verification coverage through resolved `verify` links. The Griffin solar verification scenario calls that grouped evaluator for GSA-005, GSA-006, and GSA-009 through the shared requirements adapter | Explicit constraint-usage feature values now project to formal parameters through resolved redefinition handles and supported typed expressions are substituted by the IR. Current Griffin usages do not author actual bindings, so the provider adapter still maps current measurements by parameter display name. Defaults, output binding, and full specialization/redefinition traversal remain |
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links | Coverage evaluation now compares resolved handles. The Twin status/check catalogs remain authored execution metadata, and `twin.toml`, provider selection, and USD query paths remain configuration. Replace duplicate semantic identity/status catalogs with reports derived from typed requirement, verification, realization, and evidence links |
 | Units and frames | `lunco-engineering-values` supports dimension-safe conversion from caller-resolved `Unit` values; the constraint IR and observation contracts still carry unit identity as text, while Griffin often relies on SI field-name suffixes | The unit primitive is present but is not wired from SysML unit resolution through IR type checking and provider values. Names and comments do not prevent dimensional mistakes; frame identity and conversion provenance also need typed contracts |
@@ -242,11 +242,15 @@ become Griffin's permanent source semantics.
   target names for display, and snapshot-scoped resolved verification-to-
   requirement handles for coverage. Constraint membership inheritance
   currently follows one direct requirement usage-to-definition type edge.
-- Add a generic requirement audit over the resolved graph that reports
-  uncovered requirements, duplicate/missing IDs, absent subjects, unverified
-  required constraints, invalid objective links, and unresolved source
-  members. Text-only requirements must remain distinct from malformed
-  requirements.
+- `SysmlModel.audit_requirements(policy)` now reports duplicate short names,
+  optional project rules for short names, typed subjects and verification
+  coverage, text-only requirements, unresolved verification targets, and
+  unresolved names inside requirement definitions. The Griffin requirements
+  tool exposes this as an explicit review operation; normal Twin startup does
+  not enforce it. It has not yet been run against the live Griffin source
+  snapshot. Standard usage-level feature-value bindings now project through
+  resolved formal-parameter handles; diagnostics for inherited defaults and
+  general binding relationships remain open.
 - The generic IR now compiles by exact snapshot-scoped constraint handle and
   evaluates every standard `require` membership on a requirement as one
   four-state result. It can validate the associated verification case through
@@ -254,17 +258,19 @@ become Griffin's permanent source semantics.
   predicates. The Rhai `SysmlModel.evaluate_requirement` boundary accepts the
   typed requirement and verification objects plus typed feature-path
   observations.
-- The Griffin solar geometry observer now exercises the grouped API for its
-  three formal constraints. Other Griffin observers still bind source
-  constraint definitions by qualified name and supply values by parameter
-  name. The IR does not yet project usage-site argument bindings/defaults or
-  execute arbitrary SysML binding relationships; it must fail clearly where
-  those semantics are required rather than infer them from matching names.
-- A generic requirement audit over the resolved graph is still needed to
-  report uncovered requirements, duplicate/missing IDs, absent subjects,
-  unverified required constraints, invalid objective links, and unresolved
-  source members. Text-only requirements must remain distinct from malformed
-  requirements.
+- The existing Griffin solar verification scenario calls the grouped
+  evaluator through `sysml_requirements::required_constraints_check` for
+  GSA-005, GSA-006, and GSA-009. The adapter still uses qualified predicate
+  names to prepare provider values keyed by parameter names because the
+  current requirement usages have no actual argument bindings. The generic
+  AST/IR path now projects standard feature-value bindings and substitutes
+  supported scalar and feature-path expressions. Defaults, output parameters,
+  and broader redefinition traversal remain open; no Editor/runtime run was
+  made in this review.
+- The opt-in generic requirement audit is implemented and exposed from the
+  Griffin requirements tool. Run it explicitly and review findings before
+  using its policy as a gate. Text-only requirements are reported separately
+  from unresolved names and invalid verification targets.
 
 ### P1 — quantities, geometry, and provider observations
 

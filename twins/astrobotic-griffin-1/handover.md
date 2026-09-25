@@ -56,11 +56,11 @@ These are Editor and composed-readback observations. They do not establish missi
 
 ## Next work
 
-1. Review and run the standalone solar requirement scenario for the three canonical panel identities, rail-derived widths, paired rail interfaces, notched panel outline, and the grouped SysML `require` evaluator. The visual-configuration type scenario already uses the canonical count; neither scenario is acceptance evidence until its verification is run.
-2. Replace the solar-panel study fractions and other approximate panel datums with the controlled Griffin-1 panel definition when available; verify cutout clearance, installed transforms, support and hinge interfaces, and electrical behavior against that definition.
-3. Compose the saved ramp visual component under the integrated port and starboard physical ramp roots. Preserve the physical track colliders, avoid duplicate visible geometry, and derive both poses from the ramp SysML configuration.
-4. Review the leg-to-bus mount appearance in the Editor against current Griffin-1 references. Define any additional visual bracing as a source-backed study requirement derived from the bus and leg interfaces.
-5. Continue checking the complete Griffin source against the functional, visual, mechanical, power, propulsion, and simulation-accuracy requirements. Record unresolved implementation limits in the gap report, not in duplicated scene metadata.
+1. Run `requirement_quality_audit()` explicitly from the Griffin requirements tool and review its findings. Apply only justified requirement edits; startup remains policy-neutral.
+2. Migrate Griffin predicates with real source-owned actual arguments onto explicit constraint-usage feature values as those source features become available. The generic AST/IR now projects and applies supported bindings. The existing GSA-005, GSA-006, and GSA-009 scenario calls the grouped evaluator through the shared adapter, but this work session did not execute it.
+3. Replace the solar-panel study fractions and other approximate panel datums with the controlled Griffin-1 panel definition when available; verify cutout clearance, installed transforms, support and hinge interfaces, and electrical behavior against that definition.
+4. Compose the saved ramp visual component under the integrated port and starboard physical ramp roots. Preserve the physical track colliders, avoid duplicate visible geometry, and derive both poses from the ramp SysML configuration.
+5. Review the leg-to-bus mount appearance in the Editor against current Griffin-1 references. Define any additional visual bracing as a source-backed study requirement derived from the bus and leg interfaces.
 6. Use one dry Rhai plan, one generation-checked typed Editor batch, composed readback, and save for each geometry edit. Separate focused requirement observations from full Twin/runtime acceptance.
 
 ## Repository integration

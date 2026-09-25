@@ -8,6 +8,22 @@ import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_c
 // the headful Editor and in a Twin-owned scene test.
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 
+// Run this report explicitly from the Griffin requirements tool when doing a
+// source review. It is not part of normal Twin startup or scene admission.
+// The policy is a review choice, while the audit implementation and finding
+// identities are shared by all SysML models.
+fn requirement_quality_audit() {
+    let model = sysml_requirements::model();
+    if model == () || !sysml_model_is(model) {
+        return #{ok: false, error: "resolved Griffin SysML model is unavailable"};
+    }
+    let policy = engineering_review_requirement_audit_policy();
+    policy.require_formal_constraint = true;
+    let report = model.audit_requirements(policy);
+    #{ok: !report.has_errors, source_revision: report.source_revision,
+      source_fingerprint: report.source_fingerprint, findings: report.findings}
+}
+
 // Tool-library functions are used instead of top-level constants because the
 // production static-module binding resolves names from function scope.
 fn max_payload_kg() { griffin_spec::max_payload_kg() }
