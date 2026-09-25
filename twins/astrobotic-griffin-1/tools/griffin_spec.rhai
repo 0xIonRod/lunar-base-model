@@ -436,6 +436,8 @@ fn component_solar_station_rotation_x_deg() { _sysml_number_list("solarStationRo
 fn component_solar_station_rotation_z_deg() { _sysml_number_list("solarStationRotationZDeg") }
 fn solar_component_number(name) {
     let fields = ["frameWidthM", "frameThicknessM", "frameDepthM",
+        "lowerClearanceWidthFraction", "lowerClearanceDepthFraction",
+        "lowerClearanceCenterXFraction",
         "cellWidthM", "cellThicknessM", "cellDepthM", "cellOffsetYM",
         "arrayBackplaneThicknessM", "arrayBackplaneCenterYM",
         "gridColumnCount", "gridRowCount", "dividerXWidthM",

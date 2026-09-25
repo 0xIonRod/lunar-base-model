@@ -22,6 +22,12 @@ package GriffinSolarRequirements {
         attribute frameWidthM : Real = 2.902;
         attribute frameThicknessM : Real = 0.14;
         attribute frameDepthM : Real = 3.00;
+        doc /* Width of the centered lower opening as a fraction of the panel frame width. */
+        attribute lowerClearanceWidthFraction : Real = 0.32;
+        doc /* Depth of the lower opening from the panel edge as a fraction of frame depth. */
+        attribute lowerClearanceDepthFraction : Real = 0.28;
+        doc /* Lateral position of the opening center as a fraction of frame width; zero centers it on the panel. */
+        attribute lowerClearanceCenterXFraction : Real = 0.0;
         attribute cellWidthM : Real = 2.62;
         attribute cellThicknessM : Real = 0.05;
         attribute cellDepthM : Real = 2.65;
@@ -65,7 +71,7 @@ package GriffinSolarRequirements {
         doc /* GSA-005 [installation interface] each array root frame, azimuth, panel normal, support attachment, and stowed/deployed state shall conform to the approved Griffin-1 installation/interface definition. */
     }
     requirement def GSA006_PanelEnvelope {
-        doc /* GSA-006 [geometry] each array shall match the approved installed panel outline, cell field, and clearance cutouts within the tolerances in its controlled geometry definition. */
+        doc /* GSA-006 [geometry] each array shall match the approved installed panel outline, including its lower structural clearance cutout; the frame, backplane, and cell field shall share that opening within the controlled geometry tolerances. */
     }
     requirement def GSA007_CellGridAndMount {
         doc /* GSA-007 [geometry] each array shall show cell modules, perimeter frame, and mounting features in the arrangement defined by the approved panel layout. */

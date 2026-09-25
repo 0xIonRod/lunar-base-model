@@ -62,11 +62,16 @@ The authored source configuration and composed vehicle now contain three
 referenced panel instances on consecutive forward, forward-starboard bevel,
 and starboard faces. Their identities and stations come from SysML; each
 instance's width is computed from its ordered pair of source-owned bus rails.
-The reusable panel asset provides the frame, cell field, dividers, hinge,
-brackets, and support links. This implements the qualitative arrangement in
-the public image. The exact installed station offsets, panel outline and lower
-clearance cutout, support dimensions, hinge/lock details, and electrical
-behavior still require controlled mission data.
+The reusable panel asset provides a centered lower clearance opening shared by
+the structural frame, backplane, and cell field; the internal divider members
+terminate at or split around the opening. The width and depth are currently
+controlled by typed dimensionless study fractions (0.32 of frame width and
+0.28 of frame depth), so the same component scales consistently on all three
+faces. Those fractions reproduce only the qualitative silhouette in the public
+image; they are not measured or approved Griffin-1 dimensions. The exact
+installed station offsets, panel contour/cutout dimensions, support dimensions,
+hinge/lock details, and electrical behavior still require controlled mission
+data. The render-only panel surfaces have no collision proxy.
 
 ### Data package needed to make the vehicle construction-ready
 
@@ -118,8 +123,10 @@ transit attitude and EPS data.
 - Public photos establish the three-array silhouette and qualitative sector
   arrangement. The Twin now composes the three adjacent faces through one
   reusable referenced panel asset, with rail-pair-derived widths and connected
-  study support geometry. The lower clearance cutout and exact installation
-  geometry remain unresolved; the study model is not an as-built reconstruction.
+  study support geometry. The shared frame, backplane, and cell mesh now include
+  one matching lower clearance opening driven by SysML study fractions; no
+  public scale datum supports treating these fractions or the rest of the
+  installation geometry as as-built dimensions.
 - NASA confirms completion of Griffin-1 mass-properties testing, but no public
   mass/CG/inertia table was found. Keep inherited lander values explicitly
   surrogate until that measured dataset is supplied.
@@ -334,9 +341,10 @@ become Griffin's permanent source semantics.
   typed numeric AST values; the Twin bridge currently converts those numbers
   into native `Vec3` values. Add direct structured-collection projection to the
   generic Rust/SysML bridge so vehicle builders do not need this Rhai adapter.
-  The visual component still needs the integration image's lower clearance
-  notch and controlled panel contour; exact geometry and as-built acceptance
-  require the mission installation definition. The standalone solar
+  The visual component now models a matching lower clearance opening through
+  the frame, backplane, and cell field, using source-owned study fractions.
+  Replace those fractions and refine the contour from the controlled panel
+  drawing before as-built acceptance. The standalone solar
   requirement scenario still checks signed-Z stations and Port/Starboard
   mounts; update it before treating its output as evidence for this
   three-face configuration. The visual-configuration type scenario now reads

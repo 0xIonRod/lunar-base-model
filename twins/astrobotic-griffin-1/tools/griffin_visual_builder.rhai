@@ -2822,27 +2822,24 @@ fn _solar_number(name) {
     griffin_spec::solar_component_number(name)
 }
 
-fn _solar_frame_plan(doc, edit_target, root, width, depth, section, color) {
-    let path = root + "/Frame";
-    let offset_x = width / 2.0 - section / 2.0;
-    let offset_z = depth / 2.0 - section / 2.0;
-    let stations = [vec3(-offset_x, 0.0, -offset_z),
-        vec3(offset_x, 0.0, -offset_z), vec3(offset_x, 0.0, offset_z),
-        vec3(-offset_x, 0.0, offset_z)];
-    let geometry = griffin_geometry::perimeter_beam_geometry(stations, [0.0], section);
-    if geometry.ok != true { return plan_error(geometry.error); }
+fn _component_mesh_visual_ops(doc, edit_target, parent, name, geometry, color) {
+    if geometry == () || geometry.ok != true || geometry.points == ()
+        || geometry.face_counts == () || geometry.face_indices == () {
+        return plan_error("component mesh geometry is incomplete");
+    }
+    let path = parent + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
     let ops = [];
     if query_ok(current) && current.type_name != "Mesh" {
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
-        let shape = assembly_builder::mesh_shape_plan(edit_target, root, "Frame",
+        let shape = assembly_builder::mesh_shape_plan(edit_target, parent, name,
             geometry.points, geometry.face_counts, geometry.face_indices, color, false);
         if !shape.ok { return shape; }
         for op in shape.ops { ops.push(op); }
     } else if query_ok(current) {
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
     } else {
-        let shape = assembly_builder::mesh_shape_plan(edit_target, root, "Frame",
+        let shape = assembly_builder::mesh_shape_plan(edit_target, parent, name,
             geometry.points, geometry.face_counts, geometry.face_indices, color, false);
         if !shape.ok { return shape; }
         for op in shape.ops { ops.push(op); }
@@ -2864,6 +2861,71 @@ fn _solar_frame_plan(doc, edit_target, root, width, depth, section, color) {
     #{ok: true, path: path, ops: ops}
 }
 
+fn _solar_frame_plan(doc, edit_target, root, width, depth, section,
+    clearance_center_x, clearance_width, clearance_depth, color) {
+    let offset_x = width / 2.0 - section / 2.0;
+    let offset_z = depth / 2.0 - section / 2.0;
+    let notch_left_x = clearance_center_x - clearance_width / 2.0;
+    let notch_right_x = clearance_center_x + clearance_width / 2.0;
+    let notch_start_z = depth / 2.0 - clearance_depth;
+    if clearance_width <= section || notch_left_x <= -offset_x
+        || notch_right_x >= offset_x
+        || clearance_depth <= section || clearance_depth >= depth - section {
+        return plan_error("solar-panel lower clearance cutout does not fit within the source-owned frame envelope");
+    }
+    let stations = [
+        vec3(-offset_x, 0.0, -offset_z),
+        vec3(offset_x, 0.0, -offset_z),
+        vec3(offset_x, 0.0, offset_z),
+        vec3(notch_right_x, 0.0, offset_z),
+        vec3(notch_right_x, 0.0, notch_start_z),
+        vec3(notch_left_x, 0.0, notch_start_z),
+        vec3(notch_left_x, 0.0, offset_z),
+        vec3(-offset_x, 0.0, offset_z),
+    ];
+    let geometry = griffin_geometry::perimeter_beam_geometry(stations, [0.0], section);
+    if geometry.ok != true { return plan_error(geometry.error); }
+    _component_mesh_visual_ops(doc, edit_target, root, "Frame", geometry, color)
+}
+
+fn _solar_notched_surface_geometry(width, thickness, depth, center_y,
+    clearance_center_x, clearance_width, clearance_depth) {
+    if width <= 0.0 || thickness <= 0.0 || depth <= 0.0
+        || clearance_width <= 0.0
+        || clearance_center_x - clearance_width / 2.0 <= -width / 2.0
+        || clearance_center_x + clearance_width / 2.0 >= width / 2.0
+        || clearance_depth <= 0.0 || clearance_depth >= depth {
+        return #{ok: false, error: "solar-panel surface clearance cutout must fit inside a positive panel envelope"};
+    }
+    let z_min = -depth / 2.0;
+    let z_max = depth / 2.0;
+    let notch_start_z = z_max - clearance_depth;
+    let upper_depth = notch_start_z - z_min;
+    let wing_depth = clearance_depth;
+    let notch_left_x = clearance_center_x - clearance_width / 2.0;
+    let notch_right_x = clearance_center_x + clearance_width / 2.0;
+    let left_wing_width = notch_left_x + width / 2.0;
+    let right_wing_width = width / 2.0 - notch_right_x;
+    if upper_depth <= 0.0 || left_wing_width <= 0.0 || right_wing_width <= 0.0 {
+        return #{ok: false, error: "solar-panel surface cutout leaves no connected cell or backplane material"};
+    }
+    let upper = griffin_geometry::rectangular_prism_geometry(
+        vec3(0.0, center_y, (z_min + notch_start_z) / 2.0),
+        vec3(width, thickness, upper_depth));
+    let left = griffin_geometry::rectangular_prism_geometry(
+        vec3((-width / 2.0 + notch_left_x) / 2.0, center_y,
+            (notch_start_z + z_max) / 2.0),
+        vec3(left_wing_width, thickness, wing_depth));
+    let right = griffin_geometry::rectangular_prism_geometry(
+        vec3((notch_right_x + width / 2.0) / 2.0, center_y,
+            (notch_start_z + z_max) / 2.0),
+        vec3(right_wing_width, thickness, wing_depth));
+    if upper.ok != true || left.ok != true || right.ok != true {
+        return #{ok: false, error: "solar-panel clearance surface mesh could not be generated"};
+    }
+    griffin_geometry::merge_mesh_geometries([upper, left, right])
+}
+
 // Refine the reusable solar-array component in its own document.  The
 // outward-facing root rotation is owned by GriffinLanderComponent; this
 // operation owns only the panel's local frame, blue cell face, grid members,
@@ -2879,6 +2941,9 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     let frame_width = _solar_number("frameWidthM");
     let frame_thickness = _solar_number("frameThicknessM");
     let frame_depth = _solar_number("frameDepthM");
+    let clearance_center_x_fraction = _solar_number("lowerClearanceCenterXFraction");
+    let clearance_width_fraction = _solar_number("lowerClearanceWidthFraction");
+    let clearance_depth_fraction = _solar_number("lowerClearanceDepthFraction");
     let cell_width = _solar_number("cellWidthM");
     let cell_thickness = _solar_number("cellThicknessM");
     let cell_depth = _solar_number("cellDepthM");
@@ -2914,6 +2979,11 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
     let solar_widths = griffin_spec::component_solar_array_widths_m();
     let bus_mount = griffin_spec::component_bus_mount();
     if frame_width == () || frame_thickness == () || frame_depth == ()
+        || clearance_center_x_fraction == () || clearance_width_fraction == ()
+        || clearance_depth_fraction == () || clearance_center_x_fraction <= -0.5
+        || clearance_center_x_fraction >= 0.5
+        || clearance_width_fraction <= 0.0 || clearance_width_fraction >= 1.0
+        || clearance_depth_fraction <= 0.0 || clearance_depth_fraction >= 1.0
         || cell_width == () || cell_thickness == () || cell_depth == ()
         || cell_offset == () || backplane_thickness == () || backplane_center == () {
         return plan_error("solar-panel SysML geometry datums are incomplete");
@@ -2936,40 +3006,72 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         return plan_error("solar-panel installation requires one typed station, orientation, and bus-rail pair per canonical array");
     }
     let ops = [];
+    let clearance_center_x = frame_width * clearance_center_x_fraction;
+    let clearance_width = frame_width * clearance_width_fraction;
+    let clearance_depth = frame_depth * clearance_depth_fraction;
+    if clearance_width >= cell_width || clearance_depth >= cell_depth {
+        return plan_error("solar-panel lower clearance cutout exceeds the typed cell field");
+    }
     let frame = _solar_frame_plan(doc, edit_target, root,
-        frame_width, frame_depth, frame_thickness, [0.44, 0.48, 0.55]);
+        frame_width, frame_depth, frame_thickness, clearance_center_x, clearance_width,
+        clearance_depth, [0.44, 0.48, 0.55]);
     if !frame.ok { return frame; }
     for op in frame.ops { ops.push(op); }
-    let cubes = [
-        #{name: "ArrayBackplane", translation: [0.0, backplane_center, 0.0], rotation: (),
-          scale: [cell_width, backplane_thickness, cell_depth],
-          color: [0.015, 0.035, 0.12]},
-        #{name: "Cells", translation: [0.0, cell_offset, 0.0], rotation: (),
-          scale: [cell_width, cell_thickness, cell_depth],
-          color: [0.025, 0.12, 0.48]},
+    let surface_specs = [
+        #{name: "ArrayBackplane", center_y: backplane_center,
+          thickness: backplane_thickness, color: [0.015, 0.035, 0.12]},
+        #{name: "Cells", center_y: cell_offset,
+          thickness: cell_thickness, color: [0.025, 0.12, 0.48]},
     ];
-    for item in cubes {
-        let part = _component_cube_visual_ops(doc, edit_target, root,
-            item.name, item.translation, item.rotation, item.scale, item.color);
+    for item in surface_specs {
+        let geometry = _solar_notched_surface_geometry(cell_width,
+            item.thickness, cell_depth, item.center_y,
+            clearance_center_x, clearance_width, clearance_depth);
+        if geometry.ok != true { return plan_error(geometry.error); }
+        let part = _component_mesh_visual_ops(doc, edit_target, root,
+            item.name, geometry, item.color);
         if !part.ok { return part; }
         for op in part.ops { ops.push(op); }
     }
     let divider_y = cell_offset + cell_thickness / 2.0;
+    let notch_start_z = cell_depth / 2.0 - clearance_depth;
     for index in 1..columns {
         let name = "CellDividerX" + index.to_string();
+        let x = -cell_width / 2.0 + cell_width * index / columns;
+        let inside_clearance = x >= clearance_center_x - clearance_width / 2.0
+            && x <= clearance_center_x + clearance_width / 2.0;
+        let divider_depth = if inside_clearance { cell_depth - clearance_depth } else { cell_depth };
+        let divider_center_z = if inside_clearance { -clearance_depth / 2.0 } else { 0.0 };
         let divider = _component_cube_visual_ops(doc, edit_target, root, name,
-            [-cell_width / 2.0 + cell_width * index / columns, divider_y, 0.0], (),
-            [divider_width, divider_x_thickness, cell_depth],
+            [x, divider_y, divider_center_z], (),
+            [divider_width, divider_x_thickness, divider_depth],
             [0.72, 0.78, 0.88]);
         if !divider.ok { return divider; }
         for op in divider.ops { ops.push(op); }
     }
     for index in 1..rows {
         let name = "CellDividerZ" + index.to_string();
-        let divider = _component_cube_visual_ops(doc, edit_target, root, name,
-            [0.0, divider_y, -cell_depth / 2.0 + cell_depth * index / rows], (),
-            [cell_width, divider_z_thickness, divider_span],
-            [0.72, 0.78, 0.88]);
+        let z = -cell_depth / 2.0 + cell_depth * index / rows;
+        let divider = if z > notch_start_z {
+            let notch_left_x = clearance_center_x - clearance_width / 2.0;
+            let notch_right_x = clearance_center_x + clearance_width / 2.0;
+            let left_width = notch_left_x + cell_width / 2.0;
+            let right_width = cell_width / 2.0 - notch_right_x;
+            let left = griffin_geometry::rectangular_prism_geometry(
+                vec3((-cell_width / 2.0 + notch_left_x) / 2.0, divider_y, z),
+                vec3(left_width, divider_z_thickness, divider_span));
+            let right = griffin_geometry::rectangular_prism_geometry(
+                vec3((notch_right_x + cell_width / 2.0) / 2.0, divider_y, z),
+                vec3(right_width, divider_z_thickness, divider_span));
+            let geometry = griffin_geometry::merge_mesh_geometries([left, right]);
+            _component_mesh_visual_ops(doc, edit_target, root, name,
+                geometry, [0.72, 0.78, 0.88])
+        } else {
+            _component_cube_visual_ops(doc, edit_target, root, name,
+                [0.0, divider_y, z], (),
+                [cell_width, divider_z_thickness, divider_span],
+                [0.72, 0.78, 0.88])
+        };
         if !divider.ok { return divider; }
         for op in divider.ops { ops.push(op); }
     }

@@ -9,6 +9,50 @@ fn scalar_is_finite(value) {
         && scalar > -1.7976931348623157e308
 }
 
+// Build a watertight centered box as a Mesh using native f64 profile
+// extrusion. The caller may position it by supplying a component-local centre.
+fn rectangular_prism_geometry(center, dimensions) {
+    if !vec3_is_native(center) || !vec3_is_finite(center)
+        || !vec3_is_native(dimensions) || !vec3_is_finite(dimensions)
+        || dimensions.x <= 0.0 || dimensions.y <= 0.0 || dimensions.z <= 0.0 {
+        return #{ok: false, error: "rectangular prism requires finite center and positive dimensions"};
+    }
+    let half_x = dimensions.x / 2.0;
+    let half_z = dimensions.z / 2.0;
+    let profile = [vec2(-half_x, -half_z), vec2(half_x, -half_z),
+        vec2(half_x, half_z), vec2(-half_x, half_z)];
+    let mesh = extrude_profile(profile, dimensions.y, profile_plane_xz());
+    let points = [];
+    for point in mesh.points {
+        points.push([point.x + center.x, point.y + center.y, point.z + center.z]);
+    }
+    #{ok: true, points: points, face_counts: mesh.face_vertex_counts,
+      face_indices: mesh.face_vertex_indices}
+}
+
+// Join independently generated closed meshes into one USD Mesh without
+// changing their local geometry or storing mesh values as numeric strings.
+fn merge_mesh_geometries(parts) {
+    if type_of(parts) != "array" || parts.is_empty() {
+        return #{ok: false, error: "mesh merge requires at least one geometry"};
+    }
+    let points = [];
+    let face_counts = [];
+    let face_indices = [];
+    for part in parts {
+        if part == () || part.ok != true || part.points == ()
+            || part.face_counts == () || part.face_indices == () {
+            return #{ok: false, error: "mesh merge input is incomplete"};
+        }
+        let base = points.len();
+        for point in part.points { points.push(point); }
+        for count in part.face_counts { face_counts.push(count); }
+        for index in part.face_indices { face_indices.push(index + base); }
+    }
+    #{ok: true, points: points, face_counts: face_counts,
+      face_indices: face_indices}
+}
+
 fn perimeter_beam_geometry(stations, ring_y, section) {
     if type_of(stations) != "array" || stations.len() < 3
         || type_of(ring_y) != "array" || ring_y.len() == 0
