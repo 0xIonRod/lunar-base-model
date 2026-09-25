@@ -67,10 +67,55 @@ package GriffinSolarRequirements {
     requirement def GSA004_ArrayTraceability {
         doc /* GSA-004 [evidence] array identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and deployment status is explicit. */
     }
+    constraint def GSAC005_RailSpanFit {
+        in expectedInstalledFrameWidthM : Real;
+        in measuredInstalledFrameWidthM : Real;
+        in toleranceM : Real;
+        toleranceM >= 0.0
+            and RealFunctions::abs(measuredInstalledFrameWidthM
+                - expectedInstalledFrameWidthM) <= toleranceM;
+    }
     requirement def GSA005_ArrayPlacement {
+        require GSAC005_RailSpanFit;
         doc /* GSA-005 [installation interface] each array root frame, azimuth, panel normal, support attachment, and stowed/deployed state shall conform to the approved Griffin-1 installation/interface definition. */
     }
+    constraint def GSAC006_PanelMeshEnvelope {
+        in measuredFrameWidthM : Real;
+        in measuredFrameThicknessM : Real;
+        in measuredFrameDepthM : Real;
+        in measuredCellWidthM : Real;
+        in measuredCellThicknessM : Real;
+        in measuredCellDepthM : Real;
+        in measuredCellCenterYM : Real;
+        in measuredBackplaneWidthM : Real;
+        in measuredBackplaneThicknessM : Real;
+        in measuredBackplaneDepthM : Real;
+        in measuredBackplaneCenterYM : Real;
+        in frameWidthM : Real;
+        in frameThicknessM : Real;
+        in frameDepthM : Real;
+        in cellWidthM : Real;
+        in cellThicknessM : Real;
+        in cellDepthM : Real;
+        in cellOffsetYM : Real;
+        in arrayBackplaneThicknessM : Real;
+        in arrayBackplaneCenterYM : Real;
+        in geometryToleranceM : Real;
+        geometryToleranceM >= 0.0
+            and RealFunctions::abs(measuredFrameWidthM - frameWidthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredFrameThicknessM - frameThicknessM) <= geometryToleranceM
+            and RealFunctions::abs(measuredFrameDepthM - frameDepthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredCellWidthM - cellWidthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredCellThicknessM - cellThicknessM) <= geometryToleranceM
+            and RealFunctions::abs(measuredCellDepthM - cellDepthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredCellCenterYM - cellOffsetYM) <= geometryToleranceM
+            and RealFunctions::abs(measuredBackplaneWidthM - cellWidthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredBackplaneThicknessM - arrayBackplaneThicknessM) <= geometryToleranceM
+            and RealFunctions::abs(measuredBackplaneDepthM - cellDepthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredBackplaneCenterYM - arrayBackplaneCenterYM) <= geometryToleranceM;
+    }
     requirement def GSA006_PanelEnvelope {
+        require GSAC006_PanelMeshEnvelope;
         doc /* GSA-006 [geometry] each array shall match the approved installed panel outline, including its lower structural clearance cutout; the frame, backplane, and cell field shall share that opening within the controlled geometry tolerances. */
     }
     requirement def GSA007_CellGridAndMount {

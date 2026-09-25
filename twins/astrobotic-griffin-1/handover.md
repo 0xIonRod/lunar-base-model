@@ -56,7 +56,7 @@ These are Editor and composed-readback observations. They do not establish missi
 
 ## Next work
 
-1. Update the standalone solar requirement scenario for the three canonical panel identities, rail-derived widths, paired rail interfaces, and notched panel outline. The visual-configuration type scenario already uses the canonical count; do not treat either scenario as evidence until the user requests verification.
+1. Review and run the standalone solar requirement scenario for the three canonical panel identities, rail-derived widths, paired rail interfaces, notched panel outline, and the grouped SysML `require` evaluator. The visual-configuration type scenario already uses the canonical count; neither scenario is acceptance evidence until its verification is run.
 2. Replace the solar-panel study fractions and other approximate panel datums with the controlled Griffin-1 panel definition when available; verify cutout clearance, installed transforms, support and hinge interfaces, and electrical behavior against that definition.
 3. Compose the saved ramp visual component under the integrated port and starboard physical ramp roots. Preserve the physical track colliders, avoid duplicate visible geometry, and derive both poses from the ramp SysML configuration.
 4. Review the leg-to-bus mount appearance in the Editor against current Griffin-1 references. Define any additional visual bracing as a source-backed study requirement derived from the bus and leg interfaces.
@@ -66,3 +66,8 @@ These are Editor and composed-readback observations. They do not establish missi
 ## Repository integration
 
 The Twin checkout is already on `main`; inspect `git status`, ancestry, and the exact staged diff before each commit. The core `main` worktree already contains the current terrain merge and local render-defaults commit. Report local commits and remote pushes separately; do not push unless requested.
+
+The current prioritized implementation gaps and standards review live in
+[`contracts/implementation_gaps.md`](contracts/implementation_gaps.md). Keep
+that review as the current status source; this handover records the Twin's
+authored ownership and work sequence.

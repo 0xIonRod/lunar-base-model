@@ -11,6 +11,11 @@ mechanical relations, Rhai policy boundaries, Modelica/Rumoca integration, and
 the remaining full-KerML follow-up.  This report intentionally does not cover
 the separate USD asset-download policy task.
 
+The current implementation status and prioritized gaps are maintained in the
+[Griffin implementation and standards gap review](../twins/astrobotic-griffin-1/contracts/implementation_gaps.md).
+That review supersedes the dated implementation checklist below where they
+differ.
+
 ## Executive result
 
 The Griffin work now has a working vertical slice of the intended architecture:
@@ -408,22 +413,28 @@ and the scene gate `11`.
 
 ### Current bounded semantic contract
 
-The IR currently supports source-linked scalar arithmetic/boolean expressions,
-conditionals, typed literals, fixed primitive multiplicities, parameters,
-diagnostics, deterministic fingerprints, and provider observations with
-`pass`, `fail`, `inconclusive`, and `error` outcomes. Modelica lowering is a
-backend for that subset. Rumoca parses/compiles Modelica; it does not resolve
-SysML/KerML, infer Griffin intent, navigate SysML features, or provide
-requirement provenance.
+The IR supports source-linked scalar arithmetic/boolean expressions,
+conditionals, typed literals, fixed primitive multiplicities, parameterized
+constraint predicate invocation, diagnostics, deterministic fingerprints,
+and provider observations with `pass`, `fail`, `inconclusive`, and `error`
+outcomes. Requirement-owned `require` and `assume` roles are typed, and the IR
+can evaluate all required memberships by snapshot-scoped identity while
+checking an optional verification case's resolved `verify` link. Modelica
+lowering remains a backend for the supported subset. Rumoca parses/compiles
+Modelica; it does not resolve SysML/KerML, infer Griffin intent, or navigate
+SysML features.
 
 The following are still generic implementation work, not Griffin workarounds:
 
 1. typed feature chains and reference navigation;
-2. constraint invocation, argument binding, defaults, and result typing;
+2. requirement-usage argument/binding relationships, defaults, directions,
+   and invocation result typing;
 3. collections, indexing, filtering, and aggregate expressions;
 4. quantity/unit dimensional checking and conversion across providers;
 5. null/invalid/error propagation and observation freshness semantics;
-6. requirement/constraint/assert/assume/verify/satisfy membership provenance;
+6. complete assert/invariant/satisfy provenance and usage-level constraint
+   argument bindings (require/assume and verify requirement handles are now
+   projected and executable at the requirement boundary);
 7. configuration, mode, phase, interval, and temporal applicability; and
 8. state/action/transition execution and typed Modelica result provenance.
 

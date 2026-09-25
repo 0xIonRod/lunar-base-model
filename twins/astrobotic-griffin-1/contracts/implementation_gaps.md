@@ -31,7 +31,7 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 | Area | Current state | Gap / consequence |
 |---|---|---|
 | Requirement meaning | Five Griffin domain packages plus separate subsystem packages; several requirements still contain only `doc` text | Valid as textual requirements, but no executable acceptance predicate or requirement-level evidence mapping exists for most of them |
-| Formal constraint ownership | Selected constraints now use `require`; Rust projects membership and reusable definition identity; evaluator rejects an unrelated constraint | Constraint usage argument/binding semantics and specialization/redefinition traversal are not implemented; Rhai still supplies parameters by name |
+| Formal constraint ownership | Requirement membership roles are typed as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates every `require` on a requirement, and checks verification through resolved `verify` links. The Griffin solar geometry observer now uses the grouped path for GSA-005, GSA-006, and GSA-009 | Other Griffin observers still use the per-constraint path and select definitions by qualified name; providers still supply values by parameter name. Usage-level argument/binding relationships, default arguments, specialization/redefinition traversal, and migration of remaining Twin checks to handle-based evaluation remain |
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links | Coverage evaluation now compares resolved handles. The Twin status/check catalogs remain authored execution metadata, and `twin.toml`, provider selection, and USD query paths remain configuration. Replace duplicate semantic identity/status catalogs with reports derived from typed requirement, verification, realization, and evidence links |
 | Units and frames | `lunco-engineering-values` supports dimension-safe conversion from caller-resolved `Unit` values; the constraint IR and observation contracts still carry unit identity as text, while Griffin often relies on SI field-name suffixes | The unit primitive is present but is not wired from SysML unit resolution through IR type checking and provider values. Names and comments do not prevent dimensional mistakes; frame identity and conversion provenance also need typed contracts |
@@ -247,11 +247,24 @@ become Griffin's permanent source semantics.
   required constraints, invalid objective links, and unresolved source
   members. Text-only requirements must remain distinct from malformed
   requirements.
-- Execute reusable constraint definitions through typed usage bindings and
-  argument/default/direction/result checks. The evaluator accepts named
-  parameter maps from Rhai; Griffin manually builds each map and selects
-  constraints by string name. Rust does not yet execute SysML binding
-  relationships or general constraint invocations.
+- The generic IR now compiles by exact snapshot-scoped constraint handle and
+  evaluates every standard `require` membership on a requirement as one
+  four-state result. It can validate the associated verification case through
+  resolved `verify` handles. `assume` memberships remain context, not acceptance
+  predicates. The Rhai `SysmlModel.evaluate_requirement` boundary accepts the
+  typed requirement and verification objects plus typed feature-path
+  observations.
+- The Griffin solar geometry observer now exercises the grouped API for its
+  three formal constraints. Other Griffin observers still bind source
+  constraint definitions by qualified name and supply values by parameter
+  name. The IR does not yet project usage-site argument bindings/defaults or
+  execute arbitrary SysML binding relationships; it must fail clearly where
+  those semantics are required rather than infer them from matching names.
+- A generic requirement audit over the resolved graph is still needed to
+  report uncovered requirements, duplicate/missing IDs, absent subjects,
+  unverified required constraints, invalid objective links, and unresolved
+  source members. Text-only requirements must remain distinct from malformed
+  requirements.
 
 ### P1 — quantities, geometry, and provider observations
 
