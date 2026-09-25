@@ -9,6 +9,7 @@ def Xform "GriffinFlipVisual" (
     prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
     kind = "assembly"
     documentation = "Griffin-1 and Astrolab FLIP visual review composition; SI metres."
+    prepend apiSchemas = "LunCoEpochAPI"
 )
 {
     custom string lunco:visual:status = "review-ready proxy geometry, not flight CAD"
@@ -17,6 +18,11 @@ def Xform "GriffinFlipVisual" (
     custom token lunco:visual:terrain_mode = "standard_layered"
     custom asset lunco:visual:terrain_asset = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@
     custom asset lunco:visual:terrain_shader = @lunco://shaders/terrain_layered.wgsl@
+    double lunco:anchor:lat = -84.72672255
+    double lunco:anchor:lon = 29.14428685
+    double lunco:anchor:height = 0.0
+    int lunco:anchor:body = 301
+    double lunco:time:epochJd = 2461395.5
     def Xform "Ground"
     {
         def Cube "RegolithPad"
@@ -127,5 +133,10 @@ def Xform "GriffinFlipVisual" (
                 token visibility = "invisible"
             }
         }
+    }
+    def Xform "SolarSystem" (
+        prepend references = @lunco://celestial/solar_system.usda@</SolarSystem>
+    )
+    {
     }
 }

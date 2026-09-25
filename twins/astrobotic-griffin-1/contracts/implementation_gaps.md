@@ -86,10 +86,13 @@ or `replaceable study assumption` status.
 | Site, lighting, and hazard detection | Confirmed touchdown coordinates and local frame; terrain coverage and resolution appropriate to the 15 cm hazard-detection threshold; time/epoch and Sun ephemeris; thermal and shadow/eclipses; and communications visibility. The current 4 m/pixel regional DEM cannot verify a 15 cm hazard threshold. |
 | Verification record | Requirement-specific acceptance procedure, measured source and configuration revision, uncertainty/tolerance, provider/document generation, sample interval where dynamic, raw evidence link, and distinct pass/fail/inconclusive/error outcomes. Image comparison can verify qualitative silhouette only unless calibrated. |
 
-The scene is time-aligned for a deterministic study snapshot: its root selects
-the solar-system ephemeris, authored TDB epoch, and NOBILE03 site anchor. At JD
-2461395.5 TDB, the simulator ephemeris gives Sun azimuth 7.52° clockwise from
-north and elevation 6.49° at that anchor. Astrobotic's [manifest](https://www.astrobotic.com/lunar-delivery/manifest/)
+The surface-operations and combined visual-review scenes are time-aligned for
+the same deterministic study snapshot: each root selects the solar-system
+ephemeris, authored TDB epoch, and NOBILE03 site anchor. The visual-review
+scene derives its typed site/time values from the composed surface-operations
+root. At JD 2461395.5 TDB (2026-12-21 TDB calendar date), the simulator
+ephemeris gives Sun azimuth 7.52° clockwise from north and elevation 6.49° at
+that anchor. Astrobotic's [manifest](https://www.astrobotic.com/lunar-delivery/manifest/)
 lists Nobile Region 2026 and NASA's [Moon Base update](https://www.nasa.gov/news-release/nasa-provides-update-on-moon-base-rovers-landers-missions/)
 describes a launch planned later in 2026, but neither publishes the surface
 landing timestamp; the authored epoch is not flight timeline data. The current
