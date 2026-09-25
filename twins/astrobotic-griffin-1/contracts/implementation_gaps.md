@@ -171,8 +171,10 @@ become Griffin's permanent source semantics.
   its full-width lateral corners, so contact must be checked across every
   lateral cross-section. SysML owns the transition length, derived from the
   octagonal source profile, adapter width, hinge station, required overlap,
-  and interface margin. Generic `QueryUsdPrims` now returns exact
-  canonical-stage collision vertices for one Mesh or Cube. The shared
+  and interface margin. Generic `QueryUsdPrims` now returns the geometry
+  produced by the same Avian collider cook used for runtime projection, with
+  composed transforms applied into canonical-stage coordinates. Convex
+  decomposition remains separate hull parts, not a filled envelope. The shared
   measurement library builds convex footprints and measures the minimum
   cross-section overlap across the adapter span, alongside transition length,
   top-face step, and hinge seam. This is static geometry evidence only; applying
@@ -251,10 +253,15 @@ become Griffin's permanent source semantics.
   coverage, text-only requirements, unresolved verification targets, and
   unresolved names inside requirement definitions. The Griffin requirements
   tool exposes this as an explicit review operation; normal Twin startup does
-  not enforce it. It has not yet been run against the live Griffin source
-  snapshot. Standard usage-level feature-value bindings now project through
-  resolved formal-parameter handles; diagnostics for inherited defaults and
-  general binding relationships remain open.
+  not enforce it. The `sysml-audit --engineering-review` CLI was run on the 21
+  Twin requirement sources: it found no source diagnostics or policy errors,
+  and resolved verification links for all 183 definitions. It reported 29
+  definitions with formal `require` constraints and 154 informational
+  text-only findings. The CLI does not execute mapped Rhai verifiers or inspect
+  fresh evidence, and the in-Editor audit action was not run. Standard
+  usage-level feature-value bindings now project through resolved
+  formal-parameter handles; diagnostics for inherited defaults and general
+  binding relationships remain open.
 - The generic IR now compiles by exact snapshot-scoped constraint handle and
   evaluates every standard `require` membership on a requirement as one
   four-state result. It can validate the associated verification case through
@@ -287,13 +294,16 @@ become Griffin's permanent source semantics.
   values and relies on field names for unit hints. Connect resolved units to
   IR checking and provider observations before using mixed providers or
   supplier data; never infer a conversion from a symbol string alone.
-- `QueryUsdPrims` reads one composed snapshot and exposes exact canonical-stage
-  points for active collision Mesh/Cube prims. It now returns the document
-  generation and canonical-stage generation as separate values, including
-  for live-stage reads. The remaining gap is binding SysML feature handles to
-  USD targets and carrying query/document/stage provenance into each typed
-  observation. Griffin's observer still supplies explicit paths and labels
-  frame/unit instead of resolving those from typed contracts.
+- `QueryUsdPrims` reads one composed snapshot and can expose Avian-cooked
+  triangle-mesh, convex-hull, convex-decomposition, or bounding-cube geometry
+  for active collision Mesh/Cube prims. It returns the document generation and
+  canonical-stage generation as separate values, including for live-stage
+  reads. The remaining gap is binding SysML feature handles to USD targets and
+  carrying query/document/stage provenance into each typed observation.
+  Griffin's observer still supplies explicit paths and labels frame/unit
+  instead of resolving those from typed contracts. The cooked-geometry query
+  and its Griffin consumer compile, but no fresh Editor execution or
+  post-change geometry readback has been made.
 - `QueryPhysics` already exposes mass, center of mass, principal inertia,
   readiness, support state, and FLIP wheel-ray samples with sample ticks. It
   does not expose general collider-pair manifolds, per-point impulses, full

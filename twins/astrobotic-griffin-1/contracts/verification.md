@@ -39,16 +39,19 @@ and source-deviation checks. The render ramp uses two FLIP-aligned
 wheel tracks with an open centre, using the same wheel stations and track-width
 datum as the physical contact geometry.
 
-GRR-012 uses the shared `QueryUsdPrims` exact collider-geometry observation to
-measure, from one composed snapshot per side, minimum adapter overlap at every
-lateral cross-section, transition length, deck top-face step, and hinge seam
-gap. Aggregate AABB intersection cannot prove overlap on the clipped octagonal
-adapter profile. SysML owns the transition length needed to retain the
+GRR-012 uses the shared `QueryUsdPrims` Avian-cooked collider-geometry
+observation to measure, from one composed snapshot per side, minimum adapter
+overlap at every lateral cross-section, transition length, deck top-face step,
+and hinge seam gap. Aggregate AABB intersection cannot prove overlap on the
+clipped octagonal adapter profile. SysML owns the transition length needed to retain the
 required overlap across the full adapter width; interface tolerance is a
-separate datum. GRR-006 requires each physical track to be a convex mesh and
-checks its composed collision bounds and upper/lower toe vertices against the
-same SysML length, thickness, deployment angle, and FLIP track-width datums. A
-shared mechanical relation derives the miter run from thickness and deployment angle.
+separate datum. The new cooked-geometry path has compile evidence only; fresh
+Editor execution and readback remain pending. GRR-006 requires each physical
+track to be a convex mesh and checks its composed collision bounds and
+upper/lower toe vertices against the same SysML length, thickness, deployment
+angle, and FLIP track-width datums. A
+shared mechanical relation derives the miter run from thickness and deployment
+angle.
 GRR-010 checks both transformed toe edges against terrain; the top face is
 12.228605 m, the track centre is 5.19 m, the adapter top is 5.28 m, and the
 touchdown COM datum is 3.98 m. These remain explicit study values, not accepted
