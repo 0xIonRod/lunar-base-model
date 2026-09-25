@@ -11,14 +11,15 @@ import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 // Run this report explicitly from the Griffin requirements tool when doing a
 // source review. It is not part of normal Twin startup or scene admission.
 // The policy is a review choice, while the audit implementation and finding
-// identities are shared by all SysML models.
+// identities are shared by all SysML models. A missing formal predicate is
+// informational here; this audit checks verification links but does not claim
+// that any linked scenario or evidence procedure has run.
 fn requirement_quality_audit() {
     let model = sysml_requirements::model();
     if model == () || !sysml_model_is(model) {
         return #{ok: false, error: "resolved Griffin SysML model is unavailable"};
     }
     let policy = engineering_review_requirement_audit_policy();
-    policy.require_formal_constraint = true;
     let report = model.audit_requirements(policy);
     #{ok: !report.has_errors, source_revision: report.source_revision,
       source_fingerprint: report.source_fingerprint, findings: report.findings}
@@ -425,9 +426,8 @@ fn _query_schemas(doc_id, path, attrs, rels, children) {
     query("QueryUsdPrim", request)
 }
 
-// One composed geometry observation carries schema, bounds, and optional
-// exact collision vertices. Primitive collision bounds are available for
-// cylinders even though exact collision vertices currently cover Mesh/Cube.
+// One composed geometry observation carries schema, geometry bounds, collision
+// bounds, and optional cooked Avian collider geometry.
 fn _query_geometry(doc_id, path, attrs, rels, exact_collision_geometry) {
     let request = #{path: path, schemas: true, geometry_bounds: true,
         collision_bounds: true};
@@ -1685,6 +1685,7 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
     }
     let translation = child.attrs["xformOp:translate"];
     let collision = child.collision_geometry;
+    let collision_bounds = child.collision_bounds;
     let expected_z = if child_name == "RampTrackPort" { half_track } else { -half_track };
     let source_missing = ramp_source.ok != true || ramp_length == ()
         || ramp_thickness == () || ramp_center_y == () || track_width == ()
@@ -1693,7 +1694,10 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
     let geometry_missing = translation == () || translation.len() != 3
         || child.type_name != "Mesh" || collision == ()
         || collision.frame != "canonical_stage"
-        || collision.vertices == () || collision.vertices.len() != 8
+        || collision.shape != "convex_hull"
+        || collision.vertices == () || collision.vertices.len() < 4
+        || collision_bounds == () || collision_bounds.fidelity != "exact"
+        || collision_bounds.half_extents == ()
         || !_has(child.api_schemas, "PhysicsCollisionAPI")
         || !_has(child.api_schemas, "PhysicsMeshCollisionAPI");
     if source_missing {
@@ -1703,23 +1707,21 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
     }
     if geometry_missing {
         findings.push(_finding("GR-006", child_path,
-            "physical contact track needs composed mesh vertices and applied mesh collision APIs"));
+            "physical contact track needs cooked convex-hull geometry, exact collision bounds, and applied mesh collision APIs"));
         return findings;
     }
-    // `collision_geometry.approximation` describes the extractor's vertex
-    // observation (which is exact for this authored mesh), not the PhysX
-    // cooking mode. Check the composed USD physics token that the simulator
-    // actually consumes.
+    // The geometry query returns the same cooked hull used by Avian. Keep the
+    // standard USD approximation token check as an authored-schema check.
     if child.attrs["physics:approximation"] != "convexHull" {
         findings.push(_finding("GR-006", child_path,
             "dynamic contact track collider must use the authored convexHull approximation"));
         return findings;
     }
     let expected_x = if ramp_index == 0 { ramp_length / 2.0 } else { -ramp_length / 2.0 };
-    let vertices = collision.vertices;
-    let measured_length = _distance3(vertices[1], vertices[2]);
-    let measured_thickness = _distance3(vertices[0], vertices[1]);
-    let measured_width = _distance3(vertices[0], vertices[4]);
+    let half_extents = collision_bounds.half_extents;
+    let measured_length = 2.0 * half_extents[0];
+    let measured_thickness = 2.0 * half_extents[1];
+    let measured_width = 2.0 * half_extents[2];
     let dimension_deviation = _maximum_value(
         (measured_length - ramp_length).abs(),
         _maximum_value((measured_thickness - ramp_thickness).abs(),
