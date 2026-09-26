@@ -38,8 +38,8 @@ package GriffinMechanicalRequirements {
     constraint def GRC018_TopDeckColliderOwnsContact {
         in collisionEnabled : Boolean;
         in proxyHidden : Boolean;
-        in convexHullApproximation : Boolean;
-        collisionEnabled and proxyHidden and convexHullApproximation;
+        in cookedConvexGeometry : Boolean;
+        collisionEnabled and proxyHidden and cookedConvexGeometry;
     }
 
     requirement def GR018_HullAndDeck {

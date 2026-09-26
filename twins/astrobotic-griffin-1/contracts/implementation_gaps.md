@@ -15,15 +15,31 @@ The largest gaps are requirement coverage and binding workflows over the
 resolved graph, complete typed provider provenance, source-to-realization
 mapping, and physically qualified mission evidence.
 
-The current Griffin requirements runtime run passes for its 37 requirement
-usages and 23 verification cases: all 39 emitted evidence checks pass, including
-composed geometry and the typed GR-005 source catalog. This checks the authored
-study configuration and its current verification procedures; it does not
+The last recorded Griffin requirements packet passed for its 37 requirement
+usages and 23 verification cases: all 39 emitted evidence checks passed,
+including composed geometry and the typed GR-005 source catalog. This checks
+the authored study configuration and its verification procedures; it does not
 qualify flight behavior or remove the separate geometry, physics, and mission
-data gaps below. The same run still emits five Avian joint-start seating
+data gaps below. That packet also logged five Avian joint-start seating
 errors: three angular residuals of 90° or 180° and two translation residuals
-of 3.44 m. These are unresolved mechanical initialization defects; the
-requirements verdict does not validate their correction.
+of 3.44 m. A previously started headless requirements invocation has not
+returned a verdict in this update.
+
+The Editor-loaded combined review scene has a current failing visual-evidence
+packet: 25 of 76 checks fail (11 in GV-002, seven in GV-004, one in GV-006,
+five in GV-007, and one in FVG-001). The scene log reports missing or invisible
+leg subparts and later finite-world exits for articulated lander bodies. Treat
+the composed review as not physically integrated until those failures are
+resolved and read back; the older requirements pass does not cover this
+visual/physics result.
+
+FLIP now has one integrated vehicle asset. Its SysML source owns the published
+battery-energy and solar-peak ratings; the Editor builder converts energy to
+the battery model's Ah input and projects the solar rating as a finite output
+limit. The generic panel defaults to an infinite limit, and the panel's live
+Sun direction is routed through the FLIP network boundary from its local
+environment probe. The USD and Modelica source validators accept this wiring
+and branch-free cap. Dynamic battery/solar performance remains unverified.
 
 The source contracts are being aligned with OMG SysML v2.0: formal requirement
 constraints use requirement-owned `require` memberships; verification cases
@@ -219,11 +235,11 @@ become Griffin's permanent source semantics.
   modes. These are `none` (static/kinematic triangle mesh), `convexHull`,
   `convexDecomposition`, and `boundingCube`. OpenUSD also defines
   `boundingSphere` and `meshSimplification`; both remain explicitly unsupported
-  by Avian. Its current `boundingCube` cook is axis-aligned to the source
-  mesh-local frame, while the [OpenUSD schema describes an optimally fitting
-  box](https://openusd.org/dev/api/class_usd_physics_mesh_collision_a_p_i.html).
-  Define and implement the intended fit semantics before claiming standard
-  parity across adapters.
+  by Avian. The current `boundingCube` cook now uses an oriented principal-axis
+  fit instead of a mesh-axis AABB. This fit is deterministic but does not
+  guarantee a globally minimum-volume box; exact [OpenUSD schema parity](https://openusd.org/dev/api/class_usd_physics_mesh_collision_a_p_i.html)
+  remains open. Rhai authoring obtains the adapter's supported approximation
+  tokens through one Rust capability query instead of a duplicated allow-list.
 
   The planner now requires a canonical-metre deviation tolerance and adaptively
   refines untrimmed U/V grids or trimmed curve/grid settings. It records the
@@ -325,13 +341,16 @@ become Griffin's permanent source semantics.
   triangle-mesh, convex-hull, convex-decomposition, or bounding-cube geometry
   for active collision Mesh/Cube prims. It returns the document generation and
   canonical-stage generation as separate values, including for live-stage
-  reads. The remaining gap is binding SysML feature handles to USD targets and
-  carrying query/document/stage provenance into each typed observation.
-  Griffin's observer still supplies explicit paths and labels frame/unit
-  instead of resolving those from typed contracts. The exact Griffin runtime
-  verifier now reads composed collider geometry and passes its geometry
-  constraints; interactive Editor preview and joined source/render/collider
-  comparison remain unavailable.
+  reads. The SysML evaluator now retains tagged source and USD-stage provenance
+  and flags mixed generations for one document. Griffin's GR-018 observer now
+  batches its eight perimeter beams, payload collider, and hierarchy root into
+  one query. It checks each Avian-cooked shape and frame, verifies the beam
+  source dimensions/transforms, and compares the adapter's authored mesh points
+  and topology to its SysML-derived geometry. It passes the batch's document
+  and stage revisions through typed provider provenance. The broader mapping
+  from resolved SysML feature handles to USD
+  targets and unit/frame resolution remains open. Interactive Editor preview
+  and joined source/render/collider comparison remain unavailable.
 - `QueryPhysics` already exposes mass, center of mass, principal inertia,
   readiness, support state, and FLIP wheel-ray samples with sample ticks. It
   does not expose general collider-pair manifolds, per-point impulses, full
@@ -341,11 +360,11 @@ become Griffin's permanent source semantics.
   is an evidence recorder and temporal reducer that proves the required wheels
   contacted the ramp over the full traversal interval. A static fit check is
   not traversal acceptance.
-- The first generic `UsdGeomNurbsPatch` collision cook is implemented. Remaining
-  work is tolerance-driven adaptive tessellation with measured deviation,
-  Editor preview/readback of that error, and applying the tool to a real Griffin
-  NURBS source if one is authored. Do not treat fixed subdivisions as a
-  certified collision accuracy bound.
+- The generic `UsdGeomNurbsPatch` collision cook uses tolerance-driven adaptive
+  tessellation and records a symmetric sampled convergence estimate. That
+  estimate is not a certified bound on the exact surface deviation. Editor
+  preview/readback of the error and applying the tool to a real Griffin NURBS
+  source remain open; Griffin currently authors no NURBS patch.
 - Preserve provider result states end to end. Inconclusive and error are not
   false requirements and must not be collapsed into a boolean.
 

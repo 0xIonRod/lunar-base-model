@@ -133,7 +133,7 @@ fn on_tick(me, ctx) {
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceThicknessM",
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceCenterYM",
         "FlipRequirements::FlipRover::wheelStationZ",
-        "FlipRequirements::FlipRover::visualRoverWheelWidthM"
+        "FlipRequirements::FlipRover::wheelWidthM"
     ], [
         "GriffinRampRequirements::grr001", "GriffinRampRequirements::grr002",
         "GriffinRampRequirements::grr003", "GriffinRampRequirements::grr004",
@@ -150,7 +150,7 @@ fn on_tick(me, ctx) {
     let wheel_z = sysml_requirement_checks::source_number_list(source,
         "FlipRequirements::FlipRover::wheelStationZ");
     let wheel_width = sysml_requirements::number(source,
-        "FlipRequirements::FlipRover::visualRoverWheelWidthM");
+        "FlipRequirements::FlipRover::wheelWidthM");
     let wheel_clearance = _source_number(source, "rampWheelClearanceM");
     let transition_required_overlap = _source_number(source,
         "physicalRampDeckTransitionRequiredOverlapM");

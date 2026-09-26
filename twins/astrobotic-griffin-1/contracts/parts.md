@@ -47,12 +47,12 @@ independently through the runtime authoring tools.
 | `components/lander/griffin_solar_panel_visual.usda` | frame, cells, dividers, hinge, paired brackets, paired support links | shared render-only component referenced by the three independently placed panel roots |
 | `components/lander/griffin_engine_bell_visual.usda` | bell and throat | seven repeated non-colliding bells; render-only |
 | `components/lander/griffin_ramp_visual.usda` | paired wheel tracks, rails, paired supports, underside beams, posts, hinge collars, gussets, and per-track treads | referenced port/starboard visual component owns its geometry; render-only |
-| `components/rover/flip_chassis_visual.usda` | lower frame, equipment box, bumper, payload deck, service panel | low white FLIP body; render-only |
-| `components/rover/flip_wheel_visual.usda` | tire, metal hub, hub cap | four repeated directional wheels in the visual assembly; render-only |
+| `components/rover/flip_chassis_visual.usda` | lower frame, equipment box, bumper, payload deck, service panel | referenced by the canonical FLIP vehicle; the same shapes provide visible chassis geometry and wheel-filtered rigid-body collision |
+| `components/rover/flip_wheel_visual.usda` | tire, metal hub, hub cap | referenced at each typed wheel station in the canonical FLIP vehicle; render geometry stays separate from the physical wheel prim |
 | `components/rover/flip_sensor_mast_visual.usda` | mast post, sensor head, antenna | front sensor silhouette; render-only |
 | `components/rover/flip_solar_panel_visual.usda` | white backsheet, blue cells, fold hinge | rear collapsible-array proxy; render-only |
 
-The dynamic `vehicles/flip.usda` and the presentation assembly both use the
-four-wheel directional study architecture. The visual wheel count is checked
-explicitly so a presentation update cannot silently regress to the old
-six-station proxy.
+`vehicles/flip.usda` is the only FLIP vehicle assembly. It composes the dynamic
+wheel and drivetrain model with the chassis, wheel, suspension, mast, and solar
+visual components. SysML owns wheel identities, station datums, and dimensions;
+the references keep repeated geometry in one component source.

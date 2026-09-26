@@ -10,40 +10,52 @@ def Xform "FlipChassis" (
 )
 {
     custom string lunco:visual:component = "flip_chassis"
-    def Cube "LowerFrame"
+    def Cube "LowerFrame" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
     {
-        double size = 1.0
+        double size = 2.0
         custom double3 xformOp:scale = (2.2, 0.38, 1.38)
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20000000298023224)]
         uniform token purpose = "render"
         custom token[] xformOpOrder = ["xformOp:scale"]
+        bool physics:collisionEnabled = true
     }
-    def Cube "WhiteEquipmentBox"
+    def Cube "WhiteEquipmentBox" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
     {
-        double size = 1.0
+        double size = 2.0
         double3 xformOp:translate = (0.0, 0.45, 0.08)
         double3 xformOp:scale = (1.95, 0.72, 1.22)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.8299999833106995, 0.8399999737739563, 0.8399999737739563)]
         uniform token purpose = "render"
+        bool physics:collisionEnabled = true
     }
-    def Cube "FrontBumper"
+    def Cube "FrontBumper" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
     {
-        double size = 1.0
+        double size = 2.0
         double3 xformOp:translate = (0.0, 0.2, -1.52)
         double3 xformOp:scale = (1.55, 0.25, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]
         uniform token purpose = "render"
+        bool physics:collisionEnabled = true
     }
-    def Cube "PayloadDeck"
+    def Cube "PayloadDeck" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
     {
-        double size = 1.0
+        double size = 2.0
         double3 xformOp:translate = (0.0, 0.92, 0.04)
         double3 xformOp:scale = (1.72, 0.1, 1.08)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.3400000035762787, 0.36000001430511475, 0.3799999952316284)]
         uniform token purpose = "render"
+        bool physics:collisionEnabled = true
     }
     def Cube "ServicePanel"
     {

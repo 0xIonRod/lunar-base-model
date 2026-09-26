@@ -96,14 +96,6 @@ fn _skirt_number(source, name) {
         "GriffinPropulsionRequirements::GriffinEngineSkirtComponent::" + name)
 }
 
-fn flip_steering_angles() {
-    let report = sysml_requirements::source();
-    let front = _sysml_number(report, "frontSteeringAngleDeg");
-    let rear = _sysml_number(report, "rearSteeringAngleDeg");
-    if front == () || rear == () { return (); }
-    [front, rear]
-}
-
 fn visual_component_specs(root) {
     let griffin = griffin_spec::visual_review_griffin_station();
     let flip = griffin_spec::visual_review_flip_station();
@@ -113,7 +105,7 @@ fn visual_component_specs(root) {
           asset: "twin://" + twin_name() + "/vehicles/griffin_1.usda",
           translation: vec3_array(griffin), rotation: (), scale: ()},
         #{parent: root, name: "FLIP", type_name: "Xform",
-          asset: "twin://" + twin_name() + "/vehicles/flip_visual.usda",
+          asset: "twin://" + twin_name() + "/vehicles/flip.usda",
           translation: vec3_array(flip), rotation: (), scale: ()}
     ]
 }
@@ -335,58 +327,55 @@ fn apply_visual_components(doc, edit_target, root, parent_gen) {
       command: command}
 }
 
-// The physical FLIP source and the review-only FLIP visual intentionally use
-// different station datums.  Apply the physical values as local, typed
-// assembly opinions in the current scene: this keeps the replaceable vehicle
-// source untouched while making the raycast support envelope reproducible.
-// The station order is owned by SysML FlipRover::visualWheelNames.
-fn physical_flip_station_plan(doc, edit_target, root) {
+/// Derive the battery model's Ah input from the SysML energy rating and
+/// nominal bus voltage, and project the rated solar output limit from its
+/// source-owned value. This is the explicit boundary between energy/power
+/// requirements and the generic storage/PV component interfaces.
+fn flip_electrical_model_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("physical_flip_station_plan requires a document, edit target, and absolute root");
+        return plan_error("flip_electrical_model_plan requires a document, edit target, and absolute root");
     }
-    let names = griffin_spec::visual_rover_wheel_names();
-    let xs = griffin_spec::physical_rover_wheel_station_x();
-    let ys = griffin_spec::physical_rover_wheel_station_y();
-    let zs = griffin_spec::physical_rover_wheel_station_z();
-    let rest_length = griffin_spec::physical_suspension_rest_length_m();
-    if names.len() != 4 || xs.len() != 4 || ys.len() != 4 || zs.len() != 4
-        || rest_length == () || rest_length <= 0.0 {
-        return plan_error("physical FLIP wheel station datums must contain four entries");
+    let energy_kwh = griffin_spec::rover_battery_energy_kwh();
+    let nominal_voltage_v = griffin_spec::rover_battery_nominal_voltage_v();
+    let capacity_ah = griffin_spec::rover_battery_capacity_ah();
+    let peak_power_w = griffin_spec::rover_solar_peak_power_w();
+    if energy_kwh == () || nominal_voltage_v == () || capacity_ah == () || peak_power_w == ()
+        || nominal_voltage_v <= 0.0 || energy_kwh <= 0.0 || peak_power_w <= 0.0 {
+        return plan_error("FLIP electrical requirement values are missing or invalid");
     }
-    let rover = root + "/FLIP";
-    let ops = [];
-    let paths = [];
-    for index in 0..names.len() {
-        let path = rover + "/Suspension_" + names[index];
-        let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
-        if !query_ok(prim) || prim.type_name != "Xform" {
-            return plan_error(path + ": physical FLIP station must be an existing Xform");
+    for path in [root + "/Battery", root + "/SolarArray"] {
+        if !_component_query(doc, path).ok {
+            return plan_error("FLIP electrical component is missing at " + path);
         }
-        let placement = assembly_builder::place_plan(edit_target, path,
-            [xs[index], ys[index], zs[index]], (), ());
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
-        let wheel = path + "/Wheel_" + names[index];
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: wheel,
-            name: "lunco:suspension:restLength", type_name: "float",
-            value: rest_length.to_string()}});
-        paths.push(path);
     }
-    #{ok: true, kind: "flip_physical_station_support_envelope", root: rover,
-      paths: paths, physical_station_x: xs, physical_station_y: ys,
-      physical_station_z: zs, physical_suspension_rest_length_m: rest_length,
-      ops: ops, no_op: ops.len() == 0}
+    let battery = root + "/Battery";
+    let solar = root + "/SolarArray";
+    let ops = [
+        #{SetAttribute: #{edit_target: edit_target, path: battery,
+            name: "inputs:voltage_nom", type_name: "float",
+            value: nominal_voltage_v.to_string()}},
+        #{SetAttribute: #{edit_target: edit_target, path: battery,
+            name: "inputs:capacity", type_name: "float",
+            value: capacity_ah.to_string()}},
+        #{SetAttribute: #{edit_target: edit_target, path: solar,
+            name: "inputs:peak_power_rating_w", type_name: "float",
+            value: peak_power_w.to_string()}}
+    ];
+    #{ok: true, kind: "flip_electrical_model", root: root,
+      battery_energy_kwh: energy_kwh, battery_nominal_voltage_v: nominal_voltage_v,
+      battery_capacity_ah: capacity_ah, solar_peak_power_w: peak_power_w,
+      paths: [battery, solar], ops: ops, no_op: false}
 }
 
-fn apply_physical_flip_station_geometry(doc, edit_target, root, parent_gen) {
-    let plan = physical_flip_station_plan(doc, edit_target, root);
-    if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc,
-        "Author FLIP physical suspension support envelope", plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, root: plan.root,
-      paths: plan.paths, physical_station_y: plan.physical_station_y,
-      physical_suspension_rest_length_m: plan.physical_suspension_rest_length_m,
-      command: command}
+fn apply_flip_electrical_model(doc, edit_target, root, parent_gen) {
+    let plan = flip_electrical_model_plan(doc, edit_target, root);
+    if !plan.ok { return plan; }
+    let command = assembly_edit::batch(doc, "Realize FLIP source-owned electrical ratings",
+        plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, root: root,
+      battery_energy_kwh: plan.battery_energy_kwh,
+      battery_capacity_ah: plan.battery_capacity_ah,
+      solar_peak_power_w: plan.solar_peak_power_w, command: command}
 }
 
 // Route markers are part of the mission interface, not a second navigation
@@ -548,42 +537,6 @@ fn _isolated_griffin_specs(root) {
     specs
 }
 
-fn _isolated_flip_specs(root) {
-    let steering = flip_steering_angles();
-    let solar_mount = griffin_spec::rover_solar_array_mount();
-    let solar_tilt = griffin_spec::rover_solar_array_tilt_deg();
-    // The component's X-Z plane is already horizontal in the rover frame;
-    // SysML's deck-relative tilt is therefore the direct X rotation.
-    let solar_rotation = solar_tilt;
-    let sensor_mount = griffin_spec::rover_sensor_mast_mount();
-    if steering == () || solar_mount.len() != 3 || solar_tilt == () || sensor_mount.len() != 2 { return []; }
-    let specs = [
-        #{parent: root, name: "Chassis", type_name: "Xform",
-          asset: component_asset("rover/flip_chassis_visual.usda"),
-          translation: [0.0, 0.0, 0.0], rotation: (), scale: ()},
-        #{parent: root, name: "SensorMast", type_name: "Xform",
-          asset: component_asset("rover/flip_sensor_mast_visual.usda"),
-          translation: [0.0, sensor_mount[0], sensor_mount[1]], rotation: (), scale: ()},
-        #{parent: root, name: "SolarArray", type_name: "Xform",
-          asset: component_asset("rover/flip_solar_panel_visual.usda"),
-          translation: solar_mount, rotation: [solar_rotation, 0.0, 0.0], scale: ()},
-    ];
-    let names = griffin_spec::visual_rover_wheel_names();
-    let wheel_x = griffin_spec::rover_wheel_station_x();
-    let wheel_y = griffin_spec::rover_wheel_station_y();
-    let wheel_z = griffin_spec::rover_wheel_station_z();
-    if names.len() != 4 || wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4 { return []; }
-    for index in 0..names.len() {
-        let name = names[index];
-        let steering_index = if name.starts_with("F") { 0 } else { 1 };
-        let station = root + "/Suspension_" + name;
-        specs.push(#{parent: station, name: "Wheel_" + name, type_name: "Xform",
-            asset: component_asset("rover/flip_wheel_visual.usda"),
-            translation: [0.0, 0.0, 0.0], rotation: [0.0, steering[steering_index], 0.0], scale: ()});
-    }
-    specs
-}
-
 fn _isolated_griffin_detail_specs(root) {
     let bus = root + "/Bus";
     let details = [];
@@ -593,38 +546,6 @@ fn _isolated_griffin_detail_specs(root) {
             color: griffin_spec::visual_rail_display_color()});
     }
     details
-}
-
-fn _isolated_flip_detail_specs(root) {
-    // Chassis guards and the sensor lens are presentation details of the FLIP
-    // assembly itself.  Wheel suspension is deliberately not authored here:
-    // it is a replaceable component with its own SysML contract and gate.
-    [
-        #{parent: root + "/Chassis", name: "SideGuardLeft", shape: "cube", translation: [-1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
-        #{parent: root + "/Chassis", name: "SideGuardRight", shape: "cube", translation: [1.98, 0.36, 0.0], scale: [0.08, 0.42, 1.18], color: [0.12, 0.14, 0.17]},
-        #{parent: root + "/SensorMast", name: "SensorLens", shape: "cylinder", translation: [0.0, 1.88, -0.55], radius: 0.12, height: 0.16, axis: "Z", color: [0.04, 0.08, 0.12]},
-    ]
-}
-
-// One reusable suspension asset is instanced at every wheel station.  The
-// canonical component points toward +X; right-hand stations mirror it with a
-// typed 180-degree Y rotation.  Station positions remain owned by FlipRover.
-fn _isolated_flip_suspension_specs(root) {
-    let names = griffin_spec::visual_rover_wheel_names();
-    let wheel_x = griffin_spec::rover_wheel_station_x();
-    if names.len() != 4 || wheel_x.len() != names.len() {
-        throw("FlipRequirements wheel station datums must contain four entries");
-    }
-    let specs = [];
-    for index in 0..names.len() {
-        let station = root + "/Suspension_" + names[index];
-        specs.push(#{parent: station, name: "Suspension", type_name: "Xform",
-            asset: component_asset("rover/flip_suspension_visual.usda"),
-            translation: (),
-            rotation: if wheel_x[index] < 0.0 { [0.0, 0.0, 0.0] } else { [0.0, 180.0, 0.0] },
-            scale: ()});
-    }
-    specs
 }
 
 fn _isolated_mount_ops(doc, edit_target, root) {
@@ -716,63 +637,6 @@ fn isolated_griffin_component_plan(doc, edit_target, root) {
         for op in geometry.ops { ops.push(op); }
     }
     #{ok: true, kind: "griffin_isolated_visual_assembly", root: root,
-      component_count: specs.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
-}
-
-fn _flip_suspension_refs(doc, edit_target, root, ops, paths) {
-    for spec in _isolated_flip_suspension_specs(root) {
-        let result = _component_plan(doc, edit_target, spec);
-        if !result.ok { return result; }
-        paths.push(result.path);
-        for op in result.ops { ops.push(op); }
-    }
-    #{ok: true, ops: ops, paths: paths}
-}
-
-fn isolated_flip_component_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("isolated_flip_component_plan requires a document, edit target, and absolute root");
-    }
-    let specs = _isolated_flip_specs(root);
-    if specs.len() == 0 { return plan_error("SysML FLIP visual parameters are missing"); }
-    let ops = [];
-    let paths = [];
-    for spec in specs {
-        let result = _isolated_component_plan(doc, edit_target, spec);
-        if !result.ok { return result; }
-        paths.push(result.path);
-        for op in result.ops { ops.push(op); }
-    }
-    // Station roots are authored in the visual vehicle source.  Update those
-    // roots through the same typed placement plan so the builder and verifier
-    // consume the identical SysML datum rather than relying on stale source
-    // transforms.
-    let names = griffin_spec::visual_rover_wheel_names();
-    let wheel_x = griffin_spec::rover_wheel_station_x();
-    let wheel_y = griffin_spec::rover_wheel_station_y();
-    let wheel_z = griffin_spec::rover_wheel_station_z();
-    if names.len() != 4 || wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4 {
-        return plan_error("FLIP wheel station datums must contain four entries");
-    }
-    for index in 0..names.len() {
-        let station = root + "/Suspension_" + names[index];
-        let placement = assembly_builder::place_plan(edit_target, station,
-            [wheel_x[index], wheel_y[index], wheel_z[index]], (), ());
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
-    }
-    let suspension = _flip_suspension_refs(doc, edit_target, root, ops, paths);
-    if !suspension.ok { return suspension; }
-    ops = suspension.ops;
-    paths = suspension.paths;
-    for detail in _isolated_flip_detail_specs(root) {
-        let path = detail.parent + "/" + detail.name;
-        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
-        let result = _detail_ops(edit_target, detail);
-        if !result.ok { return result; }
-        for op in result.ops { ops.push(op); }
-    }
-    #{ok: true, kind: "flip_isolated_visual_assembly", root: root,
       component_count: specs.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
 }
 
@@ -1025,7 +889,6 @@ fn physical_top_deck_collider_plan(doc, edit_target, root) {
         for op in placement.ops { ops.push(op); }
         for attribute in [
             #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
-            #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
             #{name: "purpose", type_name: "token", value: "\"proxy\""},
             #{name: "visibility", type_name: "token", value: "\"invisible\""},
         ] {
@@ -1033,6 +896,10 @@ fn physical_top_deck_collider_plan(doc, edit_target, root) {
                 name: attribute.name, type_name: attribute.type_name,
                 value: attribute.value}});
         }
+        // approximation is a PhysicsMeshCollisionAPI property. These are
+        // primitive Cube colliders, so clear any obsolete local opinion.
+        ops.push(#{RemoveAttribute: #{edit_target: edit_target, path: path,
+            name: "physics:approximation"}});
         for op in remove_legacy_semantic_string_ops(doc, edit_target, path) {
             ops.push(op);
         }
@@ -1090,40 +957,92 @@ fn physical_top_deck_collider_plan(doc, edit_target, root) {
       ops: ops}
 }
 
-/// Measure all nine colliders against their source-derived transforms and
-/// mesh topology. The central opening is preserved by using eight separate
-/// convex perimeter members rather than one convex hull.
+fn _griffin_cooked_geometry_is_valid(actual_geometry, expected_vertex_count,
+                                     expected_approximation) {
+    if actual_geometry == () || actual_geometry.frame != "canonical_stage"
+        || actual_geometry.shape != "convex_hull"
+        || actual_geometry.vertices == ()
+        || actual_geometry.vertices.len() != expected_vertex_count {
+        return false;
+    }
+    if expected_approximation != ()
+        && actual_geometry.approximation != expected_approximation {
+        return false;
+    }
+    for point in actual_geometry.vertices {
+        for axis in 0..3 {
+            let component = _native_vec3_axis(point, axis);
+            if component == () || !griffin_geometry::scalar_is_finite(component) {
+                return false;
+            }
+        }
+    }
+    true
+}
+
+/// Measure the nine source-derived colliders from one composed Avian cook.
+/// Eight separate perimeter boxes preserve the central opening.
 fn physical_top_deck_collider_observation(doc, root) {
     let expected = physical_top_deck_collider_geometry();
     if expected.ok != true {
         return #{ok: false, state: "invalid", detail: expected.error};
     }
-    let legacy = assembly_builder::composed_query(doc,
-        #{path: root + "/TopDeckCollisionProxy", children: false});
-    let old_hull_removed = !query_ok(legacy);
     let tolerance = sysml_requirements::number(sysml_requirements::source(),
         "GriffinMechanicalRequirements::GR018_HullAndDeck::topDeckProfileToleranceM");
     if tolerance == () || tolerance <= 0.0 {
         return #{ok: false, state: "invalid", detail: "shared geometry tolerance is missing from SysML"};
     }
+    let paths = [];
+    for beam in expected.ring_beams { paths.push(root + "/" + beam.name); }
+    let adapter_path = root + "/RoverPayloadDeckCollider";
+    paths.push(adapter_path);
+    paths.push(root);
+    let request = #{paths: paths,
+        attrs: ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale",
+            "size", "points", "faceVertexCounts", "faceVertexIndices",
+            "physics:collisionEnabled", "physics:approximation", "visibility", "purpose"],
+        rels: ["lunco:collider:geometrySource"], schemas: true,
+        children: true, collision_geometry: true};
+    if doc != () { request.doc_id = doc; }
+    let batch = query("QueryUsdPrims", request);
+    if !query_ok(batch) || batch.records == () || batch.records.len() != paths.len() {
+        return #{ok: false, state: "unavailable",
+            detail: "one-snapshot Avian collider geometry is unavailable"};
+    }
+    let records = batch.records;
+    let doc_id = records[0].doc_id;
+    let document_generation = records[0].document_generation;
+    let stage_generation = records[0].stage_generation;
+    if stage_generation == () {
+        return #{ok: false, state: "unavailable",
+            detail: "collider snapshot is missing composed-stage provenance"};
+    }
     let all_beams_match = true;
     let all_beams_collide = true;
     let all_beams_hidden = true;
     let all_beams_source_linked = true;
+    let all_beam_geometry_matches = true;
     let max_transform_error = 0.0;
     let open_interior_radius = 1.0e30;
-    for beam in expected.ring_beams {
-        let path = root + "/" + beam.name;
-        let record = assembly_builder::composed_query(doc, #{path: path,
-            children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ",
-                "xformOp:scale", "physics:collisionEnabled", "visibility",
-                "purpose", "physics:approximation"],
-            rels: ["lunco:collider:geometrySource"]});
-        if !query_ok(record) || record.type_name != "Cube" || record.attrs == () {
+    let root_record = records[expected.ring_beams.len() + 1];
+    let old_hull_removed = root_record.type_name == "Xform"
+        && root_record.doc_id == doc_id
+        && root_record.document_generation == document_generation
+        && root_record.stage_generation == stage_generation
+        && root_record.children != ()
+        && !root_record.children.contains(root + "/TopDeckCollisionProxy");
+    for index in 0..expected.ring_beams.len() {
+        let beam = expected.ring_beams[index];
+        let record = records[index];
+        if record.doc_id != doc_id || record.document_generation != document_generation
+            || record.stage_generation != stage_generation
+            || record.type_name != "Cube" || record.attrs == ()
+            || record.attrs["size"] != 1.0 {
             all_beams_match = false;
             all_beams_collide = false;
             all_beams_hidden = false;
             all_beams_source_linked = false;
+            all_beam_geometry_matches = false;
             continue;
         }
         let translation = record.attrs["xformOp:translate"];
@@ -1146,8 +1065,7 @@ fn physical_top_deck_collider_observation(doc, root) {
             if error > max_transform_error { max_transform_error = error; }
             if error > tolerance { all_beams_match = false; }
         }
-        if record.attrs["physics:collisionEnabled"] != true
-            || record.attrs["physics:approximation"] != "convexHull" {
+        if record.attrs["physics:collisionEnabled"] != true {
             all_beams_collide = false;
         }
         if record.attrs["visibility"] != "invisible" || record.attrs["purpose"] != "proxy" {
@@ -1159,16 +1077,19 @@ fn physical_top_deck_collider_observation(doc, root) {
             || source_targets[0] != root + "/Bus/TopDeckOctagon" {
             all_beams_source_linked = false;
         }
+        let cooked_geometry_matches = _griffin_cooked_geometry_is_valid(
+            record.collision_geometry, 8, ());
+        if !cooked_geometry_matches {
+            all_beam_geometry_matches = false;
+        }
         let inner_radius = (beam.translation[0] * beam.translation[0]
             + beam.translation[2] * beam.translation[2]).sqrt()
             - beam.dimensions[2] / 2.0;
         if inner_radius < open_interior_radius { open_interior_radius = inner_radius; }
     }
-    let adapter_path = root + "/RoverPayloadDeckCollider";
-    let adapter = assembly_builder::composed_query(doc, #{path: adapter_path,
-        children: false, attrs: ["points", "faceVertexCounts", "faceVertexIndices",
-            "physics:approximation", "physics:collisionEnabled", "visibility", "purpose"],
-        rels: ["lunco:collider:geometrySource"], schemas: true});
+    let adapter = records[expected.ring_beams.len()];
+    if adapter.doc_id != doc_id || adapter.document_generation != document_generation
+        || adapter.stage_generation != stage_generation { all_beams_match = false; }
     let adapter_matches = query_ok(adapter) && adapter.type_name == "Mesh"
         && adapter.attrs != ()
         && adapter.attrs["faceVertexCounts"] == expected.adapter_face_counts
@@ -1195,6 +1116,8 @@ fn physical_top_deck_collider_observation(doc, root) {
     let adapter_collides = query_ok(adapter) && adapter.attrs != ()
         && adapter.attrs["physics:collisionEnabled"] == true
         && adapter.attrs["physics:approximation"] == "convexHull"
+        && adapter.collision_geometry != ()
+        && adapter.collision_geometry.approximation == "convexHull"
         && adapter.api_schemas.contains("PhysicsCollisionAPI")
         && adapter.api_schemas.contains("PhysicsMeshCollisionAPI");
     let adapter_hidden = query_ok(adapter) && adapter.attrs != ()
@@ -1206,17 +1129,21 @@ fn physical_top_deck_collider_observation(doc, root) {
     let adapter_source_linked = adapter_targets != ()
         && adapter_targets.len() == 1
         && adapter_targets[0] == root + "/Bus/RoverPayloadDeck";
+    let adapter_cooked_geometry_matches = _griffin_cooked_geometry_is_valid(
+        adapter.collision_geometry, expected.adapter_points.len(), "convexHull");
     let source_geometry_linked = all_beams_source_linked && adapter_source_linked;
     let topology_matches = old_hull_removed && expected.ring_beams.len() == 8
-        && all_beams_match && adapter_matches && open_interior_radius > 0.0;
+        && all_beams_match && all_beam_geometry_matches && adapter_matches
+        && adapter_cooked_geometry_matches && open_interior_radius > 0.0;
     let collision_enabled = all_beams_collide && adapter_collides;
     let proxy_hidden = all_beams_hidden && adapter_hidden;
-    let convex_hull_approximation = all_beams_collide && adapter_collides;
+    let cooked_convex_geometry = all_beam_geometry_matches
+        && adapter_cooked_geometry_matches && adapter_collides;
     let profile_deviation = if adapter_point_deviation > max_transform_error {
         adapter_point_deviation
     } else { max_transform_error };
     let ok = topology_matches && collision_enabled && proxy_hidden
-        && convex_hull_approximation && source_geometry_linked;
+        && cooked_convex_geometry && source_geometry_linked;
     #{ok: true, state: if ok { "pass" } else { "fail" },
       legacy_hull_removed: old_hull_removed, ring_beam_count: expected.ring_beams.len(),
       topology_matches: topology_matches, profile_deviation_m: profile_deviation,
@@ -1224,16 +1151,20 @@ fn physical_top_deck_collider_observation(doc, root) {
       ring_source_geometry_linked: all_beams_source_linked,
       payload_source_geometry_linked: adapter_source_linked,
       collision_enabled: collision_enabled, proxy_hidden: proxy_hidden,
-      convex_hull_approximation: convex_hull_approximation,
+      cooked_convex_geometry: cooked_convex_geometry,
       ring_geometry_matches_source: all_beams_match,
       ring_collision_enabled: all_beams_collide, ring_proxy_hidden: all_beams_hidden,
       open_interior_radius_m: open_interior_radius,
       payload_adapter_geometry_matches_source: adapter_matches,
       payload_adapter_max_point_deviation_m: adapter_point_deviation,
+      cooked_collider_geometry_matches_source: all_beam_geometry_matches
+          && adapter_cooked_geometry_matches,
       payload_adapter_collision_enabled: adapter_collides,
       payload_adapter_proxy_hidden: adapter_hidden,
       maximum_transform_error_m: max_transform_error,
-      tolerance_m: tolerance}
+      tolerance_m: tolerance,
+      doc_id: doc_id, document_generation: document_generation,
+      stage_generation: stage_generation}
 }
 
 // The simulation lander's legacy leg roots own dynamics and joints; their
@@ -2370,11 +2301,11 @@ fn flip_payload_interface_observation(doc, root) {
         if z < min_z { min_z = z; }
         if z > max_z { max_z = z; }
     }
-    let wheel_x = griffin_spec::rover_visual_wheel_station_x();
-    let wheel_y = griffin_spec::rover_visual_wheel_station_y();
-    let wheel_z = griffin_spec::rover_visual_wheel_station_z();
-    let radius = griffin_spec::rover_visual_wheel_radius_m();
-    let width = griffin_spec::rover_visual_wheel_width_m();
+    let wheel_x = griffin_spec::rover_wheel_station_x();
+    let wheel_y = griffin_spec::rover_wheel_station_y();
+    let wheel_z = griffin_spec::rover_wheel_station_z();
+    let radius = griffin_spec::rover_wheel_radius_m();
+    let width = griffin_spec::rover_wheel_width_m();
     let tolerance = sysml_requirements::number(source,
         griffin_spec::qualified_attribute_name("geometryVerificationToleranceM"));
     if wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4
@@ -3824,98 +3755,6 @@ fn apply_refined_griffin_engine_bell(doc, edit_target, root, parent_gen) {
       root: root, paths: plan.paths}
 }
 
-fn _flip_task_match(name, task) {
-    if name == task { return true; }
-    if task == "DirectionalWheels" { return name.starts_with("Wheel_"); }
-    false
-}
-
-fn _flip_detail_matches_task(detail, task) {
-    let parent = detail.parent;
-    if detail.task != () {
-        return task == "DirectionalWheels" || detail.task == task;
-    }
-    if task == "Chassis" { return parent.ends_with("/Chassis"); }
-    if task == "SensorMast" { return parent.ends_with("/SensorMast"); }
-    false
-}
-
-fn isolated_flip_component_plan_for(doc, edit_target, root, task) {
-    if doc == () || edit_target == () || !absolute_root(root) || task == () || task == "" {
-        return plan_error("isolated_flip_component_plan_for requires a document, edit target, root, and task");
-    }
-    let specs = _isolated_flip_specs(root);
-    if specs.len() == 0 { return plan_error("SysML FLIP visual parameters are missing"); }
-    let selected = [];
-    for spec in specs {
-        if _flip_task_match(spec.name, task) { selected.push(spec); }
-    }
-    if selected.len() == 0 {
-        return plan_error("unknown FLIP visual component task ");
-    }
-    let ops = [];
-    let paths = [];
-    for spec in selected {
-        let result = _isolated_component_plan(doc, edit_target, spec);
-        if !result.ok { return result; }
-        paths.push(result.path);
-        for op in result.ops { ops.push(op); }
-    }
-    for detail in _isolated_flip_detail_specs(root) {
-        if !_flip_detail_matches_task(detail, task) { continue; }
-        let path = detail.parent + "/" + detail.name;
-        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
-        let detail_plan = _detail_ops(edit_target, detail);
-        if !detail_plan.ok { return detail_plan; }
-        for op in detail_plan.ops { ops.push(op); }
-    }
-    if task == "DirectionalWheels" || task.starts_with("Wheel_") {
-        let names = griffin_spec::visual_rover_wheel_names();
-        let wheel_x = griffin_spec::rover_wheel_station_x();
-        if names.len() != 4 || wheel_x.len() != names.len() {
-            return plan_error("FLIP wheel station datums must contain four entries");
-        }
-        let suspension_specs = _isolated_flip_suspension_specs(root);
-        for index in 0..names.len() {
-            let wheel_name = "Wheel_" + names[index];
-            if task != "DirectionalWheels" && wheel_name != task { continue; }
-            let result = _component_plan(doc, edit_target, suspension_specs[index]);
-            if !result.ok { return result; }
-            paths.push(result.path);
-            for op in result.ops { ops.push(op); }
-        }
-    }
-    let names = griffin_spec::visual_rover_wheel_names();
-    let wheel_x = griffin_spec::rover_wheel_station_x();
-    let wheel_y = griffin_spec::rover_wheel_station_y();
-    let wheel_z = griffin_spec::rover_wheel_station_z();
-    if task == "DirectionalWheels" || task.starts_with("Wheel_") {
-        if names.len() != 4 || wheel_x.len() != 4 || wheel_y.len() != 4 || wheel_z.len() != 4 {
-            return plan_error("FLIP wheel station datums must contain four entries");
-        }
-        for index in 0..names.len() {
-            let wheel_name = "Wheel_" + names[index];
-            if task != "DirectionalWheels" && wheel_name != task { continue; }
-            let station = root + "/Suspension_" + names[index];
-            let placement = assembly_builder::place_plan(edit_target, station,
-                [wheel_x[index], wheel_y[index], wheel_z[index]], (), ());
-            if !placement.ok { return placement; }
-            for op in placement.ops { ops.push(op); }
-        }
-    }
-    #{ok: true, kind: "flip_component_task", root: root, component: task,
-      component_count: selected.len(), paths: paths, ops: ops, no_op: ops.len() == 0}
-}
-
-fn apply_isolated_flip_component(doc, edit_target, root, task, parent_gen) {
-    let plan = isolated_flip_component_plan_for(doc, edit_target, root, task);
-    if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc, "Build FLIP component " + task,
-        plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, command: command,
-      component: task, component_count: plan.component_count, root: root}
-}
-
 fn _isolated_ramp_spec(root, side) {
     let mount_x = _ramp_number(if side == "port" {
         "rampPortMountX"
@@ -3987,7 +3826,7 @@ fn _isolated_ramp_contract_ops(edit_target, path, side) {
 fn _ramp_contact_track_datums(source, length, thickness) {
     let wheel_z = sysml_requirement_checks::source_number_list(source,
         "FlipRequirements::FlipRover::wheelStationZ");
-    let wheel_width = _sysml_number(source, "visualRoverWheelWidthM");
+    let wheel_width = _sysml_number(source, "wheelWidthM");
     let clearance = _sysml_number(source, "rampWheelClearanceM");
     let width = _sysml_number(source, "assemblyTrackWidthM");
     if wheel_z == () || wheel_z.len() != 4 || wheel_width == ()
@@ -5132,14 +4971,6 @@ fn apply_isolated_griffin(doc, edit_target, root, parent_gen) {
     let plan = isolated_griffin_component_plan(doc, edit_target, root);
     if !plan.ok || plan.no_op { return plan; }
     let command = assembly_edit::batch(doc, "Build isolated Griffin visual", plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, command: command,
-      component_count: plan.component_count, root: root}
-}
-
-fn apply_isolated_flip(doc, edit_target, root, parent_gen) {
-    let plan = isolated_flip_component_plan(doc, edit_target, root);
-    if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc, "Build isolated FLIP visual", plan.ops, parent_gen);
     #{ok: command.ok != false, kind: plan.kind, command: command,
       component_count: plan.component_count, root: root}
 }

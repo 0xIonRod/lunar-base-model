@@ -17,14 +17,16 @@ fn on_tick(me, ctx) {
     let root = sysml_requirements::text(source, own("usdPath"));
     let source_owner = sysml_requirements::attribute(source, own("usdPath")).record.owner_handle;
     let chassis_width = sysml_requirements::number_from_reference(source,
-        source_owner, "chassisWidth");
+        source_owner, "lowerFrameWidthM");
     let chassis_length = sysml_requirements::number_from_reference(source,
-        source_owner, "chassisLength");
+        source_owner, "lowerFrameLengthM");
+    let member_names = sysml_requirement_checks::source_enum_identifiers(source,
+        own("childNames"));
+    let child_paths = [];
+    for name in member_names { child_paths.push(root + "/" + name); }
     let checks = [];
     checks.push(sysml_requirement_checks::exists("FCC-001-root", "chassis", "fcc001", VERIFICATION, root, "Xform"));
-    checks.push(sysml_requirement_checks::children("FCC-001-structure", "chassis", "fcc001", VERIFICATION, root,
-        [root + "/LowerFrame", root + "/WhiteEquipmentBox", root + "/FrontBumper",
-         root + "/PayloadDeck", root + "/ServicePanel"]));
+    checks.push(sysml_requirement_checks::children("FCC-001-structure", "chassis", "fcc001", VERIFICATION, root, child_paths));
     checks.push(#{id: "FCC-002-width", component: "chassis", requirement: "fcc002",
         verification: VERIFICATION, kind: "extent_component", path: root + "/LowerFrame",
         index: 0, multiplier: 2.0, expected: chassis_width.value,
@@ -33,6 +35,11 @@ fn on_tick(me, ctx) {
         verification: VERIFICATION, kind: "extent_component", path: root + "/LowerFrame",
         index: 2, multiplier: 2.0, expected: chassis_length.value,
         tolerance: 0.002});
+    for path in [root + "/LowerFrame", root + "/WhiteEquipmentBox",
+        root + "/FrontBumper", root + "/PayloadDeck"] {
+        checks.push(sysml_requirement_checks::attribute_equals("FCC-003-collision-" + path,
+            "chassis", "fcc003", VERIFICATION, path, "physics:collisionEnabled", true));
+    }
     for field in [
         #{id: "FCC-005-box-width", path: root + "/WhiteEquipmentBox", index: 0, attr: "equipmentBoxWidthM"},
         #{id: "FCC-005-box-height", path: root + "/WhiteEquipmentBox", index: 1, attr: "equipmentBoxHeightM"},

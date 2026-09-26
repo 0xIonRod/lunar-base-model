@@ -1,6 +1,12 @@
 package FlipSuspensionRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::String;
+    private import GriffinRequirementSources::TwinAssetPath;
+    private import GriffinRequirementSources::UsdPrimPath;
+
+    enum def FlipSuspensionMember { SuspensionArm; SuspensionKnuckle; SuspensionStrut; }
+    enum def FlipSuspensionAxis { X; }
+    enum def FlipSuspensionTransformOperation { Translate; Scale; }
 
     constraint def FSRC008_PositiveRestLength {
         in restLengthM : Real;
@@ -12,8 +18,8 @@ package FlipSuspensionRequirements {
     // explicitly labelled Twin visual-study values until an ICD is released.
     part def FlipSuspensionComponent {
         doc /* Public FLIP and Venturi sources establish the four-wheel mobility and independent suspension architecture. Exact dimensions below are explicitly labeled Twin visual-study values; the detached assembly keeps each wheel mechanism reusable and independently verifiable. Typed requirement evidence owns the source links. */
-        attribute usdRootPath : String = "/FlipSuspension";
-        attribute componentAsset : String = "components/rover/flip_suspension_visual.usda";
+        attribute usdRootPath : UsdPrimPath = "/FlipSuspension";
+        attribute componentAsset : TwinAssetPath = "components/rover/flip_suspension_visual.usda";
         attribute geometryStatus : String = "metric visual study proxy; production suspension ICD not public";
         attribute localFrame : String = "Y-up, right-handed, SI metres; origin at wheel hub; canonical arm points +X";
         attribute collisionPolicy : String = "all suspension geometry is render-only; PhysicsCollisionAPI collisionEnabled=false";
@@ -23,15 +29,15 @@ package FlipSuspensionRequirements {
         attribute knuckleWidthM : Real = 0.36;
         attribute strutScale : Real[3] = (0.14, 0.36, 0.14);
         attribute strutOffset : Real[3] = (0.0, 0.20, 0.0);
-        attribute transformOrder : String[2] = ("xformOp:translate", "xformOp:scale");
-        attribute childNames : String[3] = ("SuspensionArm", "SuspensionKnuckle", "SuspensionStrut");
+        attribute transformOrder : FlipSuspensionTransformOperation[2] = ("Translate", "Scale");
+        attribute childNames : FlipSuspensionMember[3] = ("SuspensionArm", "SuspensionKnuckle", "SuspensionStrut");
         attribute armEnvelopeM : Real[3] = (0.65, 0.16, 0.16);
-        attribute knuckleAxis : String = "X";
+        attribute knuckleAxis : FlipSuspensionAxis = "X";
         attribute strutEnvelopeM : Real[3] = (0.14, 0.72, 0.14);
         // The physical transition datum is owned once by FlipRequirements::FlipRover.
         // This typed reference avoids a second, silently divergent suspension
         // length literal in the detached component contract.
-        ref attribute physicalRestLength : FlipRequirements::FlipRover::physicalSuspensionRestLengthM;
+        ref attribute physicalRestLength : FlipRequirements::FlipRover::suspensionRestLengthM;
         attribute physicalRestLengthStatus : String = "ramp-transition simulator assumption; FLIP as-built suspension ICD not public";
         attribute presentationOwnership : String = "all three members are render-only; wheel carrier owns contact and suspension physics";
     }

@@ -182,16 +182,12 @@ fn _qualified_attribute(name) {
         return "GriffinRampRequirements::GriffinEgressRamp::" + name;
     }
     let rover = [
-        "flipMassStudyKg", "flipPayloadCapacityKg", "wheelCount",
-        "wheelCountStatus", "egressMode", "solarArrayMode", "mobilityStatus",
-        "exactVehicleIcdStatus", "visualRoverName", "visualRoverWheelRadiusM",
-        "visualRoverWheelWidthM",
-        "visualRoverWheelCount", "visualWheelNames", "frontSteeringAngleDeg",
-        "rearSteeringAngleDeg", "missionSteeringMode", "chassisWidthM", "chassisLengthM",
+        "flipMassStudyKg", "flipPayloadCapacityKg", "batteryNominalVoltageV",
+        "egressMode", "solarArrayMode", "mobilityStatus",
+        "exactVehicleIcdStatus", "wheelRadiusM", "wheelWidthM",
+        "wheelStations", "missionSteeringMode", "chassisWidthM", "chassisLengthM",
         "sensorMastHeightM", "wheelStationX", "wheelStationY",
-        "wheelStationZ", "physicalWheelStationX", "physicalWheelStationY",
-        "physicalWheelStationZ", "physicalSuspensionRestLengthM",
-        "solarArrayMount", "solarArrayTiltDeg",
+        "wheelStationZ", "suspensionRestLengthM",
         "suspensionStrutScale", "suspensionStrutOffset",
         "suspensionArmScale", "suspensionArmOffsetM",
         "suspensionKnuckleRadiusM", "suspensionKnuckleWidthM"
@@ -199,7 +195,8 @@ fn _qualified_attribute(name) {
     if rover.contains(name) {
         return "FlipRequirements::FlipRover::" + name;
     }
-    let sensor_power = ["mastMountCenterYM", "mastMountCenterZM"];
+    let sensor_power = ["mastMountCenterYM", "mastMountCenterZM",
+        "batteryEnergyKWh", "solarArrayPeakPowerW"];
     if sensor_power.contains(name) {
         return "FlipSensorPowerRequirements::FlipSensorPowerAssembly::" + name;
     }
@@ -283,11 +280,7 @@ fn _sysml_list(name) {
     let qualified = _qualified_attribute(name);
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return []; }
-    let items = if name == "visualWheelNames" {
-        sysml_requirement_checks::source_text_list(source, qualified)
-    } else {
-        sysml_requirement_checks::source_enum_identifiers(source, qualified)
-    };
+    let items = sysml_requirement_checks::source_enum_identifiers(source, qualified);
     if items == () { return []; }
     items
 }
@@ -419,11 +412,19 @@ fn egress_apron_thickness_m() { _sysml_attribute("egressApronThicknessM") }
 fn egress_apron_surface_y_m() { _sysml_attribute("egressApronSurfaceY") }
 fn visual_camera_name() { _sysml_text("reviewCameraName") }
 fn visual_lander_name() { _sysml_text("reviewLanderName") }
-fn visual_rover_name() { _sysml_text("visualRoverName") }
 fn visual_lander_deck_width_m() { _sysml_attribute("visualLanderDeckWidthM") }
-fn visual_rover_wheel_radius_m() { _sysml_attribute("visualRoverWheelRadiusM") }
-fn visual_rover_wheel_count() { _sysml_integer("visualRoverWheelCount") }
-fn visual_rover_wheel_names() { _sysml_list("visualWheelNames") }
+fn rover_wheel_radius_m() { _sysml_attribute("wheelRadiusM") }
+fn rover_wheel_width_m() { _sysml_attribute("wheelWidthM") }
+fn rover_battery_energy_kwh() { _sysml_attribute("batteryEnergyKWh") }
+fn rover_battery_nominal_voltage_v() { _sysml_attribute("batteryNominalVoltageV") }
+fn rover_battery_capacity_ah() {
+    let energy_kwh = rover_battery_energy_kwh();
+    let voltage_v = rover_battery_nominal_voltage_v();
+    if energy_kwh == () || voltage_v == () || voltage_v <= 0.0 { return (); }
+    energy_kwh * 1000.0 / voltage_v
+}
+fn rover_solar_peak_power_w() { _sysml_attribute("solarArrayPeakPowerW") }
+fn rover_wheel_station_names() { _sysml_list("wheelStations") }
 fn component_bus_mount() { _sysml_native("bodyMount") }
 fn component_bus_mount_y() { component_bus_mount().y }
 fn component_tank_stations() { _sysml_native_list("tankStations") }
@@ -503,8 +504,6 @@ fn component_solar_array_widths_m() {
     widths
 }
 fn component_engine_stations() { _sysml_native_list("engineStations") }
-fn rover_front_steering_angle_deg() { _sysml_attribute("frontSteeringAngleDeg") }
-fn rover_rear_steering_angle_deg() { _sysml_attribute("rearSteeringAngleDeg") }
 fn visual_ramp_mount_x() { [
     _sysml_attribute("rampPortMountX"),
     _sysml_attribute("rampStarboardMountX")
@@ -607,11 +606,6 @@ fn _visual_transform_record(name, parent_role, asset, x, y, z, rx, ry, rz, unifo
 fn visual_engine_skirt_mount_y() { _sysml_attribute("engineClusterMountYM") }
 fn visual_review_griffin_station() { _sysml_native("visualReviewGriffinStation") }
 fn visual_review_flip_station() { _sysml_native("visualReviewFlipStation") }
-fn rover_visual_wheel_radius_m() { _sysml_attribute("visualRoverWheelRadiusM") }
-fn rover_visual_wheel_width_m() { _sysml_attribute("visualRoverWheelWidthM") }
-fn rover_visual_wheel_station_x() { rover_wheel_station_x() }
-fn rover_visual_wheel_station_y() { rover_wheel_station_y() }
-fn rover_visual_wheel_station_z() { rover_wheel_station_z() }
 
 fn _visual_plan_lengths_match(values, expected) {
     values != () && values.len() == expected
@@ -639,12 +633,7 @@ fn visual_component_transform_plan() {
     let ramp_y = visual_ramp_mount_y();
     let ramp_z = visual_ramp_mount_z();
     let ramp_scale = visual_ramp_stowed_scale();
-    let sensor_mount = rover_sensor_mast_mount();
-    let rover_solar_mount = rover_solar_array_mount();
-    let rover_solar_tilt = rover_solar_array_tilt_deg();
-    let front_steering = rover_front_steering_angle_deg();
-    let rear_steering = rover_rear_steering_angle_deg();
-    let wheel_names = visual_rover_wheel_names();
+    let wheel_names = rover_wheel_station_names();
     let wheel_x = rover_wheel_station_x();
     let wheel_y = rover_wheel_station_y();
     let wheel_z = rover_wheel_station_z();
@@ -669,9 +658,7 @@ fn visual_component_transform_plan() {
     let bad_engines = !_native_positions_match(engine_stations, 7) || engine_names.len() != 7
         || engine_skirt_y == ();
     let bad_ramps = ramp_x.len() != 2 || ramp_y == () || ramp_z == () || ramp_scale == ();
-    let bad_rover = sensor_mount.len() != 2 || rover_solar_mount.len() != 3
-        || rover_solar_tilt == () || front_steering == () || rear_steering == ()
-        || wheel_names.len() != 4 || !_visual_plan_lengths_match(wheel_x, 4)
+    let bad_rover = wheel_names.len() != 4 || !_visual_plan_lengths_match(wheel_x, 4)
         || !_visual_plan_lengths_match(wheel_y, 4) || !_visual_plan_lengths_match(wheel_z, 4);
     let bus_mount = component_bus_mount();
     let bad_core = bus_mount == () || !vec3_is_native(bus_mount);
@@ -711,24 +698,6 @@ fn visual_component_transform_plan() {
         "lander/griffin_ramp_visual.usda", ramp_x[1], ramp_y, ramp_z, 0.0, 180.0, 0.0,
         ramp_scale));
 
-    plan.push(_visual_transform_record("Chassis", "rover", "rover/flip_chassis_visual.usda",
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, ()));
-    plan.push(_visual_transform_record("SensorMast", "rover", "rover/flip_sensor_mast_visual.usda",
-        0.0, sensor_mount[0], sensor_mount[1], 0.0, 0.0, 0.0, ()));
-    plan.push(_visual_transform_record("SolarArray", "rover", "rover/flip_solar_panel_visual.usda",
-        rover_solar_mount[0], rover_solar_mount[1], rover_solar_mount[2],
-        rover_solar_tilt, 0.0, 0.0, ()));
-    for index in 0..wheel_names.len() {
-        let steering = if wheel_names[index].starts_with("F") {
-            front_steering
-        } else {
-            rear_steering
-        };
-        let record = _visual_transform_record("Wheel_" + wheel_names[index], "wheel",
-            "rover/flip_wheel_visual.usda", 0.0, 0.0, 0.0, 0.0, steering, 0.0, ());
-        record.station = wheel_names[index];
-        plan.push(record);
-    }
     for index in 0..engine_names.len() {
         let pose = transform(engine_stations[index], quat_identity(), vec3(1.0, 1.0, 1.0));
         let record = _visual_pose_record(engine_names[index], "engine_cluster",
@@ -762,10 +731,6 @@ fn visual_rail_station_plan() {
 fn rover_wheel_station_x() { _sysml_number_list("wheelStationX") }
 fn rover_wheel_station_y() { _sysml_number_list("wheelStationY") }
 fn rover_wheel_station_z() { _sysml_number_list("wheelStationZ") }
-fn physical_rover_wheel_station_x() { _sysml_number_list("physicalWheelStationX") }
-fn physical_rover_wheel_station_y() { _sysml_number_list("physicalWheelStationY") }
-fn physical_rover_wheel_station_z() { _sysml_number_list("physicalWheelStationZ") }
-fn physical_suspension_rest_length_m() { _sysml_attribute("physicalSuspensionRestLengthM") }
 fn physical_ramp_deck_transition_length_m() { _sysml_attribute("physicalRampDeckTransitionLengthM") }
 fn physical_ramp_deck_transition_required_overlap_m() {
     _sysml_attribute("physicalRampDeckTransitionRequiredOverlapM")
@@ -792,11 +757,6 @@ fn suspension_arm_scale() { _sysml_number_list("suspensionArmScale") }
 fn suspension_arm_offset_m() { _sysml_attribute("suspensionArmOffsetM") }
 fn suspension_knuckle_radius_m() { _sysml_attribute("suspensionKnuckleRadiusM") }
 fn suspension_knuckle_width_m() { _sysml_attribute("suspensionKnuckleWidthM") }
-fn rover_solar_array_mount() { _sysml_number_list("solarArrayMount") }
-fn rover_solar_array_tilt_deg() { _sysml_attribute("solarArrayTiltDeg") }
-fn rover_sensor_mast_mount() {
-    [_sysml_attribute("mastMountCenterYM"), _sysml_attribute("mastMountCenterZM")]
-}
 fn visual_landing_pad_radius_m() { _sysml_attribute("visualLandingPadRadiusM") }
 fn visual_review_ground_width_m() { _sysml_attribute("visualReviewGroundWidthM") }
 

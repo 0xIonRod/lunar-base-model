@@ -15,12 +15,6 @@ fn _source_attr(name) {
     "FlipRequirements::FlipRover::" + name
 }
 
-fn _list(source, name) {
-    let values = sysml_requirements::string_vector(source, _source_attr(name));
-    if values == () { return []; }
-    values
-}
-
 fn _exists(id, requirement, path, expected_type) {
     #{id: id, component: "rover", requirement: requirement,
       verification: VERIFICATION, kind: "exists", path: path,
@@ -44,24 +38,25 @@ fn on_tick(me, ctx) {
     let source = sysml_requirements::source();
     let checks = [];
     checks.push(_exists("FGV-001-root", "fvg001", ROOT, "Xform"));
-    checks.push(#{id: "FGV-001-config", component: "rover",
+    checks.push(#{id: "FGV-001-steering-mode", component: "rover",
         requirement: "fvg001", verification: VERIFICATION,
-        kind: "attribute_equals", path: ROOT, attr: "lunco:visual:configuration",
-        expected: "four directional wheels, white equipment box, sensor mast, fixed solar-array proxy"});
-    checks.push(#{id: "FGV-001-wheel-count", component: "rover",
-        requirement: "fvg001", verification: VERIFICATION,
-        kind: "attribute", path: ROOT, attr: "lunco:visual:wheel_count",
-        expected_attr: _source_attr("visualRoverWheelCount")});
+        kind: "attribute_equals", path: ROOT, attr: "lunco:steeringGeometry",
+        expected_attr: _source_attr("missionSteeringMode")});
 
     checks.push(_exists("FGV-004-chassis", "fvg004", ROOT + "/Chassis", "Xform"));
     checks.push(_children("FGV-004-chassis-parts", "fvg004", ROOT + "/Chassis",
-        [ROOT + "/Chassis/LowerFrame", ROOT + "/Chassis/WhiteEquipmentBox", ROOT + "/Chassis/PayloadDeck"]));
+        [ROOT + "/Chassis/LowerFrame", ROOT + "/Chassis/WhiteEquipmentBox",
+         ROOT + "/Chassis/FrontBumper", ROOT + "/Chassis/PayloadDeck",
+         ROOT + "/Chassis/ServicePanel"]));
     checks.push(_exists("FGV-004-mast", "fvg004", ROOT + "/SensorMast", "Xform"));
     checks.push(_children("FGV-004-mast-parts", "fvg004", ROOT + "/SensorMast",
         [ROOT + "/SensorMast/MastPost", ROOT + "/SensorMast/SensorHead", ROOT + "/SensorMast/SensorAntenna"]));
     checks.push(_exists("FGV-004-solar", "fvg004", ROOT + "/SolarArray", "Xform"));
-    checks.push(_children("FGV-004-solar-parts", "fvg004", ROOT + "/SolarArray",
-        [ROOT + "/SolarArray/WhiteBacksheet", ROOT + "/SolarArray/BlueCells", ROOT + "/SolarArray/FoldHinge"]));
+    checks.push(_exists("FGV-004-solar-visual", "fvg004", ROOT + "/SolarArray/SolarArrayVisual", "Xform"));
+    checks.push(_children("FGV-004-solar-parts", "fvg004", ROOT + "/SolarArray/SolarArrayVisual",
+        [ROOT + "/SolarArray/SolarArrayVisual/WhiteBacksheet",
+         ROOT + "/SolarArray/SolarArrayVisual/BlueCells",
+         ROOT + "/SolarArray/SolarArrayVisual/FoldHinge"]));
     let solar_mount = sysml_requirement_checks::source_number_list(source, _source_attr("solarArrayMount"));
     if solar_mount.len() == 3 {
         checks.push(_attribute_component("FGV-004-solar-x", "fvg004", ROOT + "/SolarArray", "xformOp:translate", 0, solar_mount[0]));
@@ -84,34 +79,32 @@ fn on_tick(me, ctx) {
         kind: "attribute", path: ROOT + "/SensorMast/MastPost", attr: "height",
         expected_attr: _source_attr("sensorMastHeightM"), tolerance: 0.002});
 
-    let wheel_names = _list(source, "visualWheelNames");
+    let wheel_names = sysml_requirement_checks::source_enum_identifiers(source, _source_attr("wheelStations"));
     let wheel_x = sysml_requirement_checks::source_number_list(source, _source_attr("wheelStationX"));
     let wheel_y = sysml_requirement_checks::source_number_list(source, _source_attr("wheelStationY"));
     let wheel_z = sysml_requirement_checks::source_number_list(source, _source_attr("wheelStationZ"));
     for axis in ["wheelStationX", "wheelStationY", "wheelStationZ"] {
-        checks.push(sysml_requirement_checks::source_list_count("FGV-003-" + axis,
-            "wheel", "fvg003", VERIFICATION,
-            _source_attr(axis), _source_attr("visualRoverWheelCount")));
+        let stations = sysml_requirement_checks::source_number_list(source, _source_attr(axis));
+        checks.push(#{id: "FGV-003-" + axis, component: "wheel",
+            requirement: "fvg003", verification: VERIFICATION,
+            kind: "source_collection_count", actual_count: stations.len(),
+            expected_count: wheel_names.len()});
     }
     for index in 0..wheel_names.len() {
         let name = wheel_names[index];
         let station = ROOT + "/Suspension_" + name;
         let wheel = station + "/Wheel_" + name;
-        checks.push(_exists("FGV-003-" + name, "fvg003", wheel, "Xform"));
-        checks.push(_children("FGV-003-" + name + "-parts", "fvg003", wheel,
-            [wheel + "/Tire", wheel + "/MetalHub", wheel + "/HubCap"]));
+        checks.push(_exists("FGV-003-" + name, "fvg003", wheel, "Cylinder"));
+        checks.push(_children("FGV-003-" + name + "-parts", "fvg003", wheel + "/Visual",
+            [wheel + "/Visual/Tire", wheel + "/Visual/MetalHub", wheel + "/Visual/HubCap"]));
         checks.push(#{id: "FGV-003-" + name + "-radius", component: "wheel",
             requirement: "fvg003", verification: VERIFICATION,
             kind: "attribute", path: wheel, attr: "physxVehicleWheel:radius",
-            expected_attr: _source_attr("visualRoverWheelRadiusM"), tolerance: 0.002});
-        let steering_attr = if name.starts_with("F") {
-            "frontSteeringAngleDeg"
-        } else {
-            "rearSteeringAngleDeg"
-        };
-        checks.push(_attribute_component("FGV-003-" + name + "-steering", "fvg003",
-            wheel, "xformOp:rotateXYZ", 1,
-            sysml_requirements::number(source, _source_attr(steering_attr))));
+            expected_attr: _source_attr("wheelRadiusM"), tolerance: 0.002});
+        checks.push(#{id: "FGV-003-" + name + "-width", component: "wheel",
+            requirement: "fvg003", verification: VERIFICATION,
+            kind: "attribute", path: wheel, attr: "height",
+            expected_attr: _source_attr("wheelWidthM"), tolerance: 0.002});
         if wheel_x.len() == wheel_names.len() && wheel_y.len() == wheel_names.len() && wheel_z.len() == wheel_names.len() {
             checks.push(_attribute_component("FGV-003-" + name + "-x", "fvg003", station, "xformOp:translate", 0, wheel_x[index]));
             checks.push(_attribute_component("FGV-003-" + name + "-y", "fvg003", station, "xformOp:translate", 1, wheel_y[index]));
@@ -121,11 +114,6 @@ fn on_tick(me, ctx) {
     checks.push(#{id: "FGV-005-source", component: "rover",
         requirement: "fvg005", verification: VERIFICATION,
         kind: "coverage"});
-    checks.push(#{id: "FGV-005-wheel-list-count", component: "rover",
-        requirement: "fvg005", verification: VERIFICATION,
-        kind: "source_list_count", list_attr: _source_attr("visualWheelNames"),
-        expected_attr: _source_attr("visualRoverWheelCount")});
-
     let result = sysml_requirements::evaluate(source, checks);
     result.metrics = #{clock: clock_snapshot(), root: ROOT, separate_component_document: true};
     report_structured_verdict(result, "FLIP REQUIREMENTS", "FLIP_REQUIREMENTS");

@@ -149,7 +149,7 @@ fn on_tick(me, ctx) {
     if this.phase == 2 {
         if document.generation <= this.load_generation { return; }
         let source = this.source;
-        let children = sysml_requirement_checks::source_text_list(source, own("childNames"));
+        let children = sysml_requirement_checks::source_enum_identifiers(source, own("childNames"));
         if children.len() != 3 { fail(this, "FLIP suspension childNames source datum is incomplete"); return; }
         let root_record = query("QueryUsdPrim", #{
             doc_id: this.doc, path: this.root, children: true,
@@ -172,7 +172,7 @@ fn on_tick(me, ctx) {
     // datums or writes a USD source file.
     let source = this.source;
     let root = this.root;
-    let children = sysml_requirement_checks::source_text_list(source, own("childNames"));
+    let children = sysml_requirement_checks::source_enum_identifiers(source, own("childNames"));
     let arm_scale = sysml_requirement_checks::source_number_list(source, own("armScale"));
     let arm_offset = sysml_requirements::number(source, own("armOffsetM"));
     let knuckle_radius = sysml_requirements::number(source, own("knuckleRadiusM"));
@@ -186,8 +186,12 @@ fn on_tick(me, ctx) {
         physical_rest_source.value
     } else { () };
     let physical_rest_status = sysml_requirements::text(source, own("physicalRestLengthStatus"));
-    let transform_order = sysml_requirements::string_vector(source, own("transformOrder"));
-    let transform_order = if transform_order == () { [] } else { transform_order };
+    let transform_operations = sysml_requirement_checks::source_enum_identifiers(source, own("transformOrder"));
+    let transform_order = [];
+    for operation in transform_operations {
+        if operation == "Translate" { transform_order.push("xformOp:translate"); }
+        else if operation == "Scale" { transform_order.push("xformOp:scale"); }
+    }
     let requirement_handle = sysml_requirements::requirement_handle_by_short_name(source, "FSR-001");
     let provenance = if requirement_handle.ok == true {
         sysml_requirements::provenance(source, requirement_handle.handle)
@@ -221,7 +225,9 @@ fn on_tick(me, ctx) {
     checks.push(#{id: "FSR-007-arm-offset", component: "suspension", requirement: "fsr007", verification: VERIFICATION, kind: "attribute_component", path: arm, attr: "xformOp:translate", index: 0, expected: arm_offset, tolerance: 0.002});
     checks.push(sysml_requirement_checks::attribute_equals("FSR-006-arm-order", "suspension", "fsr006", VERIFICATION, arm, "xformOpOrder", transform_order));
     checks.push(sysml_requirement_checks::attribute_equals("FSR-006-strut-order", "suspension", "fsr006", VERIFICATION, strut, "xformOpOrder", transform_order));
-    checks.push(sysml_requirement_checks::attribute_equals("FSR-007-knuckle-axis", "suspension", "fsr007", VERIFICATION, knuckle, "axis", "X"));
+    checks.push(#{id: "FSR-007-knuckle-axis", component: "suspension", requirement: "fsr007",
+        verification: VERIFICATION, kind: "attribute_equals", path: knuckle,
+        attr: "axis", expected_attr: own("knuckleAxis")});
     checks.push(#{id: "FSR-007-knuckle-radius", component: "suspension", requirement: "fsr007", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "radius", expected: knuckle_radius, tolerance: 0.002});
     checks.push(#{id: "FSR-007-knuckle-width", component: "suspension", requirement: "fsr007", verification: VERIFICATION, kind: "attribute", path: knuckle, attr: "height", expected: knuckle_width, tolerance: 0.002});
     checks.push(sysml_requirements::constraint_check(

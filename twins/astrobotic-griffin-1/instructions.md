@@ -115,11 +115,10 @@ console: `griffin_controls::control_lander()`,
 `griffin_controls::control_rover()`, and
 `griffin_controls::release_control()`.
 
-The current prototype keeps FLIP on a scene-level fixed top-deck adapter joint
-through descent, confirms the two solid integrated side ramps in their
-authored landed pose, then releases the live joint before rover egress. The
-earlier independent-ramp and six-wheel jointed attempts remain historical
-failure evidence; the active asset is the four-wheel FLIP proxy.
+The active vehicle sources are `vehicles/griffin_1.usda` and
+`vehicles/flip.usda`. Mission sequencing, physical attachment/release, deployed
+ramp stability, and rover route completion status are maintained in
+`contracts/implementation_gaps.md`.
 
 ## Step 6: run the deterministic headless check
 
@@ -133,22 +132,9 @@ Interpret the result:
 - exit 1: the scenario or physics reported FAIL;
 - exit 2: the bound expired or the app exited before a verdict.
 
-The original staged baseline reports PASS at 3,983 ticks / 66.38 simulated
-seconds on `luncosim 0.6.0-nightly.64.1 (042f0246)`, before the current
-attached-ramp release changes. The active prototype is a separate
-re-qualification target: the production run reaches touchdown, both ramp
-commands, adapter release, and FLIP autopilot engagement, then expires
-NO-VERDICT without post-release waypoint progress. The route tree is
-Griffin-local; do not substitute the generic LanderTest patrol asset because
-its waypoint paths belong to another scene.
-
-The active runtime build includes a fixed-joint cargo gate: FLIP cannot consume
-the ramp-approach sensor while it is still attached to the lander. The current
-prototype also treats the released adapter plate/restraints as non-colliding;
-only the deck, ramps, and surface are the post-release contact path. A generic
-fixed-joint regression passes, but the FLIP-specific body remains at its
-release pose after detach, so the missing phase is vehicle-body promotion/wake
-and route motion—not a missing Rhai event or a reason to add timer-only PASS.
+The route tree is Griffin-local because its waypoint paths belong to this
+scene. Current mission-verification status and unresolved runtime behavior are
+tracked in `contracts/implementation_gaps.md`.
 
 ## Step 7: investigate before changing the verdict
 

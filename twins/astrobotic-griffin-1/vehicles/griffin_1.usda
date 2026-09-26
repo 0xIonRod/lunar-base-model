@@ -19,7 +19,6 @@ def Xform "Griffin1" (
     string lunco:ui:schemaRole = "Tracks attitude · applies commands"
     custom float lunco:payload_class_kg = 625.0
     custom string lunco:payload_class_status = "not a public flight ICD; Griffin study envelope"
-    custom string lunco:configuration = "four legs, seven-engine lander, dual egress ramps"
     custom string lunco:parameter_status = "public configuration plus explicit simulator study values; flight ICD TBD"
     custom string lunco:provenance:source = "https://www.astrobotic.com/griffin"
     custom string lunco:collision:contract = "named proxy colliders own contact; render-only geometry is non-colliding"

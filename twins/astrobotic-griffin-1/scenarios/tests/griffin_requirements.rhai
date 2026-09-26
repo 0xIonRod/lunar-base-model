@@ -30,7 +30,15 @@ fn usd_observation_binding(observation, field, label) {
                 label + " composed observation is unavailable"
             } else { observation.detail }};
     }
-    #{provider: "usd", state: "value", value: observation[field]}
+    let binding = #{provider: "usd", state: "value", value: observation[field]};
+    if observation.doc_id != () { binding.doc_id = observation.doc_id; }
+    if observation.document_generation != () {
+        binding.document_generation = observation.document_generation;
+    }
+    if observation.stage_generation != () {
+        binding.stage_generation = observation.stage_generation;
+    }
+    binding
 }
 
 fn on_start(me, ctx) {
@@ -150,8 +158,8 @@ fn on_tick(me, ctx) {
                         "collision_enabled", "GR-018 collision ownership")],
                     ["proxyHidden", usd_observation_binding(deck_observation,
                         "proxy_hidden", "GR-018 proxy visibility")],
-                    ["convexHullApproximation", usd_observation_binding(deck_observation,
-                        "convex_hull_approximation", "GR-018 collision approximation")]]),
+                    ["cookedConvexGeometry", usd_observation_binding(deck_observation,
+                        "cooked_convex_geometry", "GR-018 cooked collision geometry")]]),
             "usd", 0.0)
     ];
     let deck_constraint_report = if deck_requirement.ok == true {

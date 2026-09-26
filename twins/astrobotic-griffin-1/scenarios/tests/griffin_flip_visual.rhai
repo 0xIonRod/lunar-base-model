@@ -31,15 +31,11 @@ fn flip_visual_children_check(id, component, path, paths) {
 }
 
 // Lists of authored component identities come from the same SysML snapshot
-// passed to the generic evaluator.  The test owns only child geometry names;
+// passed to the generic evaluator. The test owns only child geometry names;
 // it does not carry a second list of rover/lander station identities.
 fn _sysml_list(report, name) {
     let qualified = griffin_spec::qualified_attribute_name(name);
-    let items = if name == "visualWheelNames" {
-        sysml_requirement_checks::source_text_list(report, qualified)
-    } else {
-        sysml_requirement_checks::source_enum_identifiers(report, qualified)
-    };
+    let items = sysml_requirement_checks::source_enum_identifiers(report, qualified);
     if items == () { return []; }
     items
 }
@@ -149,57 +145,32 @@ fn on_tick(me, ctx) {
         root + "/FLIP/Chassis/WhiteEquipmentBox", root + "/FLIP/Chassis/FrontBumper",
         root + "/FLIP/Chassis/PayloadDeck", root + "/FLIP/Chassis/ServicePanel"]));
     checks.push(flip_visual_children_check("GV-003-rover-solar", "rover",
-        root + "/FLIP/SolarArray", [root + "/FLIP/SolarArray/WhiteBacksheet",
-        root + "/FLIP/SolarArray/BlueCells", root + "/FLIP/SolarArray/FoldHinge"]));
-    let wheel_count = flip_visual_exists_check("GV-003-wheel-count", "wheels", "attribute", root + "/FLIP");
-    wheel_count.attr = "lunco:visual:wheel_count";
-    wheel_count.expected_attr = griffin_spec::qualified_attribute_name("visualRoverWheelCount");
-    wheel_count.tolerance = 0.0;
-    checks.push(wheel_count);
-    let wheel_names = _sysml_list(source, "visualWheelNames");
+        root + "/FLIP/SolarArray/SolarArrayVisual", [root + "/FLIP/SolarArray/SolarArrayVisual/WhiteBacksheet",
+        root + "/FLIP/SolarArray/SolarArrayVisual/BlueCells",
+        root + "/FLIP/SolarArray/SolarArrayVisual/FoldHinge"]));
+    let wheel_names = _sysml_list(source, "wheelStations");
     for name in wheel_names {
         checks.push(flip_visual_exists_check("GV-003-wheel-" + name, "wheels", "exists", root + "/FLIP/Suspension_" + name + "/Wheel_" + name));
         checks.push(flip_visual_children_check("GV-003-wheel-" + name + "-subparts", "wheels",
-            root + "/FLIP/Suspension_" + name + "/Wheel_" + name,
-            [root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Tire",
-             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/MetalHub",
-             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/HubCap"]));
+            root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual",
+            [root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/Tire",
+             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/MetalHub",
+             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/HubCap"]));
     }
     for name in wheel_names {
         let check = #{ id: "GV-004-wheel-radius-" + name, component: "wheels",
             requirement: "fvg001",
             verification: "Verify_FLIPVisualRequirements",
-            kind: "bounds_component", path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Tire",
-            index: 1, multiplier: 1.0, expected_attr: griffin_spec::qualified_attribute_name("visualRoverWheelRadiusM"), tolerance: 0.001 };
+            kind: "attribute", path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/Tire",
+            attr: "radius", expected_attr: griffin_spec::qualified_attribute_name("wheelRadiusM"), tolerance: 0.001 };
         checks.push(check);
     }
-    let rover_config = #{ id: "FGV-001-rover-config", component: "rover",
+    let steering_mode = #{ id: "FGV-001-steering-mode", component: "rover",
         requirement: "fvg001",
         verification: "Verify_FLIPVisualRequirements",
-        kind: "attribute_equals", path: root + "/FLIP",
-        attr: "lunco:visual:configuration",
-        expected: "four directional wheels, white equipment box, sensor mast, fixed solar-array proxy" };
-    checks.push(rover_config);
-    let wheel_count = #{ id: "FGV-001-wheel-count", component: "wheels",
-        requirement: "fvg001",
-        verification: "Verify_FLIPVisualRequirements",
-        kind: "attribute", path: root + "/FLIP", attr: "lunco:visual:wheel_count",
-        expected_attr: griffin_spec::qualified_attribute_name("visualRoverWheelCount"), tolerance: 0.0 };
-    checks.push(wheel_count);
-    for name in wheel_names {
-        let expected_attr = if name.starts_with("F") {
-            "frontSteeringAngleDeg"
-        } else {
-            "rearSteeringAngleDeg"
-        };
-        checks.push(#{ id: "FGV-001-steering-" + name, component: "wheels",
-            requirement: "fvg001",
-            verification: "Verify_FLIPVisualRequirements",
-            kind: "attribute_component",
-            path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name,
-            attr: "xformOp:rotateXYZ", index: 1,
-            expected_attr: griffin_spec::qualified_attribute_name(expected_attr), tolerance: 0.001 });
-    }
+        kind: "attribute_equals", path: root + "/FLIP", attr: "lunco:steeringGeometry",
+        expected_attr: griffin_spec::qualified_attribute_name("missionSteeringMode") };
+    checks.push(steering_mode);
     // The assembly-authored socket/frame relationships are the durable
     // placement contract behind the numeric transforms.
     let port_socket = root + "/Griffin1/Bus/RampSocketPort";

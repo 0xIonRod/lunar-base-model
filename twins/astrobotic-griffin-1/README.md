@@ -70,12 +70,11 @@ Sources:
 | scenes/griffin_flip_visual.usda | Componentized headful review composition for Griffin and FLIP |
 | scenes/griffin_1_editor.usda | Clean derived headful Editor scene containing only the Griffin lander reference |
 | vehicles/griffin_1.usda | Reusable Griffin lander wrapper around the LunCoSim descent lander |
-| vehicles/flip.usda | Reusable FLIP study asset with four-wheel all-wheel-steer mobility, EPS, and thermal networks |
-| vehicles/flip_visual.usda | Render-only FLIP assembly with four directional wheel stations, chassis, mast, and solar-array components |
+| vehicles/flip.usda | Canonical FLIP study vehicle with mobility, chassis collision geometry, referenced visual components, EPS, and thermal networks |
 | components/lander/ | Twin-local visual components for the bus, landing legs, tanks, panels, bells, and ramps |
 | components/rover/ | Twin-local visual components for chassis, wheels, mast, and solar array |
 | behaviors/griffin_1_flip_patrol.btxml | Griffin-local route tree targeting the deck approach, ramp exit, waypoints, and base site |
-| environments/south_pole_surrogate.usda | DEM-backed NOBILE03 environment (legacy filename retained for scene compatibility) |
+| environments/south_pole_surrogate.usda | DEM-backed NOBILE03 South-Pole environment |
 | terrain/nobile03/ | Ignored processed heightfield output, regenerated from the manifest and adapter |
 | tools/terrain/ | Polar-stereo download, reprojection, and provenance instructions |
 | scenarios/griffin_1_surface_ops.rhai | Mission sequencing and route policy |
@@ -180,7 +179,10 @@ For Griffin work, open the integrated `vehicles/griffin_1.usda` source through
 `scenes/griffin_1_editor.usda`; its visual components remain replaceable assets
 under `components/lander/`. Edit one component at a time through a dry Rhai
 plan and typed Editor batch, then inspect the composed result. Open
-`vehicles/flip_visual.usda` separately only when editing the FLIP visual asset.
+Open `vehicles/flip.usda` to edit the integrated FLIP vehicle. Its chassis,
+wheel, suspension, mast, and solar geometry are referenced component assets
+under `components/rover/`; vehicle-level physics and visual placements stay in
+the same composed FLIP stage.
 Follow the repository-local
 [`interactive-component-authoring`](../../skills/interactive-component-authoring/SKILL.md)
 cycle: one component plan, one Editor batch, one projection/readback, one
@@ -317,18 +319,16 @@ children and SI geometry. `tools/griffin_visual_builder.rhai` exposes:
   `ApplyUsdOps` change set;
 * aggregate plans only for inspection or a deliberate, reviewed rebuild.
 
-The helper uses the generic LunCoSim `assembly_builder`/`assembly_edit` surface,
-accepts Twin-local `twin://` references, and requires the parent frames to be
-present before submission. The live Editor remains open; after each small
-command is acknowledged, query the same document generation, inspect the
-focused preview, and run the owning component gate (for example
-`flip_wheel_requirements.rhai` for one wheel task). The aggregate
-`griffin_flip_visual.rhai` gate is reserved for the checkpoint after all
-component cycles. Wheel FWW-006 also checks the assembly-owned suspension
-strut's type, metric offset/scale, render purpose, and disabled collision;
-the replaceable wheel asset remains responsible for tire/hub geometry. Both
-visual and dynamic assemblies use the source-backed four-wheel directional
-topology; a presentation-only proxy must not silently change that count.
+The Griffin helper uses the generic LunCoSim `assembly_builder`/`assembly_edit`
+surface, accepts Twin-local `twin://` references, and requires the parent frames
+to be present before submission. The live Editor remains open; after each
+small command is acknowledged, query the same document generation, inspect the
+focused preview, and run the owning component gate. The aggregate
+`griffin_flip_visual.rhai` gate verifies the canonical Griffin and FLIP vehicle
+references after component edits. Wheel FWW-006 checks the shared suspension
+component's type, metric offset/scale, render purpose, and disabled collision.
+FLIP wheel stations and their component visuals live in `vehicles/flip.usda`;
+the typed station identities and dimensions come from FlipRover SysML.
 
 Assembly identities are read from typed SysML enumerations (`landingLegInstances`,
 `tankInstances`, `rampInstances`, `solarArrayInstances`, and
@@ -413,11 +413,11 @@ The current stable boundary demonstrates:
    The wrapper includes a top-deck adapter and two optional ramps with paired
    rails. Geometry, mass properties, and mechanism details remain non-flight
    surrogates.
-6. FLIP uses a four-wheel all-wheel-steer study topology with compound chassis
-   collision, explicit wheel geometry, a vertical rear-deck solar-panel proxy,
-   motor/gearbox, finite-EPS, and motor-thermal Modelica contracts. The wheel
-   count and numeric values are proxy assumptions until FLIP ICD data is
-   available.
+6. The canonical FLIP vehicle uses a four-wheel front-steer Ackermann study
+   configuration with chassis collision geometry, explicit wheel assemblies,
+   a rear-deck solar-panel proxy, motor/gearbox, finite-EPS, and motor-thermal
+   Modelica contracts. Geometry, mass, and mobility values remain study
+   assumptions until the FLIP ICD is available.
 7. The surface environment uses a typed `LunCoTerrainAPI`/DEM layer wired to
    the processed LROC NOBILE03 crop; the old flat `Ground` fixture is inactive.
 8. The Rhai task tree expresses descent event waits, the selected direct-deck or
@@ -434,9 +434,9 @@ adapter joint before the rover route begins.
 Fixed-joint cargo is prevented from consuming route sensors before that
 release. The ramps span the deck datum to the terrain plane and carry paired
 edge rails. Astrolab's public material describes direct top-deck egress, so the
-ramp branch is an optional Griffin study assumption rather than a FLIP ICD. The
-obsolete six-wheel wrapper has been removed; the active FLIP source is
-`vehicles/flip.usda`.
+ramp branch is an optional Griffin study assumption rather than a FLIP ICD.
+Both the review composition and test fixtures reference the canonical
+`vehicles/flip.usda` vehicle.
 The generic joint regression and the isolated FLIP adapter release now pass:
 the live detach retires the native joint and graph edge (7 → 6), leaves the
 28-body/30-collider population unchanged, wakes the released endpoint, and
@@ -474,9 +474,9 @@ the authority/status surface. The Twin-local `griffin_controls` library also
 provides `control_lander()`, `control_rover()`, `release_control()`,
 `toggle_rover_autopilot()`, `start_rover_autopilot()`, and
 `stop_rover_autopilot()` for the Rhai console. For FLIP steering, use
-`griffin_controls::crab_walk()` for parallel angles on all four authored
-steering joints, `griffin_controls::ackermann_steering()` for left/right
-wheel-geometry correction on those four joints, or
+`griffin_controls::crab_walk()` for the parallel steering experiment,
+`griffin_controls::ackermann_steering()` for the source-selected front-steer
+Ackermann study mode, or
 `griffin_controls::toggle_rover_steering_mode()` to switch between them from
 one command. Change the steering mode while FLIP is stopped; if it is moving,
 the helper holds the brake until the crawl threshold is reached and reports
@@ -494,9 +494,9 @@ The controls are a study interface, not a claim about the flight command
 dictionary. The generic simulator still owns possession, input routing,
 autopilot authority, and release semantics. The steering-mode helpers are
 Twin-local live control commands: they stop a moving route, write the vehicle
-Ackermann-strength attribute, and rely on the runtime's in-place four-wheel
-resync. They are not yet a native replicated, undoable vehicle mode, and the
-current topology does not provide a separate front-only Ackermann mode.
+Ackermann-strength attribute, and rely on the runtime's in-place steering
+resync. Public FLIP information does not specify the production steering
+geometry, so this remains a simulation-study configuration.
 
 ## Next required data
 

@@ -1,7 +1,6 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
-// Standalone FLIP four-wheel directional verification.  The source list is
-// the acceptance topology; inactive middle-station proxies are deliberately
-// outside the list and therefore cannot inflate the count.
+// FLIP simulation wheel verification. Typed station identities and metric
+// datums are owned by FlipRover and checked against the composed vehicle.
 
 const PACKAGE = "FlipWheelRequirements";
 const VERIFICATION = "Verify_FLIPWheelRequirements";
@@ -25,53 +24,56 @@ fn on_tick(me, ctx) {
     let source = sysml_requirements::source();
     let root = sysml_requirements::text(source, own("usdRootPath"));
     let source_owner = sysml_requirements::attribute(source, own("usdRootPath")).record.owner_handle;
-    let names_source = sysml_requirements::string_vector_from_reference(source,
-        source_owner, "wheelNames");
-    let count_source = sysml_requirements::number_from_reference(source,
-        source_owner, "wheelCount");
-    let radius_source = sysml_requirements::number_from_reference(source,
-        source_owner, "wheelRadius");
-    let front_source = sysml_requirements::number_from_reference(source,
-        source_owner, "frontSteeringAngle");
-    let rear_source = sysml_requirements::number_from_reference(source,
-        source_owner, "rearSteeringAngle");
-    let strut_name = sysml_requirements::text(source, own("suspensionVisualChild"));
-    if strut_name == () || strut_name == "" {
-        throw("FlipWheelRequirements::suspensionVisualChild is required");
-    }
-    let names = if names_source.ok == true { names_source.value } else { [] };
+    let names = sysml_requirement_checks::source_enum_identifiers(source, rover("wheelStations"));
+    let child_names = sysml_requirement_checks::source_enum_identifiers(source, own("childNames"));
+    let radius = sysml_requirements::number(source, rover("wheelRadiusM"));
+    let width = sysml_requirements::number(source, rover("wheelWidthM"));
+    let steering_mode = sysml_requirements::text(source, rover("missionSteeringMode"));
+    let rest_length = sysml_requirements::number(source, rover("suspensionRestLengthM"));
     let xs = sysml_requirement_checks::source_number_list(source, rover("wheelStationX"));
     let ys = sysml_requirement_checks::source_number_list(source, rover("wheelStationY"));
     let zs = sysml_requirement_checks::source_number_list(source, rover("wheelStationZ"));
-    if xs.len() != names.len() || ys.len() != names.len() || zs.len() != names.len() {
-        throw("FlipWheelRequirements wheel station datums must match visualWheelNames");
+    if names.len() == 0 || xs.len() != names.len() || ys.len() != names.len()
+        || zs.len() != names.len() || child_names.len() != 3 || radius == ()
+        || width == () || steering_mode == () || rest_length == () {
+        throw("FlipWheelRequirements typed station identities and wheel datums are incomplete");
     }
     let checks = [];
-    checks.push(#{id: "FWW-001-count", component: "wheels", requirement: "fww001",
-        verification: VERIFICATION, kind: "source_collection_count",
-        actual_count: names.len(), expected_count: count_source.value});
+    checks.push(#{id: "FWW-003-steering-mode", component: "wheels", requirement: "fww003",
+        verification: VERIFICATION, kind: "attribute_equals", path: root,
+        attr: "lunco:steeringGeometry", expected: steering_mode});
     for axis in ["wheelStationX", "wheelStationY", "wheelStationZ"] {
-        checks.push(sysml_requirement_checks::source_list_count("FWW-005-" + axis,
-            "wheel", "fww005", VERIFICATION,
-            rover(axis), count_source));
+        let stations = sysml_requirement_checks::source_number_list(source, rover(axis));
+        checks.push(#{id: "FWW-005-" + axis, component: "wheel",
+            requirement: "fww005", verification: VERIFICATION,
+            kind: "source_collection_count", actual_count: stations.len(),
+            expected_count: names.len()});
     }
     for index in 0..names.len() {
         let name = names[index];
         let station = root + "/Suspension_" + name;
         let wheel = station + "/Wheel_" + name;
-        checks.push(sysml_requirement_checks::exists("FWW-001-" + name, "wheel", "fww001", VERIFICATION, wheel, "Xform"));
-        checks.push(sysml_requirement_checks::children("FWW-002-" + name, "wheel", "fww002", VERIFICATION, wheel,
-            [wheel + "/Tire", wheel + "/MetalHub", wheel + "/HubCap"]));
+        checks.push(sysml_requirement_checks::exists("FWW-001-" + name, "wheel", "fww001", VERIFICATION, wheel, "Cylinder"));
+        checks.push(sysml_requirement_checks::children("FWW-002-" + name, "wheel", "fww002", VERIFICATION, wheel + "/Visual",
+            [wheel + "/Visual/" + child_names[0], wheel + "/Visual/" + child_names[1],
+             wheel + "/Visual/" + child_names[2]]));
         checks.push(#{id: "FWW-002-" + name + "-radius", component: "wheel",
             requirement: "fww002", verification: VERIFICATION,
             kind: "attribute", path: wheel, attr: "physxVehicleWheel:radius",
-            expected: radius_source.value, tolerance: 0.002});
+            expected: radius, tolerance: 0.002});
+        checks.push(#{id: "FWW-002-" + name + "-width", component: "wheel",
+            requirement: "fww002", verification: VERIFICATION,
+            kind: "attribute", path: wheel, attr: "physxVehicleWheel:width",
+            expected: width, tolerance: 0.002});
         checks.push(#{id: "FWW-007-" + name + "-axis", component: "wheel",
             requirement: "fww007", verification: VERIFICATION, kind: "attribute_equals",
-            path: wheel + "/Tire", attr: "axis", expected_attr: own("wheelAxis")});
+            path: wheel + "/Visual/Tire", attr: "axis", expected_attr: own("wheelAxis")});
         checks.push(#{id: "FWW-007-" + name + "-tire-width", component: "wheel",
             requirement: "fww007", verification: VERIFICATION, kind: "attribute",
-            path: wheel + "/Tire", attr: "height", expected_attr: own("tireWidthM"), tolerance: 0.002});
+            path: wheel + "/Visual/Tire", attr: "height", expected: width, tolerance: 0.002});
+        checks.push(#{id: "FWW-007-" + name + "-tire-radius", component: "wheel",
+            requirement: "fww007", verification: VERIFICATION, kind: "attribute",
+            path: wheel + "/Visual/Tire", attr: "radius", expected: radius, tolerance: 0.002});
         checks.push(#{id: "FWW-007-" + name + "-hub-radius", component: "wheel",
             requirement: "fww007", verification: VERIFICATION, kind: "attribute",
             path: wheel + "/MetalHub", attr: "radius", expected_attr: own("hubRadiusM"), tolerance: 0.002});
@@ -84,19 +86,15 @@ fn on_tick(me, ctx) {
         checks.push(#{id: "FWW-007-" + name + "-cap-width", component: "wheel",
             requirement: "fww007", verification: VERIFICATION, kind: "attribute",
             path: wheel + "/HubCap", attr: "height", expected_attr: own("hubCapWidthM"), tolerance: 0.002});
-        let steering_source = if name.starts_with("F") {
-            front_source.value
-        } else { rear_source.value };
-        checks.push(#{id: "FWW-003-" + name + "-steering", component: "wheel",
-            requirement: "fww003", verification: VERIFICATION,
-            kind: "attribute_component", path: wheel, attr: "xformOp:rotateXYZ",
-            index: 1, expected: steering_source, tolerance: 0.002});
+        checks.push(#{id: "FWW-007-" + name + "-suspension-length", component: "wheel",
+            requirement: "fww007", verification: VERIFICATION, kind: "attribute",
+            path: wheel, attr: "lunco:suspension:restLength", expected: rest_length, tolerance: 0.002});
         if xs.len() == names.len() && ys.len() == names.len() && zs.len() == names.len() {
             checks.push(position("FWW-005-" + name + "-x", station, 0, xs[index]));
             checks.push(position("FWW-005-" + name + "-y", station, 1, ys[index]));
             checks.push(position("FWW-005-" + name + "-z", station, 2, zs[index]));
         }
-        let suspension = station + "/Suspension";
+        let suspension = station + "/Visual";
         checks.push(sysml_requirement_checks::exists("FWW-006-" + name,
             "suspension", "fww006", VERIFICATION,
             suspension, "Xform"));

@@ -48,14 +48,14 @@ mission-owner data is supplied, do not present these as Griffin flight values:
 | Griffin dimensions and geometry | unknown | inherited visual/physical surrogate; public material describes a stout aluminum frame and isogrid deck, not an as-built dimension set |
 | dry mass, propellant load, inertia, center of mass | unknown | NASA says Griffin-1 completed mass-properties testing but public numerical values were not found; inherited lander values remain proxies |
 | engine thrust, throttle, station and cant angles | unknown | inherited powered-descent model; current product page supports seven main engines, while older Griffin/VIPER guidance describes five |
-| FLIP wheel count, geometry, wheel loads, motor data, battery ICD | mostly unknown | active four-wheel all-wheel-steer study proxy; Astrolab confirms full-size wheels/battery but not the station ICD; replace from supplier data |
+| FLIP geometry, wheel loads, motor data, battery and steering ICD | mostly unknown | the active study configuration is owned by the FLIP SysML packages; Astrolab's public material does not provide the vehicle ICD |
 | exact landing coordinates | unresolved | reproducible NOBILE03 regional study anchor; not a flight touchdown coordinate |
 | terrain relief | source-backed regional product | 512 m NOBILE03 crop, locally reprojected and vertically normalized for the Twin |
 | lighting / epoch | deterministic study condition | surface-operations and visual-review scene roots use TDB JD 2461395.5 (2026-12-21 TDB calendar date) at the NOBILE03 regional anchor. The simulator ephemeris gives Sun azimuth 7.52° clockwise from north and elevation 6.49° at that epoch. The visual-review scene references the same solar-system model and copies its typed site/time values from the surface-operations composition. Public material gives a late-2026 launch window, not a landing timestamp; this study epoch does not assert flight timing. Reproduce with `cargo run -p lunco-celestial-ephemeris --example sun_at_site -- -84.72672255 29.14428685 2461395.5 1.0 0.125` |
 | communications geometry | study setup | deterministic local environment |
-| FLIP flight-stack attachment | unresolved in public data and previous solver trial | active prototype now uses a scene-level fixed top-deck adapter joint, detached after touchdown; validate against the next runtime test |
+| FLIP flight-stack attachment | unresolved in public data | the mission adapter and release interface require controlled integration data; current implementation status is recorded in `../contracts/implementation_gaps.md` |
 | Griffin payload capacity | source-backed product value | 625 kg published by Astrobotic; integrated mission load is a separate manifest quantity |
-| deck and egress | public mechanical ICD not released | four-leg wrapper with isogrid deck and optional side ramps; FLIP's public concept supports direct top-deck egress |
+| deck and egress | public mechanical ICD not released | Griffin owns the isogrid deck and ramp interface in its requirements; FLIP's public concept supports direct top-deck egress |
 | Griffin-1 solar configuration | Three arrays, transit Sun-pointing intent, and the surface Sun quadrant are source-backed; exact installation data is unpublished | SysML owns three named arrays across the consecutive forward, bevel, and starboard faces. The Editor-authored vehicle references the shared panel component at all three rail-derived stations and uses panel widths derived from the mounting-rail pairs. Stations, panel normals, cutout outlines, support/hinge interfaces, deployment limits, control limits, and electrical behavior remain visual-study values or unresolved |
 | propellant tank count/type | unknown | four COPV-style visual assemblies are a Twin study assumption, not a published Griffin-1 tank ICD |
 
@@ -102,51 +102,13 @@ nearly half-metric-ton rover with 30 kg payload capacity. Exact FLIP wheel
 count, dimensions, wheel torque, battery capacity, thermal limits, and steering
 map are not published in the reviewed primary sources.
 
-The executable asset therefore uses a clearly labelled engineering proxy:
-
-| Parameter | Active study value | Status |
-|---|---:|---|
-| Vehicle mass | 450 kg | dynamic study proxy; public source only states nearly 500 kg class |
-| Envelope | 2.4 m × 1.8 m × 0.7 m | simulator assumption |
-| Wheel count / steering | 4 / all-wheel-steer | architecture study proxy; FLIP-specific count is not public |
-| Wheel radius / width | 0.45 m / 0.28 m | simulator assumption |
-| Battery | 28 V, 83.33 Ah, 85% initial SOC | inherited simulator electrical proxy |
-| Solar array | 3 m², 30% efficiency, fixed +Y incidence | fixed-panel visual/power proxy; Astrolab describes a collapsible FLIP array |
-| Motor/gearbox | 0.9 N·m motor, 200:1, 400 N·m output limit | simulator actuator proxy |
-
-## Twin study implementation requirements
-
-The 2026-08-30 backlog task adds the following implementation requirements;
-they are not substitutes for the published Griffin/FLIP facts above:
-
-- use the published 625 kg Griffin payload capacity as the acceptance boundary;
-- four landing legs, isogrid top deck, and side-mounted solar arrays;
-- FLIP mounted on the top deck through a payload adapter during descent;
-- two solid integrated side ramps with physical collision surfaces and paired
-  edge rails; a typed hinge command is modeled, while deployed runtime
-  stability and rover traversal remain unaccepted;
-- landing → ramp deployment → adapter release → rover egress → base-site route.
-
-The current SysML and Editor-builder study uses a 12.228605 m top contact face,
-a 0.18 m track thickness, and mirrored 49 degree deployment commands from the
-3.98 m touchdown COM datum. Each physical track is authored as a convex mesh;
-its toe miter is derived from track thickness and deployment angle so the
-upper and lower toe edges meet the terrain plane together. The 3.50 m rail
-envelope, paired tracks, hinge, transition, and apron remain explicit Twin
-assumptions because Astrobotic has not published a ramp or site-interface ICD.
-The 95 kg body mass and (210, 34, 210) kg m² diagonal inertia are also
-source-owned study proxies; supplier mass properties and body center of mass
-remain unverified.
-
-These values and the typed geometry plan are not yet confirmed in the composed
-Editor stage. The checked-in vehicle layer still requires the Editor migration,
-composed readback of both track meshes and deck transitions, and deployed FLIP
-wheel-contact evidence before any ramp or egress acceptance is claimed. Public
-mission material describes optional rover egress but does not provide the
-as-built ramp geometry or site-apron design.
-
-These values are suitable for Modelica coupling, control-flow, power-budget,
-thermal, and mobility sensitivity studies. They are not flight data.
+The executable study inputs are owned by `FlipRequirements::FlipRover`,
+`FlipSensorPowerRequirements::FlipSensorPowerAssembly`, and the corresponding
+subsystem packages. This report does not repeat their numeric values. The
+published battery and solar ratings are requirements; the gap report records
+whether the physical storage and generation models realize them. Supplier
+geometry, mobility, thermal, and mass-property data remain unavailable, so the
+study configuration is not flight data.
 
 The Twin is therefore suitable for composition, control-flow, contact,
 deployment, mobility, and subsystem integration studies. It is not a flight-

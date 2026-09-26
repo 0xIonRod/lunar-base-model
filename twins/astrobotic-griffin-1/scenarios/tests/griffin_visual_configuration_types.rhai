@@ -137,7 +137,6 @@ fn native_transform_plan_check() {
     let expected_component_count = 1 + griffin_spec::propellant_tank_names().len()
         + griffin_spec::landing_leg_names().len()
         + griffin_spec::solar_array_names().len() + griffin_spec::ramp_names().len()
-        + 3 + griffin_spec::visual_rover_wheel_names().len()
         + griffin_spec::main_engine_names().len() + 1;
     let expected_rail_count = griffin_spec::visual_rail_names().len();
     let ok = plan.len() == expected_component_count && rails.len() == expected_rail_count

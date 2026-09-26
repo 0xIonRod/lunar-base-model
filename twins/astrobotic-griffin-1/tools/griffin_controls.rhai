@@ -101,13 +101,10 @@ fn release_rover_brake() {
     })
 }
 
-// Configure FLIP's four steering actuators as one vehicle-level mode. FLIP is
-// authored as an all-wheel-steer rover: the shared vehicle attribute controls
-// whether each left/right wheel pair receives full Ackermann correction (1.0)
-// or parallel wheel angles (0.0) for crab walk. The old implementation tried
-// to reach SteeringActuator on the USD wheel entities, but physical wheels own
-// that actuator on synthesized joint entities. That made every public helper
-// fail even though the wheel rig itself was valid.
+// Configure FLIP's front steering actuators as one vehicle-level mode. The
+// shared vehicle attribute selects Ackermann correction (1.0) for finite-turn
+// motion or parallel front-wheel angles (0.0) for crab walk. Rear wheels remain
+// straight in both modes.
 //
 // The steering mode is an authored assembly fact, not a physics-time command.
 // Stop FLIP before changing it so the steering axes do not slew underneath a

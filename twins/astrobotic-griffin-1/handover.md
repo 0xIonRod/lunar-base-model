@@ -1,12 +1,13 @@
 # Griffin-1 Twin handover
 
-**Current as of:** 2026-09-25
+**Current as of:** 2026-09-26
 
 ## Model ownership
 
-- `vehicles/griffin_1.usda` is the integrated Griffin realization. It composes the flight lander, named collision geometry, and replaceable visual components.
-- `scenes/griffin_flip_visual.usda` is the review composition. Griffin and FLIP are referenced assets; FLIP is loaded in place and remains independently authored in `vehicles/flip.usda` and `vehicles/flip_visual.usda`.
-- SysML under `requirements/` owns requirements, configuration identities, stations, and study dimensions. Rhai builders make dry plans from those typed values and submit typed Editor edits. Composed USD is the realization to inspect. Rust provides shared modeling, authoring, physics, and verification capabilities.
+- `vehicles/griffin_1.usda` is the canonical integrated Griffin lander. It composes the lander, collision geometry, and replaceable component references.
+- `vehicles/flip.usda` is the canonical integrated FLIP study vehicle. It composes the physical mobility model, chassis collision geometry, and reusable wheel, suspension, mast, and solar visual components.
+- `scenes/griffin_flip_visual.usda` is the review composition; mission and verification scenes reference the same `griffin_1.usda` and `flip.usda` vehicle sources.
+- SysML under `requirements/` owns requirements, typed configuration identities, station datums, and study dimensions. Rhai builders make dry plans from those values and submit typed Editor edits. Composed USD is the realization to inspect. Rust provides shared modeling, authoring, physics, and verification capabilities.
 - `scenarios/tests/` contains requirement observers. `tests/` contains their small USD fixtures; fixtures reference the integrated Griffin source.
 - Twin-local visual components live under `components/lander/` and `components/rover/`.
 
@@ -40,19 +41,20 @@ date. Public mission material currently gives a late-2026 launch window, not a
 surface landing timestamp, so this is not flight-timeline data. The exact
 landing site and mission-window Sun envelope remain unresolved.
 
-Completed in the current authoring session:
+Current authoring state:
 
-- The review scene now references `vehicles/griffin_1.usda` and the linked FLIP visual asset.
+- Every review, mission, and FLIP verification scene references `vehicles/griffin_1.usda` or `vehicles/flip.usda` directly.
+- FLIP's storage capacity is projected from its source-owned energy and nominal-voltage requirements into the battery model's Ah interface. Its solar panel reads the live Sun vector through a local EnvironmentProbe and the FLIP system boundary; the source-owned peak rating sets the generic output limit. The Editor-applied inputs and direction wiring were read back from the composed vehicle.
 - The review scene contains no detached sphere placeholders.
 - The ramp visual component was rebuilt from the SysML plan at its 12.228605 m surface length and saved through the Editor. Its composed component has rails, support members, posts, tracks, and 12 pairs of treads.
 - All Griffin requirement fixtures now reference `/Griffin1` from the integrated vehicle.
 - Landing-leg readback returned `ok`, with visual-to-proxy pad geometry matching within 0.001 m and all four bus mount/joint observations available.
 - The visual-review scene now shares the surface-operations scene's typed site/epoch and celestial-system reference. Its composed root and solar-system child were queried after projection, visually inspected, and saved.
-- The solar configuration now has three typed identities and stations on the forward, beveled forward-starboard, and starboard faces. The panel component was rebuilt through typed Editor operations with paired local brackets and support links; each vehicle instance references that shared asset, uses its own rail-derived width, and was read back at the configured station and orientation. The old port-side proxy was removed.
+- The solar configuration has three typed identities and stations on the forward, beveled forward-starboard, and starboard faces. The panel component uses paired local brackets and support links; each vehicle instance references that shared asset, uses its rail-derived width, and is checked at the configured station and orientation.
 - The shared solar component now has a lower clearance opening in its frame, backplane, and cell field. Typed study fractions control its width, depth, and lateral position; dividers stop at the opening or split around it. Editor readback confirmed the cell opening is clear and the notched row divider is split. The values are visual-study assumptions guided by the photo, not approved dimensions; the render-only panel has no collision proxy.
 - The three-array layout has been visually inspected in the open Editor. Its lower clearance shape is modeled qualitatively, but the released panel contour, installation dimensions, array envelope, and support datums remain replaceable study values pending controlled mission data.
 
-These are Editor and composed-readback observations. They do not establish mission-level landing or egress acceptance. No test suite was run during this authoring pass.
+These are Editor and composed-readback observations. They do not establish mission-level landing or egress acceptance. The Editor-loaded review scenario emitted a failing visual packet; the current counts and physics blockers are recorded in `contracts/implementation_gaps.md`. No headless test suite was started during this authoring pass.
 
 ## Next work
 

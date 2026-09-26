@@ -243,9 +243,6 @@ fn sysml_contract_report(verification_name) {
             missing.push("typed SysML attribute " + name);
         }
     }
-    let canonical_attributes = ["payloadCapacityKg", "landingLegCount", "mainEngineCount",
-        "propellantTankCount", "rampCount", "rampMaxDeploymentAngleRad", "solarArrayCount", "flipPayloadCapacityKg",
-        "wheelCount", "visualRoverWheelCount", "visualWheelNames"];
     // Short names may intentionally collide across component packages.  The
     // accessors above resolve each canonical value to its owning qualified
     // SysML name; do not reject a valid composed source merely because a
@@ -255,7 +252,7 @@ fn sysml_contract_report(verification_name) {
     // look Griffin-compatible when the public architecture has drifted.
     for name in ["payloadCapacityKg", "landingLegCount", "mainEngineCount",
         "propellantTankCount", "rampCount", "solarArrayCount",
-        "flipPayloadCapacityKg", "wheelCount", "landingComTouchdownY",
+        "flipPayloadCapacityKg", "landingComTouchdownY",
         "rampSurfaceLengthM", "rampSurfaceThicknessM",
         "physicalRampTerrainContactToleranceM",
         "physicalRampMassKg", "physicalRampInertiaXKgM2",
@@ -308,6 +305,13 @@ fn sysml_contract_report(verification_name) {
     }
     if griffin_spec::main_engine_names().len() != griffin_spec::main_engine_count() {
         missing.push("main-engine identity list/count mismatch in SysML");
+    }
+    let wheel_names = griffin_spec::rover_wheel_station_names();
+    if wheel_names.len() == 0
+        || griffin_spec::rover_wheel_station_x().len() != wheel_names.len()
+        || griffin_spec::rover_wheel_station_y().len() != wheel_names.len()
+        || griffin_spec::rover_wheel_station_z().len() != wheel_names.len() {
+        missing.push("typed FLIP wheel stations and metric datums must have matching cardinality");
     }
     let transition_inertia = griffin_spec::physical_ramp_deck_transition_inertia_kg_m2();
     if transition_inertia.len() != 3 {
@@ -451,22 +455,18 @@ fn sysml_contract_report(verification_name) {
     if !visual_configuration_coverage_ok {
         missing.push("Griffin visual configuration verification case does not cover all configuration requirements");
     }
-    for name in ["reviewCameraName", "reviewLanderName", "visualRoverName"] {
+    for name in ["reviewCameraName", "reviewLanderName"] {
         let text = _sysml_text(report, name);
         if text == () || text == "" {
             missing.push("typed visual component identity is missing " + name);
         }
     }
-    for name in ["visualLanderDeckWidthM", "visualRoverWheelRadiusM",
+    for name in ["visualLanderDeckWidthM", "wheelRadiusM",
         "visualLandingPadRadiusM", "visualReviewGroundWidthM"] {
         let value = _sysml_number(report, name);
         if value == () || value <= 0.0 {
             missing.push("positive visual SysML datum " + name);
         }
-    }
-    let visual_wheel_count = griffin_spec::visual_rover_wheel_count();
-    if visual_wheel_count == () || visual_wheel_count <= 0 {
-        missing.push("positive visual SysML datum visualRoverWheelCount");
     }
     if report.source_revision == () {
         missing.push("non-zero SysML source revision");
@@ -1964,8 +1964,8 @@ fn lint(doc_id, root) {
     let visible_leg_count = 0;
     if root_record.children != () {
         for child in root_record.children {
-            // Historical geometry remains in the wrapper for comparison, but
-            // must stay hidden; only visible direct Leg* bodies count here.
+            // Spring joints carry the leg dynamics and are not visible leg
+            // bodies; count only visible direct Leg* body roots.
             if child.contains("/Leg") && !child.contains("_Spring") {
                 let child_record = _query(doc_id, child, ["visibility"], (), false);
                 if _ok(child_record) && child_record.attrs["visibility"] != "invisible" {
