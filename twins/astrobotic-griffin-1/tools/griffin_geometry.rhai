@@ -33,7 +33,7 @@ fn rectangular_prism_geometry(center, dimensions) {
 // Join independently generated closed meshes into one USD Mesh without
 // changing their local geometry or storing mesh values as numeric strings.
 fn merge_mesh_geometries(parts) {
-    if type_of(parts) != "array" || parts.is_empty() {
+    if !array_is(parts) || parts.is_empty() {
         return #{ok: false, error: "mesh merge requires at least one geometry"};
     }
     let points = [];
@@ -54,13 +54,13 @@ fn merge_mesh_geometries(parts) {
 }
 
 fn perimeter_beam_geometry(stations, ring_y, section) {
-    if type_of(stations) != "array" || stations.len() < 3
-        || type_of(ring_y) != "array" || ring_y.len() == 0
+    if !array_is(stations) || stations.len() < 3
+        || !array_is(ring_y) || ring_y.len() == 0
         || section == () || section <= 0.0 {
         return #{ok: false, error: "perimeter mesh requires stations, ring planes, and positive section"};
     }
     for station in stations {
-        if type_of(station) != "Vec3" || !vec3_is_finite(station) {
+        if !vec3_is_native(station) || !vec3_is_finite(station) {
             return #{ok: false, error: "perimeter stations must be finite typed Vec3 values"};
         }
     }
@@ -122,18 +122,18 @@ fn perimeter_beam_geometry(stations, ring_y, section) {
 }
 
 fn tank_support_perimeter_geometry(profile, radius, center_y, section) {
-    if type_of(profile) != "array" || profile.len() < 3
+    if !array_is(profile) || profile.len() < 3
         || radius == () || radius <= 0.0 || center_y == ()
         || section == () || section <= 0.0 {
         return #{ok: false, error: "tank-support profile requires typed points and positive radius/section"};
     }
     let stations = [];
     for point in profile {
-        if type_of(point) != "Vec2" || !vec2_is_finite(point) {
+        if !vec2_is_native(point) || !vec2_is_finite(point) {
             return #{ok: false, error: "tank-support profile requires finite typed Vec2 values"};
         }
         stations.push(vec3(point.x * radius, 0.0, point.y * radius));
     }
-    let levels = if type_of(center_y) == "array" { center_y } else { [center_y] };
+    let levels = if array_is(center_y) { center_y } else { [center_y] };
     perimeter_beam_geometry(stations, levels, section)
 }

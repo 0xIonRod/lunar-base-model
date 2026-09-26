@@ -1,0 +1,22 @@
+#usda 1.0
+(
+    defaultPrim = "RampToeSection"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "RampToeSection" (
+    kind = "component"
+    prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
+)
+{
+    custom token lunco:component:role = "Griffin articulated egress ramp toe section"
+    over Mesh "RampTrackPort"
+    {
+        point3f[] points = [(0.000000000, -0.090000000, -0.300000000), (0.000000000, 0.090000000, -0.300000000), (4.076201667, 0.090000000, -0.300000000), (3.919730054, -0.090000000, -0.300000000), (0.000000000, -0.090000000, 0.300000000), (0.000000000, 0.090000000, 0.300000000), (4.076201667, 0.090000000, 0.300000000), (3.919730054, -0.090000000, 0.300000000)]
+    }
+    over Mesh "RampTrackStarboard"
+    {
+        point3f[] points = [(0.000000000, -0.090000000, -0.300000000), (0.000000000, 0.090000000, -0.300000000), (4.076201667, 0.090000000, -0.300000000), (3.919730054, -0.090000000, -0.300000000), (0.000000000, -0.090000000, 0.300000000), (0.000000000, 0.090000000, 0.300000000), (4.076201667, 0.090000000, 0.300000000), (3.919730054, -0.090000000, 0.300000000)]
+    }
+}

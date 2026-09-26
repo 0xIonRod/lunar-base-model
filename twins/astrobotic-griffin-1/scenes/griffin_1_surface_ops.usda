@@ -144,13 +144,13 @@ def Xform "Griffin1SurfaceOps" (
         }
         def "RampHingePort"
         {
-            point3f physics:localPos0 = (3.200000047683716, 1.75, 0.0)
+            point3f physics:localPos0 = (3.200000048, 5.190000057, 0.0)
             float physics:lowerLimit = -50.0
             float physics:upperLimit = 50.0
         }
         def "RampHingeStarboard"
         {
-            point3f physics:localPos0 = (-3.200000047683716, 1.75, 0.0)
+            point3f physics:localPos0 = (-3.200000048, 5.190000057, 0.0)
             float physics:lowerLimit = -50.0
             float physics:upperLimit = 50.0
         }
@@ -159,49 +159,25 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
     )
     {
-        double3 xformOp:translate = (0.0, 62.94, 0.0)
+        double3 xformOp:translate = (0.0, 66.15, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         double3 physics:velocity = (0.0, 0.0, 0.0)
-        custom string lunco:mission:deployment_state = "top_deck_attached_until_touchdown"
-        custom string lunco:mission:payload_mount = "Griffin top deck through four-point adapter; detach after both ramps deploy"
+        custom token lunco:mission:deploymentState = "top_deck_attached_until_touchdown"
         custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
         float physxVehicleAckermannSteering:strength = 1.0
-        over "Suspension_FL"
-        {
-            double3 xformOp:translate = (-0.95, -0.75, -1.05)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-        }
-        over "Suspension_RL"
-        {
-            double3 xformOp:translate = (-0.95, -0.75, 1.05)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-        }
-        over "Suspension_FR"
-        {
-            double3 xformOp:translate = (0.95, -0.75, -1.05)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-        }
-        over "Suspension_RR"
-        {
-            double3 xformOp:translate = (0.95, -0.75, 1.05)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-        }
     }
     def PhysicsFixedJoint "FLIPPayloadAdapterJoint"
     {
         rel physics:body0 = </Griffin1SurfaceOps/Lander>
         rel physics:body1 = </Griffin1SurfaceOps/FLIP>
-        point3f physics:localPos0 = (0.0, 1.940000057220459, 0.0)
-        point3f physics:localPos1 = (0.0, -1.0, 0.0)
+        point3f physics:localPos0 = (0.0, 5.28000020980835, 0.0)
+        point3f physics:localPos1 = (0.0, -0.8700000047683716, 0.0)
         quatf physics:localRot1 = (0.7071067690849304, 0.0, 0.7071067690849304, 0.0)
     }
     def Scope "FLIPEgressInterface"
     {
-        custom string lunco:mission:payload = "Astrolab FLIP"
-        custom string lunco:mission:interface = "top-deck adapter plus two deployable side ramps"
-        custom string lunco:physics:status = "fixed adapter joint in descent; detach_joint after touchdown; ramp surfaces are physical colliders"
-        double3 lunco:nominal_deck_offset = (0.0, 2.94, 0.0)
-        custom string lunco:public_design_boundary = "Astrolab public 2026 material describes direct top-deck egress; ramp mechanism is this project's prototype assumption"
+        custom rel lunco:mission:payloadDeck = </Griffin1SurfaceOps/Lander/Bus/RoverPayloadDeck>
+        custom rel lunco:mission:adapterJoint = </Griffin1SurfaceOps/FLIPPayloadAdapterJoint>
     }
     def Xform "RoverRampApproach" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>

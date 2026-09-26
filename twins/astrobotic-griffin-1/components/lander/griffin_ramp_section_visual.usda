@@ -1,0 +1,300 @@
+#usda 1.0
+(
+    defaultPrim = "RampSection"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "RampSection" (
+    kind = "component"
+)
+{
+    custom token lunco:component:role = "Griffin articulated egress ramp section"
+    custom double lunco:section:length_m = 4.076201667
+    custom double lunco:section:outside_width_m = 3.50
+    def Mesh "RampTrackPort" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        point3f[] points = [(0.000000000, -0.090000000, -0.300000000), (0.000000000, 0.090000000, -0.300000000), (4.076201667, 0.090000000, -0.300000000), (4.076201667, -0.090000000, -0.300000000), (0.000000000, -0.090000000, 0.300000000), (0.000000000, 0.090000000, 0.300000000), (4.076201667, 0.090000000, 0.300000000), (4.076201667, -0.090000000, 0.300000000)]
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
+        uniform token subdivisionScheme = "none"
+        double3 xformOp:translate = (0.0, 0.0, 1.150000000)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        color3f[] primvars:displayColor = [(0.340000, 0.380000, 0.440000)]
+        uniform token purpose = "render"
+        uniform token physics:approximation = "convexHull"
+        bool physics:collisionEnabled = true
+    }
+    def Mesh "RampTrackStarboard" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        point3f[] points = [(0.000000000, -0.090000000, -0.300000000), (0.000000000, 0.090000000, -0.300000000), (4.076201667, 0.090000000, -0.300000000), (4.076201667, -0.090000000, -0.300000000), (0.000000000, -0.090000000, 0.300000000), (0.000000000, 0.090000000, 0.300000000), (4.076201667, 0.090000000, 0.300000000), (4.076201667, -0.090000000, 0.300000000)]
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
+        uniform token subdivisionScheme = "none"
+        double3 xformOp:translate = (0.0, 0.0, -1.150000000)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        color3f[] primvars:displayColor = [(0.340000, 0.380000, 0.440000)]
+        uniform token purpose = "render"
+        uniform token physics:approximation = "convexHull"
+        bool physics:collisionEnabled = true
+    }
+    def Cube "OuterRail" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (2.038100834, 0.230000000, 1.680000000)
+        double3 xformOp:scale = (4.076201667, 0.280000000, 0.140000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.660000, 0.480000, 0.210000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = true
+    }
+    def Cube "InnerRail" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (2.038100834, 0.230000000, -1.680000000)
+        double3 xformOp:scale = (4.076201667, 0.280000000, 0.140000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.660000, 0.480000, 0.210000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = true
+    }
+    def Cube "UnderBeamPort" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (2.038100834, -0.170000000, 1.500000000)
+        double3 xformOp:scale = (4.076201667, 0.160000000, 0.180000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.100000, 0.120000, 0.150000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "UnderBeamStarboard" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (2.038100834, -0.170000000, -1.500000000)
+        double3 xformOp:scale = (4.076201667, 0.160000000, 0.180000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.100000, 0.120000, 0.150000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "SidePostPort1" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.500000000, 0.210000000, 1.680000000)
+        double3 xformOp:scale = (0.120000000, 0.320000000, 0.120000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.160000, 0.180000, 0.220000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "SidePostPort2" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (2.038100834, 0.210000000, 1.680000000)
+        double3 xformOp:scale = (0.120000000, 0.320000000, 0.120000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.160000, 0.180000, 0.220000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "SidePostPort3" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (3.576201667, 0.210000000, 1.680000000)
+        double3 xformOp:scale = (0.120000000, 0.320000000, 0.120000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.160000, 0.180000, 0.220000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "SidePostStarboard1" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.500000000, 0.210000000, -1.680000000)
+        double3 xformOp:scale = (0.120000000, 0.320000000, 0.120000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.160000, 0.180000, 0.220000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "SidePostStarboard2" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (2.038100834, 0.210000000, -1.680000000)
+        double3 xformOp:scale = (0.120000000, 0.320000000, 0.120000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.160000, 0.180000, 0.220000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "SidePostStarboard3" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (3.576201667, 0.210000000, -1.680000000)
+        double3 xformOp:scale = (0.120000000, 0.320000000, 0.120000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.160000, 0.180000, 0.220000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadPort1" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.500000000, 0.115000000, 1.150000000)
+        double3 xformOp:scale = (0.120000000, 0.050000000, 0.600000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.200000, 0.230000, 0.280000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadPort2" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (1.500000000, 0.115000000, 1.150000000)
+        double3 xformOp:scale = (0.120000000, 0.050000000, 0.600000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.200000, 0.230000, 0.280000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadPort3" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (2.500000000, 0.115000000, 1.150000000)
+        double3 xformOp:scale = (0.120000000, 0.050000000, 0.600000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.200000, 0.230000, 0.280000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadPort4" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (3.500000000, 0.115000000, 1.150000000)
+        double3 xformOp:scale = (0.120000000, 0.050000000, 0.600000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.200000, 0.230000, 0.280000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadStarboard1" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (0.500000000, 0.115000000, -1.150000000)
+        double3 xformOp:scale = (0.120000000, 0.050000000, 0.600000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.200000, 0.230000, 0.280000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadStarboard2" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (1.500000000, 0.115000000, -1.150000000)
+        double3 xformOp:scale = (0.120000000, 0.050000000, 0.600000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.200000, 0.230000, 0.280000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadStarboard3" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (2.500000000, 0.115000000, -1.150000000)
+        double3 xformOp:scale = (0.120000000, 0.050000000, 0.600000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.200000, 0.230000, 0.280000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadStarboard4" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double size = 1.0
+        double3 xformOp:translate = (3.500000000, 0.115000000, -1.150000000)
+        double3 xformOp:scale = (0.120000000, 0.050000000, 0.600000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.200000, 0.230000, 0.280000)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cylinder "HingeBarrel" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
+    {
+        double radius = 0.12
+        double height = 3.50
+        uniform token axis = "Z"
+        double3 xformOp:translate = (0.0, -0.18, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        color3f[] primvars:displayColor = [(0.22, 0.26, 0.31)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cylinder "OuterRailJointPin" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double radius = 0.08
+        double height = 0.22
+        uniform token axis = "Z"
+        double3 xformOp:translate = (0.0, 0.23, 1.68)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        color3f[] primvars:displayColor = [(0.22, 0.26, 0.31)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cylinder "InnerRailJointPin" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double radius = 0.08
+        double height = 0.22
+        uniform token axis = "Z"
+        double3 xformOp:translate = (0.0, 0.23, -1.68)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        color3f[] primvars:displayColor = [(0.22, 0.26, 0.31)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+}

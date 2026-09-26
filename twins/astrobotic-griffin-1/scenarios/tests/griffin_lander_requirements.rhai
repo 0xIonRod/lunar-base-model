@@ -21,10 +21,10 @@ fn _configuration_attr(name) {
 
 fn _enum_names(source, name) {
     let values = sysml_requirements::native_value(source, _configuration_attr(name));
-    if values == () || type_of(values) != "array" { return []; }
+    if values == () || !array_is(values) { return []; }
     let names = [];
     for value in values {
-        if type_of(value) != "EnumValue" { return []; }
+        if !sysml_enum_is(value) { return []; }
         names.push(value.literal);
     }
     names
@@ -32,8 +32,8 @@ fn _enum_names(source, name) {
 
 fn _position_values(source, name) {
     let values = sysml_requirements::native_value(source, _configuration_attr(name));
-    if values == () || type_of(values) != "array" { return []; }
-    for value in values { if type_of(value) != "Vec3" { return []; } }
+    if values == () || !array_is(values) { return []; }
+    for value in values { if !vec3_is_native(value) { return []; } }
     values
 }
 

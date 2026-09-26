@@ -30,6 +30,8 @@ fn on_tick(me, ctx) {
     let battery_voltage = sysml_requirements::number(source,
         "FlipRequirements::FlipRover::batteryNominalVoltageV");
     let solar_peak_power = sysml_requirements::number(source, own("solarArrayPeakPowerW"));
+    let solar_cell_width = sysml_requirements::number(source, own("solarCellWidthM"));
+    let solar_cell_depth = sysml_requirements::number(source, own("solarCellDepthM"));
     let checks = [];
     checks.push(sysml_requirement_checks::exists("FSP-001-mast", "sensor_mast", "fsp001", VERIFICATION, mast, "Xform"));
     let mast_paths = [];
@@ -99,6 +101,9 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirement_checks::extent_component(field.id, "solar_array", "fsp006", VERIFICATION,
             field.path, field.index, own(field.attr), 2.0, 0.002));
     }
+    checks.push(#{id: "FSP-006-hinge-position", component: "solar_array", requirement: "fsp006",
+        verification: VERIFICATION, kind: "attribute_component", path: solar_visual + "/FoldHinge",
+        attr: "xformOp:translate", index: 2, expected_attr: own("solarHingeCenterZM"), tolerance: 0.002});
     checks.push(#{id: "FSP-004-traceability", component: "sensor_power",
         requirement: "fsp004", verification: VERIFICATION, kind: "source_reference_available",
         source_owner: source_owner, reference_feature: "solarStatus"});
@@ -115,10 +120,18 @@ fn on_tick(me, ctx) {
             path: battery + "/Battery", attr: "inputs:voltage_nom",
             expected: battery_voltage.value, tolerance: 0.002});
     }
-    if solar_peak_power.ok == true {
+    if solar_peak_power.ok == true && solar_cell_width.ok == true && solar_cell_depth.ok == true {
+        checks.push(#{id: "FSP-008-array-area", component: "solar_array",
+            requirement: "fsp008", verification: VERIFICATION, kind: "attribute",
+            path: solar, attr: "parameters:area",
+            expected: solar_cell_width.value * solar_cell_depth.value, tolerance: 0.002});
+        checks.push(#{id: "FSP-008-array-efficiency", component: "solar_array",
+            requirement: "fsp008", verification: VERIFICATION, kind: "attribute",
+            path: solar, attr: "parameters:efficiency",
+            expected_attr: own("solarArrayEfficiency"), tolerance: 0.002});
         checks.push(#{id: "FSP-008-peak-power", component: "solar_array",
             requirement: "fsp008", verification: VERIFICATION, kind: "attribute",
-            path: solar, attr: "inputs:peak_power_rating_w",
+            path: solar, attr: "parameters:peak_power_rating_w",
             expected: solar_peak_power.value, tolerance: 0.01});
     }
     sysml_requirement_checks::finish(source, checks, "FLIP SENSOR/POWER REQUIREMENTS", "FLIP_SENSOR_POWER_REQUIREMENTS", mast, PACKAGE, VERIFICATION);

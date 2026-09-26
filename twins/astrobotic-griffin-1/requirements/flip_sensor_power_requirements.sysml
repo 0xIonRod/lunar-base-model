@@ -37,15 +37,17 @@ package FlipSensorPowerRequirements {
         attribute antennaHeightM : Real = 0.28;
         attribute antennaCenterYM : Real = 1.0;
         attribute antennaCenterZM : Real = 0.0;
-        attribute solarBacksheetWidthM : Real = 3.30;
-        attribute solarBacksheetThicknessM : Real = 0.12;
-        attribute solarBacksheetDepthM : Real = 2.10;
-        attribute solarCellWidthM : Real = 2.84;
-        attribute solarCellThicknessM : Real = 0.04;
-        attribute solarCellDepthM : Real = 1.64;
-        attribute solarHingeWidthM : Real = 3.40;
-        attribute solarHingeThicknessM : Real = 0.16;
-        attribute solarHingeDepthM : Real = 0.16;
+        attribute solarBacksheetWidthM : Real = 1.08;
+        attribute solarBacksheetThicknessM : Real = 0.04;
+        attribute solarBacksheetDepthM : Real = 0.78;
+        attribute solarCellWidthM : Real = 1.00;
+        attribute solarCellThicknessM : Real = 0.015;
+        attribute solarCellDepthM : Real = 0.70;
+        attribute solarHingeWidthM : Real = 1.10;
+        attribute solarHingeThicknessM : Real = 0.06;
+        attribute solarHingeDepthM : Real = 0.06;
+        attribute solarHingeCenterZM : Real = -0.40;
+        attribute solarArrayEfficiency : Real = 0.35;
         // Astrolab publishes these nameplate ratings; the physical models
         // realize them through the generic LunCoSim storage/source parameters.
         attribute batteryEnergyKWh : Real = 6.22;
@@ -69,13 +71,13 @@ package FlipSensorPowerRequirements {
         doc /* FSP-005 [geometry] the mast post, sensor head, antenna, and deck mount shall match the package's source-owned dimensions and placements. */
     }
     requirement def FSP006_SolarPanelGeometry {
-        doc /* FSP-006 [geometry] the rover panel shall expose a backsheet, cell surface, and fold hinge matching the source-owned package dimensions. */
+        doc /* FSP-006 [geometry] the rover panel shall expose a 1.00 m by 0.70 m active cell face, matching the source-owned 0.70 m2 electrical collection area, on a fitted backsheet and fold hinge. */
     }
     requirement def FSP007_BatteryEnergyCapacity {
         doc /* FSP-007 [power] the FLIP electrical-storage model shall realize the published battery energy capacity held in this package's source attribute. */
     }
     requirement def FSP008_SolarArrayPeakPower {
-        doc /* FSP-008 [power] the FLIP solar-generation model shall realize the deployable array peak power held in this package's source attribute. */
+        doc /* FSP-008 [power] model FLIP's 0.70 m2 solar array at 35% conversion efficiency and limit its electrical output to the source-owned 270 W nameplate rating. */
     }
 
     requirement <'FSP-001'> fsp001 : FSP001_MastStructure { subject sensorPower : FlipSensorPowerAssembly; }

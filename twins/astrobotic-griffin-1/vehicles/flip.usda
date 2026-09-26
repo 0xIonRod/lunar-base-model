@@ -498,8 +498,8 @@ def Xform "FLIP" (
         custom double3 xformOp:translate = (0.0, 1.3, 0.0)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        float inputs:area = 4.800000190734863
-        float inputs:efficiency = 0.30000001192092896
+        float parameters:area = 0.70
+        float parameters:efficiency = 0.35
         float inputs:irradiance = 1361.0
         custom token connectors:p
         token connectors:p.connect = </FLIP/Battery.connectors:p>
@@ -508,7 +508,7 @@ def Xform "FLIP" (
         float inputs:panel_normal_y = 0.0
         float inputs:panel_normal_z = 1.0
         token visibility = "inherited"
-        float inputs:peak_power_rating_w = 270.0
+        float parameters:peak_power_rating_w = 270.0
         custom double inputs:target_mount_x
         double inputs:target_mount_x.connect = </FLIP.inputs:target_mount_x>
         custom double inputs:target_mount_y

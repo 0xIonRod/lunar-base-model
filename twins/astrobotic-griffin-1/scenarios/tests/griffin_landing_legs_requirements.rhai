@@ -16,7 +16,7 @@ fn position(id, path, index, expected) {
 }
 
 fn usd_axis(direction) {
-    if type_of(direction) != "Vec3" { return (); }
+    if !vec3_is_native(direction) { return (); }
     if direction.x == 1.0 && direction.y == 0.0 && direction.z == 0.0 { return "X"; }
     if direction.x == 0.0 && direction.y == 1.0 && direction.z == 0.0 { return "Y"; }
     if direction.x == 0.0 && direction.y == 0.0 && direction.z == 1.0 { return "Z"; }

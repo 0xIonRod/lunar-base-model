@@ -23,7 +23,7 @@ fn _max_number(left, right) { if left > right { left } else { right } }
 fn _min_count(left, right) { if left < right { left } else { right } }
 
 fn _point_component(point, axis) {
-    if type_of(point) == "Vec3" {
+    if vec3_is_native(point) {
         if axis == 0 { return point.x; }
         if axis == 1 { return point.y; }
         if axis == 2 { return point.z; }
@@ -67,7 +67,7 @@ fn _mesh_extent(points) {
 }
 
 fn _mesh_dimensions_error(points, dimensions) {
-    if dimensions == () || type_of(dimensions) != "Vec3" { return (); }
+    if dimensions == () || !vec3_is_native(dimensions) { return (); }
     let extent = _mesh_extent(points);
     if extent == () { return (); }
     _max_number((extent[0] - dimensions.x).abs(),
@@ -75,12 +75,12 @@ fn _mesh_dimensions_error(points, dimensions) {
 }
 
 fn _expected_outer_profile_mesh(dimensions) {
-    if dimensions == () || type_of(dimensions) != "Vec3" { return (); }
+    if dimensions == () || !vec3_is_native(dimensions) { return (); }
     let profile_points = griffin_spec::visual_outer_body_profile_coordinates();
     if profile_points.len() != 8 { return (); }
     let scaled = [];
     for point in profile_points {
-        if type_of(point) != "Vec2" || !vec2_is_finite(point) { return (); }
+        if !vec2_is_native(point) || !vec2_is_finite(point) { return (); }
         scaled.push(vec2(point.x * dimensions.x / 2.0,
             point.y * dimensions.z / 2.0));
     }

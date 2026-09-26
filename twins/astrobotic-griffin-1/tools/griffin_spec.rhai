@@ -136,47 +136,48 @@ fn _qualified_attribute(name) {
     if name == "solarArrayCount" { return "GriffinLanderRequirements::GriffinLanderComponent::solarArrayCount"; }
     let ramp = [
         "rampCount", "rampSurfaceLengthM", "rampSurfaceWidthM",
-        "childNames",
+        "sectionAsset", "sectionInstances", "intermediateJointInstances",
+        "treadInstances", "railJointPinInstances", "transitionBody", "transitionContact", "transitionJoints",
+        "rampSectionCount", "rampSectionLengthM", "rampSectionGeometryToleranceM",
         "rampWheelClearanceM", "rampSurfaceThicknessM", "rampRailHeightM",
-        "rampRailWidthM", "rampRailOffsetZM", "rampSurfaceCenterYM", "rampRailCenterYM",
+        "rampRailWidthM", "rampRailOffsetZM", "rampRailJointPinRadiusM",
+        "rampRailJointPinLengthM", "rampSurfaceCenterYM", "rampRailCenterYM",
         "rampMaxDeploymentAngleRad",
         "rampPortMountX", "rampStarboardMountX", "rampMountY", "rampMountZ",
         "rampHingeOffsetX", "rampHingeOffsetY", "rampHingeOffsetZ",
-        "supportArmCenterXM", "supportArmCenterYM", "supportArmHalfWidthM",
-        "supportArmHalfHeightM", "supportArmHalfDepthM", "supportArmPairOffsetZM",
-        "supportArmTiltZDeg", "assemblyTreadNamePrefix", "assemblyTreadCount",
+        "assemblyTreadCount", "assemblyTreadCountPerSection",
         "assemblyTreadWidthM", "assemblyTreadHeightM", "assemblyTrackWidthM",
         "assemblyTreadFirstCenterXM", "assemblyTreadPitchM",
         "assemblyUnderBeamWidthM", "assemblyUnderBeamHeightM",
         "assemblyUnderBeamCenterYM", "assemblyUnderBeamCenterOffsetZM",
-        "assemblySidePostCountPerSide", "assemblySidePostWidthM",
-        "assemblySidePostHeightM", "assemblySidePostDepthM",
-        "assemblySidePostCenterYM", "assemblySidePostFirstCenterXM",
-        "assemblySidePostPitchM", "assemblyHingeCollarRadiusM",
-        "assemblyHingeCollarLengthM", "assemblyHingeCollarOffsetZM",
-        "assemblyHingeGussetWidthM", "assemblyHingeGussetHeightM",
-        "assemblyHingeGussetDepthM", "assemblyHingeGussetCenterXM",
-        "assemblyHingeGussetCenterYM", "assemblyHingeGussetOffsetZM",
+        "assemblySidePostCountPerSectionPerSide", "assemblySidePostWidthM",
+        "assemblySidePostDepthM", "assemblySidePostEmbeddedDepthM",
+        "assemblySidePostFirstCenterXM",
+        "assemblySidePostPitchM", "rampSectionHingeBarrelRadiusM",
+        "rampSectionHingeBarrelLengthM", "rampSectionHingeBarrelCenterYM",
         "rampSocketX", "rampSocketY", "rampSocketZ",
         "rampPortDeploymentAngleRad", "rampStarboardDeploymentAngleRad",
-        "rampBehavior", "hingeAxis", "mountDatum", "rampStowedScale",
+        "hingeAxis", "rampStowedScale",
         "rampStowedPortRotationZDeg", "rampStowedStarboardRotationYDeg",
-        "rampStowedStarboardRotationZDeg", "rampGeometryStatus",
+        "rampStowedStarboardRotationZDeg",
         "physicalRampDeckTransitionRequiredOverlapM",
         "physicalRampDeckTransitionLengthM",
         "physicalRampDeckTransitionInterfaceToleranceM",
         "physicalRampTerrainContactToleranceM",
-        "physicalRampTransitionChildName", "physicalRampTransitionContactChildName",
         "physicalRampPortMountX",
         "physicalRampStarboardMountX", "physicalRampMountY",
         "physicalRampMountZ", "physicalRampPortDeploymentAngleRad",
         "physicalRampStarboardDeploymentAngleRad",
-        "physicalRampMassKg", "physicalRampInertiaXKgM2",
-        "physicalRampInertiaYKgM2", "physicalRampInertiaZKgM2",
-        "physicalRampMassPropertiesStatus",
-        "physicalRampStowedAngleRad",
+        "physicalRampMassKg", "physicalRampSectionMassKg",
+        "physicalRampSectionInertiaXKgM2", "physicalRampSectionInertiaYKgM2",
+        "physicalRampSectionInertiaZKgM2", "physicalRampSectionJointLimitRad",
+        "physicalRampSectionMassPartitionToleranceKg",
+        "physicalRampSectionDriveTargetRad", "physicalRampSectionDriveStiffnessNmPerDeg",
+        "physicalRampSectionDriveDampingNmPerDegPerSec",
+        "physicalRampSectionDriveMaxTorqueNm",
+        "physicalRampSectionMassPropertiesToleranceKgM2",
         "physicalRampDeckTransitionMassKg",
-        "physicalRampDeckTransitionInertiaKgM2", "physicalRampTransitionJointNamePrefix",
+        "physicalRampDeckTransitionInertiaKgM2",
     ];
     if ramp.contains(name) {
         return "GriffinRampRequirements::GriffinEgressRamp::" + name;
@@ -318,6 +319,12 @@ fn _sysml_native(name) {
     let source = sysml_requirements::source_with_attributes([qualified]);
     if source == () || source.ok != true { return (); }
     sysml_requirements::native_value(source, qualified)
+}
+
+fn _sysml_enum_name(name) {
+    let value = _sysml_native(name);
+    if sysml_enum_is(value) { return value.literal; }
+    ()
 }
 
 fn _sysml_native_list(name) {
@@ -512,7 +519,7 @@ fn visual_ramp_mount_y() { _sysml_attribute("rampMountY") }
 fn visual_ramp_mount_z() { _sysml_attribute("rampMountZ") }
 fn visual_ramp_stowed_scale() { _sysml_attribute("rampStowedScale") }
 fn visual_ramp_state() { _sysml_native("rampState") }
-fn visual_ramp_child_names() { _sysml_list("childNames") }
+fn visual_ramp_child_names() { _sysml_enum_names("sectionInstances") }
 fn visual_ramp_stowed_rotation(side) {
     if side == "port" {
         [0.0, 0.0, _sysml_attribute("rampStowedPortRotationZDeg")]
@@ -738,16 +745,19 @@ fn physical_ramp_deck_transition_required_overlap_m() {
 fn physical_ramp_deck_transition_interface_tolerance_m() {
     _sysml_attribute("physicalRampDeckTransitionInterfaceToleranceM")
 }
-fn physical_ramp_transition_child_name() { _sysml_text("physicalRampTransitionChildName") }
+fn physical_ramp_transition_child_name() { _sysml_enum_name("transitionBody") }
 fn physical_ramp_transition_contact_child_name() {
-    _sysml_text("physicalRampTransitionContactChildName")
+    _sysml_enum_name("transitionContact")
 }
 fn physical_ramp_deck_transition_mass_kg() { _sysml_attribute("physicalRampDeckTransitionMassKg") }
 fn physical_ramp_deck_transition_inertia_kg_m2() {
     _sysml_number_list("physicalRampDeckTransitionInertiaKgM2")
 }
-fn physical_ramp_transition_joint_name_prefix() {
-    _sysml_text("physicalRampTransitionJointNamePrefix")
+fn physical_ramp_transition_joint_name(side) {
+    let names = ramp_transition_joint_names();
+    let index = if side == "port" { 0 } else if side == "starboard" { 1 } else { -1 };
+    if index < 0 || names.len() != 2 { return (); }
+    names[index]
 }
 fn physical_ramp_port_deployment_angle_rad() { _sysml_attribute("physicalRampPortDeploymentAngleRad") }
 fn physical_ramp_starboard_deployment_angle_rad() { _sysml_attribute("physicalRampStarboardDeploymentAngleRad") }
@@ -793,7 +803,6 @@ fn solar_array_names() { _sysml_enum_names("solarArrayInstances") }
 fn landing_leg_names() { _sysml_enum_names("landingLegInstances") }
 fn ramp_names() { _sysml_list("rampInstances") }
 fn ramp_hinge_names() { _sysml_list("rampHingeInstances") }
-fn ramp_tread_name_prefix() { _sysml_text("assemblyTreadNamePrefix") }
 fn ramp_tread_count() { _sysml_integer("assemblyTreadCount") }
 fn ramp_tread_width_m() { _sysml_attribute("assemblyTreadWidthM") }
 fn ramp_tread_height_m() { _sysml_attribute("assemblyTreadHeightM") }
@@ -804,21 +813,24 @@ fn ramp_under_beam_width_m() { _sysml_attribute("assemblyUnderBeamWidthM") }
 fn ramp_under_beam_height_m() { _sysml_attribute("assemblyUnderBeamHeightM") }
 fn ramp_under_beam_center_y_m() { _sysml_attribute("assemblyUnderBeamCenterYM") }
 fn ramp_under_beam_center_offset_z_m() { _sysml_attribute("assemblyUnderBeamCenterOffsetZM") }
-fn ramp_side_post_count_per_side() { _sysml_integer("assemblySidePostCountPerSide") }
+fn ramp_section_count() { _sysml_integer("rampSectionCount") }
+fn ramp_section_length_m() { _sysml_attribute("rampSectionLengthM") }
+fn ramp_section_names() { _sysml_enum_names("sectionInstances") }
+fn ramp_intermediate_joint_names() { _sysml_enum_names("intermediateJointInstances") }
+fn ramp_tread_names() { _sysml_enum_names("treadInstances") }
+fn ramp_rail_joint_pin_names() { _sysml_enum_names("railJointPinInstances") }
+fn ramp_transition_joint_names() { _sysml_enum_names("transitionJoints") }
+fn ramp_tread_count_per_section() { _sysml_integer("assemblyTreadCountPerSection") }
+fn ramp_side_post_count_per_section_per_side() { _sysml_integer("assemblySidePostCountPerSectionPerSide") }
 fn ramp_side_post_width_m() { _sysml_attribute("assemblySidePostWidthM") }
-fn ramp_side_post_height_m() { _sysml_attribute("assemblySidePostHeightM") }
 fn ramp_side_post_depth_m() { _sysml_attribute("assemblySidePostDepthM") }
-fn ramp_side_post_center_y_m() { _sysml_attribute("assemblySidePostCenterYM") }
+fn ramp_side_post_embedded_depth_m() { _sysml_attribute("assemblySidePostEmbeddedDepthM") }
 fn ramp_side_post_first_center_x_m() { _sysml_attribute("assemblySidePostFirstCenterXM") }
 fn ramp_side_post_pitch_m() { _sysml_attribute("assemblySidePostPitchM") }
-fn ramp_hinge_collar_radius_m() { _sysml_attribute("assemblyHingeCollarRadiusM") }
-fn ramp_hinge_collar_length_m() { _sysml_attribute("assemblyHingeCollarLengthM") }
-fn ramp_hinge_collar_offset_z_m() { _sysml_attribute("assemblyHingeCollarOffsetZM") }
-fn ramp_hinge_gusset_width_m() { _sysml_attribute("assemblyHingeGussetWidthM") }
-fn ramp_hinge_gusset_height_m() { _sysml_attribute("assemblyHingeGussetHeightM") }
-fn ramp_hinge_gusset_depth_m() { _sysml_attribute("assemblyHingeGussetDepthM") }
-fn ramp_hinge_gusset_center_x_m() { _sysml_attribute("assemblyHingeGussetCenterXM") }
-fn ramp_hinge_gusset_center_y_m() { _sysml_attribute("assemblyHingeGussetCenterYM") }
-fn ramp_hinge_gusset_offset_z_m() { _sysml_attribute("assemblyHingeGussetOffsetZM") }
+fn ramp_section_hinge_barrel_radius_m() { _sysml_attribute("rampSectionHingeBarrelRadiusM") }
+fn ramp_section_hinge_barrel_length_m() { _sysml_attribute("rampSectionHingeBarrelLengthM") }
+fn ramp_section_hinge_barrel_center_y_m() { _sysml_attribute("rampSectionHingeBarrelCenterYM") }
+fn ramp_rail_joint_pin_radius_m() { _sysml_attribute("rampRailJointPinRadiusM") }
+fn ramp_rail_joint_pin_length_m() { _sysml_attribute("rampRailJointPinLengthM") }
 fn propellant_tank_names() { _sysml_enum_names("tankInstances") }
 fn main_engine_names() { _sysml_enum_names("mainEngineInstances") }

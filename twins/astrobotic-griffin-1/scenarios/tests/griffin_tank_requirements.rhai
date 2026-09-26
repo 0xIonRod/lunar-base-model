@@ -12,15 +12,15 @@ fn visual(name) { "GriffinVisualConfigurationRequirements::GriffinVisualConfigur
 
 fn _enum_name(source, name) {
     let value = sysml_requirements::native_value(source, own(name));
-    if type_of(value) == "EnumValue" { value.literal } else { () }
+    if sysml_enum_is(value) { value.literal } else { () }
 }
 
 fn _enum_names(source, name) {
     let values = sysml_requirements::native_value(source, own(name));
-    if values == () || type_of(values) != "array" { return []; }
+    if values == () || !array_is(values) { return []; }
     let names = [];
     for value in values {
-        if type_of(value) != "EnumValue" { return []; }
+        if !sysml_enum_is(value) { return []; }
         names.push(value.literal);
     }
     names
@@ -216,7 +216,7 @@ fn on_tick(me, ctx) {
         && service_names.len() == 6 && axial_names.len() == 11
         && bracket_names.len() == 4;
     let body_ready = body_name != () && body_shape == "Sphere"
-        && type_of(body_center) == "Vec3" && body_radius != ()
+        && vec3_is_native(body_center) && body_radius != ()
         && minimum_installed_diameter != ()
         && tank_axis == "Y" && band_shape == "Cylinder"
         && axial_shape == "Cylinder" && transition_shape == "Cone";
@@ -237,8 +237,8 @@ fn on_tick(me, ctx) {
         && pad_width != () && pad_depth != () && pad_height != ();
     let support_ready = support_name != () && support_shape == "Cylinder"
         && support_radius != () && minimum_skirt_clearance != ();
-    let skirt_ready = type_of(body_mount) == "Vec3"
-        && type_of(skirt_center) == "Vec3" && type_of(skirt_dimensions) == "Vec3";
+    let skirt_ready = vec3_is_native(body_mount)
+        && vec3_is_native(skirt_center) && vec3_is_native(skirt_dimensions);
     let brackets_ready = bracket_group_name != () && bracket_shape == "Cube"
         && bracket_length != () && bracket_width != () && bracket_depth != ()
         && bracket_offset != () && bracket_tilt != ();

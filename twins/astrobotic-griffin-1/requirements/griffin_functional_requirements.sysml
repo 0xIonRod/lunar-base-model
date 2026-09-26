@@ -12,7 +12,7 @@ package GriffinFunctionalRequirements {
     }
 
     requirement def GR002_PayloadAdapter {
-        doc /* GR-002 [integration] provide an explicit payload-adapter datum that holds FLIP before the release gate; verify the fixed-joint interface in composed USD. Rationale: a named interface is needed to distinguish secured pre-release state from post-release mobility. */
+        doc /* GR-002 [integration] secure FLIP above the Griffin rover payload deck before release. All four wheel contact planes shall meet the adapter top surface within the shared geometry verification tolerance, and one fixed payload-adapter joint shall connect FLIP to the lander until the release gate. Verify wheel stations, tire radii, deck bounds, and joint topology in the composed scene. */
     }
 
     requirement def GR003_DeployableRamps {
