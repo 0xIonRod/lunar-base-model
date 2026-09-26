@@ -215,11 +215,14 @@ become Griffin's permanent source semantics.
   Define and implement the intended fit semantics before claiming standard
   parity across adapters.
 
-  The cook currently records fixed U/V, trim-curve, and trim-grid subdivision
-  counts. These are reproducible physics inputs but do not prove a maximum
-  geometric deviation. A tolerance-driven adaptive cook and measured deviation
-  readback remain open. A collision API cannot infer meaningful fitted box
-  partitions from a surface alone. Griffin itself currently contains no
+  The planner now requires a canonical-metre deviation tolerance and adaptively
+  refines untrimmed U/V grids or trimmed curve/grid settings. It records the
+  selected resolution and symmetric sampled vertex-to-triangle distance
+  between the last two levels; physics admission re-cooks and checks that
+  result. This is a convergence estimate, not a certified upper bound on exact
+  NURBS surface deviation, so geometric-error certification remains open. A
+  collision API cannot infer meaningful fitted box partitions from a surface
+  alone. Griffin itself currently contains no
   `UsdGeomNurbsPatch`/`LunCoLatheAPI` source, so no Griffin geometry was changed
   to exercise the new generic path.
 - GRR-011 moves ramp mass and diagonal-inertia literals into SysML and checks
