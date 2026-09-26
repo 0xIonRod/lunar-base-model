@@ -19,14 +19,14 @@ fn visual_children_check(id, component, requirement, path, paths) {
 fn flip_visual_exists_check(id, component, kind, path) {
     let check = visual_exists_check(id, component,
         "fvg001", kind, path);
-    check.verification = "Verify_FLIPVisualRequirements";
+    check.verification = "Verify_GriffinVisualRequirements";
     check
 }
 
 fn flip_visual_children_check(id, component, path, paths) {
     let check = visual_children_check(id, component,
         "fvg001", path, paths);
-    check.verification = "Verify_FLIPVisualRequirements";
+    check.verification = "Verify_GriffinVisualRequirements";
     check
 }
 
@@ -160,14 +160,14 @@ fn on_tick(me, ctx) {
     for name in wheel_names {
         let check = #{ id: "GV-004-wheel-radius-" + name, component: "wheels",
             requirement: "fvg001",
-            verification: "Verify_FLIPVisualRequirements",
+            verification: "Verify_GriffinVisualRequirements",
             kind: "attribute", path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/Tire",
             attr: "radius", expected_attr: griffin_spec::qualified_attribute_name("wheelRadiusM"), tolerance: 0.001 };
         checks.push(check);
     }
     let steering_mode = #{ id: "FGV-001-steering-mode", component: "rover",
         requirement: "fvg001",
-        verification: "Verify_FLIPVisualRequirements",
+        verification: "Verify_GriffinVisualRequirements",
         kind: "attribute_equals", path: root + "/FLIP", attr: "lunco:steeringGeometry",
         expected_attr: griffin_spec::qualified_attribute_name("missionSteeringMode") };
     checks.push(steering_mode);

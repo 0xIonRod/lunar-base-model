@@ -2255,14 +2255,14 @@ def Xform "Griffin1" (
         token visibility = "invisible"
     }
     def Xform "GriffinBody" (
-        prepend references = @griffin_body.usda@</GriffinBody>
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_body_collision.usda@</GriffinBody>
     )
     {
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "LegPX" (
-        prepend references = @griffin_leg.usda@</World>
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
@@ -2329,7 +2329,7 @@ def Xform "Griffin1" (
         }
     }
     def Xform "LegNX" (
-        prepend references = @griffin_leg.usda@</World>
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
@@ -2396,7 +2396,7 @@ def Xform "Griffin1" (
         }
     }
     def Xform "LegPZ" (
-        prepend references = @griffin_leg.usda@</World>
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
@@ -2463,7 +2463,7 @@ def Xform "Griffin1" (
         }
     }
     def Xform "LegNZ" (
-        prepend references = @griffin_leg.usda@</World>
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {

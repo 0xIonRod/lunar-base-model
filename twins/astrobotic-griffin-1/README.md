@@ -69,9 +69,9 @@ Sources:
 | scenes/griffin_1_surface_ops.usda | Mission composition and USD topology |
 | scenes/griffin_flip_visual.usda | Componentized headful review composition for Griffin and FLIP |
 | scenes/griffin_1_editor.usda | Clean derived headful Editor scene containing only the Griffin lander reference |
-| vehicles/griffin_1.usda | Reusable Griffin lander wrapper around the LunCoSim descent lander |
+| vehicles/griffin_1.usda | Canonical integrated Griffin study lander composing the LunCoSim descent model and Griffin components |
 | vehicles/flip.usda | Canonical FLIP study vehicle with mobility, chassis collision geometry, referenced visual components, EPS, and thermal networks |
-| components/lander/ | Twin-local visual components for the bus, landing legs, tanks, panels, bells, and ramps |
+| components/lander/ | Griffin bus, landing-leg visuals and dynamics, body collision geometry, tanks, panels, bells, and ramps |
 | components/rover/ | Twin-local visual components for chassis, wheels, mast, and solar array |
 | behaviors/griffin_1_flip_patrol.btxml | Griffin-local route tree targeting the deck approach, ramp exit, waypoints, and base site |
 | environments/south_pole_surrogate.usda | DEM-backed NOBILE03 South-Pole environment |

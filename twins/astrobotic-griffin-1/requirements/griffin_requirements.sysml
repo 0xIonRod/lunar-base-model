@@ -4,6 +4,7 @@ package Griffin1Requirements {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
     private import ScalarValues::Boolean;
+    private import MoonBaseProjectRequirements::ProjectSimulationContract;
 
     enum def GriffinMissionDesignation { AstroboticGriffinMissionOne; }
     enum def GriffinLandingRegion { NobileSouthPole; }
@@ -198,12 +199,14 @@ package Griffin1Requirements {
         }
     }
 
-    // The integration case owns traceability across the 37 system-level GR
-    // usages. Domain and visual component cases remain separately executable;
-    // this aggregate case does not claim that membership alone is test proof.
+    // The integrated system case owns Griffin's GR usages and the shared
+    // project unit/frame baseline. Domain and visual component cases remain
+    // separately executable; this aggregate does not treat membership alone
+    // as test proof.
     verification def Verify_GriffinRequirements {
         subject lander : Griffin1Lander;
         subject rover : HostedRoverInterface;
+        subject project : ProjectSimulationContract;
         objective {
             verify GriffinFunctionalRequirements::gr001;
             verify GriffinFunctionalRequirements::gr002;
@@ -242,6 +245,10 @@ package Griffin1Requirements {
             verify GriffinFunctionalRequirements::gr035;
             verify GriffinSimulationAccuracyRequirements::gr036;
             verify GriffinSimulationAccuracyRequirements::gr037;
+            verify MoonBaseProjectRequirements::mb001;
+            verify MoonBaseProjectRequirements::mb002;
+            verify MoonBaseProjectRequirements::mb003;
+            verify MoonBaseProjectRequirements::mb004;
         }
     }
 

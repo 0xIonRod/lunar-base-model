@@ -113,13 +113,6 @@ package FlipRequirements {
     requirement <'FGV-009'> fvg009 : FLIPV009_MissionSteeringMode { subject rover : FlipRover; }
     requirement <'FGV-010'> fvg010 : FLIPV010_PhysicalWheelSupportEnvelope { subject rover : FlipRover; }
 
-    verification def Verify_FLIPVisualRequirements {
-        subject rover : FlipRover;
-        objective {
-            verify fvg001;
-        }
-    }
-
     verification def Verify_FLIPComponentRequirements {
         subject rover : FlipRover;
         objective {

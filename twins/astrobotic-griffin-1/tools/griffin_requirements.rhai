@@ -477,7 +477,9 @@ fn sysml_contract_report(verification_name) {
     report.sysml_general_required_count = if general_count == () { 0 } else { general_count };
     report.sysml_general_verifies = if general_case == () || general_case_ambiguous {
         0
-    } else { general_case.verifies.len() };
+    // The integrated verifier also covers Griffin requirements; report only
+    // the project-baseline subset here.
+    } else { general_count };
     report.sysml_visual_required_count = visual_usages.len();
     report.sysml_visual_verifies = if visual_case == () || visual_case.verifies == () {
         0

@@ -7,9 +7,10 @@
 - `vehicles/griffin_1.usda` is the canonical integrated Griffin lander. It composes the lander, collision geometry, and replaceable component references.
 - `vehicles/flip.usda` is the canonical integrated FLIP study vehicle. It composes the physical mobility model, chassis collision geometry, and reusable wheel, suspension, mast, and solar visual components.
 - `scenes/griffin_flip_visual.usda` is the review composition; mission and verification scenes reference the same `griffin_1.usda` and `flip.usda` vehicle sources.
+- The combined visual review has one manifest verification binding. Its SysML objective covers Griffin's visual requirements and FLIP's hosted-rover presentation requirement; the independent FLIP component verification owns the full rover contract.
 - SysML under `requirements/` owns requirements, typed configuration identities, station datums, and study dimensions. Rhai builders make dry plans from those values and submit typed Editor edits. Composed USD is the realization to inspect. Rust provides shared modeling, authoring, physics, and verification capabilities.
 - `scenarios/tests/` contains requirement observers. `tests/` contains their small USD fixtures; fixtures reference the integrated Griffin source.
-- Twin-local visual components live under `components/lander/` and `components/rover/`.
+- Twin-local reusable component assets live under `components/lander/` and `components/rover/`, including Griffin's body collision geometry and physical landing-leg module.
 
 ## Landing-leg connection
 

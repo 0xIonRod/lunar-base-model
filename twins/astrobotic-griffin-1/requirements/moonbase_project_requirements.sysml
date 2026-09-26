@@ -35,14 +35,4 @@ package MoonBaseProjectRequirements {
     requirement <'MB-002'> mb002 : MB002_YUpFrame { subject simulation : ProjectSimulationContract; }
     requirement <'MB-003'> mb003 : MB003_DeterministicRhai { subject simulation : ProjectSimulationContract; }
     requirement <'MB-004'> mb004 : MB004_VisualEvidence { subject simulation : ProjectSimulationContract; }
-
-    verification def Verify_MoonBaseProjectRequirements {
-        subject simulation : ProjectSimulationContract;
-        objective {
-            verify mb001;
-            verify mb002;
-            verify mb003;
-            verify mb004;
-        }
-    }
 }

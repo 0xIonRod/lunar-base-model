@@ -33,12 +33,6 @@ script = "scenarios/tests/griffin_flip_visual.rhai"
 verdict_channel = "GRIFFIN_FLIP_VISUAL"
 
 [[verification.cases]]
-name = "FlipRequirements::Verify_FLIPVisualRequirements"
-scene = "tests/griffin_flip_visual.usda"
-script = "scenarios/tests/griffin_flip_visual.rhai"
-verdict_channel = "GRIFFIN_FLIP_VISUAL"
-
-[[verification.cases]]
 name = "GriffinRampRequirements::Verify_GriffinRampRequirements"
 scene = "tests/griffin_ramp_requirements.usda"
 script = "scenarios/tests/griffin_ramp_requirements.rhai"
@@ -127,12 +121,6 @@ name = "GriffinFunctionalRequirements::Verify_GriffinAdapterRelease"
 scene = "scenes/griffin_1_detach_stability_test.usda"
 script = "scenarios/tests/griffin_detach_stability.rhai"
 verdict_channel = "GRIFFIN_ADAPTER_RELEASE"
-
-[[verification.cases]]
-name = "MoonBaseProjectRequirements::Verify_MoonBaseProjectRequirements"
-scene = "tests/griffin_requirements.usda"
-script = "scenarios/tests/griffin_requirements.rhai"
-verdict_channel = "GRIFFIN_REQUIREMENTS"
 
 # Component ownership is explicit.  Each entry points to one normative SysML
 # source and one qualified verification case; the case supplies that

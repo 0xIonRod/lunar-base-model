@@ -1,6 +1,7 @@
 package GriffinVisualRequirements {
     private import Griffin1Requirements::Griffin1Lander;
     private import Griffin1Requirements::HostedRoverInterface;
+    private import FlipRequirements::FlipRover;
 
     // Domain-owned requirement definitions. Griffin1Requirements owns only
     // the integrated system subject, requirement usages, and verification.
@@ -73,6 +74,7 @@ package GriffinVisualRequirements {
     verification def Verify_GriffinVisualRequirements {
         subject lander : Griffin1Lander;
         subject rover : HostedRoverInterface;
+        subject flip : FlipRover;
         objective {
             verify GriffinVisualRequirements::gv001;
             verify GriffinVisualRequirements::gv002;
@@ -81,6 +83,7 @@ package GriffinVisualRequirements {
             verify GriffinVisualRequirements::gv005;
             verify GriffinVisualRequirements::gv006;
             verify GriffinVisualRequirements::gv007;
+            verify FlipRequirements::fvg001;
         }
     }
 
