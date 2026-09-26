@@ -1,0 +1,17 @@
+{
+  "utc": "2026-09-17T14:27:08.994047+00:00",
+  "file": "FLIP_rover_v3_corrected.FCStd",
+  "sha256": "05fbfaa454d299f5ce3f9d555d2a8727b2134cf4b251b1a380a65d007f3c0054",
+  "zip_crc_error": null,
+  "gui_xml": true,
+  "visual_review": [
+    "v3_closed.png",
+    "v3_deployed.png"
+  ],
+  "evidence_chain": [
+    "v3_audit_latest.json validates audited_source.FCStd",
+    "published_geometry_comparison.json proves all 224 world shapes identical at all 17 audited poses",
+    "requirements_check.json validates delivered-file dimensions and effective clamping"
+  ],
+  "passed": true
+}

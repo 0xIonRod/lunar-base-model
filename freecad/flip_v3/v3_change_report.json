@@ -1,0 +1,16 @@
+{
+  "preserved_components": 84,
+  "preserved_exactly": true,
+  "panel_mm": [
+    1800,
+    1380,
+    20
+  ],
+  "hinge_world_mm": [
+    -690,
+    0,
+    950
+  ],
+  "hinge_axis": "Y",
+  "baseline": "FLIP_rover_v2_recovered.FCStd"
+}

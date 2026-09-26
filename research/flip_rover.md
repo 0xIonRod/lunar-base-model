@@ -1,3 +1,5 @@
+> Updated 2026-09-17: current CAD specifications and side-hinge behavior are in [FLIP requirements](../requirements/flip-rover.md). The runtime representation below is historical and has not been promoted to CAD v3.
+
 # Astrolab FLIP rover — Griffin-1 engineering reference
 
 **Checked:** 2026-08-30  
@@ -15,8 +17,8 @@ metric ton and 30 kg payload capacity. The 2026 mission announcement describes
 small-payload and autonomous-operations work, with direct egress from the top
 of the lander after touchdown.
 
-Exact FLIP wheel count, wheelbase, dimensions, tire stiffness, wheel torque,
-battery energy, thermal limits, steering map, and payload ICD are not present
+Astrolab LPSC 2026 confirms four wheels and skid steering, with a 480 kg launch-mass constraint (https://www.hou.usra.edu/meetings/lpsc2026/pdf/1874.pdf). Exact wheelbase, dimensions, tire stiffness, wheel torque,
+battery energy, thermal limits, detailed steering dynamics, and payload ICD are not present
 in the reviewed primary sources. The related FLEX architecture page is useful
 only as a family-level design proxy; it must not be cited as FLIP-specific
 flight data.

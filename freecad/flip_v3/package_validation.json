@@ -1,0 +1,26 @@
+{
+  "scripts": [
+    "audit.py",
+    "build_side_hinge.py",
+    "compare_published.py",
+    "present.FCMacro",
+    "requirements_check.py"
+  ],
+  "archives": [
+    {
+      "name": "audited_source.FCStd",
+      "bytes": 430677,
+      "metadata_path_or_token_hits": []
+    },
+    {
+      "name": "FLIP_rover_v2_recovered.FCStd",
+      "bytes": 579597,
+      "metadata_path_or_token_hits": []
+    },
+    {
+      "name": "FLIP_rover_v3_corrected.FCStd",
+      "bytes": 556686,
+      "metadata_path_or_token_hits": []
+    }
+  ]
+}
