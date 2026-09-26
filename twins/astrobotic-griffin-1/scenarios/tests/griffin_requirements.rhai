@@ -124,6 +124,8 @@ fn on_tick(me, ctx) {
         "GriffinMechanicalRequirements::GRC018_TopDeckColliderProfileWithinTolerance";
     let deck_contact_constraint =
         "GriffinMechanicalRequirements::GRC018_TopDeckColliderOwnsContact";
+    let body_collider_constraint =
+        "GriffinMechanicalRequirements::GRC018_FlightBodyColliderMatchesCookedCube";
     let deck_requirement_usage = deck_model.requirement(
         "GriffinMechanicalRequirements::gr018");
     let deck_tolerance_observation = if deck_tolerance == () {
@@ -162,6 +164,19 @@ fn on_tick(me, ctx) {
                         "cooked_convex_geometry", "GR-018 cooked collision geometry")]]),
             "usd", 0.0)
     ];
+    let body_observation = report.layout.body_collider_observation;
+    deck_checks.push(sysml_requirements::constraint_check(
+        "GR-018-flight-body-collider", "lander", "gr018", VERIFICATION,
+        body_collider_constraint,
+        sysml_requirements::required_constraint_input_observations(deck_model,
+            deck_requirement_usage, body_collider_constraint, [
+                ["collisionEnabled", usd_observation_binding(body_observation,
+                    "collisionEnabled", "GR-018 body collider ownership")],
+                ["cookedCubeHull", usd_observation_binding(body_observation,
+                    "cookedCubeHull", "GR-018 body cooked Cube hull")],
+                ["exactCanonicalBounds", usd_observation_binding(body_observation,
+                    "exactCanonicalBounds", "GR-018 body collider bounds")]]),
+        "usd", 0.0));
     let deck_constraint_report = if deck_requirement.ok == true {
         sysml_requirements::evaluate(deck_requirement, deck_checks)
     } else { #{ok: false, error: "GR-018 requirement source is unavailable", results: []} };
@@ -171,8 +186,8 @@ fn on_tick(me, ctx) {
                 + " returned " + result.verdict));
         constraint_evidence.push(result);
     }
-    if deck_constraint_report.results == () || deck_constraint_report.results.len() != 3 {
-        failures.push("GR-018 physical deck collider did not produce all three formal constraint results");
+    if deck_constraint_report.results == () || deck_constraint_report.results.len() != 4 {
+        failures.push("GR-018 body and deck collider checks did not produce all four formal constraint results");
     }
 
     // The four dynamics legs use the same SysML foot-pad geometry as the

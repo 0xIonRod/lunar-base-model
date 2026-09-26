@@ -42,6 +42,13 @@ package GriffinMechanicalRequirements {
         collisionEnabled and proxyHidden and cookedConvexGeometry;
     }
 
+    constraint def GRC018_FlightBodyColliderMatchesCookedCube {
+        in collisionEnabled : Boolean;
+        in cookedCubeHull : Boolean;
+        in exactCanonicalBounds : Boolean;
+        collisionEnabled and cookedCubeHull and exactCanonicalBounds;
+    }
+
     requirement def GR018_HullAndDeck {
         attribute topDeckProfileToleranceM : Real = 0.001;
         require GRC018_TopDeckColliderTopologyMatchesSource;
@@ -49,6 +56,7 @@ package GriffinMechanicalRequirements {
             in toleranceM = GR018_HullAndDeck::topDeckProfileToleranceM;
         }
         require GRC018_TopDeckColliderOwnsContact;
+        require GRC018_FlightBodyColliderMatchesCookedCube;
         doc /* GR-018 [mechanical and collision] the powered body and its load-bearing deck geometry shall have explicit collision ownership. The octagonal outer deck ring shall use eight individually convex beam colliders derived from the visible Bus/TopDeckOctagon profile; a single convex hull across this open perimeter is prohibited because it closes the tank openings. The central rover payload platform shall have a separate hidden convex collider derived from RoverPayloadDeck dimensions and profile. Each proxy shall carry a typed USD relationship to its composed visible source prim. Composed transforms, mesh points, collision state, and hidden proxy role shall match the SysML source within topDeckProfileToleranceM. The one-millimetre correspondence tolerance is a Twin geometry bound, not a supplier manufacturing tolerance. Public Griffin material confirms a main payload deck and optional rover interface but does not provide its mechanical ICD, so the dimensions remain replaceable simulation-study assumptions. */
     }
 

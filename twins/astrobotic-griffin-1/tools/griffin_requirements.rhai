@@ -865,12 +865,29 @@ fn _ramp_layout_report(doc_id, root) {
     findings
 }
 
+fn _body_collider_observation(doc_id, root) {
+    let body_path = root + "/GriffinBody/BodyCollisionProxy";
+    let body = _query_geometry(doc_id, body_path,
+        ["size", "xformOp:scale", "physics:collisionEnabled", "visibility", "purpose"],
+        (), true);
+    if !_ok(body) { return body; }
+    let collision = body.collision_geometry;
+    let bounds = body.collision_bounds;
+    body.collisionEnabled = _has(body.api_schemas, "PhysicsCollisionAPI")
+        && body.attrs["physics:collisionEnabled"] == true;
+    body.cookedCubeHull = collision != () && collision.type_name == "Cube"
+        && collision.shape == "convex_hull" && collision.frame == "canonical_stage"
+        && collision.vertices != () && collision.vertices.len() == 8;
+    body.exactCanonicalBounds = bounds != () && bounds.fidelity == "exact"
+        && bounds.frame == "canonical_stage";
+    body
+}
+
 fn _body_shape_report(doc_id, root) {
     let findings = [];
     let body_path = root + "/GriffinBody/BodyCollisionProxy";
     let deck_path = root + "/RoverPayloadDeckCollider";
-    let body = _layout_query(doc_id, body_path,
-        ["size", "xformOp:scale", "physics:collisionEnabled", "visibility", "purpose"], false);
+    let body = _body_collider_observation(doc_id, root);
     if !_ok(body) {
         findings.push(_layout_finding("GR-018", body_path,
             "flight-body collision proxy is missing"));
@@ -899,6 +916,11 @@ fn _body_shape_report(doc_id, root) {
             findings.push(_layout_finding("GR-018", body_path,
                 "flight-body collider must be hidden proxy geometry"));
         }
+        if body.collisionEnabled != true || body.cookedCubeHull != true
+            || body.exactCanonicalBounds != true {
+            findings.push(_layout_finding("GR-018", body_path,
+                "flight-body Cube must read back as an exact eight-vertex Avian hull in canonical-stage coordinates"));
+        }
     }
     let deck = griffin_visual_builder::physical_top_deck_collider_observation(doc_id, root);
     if deck.ok != true || deck.state != "pass" {
@@ -913,7 +935,7 @@ fn _body_shape_report(doc_id, root) {
                 "obsolete visible body/deck assembly must be removed"));
         }
     }
-    findings
+    #{findings: findings, collider_observation: body}
 }
 
 fn _tank_layout_report(doc_id, root) {
@@ -1155,16 +1177,18 @@ fn _legacy_visibility_report(doc_id, root) {
 /// missing part.
 fn layout_report(doc_id, root) {
     let findings = [];
+    let body = _body_shape_report(doc_id, root);
+    for finding in body.findings { findings.push(finding); }
     for result in [_solar_layout_report(doc_id, root),
                    _ramp_layout_report(doc_id, root),
-                   _body_shape_report(doc_id, root),
                    _leg_layout_report(doc_id, root),
                    _tank_layout_report(doc_id, root),
                    _engine_layout_report(doc_id, root),
                    _legacy_visibility_report(doc_id, root)] {
         for finding in result { findings.push(finding); }
     }
-    #{ok: findings.len() == 0, root: root, doc_id: doc_id, findings: findings}
+    #{ok: findings.len() == 0, root: root, doc_id: doc_id, findings: findings,
+      body_collider_observation: body.collider_observation}
 }
 
 fn _audit_parameter(doc_id, rule, part_path, parameter) {

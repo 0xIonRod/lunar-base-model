@@ -362,8 +362,10 @@ become Griffin's permanent source semantics.
   and USD-stage provenance and flags mixed generations for one document.
   Griffin's GR-018 observer now batches its eight perimeter beams, payload
   collider, and hierarchy root into
-  one query. It checks each Avian-cooked shape and frame, verifies the beam
-  source dimensions/transforms, and compares the adapter's authored mesh points
+  one query. A source-owned GR-018 constraint checks the body's effective
+  eight-vertex Cube hull and exact canonical-stage bounds. The deck observer
+  checks each Avian-cooked shape and frame, verifies beam source dimensions and
+  transforms, and compares the adapter's authored mesh points
   and topology to its SysML-derived geometry. It passes the batch's document
   and stage revisions through typed provider provenance. The broader mapping
   from resolved SysML feature handles to USD
