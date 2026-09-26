@@ -57,7 +57,7 @@ These are Editor and composed-readback observations. They do not establish missi
 ## Next work
 
 1. Run `requirement_quality_audit()` explicitly from the Griffin requirements tool and review its findings. Apply only justified requirement edits; startup remains policy-neutral.
-2. Migrate Griffin predicates with real source-owned actual arguments onto explicit constraint-usage feature values as those source features become available. The generic AST/IR now projects and applies supported bindings. The existing GSA-005, GSA-006, and GSA-009 scenario calls the grouped evaluator through the shared adapter, but this work session did not execute it.
+2. Migrate remaining Griffin parameter maps to typed feature-path observations, then author explicit constraint-usage feature values for source-owned actual arguments where those values belong in SysML. The generic AST/IR projects and applies supported bindings; the current solar calls already submit typed observations, but no Editor/runtime execution was made for this update.
 3. Replace the solar-panel study fractions and other approximate panel datums with the controlled Griffin-1 panel definition when available; verify cutout clearance, installed transforms, support and hinge interfaces, and electrical behavior against that definition.
 4. Compose the saved ramp visual component under the integrated port and starboard physical ramp roots. Preserve the physical track colliders, avoid duplicate visible geometry, and derive both poses from the ramp SysML configuration.
 5. Review the leg-to-bus mount appearance in the Editor against current Griffin-1 references. Define any additional visual bracing as a source-backed study requirement derived from the bus and leg interfaces.
