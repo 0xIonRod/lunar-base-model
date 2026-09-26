@@ -31,15 +31,11 @@ payloads:
     purpose: environmental, navigation, ranging, and lunar-surface technology demonstrations
     source: primary_nasa
 terrain:
-  shape: procedural_flat_site
-  width_m: 1000
-  length_m: 1000
-  elevation_m: 0
-  gravity_m_s2: 1.62
-  coordinate_frame: local_ned
+  environment_asset: ../../twins/astrobotic-griffin-1/environments/south_pole_surrogate.usda
+  source_product: LROC NAC DTM NOBILE03
   real_site: Nobile Crater region
   real_region: lunar South Pole
-  source: simulator_simplification
+  status: regional_dem_crop; exact touchdown coordinate unresolved
 landing_site:
   name: Nobile Crater region
   region: lunar South Pole
