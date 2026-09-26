@@ -1,6 +1,6 @@
 # Griffin implementation and standards gap review
 
-**Reviewed:** 2026-09-25
+**Reviewed:** 2026-09-26
 **Scope:** Griffin as the active model, FLIP as a separately loaded hosted
 vehicle, and the generic Rust/Rhai/Editor capabilities needed to build and
 verify the model.
@@ -204,11 +204,16 @@ become Griffin's permanent source semantics.
   cook settings, and `uint64` geometry fingerprint are authored on the proxy.
   Avian re-cooks the source, checks the generated fingerprint against the
   recorded value, and compares the authored proxy mesh before admission,
-  rejecting stale or modified proxies. `boundingCube` now
-  maps to a real local-axis-aligned box; `none` is rejected on dynamic bodies.
-  Supported approximation tokens are `none` (static/kinematic mesh),
-  `convexHull`, `convexDecomposition`, and `boundingCube`; other standard USD
-  modes remain explicitly unsupported by Avian.
+  rejecting stale or modified proxies. The Avian reader and proxy planner now
+  share one typed capability contract and the plan reports the implemented
+  modes. These are `none` (static/kinematic triangle mesh), `convexHull`,
+  `convexDecomposition`, and `boundingCube`. OpenUSD also defines
+  `boundingSphere` and `meshSimplification`; both remain explicitly unsupported
+  by Avian. Its current `boundingCube` cook is axis-aligned to the source
+  mesh-local frame, while the [OpenUSD schema describes an optimally fitting
+  box](https://openusd.org/dev/api/class_usd_physics_mesh_collision_a_p_i.html).
+  Define and implement the intended fit semantics before claiming standard
+  parity across adapters.
 
   The cook currently records fixed U/V, trim-curve, and trim-grid subdivision
   counts. These are reproducible physics inputs but do not prove a maximum
