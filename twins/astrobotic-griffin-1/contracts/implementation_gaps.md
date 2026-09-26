@@ -298,6 +298,16 @@ become Griffin's permanent source semantics.
   was not run. Standard usage-level feature-value bindings project through
   resolved formal-parameter handles; diagnostics for inherited defaults and
   general binding relationships remain open.
+- The asset-level `luncosim --validate` path does not assemble the Twin's SysML
+  package context: validating all requirement files together still reports
+  cross-file names such as `GriffinRequirementSources::TwinAssetPath` and
+  `FlipRequirements::FlipRover` as unresolved. The Twin-loaded review path
+  resolves these sources, so this CLI result is not a project verdict. Add a
+  manifest-aware validation mode that resolves imports before reporting
+  semantic names. Standalone validation also flags the reusable SolarPanel
+  mass API as outside a rigid body; its FLIP instance is nested beneath the
+  rover body. Asset-context validation must distinguish reusable components
+  from unmassed scene roots.
 - The generic IR now compiles by exact snapshot-scoped constraint handle and
   evaluates every standard `require` membership on a requirement as one
   four-state result. It can validate the associated verification case through
