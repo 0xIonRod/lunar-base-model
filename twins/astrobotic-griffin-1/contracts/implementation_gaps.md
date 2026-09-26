@@ -1,6 +1,6 @@
 # Griffin implementation and standards gap review
 
-**Reviewed:** 2026-09-26
+**Reviewed:** 2026-09-27
 **Scope:** Griffin as the active model, FLIP as a separately loaded hosted
 vehicle, and the generic Rust/Rhai/Editor capabilities needed to build and
 verify the model.
@@ -15,23 +15,24 @@ The largest gaps are requirement coverage and binding workflows over the
 resolved graph, complete typed provider provenance, source-to-realization
 mapping, and physically qualified mission evidence.
 
-The last recorded Griffin requirements packet passed for its 37 requirement
+The latest recorded Griffin requirements packet passed for its 37 requirement
 usages and 23 verification cases: all 39 emitted evidence checks passed,
 including composed geometry and the typed GR-005 source catalog. This checks
 the authored study configuration and its verification procedures; it does not
 qualify flight behavior or remove the separate geometry, physics, and mission
-data gaps below. That packet also logged five Avian joint-start seating
-errors: three angular residuals of 90° or 180° and two translation residuals
-of 3.44 m. A previously started headless requirements invocation has not
-returned a verdict in this update.
+data gaps below. That packet's solver log also recorded five Avian joint-start
+seating errors: three angular residuals of 90° or 180° and two translation
+residuals of 3.44 m. No new flight-physics run was performed in this update;
+these remain the latest available runtime results, not a new acceptance verdict.
 
-The Editor-loaded combined review scene has a current failing visual-evidence
-packet: 25 of 76 checks fail (11 in GV-002, seven in GV-004, one in GV-006,
-five in GV-007, and one in FVG-001). The scene log reports missing or invisible
-leg subparts and later finite-world exits for articulated lander bodies. Treat
-the composed review as not physically integrated until those failures are
-resolved and read back; the older requirements pass does not cover this
-visual/physics result.
+The latest available Editor-loaded combined review scene packet reports 25 of
+76 checks failing (11 in GV-002, seven in GV-004, one in GV-006, five in GV-007,
+and one in FVG-001). The scene log reports missing or invisible leg subparts
+and later finite-world exits for articulated lander bodies. Treat the composed
+review as not physically integrated until those failures are resolved and read
+back; the older requirements pass does not cover this visual/physics result.
+These packet figures are the latest available evidence, not a new run in this
+update.
 
 FLIP now has one integrated vehicle asset. Its SysML source owns the published
 battery-energy and solar-peak ratings; the Editor builder converts energy to
@@ -61,7 +62,7 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links. The GR-005 evidence catalog resolves its typed requirement and source references to typed locators and roles | Coverage evaluation compares resolved handles and GR-005 source provenance is exercised in the runtime verifier. Provider observations still do not share one end-to-end identity across source revision, realization, composed-stage generation, physics sampling, and resulting evidence. Status/check catalogs remain authored execution metadata; derive the requirement matrix from requirement, verification, realization, and evidence links |
 | Units and frames | `lunco-engineering-values` supports dimension-safe conversion from caller-resolved `Unit` values; the constraint IR and observation contracts still carry unit identity as text, while Griffin often relies on SI field-name suffixes | The unit primitive is present but is not wired from SysML unit resolution through IR type checking and provider values. Names and comments do not prevent dimensional mistakes; frame identity and conversion provenance also need typed contracts |
-| Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, exact Mesh/Cube collider points, and a generic NURBS-to-USD-Mesh collision cook exist | No complete semantic part-usage graph binds every source feature to a USD realization. Griffin currently has no authored NURBS patch to cook. The first cook uses explicit deterministic subdivisions, not a geometric error tolerance |
+| Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, effective Avian-cooked Mesh/Cube geometry, exact analytic collider dimensions and poses, and a generic NURBS-to-USD-Mesh collision cook exist | No complete semantic part-usage graph binds every source feature to a USD realization. Griffin currently has no authored NURBS patch to cook. The first cook uses explicit deterministic subdivisions, not a geometric error tolerance |
 | Behavioral applicability | Mission order, sampling horizon, route phases, and release are mostly Rhai orchestration | The model cannot yet state and evaluate configuration, mode, phase, or temporal applicability as part of a reusable source-defined verification objective |
 | Modelica relationship | Continuous models and parameters are selected through Twin tooling | No complete standard realization/parameter provenance graph ties each equation set and result back to the source feature and requirement revision |
 
@@ -238,8 +239,11 @@ become Griffin's permanent source semantics.
   by Avian. The current `boundingCube` cook now uses an oriented principal-axis
   fit instead of a mesh-axis AABB. This fit is deterministic but does not
   guarantee a globally minimum-volume box; exact [OpenUSD schema parity](https://openusd.org/dev/api/class_usd_physics_mesh_collision_a_p_i.html)
-  remains open. Rhai authoring obtains the adapter's supported approximation
-  tokens through one Rust capability query instead of a duplicated allow-list.
+  remains open. Rhai authoring obtains structured mode records from one Rust
+  capability contract: each record includes the USD token, cooked geometry,
+  and rigid-body compatibility. `PlanNurbsCollisionProxy` returns the same
+  records, so authoring and planning use the runtime's contract without a
+  second allow-list or locally duplicated body restrictions.
 
   The planner now requires a canonical-metre deviation tolerance and adaptively
   refines untrimmed U/V grids or trimmed curve/grid settings. It records the
@@ -347,13 +351,17 @@ become Griffin's permanent source semantics.
   values and relies on field names for unit hints. Connect resolved units to
   IR checking and provider observations before using mixed providers or
   supplier data; never infer a conversion from a symbol string alone.
-- `QueryUsdPrims` reads one composed snapshot and can expose Avian-cooked
-  triangle-mesh, convex-hull, convex-decomposition, or bounding-cube geometry
-  for active collision Mesh/Cube prims. It returns the document generation and
-  canonical-stage generation as separate values, including for live-stage
-  reads. The SysML evaluator now retains tagged source and USD-stage provenance
-  and flags mixed generations for one document. Griffin's GR-018 observer now
-  batches its eight perimeter beams, payload collider, and hierarchy root into
+- `QueryUsdPrims` reads one composed snapshot and exposes the effective Avian
+  collider for active collision Mesh, Cube, Sphere, Cylinder, Cone, Capsule,
+  and finite Plane prims. Meshes return cooked triangle topology or convex
+  hull vertices; convex decomposition retains each hull; analytic shapes
+  return exact cooked dimensions and a collider-local-to-stage pose. Composed
+  transforms and authored scale are included in the query result. It returns
+  the document generation and canonical-stage generation as separate values,
+  including for live-stage reads. The SysML evaluator now retains tagged source
+  and USD-stage provenance and flags mixed generations for one document.
+  Griffin's GR-018 observer now batches its eight perimeter beams, payload
+  collider, and hierarchy root into
   one query. It checks each Avian-cooked shape and frame, verifies the beam
   source dimensions/transforms, and compares the adapter's authored mesh points
   and topology to its SysML-derived geometry. It passes the batch's document
@@ -428,11 +436,11 @@ become Griffin's permanent source semantics.
 - The solar-panel refiner is now instance-driven: it consumes canonical typed
   identities, stations, orientations, ordered bus-rail pairs, and a shared
   component asset, then computes each panel width and local support attachment
-  from those source values. The active Editor's `SysmlModel::value` projection
-  omits semantic `Position[n]` arrays even though `AnalyzeSysml` retains their
-  typed numeric AST values; the Twin bridge currently converts those numbers
-  into native `Vec3` values. Add direct structured-collection projection to the
-  generic Rust/SysML bridge so vehicle builders do not need this Rhai adapter.
+  from those source values. The generic `SysmlModel.value` projection now
+  preserves `Position[n]` as an array of native `DVec3` values; the Griffin
+  Rhai tool consumes that typed projection and no longer reconstructs stations
+  from `AnalyzeSysml` AST records. Broader object-valued and feature-valued
+  collection mapping remains open in the generic SysML subset.
   The visual component now models a matching lower clearance opening through
   the frame, backplane, and cell field, using source-owned study fractions.
   Replace those fractions and refine the contour from the controlled panel

@@ -4,10 +4,8 @@ import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_c
 // Machine-readable Griffin study policy.
 //
 // Keep this module free of USD queries and edits. Numeric policy comes from
-// the Twin's typed SysML model; the parsed attribute projection supplies
-// native vectors for semantic Position collections that the current compact
-// model bridge does not expose. Rhai owns reusable planning policy while
-// contracts/*.md records meaning and provenance.
+// the Twin's typed SysML model, including structured collections. Rhai owns
+// reusable planning policy while contracts/*.md records meaning and provenance.
 
 // Keep repeated Griffin lookups on one Rust-owned, revision-pinned SysML
 // session. The qualified name is an identifier boundary; the engineering
@@ -28,43 +26,6 @@ fn _typed_model_value(qualified) {
     value
 }
 
-// The compact Rhai projection omits some semantic alias arrays (for
-// example Position[3]) from SysmlModel::value even though the parsed SysML
-// analysis retains their typed numeric elements. Project those elements
-// directly from AnalyzeSysml's numeric value fields; never parse literals.
-fn _analyzed_attribute_value(qualified) {
-    let result = query("AnalyzeSysml", #{path: "twin://astrobotic-griffin-1",
-        tables: ["attributes"], attribute_names: [qualified]});
-    if result == () || result.ok != true || result.analysis == ()
-        || result.analysis.attributes == () {
-        return ();
-    }
-    for attribute in result.analysis.attributes {
-        if attribute.qualified_name == qualified { return attribute.value; }
-    }
-    ()
-}
-
-fn _analyzed_position_list(qualified) {
-    let value = _analyzed_attribute_value(qualified);
-    if value == () || value.kind != "vector" || value.elements == () { return []; }
-    let positions = [];
-    for item in value.elements {
-        if item.kind != "vector" || item.elements == () || item.elements.len() != 3 {
-            return [];
-        }
-        let coordinates = [];
-        for coordinate in item.elements {
-            if coordinate.kind != "real" || coordinate.number_value == () {
-                return [];
-            }
-            coordinates.push(coordinate.number_value);
-        }
-        positions.push(vec3(coordinates[0], coordinates[1], coordinates[2]));
-    }
-    positions
-}
-
 fn _typed_model_number(qualified) {
     let native = _typed_model_value(qualified);
     if native != () {
@@ -72,10 +33,6 @@ fn _typed_model_number(qualified) {
         let scalar = f64_from(native);
         if scalar != () { return scalar; }
     }
-    let value = _analyzed_attribute_value(qualified);
-    if value == () { return (); }
-    if value.number_value != () { return value.number_value; }
-    if value.integer_value != () { return f64_from(value.integer_value); }
     ()
 }
 
@@ -330,11 +287,6 @@ fn _sysml_enum_name(name) {
 fn _sysml_native_list(name) {
     let value = _sysml_model_value(name);
     if value != () && array_is(value) { return value; }
-    let position_lists = ["solarStations", "railStations", "tankStations",
-        "legStations", "engineStations"];
-    if position_lists.contains(name) {
-        return _analyzed_position_list(_qualified_attribute(name));
-    }
     []
 }
 
