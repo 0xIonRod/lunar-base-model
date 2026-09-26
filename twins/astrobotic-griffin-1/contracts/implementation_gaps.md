@@ -61,7 +61,7 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 | Formal constraint ownership | Requirement membership roles are projected as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates required memberships, and checks verification coverage through resolved `verify` links. It retains each usage's resolved formal-parameter handle and typed bound expression. Griffin's shared adapter resolves scalar source-feature bindings against those handles and evaluates the bound constraints | Griffin now exercises usage-bound constraints across solar, ramp, landing-leg, and deck geometry requirements; source literals and composed USD measurements enter as typed feature-path observations. Other verification paths still use name-keyed parameter maps. Defaults, output binding, and full specialization/redefinition traversal remain |
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links. The GR-005 evidence catalog resolves its typed requirement and source references to typed locators and roles | Coverage evaluation compares resolved handles and GR-005 source provenance is exercised in the runtime verifier. Provider observations still do not share one end-to-end identity across source revision, realization, composed-stage generation, physics sampling, and resulting evidence. Status/check catalogs remain authored execution metadata; derive the requirement matrix from requirement, verification, realization, and evidence links |
-| Units and frames | `lunco-engineering-values` supports dimension-safe conversion from caller-resolved `Unit` values; the constraint IR and observation contracts still carry unit identity as text, while Griffin often relies on SI field-name suffixes | The unit primitive is present but is not wired from SysML unit resolution through IR type checking and provider values. Names and comments do not prevent dimensional mistakes; frame identity and conversion provenance also need typed contracts |
+| Units and frames | SysML quantity-kind, enumeration, reference, and structured-type identity now uses source-snapshot element handles through the constraint IR; `qualified_name` is presentation metadata. `lunco-engineering-values` supports dimension-safe conversion from caller-resolved `Unit` values, but constraint/provider unit identity remains textual and Griffin often relies on SI field-name suffixes | The unit primitive is not wired from SysML unit resolution through IR type checking and provider values. Unit symbols must not stand in for semantic identity or dimensional proof. Frame identity and conversion provenance also need typed contracts |
 | Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, effective Avian-cooked Mesh/Cube geometry, exact analytic collider dimensions and poses, and a generic NURBS-to-USD-Mesh collision cook exist | No complete semantic part-usage graph binds every source feature to a USD realization. Griffin currently has no authored NURBS patch to cook. The NURBS planner uses an explicit canonical-metre tolerance and adaptive tessellation, but its successive-level convergence estimate is not a certified upper bound on exact surface deviation |
 | Behavioral applicability | Mission order, sampling horizon, route phases, and release are mostly Rhai orchestration | The model cannot yet state and evaluate configuration, mode, phase, or temporal applicability as part of a reusable source-defined verification objective |
 | Modelica relationship | Continuous models and parameters are selected through Twin tooling | No complete standard realization/parameter provenance graph ties each equation set and result back to the source feature and requirement revision |
@@ -345,12 +345,13 @@ become Griffin's permanent source semantics.
 ### P1 — quantities, geometry, and provider observations
 
 - `lunco-engineering-values` has dimension-safe conversion, and the IR carries
-  quantity and binding metadata. The evaluator still requires matching unit
-  labels for arithmetic/comparison and does not resolve a SysML unit contract
-  into the `Unit` primitive. Griffin currently authors normalized metre/radian
-  values and relies on field names for unit hints. Connect resolved units to
-  IR checking and provider observations before using mixed providers or
-  supplier data; never infer a conversion from a symbol string alone.
+  handle-backed SysML type identity plus quantity/binding metadata. The
+  evaluator still requires matching unit labels for arithmetic/comparison and
+  does not resolve a SysML unit contract into the `Unit` primitive. Griffin
+  currently authors normalized metre/radian values and relies on field names
+  for unit hints. Connect resolved units to IR checking and provider
+  observations before using mixed providers or supplier data; never infer a
+  conversion from a symbol string alone.
 - `QueryUsdPrims` reads one composed snapshot and exposes the effective Avian
   collider for active collision Mesh, Cube, Sphere, Cylinder, Cone, Capsule,
   and finite Plane prims. Meshes return cooked triangle topology or convex
