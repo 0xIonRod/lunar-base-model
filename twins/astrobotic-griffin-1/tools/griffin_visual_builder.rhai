@@ -1548,9 +1548,16 @@ fn physical_landing_leg_pad_observation(doc, root) {
     let bus_frame = assembly_builder::composed_query(doc,
         #{path: root + "/Bus/PerimeterFrame", children: false,
           geometry_bounds: true});
-    if !query_ok(bus_frame) || bus_frame.geometry_bounds == () {
+    if !query_ok(bus_frame) {
+        let reason = if bus_frame.error == () {
+            "composed bus-frame prim query failed"
+        } else { bus_frame.error };
         return #{ok: false, state: "unavailable",
-            detail: root + ": composed octagonal bus frame geometry is unavailable"};
+            detail: root + "/Bus/PerimeterFrame: " + reason};
+    }
+    if bus_frame.geometry_bounds == () {
+        return #{ok: false, state: "unavailable",
+            detail: root + "/Bus/PerimeterFrame: composed geometry bounds are unavailable"};
     }
     let details = [];
     for index in 0..suffixes.len() {

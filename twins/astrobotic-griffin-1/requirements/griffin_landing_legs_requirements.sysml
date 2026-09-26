@@ -60,6 +60,9 @@ package GriffinLandingLegRequirements {
         attribute physicalLegRotationToleranceDeg : Real = 0.001;
         attribute padColliderToleranceM : Real = 0.001;
         attribute bodyMountOverlapM : Real = 0.05;
+        // Numerical allowance for composed floating-point bound arithmetic;
+        // it does not change the physical minimum-overlap datum.
+        attribute bodyMountOverlapMeasurementToleranceM : Real = 0.000001;
         attribute mountClevisWidthM : Real = 0.42;
         attribute mountClevisHeightM : Real = 0.24;
         attribute mountClevisDepthM : Real = 0.36;
@@ -126,23 +129,31 @@ package GriffinLandingLegRequirements {
     }
 
     requirement def GLL008_FootPadGeometry {
-        require GLLC008_PadColliderMatchesVisual;
+        require GLLC008_PadColliderMatchesVisual {
+            in toleranceM = GriffinLandingLegAssembly::padColliderToleranceM;
+        }
         require GLLC008_PadColliderOwnsContact;
-        require GLLC008_PadColliderStationMatchesSource;
+        require GLLC008_PadColliderStationMatchesSource {
+            in toleranceM = GriffinLandingLegAssembly::physicalLegPlacementToleranceM;
+        }
         doc /* GLL-008 [contact geometry] each dynamics leg root shall match the ordered COM-frame legStations and legStationRotationYDeg in GriffinVisualConfiguration. Its hidden Y-axis cylinder contact proxy shall be generated from the composed visible FootPad cylinder and link to it through a typed USD relationship. Proxy and visual geometry bounds, radius, height, and leg-local center shall agree with the typed SysML dimensions within the authored tolerance. The visible component remains the geometry source; only the proxy owns contact, and legacy strut/capsule proxies shall not also collide. The 0.92 m by 0.72 m load plate remains visible above the pad. These replaceable dimensions are study values because the supplier leg ICD is not public. */
     }
     constraint def GLLC009_BusAndAxleOverlap {
         in measuredBusOverlapM : Real;
         in measuredAxleOverlapM : Real;
         in requiredOverlapM : Real;
+        in measurementToleranceM : Real;
         in physicalJointStationMatches : Boolean;
-        measuredBusOverlapM >= requiredOverlapM
-            and measuredAxleOverlapM >= requiredOverlapM
+        measuredBusOverlapM + measurementToleranceM >= requiredOverlapM
+            and measuredAxleOverlapM + measurementToleranceM >= requiredOverlapM
             and physicalJointStationMatches;
     }
     requirement def GLL009_BusMountConnection {
-        require GLLC009_BusAndAxleOverlap;
-        doc /* GLL-009 [mechanical interface] each leg's visible BodyMountArm shall overlap the octagonal PerimeterFrame and its MountAxle by at least bodyMountOverlapM. The physical prismatic suspension joint shall connect the leg rigid body to the lander at the same typed leg station. Mount geometry is derived from the bus envelope, frame section, leg station, and clevis dimensions; it is not a second placement table. */
+        require GLLC009_BusAndAxleOverlap {
+            in requiredOverlapM = GriffinLandingLegAssembly::bodyMountOverlapM;
+            in measurementToleranceM = GriffinLandingLegAssembly::bodyMountOverlapMeasurementToleranceM;
+        }
+        doc /* GLL-009 [mechanical interface] each leg's visible BodyMountArm shall overlap the octagonal PerimeterFrame and its MountAxle by at least bodyMountOverlapM. The physical prismatic suspension joint shall connect the leg rigid body to the lander at the same typed leg station. Mount geometry is derived from the bus envelope, frame section, leg station, and clevis dimensions; it is not a second placement table. The explicit measurement tolerance covers floating-point bound readback only and does not reduce the physical overlap datum. */
     }
 
     requirement <'GLL-001'> gll001 : GLL001_LegCount { subject legs : GriffinLandingLegAssembly; }

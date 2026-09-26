@@ -15,6 +15,16 @@ The largest gaps are requirement coverage and binding workflows over the
 resolved graph, complete typed provider provenance, source-to-realization
 mapping, and physically qualified mission evidence.
 
+The current Griffin requirements runtime run passes for its 37 requirement
+usages and 23 verification cases: all 39 emitted evidence checks pass, including
+composed geometry and the typed GR-005 source catalog. This checks the authored
+study configuration and its current verification procedures; it does not
+qualify flight behavior or remove the separate geometry, physics, and mission
+data gaps below. The same run still emits five Avian joint-start seating
+errors: three angular residuals of 90° or 180° and two translation residuals
+of 3.44 m. These are unresolved mechanical initialization defects; the
+requirements verdict does not validate their correction.
+
 The source contracts are being aligned with OMG SysML v2.0: formal requirement
 constraints use requirement-owned `require` memberships; verification cases
 place requirement `verify` memberships in `objective` blocks; and a check must
@@ -31,9 +41,9 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 | Area | Current state | Gap / consequence |
 |---|---|---|
 | Requirement meaning | Five Griffin domain packages plus separate subsystem packages; some definitions provide only an informal `doc` statement | The audit's 154 informational findings mean “no formal SysML `require` membership”; they do not say that no Rhai procedure exists or that it ran. The current review resolves verification links for all 183 definitions, but the CLI does not check procedure execution or evidence freshness. Use a formal predicate for finite, measurable acceptance; use a bounded verification procedure/rubric and revision-linked evidence for visual, temporal, process, and documentary acceptance. Do not invent scalar predicates for those cases |
-| Formal constraint ownership | Requirement membership roles are projected as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates required memberships, and checks verification coverage through resolved `verify` links. The Griffin solar verification scenario calls that grouped evaluator for GSA-005, GSA-006, and GSA-009 through the shared requirements adapter | Those three requirements now bind source-owned tolerance and expected-geometry features in standard constraint usages. The shared typed API compiles the effective usage-bound IR and returns the exact dependency paths; source literals and USD measurements enter as typed observation records. Other Griffin verification paths still use name-keyed parameter maps. Defaults, output binding, and full specialization/redefinition traversal remain |
+| Formal constraint ownership | Requirement membership roles are projected as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates required memberships, and checks verification coverage through resolved `verify` links. It retains each usage's resolved formal-parameter handle and typed bound expression. Griffin's shared adapter resolves scalar source-feature bindings against those handles and evaluates the bound constraints | Griffin now exercises usage-bound constraints across solar, ramp, landing-leg, and deck geometry requirements; source literals and composed USD measurements enter as typed feature-path observations. Other verification paths still use name-keyed parameter maps. Defaults, output binding, and full specialization/redefinition traversal remain |
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
-| Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links | Coverage evaluation now compares resolved handles. The Twin status/check catalogs remain authored execution metadata, and `twin.toml`, provider selection, and USD query paths remain configuration. Replace duplicate semantic identity/status catalogs with reports derived from typed requirement, verification, realization, and evidence links |
+| Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links. The GR-005 evidence catalog resolves its typed requirement and source references to typed locators and roles | Coverage evaluation compares resolved handles and GR-005 source provenance is exercised in the runtime verifier. Provider observations still do not share one end-to-end identity across source revision, realization, composed-stage generation, physics sampling, and resulting evidence. Status/check catalogs remain authored execution metadata; derive the requirement matrix from requirement, verification, realization, and evidence links |
 | Units and frames | `lunco-engineering-values` supports dimension-safe conversion from caller-resolved `Unit` values; the constraint IR and observation contracts still carry unit identity as text, while Griffin often relies on SI field-name suffixes | The unit primitive is present but is not wired from SysML unit resolution through IR type checking and provider values. Names and comments do not prevent dimensional mistakes; frame identity and conversion provenance also need typed contracts |
 | Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, exact Mesh/Cube collider points, and a generic NURBS-to-USD-Mesh collision cook exist | No complete semantic part-usage graph binds every source feature to a USD realization. Griffin currently has no authored NURBS patch to cook. The first cook uses explicit deterministic subdivisions, not a geometric error tolerance |
 | Behavioral applicability | Mission order, sampling horizon, route phases, and release are mostly Rhai orchestration | The model cannot yet state and evaluate configuration, mode, phase, or temporal applicability as part of a reusable source-defined verification objective |
@@ -265,11 +275,13 @@ become Griffin's permanent source semantics.
   Twin requirement sources: it found no source diagnostics or policy errors,
   and resolved verification links for all 183 definitions. It reported 29
   definitions with formal `require` constraints and 154 informational
-  text-only findings. The CLI does not execute mapped Rhai verifiers or inspect
-  fresh evidence, and the in-Editor audit action was not run. Standard
-  usage-level feature-value bindings now project through resolved
-  formal-parameter handles; diagnostics for inherited defaults and general
-  binding relationships remain open.
+  text-only findings. Those findings mean no formal `require` membership; they
+  do not imply that no procedure exists. The exact Griffin runtime verifier
+  now executes and checks its evidence, but the CLI still does not run mapped
+  Rhai procedures or assess evidence freshness, and the in-Editor audit action
+  was not run. Standard usage-level feature-value bindings project through
+  resolved formal-parameter handles; diagnostics for inherited defaults and
+  general binding relationships remain open.
 - The generic IR now compiles by exact snapshot-scoped constraint handle and
   evaluates every standard `require` membership on a requirement as one
   four-state result. It can validate the associated verification case through
@@ -284,18 +296,17 @@ become Griffin's permanent source semantics.
   dependencies instead of compiling a reusable definition in isolation.
   `SysmlModel.source_literal_observation(attribute)` emits a source-revision-
   scoped typed feature path and value for resolved scalar literals.
-- The Griffin solar verification scenario uses this path for GSA-005,
-  GSA-006, and GSA-009. Their standard constraint usages bind the tolerance,
-  panel dimensions, and required support overlap from the authored SysML
-  configuration. USD measurements remain provider observations. The shared
-  adapter rejects stale, ambiguous, missing, non-input, and non-scalar
-  dependencies. Other Griffin verification paths still supply name-keyed
-  parameter maps. User-defined predicate calls rebase structured member paths
-  onto resolved feature-valued actuals; that path has compile evidence only.
-  Defaults, output parameters, and broader redefinition traversal remain open.
-  The source audit resolved all 183 verification links with no source
-  diagnostics; parse-only Rhai validation passed. No Editor/runtime execution
-  was made.
+- Griffin's shared requirements adapter uses this path for source-bound
+  constraints across solar, ramp, landing-leg, and deck geometry checks. The
+  exact `luncosim test` run passed all 39 evidence checks against 37 requirement
+  usages and 23 verification cases, including composed geometry measurements
+  and typed GR-005 source provenance. This is runtime verification of the
+  authored study fixture, not an interactive Editor audit or flight
+  qualification. The source audit resolved all 183 verification links with no
+  source diagnostics. Other Griffin checks still use name-keyed parameter maps.
+  User-defined predicate calls rebase structured member paths onto resolved
+  feature-valued actuals; that path has compile evidence only. Defaults, output
+  parameters, and broader redefinition traversal remain open.
 - The opt-in generic requirement audit is implemented and exposed from the
   Griffin requirements tool. Run it explicitly and review findings before
   using its policy as a gate. Text-only requirements are reported separately
@@ -317,9 +328,10 @@ become Griffin's permanent source semantics.
   reads. The remaining gap is binding SysML feature handles to USD targets and
   carrying query/document/stage provenance into each typed observation.
   Griffin's observer still supplies explicit paths and labels frame/unit
-  instead of resolving those from typed contracts. The cooked-geometry query
-  and its Griffin consumer compile, but no fresh Editor execution or
-  post-change geometry readback has been made.
+  instead of resolving those from typed contracts. The exact Griffin runtime
+  verifier now reads composed collider geometry and passes its geometry
+  constraints; interactive Editor preview and joined source/render/collider
+  comparison remain unavailable.
 - `QueryPhysics` already exposes mass, center of mass, principal inertia,
   readiness, support state, and FLIP wheel-ray samples with sample ticks. It
   does not expose general collider-pair manifolds, per-point impulses, full

@@ -56,6 +56,16 @@ package GriffinRequirementSources {
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_requirements.sysml";
     }
 
+    part source_astrobotic_griffin_1_requirements_griffin_assurance_requirements_sysml : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml";
+    }
+
+    part source_lunco_sysml_requirements_tool : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "lunco://scripting/tools/sysml_requirements.rhai";
+    }
+
     part source_astrobotic_griffin_1_requirements_griffin_lander_requirements_sysml : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml";
@@ -709,6 +719,7 @@ package GriffinRequirementSources {
 
     part evidence_gr_005 : RequirementEvidence {
         ref targetRequirement = GriffinAssuranceRequirements::gr005;
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_assurance_requirements_sysml, source_lunco_sysml_requirements_tool);
     }
 
     part evidence_gr_006 : RequirementEvidence {

@@ -3,6 +3,7 @@ package GriffinRampRequirements {
     private import ScalarValues::Integer;
     private import ScalarValues::String;
     private import ScalarValues::Boolean;
+    private import FlipWheelRequirements::FlipDirectionalWheelAssembly;
 
     constraint def GRC005_DeploymentCommandWithinLimit {
         in commandRad : Real;
@@ -300,13 +301,21 @@ package GriffinRampRequirements {
 
     requirement def GRR005_RampBehavior {
         doc /* GRR-005 [behavior] each ramp shall expose a revolute Z hinge, publish its commanded angle in radians, mirror port/starboard signs, and reject commands outside rampMaxDeploymentAngleRad. GRC005_DeploymentCommandWithinLimit owns the signed command-envelope predicate; its 0.872664626 rad study limit converts to the native USD joint's degree-valued limits. */
-        require GRC005_DeploymentCommandWithinLimit;
+        require GRC005_DeploymentCommandWithinLimit {
+            in limitRad = GriffinEgressRamp::rampMaxDeploymentAngleRad;
+        }
     }
 
     requirement def GRR006_RampGeometry {
         doc /* GRR-006 [geometry/physics] each composed physical ramp shall provide two continuous convex-mesh contact tracks whose top-face length and thickness match the SysML study values. Their lateral centres shall equal the source FLIP wheel stations, and their width shall equal the source wheel width plus twice the wheel clearance. The outer toe face shall be mitered from the track thickness and deployed angle so its upper and lower edges meet the terrain plane together. The centre remains open between tracks; rails and support load paths remain separately inspectable. */
-        require GRC016_ContactTrackClearsTire;
-        require GRC017_ComposedContactTrackMatchesSource;
+        require GRC016_ContactTrackClearsTire {
+            in trackWidthM = GriffinEgressRamp::assemblyTrackWidthM;
+            in wheelWidthM = FlipDirectionalWheelAssembly::tireWidthM;
+            in wheelClearanceM = GriffinEgressRamp::rampWheelClearanceM;
+        }
+        require GRC017_ComposedContactTrackMatchesSource {
+            in toleranceM = GriffinEgressRamp::contactTrackGeometryToleranceM;
+        }
     }
 
     requirement def GRR007_RampEvidence {

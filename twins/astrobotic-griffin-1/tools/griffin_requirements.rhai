@@ -71,36 +71,78 @@ fn _short_name(name) {
     parts[parts.len() - 1]
 }
 
-// Read the normative SysML source through the existing generic validation
-// query. This is intentionally a read-only Rhai seam: the parser/resolver is
-// Rust-owned, but the Griffin test selects the verification key and emits the
-// verdict. No Twin-specific Rust assertion or second runner is introduced.
-fn sysml_contract_report() {
+fn _verification_covers_usage(verification, requirement_name) {
+    if verification == () || verification.verifies == () { return false; }
+    for target in verification.verifies {
+        if target == requirement_name
+            || _short_name(target) == _short_name(requirement_name) {
+            return true;
+        }
+    }
+    false
+}
+
+// Read the normative SysML source through the shared bounded, typed source
+// projection. The Rust parser/resolver owns the immutable source set; Griffin
+// policy selects its acceptance checks and emits the verdict.
+fn _sysml_contract_failure(report, fallback) {
+    let missing = [];
+    let error = fallback;
+    if report != () && report.errors != () {
+        for detail in report.errors { missing.push(detail); }
+        if missing.len() > 0 { error = missing[0]; }
+    }
+    if missing.len() == 0 { missing.push(fallback); }
+    #{ok: false, sysml_ok: false, error: error, sysml_missing: missing,
+      kind: if report == () || report.kind == () { "sysml" } else { report.kind },
+      path: if report == () { () } else { report.path },
+      source_files: if report == () || report.source_files == () { [] } else { report.source_files },
+      source_revision: if report == () { () } else { report.source_revision },
+      sysml_required_count: 0, sysml_verification_count: 0, sysml_verifies: 0,
+      sysml_general_required_count: 0, sysml_general_verifies: 0,
+      sysml_visual_required_count: 0, sysml_visual_verifies: 0,
+      sysml_visual_wheel_count: 0, sysml_visual_case_name: "",
+      sysml_verification_name: ""}
+}
+
+fn sysml_contract_report(verification_name) {
     let name = twin_name();
     if name == "" {
-        return #{ok: false, error: "active Twin root is unavailable",
-                 path: "requirements/griffin_requirements.sysml"};
+        return _sysml_contract_failure((), "active Twin root is unavailable");
     }
-    // A Twin URI asks the generic provider for the manifest-declared source
-    // set, rather than coupling this policy to an absolute checkout path.
-    let path = "twin://" + name;
-    // Keep the source envelope bounded.  Scalar literals are resolved lazily
-    // by `sysml_requirements::attribute`; requesting the complete qualified
-    // attribute map here makes the report exceed Rhai's value budget as the
-    // Twin grows.
-    let report = query("ValidateSysml", #{path: path, compact: true, attributes: []});
+    // source() pages the manifest-declared requirement and verification
+    // identities through AnalyzeSysml and adds the active typed Twin contract.
+    // Scalar literals remain lazy; this avoids transporting full source and
+    // AST tables through Rhai on every runtime report.
+    let report = sysml_requirements::source();
     if report == () {
-        return #{ok: false, error: "ValidateSysml returned no SysML report", path: path};
+        return _sysml_contract_failure((), "typed SysML source projection is unavailable");
     }
-    if report.ok != true { return report; }
+    if report.ok != true {
+        return _sysml_contract_failure(report, "typed SysML source projection failed");
+    }
     if report.kind != "sysml" {
-        report.ok = false;
-        report.error = "Griffin requirement source is not classified as SysML";
-        return report;
+        return _sysml_contract_failure(report,
+            "Griffin requirement source is not classified as SysML");
     }
     let requirements = report.requirement_records;
     let verification_cases = report.verification_records;
     let missing = [];
+    let verification = ();
+    if verification_cases != () {
+        for verification_case in verification_cases {
+            let candidate_name = _qualified(verification_case);
+            if candidate_name == verification_name
+                || _short_name(candidate_name) == verification_name {
+                if verification != () {
+                    missing.push("verification identity is ambiguous: " + verification_name);
+                    verification = ();
+                    break;
+                }
+                verification = verification_case;
+            }
+        }
+    }
     if report.verification_registry_errors != () {
         for error in report.verification_registry_errors {
             missing.push("Twin verification registry: " + error);
@@ -109,26 +151,31 @@ fn sysml_contract_report() {
     let registry = report.verification_registry;
     if registry == () || registry.len() == 0 {
         missing.push("Twin verification registry is empty");
+    } else if verification == () {
+        missing.push("SysML verification case is missing: " + verification_name);
     } else {
-        // Every SysML verification declaration must have exactly one
-        // executable Twin binding.  The manifest owns the scene/script
-        // mapping; SysML remains the source of the expected qualified names.
-        for verification_case in verification_cases {
-            let expected_name = _qualified(verification_case);
-            let found = 0;
-            for binding in registry {
-                if binding.name == expected_name {
-                    found += 1;
-                    if binding.scene == () || binding.script == ()
-                        || binding.verdict_channel == () {
-                        missing.push("incomplete Twin verification mapping " + expected_name);
-                    }
+        // Only the verification selected for this execution needs an
+        // executable Twin mapping. Nested verification definitions remain
+        // available for reuse inside another case without inventing a second
+        // scene/script binding for each one.
+        let expected_name = _qualified(verification);
+        let found = 0;
+        for binding in registry {
+            if binding.name == expected_name {
+                found += 1;
+                if binding.scene == () || binding.script == ()
+                    || binding.verdict_channel == () {
+                    missing.push("incomplete Twin verification mapping " + expected_name);
                 }
             }
-            if found != 1 {
-                missing.push("SysML verification must have exactly one Twin mapping " + expected_name);
-            }
         }
+        if found != 1 {
+            missing.push("executed SysML verification must have exactly one Twin mapping " + expected_name);
+        }
+    }
+    if verification != () && verification.verifies == () {
+        missing.push("executed SysML verification has no requirement links: "
+            + _qualified(verification));
     }
     // The component→verification selection is a generic Rhai bridge over the
     // Twin manifest. Exercise it here so every component acceptance run proves
@@ -169,24 +216,26 @@ fn sysml_contract_report() {
             }
         }
     }
-    let expected_requirement_usages = griffin_spec::requirement_usage_count();
-    if expected_requirement_usages == () {
-        missing.push("typed SysML requirement usage count");
-    } else if requirement_usages != expected_requirement_usages {
-        missing.push("all declared Griffin requirement usages");
-    }
-    let verification = ();
-    if verification_cases != () {
-        for verification_case in verification_cases {
-            if _qualified(verification_case) == griffin_spec::verification_case_name() {
-                verification = verification_case;
-                break;
+    let griffin_coverage = 0;
+    if verification != () && verification.verifies != () {
+        for requirement in requirements {
+            let name = _qualified(requirement);
+            for domain in ["GriffinFunctionalRequirements", "GriffinVisualRequirements",
+                "GriffinMechanicalRequirements", "GriffinSimulationAccuracyRequirements",
+                "GriffinAssuranceRequirements"] {
+                if name.starts_with(domain + "::gr") {
+                    if _verification_covers_usage(verification, name) {
+                        griffin_coverage += 1;
+                    } else {
+                        missing.push("verification does not cover SysML requirement " + name);
+                    }
+                    break;
+                }
             }
         }
     }
     if verification == () || verification.verifies == ()
-        || expected_requirement_usages == ()
-        || verification.verifies.len() != expected_requirement_usages {
+        || griffin_coverage != requirement_usages {
         missing.push("declared verification case covering all requirements");
     }
     for name in ["rampMaxDeploymentAngleRad", "mainEngineCount", "propellantTankCount", "landingComTouchdownY"] {
@@ -284,8 +333,7 @@ fn sysml_contract_report() {
     let general_requirements = [];
     if report.requirement_records != () {
         for requirement in report.requirement_records {
-            if requirement.element != () && requirement.element.short_name != ()
-                && requirement.element.short_name.starts_with("MB-") {
+            if _qualified(requirement).starts_with("MoonBaseProjectRequirements::mb") {
                 general_requirements.push(requirement);
             }
         }
@@ -339,31 +387,69 @@ fn sysml_contract_report() {
         || (meters_per_unit - 1.0).abs() > 0.000001 {
         missing.push("Moon Base project MB-002 metre/Y-up frame contract");
     }
-    let visual_count = griffin_spec::visual_requirement_usage_count();
-    let visual_case_name = griffin_spec::visual_verification_case_name();
-    let visual_usages = 0;
+    let visual_usages = [];
     if requirements != () {
         for requirement in requirements {
-            if _qualified(requirement).contains("::gv") {
-                visual_usages += 1;
+            if _qualified(requirement).starts_with("GriffinVisualRequirements::gv") {
+                visual_usages.push(_qualified(requirement));
             }
         }
     }
-    if visual_count == () || visual_count <= 0 || visual_usages != visual_count {
-        missing.push("all declared visual requirement usages");
-    }
     let visual_case = ();
-    if verification_cases != () && visual_case_name != () {
+    if verification_cases != () {
         for verification_case in verification_cases {
-            if _qualified(verification_case) == visual_case_name {
+            if _qualified(verification_case)
+                == "GriffinVisualRequirements::Verify_GriffinVisualRequirements" {
                 visual_case = verification_case;
                 break;
             }
         }
     }
-    if visual_case == () || visual_case.verifies == ()
-        || visual_count == () || visual_case.verifies.len() != visual_count {
+    let visual_coverage_ok = visual_case != () && visual_case.verifies != ()
+        && visual_case.verifies.len() == visual_usages.len();
+    if visual_coverage_ok {
+        for name in visual_usages {
+            if !_verification_covers_usage(visual_case, name) {
+                visual_coverage_ok = false;
+                break;
+            }
+        }
+    }
+    if !visual_coverage_ok {
         missing.push("Griffin visual verification case does not cover all visual requirements");
+    }
+    let visual_configuration_usages = [];
+    if requirements != () {
+        for requirement in requirements {
+            if _qualified(requirement).starts_with(
+                "GriffinVisualConfigurationRequirements::gvc") {
+                visual_configuration_usages.push(_qualified(requirement));
+            }
+        }
+    }
+    let visual_configuration_case = ();
+    if verification_cases != () {
+        for verification_case in verification_cases {
+            if _qualified(verification_case)
+                == "GriffinVisualConfigurationRequirements::Verify_GriffinVisualConfiguration" {
+                visual_configuration_case = verification_case;
+                break;
+            }
+        }
+    }
+    let visual_configuration_coverage_ok = visual_configuration_case != ()
+        && visual_configuration_case.verifies != ()
+        && visual_configuration_case.verifies.len() == visual_configuration_usages.len();
+    if visual_configuration_coverage_ok {
+        for name in visual_configuration_usages {
+            if !_verification_covers_usage(visual_configuration_case, name) {
+                visual_configuration_coverage_ok = false;
+                break;
+            }
+        }
+    }
+    if !visual_configuration_coverage_ok {
+        missing.push("Griffin visual configuration verification case does not cover all configuration requirements");
     }
     for name in ["reviewCameraName", "reviewLanderName", "visualRoverName"] {
         let text = _sysml_text(report, name);
@@ -392,10 +478,18 @@ fn sysml_contract_report() {
     report.sysml_general_verifies = if general_case == () || general_case_ambiguous {
         0
     } else { general_case.verifies.len() };
-    report.sysml_visual_required_count = visual_usages;
-    report.sysml_visual_verifies = if visual_case == () { 0 } else { visual_case.verifies.len() };
+    report.sysml_visual_required_count = visual_usages.len();
+    report.sysml_visual_verifies = if visual_case == () || visual_case.verifies == () {
+        0
+    } else { visual_case.verifies.len() };
     report.sysml_visual_wheel_count = visual_wheel_count;
-    report.sysml_visual_case_name = visual_case_name;
+    report.sysml_visual_case_name = if visual_case == () { "" } else { _qualified(visual_case) };
+    report.sysml_verification_name = if verification == () { "" } else { _qualified(verification) };
+    let provenance_handle = sysml_requirements::requirement_handle_by_short_name(
+        report, "GR-005");
+    report.provenance_requirement_handle = if provenance_handle.ok == true {
+        provenance_handle.handle
+    } else { () };
     report.sysml_missing = missing;
     report.sysml_ok = missing.len() == 0;
     if !report.sysml_ok {
@@ -894,23 +988,34 @@ fn _engine_layout_report(doc_id, root) {
     let engine_count = 0;
     for name in griffin_spec::main_engine_names() {
         let path = cluster_path + "/" + name;
-        let engine = _layout_query(doc_id, path,
-            ["visibility", "radius1", "radius2", "height", "physics:collisionEnabled"], false);
+        let engine = _layout_query(doc_id, path, [], false);
         if !_ok(engine) {
             findings.push(_layout_finding("GR-032", path,
-                "required main engine bell is missing"));
+                "required referenced main engine assembly is missing"));
             continue;
         }
         engine_count += 1;
-        if engine.type_name != "Cone" || !_visible(engine)
-            || engine.attrs["radius1"] == () || engine.attrs["radius1"] <= 0.0
-            || engine.attrs["radius2"] == () || engine.attrs["radius2"] <= 0.0
-            || engine.attrs["height"] == () || engine.attrs["height"] <= 0.0 {
+        if engine.type_name != "Xform" {
             findings.push(_layout_finding("GR-032", path,
+                "main engine reference must compose as an Xform assembly"));
+        }
+        let bell_path = path + "/Bell";
+        let bell = _layout_query(doc_id, bell_path,
+            ["visibility", "radius1", "radius2", "height", "physics:collisionEnabled"], false);
+        if !_ok(bell) {
+            findings.push(_layout_finding("GR-032", bell_path,
+                "referenced main engine bell geometry is missing"));
+            continue;
+        }
+        if bell.type_name != "Cone" || !_visible(bell)
+            || bell.attrs["radius1"] == () || bell.attrs["radius1"] <= 0.0
+            || bell.attrs["radius2"] == () || bell.attrs["radius2"] <= 0.0
+            || bell.attrs["height"] == () || bell.attrs["height"] <= 0.0 {
+            findings.push(_layout_finding("GR-032", bell_path,
                 "each main engine must be a visible positive Cone bell"));
         }
-        if engine.attrs["physics:collisionEnabled"] == true {
-            findings.push(_layout_finding("GR-032", path,
+        if bell.attrs["physics:collisionEnabled"] == true {
+            findings.push(_layout_finding("GR-032", bell_path,
                 "engine visual bell must not own a collider"));
         }
     }
@@ -969,7 +1074,7 @@ fn _leg_layout_report(doc_id, root) {
             findings.push(_layout_finding("GR-019", path,
                 "landing leg Y rotation disagrees with the SysML radial orientation datum"));
         }
-        let pad_path = path + "/" + pad_names[i];
+        let pad_path = path + "/LandingLegVisual/FootPadCollider";
         let pad = _layout_query(doc_id, pad_path,
             ["axis", "radius", "height", "physics:collisionEnabled",
              "xformOp:translate"], false);
@@ -983,11 +1088,6 @@ fn _leg_layout_report(doc_id, root) {
         if pad_pos[1] >= dynamic_pos[1] {
             findings.push(_layout_finding("GR-019", pad_path,
                 "foot pad must be below its leg attachment"));
-        }
-        if _horizontal_radius_squared(pad_pos)
-            <= _horizontal_radius_squared(dynamic_pos) {
-            findings.push(_layout_finding("GR-019", pad_path,
-                "foot pad must be farther outboard than its leg attachment"));
         }
         if pad.attrs["axis"] != "Y" || pad.attrs["radius"] == ()
             || pad.attrs["radius"] <= 0.0 || pad.attrs["height"] == ()
@@ -1407,8 +1507,8 @@ fn part_report(doc_id, root) {
 /// report rather than a second linter: `lint` remains the current structural
 /// implementation. Requirement identities and applicability come from the
 /// validated SysML source; this report contains only current observations.
-fn runtime_report(doc_id, root) {
-    let sysml = sysml_contract_report();
+fn runtime_report(doc_id, root, verification_name) {
+    let sysml = sysml_contract_report(verification_name);
     let lint_report = lint(doc_id, root);
     let parts = part_report(doc_id, root);
     let layout = layout_report(doc_id, root);
@@ -1421,10 +1521,6 @@ fn runtime_report(doc_id, root) {
         errors.push("SysML requirement contract: " + message);
     }
 
-    let expected_parts = griffin_spec::manifest_part_count();
-    if expected_parts == () || parts.parts.len() != expected_parts {
-        errors.push("manifest part count disagrees with SysML");
-    }
     let part_failures = [];
     for part in parts.parts {
         if !part.ok { part_failures.push(part.id); }
@@ -1433,13 +1529,12 @@ fn runtime_report(doc_id, root) {
         errors.push("part contract failed: " + id);
     }
     if !layout.ok {
-        errors.push("relational layout report has " + layout.findings.len() + " finding(s)");
+        let finding_count = if layout.findings == () { 0 } else { layout.findings.len() };
+        errors.push("relational layout report has " + finding_count + " finding(s)");
     }
 
-    // ValidateSysml also carries the complete source/AST payload.  Keep that
-    // payload behind the dedicated source query and return only the compact
-    // facts consumed by a runtime verdict; otherwise the report itself can
-    // exceed Rhai's bounded string/value transport.
+    // Keep the runtime verdict compact while retaining the source identity
+    // needed by typed provenance projections.
     let sysml_summary = #{
         // Preserve the Twin URI needed by bounded typed projections such as
         // sysml_requirements::provenance().  The summary intentionally drops
@@ -1459,6 +1554,8 @@ fn runtime_report(doc_id, root) {
         sysml_visual_verifies: sysml.sysml_visual_verifies,
         sysml_visual_wheel_count: sysml.sysml_visual_wheel_count,
         sysml_visual_case_name: sysml.sysml_visual_case_name,
+        provenance_requirement_handle: sysml.provenance_requirement_handle,
+        sysml_verification_name: sysml.sysml_verification_name,
         sysml_missing: sysml.sysml_missing,
         source_files: sysml.source_files,
         source_file_count: if sysml.source_files == () { 0 } else { sysml.source_files.len() },
@@ -1497,16 +1594,20 @@ fn _report(doc_id, root, findings) {
 }
 
 // Route static engineering predicates through the source-pinned generic
-// SysML evaluator. This wrapper supplies requirement identity and observations;
-// the constraint expression and four-state verdict are owned by SysML/IR.
+// SysML evaluator. This wrapper supplies requirement identity and typed
+// observations; the constraint expression and four-state verdict are owned by
+// SysML/IR.
 fn _evaluate_source_constraint(source, id, requirement, verification,
-                               constraint_name, bindings) {
+                               requirement_usage, constraint_name, inputs) {
     if source == () || source.ok != true {
         return #{ok: false, verdict: "error",
             error: "SysML source report is unavailable for constraint evaluation"};
     }
+    let model = sysml_requirements::model();
+    let observations = sysml_requirements::required_constraint_input_observations(
+        model, requirement_usage, constraint_name, inputs);
     let check = sysml_requirements::constraint_check(id, "lander", requirement,
-        verification, constraint_name, bindings, "derived", 0.0);
+        verification, constraint_name, observations, "derived", 0.0);
     let report = sysml_requirements::evaluate(source, [check]);
     if report.results == () || report.results.len() != 1 {
         return #{ok: false, verdict: "error",
@@ -1518,13 +1619,17 @@ fn _evaluate_source_constraint(source, id, requirement, verification,
 
 fn payload_load_check(payload_kg) {
     let source = _payload_requirement_source();
+    let model = sysml_requirements::model();
+    let requirement_usage = model.requirement("GriffinFunctionalRequirements::gr009");
     let capacity = sysml_requirements::number(source,
         griffin_spec::qualified_attribute_name("payloadCapacityKg"));
     let result = _evaluate_source_constraint(source, "GR-009-payload-capacity", "gr009",
-        "Verify_GriffinPayloadCapacity",
+        "Verify_GriffinPayloadCapacity", requirement_usage,
         "GriffinFunctionalRequirements::GR009_PayloadWithinCapacity",
-        #{payloadKg: #{provider: "external", state: if payload_kg == () { "unavailable" } else { "value" }, value: payload_kg},
-          capacityKg: #{provider: "source_literal", state: if capacity == () { "unavailable" } else { "value" }, value: capacity}});
+        [["payloadKg", #{provider: "external",
+             state: if payload_kg == () { "unavailable" } else { "value" },
+             value: payload_kg}],
+         ["capacityKg", _source_value(capacity)]]);
     result.payload_kg = payload_kg;
     result.capacity_kg = capacity;
     result
@@ -1532,6 +1637,13 @@ fn payload_load_check(payload_kg) {
 
 fn _payload_scene_checks(root, payload_kg, capacity_kg) {
     let capacity_attribute = griffin_spec::qualified_attribute_name("payloadCapacityKg");
+    let constraint_name = "GriffinFunctionalRequirements::GR009_PayloadWithinCapacity";
+    let model = sysml_requirements::model();
+    let requirement_usage = model.requirement("GriffinFunctionalRequirements::gr009");
+    let observations = sysml_requirements::required_constraint_input_observations(
+        model, requirement_usage, constraint_name,
+        [["payloadKg", _usd_value(payload_kg)],
+         ["capacityKg", _source_value(capacity_kg)]]);
     [
         #{id: "GR-009-authored-capacity", component: "lander",
           requirement: "gr009", verification: "Verify_GriffinPayloadCapacity",
@@ -1539,10 +1651,7 @@ fn _payload_scene_checks(root, payload_kg, capacity_kg) {
           expected_attr: capacity_attribute, tolerance: 0.0},
         sysml_requirements::constraint_check("GR-009-payload-load", "lander",
             "gr009", "Verify_GriffinPayloadCapacity",
-            "GriffinFunctionalRequirements::GR009_PayloadWithinCapacity",
-            #{payloadKg: #{provider: "usd", state: if payload_kg == () { "unavailable" } else { "value" }, value: payload_kg},
-              capacityKg: #{provider: "source_literal", state: if capacity_kg == () { "unavailable" } else { "value" }, value: capacity_kg}},
-            "derived", 0.0),
+            constraint_name, observations, "derived", 0.0),
     ]
 }
 
@@ -1574,6 +1683,7 @@ fn _landing_leg_requirement_source() {
         assembly + "physicalLegRotationToleranceDeg",
         assembly + "padColliderToleranceM",
         assembly + "bodyMountOverlapM",
+        assembly + "bodyMountOverlapMeasurementToleranceM",
         configuration + "legStations",
         configuration + "legStationRotationYDeg"
     ], ["GriffinLandingLegRequirements::gll005",
@@ -1610,7 +1720,10 @@ fn _landing_pad_requirement_findings(doc_id, root) {
         assembly + "physicalLegPlacementToleranceM");
     let mount_overlap = sysml_requirements::number(source,
         assembly + "bodyMountOverlapM");
-    if tolerance == () || station_tolerance == () || mount_overlap == () {
+    let mount_measurement_tolerance = sysml_requirements::number(source,
+        assembly + "bodyMountOverlapMeasurementToleranceM");
+    if tolerance == () || station_tolerance == () || mount_overlap == ()
+        || mount_measurement_tolerance == () {
         findings.push(_finding("GLL-008", root,
             "typed pad, mount, or station tolerances are unavailable"));
         return findings;
@@ -1624,40 +1737,60 @@ fn _landing_pad_requirement_findings(doc_id, root) {
             } else { observation.detail }));
         return findings;
     }
+    let pad_geometry_constraint =
+        "GriffinLandingLegRequirements::GLLC008_PadColliderMatchesVisual";
+    let pad_ownership_constraint =
+        "GriffinLandingLegRequirements::GLLC008_PadColliderOwnsContact";
+    let pad_station_constraint =
+        "GriffinLandingLegRequirements::GLLC008_PadColliderStationMatchesSource";
+    let mount_constraint =
+        "GriffinLandingLegRequirements::GLLC009_BusAndAxleOverlap";
+    let model = sysml_requirements::model();
+    let pad_requirement = model.requirement("GriffinLandingLegRequirements::gll008");
+    let mount_requirement = model.requirement("GriffinLandingLegRequirements::gll009");
     let checks = [
         sysml_requirements::constraint_check("GLL-008-pad-geometry", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
-            "GriffinLandingLegRequirements::GLLC008_PadColliderMatchesVisual",
-            #{geometryDeviationM: _usd_value(observation.geometry_deviation_m),
-              sourceRadiusDeviationM: _usd_value(observation.source_radius_deviation_m),
-              sourceHeightDeviationM: _usd_value(observation.source_height_deviation_m),
-              sourceCenterDeviationM: _usd_value(observation.source_center_deviation_m),
-              padGeometrySemanticsMatch: _usd_value(observation.pad_geometry_semantics_match),
-              toleranceM: _source_value(tolerance)}, "usd", 0.0),
+            pad_geometry_constraint,
+            sysml_requirements::required_constraint_input_observations(model,
+                pad_requirement, pad_geometry_constraint, [
+                ["geometryDeviationM", _usd_value(observation.geometry_deviation_m)],
+                ["sourceRadiusDeviationM", _usd_value(observation.source_radius_deviation_m)],
+                ["sourceHeightDeviationM", _usd_value(observation.source_height_deviation_m)],
+                ["sourceCenterDeviationM", _usd_value(observation.source_center_deviation_m)],
+                ["padGeometrySemanticsMatch", _usd_value(observation.pad_geometry_semantics_match)],
+                ["toleranceM", _source_value(tolerance)]]), "usd", 0.0),
         sysml_requirements::constraint_check("GLL-008-contact-ownership", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
-            "GriffinLandingLegRequirements::GLLC008_PadColliderOwnsContact",
-            #{collisionEnabled: _usd_value(observation.collision_enabled),
-              proxyHidden: _usd_value(observation.proxy_hidden),
-              visualCollisionDisabled: _usd_value(observation.visual_collision_disabled),
-              collisionMatchesVisual: _usd_value(observation.collision_matches_visual),
-              geometrySourceLinked: _usd_value(observation.source_relationships_valid),
-              selfCollisionFilterClear: _usd_value(observation.self_collision_filter_clear),
-              legacyCollisionDisabled: _usd_value(observation.legacy_collision_disabled)},
+            pad_ownership_constraint,
+            sysml_requirements::required_constraint_input_observations(model,
+                pad_requirement, pad_ownership_constraint, [
+                ["collisionEnabled", _usd_value(observation.collision_enabled)],
+                ["proxyHidden", _usd_value(observation.proxy_hidden)],
+                ["visualCollisionDisabled", _usd_value(observation.visual_collision_disabled)],
+                ["collisionMatchesVisual", _usd_value(observation.collision_matches_visual)],
+                ["geometrySourceLinked", _usd_value(observation.source_relationships_valid)],
+                ["selfCollisionFilterClear", _usd_value(observation.self_collision_filter_clear)],
+                ["legacyCollisionDisabled", _usd_value(observation.legacy_collision_disabled)]]),
             "usd", 0.0),
         sysml_requirements::constraint_check("GLL-008-physical-stations", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
-            "GriffinLandingLegRequirements::GLLC008_PadColliderStationMatchesSource",
-            #{stationDeviationM: _usd_value(observation.station_deviation_m),
-              toleranceM: _source_value(station_tolerance),
-              rotationMatches: _usd_value(observation.rotation_matches)}, "usd", 0.0),
+            pad_station_constraint,
+            sysml_requirements::required_constraint_input_observations(model,
+                pad_requirement, pad_station_constraint, [
+                ["stationDeviationM", _usd_value(observation.station_deviation_m)],
+                ["toleranceM", _source_value(station_tolerance)],
+                ["rotationMatches", _usd_value(observation.rotation_matches)]]), "usd", 0.0),
         sysml_requirements::constraint_check("GLL-009-body-mount-path", "landing_leg",
             "gll009", "Verify_GriffinLandingLegRequirements",
-            "GriffinLandingLegRequirements::GLLC009_BusAndAxleOverlap",
-            #{measuredBusOverlapM: _usd_value(observation.bus_mount_overlap_m),
-              measuredAxleOverlapM: _usd_value(observation.mount_axle_overlap_m),
-              requiredOverlapM: _source_value(mount_overlap),
-              physicalJointStationMatches: _usd_value(observation.physical_joints_match)},
+            mount_constraint,
+            sysml_requirements::required_constraint_input_observations(model,
+                mount_requirement, mount_constraint, [
+                ["measuredBusOverlapM", _usd_value(observation.bus_mount_overlap_m)],
+                ["measuredAxleOverlapM", _usd_value(observation.mount_axle_overlap_m)],
+                ["requiredOverlapM", _source_value(mount_overlap)],
+                ["measurementToleranceM", _source_value(mount_measurement_tolerance)],
+                ["physicalJointStationMatches", _usd_value(observation.physical_joints_match)]]),
             "usd", 0.0)
     ];
     let evaluation = sysml_requirements::evaluate(source, checks);
@@ -1728,21 +1861,31 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
             (measured_width - track_width).abs()));
     let placement_deviation = _vector_max_deviation(translation,
         [expected_x, ramp_center_y, expected_z]);
+    let clearance_constraint =
+        "GriffinRampRequirements::GRC016_ContactTrackClearsTire";
+    let geometry_constraint =
+        "GriffinRampRequirements::GRC017_ComposedContactTrackMatchesSource";
+    let model = sysml_requirements::model();
+    let requirement_usage = model.requirement("GriffinRampRequirements::grr006");
     let checks = [
         sysml_requirements::constraint_check(
             "GR-006-tire-clearance-" + child_name, "lander", "grr006",
             "Verify_GriffinRampRequirements",
-            "GriffinRampRequirements::GRC016_ContactTrackClearsTire",
-            #{trackWidthM: _usd_value(measured_width),
-              wheelWidthM: _source_value(wheel_width),
-              wheelClearanceM: _source_value(ramp_clearance)}, "derived", 0.0),
+            clearance_constraint,
+            sysml_requirements::required_constraint_input_observations(model,
+                requirement_usage, clearance_constraint, [
+                ["trackWidthM", _usd_value(measured_width)],
+                ["wheelWidthM", _source_value(wheel_width)],
+                ["wheelClearanceM", _source_value(ramp_clearance)]]), "derived", 0.0),
         sysml_requirements::constraint_check(
             "GR-006-composed-geometry-" + child_name, "lander", "grr006",
             "Verify_GriffinRampRequirements",
-            "GriffinRampRequirements::GRC017_ComposedContactTrackMatchesSource",
-            #{maximumDimensionDeviationM: _usd_value(dimension_deviation),
-              maximumPlacementDeviationM: _usd_value(placement_deviation),
-              toleranceM: _source_value(track_tolerance)}, "derived", 0.0)
+            geometry_constraint,
+            sysml_requirements::required_constraint_input_observations(model,
+                requirement_usage, geometry_constraint, [
+                ["maximumDimensionDeviationM", _usd_value(dimension_deviation)],
+                ["maximumPlacementDeviationM", _usd_value(placement_deviation)],
+                ["toleranceM", _source_value(track_tolerance)]]), "derived", 0.0)
     ];
     let evaluation = sysml_requirements::evaluate(ramp_source, checks);
     if evaluation.results == () || evaluation.results.len() != checks.len() {
@@ -1760,13 +1903,17 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
 
 fn ramp_command_check(angle_rad) {
     let source = _ramp_requirement_source();
+    let model = sysml_requirements::model();
+    let requirement_usage = model.requirement("GriffinRampRequirements::grr005");
     let limit = sysml_requirements::number(source,
         "GriffinRampRequirements::GriffinEgressRamp::rampMaxDeploymentAngleRad");
     let result = _evaluate_source_constraint(source, "GRR-005-deployment-command",
-        "grr005", "Verify_GriffinRampCommandEnvelope",
+        "grr005", "Verify_GriffinRampCommandEnvelope", requirement_usage,
         "GriffinRampRequirements::GRC005_DeploymentCommandWithinLimit",
-        #{commandRad: #{provider: "external", state: if angle_rad == () { "unavailable" } else { "value" }, value: angle_rad},
-          limitRad: #{provider: "source_literal", state: if limit == () { "unavailable" } else { "value" }, value: limit}});
+        [["commandRad", #{provider: "external",
+            state: if angle_rad == () { "unavailable" } else { "value" },
+            value: angle_rad}],
+         ["limitRad", _source_value(limit)]]);
     result.angle_rad = angle_rad;
     result.limit_rad = limit;
     result

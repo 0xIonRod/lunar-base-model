@@ -33,7 +33,9 @@ package GriffinFunctionalRequirements {
 
     requirement def GR009_PayloadCapacity {
         doc /* GR-009 [public product value] Griffin payload capacity is 625 kg; accept loads from zero through the stated boundary and reject negative or over-capacity loads. The reusable GR009_PayloadWithinCapacity SysML constraint owns the predicate; provider observations and evidence are supplied by the generic SysML requirements evaluator. Rationale: the public product datum is the only authoritative capacity available to this Twin. */
-        require GR009_PayloadWithinCapacity;
+        require GR009_PayloadWithinCapacity {
+            in capacityKg = Griffin1Lander::payloadCapacityKg;
+        }
     }
 
     constraint def GR009_PayloadWithinCapacity {
