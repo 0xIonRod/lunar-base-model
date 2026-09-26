@@ -30,8 +30,8 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 
 | Area | Current state | Gap / consequence |
 |---|---|---|
-| Requirement meaning | Five Griffin domain packages plus separate subsystem packages; some definitions provide only an informal `doc` statement | The audit's 154 informational findings mean “no formal SysML `require` membership”; they do not say that no Rhai procedure exists or that it ran. Each definition still needs an appropriate acceptance method and revision-linked evidence. Temporal behavior and evidence/process requirements should use executable scenarios or evidence review, not artificial scalar predicates |
-| Formal constraint ownership | Requirement membership roles are projected as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates required memberships, and checks verification coverage through resolved `verify` links. The Griffin solar verification scenario calls that grouped evaluator for GSA-005, GSA-006, and GSA-009 through the shared requirements adapter | Those three solar checks now supply observations by snapshot-scoped SysML feature paths resolved from the constraint inputs; the evaluator receives typed observation records rather than a string-keyed parameter map. Griffin does not yet author source actual-argument bindings for these predicates, and other verification paths still use name-keyed input maps. Defaults, output binding, and full specialization/redefinition traversal remain |
+| Requirement meaning | Five Griffin domain packages plus separate subsystem packages; some definitions provide only an informal `doc` statement | The audit's 154 informational findings mean “no formal SysML `require` membership”; they do not say that no Rhai procedure exists or that it ran. The current review resolves verification links for all 183 definitions, but the CLI does not check procedure execution or evidence freshness. Use a formal predicate for finite, measurable acceptance; use a bounded verification procedure/rubric and revision-linked evidence for visual, temporal, process, and documentary acceptance. Do not invent scalar predicates for those cases |
+| Formal constraint ownership | Requirement membership roles are projected as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates required memberships, and checks verification coverage through resolved `verify` links. The Griffin solar verification scenario calls that grouped evaluator for GSA-005, GSA-006, and GSA-009 through the shared requirements adapter | Those three requirements now bind source-owned tolerance and expected-geometry features in standard constraint usages. The shared typed API compiles the effective usage-bound IR and returns the exact dependency paths; source literals and USD measurements enter as typed observation records. Other Griffin verification paths still use name-keyed parameter maps. Defaults, output binding, and full specialization/redefinition traversal remain |
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links | Coverage evaluation now compares resolved handles. The Twin status/check catalogs remain authored execution metadata, and `twin.toml`, provider selection, and USD query paths remain configuration. Replace duplicate semantic identity/status catalogs with reports derived from typed requirement, verification, realization, and evidence links |
 | Units and frames | `lunco-engineering-values` supports dimension-safe conversion from caller-resolved `Unit` values; the constraint IR and observation contracts still carry unit identity as text, while Griffin often relies on SI field-name suffixes | The unit primitive is present but is not wired from SysML unit resolution through IR type checking and provider values. Names and comments do not prevent dimensional mistakes; frame identity and conversion provenance also need typed contracts |
@@ -269,19 +269,25 @@ become Griffin's permanent source semantics.
   predicates. The Rhai `SysmlModel.evaluate_requirement` boundary accepts the
   typed requirement and verification objects plus typed feature-path
   observations.
-- The existing Griffin solar verification scenario calls the grouped
-  evaluator through `sysml_requirements::required_constraints_check` for
-  GSA-005, GSA-006, and GSA-009. These checks now resolve each scalar input to
-  its snapshot-scoped SysML feature path and submit typed observation records;
-  the helper rejects ambiguous, missing, non-input, and non-scalar dependencies.
-  Other Griffin verification paths still supply name-keyed parameter maps.
-  The generic AST/IR path also projects standard feature-value bindings and
-  substitutes supported scalar and feature-path expressions, but Griffin's
-  current requirement usages do not yet author source actual-argument bindings.
-  User-defined predicate calls rebase structured member paths onto resolved
-  feature-valued actuals; that path has compile evidence only. Defaults, output
-  parameters, and broader redefinition traversal remain open. The changed
-  solar scripts passed parse-only validation; no Editor/runtime run was made.
+- The generic IR now exposes `compile_required_constraints` and the Rhai
+  `SysmlModel.required_constraint_irs(requirement)` method. Both the provider
+  and evaluator use the same requirement membership selection and apply the
+  same standard usage bindings, so a provider can inspect the exact effective
+  dependencies instead of compiling a reusable definition in isolation.
+  `SysmlModel.source_literal_observation(attribute)` emits a source-revision-
+  scoped typed feature path and value for resolved scalar literals.
+- The Griffin solar verification scenario uses this path for GSA-005,
+  GSA-006, and GSA-009. Their standard constraint usages bind the tolerance,
+  panel dimensions, and required support overlap from the authored SysML
+  configuration. USD measurements remain provider observations. The shared
+  adapter rejects stale, ambiguous, missing, non-input, and non-scalar
+  dependencies. Other Griffin verification paths still supply name-keyed
+  parameter maps. User-defined predicate calls rebase structured member paths
+  onto resolved feature-valued actuals; that path has compile evidence only.
+  Defaults, output parameters, and broader redefinition traversal remain open.
+  The source audit resolved all 183 verification links with no source
+  diagnostics; parse-only Rhai validation passed. No Editor/runtime execution
+  was made.
 - The opt-in generic requirement audit is implemented and exposed from the
   Griffin requirements tool. Run it explicitly and review findings before
   using its policy as a gate. Text-only requirements are reported separately

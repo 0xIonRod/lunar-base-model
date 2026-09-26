@@ -84,13 +84,13 @@ fn composed_attribute(records, path, name) {
     record.attrs[name]
 }
 
-fn sourced_measurement(source, path) {
-    let value = sysml_requirements::number(source, path);
-    if value == () {
-        return #{provider: "sysml", state: "unavailable",
-            detail: "typed SysML scalar unavailable: " + path};
+fn source_observation(model, name) {
+    let attribute = model.attribute(name);
+    if attribute == () {
+        return #{path: [], provider: "source_literal", state: "invalid",
+            detail: "typed SysML attribute is missing: " + name};
     }
-    #{provider: "sysml", state: "value", value: value}
+    model.source_literal_observation(attribute)
 }
 
 fn derived_measurement(value, detail) {
@@ -121,6 +121,9 @@ fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let model = sysml_requirements::model();
+    let gsa005 = model.requirement(PACKAGE + "::gsa005");
+    let gsa006 = model.requirement(PACKAGE + "::gsa006");
+    let gsa009 = model.requirement(PACKAGE + "::gsa009");
     let root = sysml_requirements::text(source, own("usdRootPath"));
     let geometry_tolerance = sysml_requirements::number(source, visual("geometryVerificationToleranceM"));
     let names = sysml_requirement_checks::source_enum_identifiers(source, visual("solarArrayInstances"));
@@ -217,8 +220,8 @@ fn on_tick(me, ctx) {
             && edge_clearance != () {
             (positive_rail.x - negative_rail.x).abs() - edge_clearance
         } else { () };
-        let placement_constraint = sysml_requirements::constraint_ir(model,
-            "GriffinSolarRequirements::GSAC005_RailSpanFit");
+        let placement_constraint = sysml_requirements::required_constraint_ir(model,
+            gsa005, "GriffinSolarRequirements::GSAC005_RailSpanFit");
         let placement_observations = sysml_requirements::scalar_constraint_observations(
             placement_constraint, [
             ["expectedInstalledFrameWidthM", derived_measurement(expected_installed_width,
@@ -226,14 +229,15 @@ fn on_tick(me, ctx) {
             ["measuredInstalledFrameWidthM", if installed_width == () {
                     #{provider: "usd", state: "unavailable", detail: "composed frame points or instance scale unavailable"}
                 } else { #{provider: "usd", state: "value", value: installed_width} }],
-            ["toleranceM", sourced_measurement(source, visual("geometryVerificationToleranceM"))]
         ]);
+        placement_observations.push(source_observation(model,
+            visual("geometryVerificationToleranceM")));
         checks.push(sysml_requirements::required_constraints_check("GSA-005-" + name + "-rail-span-fit",
             "solar_array", "gsa005", VERIFICATION,
             "GriffinSolarRequirements::GSAC005_RailSpanFit", placement_observations, "derived", 0.0));
 
-        let panel_envelope_constraint = sysml_requirements::constraint_ir(model,
-            "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope");
+        let panel_envelope_constraint = sysml_requirements::required_constraint_ir(model,
+            gsa006, "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope");
         let panel_envelope_observations = sysml_requirements::scalar_constraint_observations(
             panel_envelope_constraint, [
             ["measuredFrameWidthM", mesh_measurement(composed, path + "/Frame", 0, "extent")],
@@ -246,18 +250,16 @@ fn on_tick(me, ctx) {
             ["measuredBackplaneWidthM", mesh_measurement(composed, path + "/ArrayBackplane", 0, "extent")],
             ["measuredBackplaneThicknessM", mesh_measurement(composed, path + "/ArrayBackplane", 1, "extent")],
             ["measuredBackplaneDepthM", mesh_measurement(composed, path + "/ArrayBackplane", 2, "extent")],
-            ["measuredBackplaneCenterYM", mesh_measurement(composed, path + "/ArrayBackplane", 1, "center")],
-            ["frameWidthM", sourced_measurement(source, own("frameWidthM"))],
-            ["frameThicknessM", sourced_measurement(source, own("frameThicknessM"))],
-            ["frameDepthM", sourced_measurement(source, own("frameDepthM"))],
-            ["cellWidthM", sourced_measurement(source, own("cellWidthM"))],
-            ["cellThicknessM", sourced_measurement(source, own("cellThicknessM"))],
-            ["cellDepthM", sourced_measurement(source, own("cellDepthM"))],
-            ["cellOffsetYM", sourced_measurement(source, own("cellOffsetYM"))],
-            ["arrayBackplaneThicknessM", sourced_measurement(source, own("arrayBackplaneThicknessM"))],
-            ["arrayBackplaneCenterYM", sourced_measurement(source, own("arrayBackplaneCenterYM"))],
-            ["geometryToleranceM", sourced_measurement(source, visual("geometryVerificationToleranceM"))]
+            ["measuredBackplaneCenterYM", mesh_measurement(composed, path + "/ArrayBackplane", 1, "center")]
         ]);
+        for source_name in [
+            own("frameWidthM"), own("frameThicknessM"), own("frameDepthM"),
+            own("cellWidthM"), own("cellThicknessM"), own("cellDepthM"),
+            own("cellOffsetYM"), own("arrayBackplaneThicknessM"),
+            own("arrayBackplaneCenterYM"), visual("geometryVerificationToleranceM")
+        ] {
+            panel_envelope_observations.push(source_observation(model, source_name));
+        }
         checks.push(sysml_requirements::required_constraints_check("GSA-006-" + name + "-mesh-envelope",
             "solar_array", "gsa006", VERIFICATION,
             "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope", panel_envelope_observations, "usd", 0.0));
@@ -376,15 +378,16 @@ fn on_tick(me, ctx) {
                 }
             }
         }
-        let mount_constraint = sysml_requirements::constraint_ir(model,
-            "GriffinSolarRequirements::GSAC009_MountPathOverlap");
+        let mount_constraint = sysml_requirements::required_constraint_ir(model,
+            gsa009, "GriffinSolarRequirements::GSAC009_MountPathOverlap");
         let mount_observations = sysml_requirements::scalar_constraint_observations(
             mount_constraint, [
             ["busToBracketOverlapM", if available { #{provider: "usd", state: "value", value: bus_to_bracket} } else { #{provider: "usd", state: "unavailable", detail: "composed corner-post/bracket bounds unavailable"} }],
             ["bracketToLinkOverlapM", if available { #{provider: "usd", state: "value", value: bracket_to_link} } else { #{provider: "usd", state: "unavailable", detail: "composed bracket/link bounds unavailable"} }],
-            ["linkToFrameOverlapM", if available { #{provider: "usd", state: "value", value: link_to_frame} } else { #{provider: "usd", state: "unavailable", detail: "composed link/frame bounds unavailable"} }],
-            ["requiredOverlapM", #{provider: "sysml", state: "value", value: mount_overlap}]
+            ["linkToFrameOverlapM", if available { #{provider: "usd", state: "value", value: link_to_frame} } else { #{provider: "usd", state: "unavailable", detail: "composed link/frame bounds unavailable"} }]
         ]);
+        mount_observations.push(source_observation(model,
+            own("minimumMountOverlapM")));
         checks.push(sysml_requirements::required_constraints_check("GSA-009-mount-path-overlap", "solar_array",
             "gsa009", VERIFICATION, "GriffinSolarRequirements::GSAC009_MountPathOverlap",
             mount_observations, "usd", 0.0));

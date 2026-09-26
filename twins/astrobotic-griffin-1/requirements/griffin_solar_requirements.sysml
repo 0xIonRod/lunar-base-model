@@ -76,7 +76,9 @@ package GriffinSolarRequirements {
                 - expectedInstalledFrameWidthM) <= toleranceM;
     }
     requirement def GSA005_ArrayPlacement {
-        require GSAC005_RailSpanFit;
+        require GSAC005_RailSpanFit {
+            in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
         doc /* GSA-005 [installation interface] each array root frame, azimuth, panel normal, support attachment, and stowed/deployed state shall conform to the approved Griffin-1 installation/interface definition. */
     }
     constraint def GSAC006_PanelMeshEnvelope {
@@ -115,7 +117,18 @@ package GriffinSolarRequirements {
             and RealFunctions::abs(measuredBackplaneCenterYM - arrayBackplaneCenterYM) <= geometryToleranceM;
     }
     requirement def GSA006_PanelEnvelope {
-        require GSAC006_PanelMeshEnvelope;
+        require GSAC006_PanelMeshEnvelope {
+            in frameWidthM = GriffinSolarArrayAssembly::frameWidthM;
+            in frameThicknessM = GriffinSolarArrayAssembly::frameThicknessM;
+            in frameDepthM = GriffinSolarArrayAssembly::frameDepthM;
+            in cellWidthM = GriffinSolarArrayAssembly::cellWidthM;
+            in cellThicknessM = GriffinSolarArrayAssembly::cellThicknessM;
+            in cellDepthM = GriffinSolarArrayAssembly::cellDepthM;
+            in cellOffsetYM = GriffinSolarArrayAssembly::cellOffsetYM;
+            in arrayBackplaneThicknessM = GriffinSolarArrayAssembly::arrayBackplaneThicknessM;
+            in arrayBackplaneCenterYM = GriffinSolarArrayAssembly::arrayBackplaneCenterYM;
+            in geometryToleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
         doc /* GSA-006 [geometry] each array shall match the approved installed panel outline, including its lower structural clearance cutout; the frame, backplane, and cell field shall share that opening within the controlled geometry tolerances. */
     }
     requirement def GSA007_CellGridAndMount {
@@ -134,7 +147,9 @@ package GriffinSolarRequirements {
             and linkToFrameOverlapM >= requiredOverlapM;
     }
     requirement def GSA009_BusMountConnection {
-        require GSAC009_MountPathOverlap;
+        require GSAC009_MountPathOverlap {
+            in requiredOverlapM = GriffinSolarArrayAssembly::minimumMountOverlapM;
+        }
         doc /* GSA-009 [visual integration] each array shall show connected support geometry from the panel frame to the lander mounting rails, including the bracket, link, and frame interfaces. */
     }
     requirement def GSA010_TransitSunPointing {
