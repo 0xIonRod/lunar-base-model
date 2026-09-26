@@ -14,8 +14,8 @@ canonical wrapper is hidden, empty, or mounted on the wrong datum.
 | `RoverPayloadDeckCollider` | Hidden clipped-square convex collider matching the central FLIP payload adapter | Enabled, separate from the octagonal perimeter ring | Geometry is derived from adapter dimensions; supplier interface and load rating remain TBD |
 | `TankPX/NX/PZ/NZ` | `components/lander/griffin_tank_visual.usda` through four source references | Four render-only COPV study assemblies at the ordered SysML stations; MainPropulsion owns flight propellant mass | Tank count, type, dimensions, and stations are not established by a public Griffin-1 ICD |
 | `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider | FLIP interface/release datum TBD |
-| `MainPropulsion` | Chamber, fuel tank, oxidizer tank | Named propulsion interface | Thrust, propellant, mass, and engine count TBD |
-| `Nozzle` | `MainEngineCluster/Engine01..07` | Seven visible non-colliding engine-bell geometries; no single-bell design placeholder | Seven main engines are public; bell contour and spacing TBD |
+| `MainPropulsion` | Chamber, fuel and oxidizer tanks and pumps, representative nozzle design, shared plume photometry | The chamber remains the sole thrust and propellant authority; plume photometry derives per-nozzle rendering and light from aggregate simulated thrust, flow, velocity, chamber pressure, and nozzle geometry | Nozzle contour, engine-out behavior, and supplier propulsion data remain TBD |
+| `Nozzle` | `MainEngineCluster/Engine01..07`, each with a bell, throat, outer plume, hot core, and local plume light | Seven non-colliding bells and flame pairs; all seven receive the same cluster state through the shared photometry model, which divides aggregate engine outputs by its configured nozzle count | Seven main engines are public; bell contour and spacing remain study geometry |
 | `SolarPanelForward`, `SolarPanelFrontStarboard`, `SolarPanelStarboard` | Each root references `components/lander/griffin_solar_panel_visual.usda`, with `Cells`, `Frame`, dividers, hinge, brackets, and links | Three independently oriented panels use paired bus rails; each installed width derives from its rail span and shared edge clearance | The lower clearance cutout, as-built outline, installation datums, mechanism limits, and electrical behavior require the controlled panel and interface definitions |
 | `LegPX/NX/PZ/NZ` | `Strut` and matching `PadPX/NX/PZ/NZ` | Positive mass body, visible strut, enabled pad collider | Four functional legs; dimensions and damping TBD |
 | `EgressRampPort/Starboard` | Two source-aligned wheel tracks, open centre, two edge rails, and named hinge | Positive-mass Xform; both geometry-derived track colliders enabled | Track stations follow FLIP wheel datums; width and clearance remain replaceable study values |
@@ -45,7 +45,7 @@ independently through the runtime authoring tools.
 | `components/lander/griffin_landing_leg_visual.usda` | outer/inner strut, shock piston, foot pad | four repeated outboard strut assemblies; render-only |
 | `components/lander/griffin_tank_visual.usda` | MLI tank and three bands | horizontal gold tank study; render-only |
 | `components/lander/griffin_solar_panel_visual.usda` | frame, cells, dividers, hinge, paired brackets, paired support links | shared render-only component referenced by the three independently placed panel roots |
-| `components/lander/griffin_engine_bell_visual.usda` | bell and throat | seven repeated non-colliding bells; render-only |
+| `components/lander/griffin_engine_bell_visual.usda` | bell, throat, fixed-capacity outer plume and hot core, and a per-nozzle point light | referenced by each of the seven engines; plume visibility, derived length, and light output are connected to the shared Modelica photometry result; all geometry is render-only |
 | `components/lander/griffin_ramp_visual.usda` | paired wheel tracks, rails, paired supports, underside beams, posts, hinge collars, gussets, and per-track treads | referenced port/starboard visual component owns its geometry; render-only |
 | `components/rover/flip_chassis_visual.usda` | lower frame, equipment box, bumper, payload deck, service panel | referenced by the canonical FLIP vehicle; the same shapes provide visible chassis geometry and wheel-filtered rigid-body collision |
 | `components/rover/flip_wheel_visual.usda` | tire, metal hub, hub cap | referenced at each typed wheel station in the canonical FLIP vehicle; render geometry stays separate from the physical wheel prim |
@@ -56,3 +56,11 @@ independently through the runtime authoring tools.
 wheel and drivetrain model with the chassis, wheel, suspension, mast, and solar
 visual components. SysML owns wheel identities, station datums, and dimensions;
 the references keep repeated geometry in one component source.
+
+The Griffin main-engine plume is a direct presentation of the propulsion
+simulation. `MainPropulsion/PlumePhotometry` consumes combustion activity and the
+chamber's total thrust, flow, and exhaust velocity, plus nozzle area and radius
+from `MainPropulsion/NozzleDesign`. Its `engine_count` parameter normalizes the
+cluster totals to each of the seven equal nozzles. The shared output drives each
+bell component's flame pair and local light; zero delivered thrust gives zero
+plume and zero light. Rhai does not animate plume transforms or brightness.

@@ -2,17 +2,19 @@ package GriffinPropulsionRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::String;
     private import ScalarValues::Boolean;
+    private import ScalarValues::Integer;
     private import VectorValues::CartesianThreeVectorValue;
     private import GriffinRequirementSources::TwinAssetPath;
     private import GriffinRequirementSources::UsdPrimPath;
 
     attribute def Direction :> CartesianThreeVectorValue;
-    enum def GriffinEngineVisualMember { Bell; Throat; }
+    enum def GriffinEngineVisualMember { Bell; Throat; Flame; FlameCore; }
 
     part def GriffinMainPropulsionAssembly {
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1/Nozzle/MainEngineCluster";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_engine_bell_visual.usda";
-        attribute childNames : GriffinEngineVisualMember[2] = ("Bell", "Throat");
+        attribute childNames : GriffinEngineVisualMember[4] =
+            ("Bell", "Throat", "Flame", "FlameCore");
         attribute bellRadiusM : Real = 0.34;
         attribute bellHeightM : Real = 0.52;
         attribute throatRadiusM : Real = 0.12;
@@ -57,10 +59,10 @@ package GriffinPropulsionRequirements {
         doc /* GPP-001 [topology] exactly seven named main-engine visual owners are present in the cluster. */
     }
     requirement def GPP002_BellGeometry {
-        doc /* GPP-002 [visual] every engine exposes a visible bell and throat, with no placeholder circle or duplicate collider geometry. */
+        doc /* GPP-002 [visual] each engine includes its modeled bell and throat, with no placeholder circle or duplicate collider geometry. */
     }
     requirement def GPP003_ThrustOwnership {
-        doc /* GPP-003 [physics boundary] visual nozzle geometry is not a second thrust or collision implementation; the Modelica/physics owner remains authoritative. */
+        doc /* GPP-003 [physics boundary] bells and plumes are render-only. The Modelica propulsion and nozzle models remain the sole authority for thrust, propellant flow, nozzle design outputs, and plume photometry. */
     }
     requirement def GPP004_PropulsionTraceability {
         doc /* GPP-004 [evidence] engine identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and each instance is checked individually. */
@@ -84,6 +86,24 @@ package GriffinPropulsionRequirements {
     requirement def GPP007_BellSeparation {
         require GPPC007_BellSeparation;
         doc /* GPP-007 [layout] the seven bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and six equally spaced perimeter engines, and remain inside the lower central bucket envelope. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
+    }
+    constraint def GPPC008_EnginePlumeDataflow {
+        in engineCount : Integer;
+        in plumeEngineCount : Integer;
+        in photometryConsumesEngineState : Boolean;
+        in everyNozzleUsesPhotometry : Boolean;
+        in everyNozzleHasBoundPlumeMaterials : Boolean;
+        in plumeGeometryIsRenderOnly : Boolean;
+        engineCount > 0
+            and plumeEngineCount == engineCount
+            and photometryConsumesEngineState
+            and everyNozzleUsesPhotometry
+            and everyNozzleHasBoundPlumeMaterials
+            and plumeGeometryIsRenderOnly;
+    }
+    requirement def GPP008_EnginePlumeDataflow {
+        require GPPC008_EnginePlumeDataflow;
+        doc /* GPP-008 [simulation presentation] each main-engine nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow shared photometry outputs driven by live propulsion state and modeled nozzle geometry. Zero delivered thrust shall produce neither visible exhaust nor light. */
     }
     requirement def GES001_SkirtTopology {
         doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the seven-engine cluster. */
@@ -114,6 +134,7 @@ package GriffinPropulsionRequirements {
     requirement <'GPP-005'> gpp005 : GPP005_EnginePlacement { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GPP-006'> gpp006 : GPP006_BellAndThroatEnvelope { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GPP-007'> gpp007 : GPP007_BellSeparation { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-008'> gpp008 : GPP008_EnginePlumeDataflow { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GES-001'> ges001 : GES001_SkirtTopology { subject skirt : GriffinEngineSkirtComponent; }
     requirement <'GES-002'> ges002 : GES002_SkirtEnvelope { subject skirt : GriffinEngineSkirtComponent; }
     requirement <'GES-003'> ges003 : GES003_SkirtDatum { subject skirt : GriffinEngineSkirtComponent; }
@@ -133,6 +154,7 @@ package GriffinPropulsionRequirements {
             verify gpp005;
             verify gpp006;
             verify gpp007;
+            verify gpp008;
             verify ges001;
             verify ges002;
             verify ges003;

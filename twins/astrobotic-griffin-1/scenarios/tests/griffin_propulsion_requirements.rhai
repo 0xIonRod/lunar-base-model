@@ -31,6 +31,36 @@ fn attribute(id, requirement, path, attr, expected, tolerance) {
 
 fn absolute(value) { if value < 0.0 { -value } else { value } }
 
+fn record_at(result, path) {
+    if result == () || result.records == () { return (); }
+    for record in result.records {
+        if record.path == path { return record; }
+    }
+    ()
+}
+
+fn has_single_connection(record, input_name, expected_source) {
+    if record == () || record.connections == () { return false; }
+    let sources = record.connections[input_name];
+    sources != () && array_is(sources) && sources.len() == 1
+        && sources[0] == expected_source
+}
+
+fn has_single_relationship_target(record, relationship, expected_target) {
+    if record == () || record.relationships == () { return false; }
+    let targets = record.relationships[relationship];
+    targets != () && array_is(targets) && targets.len() == 1
+        && targets[0] == expected_target
+}
+
+fn provider_observation(provider, available, value, detail) {
+    if available {
+        #{provider: provider, state: "value", value: value}
+    } else {
+        #{provider: provider, state: "unavailable", detail: detail}
+    }
+}
+
 fn station_ring_is_centered_hexagon(stations, tolerance) {
     if stations.len() != 7 { return false; }
     if absolute(stations[0].x) > tolerance || absolute(stations[0].z) > tolerance {
@@ -71,6 +101,15 @@ fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
     let source = sysml_requirements::source();
     let root = sysml_requirements::text(source, own("usdRootPath"));
+    let nozzle_suffix = "/Nozzle/MainEngineCluster";
+    let vehicle_root_end = root.index_of(nozzle_suffix);
+    if vehicle_root_end < 0 {
+        throw("Griffin propulsion USD root must end in /Nozzle/MainEngineCluster");
+    }
+    let vehicle_root = root.sub_string(0, vehicle_root_end);
+    let propulsion_path = vehicle_root + "/MainPropulsion";
+    let nozzle_design_path = propulsion_path + "/NozzleDesign";
+    let photometry_path = propulsion_path + "/PlumePhotometry";
     let bell_radius = sysml_requirements::number(source, own("bellRadiusM"));
     let bell_height = sysml_requirements::number(source, own("bellHeightM"));
     let throat_radius = sysml_requirements::number(source, own("throatRadiusM"));
@@ -98,6 +137,18 @@ fn on_tick(me, ctx) {
     let checks = [];
     checks.push(sysml_requirement_checks::source_list_count("GPP-001-count", "propulsion", "gpp001", VERIFICATION, visual("mainEngineInstances"), parent("engineCount")));
     checks.push(sysml_requirement_checks::source_list_count("GPP-005-stations", "engine", "gpp005", VERIFICATION, visual("engineStations"), parent("engineCount")));
+    checks.push(attribute("GPP-001-photometry-engine-count", "gpp001",
+        photometry_path, "inputs:engine_count",
+        names.len(), 0.0));
+    checks.push(attribute("GPP-006-nozzle-design-exit-radius", "gpp006",
+        nozzle_design_path, "inputs:exit_radius",
+        bell_radius, geometry_tolerance));
+    checks.push(attribute("GPP-006-nozzle-design-throat-radius", "gpp006",
+        nozzle_design_path, "inputs:throat_radius",
+        throat_radius, geometry_tolerance));
+    checks.push(attribute("GPP-006-nozzle-design-length", "gpp006",
+        nozzle_design_path, "inputs:length",
+        bell_height, geometry_tolerance));
     for index in 0..names.len() {
         let name = names[index];
         let path = root + "/" + name;
@@ -127,7 +178,122 @@ fn on_tick(me, ctx) {
     let engine_paths = [];
     for name in names { engine_paths.push(root + "/" + name); }
     let observed_engines = query("QueryUsdPrims", #{paths: engine_paths,
-        attrs: ["xformOp:translate"], geometry_bounds: true});
+        attrs: ["xformOp:translate"], geometry_bounds: true, connections: true});
+    let plume_paths = [];
+    let light_paths = [];
+    for path in engine_paths {
+        plume_paths.push(path + "/Flame");
+        plume_paths.push(path + "/FlameCore");
+        light_paths.push(path + "/FlameCore/PlumeLight");
+    }
+    let observed_plumes = query("QueryUsdPrims", #{paths: plume_paths,
+        attrs: ["purpose", "physics:collisionEnabled"],
+        relationships: true, connections: true});
+    let observed_lights = query("QueryUsdPrims", #{paths: light_paths,
+        connections: true});
+    let observed_photometry = query("QueryUsdPrims", #{
+        paths: [photometry_path], connections: true});
+    let plume_engine_count = 0;
+    let plume_connections_match = true;
+    let plume_materials_match = true;
+    let plume_geometry_is_render_only = true;
+    let plume_observations_available = observed_engines.records != ()
+        && observed_engines.records.len() == engine_paths.len()
+        && observed_plumes.records != ()
+        && observed_plumes.records.len() == plume_paths.len()
+        && observed_lights.records != ()
+        && observed_lights.records.len() == light_paths.len()
+        && record_at(observed_photometry, photometry_path) != ();
+    if plume_observations_available {
+        for index in 0..engine_paths.len() {
+            let engine_path = engine_paths[index];
+            let engine_record = record_at(observed_engines, engine_path);
+            let flame_path = engine_path + "/Flame";
+            let core_path = engine_path + "/FlameCore";
+            let flame = record_at(observed_plumes, flame_path);
+            let core = record_at(observed_plumes, core_path);
+            let light = record_at(observed_lights, core_path + "/PlumeLight");
+            let has_pair = flame != () && core != () && light != ();
+            if has_pair { plume_engine_count += 1; }
+            let model_source = photometry_path + ".outputs:";
+            plume_connections_match = plume_connections_match
+                && has_single_connection(engine_record, "inputs:plume_throttle",
+                    model_source + "render_throttle")
+                && has_single_connection(engine_record, "inputs:plume_length_fraction",
+                    model_source + "visual_length_fraction")
+                && has_single_connection(engine_record, "inputs:plume_intensity",
+                    model_source + "intensity")
+                && has_single_connection(engine_record, "inputs:plume_light_radius",
+                    model_source + "radius")
+                && has_single_connection(flame, "inputs:throttle",
+                    engine_path + ".inputs:plume_throttle")
+                && has_single_connection(flame, "inputs:plume_length_fraction",
+                    engine_path + ".inputs:plume_length_fraction")
+                && has_single_connection(core, "inputs:throttle",
+                    engine_path + ".inputs:plume_throttle")
+                && has_single_connection(core, "inputs:plume_length_fraction",
+                    engine_path + ".inputs:plume_length_fraction")
+                && has_single_connection(light, "inputs:light_intensity",
+                    engine_path + ".inputs:plume_intensity")
+                && has_single_connection(light, "inputs:light_radius",
+                    engine_path + ".inputs:plume_light_radius");
+            if has_pair {
+                plume_materials_match = plume_materials_match
+                    && has_single_relationship_target(flame, "material:binding",
+                        vehicle_root + "/Looks/Flame_Mat")
+                    && has_single_relationship_target(core, "material:binding",
+                        vehicle_root + "/Looks/FlameCore_Mat");
+                plume_geometry_is_render_only = plume_geometry_is_render_only
+                    && flame.attrs["purpose"] == "render"
+                    && flame.attrs["physics:collisionEnabled"] == false
+                    && core.attrs["purpose"] == "render"
+                    && core.attrs["physics:collisionEnabled"] == false;
+            } else {
+                plume_geometry_is_render_only = false;
+            }
+        }
+    }
+    let photometry_record = record_at(observed_photometry,
+        photometry_path);
+    let photometry_consumes_engine_state = plume_observations_available
+        && has_single_connection(photometry_record, "inputs:throttle",
+            propulsion_path + ".outputs:engine_activity")
+        && has_single_connection(photometry_record, "inputs:thrust_n",
+            propulsion_path + ".outputs:thrust_n")
+        && has_single_connection(photometry_record, "inputs:maximum_thrust_n",
+            propulsion_path + ".outputs:maximum_thrust_n")
+        && has_single_connection(photometry_record, "inputs:propellant_flow_kgs",
+            propulsion_path + ".outputs:propellant_flow")
+        && has_single_connection(photometry_record, "inputs:exhaust_velocity_mps",
+            propulsion_path + ".outputs:exhaust_velocity_mps")
+        && has_single_connection(photometry_record, "inputs:design_exhaust_velocity_mps",
+            propulsion_path + ".outputs:design_exhaust_velocity_mps")
+        && has_single_connection(photometry_record, "inputs:nozzle_exit_radius_m",
+            nozzle_design_path + ".outputs:exit_radius_m")
+        && has_single_connection(photometry_record, "inputs:nozzle_exit_area_m2",
+            nozzle_design_path + ".outputs:exit_area")
+        && has_single_connection(photometry_record, "inputs:chamber_pressure_pa",
+            propulsion_path + ".outputs:chamber_pressure_pa");
+    checks.push(sysml_requirements::constraint_check("GPP-008-engine-plume-dataflow",
+        "engine", "gpp008", VERIFICATION,
+        "GriffinPropulsionRequirements::GPPC008_EnginePlumeDataflow",
+        #{engineCount: provider_observation("sysml", names.len() > 0,
+              names.len(), "typed engine-instance collection is unavailable"),
+          plumeEngineCount: provider_observation("usd", plume_observations_available,
+              plume_engine_count, "composed nozzle plume geometry is unavailable"),
+          photometryConsumesEngineState: provider_observation("usd",
+              plume_observations_available, photometry_consumes_engine_state,
+              "composed photometry connections are unavailable"),
+          everyNozzleUsesPhotometry: provider_observation("usd",
+              plume_observations_available, plume_connections_match,
+              "composed per-nozzle plume connections are unavailable"),
+          everyNozzleHasBoundPlumeMaterials: provider_observation("usd",
+              plume_observations_available, plume_materials_match,
+              "composed plume material bindings are unavailable"),
+          plumeGeometryIsRenderOnly: provider_observation("usd",
+              plume_observations_available, plume_geometry_is_render_only,
+              "composed plume geometry roles are unavailable")},
+        "usd", 0.0));
     let actual_stations = [];
     let measurement_available = observed_engines.records != ()
         && observed_engines.records.len() == names.len()

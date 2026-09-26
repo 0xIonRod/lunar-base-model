@@ -148,7 +148,7 @@ def Xform "Griffin1" (
         string lunco:ui:schemaRole = "Throttle in · downward braking"
         uniform token collection:components:expansionRule = "explicitOnly"
         rel collection:components:includes
-        prepend rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/FuelPump>, </Griffin1/MainPropulsion/OxidizerPump>, </Griffin1/MainPropulsion/MainChamber>, </Griffin1/MainPropulsion/PropellantStatus>]
+        prepend rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/FuelPump>, </Griffin1/MainPropulsion/OxidizerPump>, </Griffin1/MainPropulsion/MainChamber>, </Griffin1/MainPropulsion/NozzleDesign>, </Griffin1/MainPropulsion/PlumePhotometry>, </Griffin1/MainPropulsion/PropellantStatus>]
         float inputs:valve_opening
         float inputs:valve_opening.connect = </Griffin1.outputs:throttle>
         float inputs:rcs_fuel_mass_flow_kgs
@@ -368,6 +368,45 @@ def Xform "Griffin1" (
             float outputs:maximum_thrust_n
             float outputs:activity
             float outputs:heat_release_w
+        }
+        def Scope "NozzleDesign" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/BellNozzle.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            float inputs:throat_radius = 0.12
+            float inputs:exit_radius = 0.34
+            float inputs:length = 0.52
+            float inputs:contour = 1.0
+            float outputs:exit_area
+            float outputs:exit_radius_m
+        }
+        def Scope "PlumePhotometry" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            int inputs:engine_count = 7
+            float inputs:throttle.connect = </Griffin1/MainPropulsion.outputs:engine_activity>
+            float inputs:thrust_n.connect = </Griffin1/MainPropulsion.outputs:thrust_n>
+            float inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion.outputs:maximum_thrust_n>
+            float inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion.outputs:propellant_flow>
+            float inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:exhaust_velocity_mps>
+            float inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:design_exhaust_velocity_mps>
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:nozzle_exit_pressure_pa = 0.0
+            float inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion.outputs:chamber_pressure_pa>
+            float inputs:design_chamber_pressure_pa = 0.0
+            float inputs:ambient_pressure_pa = 0.0
+            float inputs:pressure_threshold_pa = 1000.0
+            float inputs:geometry_capacity_m = 4.0
+            float inputs:w_max = 0.27
+            float inputs:luminance = 15.047
         }
         def Scope "PropellantStatus" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -3092,5 +3131,74 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         custom double3 xformOp:rotateXYZ = (90.0, 0.0, -45.0)
         custom double3 xformOp:scale = (0.4736465266155053, 1.0, 1.0)
+    }
+    over "Nozzle"
+    {
+        over "MainEngineCluster"
+        {
+            over "Engine01"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine02"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine03"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine04"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine05"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine06"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine07"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+        }
     }
 }
