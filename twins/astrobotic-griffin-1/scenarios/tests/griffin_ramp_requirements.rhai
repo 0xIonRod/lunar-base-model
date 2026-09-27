@@ -107,9 +107,9 @@ fn on_tick(me, ctx) {
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionMassPartitionToleranceKg",
         "physicalRampSectionJointLimitRad", "physicalRampSectionStowedAngleRad",
         "physicalRampToeSectionStowedAngleRad", "physicalRampSectionDriveTargetRad",
-        "physicalRampSectionDriveStiffnessNmPerDeg",
-        "physicalRampSectionDriveDampingNmPerDegPerSec",
-        "physicalRampSectionDriveMaxTorqueNm",
+        "physicalRampJointDriveStiffnessNmPerDeg",
+        "physicalRampJointDriveDampingNmPerDegPerSec",
+        "physicalRampJointDriveMaxTorqueNm",
         "physicalRampSectionMassPropertiesToleranceKgM2",
         "physicalRampDeckTransitionMassKg", "physicalRampDeckTransitionInertiaKgM2"
     ] { attributes.push(_source_attr(name)); }
@@ -554,13 +554,13 @@ fn on_tick(me, ctx) {
                 "grr017", body1, "xformOp:rotateXYZ", 2, stow_angle_deg));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-stiffness",
                 "grr016", joint_path, "drive:angular:physics:stiffness", 0,
-                _source_number(source, "physicalRampSectionDriveStiffnessNmPerDeg")));
+                _source_number(source, "physicalRampJointDriveStiffnessNmPerDeg")));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-damping",
                 "grr016", joint_path, "drive:angular:physics:damping", 0,
-                _source_number(source, "physicalRampSectionDriveDampingNmPerDegPerSec")));
+                _source_number(source, "physicalRampJointDriveDampingNmPerDegPerSec")));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-torque",
                 "grr016", joint_path, "drive:angular:physics:maxForce", 0,
-                _source_number(source, "physicalRampSectionDriveMaxTorqueNm")));
+                _source_number(source, "physicalRampJointDriveMaxTorqueNm")));
         }
 
         let transition_path = ramp + "/" + transition_name;

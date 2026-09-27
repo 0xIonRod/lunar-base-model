@@ -18,6 +18,10 @@ package GriffinRampRequirements {
         RampSectionHingeStarboard01;
         RampSectionHingeStarboard12;
     }
+    enum def GriffinRampRootJointIdentity {
+        RampHingePort;
+        RampHingeStarboard;
+    }
     enum def GriffinRampHingeAxis { Z; }
     enum def GriffinRampTreadIdentity { Tread01; Tread02; Tread03; Tread04; }
     enum def GriffinRampRailJointPinIdentity {
@@ -198,6 +202,8 @@ package GriffinRampRequirements {
         attribute sectionAsset : TwinAssetPath = "components/lander/griffin_ramp_section_visual.usda";
         attribute sectionInstances : GriffinRampSectionIdentity[3] =
             ("DeckSection", "MiddleSection", "ToeSection");
+        attribute rootJointInstances : GriffinRampRootJointIdentity[2] =
+            ("RampHingePort", "RampHingeStarboard");
         attribute intermediateJointInstances : GriffinRampIntermediateJointIdentity[4] =
             ("RampSectionHingePort01", "RampSectionHingePort12",
              "RampSectionHingeStarboard01", "RampSectionHingeStarboard12");
@@ -312,8 +318,9 @@ package GriffinRampRequirements {
         // folds back by -90 deg, keeping both horizontal sections' walking
         // faces and rails upright in flight. These replaceable study datums
         // are local component-frame angles because the released stowage
-        // mechanism ICD is unavailable. After touchdown both intermediate
-        // joints return to zero before the deck hinge deploys the ramp.
+        // mechanism ICD is unavailable. After confirmed touchdown and an
+        // operator unfold command, both intermediate joints return to zero
+        // before the driven deck hinges deploy the ramp.
         // The physical ramp is hinged at the inboard edge, not at its centre:
         // the 12.228605 m contact surface therefore occupies x=0.00..12.228605 m
         // in the ramp body frame. Its centre is 6.1143025 m. The hinge
@@ -371,9 +378,9 @@ package GriffinRampRequirements {
         attribute physicalRampSectionStowedAngleRad : Real = 1.570796327;
         attribute physicalRampToeSectionStowedAngleRad : Real = -1.570796327;
         attribute physicalRampSectionDriveTargetRad : Real = 0.0;
-        attribute physicalRampSectionDriveStiffnessNmPerDeg : Real = 6000.0;
-        attribute physicalRampSectionDriveDampingNmPerDegPerSec : Real = 900.0;
-        attribute physicalRampSectionDriveMaxTorqueNm : Real = 5000.0;
+        attribute physicalRampJointDriveStiffnessNmPerDeg : Real = 6000.0;
+        attribute physicalRampJointDriveDampingNmPerDegPerSec : Real = 900.0;
+        attribute physicalRampJointDriveMaxTorqueNm : Real = 5000.0;
         attribute physicalRampSectionMassPropertiesToleranceKgM2 : Real = 0.01;
     }
 
@@ -437,7 +444,7 @@ package GriffinRampRequirements {
         doc /* The deck hinge and both intermediate section hinges shall be visible at the ramp assembly joints. Every intermediate joint shall use a Z-axis revolute connection at the adjacent section endpoints, and its hinge barrel shall remain below the walking surface. */
     }
     requirement def GRR016_ArticulatedRampSections {
-        doc /* Each upper-deck-mounted ramp shall contain three equal rigid sections, one revolute deck hinge, and two native revolute joints between consecutive sections. Section lengths shall sum to the full contact-track length. Intermediate joints shall hold zero relative angle during rover traversal so the sections, contact tracks, and upper rails form one continuous deployed path. */
+        doc /* Each upper-deck-mounted ramp shall contain three equal rigid sections, a revolute deck hinge, and two native revolute joints between consecutive sections. All six physical ramp joints shall expose the source-owned angular drive and limits so their typed angle ports can command motion inside the authored range. Section lengths shall sum to the full contact-track length. Intermediate joints shall hold zero relative angle during rover traversal so the sections, contact tracks, and upper rails form one continuous deployed path. */
         require GRC018_SectionedRampMatchesEnvelope {
             in totalLengthM = GriffinEgressRamp::rampSurfaceLengthM;
             in sectionLengthM = GriffinEgressRamp::rampSectionLengthM;
@@ -447,7 +454,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR017_FlightStowAndPostTouchdownUnfold {
-        doc /* During descent, each ramp shall be folded above the landing legs: the middle-section hinge shall hold the source-owned positive 90 degree stow angle and the toe hinge the source-owned negative 90 degree stow angle. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After touchdown, the scenario shall command both intermediate hinges to zero before commanding the deck hinge to deploy. The stow angles remain explicit Twin study assumptions until the supplier mechanism ICD is released. */
+        doc /* During descent, each ramp shall be folded above the landing legs: the middle-section hinge shall hold the source-owned positive 90 degree stow angle and the toe hinge the source-owned negative 90 degree stow angle. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall level both intermediate hinges before the scenario commands the deck hinges to deploy. The stow angles remain explicit Twin study assumptions until the supplier mechanism ICD is released. */
         require GRC022_RampFlightStowAnglesWithinTravel {
             in middleAngleRad = GriffinEgressRamp::physicalRampSectionStowedAngleRad;
             in toeAngleRad = GriffinEgressRamp::physicalRampToeSectionStowedAngleRad;

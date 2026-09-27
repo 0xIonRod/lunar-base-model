@@ -93,7 +93,7 @@ fn _qualified_attribute(name) {
     if name == "solarArrayCount" { return "GriffinLanderRequirements::GriffinLanderComponent::solarArrayCount"; }
     let ramp = [
         "rampCount", "rampSurfaceLengthM", "rampSurfaceWidthM",
-        "sectionAsset", "sectionInstances", "intermediateJointInstances",
+        "sectionAsset", "sectionInstances", "rootJointInstances", "intermediateJointInstances",
         "treadInstances", "railJointPinInstances", "transitionBody", "transitionContact", "transitionJoints",
         "rampSectionCount", "rampSectionLengthM", "rampSectionGeometryToleranceM",
         "rampWheelClearanceM", "rampSurfaceThicknessM", "rampRailHeightM",
@@ -129,9 +129,9 @@ fn _qualified_attribute(name) {
         "physicalRampSectionInertiaXKgM2", "physicalRampSectionInertiaYKgM2",
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionJointLimitRad",
         "physicalRampSectionMassPartitionToleranceKg",
-        "physicalRampSectionDriveTargetRad", "physicalRampSectionDriveStiffnessNmPerDeg",
-        "physicalRampSectionDriveDampingNmPerDegPerSec",
-        "physicalRampSectionDriveMaxTorqueNm",
+        "physicalRampSectionDriveTargetRad", "physicalRampJointDriveStiffnessNmPerDeg",
+        "physicalRampJointDriveDampingNmPerDegPerSec",
+        "physicalRampJointDriveMaxTorqueNm",
         "physicalRampSectionMassPropertiesToleranceKgM2",
         "physicalRampDeckTransitionMassKg",
         "physicalRampDeckTransitionInertiaKgM2",
@@ -777,6 +777,7 @@ fn ramp_under_beam_center_offset_z_m() { _sysml_attribute("assemblyUnderBeamCent
 fn ramp_section_count() { _sysml_integer("rampSectionCount") }
 fn ramp_section_length_m() { _sysml_attribute("rampSectionLengthM") }
 fn ramp_section_names() { _sysml_enum_names("sectionInstances") }
+fn ramp_root_joint_names() { _sysml_enum_names("rootJointInstances") }
 fn ramp_intermediate_joint_names() { _sysml_enum_names("intermediateJointInstances") }
 fn ramp_tread_names() { _sysml_enum_names("treadInstances") }
 fn ramp_rail_joint_pin_names() { _sysml_enum_names("railJointPinInstances") }

@@ -240,7 +240,6 @@ fn _mount_frame_ops(doc, edit_target, spec, root) {
             #{name: "lunco:mount:socket", value: "\"egress_ramp\""},
             #{name: "lunco:mount:joint", value: "\"revolute\""},
             #{name: "lunco:mount:axis", value: "\"Z\""},
-            #{name: "lunco:mount:asset", value: "\"twin://" + twin_name() + "/components/lander/griffin_ramp_visual.usda\""},
         ] {
             ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
                 name: field.name, type_name: "token", value: field.value}});
@@ -4638,12 +4637,16 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     let stowed_toe_angle_rad = _sysml_number(source,
         "physicalRampToeSectionStowedAngleRad");
     let drive_stiffness = _sysml_number(source,
-        "physicalRampSectionDriveStiffnessNmPerDeg");
+        "physicalRampJointDriveStiffnessNmPerDeg");
     let drive_damping = _sysml_number(source,
-        "physicalRampSectionDriveDampingNmPerDegPerSec");
+        "physicalRampJointDriveDampingNmPerDegPerSec");
     let drive_max_torque = _sysml_number(source,
-        "physicalRampSectionDriveMaxTorqueNm");
+        "physicalRampJointDriveMaxTorqueNm");
     let root_limit_rad = _sysml_number(source, "rampMaxDeploymentAngleRad");
+    let port_deployment_rad = _sysml_number(source,
+        "physicalRampPortDeploymentAngleRad");
+    let starboard_deployment_rad = _sysml_number(source,
+        "physicalRampStarboardDeploymentAngleRad");
     let mount_x = _sysml_number(source, if side == "port" {
         "physicalRampPortMountX"
     } else {
@@ -4662,7 +4665,8 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     let missing_actuation = section_limit_rad == () || target_rad == ()
         || stowed_middle_angle_rad == () || stowed_toe_angle_rad == ()
         || drive_stiffness == () || drive_damping == ()
-        || drive_max_torque == () || root_limit_rad == ();
+        || drive_max_torque == () || root_limit_rad == ()
+        || port_deployment_rad == () || starboard_deployment_rad == ();
     let missing_mount = mount_x == () || mount_y == () || mount_z == ()
         || section_names.len() != 3 || joint_names.len() != 4;
     if missing_geometry || missing_mass || missing_actuation || missing_mount {
@@ -4676,10 +4680,12 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     let invalid_inertia = inertia_x <= 0.0 || inertia_y <= 0.0 || inertia_z <= 0.0;
     let invalid_actuation = section_limit_rad <= 0.0 || root_limit_rad <= 0.0
         || drive_stiffness <= 0.0 || drive_damping < 0.0 || drive_max_torque <= 0.0;
+    let invalid_root_target = port_deployment_rad.abs() > root_limit_rad
+        || starboard_deployment_rad.abs() > root_limit_rad;
     let invalid_envelope = width <= 0.0 || thickness <= 0.0
         || rail_height <= 0.0 || rail_width <= 0.0 || clearance <= 0.0;
     if invalid_length || invalid_mass || invalid_inertia || invalid_actuation
-        || invalid_envelope {
+        || invalid_root_target || invalid_envelope {
         return plan_error("articulated physical-ramp source values violate the section, mass, or geometry contract");
     }
     if target_rad.abs() > section_limit_rad
@@ -4778,6 +4784,8 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     let root_limit_deg = root_limit_rad * 180.0 / 3.141592653589793;
     let root_rot1 = if side == "port" { "(0.0, 0.0, 0.0, 1.0)" }
         else { "(0.0, 1.0, 0.0, 0.0)" };
+    ops.push(#{SetApiSchemas: #{edit_target: edit_target,
+        path: root_joint_path, schemas: ["PhysicsDriveAPI:angular"]}});
     for item in [
         #{name: "physics:localPos0", type_name: "point3f",
           value: "(" + mount_x.to_string() + ", " + mount_y.to_string()
@@ -4785,7 +4793,13 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         #{name: "physics:localPos1", type_name: "point3f", value: "(0.0, 0.0, 0.0)"},
         #{name: "physics:localRot1", type_name: "quatf", value: root_rot1},
         #{name: "physics:lowerLimit", type_name: "float", value: (-root_limit_deg).to_string()},
-        #{name: "physics:upperLimit", type_name: "float", value: root_limit_deg.to_string()}
+        #{name: "physics:upperLimit", type_name: "float", value: root_limit_deg.to_string()},
+        #{name: "drive:angular:physics:type", type_name: "token", value: "\"force\""},
+        #{name: "drive:angular:physics:targetPosition", type_name: "float", value: "0.0"},
+        #{name: "drive:angular:physics:targetVelocity", type_name: "float", value: "0.0"},
+        #{name: "drive:angular:physics:stiffness", type_name: "float", value: drive_stiffness.to_string()},
+        #{name: "drive:angular:physics:damping", type_name: "float", value: drive_damping.to_string()},
+        #{name: "drive:angular:physics:maxForce", type_name: "float", value: drive_max_torque.to_string()}
     ] {
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: root_joint_path,
             name: item.name, type_name: item.type_name, value: item.value}});

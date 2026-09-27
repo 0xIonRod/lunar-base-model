@@ -10,7 +10,11 @@ const ROOT = "/Griffin1SurfaceOps";
 
 fn simulation_dependencies(me, ctx) {
     let lander = find_path(ROOT + "/Lander");
-    #{modelica_entities: [lander], entity_reads: [lander], entity_writes: [],
+    let gnc = find_path(ROOT + "/Lander/GNC");
+    let propulsion = find_path(ROOT + "/Lander/MainPropulsion");
+    let altimeter = find_path(ROOT + "/Lander/Altimeter/Model");
+    #{modelica_entities: [lander, gnc, propulsion, altimeter],
+      entity_reads: [lander, gnc, propulsion, altimeter], entity_writes: [],
       query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
         "QueryUsdPrim", "QueryPhysicsState"], required_inputs: []}
 }
@@ -221,14 +225,28 @@ fn on_tick(me, ctx) {
             this.touchdown_position = position;
         }
         if !this.touchdown_seen && relative_tick > 0
-            && relative_tick % (sample_every * 60) == 0 {
-            print("[griffin-landing-stability] descent sample elapsed_s="
-                + (relative_tick.to_float() * dt()).to_string()
+            && relative_tick % (sample_every * 6) == 0 {
+            let diagnostic_time = (relative_tick.to_float() * dt()).to_string();
+            print("[griffin-landing-stability] t=" + diagnostic_time
                 + " reference_y_m=" + position[1].to_string()
-                + " vertical_velocity_mps=" + sample.linear_velocity_mps[1].to_string()
+                + " vertical_velocity_mps=" + sample.linear_velocity_mps[1].to_string());
+            print("[griffin-landing-stability] t=" + diagnostic_time
                 + " any_leg_contact=" + sample.any_leg_contact.to_string()
                 + " all_legs_contact=" + sample.all_legs_contact.to_string()
                 + " touchdown=" + sample.touchdown.to_string());
+            print("[griffin-landing-stability] t=" + diagnostic_time
+                + " nav_y_m=" + sample.navigation_position_y.to_string()
+                + " altimeter_y_m=" + sample.altimeter_position_y.to_string()
+                + " altimeter_range_m=" + sample.altimeter_range_m.to_string());
+            print("[griffin-landing-stability] t=" + diagnostic_time
+                + " target_altitude_m=" + sample.altitude_above_target.to_string()
+                + " pid_y=" + sample.guidance_pid_y.to_string()
+                + " vertical_command_mps2=" + sample.guidance_vertical_command.to_string());
+            print("[griffin-landing-stability] t=" + diagnostic_time
+                + " throttle=" + sample.guidance_throttle.to_string()
+                + " thrust_n=" + sample.engine_thrust_n.to_string()
+                + " cutoff=" + sample.landing_engine_cutoff.to_string()
+                + " handoff=" + sample.landing_handoff.to_string());
         }
         if this.touchdown_seen {
             this.sample_count += 1;

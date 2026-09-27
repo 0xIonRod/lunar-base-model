@@ -3124,7 +3124,9 @@ def Xform "Griffin1" (
             custom double3 xformOp:rotateXYZ = (0.0, 180.0, 23.468608878924055)
         }
     }
-    def PhysicsRevoluteJoint "RampHingePort"
+    def PhysicsRevoluteJoint "RampHingePort" (
+        prepend apiSchemas = "PhysicsDriveAPI:angular"
+    )
     {
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/EgressRampPort>
@@ -3135,9 +3137,17 @@ def Xform "Griffin1" (
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
+        uniform token drive:angular:physics:type = "force"
+        float drive:angular:physics:targetPosition = 0.0
+        float drive:angular:physics:targetVelocity = 0.0
+        float drive:angular:physics:stiffness = 6000.0
+        float drive:angular:physics:damping = 900.0
+        float drive:angular:physics:maxForce = 5000.0
         bool physics:collisionEnabled = false
     }
-    def PhysicsRevoluteJoint "RampHingeStarboard"
+    def PhysicsRevoluteJoint "RampHingeStarboard" (
+        prepend apiSchemas = "PhysicsDriveAPI:angular"
+    )
     {
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/EgressRampStarboard>
@@ -3148,6 +3158,12 @@ def Xform "Griffin1" (
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
+        uniform token drive:angular:physics:type = "force"
+        float drive:angular:physics:targetPosition = 0.0
+        float drive:angular:physics:targetVelocity = 0.0
+        float drive:angular:physics:stiffness = 6000.0
+        float drive:angular:physics:damping = 900.0
+        float drive:angular:physics:maxForce = 5000.0
         bool physics:collisionEnabled = false
     }
     def PhysicsRevoluteJoint "RampSectionHingePort01" (
@@ -3251,7 +3267,6 @@ def Xform "Griffin1" (
             uniform token lunco:mount:socket = "egress_ramp"
             uniform token lunco:mount:joint = "revolute"
             token lunco:mount:axis = "Z"
-            uniform token lunco:mount:asset = "twin://astrobotic-griffin-1/components/lander/griffin_ramp_visual.usda"
             custom rel lunco:mount:part = </Griffin1/EgressRampPort>
         }
         def Xform "RampSocketStarboard" (
@@ -3263,7 +3278,6 @@ def Xform "Griffin1" (
             uniform token lunco:mount:socket = "egress_ramp"
             uniform token lunco:mount:joint = "revolute"
             token lunco:mount:axis = "Z"
-            uniform token lunco:mount:asset = "twin://astrobotic-griffin-1/components/lander/griffin_ramp_visual.usda"
             custom rel lunco:mount:part = </Griffin1/EgressRampStarboard>
         }
     }

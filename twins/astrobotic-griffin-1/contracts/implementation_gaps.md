@@ -94,17 +94,19 @@ The lander moved from its 60 m start altitude, but no `lander_touchdown` event
 was observed before the session was stopped; no mission verdict was produced.
 Dynamic touchdown, ramp deployment, and FLIP egress remain open. The runtime
 also reported five Avian joint-start seating residuals (angular residuals of
-90° or 180° and
-translation residuals of 1.963 m), which need separate physical investigation.
+90° or 180° and translation residuals of 1.963 m), which need separate
+physical investigation.
 
 ### Ramp flight-stow and rail-clearance status
 
-The physical ramp sections now fold for descent with the middle hinges at the
-source-owned +90° target and toe hinges at -90°. After `lander_touchdown`, the
-mission policy waits 1.5 s, commands all four intermediate hinge angles to the
-level target, waits 3 s, and only then commands the deck hinges to lower the
-ramps. These angles are explicit study assumptions pending the supplier
-mechanism ICD.
+The physical ramp sections fold for descent with the middle hinges at the
+source-owned +90° target and toe hinges at -90°. After confirmed touchdown, the
+mission waits for **U** / **UNWIND RAMP**, commands all four intermediate hinge
+angles to the level target, waits 3 s, and then commands the deck hinges to
+lower the ramps. The two root deck hinges now have angular drives as well as
+limits; they previously had limits but no drives. After a 4 s settle interval,
+**G** / **RELEASE ROVER** detaches FLIP from the deck. These angles and drive
+values are explicit study assumptions pending the supplier mechanism ICD.
 
 The new `Verify_GriffinRampFlightStow` scene passed all 61 checks at source
 revision `1134567362502136608`. It verifies the authored section transforms
@@ -583,17 +585,22 @@ Y=2.44 m, and vertical clearance is 2.75 m. A focused GRR-010 check passes
 vehicle-reference touchdown datum and 27.833532 degree deployment angle.
 These values are explicit Twin study assumptions.
 
-The post-touchdown mission sequence waits for `lander_touchdown`, levels the
-four intermediate hinges, then deploys the deck hinges. A fixed-clock descent
-diagnostic ran for 650 seconds wall time (390 simulated seconds) without that
-touchdown output. It recorded intermittent leg-contact flags, including one
-sample with all four flags set at body-reference Y=-1.39 m, followed by a
-sample at Y=9.12 m and +6.57 m/s vertical speed. The rails were still at least
-3.8 m above the terrain at the deep-contact sample. This rules out the folded
-rails touching the ground at that event; it does not identify the cause of
-the gear bounce. The ramp-unfold mission step and full 60-second post-touchdown
-stability requirement remain unverified until the landing/contact path produces
-a touchdown event.
+The post-touchdown mission now waits for **U** / **UNWIND RAMP**, levels the
+four intermediate hinges, deploys the deck hinges, and enables **G** /
+**RELEASE ROVER** only after the ramps settle. The HUD buttons use the generic
+typed Rhai hook path. `physical_ramp_hinge_report()` exposes the composed
+minimum and maximum of all six hinges in degrees and radians plus live
+angle-port records; `set_physical_ramp_hinge_angle(name, radians)` validates
+each request against those limits. A fixed-clock descent diagnostic ran for
+650 seconds wall time (390 simulated seconds) without touchdown. It recorded
+intermittent leg-contact flags, including one sample with all four flags set
+at body-reference Y=-1.39 m, followed by a sample at Y=9.12 m and +6.57 m/s
+vertical speed. The rails were still at least 3.8 m above the terrain at the
+deep-contact sample. This rules out the folded rails touching the ground at
+that event; it does not identify the cause of the gear bounce. The new
+drive/button sequence and full 60-second post-touchdown stability requirement
+remain unverified until touchdown and the operator actions are observed in the
+production scene.
 
 ## Definition of a proper first Griffin slice
 

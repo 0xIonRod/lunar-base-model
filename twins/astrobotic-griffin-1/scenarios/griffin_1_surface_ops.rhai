@@ -43,7 +43,10 @@ fn on_start(me, ctx) {
     if rover_gid >= 0 {
         subscribe_from("waypoint.reached", rover_gid);
     }
+    subscribe("griffin_ramp_unfold_requested");
+    subscribe("griffin_rover_release_requested");
     subscribe("key:KeyG");
+    subscribe("key:KeyU");
     for event_name in [
         "griffin_ramp_approach_reached", "griffin_ramp_exit_reached", "griffin_waypoint_1_reached",
         "griffin_waypoint_2_reached", "griffin_base_site_reached",
@@ -55,6 +58,7 @@ fn on_start(me, ctx) {
     this.release_requested = false;
     this.rover_detached = false;
     this.ramps_deployed = false;
+    this.ramp_unfold_requested = false;
     this.route_engaged = false;
     this.ramp_approach_reached = false;
     this.ramp_exit_reached = false;
@@ -79,31 +83,56 @@ fn on_event(me, evt, ctx) {
     let lander = find_path(LANDER);
     let rover = find_path(ROVER);
 
-    // The shared controller publishes a target-scoped semantic edge for the
-    // G binding. G is an explicit lander-owned release action and is available
-    // at any phase; the rover must never interpret it as a drive/action command.
-    // Keep the actual joint mutation in the Twin policy, where the authored dock
-    // is known.
+    // Shared controller and HUD requests converge on the same Twin-owned
+    // post-touchdown gates. The rover can never interpret U/G as drive input.
     if evt.name == "intent.edge" && evt.source == lander {
         let value = evt.value;
         if value != () && value["target_gid"] == lander &&
            value["intent"] == "release" &&
            (value["edge"] == "pressed" || value["edge"] == "pulse") {
-            if release_rover(me, this.release_requested) {
-                this.release_requested = true;
-            }
+            griffin_surface_ops::request_rover_release();
         }
         return;
     }
 
-    // Native keyboard projection is a fallback for a lander that is under the
-    // local human's control but whose authored binding has not produced an
-    // edge yet (for example during an ownership handoff). It is still gated to
-    // the lander owner, so pressing G while driving FLIP cannot detach it.
-    if evt.name == "key:KeyG" &&
-       owner_of(lander) == 0 && owner_of(rover) != 0 {
-        if release_rover(me, this.release_requested) {
+    // The native shortcuts are accepted while the lander is the active local
+    // vehicle. The HUD uses the same request functions without a possession
+    // requirement, and both routes are checked again by the mission phase.
+    if evt.name == "key:KeyU" && owner_of(lander) == 0 && owner_of(rover) != 0 {
+        let result = griffin_surface_ops::request_ramp_unfold();
+        if result.ok != true { notify_kind(result.error, "warn"); }
+        return;
+    }
+    if evt.name == "key:KeyG" && owner_of(lander) == 0 && owner_of(rover) != 0 {
+        let result = griffin_surface_ops::request_rover_release();
+        if result.ok != true { notify_kind(result.error, "warn"); }
+        return;
+    }
+
+    if evt.name == "griffin_ramp_unfold_requested" {
+        if !this.lander_settled {
+            notify_kind("Ramp unfold is available after touchdown.", "warn");
+            return;
+        }
+        if this.ramp_unfold_requested || this.ramps_deployed { return; }
+        this.ramp_unfold_requested = true;
+        griffin_controls::show_ramp_unfolding_actions();
+        print("[griffin] post-touchdown ramp unfold accepted");
+        return;
+    }
+
+    if evt.name == "griffin_rover_release_requested" {
+        if !this.lander_settled || !this.ramps_deployed {
+            notify_kind("Release is enabled after the ramp has unfolded and settled.", "warn");
+            return;
+        }
+        if this.release_requested { return; }
+        if release_rover(me, false) {
             this.release_requested = true;
+            griffin_controls::show_rover_release_pending();
+        } else {
+            this.phase_timeout = true;
+            fail_phase(this, "adapter-release");
         }
         return;
     }
@@ -196,7 +225,7 @@ fn begin_descent(me) {
 }
 
 fn touchdown_notice(me) {
-    griffin_controls::show_briefing();
+    griffin_controls::show_touchdown_actions();
     emit("griffin_touchdown_confirmed");
     notify_kind("Griffin-1 touchdown confirmed.", "success");
     print("[griffin] touchdown confirmed");
@@ -207,20 +236,15 @@ fn unfold_ramp_sections(me) {
     // before the deck hinges lower the two physical ramps to the terrain.
     let angle = griffin_spec::physical_ramp_section_drive_target_rad();
     if angle == () { return #{ok: false, error: "deployed ramp-section angle is missing from SysML"}; }
-    let joints = [
-        find_path(LANDER + "/RampSectionHingePort01"),
-        find_path(LANDER + "/RampSectionHingePort12"),
-        find_path(LANDER + "/RampSectionHingeStarboard01"),
-        find_path(LANDER + "/RampSectionHingeStarboard12"),
-    ];
+    let joints = griffin_spec::ramp_intermediate_joint_names();
+    if joints.len() != 4 {
+        return #{ok: false, error: "SysML must name all four physical ramp-section hinges"};
+    }
     let writes = [];
-    for joint in joints {
-        if joint == () || joint < 0 {
-            return #{ok: false, error: "physical ramp-section hinge entities are unavailable"};
-        }
-        let result = cmd("SetPorts", #{target: joint, writes: [["angle", angle]]});
+    for name in joints {
+        let result = griffin_surface_ops::set_physical_ramp_hinge_angle(name, angle);
         if result == () || result.ok != true {
-            return #{ok: false, error: "ramp-section unfold command was rejected", joint: joint, result: result};
+            return #{ok: false, error: "ramp-section unfold command was rejected", hinge: name, result: result};
         }
         writes.push(result);
     }
@@ -235,18 +259,17 @@ fn deploy_ramps(me) {
     // Drive their existing USD revolute joints through the generic typed angle
     // port after touchdown; this is a real hinged deployment, not a pose write
     // or a second Twin-side physics implementation.
-    let port_joint = find_path(LANDER + "/RampHingePort");
-    let starboard_joint = find_path(LANDER + "/RampHingeStarboard");
-    if port_joint == () || port_joint < 0 || starboard_joint == () || starboard_joint < 0 {
-        return #{ok: false, error: "physical ramp hinge entities are unavailable"};
+    let joints = griffin_spec::ramp_root_joint_names();
+    if joints.len() != 2 {
+        return #{ok: false, error: "SysML must name both top-deck ramp hinges"};
     }
     let port_angle = griffin_spec::physical_ramp_port_deployment_angle_rad();
     let starboard_angle = griffin_spec::physical_ramp_starboard_deployment_angle_rad();
     if port_angle == () || starboard_angle == () {
         return #{ok: false, error: "physical ramp deployment angles are missing from SysML"};
     }
-    let port = cmd("SetPorts", #{target: port_joint, writes: [["angle", port_angle]]});
-    let starboard = cmd("SetPorts", #{target: starboard_joint, writes: [["angle", starboard_angle]]});
+    let port = griffin_surface_ops::set_physical_ramp_hinge_angle(joints[0], port_angle);
+    let starboard = griffin_surface_ops::set_physical_ramp_hinge_angle(joints[1], starboard_angle);
     if port == () || port.ok != true || starboard == () || starboard.ok != true {
         return #{ok: false, error: "physical ramp joint angle command was rejected",
             port: port, starboard: starboard};
@@ -260,7 +283,10 @@ fn deploy_ramps(me) {
 
 fn release_rover(me, already_requested) {
     if already_requested { return true; }
-    emit("griffin_ramp_deployment_settled");
+    if !this.lander_settled || !this.ramps_deployed {
+        notify_kind("FLIP release rejected: touchdown and settled ramps are required.", "warn");
+        return false;
+    }
 
     let joint = find_path(DOCK);
     if joint == () || joint < 0 {
@@ -434,8 +460,21 @@ fn task(me, ctx) {
         // mission immediately after its structured failure verdict instead of
         // falling through to touchdown/egress steps.
         check(|m| this.phase_timeout != true),
-        once(|m| { this.lander_settled = true; touchdown_notice(m); true }),
+        once(|m| {
+            this.lander_settled = true;
+            touchdown_notice(m);
+            // Unattended scene runs have no operator to press U or G. Keep
+            // their authored route deterministic while windowed sessions use
+            // the same explicit command/key/HUD controls as the operator.
+            if is_unattended() { this.ramp_unfold_requested = true; }
+            true
+        }),
         wait(1.5),
+        // The folded hinge targets are the transport/descent pose. Keep the
+        // rover attached and expose U plus the HUD button until the operator
+        // explicitly requests the two-stage ramp unfold.
+        wait_until(|m| this.ramp_unfold_requested || this.phase_timeout),
+        check(|m| this.phase_timeout != true),
         once(|m| {
             let unfold = unfold_ramp_sections(m);
             if unfold.ok != true {
@@ -448,9 +487,7 @@ fn task(me, ctx) {
         check(|m| this.phase_timeout != true),
         once(|m| {
             let ramps = deploy_ramps(m);
-            if ramps.ok == true {
-                this.ramps_deployed = true;
-            } else {
+            if ramps.ok != true {
                 this.phase_timeout = true;
                 fail_phase(this, "ramp-deploy");
             }
@@ -459,14 +496,23 @@ fn task(me, ctx) {
         wait(4.0),
         check(|m| this.phase_timeout != true),
         once(|m| {
-            if release_rover(m, this.release_requested) {
-                this.release_requested = true;
-            } else {
-                this.phase_timeout = true;
-                fail_phase(this, "adapter-release");
+            this.ramps_deployed = true;
+            emit("griffin_ramp_deployment_settled");
+            griffin_controls::show_rover_release_actions();
+            print("[griffin] both physical ramps completed the deployment settle interval");
+            if is_unattended() {
+                if release_rover(m, false) {
+                    this.release_requested = true;
+                } else {
+                    this.phase_timeout = true;
+                    fail_phase(this, "adapter-release");
+                }
             }
             true
         }),
+        // The G shortcut and HUD button share the same safe release request.
+        wait_until(|m| this.release_requested || this.phase_timeout),
+        check(|m| this.phase_timeout != true),
         // The command acknowledgement only means the request was accepted.
         // Wait until the physics-owned lifecycle has retired the live entity,
         // then hand rover control to the Twin.
