@@ -175,6 +175,11 @@ mission/tutorial scenario do not obscure the lander. Keep that scene for
 visual authoring; use `scenes/griffin_1_surface_ops.usda` for integration and
 runtime acceptance.
 
+Opening the Twin defaults to `scenes/griffin_flip_visual.usda`, the combined
+Griffin/FLIP review composition. The powered landing mission remains a separate
+scene; open `scenes/griffin_1_surface_ops.usda` when you want its mission
+controls and surface-operations sequence.
+
 For Griffin work, open the integrated `vehicles/griffin_1.usda` source through
 `scenes/griffin_1_editor.usda`; its visual components remain replaceable assets
 under `components/lander/`. Edit one component at a time through a dry Rhai
@@ -377,7 +382,9 @@ execute the suite.
     .\target\debug\luncosim.exe --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda
 
 The old sandbox binary is not the target for this Twin. Use the production
-luncosim binary and the default scene from twin.toml.
+luncosim binary. The Twin default is the combined visual review scene;
+explicitly select `griffin_1_surface_ops.usda` for powered landing and its
+mission controls.
 
 The Griffin wrapper keeps attitude command inputs and valve activities in USD.
 `AttitudeActuation` selects the generic `SignedTorqueAllocator.mo` through

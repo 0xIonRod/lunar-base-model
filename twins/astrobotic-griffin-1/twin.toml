@@ -3,7 +3,7 @@ description = "Astrobotic Griffin-1 surface-operations study Twin"
 version = "0.1.0"
 
 [usd]
-default_scene = "scenes/griffin_1_surface_ops.usda"
+default_scene = "scenes/griffin_flip_visual.usda"
 scenes = [
     "scenes/*.usda",
     "tests/*.usda",
