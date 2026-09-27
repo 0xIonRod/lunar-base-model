@@ -376,12 +376,17 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/BellNozzle.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:throat_radius = 0.12
-            float inputs:exit_radius = 0.34
-            float inputs:length = 0.52
+            float inputs:throat_radius = 0.11999999731779099
+            float inputs:exit_radius = 0.3400000035762787
+            float inputs:length = 0.5199999809265137
             float inputs:contour = 1.0
             float outputs:exit_area
             float outputs:exit_radius_m
+            float inputs:gamma = 1.2000000476837158
+            float inputs:p_chamber = 5500000.0
+            float inputs:p_exit = 8000.0
+            float inputs:p_ambient = 0.0
+            float inputs:g0 = 9.806650161743164
         }
         def Scope "PlumePhotometry" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -390,27 +395,35 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
-            int inputs:engine_count = 7
             float outputs:render_throttle
             float outputs:visual_length_fraction
             float outputs:intensity
             float outputs:radius
-            float inputs:throttle.connect = </Griffin1/MainPropulsion.outputs:engine_activity>
-            float inputs:thrust_n.connect = </Griffin1/MainPropulsion.outputs:thrust_n>
-            float inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion.outputs:maximum_thrust_n>
-            float inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion.outputs:propellant_flow>
-            float inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:exhaust_velocity_mps>
-            float inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:design_exhaust_velocity_mps>
-            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
-            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:nozzle_exit_pressure_pa = 0.0
-            float inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion.outputs:chamber_pressure_pa>
             float inputs:design_chamber_pressure_pa = 0.0
             float inputs:ambient_pressure_pa = 0.0
             float inputs:pressure_threshold_pa = 1000.0
             float inputs:geometry_capacity_m = 4.0
-            float inputs:w_max = 0.27
-            float inputs:luminance = 15.047
+            float inputs:w_max = 0.27000001072883606
+            float inputs:luminance = 15.04699993133545
+            float inputs:throttle
+            float inputs:throttle.connect = </Griffin1/MainPropulsion.outputs:engine_activity>
+            float inputs:thrust_n
+            float inputs:thrust_n.connect = </Griffin1/MainPropulsion.outputs:thrust_n>
+            float inputs:maximum_thrust_n
+            float inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion.outputs:maximum_thrust_n>
+            float inputs:propellant_flow_kgs
+            float inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion.outputs:propellant_flow>
+            float inputs:exhaust_velocity_mps
+            float inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:exhaust_velocity_mps>
+            float inputs:design_exhaust_velocity_mps
+            float inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:design_exhaust_velocity_mps>
+            float inputs:nozzle_exit_radius_m
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            float inputs:nozzle_exit_area_m2
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:chamber_pressure_pa
+            float inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion.outputs:chamber_pressure_pa>
         }
         def Scope "PropellantStatus" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -1265,67 +1278,142 @@ def Xform "Griffin1" (
     {
         token visibility = "invisible"
     }
-    def Xform "Nozzle"
+    over "Nozzle"
     {
-        token visibility = "inherited"
-        def Xform "MainEngineCluster"
+        over "MainEngineCluster"
         {
-            token visibility = "inherited"
-            def Xform "Engine01" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine01"
             {
-                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine02" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine02"
             {
-                custom double3 xformOp:translate = (1.05, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine03" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine03"
             {
-                custom double3 xformOp:translate = (-1.05, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine04" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine04"
             {
-                custom double3 xformOp:translate = (0.525, 1.0, 0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine05" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine05"
             {
-                custom double3 xformOp:translate = (-0.525, 1.0, -0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine06" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine06"
             {
-                custom double3 xformOp:translate = (-0.525, 1.0, 0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine07" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine07"
             {
-                custom double3 xformOp:translate = (0.525, 1.0, -0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
-            }
-            def Xform "EngineSkirt" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
-            )
-            {
-                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
         }
     }
@@ -2225,67 +2313,142 @@ def Xform "Griffin1" (
     {
         token visibility = "invisible"
     }
-    def Xform "Nozzle"
+    over "Nozzle"
     {
-        token visibility = "inherited"
-        def Xform "MainEngineCluster"
+        over "MainEngineCluster"
         {
-            token visibility = "inherited"
-            def Xform "Engine01" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine01"
             {
-                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine02" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine02"
             {
-                custom double3 xformOp:translate = (1.05, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine03" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine03"
             {
-                custom double3 xformOp:translate = (-1.05, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine04" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine04"
             {
-                custom double3 xformOp:translate = (0.525, 1.0, 0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine05" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine05"
             {
-                custom double3 xformOp:translate = (-0.525, 1.0, -0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine06" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine06"
             {
-                custom double3 xformOp:translate = (-0.525, 1.0, 0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine07" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine07"
             {
-                custom double3 xformOp:translate = (0.525, 1.0, -0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
-            }
-            def Xform "EngineSkirt" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
-            )
-            {
-                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
         }
     }
@@ -2610,67 +2773,142 @@ def Xform "Griffin1" (
             uniform token purpose = "render"
         }
     }
-    def Xform "Nozzle"
+    over "Nozzle"
     {
-        token visibility = "inherited"
-        def Xform "MainEngineCluster"
+        over "MainEngineCluster"
         {
-            token visibility = "inherited"
-            def Xform "Engine01" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine01"
             {
-                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine02" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine02"
             {
-                custom double3 xformOp:translate = (1.05, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine03" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine03"
             {
-                custom double3 xformOp:translate = (-1.05, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine04" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine04"
             {
-                custom double3 xformOp:translate = (0.525, 1.0, 0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine05" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine05"
             {
-                custom double3 xformOp:translate = (-0.525, 1.0, -0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine06" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine06"
             {
-                custom double3 xformOp:translate = (-0.525, 1.0, 0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
-            def Xform "Engine07" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
-            )
+            over "Engine07"
             {
-                custom double3 xformOp:translate = (0.525, 1.0, -0.9093266739736606)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
-            }
-            def Xform "EngineSkirt" (
-                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
-            )
-            {
-                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float inputs:plume_throttle
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
         }
     }
@@ -2679,17 +2917,19 @@ def Xform "Griffin1" (
     )
     {
         token visibility = "inherited"
-        float physics:mass = 31.666666667
-        float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+        float physics:mass = 31.66666603088379
+        float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
         custom float lunco:deployment_angle_rad = 0.0
-        custom double3 xformOp:translate = (3.200000000, 5.190000000, 0.0)
-        custom double3 xformOp:rotateXYZ = (0.000000000, 0.000000000, 0.000000000)
+        custom double3 xformOp:translate = (3.2, 5.19, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double lunco:operational_width_m = 3.50
+        custom double lunco:operational_width_m = 3.5
         custom double lunco:wheel_clearance_m = 0.15
         def Xform "DeckSection" (
             references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
-        ) { }
+        )
+        {
+        }
         def Xform "MiddleSection" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
             references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
@@ -2697,8 +2937,8 @@ def Xform "Griffin1" (
         {
             custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
-            float physics:mass = 31.666666667
-            float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+            float physics:mass = 31.66666603088379
+            float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
             def Xform "ToeSection" (
                 prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
                 references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda@</RampToeSection>
@@ -2706,15 +2946,15 @@ def Xform "Griffin1" (
             {
                 custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                float physics:mass = 31.666666667
-                float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+                float physics:mass = 31.66666603088379
+                float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
             }
         }
         def PhysicsFixedJoint "RampTransitionJointPort"
         {
             custom rel physics:body0 = </Griffin1>
             custom rel physics:body1 = </Griffin1/EgressRampPort/TransitionPlate>
-            point3f physics:localPos0 = (2.218364954, 5.190000057, 0.0)
+            point3f physics:localPos0 = (2.218364953994751, 5.190000057220459, 0.0)
             point3f physics:localPos1 = (0.0, 0.0, 0.0)
             bool physics:collisionEnabled = false
         }
@@ -2722,19 +2962,19 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
         )
         {
-            custom double3 xformOp:translate = (-0.981635000, 0.0, 0.0)
+            custom double3 xformOp:translate = (-0.981635, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
             float physics:mass = 15.0
-            float3 physics:diagonalInertia = (15.353, 20.131, 4.859)
+            float3 physics:diagonalInertia = (15.352999687194824, 20.131000518798828, 4.859000205993652)
             def Cube "ContactSurface" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             )
             {
                 double size = 1.0
                 double3 xformOp:translate = (0.0, 0.0, 0.0)
-                double3 xformOp:scale = (1.96327, 0.18, 3.50)
+                double3 xformOp:scale = (1.96327, 0.18, 3.5)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                color3f[] primvars:displayColor = [(0.42, 0.26, 0.12)]
+                color3f[] primvars:displayColor = [(0.41999998688697815, 0.25999999046325684, 0.11999999731779099)]
                 uniform token purpose = "render"
                 bool physics:collisionEnabled = true
             }
@@ -2745,17 +2985,19 @@ def Xform "Griffin1" (
     )
     {
         token visibility = "inherited"
-        float physics:mass = 31.666666667
-        float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+        float physics:mass = 31.66666603088379
+        float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
         custom float lunco:deployment_angle_rad = 0.0
-        custom double3 xformOp:translate = (-3.200000000, 5.190000000, 0.0)
-        custom double3 xformOp:rotateXYZ = (0.000000000, 180.000000000, 0.000000000)
+        custom double3 xformOp:translate = (-3.2, 5.19, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double lunco:operational_width_m = 3.50
+        custom double lunco:operational_width_m = 3.5
         custom double lunco:wheel_clearance_m = 0.15
         def Xform "DeckSection" (
             references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
-        ) { }
+        )
+        {
+        }
         def Xform "MiddleSection" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
             references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
@@ -2763,8 +3005,8 @@ def Xform "Griffin1" (
         {
             custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
-            float physics:mass = 31.666666667
-            float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+            float physics:mass = 31.66666603088379
+            float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
             def Xform "ToeSection" (
                 prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
                 references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda@</RampToeSection>
@@ -2772,15 +3014,15 @@ def Xform "Griffin1" (
             {
                 custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                float physics:mass = 31.666666667
-                float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+                float physics:mass = 31.66666603088379
+                float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
             }
         }
         def PhysicsFixedJoint "RampTransitionJointStarboard"
         {
             custom rel physics:body0 = </Griffin1>
             custom rel physics:body1 = </Griffin1/EgressRampStarboard/TransitionPlate>
-            point3f physics:localPos0 = (-2.218364954, 5.190000057, 0.0)
+            point3f physics:localPos0 = (-2.218364953994751, 5.190000057220459, 0.0)
             point3f physics:localPos1 = (0.0, 0.0, 0.0)
             bool physics:collisionEnabled = false
         }
@@ -2788,19 +3030,19 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
         )
         {
-            custom double3 xformOp:translate = (0.981635000, 0.0, 0.0)
+            custom double3 xformOp:translate = (0.981635, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
             float physics:mass = 15.0
-            float3 physics:diagonalInertia = (15.353, 20.131, 4.859)
+            float3 physics:diagonalInertia = (15.352999687194824, 20.131000518798828, 4.859000205993652)
             def Cube "ContactSurface" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             )
             {
                 double size = 1.0
                 double3 xformOp:translate = (0.0, 0.0, 0.0)
-                double3 xformOp:scale = (1.96327, 0.18, 3.50)
+                double3 xformOp:scale = (1.96327, 0.18, 3.5)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                color3f[] primvars:displayColor = [(0.42, 0.26, 0.12)]
+                color3f[] primvars:displayColor = [(0.41999998688697815, 0.25999999046325684, 0.11999999731779099)]
                 uniform token purpose = "render"
                 bool physics:collisionEnabled = true
             }
@@ -2813,7 +3055,7 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -50.0
         float physics:upperLimit = 50.0
-        point3f physics:localPos0 = (3.200000048, 5.190000057, 0.0)
+        point3f physics:localPos0 = (3.200000047683716, 5.190000057220459, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -2826,14 +3068,14 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -50.0
         float physics:upperLimit = 50.0
-        point3f physics:localPos0 = (-3.200000048, 5.190000057, 0.0)
+        point3f physics:localPos0 = (-3.200000047683716, 5.190000057220459, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
     def PhysicsRevoluteJoint "RampSectionHingePort01" (
-        prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        prepend apiSchemas = "PhysicsDriveAPI:angular"
     )
     {
         rel physics:body0 = </Griffin1/EgressRampPort>
@@ -2841,7 +3083,7 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -120.0
         float physics:upperLimit = 120.0
-        point3f physics:localPos0 = (4.076201667, 0.0, 0.0)
+        point3f physics:localPos0 = (4.076201438903809, 0.0, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -2854,7 +3096,7 @@ def Xform "Griffin1" (
         bool physics:collisionEnabled = false
     }
     def PhysicsRevoluteJoint "RampSectionHingePort12" (
-        prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        prepend apiSchemas = "PhysicsDriveAPI:angular"
     )
     {
         rel physics:body0 = </Griffin1/EgressRampPort/MiddleSection>
@@ -2862,7 +3104,7 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -120.0
         float physics:upperLimit = 120.0
-        point3f physics:localPos0 = (4.076201667, 0.0, 0.0)
+        point3f physics:localPos0 = (4.076201438903809, 0.0, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -2875,7 +3117,7 @@ def Xform "Griffin1" (
         bool physics:collisionEnabled = false
     }
     def PhysicsRevoluteJoint "RampSectionHingeStarboard01" (
-        prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        prepend apiSchemas = "PhysicsDriveAPI:angular"
     )
     {
         rel physics:body0 = </Griffin1/EgressRampStarboard>
@@ -2883,7 +3125,7 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -120.0
         float physics:upperLimit = 120.0
-        point3f physics:localPos0 = (4.076201667, 0.0, 0.0)
+        point3f physics:localPos0 = (4.076201438903809, 0.0, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -2896,7 +3138,7 @@ def Xform "Griffin1" (
         bool physics:collisionEnabled = false
     }
     def PhysicsRevoluteJoint "RampSectionHingeStarboard12" (
-        prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        prepend apiSchemas = "PhysicsDriveAPI:angular"
     )
     {
         rel physics:body0 = </Griffin1/EgressRampStarboard/MiddleSection>
@@ -2904,7 +3146,7 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -120.0
         float physics:upperLimit = 120.0
-        point3f physics:localPos0 = (4.076201667, 0.0, 0.0)
+        point3f physics:localPos0 = (4.076201438903809, 0.0, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -3124,66 +3366,136 @@ def Xform "Griffin1" (
         {
             over "Engine01"
             {
+                float inputs:plume_throttle
                 float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
                 float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
                 float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
                 float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
-                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
-                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
             over "Engine02"
             {
+                float inputs:plume_throttle
                 float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
                 float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
                 float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
                 float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
-                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
-                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
             over "Engine03"
             {
+                float inputs:plume_throttle
                 float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
                 float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
                 float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
                 float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
-                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
-                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
             over "Engine04"
             {
+                float inputs:plume_throttle
                 float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
                 float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
                 float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
                 float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
-                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
-                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
             over "Engine05"
             {
+                float inputs:plume_throttle
                 float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
                 float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
                 float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
                 float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
-                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
-                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
             over "Engine06"
             {
+                float inputs:plume_throttle
                 float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
                 float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
                 float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
                 float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
-                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
-                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
             over "Engine07"
             {
+                float inputs:plume_throttle
                 float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction
                 float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity
                 float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius
                 float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
-                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
-                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+                over "Flame"
+                {
+                    rel material:binding = </Griffin1/Looks/Flame_Mat>
+                }
+                over "FlameCore"
+                {
+                    rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                }
             }
         }
     }
