@@ -317,6 +317,10 @@ therefore has not exercised the post-landing ramp-unfold step in runtime.
     LUNCOSIM_BIN=/path/to/terrain/target/debug/luncosim \
       twins/astrobotic-griffin-1/tools/check_landing_determinism.sh
 
+The default run bound is 30,000 fixed ticks (500 simulated seconds), long
+enough for the observed descent duration plus the required stability window.
+Set `GRIFFIN_LANDING_MAX_TICKS` to override it for focused diagnostics.
+
 The harness is deliberately not a second physics implementation: it only
 orchestrates two existing `luncosim test` invocations and applies the tolerances
 read by Rhai from SysML. A failing command is evidence of run-to-run divergence
