@@ -194,7 +194,7 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (12.8, 0.0, 0.0)
+        custom double3 xformOp:translate = (15.6, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {
@@ -372,7 +372,7 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://components/gnc/landing_target.usda@</LandingTarget>
     )
     {
-        double3 xformOp:translate = (0.0, 3.98, 0.0)
+        double3 xformOp:translate = (0.0, 0.44, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Scope "Scenario"

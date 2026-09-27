@@ -45,6 +45,12 @@ script = "scenarios/tests/griffin_ramp_flight_stow.rhai"
 verdict_channel = "GRIFFIN_RAMP_FLIGHT_STOW"
 
 [[verification.cases]]
+name = "GriffinRampRequirements::Verify_GriffinRampTouchdownGeometry"
+scene = "tests/griffin_ramp_touchdown_geometry.usda"
+script = "scenarios/tests/griffin_ramp_touchdown_geometry.rhai"
+verdict_channel = "GRIFFIN_RAMP_TOUCHDOWN_GEOMETRY"
+
+[[verification.cases]]
 name = "GriffinLanderRequirements::Verify_GriffinLanderRequirements"
 scene = "tests/griffin_lander_requirements.usda"
 script = "scenarios/tests/griffin_lander_requirements.rhai"

@@ -591,7 +591,7 @@ fn on_tick(me, ctx) {
         let local_tip_x = sign * total_length;
         let tip_bottom_x = sign * (total_length - bevel);
         let origin = vec3(0.0,
-            sysml_requirements::number(source, "Griffin1Requirements::PublicMissionContext::landingComTouchdownY")
+            sysml_requirements::number(source, "Griffin1Requirements::PublicMissionContext::landingVehicleReferenceTouchdownY")
                 + _source_number(source, "physicalRampMountY"), 0.0);
         let top_point = mechanical_relations::planar_rigid_transform_point(origin,
             vec3(local_tip_x, _source_number(source, "rampSurfaceCenterYM")

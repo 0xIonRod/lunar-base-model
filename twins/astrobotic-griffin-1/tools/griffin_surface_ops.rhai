@@ -137,7 +137,9 @@ fn physics_performance() {
 // not retain its nested physics snapshots in a per-tick test state map.
 fn landing_stability_sample() {
     let lander = find_path("/Griffin1SurfaceOps/Lander");
-    if lander == () || lander < 0 { return (); }
+    if lander == () || lander < 0 {
+        return #{ok: false, error: "lander entity is missing", lander: lander};
+    }
     let pose = query("QueryUsdPrim", #{
         path: "/Griffin1SurfaceOps/Lander",
         attrs: ["xformOp:translate"]
@@ -146,23 +148,32 @@ fn landing_stability_sample() {
     if pose == () || pose.ok == false || pose.world_position == ()
         || physics == () || physics.ok == false
         || physics.physics_state_ready != true {
-        return ();
+        return #{ok: false, error: "lander pose or physics state is unavailable",
+            lander: lander, pose: pose, physics: physics};
     }
     let linear = physics.linear_velocity_mps;
     let angular = physics.angular_velocity_radps;
     let up = world_up3(lander);
     if linear == () || linear.len() != 3 || angular == () || angular.len() != 3
         || up == () {
-        return ();
+        return #{ok: false, error: "lander velocity or attitude is unavailable",
+            lander: lander, linear_velocity_mps: linear,
+            angular_velocity_radps: angular, up: up};
     }
     let ground_speed = (linear[0] * linear[0] + linear[2] * linear[2]).sqrt();
     let angular_speed = vlen(angular);
     #{
+        ok: true,
         position: pose.world_position,
+        linear_velocity_mps: linear,
         upright_axis_y: up.y,
         ground_speed: ground_speed,
         angular_speed: angular_speed,
-        touchdown: get(lander, "touchdown")
+        touchdown: get(lander, "touchdown"),
+        all_legs_contact: get(lander, "all_legs_contact"),
+        landing_contact: get(lander, "landing_contact"),
+        any_leg_contact: get(lander, "any_leg_contact"),
+        engine_cutoff_contact: get(lander, "engine_cutoff_contact")
     }
 }
 
@@ -171,6 +182,7 @@ fn landing_stability_sample() {
 fn landing_stability_contract() {
     #{
         horizon_s: griffin_spec::landing_stability_horizon_s(),
+        sample_every_n_ticks: griffin_spec::landing_stability_sample_every_n_ticks(),
         min_upright_axis_y: griffin_spec::landing_minimum_upright_axis_y(),
         max_ground_speed_mps: griffin_spec::landing_max_ground_speed_mps(),
         max_angular_speed_rad_per_sec: griffin_spec::landing_max_angular_speed_rad_per_sec(),

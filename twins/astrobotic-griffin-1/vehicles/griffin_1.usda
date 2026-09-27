@@ -2496,7 +2496,9 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_body_collision.usda@</GriffinBody>
     )
     {
-        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        # Align the physical hull with the rendered bus. At the reference
+        # origin the old proxy struck terrain before the landing pads.
+        custom double3 xformOp:translate = (0.0, 3.2, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "LegPX" (

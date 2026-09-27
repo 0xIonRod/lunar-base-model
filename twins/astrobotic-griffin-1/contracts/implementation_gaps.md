@@ -573,6 +573,28 @@ become Griffin's permanent source semantics.
    only when their inputs have real source provenance or are explicitly marked
    replaceable study assumptions. Do not call surrogate data flight accuracy.
 
+### Ramp fold and touchdown evidence (2026-09-27)
+
+The physical ramp rails now sit on the walking-surface upper face and remain
+folded above the legs during descent. The composed flight-stow check passes
+61/61 checks: the lowest rail point is Y=5.19 m, the highest leg geometry is
+Y=2.44 m, and vertical clearance is 2.75 m. A focused GRR-010 check passes
+6/6 checks for both ramp toe edges at the terrain plane using the 0.44 m
+vehicle-reference touchdown datum and 27.833532 degree deployment angle.
+These values are explicit Twin study assumptions.
+
+The post-touchdown mission sequence waits for `lander_touchdown`, levels the
+four intermediate hinges, then deploys the deck hinges. A fixed-clock descent
+diagnostic ran for 650 seconds wall time (390 simulated seconds) without that
+touchdown output. It recorded intermittent leg-contact flags, including one
+sample with all four flags set at body-reference Y=-1.39 m, followed by a
+sample at Y=9.12 m and +6.57 m/s vertical speed. The rails were still at least
+3.8 m above the terrain at the deep-contact sample. This rules out the folded
+rails touching the ground at that event; it does not identify the cause of
+the gear bounce. The ramp-unfold mission step and full 60-second post-touchdown
+stability requirement remain unverified until the landing/contact path produces
+a touchdown event.
+
 ## Definition of a proper first Griffin slice
 
 - The source graph contains typed component usages and a formal requirement,

@@ -1,12 +1,19 @@
 // Twin-owned fixed-clock landing-stability test.
 //
 // The scene remains a compact composed fixture, while this Rhai observer
-// samples the lander until the SysML stability horizon. A verification
+// samples the lander for the SysML stability horizon after touchdown. A verification
 // binding selects the stability channel and a Twin-local harness compares the
 // resulting metrics from two fresh processes. SysML owns every limit; Rhai
 // owns the observations and verdict.
 
 const ROOT = "/Griffin1SurfaceOps";
+
+fn simulation_dependencies(me, ctx) {
+    let lander = find_path(ROOT + "/Lander");
+    #{modelica_entities: [lander], entity_reads: [lander], entity_writes: [],
+      query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
+        "QueryUsdPrim", "QueryPhysicsState"], required_inputs: []}
+}
 
 fn finite_number(value) {
     value != () && value.is_finite()
@@ -18,15 +25,26 @@ fn on_start(me, ctx) {
     // so they are diagnostic clocks rather than the test horizon.
     this.clock_start = clock_snapshot();
     this.start_tick = sim_tick();
+    this.touchdown_tick = ();
+    this.touchdown_position = ();
+    this.touchdown_seen = false;
     this.elapsed = 0.0;
     this.stability_done = false;
     this.last_sample_tick = sim_tick();
     this.sample_count = 0;
+    this.total_sample_count = 0;
+    this.unready_sample_count = 0;
+    this.post_touchdown_unready_count = 0;
     this.finite = true;
+    this.all_post_touchdown_samples_contact = true;
     this.min_upright = 1.0;
     this.max_ground = 0.0;
     this.max_angular = 0.0;
     this.max_horizontal = 0.0;
+    this.minimum_position_y = 1.0e30;
+    this.maximum_position_y = -1.0e30;
+    this.all_four_contact_samples = 0;
+    this.touchdown_samples = 0;
     this.last = #{};
     // Resolve the SysML projection once. Re-querying the full validation map
     // at 60 Hz needlessly allocates a large dynamic value and can exceed the
@@ -47,9 +65,16 @@ fn emit_stability_verdict(me, contract, source) {
     let last_upright = if me.last.upright_axis_y != () { me.last.upright_axis_y } else { 0.0 };
     let last_ground = if me.last.ground_speed != () { me.last.ground_speed } else { 0.0 };
     let last_angular = if me.last.angular_speed != () { me.last.angular_speed } else { 0.0 };
+    let touchdown_observed = me.touchdown_seen;
+    let all_four_legs_contact = me.last.all_legs_contact != ()
+        && me.last.all_legs_contact >= 0.999
+        && me.all_post_touchdown_samples_contact
+        && me.post_touchdown_unready_count == 0;
     let clocks = clock_snapshot();
-    let clock_elapsed_delta = (clocks.sim_tick - me.clock_start.sim_tick).to_float()
-        * clocks.fixed_dt_s;
+    let clock_tick_delta = clocks.sim_tick - me.clock_start.sim_tick;
+    let post_touchdown_tick_delta = clocks.sim_tick - me.touchdown_tick;
+    let simulation_elapsed_delta = clock_tick_delta.to_float() * clocks.fixed_dt_s;
+    let clock_elapsed_delta = post_touchdown_tick_delta.to_float() * clocks.fixed_dt_s;
     let fixed_elapsed_delta = clocks.fixed_elapsed_s - me.clock_start.fixed_elapsed_s;
     let clock_sync_error = (clock_elapsed_delta - me.elapsed).abs();
     let metrics = #{
@@ -57,7 +82,9 @@ fn emit_stability_verdict(me, contract, source) {
         elapsed_s: me.elapsed,
         sim_tick: clocks.sim_tick,
         clock_start_sim_tick: me.clock_start.sim_tick,
-        clock_tick_delta: clocks.sim_tick - me.clock_start.sim_tick,
+        clock_tick_delta: clock_tick_delta,
+        post_touchdown_tick_delta: post_touchdown_tick_delta,
+        simulation_elapsed_delta_s: simulation_elapsed_delta,
         fixed_elapsed_s: clocks.fixed_elapsed_s,
         fixed_elapsed_delta_s: fixed_elapsed_delta,
         admitted_sim_elapsed_delta_s: clock_elapsed_delta,
@@ -67,6 +94,10 @@ fn emit_stability_verdict(me, contract, source) {
         physics_elapsed_s: clocks.physics_elapsed_s,
         barrier_held: clocks.barrier_held,
         sample_count: me.sample_count,
+        total_sample_count: me.total_sample_count,
+        post_touchdown_unready_count: me.post_touchdown_unready_count,
+        touchdown_tick: me.touchdown_tick,
+        touchdown_position: me.touchdown_position,
         position: last_position,
         upright_axis_y: last_upright,
         ground_speed_mps: last_ground,
@@ -75,8 +106,24 @@ fn emit_stability_verdict(me, contract, source) {
         max_ground_speed_mps: me.max_ground,
         max_angular_speed_rad_per_sec: me.max_angular,
         max_horizontal_drift_m: me.max_horizontal,
+        minimum_reference_y_m: if me.sample_count > 0 { me.minimum_position_y } else { () },
+        maximum_reference_y_m: if me.sample_count > 0 { me.maximum_position_y } else { () },
+        all_four_contact_samples: me.all_four_contact_samples,
+        touchdown_samples: me.touchdown_samples,
+        all_post_touchdown_samples_contact: me.all_post_touchdown_samples_contact,
         finite: me.finite,
+        unready_sample_count: me.unready_sample_count,
+        vertical_velocity_mps: if me.last.linear_velocity_mps != ()
+            && me.last.linear_velocity_mps.len() == 3 {
+                me.last.linear_velocity_mps[1]
+            } else { () },
         touchdown: if me.last.touchdown != () { me.last.touchdown } else { 0.0 },
+        touchdown_observed: touchdown_observed,
+        any_leg_contact: if me.last.any_leg_contact != () { me.last.any_leg_contact } else { () },
+        all_legs_contact: if me.last.all_legs_contact != () { me.last.all_legs_contact } else { () },
+        all_four_legs_contact: all_four_legs_contact,
+        landing_contact: if me.last.landing_contact != () { me.last.landing_contact } else { () },
+        engine_cutoff_contact: if me.last.engine_cutoff_contact != () { me.last.engine_cutoff_contact } else { () },
         source_revision: source.source_revision,
         divergence_tolerance_m: contract.divergence_tolerance_m,
         divergence_tolerance_upright: contract.divergence_tolerance_upright,
@@ -96,12 +143,19 @@ fn emit_stability_verdict(me, contract, source) {
     } else if metric_state == "invalid" {
         "A sampled physics value was non-finite"
     } else { () };
+    let sample_available = me.sample_count > 0
+        && me.post_touchdown_unready_count == 0
+        && me.elapsed >= contract.horizon_s;
+    let sample_state = if sample_available { "value" } else { "unavailable" };
     let check = sysml_requirements::constraint_check(
         "GR-036-landing-stability", "lander", "gr036",
         "Verify_GriffinLandingStability",
         "GriffinSimulationAccuracyRequirements::GR036_LandingStabilityWithinBounds",
-        #{telemetryFinite: _physics_observation("value", me.finite, ()),
-          sampleAvailable: _physics_observation("value", me.sample_count > 0, ()),
+        #{telemetryFinite: _physics_observation(metric_state, me.finite, metric_detail),
+          sampleAvailable: _physics_observation(sample_state, sample_available,
+              if sample_available { () } else { "The full post-touchdown sample window is incomplete" }),
+          touchdownObserved: _physics_observation("value", touchdown_observed, ()),
+          allFourLegsContact: _physics_observation(metric_state, all_four_legs_contact, metric_detail),
           minimumUprightAxisY: _physics_observation(metric_state, last_upright, metric_detail),
           minimumUprightAxisYLimit: _physics_observation("value", contract.min_upright_axis_y, ()),
           maximumGroundSpeedMps: _physics_observation(metric_state, me.max_ground, metric_detail),
@@ -125,16 +179,18 @@ fn on_tick(me, ctx) {
         return;
     }
 
-    // Sampling every ten fixed ticks keeps the test inexpensive while still
-    // resolving the powered-descent oscillations that caused divergence.
+    // Sampling cadence is owned by GR-036 and measured relative to this
+    // observer's fixed-tick frame. Startup admission can begin at any tick.
     let tick = sim_tick();
     // Sample in the test's own fixed-tick frame, not against the process-wide
     // tick modulus. Startup admission may begin at any absolute SimTick, but
     // a relative observer must produce the same sample set for the same
     // horizon on every fresh process.
     let relative_tick = tick - this.start_tick;
-    this.elapsed = relative_tick.to_float() * dt();
-    if relative_tick > 0 && relative_tick % 10 == 0 && tick != this.last_sample_tick {
+    let sample_every = contract.sample_every_n_ticks;
+    if sample_every == () || sample_every <= 0 { return; }
+    if relative_tick > 0 && relative_tick % sample_every == 0
+        && tick != this.last_sample_tick {
         this.last_sample_tick = tick;
         let sample = griffin_surface_ops::landing_stability_sample();
         // Scene projection and the first admitted physics pose can complete on
@@ -143,23 +199,64 @@ fn on_tick(me, ctx) {
         // and let the explicit no-sample requirement fail if readiness never
         // arrives.  Once all fields exist, NaN/inf still fails immediately.
         let position = if sample == () { () } else { sample.position };
-        let ready = sample != () && position != () && position.len() == 3
+        let ready = sample != () && sample.ok == true
+            && position != () && position.len() == 3
             && sample.upright_axis_y != () && sample.ground_speed != ()
             && sample.angular_speed != ();
         if !ready {
+            if this.unready_sample_count < 3 {
+                print("[griffin-landing-stability] sample unavailable: " + sample);
+            }
+            this.unready_sample_count += 1;
+            if this.touchdown_seen {
+                this.post_touchdown_unready_count += 1;
+            }
             return;
         }
         this.last = sample;
-        this.sample_count += 1;
+        this.total_sample_count += 1;
+        if !this.touchdown_seen && sample.touchdown != () && sample.touchdown >= 0.999 {
+            this.touchdown_seen = true;
+            this.touchdown_tick = tick;
+            this.touchdown_position = position;
+        }
+        if !this.touchdown_seen && relative_tick > 0
+            && relative_tick % (sample_every * 60) == 0 {
+            print("[griffin-landing-stability] descent sample elapsed_s="
+                + (relative_tick.to_float() * dt()).to_string()
+                + " reference_y_m=" + position[1].to_string()
+                + " vertical_velocity_mps=" + sample.linear_velocity_mps[1].to_string()
+                + " any_leg_contact=" + sample.any_leg_contact.to_string()
+                + " all_legs_contact=" + sample.all_legs_contact.to_string()
+                + " touchdown=" + sample.touchdown.to_string());
+        }
+        if this.touchdown_seen {
+            this.sample_count += 1;
+            this.elapsed = (tick - this.touchdown_tick).to_float() * dt();
+            if position[1] < this.minimum_position_y {
+                this.minimum_position_y = position[1];
+            }
+            if position[1] > this.maximum_position_y {
+                this.maximum_position_y = position[1];
+            }
+            if sample.all_legs_contact != () && sample.all_legs_contact >= 0.999 {
+                this.all_four_contact_samples += 1;
+            } else {
+                this.all_post_touchdown_samples_contact = false;
+            }
+            if sample.touchdown != () && sample.touchdown >= 0.999 {
+                this.touchdown_samples += 1;
+            }
+        }
         let finite = position != () && position.len() == 3
             && finite_number(position[0]) && finite_number(position[1])
             && finite_number(position[2])
             && finite_number(sample.upright_axis_y)
             && finite_number(sample.ground_speed)
             && finite_number(sample.angular_speed);
-        if !finite {
+        if this.touchdown_seen && !finite {
             this.finite = false;
-        } else {
+        } else if this.touchdown_seen {
             if sample.upright_axis_y < this.min_upright {
                 this.min_upright = sample.upright_axis_y;
             }
@@ -169,15 +266,17 @@ fn on_tick(me, ctx) {
             if sample.angular_speed.abs() > this.max_angular {
                 this.max_angular = sample.angular_speed.abs();
             }
-            let horizontal = (position[0] * position[0]
-                + position[2] * position[2]).sqrt();
+            let horizontal_x = position[0] - this.touchdown_position[0];
+            let horizontal_z = position[2] - this.touchdown_position[2];
+            let horizontal = (horizontal_x * horizontal_x
+                + horizontal_z * horizontal_z).sqrt();
             if horizontal > this.max_horizontal {
                 this.max_horizontal = horizontal;
             }
         }
     }
 
-    if this.elapsed < contract.horizon_s { return; }
+    if !this.touchdown_seen || this.elapsed < contract.horizon_s { return; }
     let source = sysml_requirements::source();
     emit_stability_verdict(this, contract, source);
 }

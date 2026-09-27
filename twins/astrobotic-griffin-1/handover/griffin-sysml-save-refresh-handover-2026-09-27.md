@@ -186,3 +186,41 @@ preexisting SolarPanel/acausal changes remain staged and untouched. `luncosim
 test --list` currently hits an unrelated parse error in
 `assets/scenarios/tests/scripting_task_contract.rhai:94`; direct execution of
 the explicit Griffin scene works. No terrain or remote publication was made.
+
+## Continuation work (2026-09-27, touchdown geometry and rail concern)
+
+The landing reference is now explicit as a vehicle-reference height of 0.44 m.
+It is a replaceable estimate from the current 4,950 kg study mass, four
+4 kN/m landing-gear springs at lunar gravity, and the 0.06 m unloaded pad
+bottom datum; it is not Griffin flight data. The body collision proxy is
+translated to Y=3.2 m to align it with the rendered bus and keep the lower hull
+clear of the landing pads.
+
+The physical ramp deployment angle is now +/-0.4857867749 rad (27.833532
+degrees). This includes the upper-face track thickness and derived toe miter.
+The focused `Verify_GriffinRampTouchdownGeometry` run passed 6/6 checks at
+source revision `13950898190506578966`; for both ramps the top and bottom toe
+edges compute to Y=-7.52e-11 m against terrain Y=0. The route exit marker was
+moved to X=15.60 m beyond the deployed ramp tip near X=14.06 m.
+
+The same source revision passed `Verify_GriffinRampFlightStow` 61/61 checks.
+All 12 composed rail shapes are on the upper face of their tracks. The lowest
+stowed rail point is Y=5.19 m and the highest of 40 landing-leg geometry
+shapes is Y=2.44 m, giving 2.75 m of clearance. During descent, the rails
+remain folded; after the `lander_touchdown` event, the mission waits 1.5 s,
+commands the four middle/toe hinges level, waits 3 s, then deploys the two
+deck hinges.
+
+A fixed-clock post-touchdown diagnostic ran under a 650 s wall timeout and
+reached 390 simulated seconds without the lander's touchdown output. It
+recorded a deep-contact sample at body-reference Y=-1.386 m with both
+`any_leg_contact` and `all_legs_contact` set, then a sample at Y=9.115 m with
+vertical speed +6.566 m/s. At the deep-contact sample the folded rails were
+still about 3.80 m above terrain, so they could not have caused that ground
+contact. The contact/landing path still needs investigation; the run did not
+reach the ramp-unfold step or the full 60 s post-touchdown stability window.
+This continuation does not diagnose or modify the Modelica landing dynamics.
+
+An offscreen visual capture was attempted but did not produce a frame before
+its 120 s timeout. The composed geometry checks above are the verification
+evidence. The model repo changes remain local; no remote publication was made.

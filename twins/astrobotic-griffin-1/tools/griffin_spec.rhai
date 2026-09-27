@@ -210,7 +210,8 @@ fn _qualified_attribute(name) {
         return "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::" + name;
     }
     let landing_stability = [
-        "landingStabilityHorizonS", "landingMinimumUprightAxisY",
+        "landingStabilityHorizonS", "landingStabilitySampleEveryNTicks",
+        "landingMinimumUprightAxisY",
         "landingMaxGroundSpeedMps", "landingMaxAngularSpeedRadPerSec",
         "landingMaxHorizontalDriftM"
     ];
@@ -333,8 +334,13 @@ fn landing_leg_count() { _sysml_integer("landingLegCount") }
 fn ramp_count() { _sysml_integer("rampCount") }
 fn solar_array_count() { _sysml_integer("solarArrayCount") }
 fn route_steering_mode() { _sysml_text("missionSteeringMode") }
-fn landing_com_touchdown_y() { _sysml_attribute("landingComTouchdownY") }
+fn landing_vehicle_reference_touchdown_y() {
+    _sysml_attribute("landingVehicleReferenceTouchdownY")
+}
 fn landing_stability_horizon_s() { _sysml_attribute("landingStabilityHorizonS") }
+fn landing_stability_sample_every_n_ticks() {
+    _sysml_integer("landingStabilitySampleEveryNTicks")
+}
 fn landing_minimum_upright_axis_y() { _sysml_attribute("landingMinimumUprightAxisY") }
 fn landing_max_ground_speed_mps() { _sysml_attribute("landingMaxGroundSpeedMps") }
 fn landing_max_angular_speed_rad_per_sec() { _sysml_attribute("landingMaxAngularSpeedRadPerSec") }

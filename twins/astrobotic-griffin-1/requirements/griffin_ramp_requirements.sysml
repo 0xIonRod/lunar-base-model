@@ -284,8 +284,8 @@ package GriffinRampRequirements {
         // ground plane: its ramp hinge centre is 4.78 m high and the ramp
         // surface top is 0.09 m above that centre. A 23.4686 degree slope
         // brings the far top edge to Y=0 over the shared 12.228605 m track.
-        // The physical mission pose uses its separate COM-relative 49 degree
-        // deployment below.
+        // The physical mission pose uses its separately calculated 27.833532
+        // degree deployment below; the render review keeps this 23.4686 degree pose.
         attribute rampPortDeploymentAngleRad : Real = -0.4096044958;
         attribute rampStarboardDeploymentAngleRad : Real = 0.4096044958;
         attribute hingeAxis : GriffinRampHingeAxis = "Z";
@@ -347,16 +347,17 @@ package GriffinRampRequirements {
         attribute physicalRampMountY : Real = 5.19;
         attribute physicalRampMountZ : Real = 0.0;
         // The physical contact surface meets the 5.28 m adapter top: its
-        // centre is 5.19 m above the Griffin COM datum for a 0.18 m track.
-        // At a 3.98 m touchdown COM height, the 12.228605 m track deployed
-        // 49 degrees reaches the normalized terrain plane at its top toe.
+        // centre is 5.19 m above the Griffin body-reference datum for a
+        // 0.18 m track. At the 0.44 m nominal touchdown reference height,
+        // the 12.228605 m track deployed 27.833532 degrees places both mitered
+        // toe edges on the normalized terrain plane.
         // A thickness-and-angle-derived toe miter brings the lower toe edge
         // to that same plane and avoids a full-thickness collider penetrating
         // terrain. The command remains inside the 50 degree actuator limit.
         // These are replaceable study datums until the supplier mechanical ICD.
         attribute physicalRampTerrainContactToleranceM : Real = 0.02;
-        attribute physicalRampPortDeploymentAngleRad : Real = -0.8552113335;
-        attribute physicalRampStarboardDeploymentAngleRad : Real = 0.8552113335;
+        attribute physicalRampPortDeploymentAngleRad : Real = -0.4857867749;
+        attribute physicalRampStarboardDeploymentAngleRad : Real = 0.4857867749;
         // These values migrate the existing Twin dynamics proxy into the
         // requirement source. They are explicit replaceable assumptions, not
         // Griffin supplier data or an accepted mass-properties solution.
@@ -470,7 +471,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR010_PhysicalEgressEnvelope {
-        doc /* GRR-010 [mission integration/physics] each selected physical ramp shall bridge the composed top-deck transition to the terrain plane with two FLIP-aligned contact tracks, a 3.50 m outside rail envelope, paired rails, and a mitered toe whose upper and lower edges meet the authored terrain height at the commanded deployment angle. The current 12.228605 m top-face length and 49 degree physical deployment are replaceable study datums derived from the 5.28 m adapter top, 3.98 m touchdown COM height, and 0.18 m track thickness; the released ramp ICD remains unavailable. GRC010 checks both transformed toe edges against the terrain surface within the explicit contact tolerance. GRC016 requires each 0.60 m track to clear one tire and its side clearance. The render-only pose uses the same top-face length with a separate 4.78 m hinge datum and 23.4686 degree slope. GRR-012 independently checks the composed deck-to-transition-to-ramp static interface. These source-geometry checks do not replace composed mesh readback, deployed runtime contact, or rover traversal evidence. */
+        doc /* GRR-010 [mission integration/physics] each selected physical ramp shall bridge the composed top-deck transition to the terrain plane with two FLIP-aligned contact tracks, a 3.50 m outside rail envelope, paired top-side rails, and a mitered toe whose upper and lower edges meet the authored terrain height at the commanded deployment angle. The current 12.228605 m top-face length and 27.833532 degree physical deployment are replaceable study datums derived from the 5.28 m adapter top, 0.44 m vehicle-reference touchdown height, and 0.18 m track thickness; the released ramp ICD remains unavailable. GRC010 checks both transformed toe edges against the terrain surface within the explicit contact tolerance. GRC016 requires each 0.60 m track to clear one tire and its side clearance. The render-only pose uses the same top-face length with a separate 4.78 m hinge datum and 23.4686 degree slope. GRR-012 independently checks the composed deck-to-transition-to-ramp static interface. These source-geometry checks do not replace composed mesh readback, deployed runtime contact, or rover traversal evidence. */
         require GRC010_PhysicalRampReachesTerrain;
     }
     requirement def GRR011_PhysicalDeploymentLifecycle {
@@ -552,6 +553,12 @@ package GriffinRampRequirements {
         subject ramp : GriffinEgressRamp;
         verify grr017;
         verify grr018;
+    }
+
+    verification def Verify_GriffinRampTouchdownGeometry {
+        doc /* Verifies source-owned physical-ramp deployment angles against the composed ramp hinge and mount data, then checks both mitered toe edges against the authored terrain plane at the touchdown reference height. This geometry check is separate from dynamic deployment and rover traversal. */
+        subject ramp : GriffinEgressRamp;
+        verify grr010;
     }
 
     verification def Verify_GriffinRampCommandEnvelope {

@@ -283,6 +283,8 @@ Run the isolated component gates with the same fixed-clock settings:
     luncosim test --scene twins/astrobotic-griffin-1/tests/flip_wheel_requirements.usda --verification FlipWheelRequirements::Verify_FLIPWheelRequirements --verdict-channel FLIP_WHEEL_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
     luncosim test --scene twins/astrobotic-griffin-1/tests/flip_sensor_power_requirements.usda --verification FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements --verdict-channel FLIP_SENSOR_POWER_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
     luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_ramp_requirements.usda --verification GriffinRampRequirements::Verify_GriffinRampRequirements --verdict-channel GRIFFIN_RAMP_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_ramp_flight_stow.usda --verification GriffinRampRequirements::Verify_GriffinRampFlightStow --verdict-channel GRIFFIN_RAMP_FLIGHT_STOW --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_ramp_touchdown_geometry.usda --verification GriffinRampRequirements::Verify_GriffinRampTouchdownGeometry --verdict-channel GRIFFIN_RAMP_TOUCHDOWN_GEOMETRY --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
 
 The fixtures deliberately load one vehicle at a time, while each registered
 observer scopes its checks to one component. A component gate is not replaced
@@ -293,12 +295,19 @@ lander, rover, or ramp can be reviewed and diagnosed independently.
 ### Check landing divergence
 
 `requirements/griffin_simulation_accuracy_requirements.sysml` owns the
-landing-stability horizon and speed/drift/upright-axis bounds. The integration
-source owns the separate repeatability tolerances. The Rhai contract test
-(`scenarios/tests/griffin_surface_ops_contract.rhai`) samples the composed
-lander every ten fixed ticks and emits a `GRIFFIN_LANDING_STABILITY` verdict
-plus a `GRIFFIN_LANDING_STABILITY_METRICS` JSON line. Run two fresh processes
-with the same scene revision and compare those metrics:
+post-touchdown stability horizon, observation cadence, four-leg-contact
+predicate, and speed/drift/upright-axis bounds. The integration source owns the
+separate repeatability tolerances. The Rhai contract test
+(`scenarios/tests/griffin_surface_ops_contract.rhai`) detects physical
+touchdown, samples the composed lander every ten fixed ticks for the next 60
+seconds, and emits a `GRIFFIN_LANDING_STABILITY` verdict plus a
+`GRIFFIN_LANDING_STABILITY_METRICS` JSON line. Run two fresh processes with the
+same scene revision and compare those metrics:
+
+The current powered-descent scene has not produced `lander_touchdown`: a
+fixed-clock diagnostic reached 390 simulated seconds before its 650 s wall
+timeout, so it could not start the required post-touchdown window. The mission
+therefore has not exercised the post-landing ramp-unfold step in runtime.
 
     LUNCOSIM_BIN=/path/to/terrain/target/debug/luncosim \
       twins/astrobotic-griffin-1/tools/check_landing_determinism.sh

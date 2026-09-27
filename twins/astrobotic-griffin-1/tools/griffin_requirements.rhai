@@ -33,7 +33,9 @@ fn pi_value() { griffin_spec::pi_value() }
 fn landing_leg_count() { griffin_spec::landing_leg_count() }
 fn ramp_count() { griffin_spec::ramp_count() }
 fn solar_array_count() { griffin_spec::solar_array_count() }
-fn landing_com_touchdown_y() { griffin_spec::landing_com_touchdown_y() }
+fn landing_vehicle_reference_touchdown_y() {
+    griffin_spec::landing_vehicle_reference_touchdown_y()
+}
 
 fn _sysml_number(report, name) {
     if report == () || report.ok != true { return (); }
@@ -238,7 +240,7 @@ fn sysml_contract_report(verification_name) {
         || griffin_coverage != requirement_usages {
         missing.push("declared verification case covering all requirements");
     }
-    for name in ["rampMaxDeploymentAngleRad", "mainEngineCount", "propellantTankCount", "landingComTouchdownY"] {
+    for name in ["rampMaxDeploymentAngleRad", "mainEngineCount", "propellantTankCount", "landingVehicleReferenceTouchdownY"] {
         if _sysml_number(report, name) == () {
             missing.push("typed SysML attribute " + name);
         }
@@ -252,7 +254,7 @@ fn sysml_contract_report(verification_name) {
     // look Griffin-compatible when the public architecture has drifted.
     for name in ["payloadCapacityKg", "landingLegCount", "mainEngineCount",
         "propellantTankCount", "rampCount", "solarArrayCount",
-        "flipPayloadCapacityKg", "landingComTouchdownY",
+        "flipPayloadCapacityKg", "landingVehicleReferenceTouchdownY",
         "rampSurfaceLengthM", "rampSurfaceThicknessM",
         "physicalRampTerrainContactToleranceM",
         "physicalRampMassKg", "physicalRampInertiaXKgM2",
@@ -672,10 +674,10 @@ fn _layout_finding(id, path, message) {
 // The target is deliberately read-only: a mismatch is evidence of drift, not
 // a reason for a test to rewrite the authored scene.
 fn landing_target_geometry_check(doc_id, target_path) {
-    let expected_y = landing_com_touchdown_y();
+    let expected_y = landing_vehicle_reference_touchdown_y();
     if expected_y == () {
         return #{ok: false, path: target_path,
-            error: "landingComTouchdownY is missing from the SysML source"};
+            error: "landingVehicleReferenceTouchdownY is missing from the SysML source"};
     }
     let target = _layout_query(doc_id, target_path,
         ["xformOp:translate"], false);

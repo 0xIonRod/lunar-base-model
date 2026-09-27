@@ -39,9 +39,11 @@ SysML/USD requirements evaluator.
   Twin-owned length literal.
 - GRR-010 checks both toe edges against the authored terrain height. Source
   geometry places the physical track centre at Y=5.19 m, aligns its top to the
-  adapter at Y=5.28 m, and uses a 12.228605 m top face at 49 degrees from the
-  3.98 m touchdown COM datum. These are replaceable study values; the typed
-  Editor update and deployed runtime traversal have not been read back yet.
+  adapter at Y=5.28 m, and uses a 12.228605 m top face at 27.833532 degrees
+  from the 0.44 m vehicle-reference touchdown datum. These are replaceable
+  study values. The focused GRR-010 check passed at source revision
+  `13950898190506578966`; both toe edges compute at terrain Y=0 within numeric
+  precision. Runtime deployment and rover traversal remain unverified.
 - GRR-011 owns the existing ramp-body mass and diagonal inertia in SysML and
   checks the composed body matches those values. They remain labeled Twin
   study proxies; center of mass and supplier mass properties are still open
@@ -64,11 +66,16 @@ clearance.
 After the touchdown event, `griffin_1_surface_ops.rhai` waits 1.5 s, commands
 the four intermediate hinges to the level deployment target, waits 3 s, and
 then deploys the deck hinges. The focused `Verify_GriffinRampFlightStow` case
-passed all 61 checks at source revision `1134567362502136608`. This is static
-pose and source evidence. A separate 33.3 s powered-descent run did not reach
-touchdown, so the unfold and deck-deployment commands have not yet been
-observed in mission runtime. The stow angles remain study assumptions until a
-supplier mechanism ICD is available.
+passed all 61 checks at source revision `13950898190506578966`. This is static
+pose and source evidence. A 650 s wall-clock powered-descent diagnostic
+stopped at 390 simulated seconds without the lander's touchdown output; it
+showed intermittent leg-contact flags and continued vertical motion. Therefore,
+the unfold and deck-deployment commands have not yet been observed in mission
+runtime, and the 60 s post-touchdown stability verdict remains unavailable.
+During the folded pose, the rails remained over 5 m above the body reference,
+so they could not have made ground contact during the sampled descent. The
+stow angles remain study assumptions until a supplier mechanism ICD is
+available.
 
 ## Evidence
 
