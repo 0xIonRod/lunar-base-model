@@ -87,6 +87,33 @@ equation deficit is elsewhere in the propulsion network. No simulated plume
 values or visible engine plume have been verified. Resolve that network
 balance before treating GPP-008 as dynamically demonstrated.
 
+### Landing-leg contact geometry status
+
+Read-only composed-USD checks on the loaded `griffin_1_editor.usda` scene
+document and the dedicated landing-leg measurement scene now query all four
+effective Avian pad colliders and visible FootPads from one document/stage
+snapshot. Each cooked collider is
+an analytic cylinder; cooked dimensions and centers match the visible source
+with a maximum measured deviation of 0.0 m against the 0.001 m tolerance. The
+GLL-008 geometry, contact ownership, and station constraints and the GLL-009
+mount-path constraint return no findings. The measured minimum overlap is
+0.114 m at the bus frame and 0.05 m at each leg's MountAxle. Both scenes now
+declare the Griffin metre/Y-up stage metrics explicitly.
+
+This is static composed geometry and ownership evidence. It does not establish
+dynamic contact response, shock travel or damping, landing loads, or flight
+geometry. The leg dimensions and stations remain study inputs until controlled
+Griffin installation data is available.
+
+The Editor-saved landing-leg SysML document matches disk at generation 2, but
+the Twin-level `AnalyzeSysml` result still reports the GLL-008 usage at byte
+10506 while the saved file places it at byte 10515. The formal GLL constraints
+were unchanged in this prose edit, so the composed geometry verdicts above
+remain valid for those predicates; the source-set analysis is not current. Add
+a generic refresh/invalidation path from saved SysML documents into the
+Twin-wide analysis before using source handles or revisions after requirement
+edits.
+
 Astrobotic's current Griffin product page gives a seven-main-engine design,
 four shock-absorbing legs, a flexible isogrid payload deck, and optional
 egress ramps. Astrobotic's [solar setup post](https://lnkd.in/p/dJHz9duN)

@@ -601,6 +601,14 @@ fn _usd_value(value) {
       value: value}
 }
 
+fn _usd_snapshot_value(value, observation) {
+    #{provider: "usd",
+      state: if value == () { "unavailable" } else { "value" },
+      value: value, doc_id: observation.doc_id,
+      document_generation: observation.document_generation,
+      stage_generation: observation.stage_generation}
+}
+
 fn _ok(record) {
     record != () && record.ok != false && record.path != ()
 }
@@ -1780,43 +1788,57 @@ fn _landing_pad_requirement_findings(doc_id, root) {
             pad_geometry_constraint,
             sysml_requirements::required_constraint_input_observations(model,
                 pad_requirement, pad_geometry_constraint, [
-                ["geometryDeviationM", _usd_value(observation.geometry_deviation_m)],
-                ["sourceRadiusDeviationM", _usd_value(observation.source_radius_deviation_m)],
-                ["sourceHeightDeviationM", _usd_value(observation.source_height_deviation_m)],
-                ["sourceCenterDeviationM", _usd_value(observation.source_center_deviation_m)],
-                ["padGeometrySemanticsMatch", _usd_value(observation.pad_geometry_semantics_match)],
+                ["geometryDeviationM",
+                    _usd_snapshot_value(observation.geometry_deviation_m, observation)],
+                ["sourceRadiusDeviationM",
+                    _usd_snapshot_value(observation.source_radius_deviation_m, observation)],
+                ["sourceHeightDeviationM",
+                    _usd_snapshot_value(observation.source_height_deviation_m, observation)],
+                ["sourceCenterDeviationM",
+                    _usd_snapshot_value(observation.source_center_deviation_m, observation)],
+                ["padGeometrySemanticsMatch",
+                    _usd_snapshot_value(observation.pad_geometry_semantics_match, observation)],
                 ["toleranceM", _source_value(tolerance)]]), "usd", 0.0),
         sysml_requirements::constraint_check("GLL-008-contact-ownership", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             pad_ownership_constraint,
             sysml_requirements::required_constraint_input_observations(model,
                 pad_requirement, pad_ownership_constraint, [
-                ["collisionEnabled", _usd_value(observation.collision_enabled)],
-                ["proxyHidden", _usd_value(observation.proxy_hidden)],
-                ["visualCollisionDisabled", _usd_value(observation.visual_collision_disabled)],
-                ["collisionMatchesVisual", _usd_value(observation.collision_matches_visual)],
-                ["geometrySourceLinked", _usd_value(observation.source_relationships_valid)],
-                ["selfCollisionFilterClear", _usd_value(observation.self_collision_filter_clear)],
-                ["legacyCollisionDisabled", _usd_value(observation.legacy_collision_disabled)]]),
+                ["collisionEnabled",
+                    _usd_snapshot_value(observation.collision_enabled, observation)],
+                ["proxyHidden",
+                    _usd_snapshot_value(observation.proxy_hidden, observation)],
+                ["visualCollisionDisabled",
+                    _usd_snapshot_value(observation.visual_collision_disabled, observation)],
+                ["collisionMatchesVisual",
+                    _usd_snapshot_value(observation.collision_matches_visual, observation)],
+                ["geometrySourceLinked",
+                    _usd_snapshot_value(observation.source_relationships_valid, observation)],
+                ["selfCollisionFilterClear",
+                    _usd_snapshot_value(observation.self_collision_filter_clear, observation)],
+                ["legacyCollisionDisabled",
+                    _usd_snapshot_value(observation.legacy_collision_disabled, observation)]]),
             "usd", 0.0),
         sysml_requirements::constraint_check("GLL-008-physical-stations", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             pad_station_constraint,
             sysml_requirements::required_constraint_input_observations(model,
                 pad_requirement, pad_station_constraint, [
-                ["stationDeviationM", _usd_value(observation.station_deviation_m)],
+                ["stationDeviationM",
+                    _usd_snapshot_value(observation.station_deviation_m, observation)],
                 ["toleranceM", _source_value(station_tolerance)],
-                ["rotationMatches", _usd_value(observation.rotation_matches)]]), "usd", 0.0),
+                ["rotationMatches",
+                    _usd_snapshot_value(observation.rotation_matches, observation)]]), "usd", 0.0),
         sysml_requirements::constraint_check("GLL-009-body-mount-path", "landing_leg",
             "gll009", "Verify_GriffinLandingLegRequirements",
             mount_constraint,
             sysml_requirements::required_constraint_input_observations(model,
                 mount_requirement, mount_constraint, [
-                ["measuredBusOverlapM", _usd_value(observation.bus_mount_overlap_m)],
-                ["measuredAxleOverlapM", _usd_value(observation.mount_axle_overlap_m)],
+                ["measuredBusOverlapM", _usd_snapshot_value(observation.bus_mount_overlap_m, observation)],
+                ["measuredAxleOverlapM", _usd_snapshot_value(observation.mount_axle_overlap_m, observation)],
                 ["requiredOverlapM", _source_value(mount_overlap)],
                 ["measurementToleranceM", _source_value(mount_measurement_tolerance)],
-                ["physicalJointStationMatches", _usd_value(observation.physical_joints_match)]]),
+                ["physicalJointStationMatches", _usd_snapshot_value(observation.physical_joints_match, observation)]]),
             "usd", 0.0)
     ];
     let evaluation = sysml_requirements::evaluate(source, checks);

@@ -1451,6 +1451,38 @@ fn physical_bounds_overlap_depth(left, right) {
     depths[2]
 }
 
+fn physical_landing_pad_snapshot_matches(record, snapshot_doc,
+    document_generation, stage_generation) {
+    record != () && record.doc_id == snapshot_doc
+        && record.document_generation == document_generation
+        && record.stage_generation == stage_generation
+}
+
+fn physical_cooked_y_axis_matches(rotation_wxyz, tolerance_deg) {
+    if rotation_wxyz == () || rotation_wxyz.len() != 4
+        || tolerance_deg == () || tolerance_deg < 0.0 {
+        return false;
+    }
+    let norm_squared = 0.0;
+    for value in rotation_wxyz {
+        if !griffin_geometry::scalar_is_finite(value) { return false; }
+        norm_squared += value * value;
+    }
+    if !griffin_geometry::scalar_is_finite(norm_squared) || norm_squared <= 0.0 {
+        return false;
+    }
+    let inverse_norm = 1.0 / norm_squared.sqrt();
+    let w = rotation_wxyz[0] * inverse_norm;
+    let x = rotation_wxyz[1] * inverse_norm;
+    let y = rotation_wxyz[2] * inverse_norm;
+    let z = rotation_wxyz[3] * inverse_norm;
+    let cooked_axis = [2.0 * (x * y - w * z),
+        1.0 - 2.0 * (x * x + z * z), 2.0 * (y * z + w * x)];
+    let axis_deviation = physical_vector_deviation(cooked_axis, [0.0, 1.0, 0.0]);
+    let axis_tolerance = sin(tolerance_deg * griffin_spec::pi_value() / 180.0);
+    axis_deviation != () && axis_deviation <= axis_tolerance
+}
+
 fn physical_landing_leg_pad_observation(doc, root) {
     let geometry = physical_landing_leg_pad_geometry();
     if geometry.ok != true {
@@ -1458,6 +1490,9 @@ fn physical_landing_leg_pad_observation(doc, root) {
     }
     let suffixes = ["PX", "NX", "PZ", "NZ"];
     let geometry_deviation = 0.0;
+    let maximum_cooked_geometry_deviation_m = 0.0;
+    let all_cooked_geometry_comparable = true;
+    let all_cooked_axis_matches = true;
     let source_radius_deviation = 0.0;
     let source_height_deviation = 0.0;
     let source_center_deviation = 0.0;
@@ -1490,24 +1525,65 @@ fn physical_landing_leg_pad_observation(doc, root) {
         return #{ok: false, state: "unavailable",
             detail: root + "/Bus/PerimeterFrame: composed geometry bounds are unavailable"};
     }
+    let pad_paths = [];
+    for suffix in suffixes {
+        let visual_root = root + "/Leg" + suffix + "/LandingLegVisual";
+        pad_paths.push(visual_root + "/FootPadCollider");
+        pad_paths.push(visual_root + "/FootPad");
+    }
+    let pad_request = #{paths: pad_paths,
+        attrs: ["radius", "height", "axis", "xformOp:translate",
+            "xformOp:rotateXYZ", "xformOp:scale",
+            "physics:collisionEnabled", "visibility", "purpose",
+            "lunco:collider:geometrySource", "lunco:requirement"],
+        rels: ["lunco:collider:geometrySource"], schemas: true,
+        geometry_bounds: true, collision_geometry: true};
+    if doc != () { pad_request.doc_id = doc; }
+    let pad_batch = query("QueryUsdPrims", pad_request);
+    if !query_ok(pad_batch) || pad_batch.records == ()
+        || pad_batch.records.len() != pad_paths.len() {
+        let reason = if pad_batch == () || pad_batch.error == () {
+            "one-snapshot Avian pad geometry query did not return all visual/proxy pairs"
+        } else { pad_batch.error };
+        return #{ok: false, state: "unavailable", detail: reason};
+    }
+    let pad_records = pad_batch.records;
+    let snapshot_doc = pad_records[0].doc_id;
+    let document_generation = pad_records[0].document_generation;
+    let stage_generation = pad_records[0].stage_generation;
+    if snapshot_doc == () || document_generation == () || stage_generation == () {
+        return #{ok: false, state: "unavailable",
+            detail: "composed pad geometry is missing document or stage snapshot provenance"};
+    }
+    for record in pad_records {
+        if record.doc_id == () || record.document_generation == ()
+            || record.stage_generation == () {
+            return #{ok: false, state: "unavailable",
+                detail: "a composed pad observation is missing document or stage snapshot provenance"};
+        }
+        if !physical_landing_pad_snapshot_matches(record, snapshot_doc,
+                document_generation, stage_generation) {
+            return #{ok: false, state: "stale",
+                detail: "landing-pad visuals and proxies came from mixed composed USD snapshots"};
+        }
+    }
+    if !physical_landing_pad_snapshot_matches(bus_frame, snapshot_doc,
+            document_generation, stage_generation) {
+        return #{ok: false, state: "stale",
+            detail: "bus-frame and pad measurements came from different composed USD snapshots"};
+    }
     let details = [];
     for index in 0..suffixes.len() {
         let leg_path = root + "/Leg" + suffixes[index];
         let visual_root = leg_path + "/LandingLegVisual";
         let collider_path = visual_root + "/FootPadCollider";
         let visual_path = visual_root + "/FootPad";
-        let collider = assembly_builder::composed_query(doc, #{path: collider_path,
-            children: false, schemas: true, geometry_bounds: true,
-            attrs: ["radius", "height", "axis", "xformOp:translate",
-                "xformOp:rotateXYZ", "xformOp:scale",
-                "physics:collisionEnabled", "visibility", "purpose",
-                "lunco:collider:geometrySource", "lunco:requirement"],
-            rels: ["lunco:collider:geometrySource"]});
-        let visual = assembly_builder::composed_query(doc, #{path: visual_path,
-            children: false, geometry_bounds: true,
-            attrs: ["radius", "height", "axis", "xformOp:translate",
-                "xformOp:rotateXYZ", "xformOp:scale",
-                "physics:collisionEnabled", "purpose"]});
+        let collider = pad_records[index * 2];
+        let visual = pad_records[index * 2 + 1];
+        if collider.path != collider_path || visual.path != visual_path {
+            return #{ok: false, state: "invalid",
+                detail: leg_path + ": batched composed pad paths do not match their requested order"};
+        }
         let mount_arm = assembly_builder::composed_query(doc,
             #{path: visual_root + "/BodyMountArm", children: false,
               geometry_bounds: true});
@@ -1529,6 +1605,17 @@ fn physical_landing_leg_pad_observation(doc, root) {
             || leg_pose.attrs == () {
             return #{ok: false, state: "unavailable",
                 detail: leg_path + ": composed pad proxy or visual source geometry is missing"};
+        }
+        if !physical_landing_pad_snapshot_matches(mount_arm, snapshot_doc,
+                document_generation, stage_generation)
+            || !physical_landing_pad_snapshot_matches(mount_axle, snapshot_doc,
+                document_generation, stage_generation)
+            || !physical_landing_pad_snapshot_matches(leg_pose, snapshot_doc,
+                document_generation, stage_generation)
+            || !physical_landing_pad_snapshot_matches(joint, snapshot_doc,
+                document_generation, stage_generation) {
+            return #{ok: false, state: "stale",
+                detail: leg_path + ": pad, mount, leg, and joint measurements came from different composed USD snapshots"};
         }
         let actual_station = leg_pose.attrs["xformOp:translate"];
         let actual_rotation = leg_pose.attrs["xformOp:rotateXYZ"];
@@ -1639,6 +1726,75 @@ fn physical_landing_leg_pad_observation(doc, root) {
         for deviation in [proxy_radius_error, proxy_height_error, proxy_center_error] {
             if deviation > geometry_deviation { geometry_deviation = deviation; }
         }
+        let cooked_geometry = collider.collision_geometry;
+        if cooked_geometry == () {
+            return #{ok: false, state: "unavailable",
+                detail: collider_path + ": effective Avian collider geometry is unavailable"};
+        }
+        if cooked_geometry.frame != "canonical_stage" {
+            return #{ok: false, state: "unavailable",
+                detail: collider_path + ": effective collider geometry is not in canonical-stage coordinates"};
+        }
+        let cooked_shape = cooked_geometry.shape;
+        let cooked_deviation = ();
+        let cooked_axis_matches = false;
+        if cooked_shape == "cylinder" {
+            let cooked_pose = cooked_geometry.local_to_stage;
+            let visual_bounds = visual.geometry_bounds;
+            if cooked_geometry.geometry_frame != "collider_local"
+                || cooked_geometry.radius_m == () || cooked_geometry.half_height_m == ()
+                || cooked_pose == () || cooked_pose.translation_m == ()
+                || cooked_pose.rotation_wxyz == () || cooked_pose.rotation_wxyz.len() != 4
+                || visual_bounds == () || visual_bounds.frame != "canonical_stage"
+                || visual_bounds.center == () || visual_bounds.half_extents == ()
+                || visual_bounds.center.len() != 3 || visual_bounds.half_extents.len() != 3
+                || cooked_pose.translation_m.len() != 3 {
+                return #{ok: false, state: "unavailable",
+                    detail: collider_path + ": cooked cylinder dimensions, pose, or visible source bounds are incomplete"};
+            }
+            if !griffin_geometry::scalar_is_finite(cooked_geometry.radius_m)
+                || !griffin_geometry::scalar_is_finite(cooked_geometry.half_height_m)
+                || cooked_geometry.radius_m <= 0.0 || cooked_geometry.half_height_m <= 0.0 {
+                return #{ok: false, state: "invalid",
+                    detail: collider_path + ": cooked cylinder dimensions are not finite and positive"};
+            }
+            for value in cooked_pose.translation_m {
+                if !griffin_geometry::scalar_is_finite(value) {
+                    return #{ok: false, state: "invalid",
+                        detail: collider_path + ": cooked collider pose is not finite"};
+                }
+            }
+            for value in cooked_pose.rotation_wxyz {
+                if !griffin_geometry::scalar_is_finite(value) {
+                    return #{ok: false, state: "invalid",
+                        detail: collider_path + ": cooked collider orientation is not finite"};
+                }
+            }
+            cooked_axis_matches = physical_cooked_y_axis_matches(
+                cooked_pose.rotation_wxyz, geometry.rotation_tolerance_deg);
+            if !cooked_axis_matches {
+                all_cooked_axis_matches = false;
+                all_geometry_semantics_match = false;
+            }
+            let dimensions_deviation = physical_vector_deviation(
+                [cooked_geometry.radius_m, cooked_geometry.half_height_m,
+                    cooked_geometry.radius_m], visual_bounds.half_extents);
+            let center_deviation = physical_vector_deviation(
+                cooked_pose.translation_m, visual_bounds.center);
+            if dimensions_deviation == () || center_deviation == () {
+                return #{ok: false, state: "unavailable",
+                    detail: collider_path + ": cooked and visual geometry could not be compared in a common frame"};
+            }
+            cooked_deviation = dimensions_deviation;
+            if center_deviation > cooked_deviation { cooked_deviation = center_deviation; }
+            if cooked_deviation > maximum_cooked_geometry_deviation_m {
+                maximum_cooked_geometry_deviation_m = cooked_deviation;
+            }
+            if cooked_deviation > geometry_deviation { geometry_deviation = cooked_deviation; }
+        } else {
+            all_geometry_semantics_match = false;
+            all_cooked_geometry_comparable = false;
+        }
         let bounds_deviation = physical_pad_bounds_deviation(
             collider.geometry_bounds, visual.geometry_bounds);
         if bounds_deviation == () {
@@ -1691,22 +1847,41 @@ fn physical_landing_leg_pad_observation(doc, root) {
                 || legacy.attrs["physics:collisionEnabled"] != false
                 || legacy.attrs["visibility"] != "invisible" {
                 all_legacy_disabled = false;
+            } else if !physical_landing_pad_snapshot_matches(legacy, snapshot_doc,
+                    document_generation, stage_generation) {
+                return #{ok: false, state: "stale",
+                    detail: leg_path + ": legacy collider measurements came from a different composed USD snapshot"};
             }
         }
         let legacy_proxy = assembly_builder::composed_query(doc,
             #{path: leg_path + "/FootPadCollider", children: false});
-        if query_ok(legacy_proxy) { all_legacy_disabled = false; }
+        if query_ok(legacy_proxy) {
+            if !physical_landing_pad_snapshot_matches(legacy_proxy, snapshot_doc,
+                    document_generation, stage_generation) {
+                return #{ok: false, state: "stale",
+                    detail: leg_path + ": legacy collider query came from a different composed USD snapshot"};
+            }
+            all_legacy_disabled = false;
+        }
         details.push(#{leg: leg_path, proxy: collider_path, visual: visual_path,
             collision_enabled: collider.attrs["physics:collisionEnabled"],
             proxy_hidden: collider.attrs["visibility"] == "invisible",
             source_relationship: targets, composed_geometry_deviation_m: bounds_deviation,
+            cooked_geometry_shape: cooked_shape,
+            cooked_axis_matches: cooked_axis_matches,
+            cooked_geometry_deviation_m: cooked_deviation,
             filtered_pairs: filtered_pairs, bus_mount_overlap_m: bus_overlap,
             mount_axle_overlap_m: axle_overlap, joint_targets: joint_targets,
             joint_anchor: joint_anchor,
             station: actual_station, rotation_y_deg: actual_rotation[1]});
     }
-    #{ok: true, state: "available",
+    #{ok: true, state: "available", doc_id: snapshot_doc,
+      document_generation: document_generation, stage_generation: stage_generation,
       geometry_deviation_m: if all_geometry_available { geometry_deviation } else { () },
+      cooked_geometry_deviation_m: if all_cooked_geometry_comparable {
+          maximum_cooked_geometry_deviation_m
+      } else { () },
+      cooked_axis_matches: all_cooked_axis_matches,
       source_radius_deviation_m: source_radius_deviation,
       source_height_deviation_m: source_height_deviation,
       source_center_deviation_m: source_center_deviation,
@@ -1725,8 +1900,8 @@ fn physical_landing_leg_pad_observation(doc, root) {
       visual_collision_disabled: all_visual_disabled,
       legacy_collision_disabled: all_legacy_disabled,
       collision_matches_visual: all_geometry_available && all_axes_match
-        && all_geometry_semantics_match
-        && geometry_deviation <= geometry.tolerance_m,
+        && all_geometry_semantics_match && all_cooked_geometry_comparable
+        && all_cooked_axis_matches && geometry_deviation <= geometry.tolerance_m,
       tolerance_m: geometry.tolerance_m, details: details}
 }
 

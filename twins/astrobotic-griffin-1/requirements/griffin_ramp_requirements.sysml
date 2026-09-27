@@ -456,7 +456,7 @@ package GriffinRampRequirements {
     requirement <'GRR-006'> grr006 : GRR006_RampGeometry { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-007'> grr007 : GRR007_RampEvidence { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-008'> grr008 : GRR008_RailGeometry { subject ramp : GriffinEgressRamp; }
-    requirement <'GRR-009'> grr009 : GRR009_SupportArmGeometry { subject ramp : GriffinEgressRamp; }
+    requirement <'GRR-009'> grr009 : GRR009_RailSupportGeometry { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-013'> grr013 : GRR013_TractionTreadGeometry { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-014'> grr014 : GRR014_RampLoadPathGeometry { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-015'> grr015 : GRR015_RampHingeGussetGeometry { subject ramp : GriffinEgressRamp; }

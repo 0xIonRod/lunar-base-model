@@ -227,11 +227,26 @@ collision envelope, or runtime contract.
 8. Measure from composed USD facts (`QueryUsdPrim`, bounds, authored primitive
    dimensions and scale, or the generic measurement report). Do not infer
    dimensions from a screenshot or an uncomposed source layer.
+   Author measurement stages with explicit `metersPerUnit` and `upAxis` values
+   that match the source datums. For physics acceptance, query the effective
+   Avian collider geometry with
+   `QueryUsdPrims.collision_geometry` from the same composed snapshot as the
+   visible source geometry. Compare cooked shape, dimensions, and pose after
+   mapping both observations to the same frame and SI units; authored proxy
+   attributes alone do not prove what the solver will use. Check the typed
+   source relationship and contact ownership separately. Use exact cooked
+   dimensions when the collider is analytic, and preserve the returned mesh
+   or hull topology for mesh colliders. Treat missing cooked geometry as
+   unavailable evidence, and do not substitute a conservative bounds envelope
+   for an available exact analytic shape.
 9. Use SysML for requirement identity, units, thresholds, datums, and
    verification selection. Use Rhai for executable observation and structured
    verdicts. Keep one requirement file and one observer per owning component;
    assembly tests cover interfaces and integration rather than duplicating
-   internal part checks.
+   internal part checks. After editing SysML in Editor, confirm that the
+   Twin-level `AnalyzeSysml` snapshot has the saved source revision and source
+   locations before citing constraint handles or verdicts; single-document
+   analysis and the Twin source-set snapshot can differ.
 10. Keep physics and clocks deterministic: fixed tick rate, explicit clock
     contract, stable seed/thread policy, no wall-clock sleeps in tests, and
     report the source revision, horizon, ticks, and tolerance in evidence.
