@@ -105,14 +105,13 @@ dynamic contact response, shock travel or damping, landing loads, or flight
 geometry. The leg dimensions and stations remain study inputs until controlled
 Griffin installation data is available.
 
-The Editor-saved landing-leg SysML document matches disk at generation 2, but
-the Twin-level `AnalyzeSysml` result still reports the GLL-008 usage at byte
-10506 while the saved file places it at byte 10515. The formal GLL constraints
-were unchanged in this prose edit, so the composed geometry verdicts above
-remain valid for those predicates; the source-set analysis is not current. Add
-a generic refresh/invalidation path from saved SysML documents into the
-Twin-wide analysis before using source handles or revisions after requirement
-edits.
+The Twin-wide SysML analysis now invalidates when an indexed source document is
+saved, reloads the matching `twin://` asset, and waits for the reload event
+before rebuilding its snapshot. A headless Editor/API check against this Twin
+confirmed that an unsaved edit leaves the snapshot unchanged, saving advances
+the source revision and GLL-008 usage offset from byte 10515 to 10516, and
+saving the exact revert restores the original revision and offset. The source
+file hash and working-tree contents match the original after the check.
 
 Astrobotic's current Griffin product page gives a seven-main-engine design,
 four shock-absorbing legs, a flexible isogrid payload deck, and optional
