@@ -34,8 +34,8 @@ fn on_start(me, ctx) {
     // controller traffic from entering this VM. The release edge is the
     // controller-owned event; continuous SetPorts commands are not mission
     // events and stay out of this hook entirely.
-    let lander_gid = find(LANDER);
-    let rover_gid = find(ROVER);
+    let lander_gid = find_path(LANDER);
+    let rover_gid = find_path(ROVER);
     if lander_gid >= 0 {
         subscribe_from("intent.edge", lander_gid);
         subscribe_from("lander_touchdown", lander_gid);
@@ -76,8 +76,8 @@ fn on_start(me, ctx) {
 
 fn on_event(me, evt, ctx) {
     trace_event(this, evt);
-    let lander = find(LANDER);
-    let rover = find(ROVER);
+    let lander = find_path(LANDER);
+    let rover = find_path(ROVER);
 
     // The shared controller publishes a target-scoped semantic edge for the
     // G binding. G is an explicit lander-owned release action and is available
@@ -207,8 +207,8 @@ fn deploy_ramps(me) {
     // Drive their existing USD revolute joints through the generic typed angle
     // port after touchdown; this is a real hinged deployment, not a pose write
     // or a second Twin-side physics implementation.
-    let port_joint = find(LANDER + "/RampHingePort");
-    let starboard_joint = find(LANDER + "/RampHingeStarboard");
+    let port_joint = find_path(LANDER + "/RampHingePort");
+    let starboard_joint = find_path(LANDER + "/RampHingeStarboard");
     if port_joint == () || port_joint < 0 || starboard_joint == () || starboard_joint < 0 {
         return #{ok: false, error: "physical ramp hinge entities are unavailable"};
     }
@@ -234,7 +234,7 @@ fn release_rover(me, already_requested) {
     if already_requested { return true; }
     emit("griffin_ramp_deployment_settled");
 
-    let joint = find(DOCK);
+    let joint = find_path(DOCK);
     if joint == () || joint < 0 {
         // The adapter is already absent. Keep the same completion gate as a
         // requested detach so the mission never treats a command acknowledgement
@@ -258,7 +258,7 @@ fn release_rover(me, already_requested) {
 }
 
 fn adapter_detach_complete() {
-    let joint = find(DOCK);
+    let joint = find_path(DOCK);
     joint == () || joint < 0
 }
 
@@ -346,7 +346,7 @@ fn fail_phase(state, phase) {
 fn finish_surface_ops(state) {
     let source = sysml_requirements::source();
     let egress_apron = if state.egress_apron_evidence == () {
-        griffin_surface_ops::egress_apron_runtime_evidence(find(ROVER))
+        griffin_surface_ops::egress_apron_runtime_evidence(find_path(ROVER))
     } else {
         state.egress_apron_evidence
     };
@@ -379,8 +379,8 @@ fn finish_surface_ops(state) {
 }
 
 fn task(me, ctx) {
-    let egress_route = griffin_surface_ops::surface_egress_task(find(ROVER));
-    let route = griffin_surface_ops::surface_route_task(find(ROVER));
+    let egress_route = griffin_surface_ops::surface_egress_task(find_path(ROVER));
+    let route = griffin_surface_ops::surface_route_task(find_path(ROVER));
     let route_preflight = griffin_surface_ops::surface_route_preflight();
     seq([
         once(|m| {
@@ -473,7 +473,7 @@ fn task(me, ctx) {
         // is the source-backed post-release surface envelope.
         par_race([
                 wait_until(|m| {
-                    let rover = find(ROVER);
+                    let rover = find_path(ROVER);
                     let tick = sim_tick();
                     let previous = this.rover_settle_probe_tick;
                     if previous != () && tick >= previous && tick - previous < 6 {

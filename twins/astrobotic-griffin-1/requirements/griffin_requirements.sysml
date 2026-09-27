@@ -5,6 +5,7 @@ package Griffin1Requirements {
     private import ScalarValues::Integer;
     private import ScalarValues::Boolean;
     private import MoonBaseProjectRequirements::ProjectSimulationContract;
+    private import GriffinVehicleAssemblyRequirements::GriffinVehicleAssembly;
 
     enum def GriffinMissionDesignation { AstroboticGriffinMissionOne; }
     enum def GriffinLandingRegion { NobileSouthPole; }
@@ -146,6 +147,10 @@ package Griffin1Requirements {
     // requirements live in requirements/flip_requirements.sysml; Griffin only
     // verifies that a hosted vehicle interface exists at the release boundary.
     part def HostedRoverInterface;
+
+    // The assembly graph owns the typed subsystem multiplicities and the
+    // separate hosted-FLIP payload/release relation.
+    part missionVehicle : GriffinVehicleAssembly;
 
 
 

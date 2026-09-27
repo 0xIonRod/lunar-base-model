@@ -94,8 +94,8 @@ def Xform "GriffinFlipVisual" (
     {
         uniform bool lunco:avatar = true
         uniform token lunco:cameraMode = "freeflight"
-        double3 lunco:cameraLookAt = (1.5, 2.2, 0.0)
-        double3 xformOp:translate = (17.0, 8.5, 16.0)
+        double3 lunco:cameraLookAt = (0.0, 3.0, 0.0)
+        custom double3 xformOp:translate = (30.0, 20.0, 30.0)
         float focalLength = 32.0
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }

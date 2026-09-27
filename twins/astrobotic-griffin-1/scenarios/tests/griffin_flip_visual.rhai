@@ -40,6 +40,21 @@ fn _sysml_list(report, name) {
     items
 }
 
+fn _visual_scene_document_id() {
+    let documents = query("ListOpenDocuments");
+    if documents == () || documents.open_documents == () {
+        throw("Griffin visual review cannot enumerate open USD documents");
+    }
+    for document in documents.open_documents {
+        if document.kind == "usd" && document.origin != ()
+            && document.origin.path != ()
+            && document.origin.path.ends_with("/tests/griffin_flip_visual.usda") {
+            return document.doc_id;
+        }
+    }
+    throw("Griffin visual review scene document is not open");
+}
+
 fn on_start(me, ctx) {
     this.griffin = find("/GriffinFlipVisual/Griffin1");
     this.flip = find("/GriffinFlipVisual/FLIP");
@@ -47,12 +62,43 @@ fn on_start(me, ctx) {
     this.ground = find("/GriffinFlipVisual/Ground/RegolithPad");
     this.terrain = find("/GriffinFlipVisual/Environment/Terrain");
     this.done = false;
+    this.review_batch = 0;
 }
 
 fn on_tick(me, ctx) {
     if this.done || dt() <= 0.0 { return; }
-    this.done = true;
-    let source = sysml_requirements::source();
+    let progress = run_visual_review(this.review_batch);
+    this.review_batch += 1;
+    if this.review_batch >= progress.batch_count { this.done = true; }
+}
+
+// Keep the review callable through the one-shot production API as well as the
+// fixed-tick observer. That lets a visual acceptance run read the composed
+// scene even when an unrelated continuous model holds physics time.
+fn run_visual_review(batch_index) {
+    let source = sysml_requirements::source_with_selection([
+        griffin_spec::qualified_attribute_name("landingLegInstances"),
+        griffin_spec::qualified_attribute_name("mainEngineInstances"),
+        griffin_spec::qualified_attribute_name("rampInstances"),
+        griffin_spec::qualified_attribute_name("solarArrayInstances"),
+        griffin_spec::qualified_attribute_name("wheelStations"),
+        griffin_spec::qualified_attribute_name("wheelRadiusM"),
+        griffin_spec::qualified_attribute_name("missionSteeringMode"),
+        griffin_spec::qualified_attribute_name("visualReviewGriffinStation"),
+        griffin_spec::qualified_attribute_name("visualReviewFlipStation"),
+        griffin_spec::qualified_attribute_name("deckDimensions"),
+        griffin_spec::qualified_attribute_name("visualLandingPadRadiusM"),
+        griffin_spec::qualified_attribute_name("visualReviewGroundWidthM")
+    ], [
+        "GriffinVisualRequirements::gv001",
+        "GriffinVisualRequirements::gv002",
+        "GriffinVisualRequirements::gv003",
+        "GriffinVisualRequirements::gv004",
+        "GriffinVisualRequirements::gv005",
+        "GriffinVisualRequirements::gv006",
+        "GriffinVisualRequirements::gv007",
+        "FlipRequirements::fvg001"
+    ], ["GriffinVisualRequirements::Verify_GriffinVisualRequirements"]);
     let root = "/GriffinFlipVisual";
     let checks = [];
     checks.push(visual_exists_check("GV-001-camera", "camera", "gv001", "exists", root + "/VisualCamera"));
@@ -60,11 +106,11 @@ fn on_tick(me, ctx) {
     for name in leg_names {
         checks.push(visual_exists_check("GV-002-" + name, "legs", "gv002", "exists", root + "/Griffin1/" + name));
         checks.push(visual_children_check("GV-002-" + name + "-subparts", "legs", "gv002",
-            root + "/Griffin1/" + name,
-            [root + "/Griffin1/" + name + "/StrutOuter",
-             root + "/Griffin1/" + name + "/StrutInner",
-             root + "/Griffin1/" + name + "/ShockPiston",
-             root + "/Griffin1/" + name + "/FootPad"]));
+            root + "/Griffin1/" + name + "/LandingLegVisual",
+            [root + "/Griffin1/" + name + "/LandingLegVisual/StrutOuter",
+             root + "/Griffin1/" + name + "/LandingLegVisual/StrutInner",
+             root + "/Griffin1/" + name + "/LandingLegVisual/ShockPiston",
+             root + "/Griffin1/" + name + "/LandingLegVisual/FootPad"]));
     }
     checks.push(visual_exists_check("GV-002-deck", "lander", "gv002", "exists", root + "/Griffin1/Bus"));
     checks.push(visual_children_check("GV-002-deck-subparts", "lander", "gv002",
@@ -115,13 +161,23 @@ fn on_tick(me, ctx) {
     checks.push(visual_children_check("GV-002-ramps", "egress_ramps", "gv002",
         root + "/Griffin1", ramp_paths));
     for name in ramp_names {
-        checks.push(visual_children_check("GV-002-" + name + "-subparts", "egress_ramps",
-            "gv002", root + "/Griffin1/" + name,
-            [root + "/Griffin1/" + name + "/RampTrackPort",
-             root + "/Griffin1/" + name + "/RampTrackStarboard",
-             root + "/Griffin1/" + name + "/OuterRail",
-             root + "/Griffin1/" + name + "/InnerRail",
-             root + "/Griffin1/" + name + "/SupportArm"]));
+        let ramp = root + "/Griffin1/" + name;
+        checks.push(visual_children_check("GV-002-" + name + "-sections", "egress_ramps",
+            "gv002", ramp,
+            [ramp + "/DeckSection", ramp + "/MiddleSection", ramp + "/TransitionPlate"]));
+        for segment in ["DeckSection", "MiddleSection"] {
+            let section = ramp + "/" + segment;
+            let paths = [section + "/RampTrackPort", section + "/RampTrackStarboard",
+                section + "/OuterRail", section + "/InnerRail"];
+            if segment == "MiddleSection" { paths.push(section + "/ToeSection"); }
+            checks.push(visual_children_check("GV-002-" + name + "-" + segment,
+                "egress_ramps", "gv002", section, paths));
+        }
+        let toe = ramp + "/MiddleSection/ToeSection";
+        checks.push(visual_children_check("GV-002-" + name + "-ToeSection",
+            "egress_ramps", "gv002", toe,
+            [toe + "/RampTrackPort", toe + "/RampTrackStarboard",
+             toe + "/OuterRail", toe + "/InnerRail"]));
     }
     let solar_names = _sysml_list(source, "solarArrayInstances");
     let solar_member_names = sysml_requirement_checks::source_enum_identifiers(source,
@@ -202,10 +258,11 @@ fn on_tick(me, ctx) {
         verification: "Verify_GriffinVisualRequirements",
         kind: "relationship", path: starboard_socket, rel: "lunco:mount:part",
         targets: [root + "/Griffin1/EgressRampStarboard"] });
-    checks.push(visual_exists_check("GV-004-deck-width", "lander_deck", "gv004", "bounds_component", root + "/Griffin1/Bus/PerimeterFrame"));
+    checks.push(visual_exists_check("GV-004-deck-width", "lander_deck", "gv004", "bounds_component", root + "/Griffin1/Bus/TopDeckOctagon"));
     checks[checks.len() - 1].index = 0;
     checks[checks.len() - 1].multiplier = 2.0;
-    checks[checks.len() - 1].expected_attr = griffin_spec::qualified_attribute_name("visualLanderDeckWidthM");
+    checks[checks.len() - 1].expected_attr = griffin_spec::qualified_attribute_name("deckDimensions");
+    checks[checks.len() - 1].expected_index = 0;
     checks[checks.len() - 1].tolerance = 0.001;
     for placement in [
         #{name: "Griffin1", expected: vec3_array(griffin_spec::visual_review_griffin_station())},
@@ -270,11 +327,28 @@ fn on_tick(me, ctx) {
         kind: "attribute_equals", path: root,
         attr: "lunco:visual:terrain_mode", expected: "standard_layered" });
     checks.push(visual_exists_check("GV-006-light", "context", "gv006", "exists", root + "/Sun"));
-    let report = sysml_requirements::evaluate(source, checks);
-    print("[griffin-flip-visual] griffin=" + this.griffin +
-          " flip=" + this.flip + " camera=" + this.camera +
-          " ground=" + this.ground + " si=metres checks=" + checks.len()
-          + " evaluated=" + report.results.len());
-    report_structured_verdict(report, "GRIFFIN FLIP VISUAL", "GRIFFIN_FLIP_VISUAL");
+    let batch_count = (checks.len() + 15) / 16;
+    if batch_index < 0 || batch_index >= batch_count {
+        throw("Griffin visual review batch index is out of range");
+    }
+    let first = batch_index * 16;
+    let batch = [];
+    for index in first..checks.len() {
+        if index >= first + 16 { break; }
+        batch.push(checks[index]);
+    }
+    let scene_doc_id = _visual_scene_document_id();
+    for index in 0..batch.len() {
+        batch[index].doc_id = scene_doc_id;
+    }
+    let title = "GRIFFIN FLIP VISUAL batch " + (batch_index + 1).to_string()
+        + "/" + batch_count.to_string();
+    let report = sysml_requirements::evaluate_stream(source, batch,
+        "GRIFFIN_FLIP_VISUAL", title);
+    print("[griffin-flip-visual] si=metres batch=" + (batch_index + 1).to_string()
+          + "/" + batch_count.to_string() + " checks=" + checks.len().to_string()
+          + " evaluated=" + report.check_count.to_string());
+    report_structured_verdict(report, title, "GRIFFIN_FLIP_VISUAL");
+    #{batch_count: batch_count, ok: report.ok}
 }
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
