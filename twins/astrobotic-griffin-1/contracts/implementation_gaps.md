@@ -61,7 +61,7 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 | Formal constraint ownership | Requirement membership roles are projected as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates required memberships, and checks verification coverage through resolved `verify` links. It retains each usage's resolved formal-parameter handle and typed bound expression. Griffin's shared adapter resolves scalar source-feature bindings against those handles and evaluates the bound constraints | Griffin now exercises usage-bound constraints across solar, ramp, landing-leg, and deck geometry requirements; source literals and composed USD measurements enter as typed feature-path observations. Other verification paths still use name-keyed parameter maps. Defaults, output binding, and full specialization/redefinition traversal remain |
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links. The GR-005 evidence catalog resolves its typed requirement and source references to typed locators and roles | Coverage evaluation compares resolved handles and GR-005 source provenance is exercised in the runtime verifier. Provider observations still do not share one end-to-end identity across source revision, realization, composed-stage generation, physics sampling, and resulting evidence. Status/check catalogs remain authored execution metadata; derive the requirement matrix from requirement, verification, realization, and evidence links |
-| Units and frames | SysML type identity and literal measurement-reference identities use source-snapshot handles. Quantity literals retain their resolved scalar measurement-reference feature and declared type; constraint values carry `Quantity`, binding contracts carry `Unit`, and runtime arithmetic/conversion checks SI dimensions. Griffin measurements are mostly normalized to SI at the provider boundary | Standard `MeasurementUnit` and `MeasurementScale` dimension and conversion definitions are not yet projected into runtime `Unit`; static feature types therefore still do not carry units and source quantity literals cannot yet evaluate as runtime quantities. The bounded Modelica length-vector adapter still consults the authored symbol catalog and must be replaced by source-resolved conversions. Frame identity and conversion provenance also need typed contracts |
+| Units and frames | SysML type and literal measurement-reference identities use source-snapshot handles. Resolved linear `MeasurementUnit` definitions project SI dimensions and scales from quantity-power factors, coherent SI base units, standard conversion references, prefixes, and supported arithmetic unit initializers. Source quantity literals can enter the neutral evaluator as native `Quantity` values; the bounded Modelica length-vector adapter consumes the typed measurement reference and converts to coherent SI without a symbol catalog | Static feature types still do not carry inferred units. The standard conversion `isExact` metadata is not retained in native quantities, so scale precision is not propagated into verification. Nonlinear and affine `MeasurementScale` mappings, unsupported definitions, typed frame identity, and end-to-end conversion provenance remain open. Griffin measurements are still mostly normalized to SI at the provider boundary |
 | Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, effective Avian-cooked Mesh/Cube geometry, exact analytic collider dimensions and poses, and a generic NURBS-to-USD-Mesh collision cook exist | No complete semantic part-usage graph binds every source feature to a USD realization. Griffin currently has no authored NURBS patch to cook. The NURBS planner uses an explicit canonical-metre tolerance and adaptive tessellation, but its successive-level convergence estimate is not a certified upper bound on exact surface deviation |
 | Behavioral applicability | Mission order, sampling horizon, route phases, and release are mostly Rhai orchestration | The model cannot yet state and evaluate configuration, mode, phase, or temporal applicability as part of a reusable source-defined verification objective |
 | Modelica relationship | Continuous models and parameters are selected through Twin tooling | No complete standard realization/parameter provenance graph ties each equation set and result back to the source feature and requirement revision |
@@ -344,16 +344,20 @@ become Griffin's permanent source semantics.
 
 ### P1 — quantities, geometry, and provider observations
 
-- `lunco-engineering-values` and the neutral evaluator now carry typed
-  `Quantity` values and `Unit` contracts. Compatible dimensions are converted
-  for arithmetic/comparison; multiplication, division, powers, and square root
-  use coherent SI units. Observations reject a separate unit field and textual
-  `{ value, unit }` quantity maps. The remaining source gap is resolving SysML
-  unit usages and literal suffixes into `Unit`; authored suffix text is not a
-  semantic unit definition. Griffin providers still normalize most measured
-  values to SI explicitly, so do not claim source-driven mixed-unit verification
-  until the SysML resolver, static feature types, and provider construction share
-  resolved unit definitions.
+- `lunco-engineering-values` and the neutral evaluator carry typed `Quantity`
+  values and `Unit` contracts. Compatible dimensions are converted for
+  arithmetic/comparison; multiplication, division, powers, and square root use
+  coherent SI units. Observations reject a separate unit field and textual
+  `{ value, unit }` quantity maps. The SysML source projection now resolves
+  linear `MeasurementUnit` dimensions and scales into typed definitions for
+  source literals; supported literal quantities enter the evaluator as native
+  `Quantity` values. The Griffin Modelica length-vector adapter uses that
+  reference and converts to SI without a parallel symbol table. Static feature
+  type unit inference, affine/nonlinear `MeasurementScale` mappings, and typed
+  frame/conversion provenance remain open. Standard conversion exactness is
+  not propagated into native quantities, so converted measurement precision is
+  not yet represented in verification. Most Griffin provider measurements
+  still normalize to SI explicitly.
 - `QueryUsdPrims` reads one composed snapshot and exposes the effective Avian
   collider for active collision Mesh, Cube, Sphere, Cylinder, Cone, Capsule,
   and finite Plane prims. Meshes return cooked triangle topology or convex
@@ -370,9 +374,9 @@ become Griffin's permanent source semantics.
   checks each Avian-cooked shape and frame, verifies beam source dimensions and
   transforms, and compares the adapter's authored mesh points
   and topology to its SysML-derived geometry. It passes the batch's document
-  and stage revisions through typed provider provenance. The broader mapping
-  from resolved SysML feature handles to USD
-  targets and unit/frame resolution remains open. Interactive Editor preview
+  and stage revisions through typed provider provenance. The broader SysML
+  feature-to-USD mapping, static unit inference, `MeasurementScale` conversion,
+  and frame resolution remain open. Interactive Editor preview
   and joined source/render/collider comparison remain unavailable.
 - `QueryPhysics` already exposes mass, center of mass, principal inertia,
   readiness, support state, and FLIP wheel-ray samples with sample ticks. It
