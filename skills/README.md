@@ -7,6 +7,9 @@ checkout.
 - [`interactive-component-authoring`](interactive-component-authoring/SKILL.md)
   — the Editor-first, one-component-at-a-time cycle, CAD/multiphysics design
   intent, typed USD boundaries, and the per-step visual/requirements checks.
+- [`luncosim-twin-development`](luncosim-twin-development/SKILL.md)
+  — finding a compatible LunCoSim runtime or development checkout before
+  reporting it unavailable, then choosing evidence-appropriate Twin checks.
 
 Keep these guides generic. Vehicle-specific dimensions, names, requirements,
 and verification bindings belong under the owning Twin, not in the shared
