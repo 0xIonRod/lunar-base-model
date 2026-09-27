@@ -97,6 +97,30 @@ also reported five Avian joint-start seating residuals (angular residuals of
 90° or 180° and
 translation residuals of 1.963 m), which need separate physical investigation.
 
+### Ramp flight-stow and rail-clearance status
+
+The physical ramp sections now fold for descent with the middle hinges at the
+source-owned +90° target and toe hinges at -90°. After `lander_touchdown`, the
+mission policy waits 1.5 s, commands all four intermediate hinge angles to the
+level target, waits 3 s, and only then commands the deck hinges to lower the
+ramps. These angles are explicit study assumptions pending the supplier
+mechanism ICD.
+
+The new `Verify_GriffinRampFlightStow` scene passed all 61 checks at source
+revision `1134567362502136608`. It verifies the authored section transforms
+and drive targets, section rail placement, and source-linked constraint
+results. A composed-world geometry query measured all 12 rail shapes and 40
+landing-leg shapes: the lowest stowed rail point is Y=5.19 m, the highest leg
+point is Y=2.44 m, and vertical clearance is 2.75 m. Rail bottoms remain at
+the track walking face in each section's local frame.
+
+A separate surface-operations run advanced 2,000 ticks (33.3 simulated
+seconds) after powered descent began but emitted no touchdown event. The
+unfold and deck-deployment commands were therefore not reached. Startup still
+reported two 180° Avian joint-seating residuals; the transition/landing
+physics investigation and a touchdown verdict remain open. Do not treat the
+static fold/clearance pass as dynamic articulation or landing acceptance.
+
 ### Landing-leg contact geometry status
 
 Read-only composed-USD checks on the loaded `griffin_1_editor.usda` scene

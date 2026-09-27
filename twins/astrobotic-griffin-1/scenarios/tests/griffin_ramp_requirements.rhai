@@ -6,6 +6,12 @@ const ROOT = "/World/Griffin1";
 const OWN = "GriffinRampRequirements::GriffinEgressRamp::";
 const VERIFICATION = "Verify_GriffinRampRequirements";
 
+fn simulation_dependencies(me, ctx) {
+    #{modelica_entities: [], entity_reads: [], entity_writes: [],
+      query_reads: ["AnalyzeSysml", "QueryUsdPrim", "QueryUsdPrims"],
+      required_inputs: []}
+}
+
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
@@ -17,6 +23,12 @@ fn _source_number(source, name) {
 }
 fn _source_enum_names(source, name) {
     sysml_requirement_checks::source_enum_identifiers(source, _source_attr(name))
+}
+fn _source_enum_name(source, name) {
+    let value = sysml_requirements::native_value(source, _source_attr(name));
+    if sysml_enum_is(value) { return value.literal; }
+    if string_is(value) { return value; }
+    ""
 }
 fn _check(id, component, requirement, kind, path) {
     #{id: id, component: component, requirement: requirement,
@@ -93,7 +105,8 @@ fn on_tick(me, ctx) {
         "physicalRampMassKg", "physicalRampSectionMassKg",
         "physicalRampSectionInertiaXKgM2", "physicalRampSectionInertiaYKgM2",
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionMassPartitionToleranceKg",
-        "physicalRampSectionJointLimitRad", "physicalRampSectionDriveTargetRad",
+        "physicalRampSectionJointLimitRad", "physicalRampSectionStowedAngleRad",
+        "physicalRampToeSectionStowedAngleRad", "physicalRampSectionDriveTargetRad",
         "physicalRampSectionDriveStiffnessNmPerDeg",
         "physicalRampSectionDriveDampingNmPerDegPerSec",
         "physicalRampSectionDriveMaxTorqueNm",
@@ -103,7 +116,7 @@ fn on_tick(me, ctx) {
     let requirements = [];
     for name in ["grr001", "grr002", "grr003", "grr004", "grr005", "grr006",
         "grr007", "grr008", "grr009", "grr010", "grr011", "grr012",
-        "grr013", "grr014", "grr015", "grr016"] {
+        "grr013", "grr014", "grr015", "grr016", "grr017", "grr018"] {
         requirements.push("GriffinRampRequirements::" + name);
     }
     let source = sysml_requirements::source_with_selection(attributes, requirements,
@@ -112,16 +125,15 @@ fn on_tick(me, ctx) {
     let joint_names = _source_enum_names(source, "intermediateJointInstances");
     let tread_names = _source_enum_names(source, "treadInstances");
     let rail_pin_names = _source_enum_names(source, "railJointPinInstances");
-    let transition_body_names = _source_enum_names(source, "transitionBody");
-    let transition_contact_names = _source_enum_names(source, "transitionContact");
+    let transition_body_name = _source_enum_name(source, "transitionBody");
+    let transition_contact_name = _source_enum_name(source, "transitionContact");
     let transition_joint_names = _source_enum_names(source, "transitionJoints");
     if section_names.len() != 3 || joint_names.len() != 4 || tread_names.len() != 4
         || rail_pin_names.len() != 2
-        || transition_body_names.len() != 1 || transition_contact_names.len() != 1
+        || transition_body_name == "" || transition_contact_name == ""
         || transition_joint_names.len() != 2 {
         throw("Griffin ramp SysML identity collections are incomplete");
     }
-
     let checks = [];
     let section_count = _source_number(source, "rampSectionCount").to_int();
     let section_length = _source_number(source, "rampSectionLengthM");
@@ -164,6 +176,18 @@ fn on_tick(me, ctx) {
           sectionMassKg: _source_number(source, "physicalRampSectionMassKg"),
           sectionCount: section_count,
           toleranceKg: _source_number(source, "physicalRampSectionMassPartitionToleranceKg")}));
+    checks.push(_constraint("GRR-017-flight-stow-angle-envelope", "grr017",
+        "GRC022_RampFlightStowAnglesWithinTravel",
+        #{middleAngleRad: _source_number(source, "physicalRampSectionStowedAngleRad"),
+          toeAngleRad: _source_number(source, "physicalRampToeSectionStowedAngleRad"),
+          limitRad: _source_number(source, "physicalRampSectionJointLimitRad")}));
+    checks.push(_constraint("GRR-018-rails-on-upper-track-face", "grr018",
+        "GRC023_RailsRemainOnUpperTrackFace",
+        #{railBottomYM: _source_number(source, "rampRailCenterYM")
+                - _source_number(source, "rampRailHeightM") / 2.0,
+          walkingSurfaceTopYM: _source_number(source, "rampSurfaceCenterYM")
+                + _source_number(source, "rampSurfaceThicknessM") / 2.0,
+          toleranceM: geometry_tolerance}));
     checks.push(_constraint("GRR-011-section-inertia", "grr011",
         "GRC020_RampSectionInertiaMatchesEnvelope",
         #{measuredXKgM2: _source_number(source, "physicalRampSectionInertiaXKgM2"),
@@ -187,8 +211,8 @@ fn on_tick(me, ctx) {
         #{provider: "composed_usd_geometry", state: "unavailable",
           detail: "upper-deck collision profile is unavailable"}
     };
-    let transition_name = transition_body_names[0];
-    let contact_name = transition_contact_names[0];
+    let transition_name = transition_body_name;
+    let contact_name = transition_contact_name;
     let pi = 3.141592653589793;
 
     for side in ["port", "starboard"] {
@@ -478,6 +502,17 @@ fn on_tick(me, ctx) {
         checks.push(_relationship("GRR-002-" + side + "-transition-body1", "grr012",
             ramp + "/" + transition_joint_names[if side == "port" { 0 } else { 1 }],
             "physics:body1", ramp + "/" + transition_name));
+        let transition_path = ramp + "/" + transition_name;
+        let transition_joint = ramp + "/" + transition_joint_names[if side == "port" { 0 } else { 1 }];
+        checks.push(_attribute_component("GRR-012-" + side + "-transition-inboard-placement",
+            "grr012", transition_path, "xformOp:translate", 0,
+            -_source_number(source, "physicalRampDeckTransitionLengthM") / 2.0));
+        let expected_joint_rot1_y = if side == "port" { 0.0 } else { 1.0 };
+        let expected_joint_rot1_w = if side == "port" { 1.0 } else { 0.0 };
+        checks.push(_attribute_component("GRR-012-" + side + "-transition-frame-y",
+            "grr012", transition_joint, "physics:localRot1", 1, expected_joint_rot1_y));
+        checks.push(_attribute_component("GRR-012-" + side + "-transition-frame-w",
+            "grr012", transition_joint, "physics:localRot1", 3, expected_joint_rot1_w));
 
         for local_joint_index in 0..2 {
             let joint_name = joint_names[joint_offset + local_joint_index];
@@ -504,9 +539,19 @@ fn on_tick(me, ctx) {
                 "grr016", joint_path, "physics:lowerLimit", 0, -joint_limit_deg));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-upper-limit",
                 "grr016", joint_path, "physics:upperLimit", 0, joint_limit_deg));
-            checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-target",
-                "grr016", joint_path, "drive:angular:physics:targetPosition", 0,
-                _source_number(source, "physicalRampSectionDriveTargetRad") * 180.0 / pi));
+            let stow_angle = if local_joint_index == 0 {
+                _source_number(source, "physicalRampSectionStowedAngleRad")
+            } else {
+                _source_number(source, "physicalRampToeSectionStowedAngleRad")
+            };
+            let stow_angle_deg = stow_angle * 180.0 / pi;
+            checks.push(#{id: "GRR-017-" + side + "-" + joint_name + "-flight-stow-target",
+                component: "ramp", requirement: "grr017", verification: VERIFICATION,
+                kind: "attribute", path: joint_path,
+                attr: "drive:angular:physics:targetPosition", expected: stow_angle_deg,
+                tolerance: 0.002});
+            checks.push(_attribute_component("GRR-017-" + side + "-" + joint_name + "-flight-stow-transform",
+                "grr017", body1, "xformOp:rotateXYZ", 2, stow_angle_deg));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-stiffness",
                 "grr016", joint_path, "drive:angular:physics:stiffness", 0,
                 _source_number(source, "physicalRampSectionDriveStiffnessNmPerDeg")));

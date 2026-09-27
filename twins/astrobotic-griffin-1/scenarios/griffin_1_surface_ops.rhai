@@ -202,8 +202,36 @@ fn touchdown_notice(me) {
     print("[griffin] touchdown confirmed");
 }
 
+fn unfold_ramp_sections(me) {
+    // Remove the flight fold through the four real intermediate USD hinges
+    // before the deck hinges lower the two physical ramps to the terrain.
+    let angle = griffin_spec::physical_ramp_section_drive_target_rad();
+    if angle == () { return #{ok: false, error: "deployed ramp-section angle is missing from SysML"}; }
+    let joints = [
+        find_path(LANDER + "/RampSectionHingePort01"),
+        find_path(LANDER + "/RampSectionHingePort12"),
+        find_path(LANDER + "/RampSectionHingeStarboard01"),
+        find_path(LANDER + "/RampSectionHingeStarboard12"),
+    ];
+    let writes = [];
+    for joint in joints {
+        if joint == () || joint < 0 {
+            return #{ok: false, error: "physical ramp-section hinge entities are unavailable"};
+        }
+        let result = cmd("SetPorts", #{target: joint, writes: [["angle", angle]]});
+        if result == () || result.ok != true {
+            return #{ok: false, error: "ramp-section unfold command was rejected", joint: joint, result: result};
+        }
+        writes.push(result);
+    }
+    emit("griffin_ramp_sections_unfold_commanded");
+    notify_kind("Griffin ramp sections are unfolding after touchdown.", "info");
+    print("[griffin] physical ramp-section unfold commands accepted");
+    #{ok: true, joints: writes, angle_rad: angle}
+}
+
 fn deploy_ramps(me) {
-    // The physical ramp bodies are authored horizontal/stowed for descent.
+    // The physical ramp sections have already been unfolded after touchdown.
     // Drive their existing USD revolute joints through the generic typed angle
     // port after touchdown; this is a real hinged deployment, not a pose write
     // or a second Twin-side physics implementation.
@@ -408,6 +436,16 @@ fn task(me, ctx) {
         check(|m| this.phase_timeout != true),
         once(|m| { this.lander_settled = true; touchdown_notice(m); true }),
         wait(1.5),
+        once(|m| {
+            let unfold = unfold_ramp_sections(m);
+            if unfold.ok != true {
+                this.phase_timeout = true;
+                fail_phase(this, "ramp-unfold");
+            }
+            true
+        }),
+        wait(3.0),
+        check(|m| this.phase_timeout != true),
         once(|m| {
             let ramps = deploy_ramps(m);
             if ramps.ok == true {

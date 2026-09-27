@@ -151,3 +151,38 @@ flight-accuracy claims without source provenance.
 The earlier save-refresh report remains a separate historical record. This
 continuation updates its model evidence without changing that save-refresh
 result. The existing engine-plume handover is unchanged.
+
+## Continuation work (2026-09-27, ramp flight stow)
+
+The physical three-section ramps now hold a source-owned +90° middle fold and
+-90° toe fold for descent. The rail cubes stay on the upper side of their
+walking tracks: their local bottom Y is 0.09 m, equal to the walking-face Y.
+After `lander_touchdown`, the mission waits 1.5 s, commands the four
+intermediate joints to 0°, waits 3 s, then deploys the two deck hinges. The
+stow angles are replaceable study assumptions; the supplier mechanism ICD is
+still unavailable.
+
+`GRR-017` and `GRR-018` now cover flight fold, post-touchdown unfold target,
+rail-to-track face placement, and composed rail clearance above the landing
+legs. `GRC-025` evaluates the composed-world envelope. The focused
+`Verify_GriffinRampFlightStow` run passed 61/61 checks at source revision
+`1134567362502136608`. It queried 12 rail shapes and 40 landing-leg geometry
+shapes: lowest stowed rail bottom Y=5.19 m, highest leg top Y=2.44 m, clearance
+2.75 m. The new requirement evidence links resolve through
+`griffin_requirement_sources.sysml`.
+
+A production surface-operations attempt began powered descent and advanced
+2,000 ticks (33.3 simulated seconds), then ended `NO-VERDICT` without a
+touchdown event. The unfold and deck deployment steps were not reached. That
+run reported two 180° Avian joint-start seating residuals (zero translation
+residual). A separate older run in the preceding section reported five
+residuals; neither run proves a rail-caused rebound. Dynamic touchdown, joint
+seating, ramp articulation, and FLIP egress remain unverified. The focused
+static pass does not close them.
+
+The `terrain` worktree was checked against `origin/main` at `b61caad`; it was
+already synchronized (zero ahead/behind), so no merge was needed. Six
+preexisting SolarPanel/acausal changes remain staged and untouched. `luncosim
+test --list` currently hits an unrelated parse error in
+`assets/scenarios/tests/scripting_task_contract.rhai:94`; direct execution of
+the explicit Griffin scene works. No terrain or remote publication was made.

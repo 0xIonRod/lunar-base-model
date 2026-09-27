@@ -39,6 +39,12 @@ script = "scenarios/tests/griffin_ramp_requirements.rhai"
 verdict_channel = "GRIFFIN_RAMP_REQUIREMENTS"
 
 [[verification.cases]]
+name = "GriffinRampRequirements::Verify_GriffinRampFlightStow"
+scene = "tests/griffin_ramp_flight_stow.usda"
+script = "scenarios/tests/griffin_ramp_flight_stow.rhai"
+verdict_channel = "GRIFFIN_RAMP_FLIGHT_STOW"
+
+[[verification.cases]]
 name = "GriffinLanderRequirements::Verify_GriffinLanderRequirements"
 scene = "tests/griffin_lander_requirements.usda"
 script = "scenarios/tests/griffin_lander_requirements.rhai"

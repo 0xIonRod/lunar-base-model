@@ -50,6 +50,26 @@ SysML/USD requirements evaluator.
   across the open centre. The same source wheel stations and track width drive
   render geometry and physical colliders.
 
+## Physical flight stow and rail clearance
+
+`GRR-017` owns a replaceable two-hinge flight fold: each middle section targets
++90 degrees and each toe targets -90 degrees during descent. `GRR-018` keeps
+the rail bottoms on the upper track face: the authored rail bottom and track
+top are both Y=0.09 m in section-local coordinates. The focused composed-USD
+check also measures all 12 rail bounds and 40 landing-leg geometry bounds in
+the canonical stage frame. Its current stowed pose has a lowest rail point at
+Y=5.19 m and a highest leg point at Y=2.44 m, leaving 2.75 m of vertical
+clearance.
+
+After the touchdown event, `griffin_1_surface_ops.rhai` waits 1.5 s, commands
+the four intermediate hinges to the level deployment target, waits 3 s, and
+then deploys the deck hinges. The focused `Verify_GriffinRampFlightStow` case
+passed all 61 checks at source revision `1134567362502136608`. This is static
+pose and source evidence. A separate 33.3 s powered-descent run did not reach
+touchdown, so the unfold and deck-deployment commands have not yet been
+observed in mission runtime. The stow angles remain study assumptions until a
+supplier mechanism ICD is available.
+
 ## Evidence
 
 `scenarios/tests/griffin_ramp_requirements.rhai` observes the composed ramp
