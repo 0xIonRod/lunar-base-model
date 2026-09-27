@@ -19,7 +19,6 @@ def Xform "Griffin1" (
     string lunco:ui:schemaRole = "Tracks attitude · applies commands"
     custom float lunco:payload_class_kg = 625.0
     custom string lunco:payload_class_status = "not a public flight ICD; Griffin study envelope"
-    custom string lunco:configuration = "four legs, seven-engine lander, dual egress ramps"
     custom string lunco:parameter_status = "public configuration plus explicit simulator study values; flight ICD TBD"
     custom string lunco:provenance:source = "https://www.astrobotic.com/griffin"
     custom string lunco:collision:contract = "named proxy colliders own contact; render-only geometry is non-colliding"
@@ -149,7 +148,7 @@ def Xform "Griffin1" (
         string lunco:ui:schemaRole = "Throttle in · downward braking"
         uniform token collection:components:expansionRule = "explicitOnly"
         rel collection:components:includes
-        prepend rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/FuelPump>, </Griffin1/MainPropulsion/OxidizerPump>, </Griffin1/MainPropulsion/MainChamber>, </Griffin1/MainPropulsion/PropellantStatus>]
+        prepend rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/FuelPump>, </Griffin1/MainPropulsion/OxidizerPump>, </Griffin1/MainPropulsion/MainChamber>, </Griffin1/MainPropulsion/NozzleDesign>, </Griffin1/MainPropulsion/PlumePhotometry>, </Griffin1/MainPropulsion/PropellantStatus>]
         float inputs:valve_opening
         float inputs:valve_opening.connect = </Griffin1.outputs:throttle>
         float inputs:rcs_fuel_mass_flow_kgs
@@ -369,6 +368,49 @@ def Xform "Griffin1" (
             float outputs:maximum_thrust_n
             float outputs:activity
             float outputs:heat_release_w
+        }
+        def Scope "NozzleDesign" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/BellNozzle.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            float inputs:throat_radius = 0.12
+            float inputs:exit_radius = 0.34
+            float inputs:length = 0.52
+            float inputs:contour = 1.0
+            float outputs:exit_area
+            float outputs:exit_radius_m
+        }
+        def Scope "PlumePhotometry" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            int inputs:engine_count = 7
+            float outputs:render_throttle
+            float outputs:visual_length_fraction
+            float outputs:intensity
+            float outputs:radius
+            float inputs:throttle.connect = </Griffin1/MainPropulsion.outputs:engine_activity>
+            float inputs:thrust_n.connect = </Griffin1/MainPropulsion.outputs:thrust_n>
+            float inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion.outputs:maximum_thrust_n>
+            float inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion.outputs:propellant_flow>
+            float inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:exhaust_velocity_mps>
+            float inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:design_exhaust_velocity_mps>
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:nozzle_exit_pressure_pa = 0.0
+            float inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion.outputs:chamber_pressure_pa>
+            float inputs:design_chamber_pressure_pa = 0.0
+            float inputs:ambient_pressure_pa = 0.0
+            float inputs:pressure_threshold_pa = 1000.0
+            float inputs:geometry_capacity_m = 4.0
+            float inputs:w_max = 0.27
+            float inputs:luminance = 15.047
         }
         def Scope "PropellantStatus" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -1226,94 +1268,64 @@ def Xform "Griffin1" (
     def Xform "Nozzle"
     {
         token visibility = "inherited"
-        custom string lunco:parameter_status = "seven-engine public configuration; bell contour is a study proxy"
-        custom string lunco:provenance:source = "https://www.astrobotic.com/griffin"
         def Xform "MainEngineCluster"
         {
             token visibility = "inherited"
-            def Cone "Engine01"
+            def Xform "Engine01" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.20000000298023224
-                float radius2 = 0.41999998688697815
-                float height = 0.6200000047683716
-                double3 xformOp:translate = (0.0, -1.78, 0.0)
+                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine02"
+            def Xform "Engine02" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (1.0, -1.78, 0.0)
+                custom double3 xformOp:translate = (1.05, 1.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine03"
+            def Xform "Engine03" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (-1.0, -1.78, 0.0)
+                custom double3 xformOp:translate = (-1.05, 1.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine04"
+            def Xform "Engine04" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (0.0, -1.78, 1.0)
+                custom double3 xformOp:translate = (0.525, 1.0, 0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine05"
+            def Xform "Engine05" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (0.0, -1.78, -1.0)
+                custom double3 xformOp:translate = (-0.525, 1.0, -0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine06"
+            def Xform "Engine06" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.15000000596046448
-                float radius2 = 0.33000001311302185
-                float height = 0.5199999809265137
-                double3 xformOp:translate = (0.9, -1.78, 0.9)
+                custom double3 xformOp:translate = (-0.525, 1.0, 0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine07"
+            def Xform "Engine07" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.15000000596046448
-                float radius2 = 0.33000001311302185
-                float height = 0.5199999809265137
-                double3 xformOp:translate = (-0.9, -1.78, -0.9)
+                custom double3 xformOp:translate = (0.525, 1.0, -0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
+            }
+            def Xform "EngineSkirt" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
+            )
+            {
+                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
             }
         }
     }
@@ -1324,46 +1336,6 @@ def Xform "Griffin1" (
     over "FlameCore"
     {
         token visibility = "invisible"
-    }
-    def Capsule "TankPX"
-    {
-        uniform token axis = "Y"
-        double radius = 0.4
-        double height = 2.4
-        double3 xformOp:translate = (2.2, 0.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.75, 0.7200000286102295, 0.6499999761581421)]
-        bool physics:collisionEnabled = false
-    }
-    def Capsule "TankNX"
-    {
-        uniform token axis = "Y"
-        double radius = 0.4
-        double height = 2.4
-        double3 xformOp:translate = (-2.2, 0.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.75, 0.7200000286102295, 0.6499999761581421)]
-        bool physics:collisionEnabled = false
-    }
-    def Capsule "TankPZ"
-    {
-        uniform token axis = "Y"
-        double radius = 0.4
-        double height = 2.4
-        double3 xformOp:translate = (0.0, 0.0, 2.2)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.75, 0.7200000286102295, 0.6499999761581421)]
-        bool physics:collisionEnabled = false
-    }
-    def Capsule "TankNZ"
-    {
-        uniform token axis = "Y"
-        double radius = 0.4
-        double height = 2.4
-        double3 xformOp:translate = (0.0, 0.0, -2.2)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.75, 0.7200000286102295, 0.6499999761581421)]
-        bool physics:collisionEnabled = false
     }
     def Cube "RcsQuadPXPZ"
     {
@@ -2182,7 +2154,7 @@ def Xform "Griffin1" (
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (2.200000047683716, -1.5499999523162842, 0.0)
+        point3f physics:localPos0 = (3.0999999046325684, 2.200000047683716, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2203,7 +2175,7 @@ def Xform "Griffin1" (
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (-2.200000047683716, -1.5499999523162842, 0.0)
+        point3f physics:localPos0 = (-3.0999999046325684, 2.200000047683716, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2224,7 +2196,7 @@ def Xform "Griffin1" (
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (0.0, -1.5499999523162842, 2.200000047683716)
+        point3f physics:localPos0 = (0.0, 2.200000047683716, 3.0999999046325684)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2245,7 +2217,7 @@ def Xform "Griffin1" (
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (0.0, -1.5499999523162842, -2.200000047683716)
+        point3f physics:localPos0 = (0.0, 2.200000047683716, -3.0999999046325684)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2256,94 +2228,64 @@ def Xform "Griffin1" (
     def Xform "Nozzle"
     {
         token visibility = "inherited"
-        custom string lunco:parameter_status = "seven-engine public configuration; bell contour is a study proxy"
-        custom string lunco:provenance:source = "https://www.astrobotic.com/griffin"
         def Xform "MainEngineCluster"
         {
             token visibility = "inherited"
-            def Cone "Engine01"
+            def Xform "Engine01" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.20000000298023224
-                float radius2 = 0.41999998688697815
-                float height = 0.6200000047683716
-                double3 xformOp:translate = (0.0, -1.78, 0.0)
+                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine02"
+            def Xform "Engine02" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (1.0, -1.78, 0.0)
+                custom double3 xformOp:translate = (1.05, 1.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine03"
+            def Xform "Engine03" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (-1.0, -1.78, 0.0)
+                custom double3 xformOp:translate = (-1.05, 1.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine04"
+            def Xform "Engine04" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (0.0, -1.78, 1.0)
+                custom double3 xformOp:translate = (0.525, 1.0, 0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine05"
+            def Xform "Engine05" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (0.0, -1.78, -1.0)
+                custom double3 xformOp:translate = (-0.525, 1.0, -0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine06"
+            def Xform "Engine06" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.15000000596046448
-                float radius2 = 0.33000001311302185
-                float height = 0.5199999809265137
-                double3 xformOp:translate = (0.9, -1.78, 0.9)
+                custom double3 xformOp:translate = (-0.525, 1.0, 0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine07"
+            def Xform "Engine07" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.15000000596046448
-                float radius2 = 0.33000001311302185
-                float height = 0.5199999809265137
-                double3 xformOp:translate = (-0.9, -1.78, -0.9)
+                custom double3 xformOp:translate = (0.525, 1.0, -0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
+            }
+            def Xform "EngineSkirt" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
+            )
+            {
+                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
             }
         }
     }
@@ -2355,390 +2297,279 @@ def Xform "Griffin1" (
     {
         token visibility = "invisible"
     }
-    def Xform "SolarPanelPort"
-    {
-        custom double3 xformOp:translate = (0.0, 0.0, -2.76)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom string lunco:installation = "deployed negative-Z side solar array"
-        def Cube "Boom"
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 0.0, 0.3)
-            double3 xformOp:scale = (0.18, 0.18, 0.34)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.41999998688697815, 0.44999998807907104, 0.5)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "guide"
-        }
-        def Cube "Backsheet" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            double size = 1.0
-            custom double3 xformOp:scale = (3.4, 2.2, 0.08)
-            uniform token[] xformOpOrder = ["xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.07999999821186066, 0.10000000149011612, 0.14000000059604645)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "proxy"
-        }
-        def Cube "Cells" (
-            prepend apiSchemas = "MaterialBindingAPI"
-        )
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 0.0, -0.1)
-            custom double3 xformOp:scale = (3.24, 2.04, 0.035)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.02500000037252903, 0.07500000298023224, 0.23999999463558197)]
-            rel material:binding = </Griffin1/Looks/SolarWing_Mat>
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "FrameTop"
-        {
-            double size = 1.0
-            custom double3 xformOp:translate = (0.0, 1.06, 0.12)
-            custom double3 xformOp:scale = (3.44, 0.08, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.5799999833106995, 0.6000000238418579, 0.6399999856948853)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "FrameBottom"
-        {
-            double size = 1.0
-            custom double3 xformOp:translate = (0.0, -1.06, 0.12)
-            custom double3 xformOp:scale = (3.44, 0.08, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.5799999833106995, 0.6000000238418579, 0.6399999856948853)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "FrameLeft"
-        {
-            double size = 1.0
-            custom double3 xformOp:translate = (-1.66, 0.0, 0.12)
-            custom double3 xformOp:scale = (0.08, 2.12, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.5799999833106995, 0.6000000238418579, 0.6399999856948853)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "FrameRight"
-        {
-            double size = 1.0
-            custom double3 xformOp:translate = (1.66, 0.0, 0.12)
-            custom double3 xformOp:scale = (0.08, 2.12, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.5799999833106995, 0.6000000238418579, 0.6399999856948853)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "GridVertical"
-        {
-            double size = 1.0
-            custom double3 xformOp:scale = (0.025, 2.0, 0.055)
-            uniform token[] xformOpOrder = ["xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.7200000286102295, 0.6000000238418579, 0.25)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "GridHorizontal"
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 0.0, -0.15)
-            custom double3 xformOp:scale = (3.18, 0.025, 0.055)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.7200000286102295, 0.6000000238418579, 0.25)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-    }
-    def Xform "SolarPanelStarboard"
-    {
-        custom double3 xformOp:translate = (0.0, 0.0, 2.76)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom string lunco:installation = "deployed positive-Z side solar array"
-        def Cube "Boom"
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 0.0, -0.3)
-            double3 xformOp:scale = (0.18, 0.18, 0.34)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.41999998688697815, 0.44999998807907104, 0.5)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "guide"
-        }
-        def Cube "Backsheet" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            double size = 1.0
-            custom double3 xformOp:scale = (3.4, 2.2, 0.08)
-            uniform token[] xformOpOrder = ["xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.07999999821186066, 0.10000000149011612, 0.14000000059604645)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "proxy"
-        }
-        def Cube "Cells" (
-            prepend apiSchemas = "MaterialBindingAPI"
-        )
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 0.0, 0.1)
-            custom double3 xformOp:scale = (3.24, 2.04, 0.035)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.02500000037252903, 0.07500000298023224, 0.23999999463558197)]
-            rel material:binding = </Griffin1/Looks/SolarWing_Mat>
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "FrameTop"
-        {
-            double size = 1.0
-            custom double3 xformOp:translate = (0.0, 1.06, 0.12)
-            custom double3 xformOp:scale = (3.44, 0.08, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.5799999833106995, 0.6000000238418579, 0.6399999856948853)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "FrameBottom"
-        {
-            double size = 1.0
-            custom double3 xformOp:translate = (0.0, -1.06, 0.12)
-            custom double3 xformOp:scale = (3.44, 0.08, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.5799999833106995, 0.6000000238418579, 0.6399999856948853)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "FrameLeft"
-        {
-            double size = 1.0
-            custom double3 xformOp:translate = (-1.66, 0.0, 0.12)
-            custom double3 xformOp:scale = (0.08, 2.12, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.5799999833106995, 0.6000000238418579, 0.6399999856948853)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "FrameRight"
-        {
-            double size = 1.0
-            custom double3 xformOp:translate = (1.66, 0.0, 0.12)
-            custom double3 xformOp:scale = (0.08, 2.12, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.5799999833106995, 0.6000000238418579, 0.6399999856948853)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "GridVertical"
-        {
-            double size = 1.0
-            custom double3 xformOp:scale = (0.025, 2.0, 0.055)
-            uniform token[] xformOpOrder = ["xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.7200000286102295, 0.6000000238418579, 0.25)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "GridHorizontal"
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 0.0, 0.15)
-            custom double3 xformOp:scale = (3.18, 0.025, 0.055)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.7200000286102295, 0.6000000238418579, 0.25)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-    }
     def Xform "GriffinBody" (
-        prepend references = @griffin_body.usda@</GriffinBody>
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_body_collision.usda@</GriffinBody>
     )
     {
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
     }
-    def Mesh "TopDeckCollisionProxy" (
-        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
-    )
-    {
-        point3f[] points = [(3.1600000858306885, 1.5199999809265137, 0.0), (1.5800000429153442, 1.5199999809265137, 2.736639976501465), (-1.5800000429153442, 1.5199999809265137, 2.736639976501465), (-3.1600000858306885, 1.5199999809265137, 0.0), (-1.5800000429153442, 1.5199999809265137, -2.736639976501465), (1.5800000429153442, 1.5199999809265137, -2.736639976501465), (3.1600000858306885, 1.7200000286102295, 0.0), (1.5800000429153442, 1.7200000286102295, 2.736639976501465), (-1.5800000429153442, 1.7200000286102295, 2.736639976501465), (-3.1600000858306885, 1.7200000286102295, 0.0), (-1.5800000429153442, 1.7200000286102295, -2.736639976501465), (1.5800000429153442, 1.7200000286102295, -2.736639976501465)]
-        int[] faceVertexCounts = [6, 6, 4, 4, 4, 4, 4, 4]
-        int[] faceVertexIndices = [0, 1, 2, 3, 4, 5, 6, 11, 10, 9, 8, 7, 0, 6, 7, 1, 1, 7, 8, 2, 2, 8, 9, 3, 3, 9, 10, 4, 4, 10, 11, 5, 5, 11, 6, 0]
-        uniform token subdivisionScheme = "none"
-        uniform token physics:approximation = "convexHull"
-        uniform token purpose = "proxy"
-        token visibility = "invisible"
-        bool physics:collisionEnabled = true
-    }
     def Xform "LegPX" (
-        prepend references = @griffin_leg.usda@</World>
-        prepend apiSchemas = "PhysicsFilteredPairsAPI"
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
+        prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (2.2, -1.55, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:translate = (3.1, 2.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        custom rel physics:filteredPairs = </Griffin1>
+        custom rel physics:filteredPairs = None
         float physics:mass = 180.0
         float outputs:contact_force = 0.0
         float outputs:contact = 0.0
-        def Cylinder "Strut"
-        {
-            uniform token axis = "Y"
-            double radius = 0.18
-            double height = 2.1
-            double3 xformOp:translate = (0.0, -1.0, 0.0)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.4399999976158142, 0.4699999988079071, 0.5299999713897705)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Capsule "PadPX" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            uniform token axis = "Y"
-            double radius = 0.38
-            double height = 0.22
-            custom double3 xformOp:translate = (0.7, -2.0, 0.0)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.2199999988079071, 0.23999999463558197, 0.2800000011920929)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-        }
         def "FootPad" (
             active = false
         )
         {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "TopMount"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "OuterStrut"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "ShockHousing"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "Piston"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "FootHub"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def Xform "LandingLegVisual" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+        )
+        {
+            def Cylinder "FootPadCollider" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:translate = (0.0, -2.05, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.5199999809265137
+                double height = 0.18000000715255737
+                uniform token axis = "Y"
+                float3[] extent = [(-0.5199999809265137, -0.09000000357627869, -0.5199999809265137), (0.5199999809265137, 0.09000000357627869, 0.5199999809265137)]
+                bool physics:collisionEnabled = true
+                uniform token purpose = "proxy"
+                token visibility = "invisible"
+                custom rel lunco:collider:geometrySource = </Griffin1/LegPX/LandingLegVisual/FootPad>
+            }
         }
     }
     def Xform "LegNX" (
-        prepend references = @griffin_leg.usda@</World>
-        prepend apiSchemas = "PhysicsFilteredPairsAPI"
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
+        prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (-2.2, -1.55, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        custom rel physics:filteredPairs = </Griffin1>
+        custom double3 xformOp:translate = (-3.1, 2.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+        custom rel physics:filteredPairs = None
         float physics:mass = 180.0
         float outputs:contact_force = 0.0
         float outputs:contact = 0.0
-        def Cylinder "Strut"
-        {
-            uniform token axis = "Y"
-            double radius = 0.18
-            double height = 2.1
-            double3 xformOp:translate = (0.0, -1.0, 0.0)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.4399999976158142, 0.4699999988079071, 0.5299999713897705)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Capsule "PadNX" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            uniform token axis = "Y"
-            double radius = 0.38
-            double height = 0.22
-            custom double3 xformOp:translate = (-0.7, -2.0, 0.0)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.2199999988079071, 0.23999999463558197, 0.2800000011920929)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-        }
         def "FootPad" (
             active = false
         )
         {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "TopMount"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "OuterStrut"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "ShockHousing"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "Piston"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "FootHub"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def Xform "LandingLegVisual" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+        )
+        {
+            def Cylinder "FootPadCollider" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:translate = (0.0, -2.05, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.5199999809265137
+                double height = 0.18000000715255737
+                uniform token axis = "Y"
+                float3[] extent = [(-0.5199999809265137, -0.09000000357627869, -0.5199999809265137), (0.5199999809265137, 0.09000000357627869, 0.5199999809265137)]
+                bool physics:collisionEnabled = true
+                uniform token purpose = "proxy"
+                token visibility = "invisible"
+                custom rel lunco:collider:geometrySource = </Griffin1/LegNX/LandingLegVisual/FootPad>
+            }
         }
     }
     def Xform "LegPZ" (
-        prepend references = @griffin_leg.usda@</World>
-        prepend apiSchemas = "PhysicsFilteredPairsAPI"
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
+        prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, -1.55, 2.2)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        custom rel physics:filteredPairs = </Griffin1>
+        custom double3 xformOp:translate = (0.0, 2.2, 3.1)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+        custom rel physics:filteredPairs = None
         float physics:mass = 180.0
         float outputs:contact_force = 0.0
         float outputs:contact = 0.0
-        def Cylinder "Strut"
-        {
-            uniform token axis = "Y"
-            double radius = 0.18
-            double height = 2.1
-            double3 xformOp:translate = (0.0, -1.0, 0.0)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.4399999976158142, 0.4699999988079071, 0.5299999713897705)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Capsule "PadPZ" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            uniform token axis = "Y"
-            double radius = 0.38
-            double height = 0.22
-            custom double3 xformOp:translate = (0.0, -2.0, 0.7)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.2199999988079071, 0.23999999463558197, 0.2800000011920929)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-        }
         def "FootPad" (
             active = false
         )
         {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "TopMount"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "OuterStrut"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "ShockHousing"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "Piston"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "FootHub"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def Xform "LandingLegVisual" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+        )
+        {
+            def Cylinder "FootPadCollider" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:translate = (0.0, -2.05, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.5199999809265137
+                double height = 0.18000000715255737
+                uniform token axis = "Y"
+                float3[] extent = [(-0.5199999809265137, -0.09000000357627869, -0.5199999809265137), (0.5199999809265137, 0.09000000357627869, 0.5199999809265137)]
+                bool physics:collisionEnabled = true
+                uniform token purpose = "proxy"
+                token visibility = "invisible"
+                custom rel lunco:collider:geometrySource = </Griffin1/LegPZ/LandingLegVisual/FootPad>
+            }
         }
     }
     def Xform "LegNZ" (
-        prepend references = @griffin_leg.usda@</World>
-        prepend apiSchemas = "PhysicsFilteredPairsAPI"
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
+        prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, -1.55, -2.2)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        custom rel physics:filteredPairs = </Griffin1>
+        custom double3 xformOp:translate = (0.0, 2.2, -3.1)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+        custom rel physics:filteredPairs = None
         float physics:mass = 180.0
         float outputs:contact_force = 0.0
         float outputs:contact = 0.0
-        def Cylinder "Strut"
-        {
-            uniform token axis = "Y"
-            double radius = 0.18
-            double height = 2.1
-            double3 xformOp:translate = (0.0, -1.0, 0.0)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.4399999976158142, 0.4699999988079071, 0.5299999713897705)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Capsule "PadNZ" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            uniform token axis = "Y"
-            double radius = 0.38
-            double height = 0.22
-            custom double3 xformOp:translate = (0.0, -2.0, -0.7)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.2199999988079071, 0.23999999463558197, 0.2800000011920929)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-        }
         def "FootPad" (
             active = false
         )
         {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "TopMount"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "OuterStrut"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "ShockHousing"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "Piston"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def "FootHub"
+        {
+            bool physics:collisionEnabled = false
+            token visibility = "invisible"
+        }
+        def Xform "LandingLegVisual" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+        )
+        {
+            def Cylinder "FootPadCollider" (
+                prepend apiSchemas = "PhysicsCollisionAPI"
+            )
+            {
+                custom double3 xformOp:translate = (0.0, -2.05, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.5199999809265137
+                double height = 0.18000000715255737
+                uniform token axis = "Y"
+                float3[] extent = [(-0.5199999809265137, -0.09000000357627869, -0.5199999809265137), (0.5199999809265137, 0.09000000357627869, 0.5199999809265137)]
+                bool physics:collisionEnabled = true
+                uniform token purpose = "proxy"
+                token visibility = "invisible"
+                custom rel lunco:collider:geometrySource = </Griffin1/LegNZ/LandingLegVisual/FootPad>
+            }
         }
     }
     def Xform "MainEngineVisual" (
@@ -2750,143 +2581,10 @@ def Xform "Griffin1" (
         rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:thrust_n>
         float inputs:force_command
         float inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:thrust_n>
-        def Cone "NozzleCenter"
-        {
-            custom double3 xformOp:translate = (0.0, -1.99, 0.0)
-            custom token[] xformOpOrder = ["xformOp:translate"]
-            uniform token axis = "Y"
-            float radius1 = 0.1599999964237213
-            float radius2 = 0.3400000035762787
-            float height = 0.5199999809265137
-            color3f[] primvars:displayColor = [(0.41999998688697815, 0.4399999976158142, 0.47999998927116394)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "guide"
-        }
-        def Cone "NozzlePX"
-        {
-            custom double3 xformOp:translate = (1.05, -1.99, 0.0)
-            custom token[] xformOpOrder = ["xformOp:translate"]
-            uniform token axis = "Y"
-            float radius1 = 0.1599999964237213
-            float radius2 = 0.3400000035762787
-            float height = 0.5199999809265137
-            color3f[] primvars:displayColor = [(0.41999998688697815, 0.4399999976158142, 0.47999998927116394)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "guide"
-        }
-        def Cone "NozzlePZ"
-        {
-            custom double3 xformOp:translate = (0.525, -1.99, 0.91)
-            custom token[] xformOpOrder = ["xformOp:translate"]
-            uniform token axis = "Y"
-            float radius1 = 0.1599999964237213
-            float radius2 = 0.3400000035762787
-            float height = 0.5199999809265137
-            color3f[] primvars:displayColor = [(0.41999998688697815, 0.4399999976158142, 0.47999998927116394)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "guide"
-        }
-        def Cone "NozzleNX"
-        {
-            custom double3 xformOp:translate = (-1.05, -1.99, 0.0)
-            custom token[] xformOpOrder = ["xformOp:translate"]
-            uniform token axis = "Y"
-            float radius1 = 0.1599999964237213
-            float radius2 = 0.3400000035762787
-            float height = 0.5199999809265137
-            color3f[] primvars:displayColor = [(0.41999998688697815, 0.4399999976158142, 0.47999998927116394)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "guide"
-        }
-        def Cone "NozzleNZ"
-        {
-            custom double3 xformOp:translate = (-0.525, -1.99, -0.91)
-            custom token[] xformOpOrder = ["xformOp:translate"]
-            uniform token axis = "Y"
-            float radius1 = 0.1599999964237213
-            float radius2 = 0.3400000035762787
-            float height = 0.5199999809265137
-            color3f[] primvars:displayColor = [(0.41999998688697815, 0.4399999976158142, 0.47999998927116394)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "guide"
-        }
-        def Cone "NozzleDiagP"
-        {
-            custom double3 xformOp:translate = (0.525, -1.99, -0.91)
-            custom token[] xformOpOrder = ["xformOp:translate"]
-            uniform token axis = "Y"
-            float radius1 = 0.1599999964237213
-            float radius2 = 0.3400000035762787
-            float height = 0.5199999809265137
-            color3f[] primvars:displayColor = [(0.41999998688697815, 0.4399999976158142, 0.47999998927116394)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "guide"
-        }
-        def Cone "NozzleDiagN"
-        {
-            custom double3 xformOp:translate = (-0.525, -1.99, 0.91)
-            custom token[] xformOpOrder = ["xformOp:translate"]
-            uniform token axis = "Y"
-            float radius1 = 0.1599999964237213
-            float radius2 = 0.3400000035762787
-            float height = 0.5199999809265137
-            color3f[] primvars:displayColor = [(0.41999998688697815, 0.4399999976158142, 0.47999998927116394)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "guide"
-        }
-    }
-    def Cube "BoxyAirframe" (
-        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-    )
-    {
-        double size = 1.0
-        double3 xformOp:scale = (3.2, 1.45, 3.2)
-        uniform token[] xformOpOrder = ["xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.3199999928474426, 0.36000001430511475, 0.41999998688697815)]
-        bool physics:collisionEnabled = true
-        uniform token purpose = "render"
-    }
-    def Xform "IsogridDeck"
-    {
-        token visibility = "inherited"
-        custom string lunco:component_role = "payload deck"
-        def Cube "DeckPlate" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 1.58, 0.0)
-            double3 xformOp:scale = (3.05, 0.16, 3.05)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.47999998927116394, 0.5099999904632568, 0.5699999928474426)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-        }
-        def Cube "DeckRibX"
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 1.78, 0.0)
-            double3 xformOp:scale = (2.8, 0.035, 0.035)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.7400000095367432, 0.6100000143051147, 0.23999999463558197)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
-        def Cube "DeckRibZ"
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, 1.78, 0.0)
-            double3 xformOp:scale = (0.035, 0.035, 2.8)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.7400000095367432, 0.6100000143051147, 0.23999999463558197)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
     }
     def Xform "PayloadAdapter"
     {
         token visibility = "inherited"
-        custom string lunco:component_role = "FLIP payload adapter"
         def Cube "AdapterPlate" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
@@ -2915,94 +2613,64 @@ def Xform "Griffin1" (
     def Xform "Nozzle"
     {
         token visibility = "inherited"
-        custom string lunco:parameter_status = "seven-engine public configuration; bell contour is a study proxy"
-        custom string lunco:provenance:source = "https://www.astrobotic.com/griffin"
         def Xform "MainEngineCluster"
         {
             token visibility = "inherited"
-            def Cone "Engine01"
+            def Xform "Engine01" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.20000000298023224
-                float radius2 = 0.41999998688697815
-                float height = 0.6200000047683716
-                double3 xformOp:translate = (0.0, -1.78, 0.0)
+                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine02"
+            def Xform "Engine02" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (1.0, -1.78, 0.0)
+                custom double3 xformOp:translate = (1.05, 1.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine03"
+            def Xform "Engine03" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (-1.0, -1.78, 0.0)
+                custom double3 xformOp:translate = (-1.05, 1.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine04"
+            def Xform "Engine04" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (0.0, -1.78, 1.0)
+                custom double3 xformOp:translate = (0.525, 1.0, 0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine05"
+            def Xform "Engine05" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.17000000178813934
-                float radius2 = 0.36000001430511475
-                float height = 0.5600000023841858
-                double3 xformOp:translate = (0.0, -1.78, -1.0)
+                custom double3 xformOp:translate = (-0.525, 1.0, -0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine06"
+            def Xform "Engine06" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.15000000596046448
-                float radius2 = 0.33000001311302185
-                float height = 0.5199999809265137
-                double3 xformOp:translate = (0.9, -1.78, 0.9)
+                custom double3 xformOp:translate = (-0.525, 1.0, 0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
             }
-            def Cone "Engine07"
+            def Xform "Engine07" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
             {
-                uniform token axis = "Y"
-                float radius1 = 0.15000000596046448
-                float radius2 = 0.33000001311302185
-                float height = 0.5199999809265137
-                double3 xformOp:translate = (-0.9, -1.78, -0.9)
+                custom double3 xformOp:translate = (0.525, 1.0, -0.9093266739736606)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.5199999809265137, 0.550000011920929, 0.6100000143051147)]
-                bool physics:collisionEnabled = false
-                uniform token purpose = "render"
+            }
+            def Xform "EngineSkirt" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
+            )
+            {
+                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
             }
         }
     }
@@ -3011,63 +2679,65 @@ def Xform "Griffin1" (
     )
     {
         token visibility = "inherited"
-        float physics:mass = 95.0
-        float3 physics:diagonalInertia = (210.0, 34.0, 210.0)
-        custom string lunco:mechanism = "port revolute egress ramp"
+        float physics:mass = 31.666666667
+        float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
         custom float lunco:deployment_angle_rad = 0.0
-        double3 xformOp:translate = (3.55, -2.05, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom double lunco:operational_width_m = 2.9
-        def Cube "Surface" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        custom double3 xformOp:translate = (3.200000000, 5.190000000, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.000000000, 0.000000000, 0.000000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double lunco:operational_width_m = 3.50
+        custom double lunco:wheel_clearance_m = 0.15
+        def Xform "DeckSection" (
+            references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
+        ) { }
+        def Xform "MiddleSection" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+            references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
         )
         {
-            custom double3 xformOp:translate = (0.0, -1.15, 0.0)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
-            double size = 1.0
-            double3 xformOp:scale = (1.85, 0.09, 1.45)
-            color3f[] primvars:displayColor = [(0.5, 0.38999998569488525, 0.23999999463558197)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
+            custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            float physics:mass = 31.666666667
+            float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+            def Xform "ToeSection" (
+                prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+                references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda@</RampToeSection>
+            )
+            {
+                custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float physics:mass = 31.666666667
+                float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+            }
         }
-        def Cube "EdgeRail" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
+        def PhysicsFixedJoint "RampTransitionJointPort"
         {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, -0.92, 1.38)
-            double3 xformOp:scale = (1.85, 0.14, 0.07)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
-        }
-        def Cube "EdgeRailInner" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, -0.92, -1.38)
-            double3 xformOp:scale = (1.85, 0.14, 0.07)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -12.0)
-        }
-        def Cube "SupportArm" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
-        )
-        {
-            custom double3 xformOp:scale = (0.1, 0.55, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-            double size = 1.0
+            custom rel physics:body0 = </Griffin1>
+            custom rel physics:body1 = </Griffin1/EgressRampPort/TransitionPlate>
+            point3f physics:localPos0 = (2.218364954, 5.190000057, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.75, -0.55, 0.0)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -6.0)
-            uniform token purpose = "render"
+        }
+        def Xform "TransitionPlate" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (-0.981635000, 0.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            float physics:mass = 15.0
+            float3 physics:diagonalInertia = (15.353, 20.131, 4.859)
+            def Cube "ContactSurface" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                double size = 1.0
+                double3 xformOp:translate = (0.0, 0.0, 0.0)
+                double3 xformOp:scale = (1.96327, 0.18, 3.50)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                color3f[] primvars:displayColor = [(0.42, 0.26, 0.12)]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = true
+            }
         }
     }
     def Xform "EgressRampStarboard" (
@@ -3075,63 +2745,65 @@ def Xform "Griffin1" (
     )
     {
         token visibility = "inherited"
-        float physics:mass = 95.0
-        float3 physics:diagonalInertia = (210.0, 34.0, 210.0)
-        custom string lunco:mechanism = "starboard revolute egress ramp"
+        float physics:mass = 31.666666667
+        float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
         custom float lunco:deployment_angle_rad = 0.0
-        double3 xformOp:translate = (-3.55, -2.05, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom double lunco:operational_width_m = 2.9
-        def Cube "Surface" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        custom double3 xformOp:translate = (-3.200000000, 5.190000000, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.000000000, 180.000000000, 0.000000000)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double lunco:operational_width_m = 3.50
+        custom double lunco:wheel_clearance_m = 0.15
+        def Xform "DeckSection" (
+            references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
+        ) { }
+        def Xform "MiddleSection" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+            references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
         )
         {
-            double size = 1.0
-            double3 xformOp:scale = (1.85, 0.09, 1.45)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.5, 0.38999998569488525, 0.23999999463558197)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-            custom double3 xformOp:translate = (0.0, -1.15, 0.0)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
+            custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            float physics:mass = 31.666666667
+            float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+            def Xform "ToeSection" (
+                prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+                references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda@</RampToeSection>
+            )
+            {
+                custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+                float physics:mass = 31.666666667
+                float3 physics:diagonalInertia = (32.411888889, 76.172636183, 43.931747294)
+            }
         }
-        def Cube "EdgeRail" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
+        def PhysicsFixedJoint "RampTransitionJointStarboard"
         {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, -0.92, 1.38)
-            double3 xformOp:scale = (1.85, 0.14, 0.07)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
-        }
-        def Cube "EdgeRailInner" (
-            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-        )
-        {
-            double size = 1.0
-            double3 xformOp:translate = (0.0, -0.92, -1.38)
-            double3 xformOp:scale = (1.85, 0.14, 0.07)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.6600000262260437, 0.47999998927116394, 0.20999999344348907)]
-            bool physics:collisionEnabled = true
-            uniform token purpose = "render"
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 12.0)
-        }
-        def Cube "SupportArm" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
-        )
-        {
-            custom double3 xformOp:scale = (0.1, 0.55, 0.1)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-            double size = 1.0
+            custom rel physics:body0 = </Griffin1>
+            custom rel physics:body1 = </Griffin1/EgressRampStarboard/TransitionPlate>
+            point3f physics:localPos0 = (-2.218364954, 5.190000057, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.75, -0.55, 0.0)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 6.0)
-            uniform token purpose = "render"
+        }
+        def Xform "TransitionPlate" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (0.981635000, 0.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            float physics:mass = 15.0
+            float3 physics:diagonalInertia = (15.353, 20.131, 4.859)
+            def Cube "ContactSurface" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                double size = 1.0
+                double3 xformOp:translate = (0.0, 0.0, 0.0)
+                double3 xformOp:scale = (1.96327, 0.18, 3.50)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                color3f[] primvars:displayColor = [(0.42, 0.26, 0.12)]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = true
+            }
         }
     }
     def PhysicsRevoluteJoint "RampHingePort"
@@ -3139,9 +2811,9 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/EgressRampPort>
         uniform token physics:axis = "Z"
-        float physics:lowerLimit = -0.5799999833106995
-        float physics:upperLimit = 0.5799999833106995
-        point3f physics:localPos0 = (3.549999952316284, -2.049999952316284, 0.0)
+        float physics:lowerLimit = -50.0
+        float physics:upperLimit = 50.0
+        point3f physics:localPos0 = (3.200000048, 5.190000057, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -3152,12 +2824,367 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/EgressRampStarboard>
         uniform token physics:axis = "Z"
-        float physics:lowerLimit = -0.5799999833106995
-        float physics:upperLimit = 0.5799999833106995
-        point3f physics:localPos0 = (-3.549999952316284, -2.049999952316284, 0.0)
+        float physics:lowerLimit = -50.0
+        float physics:upperLimit = 50.0
+        point3f physics:localPos0 = (-3.200000048, 5.190000057, 0.0)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
+        quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "RampSectionHingePort01" (
+        prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+    )
+    {
+        rel physics:body0 = </Griffin1/EgressRampPort>
+        rel physics:body1 = </Griffin1/EgressRampPort/MiddleSection>
+        uniform token physics:axis = "Z"
+        float physics:lowerLimit = -120.0
+        float physics:upperLimit = 120.0
+        point3f physics:localPos0 = (4.076201667, 0.0, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
+        uniform token drive:angular:physics:type = "force"
+        float drive:angular:physics:targetPosition = 0.0
+        float drive:angular:physics:targetVelocity = 0.0
+        float drive:angular:physics:stiffness = 6000.0
+        float drive:angular:physics:damping = 900.0
+        float drive:angular:physics:maxForce = 5000.0
         bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "RampSectionHingePort12" (
+        prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+    )
+    {
+        rel physics:body0 = </Griffin1/EgressRampPort/MiddleSection>
+        rel physics:body1 = </Griffin1/EgressRampPort/MiddleSection/ToeSection>
+        uniform token physics:axis = "Z"
+        float physics:lowerLimit = -120.0
+        float physics:upperLimit = 120.0
+        point3f physics:localPos0 = (4.076201667, 0.0, 0.0)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
+        quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
+        uniform token drive:angular:physics:type = "force"
+        float drive:angular:physics:targetPosition = 0.0
+        float drive:angular:physics:targetVelocity = 0.0
+        float drive:angular:physics:stiffness = 6000.0
+        float drive:angular:physics:damping = 900.0
+        float drive:angular:physics:maxForce = 5000.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "RampSectionHingeStarboard01" (
+        prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+    )
+    {
+        rel physics:body0 = </Griffin1/EgressRampStarboard>
+        rel physics:body1 = </Griffin1/EgressRampStarboard/MiddleSection>
+        uniform token physics:axis = "Z"
+        float physics:lowerLimit = -120.0
+        float physics:upperLimit = 120.0
+        point3f physics:localPos0 = (4.076201667, 0.0, 0.0)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
+        quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
+        uniform token drive:angular:physics:type = "force"
+        float drive:angular:physics:targetPosition = 0.0
+        float drive:angular:physics:targetVelocity = 0.0
+        float drive:angular:physics:stiffness = 6000.0
+        float drive:angular:physics:damping = 900.0
+        float drive:angular:physics:maxForce = 5000.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "RampSectionHingeStarboard12" (
+        prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+    )
+    {
+        rel physics:body0 = </Griffin1/EgressRampStarboard/MiddleSection>
+        rel physics:body1 = </Griffin1/EgressRampStarboard/MiddleSection/ToeSection>
+        uniform token physics:axis = "Z"
+        float physics:lowerLimit = -120.0
+        float physics:upperLimit = 120.0
+        point3f physics:localPos0 = (4.076201667, 0.0, 0.0)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
+        quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
+        uniform token drive:angular:physics:type = "force"
+        float drive:angular:physics:targetPosition = 0.0
+        float drive:angular:physics:targetVelocity = 0.0
+        float drive:angular:physics:stiffness = 6000.0
+        float drive:angular:physics:damping = 900.0
+        float drive:angular:physics:maxForce = 5000.0
+        bool physics:collisionEnabled = false
+    }
+    def Xform "Bus" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 3.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+    }
+    def Xform "TankPX" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (1.15, 3.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+    }
+    def Xform "TankNX" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (-1.15, 3.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+    }
+    def Xform "TankPZ" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 3.2, 1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+    }
+    def Xform "TankNZ" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 3.2, -1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+    }
+    def Cube "TopDeckBeamCollider0" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (3.17680015377856, 0.16, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (0.0, 4.23, -2.575)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        uniform token physics:approximation = "convexHull"
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+        custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
+    }
+    def Cube "TopDeckBeamCollider1" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (1.6684000768892808, 0.16, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (2.04170003844464, 4.23, -2.04170003844464)
+        custom double3 xformOp:rotateXYZ = (0.0, -45.0, 0.0)
+        uniform token physics:approximation = "convexHull"
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+        custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
+    }
+    def Cube "TopDeckBeamCollider2" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (3.17680015377856, 0.16, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (2.575, 4.23, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+        uniform token physics:approximation = "convexHull"
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+        custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
+    }
+    def Cube "TopDeckBeamCollider3" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (1.6684000768892808, 0.16, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (2.04170003844464, 4.23, 2.04170003844464)
+        custom double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
+        uniform token physics:approximation = "convexHull"
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+        custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
+    }
+    def Cube "TopDeckBeamCollider4" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (3.17680015377856, 0.16, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (0.0, 4.23, 2.575)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        uniform token physics:approximation = "convexHull"
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+        custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
+    }
+    def Cube "TopDeckBeamCollider5" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (1.6684000768892808, 0.16, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (-2.04170003844464, 4.23, 2.04170003844464)
+        custom double3 xformOp:rotateXYZ = (0.0, -45.0, 0.0)
+        uniform token physics:approximation = "convexHull"
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+        custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
+    }
+    def Cube "TopDeckBeamCollider6" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (3.17680015377856, 0.16, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (-2.575, 4.23, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+        uniform token physics:approximation = "convexHull"
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+        custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
+    }
+    def Cube "TopDeckBeamCollider7" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (1.6684000768892808, 0.16, 0.16)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (-2.04170003844464, 4.23, -2.04170003844464)
+        custom double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
+        uniform token physics:approximation = "convexHull"
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+        custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
+    }
+    def Mesh "RoverPayloadDeckCollider" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
+    )
+    {
+        point3f[] points = [(-1.2887300252914429, 5.119999885559082, 1.600000023841858), (1.2887300252914429, 5.119999885559082, 1.600000023841858), (2.200000047683716, 5.119999885559082, 0.9372580051422119), (2.200000047683716, 5.119999885559082, -0.9372580051422119), (1.2887300252914429, 5.119999885559082, -1.600000023841858), (-1.2887300252914429, 5.119999885559082, -1.600000023841858), (-2.200000047683716, 5.119999885559082, -0.9372580051422119), (-2.200000047683716, 5.119999885559082, 0.9372580051422119), (-1.2887300252914429, 5.28000020980835, 1.600000023841858), (1.2887300252914429, 5.28000020980835, 1.600000023841858), (2.200000047683716, 5.28000020980835, 0.9372580051422119), (2.200000047683716, 5.28000020980835, -0.9372580051422119), (1.2887300252914429, 5.28000020980835, -1.600000023841858), (-1.2887300252914429, 5.28000020980835, -1.600000023841858), (-2.200000047683716, 5.28000020980835, -0.9372580051422119), (-2.200000047683716, 5.28000020980835, 0.9372580051422119)]
+        int[] faceVertexCounts = [8, 8, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [7, 6, 5, 4, 3, 2, 1, 0, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 9, 8, 1, 2, 10, 9, 2, 3, 11, 10, 3, 4, 12, 11, 4, 5, 13, 12, 5, 6, 14, 13, 6, 7, 15, 14, 7, 0, 8, 15]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "proxy"
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+        bool physics:collisionEnabled = true
+        uniform token physics:approximation = "convexHull"
+        token visibility = "invisible"
+        custom rel lunco:collider:geometrySource = </Griffin1/Bus/RoverPayloadDeck>
+    }
+    def Xform "SolarPanelStarboard" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
+    )
+    {
+        custom double3 xformOp:translate = (2.9, 3.2, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, -90.0)
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+    }
+    def Xform "SolarPanelForward" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 3.2, 2.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+    }
+    def Xform "SolarPanelFrontStarboard" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
+    )
+    {
+        custom double3 xformOp:translate = (2.2819, 3.2, 2.2819)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, -45.0)
+        custom double3 xformOp:scale = (0.4736465266155053, 1.0, 1.0)
+    }
+    over "Nozzle"
+    {
+        over "MainEngineCluster"
+        {
+            over "Engine01"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine02"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine03"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine04"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine05"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine06"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+            over "Engine07"
+            {
+                float inputs:plume_throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                float inputs:plume_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                float inputs:plume_light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                over "Flame" { rel material:binding = </Griffin1/Looks/Flame_Mat> }
+                over "FlameCore" { rel material:binding = </Griffin1/Looks/FlameCore_Mat> }
+            }
+        }
     }
 }

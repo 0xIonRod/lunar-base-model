@@ -43,9 +43,12 @@ The following are simulator acceptance bounds, not public as-built dimensions.
   contract. The accepted study pose uses a radial rake: strut centers at
   `(+-2.475, -3.125, +-2.475)`, half-span `1.725 m`, and pad centers at
   `(+-2.65, -4.85, +-2.65)`.
-- Two side-mounted solar arrays are sized as the lander's primary polar power
-  surfaces. Each array is a continuous solid panel with a backing/frame and a
-  rigid mount to the side wall. It must not be a floating visual-only plane.
+- Three adjacent solar arrays span the forward, beveled forward-starboard, and
+  starboard lander faces in the mission Sun quadrant. Each array is a framed,
+  cell-bearing assembly with a structural path to its paired bus rails. The
+  installed panel outline includes the required local clearance cutouts; use
+  controlled panel geometry when available and keep photo-derived study
+  geometry replaceable.
 - Two solid egress ramps have collision surfaces and two visible edge rails on
   the outside/accessible side of each ramp. Each root has a solid hinge-support
   block tied into the deck. The accepted stable pose is an authored

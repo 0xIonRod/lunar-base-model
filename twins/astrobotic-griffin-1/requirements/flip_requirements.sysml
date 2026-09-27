@@ -3,55 +3,75 @@
 // Runtime promotion remains OPEN; these builder-consumed values are unchanged.
 package FlipRequirements {
     private import ScalarValues::Real;
-    private import ScalarValues::Integer;
     private import ScalarValues::String;
+    private import GriffinRequirementSources::TwinAssetPath;
+    private import GriffinRequirementSources::UsdPrimPath;
+
+    enum def FlipWheelStation { FL; RL; FR; RR; }
+    enum def FlipSteeringMode { ackermann; crab; }
 
     // Rover-owned values stay in this source, while Griffin owns only the
     // integration requirements that reference the rover interface.
     part def FlipRover {
+        attribute componentAsset : TwinAssetPath = "vehicles/flip.usda";
+        attribute usdRootPath : UsdPrimPath = "/World/FLIP";
+        attribute localFrame : String = "Y-up, right-handed, SI metres; X is lateral and Z is longitudinal";
         attribute flipMassStudyKg : Real = 450.0;
+        attribute massPropertiesStatus : String = "study proxy; supplier mass properties and wheel loads TBD";
+        attribute batteryNominalVoltageV : Real = 28.0;
+        attribute centerOfMassM : Real[3] = (0.0, -0.05, 0.0);
+        attribute diagonalInertiaKgM2 : Real[3] = (240.0, 337.5, 145.5);
         attribute flipPayloadCapacityKg : Real = 30.0;
-        attribute wheelCount : Integer = 4;
-        attribute wheelCountStatus : String = "four-wheel directional architecture proxy; supplier ICD TBD";
         attribute egressMode : String = "direct top-deck egress is public; ramp path is optional study branch";
         attribute solarArrayMode : String = "collapsible public concept; fixed panel is current visual proxy";
         attribute mobilityStatus : String = "mobility, power, thermal, and wheel parameters are study proxies";
         attribute exactVehicleIcdStatus : String = "TBD";
-        attribute visualRoverName : String = "FLIP";
-        attribute visualRoverWheelRadiusM : Real = 0.45;
-        attribute visualRoverWheelCount : Integer = 4;
-        attribute visualWheelNames : String = "FL,RL,FR,RR";
-        attribute frontSteeringAngleDeg : Real = -12.0;
-        attribute rearSteeringAngleDeg : Real = 8.0;
+        attribute wheelRadiusM : Real = 0.45;
+        attribute wheelWidthM : Real = 0.30;
+        attribute wheelStations : FlipWheelStation[4] = ("FL", "RL", "FR", "RR");
+        // Mission route policy uses the finite-turn mode; the parallel/crab
+        // mode remains available as an operator experiment through the
+        // Twin-local control helper.
+        attribute missionSteeringMode : FlipSteeringMode = "ackermann";
         attribute chassisWidthM : Real = 4.40;
         attribute chassisLengthM : Real = 2.76;
+        attribute chassisHeightM : Real = 0.76;
+        attribute equipmentBoxWidthM : Real = 3.90;
+        attribute equipmentBoxHeightM : Real = 1.44;
+        attribute equipmentBoxDepthM : Real = 2.44;
+        attribute equipmentBoxCenterYM : Real = 0.45;
+        attribute payloadDeckWidthM : Real = 3.44;
+        attribute payloadDeckThicknessM : Real = 0.20;
+        attribute payloadDeckDepthM : Real = 2.16;
+        attribute payloadDeckCenterYM : Real = 0.92;
         attribute sensorMastHeightM : Real = 0.70;
-        // Four-wheel station datums are ordered exactly as visualWheelNames.
-        // They are shared by the Editor builder and the wheel verifier.
-        attribute wheelStationX : String = "-1.75,-1.75,1.75,1.75";
-        attribute wheelStationY : String = "-0.42,-0.42,-0.42,-0.42";
-        attribute wheelStationZ : String = "-1.15,1.15,-1.15,1.15";
-        // Assembly-owned visual connector dimensions, ordered by wheel
-        // station.  The replaceable wheel asset remains responsible for tire
-        // geometry; these values describe the authored station-to-chassis
-        // suspension proxy in the visual vehicle layer.
-        attribute suspensionStrutScale : String = "0.14,0.36,0.14";
-        attribute suspensionStrutOffset : String = "0.0,0.20,0.0";
+        // One station definition drives the simulation, Editor projection,
+        // requirements, and wheel-contact verification.
+        attribute wheelStationX : Real[4] = (-1.75, -1.75, 1.75, 1.75);
+        attribute wheelStationY : Real[4] = (-0.42, -0.42, -0.42, -0.42);
+        attribute wheelStationZ : Real[4] = (-1.15, 1.15, -1.15, 1.15);
+        // The suspension extension is a Twin simulation assumption shared by
+        // the composed vehicle and the independently checked visual module.
+        attribute suspensionRestLengthM : Real = 1.20;
+        // Assembly-owned suspension connector dimensions are shared by the
+        // Editor builder and the component requirement source.
+        attribute suspensionStrutScale : Real[3] = (0.14, 0.36, 0.14);
+        attribute suspensionStrutOffset : Real[3] = (0.0, 0.20, 0.0);
         // The wheel hubs sit outboard of the lower-frame side datum.  These
         // metric values describe the render-only bridge and its hub knuckle;
         // they are consumed by the typed Editor builder and the Rhai gate.
-        attribute suspensionArmScale : String = "0.65,0.16,0.16";
+        attribute suspensionArmScale : Real[3] = (0.65, 0.16, 0.16);
         attribute suspensionArmOffsetM : Real = 0.325;
         attribute suspensionKnuckleRadiusM : Real = 0.18;
         attribute suspensionKnuckleWidthM : Real = 0.36;
-        attribute solarArrayMount : String = "0.0,1.45,1.30";
+                        // The solar array is centered over the equipment-box roof at 1.30 m above datum so the 3.30 x 2.10 m visual panel fits inside the 4.40 x 2.76 m rover envelope; this is a geometry study assumption because supplier deck coordinates are not public.
+                        attribute solarArrayMount : Real[3] = (0.0, 1.30, 0.00);
+                // The 18 degree tilt is a conservative review-study angle above the local deck: it keeps a fixed panel readable to a high solar-elevation camera without implying a supplier-certified deployment joint; optimize it when the vehicle ICD is available.
         attribute solarArrayTiltDeg : Real = 18.0;
-        attribute componentReference : String = "https://www.astrolab.space/flip/";
-        attribute missionReference : String = "https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/";
   }
 
     requirement def FLIPV001_RoverPresentation {
-        doc /* FGV-001 [visual] the review shall show FLIP as a four-wheel directional rover with steerable front/rear wheel stations, its sensor mast, and collapsible solar assembly. */
+        doc /* FGV-001 [integration] the composed FLIP vehicle shall include its four typed wheel stations, chassis, sensor mast, solar array, and physical mobility model. */
     }
 
     requirement def FLIPV002_ChassisEnvelope {
@@ -59,7 +79,7 @@ package FlipRequirements {
     }
 
     requirement def FLIPV003_WheelStations {
-        doc /* FGV-003 [topology] exactly four named directional wheel stations shall expose tire, hub, and cap geometry with the authored radius. */
+        doc /* FGV-003 [topology] each of the four typed wheel stations shall expose tire, hub, and cap geometry with the authored wheel envelope. */
     }
 
     requirement def FLIPV004_SensorAndPower {
@@ -67,26 +87,48 @@ package FlipRequirements {
     }
 
     requirement def FLIPV005_Traceability {
-        doc /* FGV-005 [evidence] the component dimensions, wheel identities, steering angles, and public references shall be read from this SysML source by a Twin Rhai verifier. */
+        doc /* FGV-005 [evidence] component dimensions, wheel identities, and steering configuration shall resolve from typed SysML attributes and linked evidence. */
+    }
+    requirement def FLIPV006_ChassisGeometry {
+        doc /* FGV-006 [geometry] the visual chassis, equipment box, and payload deck shall match their single source-owned metric envelopes and centers. */
+    }
+    requirement def FLIPV007_MassPropertyDatum {
+        doc /* FGV-007 [physics boundary] the current rover study shall expose finite mass, center-of-mass, and diagonal-inertia datums with explicit study status; these values are not supplier-certified flight data. */
+    }
+    requirement def FLIPV008_WheelEnvelope {
+        doc /* FGV-008 [geometry] each wheel shall use the single SysML-owned radius and width, and each active wheel station shall use the same station datums in simulation and presentation. */
+    }
+    requirement def FLIPV009_MissionSteeringMode {
+        doc /* FGV-009 [behavior] the authored Griffin surface route shall select the finite-turn Ackermann steering mode before issuing route torque; parallel/crab steering remains an explicit operator experiment. */
+    }
+    requirement def FLIPV010_PhysicalWheelSupportEnvelope {
+        doc /* FGV-010 [simulation] physical wheel stations and the suspension extension shall be driven by the shared vehicle datums and pass the deployed ramp wheel-contact replay. */
     }
 
-    requirement fvg001 : FLIPV001_RoverPresentation { subject rover : FlipRover; }
-    requirement fvg002 : FLIPV002_ChassisEnvelope { subject rover : FlipRover; }
-    requirement fvg003 : FLIPV003_WheelStations { subject rover : FlipRover; }
-    requirement fvg004 : FLIPV004_SensorAndPower { subject rover : FlipRover; }
-    requirement fvg005 : FLIPV005_Traceability { subject rover : FlipRover; }
-
-    verification def Verify_FLIPVisualRequirements {
-        subject rover : FlipRover;
-        verify fvg001;
-    }
+    requirement <'FGV-001'> fvg001 : FLIPV001_RoverPresentation { subject rover : FlipRover; }
+    requirement <'FGV-002'> fvg002 : FLIPV002_ChassisEnvelope { subject rover : FlipRover; }
+    requirement <'FGV-003'> fvg003 : FLIPV003_WheelStations { subject rover : FlipRover; }
+    requirement <'FGV-004'> fvg004 : FLIPV004_SensorAndPower { subject rover : FlipRover; }
+    requirement <'FGV-005'> fvg005 : FLIPV005_Traceability { subject rover : FlipRover; }
+    requirement <'FGV-006'> fvg006 : FLIPV006_ChassisGeometry { subject rover : FlipRover; }
+    requirement <'FGV-007'> fvg007 : FLIPV007_MassPropertyDatum { subject rover : FlipRover; }
+    requirement <'FGV-008'> fvg008 : FLIPV008_WheelEnvelope { subject rover : FlipRover; }
+    requirement <'FGV-009'> fvg009 : FLIPV009_MissionSteeringMode { subject rover : FlipRover; }
+    requirement <'FGV-010'> fvg010 : FLIPV010_PhysicalWheelSupportEnvelope { subject rover : FlipRover; }
 
     verification def Verify_FLIPComponentRequirements {
         subject rover : FlipRover;
-        verify fvg001;
-        verify fvg002;
-        verify fvg003;
-        verify fvg004;
-        verify fvg005;
+        objective {
+            verify fvg001;
+            verify fvg002;
+            verify fvg003;
+            verify fvg004;
+            verify fvg005;
+            verify fvg006;
+            verify fvg007;
+            verify fvg008;
+            verify fvg009;
+            verify fvg010;
+        }
     }
 }

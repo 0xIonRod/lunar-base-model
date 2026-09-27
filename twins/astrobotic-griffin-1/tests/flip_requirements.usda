@@ -16,7 +16,7 @@ def Xform "World"
         }
     }
     def Xform "FLIP" (
-        prepend references = @twin://astrobotic-griffin-1/vehicles/flip_visual.usda@</FLIP>
+        references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
     )
     {
     }

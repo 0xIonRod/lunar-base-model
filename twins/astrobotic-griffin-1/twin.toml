@@ -21,13 +21,13 @@ script = "scenarios/tests/griffin_requirements.rhai"
 verdict_channel = "GRIFFIN_REQUIREMENTS"
 
 [[verification.cases]]
-name = "Griffin1Requirements::Verify_GriffinVisualRequirements"
-scene = "tests/griffin_flip_visual.usda"
-script = "scenarios/tests/griffin_flip_visual.rhai"
-verdict_channel = "GRIFFIN_FLIP_VISUAL"
+name = "GriffinVisualConfigurationRequirements::Verify_GriffinVisualConfiguration"
+scene = "tests/griffin_visual_configuration_types.usda"
+script = "scenarios/tests/griffin_visual_configuration_types.rhai"
+verdict_channel = "GRIFFIN_VISUAL_CONFIGURATION_TYPES"
 
 [[verification.cases]]
-name = "FlipRequirements::Verify_FLIPVisualRequirements"
+name = "GriffinVisualRequirements::Verify_GriffinVisualRequirements"
 scene = "tests/griffin_flip_visual.usda"
 script = "scenarios/tests/griffin_flip_visual.rhai"
 verdict_channel = "GRIFFIN_FLIP_VISUAL"
@@ -111,22 +111,16 @@ script = "scenarios/griffin_1_surface_ops.rhai"
 verdict_channel = "GRIFFIN_SURFACE_OPS"
 
 [[verification.cases]]
-name = "Griffin1Requirements::Verify_GriffinLandingStability"
+name = "GriffinSimulationAccuracyRequirements::Verify_GriffinLandingStability"
 scene = "tests/griffin_surface_ops_contract.usda"
 script = "scenarios/tests/griffin_surface_ops_contract.rhai"
 verdict_channel = "GRIFFIN_LANDING_STABILITY"
 
 [[verification.cases]]
-name = "Griffin1Requirements::Verify_GriffinAdapterRelease"
+name = "GriffinFunctionalRequirements::Verify_GriffinAdapterRelease"
 scene = "scenes/griffin_1_detach_stability_test.usda"
 script = "scenarios/tests/griffin_detach_stability.rhai"
 verdict_channel = "GRIFFIN_ADAPTER_RELEASE"
-
-[[verification.cases]]
-name = "MoonBaseProjectRequirements::Verify_MoonBaseProjectRequirements"
-scene = "tests/griffin_requirements.usda"
-script = "scenarios/tests/griffin_requirements.rhai"
-verdict_channel = "GRIFFIN_REQUIREMENTS"
 
 # Component ownership is explicit.  Each entry points to one normative SysML
 # source and one qualified verification case; the case supplies that
@@ -135,6 +129,12 @@ verdict_channel = "GRIFFIN_REQUIREMENTS"
 name = "griffin.lander"
 requirements = "requirements/griffin_lander_requirements.sysml"
 verification = "GriffinLanderRequirements::Verify_GriffinLanderRequirements"
+usd_path = "/World/Griffin1"
+
+[[components]]
+name = "griffin.visual_configuration"
+requirements = "requirements/griffin_visual_configuration.sysml"
+verification = "GriffinVisualConfigurationRequirements::Verify_GriffinVisualConfiguration"
 usd_path = "/World/Griffin1"
 
 [[components]]
@@ -205,3 +205,7 @@ usd_path = "/World/FLIP"
 
 [settings]
 "usd.runtime_persistence" = true
+"numerics.comparison.length_abs_m" = 1.0e-6
+"numerics.comparison.scalar_abs" = 1.0e-9
+"numerics.comparison.angle_abs_rad" = 1.0e-9
+"numerics.solver.residual_abs" = 1.0e-9

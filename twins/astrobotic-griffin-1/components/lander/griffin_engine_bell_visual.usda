@@ -9,7 +9,11 @@ def Xform "EngineBell" (
     kind = "component"
 )
 {
-    custom string lunco:visual:component = "main_engine_bell"
+    float inputs:plume_throttle = 0.0
+    float inputs:plume_length_fraction = 0.0
+    float inputs:plume_intensity = 0.0
+    float inputs:plume_light_radius = 0.06
+
     def Cone "Bell"
     {
         uniform token axis = "Y"
@@ -29,5 +33,58 @@ def Xform "EngineBell" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
         color3f[] primvars:displayColor = [(0.47999998927116394, 0.5, 0.5400000214576721)]
         uniform token purpose = "render"
+    }
+    def Cone "Flame" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform token axis = "Y"
+        double radius = 1.0
+        double height = 1.0
+        double3 xformOp:translate = (0.0, -1.74, 0.0)
+        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+        double3 xformOp:scale = (0.55, 4.0, 0.55)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        uniform token purpose = "render"
+        float[] primvars:displayOpacity = [0.42]
+        uniform bool doubleSided = true
+        bool lunco:surface:additive = false
+        bool physics:collisionEnabled = false
+        bool primvars:doNotCastShadows = true
+        float inputs:throttle.connect = </EngineBell.inputs:plume_throttle>
+        float inputs:plume_length_fraction.connect = </EngineBell.inputs:plume_length_fraction>
+    }
+    def Cone "FlameCore" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform token axis = "Y"
+        double radius = 1.0
+        double height = 1.0
+        double3 xformOp:translate = (0.0, -1.74, 0.0)
+        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+        double3 xformOp:scale = (0.27, 4.0, 0.27)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        uniform token purpose = "render"
+        float[] primvars:displayOpacity = [0.90]
+        uniform bool doubleSided = true
+        bool lunco:surface:additive = true
+        bool physics:collisionEnabled = false
+        bool primvars:doNotCastShadows = true
+        float inputs:throttle.connect = </EngineBell.inputs:plume_throttle>
+        float inputs:plume_length_fraction.connect = </EngineBell.inputs:plume_length_fraction>
+
+        def SphereLight "PlumeLight" (
+            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
+        )
+        {
+            float inputs:intensity = 0.0
+            bool inputs:shadow:enable = false
+            float inputs:radius = 0.06
+            color3f inputs:color = (1.0, 0.4, 0.04)
+            float lunco:light:range = 25.0
+            float inputs:light_intensity.connect = </EngineBell.inputs:plume_intensity>
+            float inputs:light_radius.connect = </EngineBell.inputs:plume_light_radius>
+        }
     }
 }

@@ -24,6 +24,17 @@ The latest primary-source baseline used for this package is:
 - NASA's August 2026 update says Griffin-1 is undergoing environmental testing
   at NASA's Jet Propulsion Laboratory, has completed mass-properties testing,
   and is planned for a late-2026 launch.
+- Astrobotic's current manifest lists the destination as Nobile Region 2026,
+  while NASA describes launch as planned later this year. Neither publishes a
+  surface landing timestamp. The scene's JD 2461395.5 TDB is therefore a
+  deterministic study epoch, not a flight schedule.
+- Astrobotic's Griffin-1 solar post records three arrays, transit Sun-pointing,
+  and a surface Sun path contained in one mission quadrant. The June 2026
+  integration image shows upright panels across adjacent lander faces in one
+  sector. The Twin composes three referenced panel assemblies on the forward,
+  beveled forward-starboard, and starboard faces. Their study stations, widths,
+  support geometry, and surface appearance do not replace released installation
+  dimensions, deployment limits, or electrical performance data.
 - Astrobotic's June 2026 update says the integrated lander is moving through
   environmental testing, with FLIP to be integrated at the Florida launch
   processing site.
@@ -40,7 +51,12 @@ Sources:
 
 - NASA, [Moon Base II: Astrobotic Griffin-1](https://www.nasa.gov/event/clps-flight-astrobotics-griffin-mission-one/)
 - NASA, [NASA Provides Updates on Moon Base Cargo Landers and Tech Demonstrations](https://www.nasa.gov/missions/moon-base/nasa-provides-updates-on-moon-base-cargo-landers-tech-demonstrations/)
+- NASA, [NASA Provides Update on Moon Base Rovers, Landers, Missions](https://www.nasa.gov/news-release/nasa-provides-update-on-moon-base-rovers-landers-missions/)
+- Astrobotic, [Moon Manifest: Nobile Region 2026](https://www.astrobotic.com/lunar-delivery/manifest/)
 - Astrobotic, [Griffin-1 Lunar Lander Unveiled Ahead of Environmental Testing](https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/)
+- Astrobotic, [Griffin-1 integration photo, June 15, 2026](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg)
+- Astrobotic, [Griffin's Solar Setup for Space and Moon Missions](https://lnkd.in/p/dJHz9duN) ([canonical LinkedIn activity](https://www.linkedin.com/posts/astrobotic_two-solar-panels-integrated-to-griffin-just-activity-7450595533745975296-qBEA))
+- Astrobotic, [Griffin lander current product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
 - Astrolab/Astrobotic, [FLIP rover joins Griffin-1](https://www.astrobotic.com/astrolabs-flip-rover-joins-astrobotics-griffin-1-to-the-moon/)
 
 ## Package layout
@@ -53,52 +69,59 @@ Sources:
 | scenes/griffin_1_surface_ops.usda | Mission composition and USD topology |
 | scenes/griffin_flip_visual.usda | Componentized headful review composition for Griffin and FLIP |
 | scenes/griffin_1_editor.usda | Clean derived headful Editor scene containing only the Griffin lander reference |
-| vehicles/griffin_1.usda | Reusable Griffin lander wrapper around the LunCoSim descent lander |
-| vehicles/griffin_1_visual.usda | Render-only Griffin assembly of replaceable bus, leg, tank, panel, bell, and ramp components |
-| vehicles/flip.usda | Reusable FLIP study asset with four-wheel all-wheel-steer mobility, EPS, and thermal networks |
-| vehicles/flip_visual.usda | Render-only FLIP assembly with four directional wheel stations, chassis, mast, and solar-array components |
-| components/lander/ | Twin-local visual components for the bus, landing legs, tanks, panels, bells, and ramps |
+| vehicles/griffin_1.usda | Canonical integrated Griffin study lander composing the LunCoSim descent model and Griffin components |
+| vehicles/flip.usda | Canonical FLIP study vehicle with mobility, chassis collision geometry, referenced visual components, EPS, and thermal networks |
+| components/lander/ | Griffin bus, landing-leg visuals and dynamics, body collision geometry, tanks, panels, bells, and ramps |
 | components/rover/ | Twin-local visual components for chassis, wheels, mast, and solar array |
 | behaviors/griffin_1_flip_patrol.btxml | Griffin-local route tree targeting the deck approach, ramp exit, waypoints, and base site |
-| environments/south_pole_surrogate.usda | DEM-backed NOBILE03 environment (legacy filename retained for scene compatibility) |
+| environments/south_pole_surrogate.usda | DEM-backed NOBILE03 South-Pole environment |
 | terrain/nobile03/ | Ignored processed heightfield output, regenerated from the manifest and adapter |
 | tools/terrain/ | Polar-stereo download, reprojection, and provenance instructions |
 | scenarios/griffin_1_surface_ops.rhai | Mission sequencing and route policy |
 | scenarios/tests/griffin_requirements.rhai | Twin-owned structural/parameter verdict and boundary checks |
 | scenarios/tests/griffin_lander_requirements.rhai | Rhai observer for the standalone lander-component contract |
-| scenarios/tests/griffin_bus_requirements.rhai | Component-owned Rhai gate for the hexagonal bus |
+| scenarios/tests/griffin_bus_requirements.rhai | Component-owned Rhai gate for bus geometry, tank-support openings, and source-owned appearance |
 | scenarios/tests/griffin_landing_legs_requirements.rhai | Component-owned Rhai gate for the four landing legs |
 | scenarios/tests/griffin_propulsion_requirements.rhai | Component-owned Rhai gate for the seven-engine bell cluster |
 | scenarios/tests/griffin_tank_requirements.rhai | Component-owned Rhai gate for the four propellant tanks |
-| scenarios/tests/griffin_solar_requirements.rhai | Component-owned Rhai gate for the two Griffin solar arrays |
+| scenarios/tests/griffin_solar_requirements.rhai | Component-owned Rhai gate for solar geometry; mission-window placement and transit attitude/power evidence are tracked in the implementation gap report |
 | scenarios/tests/flip_requirements.rhai | Rhai observer for the standalone four-wheel FLIP contract |
 | scenarios/tests/flip_chassis_requirements.rhai | Component-owned Rhai gate for the FLIP chassis |
 | scenarios/tests/flip_wheel_requirements.rhai | Component-owned Rhai gate for the four directional wheel stations |
 | scenarios/tests/flip_sensor_power_requirements.rhai | Component-owned Rhai gate for the FLIP sensor mast and solar array |
 | scenarios/tests/griffin_ramp_requirements.rhai | Rhai observer for independent port/starboard ramp topology, placement, geometry, and deployment checks |
-| tools/component_requirements.rhai | Shared generic SysML/USD component-check constructors and verdict metadata |
+| LunCoSim `sysml_requirement_checks` | Shared typed observation records, SysML source helpers, provenance linking, and structured verdict formatting |
 | tests/griffin_requirements.usda | Minimal composed fixture for the Griffin contract test |
 | tests/griffin_lander_requirements.usda | Minimal Griffin-only fixture for the lander-component gate |
 | tests/flip_requirements.usda | Minimal FLIP-only fixture for the rover-component gate |
 | tests/griffin_*_requirements.usda | Editor-authored, one-component lander verification fixtures |
 | tests/flip_*_requirements.usda | Editor-authored, one-component FLIP verification fixtures |
 | tests/griffin_ramp_requirements.usda | Griffin-only fixture for the independent ramp gate |
-| requirements/griffin_requirements.sysml | Normative Griffin lander/integration SysML v2 requirements, usages, study values, and verification case |
+| requirements/griffin_requirements.sysml | Griffin integration subjects, system requirement usages, mission context, and aggregate verification |
+| requirements/griffin_functional_requirements.sysml | Functional and mission-interface requirements, including payload and adapter-release constraints |
+| requirements/griffin_visual_requirements.sysml | Griffin visual presentation and evidence requirements |
+| requirements/griffin_mechanical_requirements.sysml | Mechanical and physical-interface requirements |
+| requirements/griffin_simulation_accuracy_requirements.sysml | Simulation accuracy, landing stability, and determinism requirements |
+| requirements/griffin_assurance_requirements.sysml | Provenance, authoring, and evidence assurance requirements |
 | requirements/griffin_lander_requirements.sysml | Standalone Griffin lander-component SysML v2 contract for bus, legs, tanks, engines, and solar arrays |
 | requirements/griffin_bus_requirements.sysml | Bus-owned SysML v2 requirements and verification case |
 | requirements/griffin_landing_legs_requirements.sysml | Landing-leg-owned SysML v2 requirements and verification case |
 | requirements/griffin_propulsion_requirements.sysml | Propulsion-owned SysML v2 requirements and verification case |
 | requirements/griffin_tank_requirements.sysml | Tank-owned SysML v2 requirements and verification case |
 | requirements/griffin_solar_requirements.sysml | Griffin-array-owned SysML v2 requirements and verification case |
+| requirements/griffin_requirement_sources.sysml | Typed, requirement-ID-keyed source and rationale catalog for every mounted requirement definition |
+| tools/verify_requirement_sources.sh | Read-only authoring/CI gate for catalog coverage and complete typed evidence records |
 | requirements/flip_requirements.sysml | Rover-owned FLIP SysML v2 values and visual verification case |
 | requirements/flip_chassis_requirements.sysml | Chassis-owned SysML v2 requirements and verification case |
 | requirements/flip_wheel_requirements.sysml | Wheel-owned SysML v2 requirements and verification case |
 | requirements/flip_sensor_power_requirements.sysml | Sensor/power-owned SysML v2 requirements and verification case |
 | requirements/griffin_ramp_requirements.sysml | Dedicated Griffin ramp subsystem requirements, metric envelope, hinge contract, and independent verification case |
 | twin.toml `[verification]` | Single registry binding each qualified SysML verification to its Twin scene, Rhai observer, and verdict channel |
-| contracts/ | Part contracts, full active/planned check catalog, and typed authoring procedure |
+| contracts/ | Part contracts, verification boundary, standards/gap audit, and typed authoring procedure |
+| contracts/implementation_gaps.md | SysML standards alignment, workaround inventory, Rust/Editor feature gaps, and Griffin migration order |
+| contracts/verification.md | Active verification boundary, current constraint slice, and open physical-interface evidence gap |
 | tools/griffin_spec.rhai | Rhai compatibility projection of limits read from the SysML source |
-| tools/griffin_requirements.rhai | Stable public contract API, generic part/layout audit, payload/ramp gates, and typed live-edit gate |
+| tools/griffin_requirements.rhai | Stable public contract API, visual-only and physical part/layout audits, payload/ramp gates, and typed live-edit gate |
 | tools/check_landing_determinism.sh | Twin-local two-process harness comparing the Rhai landing trial at a fixed SI clock |
 | tools/griffin_visual_builder.rhai | Idempotent dry/apply runtime builder using generic `assembly_builder` + `assembly_edit` |
 | tools/griffin_controls.rhai | Twin-local possession, handoff, and control briefing helpers |
@@ -106,7 +129,6 @@ Sources:
 | ../../requirements/griffin-lander.md | Human-readable requirement IDs, provenance, and executable-check traceability |
 | research/griffin_1_assumptions.md | Public facts, surrogate values, and confidence boundaries |
 | handover.md | Detailed implementation and verification handover |
-| agent_to_agent_missing.md | Concrete follow-up work for the next coding agent |
 | instructions.md | Step-by-step setup and completion procedure |
 
 Each component has the same three-part acceptance contract: its own SysML v2
@@ -153,18 +175,23 @@ mission/tutorial scenario do not obscure the lander. Keep that scene for
 visual authoring; use `scenes/griffin_1_surface_ops.usda` for integration and
 runtime acceptance.
 
-For render-only component work, open `vehicles/griffin_1_visual.usda` and
-`vehicles/flip_visual.usda` as two independent USD previews in Editor
-Perspective. Follow the repository-local
+For Griffin work, open the integrated `vehicles/griffin_1.usda` source through
+`scenes/griffin_1_editor.usda`; its visual components remain replaceable assets
+under `components/lander/`. Edit one component at a time through a dry Rhai
+plan and typed Editor batch, then inspect the composed result. Open
+Open `vehicles/flip.usda` to edit the integrated FLIP vehicle. Its chassis,
+wheel, suspension, mast, and solar geometry are referenced component assets
+under `components/rover/`; vehicle-level physics and visual placements stay in
+the same composed FLIP stage.
+Follow the repository-local
 [`interactive-component-authoring`](../../skills/interactive-component-authoring/SKILL.md)
 cycle: one component plan, one Editor batch, one projection/readback, one
 focused visual check, and one Rhai/SysML gate before moving on. The Twin
 `griffin_visual_builder` library is a dry-plan and typed-apply facade; use its
 component-scoped entry points for the current task rather than applying a whole
 vehicle recipe. Each operation is journaled and saved through the Editor; never
-rewrite the USDA text by hand. The ramp requirements and Rhai verification are
-intentionally separate so a ramp can be accepted without coupling it to FLIP's
-visual review.
+rewrite scene or component USDA text by hand. Ramp geometry and FLIP wheel-path
+verification remain tied to their shared SysML interface datums.
 
 The combined `scenes/griffin_flip_visual.usda` review scene uses the same
 source-backed `environments/south_pole_surrogate.usda` as the mission scene.
@@ -195,11 +222,23 @@ The PATH change is process-local and does not change the repository.
 
 ### Parse/lint the Twin files
 
-    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\requirements\griffin_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_lander_requirements.sysml twins\astrobotic-griffin-1\requirements\flip_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_ramp_requirements.sysml twins\astrobotic-griffin-1\requirements\moonbase_project_requirements.sysml twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_lander_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\flip_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_ramp_requirements.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai twins\astrobotic-griffin-1\behaviors\griffin_1_flip_patrol.btxml
+    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\requirements\griffin_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_lander_requirements.sysml twins\astrobotic-griffin-1\requirements\flip_requirements.sysml twins\astrobotic-griffin-1\requirements\griffin_ramp_requirements.sysml twins\astrobotic-griffin-1\requirements\moonbase_project_requirements.sysml twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_lander_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\flip_requirements.rhai twins\astrobotic-griffin-1\scenarios\tests\griffin_ramp_requirements.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai
 
-All listed source files must report OK; the Twin requirements test below is the
-composed-stage check rather than a text-only parse. The Rhai test also validates
-the same SysML source through `ValidateSysml` before checking USD facts.
+All supported source files listed above must report OK; `.btxml` is intentionally
+omitted because the current generic validator does not yet support that
+extension. The Twin requirements test below is the composed-stage check rather
+than a text-only parse. The Rhai test also validates the same SysML source
+through `ValidateSysml` before checking USD facts.
+
+The separate typed provenance catalog is covered by a read-only authoring gate:
+
+    bash twins/astrobotic-griffin-1/tools/verify_requirement_sources.sh
+
+It compares requirement IDs from the owning Griffin, FLIP, and Moon Base
+SysML documents with `RequirementEvidence` usages and checks that every usage
+has a typed requirement ID, qualified requirement, source reference, and
+rationale. This complements the runtime qualified lookup; it does not copy
+those values into the Twin manifest or the Rhai check table.
 
 ### Run the Twin requirements test
 
@@ -207,7 +246,7 @@ The Griffin-specific structural lint is a Rhai tool owned by this Twin. It
 checks the composed wrapper rather than parsing USDA text, and the test fixture
 does not load terrain, FLIP, guidance, or the mission timeline:
 
-    /home/rod/Documents/luncosim-workspace/terrain/target/debug/luncosim test --scene /home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_requirements.usda --verification Griffin1Requirements::Verify_GriffinRequirements --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    target/debug/luncosim test --scene /home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_requirements.usda --verification Griffin1Requirements::Verify_GriffinRequirements --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
 
 The `[verification]` registry in `twin.toml` is the only execution binding:
 the qualified SysML verification name selects the Twin-relative `.usda` scene,
@@ -253,8 +292,9 @@ lander, rover, or ramp can be reviewed and diagnosed independently.
 
 ### Check landing divergence
 
-`requirements/griffin_requirements.sysml` owns the landing-stability horizon,
-tilt/speed/drift bounds, and repeatability tolerances. The Rhai contract test
+`requirements/griffin_simulation_accuracy_requirements.sysml` owns the
+landing-stability horizon and speed/drift/upright-axis bounds. The integration
+source owns the separate repeatability tolerances. The Rhai contract test
 (`scenarios/tests/griffin_surface_ops_contract.rhai`) samples the composed
 lander every ten fixed ticks and emits a `GRIFFIN_LANDING_STABILITY` verdict
 plus a `GRIFFIN_LANDING_STABILITY_METRICS` JSON line. Run two fresh processes
@@ -279,35 +319,46 @@ children and SI geometry. `tools/griffin_visual_builder.rhai` exposes:
   `ApplyUsdOps` change set;
 * aggregate plans only for inspection or a deliberate, reviewed rebuild.
 
-The helper uses the generic LunCoSim `assembly_builder`/`assembly_edit` surface,
-accepts Twin-local `twin://` references, and requires the parent frames to be
-present before submission. The live Editor remains open; after each small
-command is acknowledged, query the same document generation, inspect the
-focused preview, and run the owning component gate (for example
-`flip_wheel_requirements.rhai` for one wheel task). The aggregate
-`griffin_flip_visual.rhai` gate is reserved for the checkpoint after all
-component cycles. Wheel FWW-006 also checks the assembly-owned suspension
-strut's type, metric offset/scale, render purpose, and disabled collision;
-the replaceable wheel asset remains responsible for tire/hub geometry. Both
-visual and dynamic assemblies use the source-backed four-wheel directional
-topology; a presentation-only proxy must not silently change that count.
+The Griffin helper uses the generic LunCoSim `assembly_builder`/`assembly_edit`
+surface, accepts Twin-local `twin://` references, and requires the parent frames
+to be present before submission. The live Editor remains open; after each
+small command is acknowledged, query the same document generation, inspect the
+focused preview, and run the owning component gate. The aggregate
+`griffin_flip_visual.rhai` gate verifies the canonical Griffin and FLIP vehicle
+references after component edits. Wheel FWW-006 checks the shared suspension
+component's type, metric offset/scale, render purpose, and disabled collision.
+FLIP wheel stations and their component visuals live in `vehicles/flip.usda`;
+the typed station identities and dimensions come from FlipRover SysML.
 
-Station names are read from the SysML source (`landingLegNames`,
-`propellantTankNames`, `rampNames`, `solarArrayNames`, `mainEngineNames`, and
-`visualWheelNames`) at test time. This keeps the component decomposition and
-the requirement source aligned without baking a second identity catalog into
-Rhai. The test emits a structured `<channel>_EVIDENCE` event before its normal
+Assembly identities are read from typed SysML enumerations (`landingLegInstances`,
+`tankInstances`, `rampInstances`, `solarArrayInstances`, and
+`mainEngineInstances`) at test time. FLIP's own wheel identities remain owned
+by its source model.
+This keeps the component decomposition and the requirement source aligned
+without baking a second identity catalog into Rhai. The test emits a
+structured `<channel>_EVIDENCE` event before its normal
 verdict line so the result can be paired with a same-generation composed query
 and frame.
 
+For the render-only Editor document, use
+`griffin_requirements::visual_report_live(doc_id, "/Griffin1")`. It reports the
+authored document generation, Edit perspective, SysML source revision,
+component roots, leg/panel station transforms, and ramp load-path children.
+The physical `lint_live`/`layout_report_live` functions remain intentionally
+separate because the render document does not own flight mass or colliders.
+
 The Twin scenario now calls `griffin_requirements::runtime_report((), root)`.
-That report first validates `requirements/griffin_requirements.sysml` and checks
-for the selected `Verify_GriffinRequirements` case. Rhai remains the executable
-test backend; SysML is the normative requirement and threshold source.
-That runtime suite enumerates all executable rule IDs, checks all 20 manifest
-parts individually, verifies the relational layout report, executes the Moon
-Base SI metric/metres/Y-up contract, validates the metres/Y-up policy catalog,
-and exercises both sides of the payload and ramp limiter boundaries. Run it
+That report validates the Twin SysML source set and checks for the selected
+`Verify_GriffinRequirements` case. The shared evaluator executes the supported
+SysML constraint subset; Rhai binds composed observations and still owns
+structural predicates whose generic USD-provider migration remains open.
+The report distinguishes the authored requirement-check catalog from results
+actually measured in this run. Payload and ramp boundary rows use their
+focused SysML verification cases. The current suite checks all 20 manifest parts
+individually, verifies the relational layout report, executes the Moon Base SI
+metric/metres/Y-up contract, validates the metres/Y-up policy catalog, and
+exercises both sides of the payload and ramp limiter boundaries. These results
+do not imply that every requirement in the catalog was verified. Run it
 through the already-running headful session with
 the `RunScenario`/`RunRhai` API path; do not launch a second simulator just to
 execute the suite.
@@ -352,17 +403,21 @@ The current stable boundary demonstrates:
    contracts.
 4. The mission scene owns guidance wiring, landing target, camera, anchors,
    waypoint markers, and mission metadata.
-5. The Griffin wrapper carries the source-backed public configuration that is
-   useful for integration: 625 kg payload capacity, four landing legs, seven
-   main engines, four propellant tanks, and an isogrid deck. It also carries a
-   clearly labelled study configuration with side-mounted solar-array proxies,
-   a top-deck adapter, and two optional ramps with paired rails. Geometry,
-   mass properties, and mechanism details remain non-flight surrogates.
-6. FLIP uses a four-wheel all-wheel-steer study topology with compound chassis
-   collision, explicit wheel geometry, a vertical rear-deck solar-panel proxy,
-   motor/gearbox, finite-EPS, and motor-thermal Modelica contracts. The wheel
-   count and numeric values are proxy assumptions until FLIP ICD data is
-   available.
+5. The Griffin wrapper carries source-backed values useful for integration:
+   625 kg payload capacity, four landing legs, seven main engines, and an
+   octagonal payload deck. It composes the three adjacent solar-array faces
+   shown in Griffin-1 integration imagery through one reusable referenced
+   panel component. Their installed widths derive from ordered bus-rail pairs;
+   stations and supports remain visual-study values. The four-tank set is
+   also a Twin study assumption, not published flight configuration data.
+   The wrapper includes a top-deck adapter and two optional ramps with paired
+   rails. Geometry, mass properties, and mechanism details remain non-flight
+   surrogates.
+6. The canonical FLIP vehicle uses a four-wheel front-steer Ackermann study
+   configuration with chassis collision geometry, explicit wheel assemblies,
+   a rear-deck solar-panel proxy, motor/gearbox, finite-EPS, and motor-thermal
+   Modelica contracts. Geometry, mass, and mobility values remain study
+   assumptions until the FLIP ICD is available.
 7. The surface environment uses a typed `LunCoTerrainAPI`/DEM layer wired to
    the processed LROC NOBILE03 crop; the old flat `Ground` fixture is inactive.
 8. The Rhai task tree expresses descent event waits, the selected direct-deck or
@@ -379,9 +434,9 @@ adapter joint before the rover route begins.
 Fixed-joint cargo is prevented from consuming route sensors before that
 release. The ramps span the deck datum to the terrain plane and carry paired
 edge rails. Astrolab's public material describes direct top-deck egress, so the
-ramp branch is an optional Griffin study assumption rather than a FLIP ICD. The
-historical six-wheel wrapper is retained as
-`vehicles/flip.legacy-six-wheel.usda` for comparison, not as the active asset.
+ramp branch is an optional Griffin study assumption rather than a FLIP ICD.
+Both the review composition and test fixtures reference the canonical
+`vehicles/flip.usda` vehicle.
 The generic joint regression and the isolated FLIP adapter release now pass:
 the live detach retires the native joint and graph edge (7 → 6), leaves the
 28-body/30-collider population unchanged, wakes the released endpoint, and
@@ -419,9 +474,9 @@ the authority/status surface. The Twin-local `griffin_controls` library also
 provides `control_lander()`, `control_rover()`, `release_control()`,
 `toggle_rover_autopilot()`, `start_rover_autopilot()`, and
 `stop_rover_autopilot()` for the Rhai console. For FLIP steering, use
-`griffin_controls::crab_walk()` for parallel angles on all four authored
-steering joints, `griffin_controls::ackermann_steering()` for left/right
-wheel-geometry correction on those four joints, or
+`griffin_controls::crab_walk()` for the parallel steering experiment,
+`griffin_controls::ackermann_steering()` for the source-selected front-steer
+Ackermann study mode, or
 `griffin_controls::toggle_rover_steering_mode()` to switch between them from
 one command. Change the steering mode while FLIP is stopped; if it is moving,
 the helper holds the brake until the crawl threshold is reached and reports
@@ -439,9 +494,9 @@ The controls are a study interface, not a claim about the flight command
 dictionary. The generic simulator still owns possession, input routing,
 autopilot authority, and release semantics. The steering-mode helpers are
 Twin-local live control commands: they stop a moving route, write the vehicle
-Ackermann-strength attribute, and rely on the runtime's in-place four-wheel
-resync. They are not yet a native replicated, undoable vehicle mode, and the
-current topology does not provide a separate front-only Ackermann mode.
+Ackermann-strength attribute, and rely on the runtime's in-place steering
+resync. Public FLIP information does not specify the production steering
+geometry, so this remains a simulation-study configuration.
 
 ## Next required data
 

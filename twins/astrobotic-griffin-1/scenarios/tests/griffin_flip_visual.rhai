@@ -1,3 +1,5 @@
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
+
 // Twin-owned visual contract.  It checks the authored presentation topology
 // and key SI dimensions; it never hard-codes engine internals or mutates USD.
 const TEST_KIND = "graphics";
@@ -17,30 +19,24 @@ fn visual_children_check(id, component, requirement, path, paths) {
 fn flip_visual_exists_check(id, component, kind, path) {
     let check = visual_exists_check(id, component,
         "fvg001", kind, path);
-    check.verification = "Verify_FLIPVisualRequirements";
+    check.verification = "Verify_GriffinVisualRequirements";
     check
 }
 
 fn flip_visual_children_check(id, component, path, paths) {
     let check = visual_children_check(id, component,
         "fvg001", path, paths);
-    check.verification = "Verify_FLIPVisualRequirements";
+    check.verification = "Verify_GriffinVisualRequirements";
     check
 }
 
 // Lists of authored component identities come from the same SysML snapshot
-// passed to the generic evaluator.  The test owns only child geometry names;
+// passed to the generic evaluator. The test owns only child geometry names;
 // it does not carry a second list of rover/lander station identities.
 fn _sysml_list(report, name) {
-    let value = sysml_requirements::text(report, griffin_spec::qualified_attribute_name(name));
-    if value == () || value == "" {
-        return [];
-    }
-    let items = [];
-    for item in value.split(",") {
-        item.trim();
-        if item != "" { items.push(item); }
-    }
+    let qualified = griffin_spec::qualified_attribute_name(name);
+    let items = sysml_requirement_checks::source_enum_identifiers(report, qualified);
+    if items == () { return []; }
     items
 }
 
@@ -60,7 +56,7 @@ fn on_tick(me, ctx) {
     let root = "/GriffinFlipVisual";
     let checks = [];
     checks.push(visual_exists_check("GV-001-camera", "camera", "gv001", "exists", root + "/VisualCamera"));
-    let leg_names = _sysml_list(source, "landingLegNames");
+    let leg_names = _sysml_list(source, "landingLegInstances");
     for name in leg_names {
         checks.push(visual_exists_check("GV-002-" + name, "legs", "gv002", "exists", root + "/Griffin1/" + name));
         checks.push(visual_children_check("GV-002-" + name + "-subparts", "legs", "gv002",
@@ -74,17 +70,20 @@ fn on_tick(me, ctx) {
     checks.push(visual_children_check("GV-002-deck-subparts", "lander", "gv002",
         root + "/Griffin1/Bus",
         [root + "/Griffin1/Bus/PerimeterFrame",
-         root + "/Griffin1/Bus/WhiteEquipmentBox",
-         root + "/Griffin1/Bus/FrontThermalPanel",
-         root + "/Griffin1/Bus/FrontLogoRedA",
-         root + "/Griffin1/Bus/FrontLogoRedB",
-         root + "/Griffin1/Bus/TopDeck"]));
-    let body_profile = visual_exists_check("GV-002-hex-body", "lander", "gv002",
-        "exists", root + "/Griffin1/Bus/WhiteEquipmentBox");
+         root + "/Griffin1/Bus/TopDeckOctagon",
+         root + "/Griffin1/Bus/LowerServiceSkirtOctagon",
+         root + "/Griffin1/Bus/TankSupportPlate",
+         root + "/Griffin1/Bus/RoverPayloadDeck"]));
+    let payload_deck = visual_exists_check("GV-004-rover-payload-deck", "lander_deck",
+        "gv004", "exists", root + "/Griffin1/Bus/RoverPayloadDeck");
+    payload_deck.expected_type = "Mesh";
+    checks.push(payload_deck);
+    let body_profile = visual_exists_check("GV-002-octagonal-body", "lander", "gv002",
+        "exists", root + "/Griffin1/Bus/PerimeterFrame");
     body_profile.expected_type = "Mesh";
     checks.push(body_profile);
     checks.push(visual_exists_check("GV-002-nozzle", "engines", "gv002", "exists", root + "/Griffin1/Nozzle"));
-    let engine_names = _sysml_list(source, "mainEngineNames");
+    let engine_names = _sysml_list(source, "mainEngineInstances");
     let engine_paths = [];
     for name in engine_names {
         engine_paths.push(root + "/Griffin1/Nozzle/MainEngineCluster/" + name);
@@ -97,7 +96,7 @@ fn on_tick(me, ctx) {
             [root + "/Griffin1/Nozzle/MainEngineCluster/" + name + "/Bell",
              root + "/Griffin1/Nozzle/MainEngineCluster/" + name + "/Throat"]));
     }
-    let tank_names = _sysml_list(source, "propellantTankNames");
+    let tank_names = griffin_spec::propellant_tank_names();
     let tank_paths = [];
     for name in tank_names { tank_paths.push(root + "/Griffin1/" + name); }
     checks.push(visual_children_check("GV-002-tanks", "propellant_tanks", "gv002",
@@ -110,7 +109,7 @@ fn on_tick(me, ctx) {
              root + "/Griffin1/" + name + "/TankBandB",
              root + "/Griffin1/" + name + "/TankBandC"]));
     }
-    let ramp_names = _sysml_list(source, "rampNames");
+    let ramp_names = _sysml_list(source, "rampInstances");
     let ramp_paths = [];
     for name in ramp_names { ramp_paths.push(root + "/Griffin1/" + name); }
     checks.push(visual_children_check("GV-002-ramps", "egress_ramps", "gv002",
@@ -118,20 +117,24 @@ fn on_tick(me, ctx) {
     for name in ramp_names {
         checks.push(visual_children_check("GV-002-" + name + "-subparts", "egress_ramps",
             "gv002", root + "/Griffin1/" + name,
-            [root + "/Griffin1/" + name + "/RampSurface",
+            [root + "/Griffin1/" + name + "/RampTrackPort",
+             root + "/Griffin1/" + name + "/RampTrackStarboard",
              root + "/Griffin1/" + name + "/OuterRail",
              root + "/Griffin1/" + name + "/InnerRail",
              root + "/Griffin1/" + name + "/SupportArm"]));
     }
-    let solar_names = _sysml_list(source, "solarArrayNames");
+    let solar_names = _sysml_list(source, "solarArrayInstances");
+    let solar_member_names = sysml_requirement_checks::source_enum_identifiers(source,
+        "GriffinSolarRequirements::GriffinSolarArrayAssembly::childNames");
     for name in solar_names {
         checks.push(visual_exists_check("GV-003-solar-" + name, "solar_panels", "gv003", "exists", root + "/Griffin1/" + name));
+        let solar_children = [];
+        for member in solar_member_names {
+            solar_children.push(root + "/Griffin1/" + name + "/" + member);
+        }
         checks.push(visual_children_check("GV-003-solar-" + name + "-layers", "solar_panels", "gv003",
             root + "/Griffin1/" + name,
-            [root + "/Griffin1/" + name + "/Frame",
-             root + "/Griffin1/" + name + "/Cells",
-             root + "/Griffin1/" + name + "/CellDividerX",
-             root + "/Griffin1/" + name + "/CellDividerZ"]));
+            solar_children));
     }
     checks.push(flip_visual_exists_check("GV-003-mast", "rover", "exists", root + "/FLIP/SensorMast"));
     checks.push(flip_visual_children_check("GV-003-mast-subparts", "rover",
@@ -142,57 +145,32 @@ fn on_tick(me, ctx) {
         root + "/FLIP/Chassis/WhiteEquipmentBox", root + "/FLIP/Chassis/FrontBumper",
         root + "/FLIP/Chassis/PayloadDeck", root + "/FLIP/Chassis/ServicePanel"]));
     checks.push(flip_visual_children_check("GV-003-rover-solar", "rover",
-        root + "/FLIP/SolarArray", [root + "/FLIP/SolarArray/WhiteBacksheet",
-        root + "/FLIP/SolarArray/BlueCells", root + "/FLIP/SolarArray/FoldHinge"]));
-    let wheel_count = flip_visual_exists_check("GV-003-wheel-count", "wheels", "attribute", root + "/FLIP");
-    wheel_count.attr = "lunco:visual:wheel_count";
-    wheel_count.expected_attr = griffin_spec::qualified_attribute_name("visualRoverWheelCount");
-    wheel_count.tolerance = 0.0;
-    checks.push(wheel_count);
-    let wheel_names = _sysml_list(source, "visualWheelNames");
+        root + "/FLIP/SolarArray/SolarArrayVisual", [root + "/FLIP/SolarArray/SolarArrayVisual/WhiteBacksheet",
+        root + "/FLIP/SolarArray/SolarArrayVisual/BlueCells",
+        root + "/FLIP/SolarArray/SolarArrayVisual/FoldHinge"]));
+    let wheel_names = _sysml_list(source, "wheelStations");
     for name in wheel_names {
         checks.push(flip_visual_exists_check("GV-003-wheel-" + name, "wheels", "exists", root + "/FLIP/Suspension_" + name + "/Wheel_" + name));
         checks.push(flip_visual_children_check("GV-003-wheel-" + name + "-subparts", "wheels",
-            root + "/FLIP/Suspension_" + name + "/Wheel_" + name,
-            [root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Tire",
-             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/MetalHub",
-             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/HubCap"]));
+            root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual",
+            [root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/Tire",
+             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/MetalHub",
+             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/HubCap"]));
     }
     for name in wheel_names {
         let check = #{ id: "GV-004-wheel-radius-" + name, component: "wheels",
             requirement: "fvg001",
-            verification: "Verify_FLIPVisualRequirements",
-            kind: "bounds_component", path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Tire",
-            index: 1, multiplier: 1.0, expected_attr: griffin_spec::qualified_attribute_name("visualRoverWheelRadiusM"), tolerance: 0.001 };
+            verification: "Verify_GriffinVisualRequirements",
+            kind: "attribute", path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/Tire",
+            attr: "radius", expected_attr: griffin_spec::qualified_attribute_name("wheelRadiusM"), tolerance: 0.001 };
         checks.push(check);
     }
-    let rover_config = #{ id: "FGV-001-rover-config", component: "rover",
+    let steering_mode = #{ id: "FGV-001-steering-mode", component: "rover",
         requirement: "fvg001",
-        verification: "Verify_FLIPVisualRequirements",
-        kind: "attribute_equals", path: root + "/FLIP",
-        attr: "lunco:visual:configuration",
-        expected: "four directional wheels, white equipment box, sensor mast, fixed solar-array proxy" };
-    checks.push(rover_config);
-    let wheel_count = #{ id: "FGV-001-wheel-count", component: "wheels",
-        requirement: "fvg001",
-        verification: "Verify_FLIPVisualRequirements",
-        kind: "attribute", path: root + "/FLIP", attr: "lunco:visual:wheel_count",
-        expected_attr: griffin_spec::qualified_attribute_name("visualRoverWheelCount"), tolerance: 0.0 };
-    checks.push(wheel_count);
-    for name in wheel_names {
-        let expected_attr = if name.starts_with("F") {
-            "frontSteeringAngleDeg"
-        } else {
-            "rearSteeringAngleDeg"
-        };
-        checks.push(#{ id: "FGV-001-steering-" + name, component: "wheels",
-            requirement: "fvg001",
-            verification: "Verify_FLIPVisualRequirements",
-            kind: "attribute_component",
-            path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name,
-            attr: "xformOp:rotateXYZ", index: 1,
-            expected_attr: griffin_spec::qualified_attribute_name(expected_attr), tolerance: 0.001 });
-    }
+        verification: "Verify_GriffinVisualRequirements",
+        kind: "attribute_equals", path: root + "/FLIP", attr: "lunco:steeringGeometry",
+        expected_attr: griffin_spec::qualified_attribute_name("missionSteeringMode") };
+    checks.push(steering_mode);
     // The assembly-authored socket/frame relationships are the durable
     // placement contract behind the numeric transforms.
     let port_socket = root + "/Griffin1/Bus/RampSocketPort";
@@ -224,11 +202,24 @@ fn on_tick(me, ctx) {
         verification: "Verify_GriffinVisualRequirements",
         kind: "relationship", path: starboard_socket, rel: "lunco:mount:part",
         targets: [root + "/Griffin1/EgressRampStarboard"] });
-    checks.push(visual_exists_check("GV-004-deck-width", "lander_deck", "gv004", "bounds_component", root + "/Griffin1/Bus/WhiteEquipmentBox"));
+    checks.push(visual_exists_check("GV-004-deck-width", "lander_deck", "gv004", "bounds_component", root + "/Griffin1/Bus/PerimeterFrame"));
     checks[checks.len() - 1].index = 0;
     checks[checks.len() - 1].multiplier = 2.0;
     checks[checks.len() - 1].expected_attr = griffin_spec::qualified_attribute_name("visualLanderDeckWidthM");
     checks[checks.len() - 1].tolerance = 0.001;
+    for placement in [
+        #{name: "Griffin1", expected: vec3_array(griffin_spec::visual_review_griffin_station())},
+        #{name: "FLIP", expected: vec3_array(griffin_spec::visual_review_flip_station())}
+    ] {
+        for axis in 0..3 {
+            checks.push(#{id: "GV-004-" + placement.name + "-station-" + axis.to_string(),
+                component: placement.name, requirement: "gv004",
+                verification: "Verify_GriffinVisualRequirements",
+                kind: "attribute_component", path: root + "/" + placement.name,
+                attr: "xformOp:translate", index: axis,
+                expected: placement.expected[axis], tolerance: 0.002});
+        }
+    }
     let pad = #{ id: "GV-004-pad-radius", component: "context",
         requirement: "gv004",
         verification: "Verify_GriffinVisualRequirements",
@@ -272,8 +263,7 @@ fn on_tick(me, ctx) {
         kind: "attribute_equals",
         path: root + "/Environment/Looks/RegolithSurface/Shader",
         attr: "info:wgsl:sourceAsset",
-        expected: sysml_requirements::text(source,
-            griffin_spec::qualified_attribute_name("visualTerrainShaderAsset")) });
+        expected: griffin_spec::visual_terrain_shader_asset() });
     checks.push(#{ id: "GV-006-terrain-mode", component: "context",
         requirement: "gv006",
         verification: "Verify_GriffinVisualRequirements",
@@ -287,3 +277,4 @@ fn on_tick(me, ctx) {
           + " evaluated=" + report.results.len());
     report_structured_verdict(report, "GRIFFIN FLIP VISUAL", "GRIFFIN_FLIP_VISUAL");
 }
+import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;

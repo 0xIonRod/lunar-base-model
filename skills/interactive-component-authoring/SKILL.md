@@ -64,6 +64,11 @@ Before authoring a component, write down:
 - mount socket and plug frames, allowed degrees of freedom, and relationship
   to the parent datum;
 - visual geometry, collision geometry, mass/inertia owner, and physics role;
+- physical material assignment for every relevant role (structure, pressure
+  boundary, thermal, electrical, or contact), with typed material identity,
+  property units, operating conditions, provenance, and confidence; represent
+  a COPV liner and composite overwrap as separate materials, not one sphere
+  label;
 - ports, controls, deployment limits, variants, and expected initial state;
 - component requirement IDs, verification function, and evidence to collect.
 
@@ -72,6 +77,109 @@ into a builder as a second literal table. A builder reads the source, validates
 the exact values, and returns an error for missing or malformed values. A
 relationship or frame is preferable to a guessed absolute translation when
 the generic editor supports it.
+
+Do not store engineering material assignments or property vectors in free-form
+strings, CSV fields, shader inputs, or comments. USD appearance (`UsdShade`) and
+contact material (`UsdPhysicsMaterialAPI`) are separate from structural,
+thermal, and electrical properties. Until the shared typed material catalogue
+and its cross-domain bindings exist, keep one sourced, typed material record in
+the Twin's SysML source set and refer to it from component requirements; record
+the missing generic adapter instead of inventing an external library resolver.
+Do not create independent numeric copies in USD, Rhai, and Modelica. A visual
+sphere's outer radius is not a pressure-wall thickness or a validated pressure
+boundary.
+
+Keep material definitions reusable and separate from their component-role
+assignments. Record grade/product form/temper or composite layup and direction;
+give each used property its unit, operating range, source revision and status
+(sourced, derived, or assumed). Separate candidate grades from the selected
+material, and do not promote a study assumption into a qualified allowable.
+Use one indexed SysML material package as the catalogue source when supported;
+until typed import/resolution and downstream projection are available, expose
+that as a generic tool gap instead of encoding a material name or property
+vector in a string.
+
+Model a surface finish or coating as a separate typed selection layered on the
+substrate, with assignments scoped to the actual component face or region. One
+substrate may have several finish options; the selected finish can carry
+coating stack/order, thickness or areal mass, process, and environmental limits
+when relevant. Keep its sourced optical/thermal properties in the engineering
+record. A typed renderer mapping may select a LunCo shader preset for the
+finish, but shader color/metallic/roughness are visual controls and never
+substitute for absorptance, infrared emittance, coating thickness, or Modelica
+thermal inputs. The generic finish catalog and `UsdShade` mapping remain
+explicit tooling gaps until implemented.
+
+## Resolve spatial relations in Rhai first; use Modelica when needed
+
+For an anchored placement over typed frames, use the shared
+`spatial_relations` Rhai tool rather than repeating coordinate arithmetic:
+`coincident` aligns complete datums, `offset` applies a `Vec3` in the fixed
+datum frame, `coincident_translation` preserves the moving orientation, and
+`point_on_axis` derives a station from a frame, native `Vec3` axis, and metric
+distance. Measure the resulting translation/rotation residual with the same
+tool. The values stay native `Transform`/`Vec3` throughout; do not encode
+stations, vectors, or solved values as CSV or metadata strings.
+
+This is an anchored direct-placement API, not a persistent relation graph or a
+general constraint solver. Its current arguments are typed transforms rather
+than projected SysML datum handles. Keep dimensions and datum values in SysML;
+do not copy them into the Rhai call as an independent source. Use the typed
+SysML-to-Modelica path when an explicit SysML constraint usage must be resolved
+or coupled equations must be solved and checked independently.
+
+For the supported Modelica coincident-point translation policy:
+
+1. Read only the required SysML facts with
+   `sysml_modelica_constraints::analyze_selected(path, attribute_names)` and
+   choose the exact qualified constraint usage. Its standard binding
+   connectors identify the moving and fixed point features; do not duplicate
+   either point in the Rhai caller.
+2. Create a scratch Modelica document with
+   `modelica_editor::new_scratch(source, name)`, retain its returned `doc_id`,
+   and inspect the current source generation. Never assume the active document
+   is the scratch document.
+3. Call
+   `sysml_modelica_constraints::begin_coincident_translation(doc_id,
+   generation, report, usage_name)`. It generates the small Modelica source
+   from typed facts, verifies the Editor source readback, and returns a bounded
+   polling ticket tied to that source generation.
+4. Advance `poll_coincident_translation(ticket, generated)` on later editor or
+   simulation ticks while `pending` is true. Do not block with a Rhai loop or
+   wall-clock sleep. The ticket first resolves the deferred command
+   acknowledgement, then polls `RunStatus` and `GetExperimentResult` by their
+   exact command/run identities. It rejects a changed source generation and
+   checks finite native `f64` samples plus the relation residual.
+5. Feed the completed native `Vec3` into
+   `coincident_translation_placement_plan` with the exact USD document,
+   edit-target, path, and generation. Submit its operations through
+   `propose_coincident_translation_plan`; inspect the visible Editor proposal
+   and projected result before committing. A solve result is never an implicit
+   USD write.
+
+The Modelica source string is the compiler input boundary, not a data store:
+SysML facts and result vectors remain typed throughout Rhai and only become
+text while emitting valid Modelica syntax. This bounded policy solves one
+documented translation relation; it is not a general CAD constraint solver or
+an automatic placement engine.
+
+## Reuse typed parametric geometry
+
+Build repeated, axisymmetric, or profile-based solids with the shared native
+geometry API before writing component-specific vertex loops. `extrude_profile`
+and `revolve_profile` consume native `Vec2` coordinates and return typed mesh
+topology; `DVec3`/`DTransform` remain the geometry and placement values until
+the Editor's standard `UsdGeomMesh` operation boundary. The design dimensions
+come from SysML, while segment counts and sampling density are rendering
+policy. Keep the mesh's axis, face winding, normals, bounds, and contact datum
+in the positive component gate. Hand-built topology in Twin Rhai is appropriate
+only when it represents a genuinely novel, named profile not covered by the
+shared primitives; if it recurs, promote the generic operation to Rust and
+expose its native type to Rhai.
+
+Do not create a general `ParametricCAD` USD schema for dimensions or mate
+equations. Standard USD geometry records the result; SysML remains the design
+source, and Modelica remains the solver for coupled physical constraints.
 
 ## Lessons carried over from CAD and multiphysics tools
 
@@ -119,14 +227,51 @@ collision envelope, or runtime contract.
 8. Measure from composed USD facts (`QueryUsdPrim`, bounds, authored primitive
    dimensions and scale, or the generic measurement report). Do not infer
    dimensions from a screenshot or an uncomposed source layer.
+   Author measurement stages with explicit `metersPerUnit` and `upAxis` values
+   that match the source datums. For physics acceptance, query the effective
+   Avian collider geometry with
+   `QueryUsdPrims.collision_geometry` from the same composed snapshot as the
+   visible source geometry. Compare cooked shape, dimensions, and pose after
+   mapping both observations to the same frame and SI units; authored proxy
+   attributes alone do not prove what the solver will use. Check the typed
+   source relationship and contact ownership separately. Use exact cooked
+   dimensions when the collider is analytic, and preserve the returned mesh
+   or hull topology for mesh colliders. Treat missing cooked geometry as
+   unavailable evidence, and do not substitute a conservative bounds envelope
+   for an available exact analytic shape.
 9. Use SysML for requirement identity, units, thresholds, datums, and
    verification selection. Use Rhai for executable observation and structured
    verdicts. Keep one requirement file and one observer per owning component;
    assembly tests cover interfaces and integration rather than duplicating
-   internal part checks.
+   internal part checks. After editing SysML in Editor, confirm that the
+   Twin-level `AnalyzeSysml` snapshot has the saved source revision and source
+   locations before citing constraint handles or verdicts; single-document
+   analysis and the Twin source-set snapshot can differ.
 10. Keep physics and clocks deterministic: fixed tick rate, explicit clock
     contract, stable seed/thread policy, no wall-clock sleeps in tests, and
     report the source revision, horizon, ticks, and tolerance in evidence.
+
+## Verification strategy
+
+Make positive conformance evidence the normal test shape: read the normative
+SysML/USD source, observe the composed result, and prove that the required
+component, geometry, relationship, datum, or runtime outcome is present and
+correct. Do not add a negative test merely to prove that an obsolete
+implementation name or old shape is absent; update the positive requirement
+and assert the required type/profile/topology instead.
+
+Use a negative case only when rejection or safe failure is itself a real
+contract, such as malformed source, non-finite data, a missing safety-critical
+relationship, stale-generation mutation, unsupported command, invalid units,
+or a required fail-safe response. Such a case must be bounded, non-destructive,
+and end at the public diagnostic/verdict boundary. A historical regression
+example is not enough by itself to justify a negative test.
+
+Write geometry, SysML-projection, and Twin-model acceptance checks as Rhai test
+assets in the production scripting/scene gate. Do not embed Griffin dimensions,
+mesh expectations, or relationship scenarios in Rust tests. Rust owns reusable
+typed algorithms and API registration; Rhai owns positive contract evidence at
+the public model/tool boundary.
 
 ## Visual review order
 

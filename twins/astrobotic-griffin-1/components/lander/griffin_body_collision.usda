@@ -1,0 +1,74 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinBody"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "GriffinBody" (
+    kind = "component"
+    prepend apiSchemas = "MaterialBindingAPI"
+)
+{
+    custom string lunco:part:role = "Griffin-1 flight-body collision assembly"
+    custom string lunco:provenance:source = "Twin-authored Griffin study geometry; public flight ICD unavailable"
+    def Cube "BodyCollisionProxy" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:scale = (2.65, 3.44, 2.1)
+        custom token[] xformOpOrder = ["xformOp:scale"]
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+    def Cube "BodyCollisionNorth" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.0, 0.0, 2.28)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.5, 1.55, 0.32)
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+    def Cube "BodyCollisionSouth" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.0, 0.0, -2.28)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.5, 1.55, 0.32)
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+    def Cube "BodyCollisionEast" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (2.55, 0.0, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.45, 1.55, 1.45)
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+    def Cube "BodyCollisionWest" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (-2.55, 0.0, 0.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.45, 1.55, 1.45)
+        bool physics:collisionEnabled = true
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+    }
+}

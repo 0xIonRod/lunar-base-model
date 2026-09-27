@@ -9,11 +9,7 @@ def Xform "FLIP" (
     documentation = "Astrolab FLIP four-wheel lunar rover study proxy with finite EPS and Modelica drivetrain."
     kind = "assembly"
     prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "PhysxVehicleAckermannSteeringAPI", "LunCoCatalogAPI", "CollectionAPI:components"]
-    prepend references = [
-        @lunco://components/avionics/obc.usda@</OBC>,
-        @lunco://components/cameras/rover_front_camera.usda@</RoverFrontCamera>,
-        @lunco://components/mobility/drive_laws/modelica_ackermann.usda@</DriveLaw>
-    ]
+    prepend references = [@lunco://components/avionics/obc.usda@</OBC>, @lunco://components/cameras/rover_front_camera.usda@</RoverFrontCamera>, @lunco://components/mobility/drive_laws/modelica_ackermann.usda@</DriveLaw>]
     prepend variantSets = "drivetrain"
     variants = { string "drivetrain" = "raycast" }
 )
@@ -21,7 +17,6 @@ def Xform "FLIP" (
     uniform bool lunco:spawnable = true
     custom string lunco:mission:payload = "Astrolab FLIP"
     custom string lunco:mission:vehicle_family = "FLEX Lunar Innovation Platform"
-    custom string lunco:configuration = "four-wheel front-steer Ackermann study proxy"
     custom string lunco:parameter_status = "public envelope plus explicit simulator assumptions"
     custom string lunco:provenance:source = "https://www.astrolab.space/flip-rover/"
     custom string lunco:provenance:video = "https://www.youtube.com/watch?v=UFEMOrg27KE"
@@ -67,8 +62,12 @@ def Xform "FLIP" (
     float outputs:solar_power.connect = </FLIP/SolarArray.outputs:power_out>
     float outputs:solar_available_power
     float outputs:solar_available_power.connect = </FLIP/SolarArray.outputs:available_power_w>
-    custom string lunco:steering:status = "front-wheel Ackermann heading is authored by the shared drive law; rear wheels track straight ahead"
-    custom string lunco:wheel:geometry = "four solid 0.45 m radius x 0.28 m width wheel assemblies; each composes regolith tire, collision, and 0.70 m suspension"
+    custom double inputs:target_mount_x
+    double inputs:target_mount_x.connect = </FLIP/SolarArray/Environment.outputs:sun_mount_x>
+    custom double inputs:target_mount_y
+    double inputs:target_mount_y.connect = </FLIP/SolarArray/Environment.outputs:sun_mount_y>
+    custom double inputs:target_mount_z
+    double inputs:target_mount_z.connect = </FLIP/SolarArray/Environment.outputs:sun_mount_z>
     variantSet "drivetrain" = {
         "raycast" {
         }
@@ -79,45 +78,69 @@ def Xform "FLIP" (
                 prepend apiSchemas = "PhysicsRigidBodyAPI"
             )
             {
+                over "Wheel_FL" (
+                    prepend apiSchemas = "PhysicsFilteredPairsAPI"
+                )
+                {
+                    custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
+                }
             }
             over "Suspension_FR" (
                 prepend apiSchemas = "PhysicsRigidBodyAPI"
             )
             {
+                over "Wheel_FR" (
+                    prepend apiSchemas = "PhysicsFilteredPairsAPI"
+                )
+                {
+                    custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
+                }
             }
             over "Suspension_RL" (
                 prepend apiSchemas = "PhysicsRigidBodyAPI"
             )
             {
+                over "Wheel_RL" (
+                    prepend apiSchemas = "PhysicsFilteredPairsAPI"
+                )
+                {
+                    custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
+                }
             }
             over "Suspension_RR" (
                 prepend apiSchemas = "PhysicsRigidBodyAPI"
             )
             {
+                over "Wheel_RR" (
+                    prepend apiSchemas = "PhysicsFilteredPairsAPI"
+                )
+                {
+                    custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
+                }
             }
             over "Suspension_FL/Wheel_FL" (
                 prepend apiSchemas = "PhysicsFilteredPairsAPI"
             )
             {
-                rel physics:filteredPairs = </FLIP/Chassis>
+                custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
             }
             over "Suspension_FR/Wheel_FR" (
                 prepend apiSchemas = "PhysicsFilteredPairsAPI"
             )
             {
-                rel physics:filteredPairs = </FLIP/Chassis>
+                custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
             }
             over "Suspension_RL/Wheel_RL" (
                 prepend apiSchemas = "PhysicsFilteredPairsAPI"
             )
             {
-                rel physics:filteredPairs = </FLIP/Chassis>
+                custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
             }
             over "Suspension_RR/Wheel_RR" (
                 prepend apiSchemas = "PhysicsFilteredPairsAPI"
             )
             {
-                rel physics:filteredPairs = </FLIP/Chassis>
+                custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
             }
         }
     }
@@ -126,47 +149,18 @@ def Xform "FLIP" (
     )
     {
     }
-    def Cube "Chassis" (
-        prepend references = @lunco://components/mobility/chassis/box_chassis.usda@</Chassis>
+    def Xform "SensorMast" (
+        references = @twin://astrobotic-griffin-1/components/rover/flip_sensor_mast_visual.usda@
     )
     {
-        double3 xformOp:scale = (2.4, 0.42, 3.15)
-        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23999999463558197, 0.2800000011920929)]
-    }
-    def Cube "PayloadDeck" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
-    )
-    {
-        double3 xformOp:translate = (0.0, 0.38, 0.0)
-        double3 xformOp:scale = (1.45, 0.08, 0.95)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.47999998927116394, 0.5, 0.5199999809265137)]
-    }
-    def Xform "SensorMast"
-    {
-        def Cylinder "Post"
-        {
-            double radius = 0.06
-            double height = 0.55
-            double3 xformOp:translate = (0.0, 0.78, -0.25)
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.3499999940395355, 0.3700000047683716, 0.4000000059604645)]
-            bool physics:collisionEnabled = false
-        }
-        def Cube "SensorBar"
-        {
-            double3 xformOp:translate = (0.0, 1.08, -0.25)
-            double3 xformOp:scale = (0.42, 0.06, 0.08)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.1599999964237213)]
-            bool physics:collisionEnabled = false
-        }
+        custom double3 xformOp:translate = (0.0, 0.46, -0.28)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "Suspension_FL" (
         prepend references = @lunco://components/mobility/suspensions/physical_carrier.usda@</SuspensionCarrier>
     )
     {
-        double3 xformOp:translate = (-0.95, -0.55, -1.05)
+        custom double3 xformOp:translate = (-1.75, -0.42, -1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_FL" (
             prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
@@ -174,22 +168,37 @@ def Xform "FLIP" (
         )
         {
             double radius = 0.45
-            double height = 0.28
+            double height = 0.3
             float physxVehicleWheel:radius = 0.44999998807907104
-            float physxVehicleWheel:width = 0.2800000011920929
+            float physxVehicleWheel:width = 0.30000001192092896
             float physxVehicleWheel:moi = 3.4000000953674316
             int physxVehicleWheelAttachment:index = 0
             float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_FL.outputs:torque>
             float inputs:heading
             float inputs:heading.connect = </FLIP.outputs:heading_fl>
+            float lunco:suspension:restLength = 1.2000000476837158
+            custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
+            uniform token purpose = "proxy"
+            def Xform "Visual" (
+                references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@
+            )
+            {
+                custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            }
+        }
+        def Xform "Visual" (
+            references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
+        )
+        {
         }
     }
     def Xform "Suspension_FR" (
         prepend references = @lunco://components/mobility/suspensions/physical_carrier.usda@</SuspensionCarrier>
     )
     {
-        double3 xformOp:translate = (0.95, -0.55, -1.05)
+        custom double3 xformOp:translate = (1.75, -0.42, -1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_FR" (
             prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
@@ -197,22 +206,39 @@ def Xform "FLIP" (
         )
         {
             double radius = 0.45
-            double height = 0.28
+            double height = 0.3
             float physxVehicleWheel:radius = 0.44999998807907104
-            float physxVehicleWheel:width = 0.2800000011920929
+            float physxVehicleWheel:width = 0.30000001192092896
             float physxVehicleWheel:moi = 3.4000000953674316
             int physxVehicleWheelAttachment:index = 1
             float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_FR.outputs:torque>
             float inputs:heading
             float inputs:heading.connect = </FLIP.outputs:heading_fr>
+            float lunco:suspension:restLength = 1.2000000476837158
+            custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
+            uniform token purpose = "proxy"
+            def Xform "Visual" (
+                references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@
+            )
+            {
+                custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            }
+        }
+        def Xform "Visual" (
+            references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
         }
     }
     def Xform "Suspension_RL" (
         prepend references = @lunco://components/mobility/suspensions/physical_carrier.usda@</SuspensionCarrier>
     )
     {
-        double3 xformOp:translate = (-0.95, -0.55, 1.05)
+        custom double3 xformOp:translate = (-1.75, -0.42, 1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_RL" (
             prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
@@ -220,20 +246,35 @@ def Xform "FLIP" (
         )
         {
             double radius = 0.45
-            double height = 0.28
+            double height = 0.3
             float physxVehicleWheel:radius = 0.44999998807907104
-            float physxVehicleWheel:width = 0.2800000011920929
+            float physxVehicleWheel:width = 0.30000001192092896
             float physxVehicleWheel:moi = 3.4000000953674316
             int physxVehicleWheelAttachment:index = 2
             float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_RL.outputs:torque>
+            float lunco:suspension:restLength = 1.2000000476837158
+            custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
+            uniform token purpose = "proxy"
+            def Xform "Visual" (
+                references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@
+            )
+            {
+                custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            }
+        }
+        def Xform "Visual" (
+            references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
+        )
+        {
         }
     }
     def Xform "Suspension_RR" (
         prepend references = @lunco://components/mobility/suspensions/physical_carrier.usda@</SuspensionCarrier>
     )
     {
-        double3 xformOp:translate = (0.95, -0.55, 1.05)
+        custom double3 xformOp:translate = (1.75, -0.42, 1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_RR" (
             prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
@@ -241,13 +282,30 @@ def Xform "FLIP" (
         )
         {
             double radius = 0.45
-            double height = 0.28
+            double height = 0.3
             float physxVehicleWheel:radius = 0.44999998807907104
-            float physxVehicleWheel:width = 0.2800000011920929
+            float physxVehicleWheel:width = 0.30000001192092896
             float physxVehicleWheel:moi = 3.4000000953674316
             int physxVehicleWheelAttachment:index = 3
             float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_RR.outputs:torque>
+            float lunco:suspension:restLength = 1.2000000476837158
+            custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
+            uniform token purpose = "proxy"
+            def Xform "Visual" (
+                references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@
+            )
+            {
+                custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            }
+        }
+        def Xform "Visual" (
+            references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
         }
     }
     def Xform "Motor_FL" (
@@ -429,7 +487,7 @@ def Xform "FLIP" (
         double3 xformOp:translate = (0.0, 0.28, 0.2)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         float inputs:voltage_nom = 28.0
-        float inputs:capacity = 83.33000183105469
+        float inputs:capacity = 222.14285278320313
         float inputs:R_internal = 0.009999999776482582
         float inputs:soc_init = 0.8500000238418579
     }
@@ -437,24 +495,46 @@ def Xform "FLIP" (
         prepend references = @lunco://components/power/solar_panel.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (0.0, 1.45, 1.05)
-        double3 xformOp:scale = (0.39, 0.03, 0.39)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale", "xformOp:rotateXYZ"]
-        float inputs:area = 4.800000190734863
-        float inputs:efficiency = 0.30000001192092896
+        custom double3 xformOp:translate = (0.0, 1.3, 0.0)
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        float parameters:area = 0.70
+        float parameters:efficiency = 0.35
         float inputs:irradiance = 1361.0
-        float inputs:sun_mount_x = 0.0
-        float inputs:sun_mount_y = 1.0
-        float inputs:sun_mount_z = 0.0
         custom token connectors:p
         token connectors:p.connect = </FLIP/Battery.connectors:p>
-        custom string lunco:geometry:status = "2.48 m x 1.92 m vertical rear-deck panel; 4.8 m2 nameplate geometry"
-        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (18.0, 0.0, 0.0)
         float inputs:panel_normal_x = 0.0
         float inputs:panel_normal_y = 0.0
         float inputs:panel_normal_z = 1.0
-        custom string lunco:installation = "vertical rear-deck photovoltaic panel; collision and mass remain owned by the FLIP root body"
-        token visibility = "invisible"
+        token visibility = "inherited"
+        float parameters:peak_power_rating_w = 270.0
+        custom double inputs:target_mount_x
+        double inputs:target_mount_x.connect = </FLIP.inputs:target_mount_x>
+        custom double inputs:target_mount_y
+        double inputs:target_mount_y.connect = </FLIP.inputs:target_mount_y>
+        custom double inputs:target_mount_z
+        double inputs:target_mount_z.connect = </FLIP.inputs:target_mount_z>
+        def "PanelSurface" (
+            active = false
+        )
+        {
+        }
+        def "PanelFrame" (
+            active = false
+        )
+        {
+        }
+        def Xform "SolarArrayVisual" (
+            references = @twin://astrobotic-griffin-1/components/rover/flip_solar_panel_visual.usda@
+        )
+        {
+        }
+        def Xform "Environment" (
+            prepend references = @lunco://components/environment/probe.usda@</EnvironmentProbe>
+        )
+        {
+        }
     }
     def LunCoEvent "BatteryDrained"
     {
@@ -556,24 +636,9 @@ def Xform "FLIP" (
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
         }
     }
-    def Cube "RoverSolarBacksheet" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+    def Xform "Chassis" (
+        references = @twin://astrobotic-griffin-1/components/rover/flip_chassis_visual.usda@
     )
     {
-        double3 xformOp:translate = (0.0, 0.52, 1.75)
-        double3 xformOp:scale = (1.6, 0.06, 0.9)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.18000000715255737, 0.20000000298023224, 0.23999999463558197)]
-        bool physics:collisionEnabled = true
-    }
-    def Cube "RoverSolarCells" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
-    )
-    {
-        double3 xformOp:translate = (0.0, 0.59, 1.75)
-        double3 xformOp:scale = (1.45, 0.02, 0.78)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.03500000014901161, 0.07000000029802322, 0.2800000011920929)]
-        bool physics:collisionEnabled = true
     }
 }

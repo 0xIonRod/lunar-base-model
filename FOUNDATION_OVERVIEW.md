@@ -51,10 +51,10 @@ unless their owner explicitly stages them in a later task.
 | Area | NASA repository assets | LunCoSim foundation | Current status and limit |
 |---|---|---|---|
 | Mission identity and provenance | `missions/mission-001/mission.yaml`, `missions/mission-002/mission.yaml`, the two mission research records, and `research/` registers | Twin manifests and source-asset metadata under `assets/` and `twins/` | Mission identity is represented. Public mission facts must not be treated as vehicle qualification data. |
-| Terrain and polar site | `missions/mission-001/scene.usda`; Mission 002 records a 1 km × 1 km `procedural_flat_site`; `twins/astrobotic-griffin-1/environments/south_pole_surrogate.usda` and `lunar_surface_base.usda` | `assets/scenes/base/lunar_surface.usda`, `assets/scenes/terrain_only.usda`, `assets/components/terrain/rocker_bogie_articulation_course.usda`, `assets/manifests/terrain.toml`, `crates/lunco-terrain-core/`, and `crates/lunco-terrain-bake/` | A deterministic flat collision surrogate and visual berms are available. There is no validated Nobile Crater DEM, hazard map, illumination timeline, or communications mask. |
+| Terrain and polar site | `missions/mission-001/scene.usda`; the Mission 002 scene composes `twins/astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda`; the canonical regional terrain is `twins/astrobotic-griffin-1/environments/south_pole_surrogate.usda` | `assets/scenes/base/lunar_surface.usda`, `assets/scenes/terrain_only.usda`, `assets/components/terrain/rocker_bogie_articulation_course.usda`, `assets/manifests/terrain.toml`, `crates/lunco-terrain-core/`, and `crates/lunco-terrain-bake/` | A reproducible 512 m LROC NOBILE03 crop is used by the Griffin Twin. The exact touchdown site, higher-resolution hazard map, illumination timeline, and communications mask are not established. |
 | Sun and illumination | `scenarios/03_power_and_illumination.yaml` plus the Griffin Twin's explicit scene lighting | `assets/lighting/sun.usda`, `assets/models/LunCo/Pointing/SunTracker.mo`, and `assets/scenarios/tests/sun_tracker.rhai` | Sun/light and tracker mechanisms exist for study workflows. Site-specific power claims require a real frame, epoch, and illumination data. |
 | Rovers | `research/flip_rover.md`, `research/vehicles.md`, `twins/astrobotic-griffin-1/vehicles/flip.usda`, and the M01 simulator rover in `missions/mission-001/scene.usda` | `assets/vessels/rovers/rocker_bogie.usda`, `six_wheel_rover.usda`, `six_wheel_independent.usda`, `ackermann_rover.usda`, `assets/components/mobility/`, and the rover behavior/test assets | Generic USD-driven mobility and explicit actuator topology are available. The active Griffin FLIP asset is a four-wheel all-wheel-steer study proxy, not an as-built FLIP model. |
-| Griffin lander | `missions/mission-002/`, `twins/astrobotic-griffin-1/vehicles/griffin_1.usda`, the Twin scene, behavior, and scenario assets | `assets/vessels/landers/descent_lander.usda`, `assets/models/Lander.mo`, GNC models, and the maintained USD/Modelica runtime | A reusable generic descent lander is wrapped with Griffin identity and study geometry. Public Griffin mass properties, propulsion details, landing coordinates, and flight state vectors remain unknown. |
+| Griffin lander | `missions/mission-002/` contains mission facts and composes `twins/astrobotic-griffin-1/vehicles/griffin_1.usda` through the canonical Twin scene | `assets/vessels/landers/descent_lander.usda`, `assets/models/Lander.mo`, GNC models, and the maintained USD/Modelica runtime | One Twin-owned integrated lander asset composes the reusable descent model and Griffin study geometry. Public Griffin mass properties, propulsion details, landing coordinates, and flight state vectors remain unknown. |
 | Habitats and base structures | `twins/astrobotic-griffin-1/environments/lunar_surface_base.usda`, mission/scenario contracts, and base context in `NASA_LUNAR_BASE_OVERVIEW.md` | `assets/structures/habitat_fsh.usda`, `assets/structures/solar_tower.usda`, and the base scene assets | Base structure primitives exist for composition and visualization. There is not yet a complete, source-backed, interactive base layout with validated power, thermal, or logistics behavior. |
 | Power and electrical components | `scenarios/03_power_and_illumination.yaml`, Griffin mission assumptions, and Twin metadata | `assets/components/power/battery.usda`, `power_bus.usda`, `solar_panel.usda`, `ideal_voltage_source.usda`, `assets/models/LunCo/Electrical/SolarPanel.mo`, and related Modelica tests | Generic battery/solar/power building blocks exist. Mission-specific capacity, generation, load, degradation, and lunar-night budgets are not flight data. |
 | Communications | `scenarios/04_communications_blackout.yaml`, `research/assumptions.md`, and mission records | `assets/components/comms/transmitter_power.usda`, communications scenarios/tests, and the API/telemetry surfaces | Blackout and recovery can be represented as an operations study. A validated relay geometry, bandwidth, latency, and link mask are not yet present. |
@@ -68,9 +68,11 @@ Griffin package is under `twins/astrobotic-griffin-1/` and currently contains:
 ```text
 twin.toml
 scenes/griffin_1_surface_ops.usda
+scenes/griffin_flip_visual.usda
 vehicles/griffin_1.usda
+vehicles/griffin_1_visual.usda
 vehicles/flip.usda
-vehicles/flip.legacy-six-wheel.usda
+vehicles/flip_visual.usda
 environments/south_pole_surrogate.usda
 environments/lunar_surface_base.usda
 behaviors/griffin_1_flip_patrol.btxml
@@ -135,8 +137,10 @@ to a focused follow-up task rather than silently weakening the existing checks.
 
 The main foundation gaps are:
 
-1. Replace the procedural surface surrogate with a registered, source-backed
-   terrain/illumination package before making geographic or power claims.
+1. Establish the exact touchdown site and add terrain resolution, hazard,
+   illumination, and communications evidence suitable for geographic or
+   power claims; the regional 4 m/pixel NOBILE03 source crop does not establish
+   those mission-specific conditions.
 2. Keep Griffin and FLIP parameters marked as public, estimated, assumed, or
    unknown until an authoritative interface-control or supplier source exists.
 3. Compose the base assets into a reusable layered scene with explicit

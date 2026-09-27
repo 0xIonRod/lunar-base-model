@@ -6,45 +6,25 @@
 )
 
 def Xform "EgressRamp" (
-    kind = "component"
+    kind = "assembly"
 )
 {
-    custom string lunco:visual:component = "egress_ramp"
-    def Cube "RampSurface"
+    custom token lunco:component:role = "Griffin three-section rover egress ramp"
+    def Xform "DeckSection" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
+    ) { }
+    def Xform "MiddleSection" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
+    )
     {
-        double size = 1.0
-        double3 xformOp:translate = (1.65, -0.10, 0.0)
-        double3 xformOp:scale = (1.85, 0.09, 0.85)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.16, 0.18, 0.21)]
-        uniform token purpose = "render"
+        double3 xformOp:translate = (4.076201667, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
     }
-    def Cube "OuterRail"
+    def Xform "ToeSection" (
+        references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda@</RampToeSection>
+    )
     {
-        double size = 1.0
-        double3 xformOp:translate = (1.65, 0.16, 0.82)
-        double3 xformOp:scale = (1.85, 0.14, 0.07)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.38, 0.40, 0.43)]
-        uniform token purpose = "render"
-    }
-    def Cube "InnerRail"
-    {
-        double size = 1.0
-        double3 xformOp:translate = (1.65, 0.16, -0.82)
-        double3 xformOp:scale = (1.85, 0.14, 0.07)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.38, 0.40, 0.43)]
-        uniform token purpose = "render"
-    }
-    def Cube "SupportArm"
-    {
-        double size = 1.0
-        double3 xformOp:translate = (0.75, 0.45, 0.0)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, -18.0)
-        double3 xformOp:scale = (0.08, 0.85, 0.08)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.10, 0.12, 0.15)]
-        uniform token purpose = "render"
+        double3 xformOp:translate = (8.152403334, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
     }
 }

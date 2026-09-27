@@ -1,49 +1,58 @@
-# Egress ramp component contract
+# Griffin ramp model contract
 
-Component: `components/lander/egress_ramp.usda`
+Visual component: `components/lander/griffin_ramp_visual.usda`
+Requirements and visual dimensions: `requirements/griffin_ramp_requirements.sysml`
 
-Status: Twin study component; public reference establishes the two-side ramp
-concept and the tested egress angle, not a complete mechanical ICD.
-
-Public reference:
-
-- https://www.astrobotic.com/astrobotic-griffin-lander-and-nasas-viper-moon-rover-complete-complex-test-drives/
+The two Griffin ramps reference the same replaceable visual component from the
+vehicle assembly. The visual asset contains render geometry only. Its identity,
+child names, dimensions, support members, appearance, wheel clearance, and
+deployment limit are owned by the SysML source and checked by the shared
+SysML/USD requirements evaluator.
 
 ## Ownership
 
-The component root owns its local geometry, mass/collision envelope, hinge
-datum, mount socket, deployment-limit metadata, and provenance. The Griffin
-assembly owns each instance's placement, side identity, host-facing revolute
-joint, and cross-component wiring.
+- `GriffinRampRequirements::GriffinEgressRamp` owns the shared visual dimensions,
+  child identities, and port/starboard deployment datums.
+- `GRC005_DeploymentCommandWithinLimit` owns the symmetric command acceptance
+  boundary in radians.
+- `GRC003_WidthClearsFlipWheelEnvelope` checks the FLIP lateral wheel stations,
+  half wheel width, and authored clearance against the outside rail envelope.
+- `GRC016_ContactTrackClearsTire` checks each separate contact-track width
+  against the source wheel width and two side clearances.
+- The physical ramp bodies, hinge joints, and deck transition belong to the
+  physical Griffin model and its separate requirements. The render component
+  does not provide a collider, mass, inertia, or a second physical body.
+- FLIP remains a referenced rover component; the ramp requirement reads FLIP's
+  wheel datums through its SysML source.
+- The physical top deck uses eight hidden convex perimeter-beam colliders and
+  a separate payload-deck collider. GRR-012 reads exact composed collider
+  vertices for the adapter, transition, and ramp track together from one USD
+  snapshot for each side. It measures minimum cross-section overlap across the
+  adapter's complete lateral span, transition length, top-face step, and hinge
+  seam. The clipped octagonal adapter makes AABB intersection too coarse to
+  prove overlap. SysML owns the transition length and minimum actual overlap.
+  The result is static interface evidence; rover traversal still needs
+  runtime wheel-contact evidence.
+- GRR-006 checks the composed physical track's convex collision bounds and toe
+  mesh vertices against SysML geometry. A shared mechanical relation derives
+  the toe bevel from track thickness and deployment angle; it is not another
+  Twin-owned length literal.
+- GRR-010 checks both toe edges against the authored terrain height. Source
+  geometry places the physical track centre at Y=5.19 m, aligns its top to the
+  adapter at Y=5.28 m, and uses a 12.228605 m top face at 49 degrees from the
+  3.98 m touchdown COM datum. These are replaceable study values; the typed
+  Editor update and deployed runtime traversal have not been read back yet.
+- GRR-011 owns the existing ramp-body mass and diagonal inertia in SysML and
+  checks the composed body matches those values. They remain labeled Twin
+  study proxies; center of mass and supplier mass properties are still open
+  under GR-021.
+- The ramp contact geometry uses two FLIP-aligned tracks, not a solid plate
+  across the open centre. The same source wheel stations and track width drive
+  render geometry and physical colliders.
 
-## Local frame and topology
+## Evidence
 
-- Y-up, right-handed, SI metres; component origin is the hinge axis.
-- Root: `/EgressRamp`, type `Xform`, one independently reusable component.
-- Required geometry: `Surface`, `EdgeRail`, `EdgeRailInner`, `HingeBlock`, and
-  `MountSocket`.
-- `Surface` and both rails are solid contact geometry with enabled collision.
-- `MountSocket` is a visual/mount datum and does not create a second body.
-- The component has one rigid body; the parent assembly supplies the
-  host-facing revolute joint when the component is mounted.
-
-## Parameters and limits
-
-- positive authored `physics:mass` and diagonal inertia;
-- `lunco:deployment_angle_limit_rad` is positive and bounded by the Twin
-  study limit;
-- each deployed instance publishes `lunco:deployment_angle_rad` in radians;
-- the transform angle is in degrees because USD `rotateXYZ` is degrees; the
-  Rhai command/lint boundary checks the conversion and does not duplicate it in
-  Modelica or Rust.
-
-The 33-degree egress value is a public test reference. The component's exact
-length, width, mass, inertia, rail section, hinge dimensions, and placement are
-study values and must remain labelled as such.
-
-## Required evidence
-
-The component test is read-only and must report exact missing/malformed paths.
-It checks topology, types, visibility, positive mass/inertia, contact collider
-flags, provenance, deployment limit, and boundary values at the limit and just
-outside the limit. It does not repair the stage or prove assembly placement.
+`scenarios/tests/griffin_ramp_requirements.rhai` observes the composed ramp
+instances in the Griffin vehicle document. It supplies typed USD facts and FLIP
+wheel measurements to generic source constraints; it does not author a second
+ramp limit or reinterpret a boolean Rhai predicate as requirement evidence.

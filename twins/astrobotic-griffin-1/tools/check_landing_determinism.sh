@@ -18,7 +18,7 @@ fi
 
 twin_root=$(cd "$(dirname "$0")/.." && pwd)
 scene="$twin_root/tests/griffin_surface_ops_contract.usda"
-verification="Griffin1Requirements::Verify_GriffinLandingStability"
+verification="GriffinSimulationAccuracyRequirements::Verify_GriffinLandingStability"
 max_ticks=${GRIFFIN_LANDING_MAX_TICKS:-4200}
 readiness_timeout=${GRIFFIN_LANDING_READINESS_TIMEOUT:-120}
 work=$(mktemp -d "${TMPDIR:-/tmp}/griffin-landing-determinism.XXXXXX")

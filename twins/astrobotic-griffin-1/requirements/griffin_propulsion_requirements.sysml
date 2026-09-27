@@ -1,22 +1,27 @@
 package GriffinPropulsionRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::String;
+    private import ScalarValues::Boolean;
+    private import ScalarValues::Integer;
+    private import VectorValues::CartesianThreeVectorValue;
+    private import GriffinRequirementSources::TwinAssetPath;
+    private import GriffinRequirementSources::UsdPrimPath;
+
+    attribute def Direction :> CartesianThreeVectorValue;
+    enum def GriffinEngineVisualMember { Bell; Throat; Flame; FlameCore; }
 
     part def GriffinMainPropulsionAssembly {
-        attribute usdRootPath : String = "/World/Griffin1/Nozzle/MainEngineCluster";
-        attribute sourceComponent : String = "GriffinLanderRequirements::GriffinLanderComponent";
-        attribute namesSource : String = "GriffinLanderRequirements::GriffinLanderComponent::engineNames";
-        attribute countSource : String = "GriffinLanderRequirements::GriffinLanderComponent::engineCount";
-        attribute childNames : String = "Bell,Throat";
-        attribute colliderPolicy : String = "render-only bell and throat; thrust/collision stay with flight model";
+        attribute usdRootPath : UsdPrimPath = "/World/Griffin1/Nozzle/MainEngineCluster";
+        attribute componentAsset : TwinAssetPath = "components/lander/griffin_engine_bell_visual.usda";
+        attribute childNames : GriffinEngineVisualMember[4] =
+            ("Bell", "Throat", "Flame", "FlameCore");
         attribute bellRadiusM : Real = 0.34;
         attribute bellHeightM : Real = 0.52;
         attribute throatRadiusM : Real = 0.12;
         attribute throatHeightM : Real = 0.16;
-        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
-        attribute sourceFact : String = "Seven main engines perform the lander's major maneuvers";
-        attribute sourceRationale : String = "The engine cluster is a separately replaceable visual subassembly; Modelica/physics remains the sole thrust owner";
-        attribute geometryStatus : String = "metric visual study proxy; engine ICD and bell profile are not public";
+        attribute throatCenterYM : Real = 0.28;
+        attribute bellAxis : Direction = (0.0, 1.0, 0.0);
+        attribute minimumBellClearanceM : Real = 0.20;
     }
 
     // The skirt is a visual/structural presentation component around the
@@ -26,9 +31,15 @@ package GriffinPropulsionRequirements {
     // datum for the Editor.
     part def GriffinEngineSkirtComponent {
         attribute usdRootPath : String = "/World/Griffin1/Nozzle/MainEngineCluster";
-        attribute memberNames : String = "EngineSkirtFront,EngineSkirtRear,EngineSkirtPort,EngineSkirtStarboard";
         attribute componentRootName : String = "EngineSkirt";
-        attribute componentMemberNames : String = "RailFront,RailRear,RailPort,RailStarboard";
+        attribute componentMemberNames : String[4] = ("RailFront", "RailRear", "RailPort", "RailStarboard");
+        attribute railFrontCenterZM : Real = 1.50;
+        attribute railRearCenterZM : Real = -1.50;
+        attribute railPortCenterXM : Real = 1.50;
+        attribute railStarboardCenterXM : Real = -1.50;
+        attribute railLengthM : Real = 3.20;
+        attribute railWidthM : Real = 0.20;
+        attribute railHeightM : Real = 0.20;
         attribute shellName : String = "EngineSkirtShell";
         attribute adapterPlateName : String = "EngineAdapterPlate";
         attribute adapterPlateWidthM : Real = 2.84;
@@ -36,37 +47,63 @@ package GriffinPropulsionRequirements {
         attribute adapterPlateHeightM : Real = 0.12;
         attribute shellDepthM : Real = 0.50;
         attribute shellBottomInsetM : Real = 0.30;
+        attribute shellUpperYM : Real = 0.10;
+        attribute shellLowerYM : Real = -0.40;
         attribute componentLocalCenterYM : Real = 0.00;
-        attribute assemblyMountYM : Real = 1.68;
-        attribute sourceComponent : String = "GriffinLanderRequirements::GriffinLanderComponent";
-        attribute dimensionSource : String = "engineClusterWidthM,engineClusterDepthM,engineSkirtHeightM,shellDepthM";
-        attribute metricEnvelope : String = "3.20 m x 3.20 m rail envelope; 0.50 m tapered shell depth; 0.20 m rail section";
-        attribute railSection : String = "0.20 m wide x 0.20 m tall nominal square rail";
-        attribute datum : String = "engine adapter plate at y = engineMountYM; skirt center y = engineMountYM - 0.07 m";
         attribute clearance : String = "minimum 0.10 m radial clearance to every bell outer radius";
         attribute colliderPolicy : String = "render-only frame; no physics collision or thrust authority";
-        attribute transformOrder : String = "xformOp:translate,xformOp:scale";
-        attribute shellTopology : String = "beveled octagonal tapered open-ended mesh shroud";
-        attribute sourceReference : String = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
-        attribute sourceFact : String = "the public Griffin material identifies a clustered propulsion system but does not publish an engine-skirt ICD";
-        attribute sourceRationale : String = "the frame is a transparent study-level interpretation, kept separate so an ICD can replace it without changing the engine owners";
-        attribute geometryStatus : String = "metric visual study proxy; confirm against released propulsion ICD when available";
+        attribute transformOrder : String[2] = ("xformOp:translate", "xformOp:scale");
     }
 
     requirement def GPP001_EngineCount {
         doc /* GPP-001 [topology] exactly seven named main-engine visual owners are present in the cluster. */
     }
     requirement def GPP002_BellGeometry {
-        doc /* GPP-002 [visual] every engine exposes a visible bell and throat, with no placeholder circle or duplicate collider geometry. */
+        doc /* GPP-002 [visual] each engine includes its modeled bell and throat, with no placeholder circle or duplicate collider geometry. */
     }
     requirement def GPP003_ThrustOwnership {
-        doc /* GPP-003 [physics boundary] visual nozzle geometry is not a second thrust or collision implementation; the Modelica/physics owner remains authoritative. */
+        doc /* GPP-003 [physics boundary] bells and plumes are render-only. The Modelica propulsion and nozzle models remain the sole authority for thrust, propellant flow, nozzle design outputs, and plume photometry. */
     }
     requirement def GPP004_PropulsionTraceability {
-        doc /* GPP-004 [evidence] engine identities and count resolve from the lander SysML source and are checked individually. */
+        doc /* GPP-004 [evidence] engine identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and each instance is checked individually. */
     }
     requirement def GPP005_EnginePlacement {
-        doc /* GPP-005 [layout] each bell owner uses the ordered metric engine station datum owned by GriffinLanderComponent. */
+        doc /* GPP-005 [layout] each bell owner uses the ordered native Position datum owned by GriffinVisualConfigurationRequirements. */
+    }
+    requirement def GPP006_BellAndThroatEnvelope {
+        doc /* GPP-006 [geometry] each engine shall expose a Y-axis bell with 0.16 m base radius, 0.34 m exit radius, and 0.52 m height plus a 0.12 m radius by 0.16 m throat centered at local Y = 0.28 m. */
+    }
+    constraint def GPPC007_BellSeparation {
+        in measuredMinimumClearanceM : Real;
+        in requiredMinimumClearanceM : Real;
+        in maximumRadialExtentM : Real;
+        in bucketOuterRadiusM : Real;
+        in typedStationsMatch : Boolean;
+        measuredMinimumClearanceM >= requiredMinimumClearanceM
+            and maximumRadialExtentM <= bucketOuterRadiusM
+            and typedStationsMatch;
+    }
+    requirement def GPP007_BellSeparation {
+        require GPPC007_BellSeparation;
+        doc /* GPP-007 [layout] the seven bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and six equally spaced perimeter engines, and remain inside the lower central bucket envelope. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
+    }
+    constraint def GPPC008_EnginePlumeDataflow {
+        in engineCount : Integer;
+        in plumeEngineCount : Integer;
+        in photometryConsumesEngineState : Boolean;
+        in everyNozzleUsesPhotometry : Boolean;
+        in everyNozzleHasBoundPlumeMaterials : Boolean;
+        in plumeGeometryIsRenderOnly : Boolean;
+        engineCount > 0
+            and plumeEngineCount == engineCount
+            and photometryConsumesEngineState
+            and everyNozzleUsesPhotometry
+            and everyNozzleHasBoundPlumeMaterials
+            and plumeGeometryIsRenderOnly;
+    }
+    requirement def GPP008_EnginePlumeDataflow {
+        require GPPC008_EnginePlumeDataflow;
+        doc /* GPP-008 [simulation presentation] each main-engine nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow shared photometry outputs driven by live propulsion state and modeled nozzle geometry. Zero delivered thrust shall produce neither visible exhaust nor light. */
     }
     requirement def GES001_SkirtTopology {
         doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the seven-engine cluster. */
@@ -83,30 +120,48 @@ package GriffinPropulsionRequirements {
     requirement def GES005_SkirtOwnership {
         doc /* GES-005 [ownership] skirt geometry is render-only and cannot introduce thrust, collider, or physics authority. */
     }
+    requirement def GES006_RailGeometry {
+        doc /* GES-006 [geometry] the four named skirt rails shall each be 3.20 m long, 0.20 m wide, and 0.20 m high, with signed centers at X = +/-1.50 m or Z = +/-1.50 m. */
+    }
+    requirement def GES007_ShellAndAdapterEnvelope {
+        doc /* GES-007 [geometry] the tapered shell shall span local Y = -0.40 m to +0.10 m, and the adapter plate shall be 2.84 m by 2.84 m by 0.12 m at its declared adapter datum. */
+    }
 
-    requirement gpp001 : GPP001_EngineCount { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement gpp002 : GPP002_BellGeometry { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement gpp003 : GPP003_ThrustOwnership { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement gpp004 : GPP004_PropulsionTraceability { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement gpp005 : GPP005_EnginePlacement { subject propulsion : GriffinMainPropulsionAssembly; }
-    requirement ges001 : GES001_SkirtTopology { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges002 : GES002_SkirtEnvelope { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges003 : GES003_SkirtDatum { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges004 : GES004_BellClearance { subject skirt : GriffinEngineSkirtComponent; }
-    requirement ges005 : GES005_SkirtOwnership { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GPP-001'> gpp001 : GPP001_EngineCount { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-002'> gpp002 : GPP002_BellGeometry { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-003'> gpp003 : GPP003_ThrustOwnership { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-004'> gpp004 : GPP004_PropulsionTraceability { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-005'> gpp005 : GPP005_EnginePlacement { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-006'> gpp006 : GPP006_BellAndThroatEnvelope { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-007'> gpp007 : GPP007_BellSeparation { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-008'> gpp008 : GPP008_EnginePlumeDataflow { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GES-001'> ges001 : GES001_SkirtTopology { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-002'> ges002 : GES002_SkirtEnvelope { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-003'> ges003 : GES003_SkirtDatum { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-004'> ges004 : GES004_BellClearance { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-005'> ges005 : GES005_SkirtOwnership { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-006'> ges006 : GES006_RailGeometry { subject skirt : GriffinEngineSkirtComponent; }
+    requirement <'GES-007'> ges007 : GES007_ShellAndAdapterEnvelope { subject skirt : GriffinEngineSkirtComponent; }
 
     verification def Verify_GriffinPropulsionRequirements {
         subject propulsion : GriffinMainPropulsionAssembly;
         subject skirt : GriffinEngineSkirtComponent;
-        verify gpp001;
-        verify gpp002;
-        verify gpp003;
-        verify gpp004;
-        verify gpp005;
-        verify ges001;
-        verify ges002;
-        verify ges003;
-        verify ges004;
-        verify ges005;
+        objective {
+            verify gpp001;
+            verify gpp002;
+            verify gpp003;
+            verify gpp004;
+            verify gpp005;
+            verify gpp006;
+            verify gpp007;
+            verify gpp008;
+            verify ges001;
+            verify ges002;
+            verify ges003;
+            verify ges004;
+            verify ges005;
+            verify ges006;
+            verify ges007;
+        }
     }
 }
