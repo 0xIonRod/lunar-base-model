@@ -115,12 +115,15 @@ package GriffinRampRequirements {
     }
 
     constraint def GRC022_RampFlightStowAnglesWithinTravel {
+        in rootStowAngleRad : Real;
         in middleAngleRad : Real;
         in toeAngleRad : Real;
-        in limitRad : Real;
-        middleAngleRad > 0.0 and toeAngleRad < 0.0
-            and middleAngleRad <= limitRad and middleAngleRad >= -limitRad
-            and toeAngleRad <= limitRad and toeAngleRad >= -limitRad;
+        in rootLimitRad : Real;
+        in sectionLimitRad : Real;
+        rootStowAngleRad > 0.0 and rootStowAngleRad <= rootLimitRad
+            and middleAngleRad < 0.0 and toeAngleRad < 0.0
+            and middleAngleRad <= sectionLimitRad and middleAngleRad >= -sectionLimitRad
+            and toeAngleRad <= sectionLimitRad and toeAngleRad >= -sectionLimitRad;
     }
 
     constraint def GRC023_RailsRemainOnUpperTrackFace {
@@ -313,14 +316,16 @@ package GriffinRampRequirements {
         // Physical contact geometry reuses the shared ramp length, outside
         // envelope, thickness, and rail dimensions above. This package owns
         // only the physical hinge, transition, and safe stowed pose.
-        // The physical ramp is folded above the landing legs during descent.
-        // The middle section folds upward by +90 deg and the toe section
-        // folds back by -90 deg, keeping both horizontal sections' walking
-        // faces and rails upright in flight. These replaceable study datums
-        // are local component-frame angles because the released stowage
-        // mechanism ICD is unavailable. After confirmed touchdown and an
-        // operator unfold command, both intermediate joints return to zero
-        // before the driven deck hinges deploy the ramp.
+        // The physical ramp is folded beside and above the landing legs during
+        // descent. The deck hinge rotates each root section upward by 90 deg;
+        // both intermediate hinges then turn -90 deg in the local section
+        // frame, making a compact three-section U fold instead of leaving the
+        // toe extended outboard. Port and starboard use mirrored root angles.
+        // These replaceable study datums are not an as-built mechanism: public
+        // Griffin material confirms launch stow and spring deployment but does
+        // not publish the stowage geometry or supplier ICD. After touchdown,
+        // an operator command returns the section hinges to zero and deploys
+        // the deck hinges within their separate descent/deployment envelope.
         // The physical ramp is hinged at the inboard edge, not at its centre:
         // the 12.228605 m contact surface therefore occupies x=0.00..12.228605 m
         // in the ramp body frame. Its centre is 6.1143025 m. The hinge
@@ -374,8 +379,10 @@ package GriffinRampRequirements {
         attribute physicalRampSectionInertiaYKgM2 : Real = 76.172636183;
         attribute physicalRampSectionInertiaZKgM2 : Real = 43.931747294;
         attribute physicalRampSectionMassPartitionToleranceKg : Real = 0.001;
+        attribute physicalRampRootJointStowLimitRad : Real = 2.094395102;
+        attribute physicalRampRootStowedAngleRad : Real = 1.570796327;
         attribute physicalRampSectionJointLimitRad : Real = 2.094395102;
-        attribute physicalRampSectionStowedAngleRad : Real = 1.570796327;
+        attribute physicalRampSectionStowedAngleRad : Real = -1.570796327;
         attribute physicalRampToeSectionStowedAngleRad : Real = -1.570796327;
         attribute physicalRampSectionDriveTargetRad : Real = 0.0;
         attribute physicalRampJointDriveStiffnessNmPerDeg : Real = 6000.0;
@@ -454,11 +461,13 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR017_FlightStowAndPostTouchdownUnfold {
-        doc /* During descent, each ramp shall be folded above the landing legs: the middle-section hinge shall hold the source-owned positive 90 degree stow angle and the toe hinge the source-owned negative 90 degree stow angle. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall level both intermediate hinges before the scenario commands the deck hinges to deploy. The stow angles remain explicit Twin study assumptions until the supplier mechanism ICD is released. */
+        doc /* During descent, each root hinge shall hold the source-owned 90 degree upward stow angle (mirrored for port/starboard), while the middle and toe hinges hold their source-owned negative 90 degree folds. This folds the complete three-section assembly into a compact side envelope above the landing legs. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall return all four intermediate hinges to level and drive both deck hinges into the deployment envelope. The stow geometry and travel remain replaceable Twin study assumptions because the supplier mechanism ICD is not public. */
         require GRC022_RampFlightStowAnglesWithinTravel {
+            in rootStowAngleRad = GriffinEgressRamp::physicalRampRootStowedAngleRad;
             in middleAngleRad = GriffinEgressRamp::physicalRampSectionStowedAngleRad;
             in toeAngleRad = GriffinEgressRamp::physicalRampToeSectionStowedAngleRad;
-            in limitRad = GriffinEgressRamp::physicalRampSectionJointLimitRad;
+            in rootLimitRad = GriffinEgressRamp::physicalRampRootJointStowLimitRad;
+            in sectionLimitRad = GriffinEgressRamp::physicalRampSectionJointLimitRad;
         }
         require GRC024_RampSectionDeploymentTargetIsLevel {
             in deploymentTargetRad = GriffinEgressRamp::physicalRampSectionDriveTargetRad;

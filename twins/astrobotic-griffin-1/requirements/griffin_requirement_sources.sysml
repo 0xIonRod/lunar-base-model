@@ -116,6 +116,11 @@ package GriffinRequirementSources {
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_ramp_requirements.rhai";
     }
 
+    part source_astrobotic_griffin_1_tests_griffin_propulsion_requirements_rhai : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_propulsion_requirements.rhai";
+    }
+
     part source_astrobotic_griffin_1_tools_griffin_visual_builder_rhai : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/tools/griffin_visual_builder.rhai";
@@ -593,6 +598,12 @@ package GriffinRequirementSources {
             source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
     }
 
+    part evidence_gpp_008 : RequirementEvidence {
+        ref targetRequirement = GriffinPropulsionRequirements::gpp008;
+        ref sources = (source_astrobotic_griffin_1_tests_griffin_propulsion_requirements_rhai,
+            source_astrobotic_griffin_1_vehicles_griffin_1_usda);
+    }
+
     part evidence_ges_001 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::ges001;
         ref sources = (source_www_astrobotic_com_griffin_lander);
@@ -701,6 +712,13 @@ package GriffinRequirementSources {
     part evidence_grr_015 : RequirementEvidence {
         ref targetRequirement = GriffinRampRequirements::grr015;
         ref sources = (source_www_astrobotic_com_griffin_lander, source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml, source_astrobotic_griffin_1_tools_griffin_visual_builder_rhai);
+    }
+
+    part evidence_grr_016 : RequirementEvidence {
+        ref targetRequirement = GriffinRampRequirements::grr016;
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml,
+            source_astrobotic_griffin_1_vehicles_griffin_1_usda,
+            source_astrobotic_griffin_1_tests_griffin_ramp_requirements_rhai);
     }
 
     part evidence_grr_017 : RequirementEvidence {

@@ -4630,6 +4630,10 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         "physicalRampSectionMassPartitionToleranceKg");
     let section_limit_rad = _sysml_number(source,
         "physicalRampSectionJointLimitRad");
+    let root_stow_angle_rad = _sysml_number(source,
+        "physicalRampRootStowedAngleRad");
+    let root_stow_limit_rad = _sysml_number(source,
+        "physicalRampRootJointStowLimitRad");
     let target_rad = _sysml_number(source,
         "physicalRampSectionDriveTargetRad");
     let stowed_middle_angle_rad = _sysml_number(source,
@@ -4642,7 +4646,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         "physicalRampJointDriveDampingNmPerDegPerSec");
     let drive_max_torque = _sysml_number(source,
         "physicalRampJointDriveMaxTorqueNm");
-    let root_limit_rad = _sysml_number(source, "rampMaxDeploymentAngleRad");
+    let deployment_limit_rad = _sysml_number(source, "rampMaxDeploymentAngleRad");
     let port_deployment_rad = _sysml_number(source,
         "physicalRampPortDeploymentAngleRad");
     let starboard_deployment_rad = _sysml_number(source,
@@ -4664,8 +4668,9 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         || mass_partition_tolerance == ();
     let missing_actuation = section_limit_rad == () || target_rad == ()
         || stowed_middle_angle_rad == () || stowed_toe_angle_rad == ()
+        || root_stow_angle_rad == () || root_stow_limit_rad == ()
         || drive_stiffness == () || drive_damping == ()
-        || drive_max_torque == () || root_limit_rad == ()
+        || drive_max_torque == () || deployment_limit_rad == ()
         || port_deployment_rad == () || starboard_deployment_rad == ();
     let missing_mount = mount_x == () || mount_y == () || mount_z == ()
         || section_names.len() != 3 || joint_names.len() != 4;
@@ -4678,10 +4683,12 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         > mass_partition_tolerance || mass_tolerance <= 0.0
         || mass_partition_tolerance <= 0.0;
     let invalid_inertia = inertia_x <= 0.0 || inertia_y <= 0.0 || inertia_z <= 0.0;
-    let invalid_actuation = section_limit_rad <= 0.0 || root_limit_rad <= 0.0
+    let invalid_actuation = section_limit_rad <= 0.0 || root_stow_limit_rad <= 0.0
+        || deployment_limit_rad <= 0.0 || root_stow_angle_rad <= 0.0
         || drive_stiffness <= 0.0 || drive_damping < 0.0 || drive_max_torque <= 0.0;
-    let invalid_root_target = port_deployment_rad.abs() > root_limit_rad
-        || starboard_deployment_rad.abs() > root_limit_rad;
+    let invalid_root_target = port_deployment_rad.abs() > deployment_limit_rad
+        || starboard_deployment_rad.abs() > deployment_limit_rad
+        || root_stow_angle_rad > root_stow_limit_rad;
     let invalid_envelope = width <= 0.0 || thickness <= 0.0
         || rail_height <= 0.0 || rail_width <= 0.0 || clearance <= 0.0;
     if invalid_length || invalid_mass || invalid_inertia || invalid_actuation
@@ -4719,8 +4726,11 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     }
 
     let ops = [];
-    let root_rotation = if side == "port" { [0.0, 0.0, 0.0] }
-        else { [0.0, 180.0, 0.0] };
+    let root_stow_angle_deg = root_stow_angle_rad * 180.0 / 3.141592653589793;
+    let root_target_deg = if side == "port" { root_stow_angle_deg }
+        else { -root_stow_angle_deg };
+    let root_rotation = if side == "port" { [0.0, 0.0, root_target_deg] }
+        else { [0.0, 180.0, root_target_deg] };
     let root_placement = assembly_builder::place_plan(edit_target, ramp_path,
         [mount_x, mount_y, mount_z], root_rotation, ());
     if !root_placement.ok { return root_placement; }
@@ -4781,7 +4791,14 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     if !query_ok(root_joint) || root_joint.type_name != "PhysicsRevoluteJoint" {
         return plan_error(root_joint_path + ": top-deck revolute hinge is missing");
     }
-    let root_limit_deg = root_limit_rad * 180.0 / 3.141592653589793;
+    let deployment_limit_deg = deployment_limit_rad * 180.0 / 3.141592653589793;
+    let root_stow_limit_deg = root_stow_limit_rad * 180.0 / 3.141592653589793;
+    let root_lower_limit_deg = if side == "port" {
+        -deployment_limit_deg
+    } else { -root_stow_limit_deg };
+    let root_upper_limit_deg = if side == "port" {
+        root_stow_limit_deg
+    } else { deployment_limit_deg };
     let root_rot1 = if side == "port" { "(0.0, 0.0, 0.0, 1.0)" }
         else { "(0.0, 1.0, 0.0, 0.0)" };
     ops.push(#{SetApiSchemas: #{edit_target: edit_target,
@@ -4792,10 +4809,10 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
             + ", " + mount_z.to_string() + ")"},
         #{name: "physics:localPos1", type_name: "point3f", value: "(0.0, 0.0, 0.0)"},
         #{name: "physics:localRot1", type_name: "quatf", value: root_rot1},
-        #{name: "physics:lowerLimit", type_name: "float", value: (-root_limit_deg).to_string()},
-        #{name: "physics:upperLimit", type_name: "float", value: root_limit_deg.to_string()},
+        #{name: "physics:lowerLimit", type_name: "float", value: root_lower_limit_deg.to_string()},
+        #{name: "physics:upperLimit", type_name: "float", value: root_upper_limit_deg.to_string()},
         #{name: "drive:angular:physics:type", type_name: "token", value: "\"force\""},
-        #{name: "drive:angular:physics:targetPosition", type_name: "float", value: "0.0"},
+        #{name: "drive:angular:physics:targetPosition", type_name: "float", value: root_target_deg.to_string()},
         #{name: "drive:angular:physics:targetVelocity", type_name: "float", value: "0.0"},
         #{name: "drive:angular:physics:stiffness", type_name: "float", value: drive_stiffness.to_string()},
         #{name: "drive:angular:physics:damping", type_name: "float", value: drive_damping.to_string()},

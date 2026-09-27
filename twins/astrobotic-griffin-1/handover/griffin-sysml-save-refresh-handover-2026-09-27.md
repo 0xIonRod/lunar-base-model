@@ -224,3 +224,40 @@ This continuation does not diagnose or modify the Modelica landing dynamics.
 An offscreen visual capture was attempted but did not produce a frame before
 its 120 s timeout. The composed geometry checks above are the verification
 evidence. The model repo changes remain local; no remote publication was made.
+
+## Continuation work (2026-09-27, corrected transport fold and control sequence)
+
+The physical flight-stow pose now folds all three ramp sections beside the
+lander. Each root hinge holds a mirrored 90-degree upright target; both local
+section hinges hold -90 degrees. The port root joint limits are -50/+120
+degrees and starboard limits are -120/+50 degrees, keeping deployment travel
+at the 50-degree operational limit while allowing the 120-degree stow side.
+These are source-owned Twin study datums, not released supplier geometry. The
+saved Editor document reached generation 36, root-layer revision 36, and
+`dirty=false` after typed, generation-checked edits to both ramps.
+
+The current `Verify_GriffinRampFlightStow` run passed 70/70 checks at source
+revision `225344422510235598` (45 for GRR-017 and 25 for GRR-018). Its composed
+stage query measured 12 rails and 40 landing-leg shapes: rail bottom Y=5.19 m,
+leg top Y=2.44 m, clearance 2.75 m. The Editor review capture is
+`handover/griffin-ramp-stow-review-2026-09-27.png`.
+
+The operator sequence now keeps the root hinges upright while U or the guided
+HUD action straightens the four section hinges, waits 3 s, then lowers the two
+root hinges to their terrain targets and waits 4 s before enabling rover
+release. G and the RELEASE ROVER button remain unavailable until that settle.
+The app-wide objectives overlay and hint are cleared when this scenario stops.
+
+Public [NASA ramp material](https://www.nasa.gov/image-article/off-ramps-moon/)
+and [Astrobotic Griffin/VIPER test coverage](https://www.astrobotic.com/astrobotics-griffin-lander-and-nasas-viper-moon-rover-complete-complex-test-drives/)
+show deployment or testing but do not publish the exact launch-stowed pose or
+supplier mechanism ICD. The fold remains a replaceable study assumption; the
+review image documents the model's current assumption, not as-built hardware.
+
+This gate is a static pose/requirement check, not a touchdown, hinge-motion,
+or rover-egress verdict. The headless test log still reports two ramp-transition
+joint-start seating residuals of 1.388 m and 90 degrees before seating those
+bodies onto their authored frames. Powered descent has not produced a touchdown
+event in the recorded mission runs, so ramp motion, rover release, and the
+post-touchdown stability verdict remain open. The new gate does not diagnose or
+modify the unrelated Modelica landing dynamics.

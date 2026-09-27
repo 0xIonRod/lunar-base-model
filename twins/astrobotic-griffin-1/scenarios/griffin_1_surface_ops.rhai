@@ -224,6 +224,14 @@ fn begin_descent(me) {
     true
 }
 
+fn on_stop(me, ctx) {
+    // The guided overlay is app-wide, so retire this mission's controls when
+    // its scenario is stopped even if the Welcome tab stays open underneath.
+    hint("");
+    objectives_hud([]);
+    griffin_controls::clear_surface_operation_actions();
+}
+
 fn touchdown_notice(me) {
     griffin_controls::show_touchdown_actions();
     emit("griffin_touchdown_confirmed");
@@ -232,8 +240,9 @@ fn touchdown_notice(me) {
 }
 
 fn unfold_ramp_sections(me) {
-    // Remove the flight fold through the four real intermediate USD hinges
-    // before the deck hinges lower the two physical ramps to the terrain.
+    // Keep each root hinge at its upright transport angle while the four real
+    // intermediate hinges straighten. This keeps the toes above the lander
+    // and landing legs; only the now-straight assemblies swing down to terrain.
     let angle = griffin_spec::physical_ramp_section_drive_target_rad();
     if angle == () { return #{ok: false, error: "deployed ramp-section angle is missing from SysML"}; }
     let joints = griffin_spec::ramp_intermediate_joint_names();
@@ -472,7 +481,7 @@ fn task(me, ctx) {
         wait(1.5),
         // The folded hinge targets are the transport/descent pose. Keep the
         // rover attached and expose U plus the HUD button until the operator
-        // explicitly requests the two-stage ramp unfold.
+        // explicitly requests the staged ramp unfold.
         wait_until(|m| this.ramp_unfold_requested || this.phase_timeout),
         check(|m| this.phase_timeout != true),
         once(|m| {

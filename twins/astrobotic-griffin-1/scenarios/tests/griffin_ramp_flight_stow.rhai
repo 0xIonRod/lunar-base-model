@@ -98,8 +98,9 @@ fn on_tick(me, ctx) {
     let attributes = [];
     for name in ["rampSectionLengthM", "rampSectionGeometryToleranceM",
         "rampSurfaceCenterYM", "rampSurfaceThicknessM", "rampRailCenterYM",
-        "rampRailHeightM", "physicalRampMountY", "physicalRampPortMountX",
+        "rampRailHeightM", "rampMaxDeploymentAngleRad", "physicalRampMountY", "physicalRampPortMountX",
         "physicalRampStarboardMountX", "physicalRampSectionJointLimitRad",
+        "physicalRampRootJointStowLimitRad", "physicalRampRootStowedAngleRad",
         "physicalRampSectionStowedAngleRad", "physicalRampToeSectionStowedAngleRad",
         "physicalRampSectionDriveTargetRad"] {
         attributes.push(_source_attr(name));
@@ -118,9 +119,11 @@ fn on_tick(me, ctx) {
     let checks = [];
     checks.push(_constraint("GRR-017-flight-stow-angle-envelope", "grr017",
         "GRC022_RampFlightStowAnglesWithinTravel",
-        #{middleAngleRad: _source_number(source, "physicalRampSectionStowedAngleRad"),
+        #{rootStowAngleRad: _source_number(source, "physicalRampRootStowedAngleRad"),
+          middleAngleRad: _source_number(source, "physicalRampSectionStowedAngleRad"),
           toeAngleRad: _source_number(source, "physicalRampToeSectionStowedAngleRad"),
-          limitRad: _source_number(source, "physicalRampSectionJointLimitRad")}));
+          rootLimitRad: _source_number(source, "physicalRampRootJointStowLimitRad"),
+          sectionLimitRad: _source_number(source, "physicalRampSectionJointLimitRad")}));
     checks.push(_constraint("GRR-018-rails-on-upper-track-face", "grr018",
         "GRC023_RailsRemainOnUpperTrackFace",
         #{railBottomYM: rail_bottom_y, walkingSurfaceTopYM: surface_top_y,
@@ -151,9 +154,12 @@ fn on_tick(me, ctx) {
     let section_length = _source_number(source, "rampSectionLengthM");
     let middle_rad = _source_number(source, "physicalRampSectionStowedAngleRad");
     let toe_rad = _source_number(source, "physicalRampToeSectionStowedAngleRad");
+    let root_rad = _source_number(source, "physicalRampRootStowedAngleRad");
     let middle_deg = middle_rad * 180.0 / 3.141592653589793;
     let toe_deg = toe_rad * 180.0 / 3.141592653589793;
+    let root_deg = root_rad * 180.0 / 3.141592653589793;
     let ramp_names = ["EgressRampPort", "EgressRampStarboard"];
+    let root_joint_names = ["RampHingePort", "RampHingeStarboard"];
     let joint_names = [
         ["RampSectionHingePort01", "RampSectionHingePort12"],
         ["RampSectionHingeStarboard01", "RampSectionHingeStarboard12"]
@@ -165,10 +171,28 @@ fn on_tick(me, ctx) {
         checks[checks.len() - 1].expected_type = "Xform";
         checks.push(_attribute_component("GRR-017-" + side + "-mount-y", "grr017",
             ramp, "xformOp:translate", 1, _source_number(source, "physicalRampMountY")));
-        if side_index == 1 {
-            checks.push(_attribute_component("GRR-017-starboard-root-rotation-y", "grr017",
-                ramp, "xformOp:rotateXYZ", 1, 180.0));
-        }
+        let root_target_deg = if side_index == 0 { root_deg } else { -root_deg };
+        checks.push(_attribute_component("GRR-017-" + side + "-root-stow-angle", "grr017",
+            ramp, "xformOp:rotateXYZ", 2, root_target_deg));
+        checks.push(_attribute_component("GRR-017-" + side + "-root-mirror", "grr017",
+            ramp, "xformOp:rotateXYZ", 1, if side_index == 0 { 0.0 } else { 180.0 }));
+        let root_joint = ROOT + "/" + root_joint_names[side_index];
+        let deployment_limit_deg = _source_number(source,
+            "rampMaxDeploymentAngleRad") * 180.0 / 3.141592653589793;
+        let root_stow_limit_deg = _source_number(source,
+            "physicalRampRootJointStowLimitRad") * 180.0 / 3.141592653589793;
+        let root_lower_limit_deg = if side_index == 0 {
+            -deployment_limit_deg
+        } else { -root_stow_limit_deg };
+        let root_upper_limit_deg = if side_index == 0 {
+            root_stow_limit_deg
+        } else { deployment_limit_deg };
+        checks.push(_attribute("GRR-017-" + side + "-root-flight-target", "grr017",
+            root_joint, "drive:angular:physics:targetPosition", root_target_deg));
+        checks.push(_attribute("GRR-017-" + side + "-root-lower-limit", "grr017",
+            root_joint, "physics:lowerLimit", root_lower_limit_deg));
+        checks.push(_attribute("GRR-017-" + side + "-root-upper-limit", "grr017",
+            root_joint, "physics:upperLimit", root_upper_limit_deg));
 
         let section_paths = [ramp + "/MiddleSection",
             ramp + "/MiddleSection/ToeSection"];

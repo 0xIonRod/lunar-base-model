@@ -106,6 +106,7 @@ fn on_tick(me, ctx) {
         "physicalRampSectionInertiaXKgM2", "physicalRampSectionInertiaYKgM2",
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionMassPartitionToleranceKg",
         "physicalRampSectionJointLimitRad", "physicalRampSectionStowedAngleRad",
+        "physicalRampRootJointStowLimitRad", "physicalRampRootStowedAngleRad",
         "physicalRampToeSectionStowedAngleRad", "physicalRampSectionDriveTargetRad",
         "physicalRampJointDriveStiffnessNmPerDeg",
         "physicalRampJointDriveDampingNmPerDegPerSec",
@@ -178,9 +179,11 @@ fn on_tick(me, ctx) {
           toleranceKg: _source_number(source, "physicalRampSectionMassPartitionToleranceKg")}));
     checks.push(_constraint("GRR-017-flight-stow-angle-envelope", "grr017",
         "GRC022_RampFlightStowAnglesWithinTravel",
-        #{middleAngleRad: _source_number(source, "physicalRampSectionStowedAngleRad"),
+        #{rootStowAngleRad: _source_number(source, "physicalRampRootStowedAngleRad"),
+          middleAngleRad: _source_number(source, "physicalRampSectionStowedAngleRad"),
           toeAngleRad: _source_number(source, "physicalRampToeSectionStowedAngleRad"),
-          limitRad: _source_number(source, "physicalRampSectionJointLimitRad")}));
+          rootLimitRad: _source_number(source, "physicalRampRootJointStowLimitRad"),
+          sectionLimitRad: _source_number(source, "physicalRampSectionJointLimitRad")}));
     checks.push(_constraint("GRR-018-rails-on-upper-track-face", "grr018",
         "GRC023_RailsRemainOnUpperTrackFace",
         #{railBottomYM: _source_number(source, "rampRailCenterYM")
@@ -259,11 +262,19 @@ fn on_tick(me, ctx) {
             requirement: "grr005", verification: VERIFICATION,
             kind: "attribute_equals", path: root_joint,
             attr: "physics:axis", expected: "Z"});
-        let root_limit_deg = _source_number(source, "rampMaxDeploymentAngleRad") * 180.0 / pi;
+        let deployment_limit_deg = _source_number(source, "rampMaxDeploymentAngleRad") * 180.0 / pi;
+        let root_stow_limit_deg = _source_number(source,
+            "physicalRampRootJointStowLimitRad") * 180.0 / pi;
+        let root_lower_limit_deg = if side == "port" {
+            -deployment_limit_deg
+        } else { -root_stow_limit_deg };
+        let root_upper_limit_deg = if side == "port" {
+            root_stow_limit_deg
+        } else { deployment_limit_deg };
         checks.push(_attribute_component("GRR-005-" + side + "-lower-limit", "grr005",
-            root_joint, "physics:lowerLimit", 0, -root_limit_deg));
+            root_joint, "physics:lowerLimit", 0, root_lower_limit_deg));
         checks.push(_attribute_component("GRR-005-" + side + "-upper-limit", "grr005",
-            root_joint, "physics:upperLimit", 0, root_limit_deg));
+            root_joint, "physics:upperLimit", 0, root_upper_limit_deg));
         checks.push(_constraint("GRR-005-" + side + "-command-envelope", "grr005",
             "GRC005_DeploymentCommandWithinLimit",
             #{commandRad: physical_angle,
