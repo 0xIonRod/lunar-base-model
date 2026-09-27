@@ -60,10 +60,14 @@ wheel and drivetrain model with the chassis, wheel, suspension, mast, and solar
 visual components. SysML owns wheel identities, station datums, and dimensions;
 the references keep repeated geometry in one component source.
 
-The Griffin main-engine plume is a direct presentation of the propulsion
-simulation. `MainPropulsion/PlumePhotometry` consumes combustion activity and the
-chamber's total thrust, flow, and exhaust velocity, plus nozzle area and radius
-from `MainPropulsion/NozzleDesign`. Its `engine_count` parameter normalizes the
-cluster totals to each of the seven equal nozzles. The shared output drives each
-bell component's flame pair and local light; zero delivered thrust gives zero
-plume and zero light. Rhai does not animate plume transforms or brightness.
+The Griffin main-engine plume is authored as a direct presentation of the
+propulsion simulation. `MainPropulsion/PlumePhotometry` consumes combustion
+activity and the chamber's total thrust, flow, and exhaust velocity, plus nozzle
+area and radius from `MainPropulsion/NozzleDesign`. Its `engine_count`
+parameter normalizes the cluster totals to each of the seven equal nozzles. The
+program declares `outputs:render_throttle`,
+`outputs:visual_length_fraction`, `outputs:intensity`, and `outputs:radius`;
+the seven bell flame pairs and local lights connect to those outputs. At zero
+delivered thrust the model specifies zero plume and zero light. Rhai does not
+animate plume transforms or brightness. The propulsion network must compile
+and produce live values before this behavior is considered demonstrated.

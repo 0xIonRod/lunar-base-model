@@ -73,6 +73,20 @@ realized feature, and evidence result.
 
 ## Griffin-1 evidence and construction blockers
 
+### Main-engine plume runtime status
+
+The vehicle declares the four typed `PlumePhotometry` outputs used by the seven
+flame pairs and engine lights: `render_throttle`,
+`visual_length_fraction`, `intensity`, and `radius`. The generated Modelica
+network exposes all four member outputs and the USD connections target them.
+The active Griffin surface-operations document still fails Modelica
+compilation with `299 equations, 302 unknowns` (balance `-3`); its
+`CompileStatus` has no compiled model or latest run. A reversible diagnostic
+that removed `PlumePhotometry` left the same `-3` balance, so the remaining
+equation deficit is elsewhere in the propulsion network. No simulated plume
+values or visible engine plume have been verified. Resolve that network
+balance before treating GPP-008 as dynamically demonstrated.
+
 Astrobotic's current Griffin product page gives a seven-main-engine design,
 four shock-absorbing legs, a flexible isogrid payload deck, and optional
 egress ramps. Astrobotic's [solar setup post](https://lnkd.in/p/dJHz9duN)

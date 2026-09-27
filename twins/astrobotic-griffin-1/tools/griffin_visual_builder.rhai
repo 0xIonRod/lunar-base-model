@@ -3827,16 +3827,16 @@ fn _ramp_section_track_points(length, thickness, width, toe_bevel) {
     let x_tip_bottom = length - toe_bevel;
     let half_thickness = thickness / 2.0;
     let half_width = width / 2.0;
-    "[(0.0, " + (-half_thickness).to_string() + ", " + (-half_width).to_string()
-        + "), (0.0, " + half_thickness.to_string() + ", " + (-half_width).to_string()
-        + "), (" + length.to_string() + ", " + half_thickness.to_string()
-        + ", " + (-half_width).to_string() + "), (" + x_tip_bottom.to_string()
-        + ", " + (-half_thickness).to_string() + ", " + (-half_width).to_string()
-        + "), (0.0, " + (-half_thickness).to_string() + ", " + half_width.to_string()
-        + "), (0.0, " + half_thickness.to_string() + ", " + half_width.to_string()
-        + "), (" + length.to_string() + ", " + half_thickness.to_string()
-        + ", " + half_width.to_string() + "), (" + x_tip_bottom.to_string()
-        + ", " + (-half_thickness).to_string() + ", " + half_width.to_string() + ")]"
+    [
+        [0.0, -half_thickness, -half_width],
+        [0.0, half_thickness, -half_width],
+        [length, half_thickness, -half_width],
+        [x_tip_bottom, -half_thickness, -half_width],
+        [0.0, -half_thickness, half_width],
+        [0.0, half_thickness, half_width],
+        [length, half_thickness, half_width],
+        [x_tip_bottom, -half_thickness, half_width],
+    ]
 }
 
 // Materialize one physical ramp section from its SysML dimensions. The USD
@@ -3878,18 +3878,28 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     let hinge_radius = griffin_spec::ramp_section_hinge_barrel_radius_m();
     let hinge_length = griffin_spec::ramp_section_hinge_barrel_length_m();
     let hinge_y = griffin_spec::ramp_section_hinge_barrel_center_y_m();
-    if section_count != 3 || section_index < 0 || section_index >= section_count
-        || section_length <= 0.0 || total_length == () || thickness == ()
-        || surface_y == () || track_width == () || rail_height == () || rail_width == ()
-        || rail_y == () || rail_z == () || rail_pin_names.len() != 2
-        || rail_pin_radius == () || rail_pin_length == () || track_centers.len() != 4
-        || tread_count <= 0 || tread_names.len() != tread_count
-        || tread_width == () || tread_height == () || tread_first_x == () || tread_pitch == ()
-        || beam_width == () || beam_height == () || beam_y == () || beam_z == ()
-        || post_count <= 0 || post_width == () || post_depth == () || post_embed == ()
-        || post_first_x == () || post_pitch == ()
-        || hinge_radius == () || hinge_length == () || hinge_y == ()
-        || deployment_angle == () {
+    let invalid_section = section_count != 3 || section_index < 0
+        || section_index >= section_count;
+    let invalid_dimensions = section_length <= 0.0 || total_length == ()
+        || thickness == () || surface_y == () || track_width == ();
+    let invalid_rail_geometry = rail_height == () || rail_width == ()
+        || rail_y == () || rail_z == ();
+    let invalid_rail_pins = rail_pin_names.len() != 2 || rail_pin_radius == ()
+        || rail_pin_length == ();
+    let invalid_tread_count = tread_count <= 0 || tread_names.len() != tread_count
+        || track_centers.len() != 4;
+    let invalid_tread_size = tread_width == () || tread_height == ()
+        || tread_first_x == () || tread_pitch == ();
+    let invalid_beams = beam_width == () || beam_height == ()
+        || beam_y == () || beam_z == ();
+    let invalid_post_count = post_count <= 0 || post_width == () || post_depth == ();
+    let invalid_post_fit = post_embed == () || post_first_x == () || post_pitch == ();
+    let invalid_hinge = hinge_radius == () || hinge_length == ()
+        || hinge_y == () || deployment_angle == ();
+    let invalid_basic = invalid_section || invalid_dimensions || invalid_rail_geometry;
+    let invalid_repeated = invalid_rail_pins || invalid_tread_count || invalid_tread_size;
+    let invalid_support = invalid_beams || invalid_post_count || invalid_post_fit;
+    if invalid_basic || invalid_repeated || invalid_support || invalid_hinge {
         return plan_error(section_path + ": ramp section geometry source values are incomplete");
     }
     let tolerance = _sysml_number(source, "rampSectionGeometryToleranceM");
@@ -3935,8 +3945,10 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         if !query_ok(member) || member.type_name != "Mesh" {
             return plan_error(track_path + ": section contact-track mesh is missing");
         }
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: track_path,
-            name: "points", type_name: "point3f[]", value: points}});
+        let geometry = assembly_builder::mesh_points_update_plan(
+            edit_target, track_path, points);
+        if !geometry.ok { return geometry; }
+        for op in geometry.ops { ops.push(op); }
         for item in [
             #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
             #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
@@ -4304,27 +4316,32 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     let mount_z = _sysml_number(source, "physicalRampMountZ");
     let section_names = griffin_spec::ramp_section_names();
     let joint_names = griffin_spec::ramp_intermediate_joint_names();
-    if section_count != 3 || section_length == () || total_length == ()
-        || geometry_tolerance == () || width == () || thickness == ()
-        || rail_height == () || rail_width == () || surface_y == ()
-        || clearance == () || mass == () || section_mass == ()
-        || inertia_x == () || inertia_y == () || inertia_z == ()
-        || mass_tolerance == () || mass_partition_tolerance == ()
-        || section_limit_rad == () || target_rad == ()
-        || drive_stiffness == () || drive_damping == () || drive_max_torque == ()
-        || root_limit_rad == () || mount_x == () || mount_y == () || mount_z == ()
-        || section_names.len() != 3 || joint_names.len() != 4 {
+    let missing_geometry = section_count != 3 || section_length == ()
+        || total_length == () || geometry_tolerance == () || width == ()
+        || thickness == () || rail_height == () || rail_width == () || clearance == ();
+    let missing_mass = mass == () || section_mass == () || inertia_x == ()
+        || inertia_y == () || inertia_z == () || mass_tolerance == ()
+        || mass_partition_tolerance == ();
+    let missing_actuation = section_limit_rad == () || target_rad == ()
+        || drive_stiffness == () || drive_damping == ()
+        || drive_max_torque == () || root_limit_rad == ();
+    let missing_mount = mount_x == () || mount_y == () || mount_z == ()
+        || section_names.len() != 3 || joint_names.len() != 4;
+    if missing_geometry || missing_mass || missing_actuation || missing_mount {
         return plan_error("articulated physical-ramp SysML datums are incomplete");
     }
-    if (section_count * section_length - total_length).abs() > geometry_tolerance
-        || (section_count * section_mass - mass).abs() > mass_partition_tolerance
-        || section_mass <= 0.0 || inertia_x <= 0.0 || inertia_y <= 0.0
-        || inertia_z <= 0.0 || mass_tolerance <= 0.0
-        || mass_partition_tolerance <= 0.0
-        || section_limit_rad <= 0.0 || root_limit_rad <= 0.0
-        || drive_stiffness <= 0.0 || drive_damping < 0.0
-        || drive_max_torque <= 0.0 || width <= 0.0 || thickness <= 0.0
-        || rail_height <= 0.0 || rail_width <= 0.0 || clearance <= 0.0 {
+    let invalid_length = (section_count * section_length - total_length).abs()
+        > geometry_tolerance || section_mass <= 0.0;
+    let invalid_mass = (section_count * section_mass - mass).abs()
+        > mass_partition_tolerance || mass_tolerance <= 0.0
+        || mass_partition_tolerance <= 0.0;
+    let invalid_inertia = inertia_x <= 0.0 || inertia_y <= 0.0 || inertia_z <= 0.0;
+    let invalid_actuation = section_limit_rad <= 0.0 || root_limit_rad <= 0.0
+        || drive_stiffness <= 0.0 || drive_damping < 0.0 || drive_max_torque <= 0.0;
+    let invalid_envelope = width <= 0.0 || thickness <= 0.0
+        || rail_height <= 0.0 || rail_width <= 0.0 || clearance <= 0.0;
+    if invalid_length || invalid_mass || invalid_inertia || invalid_actuation
+        || invalid_envelope {
         return plan_error("articulated physical-ramp source values violate the section, mass, or geometry contract");
     }
     let expected_inertia_x = section_mass * (width * width + thickness * thickness) / 12.0;
@@ -4450,7 +4467,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
                 path: joint_path, name: relation.name, targets: relation.targets}});
         }
         for item in [
-            #{name: "physics:axis", type_name: "token", value: ""Z""},
+            #{name: "physics:axis", type_name: "token", value: "\"Z\""},
             #{name: "physics:localPos0", type_name: "point3f",
               value: "(" + section_length.to_string() + ", 0.0, 0.0)"},
             #{name: "physics:localPos1", type_name: "point3f", value: "(0.0, 0.0, 0.0)"},

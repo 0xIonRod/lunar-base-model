@@ -391,6 +391,10 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
             int inputs:engine_count = 7
+            float outputs:render_throttle
+            float outputs:visual_length_fraction
+            float outputs:intensity
+            float outputs:radius
             float inputs:throttle.connect = </Griffin1/MainPropulsion.outputs:engine_activity>
             float inputs:thrust_n.connect = </Griffin1/MainPropulsion.outputs:thrust_n>
             float inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion.outputs:maximum_thrust_n>

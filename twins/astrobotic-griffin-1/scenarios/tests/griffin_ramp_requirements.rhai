@@ -337,10 +337,10 @@ fn on_tick(me, ctx) {
                     #{name: "height", axis: 1, attr: "rampRailHeightM"},
                     #{name: "width", axis: 2, attr: "rampRailWidthM"},
                 ] {
-                    checks.push(#{id: "GRR-008-" + side + "-" + index.to_string() + "-" + rail.name + "-" + dim.name,
-                        component: "ramp_rail", requirement: "grr008", verification: VERIFICATION,
-                        kind: "extent_component", path: rail_path, index: dim.axis,
-                        multiplier: 2.0, expected_attr: _source_attr(dim.attr), tolerance: 0.002});
+                    checks.push(sysml_requirement_checks::extent_component(
+                        "GRR-008-" + side + "-" + index.to_string() + "-" + rail.name + "-" + dim.name,
+                        "ramp_rail", "grr008", VERIFICATION, rail_path, dim.axis,
+                        _source_attr(dim.attr), 2.0, 0.002));
                 }
                 checks.push(_attribute_component("GRR-008-" + side + "-" + index.to_string() + "-" + rail.name + "-y",
                     "grr008", rail_path, "xformOp:translate", 1,
@@ -423,10 +423,10 @@ fn on_tick(me, ctx) {
                         #{name: "height", axis: 1, attr: "assemblyTreadHeightM"},
                         #{name: "width", axis: 2, attr: "assemblyTrackWidthM"},
                     ] {
-                        checks.push(#{id: "GRR-013-" + side + "-" + index.to_string() + "-" + track.name + tread_index.to_string() + "-" + dim.name,
-                            component: "ramp_tread", requirement: "grr013", verification: VERIFICATION,
-                            kind: "extent_component", path: tread_path, index: dim.axis,
-                            multiplier: 2.0, expected_attr: _source_attr(dim.attr), tolerance: 0.002});
+                        checks.push(sysml_requirement_checks::extent_component(
+                            "GRR-013-" + side + "-" + index.to_string() + "-" + track.name + tread_index.to_string() + "-" + dim.name,
+                            "ramp_tread", "grr013", VERIFICATION, tread_path,
+                            dim.axis, _source_attr(dim.attr), 2.0, 0.002));
                     }
                     checks.push(_attribute_component("GRR-013-" + side + "-" + index.to_string() + "-" + track.name + tread_index.to_string() + "-x",
                         "grr013", tread_path, "xformOp:translate", 0, x));
@@ -445,10 +445,10 @@ fn on_tick(me, ctx) {
                     #{name: "height", axis: 1, attr: "assemblyUnderBeamHeightM"},
                     #{name: "width", axis: 2, attr: "assemblyUnderBeamWidthM"},
                 ] {
-                    checks.push(#{id: "GRR-014-" + side + "-" + index.to_string() + "-" + beam.name + "-" + dim.name,
-                        component: "ramp_load_path", requirement: "grr014", verification: VERIFICATION,
-                        kind: "extent_component", path: beam_path, index: dim.axis,
-                        multiplier: 2.0, expected_attr: _source_attr(dim.attr), tolerance: 0.002});
+                    checks.push(sysml_requirement_checks::extent_component(
+                        "GRR-014-" + side + "-" + index.to_string() + "-" + beam.name + "-" + dim.name,
+                        "ramp_load_path", "grr014", VERIFICATION, beam_path, dim.axis,
+                        _source_attr(dim.attr), 2.0, 0.002));
                 }
                 checks.push(_attribute_component("GRR-014-" + side + "-" + index.to_string() + "-" + beam.name + "-y",
                     "grr014", beam_path, "xformOp:translate", 1,
