@@ -62,7 +62,7 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links. The GR-005 evidence catalog resolves its typed requirement and source references to typed locators and roles | Coverage evaluation compares resolved handles and GR-005 source provenance is exercised in the runtime verifier. Provider observations still do not share one end-to-end identity across source revision, realization, composed-stage generation, physics sampling, and resulting evidence. Status/check catalogs remain authored execution metadata; derive the requirement matrix from requirement, verification, realization, and evidence links |
 | Units and frames | SysML type and literal measurement-reference identities use source-snapshot handles. Resolved linear `MeasurementUnit` definitions project SI dimensions, scales, and standard `UnitConversion::isExact` metadata from quantity-power factors, coherent SI base units, reference conversions, prefixes, and supported arithmetic unit initializers. Source quantities retain conversion exactness through typed native `Quantity` operations; the bounded Modelica length-vector adapter requires an exact resolved scale before lowering to SI | Static feature types still do not carry inferred units. Measurement uncertainty and instrument accuracy are not represented by scale exactness. Nonlinear and affine `MeasurementScale` mappings, unsupported definitions, typed frame identity, and end-to-end conversion provenance remain open. Griffin measurements are still mostly normalized to SI at the provider boundary |
-| Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, effective Avian-cooked Mesh/Cube geometry, exact analytic collider dimensions and poses, and a generic NURBS-to-USD-Mesh collision cook exist | No complete semantic part-usage graph binds every source feature to a USD realization. Griffin currently has no authored NURBS patch to cook. The NURBS planner uses an explicit canonical-metre tolerance and adaptive tessellation, but its successive-level convergence estimate is not a certified upper bound on exact surface deviation |
+| Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, effective Avian-cooked Mesh/Cube geometry, exact analytic collider dimensions and poses, and a generic NURBS-to-USD-Mesh collision cook exist | No complete semantic part-usage graph binds every source feature to a USD realization. Griffin currently has no authored NURBS patch to cook. The planner uses `max_refinement_delta_m` to select adaptive tessellation, but its successive-level convergence change is not a certified upper bound on exact surface error |
 | Behavioral applicability | Mission order, sampling horizon, route phases, and release are mostly Rhai orchestration | The model cannot yet state and evaluate configuration, mode, phase, or temporal applicability as part of a reusable source-defined verification objective |
 | Modelica relationship | Continuous models and parameters are selected through Twin tooling | No complete standard realization/parameter provenance graph ties each equation set and result back to the source feature and requirement revision |
 
@@ -124,7 +124,7 @@ or `replaceable study assumption` status.
 | Requirement area | Required source data and acceptance evidence |
 |---|---|
 | Configuration and applicability | Vehicle/mission identifier, hardware revision, document revision/date, applicability, supersession, units, frames, uncertainty, and evidence role for each datum. Keep the Griffin-1 flight vehicle distinct from earlier Griffin/VIPER user-guide configurations. |
-| As-built geometry | Controlled 3D CAD or dimensioned orthographic drawings; root datum/orientation; leg, tank, engine, solar, adapter, and payload stations; member profiles; panel cutouts; hole/bolt patterns; tolerances; and view/camera references. Compare composed mesh and collider against that source geometry with stated deviation tolerances. |
+| As-built geometry | Controlled 3D CAD or dimensioned orthographic drawings; root datum/orientation; leg, tank, engine, solar, adapter, and payload stations; member profiles; panel cutouts; hole/bolt patterns; tolerances; and view/camera references. Compare composed mesh and collider against that source geometry with an explicit measurement method and source tolerance. |
 | Solar installation and power | Three panel identities, panel-local frames/normals, installed transforms on adjacent lander sides, support/hinge/lock geometry, stowed/deployed and cruise/surface states, keep-out envelopes, harness/electrical interfaces, panel I-V/temperature behavior, battery usable capacity, attitude-control law and keep-outs, time-aligned Sun/attitude/power telemetry, and mission Sun azimuth/elevation. The post establishes qualitative transit Sun-pointing and surface-quadrant behavior; it does not publish installation datums, pointing limits, or an electrical power budget. |
 | Mechanical interfaces | Payload-deck isogrid/bolt pattern and rated load; Griffin-to-FLIP adapter, release datum and loads; leg joints, travel/damping and foot contact; engine and attitude-thruster stations/cant/loads; tank vessels/restraints; and optional ramp hinge and rover-clearance interfaces. Preserve source-mesh-derived collision and prove clearances after composition. |
 | Mass properties | Measured total/dry/propellant/payload masses, center of mass, full inertia tensor with declared body frame, uncertainty, and configuration/propellant state. NASA says Griffin-1 completed mass-properties testing, but public numerical results are unavailable. |
@@ -247,26 +247,22 @@ become Griffin's permanent source semantics.
   recorded value, and compares the authored proxy mesh before admission,
   rejecting stale or modified proxies. The Avian reader and proxy planner now
   share one typed capability contract and the plan reports the implemented
-  modes. These are `none` (static/kinematic triangle mesh), `convexHull`,
-  `convexDecomposition`, and `boundingCube`. OpenUSD also defines
-  `boundingSphere` and `meshSimplification`; both remain explicitly unsupported
-  by Avian. The current `boundingCube` cook now uses an oriented principal-axis
-  fit instead of a mesh-axis AABB. This fit is deterministic but does not
-  guarantee a globally minimum-volume box; exact [OpenUSD schema parity](https://openusd.org/dev/api/class_usd_physics_mesh_collision_a_p_i.html)
-  remains open. Rhai authoring obtains structured mode records from one Rust
-  capability contract: each record includes the USD token, cooked geometry,
-  and rigid-body compatibility. `PlanNurbsCollisionProxy` returns the same
-  records, so authoring and planning use the runtime's contract without a
-  second allow-list or locally duplicated body restrictions.
+  modes. These are `none` (static/kinematic triangle mesh), `convexHull`, and
+  `convexDecomposition`. OpenUSD also defines `boundingSphere`, `boundingCube`,
+  and `meshSimplification`; all three are explicitly unsupported by Avian until
+  their standard semantics can be implemented. Rhai authoring obtains
+  structured mode records from one Rust capability contract: each record
+  includes the USD token, cooked geometry, and rigid-body compatibility.
+  `PlanNurbsCollisionProxy` returns the same records, so authoring and planning
+  use the runtime's contract without a second allow-list or locally duplicated
+  body restrictions.
 
-  The planner now requires a canonical-metre deviation tolerance and adaptively
-  refines untrimmed U/V grids or trimmed curve/grid settings. It records the
-  selected resolution and symmetric sampled vertex-to-triangle distance
-  between the last two levels; physics admission re-cooks and checks that
-  result. This is a convergence estimate, not a certified upper bound on exact
-  NURBS surface deviation, so geometric-error certification remains open. A
-  collision API cannot infer meaningful fitted box partitions from a surface
-  alone. Griffin itself currently contains no
+  The planner requires a positive canonical-metre `max_refinement_delta_m` and
+  adaptively refines untrimmed U/V grids or trimmed curve/grid settings. It
+  records the selected resolution and symmetric sampled vertex-to-triangle
+  change between the last two levels; physics admission re-cooks and checks
+  that result. This is a convergence criterion, not a certified upper bound on
+  exact NURBS surface error. Griffin itself currently contains no
   `UsdGeomNurbsPatch`/`LunCoLatheAPI` source, so no Griffin geometry was changed
   to exercise the new generic path.
 - GRR-011 moves ramp mass and diagonal-inertia literals into SysML and checks
@@ -401,11 +397,12 @@ become Griffin's permanent source semantics.
   is an evidence recorder and temporal reducer that proves the required wheels
   contacted the ramp over the full traversal interval. A static fit check is
   not traversal acceptance.
-- The generic `UsdGeomNurbsPatch` collision cook uses tolerance-driven adaptive
-  tessellation and records a symmetric sampled convergence estimate. That
-  estimate is not a certified bound on the exact surface deviation. Editor
-  preview/readback of the error and applying the tool to a real Griffin NURBS
-  source remain open; Griffin currently authors no NURBS patch.
+- The generic `UsdGeomNurbsPatch` collision cook uses
+  `max_refinement_delta_m` to select adaptive tessellation and records a
+  symmetric sampled convergence change. That change is not a certified bound
+  on exact surface error. Editor preview/readback and applying the tool to a
+  real Griffin NURBS source remain open; Griffin currently authors no NURBS
+  patch.
 - Preserve provider result states end to end. Inconclusive and error are not
   false requirements and must not be collapsed into a boolean.
 
