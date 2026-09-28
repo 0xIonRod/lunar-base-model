@@ -682,9 +682,15 @@ fn landing_target_geometry_check(doc_id, target_path) {
     let target = _layout_query(doc_id, target_path,
         ["xformOp:translate"], false);
     if !_ok(target) {
+        let query_error = "query returned no prim record";
+        if target != () && target.error != () {
+            query_error = target.error;
+        } else if target != () && target.path == () {
+            query_error = "query did not resolve the requested prim";
+        }
         return #{ok: false, path: target_path,
             expected_y: expected_y,
-            error: "landing target prim is missing from the composed stage"};
+            error: "landing target prim query failed: " + query_error};
     }
     let translate = target.attrs["xformOp:translate"];
     if translate == () || translate.len() != 3 {
