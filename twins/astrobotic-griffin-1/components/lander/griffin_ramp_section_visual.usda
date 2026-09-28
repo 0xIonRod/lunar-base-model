@@ -23,9 +23,10 @@ def Xform "RampSection" (
         double3 xformOp:translate = (0.0, 0.0, 1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         color3f[] primvars:displayColor = [(0.3400000035762787, 0.3799999952316284, 0.4399999976158142)]
-        uniform token purpose = "render"
+        uniform token purpose = "proxy"
         uniform token physics:approximation = "convexHull"
         bool physics:collisionEnabled = true
+        token visibility = "invisible"
     }
     def Mesh "RampTrackStarboard" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
@@ -38,9 +39,10 @@ def Xform "RampSection" (
         double3 xformOp:translate = (0.0, 0.0, -1.15)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         color3f[] primvars:displayColor = [(0.3400000035762787, 0.3799999952316284, 0.4399999976158142)]
-        uniform token purpose = "render"
+        uniform token purpose = "proxy"
         uniform token physics:approximation = "convexHull"
         bool physics:collisionEnabled = true
+        token visibility = "invisible"
     }
     def Cube "OuterRail" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]

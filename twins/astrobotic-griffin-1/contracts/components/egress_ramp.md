@@ -58,17 +58,17 @@ shared SysML/USD requirements evaluator.
 
 ## Physical flight stow and rail clearance
 
-`GRR-017` owns the image-based flight-stow pose: the port root holds +120 degrees
-and the starboard root holds -120 degrees because its mount is mirrored 180
-degrees about Y. This folds both ramp bundles inward over the deck while keeping
-the lowest rails above the landing-leg envelope. Both intermediate hinges turn
-180 degrees to nest all three sections into a compact transport bundle. The section
-hinges expose their full +/-180 degree travel so the fold can be commanded and
-inspected across its complete range. These angles are replaceable study
-estimates from the user-provided Griffin reference, not released supplier
-geometry. The root hinges retain source-owned asymmetric travel: deployment
-stays within the 50 degree operational limit while stow uses the available
-120 degree limit.
+`GRR-017` owns the image-based flight-stow pose: the port root holds +45 degrees
+and the starboard root holds -135 degrees locally. The starboard assembly's 180
+degree Y mount makes both folded bundles run parallel above the deck, with 6.4 m
+between their root stations. Both intermediate hinges turn 180 degrees to fold
+each three-section ramp into its transport bundle. Their full +/-180 degree
+travel remains available for commanded deployment and inspection. These angles
+are replaceable study estimates from the user-provided Griffin reference, not
+released supplier geometry. The root hinges retain source-owned asymmetric
+travel: port runs from -50 to +60 degrees and starboard from -150 to +50
+degrees; the terrain targets remain -27.83 degrees port and +27.83 degrees
+starboard.
 `GRR-018` keeps the rail bottoms on the upper track face: the authored rail
 bottom and track top are both Y=0.09 m in section-local coordinates. The
 focused composed-USD check measures all 12 rail bounds and 40 landing-leg
@@ -77,8 +77,8 @@ geometry bounds in the canonical stage frame.
 NASA describes Griffin's ramps as folding ramps and Astrobotic documents the
 optional egress-ramp interface, but public material does not publish the
 flight-stowed mechanism geometry or supplier ICD. The reference image controls
-this study pose; the mirrored 120 degree root angles and asymmetric travel
-remain explicit replaceable assumptions, not a claim of released
+this study pose; the parallel +45/-135 degree local root angles and asymmetric
+travel remain explicit replaceable assumptions, not a claim of released
 flight-hardware geometry.
 
 After touchdown and four-leg contact are confirmed, press **U** or choose

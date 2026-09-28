@@ -131,6 +131,9 @@ fn _qualified_attribute(name) {
         "physicalRampMassKg", "physicalRampSectionMassKg",
         "physicalRampSectionInertiaXKgM2", "physicalRampSectionInertiaYKgM2",
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionJointLimitRad",
+        "physicalRampPortRootJointStowLimitRad", "physicalRampPortRootStowedAngleRad",
+        "physicalRampStarboardRootJointStowLimitRad", "physicalRampStarboardRootStowedAngleRad",
+        "physicalRampSectionStowedAngleRad", "physicalRampToeSectionStowedAngleRad",
         "physicalRampSectionMassPartitionToleranceKg",
         "physicalRampSectionDriveTargetRad", "physicalRampJointDriveStiffnessNmPerDeg",
         "physicalRampJointDriveDampingNmPerDegPerSec",
@@ -722,6 +725,10 @@ fn physical_ramp_transition_joint_name(side) {
 }
 fn physical_ramp_port_deployment_angle_rad() { _sysml_attribute("physicalRampPortDeploymentAngleRad") }
 fn physical_ramp_starboard_deployment_angle_rad() { _sysml_attribute("physicalRampStarboardDeploymentAngleRad") }
+fn physical_ramp_port_root_stowed_angle_rad() { _sysml_attribute("physicalRampPortRootStowedAngleRad") }
+fn physical_ramp_starboard_root_stowed_angle_rad() { _sysml_attribute("physicalRampStarboardRootStowedAngleRad") }
+fn physical_ramp_port_root_stow_limit_rad() { _sysml_attribute("physicalRampPortRootJointStowLimitRad") }
+fn physical_ramp_starboard_root_stow_limit_rad() { _sysml_attribute("physicalRampStarboardRootJointStowLimitRad") }
 fn physical_ramp_section_stowed_angle_rad() { _sysml_attribute("physicalRampSectionStowedAngleRad") }
 fn physical_ramp_toe_section_stowed_angle_rad() { _sysml_attribute("physicalRampToeSectionStowedAngleRad") }
 fn physical_ramp_section_drive_target_rad() { _sysml_attribute("physicalRampSectionDriveTargetRad") }

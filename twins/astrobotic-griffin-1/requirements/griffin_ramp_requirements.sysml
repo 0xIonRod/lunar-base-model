@@ -115,12 +115,15 @@ package GriffinRampRequirements {
     }
 
     constraint def GRC022_RampFlightStowAnglesWithinTravel {
-        in rootStowAngleRad : Real;
+        in portRootStowAngleRad : Real;
+        in starboardRootStowAngleRad : Real;
         in middleAngleRad : Real;
         in toeAngleRad : Real;
-        in rootLimitRad : Real;
+        in portRootLimitRad : Real;
+        in starboardRootLimitRad : Real;
         in sectionLimitRad : Real;
-        rootStowAngleRad > 0.0 and rootStowAngleRad <= rootLimitRad
+        portRootStowAngleRad > 0.0 and portRootStowAngleRad <= portRootLimitRad
+            and starboardRootStowAngleRad > 0.0 and starboardRootStowAngleRad <= starboardRootLimitRad
             and middleAngleRad > 0.0 and toeAngleRad > 0.0
             and middleAngleRad <= sectionLimitRad and middleAngleRad >= -sectionLimitRad
             and toeAngleRad <= sectionLimitRad and toeAngleRad >= -sectionLimitRad;
@@ -337,12 +340,11 @@ package GriffinRampRequirements {
         // envelope, thickness, and rail dimensions above. This package owns
         // only the physical hinge, transition, and safe stowed pose.
         // The physical ramp is folded above the landing legs during descent.
-        // Port holds a +120 deg root angle and starboard holds -120 deg because
-        // its root has an authored 180 deg Y mount rotation. Both intermediate
-        // hinges fold through 180 deg, nesting the three equal sections inward
-        // over the deck. These are explicit image-based Twin study datums, not
-        // the supplier's
-        // unpublished hinge ICD. The intermediate joints allow a full
+        // Port holds a +45 deg root angle; starboard holds -135 deg locally.
+        // Its authored 180 deg Y mount aligns the two folded bundles in
+        // parallel above the deck. Both intermediate hinges fold through 180
+        // deg. These are image-based Twin study datums, not released supplier
+        // geometry. Each root limit leaves 15 deg beyond its stow target.
         // half-turn in either direction so operators can command and inspect
         // the complete travel.
         // These replaceable study datums are not an as-built mechanism: public
@@ -403,8 +405,10 @@ package GriffinRampRequirements {
         attribute physicalRampSectionInertiaYKgM2 : Real = 76.172636183;
         attribute physicalRampSectionInertiaZKgM2 : Real = 43.931747294;
         attribute physicalRampSectionMassPartitionToleranceKg : Real = 0.001;
-        attribute physicalRampRootJointStowLimitRad : Real = 2.094395102;
-        attribute physicalRampRootStowedAngleRad : Real = 2.094395102;
+        attribute physicalRampPortRootJointStowLimitRad : Real = 1.047197551;
+        attribute physicalRampPortRootStowedAngleRad : Real = 0.785398163;
+        attribute physicalRampStarboardRootJointStowLimitRad : Real = 2.617993878;
+        attribute physicalRampStarboardRootStowedAngleRad : Real = 2.356194490;
         attribute physicalRampSectionJointLimitRad : Real = 3.141592654;
         attribute physicalRampSectionStowedAngleRad : Real = 3.141592654;
         attribute physicalRampToeSectionStowedAngleRad : Real = 3.141592654;
@@ -485,12 +489,14 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR017_FlightStowAndPostTouchdownUnfold {
-        doc /* During descent, the port root holds +120 degrees and the starboard root holds -120 degrees to account for the starboard assembly's 180 degree Y mount rotation. The inward root pose tucks both folded bundles over the deck while keeping the lowest rails above the landing-leg envelope. Both intermediate hinges turn 180 degrees so the three equal sections nest into compact transport bundles. The section joints expose their full +/-180 degree travel. These image-based angles are replaceable study estimates from the user-provided Griffin reference; they are not released supplier geometry. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive all four intermediate hinges to their level targets, then move both deck hinges into the deployment envelope. */
+        doc /* During descent, the port root holds +45 degrees and the starboard root holds -135 degrees locally. The starboard assembly's 180 degree Y mount makes their folded runs parallel over the deck with clearance between bundles. Port root travel is limited to +60 degrees and starboard to -150 degrees; both leave 15 degrees beyond the stowed target while retaining their deployment targets. Both intermediate hinges turn 180 degrees to fold each three-section ramp into a compact transport bundle. The section joints expose their full +/-180 degree travel. These image-based angles are replaceable study estimates from the user-provided Griffin reference; they are not released supplier geometry. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive all four intermediate hinges to their level targets, then move both deck hinges into the deployment envelope. */
         require GRC022_RampFlightStowAnglesWithinTravel {
-            in rootStowAngleRad = GriffinEgressRamp::physicalRampRootStowedAngleRad;
+            in portRootStowAngleRad = GriffinEgressRamp::physicalRampPortRootStowedAngleRad;
+            in starboardRootStowAngleRad = GriffinEgressRamp::physicalRampStarboardRootStowedAngleRad;
             in middleAngleRad = GriffinEgressRamp::physicalRampSectionStowedAngleRad;
             in toeAngleRad = GriffinEgressRamp::physicalRampToeSectionStowedAngleRad;
-            in rootLimitRad = GriffinEgressRamp::physicalRampRootJointStowLimitRad;
+            in portRootLimitRad = GriffinEgressRamp::physicalRampPortRootJointStowLimitRad;
+            in starboardRootLimitRad = GriffinEgressRamp::physicalRampStarboardRootJointStowLimitRad;
             in sectionLimitRad = GriffinEgressRamp::physicalRampSectionJointLimitRad;
         }
         require GRC024_RampSectionDeploymentTargetIsLevel {

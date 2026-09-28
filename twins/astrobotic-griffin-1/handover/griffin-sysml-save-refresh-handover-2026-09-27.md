@@ -281,3 +281,35 @@ clearance 2.345 m. The saved-pose Editor capture is
 This is static pose and clearance evidence only. It does not establish the
 touchdown trigger, powered hinge motion, rover traversal, or post-touchdown
 stability; the full Griffin mission remains `NO-VERDICT`.
+
+## Continuation (2026-09-28, reference-parallel transport fold)
+
+After reviewing the supplied image, the earlier inward +120/-120 degree pose
+still placed the two three-section bundles across one another. The source now
+owns separate root datums: port holds +45 degrees with a +60 degree stow limit;
+starboard holds -135 degrees locally with a -150 degree stow limit. Its 180
+degree Y mount makes the two bundles parallel above the deck. The four
+intermediate joints hold +180 degrees with their complete +/-180 degree travel
+exposed. These are replaceable image-derived study assumptions.
+
+Both side plans were applied through the Editor component builder, port at
+generation 1359 and starboard at generation 1812. The matching projection for
+generation 1812 reported `projection_ready=true`; the saved vehicle document is
+generation 1812 with `dirty=false`. Composed readback placed the port middle
+hinge at (6.0823, 8.0723) m and starboard at (-0.3177, 8.0723) m, preserving
+their 6.4 m root-station separation. Root joint readback reported port limits
+-50/+60 degrees and target +45 degrees, starboard limits -150/+50 degrees and
+target -135 degrees. Each of the four section joints reported limits
+-180/+180 degrees and target +180 degrees.
+
+The composed rail/landing-leg bounds query measured all 12 rail paths and all
+40 landing-leg shape paths. Lowest rail bottom Y=4.6172 m, highest leg top
+Y=2.4400 m, for 2.1772 m clearance. The updated focused stow script now reads
+the side-specific SysML values. No fresh `luncosim test` verdict was recorded
+for this continuation; the earlier 119/119 result above belongs to the
+superseded +120/-120 pose. The current model-only Editor capture is
+`handover/griffin-ramp-stow-review-2026-09-28.png`.
+
+This remains static fold and clearance evidence. It does not establish powered
+hinge motion, touchdown gating, rover release, terrain traversal, or
+post-touchdown stability; the complete Griffin mission remains `NO-VERDICT`.

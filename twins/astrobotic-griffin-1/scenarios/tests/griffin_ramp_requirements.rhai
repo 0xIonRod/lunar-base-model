@@ -106,7 +106,8 @@ fn on_tick(me, ctx) {
         "physicalRampSectionInertiaXKgM2", "physicalRampSectionInertiaYKgM2",
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionMassPartitionToleranceKg",
         "physicalRampSectionJointLimitRad", "physicalRampSectionStowedAngleRad",
-        "physicalRampRootJointStowLimitRad", "physicalRampRootStowedAngleRad",
+        "physicalRampPortRootJointStowLimitRad", "physicalRampPortRootStowedAngleRad",
+        "physicalRampStarboardRootJointStowLimitRad", "physicalRampStarboardRootStowedAngleRad",
         "physicalRampToeSectionStowedAngleRad", "physicalRampSectionDriveTargetRad",
         "physicalRampJointDriveStiffnessNmPerDeg",
         "physicalRampJointDriveDampingNmPerDegPerSec",
@@ -179,10 +180,12 @@ fn on_tick(me, ctx) {
           toleranceKg: _source_number(source, "physicalRampSectionMassPartitionToleranceKg")}));
     checks.push(_constraint("GRR-017-flight-stow-angle-envelope", "grr017",
         "GRC022_RampFlightStowAnglesWithinTravel",
-        #{rootStowAngleRad: _source_number(source, "physicalRampRootStowedAngleRad"),
+        #{portRootStowAngleRad: _source_number(source, "physicalRampPortRootStowedAngleRad"),
+          starboardRootStowAngleRad: _source_number(source, "physicalRampStarboardRootStowedAngleRad"),
           middleAngleRad: _source_number(source, "physicalRampSectionStowedAngleRad"),
           toeAngleRad: _source_number(source, "physicalRampToeSectionStowedAngleRad"),
-          rootLimitRad: _source_number(source, "physicalRampRootJointStowLimitRad"),
+          portRootLimitRad: _source_number(source, "physicalRampPortRootJointStowLimitRad"),
+          starboardRootLimitRad: _source_number(source, "physicalRampStarboardRootJointStowLimitRad"),
           sectionLimitRad: _source_number(source, "physicalRampSectionJointLimitRad")}));
     checks.push(_constraint("GRR-018-rails-on-upper-track-face", "grr018",
         "GRC023_RailsRemainOnUpperTrackFace",
@@ -239,8 +242,9 @@ fn on_tick(me, ctx) {
         });
         let root_joint = ROOT + "/RampHinge" + suffix;
         let joint_offset = if side == "port" { 0 } else { 2 };
-        let root_stow_angle_deg = _source_number(source,
-            "physicalRampRootStowedAngleRad") * 180.0 / pi * sign;
+        let root_stow_angle_deg = _source_number(source, if side == "port" {
+            "physicalRampPortRootStowedAngleRad"
+        } else { "physicalRampStarboardRootStowedAngleRad" }) * 180.0 / pi * sign;
 
         checks.push(_check("GRR-001-" + side + "-ramp-root", "ramp", "grr001", "exists", ramp));
         checks[checks.len() - 1].expected_type = "Xform";
@@ -272,8 +276,9 @@ fn on_tick(me, ctx) {
         checks.push(_attribute_component("GRR-017-" + side + "-root-flight-stow-transform",
             "grr017", ramp, "xformOp:rotateXYZ", 2, root_stow_angle_deg));
         let deployment_limit_deg = _source_number(source, "rampMaxDeploymentAngleRad") * 180.0 / pi;
-        let root_stow_limit_deg = _source_number(source,
-            "physicalRampRootJointStowLimitRad") * 180.0 / pi;
+        let root_stow_limit_deg = _source_number(source, if side == "port" {
+            "physicalRampPortRootJointStowLimitRad"
+        } else { "physicalRampStarboardRootJointStowLimitRad" }) * 180.0 / pi;
         let root_lower_limit_deg = if side == "port" {
             -deployment_limit_deg
         } else { -root_stow_limit_deg };

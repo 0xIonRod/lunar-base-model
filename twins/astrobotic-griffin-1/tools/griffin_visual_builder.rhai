@@ -4167,7 +4167,8 @@ fn _ramp_section_track_points(length, thickness, width, toe_bevel) {
 // accepted by the Editor plan.
 fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     section_name, section_length, section_index, deployment_angle) {
-    let source = sysml_requirements::source();
+    // All required values are revision-pinned typed reads through griffin_spec.
+    let source = ();
     let section_count = griffin_spec::ramp_section_count();
     let total_length = _sysml_number(source, "rampSurfaceLengthM");
     let thickness = _sysml_number(source, "rampSurfaceThicknessM");
@@ -4490,8 +4491,9 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path, side) {
 }
 
 fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
-    transition_length, thickness, width, surface_y) {
-    let source = sysml_requirements::source();
+    root_stow_angle_rad, transition_length, thickness, width, surface_y) {
+    // All required values are revision-pinned typed reads through griffin_spec.
+    let source = ();
     let name = griffin_spec::physical_ramp_transition_child_name();
     let mass = griffin_spec::physical_ramp_deck_transition_mass_kg();
     let inertia = griffin_spec::physical_ramp_deck_transition_inertia_kg_m2();
@@ -4536,21 +4538,28 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     // non-uniform transform that stretches future mounted children.
     ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path,
         schemas: ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]}});
-    // The plate is inboard of the hinge in each side-local ramp frame. Its
-    // local authored placement is also the fixed-joint body1 origin. Once the
-    // joint is admitted, the physics projector owns this nested body and keeps
-    // it horizontal at the Griffin deck anchor while the parent ramp rotates.
-    // The transition is inboard in each ramp's local frame. Starboard's
-    // parent is rotated 180 degrees about Y, so its local -X offset becomes
-    // an inboard +X offset in the lander frame.
+    // TransitionPlate is an independent body fixed to the lander deck, but its
+    // authored prim is nested below the moving ramp root. Invert the root
+    // stow transform here so the composed plate begins level at its deck joint
+    // anchor instead of inheriting the ramp's raised angle or sitting across
+    // the tanks. The saved local pose therefore agrees with the fixed joint.
     let transition_local_center_x = -transition_length / 2.0;
     let transition_anchor_offset_x = if side == "port" {
         transition_local_center_x
     } else {
         -transition_local_center_x
     };
+    let root_stow_angle_deg = root_stow_angle_rad * 180.0 / 3.141592653589793;
+    let transition_local_x = transition_local_center_x * cos(root_stow_angle_rad);
+    let transition_local_y = -transition_local_center_x * sin(root_stow_angle_rad);
+    let transition_local_rotation = if side == "port" {
+        [0.0, 0.0, -root_stow_angle_deg]
+    } else {
+        [0.0, 180.0, -root_stow_angle_deg]
+    };
     let placement = assembly_builder::place_plan(edit_target, path,
-        [transition_local_center_x, surface_y, 0.0], [0.0, 0.0, 0.0], ());
+        [transition_local_x, transition_local_y, 0.0],
+        transition_local_rotation, ());
     if !placement.ok { return placement; }
     for op in placement.ops { ops.push(op); }
     for item in [
@@ -4583,7 +4592,8 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     for op in contact_placement.ops { ops.push(op); }
     for item in [
         #{name: "size", type_name: "double", value: "1.0"},
-        #{name: "purpose", type_name: "token", value: "\"render\""},
+        #{name: "purpose", type_name: "token", value: "\"proxy\""},
+        #{name: "visibility", type_name: "token", value: "\"invisible\""},
         #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
         #{name: "primvars:displayColor", type_name: "color3f[]",
           value: "[(0.42, 0.26, 0.12)]"}
@@ -4609,11 +4619,10 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     // the rotating ramp body. body1 remains the named nested TransitionPlate;
     // localPos0 is the deck-frame centre and localPos1 is its own origin.
     let anchor_x = mount_x + transition_anchor_offset_x;
-    let transition_local_rot1 = if side == "port" {
-        "(0.0, 0.0, 0.0, 1.0)"
-    } else {
-        "(0.0, 1.0, 0.0, 0.0)"
-    };
+    // Both transition bodies are now level in the lander frame, so the
+    // fixed-joint body1 frame matches body0 without a mirrored 180-degree
+    // offset.
+    let transition_local_rot1 = "(0.0, 0.0, 0.0, 1.0)";
     for relation in [
         #{name: "physics:body0", targets: [lander_root]},
         #{name: "physics:body1", targets: [ramp_root + "/" + name]},
@@ -4651,7 +4660,9 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     if side != "port" && side != "starboard" {
         return plan_error("physical ramp side must be port or starboard");
     }
-    let source = sysml_requirements::source();
+    // Every datum below is read through the revision-pinned typed SysML model.
+    // Avoid materializing the full Twin report for this focused component plan.
+    let source = ();
     let suffix = if side == "port" { "Port" } else { "Starboard" };
     let ramp_path = lander_root + "/EgressRamp" + suffix;
     let section_count = griffin_spec::_sysml_integer("rampSectionCount");
@@ -4675,10 +4686,12 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         "physicalRampSectionMassPartitionToleranceKg");
     let section_limit_rad = _sysml_number(source,
         "physicalRampSectionJointLimitRad");
-    let root_stow_angle_rad = _sysml_number(source,
-        "physicalRampRootStowedAngleRad");
-    let root_stow_limit_rad = _sysml_number(source,
-        "physicalRampRootJointStowLimitRad");
+    let root_stow_angle_rad = _sysml_number(source, if side == "port" {
+        "physicalRampPortRootStowedAngleRad"
+    } else { "physicalRampStarboardRootStowedAngleRad" });
+    let root_stow_limit_rad = _sysml_number(source, if side == "port" {
+        "physicalRampPortRootJointStowLimitRad"
+    } else { "physicalRampStarboardRootJointStowLimitRad" });
     let target_rad = _sysml_number(source,
         "physicalRampSectionDriveTargetRad");
     let stowed_middle_angle_rad = _sysml_number(source,
@@ -4772,9 +4785,8 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
 
     let ops = [];
     let root_stow_angle_deg = root_stow_angle_rad * 180.0 / 3.141592653589793;
-    // The starboard root is mirrored by its authored Y=180 mount rotation,
-    // so its local Z hinge target has the opposite sign to keep both ramps
-    // raised and clear of the landing legs.
+    // Root angles are source-owned per side. The starboard Y=180 mount
+    // reverses its local hinge sign so both folded runs point the same way.
     let root_target_deg = if side == "port" { root_stow_angle_deg }
         else { -root_stow_angle_deg };
     let root_rotation = if side == "port" { [0.0, 0.0, root_target_deg] }
@@ -4915,7 +4927,8 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     let transition_length = _sysml_number(source,
         "physicalRampDeckTransitionLengthM");
     let transition = _physical_ramp_transition_ops(doc, edit_target,
-        lander_root, ramp_path, side, transition_length, thickness, width, surface_y);
+        lander_root, ramp_path, side, root_stow_angle_rad,
+        transition_length, thickness, width, surface_y);
     if !transition.ok { return transition; }
     for op in transition.ops { ops.push(op); }
     #{ok: true, kind: "griffin_articulated_physical_ramp",
