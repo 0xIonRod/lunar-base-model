@@ -681,6 +681,24 @@ fn landing_target_geometry_check(doc_id, target_path) {
     }
     let target = _layout_query(doc_id, target_path,
         ["xformOp:translate"], false);
+    // Scene runners can mount the target as a live USD asset without opening a
+    // canonical stage. In that case, use an open USD document's composed stage
+    // when one owns this target, rather than treating the unavailable live read
+    // as evidence that the authored prim is missing.
+    if !_ok(target) && doc_id == () {
+        let documents = query("ListOpenDocuments");
+        if documents != () && documents.open_documents != () {
+            for document in documents.open_documents {
+                if document.kind != "usd" { continue; }
+                let candidate = _layout_query(document.doc_id, target_path,
+                    ["xformOp:translate"], false);
+                if _ok(candidate) {
+                    target = candidate;
+                    break;
+                }
+            }
+        }
+    }
     if !_ok(target) {
         let query_error = "query returned no prim record";
         if target != () && target.error != () {
