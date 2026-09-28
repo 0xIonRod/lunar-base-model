@@ -261,3 +261,23 @@ bodies onto their authored frames. Powered descent has not produced a touchdown
 event in the recorded mission runs, so ramp motion, rover release, and the
 post-touchdown stability verdict remain open. The new gate does not diagnose or
 modify the unrelated Modelica landing dynamics.
+
+## Continuation (2026-09-28, inward transport fold)
+
+The user reference showed the folded ramps grouped over the lander deck rather
+than flaring away from it. The saved source now uses a +120 degree port root
+target and -120 degree starboard target (the starboard mount has a 180 degree Y
+rotation); both intermediate hinges stow at +180 degrees. The builder, source
+requirement, and focused verification all use this mirrored pose. These remain
+image-based study angles, not released supplier geometry.
+
+The saved Editor document is generation 50, root-layer revision 28, and
+`dirty=false`. `Verify_GriffinRampFlightStow` passed 119/119 checks at source
+revision `15986075037362209922`. Its composed envelope covered 12 rails and 40
+landing-leg shapes: lowest rail bottom Y=4.785 m, leg top Y=2.44 m, and
+clearance 2.345 m. The saved-pose Editor capture is
+`handover/griffin-ramp-stow-review-2026-09-28.png`.
+
+This is static pose and clearance evidence only. It does not establish the
+touchdown trigger, powered hinge motion, rover traversal, or post-touchdown
+stability; the full Griffin mission remains `NO-VERDICT`.

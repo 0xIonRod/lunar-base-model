@@ -4197,6 +4197,10 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     let post_embed = griffin_spec::ramp_side_post_embedded_depth_m();
     let post_first_x = griffin_spec::ramp_side_post_first_center_x_m();
     let post_pitch = griffin_spec::ramp_side_post_pitch_m();
+    let truss_chord_height = griffin_spec::ramp_side_truss_chord_height_m();
+    let truss_lower_chord_y = griffin_spec::ramp_side_truss_lower_chord_center_y_m();
+    let truss_brace_thickness = griffin_spec::ramp_side_truss_brace_thickness_m();
+    let truss_brace_count = griffin_spec::ramp_side_truss_brace_count_per_side();
     let hinge_radius = griffin_spec::ramp_section_hinge_barrel_radius_m();
     let hinge_length = griffin_spec::ramp_section_hinge_barrel_length_m();
     let hinge_y = griffin_spec::ramp_section_hinge_barrel_center_y_m();
@@ -4220,7 +4224,9 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         || hinge_y == () || deployment_angle == ();
     let invalid_basic = invalid_section || invalid_dimensions || invalid_rail_geometry;
     let invalid_repeated = invalid_rail_pins || invalid_tread_count || invalid_tread_size;
-    let invalid_support = invalid_beams || invalid_post_count || invalid_post_fit;
+    let invalid_support = invalid_beams || invalid_post_count || invalid_post_fit
+        || truss_chord_height == () || truss_lower_chord_y == ()
+        || truss_brace_thickness == () || truss_brace_count != post_count + 1;
     if invalid_basic || invalid_repeated || invalid_support || invalid_hinge {
         return plan_error(section_path + ": ramp section geometry source values are incomplete");
     }
@@ -4231,8 +4237,8 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     }
     let walking_surface_top_y = surface_y + thickness / 2.0;
     let rail_bottom_y = rail_y - rail_height / 2.0;
-    if (rail_bottom_y - walking_surface_top_y).abs() > tolerance {
-        return plan_error(section_path + ": upper rail base does not meet the walking-surface top");
+    if rail_bottom_y < walking_surface_top_y - tolerance {
+        return plan_error(section_path + ": upper rail falls below the walking-surface top");
     }
     let post_bottom_y = walking_surface_top_y - post_embed;
     let post_top_y = rail_y + rail_height / 2.0;
@@ -4347,6 +4353,45 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
                 (), [post_width, post_height, post_depth]);
             if !placement.ok { return placement; }
             for op in placement.ops { ops.push(op); }
+        }
+
+        let lower_chord_path = section_path + "/SideTrussLowerChord" + post_side.name;
+        let lower_chord = assembly_builder::composed_query(doc,
+            #{path: lower_chord_path, children: false});
+        if !query_ok(lower_chord) || lower_chord.type_name != "Cube" {
+            return plan_error(lower_chord_path + ": source-owned truss lower chord is missing");
+        }
+        let lower_chord_place = assembly_builder::place_plan(edit_target, lower_chord_path,
+            [section_length / 2.0, truss_lower_chord_y, post_side.z], (),
+            [section_length, truss_chord_height, truss_chord_height]);
+        if !lower_chord_place.ok { return lower_chord_place; }
+        for op in lower_chord_place.ops { ops.push(op); }
+
+        for brace_index in 0..truss_brace_count {
+            let x0 = if brace_index == 0 { 0.0 }
+                else { post_first_x + post_pitch * (brace_index - 1) };
+            let x1 = if brace_index == truss_brace_count - 1 { section_length }
+                else { post_first_x + post_pitch * brace_index };
+            let start_low = brace_index == 0 || brace_index == 2;
+            let y0 = if start_low { truss_lower_chord_y } else { rail_y };
+            let y1 = if start_low { rail_y } else { truss_lower_chord_y };
+            let dx = x1 - x0;
+            let dy = y1 - y0;
+            let brace_length = (dx * dx + dy * dy).sqrt();
+            let brace_angle = (dy / dx).atan() * 180.0 / 3.141592653589793;
+            let brace_name = "SideTrussBrace" + post_side.name + (brace_index + 1).to_string();
+            let brace_path = section_path + "/" + brace_name;
+            let brace = assembly_builder::composed_query(doc,
+                #{path: brace_path, children: false});
+            if !query_ok(brace) || brace.type_name != "Cube" {
+                return plan_error(brace_path + ": source-owned truss brace is missing");
+            }
+            let brace_place = assembly_builder::place_plan(edit_target, brace_path,
+                [(x0 + x1) / 2.0, (y0 + y1) / 2.0, post_side.z],
+                [0.0, 0.0, brace_angle],
+                [brace_length, truss_brace_thickness, truss_brace_thickness]);
+            if !brace_place.ok { return brace_place; }
+            for op in brace_place.ops { ops.push(op); }
         }
     }
 
@@ -4727,6 +4772,9 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
 
     let ops = [];
     let root_stow_angle_deg = root_stow_angle_rad * 180.0 / 3.141592653589793;
+    // The starboard root is mirrored by its authored Y=180 mount rotation,
+    // so its local Z hinge target has the opposite sign to keep both ramps
+    // raised and clear of the landing legs.
     let root_target_deg = if side == "port" { root_stow_angle_deg }
         else { -root_stow_angle_deg };
     let root_rotation = if side == "port" { [0.0, 0.0, root_target_deg] }

@@ -110,7 +110,10 @@ fn _qualified_attribute(name) {
         "assemblySidePostCountPerSectionPerSide", "assemblySidePostWidthM",
         "assemblySidePostDepthM", "assemblySidePostEmbeddedDepthM",
         "assemblySidePostFirstCenterXM",
-        "assemblySidePostPitchM", "rampSectionHingeBarrelRadiusM",
+        "assemblySidePostPitchM", "assemblySideTrussChordHeightM",
+        "assemblySideTrussLowerChordCenterYM",
+        "assemblySideTrussBraceThicknessM", "assemblySideTrussBraceCountPerSide",
+        "rampSectionHingeBarrelRadiusM",
         "rampSectionHingeBarrelLengthM", "rampSectionHingeBarrelCenterYM",
         "rampSocketX", "rampSocketY", "rampSocketZ",
         "rampPortDeploymentAngleRad", "rampStarboardDeploymentAngleRad",
@@ -789,6 +792,10 @@ fn ramp_side_post_depth_m() { _sysml_attribute("assemblySidePostDepthM") }
 fn ramp_side_post_embedded_depth_m() { _sysml_attribute("assemblySidePostEmbeddedDepthM") }
 fn ramp_side_post_first_center_x_m() { _sysml_attribute("assemblySidePostFirstCenterXM") }
 fn ramp_side_post_pitch_m() { _sysml_attribute("assemblySidePostPitchM") }
+fn ramp_side_truss_chord_height_m() { _sysml_attribute("assemblySideTrussChordHeightM") }
+fn ramp_side_truss_lower_chord_center_y_m() { _sysml_attribute("assemblySideTrussLowerChordCenterYM") }
+fn ramp_side_truss_brace_thickness_m() { _sysml_attribute("assemblySideTrussBraceThicknessM") }
+fn ramp_side_truss_brace_count_per_side() { _sysml_integer("assemblySideTrussBraceCountPerSide") }
 fn ramp_section_hinge_barrel_radius_m() { _sysml_attribute("rampSectionHingeBarrelRadiusM") }
 fn ramp_section_hinge_barrel_length_m() { _sysml_attribute("rampSectionHingeBarrelLengthM") }
 fn ramp_section_hinge_barrel_center_y_m() { _sysml_attribute("rampSectionHingeBarrelCenterYM") }

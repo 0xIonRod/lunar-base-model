@@ -239,6 +239,8 @@ fn on_tick(me, ctx) {
         });
         let root_joint = ROOT + "/RampHinge" + suffix;
         let joint_offset = if side == "port" { 0 } else { 2 };
+        let root_stow_angle_deg = _source_number(source,
+            "physicalRampRootStowedAngleRad") * 180.0 / pi * sign;
 
         checks.push(_check("GRR-001-" + side + "-ramp-root", "ramp", "grr001", "exists", ramp));
         checks[checks.len() - 1].expected_type = "Xform";
@@ -262,6 +264,13 @@ fn on_tick(me, ctx) {
             requirement: "grr005", verification: VERIFICATION,
             kind: "attribute_equals", path: root_joint,
             attr: "physics:axis", expected: "Z"});
+        checks.push(#{id: "GRR-017-" + side + "-root-flight-stow-target",
+            component: "ramp", requirement: "grr017", verification: VERIFICATION,
+            kind: "attribute", path: root_joint,
+            attr: "drive:angular:physics:targetPosition",
+            expected: root_stow_angle_deg, tolerance: 0.002});
+        checks.push(_attribute_component("GRR-017-" + side + "-root-flight-stow-transform",
+            "grr017", ramp, "xformOp:rotateXYZ", 2, root_stow_angle_deg));
         let deployment_limit_deg = _source_number(source, "rampMaxDeploymentAngleRad") * 180.0 / pi;
         let root_stow_limit_deg = _source_number(source,
             "physicalRampRootJointStowLimitRad") * 180.0 / pi;

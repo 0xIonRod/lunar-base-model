@@ -72,12 +72,16 @@ fn _stowed_rail_leg_envelope() {
         if record.geometry_bounds != () { by_path[record.path] = record.geometry_bounds; }
     }
     let lowest_rail = 1.0e30;
+    let lowest_rail_path = "";
     for path in rail_paths {
         let bounds = by_path[path];
         if bounds == () || bounds.min == () || bounds.min.len() < 2 {
             return #{ok: false, error: "composed rail geometry bounds are missing", path: path};
         }
-        if bounds.min[1] < lowest_rail { lowest_rail = bounds.min[1]; }
+        if bounds.min[1] < lowest_rail {
+            lowest_rail = bounds.min[1];
+            lowest_rail_path = path;
+        }
     }
     let highest_leg = -1.0e30;
     for path in leg_paths {
@@ -88,6 +92,7 @@ fn _stowed_rail_leg_envelope() {
         if bounds.max[1] > highest_leg { highest_leg = bounds.max[1]; }
     }
     #{ok: true, lowest_stowed_rail_bottom_y_m: lowest_rail,
+      lowest_stowed_rail_path: lowest_rail_path,
       highest_landing_leg_top_y_m: highest_leg,
       vertical_clearance_m: lowest_rail - highest_leg,
       rail_prim_count: rail_paths.len(), leg_prim_count: leg_paths.len()}
@@ -98,7 +103,11 @@ fn on_tick(me, ctx) {
     let attributes = [];
     for name in ["rampSectionLengthM", "rampSectionGeometryToleranceM",
         "rampSurfaceCenterYM", "rampSurfaceThicknessM", "rampRailCenterYM",
-        "rampRailHeightM", "rampMaxDeploymentAngleRad", "physicalRampMountY", "physicalRampPortMountX",
+        "rampRailHeightM", "rampRailOffsetZM", "rampMaxDeploymentAngleRad",
+        "assemblySidePostCountPerSectionPerSide", "assemblySidePostFirstCenterXM",
+        "assemblySidePostPitchM", "assemblySideTrussChordHeightM",
+        "assemblySideTrussLowerChordCenterYM", "assemblySideTrussBraceThicknessM",
+        "assemblySideTrussBraceCountPerSide", "physicalRampMountY", "physicalRampPortMountX",
         "physicalRampStarboardMountX", "physicalRampSectionJointLimitRad",
         "physicalRampRootJointStowLimitRad", "physicalRampRootStowedAngleRad",
         "physicalRampSectionStowedAngleRad", "physicalRampToeSectionStowedAngleRad",
@@ -106,7 +115,8 @@ fn on_tick(me, ctx) {
         attributes.push(_source_attr(name));
     }
     let source = sysml_requirements::source_with_selection(attributes,
-        ["GriffinRampRequirements::grr017", "GriffinRampRequirements::grr018"],
+        ["GriffinRampRequirements::grr017", "GriffinRampRequirements::grr018",
+         "GriffinRampRequirements::grr019"],
         ["GriffinRampRequirements::Verify_GriffinRampFlightStow"]);
     if source == () || source.ok != true {
         throw("Griffin ramp flight-stow SysML source selection is invalid");
@@ -127,6 +137,16 @@ fn on_tick(me, ctx) {
     checks.push(_constraint("GRR-018-rails-on-upper-track-face", "grr018",
         "GRC023_RailsRemainOnUpperTrackFace",
         #{railBottomYM: rail_bottom_y, walkingSurfaceTopYM: surface_top_y,
+          toleranceM: _source_number(source, "rampSectionGeometryToleranceM")}));
+    checks.push(_constraint("GRR-019-truss-source-envelope", "grr019",
+        "GRC026_SideTrussBracing",
+        #{braceCountPerSide: _source_number(source, "assemblySideTrussBraceCountPerSide").to_int(),
+          postCountPerSide: _source_number(source, "assemblySidePostCountPerSectionPerSide").to_int(),
+          braceThicknessM: _source_number(source, "assemblySideTrussBraceThicknessM"),
+          lowerChordHeightM: _source_number(source, "assemblySideTrussChordHeightM"),
+          lowerChordCenterYM: _source_number(source, "assemblySideTrussLowerChordCenterYM"),
+          upperChordCenterYM: _source_number(source, "rampRailCenterYM"),
+          walkingSurfaceTopYM: surface_top_y,
           toleranceM: _source_number(source, "rampSectionGeometryToleranceM")}));
     checks.push(_constraint("GRR-017-post-touchdown-unfold-target", "grr017",
         "GRC024_RampSectionDeploymentTargetIsLevel",
@@ -160,6 +180,8 @@ fn on_tick(me, ctx) {
     let root_deg = root_rad * 180.0 / 3.141592653589793;
     let ramp_names = ["EgressRampPort", "EgressRampStarboard"];
     let root_joint_names = ["RampHingePort", "RampHingeStarboard"];
+    let section_limit_deg = _source_number(source,
+        "physicalRampSectionJointLimitRad") * 180.0 / 3.141592653589793;
     let joint_names = [
         ["RampSectionHingePort01", "RampSectionHingePort12"],
         ["RampSectionHingeStarboard01", "RampSectionHingeStarboard12"]
@@ -171,6 +193,8 @@ fn on_tick(me, ctx) {
         checks[checks.len() - 1].expected_type = "Xform";
         checks.push(_attribute_component("GRR-017-" + side + "-mount-y", "grr017",
             ramp, "xformOp:translate", 1, _source_number(source, "physicalRampMountY")));
+        // The starboard root's Y=180 mount rotation mirrors its local hinge
+        // direction, so the stow target has the opposite sign on that side.
         let root_target_deg = if side_index == 0 { root_deg } else { -root_deg };
         checks.push(_attribute_component("GRR-017-" + side + "-root-stow-angle", "grr017",
             ramp, "xformOp:rotateXYZ", 2, root_target_deg));
@@ -219,6 +243,10 @@ fn on_tick(me, ctx) {
                 "grr017", joint, "physics:body1", section));
             checks.push(_attribute("GRR-017-" + side + "-joint-" + section_index.to_string() + "-flight-target",
                 "grr017", joint, "drive:angular:physics:targetPosition", target_angle_deg));
+            checks.push(_attribute("GRR-017-" + side + "-joint-" + section_index.to_string() + "-lower-limit",
+                "grr017", joint, "physics:lowerLimit", -section_limit_deg));
+            checks.push(_attribute("GRR-017-" + side + "-joint-" + section_index.to_string() + "-upper-limit",
+                "grr017", joint, "physics:upperLimit", section_limit_deg));
             for rail_name in ["OuterRail", "InnerRail"] {
                 let rail = section + "/" + rail_name;
                 checks.push(_attribute_component("GRR-018-" + side + "-" + section_index.to_string() + "-" + rail_name + "-top-y",
@@ -227,6 +255,23 @@ fn on_tick(me, ctx) {
                 checks.push(_attribute_component("GRR-018-" + side + "-" + section_index.to_string() + "-" + rail_name + "-height",
                     "grr018", rail, "xformOp:scale", 1,
                     _source_number(source, "rampRailHeightM")));
+            }
+            let truss_brace_count = _source_number(source,
+                "assemblySideTrussBraceCountPerSide").to_int();
+            for truss_side in ["Port", "Starboard"] {
+                let lower_chord_path = section + "/SideTrussLowerChord" + truss_side;
+                checks.push(_check("GRR-019-" + side + "-" + section_index.to_string()
+                    + "-" + truss_side + "-lower-chord", "grr019", "exists",
+                    lower_chord_path));
+                checks[checks.len() - 1].expected_type = "Cube";
+                for brace_index in 0..truss_brace_count {
+                    let brace_path = section + "/SideTrussBrace" + truss_side
+                        + (brace_index + 1).to_string();
+                    checks.push(_check("GRR-019-" + side + "-" + section_index.to_string()
+                        + "-" + truss_side + "-brace" + (brace_index + 1).to_string(),
+                        "grr019", "exists", brace_path));
+                    checks[checks.len() - 1].expected_type = "Cube";
+                }
             }
         }
         let deck_section = ramp + "/DeckSection";
@@ -267,7 +312,10 @@ fn on_tick(me, ctx) {
     result.metrics = #{clock: clock_snapshot(), root: ROOT,
         component_package: "GriffinRampRequirements",
         verification: VERIFICATION, separate_component_document: true,
-        stowed_rail_leg_envelope: envelope};
+        stowed_rail_leg_envelope: envelope,
+        lowest_stowed_rail_path: if envelope.ok == true {
+            envelope.lowest_stowed_rail_path
+        } else { "unavailable" }};
     report_structured_verdict(result, "GRIFFIN RAMP FLIGHT STOW",
         "GRIFFIN_RAMP_FLIGHT_STOW");
     this.done = true;

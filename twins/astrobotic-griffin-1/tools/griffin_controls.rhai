@@ -58,7 +58,7 @@ fn show_touchdown_actions() {
 }
 
 fn show_ramp_unfolding_actions() {
-    hint("RAMP UNFOLDING: section hinges are straightening before the deck hinges lower the ramps.");
+    hint("RAMP UNFOLDING: section hinges stay straight while both deck hinges lower the ramps to terrain.");
     set_surface_action_buttons(false, false);
 }
 

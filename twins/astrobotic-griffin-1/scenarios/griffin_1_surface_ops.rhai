@@ -239,10 +239,9 @@ fn touchdown_notice(me) {
     print("[griffin] touchdown confirmed");
 }
 
-fn unfold_ramp_sections(me) {
-    // Keep each root hinge at its upright transport angle while the four real
-    // intermediate hinges straighten. This keeps the toes above the lander
-    // and landing legs; only the now-straight assemblies swing down to terrain.
+fn level_ramp_sections(me) {
+    // After the image-based folded descent pose, reassert the authored level
+    // traversal target at each intermediate hinge before lowering the roots.
     let angle = griffin_spec::physical_ramp_section_drive_target_rad();
     if angle == () { return #{ok: false, error: "deployed ramp-section angle is missing from SysML"}; }
     let joints = griffin_spec::ramp_intermediate_joint_names();
@@ -253,13 +252,13 @@ fn unfold_ramp_sections(me) {
     for name in joints {
         let result = griffin_surface_ops::set_physical_ramp_hinge_angle(name, angle);
         if result == () || result.ok != true {
-            return #{ok: false, error: "ramp-section unfold command was rejected", hinge: name, result: result};
+            return #{ok: false, error: "ramp-section level command was rejected", hinge: name, result: result};
         }
         writes.push(result);
     }
-    emit("griffin_ramp_sections_unfold_commanded");
-    notify_kind("Griffin ramp sections are unfolding after touchdown.", "info");
-    print("[griffin] physical ramp-section unfold commands accepted");
+    emit("griffin_ramp_sections_level_commanded");
+    notify_kind("Griffin ramp sections are held straight while the ramps lower.", "info");
+    print("[griffin] physical ramp-section level commands accepted");
     #{ok: true, joints: writes, angle_rad: angle}
 }
 
@@ -485,10 +484,10 @@ fn task(me, ctx) {
         wait_until(|m| this.ramp_unfold_requested || this.phase_timeout),
         check(|m| this.phase_timeout != true),
         once(|m| {
-            let unfold = unfold_ramp_sections(m);
-            if unfold.ok != true {
+            let level = level_ramp_sections(m);
+            if level.ok != true {
                 this.phase_timeout = true;
-                fail_phase(this, "ramp-unfold");
+                fail_phase(this, "ramp-section-level");
             }
             true
         }),

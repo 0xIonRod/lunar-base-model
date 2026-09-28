@@ -58,38 +58,43 @@ shared SysML/USD requirements evaluator.
 
 ## Physical flight stow and rail clearance
 
-`GRR-017` owns a replaceable three-hinge flight fold: each root section rotates
-upward by 90 degrees (mirrored on starboard), then its middle and toe sections
-fold by -90 degrees. This packs the three full-size sections beside the lander
-instead of leaving the toe extended outboard. The root hinges now have
-asymmetric source-owned travel: the deployment side stays at the 50 degree
-operational limit, while the stow side allows 120 degrees. `GRR-018` keeps the
-rail bottoms on the upper track face: the authored rail bottom and track top
-are both Y=0.09 m in section-local coordinates. The focused composed-USD check
-measures all 12 rail bounds and 40 landing-leg geometry bounds in the canonical
-stage frame. `Verify_GriffinRampFlightStow` passed 70/70 checks at source
-revision `225344422510235598`: the lowest stowed rail point is Y=5.19 m, the
-highest landing-leg point is Y=2.44 m, and the clearance is 2.75 m.
+`GRR-017` owns the image-based flight-stow pose: the port root holds +120 degrees
+and the starboard root holds -120 degrees because its mount is mirrored 180
+degrees about Y. This folds both ramp bundles inward over the deck while keeping
+the lowest rails above the landing-leg envelope. Both intermediate hinges turn
+180 degrees to nest all three sections into a compact transport bundle. The section
+hinges expose their full +/-180 degree travel so the fold can be commanded and
+inspected across its complete range. These angles are replaceable study
+estimates from the user-provided Griffin reference, not released supplier
+geometry. The root hinges retain source-owned asymmetric travel: deployment
+stays within the 50 degree operational limit while stow uses the available
+120 degree limit.
+`GRR-018` keeps the rail bottoms on the upper track face: the authored rail
+bottom and track top are both Y=0.09 m in section-local coordinates. The
+focused composed-USD check measures all 12 rail bounds and 40 landing-leg
+geometry bounds in the canonical stage frame.
 
-NASA/Astrobotic public material confirms that the ramp package stows for launch
-and deploys after release, but does not show the stowed geometry or publish the
-supplier mechanism ICD. The exact fold and its asymmetric hinge travel are
-therefore explicit Twin study assumptions, not a claim of released flight
-hardware geometry.
+NASA describes Griffin's ramps as folding ramps and Astrobotic documents the
+optional egress-ramp interface, but public material does not publish the
+flight-stowed mechanism geometry or supplier ICD. The reference image controls
+this study pose; the mirrored 120 degree root angles and asymmetric travel
+remain explicit replaceable assumptions, not a claim of released
+flight-hardware geometry.
 
 After touchdown and four-leg contact are confirmed, press **U** or choose
 **UNWIND RAMP** in the guided HUD. After a 1.5 s touchdown settle, the mission
-straightens all four section hinges while the root hinges remain upright,
-waits 3 s, then lowers the deck hinges to the terrain angle and waits 4 s for
-settling. **G** or **RELEASE ROVER** becomes available after that settle
-interval. The `griffin_surface_ops::request_ramp_unfold()` Rhai function
-provides the command path. `physical_ramp_hinge_report()` returns the minimum
-and maximum for all six hinges in degrees and radians plus any live angle-port
-records; `set_physical_ramp_hinge_angle(name, radians)` checks the composed
-limits before commanding one hinge. The focused flight-stow verification is
-static pose and source evidence; it does not exercise the touchdown, operator
-unfold, deck deployment, rover release, or 60 s post-touchdown stability. Those
-still require a full mission run that reaches them.
+commands zero at all four intermediate hinges, waits 3 s, then lowers the two
+straight ramp assemblies from their raised pose to the terrain angles and
+waits 4 s for settling. **G** or **RELEASE ROVER** becomes available after
+that settle interval. The `griffin_surface_ops::request_ramp_unfold()` Rhai
+function provides the command path. `physical_ramp_hinge_report()` returns the
+minimum and maximum for all six hinges in degrees and radians plus any live
+angle-port records; `set_physical_ramp_hinge_angle(name, radians)` checks the
+composed limits before commanding one hinge. The focused flight-stow
+verification is static pose and source evidence; it does not exercise the
+touchdown, operator unfold, deck deployment, rover release, or 60 s
+post-touchdown stability. Those still require a full mission run that reaches
+them.
 
 ## Evidence
 
