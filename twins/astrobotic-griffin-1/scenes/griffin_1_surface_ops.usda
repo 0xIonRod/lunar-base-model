@@ -146,12 +146,12 @@ def Xform "Griffin1SurfaceOps" (
         {
             point3f physics:localPos0 = (3.200000048, 5.190000057, 0.0)
             float physics:lowerLimit = -50.0
-            float physics:upperLimit = 50.0
+            float physics:upperLimit = 60.0
         }
         def "RampHingeStarboard"
         {
             point3f physics:localPos0 = (-3.200000048, 5.190000057, 0.0)
-            float physics:lowerLimit = -50.0
+            float physics:lowerLimit = -150.0
             float physics:upperLimit = 50.0
         }
     }

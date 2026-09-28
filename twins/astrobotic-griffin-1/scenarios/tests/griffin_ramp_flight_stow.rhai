@@ -175,6 +175,9 @@ fn on_tick(me, ctx) {
         envelope_binding, "usd", 0.0));
 
     let section_length = _source_number(source, "rampSectionLengthM");
+    let middle_fold_axis_y = _source_number(source, "rampRailCenterYM")
+        + _source_number(source, "rampRailHeightM") / 2.0;
+    let toe_fold_axis_y = -_source_number(source, "rampSurfaceThicknessM") / 2.0;
     let middle_rad = _source_number(source, "physicalRampSectionStowedAngleRad");
     let toe_rad = _source_number(source, "physicalRampToeSectionStowedAngleRad");
     let port_root_deg = _source_number(source,
@@ -237,6 +240,11 @@ fn on_tick(me, ctx) {
             checks[checks.len() - 1].expected_type = "Xform";
             checks.push(_attribute_component("GRR-017-" + side + "-section-" + section_index.to_string() + "-x",
                 "grr017", section, "xformOp:translate", 0, section_length));
+            let expected_stowed_y = if section_index == 0 {
+                2.0 * middle_fold_axis_y
+            } else { 2.0 * toe_fold_axis_y };
+            checks.push(_attribute_component("GRR-017-" + side + "-section-" + section_index.to_string() + "-stack-y",
+                "grr017", section, "xformOp:translate", 1, expected_stowed_y));
             checks.push(_attribute_component("GRR-017-" + side + "-section-" + section_index.to_string() + "-rotation-z",
                 "grr017", section, "xformOp:rotateXYZ", 2, angle_deg));
 
@@ -250,6 +258,13 @@ fn on_tick(me, ctx) {
                 "grr017", joint, "physics:body0", body0));
             checks.push(_relationship("GRR-017-" + side + "-joint-" + section_index.to_string() + "-body1",
                 "grr017", joint, "physics:body1", section));
+            let expected_hinge_y = if section_index == 0 {
+                middle_fold_axis_y
+            } else { toe_fold_axis_y };
+            checks.push(_attribute_component("GRR-017-" + side + "-joint-" + section_index.to_string() + "-stack-anchor0-y",
+                "grr017", joint, "physics:localPos0", 1, expected_hinge_y));
+            checks.push(_attribute_component("GRR-017-" + side + "-joint-" + section_index.to_string() + "-stack-anchor1-y",
+                "grr017", joint, "physics:localPos1", 1, expected_hinge_y));
             checks.push(_attribute("GRR-017-" + side + "-joint-" + section_index.to_string() + "-flight-target",
                 "grr017", joint, "drive:angular:physics:targetPosition", target_angle_deg));
             checks.push(_attribute("GRR-017-" + side + "-joint-" + section_index.to_string() + "-lower-limit",

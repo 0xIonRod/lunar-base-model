@@ -405,10 +405,10 @@ package GriffinRampRequirements {
         attribute physicalRampSectionInertiaYKgM2 : Real = 76.172636183;
         attribute physicalRampSectionInertiaZKgM2 : Real = 43.931747294;
         attribute physicalRampSectionMassPartitionToleranceKg : Real = 0.001;
-        attribute physicalRampPortRootJointStowLimitRad : Real = 1.047197551;
-        attribute physicalRampPortRootStowedAngleRad : Real = 0.785398163;
+        attribute physicalRampPortRootJointStowLimitRad : Real = 1.0471975512;
+        attribute physicalRampPortRootStowedAngleRad : Real = 0.7853981634;
         attribute physicalRampStarboardRootJointStowLimitRad : Real = 2.617993878;
-        attribute physicalRampStarboardRootStowedAngleRad : Real = 2.356194490;
+        attribute physicalRampStarboardRootStowedAngleRad : Real = 2.3561944902;
         attribute physicalRampSectionJointLimitRad : Real = 3.141592654;
         attribute physicalRampSectionStowedAngleRad : Real = 3.141592654;
         attribute physicalRampToeSectionStowedAngleRad : Real = 3.141592654;
@@ -489,7 +489,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR017_FlightStowAndPostTouchdownUnfold {
-        doc /* During descent, the port root holds +45 degrees and the starboard root holds -135 degrees locally. The starboard assembly's 180 degree Y mount makes their folded runs parallel over the deck with clearance between bundles. Port root travel is limited to +60 degrees and starboard to -150 degrees; both leave 15 degrees beyond the stowed target while retaining their deployment targets. Both intermediate hinges turn 180 degrees to fold each three-section ramp into a compact transport bundle. The section joints expose their full +/-180 degree travel. These image-based angles are replaceable study estimates from the user-provided Griffin reference; they are not released supplier geometry. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive all four intermediate hinges to their level targets, then move both deck hinges into the deployment envelope. */
+        doc /* During descent, the port root holds +45 degrees and the starboard root holds -135 degrees locally. The starboard assembly's 180 degree Y mount mirrors the root orientation. Port root travel spans -50 to +60 degrees; starboard spans -150 to +50 degrees, leaving 15 degrees beyond each stowed datum while retaining the deployment targets. Both intermediate hinges turn 180 degrees. The first hinge axis is offset to the top rail chord and the second by half the walking-surface thickness, so the three sections stack as a compact bundle instead of occupying one plane. At zero hinge angle these frame offsets keep the deployed walking surfaces level. The section joints expose their full +/-180 degree travel. These image-based angles and fold offsets are replaceable study estimates informed by the user-provided Griffin view; they are not released supplier geometry. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive all four intermediate hinges to their level targets, then move both deck hinges into the deployment envelope. */
         require GRC022_RampFlightStowAnglesWithinTravel {
             in portRootStowAngleRad = GriffinEgressRamp::physicalRampPortRootStowedAngleRad;
             in starboardRootStowAngleRad = GriffinEgressRamp::physicalRampStarboardRootStowedAngleRad;

@@ -3005,7 +3005,7 @@ def Xform "Griffin1" (
         float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
         custom float lunco:deployment_angle_rad = 0.0
         custom double3 xformOp:translate = (3.2, 5.19, 0.0)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 44.99999997722789)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double lunco:operational_width_m = 3.5
         custom double lunco:wheel_clearance_m = 0.15
@@ -3016,24 +3016,6 @@ def Xform "Griffin1" (
         )
         {
             custom token lunco:ramp:section:identity = "DeckSection"
-            def "RampTrackPort"
-            {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
-                bool physics:collisionEnabled = true
-                uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, 1.15)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            }
-            def "RampTrackStarboard"
-            {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
-                bool physics:collisionEnabled = true
-                uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, -1.15)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            }
             over "OuterRail"
             {
                 custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
@@ -3239,13 +3221,19 @@ def Xform "Griffin1" (
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
+            def Mesh "RampTrackPort"
+            {
+            }
+            def Mesh "RampTrackStarboard"
+            {
+            }
         }
         def Xform "MiddleSection" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
             references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
         )
         {
-            custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
+            custom double3 xformOp:translate = (4.076201667, 1.62, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
             float physics:mass = 31.66666603088379
@@ -3256,30 +3244,12 @@ def Xform "Griffin1" (
                 references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda@</RampToeSection>
             )
             {
-                custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
+                custom double3 xformOp:translate = (4.076201667, -0.18, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
                 float physics:mass = 31.66666603088379
                 float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
                 custom token lunco:ramp:section:identity = "ToeSection"
-                def "RampTrackPort"
-                {
-                    point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (3.7352850437164307, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (3.7352850437164307, -0.09000000357627869, 0.30000001192092896)]
-                    bool physics:collisionEnabled = true
-                    uniform token physics:approximation = "convexHull"
-                    custom double3 xformOp:translate = (0.0, 0.0, 1.15)
-                    custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                }
-                def "RampTrackStarboard"
-                {
-                    point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (3.7352850437164307, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (3.7352850437164307, -0.09000000357627869, 0.30000001192092896)]
-                    bool physics:collisionEnabled = true
-                    uniform token physics:approximation = "convexHull"
-                    custom double3 xformOp:translate = (0.0, 0.0, -1.15)
-                    custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                }
                 over "OuterRail"
                 {
                     custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
@@ -3485,24 +3455,12 @@ def Xform "Griffin1" (
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
-            }
-            def "RampTrackPort"
-            {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
-                bool physics:collisionEnabled = true
-                uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, 1.15)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            }
-            def "RampTrackStarboard"
-            {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
-                bool physics:collisionEnabled = true
-                uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, -1.15)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                def Mesh "RampTrackPort"
+                {
+                }
+                def Mesh "RampTrackStarboard"
+                {
+                }
             }
             over "OuterRail"
             {
@@ -3709,6 +3667,12 @@ def Xform "Griffin1" (
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
+            def Mesh "RampTrackPort"
+            {
+            }
+            def Mesh "RampTrackStarboard"
+            {
+            }
         }
         def PhysicsFixedJoint "RampTransitionJointPort"
         {
@@ -3727,7 +3691,7 @@ def Xform "Griffin1" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             float physics:mass = 15.0
             float3 physics:diagonalInertia = (15.352999687194824, 20.131000518798828, 4.859000205993652)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -44.99999997722789)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.0)
             def Cube "ContactSurface" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             )
@@ -3759,7 +3723,7 @@ def Xform "Griffin1" (
         float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
         custom float lunco:deployment_angle_rad = 0.0
         custom double3 xformOp:translate = (-3.2, 5.19, 0.0)
-        custom double3 xformOp:rotateXYZ = (0.0, 180.0, -134.99999998897945)
+        custom double3 xformOp:rotateXYZ = (0.0, 180.0, -135.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double lunco:operational_width_m = 3.5
         custom double lunco:wheel_clearance_m = 0.15
@@ -3770,24 +3734,6 @@ def Xform "Griffin1" (
         )
         {
             custom token lunco:ramp:section:identity = "DeckSection"
-            def "RampTrackPort"
-            {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
-                bool physics:collisionEnabled = true
-                uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, 1.15)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            }
-            def "RampTrackStarboard"
-            {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
-                bool physics:collisionEnabled = true
-                uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, -1.15)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            }
             over "OuterRail"
             {
                 custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
@@ -3993,13 +3939,19 @@ def Xform "Griffin1" (
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
+            def Mesh "RampTrackPort"
+            {
+            }
+            def Mesh "RampTrackStarboard"
+            {
+            }
         }
         def Xform "MiddleSection" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
             references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
         )
         {
-            custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
+            custom double3 xformOp:translate = (4.076201667, 1.62, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
             float physics:mass = 31.66666603088379
@@ -4010,30 +3962,12 @@ def Xform "Griffin1" (
                 references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda@</RampToeSection>
             )
             {
-                custom double3 xformOp:translate = (4.076201667, 0.0, 0.0)
+                custom double3 xformOp:translate = (4.076201667, -0.18, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
                 float physics:mass = 31.66666603088379
                 float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
                 custom token lunco:ramp:section:identity = "ToeSection"
-                def "RampTrackPort"
-                {
-                    point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (3.7352850437164307, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (3.7352850437164307, -0.09000000357627869, 0.30000001192092896)]
-                    bool physics:collisionEnabled = true
-                    uniform token physics:approximation = "convexHull"
-                    custom double3 xformOp:translate = (0.0, 0.0, 1.15)
-                    custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                }
-                def "RampTrackStarboard"
-                {
-                    point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (3.7352850437164307, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (3.7352850437164307, -0.09000000357627869, 0.30000001192092896)]
-                    bool physics:collisionEnabled = true
-                    uniform token physics:approximation = "convexHull"
-                    custom double3 xformOp:translate = (0.0, 0.0, -1.15)
-                    custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                }
                 over "OuterRail"
                 {
                     custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
@@ -4239,24 +4173,12 @@ def Xform "Griffin1" (
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
-            }
-            def "RampTrackPort"
-            {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
-                bool physics:collisionEnabled = true
-                uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, 1.15)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            }
-            def "RampTrackStarboard"
-            {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
-                bool physics:collisionEnabled = true
-                uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, -1.15)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                def Mesh "RampTrackPort"
+                {
+                }
+                def Mesh "RampTrackStarboard"
+                {
+                }
             }
             over "OuterRail"
             {
@@ -4463,6 +4385,12 @@ def Xform "Griffin1" (
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
+            def Mesh "RampTrackPort"
+            {
+            }
+            def Mesh "RampTrackStarboard"
+            {
+            }
         }
         def PhysicsFixedJoint "RampTransitionJointStarboard"
         {
@@ -4481,7 +4409,7 @@ def Xform "Griffin1" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             float physics:mass = 15.0
             float3 physics:diagonalInertia = (15.352999687194824, 20.131000518798828, 4.859000205993652)
-            custom double3 xformOp:rotateXYZ = (0.0, 180.0, -134.99999998897945)
+            custom double3 xformOp:rotateXYZ = (0.0, 180.0, -135.0)
             def Cube "ContactSurface" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             )
@@ -4555,8 +4483,8 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -180.0
         float physics:upperLimit = 180.0
-        point3f physics:localPos0 = (4.076201438903809, 0.0, 0.0)
-        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        point3f physics:localPos0 = (4.076201438903809, 0.8100000023841858, 0.0)
+        point3f physics:localPos1 = (0.0, 0.8100000023841858, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
         uniform token drive:angular:physics:type = "force"
@@ -4576,8 +4504,8 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -180.0
         float physics:upperLimit = 180.0
-        point3f physics:localPos0 = (4.076201438903809, 0.0, 0.0)
-        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        point3f physics:localPos0 = (4.076201438903809, -0.09000000357627869, 0.0)
+        point3f physics:localPos1 = (0.0, -0.09000000357627869, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
         uniform token drive:angular:physics:type = "force"
@@ -4597,8 +4525,8 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -180.0
         float physics:upperLimit = 180.0
-        point3f physics:localPos0 = (4.076201438903809, 0.0, 0.0)
-        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        point3f physics:localPos0 = (4.076201438903809, 0.8100000023841858, 0.0)
+        point3f physics:localPos1 = (0.0, 0.8100000023841858, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
         uniform token drive:angular:physics:type = "force"
@@ -4618,8 +4546,8 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -180.0
         float physics:upperLimit = 180.0
-        point3f physics:localPos0 = (4.076201438903809, 0.0, 0.0)
-        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        point3f physics:localPos0 = (4.076201438903809, -0.09000000357627869, 0.0)
+        point3f physics:localPos1 = (0.0, -0.09000000357627869, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
         uniform token drive:angular:physics:type = "force"

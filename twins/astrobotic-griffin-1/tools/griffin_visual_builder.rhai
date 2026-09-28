@@ -4698,6 +4698,9 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         "physicalRampSectionStowedAngleRad");
     let stowed_toe_angle_rad = _sysml_number(source,
         "physicalRampToeSectionStowedAngleRad");
+    let rail_center_y = _sysml_number(source, "rampRailCenterYM");
+    let rail_height = _sysml_number(source, "rampRailHeightM");
+    let fold_surface_thickness = _sysml_number(source, "rampSurfaceThicknessM");
     let drive_stiffness = _sysml_number(source,
         "physicalRampJointDriveStiffnessNmPerDeg");
     let drive_damping = _sysml_number(source,
@@ -4726,6 +4729,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         || mass_partition_tolerance == ();
     let missing_actuation = section_limit_rad == () || target_rad == ()
         || stowed_middle_angle_rad == () || stowed_toe_angle_rad == ()
+        || rail_center_y == () || rail_height == () || fold_surface_thickness == ()
         || root_stow_angle_rad == () || root_stow_limit_rad == ()
         || drive_stiffness == () || drive_damping == ()
         || drive_max_torque == () || deployment_limit_rad == ()
@@ -4742,7 +4746,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         || mass_partition_tolerance <= 0.0;
     let invalid_inertia = inertia_x <= 0.0 || inertia_y <= 0.0 || inertia_z <= 0.0;
     let invalid_actuation = section_limit_rad <= 0.0 || root_stow_limit_rad <= 0.0
-        || deployment_limit_rad <= 0.0 || root_stow_angle_rad <= 0.0
+        || deployment_limit_rad <= 0.0 || root_stow_angle_rad < 0.0
         || drive_stiffness <= 0.0 || drive_damping < 0.0 || drive_max_torque <= 0.0;
     let invalid_root_target = port_deployment_rad.abs() > deployment_limit_rad
         || starboard_deployment_rad.abs() > deployment_limit_rad
@@ -4785,6 +4789,13 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
 
     let ops = [];
     let root_stow_angle_deg = root_stow_angle_rad * 180.0 / 3.141592653589793;
+    // Put the first fold axis at the top rail chord so the reversed middle
+    // section stacks above the deck section instead of occupying the same
+    // center plane. The second hinge uses a half-surface-thickness offset to
+    // put the toe just above the inverted middle section when both folds are
+    // closed; both offsets disappear from the deployed plane at 0 degrees.
+    let middle_fold_axis_y = rail_center_y + rail_height / 2.0;
+    let toe_fold_axis_y = -fold_surface_thickness / 2.0;
     // Root angles are source-owned per side. The starboard Y=180 mount
     // reverses its local hinge sign so both folded runs point the same way.
     let root_target_deg = if side == "port" { root_stow_angle_deg }
@@ -4807,12 +4818,12 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         }
     }
     let middle_place = assembly_builder::place_plan(edit_target, middle_path,
-        [section_length, 0.0, 0.0], [0.0, 0.0,
+        [section_length, 2.0 * middle_fold_axis_y, 0.0], [0.0, 0.0,
             stowed_middle_angle_rad * 180.0 / 3.141592653589793], ());
     if !middle_place.ok { return middle_place; }
     for op in middle_place.ops { ops.push(op); }
     let toe_place = assembly_builder::place_plan(edit_target, toe_path,
-        [section_length, 0.0, 0.0], [0.0, 0.0,
+        [section_length, 2.0 * toe_fold_axis_y, 0.0], [0.0, 0.0,
             stowed_toe_angle_rad * 180.0 / 3.141592653589793], ());
     if !toe_place.ok { return toe_place; }
     for op in toe_place.ops { ops.push(op); }
@@ -4898,6 +4909,9 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
             stowed_middle_angle_rad
         } else { stowed_toe_angle_rad };
         let stowed_angle_deg = stowed_angle_rad * 180.0 / 3.141592653589793;
+        let hinge_axis_y = if section_index == 0 {
+            middle_fold_axis_y
+        } else { toe_fold_axis_y };
         for relation in [
             #{name: "physics:body0", targets: [body0]},
             #{name: "physics:body1", targets: [body1]}
@@ -4908,8 +4922,9 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         for item in [
             #{name: "physics:axis", type_name: "token", value: "\"Z\""},
             #{name: "physics:localPos0", type_name: "point3f",
-              value: "(" + section_length.to_string() + ", 0.0, 0.0)"},
-            #{name: "physics:localPos1", type_name: "point3f", value: "(0.0, 0.0, 0.0)"},
+              value: "(" + section_length.to_string() + ", " + hinge_axis_y.to_string() + ", 0.0)"},
+            #{name: "physics:localPos1", type_name: "point3f",
+              value: "(0.0, " + hinge_axis_y.to_string() + ", 0.0)"},
             #{name: "physics:lowerLimit", type_name: "float", value: (-section_limit_deg).to_string()},
             #{name: "physics:upperLimit", type_name: "float", value: section_limit_deg.to_string()},
             #{name: "drive:angular:physics:targetPosition", type_name: "float", value: stowed_angle_deg.to_string()},
