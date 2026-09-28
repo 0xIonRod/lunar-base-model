@@ -41,6 +41,9 @@ fn landing_gate_report() {
     let environment = find_path("/Griffin1SurfaceOps/Lander/Environment");
     let altimeter = find_path("/Griffin1SurfaceOps/Lander/Altimeter");
     let altimeter_model = find_path("/Griffin1SurfaceOps/Lander/Altimeter/Model");
+    let imu = find_path("/Griffin1SurfaceOps/Lander/IMU");
+    let attitude_reference = find_path("/Griffin1SurfaceOps/Lander/AttitudeReference");
+    let attitude_propulsion = find_path("/Griffin1SurfaceOps/Lander/AttitudePropulsion");
     let pose = query("QueryUsdPrim", #{
         path: "/Griffin1SurfaceOps/Lander",
         attrs: ["xformOp:translate"]
@@ -93,15 +96,37 @@ fn landing_gate_report() {
         guidance_unsaturated_throttle: get(gnc, "unsaturated_throttle"),
         guidance_pid_y: get(gnc, "pid_y_command"),
         guidance_altimeter_confidence: get(gnc, "altimeter_altitude_confidence"),
-        guidance_nav_y: get(gnc, "altimeter_vehicle_position_y"),
+        guidance_nav_y: get(gnc, "navigation.nav_pos_y"),
+        guidance_nav_velocity_y: get(gnc, "navigation.nav_vel_y"),
+        guidance_nav_acceleration_y: get(gnc, "navigation.navigation_accel_y"),
+        guidance_altitude_position_error: get(gnc, "navigation.altitude_position_error"),
+        guidance_altitude_observer_authority: get(gnc, "navigation.altitude_observation_authority.acquisition"),
+        guidance_altimeter_vehicle_position_y: get(gnc, "altimeter_vehicle_position_y"),
         environment_gravity_x: get(environment, "gravity_x"),
         environment_gravity_y: get(environment, "gravity_y"),
         environment_gravity_z: get(environment, "gravity_z"),
         guidance_nav_x: get(gnc, "navigation.nav_pos_x"),
         guidance_nav_z: get(gnc, "navigation.nav_pos_z"),
+        imu_raw_sample_valid: get(imu, "raw_sample_valid"),
+        imu_raw_acceleration_y: get(imu, "raw_acceleration_y"),
+        imu_specific_force_y: get(imu, "specific_force_y"),
+        imu_attitude_quaternion: [get(imu, "attitude_quat_w"), get(imu, "attitude_quat_x"),
+            get(imu, "attitude_quat_y"), get(imu, "attitude_quat_z")],
+        measured_attitude_error: [get(attitude_reference, "error_x"),
+            get(attitude_reference, "error_z")],
+        desired_tilt: [get(lander, "desired_tilt_x"), get(lander, "desired_tilt_z")],
+        requested_body_torque: [get(lander, "torque_x"), get(lander, "torque_y"),
+            get(lander, "torque_z")],
+        rcs_pitch_positive_a_thrust: get(attitude_propulsion, "pitch_pos_a_thrust_n"),
+        rcs_pitch_negative_a_thrust: get(attitude_propulsion, "pitch_neg_a_thrust_n"),
+        rcs_roll_positive_a_thrust: get(attitude_propulsion, "roll_pos_a_thrust_n"),
+        rcs_roll_negative_a_thrust: get(attitude_propulsion, "roll_neg_a_thrust_n"),
         ray_hit_valid: get(altimeter, "ray_hit_valid"),
         ray_distance_m: get(altimeter, "ray_distance"),
         ray_hit_position_y: get(altimeter, "ray_hit_position_y"),
+        altimeter_ray_direction_nav_y: get(altimeter_model, "ray_direction_nav_y"),
+        altimeter_vertical_projection: get(altimeter_model, "vertical_projection"),
+        altimeter_minimum_vertical_projection: get(altimeter_model, "minimum_vertical_projection"),
         altimeter_range_m: get(altimeter_model, "range_m"),
         altimeter_range_valid: get(altimeter_model, "range_valid"),
         altimeter_range_confidence: get(altimeter_model, "range_confidence"),
@@ -524,15 +549,22 @@ fn rover_route_settle_report(rover) {
     } else {
         physics.support_sample_tick
     };
-    let now_tick = sim_tick();
-    let support_fresh = support_sample_tick != () && now_tick >= support_sample_tick
-        && now_tick - support_sample_tick <= 1;
+    let now_tick = sim_tick().to_float();
+    let support_sample_tick_number = if support_sample_tick == () {
+        ()
+    } else {
+        support_sample_tick.to_float()
+    };
+    let support_fresh = support_sample_tick_number != ()
+        && now_tick >= support_sample_tick_number
+        && now_tick - support_sample_tick_number <= 1.0;
+    let has_support_contact = support_count != () && support_count.to_float() > 0.0;
     // Release is a ground-stability gate.  FLIP must have authoritative
     // support at the normalized surface datum before wheel torque is enabled;
     // a deck contact is not sufficient because the adapter has already been
     // detached and the rover is otherwise airborne.
     let ok = pose != () && speed != () && height_limit != () && speed_limit != ()
-        && support_count != () && support_count > 0
+        && has_support_contact
         && support_fresh
         && pose[1] <= height_limit && speed.abs() <= speed_limit;
     #{ok: ok,

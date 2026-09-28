@@ -11,6 +11,44 @@ const LANDER = "/Griffin1SurfaceOps/Lander";
 const ROVER = "/Griffin1SurfaceOps/FLIP";
 const DOCK = "/Griffin1SurfaceOps/FLIPPayloadAdapterJoint";
 
+fn simulation_dependencies(me, ctx) {
+    let lander = find_path(LANDER);
+    let gnc = find_path(LANDER + "/GNC");
+    let propulsion = find_path(LANDER + "/MainPropulsion");
+    let altimeter_model = find_path(LANDER + "/Altimeter/Model");
+    let imu = find_path(LANDER + "/IMU");
+    let attitude_reference = find_path(LANDER + "/AttitudeReference");
+    let attitude_propulsion = find_path(LANDER + "/AttitudePropulsion");
+    let rover = find_path(ROVER);
+    let lander_environment = find_path(LANDER + "/Environment");
+    let altimeter = find_path(LANDER + "/Altimeter");
+    let ramp_joints = [
+        find_path(LANDER + "/RampHingePort"),
+        find_path(LANDER + "/RampHingeStarboard"),
+        find_path(LANDER + "/RampSectionHingePort01"),
+        find_path(LANDER + "/RampSectionHingePort12"),
+        find_path(LANDER + "/RampSectionHingeStarboard01"),
+        find_path(LANDER + "/RampSectionHingeStarboard12"),
+    ];
+    let entity_reads = [lander, gnc, propulsion, altimeter_model, imu,
+        attitude_reference, attitude_propulsion, rover, lander_environment, altimeter];
+    let entity_writes = [rover];
+    for joint in ramp_joints {
+        entity_reads.push(joint);
+        entity_writes.push(joint);
+    }
+    #{
+        modelica_entities: [lander, gnc, propulsion, altimeter_model, imu,
+            attitude_reference, attitude_propulsion, rover],
+        entity_reads: entity_reads,
+        entity_writes: entity_writes,
+        query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
+            "QueryUsdPrim", "QueryPhysicsState", "PhysicsPerformance",
+            "ReadPorts", "ListOpenDocuments"],
+        required_inputs: []
+    }
+}
+
 fn trace_event(state, evt) {
     if state.event_trace == () || state.event_trace.len() >= 64 { return; }
     let source_id = if evt.source == () { () } else { evt.source };

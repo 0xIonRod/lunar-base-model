@@ -34,6 +34,10 @@ number changes.
   shows upright panels across adjacent sides of one lander sector. Image
   evidence supports qualitative layout only, not scale, exact normals, mount
   interfaces, or performance tolerances.
+- Griffin-1 stowed egress ramps: Astrobotic's [2021 Griffin-1 product image](https://www.astrobotic.com/wp-content/uploads/2021/02/griffin-1.png)
+  shows two raised ramp assemblies folded over the deck. This supports a
+  qualitative stowed silhouette; it does not disclose section dimensions,
+  hinge datums, joint travel, actuation, or the supplier mechanism ICD.
 - Griffin propulsion baseline: Astrobotic's current Griffin product page says
   seven main engines. The older polar/VIPER Griffin User Guide describes a
   five-engine baseline, so the older count is not applied to Griffin-1.
@@ -55,7 +59,7 @@ mission-owner data is supplied, do not present these as Griffin flight values:
 | communications geometry | study setup | deterministic local environment |
 | FLIP flight-stack attachment | unresolved in public data | the mission adapter and release interface require controlled integration data; current implementation status is recorded in `../contracts/implementation_gaps.md` |
 | Griffin payload capacity | source-backed product value | 625 kg published by Astrobotic; integrated mission load is a separate manifest quantity |
-| deck and egress | public mechanical ICD not released | Griffin owns the isogrid deck and ramp interface in its requirements; FLIP's public concept supports direct top-deck egress |
+| deck and egress | qualitative public image; mechanical ICD not released | Griffin owns the isogrid deck and ramp interface in its requirements. The 2021 Astrobotic image informs a raised, folded ramp silhouette only; hinge angles, section offsets, deployment kinematics, and FLIP's detailed interface remain Twin study values or unresolved |
 | Griffin-1 solar configuration | Three arrays, transit Sun-pointing intent, and the surface Sun quadrant are source-backed; exact installation data is unpublished | SysML owns three named arrays across the consecutive forward, bevel, and starboard faces. The Editor-authored vehicle references the shared panel component at all three rail-derived stations and uses panel widths derived from the mounting-rail pairs. Stations, panel normals, cutout outlines, support/hinge interfaces, deployment limits, control limits, and electrical behavior remain visual-study values or unresolved |
 | propellant tank count/type | unknown | four COPV-style visual assemblies are a Twin study assumption, not a published Griffin-1 tank ICD |
 

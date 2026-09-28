@@ -342,14 +342,38 @@ to `scenes/griffin_flip_visual.usda`; the powered mission is the separate
 
 The full surface mission was rerun with the refreshed terrain binary and
 exhausted its 14,400-tick bound without a verdict or `lander_touchdown`; the
-post-touchdown ramp drive and rover release therefore remain unverified. The
-saved `griffin-ramp-stow-review-2026-09-28.png` predates this stack-frame
-change and still shows the earlier splayed pose. The live Editor screenshot
-endpoint returned a 16x16 render target, so there is no fresh visual acceptance
-capture for the corrected pose. The stow geometry has a focused static PASS,
-but its visual match and powered hinge motion remain open.
+post-touchdown ramp drive and rover release therefore remain unverified. At
+that point the saved `griffin-ramp-stow-review-2026-09-28.png` predated the
+stack-frame change and the live Editor screenshot endpoint returned a 16x16
+render target, so visual acceptance remained open. The later image comparison
+and fresh offscreen capture below supersede that visual status.
 
 The ramp changes are committed locally as `5121fb0` on `main`; nothing was
 pushed. The terrain checkout was fast-forwarded to `54ad69a32`, equal to
 `origin/main`. Its six staged solar/acausal-network files were pre-existing and
 left untouched.
+
+## Continuation (2026-09-28, Astrobotic stow-image comparison)
+
+The user supplied Astrobotic's [2021 Griffin-1 product image](https://www.astrobotic.com/wp-content/uploads/2021/02/griffin-1.png)
+as the stowed-ramp reference. It shows two raised ramp bundles above the deck,
+with each three-panel assembly folded into a compact stack. The current source
+keeps the port root at +45 degrees and the starboard root at -135 degrees in
+its mirrored local datum; its 180-degree Y mount makes the bundles parallel.
+Both intermediate hinges stow at +180 degrees. I captured the current default
+`scenes/griffin_flip_visual.usda` composition offscreen at 1280x960 and replaced
+the stale image at `handover/griffin-ramp-stow-review-2026-09-28.png`.
+
+The refreshed terrain binary passed the exact
+`Verify_GriffinRampFlightStow` fixture: 131 checks, zero failures. Composed
+bounds cover all 12 rails and 40 landing-leg shapes; lowest rail bottom is
+Y=3.3444513 m, highest leg point is Y=2.44 m, and clearance is 0.9044513 m.
+The final run used Twin source revision `10204215186724938754`.
+The requirement and assumptions report now cite the image as qualitative pose
+evidence only. It does not publish section dimensions, hinge datums, actuator
+limits, deployment kinematics, or a supplier ICD.
+
+This closes the stale-image gap and confirms the saved stow silhouette plus
+static leg clearance. Powered hinge motion, the touchdown gate, ramp-ground
+contact, rover release/traversal, and the complete surface mission remain
+unverified; the mission is still `NO-VERDICT`.
