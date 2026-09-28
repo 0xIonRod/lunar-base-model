@@ -3,25 +3,29 @@
 Visual component: `components/lander/griffin_ramp_visual.usda`
 Requirements and visual dimensions: `requirements/griffin_ramp_requirements.sysml`
 
-The two Griffin ramps reference the same replaceable visual component from the
-vehicle assembly. The visual asset contains render geometry only. Its identity,
-child names, dimensions, support members, appearance, wheel clearance, and
-deployment limit are owned by the SysML source and checked by the shared
-SysML/USD requirements evaluator.
+The standalone visual ramp asset remains available for component previews. The
+integrated vehicle uses the six articulated physical hinge joints and their
+render geometry; its mount sockets do not instantiate a second static ramp.
+Section identities, dimensions, support members, appearance, wheel clearance,
+hinge limits, and drive values are owned by the SysML source and checked by the
+shared SysML/USD requirements evaluator.
 
 ## Ownership
 
-- `GriffinRampRequirements::GriffinEgressRamp` owns the shared visual dimensions,
-  child identities, and port/starboard deployment datums.
+- `GriffinRampRequirements::GriffinEgressRamp` owns the standalone visual
+  dimensions, physical child and hinge identities, and port/starboard
+  deployment datums.
 - `GRC005_DeploymentCommandWithinLimit` owns the symmetric command acceptance
   boundary in radians.
 - `GRC003_WidthClearsFlipWheelEnvelope` checks the FLIP lateral wheel stations,
   half wheel width, and authored clearance against the outside rail envelope.
 - `GRC016_ContactTrackClearsTire` checks each separate contact-track width
   against the source wheel width and two side clearances.
-- The physical ramp bodies, hinge joints, and deck transition belong to the
-  physical Griffin model and its separate requirements. The render component
-  does not provide a collider, mass, inertia, or a second physical body.
+- The physical ramp bodies, six hinge joints, and deck transition belong to
+  the physical Griffin model. The two root deck hinges and four section hinges
+  each expose the same source-owned angular drive values; the root joints had
+  limits but no drive before this repair. The render component does not provide
+  a collider, mass, inertia, or another physical body.
 - FLIP remains a referenced rover component; the ramp requirement reads FLIP's
   wheel datums through its SysML source.
 - The physical top deck uses eight hidden convex perimeter-beam colliders and
@@ -39,9 +43,11 @@ SysML/USD requirements evaluator.
   Twin-owned length literal.
 - GRR-010 checks both toe edges against the authored terrain height. Source
   geometry places the physical track centre at Y=5.19 m, aligns its top to the
-  adapter at Y=5.28 m, and uses a 12.228605 m top face at 49 degrees from the
-  3.98 m touchdown COM datum. These are replaceable study values; the typed
-  Editor update and deployed runtime traversal have not been read back yet.
+  adapter at Y=5.28 m, and uses a 12.228605 m top face at 27.833532 degrees
+  from the 0.44 m vehicle-reference touchdown datum. These are replaceable
+  study values. The focused GRR-010 check passed at source revision
+  `13950898190506578966`; both toe edges compute at terrain Y=0 within numeric
+  precision. Runtime deployment and rover traversal remain unverified.
 - GRR-011 owns the existing ramp-body mass and diagonal inertia in SysML and
   checks the composed body matches those values. They remain labeled Twin
   study proxies; center of mass and supplier mass properties are still open
@@ -49,6 +55,46 @@ SysML/USD requirements evaluator.
 - The ramp contact geometry uses two FLIP-aligned tracks, not a solid plate
   across the open centre. The same source wheel stations and track width drive
   render geometry and physical colliders.
+
+## Physical flight stow and rail clearance
+
+`GRR-017` owns the image-based flight-stow pose: the port root holds +45 degrees
+and the starboard root holds -135 degrees locally. The starboard assembly's 180
+degree Y mount makes both folded bundles run parallel above the deck, with 6.4 m
+between their root stations. Both intermediate hinges turn 180 degrees to fold
+each three-section ramp into its transport bundle. Their full +/-180 degree
+travel remains available for commanded deployment and inspection. These angles
+are replaceable study estimates from the user-provided Griffin reference, not
+released supplier geometry. The root hinges retain source-owned asymmetric
+travel: port runs from -50 to +60 degrees and starboard from -150 to +50
+degrees; the terrain targets remain -27.83 degrees port and +27.83 degrees
+starboard.
+`GRR-018` keeps the rail bottoms on the upper track face: the authored rail
+bottom and track top are both Y=0.09 m in section-local coordinates. The
+focused composed-USD check measures all 12 rail bounds and 40 landing-leg
+geometry bounds in the canonical stage frame.
+
+NASA describes Griffin's ramps as folding ramps and Astrobotic documents the
+optional egress-ramp interface, but public material does not publish the
+flight-stowed mechanism geometry or supplier ICD. The reference image controls
+this study pose; the parallel +45/-135 degree local root angles and asymmetric
+travel remain explicit replaceable assumptions, not a claim of released
+flight-hardware geometry.
+
+After touchdown and four-leg contact are confirmed, press **U** or choose
+**UNWIND RAMP** in the guided HUD. After a 1.5 s touchdown settle, the mission
+commands zero at all four intermediate hinges, waits 3 s, then lowers the two
+straight ramp assemblies from their raised pose to the terrain angles and
+waits 4 s for settling. **G** or **RELEASE ROVER** becomes available after
+that settle interval. The `griffin_surface_ops::request_ramp_unfold()` Rhai
+function provides the command path. `physical_ramp_hinge_report()` returns the
+minimum and maximum for all six hinges in degrees and radians plus any live
+angle-port records; `set_physical_ramp_hinge_angle(name, radians)` checks the
+composed limits before commanding one hinge. The focused flight-stow
+verification is static pose and source evidence; it does not exercise the
+touchdown, operator unfold, deck deployment, rover release, or 60 s
+post-touchdown stability. Those still require a full mission run that reaches
+them.
 
 ## Evidence
 

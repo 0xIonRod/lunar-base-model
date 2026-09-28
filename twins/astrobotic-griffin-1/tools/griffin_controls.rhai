@@ -31,11 +31,49 @@ fn show_briefing() {
     hint("CONTROL: click the lander or FLIP to possess; " + cancel + " releases control");
     objectives_hud([
         #{ text: "LANDER  " + thrust + " thrust | " + forward + "/" + backward + " pitch | " + left + "/" + right + " roll", state: "active" },
-        #{ text: "LANDER  " + yaw_left + "/" + yaw_right + " yaw | G release", state: "pending" },
+        #{ text: "LANDER  " + yaw_left + "/" + yaw_right + " yaw | U unwind ramp | G release rover", state: "pending" },
         #{ text: "FLIP    " + forward + "/" + backward + " drive | " + left + "/" + right + " steer | Space brake", state: "pending" },
         #{ text: "FLIP    " + action + " toggles autopilot; manual input takes authority back", state: "pending" },
         #{ text: "HANDOFF " + cancel + " releases the selected vehicle", state: "pending" }
     ]);
+    set_surface_action_buttons(false, false);
+}
+
+fn set_surface_action_buttons(unfold_enabled, release_enabled) {
+    let result = guided_hud_actions("griffin_surface_ops", "on_hud_action", [
+        #{id: "unfold_ramps", label: "UNWIND RAMP  U", enabled: unfold_enabled},
+        #{id: "release_rover", label: "RELEASE ROVER  G", enabled: release_enabled}
+    ]);
+    if result == () || result.ok != true {
+        let detail = if result == () || result.error == () { "unknown HUD action update rejection" } else { result.error };
+        notify_kind("Griffin mission buttons could not be updated: " + detail, "error");
+    }
+    result
+}
+
+fn show_touchdown_actions() {
+    show_briefing();
+    hint("TOUCHDOWN CONFIRMED: U or UNWIND RAMP to lower both ramps. G releases FLIP after the ramps settle.");
+    set_surface_action_buttons(true, false);
+}
+
+fn show_ramp_unfolding_actions() {
+    hint("RAMP UNFOLDING: section hinges stay straight while both deck hinges lower the ramps to terrain.");
+    set_surface_action_buttons(false, false);
+}
+
+fn show_rover_release_actions() {
+    hint("RAMPS SETTLED: G or RELEASE ROVER detaches FLIP from the top deck.");
+    set_surface_action_buttons(false, true);
+}
+
+fn show_rover_release_pending() {
+    hint("ROVER RELEASE REQUESTED: waiting for the physics joint to retire.");
+    set_surface_action_buttons(false, false);
+}
+
+fn clear_surface_operation_actions() {
+    clear_guided_hud_actions()
 }
 
 fn show_rover_controls() {
@@ -46,6 +84,7 @@ fn show_rover_controls() {
     let action = input_hint("action");
     let cancel = input_hint("cancel");
     let steering_mode = rover_steering_mode_label();
+    clear_surface_operation_actions();
     hint("FLIP CONTROL: " + forward + "/" + backward + " drive · " + left + "/" + right + " steer · Space brake · " + cancel + " release");
     objectives_hud([
         #{ text: "FLIP is the active surface vehicle", state: "active" },

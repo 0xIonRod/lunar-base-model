@@ -175,6 +175,11 @@ mission/tutorial scenario do not obscure the lander. Keep that scene for
 visual authoring; use `scenes/griffin_1_surface_ops.usda` for integration and
 runtime acceptance.
 
+Opening the Twin defaults to `scenes/griffin_flip_visual.usda`, the combined
+Griffin/FLIP review composition. The powered landing mission remains a separate
+scene; open `scenes/griffin_1_surface_ops.usda` when you want its mission
+controls and surface-operations sequence.
+
 For Griffin work, open the integrated `vehicles/griffin_1.usda` source through
 `scenes/griffin_1_editor.usda`; its visual components remain replaceable assets
 under `components/lander/`. Edit one component at a time through a dry Rhai
@@ -283,6 +288,8 @@ Run the isolated component gates with the same fixed-clock settings:
     luncosim test --scene twins/astrobotic-griffin-1/tests/flip_wheel_requirements.usda --verification FlipWheelRequirements::Verify_FLIPWheelRequirements --verdict-channel FLIP_WHEEL_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
     luncosim test --scene twins/astrobotic-griffin-1/tests/flip_sensor_power_requirements.usda --verification FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements --verdict-channel FLIP_SENSOR_POWER_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
     luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_ramp_requirements.usda --verification GriffinRampRequirements::Verify_GriffinRampRequirements --verdict-channel GRIFFIN_RAMP_REQUIREMENTS --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_ramp_flight_stow.usda --verification GriffinRampRequirements::Verify_GriffinRampFlightStow --verdict-channel GRIFFIN_RAMP_FLIGHT_STOW --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
+    luncosim test --scene twins/astrobotic-griffin-1/tests/griffin_ramp_touchdown_geometry.usda --verification GriffinRampRequirements::Verify_GriffinRampTouchdownGeometry --verdict-channel GRIFFIN_RAMP_TOUCHDOWN_GEOMETRY --max-ticks 120 --tick-hz 60 --threads 1 --jitter 0
 
 The fixtures deliberately load one vehicle at a time, while each registered
 observer scopes its checks to one component. A component gate is not replaced
@@ -293,15 +300,26 @@ lander, rover, or ramp can be reviewed and diagnosed independently.
 ### Check landing divergence
 
 `requirements/griffin_simulation_accuracy_requirements.sysml` owns the
-landing-stability horizon and speed/drift/upright-axis bounds. The integration
-source owns the separate repeatability tolerances. The Rhai contract test
-(`scenarios/tests/griffin_surface_ops_contract.rhai`) samples the composed
-lander every ten fixed ticks and emits a `GRIFFIN_LANDING_STABILITY` verdict
-plus a `GRIFFIN_LANDING_STABILITY_METRICS` JSON line. Run two fresh processes
-with the same scene revision and compare those metrics:
+post-touchdown stability horizon, observation cadence, four-leg-contact
+predicate, and speed/drift/upright-axis bounds. The integration source owns the
+separate repeatability tolerances. The Rhai contract test
+(`scenarios/tests/griffin_surface_ops_contract.rhai`) detects physical
+touchdown, samples the composed lander every ten fixed ticks for the next 60
+seconds, and emits a `GRIFFIN_LANDING_STABILITY` verdict plus a
+`GRIFFIN_LANDING_STABILITY_METRICS` JSON line. Run two fresh processes with the
+same scene revision and compare those metrics:
+
+The current powered-descent scene has not produced `lander_touchdown`: a
+fixed-clock diagnostic reached 390 simulated seconds before its 650 s wall
+timeout, so it could not start the required post-touchdown window. The mission
+therefore has not exercised the post-landing ramp-unfold step in runtime.
 
     LUNCOSIM_BIN=/path/to/terrain/target/debug/luncosim \
       twins/astrobotic-griffin-1/tools/check_landing_determinism.sh
+
+The default run bound is 30,000 fixed ticks (500 simulated seconds), long
+enough for the observed descent duration plus the required stability window.
+Set `GRIFFIN_LANDING_MAX_TICKS` to override it for focused diagnostics.
 
 The harness is deliberately not a second physics implementation: it only
 orchestrates two existing `luncosim test` invocations and applies the tolerances
@@ -368,7 +386,9 @@ execute the suite.
     .\target\debug\luncosim.exe --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda
 
 The old sandbox binary is not the target for this Twin. Use the production
-luncosim binary and the default scene from twin.toml.
+luncosim binary. The Twin default is the combined visual review scene;
+explicitly select `griffin_1_surface_ops.usda` for powered landing and its
+mission controls.
 
 The Griffin wrapper keeps attitude command inputs and valve activities in USD.
 `AttitudeActuation` selects the generic `SignedTorqueAllocator.mo` through

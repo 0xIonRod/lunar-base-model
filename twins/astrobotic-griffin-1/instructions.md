@@ -37,7 +37,8 @@ The package root is:
 Keep this structure:
 
     twin.toml
-    scenes/griffin_1_surface_ops.usda
+    scenes/griffin_flip_visual.usda         # default Griffin/FLIP review scene
+    scenes/griffin_1_surface_ops.usda       # explicit landing mission
     vehicles/griffin_1.usda
     vehicles/flip.usda
     behaviors/griffin_1_flip_patrol.btxml
@@ -84,7 +85,11 @@ Run:
 Expected result: six OK lines. A parse pass only proves syntax and source
 loading; it does not prove physics or mission completion.
 
-## Step 6: run the interactive Twin
+## Step 6: open the default visual Twin or run the landing mission
+
+Opening the Twin shows `scenes/griffin_flip_visual.usda`. To run the powered
+landing mission and its Griffin-specific control HUD, explicitly select the
+surface-operations scene below.
 
 Run:
 

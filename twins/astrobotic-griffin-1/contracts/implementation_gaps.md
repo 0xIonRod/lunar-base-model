@@ -20,19 +20,21 @@ usages and 23 verification cases: all 39 emitted evidence checks passed,
 including composed geometry and the typed GR-005 source catalog. This checks
 the authored study configuration and its verification procedures; it does not
 qualify flight behavior or remove the separate geometry, physics, and mission
-data gaps below. That packet's solver log also recorded five Avian joint-start
+data gaps below. That packet's solver log recorded five Avian joint-start
 seating errors: three angular residuals of 90° or 180° and two translation
-residuals of 3.44 m. No new flight-physics run was performed in this update;
-these remain the latest available runtime results, not a new acceptance verdict.
+residuals of 3.44 m. A later surface-operations run also reported five seating
+residuals, including 1.963 m translation residuals; it stopped before touchdown
+and produced no mission verdict. These runs are diagnostic observations, not
+flight-physics acceptance.
 
-The latest available Editor-loaded combined review scene packet reports 25 of
-76 checks failing (11 in GV-002, seven in GV-004, one in GV-006, five in GV-007,
-and one in FVG-001). The scene log reports missing or invisible leg subparts
-and later finite-world exits for articulated lander bodies. Treat the composed
-review as not physically integrated until those failures are resolved and read
-back; the older requirements pass does not cover this visual/physics result.
-These packet figures are the latest available evidence, not a new run in this
-update.
+The earlier combined Editor packet reported 25 of 76 checks failing (11 in
+GV-002, seven in GV-004, one in GV-006, five in GV-007, and one in FVG-001).
+After the bus and vehicle visual updates, a fresh run passed all 82 checks in
+six packets at source revision `6305100017349410906`. This closes those
+authored visual assertions for that composed fixture. It does not establish
+dynamic ramp articulation, rover traversal, or mission acceptance. The saved
+review image frames the lander, hosted FLIP, ramps, solar panels, legs, and
+polar terrain together.
 
 FLIP now has one integrated vehicle asset. Its SysML source owns the published
 battery-energy and solar-peak ratings; the Editor builder converts energy to
@@ -62,7 +64,7 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 | Verification | Requirement `verify` references are inside `objective` blocks; the Rust projection now carries source-linked `require` membership and the landing-stability case targets new requirement `GR-036` | Many text-only requirements still have no executable constraint; `GR-031` remains a separate process gate, while stability values are owned by `GR-036` |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links. The GR-005 evidence catalog resolves its typed requirement and source references to typed locators and roles | Coverage evaluation compares resolved handles and GR-005 source provenance is exercised in the runtime verifier. Provider observations still do not share one end-to-end identity across source revision, realization, composed-stage generation, physics sampling, and resulting evidence. Status/check catalogs remain authored execution metadata; derive the requirement matrix from requirement, verification, realization, and evidence links |
 | Units and frames | SysML type and literal measurement-reference identities use source-snapshot handles. Resolved linear `MeasurementUnit` definitions project SI dimensions, scales, and standard `UnitConversion::isExact` metadata from quantity-power factors, coherent SI base units, reference conversions, prefixes, and supported arithmetic unit initializers. Source quantities retain conversion exactness through typed native `Quantity` operations; the bounded Modelica length-vector adapter requires an exact resolved scale before lowering to SI | Static feature types still do not carry inferred units. Measurement uncertainty and instrument accuracy are not represented by scale exactness. Nonlinear and affine `MeasurementScale` mappings, unsupported definitions, typed frame identity, and end-to-end conversion provenance remain open. Griffin measurements are still mostly normalized to SI at the provider boundary |
-| Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, effective Avian-cooked Mesh/Cube geometry, exact analytic collider dimensions and poses, and a generic NURBS-to-USD-Mesh collision cook exist | No complete semantic part-usage graph binds every source feature to a USD realization. Griffin currently has no authored NURBS patch to cook. The planner uses `max_refinement_delta_m` to select adaptive tessellation, but its successive-level convergence change is not a certified upper bound on exact surface error |
+| Geometry | Profiles, station vectors, counts, typed source handles, resolved SysML relationships, composed USD queries, effective Avian-cooked Mesh/Cube geometry, exact analytic collider dimensions and poses, and a generic NURBS-to-USD-Mesh collision cook exist. `GriffinVehicleAssemblyRequirements` now declares the top-level parts, multiplicities, and separate FLIP reference-part boundary | The part graph is not yet joined to every canonical instance-identity array or to generic provider bindings; some compatibility count attributes still duplicate multiplicities. Griffin currently has no authored NURBS patch to cook. The planner's successive-level convergence change is not a certified upper bound on exact surface error |
 | Behavioral applicability | Mission order, sampling horizon, route phases, and release are mostly Rhai orchestration | The model cannot yet state and evaluate configuration, mode, phase, or temporal applicability as part of a reusable source-defined verification objective |
 | Modelica relationship | Continuous models and parameters are selected through Twin tooling | No complete standard realization/parameter provenance graph ties each equation set and result back to the source feature and requirement revision |
 
@@ -77,15 +79,49 @@ realized feature, and evidence result.
 
 The vehicle declares the four typed `PlumePhotometry` outputs used by the seven
 flame pairs and engine lights: `render_throttle`,
-`visual_length_fraction`, `intensity`, and `radius`. The generated Modelica
-network exposes all four member outputs and the USD connections target them.
-The active Griffin surface-operations document still fails Modelica
-compilation with `299 equations, 302 unknowns` (balance `-3`); its
-`CompileStatus` has no compiled model or latest run. A reversible diagnostic
-that removed `PlumePhotometry` left the same `-3` balance, so the remaining
-equation deficit is elsewhere in the propulsion network. No simulated plume
-values or visible engine plume have been verified. Resolve that network
-balance before treating GPP-008 as dynamically demonstrated.
+`visual_length_fraction`, `intensity`, and `radius`. The pulled model update
+`86796da` fixes the propulsion inputs. A fresh production surface-operations
+session compiled the main propulsion, attitude, GNC, sensor, and FLIP systems
+successfully. This confirms model compilation only; simulated plume values
+and visible plume behavior remain unverified.
+
+### Surface mission run status
+
+The surface route preflight now checks the authored marker positions before
+simulation, uses absolute USD path lookup, and agrees with the SysML rover exit
+marker at `x = 12.8 m`. A fresh run passed preflight and began powered descent.
+The lander moved from its 60 m start altitude, but no `lander_touchdown` event
+was observed before the session was stopped; no mission verdict was produced.
+Dynamic touchdown, ramp deployment, and FLIP egress remain open. The runtime
+also reported five Avian joint-start seating residuals (angular residuals of
+90° or 180° and translation residuals of 1.963 m), which need separate
+physical investigation.
+
+### Ramp flight-stow and rail-clearance status
+
+The physical ramp sections fold for descent with the middle hinges at the
+source-owned +90° target and toe hinges at -90°. After confirmed touchdown, the
+mission waits for **U** / **UNWIND RAMP**, commands all four intermediate hinge
+angles to the level target, waits 3 s, and then commands the deck hinges to
+lower the ramps. The two root deck hinges now have angular drives as well as
+limits; they previously had limits but no drives. After a 4 s settle interval,
+**G** / **RELEASE ROVER** detaches FLIP from the deck. These angles and drive
+values are explicit study assumptions pending the supplier mechanism ICD.
+
+The new `Verify_GriffinRampFlightStow` scene passed all 61 checks at source
+revision `1134567362502136608`. It verifies the authored section transforms
+and drive targets, section rail placement, and source-linked constraint
+results. A composed-world geometry query measured all 12 rail shapes and 40
+landing-leg shapes: the lowest stowed rail point is Y=5.19 m, the highest leg
+point is Y=2.44 m, and vertical clearance is 2.75 m. Rail bottoms remain at
+the track walking face in each section's local frame.
+
+A separate surface-operations run advanced 2,000 ticks (33.3 simulated
+seconds) after powered descent began but emitted no touchdown event. The
+unfold and deck-deployment commands were therefore not reached. Startup still
+reported two 180° Avian joint-seating residuals; the transition/landing
+physics investigation and a touchdown verdict remain open. Do not treat the
+static fold/clearance pass as dynamic articulation or landing acceptance.
 
 ### Landing-leg contact geometry status
 
@@ -228,8 +264,12 @@ become Griffin's permanent source semantics.
   support are source-owned. Editor has migrated the physical deck to eight
   octagonal perimeter colliders plus a separate payload-deck collider, with
   composed readback confirming the source profile and clear tank opening. The
-  GRR-012 composed-collider observation path exists; ramp transition changes
-  and fresh port/starboard Editor readback remain pending.
+  GRR-012 composed-collider observation path exists. Port and starboard
+  transition bodies have now been applied through the typed Editor API and read
+  back together at document generation 58. Each is an unscaled Xform rigid body
+  with SysML-owned mass/inertia, an enabled collidable contact cube, and a fixed
+  joint to the lander. This is static interface evidence; dynamic ramp
+  articulation and four-wheel rover traversal remain pending.
 - Twin verification observers bind authored requirements to composed source
   and USD observations. The generic evaluator owns requirement membership,
   constraint evaluation, and verdict classification; observers supply the
@@ -244,15 +284,16 @@ become Griffin's permanent source semantics.
   decomposition remains separate hull parts, not a filled envelope. The shared
   measurement library builds convex footprints and measures the minimum
   cross-section overlap across the adapter span, alongside transition length,
-  top-face step, and hinge seam. This is static geometry evidence only; applying
-  and reading back the ramp-side source changes and rover traversal are still
-  pending.
-- GRR-006/010 now specify a mitered convex-mesh track toe. The standard
-  mechanical relation derives the bevel run from track thickness and the
-  commanded ramp angle; generic SysML/USD checks read collision bounds and the
-  composed mesh's upper/lower toe vertices. The Editor builder plans the Mesh
-  migration, but it has not yet been applied or read back in the composed
-  vehicle document.
+  top-face step, and hinge seam. Fresh transition and joint readback is recorded
+  at generation 58; dynamic articulation and rover traversal remain pending.
+- GRR-006/010 specify a mitered convex-mesh track toe. The standard mechanical
+  relation derives the bevel run from track thickness and the commanded ramp
+  angle. A fresh composed readback of all four port/starboard toe-track meshes
+  at document generation 58 / stage generation 3 found the expected 8-vertex
+  topology, collision enabled with `convexHull`, and the upper toe at
+  `x = 4.0762014 m` versus the lower toe at `x = 3.9197299 m` (0.1564715 m
+  bevel). This closes the static mesh presence/readback gap; transformed
+  deployed contact and rover traversal remain unverified.
 - The GRR-012 footprint and full-span cross-section calculation is a
   Griffin-specific verification relation over the *composed colliders* used by
   the physics scene. It belongs in Griffin's Rhai verification policy; NURBS
@@ -507,22 +548,59 @@ become Griffin's permanent source semantics.
 2. **Completed in Editor:** migrate the physical deck collider to eight
    source-profile perimeter beams plus the separate payload-deck collider.
    Readback confirms source deviation within 0.001 m and leaves the tank
-   opening clear. GRR-012 has a shared composed-collider measurement path;
-   apply the ramp transition changes and capture fresh port/starboard readback.
-3. Build a typed Griffin assembly graph: octagonal bus and deck, separate
-   octagonal tank-support perimeter, four tank usages, seven engine usages,
-   four landing-leg usages, solar assemblies, ramp options, adapter interface,
-   and FLIP boundary. State multiplicity and reference-frame ownership once.
-4. Connect source features to reusable component USD references and generic
-   provider bindings. Keep FLIP loaded as its own component, with an explicit
-   Griffin payload/release relationship rather than copying its assembly into
-   the Griffin scene.
-5. Replace one Rhai geometric predicate at a time with a typed provider value
+   opening clear. GRR-012 now has fresh transition-body, contact-surface,
+   mass/inertia, and port/starboard joint readback at generation 58. Dynamic
+   ramp articulation and rover traversal remain required.
+3. **Started:** `requirements/griffin_vehicle_assembly.sysml` defines typed bus,
+   propulsion, engine-visual, tank, leg, solar, optional-ramp, adapter, and
+   hosted-FLIP parts with explicit multiplicities. Fresh mounted-Twin source
+   analysis resolves its imports and the root `missionVehicle` usage with no
+   parser diagnostics. Canonical identity/station arrays and legacy scalar
+   count aliases still need migration to one owner, and the graph is not yet
+   bound to composed USD/provider observations. `ValidateSysml` still reports
+   16 pre-existing missing-subject lint errors in `flip_cad_requirements.sysml`.
+4. **Partially complete:** the typed graph contains a `ref part hostedRover`,
+   adapter path, surface-scene release-joint path, and separate required
+   touchdown/settle and egress-path-ready conditions.
+   FLIP remains a separate vehicle asset with one fixed adapter joint before
+   release. Fresh topology and exactly-once ownership evidence still need to be
+   bound to the typed part and evaluated against a new composed generation.
+5. Connect source features to reusable component USD references and generic
+   provider bindings. Keep FLIP loaded as its own component rather than copying
+   its assembly into the Griffin scene.
+6. Replace one Rhai geometric predicate at a time with a typed provider value
    and a source-linked constraint. Preserve the old check only until the new
    generic path proves its positive and negative cases.
-6. Add mass, inertia, propulsion, thermal, power, contact, and landing cases
+7. Add mass, inertia, propulsion, thermal, power, contact, and landing cases
    only when their inputs have real source provenance or are explicitly marked
    replaceable study assumptions. Do not call surrogate data flight accuracy.
+
+### Ramp fold and touchdown evidence (2026-09-27)
+
+The physical ramp rails now sit on the walking-surface upper face and remain
+folded above the legs during descent. The composed flight-stow check passes
+61/61 checks: the lowest rail point is Y=5.19 m, the highest leg geometry is
+Y=2.44 m, and vertical clearance is 2.75 m. A focused GRR-010 check passes
+6/6 checks for both ramp toe edges at the terrain plane using the 0.44 m
+vehicle-reference touchdown datum and 27.833532 degree deployment angle.
+These values are explicit Twin study assumptions.
+
+The post-touchdown mission now waits for **U** / **UNWIND RAMP**, levels the
+four intermediate hinges, deploys the deck hinges, and enables **G** /
+**RELEASE ROVER** only after the ramps settle. The HUD buttons use the generic
+typed Rhai hook path. `physical_ramp_hinge_report()` exposes the composed
+minimum and maximum of all six hinges in degrees and radians plus live
+angle-port records; `set_physical_ramp_hinge_angle(name, radians)` validates
+each request against those limits. A fixed-clock descent diagnostic ran for
+650 seconds wall time (390 simulated seconds) without touchdown. It recorded
+intermittent leg-contact flags, including one sample with all four flags set
+at body-reference Y=-1.39 m, followed by a sample at Y=9.12 m and +6.57 m/s
+vertical speed. The rails were still at least 3.8 m above the terrain at the
+deep-contact sample. This rules out the folded rails touching the ground at
+that event; it does not identify the cause of the gear bounce. The new
+drive/button sequence and full 60-second post-touchdown stability requirement
+remain unverified until touchdown and the operator actions are observed in the
+production scene.
 
 ## Definition of a proper first Griffin slice
 

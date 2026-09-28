@@ -5,6 +5,7 @@ package Griffin1Requirements {
     private import ScalarValues::Integer;
     private import ScalarValues::Boolean;
     private import MoonBaseProjectRequirements::ProjectSimulationContract;
+    private import GriffinVehicleAssemblyRequirements::GriffinVehicleAssembly;
 
     enum def GriffinMissionDesignation { AstroboticGriffinMissionOne; }
     enum def GriffinLandingRegion { NobileSouthPole; }
@@ -28,11 +29,11 @@ package Griffin1Requirements {
         attribute hostedRover : HostedRoverDesignation = "AstrolabFLIP";
         attribute cargoMassLowerBoundKg : Real = 499.0;
         attribute cargoMassLowerBoundIsExclusive : Boolean = true;
-        // Geometry-derived COM target for the vertical landing study.  The
-        // inline pad/compound colliders settle at this composed contact datum
-        // above the authored 0.35 m pad surface; keep the value in SysML so
-        // the scene and Rhai checks share one source of truth.
-        attribute landingComTouchdownY : Real = 3.98;
+        // Body-reference touchdown height for the powered-descent study.
+        // Four 4 kN/m gear springs under the 4,950 kg study mass at lunar
+        // gravity give about 0.50 m nominal travel; the unloaded pad-bottom
+        // datum is 0.06 m above this reference. This is not flight data.
+        attribute landingVehicleReferenceTouchdownY : Real = 0.44;
         // Landing-stability limits are owned by GR036 in the simulation
         // accuracy package; this integration context does not mirror them.
         attribute landingDivergenceToleranceM : Real = 0.50;
@@ -87,12 +88,13 @@ package Griffin1Requirements {
         // With FLIP's roughly 1.2 m forward half-envelope, x=2.00 m brings
         // the front wheels onto the transition without
         // placing the route target itself on the moving ramp body. The
-        // The 12.228605 m track at 49 degrees reaches terrain near x=11.22 m
-        // from the +3.20 m hinge. Put the exit gate at x=12.80 m: even at the
+        // The 12.228605 m track at 27.833532 degrees reaches terrain near
+        // x=14.06 m (3.20 m hinge plus 10.86 m horizontal track run). Put
+        // the exit gate at x=15.60 m: even at the
         // near edge of its 0.30 m arrival radius the trailing wheel stations
         // lie beyond the ramp tip. Recheck the route after applying the new
         // composed geometry in Editor.
-        attribute surfaceRouteMarkerX : Real[15] = (2.00, 12.80, 16.00, 19.00, 21.00, 22.50, 23.70, 24.60, 25.20, 25.40, 25.80, 26.70, 28.00, 29.50, 31.00);
+        attribute surfaceRouteMarkerX : Real[15] = (2.00, 15.60, 16.00, 19.00, 21.00, 22.50, 23.70, 24.60, 25.20, 25.40, 25.80, 26.70, 28.00, 29.50, 31.00);
         // Route navigation is authored in the terrain x/z plane.  The first
         // marker used to carry the 6.92 m deck-height value in Y, but the
         // rover guidance contract intentionally ignores Y and therefore
@@ -109,7 +111,7 @@ package Griffin1Requirements {
         // required full-width overlap against exact composed collider footprints; the
         // static interface result remains separate from
         // runtime rover-contact acceptance. The second radius is 0.30 m at
-        // the forward (12.80,0.00) exit gate, after the trailing axle clears the ramp;
+        // the forward (15.60,0.00) exit gate, after the trailing axle clears the ramp;
         // its forward centreline placement avoids asking Ackermann guidance
         // to reverse toward a lateral marker during the transition. The later diagonal legs deliberately reduce
         // speed to 0.18..0.14 m/s because the shared Ackermann law must turn
@@ -120,8 +122,8 @@ package Griffin1Requirements {
         // 1.20 m arrival radius is a route-control study value; it is not a
         // ramp-interface tolerance or a claimed current replay measurement.
         attribute surfaceRouteArrivalRadiusM : Real[15] = (0.35, 0.30, 1.20, 1.20, 1.20, 1.00, 1.00, 1.00, 1.00, 1.20, 1.00, 1.00, 1.00, 1.00, 1.20);
-        // The deployed 12.228605 m ramp tip is near x=11.22 m, and the
-        // 12.80 m exit gate is outside the 12 m landing pad. This
+        // The deployed 12.228605 m ramp tip is near x=14.06 m, and the
+        // 15.60 m exit gate is outside the 12 m landing pad. This
         // named apron is a small prepared transition surface, not a hidden
         // teleport or terrain override: it overlaps the ramp tip and gives
         // all four wheels a continuous collision plane before survey route
@@ -146,6 +148,10 @@ package Griffin1Requirements {
     // requirements live in requirements/flip_requirements.sysml; Griffin only
     // verifies that a hosted vehicle interface exists at the release boundary.
     part def HostedRoverInterface;
+
+    // The assembly graph owns the typed subsystem multiplicities and the
+    // separate hosted-FLIP payload/release relation.
+    part missionVehicle : GriffinVehicleAssembly;
 
 
 

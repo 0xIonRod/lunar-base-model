@@ -5,6 +5,12 @@ collision policy, and an explicit parameter-status/provenance record. A
 reference or inherited substitute does not satisfy the contract when the
 canonical wrapper is hidden, empty, or mounted on the wrong datum.
 
+`../requirements/griffin_vehicle_assembly.sysml` now composes the bus, propulsion,
+seven engine visuals, four study tanks, four legs, three arrays, optional ramp
+assemblies, and the adapter interface. FLIP is a reference part that stays in
+`vehicles/flip.usda`; its assembly is not nested into the Griffin asset. The
+graph still needs canonical identity migration and generated realization links.
+
 | Part | Required topology | Required geometry / physics | Known study requirement |
 |---|---|---|---|
 | `Griffin1` | component-owned octagonal bus, payload adapter, seven-engine propulsion, four-leg landing system, three Griffin-1 solar arrays, optional two ramps | Xform root with capacity, collision, status, and provenance metadata | Three panel instances occupy adjacent forward, bevel, and starboard faces; their stations and support dimensions are visual-study values. Four visual tank assemblies are also a Twin study assumption |
@@ -13,14 +19,14 @@ canonical wrapper is hidden, empty, or mounted on the wrong datum.
 | `TopDeckBeamCollider0..7` | Eight hidden convex beams following the eight source-owned octagon edges | Enabled perimeter colliders; no hull closes the tank-support opening | Editor readback checks beam count, profile-derived dimensions, and collider state; dimensions remain a simulator study envelope |
 | `RoverPayloadDeckCollider` | Hidden clipped-square convex collider matching the central FLIP payload adapter | Enabled, separate from the octagonal perimeter ring | Geometry is derived from adapter dimensions; supplier interface and load rating remain TBD |
 | `TankPX/NX/PZ/NZ` | `components/lander/griffin_tank_visual.usda` through four source references | Four render-only COPV study assemblies at the ordered SysML stations; MainPropulsion owns flight propellant mass | Tank count, type, dimensions, and stations are not established by a public Griffin-1 ICD |
-| `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider | FLIP interface/release datum TBD |
+| `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider; the surface scene owns one fixed FLIP payload joint | The graph names the adapter and release-joint paths and requires both touchdown/settling and a ready egress path before release; mechanical interface dimensions and release-load ICD remain TBD |
 | `MainPropulsion` | Chamber, fuel and oxidizer tanks and pumps, representative nozzle design, shared plume photometry | The chamber remains the sole thrust and propellant authority; plume photometry derives per-nozzle rendering and light from aggregate simulated thrust, flow, velocity, chamber pressure, and nozzle geometry | Nozzle contour, engine-out behavior, and supplier propulsion data remain TBD |
 | `Nozzle` | `MainEngineCluster/Engine01..07`, each with a bell, throat, outer plume, hot core, and local plume light | Seven non-colliding bells and flame pairs; all seven receive the same cluster state through the shared photometry model, which divides aggregate engine outputs by its configured nozzle count | Seven main engines are public; bell contour and spacing remain study geometry |
 | `SolarPanelForward`, `SolarPanelFrontStarboard`, `SolarPanelStarboard` | Each root references `components/lander/griffin_solar_panel_visual.usda`, with `Cells`, `Frame`, dividers, hinge, brackets, and links | Three independently oriented panels use paired bus rails; each installed width derives from its rail span and shared edge clearance | The lower clearance cutout, as-built outline, installation datums, mechanism limits, and electrical behavior require the controlled panel and interface definitions |
 | `LegPX/NX/PZ/NZ` | `Strut` and matching `PadPX/NX/PZ/NZ` | Positive mass body, visible strut, enabled pad collider | Four functional legs; dimensions and damping TBD |
 | `EgressRampPort/Starboard` | Three rigid ramp sections from the upper deck; each section has two source-aligned wheel tracks, an open centre, and two upper edge-rail segments | Positive-mass rigid sections; both geometry-derived track colliders enabled | Track stations follow FLIP wheel datums; dimensions and ramp kinematics remain study values |
-| `RampHingePort/Starboard` | Upper-deck hinge connects the lander body to the first ramp section | `PhysicsRevoluteJoint`, Z axis, ordered limits | Root deployment datum is the upper deck top |
-| `RampSectionHingePort/Starboard01/12` | Two serial inter-section pivots per ramp; track surfaces, rail segments, and hinge fittings remain aligned at each joint | Native `PhysicsRevoluteJoint` between adjacent rigid section bodies | Intermediate targets hold the sections coplanar during rover traversal |
+| `RampHingePort/Starboard` | Upper-deck hinge connects the lander body to the first ramp section | `PhysicsRevoluteJoint`, Z axis, angular drive; port limits −50°..+60°, starboard −150°..+50° | Transport targets are +45° port / −135° starboard local (parallel after the Y=180° mount); terrain deployment targets are −27.83° / +27.83° |
+| `RampSectionHingePort/Starboard01/12` | Two serial inter-section pivots per ramp; track surfaces, rail segments, and hinge fittings remain aligned at each joint | Native driven `PhysicsRevoluteJoint` between adjacent rigid section bodies, ±180° limits | Both intermediate hinges target 180° for transport stow and 0° for rover traversal |
 
 ## Canonical frame
 
@@ -47,7 +53,7 @@ independently through the runtime authoring tools.
 | `components/lander/griffin_tank_visual.usda` | MLI tank and three bands | horizontal gold tank study; render-only |
 | `components/lander/griffin_solar_panel_visual.usda` | frame, cells, dividers, hinge, paired brackets, paired support links | shared render-only component referenced by the three independently placed panel roots |
 | `components/lander/griffin_engine_bell_visual.usda` | bell, throat, fixed-capacity outer plume and hot core, and a per-nozzle point light | referenced by each of the seven engines; plume visibility, derived length, and light output are connected to the shared Modelica photometry result; all geometry is render-only |
-| `components/lander/griffin_ramp_visual.usda` | three referenced ramp sections, each with paired wheel tracks, upper rail segments and joint pins, deck-to-rail posts, underside beams, hinge barrel, and per-track treads | referenced port/starboard assembly shares section geometry with the physical vehicle |
+| `components/lander/griffin_ramp_visual.usda` | three visual ramp sections, each with paired wheel tracks, upper rail segments and joint pins, deck-to-rail posts, underside beams, hinge barrel, and per-track treads | standalone preview asset; the integrated vehicle renders its articulated physical sections and does not mount a static duplicate |
 | `components/lander/griffin_ramp_section_visual.usda` | reusable full section with geometry-derived track collision, upper edge rails, rail pivot pins, supports, treads, beams, and hinge barrel | shared source section referenced by visual and physical ramp assemblies |
 | `components/lander/griffin_ramp_toe_section_visual.usda` | final section with the deployment-angle-derived toe bevel | inherits shared geometry and collision from the section source |
 | `components/rover/flip_chassis_visual.usda` | lower frame, equipment box, bumper, payload deck, service panel | referenced by the canonical FLIP vehicle; the same shapes provide visible chassis geometry and wheel-filtered rigid-body collision |

@@ -93,7 +93,7 @@ fn _qualified_attribute(name) {
     if name == "solarArrayCount" { return "GriffinLanderRequirements::GriffinLanderComponent::solarArrayCount"; }
     let ramp = [
         "rampCount", "rampSurfaceLengthM", "rampSurfaceWidthM",
-        "sectionAsset", "sectionInstances", "intermediateJointInstances",
+        "sectionAsset", "sectionInstances", "rootJointInstances", "intermediateJointInstances",
         "treadInstances", "railJointPinInstances", "transitionBody", "transitionContact", "transitionJoints",
         "rampSectionCount", "rampSectionLengthM", "rampSectionGeometryToleranceM",
         "rampWheelClearanceM", "rampSurfaceThicknessM", "rampRailHeightM",
@@ -110,7 +110,10 @@ fn _qualified_attribute(name) {
         "assemblySidePostCountPerSectionPerSide", "assemblySidePostWidthM",
         "assemblySidePostDepthM", "assemblySidePostEmbeddedDepthM",
         "assemblySidePostFirstCenterXM",
-        "assemblySidePostPitchM", "rampSectionHingeBarrelRadiusM",
+        "assemblySidePostPitchM", "assemblySideTrussChordHeightM",
+        "assemblySideTrussLowerChordCenterYM",
+        "assemblySideTrussBraceThicknessM", "assemblySideTrussBraceCountPerSide",
+        "rampSectionHingeBarrelRadiusM",
         "rampSectionHingeBarrelLengthM", "rampSectionHingeBarrelCenterYM",
         "rampSocketX", "rampSocketY", "rampSocketZ",
         "rampPortDeploymentAngleRad", "rampStarboardDeploymentAngleRad",
@@ -128,10 +131,13 @@ fn _qualified_attribute(name) {
         "physicalRampMassKg", "physicalRampSectionMassKg",
         "physicalRampSectionInertiaXKgM2", "physicalRampSectionInertiaYKgM2",
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionJointLimitRad",
+        "physicalRampPortRootJointStowLimitRad", "physicalRampPortRootStowedAngleRad",
+        "physicalRampStarboardRootJointStowLimitRad", "physicalRampStarboardRootStowedAngleRad",
+        "physicalRampSectionStowedAngleRad", "physicalRampToeSectionStowedAngleRad",
         "physicalRampSectionMassPartitionToleranceKg",
-        "physicalRampSectionDriveTargetRad", "physicalRampSectionDriveStiffnessNmPerDeg",
-        "physicalRampSectionDriveDampingNmPerDegPerSec",
-        "physicalRampSectionDriveMaxTorqueNm",
+        "physicalRampSectionDriveTargetRad", "physicalRampJointDriveStiffnessNmPerDeg",
+        "physicalRampJointDriveDampingNmPerDegPerSec",
+        "physicalRampJointDriveMaxTorqueNm",
         "physicalRampSectionMassPropertiesToleranceKgM2",
         "physicalRampDeckTransitionMassKg",
         "physicalRampDeckTransitionInertiaKgM2",
@@ -210,7 +216,8 @@ fn _qualified_attribute(name) {
         return "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::" + name;
     }
     let landing_stability = [
-        "landingStabilityHorizonS", "landingMinimumUprightAxisY",
+        "landingStabilityHorizonS", "landingStabilitySampleEveryNTicks",
+        "landingMinimumUprightAxisY",
         "landingMaxGroundSpeedMps", "landingMaxAngularSpeedRadPerSec",
         "landingMaxHorizontalDriftM"
     ];
@@ -333,8 +340,13 @@ fn landing_leg_count() { _sysml_integer("landingLegCount") }
 fn ramp_count() { _sysml_integer("rampCount") }
 fn solar_array_count() { _sysml_integer("solarArrayCount") }
 fn route_steering_mode() { _sysml_text("missionSteeringMode") }
-fn landing_com_touchdown_y() { _sysml_attribute("landingComTouchdownY") }
+fn landing_vehicle_reference_touchdown_y() {
+    _sysml_attribute("landingVehicleReferenceTouchdownY")
+}
 fn landing_stability_horizon_s() { _sysml_attribute("landingStabilityHorizonS") }
+fn landing_stability_sample_every_n_ticks() {
+    _sysml_integer("landingStabilitySampleEveryNTicks")
+}
 fn landing_minimum_upright_axis_y() { _sysml_attribute("landingMinimumUprightAxisY") }
 fn landing_max_ground_speed_mps() { _sysml_attribute("landingMaxGroundSpeedMps") }
 fn landing_max_angular_speed_rad_per_sec() { _sysml_attribute("landingMaxAngularSpeedRadPerSec") }
@@ -713,6 +725,13 @@ fn physical_ramp_transition_joint_name(side) {
 }
 fn physical_ramp_port_deployment_angle_rad() { _sysml_attribute("physicalRampPortDeploymentAngleRad") }
 fn physical_ramp_starboard_deployment_angle_rad() { _sysml_attribute("physicalRampStarboardDeploymentAngleRad") }
+fn physical_ramp_port_root_stowed_angle_rad() { _sysml_attribute("physicalRampPortRootStowedAngleRad") }
+fn physical_ramp_starboard_root_stowed_angle_rad() { _sysml_attribute("physicalRampStarboardRootStowedAngleRad") }
+fn physical_ramp_port_root_stow_limit_rad() { _sysml_attribute("physicalRampPortRootJointStowLimitRad") }
+fn physical_ramp_starboard_root_stow_limit_rad() { _sysml_attribute("physicalRampStarboardRootJointStowLimitRad") }
+fn physical_ramp_section_stowed_angle_rad() { _sysml_attribute("physicalRampSectionStowedAngleRad") }
+fn physical_ramp_toe_section_stowed_angle_rad() { _sysml_attribute("physicalRampToeSectionStowedAngleRad") }
+fn physical_ramp_section_drive_target_rad() { _sysml_attribute("physicalRampSectionDriveTargetRad") }
 fn suspension_strut_scale() { _sysml_number_list("suspensionStrutScale") }
 fn suspension_strut_offset() { _sysml_number_list("suspensionStrutOffset") }
 fn suspension_arm_scale() { _sysml_number_list("suspensionArmScale") }
@@ -768,6 +787,7 @@ fn ramp_under_beam_center_offset_z_m() { _sysml_attribute("assemblyUnderBeamCent
 fn ramp_section_count() { _sysml_integer("rampSectionCount") }
 fn ramp_section_length_m() { _sysml_attribute("rampSectionLengthM") }
 fn ramp_section_names() { _sysml_enum_names("sectionInstances") }
+fn ramp_root_joint_names() { _sysml_enum_names("rootJointInstances") }
 fn ramp_intermediate_joint_names() { _sysml_enum_names("intermediateJointInstances") }
 fn ramp_tread_names() { _sysml_enum_names("treadInstances") }
 fn ramp_rail_joint_pin_names() { _sysml_enum_names("railJointPinInstances") }
@@ -779,6 +799,10 @@ fn ramp_side_post_depth_m() { _sysml_attribute("assemblySidePostDepthM") }
 fn ramp_side_post_embedded_depth_m() { _sysml_attribute("assemblySidePostEmbeddedDepthM") }
 fn ramp_side_post_first_center_x_m() { _sysml_attribute("assemblySidePostFirstCenterXM") }
 fn ramp_side_post_pitch_m() { _sysml_attribute("assemblySidePostPitchM") }
+fn ramp_side_truss_chord_height_m() { _sysml_attribute("assemblySideTrussChordHeightM") }
+fn ramp_side_truss_lower_chord_center_y_m() { _sysml_attribute("assemblySideTrussLowerChordCenterYM") }
+fn ramp_side_truss_brace_thickness_m() { _sysml_attribute("assemblySideTrussBraceThicknessM") }
+fn ramp_side_truss_brace_count_per_side() { _sysml_integer("assemblySideTrussBraceCountPerSide") }
 fn ramp_section_hinge_barrel_radius_m() { _sysml_attribute("rampSectionHingeBarrelRadiusM") }
 fn ramp_section_hinge_barrel_length_m() { _sysml_attribute("rampSectionHingeBarrelLengthM") }
 fn ramp_section_hinge_barrel_center_y_m() { _sysml_attribute("rampSectionHingeBarrelCenterYM") }

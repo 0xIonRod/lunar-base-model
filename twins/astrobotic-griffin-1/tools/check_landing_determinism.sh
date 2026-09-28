@@ -19,7 +19,9 @@ fi
 twin_root=$(cd "$(dirname "$0")/.." && pwd)
 scene="$twin_root/tests/griffin_surface_ops_contract.usda"
 verification="GriffinSimulationAccuracyRequirements::Verify_GriffinLandingStability"
-max_ticks=${GRIFFIN_LANDING_MAX_TICKS:-4200}
+# This trial must include the descent and a full 60 s post-touchdown window.
+# A 70 s bound ended before prior powered-descent diagnostics reached contact.
+max_ticks=${GRIFFIN_LANDING_MAX_TICKS:-30000}
 readiness_timeout=${GRIFFIN_LANDING_READINESS_TIMEOUT:-120}
 work=$(mktemp -d "${TMPDIR:-/tmp}/griffin-landing-determinism.XXXXXX")
 trap 'rm -rf "$work"' EXIT

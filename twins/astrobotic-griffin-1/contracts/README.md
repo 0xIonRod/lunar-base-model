@@ -26,6 +26,13 @@ source through the generic SysML query and evaluator. The Markdown records the
 ownership and migration boundary. A value that is not source-backed must
 remain explicitly marked as a study proxy or `TBD`.
 
+`../requirements/griffin_vehicle_assembly.sysml` defines the system-level part
+composition, subsystem multiplicities, and cross-asset FLIP payload reference.
+`GriffinVisualConfiguration` remains the owner of the assembly frame and
+ordered instance stations. Their identity arrays and legacy count aliases are
+not yet fully collapsed into the graph, and the graph does not yet provide
+automatic source-feature-to-USD or provider bindings.
+
 ## Check execution
 
 The same check functions are used in two contexts:

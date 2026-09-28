@@ -2,6 +2,7 @@ package GriffinSimulationAccuracyRequirements {
     private import Griffin1Requirements::Griffin1Lander;
     private import Griffin1Requirements::HostedRoverInterface;
     private import ScalarValues::Real;
+    private import ScalarValues::Integer;
     private import ScalarValues::Boolean;
 
     constraint def GR036_LandingStabilityWithinBounds {
@@ -15,7 +16,9 @@ package GriffinSimulationAccuracyRequirements {
         in maximumAngularSpeedLimitRadPerSec : Real;
         in maximumHorizontalDriftM : Real;
         in maximumHorizontalDriftLimitM : Real;
-        telemetryFinite and sampleAvailable
+        in touchdownObserved : Boolean;
+        in allFourLegsContact : Boolean;
+        telemetryFinite and sampleAvailable and touchdownObserved and allFourLegsContact
             and minimumUprightAxisY >= minimumUprightAxisYLimit
             and maximumGroundSpeedMps <= maximumGroundSpeedLimitMps
             and maximumAngularSpeedRadPerSec <= maximumAngularSpeedLimitRadPerSec
@@ -58,8 +61,9 @@ package GriffinSimulationAccuracyRequirements {
     }
 
     requirement def GR036_LandingStability {
-        doc /* GR-036 [simulation accuracy] during the 60 s landing-stability observation window, telemetry shall remain finite, samples shall be available, the lander upright-axis Y component shall remain at least 0.9393727128473789 (cosine of the 0.35 rad study tilt limit), horizontal ground speed shall not exceed 5.0 m/s, angular speed shall not exceed 2.0 rad/s, and horizontal drift shall not exceed 50.0 m. These are replaceable Twin study limits, not supplier performance specifications. Missing physics samples are inconclusive. */
+        doc /* GR-036 [simulation accuracy] beginning with detected touchdown, observe a full 60 s post-touchdown window at the source-owned fixed-tick cadence. At every available observation all four landing legs shall remain in contact and telemetry shall be finite; the lander upright-axis Y component shall remain at least 0.9393727128473789 (cosine of the 0.35 rad study tilt limit), horizontal ground speed shall not exceed 5.0 m/s, angular speed shall not exceed 2.0 rad/s, and horizontal drift from the touchdown position shall not exceed 50.0 m. These are replaceable Twin study limits, not supplier performance specifications. Missing physics samples are inconclusive. */
         attribute landingStabilityHorizonS : Real = 60.0;
+        attribute landingStabilitySampleEveryNTicks : Integer = 10;
         attribute landingMinimumUprightAxisY : Real = 0.9393727128473789;
         attribute landingMaxGroundSpeedMps : Real = 5.0;
         attribute landingMaxAngularSpeedRadPerSec : Real = 2.0;
@@ -68,7 +72,7 @@ package GriffinSimulationAccuracyRequirements {
     }
 
     requirement def GR037_LandingTargetDatum {
-        doc /* GR-037 [simulation setup] the mission's authored landing-target Y datum shall agree with the SysML touchdown COM datum within the source-owned tolerance before descent starts. This is a setup consistency check, not evidence that the vehicle has landed or that the touchdown dynamics are accurate. */
+        doc /* GR-037 [simulation setup] the mission's authored landing-target Y datum shall agree with the SysML vehicle-reference touchdown datum within the source-owned tolerance before descent starts. This is a setup consistency check, not evidence that the vehicle has landed or that the touchdown dynamics are accurate. */
         attribute landingTargetDatumToleranceM : Real = 0.001;
         require GR037_LandingTargetDatumMatchesSource;
     }
@@ -88,7 +92,7 @@ package GriffinSimulationAccuracyRequirements {
     verification def Verify_GriffinLandingStability {
         subject lander : Griffin1Lander;
         objective {
-            verify GriffinSimulationAccuracyRequirements::gr036;
+            verify gr036;
         }
     }
 

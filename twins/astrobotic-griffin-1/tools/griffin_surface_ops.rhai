@@ -21,14 +21,14 @@ fn route_stall_timeout_s() { griffin_spec::surface_route_stall_timeout_s() }
 
 /// Put the mission view on the lander while its authored GNC performs descent.
 fn follow_lander() {
-    follow(find("/Griffin1SurfaceOps/Lander"));
+    follow(find_path("/Griffin1SurfaceOps/Lander"));
 }
 
 /// Hand the mission view to the rover immediately after the adapter release.
 /// The follow camera makes the physical ramp exit and rover drop visible
 /// without taking control away from the rover's autopilot.
 fn follow_rover() {
-    follow(find("/Griffin1SurfaceOps/FLIP"));
+    follow(find_path("/Griffin1SurfaceOps/FLIP"));
 }
 
 // Compact, named telemetry probe for the landing study.  This replaces ad-hoc
@@ -36,17 +36,20 @@ fn follow_rover() {
 // Editor, an API Rhai client, or a repeatability harness and returns the exact
 // values that the scenario's landing gates consume.
 fn landing_gate_report() {
-    let lander = find("/Griffin1SurfaceOps/Lander");
-    let gnc = find("/Griffin1SurfaceOps/Lander/GNC");
-    let environment = find("/Griffin1SurfaceOps/Lander/Environment");
-    let altimeter = find("/Griffin1SurfaceOps/Lander/Altimeter");
-    let altimeter_model = find("/Griffin1SurfaceOps/Lander/Altimeter/Model");
+    let lander = find_path("/Griffin1SurfaceOps/Lander");
+    let gnc = find_path("/Griffin1SurfaceOps/Lander/GNC");
+    let environment = find_path("/Griffin1SurfaceOps/Lander/Environment");
+    let altimeter = find_path("/Griffin1SurfaceOps/Lander/Altimeter");
+    let altimeter_model = find_path("/Griffin1SurfaceOps/Lander/Altimeter/Model");
+    let imu = find_path("/Griffin1SurfaceOps/Lander/IMU");
+    let attitude_reference = find_path("/Griffin1SurfaceOps/Lander/AttitudeReference");
+    let attitude_propulsion = find_path("/Griffin1SurfaceOps/Lander/AttitudePropulsion");
     let pose = query("QueryUsdPrim", #{
         path: "/Griffin1SurfaceOps/Lander",
         attrs: ["xformOp:translate"]
     });
     let physics = query("QueryPhysicsState", #{id: lander});
-    let rover = find("/Griffin1SurfaceOps/FLIP");
+    let rover = find_path("/Griffin1SurfaceOps/FLIP");
     let rover_physics = query("QueryPhysicsState", #{id: rover});
     let rover_settle = rover_route_settle_report(rover);
     // Topology/performance is sampled only at an explicit diagnostic gate;
@@ -93,15 +96,37 @@ fn landing_gate_report() {
         guidance_unsaturated_throttle: get(gnc, "unsaturated_throttle"),
         guidance_pid_y: get(gnc, "pid_y_command"),
         guidance_altimeter_confidence: get(gnc, "altimeter_altitude_confidence"),
-        guidance_nav_y: get(gnc, "altimeter_vehicle_position_y"),
+        guidance_nav_y: get(gnc, "navigation.nav_pos_y"),
+        guidance_nav_velocity_y: get(gnc, "navigation.nav_vel_y"),
+        guidance_nav_acceleration_y: get(gnc, "navigation.navigation_accel_y"),
+        guidance_altitude_position_error: get(gnc, "navigation.altitude_position_error"),
+        guidance_altitude_observer_authority: get(gnc, "navigation.altitude_observation_authority.acquisition"),
+        guidance_altimeter_vehicle_position_y: get(gnc, "altimeter_vehicle_position_y"),
         environment_gravity_x: get(environment, "gravity_x"),
         environment_gravity_y: get(environment, "gravity_y"),
         environment_gravity_z: get(environment, "gravity_z"),
         guidance_nav_x: get(gnc, "navigation.nav_pos_x"),
         guidance_nav_z: get(gnc, "navigation.nav_pos_z"),
+        imu_raw_sample_valid: get(imu, "raw_sample_valid"),
+        imu_raw_acceleration_y: get(imu, "raw_acceleration_y"),
+        imu_specific_force_y: get(imu, "specific_force_y"),
+        imu_attitude_quaternion: [get(imu, "attitude_quat_w"), get(imu, "attitude_quat_x"),
+            get(imu, "attitude_quat_y"), get(imu, "attitude_quat_z")],
+        measured_attitude_error: [get(attitude_reference, "error_x"),
+            get(attitude_reference, "error_z")],
+        desired_tilt: [get(lander, "desired_tilt_x"), get(lander, "desired_tilt_z")],
+        requested_body_torque: [get(lander, "torque_x"), get(lander, "torque_y"),
+            get(lander, "torque_z")],
+        rcs_pitch_positive_a_thrust: get(attitude_propulsion, "pitch_pos_a_thrust_n"),
+        rcs_pitch_negative_a_thrust: get(attitude_propulsion, "pitch_neg_a_thrust_n"),
+        rcs_roll_positive_a_thrust: get(attitude_propulsion, "roll_pos_a_thrust_n"),
+        rcs_roll_negative_a_thrust: get(attitude_propulsion, "roll_neg_a_thrust_n"),
         ray_hit_valid: get(altimeter, "ray_hit_valid"),
         ray_distance_m: get(altimeter, "ray_distance"),
         ray_hit_position_y: get(altimeter, "ray_hit_position_y"),
+        altimeter_ray_direction_nav_y: get(altimeter_model, "ray_direction_nav_y"),
+        altimeter_vertical_projection: get(altimeter_model, "vertical_projection"),
+        altimeter_minimum_vertical_projection: get(altimeter_model, "minimum_vertical_projection"),
         altimeter_range_m: get(altimeter_model, "range_m"),
         altimeter_range_valid: get(altimeter_model, "range_valid"),
         altimeter_range_confidence: get(altimeter_model, "range_confidence"),
@@ -136,8 +161,13 @@ fn physics_performance() {
 // verbose landing_gate_report available for interactive diagnostics, but do
 // not retain its nested physics snapshots in a per-tick test state map.
 fn landing_stability_sample() {
-    let lander = find("/Griffin1SurfaceOps/Lander");
-    if lander == () || lander < 0 { return (); }
+    let lander = find_path("/Griffin1SurfaceOps/Lander");
+    let gnc = find_path("/Griffin1SurfaceOps/Lander/GNC");
+    let propulsion = find_path("/Griffin1SurfaceOps/Lander/MainPropulsion");
+    let altimeter = find_path("/Griffin1SurfaceOps/Lander/Altimeter/Model");
+    if lander == () || lander < 0 {
+        return #{ok: false, error: "lander entity is missing", lander: lander};
+    }
     let pose = query("QueryUsdPrim", #{
         path: "/Griffin1SurfaceOps/Lander",
         attrs: ["xformOp:translate"]
@@ -146,23 +176,43 @@ fn landing_stability_sample() {
     if pose == () || pose.ok == false || pose.world_position == ()
         || physics == () || physics.ok == false
         || physics.physics_state_ready != true {
-        return ();
+        return #{ok: false, error: "lander pose or physics state is unavailable",
+            lander: lander, pose: pose, physics: physics};
     }
     let linear = physics.linear_velocity_mps;
     let angular = physics.angular_velocity_radps;
     let up = world_up3(lander);
     if linear == () || linear.len() != 3 || angular == () || angular.len() != 3
         || up == () {
-        return ();
+        return #{ok: false, error: "lander velocity or attitude is unavailable",
+            lander: lander, linear_velocity_mps: linear,
+            angular_velocity_radps: angular, up: up};
     }
     let ground_speed = (linear[0] * linear[0] + linear[2] * linear[2]).sqrt();
     let angular_speed = vlen(angular);
     #{
+        ok: true,
         position: pose.world_position,
+        linear_velocity_mps: linear,
         upright_axis_y: up.y,
         ground_speed: ground_speed,
         angular_speed: angular_speed,
-        touchdown: get(lander, "touchdown")
+        touchdown: get(lander, "touchdown"),
+        all_legs_contact: get(lander, "all_legs_contact"),
+        landing_contact: get(lander, "landing_contact"),
+        any_leg_contact: get(lander, "any_leg_contact"),
+        engine_cutoff_contact: get(lander, "engine_cutoff_contact"),
+        guidance_throttle: get(gnc, "throttle_cmd"),
+        guidance_vertical_command: get(gnc, "vertical_limiter_output"),
+        guidance_pid_y: get(gnc, "pid_y_command"),
+        altitude_above_target: get(gnc, "altitude_above_target"),
+        navigation_position_y: get(gnc, "navigation.nav_pos_y"),
+        altimeter_range_m: get(altimeter, "range_m"),
+        altimeter_position_y: get(altimeter, "vehicle_position_y"),
+        engine_thrust_n: get(propulsion, "thrust_n"),
+        engine_vehicle_mass_kg: get(propulsion, "vehicle_mass_kg"),
+        landing_engine_cutoff: get(gnc, "landing_engine_cutoff"),
+        landing_handoff: get(gnc, "landing_handoff")
     }
 }
 
@@ -171,6 +221,7 @@ fn landing_stability_sample() {
 fn landing_stability_contract() {
     #{
         horizon_s: griffin_spec::landing_stability_horizon_s(),
+        sample_every_n_ticks: griffin_spec::landing_stability_sample_every_n_ticks(),
         min_upright_axis_y: griffin_spec::landing_minimum_upright_axis_y(),
         max_ground_speed_mps: griffin_spec::landing_max_ground_speed_mps(),
         max_angular_speed_rad_per_sec: griffin_spec::landing_max_angular_speed_rad_per_sec(),
@@ -208,7 +259,7 @@ fn repeatability_contract() {
 // owns only the operation order and control limits.  A missing marker is a
 // construction error, not permission to carry a duplicate literal.
 fn route_marker_target(path) {
-    let marker = find(path);
+    let marker = find_path(path);
     if marker == () || marker < 0 {
         throw("Griffin route marker is missing: " + path);
     }
@@ -219,11 +270,10 @@ fn route_marker_target(path) {
     pose
 }
 
-// Validate the route frame before lowering any drive task.  SysML owns the
-// ordered marker table; the composed scene owns the actual marker transforms;
-// the active rover owns the forward axis.  Keeping these three observations in
-// one bounded preflight prevents a stale marker table or a frame/sign error
-// from becoming a late route stall.
+// Validate the static route frame before lowering any drive task. SysML owns
+// the ordered marker table and the composed scene owns the marker transforms.
+// The task tree is built before the released rover has a live physics pose, so
+// its forward frame is evaluated by the route controller during execution.
 fn surface_route_preflight() {
     let names = griffin_spec::surface_route_marker_names();
     let expected_x = griffin_spec::surface_route_marker_x();
@@ -244,7 +294,7 @@ fn surface_route_preflight() {
     let previous = ();
     for index in 0..names.len() {
         let path = "/Griffin1SurfaceOps/" + names[index];
-        let marker = find(path);
+        let marker = find_path(path);
         let actual = if marker == () || marker < 0 { () } else { world_pos3(marker) };
         let expected = vec3(expected_x[index], expected_y[index], expected_z[index]);
         if actual == () {
@@ -268,33 +318,9 @@ fn surface_route_preflight() {
         if actual != () { previous = actual; }
     }
 
-    let rover = find("/Griffin1SurfaceOps/FLIP");
-    let rover_pose = if rover == () || rover < 0 { () } else { world_pos3(rover) };
-    let rover_forward = if rover == () || rover < 0 { () } else { world_forward3(rover) };
-    let first_actual = if markers.len() == 0 { () } else { markers[0].actual };
-    let alignment = ();
-    if rover_pose != () && rover_forward != () && first_actual != () {
-        let delta = vec3(first_actual[0] - rover_pose.x, 0.0,
-            first_actual[2] - rover_pose.z);
-        let forward_plane = vec3(rover_forward.x, 0.0, rover_forward.z);
-        let delta_len = vlen(delta);
-        let forward_len = vlen(forward_plane);
-        if delta_len > 0.05 && forward_len > 0.05 {
-            alignment = vdot(vnorm(forward_plane), vnorm(delta));
-            if alignment < 0.05 {
-                findings.push("first route marker is not in the rover forward hemisphere");
-            }
-        } else {
-            findings.push("rover forward frame or first route delta is degenerate");
-        }
-    } else {
-        findings.push("active FLIP pose/forward frame is unavailable");
-    }
-
     #{ok: findings.len() == 0, findings: findings, markers: markers,
-      marker_count: names.len(), rover_pose: if rover_pose == () { () } else { vec3_array(rover_pose) },
-      rover_forward: if rover_forward == () { () } else { vec3_array(rover_forward) },
-      forward_alignment: alignment}
+      marker_count: names.len(), rover_pose: (), rover_forward: (),
+      forward_alignment: ()}
 }
 
 fn route_leg(path, speed, radius, event) {
@@ -362,7 +388,7 @@ fn surface_route() {
 /// authored Ackermann guidance law that closes the loop on live pose, yaw,
 /// and yaw rate.
 fn engage_route_subject() {
-    let rover = find("/Griffin1SurfaceOps/FLIP");
+    let rover = find_path("/Griffin1SurfaceOps/FLIP");
     if rover < 0 { return #{ ok: false, error: "FLIP entity is unavailable" }; }
     // Use LunCoSim's current typed control contract.  The old
     // `PossessVessel` name was never registered in the production command
@@ -523,15 +549,22 @@ fn rover_route_settle_report(rover) {
     } else {
         physics.support_sample_tick
     };
-    let now_tick = sim_tick();
-    let support_fresh = support_sample_tick != () && now_tick >= support_sample_tick
-        && now_tick - support_sample_tick <= 1;
+    let now_tick = sim_tick().to_float();
+    let support_sample_tick_number = if support_sample_tick == () {
+        ()
+    } else {
+        support_sample_tick.to_float()
+    };
+    let support_fresh = support_sample_tick_number != ()
+        && now_tick >= support_sample_tick_number
+        && now_tick - support_sample_tick_number <= 1.0;
+    let has_support_contact = support_count != () && support_count.to_float() > 0.0;
     // Release is a ground-stability gate.  FLIP must have authoritative
     // support at the normalized surface datum before wheel torque is enabled;
     // a deck contact is not sufficient because the adapter has already been
     // detached and the rover is otherwise airborne.
     let ok = pose != () && speed != () && height_limit != () && speed_limit != ()
-        && support_count != () && support_count > 0
+        && has_support_contact
         && support_fresh
         && pose[1] <= height_limit && speed.abs() <= speed_limit;
     #{ok: ok,
@@ -565,7 +598,7 @@ fn physical_ramp_runtime_pose_evidence() {
     let records = [];
     for side in ["Port", "Starboard"] {
         let path = "/Griffin1SurfaceOps/Lander/EgressRamp" + side;
-        let id = find(path);
+        let id = find_path(path);
         let pose = if id == () || id < 0 { () } else { world_pos3(id) };
         let rotation = if id == () || id < 0 { () } else { world_rotation_quat(id) };
         records.push(#{side: side, path: path, entity: id,
@@ -579,21 +612,159 @@ fn physical_ramp_runtime_pose_evidence() {
 // normal mission path allocation-free while recording both the commanded
 // hinge angle and the solver-produced angle when a ramp/contact fault occurs.
 fn physical_ramp_joint_evidence() {
+    physical_ramp_hinge_report()
+}
+
+/// Find this Twin's composed mission USD document. Griffin keeps many
+/// requirements and component documents open beside the scene, so every
+/// composed-stage query must name the intended scene instead of relying on an
+/// ambiguous implicit live stage.
+fn _surface_ops_scene_doc_id() {
+    let documents = query("ListOpenDocuments");
+    if documents == () || documents.open_documents == () { return (); }
+    for document in documents.open_documents {
+        if document.kind == "usd" && document.origin != ()
+            && document.origin.path != ()
+            && document.origin.path.ends_with("/scenes/griffin_1_surface_ops.usda") {
+            return document.doc_id;
+        }
+    }
+    ()
+}
+
+/// Read source limits and live angle ports for all six articulated ramp hinges.
+/// USD limits are authored in degrees; SetPorts consumes radians. `angle_ports`
+/// preserves the full typed runtime records, including target and measured
+/// values when the physics projection is available.
+fn physical_ramp_hinge_report() {
+    let doc_id = _surface_ops_scene_doc_id();
+    if doc_id == () {
+        return #{ok: false, error: "Griffin surface-operations USD document is not open"};
+    }
+    let names = [];
+    for name in griffin_spec::ramp_root_joint_names() { names.push(name); }
+    for name in griffin_spec::ramp_intermediate_joint_names() { names.push(name); }
+    if names.len() != 6 {
+        return #{ok: false, error: "SysML must name both root and all four intermediate ramp hinges", hinge_names: names};
+    }
     let records = [];
-    for side in ["Port", "Starboard"] {
-        let path = "/Griffin1SurfaceOps/Lander/RampHinge" + side;
-        let id = find(path);
+    for name in names {
+        let path = "/Griffin1SurfaceOps/Lander/" + name;
+        let prim = query("QueryUsdPrim", #{doc_id: doc_id, path: path, attrs: [
+            "physics:lowerLimit", "physics:upperLimit",
+            "drive:angular:physics:targetPosition"
+        ]});
+        if prim == () || prim.ok == false || prim.attrs == () {
+            return #{ok: false, error: "ramp hinge limits could not be read from composed USD", path: path, query: prim};
+        }
+        let lower_deg = prim.attrs["physics:lowerLimit"];
+        let upper_deg = prim.attrs["physics:upperLimit"];
+        if lower_deg == () || upper_deg == () || lower_deg > upper_deg {
+            return #{ok: false, error: "ramp hinge has missing or invalid authored angle limits", path: path, attrs: prim.attrs};
+        }
+        let id = find_path(path);
         let snapshot = if id == () || id < 0 { () }
             else { query("ReadPorts", #{api_id: id}) };
-        let selected = [];
+        let angle_ports = [];
         if snapshot != () && snapshot.ports != () {
             for port in snapshot.ports {
-                if port.name == "angle" { selected.push(port); }
+                if port.name == "angle" { angle_ports.push(port); }
             }
         }
-        records.push(#{side: side, path: path, entity: id, angle_ports: selected});
+        records.push(#{name: name, path: path, entity: id,
+            minimum_angle_deg: lower_deg, maximum_angle_deg: upper_deg,
+            minimum_angle_rad: lower_deg * 3.141592653589793 / 180.0,
+            maximum_angle_rad: upper_deg * 3.141592653589793 / 180.0,
+            drive_target_deg: prim.attrs["drive:angular:physics:targetPosition"],
+            angle_ports: angle_ports,
+            port_snapshot: snapshot});
     }
-    records
+    #{ok: true, doc_id: doc_id, hinges: records}
+}
+
+fn _ramp_touchdown_ready() {
+    let lander = find_path("/Griffin1SurfaceOps/Lander");
+    if lander == () || lander < 0 { return false; }
+    let touchdown = get(lander, "touchdown");
+    let all_legs_contact = get(lander, "all_legs_contact");
+    touchdown != () && all_legs_contact != ()
+        && touchdown >= 0.999 && all_legs_contact >= 0.999
+}
+
+/// Request the mission-owned two-stage ramp unfold after touchdown. The
+/// mission task sequences the four section drives first, then the two deck
+/// drives after the authored dwell.
+fn request_ramp_unfold() {
+    if !_ramp_touchdown_ready() {
+        return #{ok: false, error: "ramp unfold is available only after confirmed touchdown with all four legs in contact"};
+    }
+    emit("griffin_ramp_unfold_requested");
+    #{ok: true, queued: true, event: "griffin_ramp_unfold_requested"}
+}
+
+/// Request the payload adapter release. The mission owns the final safe-state
+/// gate and calls the generic DetachJoint command only after the ramp settles.
+fn request_rover_release() {
+    if !_ramp_touchdown_ready() {
+        return #{ok: false, error: "rover release is available only after confirmed touchdown with all four legs in contact"};
+    }
+    emit("griffin_rover_release_requested");
+    #{ok: true, queued: true, event: "griffin_rover_release_requested"}
+}
+
+/// Shared typed HUD action hook. It is also callable through RunRhaiToolHook
+/// with `unfold_ramps` or `release_rover` as its string argument.
+fn on_hud_action(action) {
+    if action == "unfold_ramps" { return request_ramp_unfold(); }
+    if action == "release_rover" { return request_rover_release(); }
+    #{ok: false, error: "unknown Griffin surface-operation HUD action", action: action}
+}
+
+/// Command one physical hinge by its USD prim name. Limits are read from the
+/// composed stage for every request and enforced before writing the typed
+/// angular port; the caller supplies radians, matching the port contract.
+fn set_physical_ramp_hinge_angle(name, angle_rad) {
+    if !_ramp_touchdown_ready() {
+        return #{ok: false, error: "ramp hinges may be commanded only after confirmed touchdown with all four legs in contact"};
+    }
+    if !griffin_spec::ramp_root_joint_names().contains(name)
+        && !griffin_spec::ramp_intermediate_joint_names().contains(name) {
+        return #{ok: false, error: "unknown physical ramp hinge", hinge: name};
+    }
+    if angle_rad == () || !angle_rad.is_finite() {
+        return #{ok: false, error: "hinge command angle must be a finite radian value", hinge: name};
+    }
+    let doc_id = _surface_ops_scene_doc_id();
+    if doc_id == () {
+        return #{ok: false, error: "Griffin surface-operations USD document is not open", hinge: name};
+    }
+    let path = "/Griffin1SurfaceOps/Lander/" + name;
+    let prim = query("QueryUsdPrim", #{doc_id: doc_id, path: path,
+        attrs: ["physics:lowerLimit", "physics:upperLimit"]});
+    if prim == () || prim.ok == false || prim.attrs == () {
+        return #{ok: false, error: "ramp hinge angle limits are unavailable", hinge: name, query: prim};
+    }
+    let lower_deg = prim.attrs["physics:lowerLimit"];
+    let upper_deg = prim.attrs["physics:upperLimit"];
+    if lower_deg == () || upper_deg == () || lower_deg > upper_deg {
+        return #{ok: false, error: "ramp hinge has missing or invalid authored angle limits", hinge: name, attrs: prim.attrs};
+    }
+    let angle_deg = angle_rad * 180.0 / 3.141592653589793;
+    if angle_deg < lower_deg || angle_deg > upper_deg {
+        return #{ok: false, error: "hinge command is outside the authored limit", hinge: name,
+            requested_angle_rad: angle_rad, minimum_angle_deg: lower_deg,
+            maximum_angle_deg: upper_deg};
+    }
+    let joint = find_path(path);
+    if joint == () || joint < 0 {
+        return #{ok: false, error: "ramp hinge runtime entity is unavailable", hinge: name};
+    }
+    let result = cmd("SetPorts", #{target: joint, writes: [["angle", angle_rad]]});
+    if result == () || result.ok != true {
+        return #{ok: false, error: "ramp hinge angular drive rejected the command", hinge: name, result: result};
+    }
+    #{ok: true, hinge: name, target_angle_rad: angle_rad,
+        target_angle_deg: angle_deg, result: result}
 }
 
 // Capture the authored egress apron and the native wheel-contact snapshot at
@@ -714,7 +885,7 @@ fn report_route_failure(id, error, path, evidence) {
 
 fn report_route_stall(rover, target, pose, distance, command_updates) {
     let sample = rover_route_settle_report(rover);
-    let lander = find("/Griffin1SurfaceOps/Lander");
+    let lander = find_path("/Griffin1SurfaceOps/Lander");
     let lander_pose = if lander == () || lander < 0 { () } else { world_pos3(lander) };
     let lander_physics = if lander == () || lander < 0 { () }
         else { query("QueryPhysicsState", #{id: lander}) };
@@ -847,16 +1018,16 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
                 let trace_steer = get(rover, "guidance_steer");
                 let trace_heading = get(rover, "heading_fl");
                 let trace_forward = world_forward3(rover);
-                let trace_lander = find("/Griffin1SurfaceOps/Lander");
+                let trace_lander = find_path("/Griffin1SurfaceOps/Lander");
                 let trace_lander_up = if trace_lander == () || trace_lander < 0 {
                     ()
                 } else {
                     world_up3(trace_lander)
                 };
-                let trace_wheel = find("/Griffin1SurfaceOps/FLIP/Suspension_FL/Wheel_FL");
-                let trace_wheel_fr = find("/Griffin1SurfaceOps/FLIP/Suspension_FR/Wheel_FR");
-                let trace_wheel_rl = find("/Griffin1SurfaceOps/FLIP/Suspension_RL/Wheel_RL");
-                let trace_wheel_rr = find("/Griffin1SurfaceOps/FLIP/Suspension_RR/Wheel_RR");
+                let trace_wheel = find_path("/Griffin1SurfaceOps/FLIP/Suspension_FL/Wheel_FL");
+                let trace_wheel_fr = find_path("/Griffin1SurfaceOps/FLIP/Suspension_FR/Wheel_FR");
+                let trace_wheel_rl = find_path("/Griffin1SurfaceOps/FLIP/Suspension_RL/Wheel_RL");
+                let trace_wheel_rr = find_path("/Griffin1SurfaceOps/FLIP/Suspension_RR/Wheel_RR");
                 let trace_tire = if trace_wheel == () || trace_wheel < 0 {
                     ()
                 } else {
@@ -1008,7 +1179,7 @@ fn surface_route_task(rover) {
 /// instead of claiming that the rover moved when the command was rejected.
 fn release_and_engage() {
     let release = cmd("DetachJoint", #{
-        target: find("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint"),
+        target: find_path("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint"),
         intent: "Interactive"
     });
     if release.ok == false { return release; }

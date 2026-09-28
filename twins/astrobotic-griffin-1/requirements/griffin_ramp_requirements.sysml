@@ -18,6 +18,10 @@ package GriffinRampRequirements {
         RampSectionHingeStarboard01;
         RampSectionHingeStarboard12;
     }
+    enum def GriffinRampRootJointIdentity {
+        RampHingePort;
+        RampHingeStarboard;
+    }
     enum def GriffinRampHingeAxis { Z; }
     enum def GriffinRampTreadIdentity { Tread01; Tread02; Tread03; Tread04; }
     enum def GriffinRampRailJointPinIdentity {
@@ -110,6 +114,56 @@ package GriffinRampRequirements {
             and totalTreadCount == treadCountPerSection * sectionCount;
     }
 
+    constraint def GRC022_RampFlightStowAnglesWithinTravel {
+        in portRootStowAngleRad : Real;
+        in starboardRootStowAngleRad : Real;
+        in middleAngleRad : Real;
+        in toeAngleRad : Real;
+        in portRootLimitRad : Real;
+        in starboardRootLimitRad : Real;
+        in sectionLimitRad : Real;
+        portRootStowAngleRad > 0.0 and portRootStowAngleRad <= portRootLimitRad
+            and starboardRootStowAngleRad > 0.0 and starboardRootStowAngleRad <= starboardRootLimitRad
+            and middleAngleRad > 0.0 and toeAngleRad > 0.0
+            and middleAngleRad <= sectionLimitRad and middleAngleRad >= -sectionLimitRad
+            and toeAngleRad <= sectionLimitRad and toeAngleRad >= -sectionLimitRad;
+    }
+
+    constraint def GRC023_RailsRemainOnUpperTrackFace {
+        in railBottomYM : Real;
+        in walkingSurfaceTopYM : Real;
+        in toleranceM : Real;
+        railBottomYM >= walkingSurfaceTopYM - toleranceM;
+    }
+
+    constraint def GRC024_RampSectionDeploymentTargetIsLevel {
+        in deploymentTargetRad : Real;
+        deploymentTargetRad == 0.0;
+    }
+
+    constraint def GRC025_StowedRailsClearLandingLegEnvelope {
+        in lowestStowedRailBottomYM : Real;
+        in highestLandingLegTopYM : Real;
+        in geometryToleranceM : Real;
+        lowestStowedRailBottomYM >= highestLandingLegTopYM + geometryToleranceM;
+    }
+
+    constraint def GRC026_SideTrussBracing {
+        in braceCountPerSide : Integer;
+        in postCountPerSide : Integer;
+        in braceThicknessM : Real;
+        in lowerChordHeightM : Real;
+        in lowerChordCenterYM : Real;
+        in upperChordCenterYM : Real;
+        in walkingSurfaceTopYM : Real;
+        in toleranceM : Real;
+        braceCountPerSide == postCountPerSide + 1
+            and braceThicknessM > 0.0
+            and lowerChordHeightM > 0.0
+            and lowerChordCenterYM - lowerChordHeightM / 2.0 >= walkingSurfaceTopYM - toleranceM
+            and lowerChordCenterYM < upperChordCenterYM;
+    }
+
     constraint def GRC010_PhysicalRampReachesTerrain {
         in rampTipTopYM : Real;
         in rampTipBottomYM : Real;
@@ -170,6 +224,8 @@ package GriffinRampRequirements {
         attribute sectionAsset : TwinAssetPath = "components/lander/griffin_ramp_section_visual.usda";
         attribute sectionInstances : GriffinRampSectionIdentity[3] =
             ("DeckSection", "MiddleSection", "ToeSection");
+        attribute rootJointInstances : GriffinRampRootJointIdentity[2] =
+            ("RampHingePort", "RampHingeStarboard");
         attribute intermediateJointInstances : GriffinRampIntermediateJointIdentity[4] =
             ("RampSectionHingePort01", "RampSectionHingePort12",
              "RampSectionHingeStarboard01", "RampSectionHingeStarboard12");
@@ -194,7 +250,7 @@ package GriffinRampRequirements {
         attribute rampSurfaceWidthM : Real = 3.50;
         attribute rampWheelClearanceM : Real = 0.15;
         attribute rampSurfaceThicknessM : Real = 0.18;
-        attribute rampRailHeightM : Real = 0.28;
+        attribute rampRailHeightM : Real = 0.14;
         attribute rampRailWidthM : Real = 0.14;
         attribute rampRailOffsetZM : Real = 1.68;
         attribute rampRailJointPinRadiusM : Real = 0.08;
@@ -227,11 +283,15 @@ package GriffinRampRequirements {
         attribute assemblySidePostEmbeddedDepthM : Real = 0.04;
         attribute assemblySidePostFirstCenterXM : Real = 0.50;
         attribute assemblySidePostPitchM : Real = 1.538100833;
+        attribute assemblySideTrussChordHeightM : Real = 0.14;
+        attribute assemblySideTrussLowerChordCenterYM : Real = 0.16;
+        attribute assemblySideTrussBraceThicknessM : Real = 0.08;
+        attribute assemblySideTrussBraceCountPerSide : Integer = 4;
         attribute rampSectionHingeBarrelRadiusM : Real = 0.12;
         attribute rampSectionHingeBarrelLengthM : Real = 3.50;
         attribute rampSectionHingeBarrelCenterYM : Real = -0.18;
         attribute rampSurfaceCenterYM : Real = 0.00;
-        attribute rampRailCenterYM : Real = 0.23;
+        attribute rampRailCenterYM : Real = 0.74;
         attribute rampMaxDeploymentAngleRad : Real = 0.872664626;
         // Render-only mount: the 5.15 m octagonal top deck reaches x =
         // +/-2.575 m, so the visual hinge is placed at +/-2.80 m beyond the
@@ -256,8 +316,8 @@ package GriffinRampRequirements {
         // ground plane: its ramp hinge centre is 4.78 m high and the ramp
         // surface top is 0.09 m above that centre. A 23.4686 degree slope
         // brings the far top edge to Y=0 over the shared 12.228605 m track.
-        // The physical mission pose uses its separate COM-relative 49 degree
-        // deployment below.
+        // The physical mission pose uses its separately calculated 27.833532
+        // degree deployment below; the render review keeps this 23.4686 degree pose.
         attribute rampPortDeploymentAngleRad : Real = -0.4096044958;
         attribute rampStarboardDeploymentAngleRad : Real = 0.4096044958;
         attribute hingeAxis : GriffinRampHingeAxis = "Z";
@@ -279,11 +339,19 @@ package GriffinRampRequirements {
         // Physical contact geometry reuses the shared ramp length, outside
         // envelope, thickness, and rail dimensions above. This package owns
         // only the physical hinge, transition, and safe stowed pose.
-        // The physical ramp is stowed horizontally until touchdown.  These
-        // are local component-frame datums: the port ramp uses +X and the
-        // starboard ramp mirrors the X sign in the Editor recipe.  Keeping
-        // the safe pre-landing pose in SysML prevents a deployed collision
-        // proxy from touching terrain during powered descent.
+        // The physical ramp is folded above the landing legs during descent.
+        // Port holds a +45 deg root angle; starboard holds -135 deg locally.
+        // Its authored 180 deg Y mount aligns the two folded bundles in
+        // parallel above the deck. Both intermediate hinges fold through 180
+        // deg. These are image-based Twin study datums, not released supplier
+        // geometry. Each root limit leaves 15 deg beyond its stow target.
+        // half-turn in either direction so operators can command and inspect
+        // the complete travel.
+        // These replaceable study datums are not an as-built mechanism: public
+        // Griffin material confirms launch stow and spring deployment but does
+        // not publish the stowage geometry or supplier ICD. After touchdown,
+        // an operator command returns the section hinges to zero and deploys
+        // the deck hinges within their separate descent/deployment envelope.
         // The physical ramp is hinged at the inboard edge, not at its centre:
         // the 12.228605 m contact surface therefore occupies x=0.00..12.228605 m
         // in the ramp body frame. Its centre is 6.1143025 m. The hinge
@@ -317,16 +385,17 @@ package GriffinRampRequirements {
         attribute physicalRampMountY : Real = 5.19;
         attribute physicalRampMountZ : Real = 0.0;
         // The physical contact surface meets the 5.28 m adapter top: its
-        // centre is 5.19 m above the Griffin COM datum for a 0.18 m track.
-        // At a 3.98 m touchdown COM height, the 12.228605 m track deployed
-        // 49 degrees reaches the normalized terrain plane at its top toe.
+        // centre is 5.19 m above the Griffin body-reference datum for a
+        // 0.18 m track. At the 0.44 m nominal touchdown reference height,
+        // the 12.228605 m track deployed 27.833532 degrees places both mitered
+        // toe edges on the normalized terrain plane.
         // A thickness-and-angle-derived toe miter brings the lower toe edge
         // to that same plane and avoids a full-thickness collider penetrating
         // terrain. The command remains inside the 50 degree actuator limit.
         // These are replaceable study datums until the supplier mechanical ICD.
         attribute physicalRampTerrainContactToleranceM : Real = 0.02;
-        attribute physicalRampPortDeploymentAngleRad : Real = -0.8552113335;
-        attribute physicalRampStarboardDeploymentAngleRad : Real = 0.8552113335;
+        attribute physicalRampPortDeploymentAngleRad : Real = -0.4857867749;
+        attribute physicalRampStarboardDeploymentAngleRad : Real = 0.4857867749;
         // These values migrate the existing Twin dynamics proxy into the
         // requirement source. They are explicit replaceable assumptions, not
         // Griffin supplier data or an accepted mass-properties solution.
@@ -336,11 +405,17 @@ package GriffinRampRequirements {
         attribute physicalRampSectionInertiaYKgM2 : Real = 76.172636183;
         attribute physicalRampSectionInertiaZKgM2 : Real = 43.931747294;
         attribute physicalRampSectionMassPartitionToleranceKg : Real = 0.001;
-        attribute physicalRampSectionJointLimitRad : Real = 2.094395102;
+        attribute physicalRampPortRootJointStowLimitRad : Real = 1.0471975512;
+        attribute physicalRampPortRootStowedAngleRad : Real = 0.7853981634;
+        attribute physicalRampStarboardRootJointStowLimitRad : Real = 2.617993878;
+        attribute physicalRampStarboardRootStowedAngleRad : Real = 2.3561944902;
+        attribute physicalRampSectionJointLimitRad : Real = 3.141592654;
+        attribute physicalRampSectionStowedAngleRad : Real = 3.141592654;
+        attribute physicalRampToeSectionStowedAngleRad : Real = 3.141592654;
         attribute physicalRampSectionDriveTargetRad : Real = 0.0;
-        attribute physicalRampSectionDriveStiffnessNmPerDeg : Real = 6000.0;
-        attribute physicalRampSectionDriveDampingNmPerDegPerSec : Real = 900.0;
-        attribute physicalRampSectionDriveMaxTorqueNm : Real = 5000.0;
+        attribute physicalRampJointDriveStiffnessNmPerDeg : Real = 6000.0;
+        attribute physicalRampJointDriveDampingNmPerDegPerSec : Real = 900.0;
+        attribute physicalRampJointDriveMaxTorqueNm : Real = 5000.0;
         attribute physicalRampSectionMassPropertiesToleranceKgM2 : Real = 0.01;
     }
 
@@ -404,7 +479,7 @@ package GriffinRampRequirements {
         doc /* The deck hinge and both intermediate section hinges shall be visible at the ramp assembly joints. Every intermediate joint shall use a Z-axis revolute connection at the adjacent section endpoints, and its hinge barrel shall remain below the walking surface. */
     }
     requirement def GRR016_ArticulatedRampSections {
-        doc /* Each upper-deck-mounted ramp shall contain three equal rigid sections, one revolute deck hinge, and two native revolute joints between consecutive sections. Section lengths shall sum to the full contact-track length. Intermediate joints shall hold zero relative angle during rover traversal so the sections, contact tracks, and upper rails form one continuous deployed path. */
+        doc /* Each upper-deck-mounted ramp shall contain three equal rigid sections, a revolute deck hinge, and two native revolute joints between consecutive sections. All six physical ramp joints shall expose the source-owned angular drive and limits so their typed angle ports can command motion inside the authored range. Section lengths shall sum to the full contact-track length. Intermediate joints shall hold zero relative angle during rover traversal so the sections, contact tracks, and upper rails form one continuous deployed path. */
         require GRC018_SectionedRampMatchesEnvelope {
             in totalLengthM = GriffinEgressRamp::rampSurfaceLengthM;
             in sectionLengthM = GriffinEgressRamp::rampSectionLengthM;
@@ -413,8 +488,50 @@ package GriffinRampRequirements {
             in toleranceM = GriffinEgressRamp::rampSectionGeometryToleranceM;
         }
     }
+    requirement def GRR017_FlightStowAndPostTouchdownUnfold {
+        doc /* During descent, the port root holds +45 degrees and the starboard root holds -135 degrees locally. The starboard assembly's 180 degree Y mount mirrors the root orientation. Port root travel spans -50 to +60 degrees; starboard spans -150 to +50 degrees, leaving 15 degrees beyond each stowed datum while retaining the deployment targets. Both intermediate hinges turn 180 degrees. The first hinge axis is offset to the top rail chord and the second by half the walking-surface thickness, so the three sections stack as a compact bundle instead of occupying one plane. At zero hinge angle these frame offsets keep the deployed walking surfaces level. The section joints expose their full +/-180 degree travel. The image-based angles and fold offsets are replaceable study estimates informed by Astrobotic's 2021 Griffin-1 product image (https://www.astrobotic.com/wp-content/uploads/2021/02/griffin-1.png); that image supplies qualitative silhouette only, not released supplier geometry or an ICD. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive all four intermediate hinges to their level targets, then move both deck hinges into the deployment envelope. */
+        require GRC022_RampFlightStowAnglesWithinTravel {
+            in portRootStowAngleRad = GriffinEgressRamp::physicalRampPortRootStowedAngleRad;
+            in starboardRootStowAngleRad = GriffinEgressRamp::physicalRampStarboardRootStowedAngleRad;
+            in middleAngleRad = GriffinEgressRamp::physicalRampSectionStowedAngleRad;
+            in toeAngleRad = GriffinEgressRamp::physicalRampToeSectionStowedAngleRad;
+            in portRootLimitRad = GriffinEgressRamp::physicalRampPortRootJointStowLimitRad;
+            in starboardRootLimitRad = GriffinEgressRamp::physicalRampStarboardRootJointStowLimitRad;
+            in sectionLimitRad = GriffinEgressRamp::physicalRampSectionJointLimitRad;
+        }
+        require GRC024_RampSectionDeploymentTargetIsLevel {
+            in deploymentTargetRad = GriffinEgressRamp::physicalRampSectionDriveTargetRad;
+        }
+        require GRC025_StowedRailsClearLandingLegEnvelope {
+            in geometryToleranceM = GriffinEgressRamp::rampSectionGeometryToleranceM;
+        }
+    }
+    requirement def GRR018_RailsAboveWalkingSurface {
+        doc /* Each physical section's paired upper chords shall remain above the walking surface with source-owned clearance and continuous upright supports. This preserves the top-side rail orientation when the sections are raised for descent and when lowered for egress. */
+        require GRC023_RailsRemainOnUpperTrackFace {
+            in railBottomYM = GriffinEgressRamp::rampRailCenterYM
+                - GriffinEgressRamp::rampRailHeightM / 2.0;
+            in walkingSurfaceTopYM = GriffinEgressRamp::rampSurfaceCenterYM
+                + GriffinEgressRamp::rampSurfaceThicknessM / 2.0;
+            in toleranceM = GriffinEgressRamp::rampSectionGeometryToleranceM;
+        }
+    }
+    requirement def GRR019_SideTrussBracing {
+        doc /* Each physical ramp section shall show a triangulated side truss on both sides: four alternating diagonal braces connect the track level to the upper chords around the three upright post stations, over continuous lower chords. Member sizes and stations are explicit visual study values because the supplier truss drawing is not public. */
+        require GRC026_SideTrussBracing {
+            in braceCountPerSide = GriffinEgressRamp::assemblySideTrussBraceCountPerSide;
+            in postCountPerSide = GriffinEgressRamp::assemblySidePostCountPerSectionPerSide;
+            in braceThicknessM = GriffinEgressRamp::assemblySideTrussBraceThicknessM;
+            in lowerChordHeightM = GriffinEgressRamp::assemblySideTrussChordHeightM;
+            in lowerChordCenterYM = GriffinEgressRamp::assemblySideTrussLowerChordCenterYM;
+            in upperChordCenterYM = GriffinEgressRamp::rampRailCenterYM;
+            in walkingSurfaceTopYM = GriffinEgressRamp::rampSurfaceCenterYM
+                + GriffinEgressRamp::rampSurfaceThicknessM / 2.0;
+            in toleranceM = GriffinEgressRamp::rampSectionGeometryToleranceM;
+        }
+    }
     requirement def GRR010_PhysicalEgressEnvelope {
-        doc /* GRR-010 [mission integration/physics] each selected physical ramp shall bridge the composed top-deck transition to the terrain plane with two FLIP-aligned contact tracks, a 3.50 m outside rail envelope, paired rails, and a mitered toe whose upper and lower edges meet the authored terrain height at the commanded deployment angle. The current 12.228605 m top-face length and 49 degree physical deployment are replaceable study datums derived from the 5.28 m adapter top, 3.98 m touchdown COM height, and 0.18 m track thickness; the released ramp ICD remains unavailable. GRC010 checks both transformed toe edges against the terrain surface within the explicit contact tolerance. GRC016 requires each 0.60 m track to clear one tire and its side clearance. The render-only pose uses the same top-face length with a separate 4.78 m hinge datum and 23.4686 degree slope. GRR-012 independently checks the composed deck-to-transition-to-ramp static interface. These source-geometry checks do not replace composed mesh readback, deployed runtime contact, or rover traversal evidence. */
+        doc /* GRR-010 [mission integration/physics] each selected physical ramp shall bridge the composed top-deck transition to the terrain plane with two FLIP-aligned contact tracks, a 3.50 m outside rail envelope, paired top-side rails, and a mitered toe whose upper and lower edges meet the authored terrain height at the commanded deployment angle. The current 12.228605 m top-face length and 27.833532 degree physical deployment are replaceable study datums derived from the 5.28 m adapter top, 0.44 m vehicle-reference touchdown height, and 0.18 m track thickness; the released ramp ICD remains unavailable. GRC010 checks both transformed toe edges against the terrain surface within the explicit contact tolerance. GRC016 requires each 0.60 m track to clear one tire and its side clearance. The render-only pose uses the same top-face length with a separate 4.78 m hinge datum and 23.4686 degree slope. GRR-012 independently checks the composed deck-to-transition-to-ramp static interface. These source-geometry checks do not replace composed mesh readback, deployed runtime contact, or rover traversal evidence. */
         require GRC010_PhysicalRampReachesTerrain;
     }
     requirement def GRR011_PhysicalDeploymentLifecycle {
@@ -461,6 +578,9 @@ package GriffinRampRequirements {
     requirement <'GRR-014'> grr014 : GRR014_RampLoadPathGeometry { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-015'> grr015 : GRR015_RampHingeGussetGeometry { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-016'> grr016 : GRR016_ArticulatedRampSections { subject ramp : GriffinEgressRamp; }
+    requirement <'GRR-017'> grr017 : GRR017_FlightStowAndPostTouchdownUnfold { subject ramp : GriffinEgressRamp; }
+    requirement <'GRR-018'> grr018 : GRR018_RailsAboveWalkingSurface { subject ramp : GriffinEgressRamp; }
+    requirement <'GRR-019'> grr019 : GRR019_SideTrussBracing { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-010'> grr010 : GRR010_PhysicalEgressEnvelope { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-011'> grr011 : GRR011_PhysicalDeploymentLifecycle { subject ramp : GriffinEgressRamp; }
     requirement <'GRR-012'> grr012 : GRR012_PhysicalDeckTransition { subject ramp : GriffinEgressRamp; }
@@ -484,7 +604,25 @@ package GriffinRampRequirements {
             verify grr014;
             verify grr015;
             verify grr016;
+            verify grr017;
+            verify grr018;
         }
+    }
+
+    verification def Verify_GriffinRampFlightStow {
+        doc /* Verifies the descent stow pose and upper-side rail placement independently of the still-unverified landing and rover-egress sequence. */
+        subject ramp : GriffinEgressRamp;
+        objective {
+            verify grr017;
+            verify grr018;
+            verify grr019;
+        }
+    }
+
+    verification def Verify_GriffinRampTouchdownGeometry {
+        doc /* Verifies source-owned physical-ramp deployment angles against the composed ramp hinge and mount data, then checks both mitered toe edges against the authored terrain plane at the touchdown reference height. This geometry check is separate from dynamic deployment and rover traversal. */
+        subject ramp : GriffinEgressRamp;
+        verify grr010;
     }
 
     verification def Verify_GriffinRampCommandEnvelope {
