@@ -1178,7 +1178,9 @@ def Xform "Griffin1" (
         prepend references = @lunco://vessels/sensors/altimeter.usda@</Altimeter>
     )
     {
-        double3 xformOp:translate = (0.0, -3.3, 0.0)
+        # Single source for the altimeter mount; the raw ray sampler composes
+        # this transform and the shared Modelica sensor consumes that geometry.
+        double3 xformOp:translate = (0.0, -0.35, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Model"
         {
