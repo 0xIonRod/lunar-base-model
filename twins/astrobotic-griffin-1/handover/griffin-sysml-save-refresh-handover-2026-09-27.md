@@ -313,3 +313,43 @@ superseded +120/-120 pose. The current model-only Editor capture is
 This remains static fold and clearance evidence. It does not establish powered
 hinge motion, touchdown gating, rover release, terrain traversal, or
 post-touchdown stability; the complete Griffin mission remains `NO-VERDICT`.
+
+## Continuation (2026-09-28, stacked section frames and focused verification)
+
+The reference-parallel pose still authored all three ramp panels in the same
+plane when both intermediate hinges were at 180 degrees. The physical-ramp
+builder now offsets the middle section by 1.62 m and the toe by -0.18 m in
+their respective parent frames. Their hinge anchors use the matching 0.81 m
+rail-top and -0.09 m surface-half-thickness datums, so the panel frames coincide
+at the deployed zero-angle targets. Typed local `Mesh` overlays preserve the
+referenced ramp-track geometry instead of shadowing it with untyped prims.
+
+The refreshed headless binary passed
+`Verify_GriffinRampFlightStow` at 58 ticks: 131 checks, zero failures. The
+composed bounds covered 12 rails and 40 landing-leg shapes; the lowest rail
+bottom was Y=3.3444513 m, the highest leg point Y=2.44 m, and the measured
+clearance was 0.9044513 m. The test emitted one transient startup warning while
+the selected SysML source projection was not ready, then completed the full
+verdict. Root limits remain port -50/+60 degrees and starboard -150/+50 degrees;
+the four intermediate joints expose +/-180 degrees.
+
+U and `request_ramp_unfold()` route through the touchdown gate to the staged
+section-then-root drive sequence. G and `request_rover_release()` share the
+post-touchdown release gate, and the HUD presents `UNWIND RAMP  U` and
+`RELEASE ROVER  G` only in their corresponding phases. The Twin still defaults
+to `scenes/griffin_flip_visual.usda`; the powered mission is the separate
+`scenes/griffin_1_surface_ops.usda` scene.
+
+The full surface mission was rerun with the refreshed terrain binary and
+exhausted its 14,400-tick bound without a verdict or `lander_touchdown`; the
+post-touchdown ramp drive and rover release therefore remain unverified. The
+saved `griffin-ramp-stow-review-2026-09-28.png` predates this stack-frame
+change and still shows the earlier splayed pose. The live Editor screenshot
+endpoint returned a 16x16 render target, so there is no fresh visual acceptance
+capture for the corrected pose. The stow geometry has a focused static PASS,
+but its visual match and powered hinge motion remain open.
+
+The ramp changes are committed locally as `5121fb0` on `main`; nothing was
+pushed. The terrain checkout was fast-forwarded to `54ad69a32`, equal to
+`origin/main`. Its six staged solar/acausal-network files were pre-existing and
+left untouched.
