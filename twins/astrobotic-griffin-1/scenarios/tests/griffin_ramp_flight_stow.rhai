@@ -18,14 +18,61 @@ fn _source_attr(name) { OWN + name }
 fn _source_number(source, name) {
     sysml_requirements::number(source, _source_attr(name))
 }
-fn _root_forward_in_lander_frame(path) {
-    let prim = query("QueryUsdPrim", #{path: path, children: false,
+fn _root_axes_observation() {
+    let paths = [ROOT + "/EgressRampPort", ROOT + "/EgressRampStarboard"];
+    let result = query("QueryUsdPrims", #{paths: paths,
         attrs: ["xformOp:rotateXYZ"]});
-    if prim == () || prim.path != path || prim.attrs == () { return (); }
-    let euler_xyz = prim.attrs["xformOp:rotateXYZ"];
-    if euler_xyz == () || euler_xyz.len() != 3 { return (); }
-    let rotation = quat_from_euler_xyz_deg(vec3_from(euler_xyz));
-    qrot(rotation, [1.0, 0.0, 0.0])
+    if result == () || result.error != () || result.records == ()
+        || result.records.len() != paths.len() {
+        return #{provider: "usd", state: "unavailable",
+            detail: "both composed ramp root transforms are required"};
+    }
+    let port = result.records[0];
+    let starboard = result.records[1];
+    if port.doc_id == () || port.document_generation == () || port.stage_generation == ()
+        || starboard.doc_id != port.doc_id
+        || starboard.document_generation != port.document_generation
+        || starboard.stage_generation != port.stage_generation {
+        return #{provider: "usd", state: "unavailable",
+            detail: "composed ramp roots do not share one document and stage snapshot"};
+    }
+    if port.attrs == () || starboard.attrs == () {
+        return #{provider: "usd", state: "unavailable",
+            detail: "composed ramp root rotations are unavailable",
+            doc_id: port.doc_id,
+            document_generation: port.document_generation,
+            stage_generation: port.stage_generation};
+    }
+    let port_euler = port.attrs["xformOp:rotateXYZ"];
+    let starboard_euler = starboard.attrs["xformOp:rotateXYZ"];
+    if port_euler == () || port_euler.len() != 3
+        || starboard_euler == () || starboard_euler.len() != 3 {
+        return #{provider: "usd", state: "unavailable",
+            detail: "composed ramp root rotations are malformed",
+            doc_id: port.doc_id,
+            document_generation: port.document_generation,
+            stage_generation: port.stage_generation};
+    }
+    let port_forward = qrot(quat_from_euler_xyz_deg(vec3_from(port_euler)), [1.0, 0.0, 0.0]);
+    let starboard_forward = qrot(quat_from_euler_xyz_deg(vec3_from(starboard_euler)), [1.0, 0.0, 0.0]);
+    #{provider: "usd", state: "value",
+      port_forward_x: port_forward[0], port_forward_y: port_forward[1],
+      starboard_forward_x: starboard_forward[0],
+      starboard_forward_y: starboard_forward[1],
+      doc_id: port.doc_id,
+      document_generation: port.document_generation,
+      stage_generation: port.stage_generation}
+}
+fn _axis_component_observation(axes, value) {
+    let observation = #{provider: "usd", state: axes.state};
+    if axes.state == "value" { observation.value = value; }
+    else { observation.detail = axes.detail; }
+    if axes.doc_id != () { observation.doc_id = axes.doc_id; }
+    if axes.document_generation != () {
+        observation.document_generation = axes.document_generation;
+    }
+    if axes.stage_generation != () { observation.stage_generation = axes.stage_generation; }
+    observation
 }
 fn _check(id, requirement, kind, path) {
     #{id: id, component: "ramp", requirement: requirement,
@@ -46,10 +93,21 @@ fn _relationship(id, requirement, path, rel, target) {
       verification: VERIFICATION, kind: "relationship", path: path,
       rel: rel, targets: [target]}
 }
-fn _constraint(id, requirement, name, bindings) {
-    sysml_requirements::constraint_check(id, "ramp", requirement,
+fn _constraint(source, id, requirement, name, bindings) {
+    let typed_bindings = #{};
+    for name in bindings.keys() {
+        let value = bindings[name];
+        typed_bindings[name] = if type_of(value) == "map" {
+            value
+        } else {
+            #{provider: "source_literal", state: "value", value: value,
+              provider_generation: source.source_revision,
+              source_revision: source.source_revision}
+        };
+    }
+    sysml_requirements::required_constraint_check(id, "ramp", requirement,
         VERIFICATION, "GriffinRampRequirements::" + name,
-        bindings, "derived", 0.0)
+        typed_bindings, "typed", 0.0)
 }
 fn _stowed_rail_leg_envelope() {
     let rail_paths = [];
@@ -147,8 +205,8 @@ fn on_tick(me, ctx) {
         "assemblySideTrussLowerChordCenterYM", "assemblySideTrussBraceThicknessM",
         "assemblySideTrussBraceCountPerSide", "physicalRampMountY", "physicalRampPortMountX",
         "physicalRampStarboardMountX", "physicalRampSectionJointLimitRad",
-        "physicalRampPortRootJointStowLimitRad", "physicalRampPortRootStowedAngleRad",
-        "physicalRampStarboardRootJointStowLimitRad", "physicalRampStarboardRootStowedAngleRad",
+        "physicalRampPortRootJointStowLimitRad", "physicalRampRootStowedAngleRad",
+        "physicalRampStarboardRootJointStowLimitRad",
         "physicalRampSectionStowedRelativeAngleRad",
         "physicalRampSectionJointFrameOffsetRad",
         "physicalRampSectionDeploymentRelativeAngleRad"] {
@@ -162,26 +220,24 @@ fn on_tick(me, ctx) {
         throw("Griffin ramp flight-stow SysML source selection is invalid");
     }
 
-    let surface_top_y = _source_number(source, "rampSurfaceCenterYM")
-        + _source_number(source, "rampSurfaceThicknessM") / 2.0;
-    let rail_bottom_y = _source_number(source, "rampRailCenterYM")
-        - _source_number(source, "rampRailHeightM") / 2.0;
     let checks = [];
-    checks.push(_constraint("GRR-017-flight-stow-angle-envelope", "grr017",
+    checks.push(_constraint(source, "GRR-017-flight-stow-angle-envelope", "grr017",
         "GRC022_RampFlightStowAnglesWithinTravel",
-        #{portRootStowAngleRad: _source_number(source, "physicalRampPortRootStowedAngleRad"),
-          starboardRootStowAngleRad: _source_number(source, "physicalRampStarboardRootStowedAngleRad"),
+        #{rootStowAngleRad: _source_number(source, "physicalRampRootStowedAngleRad"),
           sectionStowRelativeAngleRad: _source_number(source, "physicalRampSectionStowedRelativeAngleRad"),
           sectionDeploymentRelativeAngleRad: _source_number(source, "physicalRampSectionDeploymentRelativeAngleRad"),
           sectionJointFrameOffsetRad: _source_number(source, "physicalRampSectionJointFrameOffsetRad"),
           portRootLimitRad: _source_number(source, "physicalRampPortRootJointStowLimitRad"),
           starboardRootLimitRad: _source_number(source, "physicalRampStarboardRootJointStowLimitRad"),
           sectionLimitRad: _source_number(source, "physicalRampSectionJointLimitRad")}));
-    checks.push(_constraint("GRR-018-rails-on-upper-track-face", "grr018",
+    checks.push(_constraint(source, "GRR-018-rails-on-upper-track-face", "grr018",
         "GRC023_RailsRemainOnUpperTrackFace",
-        #{railBottomYM: rail_bottom_y, walkingSurfaceTopYM: surface_top_y,
+        #{railCenterYM: _source_number(source, "rampRailCenterYM"),
+          railHeightM: _source_number(source, "rampRailHeightM"),
+          walkingSurfaceCenterYM: _source_number(source, "rampSurfaceCenterYM"),
+          walkingSurfaceThicknessM: _source_number(source, "rampSurfaceThicknessM"),
           toleranceM: _source_number(source, "rampSectionGeometryToleranceM")}));
-    checks.push(_constraint("GRR-019-truss-source-envelope", "grr019",
+    checks.push(_constraint(source, "GRR-019-truss-source-envelope", "grr019",
         "GRC026_SideTrussBracing",
         #{braceCountPerSide: _source_number(source, "assemblySideTrussBraceCountPerSide").to_int(),
           postCountPerSide: _source_number(source, "assemblySidePostCountPerSectionPerSide").to_int(),
@@ -189,9 +245,10 @@ fn on_tick(me, ctx) {
           lowerChordHeightM: _source_number(source, "assemblySideTrussChordHeightM"),
           lowerChordCenterYM: _source_number(source, "assemblySideTrussLowerChordCenterYM"),
           upperChordCenterYM: _source_number(source, "rampRailCenterYM"),
-          walkingSurfaceTopYM: surface_top_y,
+          walkingSurfaceCenterYM: _source_number(source, "rampSurfaceCenterYM"),
+          walkingSurfaceThicknessM: _source_number(source, "rampSurfaceThicknessM"),
           toleranceM: _source_number(source, "rampSectionGeometryToleranceM")}));
-    checks.push(_constraint("GRR-017-post-touchdown-unfold-target", "grr017",
+    checks.push(_constraint(source, "GRR-017-post-touchdown-unfold-target", "grr017",
         "GRC024_RampSectionDeploymentTargetIsLevel",
         #{deploymentRelativeAngleRad: _source_number(source, "physicalRampSectionDeploymentRelativeAngleRad")}));
     let envelope = _stowed_rail_leg_envelope();
@@ -241,9 +298,8 @@ fn on_tick(me, ctx) {
     let section_frame_offset_rad = _source_number(source,
         "physicalRampSectionJointFrameOffsetRad");
     let port_root_deg = _source_number(source,
-        "physicalRampPortRootStowedAngleRad") * 180.0 / 3.141592653589793;
-    let starboard_root_deg = _source_number(source,
-        "physicalRampStarboardRootStowedAngleRad") * 180.0 / 3.141592653589793;
+        "physicalRampRootStowedAngleRad") * 180.0 / 3.141592653589793;
+    let starboard_root_deg = port_root_deg;
     let section_stow_relative_deg = section_stow_relative_rad * 180.0 / 3.141592653589793;
     let section_stow_joint_deg = (section_stow_relative_rad + section_frame_offset_rad)
         * 180.0 / 3.141592653589793;
@@ -265,7 +321,7 @@ fn on_tick(me, ctx) {
         // Body Euler rotation and revolute-coordinate target differ on the
         // starboard side because its Y=180 mount reverses the hinge axis.
         let root_target_deg = if side_index == 0 { port_root_deg } else { -starboard_root_deg };
-        let root_body_rotation_z_deg = if side_index == 0 { port_root_deg } else { starboard_root_deg };
+        let root_body_rotation_z_deg = port_root_deg;
         checks.push(_attribute_component("GRR-017-" + side + "-root-stow-angle", "grr017",
             ramp, "xformOp:rotateXYZ", 2, root_body_rotation_z_deg));
         checks.push(_attribute_component("GRR-017-" + side + "-root-mirror", "grr017",
@@ -381,32 +437,21 @@ fn on_tick(me, ctx) {
     // Evaluate each composed USD root transform in the lander frame. The live
     // physics pose is time-varying, so it is not a stable measurement of the
     // authored transport configuration after the hinge drives start moving.
-    let port_forward = _root_forward_in_lander_frame(ROOT + "/EgressRampPort");
-    let starboard_forward = _root_forward_in_lander_frame(ROOT + "/EgressRampStarboard");
-    let axis_observation = if port_forward == () || starboard_forward == ()
-        || port_forward.len() < 3 || starboard_forward.len() < 3 {
-        #{provider: "composed_usd_local_rotation", state: "unavailable",
-          detail: "both composed ramp root forward axes are required"}
-    } else {
-        #{provider: "composed_usd_local_rotation", state: "value",
-          portForwardX: port_forward[0], portForwardY: port_forward[1],
-          starboardForwardX: starboard_forward[0],
-          starboardForwardY: starboard_forward[1]}
-    };
-    checks.push(_constraint("GRR-017-root-axes-mirror", "grr017",
+    let axis_observation = _root_axes_observation();
+    let port_forward_x = _axis_component_observation(axis_observation,
+        axis_observation.port_forward_x);
+    let port_forward_y = _axis_component_observation(axis_observation,
+        axis_observation.port_forward_y);
+    let starboard_forward_x = _axis_component_observation(axis_observation,
+        axis_observation.starboard_forward_x);
+    let starboard_forward_y = _axis_component_observation(axis_observation,
+        axis_observation.starboard_forward_y);
+    checks.push(_constraint(source, "GRR-017-root-axes-mirror", "grr017",
         "GRC027_RampStowedRootAxesMirror",
-        #{portForwardX: if axis_observation.state == "value" {
-                axis_observation.portForwardX
-            } else { axis_observation},
-          portForwardY: if axis_observation.state == "value" {
-                axis_observation.portForwardY
-            } else { axis_observation},
-          starboardForwardX: if axis_observation.state == "value" {
-                axis_observation.starboardForwardX
-            } else { axis_observation},
-          starboardForwardY: if axis_observation.state == "value" {
-                axis_observation.starboardForwardY
-            } else { axis_observation},
+        #{portForwardX: port_forward_x,
+          portForwardY: port_forward_y,
+          starboardForwardX: starboard_forward_x,
+          starboardForwardY: starboard_forward_y,
           tolerance: _source_number(source, "physicalRampRootAxisMirrorTolerance")}));
 
     let result = sysml_requirements::evaluate(source, checks);
@@ -446,5 +491,11 @@ fn on_tick(me, ctx) {
     if result.ok != true {
         print("[griffin-ramp-stow] source or composed pose checks failed: "
             + result.failure_count.to_string());
+        for failure in result.failures {
+            print("[griffin-ramp-stow] failed check "
+                + failure.id.to_string() + " at "
+                + failure.path.to_string() + ": "
+                + failure.error.to_string());
+        }
     }
 }

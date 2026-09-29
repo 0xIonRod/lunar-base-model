@@ -9,11 +9,6 @@ def Xform "EngineBell" (
     kind = "component"
 )
 {
-    float inputs:plume_throttle = 0.0
-    float inputs:plume_length_fraction = 0.0
-    float inputs:plume_intensity = 0.0
-    float inputs:plume_light_radius = 0.06
-
     def Cone "Bell"
     {
         uniform token axis = "Y"
@@ -41,7 +36,7 @@ def Xform "EngineBell" (
         uniform token axis = "Y"
         double radius = 1.0
         double height = 1.0
-        double3 xformOp:translate = (0.0, -1.74, 0.0)
+        double3 xformOp:translate = (0.0, -2.26, 0.0)
         double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         double3 xformOp:scale = (0.55, 4.0, 0.55)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
@@ -51,8 +46,8 @@ def Xform "EngineBell" (
         bool lunco:surface:additive = false
         bool physics:collisionEnabled = false
         bool primvars:doNotCastShadows = true
-        float inputs:throttle.connect = </EngineBell.inputs:plume_throttle>
-        float inputs:plume_length_fraction.connect = </EngineBell.inputs:plume_length_fraction>
+        float inputs:throttle
+        float inputs:plume_length_fraction
     }
     def Cone "FlameCore" (
         prepend apiSchemas = ["MaterialBindingAPI"]
@@ -61,7 +56,7 @@ def Xform "EngineBell" (
         uniform token axis = "Y"
         double radius = 1.0
         double height = 1.0
-        double3 xformOp:translate = (0.0, -1.74, 0.0)
+        double3 xformOp:translate = (0.0, -2.26, 0.0)
         double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         double3 xformOp:scale = (0.27, 4.0, 0.27)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
@@ -71,20 +66,20 @@ def Xform "EngineBell" (
         bool lunco:surface:additive = true
         bool physics:collisionEnabled = false
         bool primvars:doNotCastShadows = true
-        float inputs:throttle.connect = </EngineBell.inputs:plume_throttle>
-        float inputs:plume_length_fraction.connect = </EngineBell.inputs:plume_length_fraction>
+        float inputs:throttle
+        float inputs:plume_length_fraction
 
         def SphereLight "PlumeLight" (
             prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
         )
         {
-            float inputs:intensity = 0.0
+            float inputs:intensity
             bool inputs:shadow:enable = false
-            float inputs:radius = 0.06
+            float inputs:radius
             color3f inputs:color = (1.0, 0.4, 0.04)
             float lunco:light:range = 25.0
-            float inputs:light_intensity.connect = </EngineBell.inputs:plume_intensity>
-            float inputs:light_radius.connect = </EngineBell.inputs:plume_light_radius>
+            float inputs:light_intensity
+            float inputs:light_radius
         }
     }
 }

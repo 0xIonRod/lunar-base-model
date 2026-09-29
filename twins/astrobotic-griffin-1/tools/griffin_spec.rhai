@@ -118,11 +118,12 @@ fn _qualified_attribute(name) {
         "rampSocketX", "rampSocketY", "rampSocketZ",
         "rampPortDeploymentAngleRad", "rampStarboardDeploymentAngleRad",
         "hingeAxis", "rampStowedScale",
-        "rampStowedPortRotationZDeg", "rampStowedStarboardRotationYDeg",
-        "rampStowedStarboardRotationZDeg",
+        "rampStowedRotationZDeg", "rampStowedStarboardRotationYDeg",
         "physicalRampDeckTransitionRequiredOverlapM",
         "physicalRampDeckTransitionLengthM",
         "physicalRampDeckTransitionInterfaceToleranceM",
+        "physicalRampDeckTransitionOutboardX",
+        "physicalRampDeckTransitionCenterY",
         "physicalRampTerrainContactToleranceM",
         "physicalRampPortMountX",
         "physicalRampStarboardMountX", "physicalRampMountY",
@@ -131,8 +132,8 @@ fn _qualified_attribute(name) {
         "physicalRampMassKg", "physicalRampSectionMassKg",
         "physicalRampSectionInertiaXKgM2", "physicalRampSectionInertiaYKgM2",
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionJointLimitRad",
-        "physicalRampPortRootJointStowLimitRad", "physicalRampPortRootStowedAngleRad",
-        "physicalRampStarboardRootJointStowLimitRad", "physicalRampStarboardRootStowedAngleRad",
+        "physicalRampPortRootJointStowLimitRad", "physicalRampRootStowedAngleRad",
+        "physicalRampStarboardRootJointStowLimitRad",
         "physicalRampSectionStowedRelativeAngleRad", "physicalRampSectionJointFrameOffsetRad",
         "physicalRampSectionDeploymentRelativeAngleRad",
         "physicalRampSectionMassPartitionToleranceKg",
@@ -493,10 +494,10 @@ fn visual_ramp_state() { _sysml_native("rampState") }
 fn visual_ramp_child_names() { _sysml_enum_names("sectionInstances") }
 fn visual_ramp_stowed_rotation(side) {
     if side == "port" {
-        [0.0, 0.0, _sysml_attribute("rampStowedPortRotationZDeg")]
+        [0.0, 0.0, _sysml_attribute("rampStowedRotationZDeg")]
     } else {
         [0.0, _sysml_attribute("rampStowedStarboardRotationYDeg"),
-            _sysml_attribute("rampStowedStarboardRotationZDeg")]
+            _sysml_attribute("rampStowedRotationZDeg")]
     }
 }
 fn visual_body_profile() { _sysml_native("bodyProfile") }
@@ -739,8 +740,8 @@ fn physical_ramp_transition_joint_name(side) {
 }
 fn physical_ramp_port_deployment_angle_rad() { _sysml_attribute("physicalRampPortDeploymentAngleRad") }
 fn physical_ramp_starboard_deployment_angle_rad() { _sysml_attribute("physicalRampStarboardDeploymentAngleRad") }
-fn physical_ramp_port_root_stowed_angle_rad() { _sysml_attribute("physicalRampPortRootStowedAngleRad") }
-fn physical_ramp_starboard_root_stowed_angle_rad() { _sysml_attribute("physicalRampStarboardRootStowedAngleRad") }
+fn physical_ramp_port_root_stowed_angle_rad() { _sysml_attribute("physicalRampRootStowedAngleRad") }
+fn physical_ramp_starboard_root_stowed_angle_rad() { _sysml_attribute("physicalRampRootStowedAngleRad") }
 fn physical_ramp_port_root_stow_limit_rad() { _sysml_attribute("physicalRampPortRootJointStowLimitRad") }
 fn physical_ramp_starboard_root_stow_limit_rad() { _sysml_attribute("physicalRampStarboardRootJointStowLimitRad") }
 fn physical_ramp_section_stowed_relative_angle_rad() {

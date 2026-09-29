@@ -6,6 +6,8 @@ package GriffinPropulsionRequirements {
     private import VectorValues::CartesianThreeVectorValue;
     private import GriffinRequirementSources::TwinAssetPath;
     private import GriffinRequirementSources::UsdPrimPath;
+    private import GriffinLanderRequirements::GriffinLanderComponent;
+    private import GriffinVisualConfigurationRequirements::GriffinVisualConfiguration;
 
     attribute def Direction :> CartesianThreeVectorValue;
     enum def GriffinEngineVisualMember { Bell; Throat; Flame; FlameCore; }
@@ -84,7 +86,10 @@ package GriffinPropulsionRequirements {
             and typedStationsMatch;
     }
     requirement def GPP007_BellSeparation {
-        require GPPC007_BellSeparation;
+        require GPPC007_BellSeparation {
+            in requiredMinimumClearanceM = GriffinMainPropulsionAssembly::minimumBellClearanceM;
+            in bucketOuterRadiusM = GriffinVisualConfiguration::lowerBucketOuterBottomRadiusM;
+        }
         doc /* GPP-007 [layout] the seven bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and six equally spaced perimeter engines, and remain inside the lower central bucket envelope. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
     }
     constraint def GPPC008_EnginePlumeDataflow {
@@ -102,7 +107,9 @@ package GriffinPropulsionRequirements {
             and plumeGeometryIsRenderOnly;
     }
     requirement def GPP008_EnginePlumeDataflow {
-        require GPPC008_EnginePlumeDataflow;
+        require GPPC008_EnginePlumeDataflow {
+            in engineCount = GriffinLanderComponent::engineCount;
+        }
         doc /* GPP-008 [simulation presentation] each main-engine nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow shared photometry outputs driven by live propulsion state and modeled nozzle geometry. Zero delivered thrust shall produce neither visible exhaust nor light. */
     }
     requirement def GES001_SkirtTopology {

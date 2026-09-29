@@ -85,10 +85,10 @@ fn on_tick(me, ctx) {
         checks.push(_attribute_component("GRR-010-" + side + "-mount-y",
             ramp, "xformOp:translate", 1, mount_y));
         checks.push(_constraint("GRR-010-" + side + "-toe-contact",
-            #{rampTipTopYM: #{provider: "derived", state: "value", value: top.y},
-              rampTipBottomYM: #{provider: "derived", state: "value", value: bottom.y},
-              terrainSurfaceYM: #{provider: "source_literal", state: "value", value: terrain_y},
-              contactToleranceM: #{provider: "source_literal", state: "value", value: tolerance}}));
+            #{rampTipTopYM: top.y,
+              rampTipBottomYM: bottom.y,
+              terrainSurfaceYM: terrain_y,
+              contactToleranceM: tolerance}));
         details.push(#{side: side, angle_rad: angle, hinge_world_y_m: hinge_y,
             tip_top_y_m: top.y, tip_bottom_y_m: bottom.y,
             terrain_y_m: terrain_y, toe_bevel_run_m: bevel});

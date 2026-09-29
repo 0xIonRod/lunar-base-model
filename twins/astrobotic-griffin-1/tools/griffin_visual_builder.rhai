@@ -4216,6 +4216,15 @@ fn _ramp_section_track_points(length, thickness, width, toe_bevel) {
     ]
 }
 
+fn _ramp_section_track_topology() {
+    // Each physical section authors a complete native mesh in the vehicle
+    // layer; do not depend on face topology leaking through the component
+    // reference when its points are replaced for the deployment toe.
+    #{face_counts: [4, 4, 4, 4, 4, 4],
+      face_indices: [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1,
+          3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]}
+}
+
 // Materialize one physical ramp section from its SysML dimensions. The USD
 // component is a topology template; all dimensions, stations, and toe bevel
 // are written from the canonical requirement source before the section is
@@ -4314,6 +4323,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         return plan_error(section_path + ": source deployment angle yields an invalid ramp toe bevel");
     }
     let points = _ramp_section_track_points(section_length, thickness, track_width, toe_bevel);
+    let topology = _ramp_section_track_topology();
     let ops = [];
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: section_path,
         name: "lunco:ramp:section:identity", type_name: "token",
@@ -4329,8 +4339,9 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         if !query_ok(member) || member.type_name != "Mesh" {
             return plan_error(track_path + ": section contact-track mesh is missing");
         }
-        let geometry = assembly_builder::mesh_points_update_plan(
-            edit_target, track_path, points);
+        let geometry = assembly_builder::mesh_geometry_update_plan(
+            edit_target, track_path, points,
+            topology.face_counts, topology.face_indices);
         if !geometry.ok { return geometry; }
         for op in geometry.ops { ops.push(op); }
         ops.push(#{SetApiSchemas: #{edit_target: edit_target,
@@ -4568,17 +4579,16 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     let mass = griffin_spec::physical_ramp_deck_transition_mass_kg();
     let inertia = griffin_spec::physical_ramp_deck_transition_inertia_kg_m2();
     let joint_name = griffin_spec::physical_ramp_transition_joint_name(side);
-    let mount_y = _sysml_number(source, "physicalRampMountY");
     let mount_z = _sysml_number(source, "physicalRampMountZ");
-    let mount_x = _sysml_number(source, if side == "port" {
-        "physicalRampPortMountX"
-    } else {
-        "physicalRampStarboardMountX"
-    });
+    let transition_outboard_x = _sysml_number(source,
+        "physicalRampDeckTransitionOutboardX");
+    let transition_center_y = _sysml_number(source,
+        "physicalRampDeckTransitionCenterY");
     if name == () || name == "" || legacy_name == () || legacy_name == ""
         || mass == () || mass <= 0.0 || inertia.len() != 3
         || joint_name == () || joint_name == ""
-        || mount_x == () || mount_y == () || mount_z == () {
+        || mount_z == ()
+        || transition_outboard_x == () || transition_center_y == () {
         return plan_error("physical ramp transition identity, frame, or mass datums are incomplete in SysML");
     }
 
@@ -4625,12 +4635,11 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path,
         schemas: ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]}});
 
-    let anchor_offset_x = if side == "port" {
-        -transition_length / 2.0
-    } else { transition_length / 2.0 };
-    let anchor_x = mount_x + anchor_offset_x;
+    let anchor_x = if side == "port" {
+        transition_outboard_x - transition_length / 2.0
+    } else { -transition_outboard_x + transition_length / 2.0 };
     let placement = assembly_builder::place_plan(edit_target, path,
-        [anchor_x, mount_y, mount_z], [0.0, 0.0, 0.0], ());
+        [anchor_x, transition_center_y, mount_z], [0.0, 0.0, 0.0], ());
     if !placement.ok { return placement; }
     for op in placement.ops { ops.push(op); }
     for item in [
@@ -4708,7 +4717,8 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
         ops.push(op);
     }
     #{ok: true, path: path, name: name, center_x_m: anchor_x,
-      transition_length_m: transition_length, mass_kg: mass, inertia_kg_m2: inertia,
+      center_y_m: transition_center_y, transition_length_m: transition_length,
+      mass_kg: mass, inertia_kg_m2: inertia,
       contact_path: contact_path, joint_path: joint_path,
       joint_anchor_x_m: anchor_x, ops: ops}
 }
@@ -4749,9 +4759,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         "physicalRampSectionMassPartitionToleranceKg");
     let section_limit_rad = _sysml_number(source,
         "physicalRampSectionJointLimitRad");
-    let root_stow_angle_rad = _sysml_number(source, if side == "port" {
-        "physicalRampPortRootStowedAngleRad"
-    } else { "physicalRampStarboardRootStowedAngleRad" });
+    let root_stow_angle_rad = _sysml_number(source, "physicalRampRootStowedAngleRad");
     let root_stow_limit_rad = _sysml_number(source, if side == "port" {
         "physicalRampPortRootJointStowLimitRad"
     } else { "physicalRampStarboardRootJointStowLimitRad" });
@@ -5293,6 +5301,7 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     let solar_widths = griffin_spec::component_solar_array_widths_m();
     let solar_frame_width = griffin_spec::solar_panel_frame_width_m();
     let engine_names = griffin_spec::main_engine_names();
+    let engine_count = griffin_spec::main_engine_count();
     let engine_stations = griffin_spec::component_engine_stations();
     let solar_members = griffin_spec::solar_component_child_names();
     let engine_members = griffin_spec::main_engine_component_child_names();
@@ -5308,7 +5317,8 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
         || solar_rot_x.len() != solar_names.len()
         || solar_rot_z.len() != solar_names.len()
         || solar_widths.len() != solar_names.len() || solar_frame_width == ()
-        || engine_names.len() != 7 || engine_stations.len() != engine_names.len()
+        || engine_names.len() != 7 || engine_count != engine_names.len()
+        || engine_stations.len() != engine_names.len()
         || engine_members.len() != 2 || skirt_name == () || skirt_name == ""
         || skirt_members.len() != 6 || skirt_y == () {
         return plan_error("typed Griffin leg, solar, or propulsion stations are incomplete");
@@ -5329,14 +5339,31 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     }
     let engine_parent = root + "/Nozzle/MainEngineCluster";
     let engine_asset = component_asset("lander/griffin_engine_bell_visual.usda");
+    let plume_path = root + "/MainPropulsion/PlumePhotometry";
     for index in 0..engine_names.len() {
         let result = _migrate_griffin_component_reference(doc, edit_target,
             engine_parent, engine_names[index], engine_asset, "/EngineBell",
             vec3_array(engine_stations[index]), (), (), engine_members);
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
+        let engine_path = engine_parent + "/" + engine_names[index];
+        for wire in [
+            #{child: "Flame", input: "inputs:throttle", output: "render_throttle"},
+            #{child: "Flame", input: "inputs:plume_length_fraction", output: "visual_length_fraction"},
+            #{child: "FlameCore", input: "inputs:throttle", output: "render_throttle"},
+            #{child: "FlameCore", input: "inputs:plume_length_fraction", output: "visual_length_fraction"},
+            #{child: "FlameCore/PlumeLight", input: "inputs:light_intensity", output: "intensity"},
+            #{child: "FlameCore/PlumeLight", input: "inputs:light_radius", output: "radius"},
+        ] {
+            ops.push(#{SetConnection: #{edit_target: edit_target,
+                path: engine_path + "/" + wire.child, name: wire.input,
+                type_name: "float", sources: [plume_path + ".outputs:" + wire.output]}});
+        }
         migrated.push(result.path);
     }
+    ops.push(#{SetAttribute: #{edit_target: edit_target,
+        path: plume_path, name: "inputs:engine_count", type_name: "float",
+        value: engine_count.to_string() + ".0"}});
 
     let skirt_asset = component_asset("lander/griffin_engine_skirt_visual.usda");
     let skirt_result = _migrate_griffin_component_reference(doc, edit_target,

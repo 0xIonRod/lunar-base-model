@@ -31,6 +31,12 @@ fn attribute(id, requirement, path, attr, expected, tolerance) {
 
 fn absolute(value) { if value < 0.0 { -value } else { value } }
 
+fn simulation_dependencies(me, ctx) {
+    #{modelica_entities: [], entity_reads: [], entity_writes: [],
+      query_reads: ["AnalyzeSysml", "QueryUsdPrim", "QueryUsdPrims"],
+      required_inputs: []}
+}
+
 fn record_at(result, path) {
     if result == () || result.records == () { return (); }
     for record in result.records {
@@ -53,12 +59,77 @@ fn has_single_relationship_target(record, relationship, expected_target) {
         && targets[0] == expected_target
 }
 
-fn provider_observation(provider, available, value, detail) {
-    if available {
-        #{provider: provider, state: "value", value: value}
-    } else {
-        #{provider: provider, state: "unavailable", detail: detail}
+fn _query_snapshot(result) {
+    if result == () || result.records == () || result.records.len() == 0 {
+        return #{ok: false, error: "USD observation returned no composed records"};
     }
+    let first = result.records[0];
+    if first.doc_id == () || first.document_generation == ()
+        || first.stage_generation == () {
+        return #{ok: false, error: "USD observation lacks document or stage provenance"};
+    }
+    for record in result.records {
+        if record.doc_id != first.doc_id
+            || record.document_generation != first.document_generation
+            || record.stage_generation != first.stage_generation {
+            return #{ok: false,
+                error: "USD records span more than one composed document snapshot"};
+        }
+    }
+    #{ok: true, doc_id: first.doc_id,
+      document_generation: first.document_generation,
+      stage_generation: first.stage_generation}
+}
+
+fn _same_snapshot(left, right) {
+    left != () && right != () && left.ok == true && right.ok == true
+        && left.doc_id == right.doc_id
+        && left.document_generation == right.document_generation
+        && left.stage_generation == right.stage_generation
+}
+
+fn _usd_observation(snapshot, available, value, detail) {
+    if !available || snapshot == () || snapshot.ok != true {
+        return #{provider: "usd", state: "unavailable", detail: detail};
+    }
+    #{provider: "usd", state: "value", value: value,
+      doc_id: snapshot.doc_id,
+      document_generation: snapshot.document_generation,
+      stage_generation: snapshot.stage_generation}
+}
+
+fn _source_literal(model, qualified_name) {
+    let attribute = model.attribute(qualified_name);
+    if attribute == () {
+        throw("Typed SysML source literal is missing: " + qualified_name);
+    }
+    model.source_literal_observation(attribute)
+}
+
+fn _required_constraint_bindings(model, requirement_name, constraint_name,
+                                 inputs) {
+    let requirement = model.requirement(PACKAGE + "::" + requirement_name);
+    if requirement == () {
+        throw("Typed SysML requirement is missing: " + requirement_name);
+    }
+    let ir = sysml_requirements::required_constraint_ir(model, requirement,
+        PACKAGE + "::" + constraint_name);
+    if ir == () || ir.ok != true {
+        throw("Required SysML constraint is invalid: " + constraint_name
+            + "; " + if ir == () { "no constraint IR" } else { ir.error });
+    }
+    let bindings = [];
+    for input in inputs {
+        let bound = sysml_requirements::scalar_constraint_observation(ir,
+            input[0], input[1]);
+        if bound == () || bound.state == "invalid" {
+            throw("Could not bind typed observation for " + constraint_name
+                + "::" + input[0] + "; "
+                + if bound == () { "no observation" } else { bound.detail });
+        }
+        bindings.push(bound);
+    }
+    bindings
 }
 
 fn station_ring_is_centered_hexagon(stations, tolerance) {
@@ -99,13 +170,48 @@ fn on_start(me, ctx) {
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
-    let source = sysml_requirements::source();
+    let selected_attributes = [];
+    for name in ["usdRootPath", "bellRadiusM", "bellHeightM", "throatRadiusM",
+        "throatHeightM", "throatCenterYM", "minimumBellClearanceM"] {
+        selected_attributes.push(own(name));
+    }
+    for name in ["componentRootName", "componentMemberNames", "shellName",
+        "adapterPlateName", "railFrontCenterZM", "railRearCenterZM",
+        "railPortCenterXM", "railStarboardCenterXM", "railLengthM",
+        "railWidthM", "railHeightM", "shellDepthM", "adapterPlateWidthM",
+        "adapterPlateHeightM", "adapterPlateDepthM", "transformOrder"] {
+        selected_attributes.push(skirt(name));
+    }
+    selected_attributes.push(parent("engineCount"));
+    for name in ["engineClusterMountYM", "engineStations", "geometryVerificationToleranceM",
+        "lowerBucketOuterBottomRadiusM", "mainEngineInstances"] {
+        selected_attributes.push(visual(name));
+    }
+    let selected_requirements = [];
+    for name in ["gpp001", "gpp002", "gpp003", "gpp004", "gpp005", "gpp006",
+        "gpp007", "gpp008"] {
+        selected_requirements.push(PACKAGE + "::" + name);
+    }
+    for name in ["ges001", "ges002", "ges003", "ges004", "ges005", "ges006", "ges007"] {
+        selected_requirements.push(PACKAGE + "::" + name);
+    }
+    let source = sysml_requirements::source_with_selection(selected_attributes,
+        selected_requirements, [PACKAGE + "::" + VERIFICATION]);
+    if source.ok != true || source.path == () || source.path == "" {
+        throw("Griffin propulsion SysML selection failed: " + source.to_string());
+    }
+    let source_model = sysml_requirements::model();
+    if source_model == () || !sysml_model_is(source_model) {
+        throw("Griffin propulsion typed SysML model is unavailable");
+    }
     let root = sysml_requirements::text(source, own("usdRootPath"));
     let nozzle_suffix = "/Nozzle/MainEngineCluster";
-    let vehicle_root_end = root.index_of(nozzle_suffix);
-    if vehicle_root_end < 0 {
-        throw("Griffin propulsion USD root must end in /Nozzle/MainEngineCluster");
+    if root.len() < nozzle_suffix.len()
+        || root.sub_string(root.len() - nozzle_suffix.len(), root.len()) != nozzle_suffix {
+        throw("Griffin propulsion USD root must end in /Nozzle/MainEngineCluster; source value was "
+            + root.to_string());
     }
+    let vehicle_root_end = root.len() - nozzle_suffix.len();
     let vehicle_root = root.sub_string(0, vehicle_root_end);
     let propulsion_path = vehicle_root + "/MainPropulsion";
     let nozzle_design_path = propulsion_path + "/NozzleDesign";
@@ -153,6 +259,9 @@ fn on_tick(me, ctx) {
         let name = names[index];
         let path = root + "/" + name;
         checks.push(sysml_requirement_checks::exists("GPP-001-" + name, "engine", "gpp001", VERIFICATION, path, "Xform"));
+        checks.push(#{id: "GPP-005-" + name + "-translate-order", component: "engine",
+            requirement: "gpp005", verification: VERIFICATION, kind: "attribute_equals",
+            path: path, attr: "xformOpOrder", expected: ["xformOp:translate"]});
         checks.push(sysml_requirement_checks::children("GPP-002-" + name, "engine", "gpp002", VERIFICATION, path,
             [path + "/Bell", path + "/Throat"]));
         checks.push(sysml_requirement_checks::attribute_equals("GPP-002-" + name + "-purpose", "engine", "gpp002", VERIFICATION,
@@ -178,7 +287,8 @@ fn on_tick(me, ctx) {
     let engine_paths = [];
     for name in names { engine_paths.push(root + "/" + name); }
     let observed_engines = query("QueryUsdPrims", #{paths: engine_paths,
-        attrs: ["xformOp:translate"], geometry_bounds: true, connections: true});
+        attrs: ["xformOp:translate", "xformOpOrder"], geometry_bounds: true,
+        connections: true});
     let plume_paths = [];
     let light_paths = [];
     for path in engine_paths {
@@ -193,11 +303,29 @@ fn on_tick(me, ctx) {
         connections: true});
     let observed_photometry = query("QueryUsdPrims", #{
         paths: [photometry_path], connections: true});
+    let snapshots = [
+        _query_snapshot(observed_engines),
+        _query_snapshot(observed_plumes),
+        _query_snapshot(observed_lights),
+        _query_snapshot(observed_photometry)
+    ];
+    let usd_snapshot = ();
+    let usd_snapshots_match = true;
+    for snapshot in snapshots {
+        if snapshot.ok != true {
+            usd_snapshots_match = false;
+        } else if usd_snapshot == () {
+            usd_snapshot = snapshot;
+        } else if !_same_snapshot(usd_snapshot, snapshot) {
+            usd_snapshots_match = false;
+        }
+    }
     let plume_engine_count = 0;
     let plume_connections_match = true;
     let plume_materials_match = true;
     let plume_geometry_is_render_only = true;
-    let plume_observations_available = observed_engines.records != ()
+    let plume_observations_available = usd_snapshots_match
+        && observed_engines.records != ()
         && observed_engines.records.len() == engine_paths.len()
         && observed_plumes.records != ()
         && observed_plumes.records.len() == plume_paths.len()
@@ -217,26 +345,18 @@ fn on_tick(me, ctx) {
             if has_pair { plume_engine_count += 1; }
             let model_source = photometry_path + ".outputs:";
             plume_connections_match = plume_connections_match
-                && has_single_connection(engine_record, "inputs:plume_throttle",
-                    model_source + "render_throttle")
-                && has_single_connection(engine_record, "inputs:plume_length_fraction",
-                    model_source + "visual_length_fraction")
-                && has_single_connection(engine_record, "inputs:plume_intensity",
-                    model_source + "intensity")
-                && has_single_connection(engine_record, "inputs:plume_light_radius",
-                    model_source + "radius")
                 && has_single_connection(flame, "inputs:throttle",
-                    engine_path + ".inputs:plume_throttle")
+                    model_source + "render_throttle")
                 && has_single_connection(flame, "inputs:plume_length_fraction",
-                    engine_path + ".inputs:plume_length_fraction")
+                    model_source + "visual_length_fraction")
                 && has_single_connection(core, "inputs:throttle",
-                    engine_path + ".inputs:plume_throttle")
+                    model_source + "render_throttle")
                 && has_single_connection(core, "inputs:plume_length_fraction",
-                    engine_path + ".inputs:plume_length_fraction")
+                    model_source + "visual_length_fraction")
                 && has_single_connection(light, "inputs:light_intensity",
-                    engine_path + ".inputs:plume_intensity")
+                    model_source + "intensity")
                 && has_single_connection(light, "inputs:light_radius",
-                    engine_path + ".inputs:plume_light_radius");
+                    model_source + "radius");
             if has_pair {
                 plume_materials_match = plume_materials_match
                     && has_single_relationship_target(flame, "material:binding",
@@ -274,39 +394,49 @@ fn on_tick(me, ctx) {
             nozzle_design_path + ".outputs:exit_area")
         && has_single_connection(photometry_record, "inputs:chamber_pressure_pa",
             propulsion_path + ".outputs:chamber_pressure_pa");
-    checks.push(sysml_requirements::constraint_check("GPP-008-engine-plume-dataflow",
+    let plume_requirement_bindings = _required_constraint_bindings(source_model,
+        "gpp008", "GPPC008_EnginePlumeDataflow", [
+            ["engineCount", _source_literal(source_model, parent("engineCount"))],
+            ["plumeEngineCount", _usd_observation(usd_snapshot,
+                plume_observations_available, plume_engine_count,
+                "composed nozzle plume geometry is unavailable")],
+            ["photometryConsumesEngineState", _usd_observation(usd_snapshot,
+                plume_observations_available, photometry_consumes_engine_state,
+                "composed photometry connections are unavailable")],
+            ["everyNozzleUsesPhotometry", _usd_observation(usd_snapshot,
+                plume_observations_available, plume_connections_match,
+                "composed per-nozzle plume connections are unavailable")],
+            ["everyNozzleHasBoundPlumeMaterials", _usd_observation(usd_snapshot,
+                plume_observations_available, plume_materials_match,
+                "composed plume material bindings are unavailable")],
+            ["plumeGeometryIsRenderOnly", _usd_observation(usd_snapshot,
+                plume_observations_available, plume_geometry_is_render_only,
+                "composed plume geometry roles are unavailable")]
+        ]);
+    checks.push(sysml_requirements::required_constraint_check("GPP-008-engine-plume-dataflow",
         "engine", "gpp008", VERIFICATION,
         "GriffinPropulsionRequirements::GPPC008_EnginePlumeDataflow",
-        #{engineCount: provider_observation("sysml", names.len() > 0,
-              names.len(), "typed engine-instance collection is unavailable"),
-          plumeEngineCount: provider_observation("usd", plume_observations_available,
-              plume_engine_count, "composed nozzle plume geometry is unavailable"),
-          photometryConsumesEngineState: provider_observation("usd",
-              plume_observations_available, photometry_consumes_engine_state,
-              "composed photometry connections are unavailable"),
-          everyNozzleUsesPhotometry: provider_observation("usd",
-              plume_observations_available, plume_connections_match,
-              "composed per-nozzle plume connections are unavailable"),
-          everyNozzleHasBoundPlumeMaterials: provider_observation("usd",
-              plume_observations_available, plume_materials_match,
-              "composed plume material bindings are unavailable"),
-          plumeGeometryIsRenderOnly: provider_observation("usd",
-              plume_observations_available, plume_geometry_is_render_only,
-              "composed plume geometry roles are unavailable")},
-        "usd", 0.0));
+        plume_requirement_bindings,
+        "typed", 0.0));
     let actual_stations = [];
     let measurement_available = observed_engines.records != ()
         && observed_engines.records.len() == names.len()
         && names.len() == 7 && stations.len() == names.len()
         && bell_radius != () && required_clearance != ()
-        && bucket_outer_radius != () && geometry_tolerance != ();
+        && bucket_outer_radius != () && geometry_tolerance != ()
+        && usd_snapshots_match && usd_snapshot != ()
+        && usd_snapshot.ok == true;
     if measurement_available {
         for record in observed_engines.records {
-            if record.world_position == () || record.world_position.len() != 3 {
+            // Source stations are expressed in the engine-cluster frame.
+            // Use the composed local placement, not live world position,
+            // which moves with the lander's rigid body during this fixture.
+            let placement = record.attrs["xformOp:translate"];
+            if placement == () || placement.len() != 3 {
                 measurement_available = false;
             } else {
-                actual_stations.push(vec3(record.world_position[0],
-                    record.world_position[1], record.world_position[2]));
+                actual_stations.push(vec3(placement[0], placement[1],
+                    placement[2]));
             }
         }
     }
@@ -341,15 +471,27 @@ fn on_tick(me, ctx) {
                 geometry_tolerance)
             && typed_stations_match;
     }
-    checks.push(sysml_requirements::constraint_check("GPP-007-bell-separation",
+    let separation_requirement_bindings = _required_constraint_bindings(source_model,
+        "gpp007", "GPPC007_BellSeparation", [
+            ["measuredMinimumClearanceM", _usd_observation(usd_snapshot,
+                measurement_available, measured_clearance,
+                "composed engine station readback unavailable")],
+            ["requiredMinimumClearanceM",
+                _source_literal(source_model, own("minimumBellClearanceM"))],
+            ["maximumRadialExtentM", _usd_observation(usd_snapshot,
+                measurement_available, maximum_radial_extent,
+                "composed engine station readback unavailable")],
+            ["bucketOuterRadiusM", _source_literal(source_model,
+                visual("lowerBucketOuterBottomRadiusM"))],
+            ["typedStationsMatch", _usd_observation(usd_snapshot,
+                measurement_available, typed_stations_match,
+                "typed engine stations are unavailable")]
+        ]);
+    checks.push(sysml_requirements::required_constraint_check("GPP-007-bell-separation",
         "engine", "gpp007", VERIFICATION,
         "GriffinPropulsionRequirements::GPPC007_BellSeparation",
-        #{measuredMinimumClearanceM: if measurement_available { #{provider: "usd", state: "value", value: measured_clearance} } else { #{provider: "usd", state: "unavailable", detail: "composed engine station readback unavailable"} },
-          requiredMinimumClearanceM: if required_clearance != () { #{provider: "sysml", state: "value", value: required_clearance} } else { #{provider: "sysml", state: "unavailable", detail: "minimum bell clearance missing"} },
-          maximumRadialExtentM: if measurement_available { #{provider: "usd", state: "value", value: maximum_radial_extent} } else { #{provider: "usd", state: "unavailable", detail: "composed engine station readback unavailable"} },
-          bucketOuterRadiusM: if bucket_outer_radius != () { #{provider: "sysml", state: "value", value: bucket_outer_radius} } else { #{provider: "sysml", state: "unavailable", detail: "lower bucket envelope missing"} },
-          typedStationsMatch: if measurement_available { #{provider: "usd", state: "value", value: typed_stations_match} } else { #{provider: "usd", state: "unavailable", detail: "typed engine stations unavailable"} }},
-        "usd", 0.0));
+        separation_requirement_bindings,
+        "typed", 0.0));
     // The skirt is a separate referenced component.  Validate its four rails
     // and shell in the composed assembly; the source file remains the only
     // owner of the component geometry.

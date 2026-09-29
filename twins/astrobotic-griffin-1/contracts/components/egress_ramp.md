@@ -58,15 +58,17 @@ shared SysML/USD requirements evaluator.
 
 ## Physical flight stow and rail clearance
 
-`GRR-017` owns the image-based flight-stow pose: the port root holds +45 degrees
-and the starboard root holds -135 degrees locally. The starboard assembly's 180
-degree Y mount makes both folded bundles run parallel above the deck, with 6.4 m
-between their root stations. Both intermediate hinges turn 180 degrees to fold
+`GRR-017` owns the image-based flight-stow pose: both roots use a +45 degree
+Z rotation, and the starboard root also uses a 180 degree Y mount. Under the
+simulator's fixed-axis `rotateXYZ` convention, their
+lander-frame headings are +45 and +135 degrees. The 180 degree Y mount makes both
+folded bundles mirror across the lander's X=0 centerline, with 6.4 m between
+their root stations. Both intermediate hinges turn 180 degrees to fold
 each three-section ramp into its transport bundle. Their full +/-180 degree
 travel remains available for commanded deployment and inspection. These angles
 are replaceable study estimates from the user-provided Griffin reference, not
 released supplier geometry. The root hinges retain source-owned asymmetric
-travel: port runs from -50 to +60 degrees and starboard from -150 to +50
+travel: port runs from -50 to +60 degrees and starboard from -60 to +50
 degrees; the terrain targets remain -27.83 degrees port and +27.83 degrees
 starboard.
 `GRR-018` keeps the rail bottoms on the upper track face: the authored rail
@@ -77,9 +79,9 @@ geometry bounds in the canonical stage frame.
 NASA describes Griffin's ramps as folding ramps and Astrobotic documents the
 optional egress-ramp interface, but public material does not publish the
 flight-stowed mechanism geometry or supplier ICD. The reference image controls
-this study pose; the parallel +45/-135 degree local root angles and asymmetric
-travel remain explicit replaceable assumptions, not a claim of released
-flight-hardware geometry.
+this study pose; the mirrored +45/-45 degree local Z rotations, starboard
+180 degree Y mount, and asymmetric travel remain explicit replaceable
+assumptions, not a claim of released flight-hardware geometry.
 
 After touchdown and four-leg contact are confirmed, press **U** or choose
 **UNWIND RAMP** in the guided HUD. After a 1.5 s touchdown settle, the mission
