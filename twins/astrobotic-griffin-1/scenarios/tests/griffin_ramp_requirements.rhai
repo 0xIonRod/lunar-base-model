@@ -105,12 +105,14 @@ fn on_tick(me, ctx) {
         "physicalRampMassKg", "physicalRampSectionMassKg",
         "physicalRampSectionInertiaXKgM2", "physicalRampSectionInertiaYKgM2",
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionMassPartitionToleranceKg",
-        "physicalRampSectionJointLimitRad", "physicalRampSectionStowedAngleRad",
+        "physicalRampSectionJointLimitRad", "physicalRampSectionStowedRelativeAngleRad",
+        "physicalRampSectionJointFrameOffsetRad",
         "physicalRampPortRootJointStowLimitRad", "physicalRampPortRootStowedAngleRad",
         "physicalRampStarboardRootJointStowLimitRad", "physicalRampStarboardRootStowedAngleRad",
-        "physicalRampToeSectionStowedAngleRad", "physicalRampSectionDriveTargetRad",
+        "physicalRampSectionDeploymentRelativeAngleRad",
         "physicalRampJointDriveStiffnessNmPerDeg",
-        "physicalRampJointDriveDampingNmPerDegPerSec",
+        "physicalRampRootJointDriveDampingNmPerDegPerSec",
+        "physicalRampSectionJointDriveDampingNmPerDegPerSec",
         "physicalRampJointDriveMaxTorqueNm",
         "physicalRampSectionMassPropertiesToleranceKgM2",
         "physicalRampDeckTransitionMassKg", "physicalRampDeckTransitionInertiaKgM2"
@@ -182,8 +184,9 @@ fn on_tick(me, ctx) {
         "GRC022_RampFlightStowAnglesWithinTravel",
         #{portRootStowAngleRad: _source_number(source, "physicalRampPortRootStowedAngleRad"),
           starboardRootStowAngleRad: _source_number(source, "physicalRampStarboardRootStowedAngleRad"),
-          middleAngleRad: _source_number(source, "physicalRampSectionStowedAngleRad"),
-          toeAngleRad: _source_number(source, "physicalRampToeSectionStowedAngleRad"),
+          sectionStowRelativeAngleRad: _source_number(source, "physicalRampSectionStowedRelativeAngleRad"),
+          sectionDeploymentRelativeAngleRad: _source_number(source, "physicalRampSectionDeploymentRelativeAngleRad"),
+          sectionJointFrameOffsetRad: _source_number(source, "physicalRampSectionJointFrameOffsetRad"),
           portRootLimitRad: _source_number(source, "physicalRampPortRootJointStowLimitRad"),
           starboardRootLimitRad: _source_number(source, "physicalRampStarboardRootJointStowLimitRad"),
           sectionLimitRad: _source_number(source, "physicalRampSectionJointLimitRad")}));
@@ -244,7 +247,8 @@ fn on_tick(me, ctx) {
         let joint_offset = if side == "port" { 0 } else { 2 };
         let root_stow_angle_deg = _source_number(source, if side == "port" {
             "physicalRampPortRootStowedAngleRad"
-        } else { "physicalRampStarboardRootStowedAngleRad" }) * 180.0 / pi * sign;
+        } else { "physicalRampStarboardRootStowedAngleRad" }) * 180.0 / pi;
+        let root_target_deg = root_stow_angle_deg * sign;
 
         checks.push(_check("GRR-001-" + side + "-ramp-root", "ramp", "grr001", "exists", ramp));
         checks[checks.len() - 1].expected_type = "Xform";
@@ -272,9 +276,18 @@ fn on_tick(me, ctx) {
             component: "ramp", requirement: "grr017", verification: VERIFICATION,
             kind: "attribute", path: root_joint,
             attr: "drive:angular:physics:targetPosition",
-            expected: root_stow_angle_deg, tolerance: 0.002});
+            expected: root_target_deg, tolerance: 0.002});
         checks.push(_attribute_component("GRR-017-" + side + "-root-flight-stow-transform",
             "grr017", ramp, "xformOp:rotateXYZ", 2, root_stow_angle_deg));
+        checks.push(_attribute_component("GRR-016-" + side + "-root-stiffness",
+            "grr016", root_joint, "drive:angular:physics:stiffness", 0,
+            _source_number(source, "physicalRampJointDriveStiffnessNmPerDeg")));
+        checks.push(_attribute_component("GRR-016-" + side + "-root-damping",
+            "grr016", root_joint, "drive:angular:physics:damping", 0,
+            _source_number(source, "physicalRampRootJointDriveDampingNmPerDegPerSec")));
+        checks.push(_attribute_component("GRR-016-" + side + "-root-torque",
+            "grr016", root_joint, "drive:angular:physics:maxForce", 0,
+            _source_number(source, "physicalRampJointDriveMaxTorqueNm")));
         let deployment_limit_deg = _source_number(source, "rampMaxDeploymentAngleRad") * 180.0 / pi;
         let root_stow_limit_deg = _source_number(source, if side == "port" {
             "physicalRampPortRootJointStowLimitRad"
@@ -520,20 +533,37 @@ fn on_tick(me, ctx) {
 
         checks.push(#{id: "GRR-001-" + side + "-sections", component: "ramp",
             requirement: "grr001", verification: VERIFICATION,
-            kind: "children", path: ramp, paths: [section_paths[0], section_paths[1], ramp + "/TransitionPlate"]});
+            kind: "children", path: ramp, paths: [section_paths[0], section_paths[1]]});
+        let transition_path = ROOT + "/" + transition_body_name + _side_suffix(side);
+        checks.push(#{id: "GRR-001-" + side + "-transition-plate", component: "ramp",
+            requirement: "grr001", verification: VERIFICATION,
+            kind: "children", path: ROOT, paths: [transition_path]});
+        let transition_joint = ROOT + "/" + transition_joint_names[if side == "port" { 0 } else { 1 }];
         checks.push(_relationship("GRR-002-" + side + "-transition-body0", "grr012",
-            ramp + "/" + transition_joint_names[if side == "port" { 0 } else { 1 }],
-            "physics:body0", ROOT));
+            transition_joint, "physics:body0", ROOT));
         checks.push(_relationship("GRR-002-" + side + "-transition-body1", "grr012",
-            ramp + "/" + transition_joint_names[if side == "port" { 0 } else { 1 }],
-            "physics:body1", ramp + "/" + transition_name));
-        let transition_path = ramp + "/" + transition_name;
-        let transition_joint = ramp + "/" + transition_joint_names[if side == "port" { 0 } else { 1 }];
+            transition_joint, "physics:body1", transition_path));
+        let mount_x = _source_number(source, if side == "port" {
+            "physicalRampPortMountX"
+        } else { "physicalRampStarboardMountX" });
+        let transition_offset_x = if side == "port" {
+            -_source_number(source, "physicalRampDeckTransitionLengthM") / 2.0
+        } else { _source_number(source, "physicalRampDeckTransitionLengthM") / 2.0 };
         checks.push(_attribute_component("GRR-012-" + side + "-transition-inboard-placement",
             "grr012", transition_path, "xformOp:translate", 0,
-            -_source_number(source, "physicalRampDeckTransitionLengthM") / 2.0));
-        let expected_joint_rot1_y = if side == "port" { 0.0 } else { 1.0 };
-        let expected_joint_rot1_w = if side == "port" { 1.0 } else { 0.0 };
+            mount_x + transition_offset_x));
+        checks.push(_attribute_component("GRR-012-" + side + "-transition-deck-height",
+            "grr012", transition_path, "xformOp:translate", 1,
+            _source_number(source, "physicalRampMountY")));
+        checks.push(_attribute_component("GRR-012-" + side + "-transition-lateral-position",
+            "grr012", transition_path, "xformOp:translate", 2,
+            _source_number(source, "physicalRampMountZ")));
+        let expected_joint_rot1_y = 0.0;
+        let expected_joint_rot1_w = 1.0;
+        checks.push(_attribute_component("GRR-012-" + side + "-transition-frame0-y",
+            "grr012", transition_joint, "physics:localRot0", 1, 0.0));
+        checks.push(_attribute_component("GRR-012-" + side + "-transition-frame0-w",
+            "grr012", transition_joint, "physics:localRot0", 3, 1.0));
         checks.push(_attribute_component("GRR-012-" + side + "-transition-frame-y",
             "grr012", transition_joint, "physics:localRot1", 1, expected_joint_rot1_y));
         checks.push(_attribute_component("GRR-012-" + side + "-transition-frame-w",
@@ -564,31 +594,38 @@ fn on_tick(me, ctx) {
                 "grr016", joint_path, "physics:lowerLimit", 0, -joint_limit_deg));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-upper-limit",
                 "grr016", joint_path, "physics:upperLimit", 0, joint_limit_deg));
-            let stow_angle = if local_joint_index == 0 {
-                _source_number(source, "physicalRampSectionStowedAngleRad")
-            } else {
-                _source_number(source, "physicalRampToeSectionStowedAngleRad")
-            };
-            let stow_angle_deg = stow_angle * 180.0 / pi;
+            let stow_relative_angle = _source_number(source,
+                "physicalRampSectionStowedRelativeAngleRad");
+            let frame_offset = _source_number(source,
+                "physicalRampSectionJointFrameOffsetRad");
+            let stow_joint_angle_deg = (stow_relative_angle + frame_offset)
+                * 180.0 / pi;
+            let stow_relative_angle_deg = stow_relative_angle * 180.0 / pi;
             checks.push(#{id: "GRR-017-" + side + "-" + joint_name + "-flight-stow-target",
                 component: "ramp", requirement: "grr017", verification: VERIFICATION,
                 kind: "attribute", path: joint_path,
-                attr: "drive:angular:physics:targetPosition", expected: stow_angle_deg,
+                attr: "drive:angular:physics:targetPosition", expected: stow_joint_angle_deg,
                 tolerance: 0.002});
             checks.push(_attribute_component("GRR-017-" + side + "-" + joint_name + "-flight-stow-transform",
-                "grr017", body1, "xformOp:rotateXYZ", 2, stow_angle_deg));
+                "grr017", body1, "xformOp:rotateXYZ", 2, stow_relative_angle_deg));
+            checks.push(_attribute_component("GRR-017-" + side + "-" + joint_name + "-joint-frame-z",
+                "grr017", joint_path, "physics:localRot1", 2,
+                sin(frame_offset / 2.0)));
+            checks.push(_attribute_component("GRR-017-" + side + "-" + joint_name + "-joint-frame-w",
+                "grr017", joint_path, "physics:localRot1", 3,
+                cos(frame_offset / 2.0)));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-stiffness",
                 "grr016", joint_path, "drive:angular:physics:stiffness", 0,
                 _source_number(source, "physicalRampJointDriveStiffnessNmPerDeg")));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-damping",
                 "grr016", joint_path, "drive:angular:physics:damping", 0,
-                _source_number(source, "physicalRampJointDriveDampingNmPerDegPerSec")));
+                _source_number(source, "physicalRampSectionJointDriveDampingNmPerDegPerSec")));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-torque",
                 "grr016", joint_path, "drive:angular:physics:maxForce", 0,
                 _source_number(source, "physicalRampJointDriveMaxTorqueNm")));
         }
 
-        let transition_path = ramp + "/" + transition_name;
+        let transition_path = ROOT + "/" + transition_name + suffix;
         let contact_path = transition_path + "/" + contact_name;
         for track in ["RampTrackPort", "RampTrackStarboard"] {
             let ramp_track = section_paths[0] + "/" + track;

@@ -49,6 +49,42 @@ fn landing_gate_report() {
         attrs: ["xformOp:translate"]
     });
     let physics = query("QueryPhysicsState", #{id: lander});
+    let target_pose = query("QueryUsdPrim", #{
+        path: "/Griffin1SurfaceOps/LandingTarget",
+        attrs: ["xformOp:translate"]
+    });
+    let pad_pose = query("QueryUsdPrim", #{
+        path: "/Griffin1SurfaceOps/LandingSitePad",
+        attrs: ["xformOp:translate", "xformOp:scale"]
+    });
+    let lander_port_snapshot = read_ports(lander);
+    let leg_names = ["LegPX", "LegNX", "LegPZ", "LegNZ"];
+    let leg_contact_geometry = [];
+    let contact_names = ["leg_contact_px", "leg_contact_nx", "leg_contact_pz", "leg_contact_nz"];
+    let force_names = ["leg_force_px", "leg_force_nx", "leg_force_pz", "leg_force_nz"];
+    let displacement_names = ["leg_displacement_px", "leg_displacement_nx", "leg_displacement_pz", "leg_displacement_nz"];
+    let velocity_names = ["leg_velocity_px", "leg_velocity_nx", "leg_velocity_pz", "leg_velocity_nz"];
+    if lander_port_snapshot != () && lander_port_snapshot.ports != () {
+        for index in 0..leg_names.len() {
+            let leg_path = "/Griffin1SurfaceOps/Lander/" + leg_names[index];
+            let leg_pose = query("QueryUsdPrim", #{path: leg_path, attrs: ["xformOp:translate"]});
+            let foot_path = leg_path + "/LandingLegVisual/FootPadCollider";
+            let foot_pose = query("QueryUsdPrim", #{path: foot_path, attrs: ["xformOp:translate"]});
+            let contact = _ramp_hinge_port(lander_port_snapshot.ports, contact_names[index], "in");
+            let force = _ramp_hinge_port(lander_port_snapshot.ports, force_names[index], "in");
+            let displacement = _ramp_hinge_port(lander_port_snapshot.ports, displacement_names[index], "in");
+            let leg_velocity = _ramp_hinge_port(lander_port_snapshot.ports, velocity_names[index], "in");
+            leg_contact_geometry.push(#{
+                name: leg_names[index],
+                leg_position: if leg_pose == () { () } else { leg_pose.world_position },
+                footpad_center: if foot_pose == () { () } else { foot_pose.world_position },
+                contact: if contact == () { () } else { contact.value },
+                contact_force_n: if force == () { () } else { force.value },
+                suspension_displacement_m: if displacement == () { () } else { displacement.value },
+                suspension_velocity_mps: if leg_velocity == () { () } else { leg_velocity.value }
+            });
+        }
+    }
     let rover = find_path("/Griffin1SurfaceOps/FLIP");
     let rover_physics = query("QueryPhysicsState", #{id: rover});
     let rover_settle = rover_route_settle_report(rover);
@@ -59,6 +95,11 @@ fn landing_gate_report() {
     let report = #{
         position: if pose == () { [] } else { pose.world_position },
         physics_state: physics,
+        landing_target_position: if target_pose == () { () } else { target_pose.world_position },
+        landing_pad_position: if pad_pose == () { () } else { pad_pose.world_position },
+        landing_pad_scale: if pad_pose == () { () } else { pad_pose.attrs["xformOp:scale"] },
+        leg_contact_geometry: leg_contact_geometry,
+        minimum_leg_compression_m: get(lander, "minimum_leg_compression"),
         rover_physics_state: rover_physics,
         rover_settle: rover_settle,
         physics_performance: physics_performance,
@@ -589,106 +630,233 @@ fn rover_route_settle_ready(rover) {
     rover_route_settle_report(rover).ok
 }
 
-// The generic physics query intentionally reports velocities and support, not
-// body orientation. Keep the deployment evidence structured by sampling the
-// two physical ramp bodies through the native pose bridge at the same route
-// observation point. This makes a failed egress distinguish an uncommanded
-// hinge from a rover/contact failure without scraping log text.
+// Record only the body transforms here. Joint targets and measured angles come
+// from the coherent port snapshot below; repeating full physics query records
+// in every sample made the failure evidence exceed Rhai's string limit.
 fn physical_ramp_runtime_pose_evidence() {
     let records = [];
     for side in ["Port", "Starboard"] {
-        let path = "/Griffin1SurfaceOps/Lander/EgressRamp" + side;
-        let id = find_path(path);
-        let pose = if id == () || id < 0 { () } else { world_pos3(id) };
-        let rotation = if id == () || id < 0 { () } else { world_rotation_quat(id) };
-        records.push(#{side: side, path: path, entity: id,
-            pose: if pose == () { () } else { vec3_array(pose) },
-            rotation: if rotation == () { () } else { quat_array(rotation) }});
+        let root_path = "/Griffin1SurfaceOps/Lander/EgressRamp" + side;
+        for body in [
+            #{name: "root", path: root_path},
+            #{name: "middle", path: root_path + "/MiddleSection"},
+            #{name: "toe", path: root_path + "/MiddleSection/ToeSection"},
+        ] {
+            let id = find_path(body.path);
+            let pose = if id == () || id < 0 { () } else { world_pos3(id) };
+            let rotation = if id == () || id < 0 { () } else { world_rotation_quat(id) };
+            records.push(#{side: side, section: body.name,
+                pose: if pose == () { () } else { vec3_array(pose) },
+                rotation: if rotation == () { () } else { quat_array(rotation) }});
+        }
     }
     records
 }
 
-// The joint ports are sampled only at a failure boundary.  This keeps the
-// normal mission path allocation-free while recording both the commanded
-// hinge angle and the solver-produced angle when a ramp/contact fault occurs.
-fn physical_ramp_joint_evidence() {
-    physical_ramp_hinge_report()
+// Build a compact ramp-motion trace update as a returned value. The scenario
+// assigns the result explicitly, so trace capture never relies on a module
+// function mutating caller-owned state.
+fn update_physical_ramp_motion_trace(trace, previous_tick, phase) {
+    let tick = sim_tick();
+    if tick == () || trace.len() >= 24 {
+        return #{samples: trace, last_tick: previous_tick};
+    }
+    if previous_tick != () && tick >= previous_tick && tick - previous_tick < 120 {
+        return #{samples: trace, last_tick: previous_tick};
+    }
+    let hinges = physical_ramp_joint_evidence();
+    let bodies = physical_ramp_runtime_pose_evidence();
+    trace.push(#{
+        sim_tick: tick,
+        phase: phase,
+        hinges: hinges,
+        bodies: bodies,
+    });
+    #{samples: trace, last_tick: tick}
 }
 
-/// Find this Twin's composed mission USD document. Griffin keeps many
-/// requirements and component documents open beside the scene, so every
-/// composed-stage query must name the intended scene instead of relying on an
-/// ambiguous implicit live stage.
-fn _surface_ops_scene_doc_id() {
-    let documents = query("ListOpenDocuments");
-    if documents == () || documents.open_documents == () { return (); }
-    for document in documents.open_documents {
-        if document.kind == "usd" && document.origin != ()
-            && document.origin.path != ()
-            && document.origin.path.ends_with("/scenes/griffin_1_surface_ops.usda") {
-            return document.doc_id;
-        }
+// Keep a compact hinge snapshot for failure evidence. Acceptance continues to
+// use the complete typed report, including limits and metadata.
+fn physical_ramp_joint_evidence() {
+    let report = physical_ramp_hinge_report();
+    if report == () || report.ok != true {
+        return #{ok: false,
+            error: if report == () { "ramp hinge report is unavailable" } else { report.error },
+            sim_tick: if report == () { () } else { report.sim_tick }};
+    }
+    let hinges = [];
+    for hinge in report.hinges {
+        hinges.push(#{name: hinge.name,
+            drive_target_rad: hinge.drive_target_rad,
+            measured_angle_rad: hinge.measured_angle_rad,
+            error_rad: _ramp_angle_error_rad(
+                hinge.measured_angle_rad, hinge.drive_target_rad)});
+    }
+    #{ok: true, sim_tick: report.sim_tick, hinges: hinges}
+}
+
+fn _ramp_hinge_port(ports, name, direction) {
+    if ports == () { return (); }
+    for port in ports {
+        if port.name == name && port.direction == direction { return port; }
     }
     ()
 }
 
-/// Read source limits and live angle ports for all six articulated ramp hinges.
-/// USD limits are authored in degrees; SetPorts consumes radians. `angle_ports`
-/// preserves the full typed runtime records, including target and measured
-/// values when the physics projection is available.
-fn physical_ramp_hinge_report() {
-    let doc_id = _surface_ops_scene_doc_id();
-    if doc_id == () {
-        return #{ok: false, error: "Griffin surface-operations USD document is not open"};
+/// Validate one hinge from the coherent batch snapshot. Runtime metadata is
+/// the active solver contract; authored USD limits are not a second authority.
+fn _ramp_hinge_state(name, path, id, ports) {
+    let angle_input = _ramp_hinge_port(ports, "angle", "in");
+    let angle_output = _ramp_hinge_port(ports, "angle", "out");
+    if angle_input == () || angle_output == ()
+        || angle_input.metadata == () || angle_output.metadata == () {
+        return #{ok: false, error: "ramp hinge angle ports or metadata are unavailable",
+            hinge: name, path: path, entity: id, ports: ports};
     }
+    let range = angle_input.metadata.range;
+    let minimum = if range == () { () } else { range.min };
+    let maximum = if range == () { () } else { range.max };
+    let target_unit = angle_input.metadata.unit;
+    let measured_unit = angle_output.metadata.unit;
+    if minimum == () || maximum == () || !minimum.is_finite() || !maximum.is_finite()
+        || minimum > maximum
+        || target_unit == () || target_unit.id != "rad"
+        || measured_unit == () || measured_unit.id != "rad"
+        || angle_input.metadata.frame != angle_output.metadata.frame
+        || angle_input.metadata.writable != true {
+        return #{ok: false, error: "ramp hinge has missing or invalid runtime angle limits",
+            hinge: name, path: path, entity: id, ports: ports};
+    }
+    #{ok: true, name: name, path: path, entity: id,
+        minimum_angle_rad: minimum, maximum_angle_rad: maximum,
+        drive_target_rad: angle_input.value,
+        measured_angle_rad: angle_output.value,
+        angle_ports: ports}
+}
+
+/// Read live limits and angles for all six ramp hinges at one simulation tick.
+/// `ReadPortsBatch` keeps mechanism evidence coherent across both ramps.
+fn physical_ramp_hinge_report() {
     let names = [];
     for name in griffin_spec::ramp_root_joint_names() { names.push(name); }
     for name in griffin_spec::ramp_intermediate_joint_names() { names.push(name); }
     if names.len() != 6 {
         return #{ok: false, error: "SysML must name both root and all four intermediate ramp hinges", hinge_names: names};
     }
-    let records = [];
+    let paths = [];
+    let ids = [];
     for name in names {
         let path = "/Griffin1SurfaceOps/Lander/" + name;
-        let prim = query("QueryUsdPrim", #{doc_id: doc_id, path: path, attrs: [
-            "physics:lowerLimit", "physics:upperLimit",
-            "drive:angular:physics:targetPosition"
-        ]});
-        if prim == () || prim.ok == false || prim.attrs == () {
-            return #{ok: false, error: "ramp hinge limits could not be read from composed USD", path: path, query: prim};
-        }
-        let lower_deg = prim.attrs["physics:lowerLimit"];
-        let upper_deg = prim.attrs["physics:upperLimit"];
-        if lower_deg == () || upper_deg == () || lower_deg > upper_deg {
-            return #{ok: false, error: "ramp hinge has missing or invalid authored angle limits", path: path, attrs: prim.attrs};
-        }
         let id = find_path(path);
-        let snapshot = if id == () || id < 0 { () }
-            else { query("ReadPorts", #{api_id: id}) };
-        let angle_ports = [];
-        if snapshot != () && snapshot.ports != () {
-            for port in snapshot.ports {
-                if port.name == "angle" { angle_ports.push(port); }
+        if id == () || id < 0 {
+            return #{ok: false, error: "ramp hinge runtime entity is unavailable",
+                hinge: name, path: path};
+        }
+        if ids.contains(id) {
+            return #{ok: false, error: "ramp hinge paths resolved to duplicate runtime entities",
+                hinge: name, path: path, entity: id};
+        }
+        paths.push(path);
+        ids.push(id);
+    }
+    let snapshot = read_ports_batch(ids);
+    if snapshot == () || snapshot.sim_tick == () || snapshot.entities == ()
+        || snapshot.entities.len() != names.len() {
+        return #{ok: false, error: "coherent ramp hinge port snapshot is unavailable",
+            entities: ids, snapshot: snapshot};
+    }
+    let records = [];
+    for index in 0..names.len() {
+        let row = snapshot.entities[index];
+        let state = _ramp_hinge_state(names[index], paths[index], ids[index], row.ports);
+        if state == () || state.ok != true {
+            return #{ok: false, error: "ramp hinge runtime state violates its typed port contract",
+                hinge: names[index], sim_tick: snapshot.sim_tick, state: state};
+        }
+        records.push(state);
+    }
+    #{ok: true, sim_tick: snapshot.sim_tick, hinges: records}
+}
+
+fn _ramp_angle_error_rad(actual, expected) {
+    let pi = 3.141592653589793;
+    let tau = 2.0 * pi;
+    let delta = (actual - expected) % tau;
+    let shortest = if delta > pi { delta - tau }
+        else if delta < -pi { delta + tau }
+        else { delta };
+    shortest.abs()
+}
+
+/// Check requested physical hinge positions against both the actuator target
+/// and the solver-measured angle. A command acknowledgement alone is not
+/// evidence that the ramp has moved into its traversal pose.
+fn physical_ramp_hinges_settled(expected_angles, tolerance_rad) {
+    if expected_angles == () || expected_angles.len() == 0
+        || tolerance_rad == () || !tolerance_rad.is_finite() || tolerance_rad < 0.0 {
+        return #{ok: false, settled: false,
+            error: "ramp hinge settle check requires expected angles and a finite nonnegative tolerance"};
+    }
+    let report = physical_ramp_hinge_report();
+    if report == () || report.ok != true {
+        return #{ok: false, settled: false,
+            error: "ramp hinge live state could not be sampled", report: report};
+    }
+    let observations = [];
+    let pending = [];
+    for expected in expected_angles {
+        if expected.name == () || expected.target_rad == ()
+            || !expected.target_rad.is_finite() {
+            return #{ok: false, settled: false,
+                error: "ramp hinge settle expectation is incomplete", expected: expected};
+        }
+        let state = ();
+        for hinge in report.hinges {
+            if hinge.name == expected.name {
+                state = hinge;
+                break;
             }
         }
-        records.push(#{name: name, path: path, entity: id,
-            minimum_angle_deg: lower_deg, maximum_angle_deg: upper_deg,
-            minimum_angle_rad: lower_deg * 3.141592653589793 / 180.0,
-            maximum_angle_rad: upper_deg * 3.141592653589793 / 180.0,
-            drive_target_deg: prim.attrs["drive:angular:physics:targetPosition"],
-            angle_ports: angle_ports,
-            port_snapshot: snapshot});
+        if state == () {
+            return #{ok: false, settled: false,
+                error: "requested ramp hinge is missing from the live report",
+                hinge: expected.name, report: report};
+        }
+        if state.measured_angle_rad == () || state.drive_target_rad == ()
+            || !state.measured_angle_rad.is_finite() || !state.drive_target_rad.is_finite() {
+            return #{ok: false, settled: false,
+                error: "ramp hinge target or measured angle is unavailable", hinge: state};
+        }
+        let target_error = _ramp_angle_error_rad(state.drive_target_rad, expected.target_rad);
+        let measured_error = _ramp_angle_error_rad(state.measured_angle_rad, expected.target_rad);
+        let settled = target_error <= tolerance_rad && measured_error <= tolerance_rad;
+        let observation = #{name: state.name, target_rad: expected.target_rad,
+            drive_target_rad: state.drive_target_rad,
+            measured_angle_rad: state.measured_angle_rad,
+            target_error_rad: target_error, measured_error_rad: measured_error,
+            tolerance_rad: tolerance_rad, settled: settled};
+        observations.push(observation);
+        if !settled { pending.push(observation); }
     }
-    #{ok: true, doc_id: doc_id, hinges: records}
+    #{ok: true, settled: pending.len() == 0, sim_tick: report.sim_tick,
+      tolerance_rad: tolerance_rad,
+      observations: observations, pending: pending}
 }
 
 fn _ramp_touchdown_ready() {
     let lander = find_path("/Griffin1SurfaceOps/Lander");
     if lander == () || lander < 0 { return false; }
-    let touchdown = get(lander, "touchdown");
-    let all_legs_contact = get(lander, "all_legs_contact");
-    touchdown != () && all_legs_contact != ()
-        && touchdown >= 0.999 && all_legs_contact >= 0.999
+    let snapshot = read_ports(lander);
+    // `touchdown` is an event-phase signal and clears after the landing
+    // supervisor hands flight control to the landing gear. Ramp operations
+    // use that persistent handoff latch, together with live four-pad contact.
+    let handoff_port = _ramp_hinge_port(snapshot.ports, "landing_handoff", "in");
+    let contact_port = _ramp_hinge_port(snapshot.ports, "all_legs_contact", "out");
+    if handoff_port == () || contact_port == () { return false; }
+    let landing_handoff = handoff_port.value;
+    let all_legs_contact = contact_port.value;
+    landing_handoff != () && all_legs_contact != ()
+        && landing_handoff >= 0.999 && all_legs_contact >= 0.999
 }
 
 /// Request the mission-owned two-stage ramp unfold after touchdown. The
@@ -720,51 +888,63 @@ fn on_hud_action(action) {
     #{ok: false, error: "unknown Griffin surface-operation HUD action", action: action}
 }
 
-/// Command one physical hinge by its USD prim name. Limits are read from the
-/// composed stage for every request and enforced before writing the typed
-/// angular port; the caller supplies radians, matching the port contract.
-fn set_physical_ramp_hinge_angle(name, angle_rad) {
+/// Command one physical hinge by its USD prim name. Limits are read from its
+/// active physics component and checked in radians before writing the angular port.
+fn set_physical_ramp_hinge_angles(expected_angles) {
     if !_ramp_touchdown_ready() {
         return #{ok: false, error: "ramp hinges may be commanded only after confirmed touchdown with all four legs in contact"};
     }
-    if !griffin_spec::ramp_root_joint_names().contains(name)
-        && !griffin_spec::ramp_intermediate_joint_names().contains(name) {
-        return #{ok: false, error: "unknown physical ramp hinge", hinge: name};
+    if expected_angles == () || expected_angles.len() < 2 {
+        return #{ok: false, error: "atomic ramp motion requires at least two hinge targets"};
     }
-    if angle_rad == () || !angle_rad.is_finite() {
-        return #{ok: false, error: "hinge command angle must be a finite radian value", hinge: name};
+    let report = physical_ramp_hinge_report();
+    if report == () || report.ok != true {
+        return #{ok: false, error: "ramp hinge limits are unavailable", report: report};
     }
-    let doc_id = _surface_ops_scene_doc_id();
-    if doc_id == () {
-        return #{ok: false, error: "Griffin surface-operations USD document is not open", hinge: name};
+    let batches = [];
+    let targets = [];
+    for expected in expected_angles {
+        if expected.name == () || expected.target_rad == ()
+            || !expected.target_rad.is_finite() {
+            return #{ok: false, error: "ramp hinge target must contain a name and finite radians",
+                expected: expected};
+        }
+        if !griffin_spec::ramp_root_joint_names().contains(expected.name)
+            && !griffin_spec::ramp_intermediate_joint_names().contains(expected.name) {
+            return #{ok: false, error: "unknown physical ramp hinge", hinge: expected.name};
+        }
+        let state = ();
+        for hinge in report.hinges {
+            if hinge.name == expected.name {
+                state = hinge;
+                break;
+            }
+        }
+        if state == () {
+            return #{ok: false, error: "requested ramp hinge is absent from the live snapshot",
+                hinge: expected.name, report: report};
+        }
+        if targets.contains(state.entity) {
+            return #{ok: false, error: "ramp hinge batch contains a duplicate target",
+                hinge: expected.name, entity: state.entity};
+        }
+        if expected.target_rad < state.minimum_angle_rad
+            || expected.target_rad > state.maximum_angle_rad {
+            return #{ok: false, error: "hinge command is outside the solver angle limit",
+                hinge: expected.name, requested_angle_rad: expected.target_rad,
+                minimum_angle_rad: state.minimum_angle_rad,
+                maximum_angle_rad: state.maximum_angle_rad};
+        }
+        targets.push(state.entity);
+        batches.push(#{target: state.entity, writes: [["angle", expected.target_rad]]});
     }
-    let path = "/Griffin1SurfaceOps/Lander/" + name;
-    let prim = query("QueryUsdPrim", #{doc_id: doc_id, path: path,
-        attrs: ["physics:lowerLimit", "physics:upperLimit"]});
-    if prim == () || prim.ok == false || prim.attrs == () {
-        return #{ok: false, error: "ramp hinge angle limits are unavailable", hinge: name, query: prim};
-    }
-    let lower_deg = prim.attrs["physics:lowerLimit"];
-    let upper_deg = prim.attrs["physics:upperLimit"];
-    if lower_deg == () || upper_deg == () || lower_deg > upper_deg {
-        return #{ok: false, error: "ramp hinge has missing or invalid authored angle limits", hinge: name, attrs: prim.attrs};
-    }
-    let angle_deg = angle_rad * 180.0 / 3.141592653589793;
-    if angle_deg < lower_deg || angle_deg > upper_deg {
-        return #{ok: false, error: "hinge command is outside the authored limit", hinge: name,
-            requested_angle_rad: angle_rad, minimum_angle_deg: lower_deg,
-            maximum_angle_deg: upper_deg};
-    }
-    let joint = find_path(path);
-    if joint == () || joint < 0 {
-        return #{ok: false, error: "ramp hinge runtime entity is unavailable", hinge: name};
-    }
-    let result = cmd("SetPorts", #{target: joint, writes: [["angle", angle_rad]]});
+    let result = write_ports_batch(batches);
     if result == () || result.ok != true {
-        return #{ok: false, error: "ramp hinge angular drive rejected the command", hinge: name, result: result};
+        return #{ok: false, error: "atomic ramp hinge batch was rejected",
+            expected_angles: expected_angles, result: result};
     }
-    #{ok: true, hinge: name, target_angle_rad: angle_rad,
-        target_angle_deg: angle_deg, result: result}
+    #{ok: true, sim_tick: report.sim_tick, expected_angles: expected_angles,
+        hinge_states: report.hinges, result: result}
 }
 
 // Capture the authored egress apron and the native wheel-contact snapshot at

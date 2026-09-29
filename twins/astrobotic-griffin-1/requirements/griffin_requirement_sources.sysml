@@ -734,6 +734,14 @@ package GriffinRequirementSources {
             source_astrobotic_griffin_1_components_lander_griffin_ramp_section_visual_usda);
     }
 
+    part evidence_grr_019 : RequirementEvidence {
+        ref targetRequirement = GriffinRampRequirements::grr019;
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml,
+            source_astrobotic_griffin_1_components_lander_griffin_ramp_section_visual_usda,
+            source_astrobotic_griffin_1_tools_griffin_visual_builder_rhai,
+            source_astrobotic_griffin_1_research_griffin_1_assumptions_md);
+    }
+
     part evidence_gr_001 : RequirementEvidence {
         ref targetRequirement = GriffinFunctionalRequirements::gr001;
         ref sources = (source_www_astrobotic_com_griffin_lander);

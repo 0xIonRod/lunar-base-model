@@ -4278,6 +4278,9 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             edit_target, track_path, points);
         if !geometry.ok { return geometry; }
         for op in geometry.ops { ops.push(op); }
+        ops.push(#{SetApiSchemas: #{edit_target: edit_target,
+            path: track_path,
+            schemas: ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]}});
         for item in [
             #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
             #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
@@ -4311,15 +4314,27 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         let pin_path = section_path + "/" + pin_name;
         let pin = assembly_builder::composed_query(doc,
             #{path: pin_path, children: false});
-        if !query_ok(pin) || pin.type_name != "Cylinder" {
-            return plan_error(pin_path + ": source-owned upper-rail pivot fitting is missing");
+        if query_ok(pin) && pin.type_name != "Cylinder" {
+            return plan_error(pin_path + ": upper-rail pivot fitting must be a Cylinder");
+        }
+        if !query_ok(pin) {
+            ops.push(#{AddPrim: #{edit_target: edit_target,
+                parent_path: section_path, name: pin_name,
+                type_name: "Cylinder", reference: (),
+                reference_prim_path: ""}});
         }
         let pin_z = if pin_name == "OuterRailJointPin" { rail_z } else { -rail_z };
+        ops.push(#{SetApiSchemas: #{edit_target: edit_target,
+            path: pin_path,
+            schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
         for item in [
             #{name: "radius", type_name: "double", value: rail_pin_radius.to_string()},
             #{name: "height", type_name: "double", value: rail_pin_length.to_string()},
             #{name: "axis", type_name: "token", value: "\"Z\""},
             #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
+            #{name: "purpose", type_name: "token", value: "\"render\""},
+            #{name: "primvars:displayColor", type_name: "color3f[]",
+              value: "[(0.58, 0.62, 0.67)]"},
         ] {
             ops.push(#{SetAttribute: #{edit_target: edit_target, path: pin_path,
                 name: item.name, type_name: item.type_name, value: item.value}});
@@ -4491,10 +4506,10 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path, side) {
 }
 
 fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
-    root_stow_angle_rad, transition_length, thickness, width, surface_y) {
-    // All required values are revision-pinned typed reads through griffin_spec.
+    transition_length, thickness, width) {
     let source = ();
-    let name = griffin_spec::physical_ramp_transition_child_name();
+    let name = griffin_spec::physical_ramp_transition_body_name(side);
+    let legacy_name = griffin_spec::physical_ramp_transition_child_name();
     let mass = griffin_spec::physical_ramp_deck_transition_mass_kg();
     let inertia = griffin_spec::physical_ramp_deck_transition_inertia_kg_m2();
     let joint_name = griffin_spec::physical_ramp_transition_joint_name(side);
@@ -4505,12 +4520,15 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     } else {
         "physicalRampStarboardMountX"
     });
-    if name == () || name == "" || mass == () || mass <= 0.0
-        || inertia.len() != 3 || joint_name == () || joint_name == ""
+    if name == () || name == "" || legacy_name == () || legacy_name == ""
+        || mass == () || mass <= 0.0 || inertia.len() != 3
+        || joint_name == () || joint_name == ""
         || mount_x == () || mount_y == () || mount_z == () {
-        return plan_error("physical ramp transition identity/mass/inertia datums are incomplete in SysML");
+        return plan_error("physical ramp transition identity, frame, or mass datums are incomplete in SysML");
     }
-    let path = ramp_root + "/" + name;
+
+    let path = lander_root + "/" + name;
+    let legacy_path = ramp_root + "/" + legacy_name;
     let contact_name = griffin_spec::physical_ramp_transition_contact_child_name();
     if contact_name == () || contact_name == "" {
         return plan_error("physical ramp transition contact child name is missing from SysML");
@@ -4521,45 +4539,43 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     if query_ok(existing) && existing.type_name != "Xform" && !migrate_scaled_body {
         return plan_error(path + ": physical ramp transition must be an Xform rigid-body frame");
     }
+
+    let legacy_joint_path = ramp_root + "/" + joint_name;
+    let legacy_body = assembly_builder::composed_query(doc,
+        #{path: legacy_path, children: false});
+    let legacy_joint = assembly_builder::composed_query(doc,
+        #{path: legacy_joint_path, children: false});
+    let joint_path = lander_root + "/" + joint_name;
+    let existing_joint = assembly_builder::composed_query(doc,
+        #{path: joint_path, children: false});
+    if query_ok(existing_joint) && existing_joint.type_name != "PhysicsFixedJoint" {
+        return plan_error(joint_path + ": transition joint must be PhysicsFixedJoint");
+    }
+
     let ops = [];
+    if query_ok(legacy_body) {
+        ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_path}});
+    }
+    if query_ok(legacy_joint) {
+        ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_joint_path}});
+    }
     if migrate_scaled_body {
-        // A scaled Cube cannot serve as the rigid-body frame. Replace it with
-        // the required Xform and author its contact child and fixed joint in
-        // the same undoable Editor change set.
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
-        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: ramp_root,
+        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: lander_root,
             name: name, type_name: "Xform", reference: (), reference_prim_path: ""}});
     } else if !query_ok(existing) {
-        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: ramp_root,
-            name: name, type_name: "Xform", reference: (),
-            reference_prim_path: ""}});
+        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: lander_root,
+            name: name, type_name: "Xform", reference: (), reference_prim_path: ""}});
     }
-    // The frame is deliberately unscaled: a rigid body must not carry a
-    // non-uniform transform that stretches future mounted children.
     ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path,
         schemas: ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]}});
-    // TransitionPlate is an independent body fixed to the lander deck, but its
-    // authored prim is nested below the moving ramp root. Invert the root
-    // stow transform here so the composed plate begins level at its deck joint
-    // anchor instead of inheriting the ramp's raised angle or sitting across
-    // the tanks. The saved local pose therefore agrees with the fixed joint.
-    let transition_local_center_x = -transition_length / 2.0;
-    let transition_anchor_offset_x = if side == "port" {
-        transition_local_center_x
-    } else {
-        -transition_local_center_x
-    };
-    let root_stow_angle_deg = root_stow_angle_rad * 180.0 / 3.141592653589793;
-    let transition_local_x = transition_local_center_x * cos(root_stow_angle_rad);
-    let transition_local_y = -transition_local_center_x * sin(root_stow_angle_rad);
-    let transition_local_rotation = if side == "port" {
-        [0.0, 0.0, -root_stow_angle_deg]
-    } else {
-        [0.0, 180.0, -root_stow_angle_deg]
-    };
+
+    let anchor_offset_x = if side == "port" {
+        -transition_length / 2.0
+    } else { transition_length / 2.0 };
+    let anchor_x = mount_x + anchor_offset_x;
     let placement = assembly_builder::place_plan(edit_target, path,
-        [transition_local_x, transition_local_y, 0.0],
-        transition_local_rotation, ());
+        [anchor_x, mount_y, mount_z], [0.0, 0.0, 0.0], ());
     if !placement.ok { return placement; }
     for op in placement.ops { ops.push(op); }
     for item in [
@@ -4574,6 +4590,7 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     for op in remove_legacy_semantic_string_ops(doc, edit_target, path) {
         ops.push(op);
     }
+
     let existing_contact = assembly_builder::composed_query(doc,
         #{path: contact_path, children: false});
     if query_ok(existing_contact) && existing_contact.type_name != "Cube" {
@@ -4604,28 +4621,18 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     for op in remove_legacy_semantic_string_ops(doc, edit_target, contact_path) {
         ops.push(op);
     }
-    let joint_path = ramp_root + "/" + joint_name;
-    let existing_joint = assembly_builder::composed_query(doc,
-        #{path: joint_path, children: false});
-    if query_ok(existing_joint) && existing_joint.type_name != "PhysicsFixedJoint" {
-        return plan_error(joint_path + ": transition joint must be PhysicsFixedJoint");
-    }
+
     if !query_ok(existing_joint) || migrate_scaled_body {
-        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: ramp_root,
+        if query_ok(existing_joint) {
+            ops.push(#{RemovePrim: #{edit_target: edit_target, path: joint_path}});
+        }
+        ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: lander_root,
             name: joint_name, type_name: "PhysicsFixedJoint", reference: (),
             reference_prim_path: ""}});
     }
-    // The fixed joint is deliberately attached to the lander root rather than
-    // the rotating ramp body. body1 remains the named nested TransitionPlate;
-    // localPos0 is the deck-frame centre and localPos1 is its own origin.
-    let anchor_x = mount_x + transition_anchor_offset_x;
-    // Both transition bodies are now level in the lander frame, so the
-    // fixed-joint body1 frame matches body0 without a mirrored 180-degree
-    // offset.
-    let transition_local_rot1 = "(0.0, 0.0, 0.0, 1.0)";
     for relation in [
         #{name: "physics:body0", targets: [lander_root]},
-        #{name: "physics:body1", targets: [ramp_root + "/" + name]},
+        #{name: "physics:body1", targets: [path]},
     ] {
         ops.push(#{SetRelationship: #{edit_target: edit_target, path: joint_path,
             name: relation.name, targets: relation.targets}});
@@ -4635,7 +4642,8 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
           value: "(" + anchor_x.to_string() + ", " + mount_y.to_string()
             + ", " + mount_z.to_string() + ")"},
         #{name: "physics:localPos1", type_name: "point3f", value: "(0.0, 0.0, 0.0)"},
-        #{name: "physics:localRot1", type_name: "quatf", value: transition_local_rot1},
+        #{name: "physics:localRot0", type_name: "quatf", value: "(0.0, 0.0, 0.0, 1.0)"},
+        #{name: "physics:localRot1", type_name: "quatf", value: "(0.0, 0.0, 0.0, 1.0)"},
         #{name: "physics:collisionEnabled", type_name: "bool", value: "false"}
     ] {
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: joint_path,
@@ -4644,7 +4652,7 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     for op in remove_legacy_semantic_string_ops(doc, edit_target, joint_path) {
         ops.push(op);
     }
-    #{ok: true, path: path, name: name, center_x_m: transition_local_center_x,
+    #{ok: true, path: path, name: name, center_x_m: anchor_x,
       transition_length_m: transition_length, mass_kg: mass, inertia_kg_m2: inertia,
       contact_path: contact_path, joint_path: joint_path,
       joint_anchor_x_m: anchor_x, ops: ops}
@@ -4693,18 +4701,20 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         "physicalRampPortRootJointStowLimitRad"
     } else { "physicalRampStarboardRootJointStowLimitRad" });
     let target_rad = _sysml_number(source,
-        "physicalRampSectionDriveTargetRad");
+        "physicalRampSectionDeploymentRelativeAngleRad");
     let stowed_middle_angle_rad = _sysml_number(source,
-        "physicalRampSectionStowedAngleRad");
-    let stowed_toe_angle_rad = _sysml_number(source,
-        "physicalRampToeSectionStowedAngleRad");
+        "physicalRampSectionStowedRelativeAngleRad");
+    let section_joint_frame_offset_rad = _sysml_number(source,
+        "physicalRampSectionJointFrameOffsetRad");
     let rail_center_y = _sysml_number(source, "rampRailCenterYM");
     let rail_height = _sysml_number(source, "rampRailHeightM");
     let fold_surface_thickness = _sysml_number(source, "rampSurfaceThicknessM");
     let drive_stiffness = _sysml_number(source,
         "physicalRampJointDriveStiffnessNmPerDeg");
-    let drive_damping = _sysml_number(source,
-        "physicalRampJointDriveDampingNmPerDegPerSec");
+    let root_drive_damping = _sysml_number(source,
+        "physicalRampRootJointDriveDampingNmPerDegPerSec");
+    let section_drive_damping = _sysml_number(source,
+        "physicalRampSectionJointDriveDampingNmPerDegPerSec");
     let drive_max_torque = _sysml_number(source,
         "physicalRampJointDriveMaxTorqueNm");
     let deployment_limit_rad = _sysml_number(source, "rampMaxDeploymentAngleRad");
@@ -4728,10 +4738,11 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         || inertia_y == () || inertia_z == () || mass_tolerance == ()
         || mass_partition_tolerance == ();
     let missing_actuation = section_limit_rad == () || target_rad == ()
-        || stowed_middle_angle_rad == () || stowed_toe_angle_rad == ()
+        || stowed_middle_angle_rad == () || section_joint_frame_offset_rad == ()
         || rail_center_y == () || rail_height == () || fold_surface_thickness == ()
         || root_stow_angle_rad == () || root_stow_limit_rad == ()
-        || drive_stiffness == () || drive_damping == ()
+        || drive_stiffness == () || root_drive_damping == ()
+        || section_drive_damping == ()
         || drive_max_torque == () || deployment_limit_rad == ()
         || port_deployment_rad == () || starboard_deployment_rad == ();
     let missing_mount = mount_x == () || mount_y == () || mount_z == ()
@@ -4747,7 +4758,8 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     let invalid_inertia = inertia_x <= 0.0 || inertia_y <= 0.0 || inertia_z <= 0.0;
     let invalid_actuation = section_limit_rad <= 0.0 || root_stow_limit_rad <= 0.0
         || deployment_limit_rad <= 0.0 || root_stow_angle_rad < 0.0
-        || drive_stiffness <= 0.0 || drive_damping < 0.0 || drive_max_torque <= 0.0;
+        || drive_stiffness <= 0.0 || root_drive_damping < 0.0
+        || section_drive_damping < 0.0 || drive_max_torque <= 0.0;
     let invalid_root_target = port_deployment_rad.abs() > deployment_limit_rad
         || starboard_deployment_rad.abs() > deployment_limit_rad
         || root_stow_angle_rad > root_stow_limit_rad;
@@ -4757,10 +4769,13 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         || invalid_root_target || invalid_envelope {
         return plan_error("articulated physical-ramp source values violate the section, mass, or geometry contract");
     }
+    let stowed_joint_angle_rad = stowed_middle_angle_rad + section_joint_frame_offset_rad;
+    let deployment_joint_angle_rad = target_rad + section_joint_frame_offset_rad;
     if target_rad.abs() > section_limit_rad
         || stowed_middle_angle_rad.abs() > section_limit_rad
-        || stowed_toe_angle_rad.abs() > section_limit_rad {
-        return plan_error("ramp-section flight stow or deployed angle exceeds the hinge travel limit");
+        || stowed_joint_angle_rad.abs() > section_limit_rad
+        || deployment_joint_angle_rad.abs() > section_limit_rad {
+        return plan_error("ramp-section physical pose or joint-frame target exceeds hinge travel");
     }
     let expected_inertia_x = section_mass * (width * width + thickness * thickness) / 12.0;
     let expected_inertia_y = section_mass * (section_length * section_length
@@ -4796,12 +4811,13 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     // closed; both offsets disappear from the deployed plane at 0 degrees.
     let middle_fold_axis_y = rail_center_y + rail_height / 2.0;
     let toe_fold_axis_y = -fold_surface_thickness / 2.0;
-    // Root angles are source-owned per side. The starboard Y=180 mount
-    // reverses its local hinge sign so both folded runs point the same way.
+    // The body orientation uses the positive source stow magnitude on both
+    // sides. Starboard's Y=180 mount mirrors its forward axis; its revolute
+    // coordinate therefore uses the opposite sign for the same physical pose.
     let root_target_deg = if side == "port" { root_stow_angle_deg }
         else { -root_stow_angle_deg };
     let root_rotation = if side == "port" { [0.0, 0.0, root_target_deg] }
-        else { [0.0, 180.0, root_target_deg] };
+        else { [0.0, 180.0, -root_target_deg] };
     let root_placement = assembly_builder::place_plan(edit_target, ramp_path,
         [mount_x, mount_y, mount_z], root_rotation, ());
     if !root_placement.ok { return root_placement; }
@@ -4824,7 +4840,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     for op in middle_place.ops { ops.push(op); }
     let toe_place = assembly_builder::place_plan(edit_target, toe_path,
         [section_length, 2.0 * toe_fold_axis_y, 0.0], [0.0, 0.0,
-            stowed_toe_angle_rad * 180.0 / 3.141592653589793], ());
+            stowed_middle_angle_rad * 180.0 / 3.141592653589793], ());
     if !toe_place.ok { return toe_place; }
     for op in toe_place.ops { ops.push(op); }
     let section_angle = _sysml_number(source, if side == "port" {
@@ -4886,7 +4902,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         #{name: "drive:angular:physics:targetPosition", type_name: "float", value: root_target_deg.to_string()},
         #{name: "drive:angular:physics:targetVelocity", type_name: "float", value: "0.0"},
         #{name: "drive:angular:physics:stiffness", type_name: "float", value: drive_stiffness.to_string()},
-        #{name: "drive:angular:physics:damping", type_name: "float", value: drive_damping.to_string()},
+        #{name: "drive:angular:physics:damping", type_name: "float", value: root_drive_damping.to_string()},
         #{name: "drive:angular:physics:maxForce", type_name: "float", value: drive_max_torque.to_string()}
     ] {
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: root_joint_path,
@@ -4895,6 +4911,11 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
 
     let joint_offset = if side == "port" { 0 } else { 2 };
     let section_limit_deg = section_limit_rad * 180.0 / 3.141592653589793;
+    let joint_frame_half_offset = section_joint_frame_offset_rad / 2.0;
+    let joint_local_rot1 = "(0.0, 0.0, "
+        + sin(joint_frame_half_offset).to_string() + ", "
+        + cos(joint_frame_half_offset).to_string() + ")";
+    let stowed_joint_angle_deg = stowed_joint_angle_rad * 180.0 / 3.141592653589793;
     for section_index in 0..2 {
         let joint_name = joint_names[joint_offset + section_index];
         let joint_path = lander_root + "/" + joint_name;
@@ -4905,10 +4926,6 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         }
         let body0 = if section_index == 0 { ramp_path } else { middle_path };
         let body1 = if section_index == 0 { middle_path } else { toe_path };
-        let stowed_angle_rad = if section_index == 0 {
-            stowed_middle_angle_rad
-        } else { stowed_toe_angle_rad };
-        let stowed_angle_deg = stowed_angle_rad * 180.0 / 3.141592653589793;
         let hinge_axis_y = if section_index == 0 {
             middle_fold_axis_y
         } else { toe_fold_axis_y };
@@ -4925,12 +4942,14 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
               value: "(" + section_length.to_string() + ", " + hinge_axis_y.to_string() + ", 0.0)"},
             #{name: "physics:localPos1", type_name: "point3f",
               value: "(0.0, " + hinge_axis_y.to_string() + ", 0.0)"},
+            #{name: "physics:localRot0", type_name: "quatf", value: "(0.0, 0.0, 0.0, 1.0)"},
+            #{name: "physics:localRot1", type_name: "quatf", value: joint_local_rot1},
             #{name: "physics:lowerLimit", type_name: "float", value: (-section_limit_deg).to_string()},
             #{name: "physics:upperLimit", type_name: "float", value: section_limit_deg.to_string()},
-            #{name: "drive:angular:physics:targetPosition", type_name: "float", value: stowed_angle_deg.to_string()},
+            #{name: "drive:angular:physics:targetPosition", type_name: "float", value: stowed_joint_angle_deg.to_string()},
             #{name: "drive:angular:physics:targetVelocity", type_name: "float", value: "0.0"},
             #{name: "drive:angular:physics:stiffness", type_name: "float", value: drive_stiffness.to_string()},
-            #{name: "drive:angular:physics:damping", type_name: "float", value: drive_damping.to_string()},
+            #{name: "drive:angular:physics:damping", type_name: "float", value: section_drive_damping.to_string()},
             #{name: "drive:angular:physics:maxForce", type_name: "float", value: drive_max_torque.to_string()},
             #{name: "physics:collisionEnabled", type_name: "bool", value: "false"}
         ] {
@@ -4942,8 +4961,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     let transition_length = _sysml_number(source,
         "physicalRampDeckTransitionLengthM");
     let transition = _physical_ramp_transition_ops(doc, edit_target,
-        lander_root, ramp_path, side, root_stow_angle_rad,
-        transition_length, thickness, width, surface_y);
+        lander_root, ramp_path, side, transition_length, thickness, width);
     if !transition.ok { return transition; }
     for op in transition.ops { ops.push(op); }
     #{ok: true, kind: "griffin_articulated_physical_ramp",
@@ -4952,6 +4970,40 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
       root_hinge_path: root_joint_path, intermediate_joint_names: joint_names,
       paths: [ramp_path, middle_path, toe_path], ops: ops,
       no_op: ops.len() == 0}
+}
+
+fn griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root) {
+    if doc == () || edit_target == () || !absolute_root(lander_root) {
+        return plan_error("bilateral physical-ramp planning requires a document, edit target, and absolute lander root");
+    }
+    let port = isolated_griffin_physical_ramp_geometry_plan(
+        doc, edit_target, lander_root, "port");
+    if !port.ok { return port; }
+    let starboard = isolated_griffin_physical_ramp_geometry_plan(
+        doc, edit_target, lander_root, "starboard");
+    if !starboard.ok { return starboard; }
+    let ops = [];
+    for op in port.ops { ops.push(op); }
+    for op in starboard.ops { ops.push(op); }
+    let paths = [];
+    for path in port.paths { paths.push(path); }
+    for path in starboard.paths { paths.push(path); }
+    let joint_names = [];
+    for name in port.intermediate_joint_names { joint_names.push(name); }
+    for name in starboard.intermediate_joint_names { joint_names.push(name); }
+    #{ok: true, kind: "griffin_bilateral_articulated_physical_ramps",
+      paths: paths, joint_names: joint_names,
+      ops: ops, no_op: ops.len() == 0}
+}
+
+fn apply_griffin_physical_ramp_geometry(doc, edit_target,
+    lander_root, parent_gen) {
+    let plan = griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc,
+        "Reconcile bilateral Griffin articulated physical ramps", plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, command: command,
+      paths: plan.paths, joint_names: plan.joint_names}
 }
 
 fn apply_isolated_griffin_physical_ramp_geometry(doc, edit_target,

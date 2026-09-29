@@ -2127,7 +2127,8 @@ fn lint(doc_id, root) {
             }
             let physical_children = ["RampTrackPort", "RampTrackStarboard",
                 "EdgeRail", "EdgeRailInner"];
-            let transition_name = griffin_spec::physical_ramp_transition_child_name();
+            let side = if i == 0 { "port" } else { "starboard" };
+            let transition_name = griffin_spec::physical_ramp_transition_body_name(side);
             if transition_name != () && transition_name != "" {
                 // TransitionPlate is a rigid-body frame; its ContactSurface
                 // child owns the collision geometry. Keep that boundary
@@ -2163,7 +2164,7 @@ fn lint(doc_id, root) {
             }
             if transition_name != () && transition_name != "" {
                 let contact_name = griffin_spec::physical_ramp_transition_contact_child_name();
-                let transition_path = ramp_path + "/" + transition_name;
+                let transition_path = root + "/" + transition_name;
                 let transition = _query_schemas(doc_id, transition_path,
                     ["physics:mass", "physics:diagonalInertia"], (), true);
                 if !_ok(transition) || transition.type_name != "Xform" {
@@ -2214,7 +2215,7 @@ fn lint(doc_id, root) {
                 }
                 let prefix = griffin_spec::physical_ramp_transition_joint_name_prefix();
                 let suffix = if i == 0 { "Port" } else { "Starboard" };
-                let joint_path = ramp_path + "/" + prefix + suffix;
+                let joint_path = root + "/" + prefix + suffix;
                 let joint = _query(doc_id, joint_path,
                     ["physics:localPos0", "physics:localPos1", "physics:collisionEnabled"],
                     ["physics:body0", "physics:body1"], false);

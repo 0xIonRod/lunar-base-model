@@ -57,11 +57,54 @@ fn on_start(me, ctx) {
     print("[griffin-landing-stability] waiting for composed Twin stage");
 }
 
-fn _physics_observation(state, value, detail) {
-    let observation = #{provider: "physics", state: state};
+fn _bind_stability_observation(ir, input_name, observation) {
+    if ir == () || ir.ok != true {
+        observation.path = [];
+        observation.state = "invalid";
+        observation.detail = "GR-036 constraint IR is unavailable";
+        return observation;
+    }
+    let bound = sysml_requirements::scalar_constraint_observation(
+        ir, input_name, observation);
+    if bound.state == "invalid" {
+        observation.path = bound.path;
+        observation.state = "invalid";
+        observation.detail = bound.detail;
+        return observation;
+    }
+    bound
+}
+
+fn _stability_telemetry(model, ir, input_name, state, value, detail,
+                        generation, sample_interval) {
+    let observation = #{
+        provider: "telemetry",
+        state: state,
+        provider_generation: generation,
+        source_revision: if model == () { () } else { model.source_revision },
+        document_id: (),
+        document_generation: (),
+        sample_interval: sample_interval,
+    };
     if state == "value" { observation.value = value; }
     if detail != () { observation.detail = detail; }
-    observation
+    _bind_stability_observation(ir, input_name, observation)
+}
+
+fn _stability_source_literal(model, ir, input_name, attribute_name) {
+    if model == () || !sysml_model_is(model) {
+        return #{path: [], provider: "source_literal", state: "invalid",
+            detail: "source-pinned SysML model is unavailable"};
+    }
+    let attribute = model.attribute(attribute_name);
+    if attribute == () {
+        return #{path: [], provider: "source_literal", state: "invalid",
+            source_revision: model.source_revision,
+            provider_generation: model.source_revision,
+            detail: "GR-036 source limit is missing: " + attribute_name};
+    }
+    let observation = model.source_literal_observation(attribute);
+    _bind_stability_observation(ir, input_name, observation)
 }
 
 fn emit_stability_verdict(me, contract, source) {
@@ -151,24 +194,64 @@ fn emit_stability_verdict(me, contract, source) {
         && me.post_touchdown_unready_count == 0
         && me.elapsed >= contract.horizon_s;
     let sample_state = if sample_available { "value" } else { "unavailable" };
-    let check = sysml_requirements::constraint_check(
+    let source_model = sysml_requirements::model();
+    let requirement = if source_model != () && sysml_model_is(source_model) {
+        source_model.requirement("GriffinSimulationAccuracyRequirements::gr036")
+    } else { () };
+    let constraint_ir = if requirement != () {
+        sysml_requirements::required_constraint_ir(
+            source_model,
+            requirement,
+            "GriffinSimulationAccuracyRequirements::GR036_LandingStabilityWithinBounds")
+    } else { () };
+    let sample_interval = #{
+        clock: "simulation",
+        start_tick: if me.touchdown_tick != () { me.touchdown_tick } else { me.start_tick },
+        end_tick: clocks.sim_tick,
+    };
+    let telemetry = [];
+    telemetry.push(_stability_telemetry(source_model, constraint_ir,
+        "telemetryFinite", metric_state, me.finite, metric_detail,
+        clocks.sim_tick, sample_interval));
+    telemetry.push(_stability_telemetry(source_model, constraint_ir,
+        "sampleAvailable", sample_state, sample_available,
+        if sample_available { () } else { "The full post-touchdown sample window is incomplete" },
+        clocks.sim_tick, sample_interval));
+    telemetry.push(_stability_telemetry(source_model, constraint_ir,
+        "touchdownObserved", "value", touchdown_observed, (),
+        clocks.sim_tick, sample_interval));
+    telemetry.push(_stability_telemetry(source_model, constraint_ir,
+        "allFourLegsContact", metric_state, all_four_legs_contact, metric_detail,
+        clocks.sim_tick, sample_interval));
+    telemetry.push(_stability_telemetry(source_model, constraint_ir,
+        "minimumUprightAxisY", metric_state, me.min_upright, metric_detail,
+        clocks.sim_tick, sample_interval));
+    telemetry.push(_stability_source_literal(source_model, constraint_ir,
+        "minimumUprightAxisYLimit",
+        "GriffinSimulationAccuracyRequirements::GR036_LandingStability::landingMinimumUprightAxisY"));
+    telemetry.push(_stability_telemetry(source_model, constraint_ir,
+        "maximumGroundSpeedMps", metric_state, me.max_ground, metric_detail,
+        clocks.sim_tick, sample_interval));
+    telemetry.push(_stability_source_literal(source_model, constraint_ir,
+        "maximumGroundSpeedLimitMps",
+        "GriffinSimulationAccuracyRequirements::GR036_LandingStability::landingMaxGroundSpeedMps"));
+    telemetry.push(_stability_telemetry(source_model, constraint_ir,
+        "maximumAngularSpeedRadPerSec", metric_state, me.max_angular, metric_detail,
+        clocks.sim_tick, sample_interval));
+    telemetry.push(_stability_source_literal(source_model, constraint_ir,
+        "maximumAngularSpeedLimitRadPerSec",
+        "GriffinSimulationAccuracyRequirements::GR036_LandingStability::landingMaxAngularSpeedRadPerSec"));
+    telemetry.push(_stability_telemetry(source_model, constraint_ir,
+        "maximumHorizontalDriftM", metric_state, me.max_horizontal, metric_detail,
+        clocks.sim_tick, sample_interval));
+    telemetry.push(_stability_source_literal(source_model, constraint_ir,
+        "maximumHorizontalDriftLimitM",
+        "GriffinSimulationAccuracyRequirements::GR036_LandingStability::landingMaxHorizontalDriftM"));
+    let check = sysml_requirements::required_constraints_check(
         "GR-036-landing-stability", "lander", "gr036",
         "Verify_GriffinLandingStability",
         "GriffinSimulationAccuracyRequirements::GR036_LandingStabilityWithinBounds",
-        #{telemetryFinite: _physics_observation(metric_state, me.finite, metric_detail),
-          sampleAvailable: _physics_observation(sample_state, sample_available,
-              if sample_available { () } else { "The full post-touchdown sample window is incomplete" }),
-          touchdownObserved: _physics_observation("value", touchdown_observed, ()),
-          allFourLegsContact: _physics_observation(metric_state, all_four_legs_contact, metric_detail),
-          minimumUprightAxisY: _physics_observation(metric_state, last_upright, metric_detail),
-          minimumUprightAxisYLimit: _physics_observation("value", contract.min_upright_axis_y, ()),
-          maximumGroundSpeedMps: _physics_observation(metric_state, me.max_ground, metric_detail),
-          maximumGroundSpeedLimitMps: _physics_observation("value", contract.max_ground_speed_mps, ()),
-          maximumAngularSpeedRadPerSec: _physics_observation(metric_state, me.max_angular, metric_detail),
-          maximumAngularSpeedLimitRadPerSec: _physics_observation("value", contract.max_angular_speed_rad_per_sec, ()),
-          maximumHorizontalDriftM: _physics_observation(metric_state, me.max_horizontal, metric_detail),
-          maximumHorizontalDriftLimitM: _physics_observation("value", contract.max_horizontal_drift_m, ())},
-        "physics", 0.0);
+        telemetry, "typed", 0.0);
     let report = sysml_requirements::evaluate(source, [check]);
     report.metrics = metrics;
     report.contract = contract;

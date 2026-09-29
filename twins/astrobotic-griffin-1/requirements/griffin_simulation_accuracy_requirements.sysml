@@ -68,7 +68,12 @@ package GriffinSimulationAccuracyRequirements {
         attribute landingMaxGroundSpeedMps : Real = 5.0;
         attribute landingMaxAngularSpeedRadPerSec : Real = 2.0;
         attribute landingMaxHorizontalDriftM : Real = 50.0;
-        require GR036_LandingStabilityWithinBounds;
+        require GR036_LandingStabilityWithinBounds {
+            in minimumUprightAxisYLimit = landingMinimumUprightAxisY;
+            in maximumGroundSpeedLimitMps = landingMaxGroundSpeedMps;
+            in maximumAngularSpeedLimitRadPerSec = landingMaxAngularSpeedRadPerSec;
+            in maximumHorizontalDriftLimitM = landingMaxHorizontalDriftM;
+        }
     }
 
     requirement def GR037_LandingTargetDatum {

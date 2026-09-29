@@ -117,16 +117,22 @@ package GriffinRampRequirements {
     constraint def GRC022_RampFlightStowAnglesWithinTravel {
         in portRootStowAngleRad : Real;
         in starboardRootStowAngleRad : Real;
-        in middleAngleRad : Real;
-        in toeAngleRad : Real;
+        in sectionStowRelativeAngleRad : Real;
+        in sectionDeploymentRelativeAngleRad : Real;
+        in sectionJointFrameOffsetRad : Real;
         in portRootLimitRad : Real;
         in starboardRootLimitRad : Real;
         in sectionLimitRad : Real;
         portRootStowAngleRad > 0.0 and portRootStowAngleRad <= portRootLimitRad
             and starboardRootStowAngleRad > 0.0 and starboardRootStowAngleRad <= starboardRootLimitRad
-            and middleAngleRad > 0.0 and toeAngleRad > 0.0
-            and middleAngleRad <= sectionLimitRad and middleAngleRad >= -sectionLimitRad
-            and toeAngleRad <= sectionLimitRad and toeAngleRad >= -sectionLimitRad;
+            and sectionStowRelativeAngleRad > 0.0
+            and sectionStowRelativeAngleRad <= sectionLimitRad
+            and sectionStowRelativeAngleRad >= -sectionLimitRad
+            and sectionStowRelativeAngleRad > sectionDeploymentRelativeAngleRad
+            and sectionStowRelativeAngleRad + sectionJointFrameOffsetRad < sectionLimitRad
+            and sectionStowRelativeAngleRad + sectionJointFrameOffsetRad > -sectionLimitRad
+            and sectionDeploymentRelativeAngleRad + sectionJointFrameOffsetRad < sectionLimitRad
+            and sectionDeploymentRelativeAngleRad + sectionJointFrameOffsetRad > -sectionLimitRad;
     }
 
     constraint def GRC023_RailsRemainOnUpperTrackFace {
@@ -137,8 +143,8 @@ package GriffinRampRequirements {
     }
 
     constraint def GRC024_RampSectionDeploymentTargetIsLevel {
-        in deploymentTargetRad : Real;
-        deploymentTargetRad == 0.0;
+        in deploymentRelativeAngleRad : Real;
+        deploymentRelativeAngleRad == 0.0;
     }
 
     constraint def GRC025_StowedRailsClearLandingLegEnvelope {
@@ -162,6 +168,17 @@ package GriffinRampRequirements {
             and lowerChordHeightM > 0.0
             and lowerChordCenterYM - lowerChordHeightM / 2.0 >= walkingSurfaceTopYM - toleranceM
             and lowerChordCenterYM < upperChordCenterYM;
+    }
+
+    constraint def GRC027_RampStowedRootAxesMirror {
+        in portForwardX : Real;
+        in portForwardY : Real;
+        in starboardForwardX : Real;
+        in starboardForwardY : Real;
+        in tolerance : Real;
+        tolerance >= 0.0
+            and RealFunctions::abs(portForwardX + starboardForwardX) <= tolerance
+            and RealFunctions::abs(portForwardY - starboardForwardY) <= tolerance;
     }
 
     constraint def GRC010_PhysicalRampReachesTerrain {
@@ -407,14 +424,24 @@ package GriffinRampRequirements {
         attribute physicalRampSectionMassPartitionToleranceKg : Real = 0.001;
         attribute physicalRampPortRootJointStowLimitRad : Real = 1.0471975512;
         attribute physicalRampPortRootStowedAngleRad : Real = 0.7853981634;
-        attribute physicalRampStarboardRootJointStowLimitRad : Real = 2.617993878;
-        attribute physicalRampStarboardRootStowedAngleRad : Real = 2.3561944902;
+        attribute physicalRampStarboardRootJointStowLimitRad : Real = 1.0471975512;
+        attribute physicalRampStarboardRootStowedAngleRad : Real = 0.7853981634;
+        attribute physicalRampRootAxisMirrorTolerance : Real = 0.002;
         attribute physicalRampSectionJointLimitRad : Real = 3.141592654;
-        attribute physicalRampSectionStowedAngleRad : Real = 3.141592654;
-        attribute physicalRampToeSectionStowedAngleRad : Real = 3.141592654;
-        attribute physicalRampSectionDriveTargetRad : Real = 0.0;
+        // This is the section's physical fold relative to its parent. The
+        // joint frame offset below expresses the same pose away from the
+        // solver's +/-pi branch cut and selects the intended opening sweep.
+        attribute physicalRampSectionStowedRelativeAngleRad : Real = 3.141592654;
+        attribute physicalRampSectionJointFrameOffsetRad : Real = -1.570796327;
+        // Physical relative angle of a level, deployed section. The joint
+        // coordinate target is this angle plus the joint frame offset.
+        attribute physicalRampSectionDeploymentRelativeAngleRad : Real = 0.0;
         attribute physicalRampJointDriveStiffnessNmPerDeg : Real = 6000.0;
-        attribute physicalRampJointDriveDampingNmPerDegPerSec : Real = 900.0;
+        attribute physicalRampRootJointDriveDampingNmPerDegPerSec : Real = 900.0;
+        // Replaceable near-critical damping assumption for the authored
+        // section generalized inertias (approximately 41–58 kg m²). The
+        // supplier actuator curve is not available in the source package.
+        attribute physicalRampSectionJointDriveDampingNmPerDegPerSec : Real = 150.0;
         attribute physicalRampJointDriveMaxTorqueNm : Real = 5000.0;
         attribute physicalRampSectionMassPropertiesToleranceKgM2 : Real = 0.01;
     }
@@ -489,21 +516,25 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR017_FlightStowAndPostTouchdownUnfold {
-        doc /* During descent, the port root holds +45 degrees and the starboard root holds -135 degrees locally. The starboard assembly's 180 degree Y mount mirrors the root orientation. Port root travel spans -50 to +60 degrees; starboard spans -150 to +50 degrees, leaving 15 degrees beyond each stowed datum while retaining the deployment targets. Both intermediate hinges turn 180 degrees. The first hinge axis is offset to the top rail chord and the second by half the walking-surface thickness, so the three sections stack as a compact bundle instead of occupying one plane. At zero hinge angle these frame offsets keep the deployed walking surfaces level. The section joints expose their full +/-180 degree travel. The image-based angles and fold offsets are replaceable study estimates informed by Astrobotic's 2021 Griffin-1 product image (https://www.astrobotic.com/wp-content/uploads/2021/02/griffin-1.png); that image supplies qualitative silhouette only, not released supplier geometry or an ICD. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive all four intermediate hinges to their level targets, then move both deck hinges into the deployment envelope. */
+        doc /* The descent stow pose shall place the two root ramp axes as mirror images across the lander X=0 centerline: the port body uses a +45 degree Z rotation; the starboard body uses a 180 degree Y mount followed by a +45 degree Z rotation. Their lander-frame headings are +45 and +135 degrees. The starboard revolute target is -45 degrees because the mount reverses the hinge axis. The port root joint spans -50 to +60 degrees and the starboard root joint spans -60 to +50 degrees, retaining the authored outward/down deployment targets. Both intermediate hinges fold 180 degrees in the physical section geometry. Their child-side joint frames are offset by -90 degrees, so the transport pose is represented at +90 degrees and the level deployment pose at -90 degrees in the joint coordinate. This keeps both commanded poses inside the +/-180 degree travel and gives deployment a definite signed sweep away from the lander instead of starting at the angular branch cut. The first hinge axis is offset to the top rail chord and the second by half the walking-surface thickness, so the three sections stack as a compact bundle instead of occupying one plane. At the level physical relative angle, these frame offsets keep the deployed walking surfaces aligned. The image-based angles and fold offsets are replaceable study estimates informed by the 2021 Griffin-1 product image; the image supplies qualitative silhouette only, not released supplier geometry or an ICD. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive all four intermediate hinges to their level targets, then move both deck hinges into the deployment envelope. */
         require GRC022_RampFlightStowAnglesWithinTravel {
             in portRootStowAngleRad = GriffinEgressRamp::physicalRampPortRootStowedAngleRad;
             in starboardRootStowAngleRad = GriffinEgressRamp::physicalRampStarboardRootStowedAngleRad;
-            in middleAngleRad = GriffinEgressRamp::physicalRampSectionStowedAngleRad;
-            in toeAngleRad = GriffinEgressRamp::physicalRampToeSectionStowedAngleRad;
+            in sectionStowRelativeAngleRad = GriffinEgressRamp::physicalRampSectionStowedRelativeAngleRad;
+            in sectionDeploymentRelativeAngleRad = GriffinEgressRamp::physicalRampSectionDeploymentRelativeAngleRad;
+            in sectionJointFrameOffsetRad = GriffinEgressRamp::physicalRampSectionJointFrameOffsetRad;
             in portRootLimitRad = GriffinEgressRamp::physicalRampPortRootJointStowLimitRad;
             in starboardRootLimitRad = GriffinEgressRamp::physicalRampStarboardRootJointStowLimitRad;
             in sectionLimitRad = GriffinEgressRamp::physicalRampSectionJointLimitRad;
         }
         require GRC024_RampSectionDeploymentTargetIsLevel {
-            in deploymentTargetRad = GriffinEgressRamp::physicalRampSectionDriveTargetRad;
+            in deploymentRelativeAngleRad = GriffinEgressRamp::physicalRampSectionDeploymentRelativeAngleRad;
         }
         require GRC025_StowedRailsClearLandingLegEnvelope {
             in geometryToleranceM = GriffinEgressRamp::rampSectionGeometryToleranceM;
+        }
+        require GRC027_RampStowedRootAxesMirror {
+            in tolerance = GriffinEgressRamp::physicalRampRootAxisMirrorTolerance;
         }
     }
     requirement def GRR018_RailsAboveWalkingSurface {

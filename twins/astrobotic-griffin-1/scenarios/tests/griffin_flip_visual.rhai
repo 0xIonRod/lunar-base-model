@@ -164,7 +164,7 @@ fn run_visual_review(batch_index) {
         let ramp = root + "/Griffin1/" + name;
         checks.push(visual_children_check("GV-002-" + name + "-sections", "egress_ramps",
             "gv002", ramp,
-            [ramp + "/DeckSection", ramp + "/MiddleSection", ramp + "/TransitionPlate"]));
+            [ramp + "/DeckSection", ramp + "/MiddleSection"]));
         for segment in ["DeckSection", "MiddleSection"] {
             let section = ramp + "/" + segment;
             let paths = [section + "/RampTrackPort", section + "/RampTrackStarboard",
@@ -179,6 +179,10 @@ fn run_visual_review(batch_index) {
             [toe + "/RampTrackPort", toe + "/RampTrackStarboard",
              toe + "/OuterRail", toe + "/InnerRail"]));
     }
+    checks.push(visual_children_check("GV-002-ramp-transition-plates", "egress_ramps",
+        "gv002", root + "/Griffin1",
+        [root + "/Griffin1/" + griffin_spec::physical_ramp_transition_body_name("port"),
+         root + "/Griffin1/" + griffin_spec::physical_ramp_transition_body_name("starboard")]));
     let solar_names = _sysml_list(source, "solarArrayInstances");
     let solar_member_names = sysml_requirement_checks::source_enum_identifiers(source,
         "GriffinSolarRequirements::GriffinSolarArrayAssembly::childNames");

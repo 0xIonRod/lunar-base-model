@@ -133,10 +133,12 @@ fn _qualified_attribute(name) {
         "physicalRampSectionInertiaZKgM2", "physicalRampSectionJointLimitRad",
         "physicalRampPortRootJointStowLimitRad", "physicalRampPortRootStowedAngleRad",
         "physicalRampStarboardRootJointStowLimitRad", "physicalRampStarboardRootStowedAngleRad",
-        "physicalRampSectionStowedAngleRad", "physicalRampToeSectionStowedAngleRad",
+        "physicalRampSectionStowedRelativeAngleRad", "physicalRampSectionJointFrameOffsetRad",
+        "physicalRampSectionDeploymentRelativeAngleRad",
         "physicalRampSectionMassPartitionToleranceKg",
-        "physicalRampSectionDriveTargetRad", "physicalRampJointDriveStiffnessNmPerDeg",
-        "physicalRampJointDriveDampingNmPerDegPerSec",
+        "physicalRampJointDriveStiffnessNmPerDeg",
+        "physicalRampRootJointDriveDampingNmPerDegPerSec",
+        "physicalRampSectionJointDriveDampingNmPerDegPerSec",
         "physicalRampJointDriveMaxTorqueNm",
         "physicalRampSectionMassPropertiesToleranceKgM2",
         "physicalRampDeckTransitionMassKg",
@@ -710,6 +712,13 @@ fn physical_ramp_deck_transition_interface_tolerance_m() {
     _sysml_attribute("physicalRampDeckTransitionInterfaceToleranceM")
 }
 fn physical_ramp_transition_child_name() { _sysml_enum_name("transitionBody") }
+fn physical_ramp_transition_body_name(side) {
+    let base = physical_ramp_transition_child_name();
+    let suffix = if side == "port" { "Port" }
+        else if side == "starboard" { "Starboard" } else { return (); };
+    if base == () || base == "" { return (); }
+    base + suffix
+}
 fn physical_ramp_transition_contact_child_name() {
     _sysml_enum_name("transitionContact")
 }
@@ -729,9 +738,31 @@ fn physical_ramp_port_root_stowed_angle_rad() { _sysml_attribute("physicalRampPo
 fn physical_ramp_starboard_root_stowed_angle_rad() { _sysml_attribute("physicalRampStarboardRootStowedAngleRad") }
 fn physical_ramp_port_root_stow_limit_rad() { _sysml_attribute("physicalRampPortRootJointStowLimitRad") }
 fn physical_ramp_starboard_root_stow_limit_rad() { _sysml_attribute("physicalRampStarboardRootJointStowLimitRad") }
-fn physical_ramp_section_stowed_angle_rad() { _sysml_attribute("physicalRampSectionStowedAngleRad") }
-fn physical_ramp_toe_section_stowed_angle_rad() { _sysml_attribute("physicalRampToeSectionStowedAngleRad") }
-fn physical_ramp_section_drive_target_rad() { _sysml_attribute("physicalRampSectionDriveTargetRad") }
+fn physical_ramp_section_stowed_relative_angle_rad() {
+    _sysml_attribute("physicalRampSectionStowedRelativeAngleRad")
+}
+fn physical_ramp_section_deployment_relative_angle_rad() {
+    _sysml_attribute("physicalRampSectionDeploymentRelativeAngleRad")
+}
+fn physical_ramp_section_joint_frame_offset_rad() {
+    _sysml_attribute("physicalRampSectionJointFrameOffsetRad")
+}
+fn physical_ramp_section_joint_coordinate_angle(relative_angle_rad) {
+    let offset = physical_ramp_section_joint_frame_offset_rad();
+    if relative_angle_rad == () || offset == ()
+        || !relative_angle_rad.is_finite() || !offset.is_finite() {
+        return ();
+    }
+    relative_angle_rad + offset
+}
+fn physical_ramp_section_stowed_joint_angle_rad() {
+    physical_ramp_section_joint_coordinate_angle(
+        physical_ramp_section_stowed_relative_angle_rad())
+}
+fn physical_ramp_section_deployment_joint_angle_rad() {
+    physical_ramp_section_joint_coordinate_angle(
+        physical_ramp_section_deployment_relative_angle_rad())
+}
 fn suspension_strut_scale() { _sysml_number_list("suspensionStrutScale") }
 fn suspension_strut_offset() { _sysml_number_list("suspensionStrutOffset") }
 fn suspension_arm_scale() { _sysml_number_list("suspensionArmScale") }

@@ -44,7 +44,7 @@ fn simulation_dependencies(me, ctx) {
         entity_writes: entity_writes,
         query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
             "QueryUsdPrim", "QueryPhysicsState", "PhysicsPerformance",
-            "ReadPorts", "ListOpenDocuments"],
+            "ReadPorts", "ReadPortsBatch", "ListOpenDocuments"],
         required_inputs: []
     }
 }
@@ -113,6 +113,14 @@ fn on_start(me, ctx) {
     this.route_preflight = ();
     this.egress_apron_evidence = ();
     this.rover_settle_probe_tick = ();
+    this.ramp_settle_probe_tick = ();
+    this.ramp_sections_expected = ();
+    this.ramp_deployment_expected = ();
+    this.ramp_section_settle_evidence = ();
+    this.ramp_deployment_settle_evidence = ();
+    this.ramp_motion_trace = [];
+    this.ramp_motion_trace_last_tick = ();
+    this.phase_failure_reported = false;
     this.event_trace = [];
 }
 
@@ -277,54 +285,108 @@ fn touchdown_notice(me) {
     print("[griffin] touchdown confirmed");
 }
 
-fn level_ramp_sections(me) {
-    // After the image-based folded descent pose, reassert the authored level
-    // traversal target at each intermediate hinge before lowering the roots.
-    let angle = griffin_spec::physical_ramp_section_drive_target_rad();
-    if angle == () { return #{ok: false, error: "deployed ramp-section angle is missing from SysML"}; }
-    let joints = griffin_spec::ramp_intermediate_joint_names();
-    if joints.len() != 4 {
+fn unfold_ramp_middle_sections(me) {
+    // Keep the source-defined Z-fold until the root decks are down. Then unfold
+    // the middle sections while the toe sections stay stowed, so they do not
+    // sweep through the lander or the still-folded middle sections.
+    let angle = griffin_spec::physical_ramp_section_deployment_joint_angle_rad();
+    let toe_stowed = griffin_spec::physical_ramp_section_stowed_joint_angle_rad();
+    let names = griffin_spec::ramp_intermediate_joint_names();
+    if angle == () || toe_stowed == () || names.len() != 4 {
         return #{ok: false, error: "SysML must name all four physical ramp-section hinges"};
     }
-    let writes = [];
-    for name in joints {
-        let result = griffin_surface_ops::set_physical_ramp_hinge_angle(name, angle);
-        if result == () || result.ok != true {
-            return #{ok: false, error: "ramp-section level command was rejected", hinge: name, result: result};
-        }
-        writes.push(result);
+    let expected = [
+        #{name: names[0], target_rad: angle},
+        #{name: names[1], target_rad: toe_stowed},
+        #{name: names[2], target_rad: angle},
+        #{name: names[3], target_rad: toe_stowed},
+    ];
+    let command = griffin_surface_ops::set_physical_ramp_hinge_angles([
+        #{name: names[0], target_rad: angle},
+        #{name: names[2], target_rad: angle},
+    ]);
+    if command == () || command.ok != true {
+        return #{ok: false, error: "atomic middle-section unfold command was rejected",
+            expected_angles: expected, command: command};
     }
-    emit("griffin_ramp_sections_level_commanded");
-    notify_kind("Griffin ramp sections are held straight while the ramps lower.", "info");
-    print("[griffin] physical ramp-section level commands accepted");
-    #{ok: true, joints: writes, angle_rad: angle}
+    emit("griffin_ramp_middle_sections_unfold_commanded");
+    notify_kind("Griffin ramp middle sections are unfolding; the toes remain stowed.", "info");
+    print("[griffin] atomic middle-section unfold command accepted; toe sections remain stowed");
+    #{ok: true, command: command, angle_rad: angle, expected_angles: expected}
+}
+
+fn unfold_ramp_toes(me) {
+    // The middle sections are verified straight before the distal hinges move.
+    let names = griffin_spec::ramp_intermediate_joint_names();
+    let angle = griffin_spec::physical_ramp_section_deployment_joint_angle_rad();
+    if names.len() != 4 || angle == () {
+        return #{ok: false, error: "SysML must define both ramp toe hinges and their deployed target"};
+    }
+    let expected = [
+        #{name: names[1], target_rad: angle},
+        #{name: names[3], target_rad: angle},
+    ];
+    let command = griffin_surface_ops::set_physical_ramp_hinge_angles(expected);
+    if command == () || command.ok != true {
+        return #{ok: false, error: "atomic ramp-toe unfold command was rejected",
+            expected_angles: expected, command: command};
+    }
+    emit("griffin_ramp_toes_unfold_commanded");
+    print("[griffin] atomic ramp-toe unfold command accepted after middle-section settlement");
+    #{ok: true, command: command, expected_angles: ramp_section_angle_expectations()}
 }
 
 fn deploy_ramps(me) {
-    // The physical ramp sections have already been unfolded after touchdown.
-    // Drive their existing USD revolute joints through the generic typed angle
-    // port after touchdown; this is a real hinged deployment, not a pose write
-    // or a second Twin-side physics implementation.
+    // Lower each folded ramp root first. The section hinges retain their
+    // source-defined transport targets until the roots reach the ground-facing
+    // deployment pose.
     let joints = griffin_spec::ramp_root_joint_names();
     if joints.len() != 2 {
         return #{ok: false, error: "SysML must name both top-deck ramp hinges"};
     }
-    let port_angle = griffin_spec::physical_ramp_port_deployment_angle_rad();
-    let starboard_angle = griffin_spec::physical_ramp_starboard_deployment_angle_rad();
+    let expected = [
+        #{name: joints[0], target_rad: griffin_spec::physical_ramp_port_deployment_angle_rad()},
+        #{name: joints[1], target_rad: griffin_spec::physical_ramp_starboard_deployment_angle_rad()},
+    ];
+    let port_angle = expected[0].target_rad;
+    let starboard_angle = expected[1].target_rad;
     if port_angle == () || starboard_angle == () {
         return #{ok: false, error: "physical ramp deployment angles are missing from SysML"};
     }
-    let port = griffin_surface_ops::set_physical_ramp_hinge_angle(joints[0], port_angle);
-    let starboard = griffin_surface_ops::set_physical_ramp_hinge_angle(joints[1], starboard_angle);
-    if port == () || port.ok != true || starboard == () || starboard.ok != true {
-        return #{ok: false, error: "physical ramp joint angle command was rejected",
-            port: port, starboard: starboard};
+    let command = griffin_surface_ops::set_physical_ramp_hinge_angles(expected);
+    if command == () || command.ok != true {
+        return #{ok: false, error: "atomic physical ramp deployment command was rejected",
+            expected_angles: expected, command: command};
     }
     emit("griffin_ramps_deploy_commanded");
     notify_kind("Griffin solid side ramps are deploying after touchdown.", "info");
-    print("[griffin] physical egress ramp angle commands accepted");
-    #{ok: true, port: port, starboard: starboard,
+    print("[griffin] atomic physical egress ramp angle command accepted");
+    #{ok: true, command: command,
         port_angle_rad: port_angle, starboard_angle_rad: starboard_angle}
+}
+
+fn ramp_section_angle_expectations() {
+    let target = griffin_spec::physical_ramp_section_deployment_joint_angle_rad();
+    let names = griffin_spec::ramp_intermediate_joint_names();
+    if target == () || names.len() != 4 { return (); }
+    let expected = [];
+    for name in names {
+        expected.push(#{name: name, target_rad: target});
+    }
+    expected
+}
+
+fn ramp_root_deployment_angle_expectations() {
+    let root_names = griffin_spec::ramp_root_joint_names();
+    let port = griffin_spec::physical_ramp_port_deployment_angle_rad();
+    let starboard = griffin_spec::physical_ramp_starboard_deployment_angle_rad();
+    if root_names.len() != 2 || port == () || starboard == () {
+        return ();
+    }
+    [
+        #{name: root_names[0], target_rad: port},
+        #{name: root_names[1], target_rad: starboard},
+    ]
 }
 
 fn release_rover(me, already_requested) {
@@ -417,15 +479,31 @@ fn release_rover_settle_brake() {
 }
 
 fn fail_phase(state, phase) {
+    if state.phase_failure_reported == true { return; }
+    state.phase_failure_reported = true;
     print("[griffin] phase timeout: " + phase);
-    // Keep a typed, repeatable snapshot beside the phase failure.  This is
-    // deliberately a read-only query: the mission must never turn a timeout
-    // into a hidden pose/physics mutation just to make the report look good.
+    // Keep a typed, bounded snapshot beside the phase failure. This is a
+    // read-only query: a timeout must never turn into a hidden pose mutation.
     let gates = griffin_surface_ops::landing_gate_report();
+    let landing = #{
+        position: gates.position,
+        leg_contact_geometry: gates.leg_contact_geometry,
+        all_legs_contact: gates.all_legs_contact,
+        upright_axis_y: gates.upright_axis_y,
+        ground_speed: gates.ground_speed,
+        descent_speed: gates.descent_speed,
+        angular_speed: gates.angular_speed,
+        landing_contact: gates.landing_contact,
+        touchdown: gates.touchdown,
+        engine_cutoff_contact: gates.engine_cutoff_contact,
+        landing_handoff: gates.landing_handoff
+    };
     let ramp_runtime = griffin_surface_ops::physical_ramp_runtime_pose_evidence();
     let ramp_joints = griffin_surface_ops::physical_ramp_joint_evidence();
-    print("[griffin] phase timeout evidence: " + #{landing: gates,
-        physical_ramps: ramp_runtime, physical_ramp_joints: ramp_joints});
+    let evidence = #{landing: landing,
+        physical_ramps: ramp_runtime, physical_ramp_joints: ramp_joints,
+        ramp_motion_trace: state.ramp_motion_trace};
+    print("[griffin] phase timeout evidence: " + evidence);
     let source = sysml_requirements::source();
     let failure = #{id: "GR-004-phase-" + phase, component: "mission",
         requirement: "GriffinFunctionalRequirements::gr004",
@@ -437,7 +515,8 @@ fn fail_phase(state, phase) {
         requirement_count: 1, source_revision: source.source_revision,
         source_files: source.source_files, results: [failure], failures: [failure],
         metrics: #{phase: phase, event_trace: state.event_trace,
-            clocks: clock_snapshot(), landing_gates: gates,
+            clocks: clock_snapshot(), landing_gates: landing,
+            ramp_motion_trace: state.ramp_motion_trace,
             route_command_updates: state.route_command_updates}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
     emit("griffin_phase_timeout");
@@ -522,30 +601,151 @@ fn task(me, ctx) {
         wait_until(|m| this.ramp_unfold_requested || this.phase_timeout),
         check(|m| this.phase_timeout != true),
         once(|m| {
-            let level = level_ramp_sections(m);
-            if level.ok != true {
+            this.ramp_deployment_expected = ramp_root_deployment_angle_expectations();
+            if this.ramp_deployment_expected == () {
                 this.phase_timeout = true;
-                fail_phase(this, "ramp-section-level");
+                fail_phase(this, "ramp-root-deployment-targets");
+                return true;
             }
-            true
-        }),
-        wait(3.0),
-        check(|m| this.phase_timeout != true),
-        once(|m| {
+            this.ramp_motion_trace = [];
+            this.ramp_motion_trace_last_tick = ();
             let ramps = deploy_ramps(m);
             if ramps.ok != true {
                 this.phase_timeout = true;
-                fail_phase(this, "ramp-deploy");
+                fail_phase(this, "ramp-root-deploy-command");
             }
             true
         }),
-        wait(4.0),
+        par_race([
+            seq([
+                wait_until(|m| {
+                    let trace = griffin_surface_ops::update_physical_ramp_motion_trace(
+                        this.ramp_motion_trace, this.ramp_motion_trace_last_tick,
+                        "root-deployment");
+                    this.ramp_motion_trace = trace.samples;
+                    this.ramp_motion_trace_last_tick = trace.last_tick;
+                    let tick = sim_tick();
+                    let previous = this.ramp_settle_probe_tick;
+                    if previous != () && tick >= previous && tick - previous < 6 {
+                        return false;
+                    }
+                    this.ramp_settle_probe_tick = tick;
+                    let evidence = griffin_surface_ops::physical_ramp_hinges_settled(
+                        this.ramp_deployment_expected, 0.035);
+                    this.ramp_deployment_settle_evidence = evidence;
+                    evidence.ok == true && evidence.settled == true
+                })
+            ]),
+            seq([
+                wait(30.0),
+                once(|m| {
+                    this.ramp_deployment_settle_evidence =
+                        griffin_surface_ops::physical_ramp_hinges_settled(
+                            this.ramp_deployment_expected, 0.035);
+                    this.phase_timeout = true;
+                    fail_phase(this, "ramp-root-deployment-settle");
+                    true
+                })
+            ])
+        ]),
+        check(|m| this.phase_timeout != true),
+        once(|m| {
+            this.ramp_motion_trace = [];
+            this.ramp_motion_trace_last_tick = ();
+            let middle = unfold_ramp_middle_sections(m);
+            if middle.ok != true {
+                this.phase_timeout = true;
+                fail_phase(this, "ramp-middle-unfold-command");
+            } else {
+                this.ramp_sections_expected = middle.expected_angles;
+            }
+            true
+        }),
+        check(|m| this.phase_timeout != true),
+        par_race([
+            seq([
+                wait_until(|m| {
+                    let trace = griffin_surface_ops::update_physical_ramp_motion_trace(
+                        this.ramp_motion_trace, this.ramp_motion_trace_last_tick,
+                        "middle-unfold");
+                    this.ramp_motion_trace = trace.samples;
+                    this.ramp_motion_trace_last_tick = trace.last_tick;
+                    let tick = sim_tick();
+                    let previous = this.ramp_settle_probe_tick;
+                    if previous != () && tick >= previous && tick - previous < 6 {
+                        return false;
+                    }
+                    this.ramp_settle_probe_tick = tick;
+                    let evidence = griffin_surface_ops::physical_ramp_hinges_settled(
+                        this.ramp_sections_expected, 0.035);
+                    this.ramp_section_settle_evidence = evidence;
+                    evidence.ok == true && evidence.settled == true
+                })
+            ]),
+            seq([
+                wait(20.0),
+                once(|m| {
+                    this.ramp_section_settle_evidence =
+                        griffin_surface_ops::physical_ramp_hinges_settled(
+                            this.ramp_sections_expected, 0.035);
+                    this.phase_timeout = true;
+                    fail_phase(this, "ramp-middle-unfold-settle");
+                    true
+                })
+            ])
+        ]),
+        check(|m| this.phase_timeout != true),
+        once(|m| {
+            this.ramp_motion_trace = [];
+            this.ramp_motion_trace_last_tick = ();
+            let toes = unfold_ramp_toes(m);
+            if toes.ok != true {
+                this.phase_timeout = true;
+                fail_phase(this, "ramp-toe-unfold-command");
+            } else {
+                this.ramp_sections_expected = toes.expected_angles;
+            }
+            true
+        }),
+        check(|m| this.phase_timeout != true),
+        par_race([
+            seq([
+                wait_until(|m| {
+                    let trace = griffin_surface_ops::update_physical_ramp_motion_trace(
+                        this.ramp_motion_trace, this.ramp_motion_trace_last_tick,
+                        "toe-unfold");
+                    this.ramp_motion_trace = trace.samples;
+                    this.ramp_motion_trace_last_tick = trace.last_tick;
+                    let tick = sim_tick();
+                    let previous = this.ramp_settle_probe_tick;
+                    if previous != () && tick >= previous && tick - previous < 6 {
+                        return false;
+                    }
+                    this.ramp_settle_probe_tick = tick;
+                    let evidence = griffin_surface_ops::physical_ramp_hinges_settled(
+                        this.ramp_sections_expected, 0.035);
+                    this.ramp_section_settle_evidence = evidence;
+                    evidence.ok == true && evidence.settled == true
+                })
+            ]),
+            seq([
+                wait(30.0),
+                once(|m| {
+                    this.ramp_section_settle_evidence =
+                        griffin_surface_ops::physical_ramp_hinges_settled(
+                            this.ramp_sections_expected, 0.035);
+                    this.phase_timeout = true;
+                    fail_phase(this, "ramp-toe-unfold-settle");
+                    true
+                })
+            ])
+        ]),
         check(|m| this.phase_timeout != true),
         once(|m| {
             this.ramps_deployed = true;
             emit("griffin_ramp_deployment_settled");
             griffin_controls::show_rover_release_actions();
-            print("[griffin] both physical ramps completed the deployment settle interval");
+            print("[griffin] both physical ramps reached their measured deployment hinge targets");
             if is_unattended() {
                 if release_rover(m, false) {
                     this.release_requested = true;
