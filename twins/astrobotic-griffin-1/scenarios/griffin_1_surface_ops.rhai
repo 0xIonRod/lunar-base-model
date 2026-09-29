@@ -43,7 +43,7 @@ fn simulation_dependencies(me, ctx) {
         entity_reads: entity_reads,
         entity_writes: entity_writes,
         query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
-            "QueryUsdPrim", "QueryPhysicsState", "PhysicsPerformance",
+            "QueryUsdPrim", "QueryUsdPrims", "QueryPhysicsState", "PhysicsPerformance",
             "ReadPorts", "ReadPortsBatch", "ListOpenDocuments"],
         required_inputs: []
     }
@@ -112,6 +112,7 @@ fn on_start(me, ctx) {
     this.route_failure_evidence = ();
     this.route_preflight = ();
     this.egress_apron_evidence = ();
+    this.landing_setup_evidence = ();
     this.rover_settle_probe_tick = ();
     this.ramp_settle_probe_tick = ();
     this.ramp_sections_expected = ();
@@ -173,7 +174,7 @@ fn on_event(me, evt, ctx) {
             return;
         }
         if this.release_requested { return; }
-        if release_rover(me, false) {
+        if release_rover(this, false) {
             this.release_requested = true;
             griffin_controls::show_rover_release_pending();
         } else {
@@ -249,19 +250,24 @@ fn on_event(me, evt, ctx) {
     }
 }
 
-fn begin_descent(me) {
-    let target_check = griffin_requirements::landing_target_geometry_check(
-        (), "/Griffin1SurfaceOps/LandingTarget");
-    if target_check.ok != true {
-        let detail = target_check.error;
-        if detail == () { detail = "unknown landing-target mismatch"; }
-        print("[griffin] landing target geometry check failed: " + detail);
-        notify_kind("Griffin landing target does not match the SysML geometry datum.", "error");
+fn begin_descent(state) {
+    let setup = griffin_requirements::landing_setup_geometry_check(
+        (), "/Griffin1SurfaceOps/LandingTarget",
+        "/Griffin1SurfaceOps/LandingSitePad");
+    state.landing_setup_evidence = setup;
+    if setup.ok != true {
+        let detail = setup.error;
+        print("[griffin] landing geometry preflight evidence: " + setup);
+        if detail == () || detail == "" {
+            detail = "landing geometry check failed without a diagnostic";
+        }
+        print("[griffin] landing geometry preflight failed: " + detail);
+        notify_kind("Griffin landing target or contact pad does not match the SysML geometry.", "error");
         emit("griffin_surface_ops_geometry_failed");
         return false;
     }
-    print("[griffin] landing target geometry check PASS (Y="
-        + target_check.actual_y + " m)");
+    print("[griffin] landing geometry preflight PASS (target Y="
+        + setup.target_y_m + " m, pad top Y=" + setup.pad_top_y_m + " m)");
     griffin_surface_ops::follow_lander();
     griffin_controls::show_briefing();
     emit("griffin_powered_descent_started");
@@ -389,9 +395,9 @@ fn ramp_root_deployment_angle_expectations() {
     ]
 }
 
-fn release_rover(me, already_requested) {
+fn release_rover(state, already_requested) {
     if already_requested { return true; }
-    if !this.lander_settled || !this.ramps_deployed {
+    if !state.lander_settled || !state.ramps_deployed {
         notify_kind("FLIP release rejected: touchdown and settled ramps are required.", "warn");
         return false;
     }
@@ -515,7 +521,8 @@ fn fail_phase(state, phase) {
         requirement_count: 1, source_revision: source.source_revision,
         source_files: source.source_files, results: [failure], failures: [failure],
         metrics: #{phase: phase, event_trace: state.event_trace,
-            clocks: clock_snapshot(), landing_gates: landing,
+            clocks: clock_snapshot(), landing_setup: state.landing_setup_evidence,
+            landing_gates: landing,
             ramp_motion_trace: state.ramp_motion_trace,
             route_command_updates: state.route_command_updates}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
@@ -542,6 +549,8 @@ fn finish_surface_ops(state) {
         #{id: "GR-004-base-site", component: "rover", requirement: "GriffinFunctionalRequirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps/BaseSite", actual: state.base_site_reached, expected: true, ok: state.base_site_reached, error: "base site was not reached"},
         #{id: "GR-004-mission-ready", component: "mission", requirement: "GriffinFunctionalRequirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: "/Griffin1SurfaceOps", actual: state.mission_ready, expected: true, ok: state.mission_ready, error: "mission readiness gate failed"},
         #{id: "GR-034-route-frame", component: "rover", requirement: "GriffinFunctionalRequirements::gr034", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: "/Griffin1SurfaceOps", actual: state.route_preflight, expected: true, ok: state.route_preflight != () && state.route_preflight.ok == true, error: "route markers do not agree with the active rover frame"},
+        #{id: "GR-037-landing-target-datum", component: "landing", requirement: "GriffinSimulationAccuracyRequirements::gr037", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: "/Griffin1SurfaceOps/LandingTarget", actual: if state.landing_setup_evidence == () { () } else { state.landing_setup_evidence.landing_target }, expected: "SysML body-reference touchdown Y", ok: state.landing_setup_evidence != () && state.landing_setup_evidence.landing_target != () && state.landing_setup_evidence.landing_target.ok == true, error: "landing target Y does not satisfy GR-037"},
+        #{id: "GR-038-landing-surface-datum", component: "landing", requirement: "GriffinSimulationAccuracyRequirements::gr038", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: "/Griffin1SurfaceOps/LandingSitePad", actual: if state.landing_setup_evidence == () { () } else { state.landing_setup_evidence.landing_surface }, expected: "collision pad top on the normalized terrain plane with target inside its footprint", ok: state.landing_setup_evidence != () && state.landing_setup_evidence.landing_surface != () && state.landing_setup_evidence.landing_surface.ok == true, error: "landing pad surface does not satisfy GR-038"},
         #{id: "GR-035-egress-apron-contact", component: "egress_apron", requirement: "GriffinFunctionalRequirements::gr035", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "contact", path: "/Griffin1SurfaceOps/EgressApron", actual: egress_apron, expected: "typed 10 x 8 x 0.1 m collision apron with native FLIP wheel contact at ramp exit", ok: egress_apron_ok, error: "GR-035 apron geometry or native wheel contact evidence is missing"}
     ];
     let failures = [];
@@ -552,6 +561,7 @@ fn finish_surface_ops(state) {
         source_files: source.source_files, results: checks, failures: failures,
         metrics: #{event_trace: state.event_trace, clocks: clock_snapshot(),
             route_preflight: state.route_preflight,
+            landing_setup: state.landing_setup_evidence,
             egress_apron: egress_apron,
             final_state: state}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
@@ -564,7 +574,7 @@ fn task(me, ctx) {
     seq([
         once(|m| {
             this.route_preflight = route_preflight;
-            if !begin_descent(m) { this.mission_ready = false; };
+            if !begin_descent(this) { this.mission_ready = false; };
             true
         }),
         par_race([
@@ -747,7 +757,7 @@ fn task(me, ctx) {
             griffin_controls::show_rover_release_actions();
             print("[griffin] both physical ramps reached their measured deployment hinge targets");
             if is_unattended() {
-                if release_rover(m, false) {
+                if release_rover(this, false) {
                     this.release_requested = true;
                 } else {
                     this.phase_timeout = true;

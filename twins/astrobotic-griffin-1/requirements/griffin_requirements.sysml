@@ -17,7 +17,7 @@ package Griffin1Requirements {
         RoverBaseArc1; RoverBaseArc2; RoverBaseApproach;
         RoverBaseFinal; BaseSite;
     }
-    enum def GriffinSurfaceFeatureName { EgressApron; }
+    enum def GriffinSurfaceFeatureName { LandingSitePad; EgressApron; }
 
     // Public mission context uses typed designations and numeric bounds. The
     // evidence catalog owns external citations; this part stores no URL or
@@ -66,11 +66,12 @@ package Griffin1Requirements {
         // integration fault (usually contact/steering geometry), not a reason
         // to keep evaluating the same control law until the mission timeout.
         attribute surfaceRouteStallTimeoutS : Real = 15.0;
-        // Visual review contract.  These are intentionally small, stable
-        // presentation datums, not a hidden CAD model: the Twin graphics test
-        // reads them and compares them with composed USD geometry.
+        // Visual review dimensions are compared with composed USD geometry;
+        // they are presentation requirements, not supplier CAD data.
         attribute visualLanderDeckWidthM : Real = 4.50;
-        attribute visualLandingPadRadiusM : Real = 6.0;
+        // Study extent shared by the physical square contact pad and its
+        // circular visual-review boundary.
+        attribute landingSitePadExtentM : Real = 6.0;
         attribute visualReviewGroundWidthM : Real = 36.0;
         // Route markers are mission-interface datums, not navigation-code
         // constants.  Keep the complete marker table in SysML so the scene
@@ -129,14 +130,17 @@ package Griffin1Requirements {
         // all four wheels a continuous collision plane before survey route
         // control begins.  Its dimensions are replaceable Twin study values
         // until the Griffin site ICD is available.
+        attribute landingSitePadName : GriffinSurfaceFeatureName = "LandingSitePad";
+        attribute landingSitePadThicknessM : Real = 0.10;
         attribute egressApronName : GriffinSurfaceFeatureName = "EgressApron";
         attribute egressApronCenterX : Real = 13.50;
-        attribute egressApronCenterY : Real = -0.05;
         attribute egressApronCenterZ : Real = -1.00;
         attribute egressApronLengthM : Real = 10.00;
         attribute egressApronWidthM : Real = 8.00;
         attribute egressApronThicknessM : Real = 0.10;
-        attribute egressApronSurfaceY : Real = 0.00;
+        // Shared top plane for the landing pad and prepared egress apron. Each
+        // collision cube is centered half its thickness below this datum.
+        attribute siteSurfaceY : Real = 0.00;
     }
 
     part def Griffin1Lander {
@@ -202,6 +206,8 @@ package Griffin1Requirements {
             verify GriffinFunctionalRequirements::gr004;
             verify GriffinFunctionalRequirements::gr007;
             verify GriffinFunctionalRequirements::gr026;
+            verify GriffinSimulationAccuracyRequirements::gr037;
+            verify GriffinSimulationAccuracyRequirements::gr038;
         }
     }
 
@@ -251,6 +257,7 @@ package Griffin1Requirements {
             verify GriffinFunctionalRequirements::gr035;
             verify GriffinSimulationAccuracyRequirements::gr036;
             verify GriffinSimulationAccuracyRequirements::gr037;
+            verify GriffinSimulationAccuracyRequirements::gr038;
             verify MoonBaseProjectRequirements::mb001;
             verify MoonBaseProjectRequirements::mb002;
             verify MoonBaseProjectRequirements::mb003;

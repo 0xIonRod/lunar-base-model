@@ -33,9 +33,6 @@ fn pi_value() { griffin_spec::pi_value() }
 fn landing_leg_count() { griffin_spec::landing_leg_count() }
 fn ramp_count() { griffin_spec::ramp_count() }
 fn solar_array_count() { griffin_spec::solar_array_count() }
-fn landing_vehicle_reference_touchdown_y() {
-    griffin_spec::landing_vehicle_reference_touchdown_y()
-}
 
 fn _sysml_number(report, name) {
     if report == () || report.ok != true { return (); }
@@ -464,7 +461,7 @@ fn sysml_contract_report(verification_name) {
         }
     }
     for name in ["visualLanderDeckWidthM", "wheelRadiusM",
-        "visualLandingPadRadiusM", "visualReviewGroundWidthM"] {
+        "landingSitePadExtentM", "visualReviewGroundWidthM"] {
         let value = _sysml_number(report, name);
         if value == () || value <= 0.0 {
             missing.push("positive visual SysML datum " + name);
@@ -591,10 +588,12 @@ fn _distance3(a, b) {
     (x * x + y * y + z * z).sqrt()
 }
 
-fn _source_value(value) {
+fn _source_value(value, source) {
+    let revision = if source == () { () } else { source.source_revision };
     #{provider: "source_literal",
       state: if value == () { "unavailable" } else { "value" },
-      value: value}
+      value: value, source_revision: revision,
+      provider_generation: revision}
 }
 
 fn _usd_value(value) {
@@ -609,6 +608,15 @@ fn _usd_snapshot_value(value, observation) {
       value: value, doc_id: observation.doc_id,
       document_generation: observation.document_generation,
       stage_generation: observation.stage_generation}
+}
+
+fn _derived_snapshot_value(value, observation) {
+    #{provider: "derived",
+      state: if value == () { "unavailable" } else { "value" },
+      value: value, provider_generation: observation.stage_generation,
+      document_id: if observation.doc_id == () { () }
+          else { "usd:" + observation.doc_id },
+      document_generation: observation.document_generation}
 }
 
 fn _ok(record) {
@@ -668,60 +676,162 @@ fn _layout_finding(id, path, message) {
     _finding(id, path, message)
 }
 
-// Compare the live landing-target datum with the geometry-derived SysML
-// parameter.  Keeping this in the Twin makes the check reusable from both a
-// scenario and an Editor session while leaving USD traversal generic in core.
-// The target is deliberately read-only: a mismatch is evidence of drift, not
-// a reason for a test to rewrite the authored scene.
-fn landing_target_geometry_check(doc_id, target_path) {
-    let expected_y = landing_vehicle_reference_touchdown_y();
-    if expected_y == () {
-        return #{ok: false, path: target_path,
-            error: "landingVehicleReferenceTouchdownY is missing from the SysML source"};
+// Check the authored landing target and collision pad against one source
+// revision and one composed USD snapshot. The SysML constraints own both
+// datums; this policy only binds source literals and measured USD geometry.
+fn landing_setup_geometry_check(doc_id, target_path, pad_path) {
+    let source = sysml_requirements::source();
+    if source == () || source.ok != true {
+        return #{ok: false,
+            error: "typed SysML source is unavailable for the landing setup constraints",
+            landing_target: #{ok: false, path: target_path,
+                error: "typed SysML source is unavailable"},
+            landing_surface: #{ok: false, path: pad_path,
+                error: "typed SysML source is unavailable"}};
     }
-    let target = _layout_query(doc_id, target_path,
-        ["xformOp:translate"], false);
-    // Scene runners can mount the target as a live USD asset without opening a
-    // canonical stage. In that case, use an open USD document's composed stage
-    // when one owns this target, rather than treating the unavailable live read
-    // as evidence that the authored prim is missing.
-    if !_ok(target) && doc_id == () {
-        let documents = query("ListOpenDocuments");
-        if documents != () && documents.open_documents != () {
-            for document in documents.open_documents {
-                if document.kind != "usd" { continue; }
-                let candidate = _layout_query(document.doc_id, target_path,
-                    ["xformOp:translate"], false);
-                if _ok(candidate) {
-                    target = candidate;
-                    break;
-                }
-            }
-        }
+    let expected_target_y = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("landingVehicleReferenceTouchdownY"));
+    let target_tolerance = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("landingTargetDatumToleranceM"));
+    let surface_y = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("siteSurfaceY"));
+    let pad_extent = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("landingSitePadExtentM"));
+    let pad_thickness = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("landingSitePadThicknessM"));
+    let surface_tolerance = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("landingSurfaceDatumToleranceM"));
+    if expected_target_y == () || target_tolerance == () || surface_y == ()
+        || pad_extent == () || pad_thickness == () || surface_tolerance == () {
+        return #{ok: false, error: "landing setup datums are incomplete in the SysML source"};
     }
-    if !_ok(target) {
-        let query_error = "query returned no prim record";
-        if target != () && target.error != () {
-            query_error = target.error;
-        } else if target != () && target.path == () {
-            query_error = "query did not resolve the requested prim";
-        }
-        return #{ok: false, path: target_path,
-            expected_y: expected_y,
-            error: "landing target prim query failed: " + query_error};
+    let request = #{paths: [target_path, pad_path], schemas: true,
+        attrs: ["xformOp:translate", "xformOp:scale", "size",
+            "physics:collisionEnabled"]};
+    if doc_id != () { request.doc_id = doc_id; }
+    let snapshot = query("QueryUsdPrims", request);
+    if snapshot == () || snapshot.ok == false {
+        let detail = if snapshot == () {
+            "QueryUsdPrims returned no response"
+        } else if snapshot.error == () {
+            "QueryUsdPrims failed without a provider diagnostic"
+        } else { snapshot.error };
+        return #{ok: false, error: detail,
+            landing_target: #{ok: false, path: target_path, error: detail},
+            landing_surface: #{ok: false, path: pad_path, error: detail}};
     }
-    let translate = target.attrs["xformOp:translate"];
-    if translate == () || translate.len() != 3 {
-        return #{ok: false, path: target_path,
-            expected_y: expected_y,
-            error: "landing target does not publish a three-axis translate"};
+    if snapshot.records == () || snapshot.records.len() != 2 {
+        let detail = if snapshot.records == () {
+            "QueryUsdPrims succeeded without a records array"
+        } else {
+            "QueryUsdPrims returned " + snapshot.records.len()
+                + " records for the two requested landing setup prims"
+        };
+        return #{ok: false, error: detail,
+            landing_target: #{ok: false, path: target_path, error: detail},
+            landing_surface: #{ok: false, path: pad_path, error: detail}};
     }
-    let actual_y = translate[1];
-    let tolerance = 0.001;
-    #{ok: _near(actual_y, expected_y, tolerance), path: target_path,
-      expected_y: expected_y, actual_y: actual_y, tolerance: tolerance,
-      error: if _near(actual_y, expected_y, tolerance) { "" }
-             else { "landing target Y disagrees with SysML geometry datum" }}
+    let target = snapshot.records[0];
+    let pad = snapshot.records[1];
+    let target_position = target.attrs["xformOp:translate"];
+    let pad_center = pad.attrs["xformOp:translate"];
+    let pad_scale = pad.attrs["xformOp:scale"];
+    let cube_size = pad.attrs["size"];
+    if target.path != target_path || pad.path != pad_path
+        || target_position == () || target_position.len() != 3
+        || pad_center == () || pad_center.len() != 3
+        || pad_scale == () || pad_scale.len() != 3 || cube_size == ()
+        || cube_size <= 0.0 {
+        return #{ok: false, error: "landing target or pad has incomplete composed geometry",
+            landing_target: #{ok: false, path: target_path,
+                error: "landing target has no composed three-axis translate"},
+            landing_surface: #{ok: false, path: pad_path,
+                error: "landing pad has no complete composed cube geometry"}};
+    }
+    let actual_pad_half_extent_x = (pad_scale[0] * cube_size * 0.5).abs();
+    let actual_pad_half_extent_y = (pad_scale[1] * cube_size * 0.5).abs();
+    let actual_pad_half_extent_z = (pad_scale[2] * cube_size * 0.5).abs();
+    let actual_pad_top_y = pad_center[1] + actual_pad_half_extent_y;
+    let collision_enabled = pad.attrs["physics:collisionEnabled"] == true;
+    let collision_schema = pad.api_schemas != ()
+        && _has(pad.api_schemas, "PhysicsCollisionAPI");
+
+    let target_constraint = sysml_requirements::required_constraint_check(
+        "GR-037-landing-target-datum", "lander", "gr037",
+        "Verify_GriffinSurfaceOperations",
+        "GriffinSimulationAccuracyRequirements::GR037_LandingTargetDatumMatchesSource",
+        #{authoredTargetY: _usd_snapshot_value(target_position[1], target),
+          sourceTargetY: _source_value(expected_target_y, source),
+          toleranceM: _source_value(target_tolerance, source)}, "typed", 0.0);
+    let surface_constraint = sysml_requirements::required_constraint_check(
+        "GR-038-landing-surface-datum", "lander", "gr038",
+        "Verify_GriffinSurfaceOperations",
+        "GriffinSimulationAccuracyRequirements::GR038_LandingSurfaceContainsTargetOnTerrainPlane",
+        #{authoredPadTopY: _derived_snapshot_value(actual_pad_top_y, pad),
+          sourceSurfaceY: _source_value(surface_y, source),
+          padCenterX: _usd_snapshot_value(pad_center[0], pad),
+          padCenterZ: _usd_snapshot_value(pad_center[2], pad),
+          targetX: _usd_snapshot_value(target_position[0], target),
+          targetZ: _usd_snapshot_value(target_position[2], target),
+          actualPadHalfExtentX: _derived_snapshot_value(actual_pad_half_extent_x, pad),
+          actualPadHalfExtentZ: _derived_snapshot_value(actual_pad_half_extent_z, pad),
+          requiredPadHalfExtentM: _source_value(pad_extent, source),
+          actualPadThicknessM: _derived_snapshot_value(
+              actual_pad_half_extent_y * 2.0, pad),
+          requiredPadThicknessM: _source_value(pad_thickness, source),
+          toleranceM: _source_value(surface_tolerance, source)}, "typed", 0.0);
+    let evaluation = sysml_requirements::evaluate(source,
+        [target_constraint, surface_constraint]);
+    if evaluation == () || evaluation.results == ()
+        || evaluation.results.len() != 2 {
+        return #{ok: false,
+            error: "SysML landing setup constraints did not produce two results",
+            landing_target: #{ok: false, path: target_path,
+                error: "GR-037 constraint evaluation failed"},
+            landing_surface: #{ok: false, path: pad_path,
+                error: "GR-038 constraint evaluation failed"}};
+    }
+    let target_result = evaluation.results[0];
+    let surface_result = evaluation.results[1];
+    let shape_valid = pad.type_name == "Cube" && collision_enabled && collision_schema;
+    let surface_ok = surface_result.ok == true && shape_valid;
+    let target_ok = target_result.ok == true;
+    let detail = "";
+    if !target_ok { detail = _constraint_result_failure(target_result); }
+    if surface_result.ok != true {
+        if detail != "" { detail += "; "; }
+        detail += _constraint_result_failure(surface_result);
+    }
+    if !shape_valid {
+        if detail != "" { detail += "; "; }
+        detail += "landing pad is not a colliding Cube with PhysicsCollisionAPI";
+    }
+    #{ok: target_ok && surface_ok,
+      error: if target_ok && surface_ok { "" } else { detail },
+      source_revision: source.source_revision,
+      source_files: source.source_files,
+      target_y_m: target_position[1],
+      pad_top_y_m: actual_pad_top_y,
+      pad_center: pad_center,
+      pad_half_extents_m: [actual_pad_half_extent_x,
+          actual_pad_half_extent_y, actual_pad_half_extent_z],
+      pad_collision_enabled: collision_enabled,
+      landing_target: #{ok: target_ok, path: target_path,
+          expected_y: expected_target_y, actual_y: target_position[1],
+          tolerance: target_tolerance, constraint: target_result,
+          error: _constraint_result_failure(target_result)},
+      landing_surface: #{ok: surface_ok, path: pad_path,
+          expected_surface_y: surface_y, actual_pad_top_y: actual_pad_top_y,
+          expected_half_extent_m: pad_extent,
+          expected_thickness_m: pad_thickness,
+          target_position: target_position,
+          collision_enabled: collision_enabled,
+          collision_schema: collision_schema,
+          constraint: surface_result,
+          error: if surface_ok { "" }
+              else if surface_result.ok != true {
+                  _constraint_result_failure(surface_result)
+              } else { "landing pad is not a colliding Cube" }}}
 }
 
 // Visual-only wrappers are not always spawned by the isolated headless
@@ -1689,13 +1799,14 @@ fn payload_load_check(payload_kg) {
         [["payloadKg", #{provider: "external",
              state: if payload_kg == () { "unavailable" } else { "value" },
              value: payload_kg}],
-         ["capacityKg", _source_value(capacity)]]);
+         ["capacityKg", _source_value(capacity, source)]]);
     result.payload_kg = payload_kg;
     result.capacity_kg = capacity;
     result
 }
 
 fn _payload_scene_checks(root, payload_kg, capacity_kg) {
+    let source = _payload_requirement_source();
     let capacity_attribute = griffin_spec::qualified_attribute_name("payloadCapacityKg");
     let constraint_name = "GriffinFunctionalRequirements::GR009_PayloadWithinCapacity";
     let model = sysml_requirements::model();
@@ -1703,7 +1814,7 @@ fn _payload_scene_checks(root, payload_kg, capacity_kg) {
     let observations = sysml_requirements::required_constraint_input_observations(
         model, requirement_usage, constraint_name,
         [["payloadKg", _usd_value(payload_kg)],
-         ["capacityKg", _source_value(capacity_kg)]]);
+         ["capacityKg", _source_value(capacity_kg, source)]]);
     [
         #{id: "GR-009-authored-capacity", component: "lander",
           requirement: "gr009", verification: "Verify_GriffinPayloadCapacity",
@@ -1824,7 +1935,7 @@ fn _landing_pad_requirement_findings(doc_id, root) {
                     _usd_snapshot_value(observation.source_center_deviation_m, observation)],
                 ["padGeometrySemanticsMatch",
                     _usd_snapshot_value(observation.pad_geometry_semantics_match, observation)],
-                ["toleranceM", _source_value(tolerance)]]), "usd", 0.0),
+                ["toleranceM", _source_value(tolerance, source)]]), "usd", 0.0),
         sysml_requirements::constraint_check("GLL-008-contact-ownership", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             pad_ownership_constraint,
@@ -1852,7 +1963,7 @@ fn _landing_pad_requirement_findings(doc_id, root) {
                 pad_requirement, pad_station_constraint, [
                 ["stationDeviationM",
                     _usd_snapshot_value(observation.station_deviation_m, observation)],
-                ["toleranceM", _source_value(station_tolerance)],
+                ["toleranceM", _source_value(station_tolerance, source)],
                 ["rotationMatches",
                     _usd_snapshot_value(observation.rotation_matches, observation)]]), "usd", 0.0),
         sysml_requirements::constraint_check("GLL-009-body-mount-path", "landing_leg",
@@ -1862,8 +1973,8 @@ fn _landing_pad_requirement_findings(doc_id, root) {
                 mount_requirement, mount_constraint, [
                 ["measuredBusOverlapM", _usd_snapshot_value(observation.bus_mount_overlap_m, observation)],
                 ["measuredAxleOverlapM", _usd_snapshot_value(observation.mount_axle_overlap_m, observation)],
-                ["requiredOverlapM", _source_value(mount_overlap)],
-                ["measurementToleranceM", _source_value(mount_measurement_tolerance)],
+                ["requiredOverlapM", _source_value(mount_overlap, source)],
+                ["measurementToleranceM", _source_value(mount_measurement_tolerance, source)],
                 ["physicalJointStationMatches", _usd_snapshot_value(observation.physical_joints_match, observation)]]),
             "usd", 0.0)
     ];
@@ -1949,8 +2060,8 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
             sysml_requirements::required_constraint_input_observations(model,
                 requirement_usage, clearance_constraint, [
                 ["trackWidthM", _usd_value(measured_width)],
-                ["wheelWidthM", _source_value(wheel_width)],
-                ["wheelClearanceM", _source_value(ramp_clearance)]]), "derived", 0.0),
+                ["wheelWidthM", _source_value(wheel_width, ramp_source)],
+                ["wheelClearanceM", _source_value(ramp_clearance, ramp_source)]]), "derived", 0.0),
         sysml_requirements::constraint_check(
             "GR-006-composed-geometry-" + child_name, "lander", "grr006",
             "Verify_GriffinRampRequirements",
@@ -1959,7 +2070,7 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
                 requirement_usage, geometry_constraint, [
                 ["maximumDimensionDeviationM", _usd_value(dimension_deviation)],
                 ["maximumPlacementDeviationM", _usd_value(placement_deviation)],
-                ["toleranceM", _source_value(track_tolerance)]]), "derived", 0.0)
+                ["toleranceM", _source_value(track_tolerance, ramp_source)]]), "derived", 0.0)
     ];
     let evaluation = sysml_requirements::evaluate(ramp_source, checks);
     if evaluation.results == () || evaluation.results.len() != checks.len() {
@@ -1987,7 +2098,7 @@ fn ramp_command_check(angle_rad) {
         [["commandRad", #{provider: "external",
             state: if angle_rad == () { "unavailable" } else { "value" },
             value: angle_rad}],
-         ["limitRad", _source_value(limit)]]);
+         ["limitRad", _source_value(limit, source)]]);
     result.angle_rad = angle_rad;
     result.limit_rad = limit;
     result

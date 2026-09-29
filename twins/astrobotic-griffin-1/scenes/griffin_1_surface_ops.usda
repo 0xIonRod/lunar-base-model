@@ -361,7 +361,7 @@ def Xform "Griffin1SurfaceOps" (
     )
     {
         double size = 1.0
-        double3 xformOp:translate = (0.0, 0.25, 0.0)
+        double3 xformOp:translate = (0.0, -0.05, 0.0)
         double3 xformOp:scale = (12.0, 0.1, 12.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.23999999463558197, 0.25, 0.27000001072883606)]

@@ -33,6 +33,33 @@ package GriffinSimulationAccuracyRequirements {
             and authoredTargetY <= sourceTargetY + toleranceM;
     }
 
+    constraint def GR038_LandingSurfaceContainsTargetOnTerrainPlane {
+        in authoredPadTopY : Real;
+        in sourceSurfaceY : Real;
+        in padCenterX : Real;
+        in padCenterZ : Real;
+        in targetX : Real;
+        in targetZ : Real;
+        in actualPadHalfExtentX : Real;
+        in actualPadHalfExtentZ : Real;
+        in requiredPadHalfExtentM : Real;
+        in actualPadThicknessM : Real;
+        in requiredPadThicknessM : Real;
+        in toleranceM : Real;
+        authoredPadTopY >= sourceSurfaceY - toleranceM
+            and authoredPadTopY <= sourceSurfaceY + toleranceM
+            and actualPadHalfExtentX >= requiredPadHalfExtentM - toleranceM
+            and actualPadHalfExtentX <= requiredPadHalfExtentM + toleranceM
+            and actualPadHalfExtentZ >= requiredPadHalfExtentM - toleranceM
+            and actualPadHalfExtentZ <= requiredPadHalfExtentM + toleranceM
+            and actualPadThicknessM >= requiredPadThicknessM - toleranceM
+            and actualPadThicknessM <= requiredPadThicknessM + toleranceM
+            and targetX >= padCenterX - requiredPadHalfExtentM - toleranceM
+            and targetX <= padCenterX + requiredPadHalfExtentM + toleranceM
+            and targetZ >= padCenterZ - requiredPadHalfExtentM - toleranceM
+            and targetZ <= padCenterZ + requiredPadHalfExtentM + toleranceM;
+    }
+
     // Domain-owned requirement definitions. Griffin1Requirements owns only
     // the integrated system subject, requirement usages, and verification.
 
@@ -82,6 +109,12 @@ package GriffinSimulationAccuracyRequirements {
         require GR037_LandingTargetDatumMatchesSource;
     }
 
+    requirement def GR038_LandingSurfaceDatum {
+        doc /* GR-038 [simulation setup] the collision pad top shall be continuous with the normalized terrain surface, and the landing target shall lie within the pad footprint. This setup check does not substitute for native four-leg contact or touchdown stability evidence. */
+        attribute landingSurfaceDatumToleranceM : Real = 0.001;
+        require GR038_LandingSurfaceContainsTargetOnTerrainPlane;
+    }
+
 
     // System integration requirement usages owned by this domain.
     requirement <'GR-008'> gr008 : GR008_AttitudeCases { subject rover : HostedRoverInterface; }
@@ -92,6 +125,7 @@ package GriffinSimulationAccuracyRequirements {
     requirement <'GR-031'> gr031 : GR031_DeterministicVerdict { subject rover : HostedRoverInterface; }
     requirement <'GR-036'> gr036 : GR036_LandingStability { subject lander : Griffin1Lander; }
     requirement <'GR-037'> gr037 : GR037_LandingTargetDatum { subject lander : Griffin1Lander; }
+    requirement <'GR-038'> gr038 : GR038_LandingSurfaceDatum { subject lander : Griffin1Lander; }
 
 
     verification def Verify_GriffinLandingStability {
@@ -105,6 +139,13 @@ package GriffinSimulationAccuracyRequirements {
         subject lander : Griffin1Lander;
         objective {
             verify gr037;
+        }
+    }
+
+    verification def Verify_GriffinLandingSurfaceDatum {
+        subject lander : Griffin1Lander;
+        objective {
+            verify gr038;
         }
     }
 

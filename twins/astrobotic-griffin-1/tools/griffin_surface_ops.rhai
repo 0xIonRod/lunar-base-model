@@ -979,7 +979,8 @@ fn egress_apron_runtime_evidence(rover) {
 
     let expected_center = [
         griffin_spec::egress_apron_center_x_m(),
-        griffin_spec::egress_apron_center_y_m(),
+        griffin_spec::site_surface_y_m()
+            - griffin_spec::egress_apron_thickness_m() * 0.5,
         griffin_spec::egress_apron_center_z_m(),
     ];
     let expected_half_extents = [

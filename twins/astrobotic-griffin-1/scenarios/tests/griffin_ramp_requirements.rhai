@@ -666,7 +666,7 @@ fn on_tick(me, ctx) {
             #{rampTipTopYM: _measurement_value(#{ok: true, y: top_point.y}, "y", side + " ramp toe top"),
               rampTipBottomYM: _measurement_value(#{ok: true, y: bottom_point.y}, "y", side + " ramp toe bottom"),
               terrainSurfaceYM: sysml_requirements::number(source,
-                  "Griffin1Requirements::PublicMissionContext::egressApronSurfaceY"),
+                  "Griffin1Requirements::PublicMissionContext::siteSurfaceY"),
               contactToleranceM: _source_number(source, "physicalRampTerrainContactToleranceM")}));
     }
 

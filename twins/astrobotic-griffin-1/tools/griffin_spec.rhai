@@ -226,6 +226,12 @@ fn _qualified_attribute(name) {
     if landing_stability.contains(name) {
         return "GriffinSimulationAccuracyRequirements::GR036_LandingStability::" + name;
     }
+    if name == "landingTargetDatumToleranceM" {
+        return "GriffinSimulationAccuracyRequirements::GR037_LandingTargetDatum::" + name;
+    }
+    if name == "landingSurfaceDatumToleranceM" {
+        return "GriffinSimulationAccuracyRequirements::GR038_LandingSurfaceDatum::" + name;
+    }
     "Griffin1Requirements::PublicMissionContext::" + name
 }
 
@@ -342,9 +348,6 @@ fn landing_leg_count() { _sysml_integer("landingLegCount") }
 fn ramp_count() { _sysml_integer("rampCount") }
 fn solar_array_count() { _sysml_integer("solarArrayCount") }
 fn route_steering_mode() { _sysml_text("missionSteeringMode") }
-fn landing_vehicle_reference_touchdown_y() {
-    _sysml_attribute("landingVehicleReferenceTouchdownY")
-}
 fn landing_stability_horizon_s() { _sysml_attribute("landingStabilityHorizonS") }
 fn landing_stability_sample_every_n_ticks() {
     _sysml_integer("landingStabilitySampleEveryNTicks")
@@ -377,12 +380,14 @@ fn surface_route_speed_mps() { _sysml_number_list("surfaceRouteSpeedMps") }
 fn surface_route_arrival_radius_m() { _sysml_number_list("surfaceRouteArrivalRadiusM") }
 fn egress_apron_name() { _sysml_text("egressApronName") }
 fn egress_apron_center_x_m() { _sysml_attribute("egressApronCenterX") }
-fn egress_apron_center_y_m() { _sysml_attribute("egressApronCenterY") }
 fn egress_apron_center_z_m() { _sysml_attribute("egressApronCenterZ") }
 fn egress_apron_length_m() { _sysml_attribute("egressApronLengthM") }
 fn egress_apron_width_m() { _sysml_attribute("egressApronWidthM") }
 fn egress_apron_thickness_m() { _sysml_attribute("egressApronThicknessM") }
-fn egress_apron_surface_y_m() { _sysml_attribute("egressApronSurfaceY") }
+fn site_surface_y_m() { _sysml_attribute("siteSurfaceY") }
+fn landing_site_pad_name() { _sysml_text("landingSitePadName") }
+fn landing_site_pad_extent_m() { _sysml_attribute("landingSitePadExtentM") }
+fn landing_site_pad_thickness_m() { _sysml_attribute("landingSitePadThicknessM") }
 fn visual_camera_name() { _sysml_text("reviewCameraName") }
 fn visual_lander_name() { _sysml_text("reviewLanderName") }
 fn visual_lander_deck_width_m() { _sysml_attribute("visualLanderDeckWidthM") }
@@ -769,7 +774,6 @@ fn suspension_arm_scale() { _sysml_number_list("suspensionArmScale") }
 fn suspension_arm_offset_m() { _sysml_attribute("suspensionArmOffsetM") }
 fn suspension_knuckle_radius_m() { _sysml_attribute("suspensionKnuckleRadiusM") }
 fn suspension_knuckle_width_m() { _sysml_attribute("suspensionKnuckleWidthM") }
-fn visual_landing_pad_radius_m() { _sysml_attribute("visualLandingPadRadiusM") }
 fn visual_review_ground_width_m() { _sysml_attribute("visualReviewGroundWidthM") }
 
 // GV-006 links each visual asset as a typed EvidenceSource with an enum role.

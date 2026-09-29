@@ -475,18 +475,18 @@ fn egress_apron_plan(doc, edit_target, root) {
     }
     let name = griffin_spec::egress_apron_name();
     let cx = griffin_spec::egress_apron_center_x_m();
-    let cy = griffin_spec::egress_apron_center_y_m();
     let cz = griffin_spec::egress_apron_center_z_m();
     let length = griffin_spec::egress_apron_length_m();
     let width = griffin_spec::egress_apron_width_m();
     let thickness = griffin_spec::egress_apron_thickness_m();
-    let surface_y = griffin_spec::egress_apron_surface_y_m();
+    let surface_y = griffin_spec::site_surface_y_m();
     if name == () || name == ""
-        || cx == () || cy == () || cz == ()
+        || cx == () || cz == ()
         || length == () || width == () || thickness == () || surface_y == ()
         || length <= 0.0 || width <= 0.0 || thickness <= 0.0 {
         return plan_error("typed EgressApron datums are incomplete or non-positive");
     }
+    let cy = surface_y - thickness * 0.5;
     let path = root + "/" + name;
     let existing = assembly_builder::composed_query(doc,
         #{path: path, children: false, attrs: ["physics:collisionEnabled"]});
@@ -530,6 +530,61 @@ fn egress_apron_plan(doc, edit_target, root) {
       center: [cx, cy, cz], length_m: length, width_m: width,
       thickness_m: thickness, surface_y: surface_y, ops: ops,
       no_op: ops.len() == 0}
+}
+
+fn landing_site_pad_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !absolute_root(root) {
+        return plan_error("landing_site_pad_plan requires a document, edit target, and absolute root");
+    }
+    let name = griffin_spec::landing_site_pad_name();
+    let extent = griffin_spec::landing_site_pad_extent_m();
+    let thickness = griffin_spec::landing_site_pad_thickness_m();
+    let surface_y = griffin_spec::site_surface_y_m();
+    if name == () || name == "" || extent == () || thickness == () || surface_y == ()
+        || extent <= 0.0 || thickness <= 0.0 {
+        return plan_error("typed landing-site pad datums are incomplete or non-positive");
+    }
+    let path = root + "/" + name;
+    let existing = assembly_builder::composed_query(doc,
+        #{path: path, children: false, attrs: ["physics:collisionEnabled"]});
+    let ops = [];
+    if !query_ok(existing) {
+        let shape = assembly_builder::cube_shape_plan(edit_target, root, name, 1.0,
+            [extent * 2.0, thickness, extent * 2.0], true);
+        if !shape.ok { return shape; }
+        for op in shape.ops { ops.push(op); }
+    } else if existing.type_name != "Cube" {
+        return plan_error(path + ": expected Cube, got " + existing.type_name);
+    }
+    let placement = assembly_builder::place_plan(edit_target, path,
+        [0.0, surface_y - thickness * 0.5, 0.0], (),
+        [extent * 2.0, thickness, extent * 2.0]);
+    if !placement.ok { return placement; }
+    for op in placement.ops { ops.push(op); }
+    ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path,
+        schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "physics:collisionEnabled", type_name: "bool", value: "true"}});
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "primvars:displayColor", type_name: "color3f[]",
+        value: _color_literal([0.24, 0.25, 0.27])}});
+    ops.push(#{SetRelationship: #{edit_target: edit_target, path: path,
+        name: "material:binding:physics",
+        targets: [root + "/PhysicsMaterials/Friction_1_0"]}});
+    #{ok: true, kind: "griffin_landing_site_pad", path: path,
+      center: [0.0, surface_y - thickness * 0.5, 0.0],
+      half_extents: [extent, thickness * 0.5, extent],
+      surface_y: surface_y, ops: ops, no_op: ops.len() == 0}
+}
+
+fn apply_landing_site_pad(doc, edit_target, root, parent_gen) {
+    let plan = landing_site_pad_plan(doc, edit_target, root);
+    if !plan.ok || plan.no_op { return plan; }
+    let command = assembly_edit::batch(doc, "Author Griffin landing-site contact pad",
+        plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, path: plan.path,
+      center: plan.center, half_extents: plan.half_extents,
+      surface_y: plan.surface_y, command: command}
 }
 
 fn apply_egress_apron(doc, edit_target, root, parent_gen) {

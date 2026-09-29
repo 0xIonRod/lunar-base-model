@@ -41,7 +41,7 @@ fn on_tick(me, ctx) {
         _physical_attr("physicalRampStarboardDeploymentAngleRad"),
         _physical_attr("physicalRampTerrainContactToleranceM"),
         "Griffin1Requirements::PublicMissionContext::landingVehicleReferenceTouchdownY",
-        "Griffin1Requirements::PublicMissionContext::egressApronSurfaceY"
+        "Griffin1Requirements::PublicMissionContext::siteSurfaceY"
     ];
     let source = sysml_requirements::source_with_selection(selected,
         ["GriffinRampRequirements::grr010"],
@@ -57,7 +57,7 @@ fn on_tick(me, ctx) {
     let touchdown_y = sysml_requirements::number(source,
         "Griffin1Requirements::PublicMissionContext::landingVehicleReferenceTouchdownY");
     let terrain_y = sysml_requirements::number(source,
-        "Griffin1Requirements::PublicMissionContext::egressApronSurfaceY");
+        "Griffin1Requirements::PublicMissionContext::siteSurfaceY");
     let tolerance = sysml_requirements::number(source,
         _physical_attr("physicalRampTerrainContactToleranceM"));
     let top_offset = center_y + thickness / 2.0;
