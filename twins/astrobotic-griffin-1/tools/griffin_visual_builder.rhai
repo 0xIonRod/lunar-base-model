@@ -3090,6 +3090,12 @@ fn _component_cube_visual_ops(doc, edit_target, parent, name,
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
     }
+    // Shape creation can author scale first. A placement must never scale
+    // its metric translation; explicitly normalize the owned transform stack.
+    let order=if rotation==() {"[\"xformOp:translate\", \"xformOp:scale\"]"}
+        else {"[\"xformOp:translate\", \"xformOp:rotateXYZ\", \"xformOp:scale\"]"};
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"xformOpOrder",
+        type_name:"token[]",value:order}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
         name: "purpose", type_name: "token", value: "\"render\""}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
@@ -3293,6 +3299,13 @@ fn _solar_frame_plan(doc, edit_target, root, width, depth, section,
     clearance_center_x, clearance_width, clearance_depth, color) {
     let offset_x = width / 2.0 - section / 2.0;
     let offset_z = depth / 2.0 - section / 2.0;
+    if clearance_width==0.0 && clearance_depth==0.0 {
+        let geometry=griffin_geometry::perimeter_beam_geometry([
+            vec3(-offset_x,0.0,-offset_z),vec3(offset_x,0.0,-offset_z),
+            vec3(offset_x,0.0,offset_z),vec3(-offset_x,0.0,offset_z)], [0.0], section);
+        if !geometry.ok {return plan_error(geometry.error);}
+        return _component_mesh_visual_ops(doc,edit_target,root,"Frame",geometry,color);
+    }
     let notch_left_x = clearance_center_x - clearance_width / 2.0;
     let notch_right_x = clearance_center_x + clearance_width / 2.0;
     let notch_start_z = depth / 2.0 - clearance_depth;
@@ -3318,6 +3331,9 @@ fn _solar_frame_plan(doc, edit_target, root, width, depth, section,
 
 fn _solar_notched_surface_geometry(width, thickness, depth, center_y,
     clearance_center_x, clearance_width, clearance_depth) {
+    if width>0.0 && thickness>0.0 && depth>0.0 && clearance_width==0.0 && clearance_depth==0.0 {
+        return griffin_geometry::rectangular_prism_geometry(vec3(0.0,center_y,0.0),vec3(width,thickness,depth));
+    }
     if width <= 0.0 || thickness <= 0.0 || depth <= 0.0
         || clearance_width <= 0.0
         || clearance_center_x - clearance_width / 2.0 <= -width / 2.0
@@ -3410,8 +3426,9 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         || clearance_center_x_fraction == () || clearance_width_fraction == ()
         || clearance_depth_fraction == () || clearance_center_x_fraction <= -0.5
         || clearance_center_x_fraction >= 0.5
-        || clearance_width_fraction <= 0.0 || clearance_width_fraction >= 1.0
-        || clearance_depth_fraction <= 0.0 || clearance_depth_fraction >= 1.0
+        || clearance_width_fraction < 0.0 || clearance_width_fraction >= 1.0
+        || clearance_depth_fraction < 0.0 || clearance_depth_fraction >= 1.0
+        || ((clearance_width_fraction==0.0) != (clearance_depth_fraction==0.0))
         || cell_width == () || cell_thickness == () || cell_depth == ()
         || cell_offset == () || backplane_thickness == () || backplane_center == () {
         return plan_error("solar-panel SysML geometry datums are incomplete");
@@ -3445,11 +3462,13 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
         clearance_depth, [0.44, 0.48, 0.55]);
     if !frame.ok { return frame; }
     for op in frame.ops { ops.push(op); }
+    let cell_color=sysml_requirements::model().value("GriffinSolarRequirements::GriffinSolarArrayAssembly::cellDisplayColor");
+    if !array_is(cell_color) || cell_color.len()!=3 {return plan_error("solar cell color missing");}
     let surface_specs = [
         #{name: "ArrayBackplane", center_y: backplane_center,
           thickness: backplane_thickness, color: [0.015, 0.035, 0.12]},
         #{name: "Cells", center_y: cell_offset,
-          thickness: cell_thickness, color: [0.025, 0.12, 0.48]},
+          thickness: cell_thickness, color: cell_color},
     ];
     for item in surface_specs {
         let geometry = _solar_notched_surface_geometry(cell_width,

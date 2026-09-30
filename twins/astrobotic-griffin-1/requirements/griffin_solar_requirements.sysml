@@ -28,34 +28,52 @@ package GriffinSolarRequirements {
         // Cell size retains frame
         // edge margins. Estimates, not vendor dimensions; griffin-size-evidence.md.
         attribute frameWidthM : Real = 1.716;
-        attribute frameThicknessM : Real = 0.14;
+        /* Panel/support stock is an explicit visual estimate from the 2021
+         * product rendering https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png
+         * linked from https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
+         * The legacy 140 mm frame and 440 mm brackets obstructed the cell face.
+         * Use 30 mm frame stock, 12 mm backplane, 2 mm visual cell surface,
+         * 1 mm dividers, 100 x 80 x 120 mm brackets and 50 mm hinge diameter.
+         * These are appearance envelopes, not laminate/hinge design dimensions.
+         * The 280 mm link bridges the unchanged 220 mm bus standoff; 10 mm
+         * overlap is a visual seating tolerance, not a structural engagement spec.
+         * Divider placement must apply translation after shape scaling so the
+         * 14 x 5 observed grid retains uniform metric spacing. */
+        attribute cellDisplayColor : Real[3] = (.015, .025, .060);
+        attribute cellMetallic : Real = .15;
+        attribute cellRoughness : Real = .25;
+        attribute frameThicknessM : Real = 0.03;
         attribute frameDepthM : Real = 0.66;
+        /* This reconstruction follows the 2021 product rendering's rectangular
+         * 14 x 5 arrays. No lower notch is visible there and corner leg sleeves
+         * now sit below the belt. Zero width/depth explicitly selects a full
+         * panel; the previous hardware-photo notch belongs to another revision. */
         doc /* Width of the centered lower opening as a fraction of the panel frame width. */
-        attribute lowerClearanceWidthFraction : Real = 0.32;
+        attribute lowerClearanceWidthFraction : Real = 0.0;
         doc /* Depth of the lower opening from the panel edge as a fraction of frame depth. */
-        attribute lowerClearanceDepthFraction : Real = 0.28;
+        attribute lowerClearanceDepthFraction : Real = 0.0;
         doc /* Lateral position of the opening center as a fraction of frame width; zero centers it on the panel. */
         attribute lowerClearanceCenterXFraction : Real = 0.0;
         attribute cellWidthM : Real = 1.596;
-        attribute cellThicknessM : Real = 0.05;
+        attribute cellThicknessM : Real = 0.002;
         attribute cellDepthM : Real = 0.58;
-        attribute cellOffsetYM : Real = 0.075;
-        attribute arrayBackplaneThicknessM : Real = 0.04;
-        attribute arrayBackplaneCenterYM : Real = 0.03;
+        attribute cellOffsetYM : Real = 0.007;
+        attribute arrayBackplaneThicknessM : Real = 0.012;
+        attribute arrayBackplaneCenterYM : Real = 0;
         attribute dividerXWidthM : Real = 0.006;
-        attribute dividerXThicknessM : Real = 0.04;
+        attribute dividerXThicknessM : Real = 0.001;
         attribute dividerZWidthM : Real = 0.006;
-        attribute dividerZThicknessM : Real = 0.04;
-        attribute mountBracketWidthM : Real = 0.44;
-        attribute mountBracketThicknessM : Real = 0.32;
-        attribute mountBracketDepthM : Real = 0.44;
-        attribute hingeBarRadiusM : Real = 0.10;
-        attribute hingeBarLengthM : Real = 1.90;
+        attribute dividerZThicknessM : Real = 0.001;
+        attribute mountBracketWidthM : Real = 0.1;
+        attribute mountBracketThicknessM : Real = 0.08;
+        attribute mountBracketDepthM : Real = 0.12;
+        attribute hingeBarRadiusM : Real = 0.025;
+        attribute hingeBarLengthM : Real = 1.716;
         attribute hingeBarCenterYM : Real = -0.18;
         attribute hingeBarCenterZM : Real = 0.00;
-        attribute mountLinkHeightM : Real = 0.44;
-        attribute mountLinkDepthM : Real = 0.18;
-        attribute mountLinkCenterYM : Real = -0.08;
+        attribute mountLinkHeightM : Real = 0.28;
+        attribute mountLinkDepthM : Real = 0.04;
+        attribute mountLinkCenterYM : Real = -0.11;
         attribute mountLinkCenterZM : Real = 0.00;
         attribute gridColumnCount : Integer = 14;
         attribute gridRowCount : Integer = 5;
@@ -63,7 +81,7 @@ package GriffinSolarRequirements {
         /* Quaternion component tolerance covers authored serialization precision,
          * not an angular hardware tolerance. USD orient uses (w,x,y,z). */
         attribute orientationTolerance : Real = 0.00001;
-        attribute minimumMountOverlapM : Real = 0.05;
+        attribute minimumMountOverlapM : Real = 0.01;
     }
 
     requirement def GSA001_ArrayCount {

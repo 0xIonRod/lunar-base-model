@@ -387,3 +387,21 @@ estimates, not strength calculations. Physical contact meshes use the same
 thickness. Hinge offsets, toe bevel, under-beam seating, transition center
 and box-proxy inertias change together; the deck top, slope and terrain toe
 height stay fixed. Ramp/transition masses remain explicitly unqualified proxies.
+
+## Rectangular solar arrays and support stock — 2026-09-30
+
+The selected [Astrobotic product rendering](https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png)
+shows rectangular 14 x 5 arrays with small attachment fittings. This pass
+replaces the notch inferred from a different hardware revision with a full
+cell field. Panel height/width and installed bus datums are retained.
+Frame stock 30 mm, backplane 12 mm, visual cell surface 2 mm, divider relief
+1 mm, bracket envelope 100 x 80 x 120 mm and hinge diameter 50 mm are explicit
+appearance estimates. They do not describe qualified laminate or mechanisms.
+The support link spans the unchanged 220 mm standoff; 10 mm overlap checks
+visible seating only. Dark cell color and finish values are artistic estimates.
+
+Eight later-created dividers had scale-before-translation USD transforms,
+which compressed their metric spacing while raw position attributes appeared
+correct. The component cube planner now authors translate/rotate/scale order;
+a targeted solar regression checks the affected final divider. The complete
+grid and slim fittings were reviewed in a freshly composed vehicle preview.

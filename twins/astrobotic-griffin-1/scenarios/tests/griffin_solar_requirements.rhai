@@ -261,6 +261,11 @@ fn on_tick(me, ctx) {
             "solar_array", "gsa006", VERIFICATION,
             "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope", panel_envelope_observations, "typed", 0.0));
 
+        // Regression: late-created grid members formerly scaled their own
+        // translations, collapsing eight columns despite correct raw X values.
+        checks.push(sysml_requirement_checks::attribute_equals(
+            "GSA-007-"+name+"-divider-placement-order", "solar_array", "gsa007", VERIFICATION,
+            path+"/CellDividerX13", "xformOpOrder", ["xformOp:translate", "xformOp:scale"]));
         for side in ["NegativeX", "PositiveX"] {
             let bracket_path = path + "/MountBracket" + side;
             checks.push(sysml_requirement_checks::exists("GSA-007-" + name + "-" + side + "-bracket",
