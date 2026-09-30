@@ -169,7 +169,7 @@ package GriffinRampRequirements {
         in walkingSurfaceCenterYM : Real;
         in walkingSurfaceThicknessM : Real;
         in toleranceM : Real;
-        braceCountPerSide == postCountPerSide + 1
+        postCountPerSide == 2 and braceCountPerSide > 1
             and braceThicknessM > 0.0
             and lowerChordHeightM > 0.0
             and lowerChordCenterYM - lowerChordHeightM / 2.0
@@ -329,25 +329,26 @@ package GriffinRampRequirements {
         attribute maxRailHeightToSectionLength : Real = 0.03;
         attribute maxPivotDiameterToRailHeight : Real = 1.5;
         attribute rampRailHeightM : Real = 0.04;
-        /* Rail-width correction, 2026-10-01: the selected Astrobotic 2021
-         * rendering shows plate-like guide sides rather than square bars.
-         * Keep the 40 mm vertical chord depth/fold datum, reduce its transverse
-         * width to 20 mm (1.1% of section length), and use 40 mm post depth so
-         * supports still overlap the track by 10 mm. 8 mm diagonal stock and
-         * 20 mm square lower chords reduce visual congestion when folded.
-         * 40 mm diameter, 60 mm long local pins and 10 mm lug plates are compact
-         * attachment estimates; common shaft diameter stays 50 mm, with its
-         * length derived from the revised outside guide envelope.
+        /* Side-web refinement, 2026-10-01: the selected Astrobotic artist
+         * rendering shows thin, plate-like triangulated sides, rather than
+         * square-section fence posts. Estimate a common 6 mm transverse web
+         * thickness (0.33% of the 1.799 m section length), 40 mm upper strip,
+         * 20 mm lower strip and 12 mm in-plane diagonals. Uprights and both
+         * chords share the same transverse thickness, leaving triangular
+         * openings. The rendered stock gauge cannot be measured from this
+         * oblique image; 6 mm is a low-confidence silhouette reconstruction,
+         * not a supplier thickness or structural sizing calculation.
          * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png
-         * These are low-confidence silhouette estimates, not measured stock,
-         * structural sizing, or supplier interfaces. Tire contact widths,
-         * deployment angles, bay count and vertical hinge datums are retained. */
-        attribute rampRailWidthM : Real = 0.02;
+         * https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
+         * Post embedment ends at the track midplane; its transverse edge meets
+         * the track edge. The top chord/fold datum and wheel clearance persist.
+         * Local pins remain estimated 40 mm diameter by 60 mm long. */
+        attribute rampRailWidthM : Real = 0.006;
         /* Two guide edges per track. Guide inner faces meet the physical
          * track edges, retaining the source tire clearance. Centre-side
          * guides mirror the outside ones around the wheel station. The old
          * outside guides sat 50 mm away from the tracks, leaving unsupported
-         * posts. With 40 mm post depth, each post overlaps the plate by 10 mm.
+         * posts. Posts share the guide thickness and meet the plate edge.
          * This paired-track topology is informed by the two-sided lattice
          * tracks in https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png ;
          * member stock and attachments remain unqualified study estimates. */
@@ -384,28 +385,30 @@ package GriffinRampRequirements {
         // A full-scale ramp needs a visible load path below the walking
         // surface. These are presentation-level structural proxies, not a
         // supplier drawing. Two longitudinal beams sit just below the deck.
-        // The source-owned section geometry uses two underside beams and eleven
+        // The source-owned section geometry uses two underside beams and two end
         // upright posts per edge rail on every rigid ramp section.
         attribute assemblyUnderBeamWidthM : Real = 0.06;
         attribute assemblyUnderBeamHeightM : Real = 0.045;
         attribute assemblyUnderBeamCenterYM : Real = -0.037500000000;
         attribute assemblyUnderBeamCenterOffsetZM : Real = 1.20;
-        /* Equal bays replace long shallow diagonals. Twelve bays per 1.799 m
-         * section give about 150 mm pitch against 125 mm web depth, approaching
-         * the near-square triangular lattice seen in the selected 2021 image.
-         * Count is estimated from an oblique rendering, not measured hardware.
-         * 12 mm uprights, 8 mm diagonals and 20 mm lower chords are silhouette
-         * estimates; the 40 mm upper guard remains the collision boundary.
-         * No structural load capacity is claimed by these visual dimensions. */
-        attribute assemblySidePostCountPerSectionPerSide : Integer = 11;
+        /* Web topology review, 2026-10-01: interpret the triangular openings
+         * in the selected Astrobotic 2021 rendering as a continuous zigzag
+         * web with end posts, rather than adding an upright in every bay.
+         * Twelve equal diagonal bays across 1.799 m give about 150 mm pitch;
+         * this count is a low-confidence visual estimate. Lower-strip bottom
+         * is derived to meet the track top, eliminating the unsupported gap.
+         * 12 mm end posts/diagonals and 20 mm lower strips are in-plane
+         * silhouette estimates. No structural load capacity is claimed.
+         * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png */
+        attribute assemblySidePostCountPerSectionPerSide : Integer = 2;
         attribute assemblySidePostWidthM : Real = 0.012;
-        attribute assemblySidePostDepthM : Real = 0.04;
-        attribute assemblySidePostEmbeddedDepthM : Real = 0.04;
-        attribute assemblySidePostFirstCenterXM : Real = GriffinEgressRamp::assemblySidePostPitchM;
-        attribute assemblySidePostPitchM : Real = GriffinEgressRamp::rampSectionLengthM / (GriffinEgressRamp::assemblySidePostCountPerSectionPerSide + 1.0);
+        attribute assemblySidePostDepthM : Real = GriffinEgressRamp::rampRailWidthM;
+        attribute assemblySidePostEmbeddedDepthM : Real = GriffinEgressRamp::rampSurfaceThicknessM / 2.0;
+        attribute assemblySidePostFirstCenterXM : Real = 0.0;
+        attribute assemblySidePostPitchM : Real = GriffinEgressRamp::rampSectionLengthM / (GriffinEgressRamp::assemblySidePostCountPerSectionPerSide - 1.0);
         attribute assemblySideTrussChordHeightM : Real = 0.020;
-        attribute assemblySideTrussLowerChordCenterYM : Real = 0.055000000000;
-        attribute assemblySideTrussBraceThicknessM : Real = 0.008;
+        attribute assemblySideTrussLowerChordCenterYM : Real = GriffinEgressRamp::rampSurfaceCenterYM + GriffinEgressRamp::rampSurfaceThicknessM / 2.0 + GriffinEgressRamp::assemblySideTrussChordHeightM / 2.0;
+        attribute assemblySideTrussBraceThicknessM : Real = 0.012;
         attribute assemblySideTrussBraceCountPerSide : Integer = 12;
         attribute rampSectionHingeBarrelRadiusM : Real = 0.025;
         attribute rampSectionHingeBarrelLengthM : Real = 2.0 * (GriffinEgressRamp::rampRailOffsetZM + GriffinEgressRamp::rampRailWidthM / 2.0);
@@ -420,8 +423,8 @@ package GriffinRampRequirements {
         attribute rampSurfaceCenterYM : Real = 0.00;
         /* Replace the legacy 340 mm rail elevation, retained from the thick
          * slab, with an estimated 180 mm chord center above the track datum.
-         * With 40 mm stock the fold datum is now 200 mm, and the 55 mm lower
-         * chord leaves a 125 mm triangulated web. This produces the slender
+         * With 40 mm upper stock the fold datum is 200 mm. The lower
+         * strip now derives from the track top and leaves a 155 mm web. This produces the slender
          * paired folded tracks shown in the selected Astrobotic 2021 render:
          * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png .
          * It is a silhouette reconstruction, not released ramp section data.
@@ -603,7 +606,7 @@ package GriffinRampRequirements {
         doc /* Both guide edges of each contact track shall start at the upper-deck hinge, sit above the walking surface, and continue to the toe as one rail segment per rigid ramp section. Four coaxial pin fittings and connecting lugs shall join the guards to each section hinge. Pin centers shall use the native section-axis elevations (root shaft, middle chord top, toe plate bottom), and each segment shall match its section length and source-owned rail envelope. */
     }
     requirement def GRR009_RailSupportGeometry {
-        doc /* Each section shall connect all four upper guide rails to the walking surface with eleven evenly spaced upright posts per side. Posts shall align with the rail stations and overlap the walking surface and rail so the supports visibly and structurally connect both members. Post height and center shall be derived from the authored surface, rail, and embedment datums. */
+        doc /* Each section shall connect all four upper guide rails to the walking surface with two end posts per guide. Posts shall align with the rail stations, meet the contact-track edge, and join the upper chord. Upper/lower chords, uprights and diagonals shall share the source transverse web thickness, giving plate-like triangulated sides with open bays. Post height and center shall be derived from the authored surface, rail, and embedment datums. This is a visual reconstruction; structural qualification requires supplier data. */
     }
     requirement def GRR013_TractionTreadGeometry {
         doc /* Each contact track shall have four transverse traction bars on every ramp section. Bars shall span one track, sit above its walking surface, and use the source-owned first station and pitch. The open centre remains clear. */
@@ -669,7 +672,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR019_SideTrussBracing {
-        doc /* Each physical ramp section shall show a triangulated side truss on both edges of each contact track: twelve alternating diagonal braces connect the track level to the upper chords around the eleven equally spaced upright post stations, over continuous lower chords. Member sizes and stations are explicit visual study values because the supplier truss drawing is not public. */
+        doc /* Each physical ramp section shall show a triangulated side truss on both edges of each contact track: twelve alternating diagonal braces connect the track level to the upper chords between two end posts, over continuous lower strips seated on the track top. Member sizes and stations are explicit visual study values because the supplier truss drawing is not public. */
         require GRC026_SideTrussBracing {
             in braceCountPerSide = GriffinEgressRamp::assemblySideTrussBraceCountPerSide;
             in postCountPerSide = GriffinEgressRamp::assemblySidePostCountPerSectionPerSide;

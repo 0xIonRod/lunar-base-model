@@ -873,10 +873,10 @@ fn ramp_guide_stations() {
     if pins.len()!=4 {throw("ramp guide stations require four sourced pin identities");}
     let outer=_sysml_attribute("rampRailOffsetZM");
     let inner=_sysml_attribute("rampCenterRailOffsetZM");
-    [#{name:"OuterRail",pin:pins[0],z:outer},
-     #{name:"InnerRail",pin:pins[1],z:-outer},
-     #{name:"CenterRailPort",pin:pins[2],z:inner},
-     #{name:"CenterRailStarboard",pin:pins[3],z:-inner}]
+    [#{name:"OuterRail",side:"Port",pin:pins[0],z:outer},
+     #{name:"InnerRail",side:"Starboard",pin:pins[1],z:-outer},
+     #{name:"CenterRailPort",side:"PortCenter",pin:pins[2],z:inner},
+     #{name:"CenterRailStarboard",side:"StarboardCenter",pin:pins[3],z:-inner}]
 }
 fn ramp_transition_joint_names() { _sysml_enum_names("transitionJoints") }
 fn ramp_tread_count_per_section() { _sysml_integer("assemblyTreadCountPerSection") }

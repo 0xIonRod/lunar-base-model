@@ -170,7 +170,7 @@ fn on_tick(me, ctx) {
         "assemblyUnderBeamCenterOffsetZM", "assemblySidePostCountPerSectionPerSide",
         "assemblySidePostWidthM", "assemblySidePostDepthM",
         "assemblySidePostEmbeddedDepthM", "assemblySidePostFirstCenterXM",
-        "assemblySidePostPitchM",
+        "assemblySidePostPitchM", "assemblySideTrussLowerChordCenterYM",
         "rampSectionHingeBarrelRadiusM", "rampSectionHingeBarrelLengthM",
         "rampSectionHingeBarrelCenterYM", "rampPortMountX", "rampStarboardMountX",
         "rampMountY", "rampMountZ", "hingeAxis", "physicalRampDeckTransitionRequiredOverlapM",
@@ -550,6 +550,25 @@ fn on_tick(me, ctx) {
                             + _source_number(source, "assemblySidePostPitchM") * post_index));
                     checks.push(_attribute_component("GRR-009-" + side + "-" + index.to_string() + "-" + post_side.name + post_index.to_string() + "-z",
                         "grr009", post_path, "xformOp:translate", 2, post_side.z));
+                }
+            }
+
+            // One transverse stock sample per guide checks the shared web
+            // contract without repeating every identical lattice member.
+            for guide in griffin_spec::ramp_guide_stations() {
+                let side_name = guide.side;
+                checks.push(_attribute_component(
+                    "GRR-009-" + side + "-" + index.to_string() + "-" + side_name + "-lower-strip-seat",
+                    "grr009", section + "/SideTrussLowerChord" + side_name,
+                    "xformOp:translate", 1,
+                    _source_number(source, "assemblySideTrussLowerChordCenterYM")));
+                for member in ["SidePost" + side_name + "1",
+                    "SideTrussLowerChord" + side_name,
+                    "SideTrussBrace" + side_name + "1"] {
+                    checks.push(_attribute_component(
+                        "GRR-009-" + side + "-" + index.to_string() + "-" + member + "-web-thickness",
+                        "grr009", section + "/" + member, "xformOp:scale", 2,
+                        _source_number(source, "rampRailWidthM")));
                 }
             }
 

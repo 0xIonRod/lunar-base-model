@@ -4574,7 +4574,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     let invalid_repeated = invalid_rail_pins || invalid_tread_count || invalid_tread_size;
     let invalid_support = invalid_beams || invalid_post_count || invalid_post_fit
         || truss_chord_height == () || truss_lower_chord_y == ()
-        || truss_brace_thickness == () || truss_brace_count != post_count + 1;
+        || truss_brace_thickness == () || truss_brace_count <= 1;
     if invalid_basic || invalid_repeated || invalid_support || invalid_hinge {
         return plan_error(section_path + ": ramp section geometry source values are incomplete");
     }
@@ -4719,12 +4719,8 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
 
     }
 
-    for post_side in [
-        #{name: "Port", z: rail_z},
-        #{name: "Starboard", z: -rail_z},
-        #{name: "PortCenter", z: center_rail_z},
-        #{name: "StarboardCenter", z: -center_rail_z},
-    ] {
+    for guide in griffin_spec::ramp_guide_stations() {
+        let post_side = #{name: guide.side, z: guide.z};
         if member_group!=post_side.name {continue;}
         for index in 0..post_count {
             let post_path = section_path + "/SidePost" + post_side.name
@@ -4740,15 +4736,14 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         let lower_chord_place = _component_cube_visual_ops(doc,edit_target,section_path,
             "SideTrussLowerChord"+post_side.name,
             [section_length / 2.0, truss_lower_chord_y, post_side.z], (),
-            [section_length, truss_chord_height, truss_chord_height],structure_color);
+            [section_length, truss_chord_height, rail_width],structure_color);
         if !lower_chord_place.ok { return lower_chord_place; }
         for op in lower_chord_place.ops { ops.push(op); }
 
         for brace_index in 0..truss_brace_count {
-            let x0 = if brace_index == 0 { 0.0 }
-                else { post_first_x + post_pitch * (brace_index - 1) };
-            let x1 = if brace_index == truss_brace_count - 1 { section_length }
-                else { post_first_x + post_pitch * brace_index };
+            let bay_pitch = section_length / truss_brace_count;
+            let x0 = bay_pitch * brace_index;
+            let x1 = bay_pitch * (brace_index + 1);
             let start_low = brace_index % 2 == 0;
             let y0 = if start_low { truss_lower_chord_y } else { rail_y };
             let y1 = if start_low { rail_y } else { truss_lower_chord_y };
@@ -4760,7 +4755,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             let brace_place = _component_cube_visual_ops(doc,edit_target,section_path,brace_name,
                 [(x0 + x1) / 2.0, (y0 + y1) / 2.0, post_side.z],
                 [0.0, 0.0, brace_angle],
-                [brace_length, truss_brace_thickness, truss_brace_thickness],structure_color);
+                [brace_length, truss_brace_thickness, rail_width],structure_color);
             if !brace_place.ok { return brace_place; }
             for op in brace_place.ops { ops.push(op); }
         }
