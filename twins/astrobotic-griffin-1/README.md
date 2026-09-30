@@ -404,14 +404,19 @@ leg touches down outside the marked target; it is not a scripted pose reset.
 
 ### Run the bounded headless check
 
-    .\target\debug\luncosim.exe test --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda --max-ticks 14400 --tick-hz 60 --verdict-channel GRIFFIN_SURFACE_OPS
+    .\target\debug\luncosim.exe test --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda --max-ticks 120000 --tick-hz 60 --verdict-channel GRIFFIN_SURFACE_OPS
 
 Exit code 0 means the Rhai scenario emitted PASS. Exit code 1 means a
 terminal runtime or scenario failure. Exit code 2 means the bound expired
-without a verdict. The current 14,400-tick run reaches terminal descent with
-valid raw-ray navigation and RCS activity, but the strict target/velocity
-touchdown gates do not yet emit the typed touchdown event. This is the active
-prototype result, not a mission PASS; no acceptance threshold is relaxed.
+without a verdict. The outer ceiling above is 2,000 simulated seconds, a run
+budget rather than a physical acceptance limit. For a focused landing
+diagnosis use `--max-ticks 20000` (333.3 seconds). The authored
+`Griffin1Lander::landingPhaseTimeoutS` is 300 seconds: the old 14,400-tick
+command stopped at 240 seconds, before its landing watchdog could report a
+structured failure. Earlier runs without touchdown remain unaccepted, but
+that shortened horizon does not prove a completed landing-phase verdict.
+The larger ceiling allows the watchdog and later mission phases to run;
+it does not relax any contact, attitude, velocity or event predicate.
 Keep the failure evidence from `griffin_surface_ops::landing_gate_report()`
 with the run while tuning the generic guidance/physics boundary.
 

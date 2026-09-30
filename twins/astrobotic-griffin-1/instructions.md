@@ -129,7 +129,12 @@ ramp stability, and rover route completion status are maintained in
 
 Run:
 
-    .\target\debug\luncosim.exe test --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda --max-ticks 14400 --tick-hz 60 --verdict-channel GRIFFIN_SURFACE_OPS
+    .\target\debug\luncosim.exe test --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda --max-ticks 120000 --tick-hz 60 --verdict-channel GRIFFIN_SURFACE_OPS
+
+This is a 2,000-second outer run budget, not an acceptance threshold. A focused
+landing diagnosis can use `--max-ticks 20000` (333.3 seconds), allowing the
+SysML-owned 300-second landing watchdog to report a structured failure.
+The former 14,400-tick budget stopped at 240 seconds, before that watchdog.
 
 Interpret the result:
 
