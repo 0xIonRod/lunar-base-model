@@ -5844,3 +5844,41 @@ fn flip_wheel_surface_plan(doc, edit_target, root) {
     }
     #{ok:true, ops:ops}
 }
+
+// One standard material network can bind several members of a component.
+// Appearance has no physics authority; preserve existing schemas on each prim.
+fn griffin_surface_material_plan(doc, edit_target, root, name, paths, color, metallic, roughness) {
+    if !absolute_root(root) || paths.is_empty() || color.len()!=3
+        || metallic<0.0 || metallic>1.0 || roughness<0.0 || roughness>1.0 {
+        return plan_error("surface material parameters incomplete");
+    }
+    let mat=root+"/Looks/"+name;let shader=mat+"/Surface";let ops=[];
+    for part in [#{parent:root,name:"Looks",kind:"Scope"},
+        #{parent:root+"/Looks",name:name,kind:"Material"},
+        #{parent:mat,name:"Surface",kind:"Shader"}] {
+        let existing=assembly_builder::composed_query(doc,#{path:part.parent+"/"+part.name,children:false});
+        if query_ok(existing) && existing.type_name!=part.kind {
+            return plan_error("material network prim has wrong type: "+part.parent+"/"+part.name);
+        }
+        if !query_ok(existing) {
+            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:part.parent,name:part.name,
+                type_name:part.kind,reference:(),reference_prim_path:()}});
+        }
+    }
+    for attr in [#{name:"info:id",kind:"token",value:"\"UsdPreviewSurface\""},
+        #{name:"outputs:surface",kind:"token",value:"\"\""},
+        #{name:"inputs:diffuseColor",kind:"color3f",value:"("+color[0].to_string()+", "+color[1].to_string()+", "+color[2].to_string()+")"},
+        #{name:"inputs:metallic",kind:"float",value:metallic.to_string()},
+        #{name:"inputs:roughness",kind:"float",value:roughness.to_string()}] {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:shader,name:attr.name,type_name:attr.kind,value:attr.value}});
+    }
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:mat,name:"outputs:surface",type_name:"token",sources:[shader+".outputs:surface"]}});
+    for path in paths {
+        let prim=assembly_builder::composed_query(doc,#{path:path,children:false,schemas:true});
+        if !query_ok(prim) {return plan_error("material target missing: "+path);}
+        let schemas=prim.api_schemas;if !schemas.contains("MaterialBindingAPI") {schemas.push("MaterialBindingAPI");}
+        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:schemas}});
+        ops.push(#{SetRelationship:#{edit_target:edit_target,path:path,name:"material:binding",targets:[mat]}});
+    }
+    #{ok:true,ops:ops}
+}

@@ -134,7 +134,19 @@ package GriffinVisualConfigurationRequirements {
         attribute bodySideFaceAspectRatioTolerance : Real = 0.35;
         attribute bodySkinThicknessM : Real = 0.025;
         attribute bodySkinEdgeMarginM : Real = 0.04;
-        attribute bodySkinDisplayColor : Real[3] = (0.32, 0.34, 0.36);
+        attribute bodySkinDisplayColor : Real[3] = (0.65, 0.66, 0.64);
+        /* Standard UsdPreviewSurface presentation parameters. ESA/Astrobotic
+         * reference renderings show pale exterior panels
+         * and silver ramp/leg members. These linear RGB colors, metallic and
+         * roughness values are artistic estimates; they are not measured
+         * optical properties, alloy definitions or a released blanket stack.
+         * Source: https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
+         * and https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ . */
+        attribute silverDisplayColor : Real[3] = (.55, .58, .62);
+        attribute silverMetallic : Real = .75;
+        attribute silverRoughness : Real = .42;
+        attribute panelMetallic : Real = .0;
+        attribute panelRoughness : Real = .65;
         attribute bodyGroundClearanceM : Real = 0.20;
         attribute lowerSkirtDimensions : Dimensions = (3.40, 0.24, 3.40);
         attribute lowerSkirtCenter : Position = (0.0, -0.36, 0.0);

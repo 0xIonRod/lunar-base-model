@@ -10,7 +10,7 @@ def Xform "LandingLeg" (
 )
 {
     def Cylinder "StrutOuter" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:translate = (-0.551543289325507, -0.365, 0.311126983722081)
@@ -23,9 +23,10 @@ def Xform "LandingLeg" (
         uniform token axis = "Y"
         double radius = 0.035
         double height = 1.5712733689590743
+        custom rel material:binding = </LandingLeg/Looks/BrushedMetal>
     }
     def Cylinder "StrutInner" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:translate = (-0.551543289325507, -0.365, -0.311126983722081)
@@ -38,8 +39,11 @@ def Xform "LandingLeg" (
         uniform token axis = "Y"
         double radius = 0.035
         double height = 1.5712733689590743
+        custom rel material:binding = </LandingLeg/Looks/BrushedMetal>
     }
-    def Cylinder "ShockPiston"
+    def Cylinder "ShockPiston" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
     {
         uniform token axis = "Y"
         custom double3 xformOp:translate = (-0.334314575050762, -0.415, 0.0)
@@ -50,8 +54,11 @@ def Xform "LandingLeg" (
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 38.85412952410278)
         double radius = 0.06
         double height = 1.065816560373072
+        custom rel material:binding = </LandingLeg/Looks/BrushedMetal>
     }
-    def Cylinder "FootPad"
+    def Cylinder "FootPad" (
+        prepend apiSchemas = "MaterialBindingAPI"
+    )
     {
         uniform token axis = "Y"
         custom double3 xformOp:translate = (0.0, -0.89, 0.0)
@@ -61,9 +68,10 @@ def Xform "LandingLeg" (
         bool physics:collisionEnabled = false
         double radius = 0.35
         double height = 0.04
+        custom rel material:binding = </LandingLeg/Looks/BrushedMetal>
     }
     def Cube "MountClevisOuter" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -73,9 +81,10 @@ def Xform "LandingLeg" (
         custom double3 xformOp:translate = (-1.103086578651014, 0.1, 0.622253967444162)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
+        custom rel material:binding = </LandingLeg/Looks/BrushedMetal>
     }
     def Cube "MountClevisInner" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -85,9 +94,10 @@ def Xform "LandingLeg" (
         custom double3 xformOp:translate = (-1.103086578651014, 0.1, -0.622253967444162)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
+        custom rel material:binding = </LandingLeg/Looks/BrushedMetal>
     }
     def Cube "FootPadPlate" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:scale = (0.42, 0.04, 0.36)
@@ -97,9 +107,10 @@ def Xform "LandingLeg" (
         custom double3 xformOp:translate = (0.0, -0.85, 0.0)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
+        custom rel material:binding = </LandingLeg/Looks/BrushedMetal>
     }
     def Cylinder "MountAxle" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:translate = (-0.668629150101524, 0.0, 0.0)
@@ -110,9 +121,10 @@ def Xform "LandingLeg" (
         color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
         double radius = 0.08
         double height = 0.16
+        custom rel material:binding = </LandingLeg/Looks/BrushedMetal>
     }
     def Cube "BodyMountArm" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:scale = (0.09999999999999964, 0.32000000000000006, 0.16)
@@ -122,5 +134,22 @@ def Xform "LandingLeg" (
         custom double3 xformOp:translate = (-0.7486291501015241, 0.08000000000000002, 0.0)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
+        custom rel material:binding = </LandingLeg/Looks/BrushedMetal>
+    }
+    def Scope "Looks"
+    {
+        def Material "BrushedMetal"
+        {
+            custom token outputs:surface
+            token outputs:surface.connect = </LandingLeg/Looks/BrushedMetal/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                token outputs:surface = ""
+                color3f inputs:diffuseColor = (0.550000011920929, 0.5799999833106995, 0.6200000047683716)
+                float inputs:metallic = 0.75
+                float inputs:roughness = 0.41999998688697815
+            }
+        }
     }
 }
