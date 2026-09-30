@@ -4289,14 +4289,36 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
         let station = ((axial-i).to_float()/axial.to_float()) ** 2.0;
         profile.push([throat+(exit-throat)*(station ** contour)-wall,height*(0.5-station)]);
     }
+    let neck_height=f64_from(model.value(own+"throatHeightM"));
+    let neck_center=f64_from(model.value(own+"throatCenterYM"));
+    if neck_height==() || neck_height<=0.0 || neck_center==() {
+        return plan_error("engine throat envelope is invalid");
+    }
+    let neck_lower=neck_center-neck_height/2.0;
+    let neck_upper=neck_center+neck_height/2.0;
+    let neck_profile=[[throat,neck_lower],[throat,neck_upper],
+        [throat-wall,neck_upper],[throat-wall,neck_lower]];
     let ops = [
         #{RemovePrim:#{edit_target:edit_target,path:root+"/Bell"}},
         #{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Bell",type_name:"Mesh",reference:(),reference_prim_path:""}},
-        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Bell",profile:profile,angular_segments:segments,normal_crease_angle_deg:crease,display_color:[0.20,0.22,0.25],collision_enabled:false}},
-        #{SetAttribute:#{edit_target:edit_target,path:root+"/Bell",name:"purpose",type_name:"token",value:"\"render\""}}
+        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Bell",profile:profile,angular_segments:segments,normal_crease_angle_deg:crease,display_color:model.value(own+"bellDisplayColor"),collision_enabled:false}},
+        #{SetAttribute:#{edit_target:edit_target,path:root+"/Bell",name:"purpose",type_name:"token",value:"\"render\""}},
+        #{RemovePrim:#{edit_target:edit_target,path:root+"/Throat"}},
+        #{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Throat",type_name:"Mesh",reference:(),reference_prim_path:""}},
+        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Throat",profile:neck_profile,angular_segments:segments,normal_crease_angle_deg:crease,
+            display_color:sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::silverDisplayColor"),collision_enabled:false}},
+        #{SetAttribute:#{edit_target:edit_target,path:root+"/Throat",name:"purpose",type_name:"token",value:"\"render\""}}
     ];
+    // Reuse the inherited engine-library metal surface on both flow shells.
+    // Geometry dimensions stay in the Twin; no duplicate nozzle shader graph.
+    for member in ["Bell","Throat"] {
+        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:root+"/"+member,
+            schemas:["PhysicsCollisionAPI","MaterialBindingAPI"]}});
+        ops.push(#{SetRelationship:#{edit_target:edit_target,path:root+"/"+member,
+            name:"material:binding",targets:[root+"/Looks/Nozzle_Mat"]}});
+    }
     #{ok:true,kind:"griffin_engine_bell_component_refinement",root:root,
-      paths:[root+"/Bell"],ops:ops,no_op:false}
+      paths:[root+"/Bell",root+"/Throat"],ops:ops,no_op:false}
 }
 
 fn apply_refined_griffin_engine_bell(doc, edit_target, root, parent_gen) {
@@ -5899,7 +5921,7 @@ fn griffin_surface_material_plan(doc, edit_target, root, name, paths, color, met
     for part in [#{parent:root,name:"Looks",kind:"Scope"},
         #{parent:root+"/Looks",name:name,kind:"Material"},
         #{parent:mat,name:"Surface",kind:"Shader"}] {
-        let existing=assembly_builder::composed_query(doc,#{path:part.parent+"/"+part.name,children:false});
+        let existing=assembly_builder::composed_query(doc,#{path:part.parent+"/"+part.name,children:false,attrs:[]});
         if query_ok(existing) && existing.type_name!=part.kind {
             return plan_error("material network prim has wrong type: "+part.parent+"/"+part.name);
         }
@@ -5917,7 +5939,7 @@ fn griffin_surface_material_plan(doc, edit_target, root, name, paths, color, met
     }
     ops.push(#{SetConnection:#{edit_target:edit_target,path:mat,name:"outputs:surface",type_name:"token",sources:[shader+".outputs:surface"]}});
     for path in paths {
-        let prim=assembly_builder::composed_query(doc,#{path:path,children:false,schemas:true});
+        let prim=assembly_builder::composed_query(doc,#{path:path,children:false,schemas:true,attrs:[]});
         if !query_ok(prim) {return plan_error("material target missing: "+path);}
         let schemas=prim.api_schemas;if !schemas.contains("MaterialBindingAPI") {schemas.push("MaterialBindingAPI");}
         ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:schemas}});

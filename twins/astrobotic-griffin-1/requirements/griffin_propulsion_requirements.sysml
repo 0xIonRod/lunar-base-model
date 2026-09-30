@@ -21,7 +21,12 @@ package GriffinPropulsionRequirements {
         attribute bellHeightM : Real = 0.52;
         attribute throatRadiusM : Real = 0.12;
         attribute throatHeightM : Real = 0.16;
-        attribute throatCenterYM : Real = 0.28;
+        // Neck starts at the bell throat plane and extends upwards; the old
+        // solid cylinder started inside the expanding bore and capped it.
+        // Radius/height and the shared 6 mm visual wall remain reconstruction
+        // estimates. Topology follows the throat-to-diverging-exit flow path:
+        // https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/nozzle-design/
+        attribute throatCenterYM : Real = GriffinMainPropulsionAssembly::bellHeightM / 2.0 + GriffinMainPropulsionAssembly::throatHeightM / 2.0;
         attribute bellAxis : Direction = (0.0, 1.0, 0.0);
         // Estimated bell contour, using LunCo.Propulsion.BellNozzle's law:
         // r(s)=throatRadiusM+(bellRadiusM-throatRadiusM)*s^bellContourExponent.
@@ -34,6 +39,14 @@ package GriffinPropulsionRequirements {
         attribute bellAngularSegments : Integer = 48;
         // Estimated shading crease; keeps the physical rim sharp.
         attribute bellNormalCreaseAngleDeg : Real = 35.0;
+        /* Dark gray nozzle appearance is an artistic estimate from the
+         * selected Astrobotic rendering, not a material grade, emissivity or
+         * temperature-dependent optical property. This prim displayColor
+         * serves inspection; normal shading on both hollow shells reuses
+         * Nozzle_Mat from lunco://components/propulsion/rocket_engine_visual.usda.
+         * No duplicate nozzle shader or engineering optical data is authored.
+         * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png */
+        attribute bellDisplayColor : Real[3] = (.20, .22, .25);
 
         // Hypergolic family from PUG p.26 (M20 / MON3). Palette is heuristic;
         // 2.0 reference O/F is a provisional chemistry estimate, not flight data.
@@ -139,10 +152,16 @@ package GriffinPropulsionRequirements {
         in measuredExitRadiusM : Real;
         in measuredHeightM : Real;
         in measuredMinimumRadiusM : Real;
+        in measuredThroatOuterRadiusM : Real;
+        in measuredThroatHeightM : Real;
+        in measuredThroatCenterYM : Real;
+        in measuredThroatBoreOpen : Boolean;
         in boreOpen : Boolean;
         in exitRadiusM : Real;
         in heightM : Real;
         in throatRadiusM : Real;
+        in throatHeightM : Real;
+        in throatCenterYM : Real;
         in wallThicknessM : Real;
         in toleranceM : Real;
         measuredExitRadiusM - exitRadiusM <= toleranceM
@@ -151,16 +170,25 @@ package GriffinPropulsionRequirements {
             and measuredHeightM - heightM >= -toleranceM
             and measuredMinimumRadiusM >= throatRadiusM - wallThicknessM - toleranceM
             and boreOpen
+            and measuredThroatOuterRadiusM - throatRadiusM <= toleranceM
+            and measuredThroatOuterRadiusM - throatRadiusM >= -toleranceM
+            and measuredThroatHeightM - throatHeightM <= toleranceM
+            and measuredThroatHeightM - throatHeightM >= -toleranceM
+            and measuredThroatCenterYM - throatCenterYM <= toleranceM
+            and measuredThroatCenterYM - throatCenterYM >= -toleranceM
+            and measuredThroatBoreOpen
     }
     requirement def GPP006_BellAndThroatEnvelope {
         require GPPC006_OpenBellEnvelope {
             in exitRadiusM = GriffinMainPropulsionAssembly::bellRadiusM;
             in heightM = GriffinMainPropulsionAssembly::bellHeightM;
             in throatRadiusM = GriffinMainPropulsionAssembly::throatRadiusM;
+            in throatHeightM = GriffinMainPropulsionAssembly::throatHeightM;
+            in throatCenterYM = GriffinMainPropulsionAssembly::throatCenterYM;
             in wallThicknessM = GriffinMainPropulsionAssembly::bellVisualWallThicknessM;
             in toleranceM = GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GPP-006 [geometry] each engine exposes an open Y-axis hollow bell Mesh and a throat using the source-owned radius/height datums. Mesh vertices and faces shall establish the exit envelope, height, positive flow-bore radius and absence of a closing face. bellContourExponent relates the reconstruction contour to those datums using the library BellNozzle law; the exponent and bellVisualWallThicknessM are explicit visual estimates, not flight nozzle design or wall sizing. See griffin-size-evidence.md. */
+        doc /* GPP-006 [geometry] each engine exposes an open Y-axis hollow bell Mesh and an uncapped hollow throat Mesh using the source-owned radius/height datums. Mesh vertices and faces shall establish the exit envelope, height, positive flow-bore radius and absence of a closing face in both parts. The throat lower rim shall meet the bell throat plane, and the upper rim seats against the adapter plate. bellContourExponent relates the reconstruction contour to those datums using the library BellNozzle law; the exponent and bellVisualWallThicknessM are explicit visual estimates, not flight nozzle design or wall sizing. See griffin-size-evidence.md. */
     }
     constraint def GPPC007_BellSeparation {
         in measuredMinimumClearanceM : Real;

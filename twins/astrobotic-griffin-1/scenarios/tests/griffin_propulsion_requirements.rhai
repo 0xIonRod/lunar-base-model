@@ -197,7 +197,7 @@ fn skirt_fit_observation(skirt_root, engine_records, bell_observations, toleranc
     let paths=[skirt_root+"/EngineSkirtShell",skirt_root+"/EngineAdapterPlate",skirt_root];
     for name in ["RailFront","RailRear","RailPort","RailStarboard"] {paths.push(skirt_root+"/"+name);}
     for record in engine_records {paths.push(record.path+"/Throat");}
-    let batch=query("QueryUsdPrims",#{paths:paths,attrs:["points","xformOp:translate","xformOp:scale","height"]});
+    let batch=query("QueryUsdPrims",#{paths:paths,attrs:["points","xformOp:translate","xformOp:scale"]});
     let snapshot=_query_snapshot(batch);
     if snapshot.ok!=true || batch.records.len()!=paths.len() {return #{available:false,snapshot:snapshot};}
     let shell=batch.records[0];let plate=batch.records[1];let mount=batch.records[2];
@@ -229,9 +229,11 @@ fn skirt_fit_observation(skirt_root, engine_records, bell_observations, toleranc
             let rail_gap=(dx*dx+dz*dz).sqrt()-bell.radius;
             if rail_gap<clearance {clearance=rail_gap;}
         }
-        let throat=batch.records[7+i];let t=throat.attrs["xformOp:translate"];let h=throat.attrs.height;
-        if t==() || h==() {return #{available:false,snapshot:snapshot};}
-        let gap=plate_bottom-center.y-t[1]-h/2.0;
+        let throat=batch.records[7+i];let points=throat.attrs.points;
+        if points==() || points.len()==0 {return #{available:false,snapshot:snapshot};}
+        let throat_upper=-1.0e30;
+        for p in points {if p[1]>throat_upper {throat_upper=p[1];}}
+        let gap=plate_bottom-center.y-throat_upper;
         if gap<separation {separation=gap;}
     }
     #{available:true,snapshot:snapshot,clearance:clearance,visible:visible,separation:separation}
@@ -405,25 +407,33 @@ fn on_tick(me, ctx) {
             let snapshot=#{ok:bell!=() && bell.doc_id!=(),doc_id:bell.doc_id,
                 document_generation:bell.document_generation,stage_generation:bell.stage_generation};
             if !_same_snapshot(snapshot,this.mesh_snapshot) {throw("USD changed after nozzle measurement");}
+            let throat_mesh=query("QueryUsdPrim",#{path:path+"/Throat",
+                attrs:["points","faceVertexCounts","faceVertexIndices"]});
+            if !_same_snapshot(snapshot,#{ok:throat_mesh.doc_id!=(),doc_id:throat_mesh.doc_id,
+                document_generation:throat_mesh.document_generation,stage_generation:throat_mesh.stage_generation}) {
+                throw("USD changed while measuring the throat");
+            }
+            let neck=open_bell_mesh(throat_mesh.attrs.points,throat_mesh.attrs.faceVertexCounts,throat_mesh.attrs.faceVertexIndices);
             let bindings=_required_constraint_bindings(source_model,"gpp006","GPPC006_OpenBellEnvelope",[
                 ["measuredExitRadiusM",_usd_observation(snapshot,mesh.available,mesh.radius,"bell mesh unavailable")],
                 ["measuredHeightM",_usd_observation(snapshot,mesh.available,mesh.height,"bell mesh unavailable")],
                 ["measuredMinimumRadiusM",_usd_observation(snapshot,mesh.available,mesh.minimum,"bell mesh unavailable")],
                 ["boreOpen",_usd_observation(snapshot,mesh.available,mesh.open,"bell mesh unavailable")],
+                ["measuredThroatOuterRadiusM",_usd_observation(snapshot,neck.available,neck.radius,"throat mesh unavailable")],
+                ["measuredThroatHeightM",_usd_observation(snapshot,neck.available,neck.height,"throat mesh unavailable")],
+                ["measuredThroatCenterYM",_usd_observation(snapshot,neck.available,(neck.lower+neck.upper)/2.0,"throat mesh unavailable")],
+                ["measuredThroatBoreOpen",_usd_observation(snapshot,neck.available,neck.open,"throat mesh unavailable")],
                 ["exitRadiusM",_source_literal(source_model,own("bellRadiusM"))],
                 ["heightM",_source_literal(source_model,own("bellHeightM"))],
                 ["throatRadiusM",_source_literal(source_model,own("throatRadiusM"))],
+                ["throatHeightM",_source_literal(source_model,own("throatHeightM"))],
+                ["throatCenterYM",_source_literal(source_model,own("throatCenterYM"))],
                 ["wallThicknessM",_source_literal(source_model,own("bellVisualWallThicknessM"))],
                 ["toleranceM",_source_literal(source_model,visual("geometryVerificationToleranceM"))]
             ]);
             checks.push(sysml_requirements::required_constraint_check("GPP-006-"+name+"-open-bell",
                 "engine","gpp006",VERIFICATION,PACKAGE+"::GPPC006_OpenBellEnvelope",bindings,"typed",0.0));
-            checks.push(attribute("GPP-006-" + name + "-throat-radius", "gpp006", path + "/Throat", "radius", throat_radius, geometry_tolerance));
-            checks.push(attribute("GPP-006-" + name + "-throat-height", "gpp006", path + "/Throat", "height", throat_height, geometry_tolerance));
-            checks.push(#{id: "GPP-006-" + name + "-throat-center", component: "engine",
-                requirement: "gpp006", verification: VERIFICATION, kind: "attribute_component",
-                path: path + "/Throat", attr: "xformOp:translate", index: 1,
-                expected_attr: own("throatCenterYM"), tolerance: geometry_tolerance});
+
         }
         if stations.len() == names.len() {
             checks.push(position("GPP-005-" + name + "-x", path, 0, stations[index].x, geometry_tolerance));

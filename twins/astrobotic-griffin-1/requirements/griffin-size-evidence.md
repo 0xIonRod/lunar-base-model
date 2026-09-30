@@ -291,6 +291,12 @@ for a legible rim; it is not a qualified wall thickness. The outer radius is the
 current presentation/design datum. [NASA nozzle design](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/nozzle-design/)
 supports the throat and expanding exit topology, not these dimensions or an
 optimized manufacturer contour.
+The neck is also a hollow revolved shell, using the same estimated 6 mm
+visual wall. Its lower rim is seated at the bell throat plane (.26 m local Y);
+its 160 mm height derives a .34 m centre and .42 m upper rim. The adapter plate
+lower face follows that upper rim. This replaces the old capped cylinder that
+intruded into and visually closed the flow bore. The requirement observer
+measures both meshes and rejects a face closing either bore.
 
 The engine component inherits exhaust from LunCoSim's standard engine library.
 The Twin supplies only nozzle-exit placement and physics connections. Modelica
