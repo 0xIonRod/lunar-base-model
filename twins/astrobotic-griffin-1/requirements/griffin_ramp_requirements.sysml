@@ -318,8 +318,8 @@ package GriffinRampRequirements {
          * Neither gives stock dimensions. Chords are estimated at 40 mm
          * (~2.2% of the 1.799 m section length); finer web members are
          * estimated below using the selected rendering's shorter lattice bays.
-         * 50 mm hinge/pin diameter avoids the previous oversized
-         * 240 mm transverse barrels and 160 mm upper pins. These are visual
+         * 50 mm common hinge diameter avoids the previous oversized
+         * 240 mm transverse barrels; local pins are refined below. These are visual
          * estimates, not calibrated measurements or strength-qualified stock.
          * Under-beam top derives from the revised plate bottom: -.015 m = -.0375+.045/2.
          * Keep walking contact, span, hinge axes and section poses unchanged.
@@ -329,30 +329,43 @@ package GriffinRampRequirements {
         attribute maxRailHeightToSectionLength : Real = 0.03;
         attribute maxPivotDiameterToRailHeight : Real = 1.5;
         attribute rampRailHeightM : Real = 0.04;
-        attribute rampRailWidthM : Real = 0.04;
+        /* Rail-width correction, 2026-10-01: the selected Astrobotic 2021
+         * rendering shows plate-like guide sides rather than square bars.
+         * Keep the 40 mm vertical chord depth/fold datum, reduce its transverse
+         * width to 20 mm (1.1% of section length), and use 40 mm post depth so
+         * supports still overlap the track by 10 mm. 8 mm diagonal stock and
+         * 20 mm square lower chords reduce visual congestion when folded.
+         * 40 mm diameter, 60 mm long local pins and 10 mm lug plates are compact
+         * attachment estimates; common shaft diameter stays 50 mm, with its
+         * length derived from the revised outside guide envelope.
+         * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png
+         * These are low-confidence silhouette estimates, not measured stock,
+         * structural sizing, or supplier interfaces. Tire contact widths,
+         * deployment angles, bay count and vertical hinge datums are retained. */
+        attribute rampRailWidthM : Real = 0.02;
         /* Two guide edges per track. Guide inner faces meet the physical
          * track edges, retaining the source tire clearance. Centre-side
          * guides mirror the outside ones around the wheel station. The old
          * outside guides sat 50 mm away from the tracks, leaving unsupported
-         * posts. With 60 mm post depth, each post overlaps the plate by 10 mm.
+         * posts. With 40 mm post depth, each post overlaps the plate by 10 mm.
          * This paired-track topology is informed by the two-sided lattice
          * tracks in https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png ;
          * member stock and attachments remain unqualified study estimates. */
         attribute rampRailOffsetZM : Real = CadStudy::trackMm / (2.0 * CadStudy::millimetresPerMetre) + GriffinEgressRamp::assemblyTrackWidthM / 2.0 + GriffinEgressRamp::rampRailWidthM / 2.0;
         attribute rampCenterRailOffsetZM : Real = CadStudy::trackMm / (2.0 * CadStudy::millimetresPerMetre) - GriffinEgressRamp::assemblyTrackWidthM / 2.0 - GriffinEgressRamp::rampRailWidthM / 2.0;
-        attribute rampRailJointPinRadiusM : Real = 0.025;
-        attribute rampRailJointPinLengthM : Real = 0.10;
+        attribute rampRailJointPinRadiusM : Real = 0.020;
+        attribute rampRailJointPinLengthM : Real = 0.06;
         /* Pivot lugs connect each guard to its section's native hinge axis.
          * Their height derives from axis elevation, pin radius and chord top;
          * four coaxial pin visuals share the common section shaft. 60 mm lug
-         * travel width and 16 mm plate thickness are unqualified assembly
+         * travel width and 10 mm plate thickness are unqualified assembly
          * estimates to bridge the observed rail/hinge separation. The image
          * establishes folded tracks but gives no hinge bracket drawing:
          * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png .
          * These pieces follow the existing rigid section; no new joints,
          * mass copies or separate deployment motion are introduced. */
         attribute rampPivotLugWidthM : Real = 0.06;
-        attribute rampPivotLugThicknessM : Real = 0.016;
+        attribute rampPivotLugThicknessM : Real = 0.010;
         // Separate traction bars on each wheel track leave the centre open.
         // Count and pitch are visual study assumptions because Astrobotic has
         // not published the Griffin ramp tread ICD.
@@ -381,18 +394,18 @@ package GriffinRampRequirements {
          * section give about 150 mm pitch against 125 mm web depth, approaching
          * the near-square triangular lattice seen in the selected 2021 image.
          * Count is estimated from an oblique rendering, not measured hardware.
-         * 12 mm uprights, 10 mm diagonals and 25 mm lower chords are silhouette
+         * 12 mm uprights, 8 mm diagonals and 20 mm lower chords are silhouette
          * estimates; the 40 mm upper guard remains the collision boundary.
          * No structural load capacity is claimed by these visual dimensions. */
         attribute assemblySidePostCountPerSectionPerSide : Integer = 11;
         attribute assemblySidePostWidthM : Real = 0.012;
-        attribute assemblySidePostDepthM : Real = 0.06;
+        attribute assemblySidePostDepthM : Real = 0.04;
         attribute assemblySidePostEmbeddedDepthM : Real = 0.04;
         attribute assemblySidePostFirstCenterXM : Real = GriffinEgressRamp::assemblySidePostPitchM;
         attribute assemblySidePostPitchM : Real = GriffinEgressRamp::rampSectionLengthM / (GriffinEgressRamp::assemblySidePostCountPerSectionPerSide + 1.0);
-        attribute assemblySideTrussChordHeightM : Real = 0.025;
+        attribute assemblySideTrussChordHeightM : Real = 0.020;
         attribute assemblySideTrussLowerChordCenterYM : Real = 0.055000000000;
-        attribute assemblySideTrussBraceThicknessM : Real = 0.010;
+        attribute assemblySideTrussBraceThicknessM : Real = 0.008;
         attribute assemblySideTrussBraceCountPerSide : Integer = 12;
         attribute rampSectionHingeBarrelRadiusM : Real = 0.025;
         attribute rampSectionHingeBarrelLengthM : Real = 2.0 * (GriffinEgressRamp::rampRailOffsetZM + GriffinEgressRamp::rampRailWidthM / 2.0);

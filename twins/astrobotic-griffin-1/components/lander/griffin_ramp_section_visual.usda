@@ -52,8 +52,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.899542027, 0.18, 1.31)
-        custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
+        custom double3 xformOp:translate = (0.899542027, 0.18, 1.3)
+        custom double3 xformOp:scale = (1.799084054, 0.04, 0.02)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -64,8 +64,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.899542027, 0.18, -1.31)
-        custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
+        custom double3 xformOp:translate = (0.899542027, 0.18, -1.3)
+        custom double3 xformOp:scale = (1.799084054, 0.04, 0.02)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -100,8 +100,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.14992367116666666, 0.0875, 1.31)
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:translate = (0.14992367116666666, 0.0875, 1.3)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -112,8 +112,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.2998473423333333, 0.0875, 1.31)
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:translate = (0.2998473423333333, 0.0875, 1.3)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -124,8 +124,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.4497710135, 0.0875, 1.31)
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:translate = (0.4497710135, 0.0875, 1.3)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -136,8 +136,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.14992367116666666, 0.0875, -1.31)
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:translate = (0.14992367116666666, 0.0875, -1.3)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -148,8 +148,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.2998473423333333, 0.0875, -1.31)
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:translate = (0.2998473423333333, 0.0875, -1.3)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -160,8 +160,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.4497710135, 0.0875, -1.31)
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:translate = (0.4497710135, 0.0875, -1.3)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -268,7 +268,7 @@ def Xform "RampSection" (
     )
     {
         double radius = 0.025
-        double height = 2.66
+        double height = 2.62
         uniform token axis = "Z"
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
@@ -281,10 +281,10 @@ def Xform "RampSection" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
-        double radius = 0.025
-        double height = 0.1
+        double radius = 0.02
+        double height = 0.06
         uniform token axis = "Z"
-        custom double3 xformOp:translate = (0.0, 0.0, 1.31)
+        custom double3 xformOp:translate = (0.0, 0.0, 1.3)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -295,10 +295,10 @@ def Xform "RampSection" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
-        double radius = 0.025
-        double height = 0.1
+        double radius = 0.02
+        double height = 0.06
         uniform token axis = "Z"
-        custom double3 xformOp:translate = (0.0, 0.0, -1.31)
+        custom double3 xformOp:translate = (0.0, 0.0, -1.3)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -309,9 +309,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.899542027, 0.055, 1.31)
+        custom double3 xformOp:translate = (0.899542027, 0.055, 1.3)
         double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        custom double3 xformOp:scale = (1.799084054, 0.025, 0.025)
+        custom double3 xformOp:scale = (1.799084054, 0.02, 0.02)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -322,9 +322,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.07496183558333333, 0.1175, 1.31)
+        custom double3 xformOp:translate = (0.07496183558333333, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.819914153448)
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -335,9 +335,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.22488550675, 0.1175, 1.31)
+        custom double3 xformOp:translate = (0.22488550675, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.819914153448)
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -348,9 +348,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.3748091779166667, 0.1175, 1.31)
+        custom double3 xformOp:translate = (0.3748091779166667, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.819914153448)
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -361,9 +361,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.5247328490833333, 0.1175, 1.31)
+        custom double3 xformOp:translate = (0.5247328490833333, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.819914153448)
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -374,9 +374,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.899542027, 0.055, -1.31)
+        custom double3 xformOp:translate = (0.899542027, 0.055, -1.3)
         double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        custom double3 xformOp:scale = (1.799084054, 0.025, 0.025)
+        custom double3 xformOp:scale = (1.799084054, 0.02, 0.02)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -387,9 +387,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.07496183558333333, 0.1175, -1.31)
+        custom double3 xformOp:translate = (0.07496183558333333, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.819914153448)
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -400,9 +400,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.22488550675, 0.1175, -1.31)
+        custom double3 xformOp:translate = (0.22488550675, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.819914153448)
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -413,9 +413,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.3748091779166667, 0.1175, -1.31)
+        custom double3 xformOp:translate = (0.3748091779166667, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.819914153448)
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -426,9 +426,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.5247328490833333, 0.1175, -1.31)
+        custom double3 xformOp:translate = (0.5247328490833333, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.819914153448)
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
@@ -439,11 +439,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
+        custom double3 xformOp:scale = (1.799084054, 0.04, 0.02)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (0.899542027, 0.18, 0.69)
+        custom double3 xformOp:translate = (0.899542027, 0.18, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -451,11 +451,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
+        custom double3 xformOp:scale = (1.799084054, 0.04, 0.02)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (0.899542027, 0.18, -0.69)
+        custom double3 xformOp:translate = (0.899542027, 0.18, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -463,11 +463,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.14992367116666666, 0.0875, 0.69)
+        custom double3 xformOp:translate = (0.14992367116666666, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -475,11 +475,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.2998473423333333, 0.0875, 0.69)
+        custom double3 xformOp:translate = (0.2998473423333333, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -487,11 +487,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.4497710135, 0.0875, 0.69)
+        custom double3 xformOp:translate = (0.4497710135, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -499,11 +499,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.799084054, 0.025, 0.025)
+        custom double3 xformOp:scale = (1.799084054, 0.02, 0.02)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.899542027, 0.055, 0.69)
+        custom double3 xformOp:translate = (0.899542027, 0.055, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -511,11 +511,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.07496183558333333, 0.1175, 0.69)
+        custom double3 xformOp:translate = (0.07496183558333333, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.819914153448)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -524,11 +524,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.22488550675, 0.1175, 0.69)
+        custom double3 xformOp:translate = (0.22488550675, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.819914153448)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -537,11 +537,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.3748091779166667, 0.1175, 0.69)
+        custom double3 xformOp:translate = (0.3748091779166667, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.819914153448)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -550,11 +550,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.5247328490833333, 0.1175, 0.69)
+        custom double3 xformOp:translate = (0.5247328490833333, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.819914153448)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -563,11 +563,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.14992367116666666, 0.0875, -0.69)
+        custom double3 xformOp:translate = (0.14992367116666666, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -575,11 +575,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.2998473423333333, 0.0875, -0.69)
+        custom double3 xformOp:translate = (0.2998473423333333, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -587,11 +587,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.4497710135, 0.0875, -0.69)
+        custom double3 xformOp:translate = (0.4497710135, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -599,11 +599,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.799084054, 0.025, 0.025)
+        custom double3 xformOp:scale = (1.799084054, 0.02, 0.02)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.899542027, 0.055, -0.69)
+        custom double3 xformOp:translate = (0.899542027, 0.055, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -611,11 +611,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.07496183558333333, 0.1175, -0.69)
+        custom double3 xformOp:translate = (0.07496183558333333, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.819914153448)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -624,11 +624,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.22488550675, 0.1175, -0.69)
+        custom double3 xformOp:translate = (0.22488550675, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.819914153448)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -637,11 +637,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.3748091779166667, 0.1175, -0.69)
+        custom double3 xformOp:translate = (0.3748091779166667, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.819914153448)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -650,11 +650,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987056, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987056, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.5247328490833333, 0.1175, -0.69)
+        custom double3 xformOp:translate = (0.5247328490833333, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.819914153448)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -663,11 +663,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.5996946846666666, 0.0875, 1.31)
+        custom double3 xformOp:translate = (0.5996946846666666, 0.0875, 1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -675,11 +675,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.7496183558333334, 0.0875, 1.31)
+        custom double3 xformOp:translate = (0.7496183558333334, 0.0875, 1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -687,11 +687,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.8995420270000001, 0.0875, 1.31)
+        custom double3 xformOp:translate = (0.8995420270000001, 0.0875, 1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -699,11 +699,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.0494656981666666, 0.0875, 1.31)
+        custom double3 xformOp:translate = (1.0494656981666666, 0.0875, 1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -711,11 +711,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.1993893693333333, 0.0875, 1.31)
+        custom double3 xformOp:translate = (1.1993893693333333, 0.0875, 1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -723,11 +723,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.3493130405, 0.0875, 1.31)
+        custom double3 xformOp:translate = (1.3493130405, 0.0875, 1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -735,11 +735,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.4992367116666667, 0.0875, 1.31)
+        custom double3 xformOp:translate = (1.4992367116666667, 0.0875, 1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -747,11 +747,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.6491603828333334, 0.0875, 1.31)
+        custom double3 xformOp:translate = (1.6491603828333334, 0.0875, 1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -759,11 +759,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.67465652025, 0.1175, 1.31)
+        custom double3 xformOp:translate = (0.67465652025, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -772,11 +772,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.8245801914166667, 0.1175, 1.31)
+        custom double3 xformOp:translate = (0.8245801914166667, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -785,11 +785,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987045, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987045, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.9745038625833332, 0.1175, 1.31)
+        custom double3 xformOp:translate = (0.9745038625833332, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344803)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -798,11 +798,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.12442753375, 0.1175, 1.31)
+        custom double3 xformOp:translate = (1.12442753375, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -811,11 +811,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.2743512049166663, 0.1175, 1.31)
+        custom double3 xformOp:translate = (1.2743512049166663, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -824,11 +824,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.4242748760833337, 0.1175, 1.31)
+        custom double3 xformOp:translate = (1.4242748760833337, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -837,11 +837,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.57419854725, 0.1175, 1.31)
+        custom double3 xformOp:translate = (1.57419854725, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -850,11 +850,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987045, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987045, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.724122218416667, 0.1175, 1.31)
+        custom double3 xformOp:translate = (1.724122218416667, 0.1175, 1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344803)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -863,11 +863,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.5996946846666666, 0.0875, -1.31)
+        custom double3 xformOp:translate = (0.5996946846666666, 0.0875, -1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -875,11 +875,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.7496183558333334, 0.0875, -1.31)
+        custom double3 xformOp:translate = (0.7496183558333334, 0.0875, -1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -887,11 +887,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.8995420270000001, 0.0875, -1.31)
+        custom double3 xformOp:translate = (0.8995420270000001, 0.0875, -1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -899,11 +899,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.0494656981666666, 0.0875, -1.31)
+        custom double3 xformOp:translate = (1.0494656981666666, 0.0875, -1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -911,11 +911,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.1993893693333333, 0.0875, -1.31)
+        custom double3 xformOp:translate = (1.1993893693333333, 0.0875, -1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -923,11 +923,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.3493130405, 0.0875, -1.31)
+        custom double3 xformOp:translate = (1.3493130405, 0.0875, -1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -935,11 +935,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.4992367116666667, 0.0875, -1.31)
+        custom double3 xformOp:translate = (1.4992367116666667, 0.0875, -1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -947,11 +947,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.6491603828333334, 0.0875, -1.31)
+        custom double3 xformOp:translate = (1.6491603828333334, 0.0875, -1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -959,11 +959,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.67465652025, 0.1175, -1.31)
+        custom double3 xformOp:translate = (0.67465652025, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -972,11 +972,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.8245801914166667, 0.1175, -1.31)
+        custom double3 xformOp:translate = (0.8245801914166667, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -985,11 +985,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987045, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987045, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.9745038625833332, 0.1175, -1.31)
+        custom double3 xformOp:translate = (0.9745038625833332, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344803)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -998,11 +998,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.12442753375, 0.1175, -1.31)
+        custom double3 xformOp:translate = (1.12442753375, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1011,11 +1011,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.2743512049166663, 0.1175, -1.31)
+        custom double3 xformOp:translate = (1.2743512049166663, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1024,11 +1024,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.4242748760833337, 0.1175, -1.31)
+        custom double3 xformOp:translate = (1.4242748760833337, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1037,11 +1037,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.57419854725, 0.1175, -1.31)
+        custom double3 xformOp:translate = (1.57419854725, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1050,11 +1050,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987045, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987045, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.724122218416667, 0.1175, -1.31)
+        custom double3 xformOp:translate = (1.724122218416667, 0.1175, -1.3)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344803)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1063,11 +1063,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.5996946846666666, 0.0875, 0.69)
+        custom double3 xformOp:translate = (0.5996946846666666, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1075,11 +1075,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.7496183558333334, 0.0875, 0.69)
+        custom double3 xformOp:translate = (0.7496183558333334, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1087,11 +1087,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.8995420270000001, 0.0875, 0.69)
+        custom double3 xformOp:translate = (0.8995420270000001, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1099,11 +1099,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.0494656981666666, 0.0875, 0.69)
+        custom double3 xformOp:translate = (1.0494656981666666, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1111,11 +1111,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.1993893693333333, 0.0875, 0.69)
+        custom double3 xformOp:translate = (1.1993893693333333, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1123,11 +1123,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.3493130405, 0.0875, 0.69)
+        custom double3 xformOp:translate = (1.3493130405, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1135,11 +1135,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.4992367116666667, 0.0875, 0.69)
+        custom double3 xformOp:translate = (1.4992367116666667, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1147,11 +1147,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.6491603828333334, 0.0875, 0.69)
+        custom double3 xformOp:translate = (1.6491603828333334, 0.0875, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1159,11 +1159,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.67465652025, 0.1175, 0.69)
+        custom double3 xformOp:translate = (0.67465652025, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1172,11 +1172,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.8245801914166667, 0.1175, 0.69)
+        custom double3 xformOp:translate = (0.8245801914166667, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1185,11 +1185,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987045, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987045, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.9745038625833332, 0.1175, 0.69)
+        custom double3 xformOp:translate = (0.9745038625833332, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344803)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1198,11 +1198,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.12442753375, 0.1175, 0.69)
+        custom double3 xformOp:translate = (1.12442753375, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1211,11 +1211,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.2743512049166663, 0.1175, 0.69)
+        custom double3 xformOp:translate = (1.2743512049166663, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1224,11 +1224,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.4242748760833337, 0.1175, 0.69)
+        custom double3 xformOp:translate = (1.4242748760833337, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1237,11 +1237,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.57419854725, 0.1175, 0.69)
+        custom double3 xformOp:translate = (1.57419854725, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1250,11 +1250,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987045, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987045, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.724122218416667, 0.1175, 0.69)
+        custom double3 xformOp:translate = (1.724122218416667, 0.1175, 0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344803)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1263,11 +1263,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.5996946846666666, 0.0875, -0.69)
+        custom double3 xformOp:translate = (0.5996946846666666, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1275,11 +1275,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.7496183558333334, 0.0875, -0.69)
+        custom double3 xformOp:translate = (0.7496183558333334, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1287,11 +1287,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.8995420270000001, 0.0875, -0.69)
+        custom double3 xformOp:translate = (0.8995420270000001, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1299,11 +1299,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.0494656981666666, 0.0875, -0.69)
+        custom double3 xformOp:translate = (1.0494656981666666, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1311,11 +1311,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.1993893693333333, 0.0875, -0.69)
+        custom double3 xformOp:translate = (1.1993893693333333, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1323,11 +1323,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.3493130405, 0.0875, -0.69)
+        custom double3 xformOp:translate = (1.3493130405, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1335,11 +1335,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.4992367116666667, 0.0875, -0.69)
+        custom double3 xformOp:translate = (1.4992367116666667, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1347,11 +1347,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.012, 0.225, 0.06)
+        custom double3 xformOp:scale = (0.012, 0.225, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.6491603828333334, 0.0875, -0.69)
+        custom double3 xformOp:translate = (1.6491603828333334, 0.0875, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1359,11 +1359,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.67465652025, 0.1175, -0.69)
+        custom double3 xformOp:translate = (0.67465652025, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1372,11 +1372,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.8245801914166667, 0.1175, -0.69)
+        custom double3 xformOp:translate = (0.8245801914166667, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1385,11 +1385,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987045, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987045, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.9745038625833332, 0.1175, -0.69)
+        custom double3 xformOp:translate = (0.9745038625833332, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344803)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1398,11 +1398,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.12442753375, 0.1175, -0.69)
+        custom double3 xformOp:translate = (1.12442753375, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1411,11 +1411,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.2743512049166663, 0.1175, -0.69)
+        custom double3 xformOp:translate = (1.2743512049166663, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1424,11 +1424,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.4242748760833337, 0.1175, -0.69)
+        custom double3 xformOp:translate = (1.4242748760833337, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1437,11 +1437,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.1951976105798706, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.1951976105798706, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.57419854725, 0.1175, -0.69)
+        custom double3 xformOp:translate = (1.57419854725, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 39.81991415344799)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1450,11 +1450,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.19519761057987045, 0.01, 0.01)
+        custom double3 xformOp:scale = (0.19519761057987045, 0.008, 0.008)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.724122218416667, 0.1175, -0.69)
+        custom double3 xformOp:translate = (1.724122218416667, 0.1175, -0.7)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344803)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
@@ -1463,11 +1463,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.06, 0.225, 0.016)
+        custom double3 xformOp:scale = (0.06, 0.21999999999999997, 0.01)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.0, 0.0875, 1.31)
+        custom double3 xformOp:translate = (0.0, 0.09, 1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1475,11 +1475,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.06, 0.225, 0.016)
+        custom double3 xformOp:scale = (0.06, 0.21999999999999997, 0.01)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.0, 0.0875, -1.31)
+        custom double3 xformOp:translate = (0.0, 0.09, -1.3)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1487,13 +1487,13 @@ def Xform "RampSection" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
-        double radius = 0.025
-        double height = 0.1
+        double radius = 0.02
+        double height = 0.06
         uniform token axis = "Z"
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom double3 xformOp:translate = (0.0, 0.0, 0.69)
+        custom double3 xformOp:translate = (0.0, 0.0, 0.7)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
     }
@@ -1501,11 +1501,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.06, 0.225, 0.016)
+        custom double3 xformOp:scale = (0.06, 0.21999999999999997, 0.01)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.0, 0.0875, 0.69)
+        custom double3 xformOp:translate = (0.0, 0.09, 0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
@@ -1513,13 +1513,13 @@ def Xform "RampSection" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
-        double radius = 0.025
-        double height = 0.1
+        double radius = 0.02
+        double height = 0.06
         uniform token axis = "Z"
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom double3 xformOp:translate = (0.0, 0.0, -0.69)
+        custom double3 xformOp:translate = (0.0, 0.0, -0.7)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
     }
@@ -1527,11 +1527,11 @@ def Xform "RampSection" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.06, 0.225, 0.016)
+        custom double3 xformOp:scale = (0.06, 0.21999999999999997, 0.01)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.0, 0.0875, -0.69)
+        custom double3 xformOp:translate = (0.0, 0.09, -0.7)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
