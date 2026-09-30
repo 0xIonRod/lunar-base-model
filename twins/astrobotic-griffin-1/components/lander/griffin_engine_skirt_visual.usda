@@ -15,11 +15,11 @@ def Xform "World"
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            custom double3 xformOp:scale = (3.2, 0.2, 0.2)
+            custom double3 xformOp:scale = (3.2, 0.08, 0.08)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.0, 0.0, 1.5)
+            custom double3 xformOp:translate = (0.0, 0.0, 1.56)
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
             uniform token purpose = "render"
         }
@@ -27,11 +27,11 @@ def Xform "World"
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            custom double3 xformOp:scale = (3.2, 0.2, 0.2)
+            custom double3 xformOp:scale = (3.2, 0.08, 0.08)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.0, 0.0, -1.5)
+            custom double3 xformOp:translate = (0.0, 0.0, -1.56)
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
             uniform token purpose = "render"
         }
@@ -39,11 +39,11 @@ def Xform "World"
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            custom double3 xformOp:scale = (0.2, 0.2, 3.2)
+            custom double3 xformOp:scale = (0.08, 0.08, 3.2)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (1.5, 0.0, 0.0)
+            custom double3 xformOp:translate = (1.56, 0.0, 0.0)
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
             uniform token purpose = "render"
         }
@@ -51,11 +51,11 @@ def Xform "World"
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            custom double3 xformOp:scale = (0.2, 0.2, 3.2)
+            custom double3 xformOp:scale = (0.08, 0.08, 3.2)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (-1.5, 0.0, 0.0)
+            custom double3 xformOp:translate = (-1.56, 0.0, 0.0)
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
             uniform token purpose = "render"
         }
@@ -63,21 +63,21 @@ def Xform "World"
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            point3f[] points = [(-1.600000023841858, 0.10000000149011612, 1.2999999523162842), (-1.2999999523162842, 0.10000000149011612, 1.600000023841858), (1.2999999523162842, 0.10000000149011612, 1.600000023841858), (1.600000023841858, 0.10000000149011612, 1.2999999523162842), (1.600000023841858, 0.10000000149011612, -1.2999999523162842), (1.2999999523162842, 0.10000000149011612, -1.600000023841858), (-1.2999999523162842, 0.10000000149011612, -1.600000023841858), (-1.600000023841858, 0.10000000149011612, -1.2999999523162842), (-1.2999999523162842, -0.4000000059604645, 1.0), (-1.0, -0.4000000059604645, 1.2999999523162842), (1.0, -0.4000000059604645, 1.2999999523162842), (1.2999999523162842, -0.4000000059604645, 1.0), (1.2999999523162842, -0.4000000059604645, -1.0), (1.0, -0.4000000059604645, -1.2999999523162842), (-1.0, -0.4000000059604645, -1.2999999523162842), (-1.2999999523162842, -0.4000000059604645, -1.0)]
+            point3f[] points = [(-1.600000023841858, 0.03999999910593033, 1.5399999618530273), (-1.5399999618530273, 0.03999999910593033, 1.600000023841858), (1.5399999618530273, 0.03999999910593033, 1.600000023841858), (1.600000023841858, 0.03999999910593033, 1.5399999618530273), (1.600000023841858, 0.03999999910593033, -1.5399999618530273), (1.5399999618530273, 0.03999999910593033, -1.600000023841858), (-1.5399999618530273, 0.03999999910593033, -1.600000023841858), (-1.600000023841858, 0.03999999910593033, -1.5399999618530273), (-1.5399999618530273, -0.07999999821186066, 1.4800000190734863), (-1.4800000190734863, -0.07999999821186066, 1.5399999618530273), (1.4800000190734863, -0.07999999821186066, 1.5399999618530273), (1.5399999618530273, -0.07999999821186066, 1.4800000190734863), (1.5399999618530273, -0.07999999821186066, -1.4800000190734863), (1.4800000190734863, -0.07999999821186066, -1.5399999618530273), (-1.4800000190734863, -0.07999999821186066, -1.5399999618530273), (-1.5399999618530273, -0.07999999821186066, -1.4800000190734863)]
             int[] faceVertexCounts = [4, 4, 4, 4, 4, 4, 4, 4]
             int[] faceVertexIndices = [0, 1, 9, 8, 1, 2, 10, 9, 2, 3, 11, 10, 3, 4, 12, 11, 4, 5, 13, 12, 5, 6, 14, 13, 6, 7, 15, 14, 7, 0, 8, 15]
             uniform token subdivisionScheme = "none"
             uniform token purpose = "render"
             uniform bool doubleSided = true
-            color3f[] primvars:displayColor = [(0.14000000059604645, 0.18000000715255737, 0.23000000417232513)]
+            color3f[] primvars:displayColor = [(0.07000000029802322, 0.09000000357627869, 0.11999999731779099)]
             bool physics:collisionEnabled = false
         }
         def Cube "EngineAdapterPlate" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
         {
-            custom double3 xformOp:translate = (0.0, 0.16, 0.0)
-            custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:translate = (0.0, 0.42, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             custom double3 xformOp:scale = (2.84, 0.12, 2.84)
             double size = 1.0
             bool physics:collisionEnabled = false

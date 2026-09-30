@@ -32,12 +32,15 @@ package GriffinLandingLegRequirements {
         // photograph. The source has perspective and no calibrated scale.
         // Coordinates below are explicit packaging estimates: local +X outward,
         // Y up, Z tangential. Main top meets the outer bus mount; brace tops
-        // meet the current skirt's X=1.50 m rail at two separated Z stations.
+        // meet the current skirt's X=1.56 m rail at two separated Z stations.
+        // Root Y=.90 puts the sleeve below the body belt. Primary local Y=0;
+        // brace X=-.34 = skirt rail X1.56 - root X1.90, and Y=.10 =
+        // skirt mount Y1.00 - root Y.90. These are interface derivations.
         attribute loadMembers : GriffinLandingLegChild[3] =
             ("ShockPiston", "StrutOuter", "StrutInner");
         attribute memberUpperAnchors : Position[3] =
-            ((-.10, .12, 0.0), (-.40, -.10, .68), (-.40, -.10, -.68));
-        attribute memberLowerAnchor : Position = (0.0, -1.13, 0.0);
+            ((-.10, 0.0, 0.0), (-.34, .10, .68), (-.34, .10, -.68));
+        attribute memberLowerAnchor : Position = (0.0, -.83, 0.0);
         // Diameter estimates: 0.12 m main shock and 0.07 m braces. These
         // approximate the slender primary/secondary silhouette, not a flight
         // tube section or wall thickness. Length/center/rotation are derived
@@ -48,9 +51,10 @@ package GriffinLandingLegRequirements {
         attribute memberEndpointToleranceM : Real = .002;
         attribute footPadRadiusM : Real = .35;
         attribute footPadHeightM : Real = .04;
-        // Preserve the previous -1.21 m foot-bottom datum and 4.50 m footprint.
+        // Root moves down .30 m; local foot datums rise .30 m to preserve
+        // vehicle-frame foot bottom -.01 m and the 4.50 m footprint.
         // Thin the pad rather than moving terrain/contact or the leg station.
-        attribute footPadCenterYM : Real = -1.19;
+        attribute footPadCenterYM : Real = -.89;
         // Suspension study values. The spring rest target is derived from the
         // authored vehicle touchdown datum, leg mount, pad, and site surface;
         // it is not a second hand-entered pose value.
@@ -73,7 +77,7 @@ package GriffinLandingLegRequirements {
         attribute mountClevisWidthM : Real = .16;
         attribute mountClevisHeightM : Real = .16;
         attribute mountClevisDepthM : Real = .12;
-        attribute mountClevisCenterYM : Real = 0.12;
+        attribute mountClevisCenterYM : Real = 0.0;
         // Visual correction requested in the assembly review: the bus-side
         // cylindrical mount sleeve follows local +X, along BodyMountArm.
         // Its center is the primary member's upper anchor. This render-only
@@ -83,7 +87,7 @@ package GriffinLandingLegRequirements {
         attribute footPadPlateWidthM : Real = .42;
         attribute footPadPlateHeightM : Real = .04;
         attribute footPadPlateDepthM : Real = .36;
-        attribute footPadPlateCenterYM : Real = -1.15;
+        attribute footPadPlateCenterYM : Real = -.85;
     }
 
     requirement def GLL001_LegCount {
@@ -184,7 +188,7 @@ package GriffinLandingLegRequirements {
         require GLLC009_SpringFrameAlignment {
             in toleranceDeg = GriffinLandingLegAssembly::physicalLegRotationToleranceDeg;
         }
-        doc /* GLL-009 [mechanical interface] each leg's visible BodyMountArm shall overlap the octagonal PerimeterFrame and its MountAxle by at least bodyMountOverlapM. The physical prismatic suspension joint shall connect the leg rigid body to the lander at the same typed leg station, with local frames that preserve the source-owned leg orientation when initially seated. Mount geometry is derived from the bus envelope, frame section, leg station, and clevis dimensions; it is not a second placement table. The explicit measurement tolerance covers floating-point bound readback only and does not reduce the physical overlap datum. */
+        doc /* GLL-009 [mechanical interface] each leg's visible BodyMountArm shall overlap the octagonal PerimeterFrame and its MountAxle by at least bodyMountOverlapM. The physical prismatic suspension joint shall connect the leg rigid body to the lander at the same typed leg station, with local frames that preserve the source-owned leg orientation when initially seated. The sleeve upper edge shall meet the body belt lower edge within the endpoint tolerance, so the primary shock stays below the side panel. A vertical bus-mount bracket connects that sleeve to the lower perimeter ring. Mount geometry is derived from the bus envelope, frame section, leg station, and clevis dimensions; it is not a second placement table. The explicit measurement tolerance covers floating-point bound readback only and does not reduce the physical overlap datum. */
     }
     constraint def GLLC010_SpringRestPoseMatchesTouchdownDatum {
         in vehicleReferenceTouchdownY : Real;

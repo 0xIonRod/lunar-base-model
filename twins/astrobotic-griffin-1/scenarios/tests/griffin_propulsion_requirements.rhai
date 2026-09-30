@@ -1,3 +1,4 @@
+import "twin://astrobotic-griffin-1/tools/griffin_geometry.rhai" as griffin_geometry;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 // Standalone Griffin main-propulsion visual verification.  Thrust and
@@ -188,7 +189,52 @@ fn open_bell_mesh(points, counts, indices) {
         offset+=count;
     }
     #{available:offset==indices.len(),radius:maximum,height:upper-lower,
-      minimum:minimum,open:open && minimum>0.0}
+      minimum:minimum,lower:lower,upper:upper,open:open && minimum>0.0}
+}
+
+// One composed snapshot of the skirt, plate, rail stock and throat ends.
+fn skirt_fit_observation(skirt_root, engine_records, bell_observations, tolerance) {
+    let paths=[skirt_root+"/EngineSkirtShell",skirt_root+"/EngineAdapterPlate",skirt_root];
+    for name in ["RailFront","RailRear","RailPort","RailStarboard"] {paths.push(skirt_root+"/"+name);}
+    for record in engine_records {paths.push(record.path+"/Throat");}
+    let batch=query("QueryUsdPrims",#{paths:paths,attrs:["points","xformOp:translate","xformOp:scale","height"]});
+    let snapshot=_query_snapshot(batch);
+    if snapshot.ok!=true || batch.records.len()!=paths.len() {return #{available:false,snapshot:snapshot};}
+    let shell=batch.records[0];let plate=batch.records[1];let mount=batch.records[2];
+    if shell.attrs.points==() || shell.attrs.points.len()!=16
+        || plate.attrs["xformOp:translate"]==() || plate.attrs["xformOp:scale"]==()
+        || mount.attrs["xformOp:translate"]==() {return #{available:false,snapshot:snapshot};}
+    let lower=1.0e30;
+    for p in shell.attrs.points {if p[1]<lower {lower=p[1];}}
+    let contour=[];
+    for p in shell.attrs.points {if (p[1]-lower).abs()<=tolerance {contour.push(vec3_from(p));}}
+    if contour.len()!=8 {return #{available:false,snapshot:snapshot};}
+    let mount_y=mount.attrs["xformOp:translate"][1];
+    let plate_bottom=mount_y+plate.attrs["xformOp:translate"][1]-plate.attrs["xformOp:scale"][1]/2.0;
+    let clearance=1.0e30;let visible=1.0e30;let separation=1.0e30;
+    for i in 0..engine_records.len() {
+        let record=engine_records[i];let bell=bell_observations[i];
+        let center=vec3_from(record.attrs["xformOp:translate"]);
+        let gap=griffin_geometry::convex_polygon_clearance_xz(center,contour);
+        if gap==() || !bell.available {return #{available:false,snapshot:snapshot};}
+        if gap-bell.radius<clearance {clearance=gap-bell.radius;}
+        let exposed=(mount_y+lower-center.y-bell.lower)/bell.height;
+        if exposed<visible {visible=exposed;}
+        for rail_index in 3..7 {
+            let rail=batch.records[rail_index];let t=rail.attrs["xformOp:translate"];let scale=rail.attrs["xformOp:scale"];
+            if t==() || scale==() {return #{available:false,snapshot:snapshot};}
+            let dx=(center.x-t[0]).abs()-scale[0]/2.0;
+            let dz=(center.z-t[2]).abs()-scale[2]/2.0;
+            if dx<0.0 {dx=0.0;}if dz<0.0 {dz=0.0;}
+            let rail_gap=(dx*dx+dz*dz).sqrt()-bell.radius;
+            if rail_gap<clearance {clearance=rail_gap;}
+        }
+        let throat=batch.records[7+i];let t=throat.attrs["xformOp:translate"];let h=throat.attrs.height;
+        if t==() || h==() {return #{available:false,snapshot:snapshot};}
+        let gap=plate_bottom-center.y-t[1]-h/2.0;
+        if gap<separation {separation=gap;}
+    }
+    #{available:true,snapshot:snapshot,clearance:clearance,visible:visible,separation:separation}
 }
 
 fn on_start(me, ctx) {
@@ -261,7 +307,7 @@ fn on_tick(me, ctx) {
         "adapterPlateName", "railFrontCenterZM", "railRearCenterZM",
         "railPortCenterXM", "railStarboardCenterXM", "railLengthM",
         "railWidthM", "railHeightM", "shellDepthM", "adapterPlateWidthM",
-        "adapterPlateHeightM", "adapterPlateDepthM", "transformOrder"] {
+        "adapterPlateHeightM", "adapterPlateDepthM", "adapterPlateCenterYM", "minimumSkirtBellClearanceM", "minimumVisibleBellHeightFraction", "transformOrder"] {
         selected_attributes.push(skirt(name));
     }
     selected_attributes.push(parent("engineCount"));
@@ -630,6 +676,20 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-depth-y", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 1, skirt("shellDepthM"), 2.0, geometry_tolerance));
         checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-envelope-depth", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 2, skirt("railLengthM"), 2.0, geometry_tolerance));
         let adapter_path = skirt_root + "/" + adapter_name;
+        checks.push(component_position("GES-007-adapter-y", adapter_path, 1,
+            sysml_requirements::number(source,skirt("adapterPlateCenterYM")),geometry_tolerance));
+        let fit=skirt_fit_observation(skirt_root,observed_engines.records,this.mesh_results,geometry_tolerance);
+        let fit_available=fit.available==true && _same_snapshot(fit.snapshot,usd_snapshot);
+        let fit_bindings=_required_constraint_bindings(source_model,"ges004","GESC004_SkirtAndBellFit",[
+            ["minimumRadialClearanceM",_usd_observation(fit.snapshot,fit_available,fit.clearance,"skirt/rail contour unavailable")],
+            ["visibleBellHeightFraction",_usd_observation(fit.snapshot,fit_available,fit.visible,"bell exposure unavailable")],
+            ["adapterThroatSeparationM",_usd_observation(fit.snapshot,fit_available,fit.separation,"adapter/throat datums unavailable")],
+            ["requiredRadialClearanceM",_source_literal(source_model,skirt("minimumSkirtBellClearanceM"))],
+            ["requiredVisibleBellHeightFraction",_source_literal(source_model,skirt("minimumVisibleBellHeightFraction"))],
+            ["toleranceM",_source_literal(source_model,visual("geometryVerificationToleranceM"))]
+        ]);
+        checks.push(sysml_requirements::required_constraint_check("GES-004-skirt-fit","engine_skirt","ges004",VERIFICATION,"GriffinPropulsionRequirements::GESC004_SkirtAndBellFit",fit_bindings,"typed",0.0));
+
         checks.push(sysml_requirement_checks::exists("GES-007-adapter-plate", "engine_skirt", "ges007", VERIFICATION, adapter_path, "Cube"));
         checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-width", "engine_skirt", "ges007", VERIFICATION, adapter_path, 0, skirt("adapterPlateWidthM"), 1.0, geometry_tolerance));
         checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-height", "engine_skirt", "ges007", VERIFICATION, adapter_path, 1, skirt("adapterPlateHeightM"), 1.0, geometry_tolerance));

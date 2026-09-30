@@ -152,3 +152,23 @@ fn tank_brace_datum(pad_top_y, offset, length, tilt_deg) {
         pad_top_y + direction[1] * length,
         offset + direction[2] * length]}
 }
+
+
+// Signed distance to the nearest edge half-plane of a convex X/Z polygon.
+// Positive means inside, so subtracting a circular part radius measures its
+// conservative clearance. Reversing polygon winding preserves the result.
+fn convex_polygon_clearance_xz(point, polygon) {
+    if polygon.len()<3 {return ();}
+    let area=0.0;
+    for i in 0..polygon.len() {let a=polygon[i];let b=polygon[(i+1)%polygon.len()];area+=a.x*b.z-b.x*a.z;}
+    if area.abs()<=1.0e-12 {return ();}
+    let sign=if area>0.0 {1.0} else {-1.0};
+    let minimum=1.0e30;
+    for i in 0..polygon.len() {
+        let a=polygon[i];let b=polygon[(i+1)%polygon.len()];let dx=b.x-a.x;let dz=b.z-a.z;
+        let length=(dx*dx+dz*dz).sqrt();if length<=1.0e-12 {return ();}
+        let distance=sign*(dx*(point.z-a.z)-dz*(point.x-a.x))/length;
+        if distance<minimum {minimum=distance;}
+    }
+    minimum
+}

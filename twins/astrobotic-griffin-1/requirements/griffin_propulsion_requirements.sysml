@@ -54,24 +54,34 @@ package GriffinPropulsionRequirements {
         attribute usdRootPath : String = "/World/Griffin1/Nozzle/MainEngineCluster";
         attribute componentRootName : String = "EngineSkirt";
         attribute componentMemberNames : String[4] = ("RailFront", "RailRear", "RailPort", "RailStarboard");
-        attribute railFrontCenterZM : Real = 1.50;
-        attribute railRearCenterZM : Real = -1.50;
-        attribute railPortCenterXM : Real = 1.50;
-        attribute railStarboardCenterXM : Real = -1.50;
+        attribute railFrontCenterZM : Real = railLengthM / 2.0 - railWidthM / 2.0;
+        attribute railRearCenterZM : Real = -railFrontCenterZM;
+        attribute railPortCenterXM : Real = railFrontCenterZM;
+        attribute railStarboardCenterXM : Real = -railPortCenterXM;
         attribute railLengthM : Real = 3.20;
-        attribute railWidthM : Real = 0.20;
-        attribute railHeightM : Real = 0.20;
+        attribute railWidthM : Real = 0.08;
+        attribute railHeightM : Real = 0.08;
         attribute shellName : String = "EngineSkirtShell";
         attribute adapterPlateName : String = "EngineAdapterPlate";
         attribute adapterPlateWidthM : Real = 2.84;
         attribute adapterPlateDepthM : Real = 2.84;
         attribute adapterPlateHeightM : Real = 0.12;
-        attribute shellDepthM : Real = 0.50;
-        attribute shellBottomInsetM : Real = 0.30;
-        attribute shellUpperYM : Real = 0.10;
-        attribute shellLowerYM : Real = -0.40;
+        // The PGH hardware photograph shows an open underside, rather than
+        // a deep opaque shroud: https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png.
+        // 80 mm frame stock, a 120 mm shallow fairing, and 60 mm taper are
+        // explicit visualization estimates, not calibrated stock dimensions.
+        attribute shellDepthM : Real = 0.12;
+        attribute shellBottomInsetM : Real = 0.06;
+        attribute shellUpperYM : Real = componentLocalCenterYM + railHeightM / 2.0;
+        attribute shellLowerYM : Real = shellUpperYM - shellDepthM;
         attribute componentLocalCenterYM : Real = 0.00;
         attribute minimumSkirtBellClearanceM : Real = 0.10;
+        // Seat the plate's lower face at the upper throat end. A plate
+        // centered on the rail plane would intersect all five bell walls.
+        attribute adapterPlateCenterYM : Real = GriffinMainPropulsionAssembly::throatCenterYM + GriffinMainPropulsionAssembly::throatHeightM / 2.0 + adapterPlateHeightM / 2.0;
+        // Estimated minimum exposure below the shroud, to reject geometry
+        // that encloses the bell exits while passing simple dimension checks.
+        attribute minimumVisibleBellHeightFraction : Real = 0.30;
         attribute colliderPolicy : String = "render-only frame; no physics collision or thrust authority";
         attribute transformOrder : String[2] = ("xformOp:translate", "xformOp:scale");
     }
@@ -198,8 +208,24 @@ package GriffinPropulsionRequirements {
     requirement def GES003_SkirtDatum {
         doc /* GES-003 [placement] the skirt is centered on the engine adapter datum immediately below the bus. */
     }
+    constraint def GESC004_SkirtAndBellFit {
+        in minimumRadialClearanceM : Real;
+        in requiredRadialClearanceM : Real;
+        in visibleBellHeightFraction : Real;
+        in requiredVisibleBellHeightFraction : Real;
+        in adapterThroatSeparationM : Real;
+        in toleranceM : Real;
+        minimumRadialClearanceM >= requiredRadialClearanceM
+            and visibleBellHeightFraction >= requiredVisibleBellHeightFraction
+            and adapterThroatSeparationM >= -toleranceM;
+    }
     requirement def GES004_BellClearance {
-        doc /* GES-004 [clearance] every rail leaves at least minimumSkirtBellClearanceM radial clearance to the visible bell envelope. */
+        require GESC004_SkirtAndBellFit {
+            in requiredRadialClearanceM = GriffinEngineSkirtComponent::minimumSkirtBellClearanceM;
+            in requiredVisibleBellHeightFraction = GriffinEngineSkirtComponent::minimumVisibleBellHeightFraction;
+            in toleranceM = GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
+        doc /* GES-004 [clearance] the rails and lower shroud contour leave at least minimumSkirtBellClearanceM clearance to the full bell envelopes. At least minimumVisibleBellHeightFraction of bell height remains below the shroud edge, and the adapter plate lower face is at or above the upper throat ends. These conservative packaging checks must use composed geometry; a named shroud is not evidence of clearance. */
     }
     requirement def GES005_SkirtOwnership {
         doc /* GES-005 [ownership] skirt geometry is render-only and cannot introduce thrust, collider, or physics authority. */
@@ -208,7 +234,7 @@ package GriffinPropulsionRequirements {
         doc /* GES-006 [geometry] the four named skirt rails shall match railLengthM, railWidthM, railHeightM, and the signed center stations in GriffinEngineSkirtComponent. */
     }
     requirement def GES007_ShellAndAdapterEnvelope {
-        doc /* GES-007 [geometry] the tapered shell shall use its typed upper/lower Y limits, and the adapter plate shall match its typed dimensions and declared datum. */
+        doc /* GES-007 [geometry] the tapered shell shall use its typed upper/lower Y limits, and the adapter plate shall match its typed dimensions and declared datum. The plate center derives from the throat upper end and its own thickness, not from the skirt rail plane. */
     }
 
     requirement <'GPP-001'> gpp001 : GPP001_EngineCount { subject propulsion : GriffinMainPropulsionAssembly; }

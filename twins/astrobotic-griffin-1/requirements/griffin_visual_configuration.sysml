@@ -224,9 +224,17 @@ package GriffinVisualConfigurationRequirements {
         attribute payloadAdapterDimensions : Dimensions = (3.20, .16, 3.20);
         attribute payloadAdapterCenterYM : Real = 2.00;
 
+        /* Correct the upper leg mount to the lower body edge, per the user's
+         * Astrobotic rendering: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
+         * and https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2r1xQLuK9FVl67Bpt2FkrW5JXaLk0HFu78gfflGo-r32Rt636APG830o&s=10.
+         * Sleeve center Y=.90 = body center 1.34 - belt height .72/2
+         * - sleeve radius .08. Thus sleeve top meets body bottom .98.
+         * This is a reference-informed packaging estimate, not measured CAD.
+         * Shift the shared physics/visual root down .30 m and compensate the
+         * local foot datums to preserve the previous terrain contact. */
         attribute legStations : Position[4] =
-            ((1.90, 1.20, 0.0), (-1.90, 1.20, 0.0),
-             (0.0, 1.20, 1.90), (0.0, 1.20, -1.90));
+            ((1.90, .90, 0.0), (-1.90, .90, 0.0),
+             (0.0, .90, 1.90), (0.0, .90, -1.90));
         /* Each local +X axis points radially outward. This gives the shared
          * leg mount interface one canonical orientation at every bus side. */
         attribute legStationRotationYDeg : Real[4] = (0.0, 180.0, -90.0, 90.0);

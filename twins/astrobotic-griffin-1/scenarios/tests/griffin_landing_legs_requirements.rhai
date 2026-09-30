@@ -190,6 +190,17 @@ fn on_tick(me, ctx) {
         let name = names[index];
         let path = root + "/" + name;
         let visual_path = path + "/LandingLegVisual";
+        // Reject a primary mount buried at belt mid-height even when its tube
+        // closes perfectly to a wrong source anchor. Compare to the bus edge.
+        let body=model.value(visual("bodyDimensions"));
+        let bus_mount=model.value(visual("bodyMount"));
+        let sleeve_radius=f64_from(model.value(own("mountClevisHeightM")))/2.0;
+        let expected_mount_y=bus_mount.y-body.y/2.0-stations[index].y-sleeve_radius;
+        checks.push(#{id:"GLL-009-"+name+"-under-body-edge",component:"landing_leg",
+            requirement:"gll009",verification:VERIFICATION,kind:"attribute_component",
+            path:visual_path+"/MountAxle",attr:"xformOp:translate",index:1,
+            expected:expected_mount_y,tolerance:f64_from(model.value(own("memberEndpointToleranceM")))});
+
         if rotations_y.len() == names.len() {
             let joint_path = root + "/" + name + "_Spring";
             checks.push(sysml_requirement_checks::exists("GLL-009-" + name + "-spring-joint",

@@ -3174,6 +3174,14 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
     let stations=model.value(visual+"legStations");
     let section=f64_from(model.value(visual+"frameRingSectionM"));
     let overlap=f64_from(model.value(own+"bodyMountOverlapM"));
+    let bus_mount=model.value(visual+"bodyMount");
+    let rings=model.value(visual+"frameRingCenterY");
+    if !vec3_is_native(bus_mount) || !array_is(rings) || rings.len()!=2 {
+        return plan_error("leg lower-frame connection datums incomplete");
+    }
+    let frame_y=bus_mount.y+f64_from(rings[1])-stations[0].y;
+    let arm_y=(frame_y+clevis_y)/2.0;
+    let arm_height=(frame_y-clevis_y).abs()+clevis_height;
     if clevis_width==() || clevis_height==() || clevis_depth==() || clevis_y==() || section==() || overlap==()
         || !vec3_is_native(body) || !array_is(stations) || stations.len()!=4 {return plan_error("leg mounting datums incomplete");}
     let radial=(stations[0].x*stations[0].x+stations[0].z*stations[0].z).sqrt();
@@ -3197,7 +3205,7 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
         #{name:"MountClevisInner",center:vec3_array(upper[2]),size:[clevis_width,clevis_height,clevis_depth]},
         #{name:"FootPadPlate",center:[0.0,f64_from(model.value(own+"footPadPlateCenterYM")),0.0],
           size:[f64_from(model.value(own+"footPadPlateWidthM")),f64_from(model.value(own+"footPadPlateHeightM")),f64_from(model.value(own+"footPadPlateDepthM"))]},
-        #{name:"BodyMountArm",center:[(bus_edge+arm_end)/2.0-radial,clevis_y,0.0],size:[arm_end-bus_edge,clevis_height,clevis_width]}
+        #{name:"BodyMountArm",center:[(bus_edge+arm_end)/2.0-radial,arm_y,0.0],size:[arm_end-bus_edge,arm_height,clevis_width]}
     ] {
         let part=_component_cube_visual_ops(doc,edit_target,root,item.name,item.center,(),item.size,[0.38,0.42,0.47]);
         if !part.ok {return part;}
@@ -4054,7 +4062,11 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
         return plan_error("refine_griffin_engine_skirt_plan requires a document, edit target, and absolute root");
     }
-    let source = sysml_requirements::source();
+    let selected=[];
+    for name in ["railLengthM","railHeightM","railWidthM","shellDepthM","shellBottomInsetM","adapterPlateName","adapterPlateWidthM","adapterPlateDepthM","adapterPlateHeightM","componentLocalCenterYM","adapterPlateCenterYM"] {
+        selected.push("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::"+name);
+    }
+    let source = sysml_requirements::source_with_attributes(selected);
     // The component owns its typed rail envelope. Avoid duplicated lander
     // geometry fields and source-path indirection.
     let width = _skirt_number(source, "railLengthM");
@@ -4069,10 +4081,11 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     let adapter_depth = _skirt_number(source, "adapterPlateDepthM");
     let adapter_height = _skirt_number(source, "adapterPlateHeightM");
     let local_center_y = _skirt_number(source, "componentLocalCenterYM");
+    let adapter_center_y = _skirt_number(source, "adapterPlateCenterYM");
     if width == () || depth == () || height == () || section == ()
         || shell_depth == () || shell_inset == () || local_center_y == ()
         || adapter_name == () || adapter_name == ""
-        || adapter_width == () || adapter_depth == () || adapter_height == ()
+        || adapter_width == () || adapter_depth == () || adapter_height == () || adapter_center_y == ()
         || width <= 0.0 || depth <= 0.0 || height <= 0.0 || section <= 0.0
         || shell_depth <= 0.0 || shell_inset <= 0.0
         || shell_inset >= width / 2.0 || shell_inset >= depth / 2.0
@@ -4127,12 +4140,16 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         if !adapter_plan.ok { return adapter_plan; }
         for op in adapter_plan.ops { ops.push(op); }
         ops.push(#{SetTranslate: #{edit_target: edit_target, path: adapter_path,
-            value: [0.0, local_center_y + height / 2.0 + adapter_height / 2.0, 0.0]}});
+            value: [0.0, adapter_center_y, 0.0]}});
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: adapter_path,
             name: "purpose", type_name: "token", value: "\"render\""}});
     }
+    let adapter_placement = assembly_builder::place_plan(edit_target, adapter_path,
+        [0.0, adapter_center_y, 0.0], (), [adapter_width, adapter_height, adapter_depth]);
+    if !adapter_placement.ok { return adapter_placement; }
+    for op in adapter_placement.ops { ops.push(op); }
     // Add the visible beveled octagonal shroud as its own replaceable visual part.
-    // It is open at both ends so the seven bells remain readable, and it is
+    // It is open at both ends so the five bells remain readable, and it is
     // double-sided because a study-level thin shell must not disappear when
     // the Editor camera moves underneath the lander.
     let shell_path = root + "/EngineSkirtShell";
@@ -4140,7 +4157,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     if query_ok(shell) && shell.type_name != "Mesh" {
         return plan_error(shell_path + ": existing skirt shell must be Mesh, got " + shell.type_name);
     }
-    if !query_ok(shell) {
+    {
         let y_top = local_center_y + height / 2.0;
         let y_bottom = y_top - shell_depth;
         let top_x = width / 2.0;
@@ -4158,13 +4175,19 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
             [top_x, y_bottom, -top_z_bevel], [top_x_bevel, y_bottom, -top_z],
             [-top_x_bevel, y_bottom, -top_z], [-top_x, y_bottom, -top_z_bevel],
         ];
+        for index in 8..16 {
+            for axis in [0,2] {
+                let coordinate=points[index][axis];
+                points[index][axis]=coordinate + if coordinate>0.0 {-shell_inset} else {shell_inset};
+            }
+        }
         let mesh = assembly_builder::mesh_shape_plan(edit_target, root,
             "EngineSkirtShell", points, [4, 4, 4, 4, 4, 4, 4, 4],
             [0, 1, 9, 8, 1, 2, 10, 9, 2, 3, 11, 10, 3, 4, 12, 11,
              4, 5, 13, 12, 5, 6, 14, 13, 6, 7, 15, 14, 7, 0, 8, 15],
             [0.07, 0.09, 0.12], false);
         if !mesh.ok { return mesh; }
-        for op in mesh.ops { ops.push(op); }
+        for op in mesh.ops { if query_ok(shell) && op.AddPrim != () {continue;} ops.push(op); }
     }
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
         name: "doubleSided", type_name: "bool", value: "true"}});
