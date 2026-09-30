@@ -57,7 +57,7 @@ independently through the runtime authoring tools.
 | `components/lander/griffin_ramp_section_visual.usda` | reusable full section with geometry-derived track collision, upper edge rails, rail pivot pins, supports, treads, beams, and hinge barrel | shared source section referenced by visual and physical ramp assemblies |
 | `components/lander/griffin_ramp_toe_section_visual.usda` | final section with the deployment-angle-derived toe bevel | inherits shared geometry and collision from the section source |
 | `components/rover/flip_chassis_visual.usda` | lower frame, equipment box, bumper, payload deck, service panel | referenced by the canonical FLIP vehicle; the same shapes provide visible chassis geometry and wheel-filtered rigid-body collision |
-| `components/rover/flip_wheel_visual.usda` | tire, metal hub, hub cap | referenced at each typed wheel station in the canonical FLIP vehicle; render geometry stays separate from the physical wheel prim |
+| Shared `lunco://components/mobility/wheel.usda` and selected tire | wheel cylinder, tire material and dynamics | one geometry source per station; the simulator transfers its mesh to a physics-driven runtime render child |
 | `components/rover/flip_sensor_mast_visual.usda` | mast post, sensor head, antenna | front sensor silhouette; render-only |
 | `components/rover/flip_solar_panel_visual.usda` | white backsheet, blue cells, fold hinge | rear collapsible-array proxy; render-only |
 

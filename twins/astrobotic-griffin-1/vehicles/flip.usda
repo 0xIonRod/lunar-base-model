@@ -179,15 +179,8 @@ def Xform "FLIP" (
             float inputs:heading.connect = </FLIP.outputs:heading_fl>
             float lunco:suspension:restLength = 0.30000001192092896
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            uniform token purpose = "proxy"
+            uniform token purpose = "default"
             uniform token axis = "Z"
-            def Xform "Visual" (
-                references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@
-            )
-            {
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
-            }
         }
         def Xform "Visual" (
             references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
@@ -220,15 +213,8 @@ def Xform "FLIP" (
             float inputs:heading.connect = </FLIP.outputs:heading_fr>
             float lunco:suspension:restLength = 0.30000001192092896
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            uniform token purpose = "proxy"
+            uniform token purpose = "default"
             uniform token axis = "Z"
-            def Xform "Visual" (
-                references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@
-            )
-            {
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
-            }
         }
         def Xform "Visual" (
             references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
@@ -259,15 +245,8 @@ def Xform "FLIP" (
             float inputs:drive.connect = </FLIP/Shaft_RL.outputs:torque>
             float lunco:suspension:restLength = 0.30000001192092896
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            uniform token purpose = "proxy"
+            uniform token purpose = "default"
             uniform token axis = "Z"
-            def Xform "Visual" (
-                references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@
-            )
-            {
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
-            }
         }
         def Xform "Visual" (
             references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
@@ -298,15 +277,8 @@ def Xform "FLIP" (
             float inputs:drive.connect = </FLIP/Shaft_RR.outputs:torque>
             float lunco:suspension:restLength = 0.30000001192092896
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            uniform token purpose = "proxy"
+            uniform token purpose = "default"
             uniform token axis = "Z"
-            def Xform "Visual" (
-                references = @twin://astrobotic-griffin-1/components/rover/flip_wheel_visual.usda@
-            )
-            {
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
-            }
         }
         def Xform "Visual" (
             references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@

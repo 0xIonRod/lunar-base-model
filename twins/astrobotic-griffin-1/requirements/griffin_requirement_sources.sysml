@@ -381,6 +381,15 @@ package GriffinRequirementSources {
         ref sources = (source_astrobotic_griffin_1_requirements_flip_requirements_sysml, source_astrobotic_griffin_1_requirements_flip_suspension_requirements_sysml, source_astrobotic_griffin_1_vehicles_flip_usda, source_astrobotic_griffin_1_scenes_griffin_1_surface_ops_usda);
     }
 
+    part source_lunco_mobility_wheel_usda : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "lunco://components/mobility/wheel.usda";
+    }
+    part source_lunco_mobility_regolith_tire_usda : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "lunco://components/mobility/tires/regolith.usda";
+    }
+
     part evidence_fww_001 : RequirementEvidence {
         ref targetRequirement = FlipWheelRequirements::fww001;
         ref sources = (source_www_astrolab_space_flip);
@@ -388,7 +397,7 @@ package GriffinRequirementSources {
 
     part evidence_fww_002 : RequirementEvidence {
         ref targetRequirement = FlipWheelRequirements::fww002;
-        ref sources = (source_www_astrolab_space_flip);
+        ref sources = (source_www_astrolab_space_flip, source_astrobotic_griffin_1_requirements_flip_requirements_sysml, source_astrobotic_griffin_1_vehicles_flip_usda, source_lunco_mobility_wheel_usda, source_lunco_mobility_regolith_tire_usda);
     }
 
     part evidence_fww_003 : RequirementEvidence {
@@ -413,7 +422,7 @@ package GriffinRequirementSources {
 
     part evidence_fww_007 : RequirementEvidence {
         ref targetRequirement = FlipWheelRequirements::fww007;
-        ref sources = (source_www_astrolab_space_flip);
+        ref sources = (source_www_astrolab_space_flip, source_astrobotic_griffin_1_requirements_flip_requirements_sysml, source_astrobotic_griffin_1_vehicles_flip_usda, source_lunco_mobility_wheel_usda, source_lunco_mobility_regolith_tire_usda);
     }
 
     part evidence_gbc_001 : RequirementEvidence {

@@ -1,3 +1,4 @@
+import "twin://astrobotic-griffin-1/tools/flip_wheel_checks" as flip_wheel_checks;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 
@@ -230,17 +231,15 @@ fn run_visual_review(batch_index) {
     let wheel_names = _sysml_list(source, "wheelStations");
     for name in wheel_names {
         checks.push(flip_visual_exists_check("GV-003-wheel-" + name, "wheels", "exists", root + "/FLIP/Suspension_" + name + "/Wheel_" + name));
-        checks.push(flip_visual_children_check("GV-003-wheel-" + name + "-subparts", "wheels",
-            root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual",
-            [root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/Tire",
-             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/MetalHub",
-             root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/HubCap"]));
+        for check in flip_wheel_checks::single_surface("GV-003-wheel-" + name,
+            "wheels", "fvg001", "Verify_GriffinVisualRequirements",
+            root + "/FLIP/Suspension_" + name + "/Wheel_" + name) { checks.push(check); }
     }
     for name in wheel_names {
         let check = #{ id: "GV-004-wheel-radius-" + name, component: "wheels",
             requirement: "fvg001",
             verification: "Verify_GriffinVisualRequirements",
-            kind: "attribute", path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name + "/Visual/Tire",
+            kind: "attribute", path: root + "/FLIP/Suspension_" + name + "/Wheel_" + name,
             attr: "radius", expected_attr: griffin_spec::qualified_attribute_name("wheelRadiusM"), tolerance: 0.001 };
         checks.push(check);
     }

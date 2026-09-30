@@ -207,3 +207,7 @@ is not final finish acceptance: insulation visibility, structural detail and
 materials still need visual work. The fresh powered-descent diagnostic was
 stopped when the user reprioritized the 3D model; it established preflight and
 powered-descent startup, not an accepted landing.
+
+### FLIP wheel ownership correction, 2026-09-30
+
+Four wheel stations remain. Each physical wheel cylinder is now the sole tire geometry source; the redundant three-cylinder visual component is removed. LunCoSim's `spawn_wheel_visual` already transfers the source mesh to a render child driven by suspension and spin. The shared selected tire material supplies tread, rim and hub appearance. Source: simulator `skills/build-vehicle/SKILL.md`, `crates/lunco-usd-sim/src/lib.rs`, `assets/components/mobility/wheel.usda` and `assets/components/mobility/tires/regolith.usda`, inspected 2026-09-30. Existing 0.45 m radius and 0.28 m width remain explicit reconstruction estimates, not newly sourced flight dimensions. Animation must preserve the authored Z axle; a fixed X-axle visual rotation is invalid. Static ownership checks do not establish dynamic acceptance.

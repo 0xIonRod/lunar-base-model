@@ -12,7 +12,7 @@ package FlipRequirements {
     // Rover-owned values stay in this source, while Griffin owns only the
     // integration requirements that reference the rover interface.
     part def FlipRover {
-        doc /* Body 2.116 x 1.476 m, 0.396 m equipment-box height, 2.0 m track, 1.7 m wheelbase, 0.45 m tire radius and 0.28 m tire width are estimates transferred from flip_cad_requirements.sysml, with CAD (X,Y,Z) mapped to USD (Y,Z,X). LPSC 2026 https://www.hou.usra.edu/meetings/lpsc2026/pdf/1874.pdf supports four wheels and skid steering, not these numerical dimensions. Lower-frame thickness, equipment position, fixed panel mount, suspension rest length and hub sizes are packaging/simulation estimates. Mass, COM and inertia remain uncalibrated legacy proxies. Rationale and confidence: griffin-size-evidence.md. */
+        doc /* Body 2.116 x 1.476 m, 0.396 m equipment-box height, 2.0 m track, 1.7 m wheelbase, 0.45 m tire radius and 0.28 m tire width are estimates transferred from flip_cad_requirements.sysml, with CAD (X,Y,Z) mapped to USD (Y,Z,X). LPSC 2026 https://www.hou.usra.edu/meetings/lpsc2026/pdf/1874.pdf supports four wheels and skid steering, not these numerical dimensions. Lower-frame thickness, equipment position, fixed panel mount, suspension rest length are packaging/simulation estimates. Mass, COM and inertia remain uncalibrated legacy proxies. Rationale and confidence: griffin-size-evidence.md. */
         attribute componentAsset : TwinAssetPath = "vehicles/flip.usda";
         attribute usdRootPath : UsdPrimPath = "/World/FLIP";
         attribute localFrame : String = "Y-up SI metres; X longitudinal, Z lateral; CAD (X,Y,Z) maps to USD (Y,Z,X)";
@@ -80,7 +80,7 @@ package FlipRequirements {
     }
 
     requirement def FLIPV003_WheelStations {
-        doc /* FGV-003 [topology] each of the four typed wheel stations shall expose tire, hub, and cap geometry with the authored wheel envelope. */
+        doc /* FGV-003 [topology] each of the four typed wheel stations shall use one physical wheel cylinder with the authored envelope and a shared tire material. The material supplies tread, hub and rim appearance; no second authored tire surface is permitted. The detailed ownership contract is FWW-002 in FlipWheelRequirements. */
     }
 
     requirement def FLIPV004_SensorAndPower {

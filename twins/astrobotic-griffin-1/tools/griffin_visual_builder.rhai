@@ -201,14 +201,14 @@ fn flip_vehicle_size_plan(doc, edit_target, root) {
             #{name:"lunco:suspension:restLength",type_name:"float",value:rest.to_string()}] {
             ops.push(#{SetAttribute:#{edit_target:edit_target,path:wheel,name:a.name,type_name:a.type_name,value:a.value}});
         }
-        // The reusable visual already uses Z-axis cylinders. Rotating it
-        // through Y=90 had made the visible tire disagree with its axle.
-        ops.push(#{SetRotate:#{edit_target:edit_target,path:wheel+"/Visual",value:[0.0,0.0,0.0]}});
         // Shared suspension arm is +X in its component; point it inboard
         // along the revised Z lateral axis, preserving the reusable component.
         ops.push(#{SetRotate:#{edit_target:edit_target,path:carrier+"/Visual",value:[0.0,if zs[i]<0.0 {-90.0}else{90.0},0.0]}});
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:carrier+"/Visual",name:"xformOpOrder",type_name:"token[]",value:"[\"xformOp:rotateXYZ\"]"}});
     }
+    let surface = flip_wheel_surface_plan(doc, edit_target, root);
+    if !surface.ok { return surface; }
+    for op in surface.ops { ops.push(op); }
     let solar=sysml_requirements::model().value("FlipRequirements::FlipRover::solarArrayMount");
     if solar.len()!=3 {return plan_error("FLIP solar mount incomplete");}
     ops.push(#{SetTranslate:#{edit_target:edit_target,path:root+"/SolarArray",value:solar}});
@@ -5893,4 +5893,22 @@ fn griffin_payload_frame_component_plan(doc, edit_target, root) {
     let model = sysml_model("twin://astrobotic-griffin-1");
     if !sysml_model_is(model) { return plan_error("Griffin model unavailable"); }
     _griffin_payload_frame_component_plan(doc, edit_target, root, model)
+}
+
+// The shared wheel projector owns the render child and its animated pose.
+// Keep one authored cylinder per station, rather than a second tire subtree.
+fn flip_wheel_surface_plan(doc, edit_target, root) {
+    let names = griffin_spec::rover_wheel_station_names();
+    if names.len() != 4 { return plan_error("FLIP requires four typed wheel stations"); }
+    let ops = [];
+    for name in names {
+        let path = root + "/Suspension_" + name + "/Wheel_" + name;
+        let wheel = _component_query(doc, path);
+        if !wheel.ok || wheel.type_name != "Cylinder" { return plan_error(path + ": wheel Cylinder missing"); }
+        let visual = _component_query(doc, path + "/Visual");
+        if visual.ok { ops.push(#{RemovePrim: #{edit_target:edit_target,path:path+"/Visual"}}); }
+        ops.push(#{SetAttribute: #{edit_target:edit_target,path:path,name:"purpose",
+            type_name:"token",value:"\"default\""}});
+    }
+    #{ok:true, ops:ops}
 }

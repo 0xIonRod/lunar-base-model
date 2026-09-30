@@ -1,3 +1,4 @@
+import "twin://astrobotic-griffin-1/tools/flip_wheel_checks" as flip_wheel_checks;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Standalone FLIP rover component verification.
 // The integration scene still has a combined visual gate; this component gate
@@ -95,8 +96,8 @@ fn on_tick(me, ctx) {
         let station = ROOT + "/Suspension_" + name;
         let wheel = station + "/Wheel_" + name;
         checks.push(_exists("FGV-003-" + name, "fvg003", wheel, "Cylinder"));
-        checks.push(_children("FGV-003-" + name + "-parts", "fvg003", wheel + "/Visual",
-            [wheel + "/Visual/Tire", wheel + "/Visual/MetalHub", wheel + "/Visual/HubCap"]));
+        for check in flip_wheel_checks::single_surface("FGV-003-" + name,
+            "wheel", "fvg003", VERIFICATION, wheel) { checks.push(check); }
         checks.push(#{id: "FGV-003-" + name + "-radius", component: "wheel",
             requirement: "fvg003", verification: VERIFICATION,
             kind: "attribute", path: wheel, attr: "physxVehicleWheel:radius",
