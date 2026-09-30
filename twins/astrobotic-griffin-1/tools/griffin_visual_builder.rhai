@@ -2580,7 +2580,7 @@ fn _central_bucket_mesh_plan(doc, edit_target, root, name, profile, segments, co
             name: name, type_name: "Mesh", reference: (), reference_prim_path: ""}});
     }
     ops.push(#{RevolveProfileMesh: #{edit_target: edit_target, path: path,
-        profile: profile, angular_segments: segments.to_int(), display_color: color,
+        profile: profile, angular_segments: segments.to_int(), normal_crease_angle_deg: 0.0, display_color: color,
         collision_enabled: false}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
         name: "purpose", type_name: "token", value: "\"render\""}});
@@ -4174,7 +4174,8 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
     let axial = model.value(own + "bellAxialSegments");
     let wall = f64_from(model.value(own + "bellVisualWallThicknessM"));
     let segments = model.value(own + "bellAngularSegments");
-    if contour==() || contour<=0.0 || contour>=1.0 || axial<8 || axial>64 || wall==() || wall<=0.0 {
+    let crease = f64_from(model.value(own + "bellNormalCreaseAngleDeg"));
+    if contour==() || contour<=0.0 || contour>=1.0 || axial<8 || axial>64 || wall==() || wall<=0.0 || crease==() || crease<0.0 || crease>180.0 {
         return plan_error("engine wall profile is incomplete");
     }
     let throat=f64_from(model.value(own+"throatRadiusM"));
@@ -4195,7 +4196,7 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
     let ops = [
         #{RemovePrim:#{edit_target:edit_target,path:root+"/Bell"}},
         #{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Bell",type_name:"Mesh",reference:(),reference_prim_path:""}},
-        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Bell",profile:profile,angular_segments:segments,display_color:[0.20,0.22,0.25],collision_enabled:false}},
+        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Bell",profile:profile,angular_segments:segments,normal_crease_angle_deg:crease,display_color:[0.20,0.22,0.25],collision_enabled:false}},
         #{SetAttribute:#{edit_target:edit_target,path:root+"/Bell",name:"purpose",type_name:"token",value:"\"render\""}}
     ];
     #{ok:true,kind:"griffin_engine_bell_component_refinement",root:root,
@@ -5537,7 +5538,7 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
         let engine_path = engine_parent + "/" + engine_names[index];
-        for op in engine_exhaust::connection_ops(edit_target, engine_path, plume_path) {
+        for op in engine_exhaust::connection_ops(edit_target, engine_path, plume_path, #{}) {
             ops.push(op);
         }
         migrated.push(result.path);

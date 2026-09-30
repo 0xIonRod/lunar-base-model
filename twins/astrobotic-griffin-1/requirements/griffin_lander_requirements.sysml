@@ -38,7 +38,7 @@ package GriffinLanderRequirements {
         doc /* GLR-002 [visual] exactly four named landing-leg components shall expose struts and a visible foot pad. */
     }
     requirement def GLR003_PropellantTanks {
-        doc /* GLR-003 [visual study] exactly four named propellant-tank study assemblies shall expose a tank body and retention bands/cradle. Four is a replaceable Twin visualization assumption; public Griffin-1 sources do not publish tank count, type, stations, or dimensions. */
+        doc /* GLR-003 [visual study] exactly four named propellant-tank study assemblies shall expose a tank body and retention bands/cradle. The August 2021 Astrobotic Payload User Guide v5.02 p.26 documents two fuel and two oxidizer tanks. Their detailed shapes, attachment stations and dimensions remain explicit Twin estimates. */
     }
     requirement def GLR004_EngineCluster {
         doc /* GLR-004 [visual] exactly five named main-engine components shall expose a visible bell and throat. */

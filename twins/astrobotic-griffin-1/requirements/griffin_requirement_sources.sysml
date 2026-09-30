@@ -22,6 +22,7 @@ package GriffinRequirementSources {
      * identifiers are the standard SysML short names on those usages.
      */
     part source_astrobotic_griffin_propulsion_pug_2022 : EvidenceSource {
+        doc /* August 2021 v5.02, printed p.26. URL dated January 2022 is the hosting/upload path, not the guide edition. Five main engines, twelve ACS engines in groups of three, two fuel and two oxidizer tanks; detailed dimensions remain estimates. */
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf";
     }

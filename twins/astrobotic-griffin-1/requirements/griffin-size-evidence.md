@@ -272,7 +272,7 @@ articulation remain outside this acceptance.
 
 ## Engine and exhaust reconstruction, 2026-09-30
 
-[Astrobotic Payload User Guide, January 2022, page 26](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf)
+[Astrobotic Payload User Guide, August 2021 v5.02, page 26 (hosted January 2022)](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf)
 specifies five 700 lbf pulsed main engines, twelve 25 lbf attitude engines,
 pressure-fed M20 fuel and MON3 oxidizer, and two tanks for each reactant. The
 previous seven-engine interpretation was wrong. Requirements and USD now use
@@ -325,3 +325,5 @@ The Editor's saved nozzle document and projected generation both read 0 in a
 fresh session; the [current bell review](../handover/griffin-five-engine-bell-2026-09-30.png)
 shows the curved shell with remaining flat-shaded facets. Smooth normals and
 finer material work remain visual improvements, not completed acceptance.
+
+The 35-degree bell shading crease is a rendering estimate: adjacent curved-wall normals are averaged, while the thin open rim retains its sharp edge. It changes shading only, not the source-derived envelope or mesh topology.

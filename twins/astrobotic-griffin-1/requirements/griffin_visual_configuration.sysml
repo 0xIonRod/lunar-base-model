@@ -270,7 +270,7 @@ package GriffinVisualConfigurationRequirements {
 
         attribute engineClusterMountYM : Real = 1.00;
         attribute engineBellDirection : Direction = (0.0, -1.0, 0.0);
-        /* Five engines are documented in Astrobotic's 2022 Payload User Guide,
+        /* Five engines are documented in Astrobotic's August 2021 Payload User Guide v5.02,
          * p.26. Center plus four cardinal stations on a 1.05 m radius is an
          * explicit layout estimate, not a supplier mounting drawing. It keeps
          * 0.34 m bell envelopes inside the estimated 1.54 m lower bucket. */

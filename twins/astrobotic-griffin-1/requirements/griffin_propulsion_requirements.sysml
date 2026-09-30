@@ -32,6 +32,8 @@ package GriffinPropulsionRequirements {
         attribute bellAxialSegments : Integer = 16;
         attribute bellVisualWallThicknessM : Real = .006;
         attribute bellAngularSegments : Integer = 48;
+        // Estimated shading crease; keeps the physical rim sharp.
+        attribute bellNormalCreaseAngleDeg : Real = 35.0;
 
         // Hypergolic family from PUG p.26 (M20 / MON3). Palette is heuristic;
         // 2.0 reference O/F is a provisional chemistry estimate, not flight data.
