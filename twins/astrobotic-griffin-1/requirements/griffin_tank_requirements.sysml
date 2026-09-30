@@ -152,11 +152,11 @@ package GriffinTankRequirements {
         doc /* GPT-004 [evidence] tank identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and each instance is checked individually. */
     }
     requirement def GPT005_TankPlacement {
-        doc /* GPT-005 [layout] each tank root transform matches its ordered typed cardinal-axis Position datum; all four tanks share the bus-origin plane and provide at least 0.06 m inter-instance and frame-envelope clearance while fitting within the published 4.5 m Griffin footprint. Station coordinates and installed envelope are replaceable study assumptions, not a flight ICD. */
+        doc /* GPT-005 [layout] each tank root transform matches its ordered typed cardinal-axis Position datum. The four tanks share the bus-origin plane and satisfy the source-owned inter-instance and frame-envelope clearances. The envelope is derived from typed station and tank geometry; station coordinates and installed dimensions remain replaceable study assumptions, not a flight ICD. */
         require GPT005_MinimumClearance;
     }
     requirement def GPT006_TankEndHardware {
-        doc /* GPT-006 [visual] each tank body is a near-spherical 0.84 m nominal-radius metric proxy with three shell-conforming retention bands, tapered polar transitions, seated adapter hardware, and coaxial necks. Its 0.90 assembly scale gives a 1.512 m installed body diameter, satisfying the typed 1.51 m minimum. Astrobotic identifies four Griffin-1 COPV propellant tanks, but does not publish their vessel geometry; the vessel size, assembly scale, and interface details are explicit replaceable study assumptions, not flight data. */
+        doc /* GPT-006 [visual] each tank body is a near-spherical metric proxy using the source-owned bodyRadiusM and assembly scale. Its installed diameter, derived from those values, shall satisfy minimumInstalledBodyDiameterM. Include the three source-sized retention bands, tapered polar transitions, seated adapter hardware, and coaxial necks. Astrobotic identifies four Griffin-1 COPV propellant tanks, but does not publish their vessel geometry; the vessel size, assembly scale, and interface details are explicit replaceable study assumptions, not flight data. */
         require GPT006_MinimumInstalledDiameter;
     }
     requirement def GPT007_TankServiceHardware {
@@ -166,12 +166,12 @@ package GriffinTankRequirements {
         doc /* GPT-008 [orientation] the spherical body is centered on the tank datum and all axial service hardware follows the declared local Y axis; no hidden rotations or through-geometry are permitted. */
     }
     requirement def GPT009_TankDeckSeat {
-        doc /* GPT-009 [interface] the component-local lower cradle is a 0.74 m radius x 0.16 m high Cylinder and its 1.08 m x 1.08 m x 0.13 m adapter pad seats above the lower service-skirt datum; the assembly scale is applied once to this local envelope. A coaxial support post bridges the pad to the lower neck, preserving the typed skirt gap. These mount sizes are study assumptions because the attachment ICD is unpublished. */
+        doc /* GPT-009 [interface] the component-local lower cradle and adapter pad shall use the typed shape and dimension attributes, with assembly scale applied once to this local envelope. The pad seats above the lower service-skirt datum; a coaxial support post bridges the pad to the lower neck while preserving minimumSkirtClearanceM. These mount sizes are study assumptions because the attachment ICD is unpublished. */
         require GPT009_SkirtClearanceMatchesDatum;
         require GPT009_SupportPostSpansSeat;
     }
     requirement def GPT010_TankMounting {
-        doc /* GPT-010 [interface/visual] four 0.10 m square-section, 0.18 m component-local braces bridge the adapter pad to the 0.84 m nominal-radius spherical shell. Their four signed X/Z rotations are mirrored and slope inward by 12 degrees; each endpoint closes to the spherical envelope from the typed pad top and 0.46 m radial offset. The local sizes are scaled once at assembly and remain replaceable study assumptions, since exact flight attachment details are unpublished. */
+        doc /* GPT-010 [interface/visual] the four braces shall use the typed bracket dimensions, mirrored X/Z orientation convention, and inward tilt. Their endpoints close to the source-owned spherical envelope from the typed pad top and bracketCenterOffsetM. The local sizes are scaled once at assembly and remain replaceable study assumptions, since exact flight attachment details are unpublished. */
         require GPT010_BraceContactsVesselEnvelope;
     }
     requirement def GPT011_ComponentIdentity {

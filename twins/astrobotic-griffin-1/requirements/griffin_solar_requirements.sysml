@@ -1,6 +1,7 @@
 package GriffinSolarRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
+    private import ScalarValues::String;
     private import VectorValues::CartesianThreeVectorValue;
     private import GriffinRequirementSources::TwinAssetPath;
     private import GriffinRequirementSources::UsdPrimPath;
@@ -163,7 +164,8 @@ package GriffinSolarRequirements {
         doc /* GSA-009 [visual integration] each array shall show connected support geometry from the panel frame to the lander mounting rails, including the bracket, link, and frame interfaces. */
     }
     requirement def GSA010_TransitSunPointing {
-        doc /* GSA-010 [operational] during transit, Griffin attitude control shall keep the solar-array incidence within the approved Sun-pointing envelope whenever mission, thermal, and vehicle constraints permit. Verify against time-aligned Sun direction, commanded and measured vehicle attitude, panel incidence, and electrical-power evidence. */
+        attribute acceptanceStatus : String = "OPEN: approved incidence bounds, evaluation window, and exception authority are not source-defined";
+        doc /* GSA-010 [operational, OPEN] during transit, Griffin attitude control shall keep solar-array incidence within a source-defined Sun-pointing envelope when mission, thermal, and vehicle constraints permit. Define the envelope, evaluation window, and permitted exceptions before claiming a pass. Verification evidence shall correlate time-aligned Sun direction, commanded and measured vehicle attitude, panel incidence, and electrical-power data. */
     }
 
     requirement <'GSA-001'> gsa001 : GSA001_ArrayCount { subject arrays : GriffinSolarArrayAssembly; }

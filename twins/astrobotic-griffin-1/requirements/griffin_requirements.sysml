@@ -261,6 +261,7 @@ package Griffin1Requirements {
             verify GriffinSimulationAccuracyRequirements::gr036;
             verify GriffinSimulationAccuracyRequirements::gr037;
             verify GriffinSimulationAccuracyRequirements::gr038;
+            verify GriffinSimulationAccuracyRequirements::gr039;
             verify MoonBaseProjectRequirements::mb001;
             verify MoonBaseProjectRequirements::mb002;
             verify MoonBaseProjectRequirements::mb003;

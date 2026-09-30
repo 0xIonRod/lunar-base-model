@@ -532,7 +532,7 @@ package GriffinRequirementSources {
 
     part evidence_gll_002 : RequirementEvidence {
         ref targetRequirement = GriffinLandingLegRequirements::gll002;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_www_astrobotic_com_griffin_lander, source_pghtech_griffin_hardware_photo);
     }
 
     part evidence_gll_003 : RequirementEvidence {
@@ -552,12 +552,12 @@ package GriffinRequirementSources {
 
     part evidence_gll_006 : RequirementEvidence {
         ref targetRequirement = GriffinLandingLegRequirements::gll006;
-        ref sources = (source_www_astrobotic_com_griffin_lander, source_science_nasa_gov_astrobotic_lunar_landers_pug_pdf);
+        ref sources = (source_www_astrobotic_com_griffin_lander, source_science_nasa_gov_astrobotic_lunar_landers_pug_pdf, source_pghtech_griffin_hardware_photo);
     }
 
     part evidence_gll_007 : RequirementEvidence {
         ref targetRequirement = GriffinLandingLegRequirements::gll007;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_www_astrobotic_com_griffin_lander, source_pghtech_griffin_hardware_photo);
     }
 
     part evidence_gll_008 : RequirementEvidence {
@@ -1166,4 +1166,103 @@ package GriffinRequirementSources {
         ref sources = (source_astrobotic_griffin_1_requirements_griffin_simulation_accuracy_requiremen, source_astrobotic_griffin_1_scenes_griffin_1_surface_ops_usda, source_astrobotic_griffin_1_scenarios_griffin_1_surface_ops_rhai);
     }
 
+
+    part source_flip_cad_study : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml";
+    }
+
+    part evidence_fr_001 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr001;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_002 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr002;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_003 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr003;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_004 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr004;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_005 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr005;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_006 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr006;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_007 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr007;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_008 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr008;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_009 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr009;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_010 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr010;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_011 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr011;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_012 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr012;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_013 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr013;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_014 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr014;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_015 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr015;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_fr_016 : RequirementEvidence {
+        ref targetRequirement = FlipCadRequirements::fr016;
+        ref sources = (source_flip_cad_study);
+    }
+
+    part evidence_gll_010 : RequirementEvidence {
+        ref targetRequirement = GriffinLandingLegRequirements::gll010;
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
+    }
+
+    part evidence_gr_039 : RequirementEvidence {
+        ref targetRequirement = GriffinSimulationAccuracyRequirements::gr039;
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_simulation_accuracy_requiremen);
+    }
+    part source_pghtech_griffin_hardware_photo : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png";
+    }
 }

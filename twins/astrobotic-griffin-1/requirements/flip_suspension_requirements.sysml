@@ -63,11 +63,13 @@ package FlipSuspensionRequirements {
         doc /* FSR-006 [transform] translated suspension members shall use translate-before-scale so metric offsets remain true in the composed stage. */
     }
     requirement def FSR007_EnvelopeAndAxis {
-        doc /* FSR-007 [geometry] the arm and strut shall use the declared metric envelopes, the knuckle shall be a 0.18 m radius by 0.36 m X-axis cylinder, and all child axes shall match this component contract. */
+        doc /* FSR-007 [geometry] the arm, strut, and X-axis knuckle cylinder shall match the declared metric envelopes and dimensions in this component contract. */
     }
     requirement def FSR008_PhysicalTransitionEnvelope {
-        doc /* FSR-008 [physics boundary] the physical FLIP realization shall expose the 1.20 m ramp-transition suspension rest length as a separate study datum from the 0.70 m generic suspension default. Source: Griffin physical-ramp replay evidence. Rationale: the longer envelope is required to acquire the steep ramp surface before the released chassis loses support; it is explicitly replaceable when supplier data arrives. */
-        require FSRC008_PositiveRestLength;
+        doc /* FSR-008 [physics boundary] the physical FLIP realization shall use the source-owned ramp-transition rest-length datum referenced by FlipSuspensionComponent. This replaceable Twin study value is a suspension-envelope assumption; the current 0.30 m datum has not been accepted by a full driving replay. The sibling proposal of 1.20 m is deferred because its cited replay artifact is unidentified. Supplier suspension data is not public. */
+        require FSRC008_PositiveRestLength {
+            in restLengthM = FlipRequirements::FlipRover::suspensionRestLengthM;
+        }
     }
 
     requirement <'FSR-001'> fsr001 : FSR001_SourceTraceability { subject suspension : FlipSuspensionComponent; }

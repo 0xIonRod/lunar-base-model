@@ -16,7 +16,7 @@ package MoonBaseProjectRequirements {
     }
 
     requirement def MB001_MetricSystem {
-        doc /* MB-001 [project] all authored geometry and simulation parameters use SI metric units: metres, kilograms, radians, and seconds. */
+        doc /* MB-001 [project] authored Twin geometry and simulation parameters use SI metric units: metres, kilograms, radians, and seconds. Source-exchange artifacts may retain their explicitly declared native units; every value bound into the Twin model shall be converted to SI at its typed integration source. */
     }
 
     requirement def MB002_YUpFrame {

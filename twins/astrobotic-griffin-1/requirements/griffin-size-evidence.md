@@ -29,7 +29,7 @@ derived hinge coordinates is for interface closure, not measurement accuracy.
 | Quantity | Previous active model | New study value | Basis and uncertainty |
 |---|---:|---:|---|
 | Griffin body plan span | 5.40 m | 3.60 m | Estimate: 80% of the historical 4.5 m overall envelope reserves 0.45 m per side for leg/foot extension. Plausible range 3.2–4.0 m; low confidence. |
-| Body belt height | 2.00 m; first pass 1.40 m | 0.72 m | User-selected ESA face ratio ≈3:1; broad octagon face = 0.585786 × 3.60 = 2.109 m; 2.109 / 3 = 0.703 m, rounded to 0.72 m. Approximate range 0.60–0.84 m; perspective and concept-version uncertainty. |
+| Body belt and frame-member height | 2.00 m; first pass 1.40 m | 0.72 m | User-selected ESA face ratio ≈3:1; broad octagon face = 0.585786 × 3.60 = 2.109 m; 2.109 / 3 = 0.703 m, rounded to 0.72 m. Approximate range 0.60–0.84 m; low-confidence presentation estimate. The earlier 1.40 m entry was stale and did not match the authored geometry. |
 | Payload surface above terrain | 5.72 m | 2.52 m | Estimate: older 2.0 m overall-height anchor plus approximately 0.5 m allowance for the current higher deck/structure. Range 2.0–3.0 m. Not a photograph measurement. |
 | Footprint across opposed pad edges | 7.24 m | 4.50 m | Two 1.90 m radial leg stations plus two 0.35 m pad radii; selected to match the historical envelope approximately. Current footprint unconfirmed. |
 | Payload adapter | 4.40 × 3.20 m | 3.20 × 3.20 m | Estimated octagonal footprint fitting inside the bus and covering the reconstructed FLIP wheels after clipping the corners. Thickness retained at 0.16 m as a structural proxy. |
@@ -211,3 +211,20 @@ powered-descent startup, not an accepted landing.
 ### FLIP wheel ownership correction, 2026-09-30
 
 Four wheel stations remain. Each physical wheel cylinder is now the sole tire geometry source; the redundant three-cylinder visual component is removed. LunCoSim's `spawn_wheel_visual` already transfers the source mesh to a render child driven by suspension and spin. The shared selected tire material supplies tread, rim and hub appearance. Source: simulator `skills/build-vehicle/SKILL.md`, `crates/lunco-usd-sim/src/lib.rs`, `assets/components/mobility/wheel.usda` and `assets/components/mobility/tires/regolith.usda`, inspected 2026-09-30. Existing 0.45 m radius and 0.28 m width remain explicit reconstruction estimates, not newly sourced flight dimensions. Animation must preserve the authored Z axle; a fixed X-axle visual rotation is invalid. Static ownership checks do not establish dynamic acceptance.
+
+## Landing-gear reference for the next geometry pass
+
+The user-supplied [Pittsburgh Technology Council Griffin hardware photograph](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
+was reviewed on 2026-09-30. It supports a slender primary shock member from the
+outer body frame to the foot and two diagonal braces spreading to separated
+underside/frame attachments. It does not support three thick, almost parallel
+members. The photograph has no calibrated scale or identified hardware revision;
+attachment coordinates, tube diameters and pad thickness must remain explicit
+packaging estimates, with endpoints derived from the body/skirt datums.
+
+The large central tapered item beneath the vehicle must not be used as an
+individual engine-bell reference. The Astrobotic PUG page 25 distinguishes a
+launch-vehicle adapter from payload interfaces. Exact correspondence of this
+photographed item to flight engine/skirt hardware is unconfirmed. The current
+USD leg and engine proxies still need this geometry pass; adding a reference
+is not visual acceptance or a structural qualification claim.

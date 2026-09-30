@@ -147,16 +147,16 @@ fn griffin_bus_cladding_plan(doc, edit_target, root) {
 fn flip_chassis_size_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
     let prefix="FlipRequirements::FlipRover::";
-    let x=f64_from(model.value(prefix+"chassisWidthM"));
+    let x=f64_from(model.value(prefix+"chassisLengthM"));
     let y=f64_from(model.value(prefix+"chassisHeightM"));
-    let z=f64_from(model.value(prefix+"chassisLengthM"));
-    let ex=f64_from(model.value(prefix+"equipmentBoxWidthM"));
+    let z=f64_from(model.value(prefix+"chassisWidthM"));
+    let ex=f64_from(model.value(prefix+"equipmentBoxDepthM"));
     let ey=f64_from(model.value(prefix+"equipmentBoxHeightM"));
-    let ez=f64_from(model.value(prefix+"equipmentBoxDepthM"));
+    let ez=f64_from(model.value(prefix+"equipmentBoxWidthM"));
     let cy=f64_from(model.value(prefix+"equipmentBoxCenterYM"));
-    let dx=f64_from(model.value(prefix+"payloadDeckWidthM"));
+    let dx=f64_from(model.value(prefix+"payloadDeckDepthM"));
     let dy=f64_from(model.value(prefix+"payloadDeckThicknessM"));
-    let dz=f64_from(model.value(prefix+"payloadDeckDepthM"));
+    let dz=f64_from(model.value(prefix+"payloadDeckWidthM"));
     let dc=f64_from(model.value(prefix+"payloadDeckCenterYM"));
     if x==() || y==() || z==() || ex==() || ey==() || ez==() || cy==()
         || dx==() || dy==() || dz==() || dc==() {return plan_error("FLIP chassis source incomplete");}

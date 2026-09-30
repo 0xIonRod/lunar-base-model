@@ -52,7 +52,7 @@ package GriffinPropulsionRequirements {
         attribute shellUpperYM : Real = 0.10;
         attribute shellLowerYM : Real = -0.40;
         attribute componentLocalCenterYM : Real = 0.00;
-        attribute clearance : String = "minimum 0.10 m radial clearance to every bell outer radius";
+        attribute minimumSkirtBellClearanceM : Real = 0.10;
         attribute colliderPolicy : String = "render-only frame; no physics collision or thrust authority";
         attribute transformOrder : String[2] = ("xformOp:translate", "xformOp:scale");
     }
@@ -73,7 +73,7 @@ package GriffinPropulsionRequirements {
         doc /* GPP-005 [layout] each bell owner uses the ordered native Position datum owned by GriffinVisualConfigurationRequirements. */
     }
     requirement def GPP006_BellAndThroatEnvelope {
-        doc /* GPP-006 [geometry] each engine shall expose a Y-axis bell with 0.16 m base radius, 0.34 m exit radius, and 0.52 m height plus a 0.12 m radius by 0.16 m throat centered at local Y = 0.28 m. */
+        doc /* GPP-006 [geometry] each engine shall expose a Y-axis bell and throat using the source-owned bellRadiusM, bellHeightM, throatRadiusM, throatHeightM, and throatCenterYM values. */
     }
     constraint def GPPC007_BellSeparation {
         in measuredMinimumClearanceM : Real;
@@ -116,22 +116,22 @@ package GriffinPropulsionRequirements {
         doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the seven-engine cluster. */
     }
     requirement def GES002_SkirtEnvelope {
-        doc /* GES-002 [geometry] the rail envelope is 3.20 m by 3.20 m with a 0.20 m rail section; the tapered open-ended shell extends 0.50 m below the adapter and a 2.84 m x 2.84 m x 0.12 m plate seats the cluster, all metric. */
+        doc /* GES-002 [geometry] the rail envelope, rail section, open-ended shell, and adapter plate shall use their typed dimensions and station datums in GriffinEngineSkirtComponent. */
     }
     requirement def GES003_SkirtDatum {
         doc /* GES-003 [placement] the skirt is centered on the engine adapter datum immediately below the bus. */
     }
     requirement def GES004_BellClearance {
-        doc /* GES-004 [clearance] every rail leaves at least 0.10 m radial clearance to the visible bell envelope. */
+        doc /* GES-004 [clearance] every rail leaves at least minimumSkirtBellClearanceM radial clearance to the visible bell envelope. */
     }
     requirement def GES005_SkirtOwnership {
         doc /* GES-005 [ownership] skirt geometry is render-only and cannot introduce thrust, collider, or physics authority. */
     }
     requirement def GES006_RailGeometry {
-        doc /* GES-006 [geometry] the four named skirt rails shall each be 3.20 m long, 0.20 m wide, and 0.20 m high, with signed centers at X = +/-1.50 m or Z = +/-1.50 m. */
+        doc /* GES-006 [geometry] the four named skirt rails shall match railLengthM, railWidthM, railHeightM, and the signed center stations in GriffinEngineSkirtComponent. */
     }
     requirement def GES007_ShellAndAdapterEnvelope {
-        doc /* GES-007 [geometry] the tapered shell shall span local Y = -0.40 m to +0.10 m, and the adapter plate shall be 2.84 m by 2.84 m by 0.12 m at its declared adapter datum. */
+        doc /* GES-007 [geometry] the tapered shell shall use its typed upper/lower Y limits, and the adapter plate shall match its typed dimensions and declared datum. */
     }
 
     requirement <'GPP-001'> gpp001 : GPP001_EngineCount { subject propulsion : GriffinMainPropulsionAssembly; }

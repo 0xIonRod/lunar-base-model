@@ -100,7 +100,7 @@ package GriffinSimulationAccuracyRequirements {
     }
 
     requirement def GR036_LandingStability {
-        doc /* GR-036 [simulation accuracy] beginning with detected touchdown, observe a full 60 s post-touchdown window at the source-owned fixed-tick cadence. At every available observation all four landing legs shall remain in contact and telemetry shall be finite; the lander upright-axis Y component shall remain at least 0.9393727128473789 (cosine of the 0.35 rad study tilt limit), horizontal ground speed shall not exceed 5.0 m/s, angular speed shall not exceed 2.0 rad/s, and horizontal drift from the touchdown position shall not exceed 50.0 m. These are replaceable Twin study limits, not supplier performance specifications. Missing physics samples are inconclusive. */
+        doc /* GR-036 [simulation accuracy] beginning with detected touchdown, observe the source-owned post-touchdown horizon at the source-owned fixed-tick cadence. At every available observation all four landing legs shall remain in contact and telemetry shall be finite; upright attitude, horizontal speed, angular speed and drift shall remain within the typed bounds below. These are replaceable Twin screening limits, not supplier performance specifications or mission-level landing-stability acceptance. Missing physics samples are inconclusive. */
         attribute landingStabilityHorizonS : Real = 60.0;
         attribute landingStabilitySampleEveryNTicks : Integer = 10;
         attribute landingMinimumUprightAxisY : Real = 0.9393727128473789;

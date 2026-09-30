@@ -70,7 +70,7 @@ package GriffinBusRequirements {
         doc /* GBC-004 [evidence] each bus assumption and its rationale/source shall resolve from the separate SysML provenance catalog, while geometry is verified from typed requirements and composed mesh data. */
     }
     requirement def GBC005_BusFrameGeometry {
-        doc /* GBC-005 [geometry] the internal eight-sided frame shall comprise eight upper and eight lower perimeter beams plus eight named corner posts. Dimensions resolve from GriffinVisualConfiguration, currently an estimated 3.60 m X/Z envelope and 0.72 m body-belt height. Source and uncertainty: griffin-size-evidence.md; the older NASA whole-lander envelope is not a current core measurement. The 0.16 m member stock is an explicit packaging assumption, not a supplier section specification. */
+        doc /* GBC-005 [geometry] the internal eight-sided frame shall comprise eight upper and eight lower perimeter beams plus eight named corner posts. Plan span, frame height, and member stock shall resolve from GriffinVisualConfiguration and remain replaceable presentation estimates documented in griffin-size-evidence.md; the older NASA whole-lander envelope is not a current core measurement. */
         require GBC_MeasurementWithinTolerance;
     }
     requirement def GBC006_DeckGeometry {

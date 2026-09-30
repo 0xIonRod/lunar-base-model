@@ -1,11 +1,14 @@
 import "twin://astrobotic-griffin-1/tools/flip_wheel_checks" as flip_wheel_checks;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 // Standalone FLIP rover component verification.
 // The integration scene still has a combined visual gate; this component gate
 // is independent and can be opened in Editor Perspective without the lander.
 
 const ROOT = "/World/FLIP";
 const VERIFICATION = "Verify_FLIPComponentRequirements";
+
+fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
 
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
@@ -69,12 +72,12 @@ fn on_tick(me, ctx) {
 
     checks.push(#{id: "FGV-002-width", component: "chassis",
         requirement: "fvg002", verification: VERIFICATION,
-        kind: "extent_component", path: ROOT + "/Chassis/LowerFrame", index: 0,
-        multiplier: 2.0, expected_attr: _source_attr("chassisWidthM"), tolerance: 0.002});
+        kind: "extent_component", path: ROOT + "/Chassis/LowerFrame", index: 2,
+        multiplier: 1.0, expected_attr: _source_attr("chassisWidthM"), tolerance: 0.002});
     checks.push(#{id: "FGV-002-length", component: "chassis",
         requirement: "fvg002", verification: VERIFICATION,
-        kind: "extent_component", path: ROOT + "/Chassis/LowerFrame", index: 2,
-        multiplier: 2.0, expected_attr: _source_attr("chassisLengthM"), tolerance: 0.002});
+        kind: "extent_component", path: ROOT + "/Chassis/LowerFrame", index: 0,
+        multiplier: 1.0, expected_attr: _source_attr("chassisLengthM"), tolerance: 0.002});
     checks.push(#{id: "FGV-002-mast-height", component: "mast",
         requirement: "fvg002", verification: VERIFICATION,
         kind: "attribute", path: ROOT + "/SensorMast/MastPost", attr: "height",

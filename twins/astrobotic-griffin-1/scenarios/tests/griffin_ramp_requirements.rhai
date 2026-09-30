@@ -1,16 +1,13 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "lunco://scripting/tools/authoring_measurements" as authoring_measurements;
 import "lunco://scripting/tools/mechanical_relations" as mechanical_relations;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 
 const ROOT = "/World/Griffin1";
 const OWN = "GriffinRampRequirements::GriffinEgressRamp::";
 const VERIFICATION = "Verify_GriffinRampRequirements";
 
-fn simulation_dependencies(me, ctx) {
-    #{modelica_entities: [], entity_reads: [], entity_writes: [],
-      query_reads: ["AnalyzeSysml", "QueryUsdPrim", "QueryUsdPrims"],
-      required_inputs: []}
-}
+fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
 
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();

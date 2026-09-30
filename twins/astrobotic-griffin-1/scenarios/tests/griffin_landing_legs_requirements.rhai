@@ -1,4 +1,5 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 // Standalone Griffin landing-leg verification. Typed identities and stations
 // come from GriffinVisualConfigurationRequirements; the lander owns the count.
 
@@ -29,11 +30,7 @@ fn joint_frame_component(id, path, attr, index, expected, tolerance) {
       attr: attr, index: index, expected: expected, tolerance: tolerance}
 }
 
-fn simulation_dependencies(me, ctx) {
-    #{modelica_entities: [], entity_reads: [], entity_writes: [],
-      query_reads: ["AnalyzeSysml", "ReadActiveTwinContract", "QueryUsdPrims"],
-      required_inputs: []}
-}
+fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
 
 fn _joint_frame_observation(root, name) {
     let body_path = root + "/" + name;

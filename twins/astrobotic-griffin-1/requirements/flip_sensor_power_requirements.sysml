@@ -74,13 +74,13 @@ package FlipSensorPowerRequirements {
         doc /* FSP-005 [geometry] the mast post, sensor head, antenna, and deck mount shall match the package's source-owned dimensions and placements. */
     }
     requirement def FSP006_SolarPanelGeometry {
-        doc /* FSP-006 [geometry] the rover panel shall expose a 1.00 m by 0.70 m active cell face, matching the source-owned 0.70 m2 electrical collection area, on a fitted backsheet and fold hinge. */
+        doc /* FSP-006 [geometry] the rover panel shall expose an active cell face sized by solarCellWidthM and solarCellDepthM. Its collection area is derived from those typed dimensions and shall fit on the source-owned backsheet and fold hinge. */
     }
     requirement def FSP007_BatteryEnergyCapacity {
         doc /* FSP-007 [power] the FLIP electrical-storage model shall realize the published battery energy capacity held in this package's source attribute. */
     }
     requirement def FSP008_SolarArrayPeakPower {
-        doc /* FSP-008 [power] model FLIP's 0.70 m2 solar array at 35% conversion efficiency and limit its electrical output to the source-owned 270 W nameplate rating. */
+        doc /* FSP-008 [power] derive the modeled solar collection area from the typed cell dimensions, apply solarArrayEfficiency, and limit electrical output to solarArrayPeakPowerW. */
     }
 
     requirement <'FSP-001'> fsp001 : FSP001_MastStructure { subject sensorPower : FlipSensorPowerAssembly; }

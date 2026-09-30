@@ -1,4 +1,5 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 // Standalone Griffin main-propulsion visual verification.  Thrust and
 // collision remain owned by the flight model; this observer checks only the
 // replaceable bell/throat presentation components.
@@ -31,11 +32,7 @@ fn attribute(id, requirement, path, attr, expected, tolerance) {
 
 fn absolute(value) { if value < 0.0 { -value } else { value } }
 
-fn simulation_dependencies(me, ctx) {
-    #{modelica_entities: [], entity_reads: [], entity_writes: [],
-      query_reads: ["AnalyzeSysml", "QueryUsdPrim", "QueryUsdPrims"],
-      required_inputs: []}
-}
+fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
 
 fn record_at(result, path) {
     if result == () || result.records == () { return (); }

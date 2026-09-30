@@ -5,51 +5,60 @@ package FlipRequirements {
     private import ScalarValues::String;
     private import GriffinRequirementSources::TwinAssetPath;
     private import GriffinRequirementSources::UsdPrimPath;
+    private import FlipCadRequirements::CadStudy;
 
     enum def FlipWheelStation { FL; RL; FR; RR; }
     enum def FlipSteeringMode { ackermann; crab; }
 
-    // Rover-owned values stay in this source, while Griffin owns only the
-    // integration requirements that reference the rover interface.
+    // CAD-study dimensions are owned by FlipCadRequirements::CadStudy and
+    // converted to the SI runtime frame here. Rover-specific simulation policy
+    // remains owned by this part definition.
     part def FlipRover {
-        doc /* Body 2.116 x 1.476 m, 0.396 m equipment-box height, 2.0 m track, 1.7 m wheelbase, 0.45 m tire radius and 0.28 m tire width are estimates transferred from flip_cad_requirements.sysml, with CAD (X,Y,Z) mapped to USD (Y,Z,X). LPSC 2026 https://www.hou.usra.edu/meetings/lpsc2026/pdf/1874.pdf supports four wheels and skid steering, not these numerical dimensions. Lower-frame thickness, equipment position, fixed panel mount, suspension rest length are packaging/simulation estimates. Mass, COM and inertia remain uncalibrated legacy proxies. Rationale and confidence: griffin-size-evidence.md. */
+        doc /* CAD body, wheel, and baseplate dimensions are owned by FlipCadRequirements::CadStudy and converted to SI for the Twin frame (CAD X,Y,Z maps to USD Y,Z,X). The public skid-steer architecture is distinct from this Twin's Ackermann route-control approximation. Lower-frame thickness, equipment position, fixed panel mount, suspension rest length, mass, COM, and inertia remain replaceable simulation-study values. Rationale and confidence: griffin-size-evidence.md. */
         attribute componentAsset : TwinAssetPath = "vehicles/flip.usda";
         attribute usdRootPath : UsdPrimPath = "/World/FLIP";
         attribute localFrame : String = "Y-up SI metres; X longitudinal, Z lateral; CAD (X,Y,Z) maps to USD (Y,Z,X)";
-        attribute flipMassStudyKg : Real = 450.0;
+        attribute flipMassStudyKg : Real = FlipCadRequirements::CadStudy::legacyRuntimeMassKg;
         attribute massPropertiesStatus : String = "study proxy; supplier mass properties and wheel loads TBD";
         attribute batteryNominalVoltageV : Real = 28.0;
         attribute centerOfMassM : Real[3] = (0.0, -0.05, 0.0);
         attribute diagonalInertiaKgM2 : Real[3] = (240.0, 337.5, 145.5);
-        attribute flipPayloadCapacityKg : Real = 30.0;
+        attribute flipPayloadCapacityKg : Real = FlipCadRequirements::CadStudy::historicalPayloadCapacityKg;
         attribute egressMode : String = "direct top-deck egress is public; ramp path is optional study branch";
         attribute solarArrayMode : String = "collapsible public concept; fixed panel is current visual proxy";
         attribute mobilityStatus : String = "mobility, power, thermal, and wheel parameters are study proxies";
         attribute exactVehicleIcdStatus : String = "TBD";
-        attribute wheelRadiusM : Real = 0.45;
-        attribute wheelWidthM : Real = .28;
+        attribute wheelRadiusM : Real = FlipCadRequirements::CadStudy::wheelBandRadiusMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute wheelWidthM : Real = FlipCadRequirements::CadStudy::wheelWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute wheelStations : FlipWheelStation[4] = ("FL", "RL", "FR", "RR");
-        // Mission route policy uses the finite-turn mode; the parallel/crab
-        // mode remains available as an operator experiment through the
-        // Twin-local control helper.
+        // Ackermann is the current route-control approximation; it is not a
+        // claim that the public skid-steer hardware has Ackermann kinematics.
         attribute missionSteeringMode : FlipSteeringMode = "ackermann";
-        attribute chassisWidthM : Real = 2.116;
-        attribute chassisLengthM : Real = 1.476;
+        attribute chassisWidthM : Real = FlipCadRequirements::CadStudy::bodyWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute chassisLengthM : Real = FlipCadRequirements::CadStudy::bodyLengthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute chassisHeightM : Real = .12;
-        attribute equipmentBoxWidthM : Real = 2.100;
-        attribute equipmentBoxHeightM : Real = .396;
-        attribute equipmentBoxDepthM : Real = 1.460;
-        attribute equipmentBoxCenterYM : Real = .258;
-        attribute payloadDeckWidthM : Real = 2.10;
+        attribute equipmentBoxWidthM : Real = FlipCadRequirements::CadStudy::baseplateWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute equipmentBoxHeightM : Real = FlipCadRequirements::CadStudy::bodyHeightMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute equipmentBoxDepthM : Real = FlipCadRequirements::CadStudy::baseplateLengthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute equipmentBoxCenterYM : Real = chassisHeightM / 2.0 + equipmentBoxHeightM / 2.0;
+        attribute payloadDeckWidthM : Real = FlipCadRequirements::CadStudy::baseplateWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute payloadDeckThicknessM : Real = .04;
-        attribute payloadDeckDepthM : Real = 1.46;
-        attribute payloadDeckCenterYM : Real = .476;
+        attribute payloadDeckDepthM : Real = FlipCadRequirements::CadStudy::baseplateLengthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute payloadDeckCenterYM : Real = equipmentBoxCenterYM + equipmentBoxHeightM / 2.0 + payloadDeckThicknessM / 2.0;
         attribute sensorMastHeightM : Real = 0.70;
         // One station definition drives the simulation, Editor projection,
         // requirements, and wheel-contact verification.
-        attribute wheelStationX : Real[4] = (-.85, .85, -.85, .85);
+        attribute wheelStationX : Real[4] = (
+            -FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
+             FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
+            -FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
+             FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre));
         attribute wheelStationY : Real[4] = (-.05, -.05, -.05, -.05);
-        attribute wheelStationZ : Real[4] = (-1.0, -1.0, 1.0, 1.0);
+        attribute wheelStationZ : Real[4] = (
+            -FlipCadRequirements::CadStudy::trackMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
+            -FlipCadRequirements::CadStudy::trackMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
+             FlipCadRequirements::CadStudy::trackMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
+             FlipCadRequirements::CadStudy::trackMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre));
         // The suspension extension is a Twin simulation assumption shared by
         // the composed vehicle and the independently checked visual module.
         attribute suspensionRestLengthM : Real = .30;
@@ -64,12 +73,13 @@ package FlipRequirements {
         attribute suspensionArmOffsetM : Real = .13;
         attribute suspensionKnuckleRadiusM : Real = 0.18;
         attribute suspensionKnuckleWidthM : Real = 0.36;
-                        // Estimated fixed-panel mount above the reconstructed equipment roof;
+        // Estimated fixed-panel mount above the reconstructed equipment roof;
         // the real collapsible panel mechanism remains unpromoted.
-                        attribute solarArrayMount : Real[3] = (0.0, .55, 0.0);
-                // The 18 degree tilt is a conservative review-study angle above the local deck: it keeps a fixed panel readable to a high solar-elevation camera without implying a supplier-certified deployment joint; optimize it when the vehicle ICD is available.
+        attribute solarArrayMount : Real[3] = (0.0, .55, 0.0);
+        // The 18 degree tilt is a conservative review-study angle above the
+        // local deck; it does not imply a supplier-certified deployment joint.
         attribute solarArrayTiltDeg : Real = 18.0;
-  }
+    }
 
     requirement def FLIPV001_RoverPresentation {
         doc /* FGV-001 [integration] the composed FLIP vehicle shall include its four typed wheel stations, chassis, sensor mast, solar array, and physical mobility model. */
@@ -100,7 +110,7 @@ package FlipRequirements {
         doc /* FGV-008 [geometry] each wheel shall use the single SysML-owned radius and width, and each active wheel station shall use the same station datums in simulation and presentation. */
     }
     requirement def FLIPV009_MissionSteeringMode {
-        doc /* FGV-009 [behavior] the authored Griffin surface route shall select the finite-turn Ackermann steering mode before issuing route torque; parallel/crab steering remains an explicit operator experiment. */
+        doc /* FGV-009 [behavior] the authored Griffin surface route shall use the source-owned Twin steering approximation before issuing route torque. This simulation policy does not redefine FLIP's public skid-steer architecture; controller behavior remains a separate validation item. */
     }
     requirement def FLIPV010_PhysicalWheelSupportEnvelope {
         doc /* FGV-010 [simulation] physical wheel stations and the suspension extension shall be driven by the shared vehicle datums and pass the deployed ramp wheel-contact replay. */
