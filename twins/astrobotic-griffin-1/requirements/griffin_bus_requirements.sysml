@@ -70,7 +70,7 @@ package GriffinBusRequirements {
         doc /* GBC-004 [evidence] each bus assumption and its rationale/source shall resolve from the separate SysML provenance catalog, while geometry is verified from typed requirements and composed mesh data. */
     }
     requirement def GBC005_BusFrameGeometry {
-        doc /* GBC-005 [geometry] the internal eight-sided frame shall comprise eight upper and eight lower perimeter beams plus eight named corner posts. Dimensions resolve from GriffinVisualConfiguration, currently an estimated 3.60 m X/Z envelope and 1.40 m frame height. Source and uncertainty: griffin-size-evidence.md; the older NASA whole-lander envelope is not a current core measurement. The 0.16 m member stock is an explicit packaging assumption, not a supplier section specification. */
+        doc /* GBC-005 [geometry] the internal eight-sided frame shall comprise eight upper and eight lower perimeter beams plus eight named corner posts. Dimensions resolve from GriffinVisualConfiguration, currently an estimated 3.60 m X/Z envelope and 0.72 m body-belt height. Source and uncertainty: griffin-size-evidence.md; the older NASA whole-lander envelope is not a current core measurement. The 0.16 m member stock is an explicit packaging assumption, not a supplier section specification. */
         require GBC_MeasurementWithinTolerance;
     }
     requirement def GBC006_DeckGeometry {
@@ -87,7 +87,7 @@ package GriffinBusRequirements {
         require GBC_ObservedCountEquals;
     }
     requirement def GBC009_OpenSideBays {
-        doc /* GBC-009 [configuration/appearance] obsolete side-bay panels shall remain absent. Eight named ExteriorFacet meshes shall provide the flight exterior over the internal frame. Each shall be a closed six-quad solid with eight points and twelve edges of incidence two, source-owned height, color, render purpose, single-sided faces and disabled collision. Source: Astrobotic Griffin-1 unveiling photo, June 2026, linked in griffin-size-evidence.md, shows covered faceted bays rather than an exposed cage. Thickness and edge gaps are explicitly estimated presentation values, not released thermal-blanket construction. */
+        doc /* GBC-009 [configuration/appearance] obsolete side-bay panels shall remain absent. Eight named ExteriorFacet meshes shall provide the flight exterior over the internal frame. Each shall be a closed six-quad solid with eight points and twelve edges of incidence two, source-owned height, color, render purpose, single-sided faces and disabled collision. Source: ESA Griffin artist impression (2022-09-23), https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander, is the user-selected silhouette reference. Four broad side faces shall approximately match its 3:1 width/height ratio within the source-owned estimate tolerance; clipped corner faces are narrower. Astrobotic product rendering https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ corroborates a shallow belt and an observed 14-column by 5-row cell field. This is a concept reconstruction, not June 2026 as-built metrology. Thickness and edge gaps are explicitly estimated presentation values, not released thermal-blanket construction. */
         require GBC_ObservedCountEquals;
         require GBC_MeasurementWithinTolerance;
     }

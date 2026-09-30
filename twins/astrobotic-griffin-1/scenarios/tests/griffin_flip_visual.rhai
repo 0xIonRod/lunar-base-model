@@ -61,13 +61,16 @@ fn on_start(me, ctx) {
     this.terrain = find("/GriffinFlipVisual/Environment/Terrain");
     this.done = false;
     this.review_batch = 0;
+    this.report = ();
 }
 
 fn on_tick(me, ctx) {
     if this.done || dt() <= 0.0 { return; }
     let progress = run_visual_review(this.review_batch);
     this.review_batch += 1;
-    if this.review_batch >= progress.batch_count { this.done = true; }
+    this.done = this.review_batch >= progress.batch_count;
+    this.report = usd_geometry_inspection::record_batch(progress.report, this.report,
+        this.done, "GRIFFIN FLIP VISUAL", "GRIFFIN_FLIP_VISUAL");
 }
 
 // Keep the review callable through the one-shot production API as well as the
@@ -350,7 +353,6 @@ fn run_visual_review(batch_index) {
     print("[griffin-flip-visual] si=metres batch=" + (batch_index + 1).to_string()
           + "/" + batch_count.to_string() + " checks=" + checks.len().to_string()
           + " evaluated=" + report.check_count.to_string());
-    report_structured_verdict(report, title, "GRIFFIN_FLIP_VISUAL");
-    #{batch_count: batch_count, ok: report.ok}
+    #{batch_count: batch_count, ok: report.ok, report: report}
 }
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;

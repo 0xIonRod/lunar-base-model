@@ -1,5 +1,6 @@
 import "lunco://scripting/tools/assembly_builder" as assembly_builder;
 import "griffin_geometry" as griffin_geometry;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 // The bus gate evaluates actual composed geometry against typed SysML
@@ -14,6 +15,17 @@ fn verification_name() { "Verify_GriffinBusRequirements" }
 // default prim is World), so verification must query the composed namespace.
 fn default_root_path() { "/World/Griffin1/Bus" }
 fn _query_ok(record) { record != () && record.ok != false }
+
+fn _visual_attribute_check(id, requirement, path, attr, source_attr, model) {
+    let check = #{id: id, component: "bus", requirement: requirement,
+        verification: verification_name(), kind: "attribute", path: path,
+        attr: attr, expected_attr: visual(source_attr)};
+    if attr == "purpose" {
+        check.remove("expected_attr");
+        check.expected = usd_geometry_inspection::purpose_token(model.value(visual(source_attr)));
+    }
+    check
+}
 
 fn _model_names(model, name) {
     let result = [];
@@ -82,16 +94,12 @@ fn _mesh_dimensions_error(points, dimensions) {
         _max_number((extent[1] - dimensions.y).abs(), (extent[2] - dimensions.z).abs()))
 }
 
-fn _expected_outer_profile_mesh(dimensions, profile_points) {
-    if dimensions == () || !vec3_is_native(dimensions) { return (); }
-    if profile_points.len() != 8 { return (); }
-    let scaled = [];
-    for point in profile_points {
-        if !vec2_is_native(point) || !vec2_is_finite(point) { return (); }
-        scaled.push(vec2(point.x * dimensions.x / 2.0,
-            point.y * dimensions.z / 2.0));
-    }
-    extrude_profile(scaled, dimensions.y, profile_plane_xz())
+fn _expected_outer_profile_mesh(dimensions, profile_points, center) {
+    if !vec3_is_native(dimensions) || !vec3_is_native(center)
+        || !array_is(profile_points) || profile_points.len() != 8 { return (); }
+    // Deck and service skirt are open eight-member rings, not solid extrusions.
+    return griffin_geometry::tank_support_perimeter_geometry(profile_points,
+        dimensions.x / 2.0 - dimensions.y / 2.0, center.y, dimensions.y);
 }
 
 fn _mesh_profile_metrics(prim, expected) {
@@ -184,7 +192,7 @@ fn _opening_radial_error(points, station, inner_radius, outer_radius, segments) 
 }
 
 fn _tank_support_ring_checks(doc, root, name, center_y, profile, radius,
-    section, geometry_tolerance, appearance_tolerance, color) {
+    section, geometry_tolerance, appearance_tolerance, model) {
     let path = root + "/TankSupportPlate/" + name;
     let ring = assembly_builder::composed_query(doc,
         #{path: path, children: false});
@@ -216,12 +224,11 @@ fn _tank_support_ring_checks(doc, root, name, center_y, profile, radius,
         ["physics:collisionEnabled", "renderOnlyCollisionEnabled"],
         ["purpose", "renderPurpose"]
     ] {
-        checks.push(#{id: "GBC-011-" + name + "-" + pair[0], component: "bus",
-            requirement: "gbc011", verification: verification_name(), kind: "attribute",
-            path: path, attr: pair[0], expected_attr: visual(pair[1])});
+        checks.push(_visual_attribute_check("GBC-011-" + name + "-" + pair[0],
+            "gbc011", path, pair[0], pair[1], model));
     }
     checks.push(_tolerance_constraint("GBC-011-" + name + "-appearance", "gbc011",
-        _display_color_error(ring, color),
+        _display_color_error(ring, model.value(visual("tankSupportDisplayColor"))),
         appearance_tolerance));
     #{checks: checks, path: path}
 }
@@ -270,43 +277,8 @@ fn outward_quad_face_count(points, counts, indices, beam_count) {
     outward
 }
 
-fn outward_profile_prism_face_count(points, counts, indices, profile_count) {
-    if points.len() != profile_count * 2 || counts.len() != profile_count + 2
-        || indices.len() != profile_count * 6 { return 0; }
-    let centroid = [0.0, 0.0, 0.0];
-    for point in points {
-        for axis in 0..3 { centroid[axis] += _point_component(point, axis) / points.len(); }
-    }
-    let outward = 0;
-    let offset = 0;
-    for face in 0..counts.len() {
-        let count = counts[face].to_int();
-        if count < 3 { return 0; }
-        let a = points[indices[offset]];
-        let b = points[indices[offset + 1]];
-        let c = points[indices[offset + 2]];
-        let ax = _point_component(a, 0); let ay = _point_component(a, 1); let az = _point_component(a, 2);
-        let bx = _point_component(b, 0); let by = _point_component(b, 1); let bz = _point_component(b, 2);
-        let cx = _point_component(c, 0); let cy = _point_component(c, 1); let cz = _point_component(c, 2);
-        let ux = bx - ax; let uy = by - ay; let uz = bz - az;
-        let vx = cx - ax; let vy = cy - ay; let vz = cz - az;
-        let nx = uy * vz - uz * vy;
-        let ny = uz * vx - ux * vz;
-        let nz = ux * vy - uy * vx;
-        let face_center = [0.0, 0.0, 0.0];
-        for vertex in 0..count {
-            let point = points[indices[offset + vertex]];
-            for axis in 0..3 { face_center[axis] += _point_component(point, axis) / count; }
-        }
-        if nx * (face_center[0] - centroid[0])
-            + ny * (face_center[1] - centroid[1])
-            + nz * (face_center[2] - centroid[2]) > 0.0 { outward += 1; }
-        offset += count;
-    }
-    outward
-}
 
-fn verify_bus(doc, source, bus_root) {
+fn bus_checks(doc, source, bus_root) {
     let checks = [];
     let root = bus_root;
     let model = sysml_model("twin://astrobotic-griffin-1");
@@ -358,7 +330,7 @@ fn verify_bus(doc, source, bus_root) {
         path: root + "/PerimeterFrame", attr: "doubleSided",
         expected_attr: visual("doubleSidedFacesMustBe")});
 
-    
+
     let rail_color_error = 0.0;
     for index in 0..rail_names.len() {
         let path = root + "/" + rail_names[index];
@@ -381,7 +353,7 @@ fn verify_bus(doc, source, bus_root) {
         checks.push(#{id: "GBC-007-" + rail_names[index] + "-purpose",
             component: "bus", requirement: "gbc007", verification: verification_name(),
             kind: "attribute", path: path, attr: "purpose",
-            expected_attr: visual("renderPurpose")});
+            expected: usd_geometry_inspection::purpose_token(model.value(visual("renderPurpose")))});
         checks.push(#{id: "GBC-007-" + rail_names[index] + "-collision",
             component: "bus", requirement: "gbc007", verification: verification_name(),
             kind: "attribute", path: path, attr: "physics:collisionEnabled",
@@ -398,9 +370,9 @@ fn verify_bus(doc, source, bus_root) {
         #{path: root + "/TopDeckOctagon", children: false});
     let deck_dims = _native(source, "deckDimensions");
     let deck_center = _native(source, "deckCenter");
-    let expected_deck = _expected_outer_profile_mesh(deck_dims, model.value(visual("outerBodyProfileCoordinates")));
+    let expected_deck = _expected_outer_profile_mesh(deck_dims, model.value(visual("outerBodyProfileCoordinates")), deck_center);
     let deck_profile = _mesh_profile_metrics(deck, expected_deck);
-    let deck_faces = if _query_ok(deck) { outward_profile_prism_face_count(deck.attrs.points,
+    let deck_faces = if _query_ok(deck) { outward_quad_face_count(deck.attrs.points,
         deck.attrs.faceVertexCounts, deck.attrs.faceVertexIndices, 8) } else { 0 };
     checks.push(_count_constraint("GBC-006-deck-profile-topology", "gbc006",
         deck_profile.topologyMismatches, 0));
@@ -411,11 +383,9 @@ fn verify_bus(doc, source, bus_root) {
     checks.push(_tolerance_constraint("GBC-006-deck-envelope", "gbc006",
         _mesh_dimensions_error(if _query_ok(deck) { deck.attrs.points } else { () }, deck_dims),
         geometry_tolerance));
-    checks.push(#{id: "GBC-006-deck-elevation", component: "bus",
-        requirement: "gbc006", verification: verification_name(),
-        kind: "attribute_component", path: root + "/TopDeckOctagon",
-        attr: "xformOp:translate", index: 1, expected_attr: visual("deckCenter"),
-        expected_index: 1, tolerance: geometry_tolerance});
+    checks.push(_tolerance_constraint("GBC-006-deck-elevation", "gbc006",
+        _max_vertical_band_error(if _query_ok(deck) { deck.attrs.points } else { [] },
+            deck_center.y, deck_dims.y / 2.0), geometry_tolerance));
     checks.push(#{id: "GBC-006-deck-sidedness", component: "bus",
         requirement: "gbc006", verification: verification_name(), kind: "attribute",
         path: root + "/TopDeckOctagon", attr: "doubleSided",
@@ -425,9 +395,9 @@ fn verify_bus(doc, source, bus_root) {
         #{path: root + "/LowerServiceSkirtOctagon", children: false});
     let skirt_dims = _native(source, "lowerSkirtDimensions");
     let skirt_center = _native(source, "lowerSkirtCenter");
-    let expected_skirt = _expected_outer_profile_mesh(skirt_dims, model.value(visual("outerBodyProfileCoordinates")));
+    let expected_skirt = _expected_outer_profile_mesh(skirt_dims, model.value(visual("outerBodyProfileCoordinates")), skirt_center);
     let skirt_profile = _mesh_profile_metrics(skirt, expected_skirt);
-    let skirt_faces = if _query_ok(skirt) { outward_profile_prism_face_count(skirt.attrs.points,
+    let skirt_faces = if _query_ok(skirt) { outward_quad_face_count(skirt.attrs.points,
         skirt.attrs.faceVertexCounts, skirt.attrs.faceVertexIndices, 8) } else { 0 };
     checks.push(_count_constraint("GBC-006-skirt-profile-topology", "gbc006",
         skirt_profile.topologyMismatches, 0));
@@ -438,11 +408,9 @@ fn verify_bus(doc, source, bus_root) {
     checks.push(_tolerance_constraint("GBC-006-skirt-envelope", "gbc006",
         _mesh_dimensions_error(if _query_ok(skirt) { skirt.attrs.points } else { () }, skirt_dims),
         geometry_tolerance));
-    checks.push(#{id: "GBC-006-skirt-elevation", component: "bus",
-        requirement: "gbc006", verification: verification_name(),
-        kind: "attribute_component", path: root + "/LowerServiceSkirtOctagon",
-        attr: "xformOp:translate", index: 1, expected_attr: visual("lowerSkirtCenter"),
-        expected_index: 1, tolerance: geometry_tolerance});
+    checks.push(_tolerance_constraint("GBC-006-skirt-elevation", "gbc006",
+        _max_vertical_band_error(if _query_ok(skirt) { skirt.attrs.points } else { [] },
+            skirt_center.y, skirt_dims.y / 2.0), geometry_tolerance));
     checks.push(#{id: "GBC-006-skirt-sidedness", component: "bus",
         requirement: "gbc006", verification: verification_name(), kind: "attribute",
         path: root + "/LowerServiceSkirtOctagon", attr: "doubleSided",
@@ -483,7 +451,7 @@ fn verify_bus(doc, source, bus_root) {
     for index in 0..ring_names.len() {
         let ring = _tank_support_ring_checks(doc, root, ring_names[index],
             support_planes[index], support_profile, support_radius,
-            support_section, geometry_tolerance, appearance_tolerance, model.value(visual("tankSupportDisplayColor")));
+            support_section, geometry_tolerance, appearance_tolerance, model);
         for check in ring.checks { checks.push(check); }
         support_color_errors.push(_display_color_error(
             assembly_builder::composed_query(doc, #{path: ring.path, children: false}),
@@ -537,7 +505,7 @@ fn verify_bus(doc, source, bus_root) {
             checks.push(#{id: "GBC-011-opening-purpose-" + label,
                 component: "bus", requirement: "gbc011", verification: verification_name(),
                 kind: "attribute", path: path, attr: "purpose",
-                expected_attr: visual("renderPurpose")});
+                expected: usd_geometry_inspection::purpose_token(model.value(visual("renderPurpose")))});
         }
     }
 
@@ -621,20 +589,40 @@ fn verify_bus(doc, source, bus_root) {
             error = _max_number(error, _max_number(0.0, extent[2] - body_dimensions.z - 2.0 * skin_thickness));
         }
         checks.push(_tolerance_constraint("GBC-009-envelope-" + label, "gbc009", error, geometry_tolerance));
+        // Only the four broad axial faces correspond to the user's marked
+        // face. Applying that ratio to the clipped corners would distort the
+        // octagon. Measure actual mesh edges instead of dividing source sizes.
+        if index % 2 == 1 {
+            let ratio_error = ();
+            if points.len() == 8 {
+                let dx = points[3][0] - points[0][0];
+                let dz = points[3][2] - points[0][2];
+                let height = (points[1][1] - points[0][1]).abs();
+                if height > 0.0 {
+                    let ratio = sqrt(dx * dx + dz * dz) / height;
+                    ratio_error = (ratio - sysml_requirements::number(source,
+                        visual("bodySideFaceAspectRatio"))).abs();
+                }
+            }
+            checks.push(_tolerance_constraint("GBC-009-face-ratio-" + label, "gbc009",
+                ratio_error, sysml_requirements::number(source, visual("bodySideFaceAspectRatioTolerance"))));
+        }
         checks.push(_tolerance_constraint("GBC-009-color-" + label, "gbc009",
             _display_color_error(prim, skin_color), appearance_tolerance));
         for attr in ["physics:collisionEnabled", "purpose", "doubleSided"] {
             let expected = if attr == "purpose" { "renderPurpose" }
                 else if attr == "doubleSided" { "doubleSidedFacesMustBe" }
                 else { "renderOnlyCollisionEnabled" };
-            checks.push(#{id: "GBC-009-" + label + "-" + attr, component: "bus",
-                requirement: "gbc009", verification: verification_name(), kind: "attribute",
-                path: path, attr: attr, expected_attr: visual(expected)});
+            checks.push(_visual_attribute_check("GBC-009-" + label + "-" + attr,
+                "gbc009", path, attr, expected, model));
         }
     }
 
-    let result = sysml_requirement_checks::finish(source, checks,
-        "GRIFFIN BUS REQUIREMENTS", "GRIFFIN_BUS_REQUIREMENTS", root,
-        package_name(), verification_name());
-    result
+    checks
+}
+
+fn verify_bus(doc, source, bus_root) {
+    sysml_requirement_checks::finish(source, bus_checks(doc, source, bus_root),
+        "GRIFFIN BUS REQUIREMENTS", "GRIFFIN_BUS_REQUIREMENTS", bus_root,
+        package_name(), verification_name())
 }

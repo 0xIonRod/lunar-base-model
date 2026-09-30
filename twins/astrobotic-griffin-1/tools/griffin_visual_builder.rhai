@@ -60,6 +60,31 @@ fn griffin_body_collision_component_plan(doc, edit_target, root) {
     #{ok:true,ops:ops}
 }
 
+fn griffin_solar_station_plan(doc, edit_target, root, index) {
+    let names = griffin_spec::solar_array_names();
+    let positions = griffin_spec::component_solar_stations();
+    let widths = griffin_spec::component_solar_array_widths_m();
+    let nominal_width = griffin_spec::solar_panel_frame_width_m();
+    let q = griffin_spec::component_solar_orientation(index);
+    if index < 0 || index >= names.len() || positions.len() != names.len()
+        || widths.len() != names.len() || nominal_width == () || nominal_width <= 0.0
+        || !quat_is_valid(q) { return plan_error("solar station source incomplete"); }
+    let path = root + "/" + names[index];
+    let current = assembly_builder::composed_query(doc,
+        #{path: path, children: false, attrs: ["xformOp:rotateXYZ"]});
+    if !query_ok(current) || current.type_name != "Xform" { return plan_error("solar station must exist"); }
+    let ops = [#{SetTranslate: #{edit_target: edit_target, path: path, value: vec3_array(positions[index])}},
+        #{SetScale: #{edit_target: edit_target, path: path, value: [widths[index]/nominal_width,1.0,1.0]}},
+        #{SetAttribute: #{edit_target: edit_target, path: path, name: "xformOp:orient", type_name: "quatd",
+            value: "("+q.w.to_string()+", "+q.x.to_string()+", "+q.y.to_string()+", "+q.z.to_string()+")"}},
+        #{SetAttribute: #{edit_target: edit_target, path: path, name: "xformOpOrder", type_name: "token[]",
+            value: "[\"xformOp:translate\", \"xformOp:orient\", \"xformOp:scale\"]"}}];
+    if current.attrs["xformOp:rotateXYZ"] != () {
+        ops.push(#{RemoveAttribute: #{edit_target: edit_target, path: path, name: "xformOp:rotateXYZ"}});
+    }
+    #{ok: true, ops: ops}
+}
+
 fn griffin_bus_cladding_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
     let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
@@ -104,6 +129,7 @@ fn griffin_bus_cladding_plan(doc, edit_target, root) {
         }
         for a in [#{name:"purpose",type_name:"token",value:"\"render\""},
             #{name:"physics:collisionEnabled",type_name:"bool",value:"false"},
+            #{name:"doubleSided",type_name:"bool",value:model.value(prefix+"doubleSidedFacesMustBe").to_string()},
             #{name:"primvars:displayColor",type_name:"color3f[]",value:_color_literal(color)}] {
             ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:a.name,type_name:a.type_name,value:a.value}});
         }
@@ -3526,9 +3552,11 @@ fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
             _component_mesh_visual_ops(doc, edit_target, root, name,
                 geometry, [0.72, 0.78, 0.88])
         } else {
-            _component_cube_visual_ops(doc, edit_target, root, name,
-                [0.0, divider_y, z], (),
-                [cell_width, divider_z_thickness, divider_span],
+            // Stable Mesh identity in both notch configurations: changing
+            // row count must also work for a former split row divider.
+            let geometry = griffin_geometry::rectangular_prism_geometry(
+                vec3(0.0, divider_y, z), vec3(cell_width, divider_z_thickness, divider_span));
+            _component_mesh_visual_ops(doc, edit_target, root, name, geometry,
                 [0.72, 0.78, 0.88])
         };
         if !divider.ok { return divider; }

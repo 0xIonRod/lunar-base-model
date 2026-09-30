@@ -29,7 +29,7 @@ derived hinge coordinates is for interface closure, not measurement accuracy.
 | Quantity | Previous active model | New study value | Basis and uncertainty |
 |---|---:|---:|---|
 | Griffin body plan span | 5.40 m | 3.60 m | Estimate: 80% of the historical 4.5 m overall envelope reserves 0.45 m per side for leg/foot extension. Plausible range 3.2–4.0 m; low confidence. |
-| Body frame height | 2.00 m | 1.40 m | Packaging estimate to keep the bus substantial without treating the handling stand as spacecraft. Range 1.1–1.7 m; low confidence. |
+| Body belt height | 2.00 m; first pass 1.40 m | 0.72 m | User-selected ESA face ratio ≈3:1; broad octagon face = 0.585786 × 3.60 = 2.109 m; 2.109 / 3 = 0.703 m, rounded to 0.72 m. Approximate range 0.60–0.84 m; perspective and concept-version uncertainty. |
 | Payload surface above terrain | 5.72 m | 2.52 m | Estimate: older 2.0 m overall-height anchor plus approximately 0.5 m allowance for the current higher deck/structure. Range 2.0–3.0 m. Not a photograph measurement. |
 | Footprint across opposed pad edges | 7.24 m | 4.50 m | Two 1.90 m radial leg stations plus two 0.35 m pad radii; selected to match the historical envelope approximately. Current footprint unconfirmed. |
 | Payload adapter | 4.40 × 3.20 m | 3.20 × 3.20 m | Estimated octagonal footprint fitting inside the bus and covering the reconstructed FLIP wheels after clipping the corners. Thickness retained at 0.16 m as a structural proxy. |
@@ -74,8 +74,8 @@ control, or successful rover egress. The legacy Ackermann simulation policy
 also remains a separate mismatch with the public skid-steer configuration;
 correcting its controller requires its own behavior validation.
 
-The eight muted-gold exterior facets approximate wrapped side panels visible in
-the June 2026 hardware photo. Their 25 mm thickness, 80 mm frame-edge margin,
+The eight neutral exterior facets reproduce the shallow body belt in the
+user-selected ESA concept image. Their 25 mm thickness, 40 mm frame-edge margin,
 flat faces and display color are presentation estimates. They add no collision
 or material/structural claim. The body collision proxy uses five boxes inscribed
 in the octagon; it omits the diagonal triangular wedges and follows the same
@@ -88,3 +88,60 @@ environment-direction-unavailable fault. These results do not establish full
 mission acceptance. The stow gate now measures composed track centers directly:
 the previous Euler reconstruction disagreed with USD geometry and hid the
 starboard downward pose. Its saved USD rotation is corrected to (0,180,-45).
+
+## User-selected proportion correction
+
+[ESA Griffin lander, 23 September 2022](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander)
+is explicitly an artist's impression. The user marked one broad side face,
+roughly three times wider than high. This is not the whole lander aspect ratio,
+and it excludes the tanks and rover above the belt. The selected 3.60 m plan
+span remains an uncertain scale assumption; changing it should scale the belt
+height with the face ratio. Four wide octagon faces have a 2.109 m span before
+panel margins. Their source ratio is 2.93 with the selected 0.72 m height.
+The image ratio is estimated as 3.0 ±0.35; this tolerance reflects visual
+interpretation, not a manufacturing allowable. The gate measures the actual
+four wide facet meshes, including margins; corner faces are excluded.
+
+[Astrobotic Griffin product rendering](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
+provides a second shallow-belt reference and labels an older overall envelope
+4.5 m across, 2.0 m high. The user counts **14 cell columns and 5 rows** in the
+front panel. Nearly equal cell pitches imply an active-field aspect ratio
+around 2.8, before borders and perspective. This count is observed in a concept
+rendering, not verified current flight hardware. The model uses a 14×5 grid,
+1.596×0.58 m active field (pitch ratio 0.983), and 1.716×0.66 m nominal frame.
+Each installed panel width still follows its own face-rail spacing. The 6 mm
+dividers are visual gap estimates; the lower mounting cutout remains a study
+assumption, so not every nominal cell has a full rectangular active area.
+
+Body top remains vehicle Y=1.70; shortening the belt raises its center to
+Y=1.34. Deck, adapter and ramp mount datums remain fixed. Frame rings, corner
+posts, collars and buckets follow the new local height. Tanks move to Y=1.40
+as a packaging estimate so their upper domes emerge above the belt while
+remaining below the adapter; tank size is unchanged. This reconstructs the
+concept's separation of shallow structure and exposed tank domes, without
+claiming that the June 2026 hardware has the same exterior coverage.
+
+Ramp truss chord top is revised from 0.81 to 0.36 m above the walking plane:
+0.20 of a 1.799 m section length, rather than 0.45. This is a silhouette estimate
+from the two concept images, not a strength calculation. Rail/chord stock is
+0.08 m, posts 0.06 m, diagonal braces 0.04 m, underside beams 0.12×0.10 m.
+Physical walking thickness, conservative width envelope, hinge location,
+length, deployment angle and existing mass proxies are unchanged. The fold
+axis offsets are re-derived from the slimmer chords by the builder.
+
+The shared `usd_geometry_inspection` library owns the read-only fixed-tick USD
+query contract and composed scene-owner lookup. Bus and visual gates do not
+rely on Editor tab focus; the ramp stow gate uses the same dependencies.
+
+
+Latest focused evidence: the bus gate passed 339 checks, the solar gate passed
+148, ramp stow passed 164 and touchdown geometry passed 6. These are geometry
+checks, not flight or deployment dynamics acceptance. Bus and solar fixtures
+now explicitly declare metres; otherwise USD defaults to centimetres and
+world-space overlap evidence has the wrong scale. Solar mounting orientation
+uses a quaternion for face tilt followed by plan bearing; the previous Euler
+composition tilted the diagonal panels and disconnected the side mounts.
+The other assembly authoring entry points still need migration to that same
+orientation recipe before rebuilding a vehicle through those entry points.
+The owned windowed review reports a degraded-rendering shader binding fault;
+full rendered visual acceptance remains unresolved.

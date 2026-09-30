@@ -59,6 +59,9 @@ package GriffinSolarRequirements {
         attribute gridColumnCount : Integer = 14;
         attribute gridRowCount : Integer = 5;
         attribute cellFaceNormal : Direction = (0.0, 1.0, 0.0);
+        /* Quaternion component tolerance covers authored serialization precision,
+         * not an angular hardware tolerance. USD orient uses (w,x,y,z). */
+        attribute orientationTolerance : Real = 0.00001;
         attribute minimumMountOverlapM : Real = 0.05;
     }
 

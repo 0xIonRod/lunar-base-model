@@ -435,6 +435,23 @@ fn component_leg_station_rotation_y_deg() { _sysml_number_list("legStationRotati
 fn component_solar_stations() { _sysml_native_list("solarStations") }
 fn component_solar_station_rotation_x_deg() { _sysml_number_list("solarStationRotationXDeg") }
 fn component_solar_station_rotation_z_deg() { _sysml_number_list("solarStationRotationZDeg") }
+
+// Tilt about local X, then orient the face normal around vehicle Y. Keep
+// this composition explicit; USD Euler and native Euler adapters have differed.
+fn component_solar_orientation(index) {
+    let tilt = component_solar_station_rotation_x_deg();
+    let bearing = component_solar_station_rotation_z_deg();
+    if index < 0 || index >= tilt.len() || index >= bearing.len() { return (); }
+    let hx = tilt[index] * pi_value() / 360.0;
+    let hy = -bearing[index] * pi_value() / 360.0;
+    quat(0.0, sin(hy), 0.0, cos(hy)) * quat(sin(hx), 0.0, 0.0, cos(hx))
+}
+
+fn component_solar_orientation_components(index) {
+    let q = component_solar_orientation(index);
+    if !quat_is_valid(q) { return []; }
+    [q.w, q.x, q.y, q.z]
+}
 fn solar_component_number(name) {
     let fields = ["frameWidthM", "frameThicknessM", "frameDepthM",
         "lowerClearanceWidthFraction", "lowerClearanceDepthFraction",
@@ -686,7 +703,7 @@ fn visual_component_transform_plan() {
     for index in 0..solar_names.len() {
         let scale = vec3(solar_widths[index] / solar_panel_frame_width_m(), 1.0, 1.0);
         let pose = transform(solar_stations[index],
-            quat_from_euler_xyz_deg(vec3(solar_rot_x[index], 0.0, solar_rot_z[index])),
+            component_solar_orientation(index),
             scale);
         plan.push(_visual_pose_record(solar_names[index], "lander",
             "lander/griffin_solar_panel_visual.usda", pose, false));

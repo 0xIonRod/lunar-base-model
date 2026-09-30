@@ -240,12 +240,20 @@ package GriffinVisualConfigurationRequirements {
          * Each pair maps local panel -X then +X to the corresponding rails.
          * Panel width derives from each rail pair's spacing minus the common
          * edge clearance; the component's maximum width is owned by GSA. */
+        /* Diagonal center = mean of adjacent rail X/Z (1.364 m) plus
+         * 0.22/sqrt(2), so all three arrays share the same local bracket
+         * depth as the axial station (1.94 - 1.72 = 0.22 m). This is a
+         * mount-closure derivation, not an image measurement. */
         attribute solarStations : Position[3] =
-            ((0.0, 1.34, 1.94), (1.49, 1.34, 1.49), (1.94, 1.34, 0.0));
+            ((0.0, 1.34, 1.94), (1.519563492, 1.34, 1.519563492), (1.94, 1.34, 0.0));
         attribute solarMountRails : GriffinFrameRailNode[6] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard",
              "FrameRailFrontStarboard", "FrameRailStarboardFront",
              "FrameRailStarboardFront", "FrameRailStarboardRear");
+        /* X is panel tilt; negative signed Z values below name the clockwise
+         * plan bearing, not a literal USD rotateXYZ triple. The authored
+         * quaternion composes Y(-bearing) after local X(tilt), keeping all
+         * panels upright and their normal on the intended octagonal face. */
         attribute solarStationRotationXDeg : Real[3] = (90.0, 90.0, 90.0);
         attribute solarStationRotationZDeg : Real[3] = (0.0, -45.0, -90.0);
         attribute solarArrayEdgeClearanceM : Real = 0.15;

@@ -1,10 +1,13 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 // Standalone Griffin solar-array component verification. Mission placement
 // remains inconclusive until the controlled installation datums are available.
 
 const PACKAGE = "GriffinSolarRequirements";
 const VERIFICATION = "Verify_GriffinSolarRequirements";
 const PI = 3.141592653589793;
+
+fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
 
 fn own(name) { PACKAGE + "::GriffinSolarArrayAssembly::" + name }
 fn visual(name) { "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::" + name }
@@ -69,7 +72,7 @@ fn mesh_measurement(records, path, axis, quantity) {
     }
     let value = if quantity == "center" { bounds.center[axis] }
         else { bounds.extent[axis] };
-    #{provider: "usd", state: "value", value: value}
+    usd_geometry_inspection::measurement(value, record, "mesh measurement lacks snapshot identity")
 }
 
 fn mesh_geometry(records, path) {
@@ -93,11 +96,13 @@ fn source_observation(model, name) {
     model.source_literal_observation(attribute)
 }
 
-fn derived_measurement(value, detail) {
+fn derived_measurement(value, detail, model) {
     if value == () {
-        return #{provider: "sysml_derived", state: "unavailable", detail: detail};
+        return #{provider: "derived", state: "unavailable", detail: detail};
     }
-    #{provider: "sysml_derived", state: "value", value: value}
+    #{provider: "derived", state: "value", value: value,
+        provider_generation: model.source_revision, source_revision: model.source_revision,
+        document_id: (), document_generation: ()}
 }
 
 fn panel_local_rail(rail, bus_mount, station, rotation_z_deg) {
@@ -172,7 +177,7 @@ fn on_tick(me, ctx) {
         query("QueryUsdPrims", #{paths: mesh_paths, attrs: ["points", "xformOp:scale"]})
     } else { () };
     let composed = #{};
-    if mesh_batch != () && mesh_batch.records != () {
+    if mesh_batch != () && usd_geometry_inspection::same_snapshot(mesh_batch.records) {
         for record in mesh_batch.records { composed[record.path] = record; }
     }
     let checks = [];
@@ -193,13 +198,15 @@ fn on_tick(me, ctx) {
             checks.push(position("GSA-005-" + name + "-y", path, 1, stations[index].y, geometry_tolerance));
             checks.push(position("GSA-005-" + name + "-z", path, 2, stations[index].z, geometry_tolerance));
         }
-        if rotx.len() == names.len() && rotz.len() == names.len() {
-            checks.push(#{id: "GSA-005-" + name + "-rotx", component: "solar_array",
-                requirement: "gsa005", verification: VERIFICATION, kind: "attribute_component",
-                path: path, attr: "xformOp:rotateXYZ", index: 0, expected: rotx[index], tolerance: geometry_tolerance});
-            checks.push(#{id: "GSA-005-" + name + "-rotz", component: "solar_array",
-                requirement: "gsa005", verification: VERIFICATION, kind: "attribute_component",
-                path: path, attr: "xformOp:rotateXYZ", index: 2, expected: rotz[index], tolerance: geometry_tolerance});
+        let q = griffin_spec::component_solar_orientation(index);
+        if quat_is_valid(q) {
+            let expected = [q.w,q.x,q.y,q.z];
+            for axis in 0..4 {
+                checks.push(#{id: "GSA-005-"+name+"-orientation-"+axis,
+                    component: "solar_array", requirement: "gsa005", verification: VERIFICATION,
+                    kind: "attribute_component", path: path, attr: "xformOp:orient",
+                    index: axis, expected: expected[axis], tolerance: sysml_requirements::number(source, own("orientationTolerance"))});
+            }
         }
         for member in ["Frame", "Cells", "ArrayBackplane"] {
             checks.push(sysml_requirement_checks::exists("GSA-006-" + name + "-" + member,
@@ -225,16 +232,14 @@ fn on_tick(me, ctx) {
         let placement_observations = sysml_requirements::scalar_constraint_observations(
             placement_constraint, [
             ["expectedInstalledFrameWidthM", derived_measurement(expected_installed_width,
-                "typed bus rail pair or array edge clearance is unavailable")],
-            ["measuredInstalledFrameWidthM", if installed_width == () {
-                    #{provider: "usd", state: "unavailable", detail: "composed frame points or instance scale unavailable"}
-                } else { #{provider: "usd", state: "value", value: installed_width} }],
+                "typed bus rail pair or array edge clearance is unavailable", model)],
+            ["measuredInstalledFrameWidthM", usd_geometry_inspection::measurement(installed_width, composed[path + "/Frame"], "composed frame points or instance scale unavailable")],
         ]);
         placement_observations.push(source_observation(model,
             visual("geometryVerificationToleranceM")));
         checks.push(sysml_requirements::required_constraints_check("GSA-005-" + name + "-rail-span-fit",
             "solar_array", "gsa005", VERIFICATION,
-            "GriffinSolarRequirements::GSAC005_RailSpanFit", placement_observations, "derived", 0.0));
+            "GriffinSolarRequirements::GSAC005_RailSpanFit", placement_observations, "typed", 0.0));
 
         let panel_envelope_constraint = sysml_requirements::required_constraint_ir(model,
             gsa006, "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope");
@@ -262,7 +267,7 @@ fn on_tick(me, ctx) {
         }
         checks.push(sysml_requirements::required_constraints_check("GSA-006-" + name + "-mesh-envelope",
             "solar_array", "gsa006", VERIFICATION,
-            "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope", panel_envelope_observations, "usd", 0.0));
+            "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope", panel_envelope_observations, "typed", 0.0));
 
         for side in ["NegativeX", "PositiveX"] {
             let bracket_path = path + "/MountBracket" + side;
@@ -354,7 +359,8 @@ fn on_tick(me, ctx) {
         let bus_to_bracket = 1.0e30;
         let bracket_to_link = 1.0e30;
         let link_to_frame = 1.0e30;
-        let available = batch.records != () && batch.records.len() == paths.len();
+        let available = usd_geometry_inspection::same_snapshot(batch.records)
+            && batch.records.len() == paths.len();
         if available {
             for array_index in 0..names.len() {
                 let name = names[array_index];
@@ -382,15 +388,15 @@ fn on_tick(me, ctx) {
             gsa009, "GriffinSolarRequirements::GSAC009_MountPathOverlap");
         let mount_observations = sysml_requirements::scalar_constraint_observations(
             mount_constraint, [
-            ["busToBracketOverlapM", if available { #{provider: "usd", state: "value", value: bus_to_bracket} } else { #{provider: "usd", state: "unavailable", detail: "composed corner-post/bracket bounds unavailable"} }],
-            ["bracketToLinkOverlapM", if available { #{provider: "usd", state: "value", value: bracket_to_link} } else { #{provider: "usd", state: "unavailable", detail: "composed bracket/link bounds unavailable"} }],
-            ["linkToFrameOverlapM", if available { #{provider: "usd", state: "value", value: link_to_frame} } else { #{provider: "usd", state: "unavailable", detail: "composed link/frame bounds unavailable"} }]
+            ["busToBracketOverlapM", usd_geometry_inspection::measurement(if available { bus_to_bracket } else { () }, if available { batch.records[0] } else { () }, "composed corner-post/bracket bounds unavailable")],
+            ["bracketToLinkOverlapM", usd_geometry_inspection::measurement(if available { bracket_to_link } else { () }, if available { batch.records[0] } else { () }, "composed bracket/link bounds unavailable")],
+            ["linkToFrameOverlapM", usd_geometry_inspection::measurement(if available { link_to_frame } else { () }, if available { batch.records[0] } else { () }, "composed link/frame bounds unavailable")]
         ]);
         mount_observations.push(source_observation(model,
             own("minimumMountOverlapM")));
         checks.push(sysml_requirements::required_constraints_check("GSA-009-mount-path-overlap", "solar_array",
             "gsa009", VERIFICATION, "GriffinSolarRequirements::GSAC009_MountPathOverlap",
-            mount_observations, "usd", 0.0));
+            mount_observations, "typed", 0.0));
     }
     // This is requirement/verification-link coverage only. It does not verify
     // the panel quadrant; that needs mission solar ephemeris and approved

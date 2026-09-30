@@ -10,6 +10,8 @@ fn simulation_dependencies(me, ctx) {
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
+    this.next_check = 0;
+    this.report = ();
 }
 
 fn on_tick(me, ctx) {
@@ -48,10 +50,16 @@ fn on_tick(me, ctx) {
         "GriffinBusRequirements::gbc009", "GriffinBusRequirements::gbc010",
         "GriffinBusRequirements::gbc011", "GriffinBusRequirements::gbc012"
     ], ["GriffinBusRequirements::Verify_GriffinBusRequirements"]);
-    let result = griffin_bus_verification::verify_bus(doc_id,
+    let checks = griffin_bus_verification::bus_checks(doc_id,
         source, griffin_bus_verification::default_root_path());
-    print(#{verdict: if result.ok { "PASS" } else { "FAIL" },
-        checks: result.check_count, failures: result.failure_count,
-        evidence: result.evidence});
-    this.done = true;
+    for i in 0..checks.len() { checks[i].doc_id = doc_id; }
+    let batch = [];
+    let end = if this.next_check + 16 < checks.len() { this.next_check + 16 } else { checks.len() };
+    for i in this.next_check..end { batch.push(checks[i]); }
+    let result = sysml_requirements::evaluate_stream(source, batch,
+        "GRIFFIN_BUS_REQUIREMENTS", "GRIFFIN BUS REQUIREMENTS");
+    this.next_check = end;
+    this.done = end == checks.len();
+    this.report = usd_geometry_inspection::record_batch(result, this.report,
+        this.done, "GRIFFIN BUS REQUIREMENTS", "GRIFFIN_BUS_REQUIREMENTS");
 }
