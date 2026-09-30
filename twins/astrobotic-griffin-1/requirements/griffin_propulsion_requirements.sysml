@@ -73,6 +73,40 @@ package GriffinPropulsionRequirements {
         attribute transformOrder : String[2] = ("xformOp:translate", "xformOp:scale");
     }
 
+    part def GriffinAttitudeEngineAssembly {
+        doc /* Pending RCS integration requirements, deferred by the user:
+         * retain twelve existing force-actuator identities, command connections
+         * and force axes; render one hollow nozzle per physics actuator, with
+         * exhaust opposite thrust. No additional Twin-authored flame geometry.
+         * Reference the shared LunCoSim engine visual and bind its geometry,
+         * colour and light inputs to RCSJet outputs. Connect RCSJet fuel and
+         * oxidizer availability to the owning Griffin tank mass outputs; test
+         * positive firing, fuel starvation and oxidizer starvation while valve
+         * demand remains open. Group the nozzles three per corner, deriving
+         * mounts from the bus chamfer faces and top datum. Verify clearances
+         * and actuator torque capacity after changing poses/force ratings.
+         * None of these vehicle changes is implemented by this source entry.
+         */
+        // Astrobotic PUG August 2021 v5.02 p.26: twelve 25 lbf ACS
+        // engines, arranged in groups of three. SI force uses exact
+        // standard lbf conversion; detailed vendor envelopes are unavailable.
+        attribute nominalForceN : Real = 111.2055403815125;
+        // Envelope estimates from small attitude-nozzle silhouettes in the
+        // supplied PGH Tech photo: 80 mm exit, 120 mm bell, 24 mm throat.
+        // Reuse the curved main-bell mesh with separate geometry transforms;
+        // exhaust geometry has no inherited scaling from those mesh transforms.
+        attribute exitRadiusM : Real = .04;
+        attribute throatRadiusM : Real = .012;
+        attribute bellHeightM : Real = .12;
+        attribute collarHeightM : Real = .03;
+        // Packaging estimates relative to the bus top and diagonal faces.
+        // 60 mm outward standoff clears the skin; +/-120 mm tangent offsets
+        // separate the three retained actuator identities at each corner.
+        attribute mountBelowBusTopM : Real = .04;
+        attribute mountStandoffM : Real = .06;
+        attribute memberTangentOffsetM : Real = .12;
+    }
+
     requirement def GPP001_EngineCount {
         doc /* GPP-001 [topology] exactly five named main-engine visual owners are present in the cluster. */
     }
