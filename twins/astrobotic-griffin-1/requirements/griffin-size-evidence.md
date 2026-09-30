@@ -327,3 +327,9 @@ shows the curved shell with remaining flat-shaded facets. Smooth normals and
 finer material work remain visual improvements, not completed acceptance.
 
 The 35-degree bell shading crease is a rendering estimate: adjacent curved-wall normals are averaged, while the thin open rim retains its sharp edge. It changes shading only, not the source-derived envelope or mesh topology.
+
+### Ramp rail stock review, 2026-09-30
+
+The user identified overly thick rails. The [ESA artist impression](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander) and [Astrobotic product rendering](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/) show slender truss members, with compact fittings rather than large transverse pipes. Perspective and unknown stock sizes prevent a calibrated measurement. The revised estimates are 40 mm upper chords, 35 mm lower chord depth, 25 mm posts, 18 mm diagonal thickness, 50 mm hinge/pin diameter and 60 by 45 mm underside beams. Upper chord depth is 2.2% of the 1.799 m section length; previous 80 mm depth was 4.4%. The 240 mm hinge barrels were particularly oversized. Walking contact thickness, ramp span, deployment poses and physical hinge datums remain the existing contract. These changes improve the rendered structural silhouette; they do not establish structural strength.
+
+The interface width check now compares transition coverage with the ramp travel corridor, rather than the wider 3.20 m payload adapter. It retains the existing 2 mm composed-geometry tolerance. Wheel-track width is derived from the rover tire width plus twice the source clearance, avoiding a rounded duplicate decimal at the exact clearance limit. The separate bus collider/profile compatibility check remains required.

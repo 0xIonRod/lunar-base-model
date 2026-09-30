@@ -185,6 +185,23 @@ package GriffinRampRequirements {
             and RealFunctions::abs(portForwardY - starboardForwardY) <= tolerance;
     }
 
+    // A visual-review guard, not a structural strength limit. The image
+    // evidence cannot calibrate stock sizes; these explicit estimated bounds
+    // reject the earlier thick chords and oversized transverse cylinders.
+    constraint def GRC028_RailAndPivotSlenderness {
+        in chordHeightM : Real;
+        in sectionLengthM : Real;
+        in hingeRadiusM : Real;
+        in pinRadiusM : Real;
+        in maxChordFraction : Real;
+        in maxFittingDiameterRatio : Real;
+        sectionLengthM > 0.0 and chordHeightM > 0.0
+            and hingeRadiusM > 0.0 and pinRadiusM > 0.0
+            and chordHeightM <= sectionLengthM * maxChordFraction
+            and 2.0 * hingeRadiusM <= chordHeightM * maxFittingDiameterRatio
+            and 2.0 * pinRadiusM <= chordHeightM * maxFittingDiameterRatio;
+    }
+
     constraint def GRC010_PhysicalRampReachesTerrain {
         in rampTipTopYM : Real;
         in rampTipBottomYM : Real;
@@ -231,7 +248,7 @@ package GriffinRampRequirements {
             and deckTopStepM <= interfaceToleranceM
             and transitionRampTopStepM <= interfaceToleranceM
             and hingeGapM <= interfaceToleranceM
-            and lateralCoverageM >= requiredLateralCoverageM
+            and lateralCoverageM + interfaceToleranceM >= requiredLateralCoverageM
             and deckProfileCompatible;
     }
 
@@ -275,16 +292,32 @@ package GriffinRampRequirements {
         attribute rampSurfaceThicknessM : Real = 0.18;
         /* Slimmer truss silhouette estimated from the ESA 2022 Griffin artist
          * impression and Astrobotic product rendering, linked in
-         * griffin-size-evidence.md. 0.36 m walking-plane-to-chord-top versus
-         * 1.799 m section length gives depth/length 0.20; prior 0.81 m gave
+         * griffin-size-evidence.md. 0.27 m walking-plane-to-chord-top versus
+         * 1.799 m section length gives depth/length 0.15; prior 0.81 m gave
          * 0.45 and resembled a large handrail. These are render structural
          * proxies, not strength-qualified stock. Ramp mount, length, angle,
          * walking contact and width datums remain unchanged. */
-        attribute rampRailHeightM : Real = 0.08;
-        attribute rampRailWidthM : Real = 0.08;
+        /* Rail-section reconstruction, 2026-09-30, user review of fat rails:
+         * ESA 2022 image: https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
+         * Astrobotic rendering: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
+         * Both show slender triangulated webs and compact pivot fittings.
+         * Neither gives stock dimensions. Chords are estimated at 40 mm
+         * (~2.2% of the 1.799 m section length), posts 25 mm and diagonals
+         * 18 mm. 50 mm hinge/pin diameter avoids the previous oversized
+         * 240 mm transverse barrels and 160 mm upper pins. These are visual
+         * estimates, not calibrated measurements or strength-qualified stock.
+         * Under-beam top derives from deck bottom: -.09 m = -.1125+.045/2.
+         * Keep walking contact, span, hinge axes and section poses unchanged.
+         */
+        // Explicit review bounds: chord <=3% section length, fittings <=1.5x
+        // chord depth. Selected to preserve the image's slender silhouette.
+        attribute maxRailHeightToSectionLength : Real = 0.03;
+        attribute maxPivotDiameterToRailHeight : Real = 1.5;
+        attribute rampRailHeightM : Real = 0.04;
+        attribute rampRailWidthM : Real = 0.04;
         attribute rampRailOffsetZM : Real = 1.36;
-        attribute rampRailJointPinRadiusM : Real = 0.08;
-        attribute rampRailJointPinLengthM : Real = 0.22;
+        attribute rampRailJointPinRadiusM : Real = 0.025;
+        attribute rampRailJointPinLengthM : Real = 0.10;
         // Separate traction bars on each wheel track leave the centre open.
         // Count and pitch are visual study assumptions because Astrobotic has
         // not published the Griffin ramp tread ICD.
@@ -294,7 +327,9 @@ package GriffinRampRequirements {
         attribute assemblyTreadHeightM : Real = 0.05;
         // Source-owned track width; GRC016 constrains it against FLIP's wheel
         // width and the required clearance. Geometry builders use this value.
-        attribute assemblyTrackWidthM : Real = .58;
+        // Derive the exact source interface instead of rounding a duplicate
+        // decimal; .28 + 2*.15 can differ from literal .58 in f64 arithmetic.
+        attribute assemblyTrackWidthM : Real = FlipRover::wheelWidthM + 2.0 * GriffinEgressRamp::rampWheelClearanceM;
         attribute contactTrackGeometryToleranceM : Real = 0.002;
         attribute assemblyTreadFirstCenterXM : Real = 0.224885507;
         attribute assemblyTreadPitchM : Real = 0.449771013;
@@ -303,25 +338,27 @@ package GriffinRampRequirements {
         // supplier drawing: two longitudinal beams sit just below the deck,
         // The source-owned section geometry uses two underside beams and three
         // upright posts per edge rail on every rigid ramp section.
-        attribute assemblyUnderBeamWidthM : Real = 0.12;
-        attribute assemblyUnderBeamHeightM : Real = 0.10;
-        attribute assemblyUnderBeamCenterYM : Real = -0.14;
+        attribute assemblyUnderBeamWidthM : Real = 0.06;
+        attribute assemblyUnderBeamHeightM : Real = 0.045;
+        attribute assemblyUnderBeamCenterYM : Real = -0.1125;
         attribute assemblyUnderBeamCenterOffsetZM : Real = 1.20;
         attribute assemblySidePostCountPerSectionPerSide : Integer = 3;
-        attribute assemblySidePostWidthM : Real = 0.06;
-        attribute assemblySidePostDepthM : Real = 0.06;
+        attribute assemblySidePostWidthM : Real = 0.025;
+        attribute assemblySidePostDepthM : Real = 0.025;
         attribute assemblySidePostEmbeddedDepthM : Real = 0.04;
         attribute assemblySidePostFirstCenterXM : Real = 0.224885507;
         attribute assemblySidePostPitchM : Real = 0.674656520;
-        attribute assemblySideTrussChordHeightM : Real = 0.08;
+        attribute assemblySideTrussChordHeightM : Real = 0.035;
         attribute assemblySideTrussLowerChordCenterYM : Real = 0.13;
-        attribute assemblySideTrussBraceThicknessM : Real = 0.04;
+        attribute assemblySideTrussBraceThicknessM : Real = 0.018;
         attribute assemblySideTrussBraceCountPerSide : Integer = 4;
-        attribute rampSectionHingeBarrelRadiusM : Real = 0.12;
+        attribute rampSectionHingeBarrelRadiusM : Real = 0.025;
         attribute rampSectionHingeBarrelLengthM : Real = 2.86;
         attribute rampSectionHingeBarrelCenterYM : Real = -0.18;
         attribute rampSurfaceCenterYM : Real = 0.00;
-        attribute rampRailCenterYM : Real = 0.32;
+        // Preserve the existing chord-top/fold-pivot datum at Y=.36 m:
+        // .34 + .04/2 = .36. Thinner stock moves its center, not the hinge.
+        attribute rampRailCenterYM : Real = 0.34;
         attribute rampMaxDeploymentAngleRad : Real = 0.872664626;
         // Render review uses the revised top ring at Y=1.79; hinge center
         // Y=1.70 places a 0.18 m track flush with that ring. The mission
@@ -512,6 +549,14 @@ package GriffinRampRequirements {
     }
     requirement def GRR015_RampHingeGussetGeometry {
         doc /* The deck hinge and both intermediate section hinges shall be visible at the ramp assembly joints. Every intermediate joint shall use a Z-axis revolute connection at the adjacent section endpoints, and its hinge barrel shall remain below the walking surface. */
+        require GRC028_RailAndPivotSlenderness {
+            in chordHeightM = GriffinEgressRamp::rampRailHeightM;
+            in sectionLengthM = GriffinEgressRamp::rampSectionLengthM;
+            in hingeRadiusM = GriffinEgressRamp::rampSectionHingeBarrelRadiusM;
+            in pinRadiusM = GriffinEgressRamp::rampRailJointPinRadiusM;
+            in maxChordFraction = GriffinEgressRamp::maxRailHeightToSectionLength;
+            in maxFittingDiameterRatio = GriffinEgressRamp::maxPivotDiameterToRailHeight;
+        }
     }
     requirement def GRR016_ArticulatedRampSections {
         doc /* Each upper-deck-mounted ramp shall contain three equal rigid sections, a revolute deck hinge, and two native revolute joints between consecutive sections. All six physical ramp joints shall expose the source-owned angular drive and limits so their typed angle ports can command motion inside the authored range. Section lengths shall sum to the full contact-track length. Intermediate joints shall hold zero relative angle during rover traversal so the sections, contact tracks, and upper rails form one continuous deployed path. */

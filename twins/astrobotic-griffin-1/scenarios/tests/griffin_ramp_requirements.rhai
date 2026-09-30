@@ -161,6 +161,7 @@ fn on_tick(me, ctx) {
         "rampSectionGeometryToleranceM", "rampSurfaceWidthM", "rampSurfaceThicknessM",
         "rampWheelClearanceM", "rampRailHeightM", "rampRailWidthM", "rampRailOffsetZM",
         "rampRailJointPinRadiusM", "rampRailJointPinLengthM",
+        "maxRailHeightToSectionLength", "maxPivotDiameterToRailHeight",
         "rampSurfaceCenterYM", "rampRailCenterYM", "rampMaxDeploymentAngleRad",
         "assemblyTrackWidthM", "contactTrackGeometryToleranceM", "assemblyTreadCount",
         "assemblyTreadCountPerSection", "assemblyTreadWidthM", "assemblyTreadHeightM",
@@ -219,6 +220,16 @@ fn on_tick(me, ctx) {
         throw("Griffin ramp SysML identity collections are incomplete");
     }
     let checks = [];
+    if batch==0 {
+        checks.push(_constraint(source,"GRR-015-slender-rails-and-pivots","grr015",
+            "GRC028_RailAndPivotSlenderness",
+            #{chordHeightM:_source_number(source,"rampRailHeightM"),
+              sectionLengthM:_source_number(source,"rampSectionLengthM"),
+              hingeRadiusM:_source_number(source,"rampSectionHingeBarrelRadiusM"),
+              pinRadiusM:_source_number(source,"rampRailJointPinRadiusM"),
+              maxChordFraction:_source_number(source,"maxRailHeightToSectionLength"),
+              maxFittingDiameterRatio:_source_number(source,"maxPivotDiameterToRailHeight")}));
+    }
     let section_count = _source_number(source, "rampSectionCount").to_int();
     let section_length = _source_number(source, "rampSectionLengthM");
     let total_length = _source_number(source, "rampSurfaceLengthM");
@@ -279,6 +290,7 @@ fn on_tick(me, ctx) {
             requirement: "grr007", verification: VERIFICATION, kind: "children",
             path: ROOT, paths: ramp_roots});
         let deck_observation = griffin_visual_builder::physical_top_deck_collider_observation((), ROOT);
+        if deck_observation.state!="pass" {print("[griffin-ramp] deck collider evidence: "+deck_observation);}
         deck_profile_compatible = if deck_observation.ok == true
             && (deck_observation.state == "pass" || deck_observation.state == "fail") {
             #{provider: "usd", state: "value",
@@ -693,7 +705,10 @@ fn on_tick(me, ctx) {
                   interfaceToleranceM: _source_number(source, "physicalRampDeckTransitionInterfaceToleranceM"),
                   hingeGapM: _measurement_value(observation, "hinge_gap_m", side + " track seam"),
                   lateralCoverageM: _measurement_value(observation, "lateral_coverage_m", side + " deck coverage"),
-                  requiredLateralCoverageM: _measurement_value(observation, "deck_lateral_span_m", side + " deck span"),
+                  // The transition must span the ramp travel corridor. The
+                  // payload adapter is wider; covering its full width is not
+                  // required for these two wheel tracks.
+                  requiredLateralCoverageM: _source_number(source,"rampSurfaceWidthM"),
                   deckProfileCompatible: deck_profile_compatible}));
         }
         }
