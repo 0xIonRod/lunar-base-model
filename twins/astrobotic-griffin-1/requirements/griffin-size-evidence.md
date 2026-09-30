@@ -471,3 +471,34 @@ kept separate so the reflector estimate cannot rescale the bus or pedestal.
 Yaw/elevation bodies and tracking stay in the library's disabled parked state;
 operational pointing, actuator sizing and antenna mass qualification are open.
 The medium- and low-gain hardware remains to be reconstructed from evidence.
+
+### Integrated Editor preview isolation, 2026-10-01
+
+The saved Griffin-FLIP composition is georeferenced; its authored vehicle
+station still reads (0,0,0) in canonical stage coordinates. In the owned
+Editor preview, FrameUsdPreviewSelection instead targeted approximately
+(-51650.75,-1725515.25,195171.97) m, and the resulting image showed rotated,
+severely distorted fine geometry. The same saved Griffin asset renders normally
+in its local component preview. Evidence images:
+/tmp/griffin-flip-composed-review.png (fixed local preset missed the scene),
+/tmp/griffin-flip-framed-review.png (framed integrated scene).
+
+This is evidence of a preview projection/frame problem, not evidence that the
+saved leg/ramp shapes need compensating transforms. Current owner investigation
+found project_celestial_comms_prims in terrain/crates/lunco-usd-sim-celestial/src/lib.rs
+has no UsdPreviewOnly ancestry guard. Other simulation adapters reuse
+is_preview_only from lunco-usd-bevy-scene. Celestial placement can establish a
+site grid and ActivePhysicsFrame, while the preview camera is an ordinary local
+Transform. Preview scene isolation is now explicit in GV001. The missing guard
+is a leading cause pending a regression test and rebuilt headful confirmation;
+no flight/site coordinates were altered to hide the symptom.
+
+The same PUG used for the dish provides further communications evidence:
+https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf,
+August2021 v5.02 pp20/30. Page20 depicts Peregrine medium gain as a flat panel
+and low gain as a small flush patch; page30 labels Griffin's medium gain at its
+bus edge and says the communications system can share Peregrine specifications.
+Those references motivate examining panel/patch geometry, not adding more
+parabolic dishes. Griffin-specific antenna dimensions, count and mounting
+interfaces remain unestablished; they must not be copied from Peregrine as
+verified Griffin hardware.

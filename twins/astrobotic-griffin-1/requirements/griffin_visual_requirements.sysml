@@ -27,7 +27,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV001_PresentationFrame {
-        doc /* GV-001 [visual] the review composition shall expose an authored VisualCamera in the project SI/Y-up frame. Source: LunCoSim visual review contract. Rationale: a named camera makes visual evidence repeatable across headful and capture runs. */
+        doc /* GV-001 [visual] the review composition shall expose an authored VisualCamera in the project SI/Y-up frame. Source: LunCoSim visual review contract. Rationale: a named camera makes visual evidence repeatable across headful and capture runs. Editor component previews must retain the canonical metric/Y-up stage frame and remain isolated from site-anchor placement and simulation-domain authority. A georeferenced mission camera uses its actual site frame; these are distinct presentation contexts. Rationale: the integrated Griffin-FLIP Editor preview was rotated and displaced to lunar-radius coordinates while the same local vehicle preview was correct. Owner evidence: LunCoSim UsdPreviewOnly ancestry contract in crates/lunco-usd-bevy-scene/src/lib.rs; observed missing guard in crates/lunco-usd-sim-celestial/src/lib.rs. */
     }
 
     requirement def GRV002_LanderPresentation {
