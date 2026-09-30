@@ -2681,14 +2681,12 @@ fn visual_report(doc_id, root) {
 
     let solar_names = griffin_spec::solar_array_names();
     let solar_stations = sysml_requirement_checks::source_position_list(source, _visual_configuration_attr("solarStations"));
-    let solar_rot_x = sysml_requirement_checks::source_number_list(source, _visual_configuration_attr("solarStationRotationXDeg"));
-    let solar_rot = sysml_requirement_checks::source_number_list(source, _visual_configuration_attr("solarStationRotationZDeg"));
     let solar_widths = griffin_spec::component_solar_array_widths_m();
     let solar_frame_width = griffin_spec::solar_panel_frame_width_m();
     for index in 0..solar_names.len() {
         let path = root + "/" + solar_names[index];
         let record = _layout_query(doc_id, path,
-            ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"], false);
+            ["xformOp:translate", "xformOp:orient", "xformOp:scale"], false);
         checks.push("GLR-011-" + solar_names[index]);
         if !_ok(record) {
             findings.push(_finding("GLR-011-array", path,
@@ -2696,7 +2694,7 @@ fn visual_report(doc_id, root) {
             continue;
         }
         let position = record.attrs["xformOp:translate"];
-        let rotation = record.attrs["xformOp:rotateXYZ"];
+        let rotation = record.attrs["xformOp:orient"];
         let scale = record.attrs["xformOp:scale"];
         if position == () || position.len() != 3 || solar_stations.len() != solar_names.len()
             || !_near(position[0], solar_stations[index].x, 0.002)
@@ -2705,15 +2703,15 @@ fn visual_report(doc_id, root) {
             findings.push(_finding("GLR-011-array-position", path,
                 "solar-array station differs from the ordered SysML datum"));
         }
-        if rotation == () || rotation.len() != 3 || solar_rot_x.len() != solar_names.len()
-            || !_near(rotation[0], solar_rot_x[index], 0.002) {
-            findings.push(_finding("GLR-011-array-rotation-x", path,
-                "solar-array X rotation does not map the local cell face outward"));
+        let expected = griffin_spec::component_solar_orientation_components(index);
+        let tolerance = griffin_spec::solar_component_number("orientationTolerance");
+        let orientation_ok = rotation != () && rotation.len() == 4 && expected.len() == 4 && tolerance != ();
+        if orientation_ok {
+            for axis in 0..4 { orientation_ok = orientation_ok && _near(rotation[axis], expected[axis], tolerance); }
         }
-        if rotation == () || rotation.len() != 3 || solar_rot.len() != solar_names.len()
-            || !_near(rotation[2], solar_rot[index], 0.002) {
+        if !orientation_ok {
             findings.push(_finding("GLR-011-array-rotation", path,
-                "solar-array outward orientation differs from the ordered SysML datum"));
+                "solar-array orientation differs from the source tilt followed by plan bearing"));
         }
         if scale == () || scale.len() != 3 || solar_widths.len() != solar_names.len()
             || solar_frame_width == ()
@@ -2858,4 +2856,22 @@ fn apply_ramp_deployment(doc_id, edit_target, root, ramp_path, angle_rad, parent
         validation_pending: result.ok == true,
         next: "after projection, call griffin_requirements::lint_live(doc_id, root)",
     }
+}
+
+
+// Shared quaternion evidence for installed solar panels, independent of the
+// requirement package that calls it. Numeric tolerance belongs to SysML.
+fn solar_orientation_checks(id, path, index, requirement, verification) {
+    let expected = griffin_spec::component_solar_orientation_components(index);
+    if expected.len() != 4 { throw("Solar orientation source incomplete"); }
+    let tolerance = griffin_spec::solar_component_number("orientationTolerance");
+    if tolerance == () || tolerance <= 0.0 { throw("Solar orientation tolerance unavailable"); }
+    let checks = [];
+    for axis in 0..4 {
+        checks.push(#{id: id + "-orientation-" + axis, component: "solar_array",
+            requirement: requirement, verification: verification,
+            kind: "attribute_component", path: path, attr: "xformOp:orient",
+            index: axis, expected: expected[axis], tolerance: tolerance});
+    }
+    checks
 }

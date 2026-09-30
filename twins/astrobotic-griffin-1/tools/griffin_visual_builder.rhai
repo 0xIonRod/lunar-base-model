@@ -60,7 +60,7 @@ fn griffin_body_collision_component_plan(doc, edit_target, root) {
     #{ok:true,ops:ops}
 }
 
-fn griffin_solar_station_plan(doc, edit_target, root, index) {
+fn _solar_station_ops(edit_target, root, index) {
     let names = griffin_spec::solar_array_names();
     let positions = griffin_spec::component_solar_stations();
     let widths = griffin_spec::component_solar_array_widths_m();
@@ -70,19 +70,26 @@ fn griffin_solar_station_plan(doc, edit_target, root, index) {
         || widths.len() != names.len() || nominal_width == () || nominal_width <= 0.0
         || !quat_is_valid(q) { return plan_error("solar station source incomplete"); }
     let path = root + "/" + names[index];
-    let current = assembly_builder::composed_query(doc,
-        #{path: path, children: false, attrs: ["xformOp:rotateXYZ"]});
-    if !query_ok(current) || current.type_name != "Xform" { return plan_error("solar station must exist"); }
     let ops = [#{SetTranslate: #{edit_target: edit_target, path: path, value: vec3_array(positions[index])}},
         #{SetScale: #{edit_target: edit_target, path: path, value: [widths[index]/nominal_width,1.0,1.0]}},
         #{SetAttribute: #{edit_target: edit_target, path: path, name: "xformOp:orient", type_name: "quatd",
             value: "("+q.w.to_string()+", "+q.x.to_string()+", "+q.y.to_string()+", "+q.z.to_string()+")"}},
         #{SetAttribute: #{edit_target: edit_target, path: path, name: "xformOpOrder", type_name: "token[]",
             value: "[\"xformOp:translate\", \"xformOp:orient\", \"xformOp:scale\"]"}}];
-    if current.attrs["xformOp:rotateXYZ"] != () {
-        ops.push(#{RemoveAttribute: #{edit_target: edit_target, path: path, name: "xformOp:rotateXYZ"}});
-    }
     #{ok: true, ops: ops}
+}
+
+fn griffin_solar_station_plan(doc, edit_target, root, index) {
+    let plan = _solar_station_ops(edit_target, root, index);
+    if !plan.ok { return plan; }
+    let path = root + "/" + griffin_spec::solar_array_names()[index];
+    let current = assembly_builder::composed_query(doc,
+        #{path: path, children: false, attrs: ["xformOp:rotateXYZ"]});
+    if !query_ok(current) || current.type_name != "Xform" { return plan_error("solar station must exist"); }
+    if current.attrs["xformOp:rotateXYZ"] != () {
+        plan.ops.push(#{RemoveAttribute: #{edit_target: edit_target, path: path, name: "xformOp:rotateXYZ"}});
+    }
+    plan
 }
 
 fn griffin_bus_cladding_plan(doc, edit_target, root) {
@@ -798,7 +805,19 @@ fn apply_egress_apron(doc, edit_target, root, parent_gen) {
 // repeatable.
 
 fn _isolated_component_plan(doc, edit_target, spec) {
-    _component_plan(doc, edit_target, spec)
+    let base = _component_plan(doc, edit_target, spec);
+    if !base.ok { return base; }
+    let names = griffin_spec::solar_array_names();
+    for index in 0..names.len() {
+        if spec.name == names[index] {
+            let station = _solar_station_ops(edit_target, spec.parent, index);
+            if !station.ok { return station; }
+            for op in station.ops { base.ops.push(op); }
+            base.ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+                path: base.path, name: "xformOp:rotateXYZ"}});
+        }
+    }
+    base
 }
 
 fn _isolated_griffin_specs(root) {
@@ -5585,6 +5604,11 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
             solar_members);
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
+        let station = _solar_station_ops(edit_target, root, index);
+        if !station.ok { return station; }
+        for op in station.ops { ops.push(op); }
+        ops.push(#{RemoveAttribute: #{edit_target: edit_target,
+            path: result.path, name: "xformOp:rotateXYZ"}});
         migrated.push(result.path);
     }
     let engine_parent = root + "/Nozzle/MainEngineCluster";

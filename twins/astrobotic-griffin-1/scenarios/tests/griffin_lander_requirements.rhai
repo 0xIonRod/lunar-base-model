@@ -1,3 +1,4 @@
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Standalone Griffin lander component verification.
 // SysML owns names/counts/dimensions and references; this Rhai observer only
@@ -5,6 +6,8 @@ import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_c
 
 const ROOT = "/World/Griffin1";
 const VERIFICATION = "Verify_GriffinLanderRequirements";
+
+fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
 
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
@@ -153,8 +156,6 @@ fn on_tick(me, ctx) {
     }
     let solar_names = _enum_names(values, "solarArrayInstances");
     let solar_stations = _position_values(values, "solarStations");
-    let solar_rz = sysml_requirement_checks::source_number_list(values,
-        _configuration_attr("solarStationRotationZDeg"));
     for index in 0..solar_names.len() {
         let name = solar_names[index];
         let path = ROOT + "/" + name;
@@ -166,12 +167,9 @@ fn on_tick(me, ctx) {
             checks.push(_position("GLR-008-" + name + "-y", "glr008", path, 1, solar_stations[index].y));
             checks.push(_position("GLR-008-" + name + "-z", "glr008", path, 2, solar_stations[index].z));
         }
-        if solar_rz.len() == solar_names.len() {
-            checks.push(#{id: "GLR-011-" + name + "-rotation", component: "solar_array",
-                requirement: "glr011", verification: VERIFICATION,
-                kind: "attribute_component", path: path, attr: "xformOp:rotateXYZ",
-                index: 2, expected: solar_rz[index], tolerance: 0.002});
-        }
+        for check in griffin_requirements::solar_orientation_checks(
+            "GLR-011-" + name, path, index, "glr011", VERIFICATION) { checks.push(check); }
+
     }
 
     checks.push(sysml_requirement_checks::coverage("GLR-010-frame-ownership", "lander",

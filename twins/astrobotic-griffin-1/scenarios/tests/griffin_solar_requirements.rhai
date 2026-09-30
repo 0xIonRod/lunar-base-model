@@ -198,16 +198,8 @@ fn on_tick(me, ctx) {
             checks.push(position("GSA-005-" + name + "-y", path, 1, stations[index].y, geometry_tolerance));
             checks.push(position("GSA-005-" + name + "-z", path, 2, stations[index].z, geometry_tolerance));
         }
-        let q = griffin_spec::component_solar_orientation(index);
-        if quat_is_valid(q) {
-            let expected = [q.w,q.x,q.y,q.z];
-            for axis in 0..4 {
-                checks.push(#{id: "GSA-005-"+name+"-orientation-"+axis,
-                    component: "solar_array", requirement: "gsa005", verification: VERIFICATION,
-                    kind: "attribute_component", path: path, attr: "xformOp:orient",
-                    index: axis, expected: expected[axis], tolerance: sysml_requirements::number(source, own("orientationTolerance"))});
-            }
-        }
+        for check in griffin_requirements::solar_orientation_checks(
+            "GSA-005-" + name, path, index, "gsa005", VERIFICATION) { checks.push(check); }
         for member in ["Frame", "Cells", "ArrayBackplane"] {
             checks.push(sysml_requirement_checks::exists("GSA-006-" + name + "-" + member,
                 "solar_array", "gsa006", VERIFICATION, path + "/" + member, "Mesh"));

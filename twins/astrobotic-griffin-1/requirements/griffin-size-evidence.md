@@ -141,7 +141,19 @@ now explicitly declare metres; otherwise USD defaults to centimetres and
 world-space overlap evidence has the wrong scale. Solar mounting orientation
 uses a quaternion for face tilt followed by plan bearing; the previous Euler
 composition tilted the diagonal panels and disconnected the side mounts.
-The other assembly authoring entry points still need migration to that same
-orientation recipe before rebuilding a vehicle through those entry points.
+The isolated and component-migration builders now share that orientation
+recipe, as do the solar and broader lander checks.
 The owned windowed review reports a degraded-rendering shader binding fault;
 full rendered visual acceptance remains unresolved.
+
+
+Follow-up evidence: the broader lander gate passes 122 checks after its fixture
+also declares metres and shares the quaternion checks. The solar gate again
+passes 148 checks after deduplication. All three isolated solar placement
+recipes produce dry plans successfully. The saved vehicle preview has matching
+document and projected generations 1050; the
+[review screenshot](../handover/griffin-proportions-review-2026-09-30.png)
+shows upright panels following their bus faces. It still reports rendering
+Degraded and is a geometry review, not final material/render acceptance.
+The [minimal relationship assembly proposal](../contracts/declarative-assembly.md)
+uses existing named-frame tools; no new CAD solver or loader is implemented.
