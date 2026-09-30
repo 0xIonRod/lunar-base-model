@@ -2824,34 +2824,6 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
             }
-            def "OuterRailJointPin" (
-                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-            )
-            {
-                double radius = 0.025
-                double height = 0.1
-                uniform token axis = "Z"
-                bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.18, 1.31)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                uniform token purpose = "render"
-                color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
-            }
-            def "InnerRailJointPin" (
-                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-            )
-            {
-                double radius = 0.025
-                double height = 0.1
-                uniform token axis = "Z"
-                bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.18, -1.31)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                uniform token purpose = "render"
-                color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
-            }
             over "UnderBeamPort"
             {
                 custom double3 xformOp:translate = (0.899542027, -0.0375, 1.2)
@@ -3013,34 +2985,6 @@ def Xform "Griffin1" (
                     bool physics:collisionEnabled = true
                     color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
                 }
-                def "OuterRailJointPin" (
-                    prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-                )
-                {
-                    double radius = 0.025
-                    double height = 0.1
-                    uniform token axis = "Z"
-                    bool physics:collisionEnabled = false
-                    custom double3 xformOp:translate = (0.0, 0.18, 1.31)
-                    custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                    uniform token purpose = "render"
-                    color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
-                }
-                def "InnerRailJointPin" (
-                    prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-                )
-                {
-                    double radius = 0.025
-                    double height = 0.1
-                    uniform token axis = "Z"
-                    bool physics:collisionEnabled = false
-                    custom double3 xformOp:translate = (0.0, 0.18, -1.31)
-                    custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                    uniform token purpose = "render"
-                    color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
-                }
                 over "UnderBeamPort"
                 {
                     custom double3 xformOp:translate = (0.899542027, -0.0375, 1.2)
@@ -3187,11 +3131,11 @@ def Xform "Griffin1" (
                 double height = 0.1
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.18, 1.31)
+                custom double3 xformOp:translate = (0.0, 0.2, 1.31)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
-                color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
             }
             def "InnerRailJointPin" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -3201,11 +3145,11 @@ def Xform "Griffin1" (
                 double height = 0.1
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.18, -1.31)
+                custom double3 xformOp:translate = (0.0, 0.2, -1.31)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
-                color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
             }
             over "UnderBeamPort"
             {
@@ -3326,6 +3270,70 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
             }
+            over "OuterRailJointPinLug"
+            {
+                custom double3 xformOp:translate = (0.0, 0.10499999999999998, 1.31)
+                custom double3 xformOp:scale = (0.06, 0.24, 0.016)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = false
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            }
+            over "InnerRailJointPinLug"
+            {
+                custom double3 xformOp:translate = (0.0, 0.10499999999999998, -1.31)
+                custom double3 xformOp:scale = (0.06, 0.24, 0.016)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = false
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            }
+            def "CenterRailPortJointPin" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                double radius = 0.025
+                double height = 0.1
+                uniform token axis = "Z"
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+                custom double3 xformOp:translate = (0.0, 0.2, 0.69)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            over "CenterRailPortJointPinLug"
+            {
+                custom double3 xformOp:translate = (0.0, 0.10499999999999998, 0.69)
+                custom double3 xformOp:scale = (0.06, 0.24, 0.016)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = false
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            }
+            def "CenterRailStarboardJointPin" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                double radius = 0.025
+                double height = 0.1
+                uniform token axis = "Z"
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+                custom double3 xformOp:translate = (0.0, 0.2, -0.69)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            over "CenterRailStarboardJointPinLug"
+            {
+                custom double3 xformOp:translate = (0.0, 0.10499999999999998, -0.69)
+                custom double3 xformOp:scale = (0.06, 0.24, 0.016)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = false
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            }
         }
         def Xform "MountFrame"
         {
@@ -3371,34 +3379,6 @@ def Xform "Griffin1" (
                 uniform token purpose = "render"
                 bool physics:collisionEnabled = true
                 color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-            }
-            def "OuterRailJointPin" (
-                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-            )
-            {
-                double radius = 0.025
-                double height = 0.1
-                uniform token axis = "Z"
-                bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.18, 1.31)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                uniform token purpose = "render"
-                color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
-            }
-            def "InnerRailJointPin" (
-                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-            )
-            {
-                double radius = 0.025
-                double height = 0.1
-                uniform token axis = "Z"
-                bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.18, -1.31)
-                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                uniform token purpose = "render"
-                color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
             }
             over "UnderBeamPort"
             {
@@ -3560,34 +3540,6 @@ def Xform "Griffin1" (
                     bool physics:collisionEnabled = true
                     color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
                 }
-                def "OuterRailJointPin" (
-                    prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-                )
-                {
-                    double radius = 0.025
-                    double height = 0.1
-                    uniform token axis = "Z"
-                    bool physics:collisionEnabled = false
-                    custom double3 xformOp:translate = (0.0, 0.18, 1.31)
-                    custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                    uniform token purpose = "render"
-                    color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
-                }
-                def "InnerRailJointPin" (
-                    prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-                )
-                {
-                    double radius = 0.025
-                    double height = 0.1
-                    uniform token axis = "Z"
-                    bool physics:collisionEnabled = false
-                    custom double3 xformOp:translate = (0.0, 0.18, -1.31)
-                    custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                    uniform token purpose = "render"
-                    color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
-                }
                 over "UnderBeamPort"
                 {
                     custom double3 xformOp:translate = (0.899542027, -0.0375, 1.2)
@@ -3734,11 +3686,11 @@ def Xform "Griffin1" (
                 double height = 0.1
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.18, 1.31)
+                custom double3 xformOp:translate = (0.0, 0.2, 1.31)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
-                color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
             }
             def "InnerRailJointPin" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -3748,11 +3700,11 @@ def Xform "Griffin1" (
                 double height = 0.1
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.18, -1.31)
+                custom double3 xformOp:translate = (0.0, 0.2, -1.31)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
-                color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
             }
             over "UnderBeamPort"
             {
@@ -3871,6 +3823,70 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
                 bool physics:collisionEnabled = true
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            }
+            over "OuterRailJointPinLug"
+            {
+                custom double3 xformOp:translate = (0.0, 0.10499999999999998, 1.31)
+                custom double3 xformOp:scale = (0.06, 0.24, 0.016)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = false
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            }
+            over "InnerRailJointPinLug"
+            {
+                custom double3 xformOp:translate = (0.0, 0.10499999999999998, -1.31)
+                custom double3 xformOp:scale = (0.06, 0.24, 0.016)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = false
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            }
+            def "CenterRailPortJointPin" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                double radius = 0.025
+                double height = 0.1
+                uniform token axis = "Z"
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+                custom double3 xformOp:translate = (0.0, 0.2, 0.69)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            over "CenterRailPortJointPinLug"
+            {
+                custom double3 xformOp:translate = (0.0, 0.10499999999999998, 0.69)
+                custom double3 xformOp:scale = (0.06, 0.24, 0.016)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = false
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            }
+            def "CenterRailStarboardJointPin" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                double radius = 0.025
+                double height = 0.1
+                uniform token axis = "Z"
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+                custom double3 xformOp:translate = (0.0, 0.2, -0.69)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            over "CenterRailStarboardJointPinLug"
+            {
+                custom double3 xformOp:translate = (0.0, 0.10499999999999998, -0.69)
+                custom double3 xformOp:scale = (0.06, 0.24, 0.016)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                uniform token purpose = "render"
+                bool physics:collisionEnabled = false
                 color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
             }
         }

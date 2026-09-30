@@ -28,6 +28,8 @@ package GriffinRampRequirements {
     enum def GriffinRampRailJointPinIdentity {
         OuterRailJointPin;
         InnerRailJointPin;
+        CenterRailPortJointPin;
+        CenterRailStarboardJointPin;
     }
     enum def GriffinRampTransitionBodyIdentity { TransitionPlate; }
     enum def GriffinRampTransitionContactIdentity { ContactSurface; }
@@ -272,8 +274,9 @@ package GriffinRampRequirements {
              "RampSectionHingeStarboard01", "RampSectionHingeStarboard12");
         attribute treadInstances : GriffinRampTreadIdentity[4] =
             ("Tread01", "Tread02", "Tread03", "Tread04");
-        attribute railJointPinInstances : GriffinRampRailJointPinIdentity[2] =
-            ("OuterRailJointPin", "InnerRailJointPin");
+        attribute railJointPinInstances : GriffinRampRailJointPinIdentity[4] =
+            ("OuterRailJointPin", "InnerRailJointPin",
+             "CenterRailPortJointPin", "CenterRailStarboardJointPin");
         attribute transitionBody : GriffinRampTransitionBodyIdentity = "TransitionPlate";
         attribute transitionContact : GriffinRampTransitionContactIdentity = "ContactSurface";
         attribute transitionJoints : GriffinRampTransitionJointIdentity[2] =
@@ -339,6 +342,17 @@ package GriffinRampRequirements {
         attribute rampCenterRailOffsetZM : Real = CadStudy::trackMm / (2.0 * CadStudy::millimetresPerMetre) - GriffinEgressRamp::assemblyTrackWidthM / 2.0 - GriffinEgressRamp::rampRailWidthM / 2.0;
         attribute rampRailJointPinRadiusM : Real = 0.025;
         attribute rampRailJointPinLengthM : Real = 0.10;
+        /* Pivot lugs connect each guard to its section's native hinge axis.
+         * Their height derives from axis elevation, pin radius and chord top;
+         * four coaxial pin visuals share the common section shaft. 60 mm lug
+         * travel width and 16 mm plate thickness are unqualified assembly
+         * estimates to bridge the observed rail/hinge separation. The image
+         * establishes folded tracks but gives no hinge bracket drawing:
+         * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png .
+         * These pieces follow the existing rigid section; no new joints,
+         * mass copies or separate deployment motion are introduced. */
+        attribute rampPivotLugWidthM : Real = 0.06;
+        attribute rampPivotLugThicknessM : Real = 0.016;
         // Separate traction bars on each wheel track leave the centre open.
         // Count and pitch are visual study assumptions because Astrobotic has
         // not published the Griffin ramp tread ICD.
@@ -573,7 +587,7 @@ package GriffinRampRequirements {
         doc /* Port and starboard egress ramps shall be independently addressable component instances that share the same section geometry source and use mirrored deck mounting stations. */
     }
     requirement def GRR008_RailGeometry {
-        doc /* Both guide edges of each contact track shall start at the upper-deck hinge, sit above the walking surface, and continue to the toe as one rail segment per rigid ramp section. A visible pivot fitting shall join each rail segment at the deck hinge and at both section hinges. Pin centers shall coincide with the ramp hinge line, and each segment shall match its section length and source-owned rail envelope. */
+        doc /* Both guide edges of each contact track shall start at the upper-deck hinge, sit above the walking surface, and continue to the toe as one rail segment per rigid ramp section. Four coaxial pin fittings and connecting lugs shall join the guards to each section hinge. Pin centers shall use the native section-axis elevations (root shaft, middle chord top, toe plate bottom), and each segment shall match its section length and source-owned rail envelope. */
     }
     requirement def GRR009_RailSupportGeometry {
         doc /* Each section shall connect all four upper guide rails to the walking surface with eleven evenly spaced upright posts per side. Posts shall align with the rail stations and overlap the walking surface and rail so the supports visibly and structurally connect both members. Post height and center shall be derived from the authored surface, rail, and embedment datums. */

@@ -214,7 +214,7 @@ fn on_tick(me, ctx) {
     let transition_contact_name = _source_enum_name(source, "transitionContact");
     let transition_joint_names = _source_enum_names(source, "transitionJoints");
     if section_names.len() != 3 || joint_names.len() != 4 || tread_names.len() != 4
-        || rail_pin_names.len() != 2
+        || rail_pin_names.len() != 4
         || transition_body_name == "" || transition_contact_name == ""
         || transition_joint_names.len() != 2 {
         throw("Griffin ramp SysML identity collections are incomplete");
@@ -463,12 +463,7 @@ fn on_tick(me, ctx) {
                 }
             }
 
-            for rail in [
-                #{name: "OuterRail", z: _source_number(source, "rampRailOffsetZM")},
-                #{name: "InnerRail", z: -_source_number(source, "rampRailOffsetZM")},
-                #{name: "CenterRailPort", z: _source_number(source, "rampCenterRailOffsetZM")},
-                #{name: "CenterRailStarboard", z: -_source_number(source, "rampCenterRailOffsetZM")},
-            ] {
+            for rail in griffin_spec::ramp_guide_stations() {
                 let rail_path = section + "/" + rail.name;
                 for dim in [
                     #{name: "length", axis: 0, attr: "rampSectionLengthM"},
@@ -489,13 +484,9 @@ fn on_tick(me, ctx) {
                     "grr008", rail_path, "xformOp:translate", 0, section_length / 2.0));
             }
 
-            for pin_index in 0..rail_pin_names.len() {
-                let pin_name = rail_pin_names[pin_index];
-                let pin_z = if pin_index == 0 {
-                    _source_number(source, "rampRailOffsetZM")
-                } else {
-                    -_source_number(source, "rampRailOffsetZM")
-                };
+            for guide in griffin_spec::ramp_guide_stations() {
+                let pin_name=guide.pin;
+                let pin_z=guide.z;
                 let pin_path = section + "/" + pin_name;
                 checks.push(_check("GRR-008-" + side + "-" + index.to_string() + "-" + pin_name,
                     "ramp_rail_joint", "grr008", "exists", pin_path));
@@ -513,9 +504,23 @@ fn on_tick(me, ctx) {
                     "grr008", pin_path, "xformOp:translate", 0, 0.0));
                 checks.push(_attribute_component("GRR-008-" + side + "-" + index.to_string() + "-" + pin_name + "-y",
                     "grr008", pin_path, "xformOp:translate", 1,
-                    _source_number(source, "rampRailCenterYM")));
+                    griffin_spec::ramp_section_hinge_axis_y_m(index)));
                 checks.push(_attribute_component("GRR-008-" + side + "-" + index.to_string() + "-" + pin_name + "-z",
                     "grr008", pin_path, "xformOp:translate", 2, pin_z));
+                let axis_y=griffin_spec::ramp_section_hinge_axis_y_m(index);
+                let pin_radius=_source_number(source,"rampRailJointPinRadiusM");
+                let lug_bottom=min(axis_y-pin_radius,
+                    _source_number(source,"rampSurfaceCenterYM")
+                    -_source_number(source,"rampSurfaceThicknessM")/2.0);
+                let lug_top=max(axis_y+pin_radius,
+                    _source_number(source,"rampRailCenterYM")
+                    +_source_number(source,"rampRailHeightM")/2.0);
+                checks.push(#{id:"GRR-008-"+side+"-"+index.to_string()+"-"+pin_name+"-lug-span",
+                    component:"ramp_rail_joint",requirement:"grr008",verification:VERIFICATION,
+                    kind:"extent_component",path:pin_path+"Lug",index:1,multiplier:1.0,
+                    expected:lug_top-lug_bottom,tolerance:0.002});
+                checks.push(_attribute_component("GRR-008-"+side+"-"+index.to_string()+"-"+pin_name+"-lug-y",
+                    "grr008",pin_path+"Lug","xformOp:translate",1,(lug_top+lug_bottom)/2.0));
             }
 
             let walking_surface_top_y = _source_number(source, "rampSurfaceCenterYM")

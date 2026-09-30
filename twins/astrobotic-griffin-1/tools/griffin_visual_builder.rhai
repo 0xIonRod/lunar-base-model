@@ -4536,7 +4536,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         || thickness == () || surface_y == () || track_width == ();
     let invalid_rail_geometry = rail_height == () || rail_width == ()
         || rail_y == () || rail_z == () || center_rail_z == () || center_rail_z<=0.0;
-    let invalid_rail_pins = rail_pin_names.len() != 2 || rail_pin_radius == ()
+    let invalid_rail_pins = rail_pin_names.len() != 4 || rail_pin_radius == ()
         || rail_pin_length == ();
     let invalid_tread_count = tread_count <= 0 || tread_names.len() != tread_count
         || track_centers.len() != 4;
@@ -4626,12 +4626,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             for op in placement.ops { ops.push(op); }
         }
 
-        for rail in [
-            #{name: "OuterRail", z: rail_z},
-            #{name: "InnerRail", z: -rail_z},
-            #{name: "CenterRailPort", z: center_rail_z},
-            #{name: "CenterRailStarboard", z: -center_rail_z},
-        ] {
+        for rail in griffin_spec::ramp_guide_stations() {
             let rail_path = section_path + "/" + rail.name;
             let placement = _component_cube_visual_ops(doc,edit_target,section_path,rail.name,
                 [section_length / 2.0, rail_y, rail.z], (),
@@ -4642,11 +4637,10 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
                 name:"physics:collisionEnabled",type_name:"bool",value:"true"}});
         }
 
-        // Each section begins at either the deck pivot or an intermediate pivot.
-        // Place the two edge-rail fittings on that same line so the rail assembly
-        // visibly follows all three revolute joints.
-        for index in 0..rail_pin_names.len() {
-            let pin_name = rail_pin_names[index];
+        // Fittings belong to the same native hinge axis as the common shaft.
+        // Lugs bridge from that axis to the guard; no independent visual motion.
+        for guide in griffin_spec::ramp_guide_stations() {
+            let pin_name = guide.pin;
             let pin_path = section_path + "/" + pin_name;
             let pin = assembly_builder::composed_query(doc,
                 #{path: pin_path, children: false});
@@ -4659,7 +4653,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
                     type_name: "Cylinder", reference: (),
                     reference_prim_path: ""}});
             }
-            let pin_z = if pin_name == "OuterRailJointPin" { rail_z } else { -rail_z };
+            let pin_z = guide.z;
             ops.push(#{SetApiSchemas: #{edit_target: edit_target,
                 path: pin_path,
                 schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
@@ -4670,15 +4664,23 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
                 #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
                 #{name: "purpose", type_name: "token", value: "\"render\""},
                 #{name: "primvars:displayColor", type_name: "color3f[]",
-                  value: "[(0.58, 0.62, 0.67)]"},
+                  value: _color_literal(structure_color)},
             ] {
                 ops.push(#{SetAttribute: #{edit_target: edit_target, path: pin_path,
                     name: item.name, type_name: item.type_name, value: item.value}});
             }
             let pin_placement = assembly_builder::place_plan(edit_target, pin_path,
-                [0.0, rail_y, pin_z], (), [1.0, 1.0, 1.0]);
+                [0.0, hinge_y, pin_z], (), [1.0, 1.0, 1.0]);
             if !pin_placement.ok { return pin_placement; }
             for op in pin_placement.ops { ops.push(op); }
+            let lug_bottom=min(hinge_y-rail_pin_radius, surface_y-thickness/2.0);
+            let lug_top=max(hinge_y+rail_pin_radius,rail_y+rail_height/2.0);
+            let lug=_component_cube_visual_ops(doc,edit_target,section_path,
+                pin_name+"Lug",[0.0,(lug_top+lug_bottom)/2.0,pin_z],(),
+                [_ramp_number("rampPivotLugWidthM"),lug_top-lug_bottom,
+                 _ramp_number("rampPivotLugThicknessM")],structure_color);
+            if !lug.ok {return lug;}
+            for op in lug.ops {ops.push(op);}
         }
 
         for beam in [

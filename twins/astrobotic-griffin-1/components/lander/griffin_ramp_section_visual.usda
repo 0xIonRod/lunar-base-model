@@ -284,9 +284,9 @@ def Xform "RampSection" (
         double radius = 0.025
         double height = 0.1
         uniform token axis = "Z"
-        custom double3 xformOp:translate = (0.0, 0.18, 1.31)
+        custom double3 xformOp:translate = (0.0, 0.0, 1.31)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -298,9 +298,9 @@ def Xform "RampSection" (
         double radius = 0.025
         double height = 0.1
         uniform token axis = "Z"
-        custom double3 xformOp:translate = (0.0, 0.18, -1.31)
+        custom double3 xformOp:translate = (0.0, 0.0, -1.31)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -1456,6 +1456,82 @@ def Xform "RampSection" (
         bool physics:collisionEnabled = false
         custom double3 xformOp:translate = (1.724122218416667, 0.1175, -0.69)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -39.81991415344803)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+    }
+    def Cube "OuterRailJointPinLug" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.06, 0.225, 0.016)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.0875, 1.31)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+    }
+    def Cube "InnerRailJointPinLug" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.06, 0.225, 0.016)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.0875, -1.31)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+    }
+    def Cylinder "CenterRailPortJointPin" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double radius = 0.025
+        double height = 0.1
+        uniform token axis = "Z"
+        bool physics:collisionEnabled = false
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom double3 xformOp:translate = (0.0, 0.0, 0.69)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+    }
+    def Cube "CenterRailPortJointPinLug" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.06, 0.225, 0.016)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.0875, 0.69)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+    }
+    def Cylinder "CenterRailStarboardJointPin" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double radius = 0.025
+        double height = 0.1
+        uniform token axis = "Z"
+        bool physics:collisionEnabled = false
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom double3 xformOp:translate = (0.0, 0.0, -0.69)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+    }
+    def Cube "CenterRailStarboardJointPinLug" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.06, 0.225, 0.016)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.0875, -0.69)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }

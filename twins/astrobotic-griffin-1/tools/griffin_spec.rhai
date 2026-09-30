@@ -115,7 +115,7 @@ fn _qualified_attribute(name) {
         "rampSectionCount", "rampSectionLengthM", "rampSectionGeometryToleranceM",
         "rampWheelClearanceM", "rampSurfaceThicknessM", "rampRailHeightM",
         "rampRailWidthM", "rampRailOffsetZM", "rampCenterRailOffsetZM", "rampRailJointPinRadiusM",
-        "rampRailJointPinLengthM", "rampSurfaceCenterYM", "rampRailCenterYM",
+        "rampRailJointPinLengthM", "rampPivotLugWidthM", "rampPivotLugThicknessM", "rampSurfaceCenterYM", "rampRailCenterYM",
         "rampMaxDeploymentAngleRad",
         "rampPortMountX", "rampStarboardMountX", "rampMountY", "rampMountZ",
         "rampHingeOffsetX", "rampHingeOffsetY", "rampHingeOffsetZ",
@@ -867,6 +867,17 @@ fn ramp_root_joint_names() { _sysml_enum_names("rootJointInstances") }
 fn ramp_intermediate_joint_names() { _sysml_enum_names("intermediateJointInstances") }
 fn ramp_tread_names() { _sysml_enum_names("treadInstances") }
 fn ramp_rail_joint_pin_names() { _sysml_enum_names("railJointPinInstances") }
+// Stable guide identities pair each inherited rail with its coaxial fitting.
+fn ramp_guide_stations() {
+    let pins=ramp_rail_joint_pin_names();
+    if pins.len()!=4 {throw("ramp guide stations require four sourced pin identities");}
+    let outer=_sysml_attribute("rampRailOffsetZM");
+    let inner=_sysml_attribute("rampCenterRailOffsetZM");
+    [#{name:"OuterRail",pin:pins[0],z:outer},
+     #{name:"InnerRail",pin:pins[1],z:-outer},
+     #{name:"CenterRailPort",pin:pins[2],z:inner},
+     #{name:"CenterRailStarboard",pin:pins[3],z:-inner}]
+}
 fn ramp_transition_joint_names() { _sysml_enum_names("transitionJoints") }
 fn ramp_tread_count_per_section() { _sysml_integer("assemblyTreadCountPerSection") }
 fn ramp_side_post_count_per_section_per_side() { _sysml_integer("assemblySidePostCountPerSectionPerSide") }
