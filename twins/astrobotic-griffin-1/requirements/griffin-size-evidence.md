@@ -434,3 +434,17 @@ and toe shaft Y derives from the plate bottom. These match the section
 revolute frame datums and are shared by native joint placement and shaft
 appearance. Deployed ramp and folded-rail gates passed for these changes;
 rendered review shows continuous tracks and closer-packed folded trusses.
+
+### Tank support surface ownership, 2026-10-01
+
+The three tank-support perimeters and twelve annular collars now bind two
+reusable standard USD materials inside the bus component. Their existing
+source-owned tankSupportDisplayColor and tankCollarDisplayColor supply the
+palette; silverMetallic and silverRoughness supply the shared inspection finish.
+These are artistic appearance estimates chosen to distinguish structure from
+gold tank blankets, informed by the supplied ESA rendering:
+https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander.
+They are not measured optical constants, an alloy selection or evidence of
+hardware qualification. The 120 mm ring section and annular radii were retained:
+reducing the collar outer radius alone would break its reconstructed connection
+to the perimeter. Tank clearances and existing datums remain the geometry basis.

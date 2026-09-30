@@ -175,7 +175,7 @@ def Xform "GriffinBus" (
     def Xform "TankSupportPlate"
     {
         def Mesh "TankSupportPerimeter" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -189,9 +189,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankFrame>
         }
         def Mesh "OpeningTankPX" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -205,9 +206,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankNX" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -221,9 +223,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankPZ" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -237,9 +240,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankNZ" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -253,9 +257,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "TankSupportPerimeterUpper" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -269,9 +274,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankFrame>
         }
         def Mesh "TankSupportPerimeterLower" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -285,9 +291,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankFrame>
         }
         def Mesh "OpeningTankPXUpper" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -301,9 +308,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankNXUpper" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -317,9 +325,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankPZUpper" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -333,9 +342,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankNZUpper" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -349,9 +359,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankPXLower" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -365,9 +376,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankNXLower" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -381,9 +393,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankPZLower" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -397,9 +410,10 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
         def Mesh "OpeningTankNZLower" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             active = true
         )
         {
@@ -413,6 +427,7 @@ def Xform "GriffinBus" (
             uniform bool doubleSided = false
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom token[] xformOpOrder = ["xformOp:translate"]
+            custom rel material:binding = </GriffinBus/Looks/TankCollars>
         }
     }
     def Mesh "UpperCentralBucket" (
@@ -594,6 +609,32 @@ def Xform "GriffinBus" (
                 color3f inputs:diffuseColor = (0.6499999761581421, 0.6600000262260437, 0.6399999856948853)
                 float inputs:metallic = 0.0
                 float inputs:roughness = 0.6499999761581421
+            }
+        }
+        def Material "TankFrame"
+        {
+            custom token outputs:surface
+            token outputs:surface.connect = </GriffinBus/Looks/TankFrame/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                token outputs:surface = ""
+                color3f inputs:diffuseColor = (0.11999999731779099, 0.15000000596046448, 0.1899999976158142)
+                float inputs:metallic = 0.75
+                float inputs:roughness = 0.41999998688697815
+            }
+        }
+        def Material "TankCollars"
+        {
+            custom token outputs:surface
+            token outputs:surface.connect = </GriffinBus/Looks/TankCollars/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                token outputs:surface = ""
+                color3f inputs:diffuseColor = (0.23999999463558197, 0.2800000011920929, 0.3400000035762787)
+                float inputs:metallic = 0.75
+                float inputs:roughness = 0.41999998688697815
             }
         }
     }
