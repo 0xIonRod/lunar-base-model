@@ -2706,18 +2706,6 @@ def Xform "Griffin1" (
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
         }
-        def Cylinder "AdapterRing"
-        {
-            uniform token axis = "Y"
-            double radius = 1.0
-            double height = 0.18
-            double3 xformOp:translate = (0.0, 2.18, 0.0)
-            double3 xformOp:scale = (1.35, 1.0, 1.35)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.7900000214576721, 0.6200000047683716, 0.30000001192092896)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-        }
     }
     def Xform "EgressRampPort" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
@@ -4422,6 +4410,12 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         custom double3 xformOp:scale = (0.6, 0.6, 0.6)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        def "MliTank" (
+            prepend apiSchemas = "MaterialBindingAPI"
+        )
+        {
+            custom rel material:binding = </Griffin1/Looks/MliFoil_Mat>
+        }
     }
     def Xform "TankNX" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
@@ -4431,6 +4425,12 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         custom double3 xformOp:scale = (0.6, 0.6, 0.6)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        def "MliTank" (
+            prepend apiSchemas = "MaterialBindingAPI"
+        )
+        {
+            custom rel material:binding = </Griffin1/Looks/MliFoil_Mat>
+        }
     }
     def Xform "TankPZ" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
@@ -4440,6 +4440,12 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         custom double3 xformOp:scale = (0.6, 0.6, 0.6)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        def "MliTank" (
+            prepend apiSchemas = "MaterialBindingAPI"
+        )
+        {
+            custom rel material:binding = </Griffin1/Looks/MliFoil_Mat>
+        }
     }
     def Xform "TankNZ" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
@@ -4449,6 +4455,12 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         custom double3 xformOp:scale = (0.6, 0.6, 0.6)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        def "MliTank" (
+            prepend apiSchemas = "MaterialBindingAPI"
+        )
+        {
+            custom rel material:binding = </Griffin1/Looks/MliFoil_Mat>
+        }
     }
     def Cube "TopDeckBeamCollider0" (
         prepend apiSchemas = "PhysicsCollisionAPI"

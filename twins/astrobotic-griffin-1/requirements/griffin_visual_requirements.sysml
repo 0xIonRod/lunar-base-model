@@ -15,7 +15,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GR020_ProxySuppression {
-        doc /* GR-020 [visual ownership] suppress inherited comparison geometry when a named part owns the visible representation; hidden duplicates do not count as removal. Source: Twin component ownership policy. Rationale: inactive or hidden duplicates still obscure which component owns the rendered geometry and can reappear during composition. */
+        doc /* GR-020 [visual ownership] suppress inherited comparison geometry when a named part owns the visible representation; hidden duplicates do not count as removal. Source: Twin component ownership policy. Rationale: inactive or hidden duplicates still obscure which component owns the rendered geometry and can reappear during composition. The obsolete solid PayloadAdapter/AdapterRing cylinder shall be removed; the maintained visible platform is Bus/RoverPayloadDeck, and the AdapterPlate physical interface is retained. Rationale: the render-only comparison disc obscured tank domes and presented an unsupported circular platform shape. */
     }
 
     requirement def GR032_MainEngineBells {
@@ -23,7 +23,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GR033_PropellantTanks {
-        doc /* GR-033 [public integration value] model four visible, source-owned COPV study assemblies at the ordered GriffinVisualConfiguration tank stations and scales. The vessel skin and retention bands are render-only; flight propellant mass remains in MainPropulsion. Exact COPV dimensions and placement remain TBD. Rationale: four repeated tank owners represent the visible system without retaining incompatible Capsule placeholders; public material does not provide a certified tank ICD. */
+        doc /* GR-033 [public integration value] model four visible, source-owned COPV study assemblies at the ordered GriffinVisualConfiguration tank stations and scales. The vessel skin and retention bands are render-only; flight propellant mass remains in MainPropulsion. The MliTank vessel skins shall bind to the vehicle MliFoil_Mat material. Its colour, crinkle density and sheen are appearance estimates inherited from lunco://shaders/mli_foil.wgsl, not measured material optical properties. The gold blanket appearance is informed by https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander and https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ (concept imagery, not a current flight CAD guarantee). Exact COPV dimensions and placement remain TBD. Rationale: four repeated tank owners represent the visible system without retaining incompatible Capsule placeholders; public material does not provide a certified tank ICD. */
     }
 
     requirement def GRV001_PresentationFrame {

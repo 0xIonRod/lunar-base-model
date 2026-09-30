@@ -178,3 +178,32 @@ invisible Mesh collision tracks. Requiring those proxy tracks to be visible
 contradicted the authored render/contact separation. Review placement values
 are read from the gate's selected source snapshot; the final rerun has no
 scenario startup exception. This is presentation topology evidence only.
+
+## Reusable model cleanup and remaining packaging correction
+
+The visible solid cylinder `PayloadAdapter/AdapterRing` was an obsolete
+comparison primitive above the maintained `Bus/RoverPayloadDeck`. The typed
+Editor cleanup removes that render-only cylinder and retains `AdapterPlate`'s
+physical interface. Four `MliTank` shells now bind to the already authored
+`MliFoil_Mat` shader. Its optical parameters are appearance estimates, not
+measured Griffin blanket properties; GR-033 records that boundary and the
+concept-image sources. The updated visual gate passes 100 checks, including
+four material relationships and absence of the old disc.
+
+[Astrobotic Payload User's Guide, August 2021 version 5.02, page 25](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf)
+shows the aluminum bus, large deck openings, radiators and a central upper cone.
+The text explicitly identifies that upper-cone configuration as designed for
+VIPER and says the payload mounting interface is mission-specific. It does
+not establish a FLIP adapter ICD. That evidence supports an open structural
+layout around the tanks; the current broad solid rover platform is still a
+study assumption that hides much of the domes. Revise that packaging rather
+than claiming the current silhouette is accepted. The scoped public-model
+search found reference imagery and user-guide drawings, not a downloadable
+Griffin engineering model on the inspected official pages.
+
+[Settled model cleanup preview](../handover/griffin-model-cleanup-2026-09-30.png)
+uses matching document/projected generation 17. It confirms disc removal, but
+is not final finish acceptance: insulation visibility, structural detail and
+materials still need visual work. The fresh powered-descent diagnostic was
+stopped when the user reprioritized the 3D model; it established preflight and
+powered-descent startup, not an accepted landing.

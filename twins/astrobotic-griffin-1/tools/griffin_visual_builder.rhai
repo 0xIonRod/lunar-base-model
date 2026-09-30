@@ -5786,3 +5786,33 @@ fn apply_standard_terrain(doc, edit_target, root, parent_gen) {
       root: root, environment: plan.environment, asset: plan.asset,
       shader: plan.shader}
 }
+
+
+// Reuse the vehicle's authored foil material on the reusable tank shells.
+// This changes presentation only; stations, collision and mass stay source-owned.
+fn griffin_surface_finish_plan(doc, edit_target, root) {
+    let material = root + "/Looks/MliFoil_Mat";
+    let mat = _component_query(doc, material);
+    if !mat.ok || mat.type_name != "Material" { return plan_error("Griffin foil material is missing"); }
+    let ops = [];
+    for name in griffin_spec::propellant_tank_names() {
+        let path = root + "/" + name + "/MliTank";
+        let prim = _component_query(doc, path);
+        if !prim.ok || prim.type_name != "Sphere" { return plan_error("Tank foil shell is missing: " + path); }
+        ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path, schemas: ["MaterialBindingAPI"]}});
+        ops.push(#{SetRelationship: #{edit_target: edit_target, path: path,
+            name: "material:binding", targets: [material]}});
+    }
+    // Retire the obsolete solid disc: Bus/RoverPayloadDeck owns the
+    // maintained platform, while AdapterPlate retains its physical interface.
+    let legacy_path = root + "/PayloadAdapter/AdapterRing";
+    let legacy = assembly_builder::composed_query(doc,
+        #{path: legacy_path, children: false, attrs: ["physics:collisionEnabled"]});
+    if query_ok(legacy) {
+        if legacy.type_name != "Cylinder" || legacy.attrs["physics:collisionEnabled"] != false {
+            return plan_error("Legacy adapter disc must be an identified render-only Cylinder");
+        }
+        ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_path}});
+    }
+    #{ok: true, ops: ops}
+}

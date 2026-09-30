@@ -157,6 +157,15 @@ fn run_visual_review(batch_index) {
              root + "/Griffin1/" + name + "/TankBandB",
              root + "/Griffin1/" + name + "/TankBandC"]));
     }
+    for name in tank_names {
+        checks.push(#{id: "GV-002-" + name + "-foil-material", component: "propellant_tanks",
+            requirement: "gv002", verification: "Verify_GriffinVisualRequirements",
+            kind: "relationship", path: root + "/Griffin1/" + name + "/MliTank",
+            rel: "material:binding", targets: [root + "/Griffin1/Looks/MliFoil_Mat"]});
+    }
+    checks.push(#{id: "GV-002-legacy-adapter-disc-removed", component: "lander_deck",
+        requirement: "gv002", verification: "Verify_GriffinVisualRequirements",
+        kind: "not_exists", path: root + "/Griffin1/PayloadAdapter/AdapterRing"});
     let ramp_names = _sysml_list(source, "rampInstances");
     let ramp_paths = [];
     for name in ramp_names { ramp_paths.push(root + "/Griffin1/" + name); }
