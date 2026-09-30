@@ -36,3 +36,20 @@ do not label a raw topology pass as successful rendered nozzle acceptance.
 Rail stages were separately committed as 88cfe70 and 8385d77. The active Griffin
 landing/FLIP goal remains incomplete; continue visual refinement, preserving
 source/estimate rationale and periodic commits. RCS requirements remain deferred.
+
+## Follow-up: direct bore visual evidence
+
+The isolated component was inspected on 2026-10-01 in the same owned Editor.
+A temporary, unsaved root rotation (-55, 0, 35) degrees brought the bore toward
+view 26's existing underside camera. At projected generation 2, projection_ready
+was true and the two-layer composed component rendered a continuous curved
+inner bell, thin exit rim and visibly open throat. Screenshot:
+/tmp/griffin-bore-inspection.png. This resolves the apparent solid exit in the
+previous shallow view; no cap, fake dark disc or geometry distortion was added.
+The image still lacks cavity self-shadowing under the current preview lights.
+
+Both temporary root attributes were removed through ApplyUsdOps. Generation 4
+was projection-ready; QueryUsdPrim reported no rotateXYZ or xformOpOrder on
+/EngineBell, with world position (0,0,0). SaveDocument restored the unchanged
+source; the complete vehicle was left focused. This proves the visible isolated
+flow path, not propulsion operation or full lander lighting acceptance.
