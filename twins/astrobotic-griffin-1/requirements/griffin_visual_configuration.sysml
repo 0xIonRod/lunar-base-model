@@ -109,8 +109,8 @@ package GriffinVisualConfigurationRequirements {
          * motivates a taller 2.52 +/-0.5 m landed payload surface, excluding
          * its ground handling stand. Body belt height 0.72 +/-0.12 m and all internal
          * support coordinates below are packaging estimates, not metrology.
-         * A 0.44 m vehicle touchdown datum plus adapter Y=2.0 and half its
-         * 0.16 m thickness gives the 2.52 m ground-to-payload height. */
+         * A 0.44 m vehicle touchdown datum plus adapter Y=2.04 and half its
+         * 0.08 m thickness gives the 2.52 m ground-to-payload height. */
         attribute bodyDimensions : Dimensions = (3.60, 0.72, 3.60);
         attribute bodyMount : Position = (0.0, 1.34, 0.0);
         /* Exterior blanket/panel presentation follows the faceted wrapped
@@ -138,8 +138,12 @@ package GriffinVisualConfigurationRequirements {
         attribute bodyGroundClearanceM : Real = 0.20;
         attribute lowerSkirtDimensions : Dimensions = (3.40, 0.24, 3.40);
         attribute lowerSkirtCenter : Position = (0.0, -0.36, 0.0);
-        attribute deckDimensions : Dimensions = (3.50, 0.16, 3.50);
-        attribute deckCenter : Position = (0.0, 0.37, 0.0);
+        /* Apply the same estimated 80 mm stock to the upper perimeter deck
+         * ring. Raise its center 40 mm to retain the original top surface:
+         * bus-local .41 + .08/2 = .45 m. This reduces the opaque band below
+         * that surface without altering its physical support elevation. */
+        attribute deckDimensions : Dimensions = (3.50, 0.08, 3.50);
+        attribute deckCenter : Position = (0.0, 0.41, 0.0);
         attribute avionicsDeckDimensions : Dimensions = (2.00, 0.10, 1.46);
         attribute avionicsDeckCenter : Position = (0.0, 0.46, 0.0);
 
@@ -221,8 +225,14 @@ package GriffinVisualConfigurationRequirements {
         attribute lowerBucketOuterBottomRadiusM : Real = .58;
         attribute lowerBucketTopCenterYM : Real = -0.46;
         attribute lowerBucketBottomCenterYM : Real = -0.58;
-        attribute payloadAdapterDimensions : Dimensions = (3.20, .16, 3.20);
-        attribute payloadAdapterCenterYM : Real = 2.00;
+        /* The former 160 mm square-stock payload frame dominated the upper
+         * silhouette and hid tank domes. Use 80 mm stock as an explicit visual
+         * estimate (not load-qualified supplier sizing), informed by the slender
+         * open structure in https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
+         * Preserve the wheel contact top: center 2.04 + .08/2 = 2.08 m.
+         * The visible frame and its contact proxy must change together. */
+        attribute payloadAdapterDimensions : Dimensions = (3.20, .08, 3.20);
+        attribute payloadAdapterCenterYM : Real = 2.04;
 
         /* Correct the upper leg mount to the lower body edge, per the user's
          * Astrobotic rendering: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
@@ -273,7 +283,8 @@ package GriffinVisualConfigurationRequirements {
          * the 1.66 m skin top, following the exposed-domes silhouette of
          * https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander.
          * Dome exposure is limited by the FLIP support-frame underside.
-         * The upper cap has 14 mm vertical clearance. This explicit packing
+         * The upper cap now has 94 mm vertical clearance below the slimmer
+         * payload rails; the previous 160 mm stock left only 14 mm. This explicit packing
          * estimate also leaves a
          * positive lower-neck support span above the source-derived cradle.
          * Their largest band radius is approximately 0.516 m, so 0.58 m

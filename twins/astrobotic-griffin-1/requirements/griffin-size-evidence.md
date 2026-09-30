@@ -32,7 +32,7 @@ derived hinge coordinates is for interface closure, not measurement accuracy.
 | Body belt and frame-member height | 2.00 m; first pass 1.40 m | 0.72 m | User-selected ESA face ratio ≈3:1; broad octagon face = 0.585786 × 3.60 = 2.109 m; 2.109 / 3 = 0.703 m, rounded to 0.72 m. Approximate range 0.60–0.84 m; low-confidence presentation estimate. The earlier 1.40 m entry was stale and did not match the authored geometry. |
 | Payload surface above terrain | 5.72 m | 2.52 m | Estimate: older 2.0 m overall-height anchor plus approximately 0.5 m allowance for the current higher deck/structure. Range 2.0–3.0 m. Not a photograph measurement. |
 | Footprint across opposed pad edges | 7.24 m | 4.50 m | Diagonal foot stations at X/Z=+/-1.90 m plus 0.35 m pad radii on each side; selected to match the historical envelope approximately. Current footprint unconfirmed. |
-| Payload adapter | 4.40 × 3.20 m | 3.20 × 3.20 m | Estimated octagonal footprint fitting inside the bus and covering the reconstructed FLIP wheels after clipping the corners. Thickness retained at 0.16 m as a structural proxy. |
+| Payload adapter | 4.40 × 3.20 m | 3.20 × 3.20 m | Estimated octagonal footprint fitting inside the bus and covering the reconstructed FLIP wheels after clipping the corners. 80 mm stock is an explicit silhouette estimate; center Y2.04 preserves the Y2.08 contact top. |
 | FLIP body | 4.40 × 2.76 m lower frame | 2.116 × 1.476 m | Promote the estimated CAD plan dimensions with an explicit axis mapping. Allow approximately 20% dimensional uncertainty. The 0.12 m lower-frame height is a visualization/collision proxy; equipment box height 0.396 m comes from CAD. |
 | FLIP wheel envelope | legacy inconsistent envelope | 2.28 m across track; 2.60 m along travel | Derived from 2.0 m track + 0.28 m tire width and 1.7 m wheelbase + two 0.45 m radii. Wheel ribs, deformation and suspension travel excluded. |
 | Ramp length | 12.228605 m | 5.397252161 m | Derived: 2.52 / sin(0.4857867749). Retain the previous **estimated** 27.8335° deployment angle to isolate the height correction; not a published ramp slope. At 2.0–3.0 m deck heights this gives 4.28–6.43 m. |
@@ -40,8 +40,8 @@ derived hinge coordinates is for interface closure, not measurement accuracy.
 | Ramp outside width | 3.50 m | 2.86 m | 2.00 m track + 0.58 m contact-track width + two 0.14 m rails. Contact width is 0.28 m wheel + twice 0.15 m estimated clearance. |
 | Deck transition | 1.96327 m | 0.90 m | Estimated bridge to the octagonal deck: outboard X=1.90, inboard X=1.00. At outer rail Z=1.43 the deck edge is X≈1.107, leaving >0.05 m overlap. |
 
-The vehicle touchdown reference remains 0.44 m. Adapter center Y=2.00 plus
-half-thickness 0.08 gives a vehicle-local top of 2.08 m, hence 2.52 m above
+The vehicle touchdown reference remains 0.44 m. Adapter center Y=2.04 plus
+half-thickness 0.04 gives a vehicle-local top of 2.08 m, hence 2.52 m above
 ground. A ramp half-thickness of 0.09 m yields hinge X=1.90+0.09 sin(angle),
 Y=2.08−0.09 cos(angle); the builder's toe miter closes both contact edges.
 Section and transition inertia are recomputed as rectangular-envelope proxies
@@ -361,3 +361,18 @@ existing 3.60 m octagon, not calibrated from pixels. Tube lengths/rotations and
 mount brackets derive from endpoints; the three-member load path is retained.
 The footprint diagonal is larger than the X/Z span; the old description of
 1.90 m radial stations no longer applies. No panel cutouts are used.
+
+## Payload support stock — 2026-09-30
+
+The earlier 160 mm square perimeter beams obscured the COPV domes and dominated
+the silhouette. Revise stock to an estimated 80 mm, following the lighter open
+structure in the user-selected Astrobotic rendering. This is not supplier
+structural sizing. Keep the 3.20 m plan span and Y2.08 support top: center Y2.04
+plus half-stock .04. Visual mesh and cooked contact proxy use that same source.
+Wheel-track widths remain dictated by the existing FLIP packaging estimate.
+
+The upper perimeter deck ring also uses estimated 80 mm stock; its bus-local
+center rises from .37 to .41 m, preserving its .45 m upper surface. Source-driven
+contact beams change together. This leaves the body envelope and solar mounts
+unchanged. COPV upper-cap clearance below the payload rails increases from
+14 mm to 94 mm; this is a derived consequence, not a new tank size measurement.
