@@ -19,9 +19,13 @@ fn _source_number(source, name) {
     sysml_requirements::number(source, _source_attr(name))
 }
 fn _root_axes_observation() {
-    let paths = [ROOT + "/EgressRampPort", ROOT + "/EgressRampStarboard"];
+    let paths = [ROOT + "/EgressRampPort", ROOT + "/EgressRampStarboard",
+        ROOT + "/EgressRampPort/DeckSection/RampTrackPort",
+        ROOT + "/EgressRampPort/DeckSection/RampTrackStarboard",
+        ROOT + "/EgressRampStarboard/DeckSection/RampTrackPort",
+        ROOT + "/EgressRampStarboard/DeckSection/RampTrackStarboard"];
     let result = query("QueryUsdPrims", #{paths: paths,
-        attrs: ["xformOp:rotateXYZ"]});
+        attrs: ["xformOp:translate", "xformOp:rotateXYZ"], geometry_bounds: true});
     if result == () || result.error != () || result.records == ()
         || result.records.len() != paths.len() {
         return #{provider: "usd", state: "unavailable",
@@ -53,8 +57,27 @@ fn _root_axes_observation() {
             document_generation: port.document_generation,
             stage_generation: port.stage_generation};
     }
-    let port_forward = qrot(quat_from_euler_xyz_deg(vec3_from(port_euler)), [1.0, 0.0, 0.0]);
-    let starboard_forward = qrot(quat_from_euler_xyz_deg(vec3_from(starboard_euler)), [1.0, 0.0, 0.0]);
+    // Measure the actual composed straight track centers. Averaging the two
+    // lateral tracks cancels their Z offset; the center-to-root vector is
+    // local +X. This avoids reinterpreting USD Euler angles with a different
+    // quaternion convention and incorrectly accepting a downward ramp.
+    let centers=[];
+    for i in 2..6 {
+        let record=result.records[i];
+        if record.doc_id != port.doc_id || record.document_generation != port.document_generation
+            || record.stage_generation != port.stage_generation
+            || record.geometry_bounds == () || record.geometry_bounds.center == () {
+            return #{provider:"usd",state:"unavailable",detail:"ramp track centers lack one canonical geometry snapshot"};
+        }
+        centers.push(record.geometry_bounds.center);
+    }
+    let port_delta=[]; let starboard_delta=[];
+    for axis in 0..3 {
+        port_delta.push((centers[0][axis]+centers[1][axis])/2.0-port.attrs["xformOp:translate"][axis]);
+        starboard_delta.push((centers[2][axis]+centers[3][axis])/2.0-starboard.attrs["xformOp:translate"][axis]);
+    }
+    let port_forward=vnorm(port_delta);
+    let starboard_forward=vnorm(starboard_delta);
     #{provider: "usd", state: "value",
       port_forward_x: port_forward[0], port_forward_y: port_forward[1],
       starboard_forward_x: starboard_forward[0],
@@ -321,7 +344,7 @@ fn on_tick(me, ctx) {
         // Body Euler rotation and revolute-coordinate target differ on the
         // starboard side because its Y=180 mount reverses the hinge axis.
         let root_target_deg = if side_index == 0 { port_root_deg } else { -starboard_root_deg };
-        let root_body_rotation_z_deg = port_root_deg;
+        let root_body_rotation_z_deg = root_target_deg;
         checks.push(_attribute_component("GRR-017-" + side + "-root-stow-angle", "grr017",
             ramp, "xformOp:rotateXYZ", 2, root_body_rotation_z_deg));
         checks.push(_attribute_component("GRR-017-" + side + "-root-mirror", "grr017",
@@ -386,11 +409,24 @@ fn on_tick(me, ctx) {
             checks.push(_attribute("GRR-017-" + side + "-joint-" + section_index.to_string() + "-flight-target",
                 "grr017", joint, "drive:angular:physics:targetPosition", target_angle_deg));
             checks.push(_attribute_component("GRR-017-" + side + "-joint-" + section_index.to_string() + "-joint-frame-z",
-                "grr017", joint, "physics:localRot1", 2,
+                "grr017", joint, "physics:localRot1", 3,
                 sin(section_frame_offset_rad / 2.0)));
             checks.push(_attribute_component("GRR-017-" + side + "-joint-" + section_index.to_string() + "-joint-frame-w",
-                "grr017", joint, "physics:localRot1", 3,
+                "grr017", joint, "physics:localRot1", 0,
                 cos(section_frame_offset_rad / 2.0)));
+            // Observe every component in USD's scalar-first representation.
+            // Checking the drive angle alone misses a hinge about the wrong axis.
+            for index in 0..4 {
+                checks.push(_attribute_component("GRR-017-" + side + "-joint-"
+                    + section_index.to_string() + "-parent-frame-" + index.to_string(),
+                    "grr017", joint, "physics:localRot0", index,
+                    if index == 0 { 1.0 } else { 0.0 }));
+            }
+            for index in [1, 2] {
+                checks.push(_attribute_component("GRR-017-" + side + "-joint-"
+                    + section_index.to_string() + "-child-frame-" + index.to_string(),
+                    "grr017", joint, "physics:localRot1", index, 0.0));
+            }
             checks.push(_attribute("GRR-017-" + side + "-joint-" + section_index.to_string() + "-lower-limit",
                 "grr017", joint, "physics:lowerLimit", -section_limit_deg));
             checks.push(_attribute("GRR-017-" + side + "-joint-" + section_index.to_string() + "-upper-limit",

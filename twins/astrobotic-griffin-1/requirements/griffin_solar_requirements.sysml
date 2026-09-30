@@ -19,18 +19,22 @@ package GriffinSolarRequirements {
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_solar_panel_visual.usda";
         attribute childNames : GriffinSolarVisualMember[16] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "MountBracketNegativeX", "MountBracketPositiveX", "HingeBar", "MountLinkNegativeX", "MountLinkPositiveX");
-        attribute frameWidthM : Real = 2.902;
+        // Panel size revised to fit the smaller bus: 1.716 m maximum face
+        // width comes from rail spacing minus edge margins; 1.80 m height
+        // allows a 1.40 m core plus 0.40 m coverage. Cell size retains frame
+        // edge margins. Estimates, not vendor dimensions; griffin-size-evidence.md.
+        attribute frameWidthM : Real = 1.716;
         attribute frameThicknessM : Real = 0.14;
-        attribute frameDepthM : Real = 3.00;
+        attribute frameDepthM : Real = 1.80;
         doc /* Width of the centered lower opening as a fraction of the panel frame width. */
         attribute lowerClearanceWidthFraction : Real = 0.32;
         doc /* Depth of the lower opening from the panel edge as a fraction of frame depth. */
         attribute lowerClearanceDepthFraction : Real = 0.28;
         doc /* Lateral position of the opening center as a fraction of frame width; zero centers it on the panel. */
         attribute lowerClearanceCenterXFraction : Real = 0.0;
-        attribute cellWidthM : Real = 2.62;
+        attribute cellWidthM : Real = 1.436;
         attribute cellThicknessM : Real = 0.05;
-        attribute cellDepthM : Real = 2.65;
+        attribute cellDepthM : Real = 1.50;
         attribute cellOffsetYM : Real = 0.075;
         attribute arrayBackplaneThicknessM : Real = 0.04;
         attribute arrayBackplaneCenterYM : Real = 0.03;
@@ -42,7 +46,7 @@ package GriffinSolarRequirements {
         attribute mountBracketThicknessM : Real = 0.32;
         attribute mountBracketDepthM : Real = 0.44;
         attribute hingeBarRadiusM : Real = 0.10;
-        attribute hingeBarLengthM : Real = 3.10;
+        attribute hingeBarLengthM : Real = 1.90;
         attribute hingeBarCenterYM : Real = -0.18;
         attribute hingeBarCenterZM : Real = 0.00;
         attribute mountLinkHeightM : Real = 0.44;

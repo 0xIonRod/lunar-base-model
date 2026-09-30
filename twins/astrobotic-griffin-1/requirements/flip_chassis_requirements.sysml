@@ -1,8 +1,8 @@
-// Legacy runtime visual-study contract; not the corrected FreeCAD v3 geometry.
-// See flip_cad_requirements.sysml for current CAD behavior and dimensions.
-// Runtime promotion remains OPEN; these builder-consumed values are unchanged.
+// Provisional size reconstruction, 2026-09-30. See griffin-size-evidence.md.
+// CAD dimensions are estimates; geometry promotion does not qualify dynamics.
 package FlipChassisRequirements {
     private import ScalarValues::String;
+    private import VectorValues::CartesianThreeVectorValue;
     private import GriffinRequirementSources::TwinAssetPath;
     private import GriffinRequirementSources::UsdPrimPath;
 
@@ -25,6 +25,13 @@ package FlipChassisRequirements {
         ref attribute payloadDeckLengthM : FlipRequirements::FlipRover::payloadDeckDepthM;
         ref attribute payloadDeckCenterYM : FlipRequirements::FlipRover::payloadDeckCenterYM;
         attribute presentationCollisionPolicy : String = "chassis geometry is both rendered and used by the FLIP rigid body; wheel filtered pairs target these same shapes";
+        // Packaging estimates: bumper sits at the front (-X); service panel
+        // lies on the equipment-box -Z face. Neither is supplier metrology.
+        // See griffin-size-evidence.md for the CAD-to-runtime axis mapping.
+        attribute detailDimensions : CartesianThreeVectorValue[2] =
+            ((0.12, 0.12, 1.20), (1.12, 0.25, 0.025));
+        attribute detailCenters : CartesianThreeVectorValue[2] =
+            ((-1.05, 0.06, 0.0), (0.0, 0.258, -0.7425));
     }
 
     requirement def FCC001_ChassisIdentity {

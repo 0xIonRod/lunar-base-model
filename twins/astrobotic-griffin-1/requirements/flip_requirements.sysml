@@ -1,6 +1,5 @@
-// Legacy runtime visual-study contract; not the corrected FreeCAD v3 geometry.
-// See flip_cad_requirements.sysml for current CAD behavior and dimensions.
-// Runtime promotion remains OPEN; these builder-consumed values are unchanged.
+// Runtime dimensions revised 2026-09-30 from the reference-informed CAD study.
+// Geometry promotion does not promote CAD kinematics or qualify mission dynamics.
 package FlipRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::String;
@@ -13,9 +12,10 @@ package FlipRequirements {
     // Rover-owned values stay in this source, while Griffin owns only the
     // integration requirements that reference the rover interface.
     part def FlipRover {
+        doc /* Body 2.116 x 1.476 m, 0.396 m equipment-box height, 2.0 m track, 1.7 m wheelbase, 0.45 m tire radius and 0.28 m tire width are estimates transferred from flip_cad_requirements.sysml, with CAD (X,Y,Z) mapped to USD (Y,Z,X). LPSC 2026 https://www.hou.usra.edu/meetings/lpsc2026/pdf/1874.pdf supports four wheels and skid steering, not these numerical dimensions. Lower-frame thickness, equipment position, fixed panel mount, suspension rest length and hub sizes are packaging/simulation estimates. Mass, COM and inertia remain uncalibrated legacy proxies. Rationale and confidence: griffin-size-evidence.md. */
         attribute componentAsset : TwinAssetPath = "vehicles/flip.usda";
         attribute usdRootPath : UsdPrimPath = "/World/FLIP";
-        attribute localFrame : String = "Y-up, right-handed, SI metres; X is lateral and Z is longitudinal";
+        attribute localFrame : String = "Y-up SI metres; X longitudinal, Z lateral; CAD (X,Y,Z) maps to USD (Y,Z,X)";
         attribute flipMassStudyKg : Real = 450.0;
         attribute massPropertiesStatus : String = "study proxy; supplier mass properties and wheel loads TBD";
         attribute batteryNominalVoltageV : Real = 28.0;
@@ -27,32 +27,32 @@ package FlipRequirements {
         attribute mobilityStatus : String = "mobility, power, thermal, and wheel parameters are study proxies";
         attribute exactVehicleIcdStatus : String = "TBD";
         attribute wheelRadiusM : Real = 0.45;
-        attribute wheelWidthM : Real = 0.30;
+        attribute wheelWidthM : Real = .28;
         attribute wheelStations : FlipWheelStation[4] = ("FL", "RL", "FR", "RR");
         // Mission route policy uses the finite-turn mode; the parallel/crab
         // mode remains available as an operator experiment through the
         // Twin-local control helper.
         attribute missionSteeringMode : FlipSteeringMode = "ackermann";
-        attribute chassisWidthM : Real = 4.40;
-        attribute chassisLengthM : Real = 2.76;
-        attribute chassisHeightM : Real = 0.76;
-        attribute equipmentBoxWidthM : Real = 3.90;
-        attribute equipmentBoxHeightM : Real = 1.44;
-        attribute equipmentBoxDepthM : Real = 2.44;
-        attribute equipmentBoxCenterYM : Real = 0.45;
-        attribute payloadDeckWidthM : Real = 3.44;
-        attribute payloadDeckThicknessM : Real = 0.20;
-        attribute payloadDeckDepthM : Real = 2.16;
-        attribute payloadDeckCenterYM : Real = 0.92;
+        attribute chassisWidthM : Real = 2.116;
+        attribute chassisLengthM : Real = 1.476;
+        attribute chassisHeightM : Real = .12;
+        attribute equipmentBoxWidthM : Real = 2.100;
+        attribute equipmentBoxHeightM : Real = .396;
+        attribute equipmentBoxDepthM : Real = 1.460;
+        attribute equipmentBoxCenterYM : Real = .258;
+        attribute payloadDeckWidthM : Real = 2.10;
+        attribute payloadDeckThicknessM : Real = .04;
+        attribute payloadDeckDepthM : Real = 1.46;
+        attribute payloadDeckCenterYM : Real = .476;
         attribute sensorMastHeightM : Real = 0.70;
         // One station definition drives the simulation, Editor projection,
         // requirements, and wheel-contact verification.
-        attribute wheelStationX : Real[4] = (-1.75, -1.75, 1.75, 1.75);
-        attribute wheelStationY : Real[4] = (-0.42, -0.42, -0.42, -0.42);
-        attribute wheelStationZ : Real[4] = (-1.15, 1.15, -1.15, 1.15);
+        attribute wheelStationX : Real[4] = (-.85, .85, -.85, .85);
+        attribute wheelStationY : Real[4] = (-.05, -.05, -.05, -.05);
+        attribute wheelStationZ : Real[4] = (-1.0, -1.0, 1.0, 1.0);
         // The suspension extension is a Twin simulation assumption shared by
         // the composed vehicle and the independently checked visual module.
-        attribute suspensionRestLengthM : Real = 1.20;
+        attribute suspensionRestLengthM : Real = .30;
         // Assembly-owned suspension connector dimensions are shared by the
         // Editor builder and the component requirement source.
         attribute suspensionStrutScale : Real[3] = (0.14, 0.36, 0.14);
@@ -60,12 +60,13 @@ package FlipRequirements {
         // The wheel hubs sit outboard of the lower-frame side datum.  These
         // metric values describe the render-only bridge and its hub knuckle;
         // they are consumed by the typed Editor builder and the Rhai gate.
-        attribute suspensionArmScale : Real[3] = (0.65, 0.16, 0.16);
-        attribute suspensionArmOffsetM : Real = 0.325;
+        attribute suspensionArmScale : Real[3] = (.26, .12, .12);
+        attribute suspensionArmOffsetM : Real = .13;
         attribute suspensionKnuckleRadiusM : Real = 0.18;
         attribute suspensionKnuckleWidthM : Real = 0.36;
-                        // The solar array is centered over the equipment-box roof at 1.30 m above datum so the 3.30 x 2.10 m visual panel fits inside the 4.40 x 2.76 m rover envelope; this is a geometry study assumption because supplier deck coordinates are not public.
-                        attribute solarArrayMount : Real[3] = (0.0, 1.30, 0.00);
+                        // Estimated fixed-panel mount above the reconstructed equipment roof;
+        // the real collapsible panel mechanism remains unpromoted.
+                        attribute solarArrayMount : Real[3] = (0.0, .55, 0.0);
                 // The 18 degree tilt is a conservative review-study angle above the local deck: it keeps a fixed panel readable to a high solar-elevation camera without implying a supplier-certified deployment joint; optimize it when the vehicle ICD is available.
         attribute solarArrayTiltDeg : Real = 18.0;
   }

@@ -17,20 +17,21 @@ def Xform "GriffinBody" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:scale = (2.65, 3.44, 2.1)
-        custom token[] xformOpOrder = ["xformOp:scale"]
+        custom double3 xformOp:scale = (2.1088311754568574, 1.4, 2.1088311754568574)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
         token visibility = "invisible"
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
     }
     def Cube "BodyCollisionNorth" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.0, 0.0, 2.28)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (1.5, 1.55, 0.32)
+        custom double3 xformOp:translate = (0.0, 0.0, 1.4272077938642145)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (2.1088311754568574, 1.4, 0.7455844122715714)
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
         token visibility = "invisible"
@@ -40,9 +41,9 @@ def Xform "GriffinBody" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.0, 0.0, -2.28)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (1.5, 1.55, 0.32)
+        custom double3 xformOp:translate = (0.0, 0.0, -1.4272077938642145)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (2.1088311754568574, 1.4, 0.7455844122715714)
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
         token visibility = "invisible"
@@ -52,9 +53,9 @@ def Xform "GriffinBody" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (2.55, 0.0, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (0.45, 1.55, 1.45)
+        custom double3 xformOp:translate = (1.4272077938642145, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.7455844122715714, 1.4, 2.1088311754568574)
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
         token visibility = "invisible"
@@ -64,9 +65,9 @@ def Xform "GriffinBody" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (-2.55, 0.0, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (0.45, 1.55, 1.45)
+        custom double3 xformOp:translate = (-1.4272077938642145, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.7455844122715714, 1.4, 2.1088311754568574)
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
         token visibility = "invisible"

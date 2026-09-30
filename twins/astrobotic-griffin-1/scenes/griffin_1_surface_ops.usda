@@ -85,8 +85,6 @@ def Xform "Griffin1SurfaceOps" (
             float inputs:initial_vel_x = 0.0
             float inputs:initial_vel_y = 0.0
             float inputs:initial_vel_z = 0.0
-            double inputs:vehicle_mass.connect = </Griffin1SurfaceOps/Lander.outputs:dynamic_joint_island_mass_kg>
-            double inputs:mass_properties_valid.connect = </Griffin1SurfaceOps/Lander.outputs:dynamic_joint_island_mass_valid>
             float inputs:touchdown
             float inputs:touchdown.connect = </Griffin1SurfaceOps/Lander.outputs:touchdown>
             float inputs:engine_cutoff_contact
@@ -141,6 +139,10 @@ def Xform "Griffin1SurfaceOps" (
             float inputs:landing_flare_range_m = 12.0
             float inputs:descent_speed_limit_mps = 2.5
             float inputs:descent_braking_accel_mps2 = 6.0
+            double inputs:vehicle_mass
+            double inputs:vehicle_mass.connect = </Griffin1SurfaceOps/Lander.outputs:dynamic_joint_island_mass_kg>
+            double inputs:mass_properties_valid
+            double inputs:mass_properties_valid.connect = </Griffin1SurfaceOps/Lander.outputs:dynamic_joint_island_mass_valid>
         }
         def "RampHingePort"
         {
@@ -153,20 +155,20 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
     )
     {
-        double3 xformOp:translate = (0.0, 66.15, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:translate = (0.0, 62.58, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         double3 physics:velocity = (0.0, 0.0, 0.0)
         custom token lunco:mission:deploymentState = "top_deck_attached_until_touchdown"
-        custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float physxVehicleAckermannSteering:strength = 1.0
     }
     def PhysicsFixedJoint "FLIPPayloadAdapterJoint"
     {
         rel physics:body0 = </Griffin1SurfaceOps/Lander>
         rel physics:body1 = </Griffin1SurfaceOps/FLIP>
-        point3f physics:localPos0 = (0.0, 5.28000020980835, 0.0)
-        point3f physics:localPos1 = (0.0, -0.8700000047683716, 0.0)
-        quatf physics:localRot1 = (0.7071067690849304, 0.0, 0.7071067690849304, 0.0)
+        point3f physics:localPos0 = (0.0, 2.0799999237060547, 0.0)
+        point3f physics:localPos1 = (0.0, -0.5, 0.0)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
     }
     def Scope "FLIPEgressInterface"
     {

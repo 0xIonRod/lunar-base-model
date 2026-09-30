@@ -18,6 +18,170 @@ fn query_ok(record) {
     record != () && record.ok != false
 }
 
+// Size reconstruction plans consume the canonical typed source. These are
+// explicit collision/presentation proxies; see requirements/griffin-size-evidence.md.
+fn _resize_cube_ops(edit_target, path, dimensions, center, cube_size) {
+    let scale=[]; for dimension in dimensions {scale.push(dimension/cube_size);}
+    [#{SetAttribute: #{edit_target: edit_target, path: path,
+       name: "size", type_name: "double", value: cube_size.to_string()}},
+     #{SetScale: #{edit_target: edit_target, path: path, value: scale}},
+     #{SetTranslate: #{edit_target: edit_target, path: path, value: center}},
+     #{SetAttribute: #{edit_target: edit_target, path: path,
+       name: "xformOpOrder", type_name: "token[]",
+       value: "[\"xformOp:translate\", \"xformOp:scale\"]"}}]
+}
+
+fn griffin_body_collision_component_plan(doc, edit_target, root) {
+    let dims = griffin_spec::_sysml_native("bodyDimensions");
+    let profile = griffin_spec::visual_outer_body_profile_coordinates();
+    if !vec3_is_native(dims) || dims.x <= 0.0 || dims.y <= 0.0
+        || dims.z <= 0.0 || profile.len() != 8 {
+        return plan_error("body collision reconstruction needs positive typed dimensions and octagon");
+    }
+    // Five inscribed boxes avoid an invisible collider outside the visual
+    // octagon. They omit the diagonal triangular wedges, an explicit proxy
+    // approximation, rather than guessing an independent body envelope.
+    let clip = profile[0].x.abs();
+    let ix = dims.x * clip; let iz = dims.z * clip;
+    let specs = [
+        #{name:"BodyCollisionProxy", size:[ix,dims.y,iz], center:[0.0,0.0,0.0]},
+        #{name:"BodyCollisionNorth", size:[ix,dims.y,(dims.z-iz)/2.0], center:[0.0,0.0,(dims.z+iz)/4.0]},
+        #{name:"BodyCollisionSouth", size:[ix,dims.y,(dims.z-iz)/2.0], center:[0.0,0.0,-(dims.z+iz)/4.0]},
+        #{name:"BodyCollisionEast", size:[(dims.x-ix)/2.0,dims.y,iz], center:[(dims.x+ix)/4.0,0.0,0.0]},
+        #{name:"BodyCollisionWest", size:[(dims.x-ix)/2.0,dims.y,iz], center:[-(dims.x+ix)/4.0,0.0,0.0]}
+    ];
+    let ops=[];
+    for spec in specs {
+        let path=root+"/"+spec.name;
+        let record=_component_query(doc,path);
+        if !record.ok || record.type_name != "Cube" {return plan_error(path+": expected existing collision Cube");}
+        for op in _resize_cube_ops(edit_target,path,spec.size,spec.center,1.0) {ops.push(op);}
+    }
+    #{ok:true,ops:ops}
+}
+
+fn griffin_bus_cladding_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let dims=model.value(prefix+"bodyDimensions");
+    let profile=model.value(prefix+"outerBodyProfileCoordinates");
+    let thickness=f64_from(model.value(prefix+"bodySkinThicknessM"));
+    let margin=f64_from(model.value(prefix+"bodySkinEdgeMarginM"));
+    let color=model.value(prefix+"bodySkinDisplayColor");
+    if !vec3_is_native(dims) || !array_is(profile) || profile.len()!=8
+        || thickness==() || thickness<=0.0 || margin==() || margin<0.0
+        || dims.y<=2.0*margin || !array_is(color) || color.len()!=3 {
+        return plan_error("Griffin cladding source dimensions or color incomplete");
+    }
+    let ops=[];
+    for i in 0..profile.len() {
+        let a=profile[i]; let b=profile[(i+1)%profile.len()];
+        let ax=a.x*dims.x/2.0;let az=-a.y*dims.z/2.0;
+        let bx=b.x*dims.x/2.0;let bz=-b.y*dims.z/2.0;
+        let dx=bx-ax;let dz=bz-az;let length=sqrt(dx*dx+dz*dz);
+        if length<=2.0*margin {return plan_error("cladding edge margin consumes a facet");}
+        let tx=dx/length;let tz=dz/length;
+        let nx=-tz;let nz=tx;
+        if nx*(ax+bx)+nz*(az+bz)<0.0 {nx=-nx;nz=-nz;}
+        let x0=ax+tx*margin;let z0=az+tz*margin;
+        let x1=bx-tx*margin;let z1=bz-tz*margin;
+        let low=-dims.y/2.0+margin;let high=dims.y/2.0-margin;
+        let points=[[x0,low,z0],[x0,high,z0],[x1,high,z1],[x1,low,z1],
+            [x0+nx*thickness,low,z0+nz*thickness],
+            [x0+nx*thickness,high,z0+nz*thickness],
+            [x1+nx*thickness,high,z1+nz*thickness],
+            [x1+nx*thickness,low,z1+nz*thickness]];
+        let name="ExteriorFacet"+(i+1).to_string();let path=root+"/"+name;
+        let current=assembly_builder::composed_query(doc,#{path:path,children:false});
+        let topology=_ramp_section_track_topology();
+        if query_ok(current) {
+            if current.type_name!="Mesh" {return plan_error(path+": exterior facet must be Mesh");}
+            let p=assembly_builder::mesh_geometry_update_plan(edit_target,path,points,topology.face_counts,topology.face_indices);
+            if !p.ok {return p;} for op in p.ops {ops.push(op);}
+        } else {
+            let p=assembly_builder::mesh_shape_plan(edit_target,root,name,points,topology.face_counts,topology.face_indices,color,false);
+            if !p.ok {return p;} for op in p.ops {ops.push(op);}
+        }
+        for a in [#{name:"purpose",type_name:"token",value:"\"render\""},
+            #{name:"physics:collisionEnabled",type_name:"bool",value:"false"},
+            #{name:"primvars:displayColor",type_name:"color3f[]",value:_color_literal(color)}] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:a.name,type_name:a.type_name,value:a.value}});
+        }
+    }
+    #{ok:true,ops:ops}
+}
+
+fn flip_chassis_size_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    let prefix="FlipRequirements::FlipRover::";
+    let x=f64_from(model.value(prefix+"chassisWidthM"));
+    let y=f64_from(model.value(prefix+"chassisHeightM"));
+    let z=f64_from(model.value(prefix+"chassisLengthM"));
+    let ex=f64_from(model.value(prefix+"equipmentBoxWidthM"));
+    let ey=f64_from(model.value(prefix+"equipmentBoxHeightM"));
+    let ez=f64_from(model.value(prefix+"equipmentBoxDepthM"));
+    let cy=f64_from(model.value(prefix+"equipmentBoxCenterYM"));
+    let dx=f64_from(model.value(prefix+"payloadDeckWidthM"));
+    let dy=f64_from(model.value(prefix+"payloadDeckThicknessM"));
+    let dz=f64_from(model.value(prefix+"payloadDeckDepthM"));
+    let dc=f64_from(model.value(prefix+"payloadDeckCenterYM"));
+    if x==() || y==() || z==() || ex==() || ey==() || ez==() || cy==()
+        || dx==() || dy==() || dz==() || dc==() {return plan_error("FLIP chassis source incomplete");}
+    let ops=[];
+    let details=model.value("FlipChassisRequirements::FlipChassisComponent::detailDimensions");
+    let centers=model.value("FlipChassisRequirements::FlipChassisComponent::detailCenters");
+    if !array_is(details) || !array_is(centers) || details.len()!=2 || centers.len()!=2 {
+        return plan_error("FLIP bumper/service-panel typed datums missing");
+    }
+    let specs=[#{name:"LowerFrame",size:[x,y,z],center:[0.0,0.0,0.0]},
+        #{name:"WhiteEquipmentBox",size:[ex,ey,ez],center:[0.0,cy,0.0]},
+        #{name:"PayloadDeck",size:[dx,dy,dz],center:[0.0,dc,0.0]},
+        #{name:"FrontBumper",size:vec3_array(details[0]),center:vec3_array(centers[0])},
+        #{name:"ServicePanel",size:vec3_array(details[1]),center:vec3_array(centers[1])}];
+    for spec in specs {
+        let path=root+"/"+spec.name;
+        let record=_component_query(doc,path);
+        if !record.ok || record.type_name!="Cube" {return plan_error(path+": expected existing chassis Cube");}
+        for op in _resize_cube_ops(edit_target,path,spec.size,spec.center,2.0) {ops.push(op);}
+    }
+    #{ok:true,ops:ops}
+}
+
+fn flip_vehicle_size_plan(doc, edit_target, root) {
+    let names=griffin_spec::rover_wheel_station_names();
+    let xs=griffin_spec::rover_wheel_station_x();
+    let ys=griffin_spec::rover_wheel_station_y();
+    let zs=griffin_spec::rover_wheel_station_z();
+    if names.len()!=4 || xs.len()!=4 || ys.len()!=4 || zs.len()!=4 {return plan_error("FLIP station source incomplete");}
+    let width=griffin_spec::_sysml_attribute("wheelWidthM");
+    let rest=griffin_spec::_sysml_attribute("suspensionRestLengthM");
+    let ops=[];
+    for i in 0..names.len() {
+        let carrier=root+"/Suspension_"+names[i];
+        let wheel=carrier+"/Wheel_"+names[i];
+        let record=_component_query(doc,wheel);
+        if !record.ok || record.type_name!="Cylinder" {return plan_error(wheel+": wheel Cylinder missing");}
+        ops.push(#{SetTranslate:#{edit_target:edit_target,path:carrier,value:[xs[i],ys[i],zs[i]]}});
+        for a in [#{name:"axis",type_name:"token",value:"\"Z\""},
+            #{name:"height",type_name:"double",value:width.to_string()},
+            #{name:"physxVehicleWheel:width",type_name:"float",value:width.to_string()},
+            #{name:"lunco:suspension:restLength",type_name:"float",value:rest.to_string()}] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:wheel,name:a.name,type_name:a.type_name,value:a.value}});
+        }
+        // The reusable visual already uses Z-axis cylinders. Rotating it
+        // through Y=90 had made the visible tire disagree with its axle.
+        ops.push(#{SetRotate:#{edit_target:edit_target,path:wheel+"/Visual",value:[0.0,0.0,0.0]}});
+        // Shared suspension arm is +X in its component; point it inboard
+        // along the revised Z lateral axis, preserving the reusable component.
+        ops.push(#{SetRotate:#{edit_target:edit_target,path:carrier+"/Visual",value:[0.0,if zs[i]<0.0 {-90.0}else{90.0},0.0]}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:carrier+"/Visual",name:"xformOpOrder",type_name:"token[]",value:"[\"xformOp:rotateXYZ\"]"}});
+    }
+    let solar=sysml_requirements::model().value("FlipRequirements::FlipRover::solarArrayMount");
+    if solar.len()!=3 {return plan_error("FLIP solar mount incomplete");}
+    ops.push(#{SetTranslate:#{edit_target:edit_target,path:root+"/SolarArray",value:solar}});
+    #{ok:true,ops:ops}
+}
+
 fn remove_legacy_semantic_string_ops(doc, edit_target, path) {
     let record = assembly_builder::composed_query(doc, #{path: path,
         attrs: ["lunco:collider:geometrySource", "lunco:requirement",
@@ -4757,7 +4921,7 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     }
     for item in [
         #{name: "physics:localPos0", type_name: "point3f",
-          value: "(" + anchor_x.to_string() + ", " + mount_y.to_string()
+          value: "(" + anchor_x.to_string() + ", " + transition_center_y.to_string()
             + ", " + mount_z.to_string() + ")"},
         #{name: "physics:localPos1", type_name: "point3f", value: "(0.0, 0.0, 0.0)"},
         #{name: "physics:localRot0", type_name: "quatf", value: "(0.0, 0.0, 0.0, 1.0)"},
@@ -4933,8 +5097,11 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     // coordinate therefore uses the opposite sign for the same physical pose.
     let root_target_deg = if side == "port" { root_stow_angle_deg }
         else { -root_stow_angle_deg };
+    // USD rotateXYZ composes Rz * Ry * Rx for column vectors. After the
+    // starboard Y=180 mirror, its negative Z angle raises local +X. Negating
+    // the joint target again would point the authored section downwards.
     let root_rotation = if side == "port" { [0.0, 0.0, root_target_deg] }
-        else { [0.0, 180.0, -root_target_deg] };
+        else { [0.0, 180.0, root_target_deg] };
     let root_placement = assembly_builder::place_plan(edit_target, ramp_path,
         [mount_x, mount_y, mount_z], root_rotation, ());
     if !root_placement.ok { return root_placement; }
@@ -5029,9 +5196,10 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     let joint_offset = if side == "port" { 0 } else { 2 };
     let section_limit_deg = section_limit_rad * 180.0 / 3.141592653589793;
     let joint_frame_half_offset = section_joint_frame_offset_rad / 2.0;
-    let joint_local_rot1 = "(0.0, 0.0, "
-        + sin(joint_frame_half_offset).to_string() + ", "
-        + cos(joint_frame_half_offset).to_string() + ")";
+    // USD quaternion literals are (w, x, y, z), unlike Rhai's native
+    // quat_array. Both joint bases must retain the section's local Z axis.
+    let joint_local_rot1 = "(" + cos(joint_frame_half_offset).to_string()
+        + ", 0.0, 0.0, " + sin(joint_frame_half_offset).to_string() + ")";
     let stowed_joint_angle_deg = stowed_joint_angle_rad * 180.0 / 3.141592653589793;
     for section_index in 0..2 {
         let joint_name = joint_names[joint_offset + section_index];
@@ -5059,7 +5227,7 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
               value: "(" + section_length.to_string() + ", " + hinge_axis_y.to_string() + ", 0.0)"},
             #{name: "physics:localPos1", type_name: "point3f",
               value: "(0.0, " + hinge_axis_y.to_string() + ", 0.0)"},
-            #{name: "physics:localRot0", type_name: "quatf", value: "(0.0, 0.0, 0.0, 1.0)"},
+            #{name: "physics:localRot0", type_name: "quatf", value: "(1.0, 0.0, 0.0, 0.0)"},
             #{name: "physics:localRot1", type_name: "quatf", value: joint_local_rot1},
             #{name: "physics:lowerLimit", type_name: "float", value: (-section_limit_deg).to_string()},
             #{name: "physics:upperLimit", type_name: "float", value: section_limit_deg.to_string()},

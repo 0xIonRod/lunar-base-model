@@ -1,6 +1,5 @@
-// Legacy runtime visual-study contract; not the corrected FreeCAD v3 geometry.
-// See flip_cad_requirements.sysml for current CAD behavior and dimensions.
-// Runtime promotion remains OPEN; these builder-consumed values are unchanged.
+// Provisional size reconstruction, 2026-09-30. See griffin-size-evidence.md.
+// CAD dimensions are estimates; geometry promotion does not qualify dynamics.
 package FlipSuspensionRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::String;
@@ -26,15 +25,15 @@ package FlipSuspensionRequirements {
         attribute geometryStatus : String = "metric visual study proxy; production suspension ICD not public";
         attribute localFrame : String = "Y-up, right-handed, SI metres; origin at wheel hub; canonical arm points +X";
         attribute collisionPolicy : String = "all suspension geometry is render-only; PhysicsCollisionAPI collisionEnabled=false";
-        attribute armScale : Real[3] = (0.65, 0.16, 0.16);
-        attribute armOffsetM : Real = 0.325;
+        attribute armScale : Real[3] = (.26,.12,.12);
+        attribute armOffsetM : Real = .13;
         attribute knuckleRadiusM : Real = 0.18;
         attribute knuckleWidthM : Real = 0.36;
         attribute strutScale : Real[3] = (0.14, 0.36, 0.14);
         attribute strutOffset : Real[3] = (0.0, 0.20, 0.0);
         attribute transformOrder : FlipSuspensionTransformOperation[2] = ("Translate", "Scale");
         attribute childNames : FlipSuspensionMember[3] = ("SuspensionArm", "SuspensionKnuckle", "SuspensionStrut");
-        attribute armEnvelopeM : Real[3] = (0.65, 0.16, 0.16);
+        attribute armEnvelopeM : Real[3] = (.26,.12,.12);
         attribute knuckleAxis : FlipSuspensionAxis = "X";
         attribute strutEnvelopeM : Real[3] = (0.14, 0.72, 0.14);
         // The physical transition datum is owned once by FlipRequirements::FlipRover.

@@ -1292,17 +1292,23 @@ def Xform "Griffin1" (
                 over "Flame"
                 {
                     rel material:binding = </Griffin1/Looks/Flame_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                 }
                 over "FlameCore"
                 {
                     rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                     over "PlumeLight"
                     {
+                        float inputs:light_intensity
                         float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                        float inputs:light_radius
                         float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
                     }
                 }
@@ -1316,17 +1322,23 @@ def Xform "Griffin1" (
                 over "Flame"
                 {
                     rel material:binding = </Griffin1/Looks/Flame_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                 }
                 over "FlameCore"
                 {
                     rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                     over "PlumeLight"
                     {
+                        float inputs:light_intensity
                         float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                        float inputs:light_radius
                         float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
                     }
                 }
@@ -1340,17 +1352,23 @@ def Xform "Griffin1" (
                 over "Flame"
                 {
                     rel material:binding = </Griffin1/Looks/Flame_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                 }
                 over "FlameCore"
                 {
                     rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                     over "PlumeLight"
                     {
+                        float inputs:light_intensity
                         float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                        float inputs:light_radius
                         float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
                     }
                 }
@@ -1364,17 +1382,23 @@ def Xform "Griffin1" (
                 over "Flame"
                 {
                     rel material:binding = </Griffin1/Looks/Flame_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                 }
                 over "FlameCore"
                 {
                     rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                     over "PlumeLight"
                     {
+                        float inputs:light_intensity
                         float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                        float inputs:light_radius
                         float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
                     }
                 }
@@ -1388,17 +1412,23 @@ def Xform "Griffin1" (
                 over "Flame"
                 {
                     rel material:binding = </Griffin1/Looks/Flame_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                 }
                 over "FlameCore"
                 {
                     rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                     over "PlumeLight"
                     {
+                        float inputs:light_intensity
                         float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                        float inputs:light_radius
                         float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
                     }
                 }
@@ -1412,17 +1442,23 @@ def Xform "Griffin1" (
                 over "Flame"
                 {
                     rel material:binding = </Griffin1/Looks/Flame_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                 }
                 over "FlameCore"
                 {
                     rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                     over "PlumeLight"
                     {
+                        float inputs:light_intensity
                         float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                        float inputs:light_radius
                         float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
                     }
                 }
@@ -1436,17 +1472,23 @@ def Xform "Griffin1" (
                 over "Flame"
                 {
                     rel material:binding = </Griffin1/Looks/Flame_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                 }
                 over "FlameCore"
                 {
                     rel material:binding = </Griffin1/Looks/FlameCore_Mat>
+                    float inputs:throttle
                     float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                    float inputs:plume_length_fraction
                     float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
                     over "PlumeLight"
                     {
+                        float inputs:light_intensity
                         float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                        float inputs:light_radius
                         float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
                     }
                 }
@@ -2280,12 +2322,12 @@ def Xform "Griffin1" (
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = -0.5
+        float drive:linear:physics:targetPosition = -0.4300000071525574
         float drive:linear:physics:targetVelocity = 0.0
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (3.0999999046325684, 2.200000047683716, 0.0)
+        point3f physics:localPos0 = (1.899999976158142, 1.2000000476837158, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2301,12 +2343,12 @@ def Xform "Griffin1" (
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = -0.5
+        float drive:linear:physics:targetPosition = -0.4300000071525574
         float drive:linear:physics:targetVelocity = 0.0
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (-3.0999999046325684, 2.200000047683716, 0.0)
+        point3f physics:localPos0 = (-1.899999976158142, 1.2000000476837158, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2322,12 +2364,12 @@ def Xform "Griffin1" (
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = -0.5
+        float drive:linear:physics:targetPosition = -0.4300000071525574
         float drive:linear:physics:targetVelocity = 0.0
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (0.0, 2.200000047683716, 3.0999999046325684)
+        point3f physics:localPos0 = (0.0, 1.2000000476837158, 1.899999976158142)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2343,12 +2385,12 @@ def Xform "Griffin1" (
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = -0.5
+        float drive:linear:physics:targetPosition = -0.4300000071525574
         float drive:linear:physics:targetVelocity = 0.0
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (0.0, 2.200000047683716, -3.0999999046325684)
+        point3f physics:localPos0 = (0.0, 1.2000000476837158, -1.899999976158142)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2356,7 +2398,6 @@ def Xform "Griffin1" (
     {
         token visibility = "invisible"
     }
-
     over "Flame"
     {
         token visibility = "invisible"
@@ -2369,15 +2410,15 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_body_collision.usda@</GriffinBody>
     )
     {
-        custom double3 xformOp:translate = (0.0, 3.2, 0.0)
-        custom token[] xformOpOrder = ["xformOp:translate"]
+        custom double3 xformOp:translate = (0.0, 1.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "LegPX" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (3.1, 2.2, 0.0)
+        custom double3 xformOp:translate = (1.9, 1.2, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         custom rel physics:filteredPairs = None
@@ -2424,14 +2465,14 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -2.05, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.15, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                double radius = 0.5199999809265137
-                double height = 0.18000000715255737
+                double radius = 0.3499999940395355
+                double height = 0.11999999731779099
                 uniform token axis = "Y"
-                float3[] extent = [(-0.5199999809265137, -0.09000000357627869, -0.5199999809265137), (0.5199999809265137, 0.09000000357627869, 0.5199999809265137)]
+                float3[] extent = [(-0.3499999940395355, -0.05999999865889549, -0.3499999940395355), (0.3499999940395355, 0.05999999865889549, 0.3499999940395355)]
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
@@ -2444,7 +2485,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (-3.1, 2.2, 0.0)
+        custom double3 xformOp:translate = (-1.9, 1.2, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
         custom rel physics:filteredPairs = None
@@ -2491,14 +2532,14 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -2.05, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.15, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                double radius = 0.5199999809265137
-                double height = 0.18000000715255737
+                double radius = 0.3499999940395355
+                double height = 0.11999999731779099
                 uniform token axis = "Y"
-                float3[] extent = [(-0.5199999809265137, -0.09000000357627869, -0.5199999809265137), (0.5199999809265137, 0.09000000357627869, 0.5199999809265137)]
+                float3[] extent = [(-0.3499999940395355, -0.05999999865889549, -0.3499999940395355), (0.3499999940395355, 0.05999999865889549, 0.3499999940395355)]
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
@@ -2511,7 +2552,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, 2.2, 3.1)
+        custom double3 xformOp:translate = (0.0, 1.2, 1.9)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
         custom rel physics:filteredPairs = None
@@ -2558,14 +2599,14 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -2.05, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.15, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                double radius = 0.5199999809265137
-                double height = 0.18000000715255737
+                double radius = 0.3499999940395355
+                double height = 0.11999999731779099
                 uniform token axis = "Y"
-                float3[] extent = [(-0.5199999809265137, -0.09000000357627869, -0.5199999809265137), (0.5199999809265137, 0.09000000357627869, 0.5199999809265137)]
+                float3[] extent = [(-0.3499999940395355, -0.05999999865889549, -0.3499999940395355), (0.3499999940395355, 0.05999999865889549, 0.3499999940395355)]
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
@@ -2578,7 +2619,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, 2.2, -3.1)
+        custom double3 xformOp:translate = (0.0, 1.2, -1.9)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
         custom rel physics:filteredPairs = None
@@ -2625,14 +2666,14 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -2.05, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.15, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-                double radius = 0.5199999809265137
-                double height = 0.18000000715255737
+                double radius = 0.3499999940395355
+                double height = 0.11999999731779099
                 uniform token axis = "Y"
-                float3[] extent = [(-0.5199999809265137, -0.09000000357627869, -0.5199999809265137), (0.5199999809265137, 0.09000000357627869, 0.5199999809265137)]
+                float3[] extent = [(-0.3499999940395355, -0.05999999865889549, -0.3499999940395355), (0.3499999940395355, 0.05999999865889549, 0.3499999940395355)]
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
@@ -2678,19 +2719,18 @@ def Xform "Griffin1" (
             uniform token purpose = "render"
         }
     }
-
     def Xform "EgressRampPort" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
     )
     {
         token visibility = "inherited"
         float physics:mass = 31.66666603088379
-        float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
+        float3 physics:diagonalInertia = (21.670555114746094, 30.12635612487793, 8.626800537109375)
         custom float lunco:deployment_angle_rad = 0.0
-        custom double3 xformOp:translate = (3.242021383, 5.200412291, 0.0)
+        custom double3 xformOp:translate = (1.942021383, 2.000412291, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.00000000014621)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double lunco:operational_width_m = 3.5
+        custom double lunco:operational_width_m = 2.86
         custom double lunco:wheel_clearance_m = 0.15
         custom rel lunco:mount:frame = </Griffin1/EgressRampPort/MountFrame>
         uniform token lunco:mount:plug = "egress_ramp"
@@ -2701,14 +2741,14 @@ def Xform "Griffin1" (
             custom token lunco:ramp:section:identity = "DeckSection"
             over "OuterRail"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.74, 1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "InnerRail"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.74, -1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.74, -1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             def "OuterRailJointPin" (
@@ -2719,7 +2759,7 @@ def Xform "Griffin1" (
                 double height = 0.22
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.74, 1.68)
+                custom double3 xformOp:translate = (0.0, 0.74, 1.36)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
@@ -2733,7 +2773,7 @@ def Xform "Griffin1" (
                 double height = 0.22
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.74, -1.68)
+                custom double3 xformOp:translate = (0.0, 0.74, -1.36)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
@@ -2741,172 +2781,172 @@ def Xform "Griffin1" (
             }
             over "UnderBeamPort"
             {
-                custom double3 xformOp:translate = (2.0381008335, -0.17, 1.5)
-                custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                custom double3 xformOp:translate = (0.899542027, -0.17, 1.2)
+                custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "UnderBeamStarboard"
             {
-                custom double3 xformOp:translate = (2.0381008335, -0.17, -1.5)
-                custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                custom double3 xformOp:translate = (0.899542027, -0.17, -1.2)
+                custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort1"
             {
-                custom double3 xformOp:translate = (0.5, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort2"
             {
-                custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort3"
             {
-                custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussLowerChordPort"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.16, 1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.16, 1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussBracePort1"
             {
-                custom double3 xformOp:translate = (0.25, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.1124427535, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort2"
             {
-                custom double3 xformOp:translate = (1.2690504164999998, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.562213767, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort3"
             {
-                custom double3 xformOp:translate = (2.8071512494999995, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.236870287, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort4"
             {
-                custom double3 xformOp:translate = (3.8262016665000003, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.6866413004999998, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SidePostStarboard1"
             {
-                custom double3 xformOp:translate = (0.5, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostStarboard2"
             {
-                custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostStarboard3"
             {
-                custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussLowerChordStarboard"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.16, -1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.16, -1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard1"
             {
-                custom double3 xformOp:translate = (0.25, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.1124427535, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard2"
             {
-                custom double3 xformOp:translate = (1.2690504164999998, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.562213767, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard3"
             {
-                custom double3 xformOp:translate = (2.8071512494999995, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.236870287, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard4"
             {
-                custom double3 xformOp:translate = (3.8262016665000003, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.6866413004999998, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "TreadPort1"
             {
-                custom double3 xformOp:translate = (0.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.224885507, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort2"
             {
-                custom double3 xformOp:translate = (1.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.67465652, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort3"
             {
-                custom double3 xformOp:translate = (2.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.124427533, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort4"
             {
-                custom double3 xformOp:translate = (3.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.574198546, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard1"
             {
-                custom double3 xformOp:translate = (0.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.224885507, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard2"
             {
-                custom double3 xformOp:translate = (1.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.67465652, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard3"
             {
-                custom double3 xformOp:translate = (2.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.124427533, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard4"
             {
-                custom double3 xformOp:translate = (3.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.574198546, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             def "HingeBarrel"
             {
                 double radius = 0.12
-                double height = 3.5
+                double height = 2.86
                 uniform token axis = "Z"
                 custom double3 xformOp:translate = (0.0, -0.18, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -2916,12 +2956,12 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
+                point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, -0.09000000357627869, 0.28999999165534973)]
                 int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                 int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                 bool physics:collisionEnabled = true
                 uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, 1.15)
+                custom double3 xformOp:translate = (0.0, 0.0, 1.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
@@ -2929,12 +2969,12 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
+                point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, -0.09000000357627869, 0.28999999165534973)]
                 int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                 int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                 bool physics:collisionEnabled = true
                 uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, -1.15)
+                custom double3 xformOp:translate = (0.0, 0.0, -1.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
@@ -2944,33 +2984,33 @@ def Xform "Griffin1" (
             references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
         )
         {
-            custom double3 xformOp:translate = (4.076201667, 1.62, 0.0)
+            custom double3 xformOp:translate = (1.799084054, 1.62, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
             float physics:mass = 31.66666603088379
-            float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
+            float3 physics:diagonalInertia = (21.670555114746094, 30.12635612487793, 8.626800537109375)
             custom token lunco:ramp:section:identity = "MiddleSection"
             def Xform "ToeSection" (
                 prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
                 references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda@</RampToeSection>
             )
             {
-                custom double3 xformOp:translate = (4.076201667, -0.18, 0.0)
+                custom double3 xformOp:translate = (1.799084054, -0.18, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
                 float physics:mass = 31.66666603088379
-                float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
+                float3 physics:diagonalInertia = (21.670555114746094, 30.12635612487793, 8.626800537109375)
                 custom token lunco:ramp:section:identity = "ToeSection"
                 over "OuterRail"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
-                    custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                    custom double3 xformOp:translate = (0.899542027, 0.74, 1.36)
+                    custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "InnerRail"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, 0.74, -1.68)
-                    custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                    custom double3 xformOp:translate = (0.899542027, 0.74, -1.36)
+                    custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 def "OuterRailJointPin" (
@@ -2981,7 +3021,7 @@ def Xform "Griffin1" (
                     double height = 0.22
                     uniform token axis = "Z"
                     bool physics:collisionEnabled = false
-                    custom double3 xformOp:translate = (0.0, 0.74, 1.68)
+                    custom double3 xformOp:translate = (0.0, 0.74, 1.36)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     uniform token purpose = "render"
@@ -2995,7 +3035,7 @@ def Xform "Griffin1" (
                     double height = 0.22
                     uniform token axis = "Z"
                     bool physics:collisionEnabled = false
-                    custom double3 xformOp:translate = (0.0, 0.74, -1.68)
+                    custom double3 xformOp:translate = (0.0, 0.74, -1.36)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     uniform token purpose = "render"
@@ -3003,172 +3043,172 @@ def Xform "Griffin1" (
                 }
                 over "UnderBeamPort"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, -0.17, 1.5)
-                    custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                    custom double3 xformOp:translate = (0.899542027, -0.17, 1.2)
+                    custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "UnderBeamStarboard"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, -0.17, -1.5)
-                    custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                    custom double3 xformOp:translate = (0.899542027, -0.17, -1.2)
+                    custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostPort1"
                 {
-                    custom double3 xformOp:translate = (0.5, 0.43000000000000005, 1.68)
+                    custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, 1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostPort2"
                 {
-                    custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, 1.68)
+                    custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, 1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostPort3"
                 {
-                    custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, 1.68)
+                    custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, 1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SideTrussLowerChordPort"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, 0.16, 1.68)
-                    custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                    custom double3 xformOp:translate = (0.899542027, 0.16, 1.36)
+                    custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SideTrussBracePort1"
                 {
-                    custom double3 xformOp:translate = (0.25, 0.45, 1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                    custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                    custom double3 xformOp:translate = (0.1124427535, 0.45, 1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                    custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBracePort2"
                 {
-                    custom double3 xformOp:translate = (1.2690504164999998, 0.45, 1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                    custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                    custom double3 xformOp:translate = (0.562213767, 0.45, 1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                    custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBracePort3"
                 {
-                    custom double3 xformOp:translate = (2.8071512494999995, 0.45, 1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                    custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                    custom double3 xformOp:translate = (1.236870287, 0.45, 1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                    custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBracePort4"
                 {
-                    custom double3 xformOp:translate = (3.8262016665000003, 0.45, 1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                    custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                    custom double3 xformOp:translate = (1.6866413004999998, 0.45, 1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                    custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SidePostStarboard1"
                 {
-                    custom double3 xformOp:translate = (0.5, 0.43000000000000005, -1.68)
+                    custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, -1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostStarboard2"
                 {
-                    custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, -1.68)
+                    custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, -1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostStarboard3"
                 {
-                    custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, -1.68)
+                    custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, -1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SideTrussLowerChordStarboard"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, 0.16, -1.68)
-                    custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                    custom double3 xformOp:translate = (0.899542027, 0.16, -1.36)
+                    custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SideTrussBraceStarboard1"
                 {
-                    custom double3 xformOp:translate = (0.25, 0.45, -1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                    custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                    custom double3 xformOp:translate = (0.1124427535, 0.45, -1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                    custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBraceStarboard2"
                 {
-                    custom double3 xformOp:translate = (1.2690504164999998, 0.45, -1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                    custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                    custom double3 xformOp:translate = (0.562213767, 0.45, -1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                    custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBraceStarboard3"
                 {
-                    custom double3 xformOp:translate = (2.8071512494999995, 0.45, -1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                    custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                    custom double3 xformOp:translate = (1.236870287, 0.45, -1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                    custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBraceStarboard4"
                 {
-                    custom double3 xformOp:translate = (3.8262016665000003, 0.45, -1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                    custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                    custom double3 xformOp:translate = (1.6866413004999998, 0.45, -1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                    custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "TreadPort1"
                 {
-                    custom double3 xformOp:translate = (0.5, 0.11499999999999999, 1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (0.224885507, 0.115, 1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadPort2"
                 {
-                    custom double3 xformOp:translate = (1.5, 0.11499999999999999, 1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (0.67465652, 0.115, 1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadPort3"
                 {
-                    custom double3 xformOp:translate = (2.5, 0.11499999999999999, 1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (1.124427533, 0.115, 1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadPort4"
                 {
-                    custom double3 xformOp:translate = (3.5, 0.11499999999999999, 1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (1.574198546, 0.115, 1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadStarboard1"
                 {
-                    custom double3 xformOp:translate = (0.5, 0.11499999999999999, -1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (0.224885507, 0.115, -1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadStarboard2"
                 {
-                    custom double3 xformOp:translate = (1.5, 0.11499999999999999, -1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (0.67465652, 0.115, -1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadStarboard3"
                 {
-                    custom double3 xformOp:translate = (2.5, 0.11499999999999999, -1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (1.124427533, 0.115, -1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadStarboard4"
                 {
-                    custom double3 xformOp:translate = (3.5, 0.11499999999999999, -1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (1.574198546, 0.115, -1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 def "HingeBarrel"
                 {
                     double radius = 0.12
-                    double height = 3.5
+                    double height = 2.86
                     uniform token axis = "Z"
                     custom double3 xformOp:translate = (0.0, -0.18, 0.0)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -3178,12 +3218,12 @@ def Xform "Griffin1" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
                 )
                 {
-                    point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (3.7352850437164307, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (3.7352850437164307, -0.09000000357627869, 0.30000001192092896)]
-                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
-                int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
+                    point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.4581674337387085, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.4581674337387085, -0.09000000357627869, 0.28999999165534973)]
+                    int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                    int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                     bool physics:collisionEnabled = true
                     uniform token physics:approximation = "convexHull"
-                    custom double3 xformOp:translate = (0.0, 0.0, 1.15)
+                    custom double3 xformOp:translate = (0.0, 0.0, 1.0)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
@@ -3191,26 +3231,26 @@ def Xform "Griffin1" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
                 )
                 {
-                    point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (3.7352850437164307, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (3.7352850437164307, -0.09000000357627869, 0.30000001192092896)]
-                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
-                int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
+                    point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.4581674337387085, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.4581674337387085, -0.09000000357627869, 0.28999999165534973)]
+                    int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                    int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                     bool physics:collisionEnabled = true
                     uniform token physics:approximation = "convexHull"
-                    custom double3 xformOp:translate = (0.0, 0.0, -1.15)
+                    custom double3 xformOp:translate = (0.0, 0.0, -1.0)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
             }
             over "OuterRail"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.74, 1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "InnerRail"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.74, -1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.74, -1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             def "OuterRailJointPin" (
@@ -3221,7 +3261,7 @@ def Xform "Griffin1" (
                 double height = 0.22
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.74, 1.68)
+                custom double3 xformOp:translate = (0.0, 0.74, 1.36)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
@@ -3235,7 +3275,7 @@ def Xform "Griffin1" (
                 double height = 0.22
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.74, -1.68)
+                custom double3 xformOp:translate = (0.0, 0.74, -1.36)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
@@ -3243,172 +3283,172 @@ def Xform "Griffin1" (
             }
             over "UnderBeamPort"
             {
-                custom double3 xformOp:translate = (2.0381008335, -0.17, 1.5)
-                custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                custom double3 xformOp:translate = (0.899542027, -0.17, 1.2)
+                custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "UnderBeamStarboard"
             {
-                custom double3 xformOp:translate = (2.0381008335, -0.17, -1.5)
-                custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                custom double3 xformOp:translate = (0.899542027, -0.17, -1.2)
+                custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort1"
             {
-                custom double3 xformOp:translate = (0.5, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort2"
             {
-                custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort3"
             {
-                custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussLowerChordPort"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.16, 1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.16, 1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussBracePort1"
             {
-                custom double3 xformOp:translate = (0.25, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.1124427535, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort2"
             {
-                custom double3 xformOp:translate = (1.2690504164999998, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.562213767, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort3"
             {
-                custom double3 xformOp:translate = (2.8071512494999995, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.236870287, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort4"
             {
-                custom double3 xformOp:translate = (3.8262016665000003, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.6866413004999998, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SidePostStarboard1"
             {
-                custom double3 xformOp:translate = (0.5, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostStarboard2"
             {
-                custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostStarboard3"
             {
-                custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussLowerChordStarboard"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.16, -1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.16, -1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard1"
             {
-                custom double3 xformOp:translate = (0.25, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.1124427535, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard2"
             {
-                custom double3 xformOp:translate = (1.2690504164999998, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.562213767, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard3"
             {
-                custom double3 xformOp:translate = (2.8071512494999995, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.236870287, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard4"
             {
-                custom double3 xformOp:translate = (3.8262016665000003, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.6866413004999998, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "TreadPort1"
             {
-                custom double3 xformOp:translate = (0.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.224885507, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort2"
             {
-                custom double3 xformOp:translate = (1.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.67465652, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort3"
             {
-                custom double3 xformOp:translate = (2.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.124427533, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort4"
             {
-                custom double3 xformOp:translate = (3.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.574198546, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard1"
             {
-                custom double3 xformOp:translate = (0.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.224885507, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard2"
             {
-                custom double3 xformOp:translate = (1.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.67465652, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard3"
             {
-                custom double3 xformOp:translate = (2.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.124427533, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard4"
             {
-                custom double3 xformOp:translate = (3.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.574198546, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             def "HingeBarrel"
             {
                 double radius = 0.12
-                double height = 3.5
+                double height = 2.86
                 uniform token axis = "Z"
                 custom double3 xformOp:translate = (0.0, -0.18, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -3418,12 +3458,12 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
+                point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, -0.09000000357627869, 0.28999999165534973)]
                 int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                 int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                 bool physics:collisionEnabled = true
                 uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, 1.15)
+                custom double3 xformOp:translate = (0.0, 0.0, 1.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
@@ -3431,12 +3471,12 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
+                point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, -0.09000000357627869, 0.28999999165534973)]
                 int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                 int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                 bool physics:collisionEnabled = true
                 uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, -1.15)
+                custom double3 xformOp:translate = (0.0, 0.0, -1.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
@@ -3454,12 +3494,12 @@ def Xform "Griffin1" (
     {
         token visibility = "inherited"
         float physics:mass = 31.66666603088379
-        float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
+        float3 physics:diagonalInertia = (21.670555114746094, 30.12635612487793, 8.626800537109375)
         custom float lunco:deployment_angle_rad = 0.0
-        custom double3 xformOp:translate = (-3.242021383, 5.200412291, 0.0)
-        custom double3 xformOp:rotateXYZ = (0.0, 180.0, 45.00000000014621)
+        custom double3 xformOp:translate = (-1.942021383, 2.000412291, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 180.0, -45.00000000014621)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double lunco:operational_width_m = 3.5
+        custom double lunco:operational_width_m = 2.86
         custom double lunco:wheel_clearance_m = 0.15
         custom rel lunco:mount:frame = </Griffin1/EgressRampStarboard/MountFrame>
         uniform token lunco:mount:plug = "egress_ramp"
@@ -3470,14 +3510,14 @@ def Xform "Griffin1" (
             custom token lunco:ramp:section:identity = "DeckSection"
             over "OuterRail"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.74, 1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "InnerRail"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.74, -1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.74, -1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             def "OuterRailJointPin" (
@@ -3488,7 +3528,7 @@ def Xform "Griffin1" (
                 double height = 0.22
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.74, 1.68)
+                custom double3 xformOp:translate = (0.0, 0.74, 1.36)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
@@ -3502,7 +3542,7 @@ def Xform "Griffin1" (
                 double height = 0.22
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.74, -1.68)
+                custom double3 xformOp:translate = (0.0, 0.74, -1.36)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
@@ -3510,172 +3550,172 @@ def Xform "Griffin1" (
             }
             over "UnderBeamPort"
             {
-                custom double3 xformOp:translate = (2.0381008335, -0.17, 1.5)
-                custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                custom double3 xformOp:translate = (0.899542027, -0.17, 1.2)
+                custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "UnderBeamStarboard"
             {
-                custom double3 xformOp:translate = (2.0381008335, -0.17, -1.5)
-                custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                custom double3 xformOp:translate = (0.899542027, -0.17, -1.2)
+                custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort1"
             {
-                custom double3 xformOp:translate = (0.5, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort2"
             {
-                custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort3"
             {
-                custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussLowerChordPort"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.16, 1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.16, 1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussBracePort1"
             {
-                custom double3 xformOp:translate = (0.25, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.1124427535, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort2"
             {
-                custom double3 xformOp:translate = (1.2690504164999998, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.562213767, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort3"
             {
-                custom double3 xformOp:translate = (2.8071512494999995, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.236870287, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort4"
             {
-                custom double3 xformOp:translate = (3.8262016665000003, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.6866413004999998, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SidePostStarboard1"
             {
-                custom double3 xformOp:translate = (0.5, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostStarboard2"
             {
-                custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostStarboard3"
             {
-                custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussLowerChordStarboard"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.16, -1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.16, -1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard1"
             {
-                custom double3 xformOp:translate = (0.25, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.1124427535, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard2"
             {
-                custom double3 xformOp:translate = (1.2690504164999998, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.562213767, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard3"
             {
-                custom double3 xformOp:translate = (2.8071512494999995, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.236870287, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard4"
             {
-                custom double3 xformOp:translate = (3.8262016665000003, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.6866413004999998, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "TreadPort1"
             {
-                custom double3 xformOp:translate = (0.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.224885507, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort2"
             {
-                custom double3 xformOp:translate = (1.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.67465652, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort3"
             {
-                custom double3 xformOp:translate = (2.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.124427533, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort4"
             {
-                custom double3 xformOp:translate = (3.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.574198546, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard1"
             {
-                custom double3 xformOp:translate = (0.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.224885507, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard2"
             {
-                custom double3 xformOp:translate = (1.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.67465652, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard3"
             {
-                custom double3 xformOp:translate = (2.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.124427533, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard4"
             {
-                custom double3 xformOp:translate = (3.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.574198546, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             def "HingeBarrel"
             {
                 double radius = 0.12
-                double height = 3.5
+                double height = 2.86
                 uniform token axis = "Z"
                 custom double3 xformOp:translate = (0.0, -0.18, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -3685,12 +3725,12 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
+                point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, -0.09000000357627869, 0.28999999165534973)]
                 int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                 int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                 bool physics:collisionEnabled = true
                 uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, 1.15)
+                custom double3 xformOp:translate = (0.0, 0.0, 1.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
@@ -3698,12 +3738,12 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
+                point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, -0.09000000357627869, 0.28999999165534973)]
                 int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                 int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                 bool physics:collisionEnabled = true
                 uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, -1.15)
+                custom double3 xformOp:translate = (0.0, 0.0, -1.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
@@ -3713,33 +3753,33 @@ def Xform "Griffin1" (
             references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda@</RampSection>
         )
         {
-            custom double3 xformOp:translate = (4.076201667, 1.62, 0.0)
+            custom double3 xformOp:translate = (1.799084054, 1.62, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
             float physics:mass = 31.66666603088379
-            float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
+            float3 physics:diagonalInertia = (21.670555114746094, 30.12635612487793, 8.626800537109375)
             custom token lunco:ramp:section:identity = "MiddleSection"
             def Xform "ToeSection" (
                 prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
                 references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda@</RampToeSection>
             )
             {
-                custom double3 xformOp:translate = (4.076201667, -0.18, 0.0)
+                custom double3 xformOp:translate = (1.799084054, -0.18, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
                 float physics:mass = 31.66666603088379
-                float3 physics:diagonalInertia = (32.411888122558594, 76.17263793945313, 43.93174743652344)
+                float3 physics:diagonalInertia = (21.670555114746094, 30.12635612487793, 8.626800537109375)
                 custom token lunco:ramp:section:identity = "ToeSection"
                 over "OuterRail"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
-                    custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                    custom double3 xformOp:translate = (0.899542027, 0.74, 1.36)
+                    custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "InnerRail"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, 0.74, -1.68)
-                    custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                    custom double3 xformOp:translate = (0.899542027, 0.74, -1.36)
+                    custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 def "OuterRailJointPin" (
@@ -3750,7 +3790,7 @@ def Xform "Griffin1" (
                     double height = 0.22
                     uniform token axis = "Z"
                     bool physics:collisionEnabled = false
-                    custom double3 xformOp:translate = (0.0, 0.74, 1.68)
+                    custom double3 xformOp:translate = (0.0, 0.74, 1.36)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     uniform token purpose = "render"
@@ -3764,7 +3804,7 @@ def Xform "Griffin1" (
                     double height = 0.22
                     uniform token axis = "Z"
                     bool physics:collisionEnabled = false
-                    custom double3 xformOp:translate = (0.0, 0.74, -1.68)
+                    custom double3 xformOp:translate = (0.0, 0.74, -1.36)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     uniform token purpose = "render"
@@ -3772,172 +3812,172 @@ def Xform "Griffin1" (
                 }
                 over "UnderBeamPort"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, -0.17, 1.5)
-                    custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                    custom double3 xformOp:translate = (0.899542027, -0.17, 1.2)
+                    custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "UnderBeamStarboard"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, -0.17, -1.5)
-                    custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                    custom double3 xformOp:translate = (0.899542027, -0.17, -1.2)
+                    custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostPort1"
                 {
-                    custom double3 xformOp:translate = (0.5, 0.43000000000000005, 1.68)
+                    custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, 1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostPort2"
                 {
-                    custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, 1.68)
+                    custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, 1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostPort3"
                 {
-                    custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, 1.68)
+                    custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, 1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SideTrussLowerChordPort"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, 0.16, 1.68)
-                    custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                    custom double3 xformOp:translate = (0.899542027, 0.16, 1.36)
+                    custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SideTrussBracePort1"
                 {
-                    custom double3 xformOp:translate = (0.25, 0.45, 1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                    custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                    custom double3 xformOp:translate = (0.1124427535, 0.45, 1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                    custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBracePort2"
                 {
-                    custom double3 xformOp:translate = (1.2690504164999998, 0.45, 1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                    custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                    custom double3 xformOp:translate = (0.562213767, 0.45, 1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                    custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBracePort3"
                 {
-                    custom double3 xformOp:translate = (2.8071512494999995, 0.45, 1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                    custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                    custom double3 xformOp:translate = (1.236870287, 0.45, 1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                    custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBracePort4"
                 {
-                    custom double3 xformOp:translate = (3.8262016665000003, 0.45, 1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                    custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                    custom double3 xformOp:translate = (1.6866413004999998, 0.45, 1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                    custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SidePostStarboard1"
                 {
-                    custom double3 xformOp:translate = (0.5, 0.43000000000000005, -1.68)
+                    custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, -1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostStarboard2"
                 {
-                    custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, -1.68)
+                    custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, -1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SidePostStarboard3"
                 {
-                    custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, -1.68)
+                    custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, -1.36)
                     custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SideTrussLowerChordStarboard"
                 {
-                    custom double3 xformOp:translate = (2.0381008335, 0.16, -1.68)
-                    custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                    custom double3 xformOp:translate = (0.899542027, 0.16, -1.36)
+                    custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "SideTrussBraceStarboard1"
                 {
-                    custom double3 xformOp:translate = (0.25, 0.45, -1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                    custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                    custom double3 xformOp:translate = (0.1124427535, 0.45, -1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                    custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBraceStarboard2"
                 {
-                    custom double3 xformOp:translate = (1.2690504164999998, 0.45, -1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                    custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                    custom double3 xformOp:translate = (0.562213767, 0.45, -1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                    custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBraceStarboard3"
                 {
-                    custom double3 xformOp:translate = (2.8071512494999995, 0.45, -1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                    custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                    custom double3 xformOp:translate = (1.236870287, 0.45, -1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                    custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "SideTrussBraceStarboard4"
                 {
-                    custom double3 xformOp:translate = (3.8262016665000003, 0.45, -1.68)
-                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                    custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                    custom double3 xformOp:translate = (1.6866413004999998, 0.45, -1.36)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                    custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 }
                 over "TreadPort1"
                 {
-                    custom double3 xformOp:translate = (0.5, 0.11499999999999999, 1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (0.224885507, 0.115, 1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadPort2"
                 {
-                    custom double3 xformOp:translate = (1.5, 0.11499999999999999, 1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (0.67465652, 0.115, 1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadPort3"
                 {
-                    custom double3 xformOp:translate = (2.5, 0.11499999999999999, 1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (1.124427533, 0.115, 1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadPort4"
                 {
-                    custom double3 xformOp:translate = (3.5, 0.11499999999999999, 1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (1.574198546, 0.115, 1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadStarboard1"
                 {
-                    custom double3 xformOp:translate = (0.5, 0.11499999999999999, -1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (0.224885507, 0.115, -1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadStarboard2"
                 {
-                    custom double3 xformOp:translate = (1.5, 0.11499999999999999, -1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (0.67465652, 0.115, -1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadStarboard3"
                 {
-                    custom double3 xformOp:translate = (2.5, 0.11499999999999999, -1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (1.124427533, 0.115, -1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 over "TreadStarboard4"
                 {
-                    custom double3 xformOp:translate = (3.5, 0.11499999999999999, -1.15)
-                    custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                    custom double3 xformOp:translate = (1.574198546, 0.115, -1.0)
+                    custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
                 def "HingeBarrel"
                 {
                     double radius = 0.12
-                    double height = 3.5
+                    double height = 2.86
                     uniform token axis = "Z"
                     custom double3 xformOp:translate = (0.0, -0.18, 0.0)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -3947,12 +3987,12 @@ def Xform "Griffin1" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
                 )
                 {
-                    point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (3.7352850437164307, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (3.7352850437164307, -0.09000000357627869, 0.30000001192092896)]
-                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
-                int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
+                    point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.4581674337387085, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.4581674337387085, -0.09000000357627869, 0.28999999165534973)]
+                    int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                    int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                     bool physics:collisionEnabled = true
                     uniform token physics:approximation = "convexHull"
-                    custom double3 xformOp:translate = (0.0, 0.0, 1.15)
+                    custom double3 xformOp:translate = (0.0, 0.0, 1.0)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
@@ -3960,26 +4000,26 @@ def Xform "Griffin1" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
                 )
                 {
-                    point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (3.7352850437164307, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (3.7352850437164307, -0.09000000357627869, 0.30000001192092896)]
-                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
-                int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
+                    point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.4581674337387085, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.4581674337387085, -0.09000000357627869, 0.28999999165534973)]
+                    int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                    int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                     bool physics:collisionEnabled = true
                     uniform token physics:approximation = "convexHull"
-                    custom double3 xformOp:translate = (0.0, 0.0, -1.15)
+                    custom double3 xformOp:translate = (0.0, 0.0, -1.0)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 }
             }
             over "OuterRail"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.74, 1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.74, 1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "InnerRail"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.74, -1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.74, -1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             def "OuterRailJointPin" (
@@ -3990,7 +4030,7 @@ def Xform "Griffin1" (
                 double height = 0.22
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.74, 1.68)
+                custom double3 xformOp:translate = (0.0, 0.74, 1.36)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
@@ -4004,7 +4044,7 @@ def Xform "Griffin1" (
                 double height = 0.22
                 uniform token axis = "Z"
                 bool physics:collisionEnabled = false
-                custom double3 xformOp:translate = (0.0, 0.74, -1.68)
+                custom double3 xformOp:translate = (0.0, 0.74, -1.36)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "render"
@@ -4012,172 +4052,172 @@ def Xform "Griffin1" (
             }
             over "UnderBeamPort"
             {
-                custom double3 xformOp:translate = (2.0381008335, -0.17, 1.5)
-                custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                custom double3 xformOp:translate = (0.899542027, -0.17, 1.2)
+                custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "UnderBeamStarboard"
             {
-                custom double3 xformOp:translate = (2.0381008335, -0.17, -1.5)
-                custom double3 xformOp:scale = (4.076201667, 0.16, 0.18)
+                custom double3 xformOp:translate = (0.899542027, -0.17, -1.2)
+                custom double3 xformOp:scale = (1.799084054, 0.16, 0.18)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort1"
             {
-                custom double3 xformOp:translate = (0.5, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort2"
             {
-                custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostPort3"
             {
-                custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, 1.68)
+                custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, 1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussLowerChordPort"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.16, 1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.16, 1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussBracePort1"
             {
-                custom double3 xformOp:translate = (0.25, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.1124427535, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort2"
             {
-                custom double3 xformOp:translate = (1.2690504164999998, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.562213767, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort3"
             {
-                custom double3 xformOp:translate = (2.8071512494999995, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.236870287, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBracePort4"
             {
-                custom double3 xformOp:translate = (3.8262016665000003, 0.45, 1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.6866413004999998, 0.45, 1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SidePostStarboard1"
             {
-                custom double3 xformOp:translate = (0.5, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (0.224885507, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostStarboard2"
             {
-                custom double3 xformOp:translate = (2.0381008329999997, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (0.899542027, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SidePostStarboard3"
             {
-                custom double3 xformOp:translate = (3.576201666, 0.43000000000000005, -1.68)
+                custom double3 xformOp:translate = (1.574198547, 0.4300000000000001, -1.36)
                 custom double3 xformOp:scale = (0.12, 0.76, 0.12)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussLowerChordStarboard"
             {
-                custom double3 xformOp:translate = (2.0381008335, 0.16, -1.68)
-                custom double3 xformOp:scale = (4.076201667, 0.14, 0.14)
+                custom double3 xformOp:translate = (0.899542027, 0.16, -1.36)
+                custom double3 xformOp:scale = (1.799084054, 0.14, 0.14)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard1"
             {
-                custom double3 xformOp:translate = (0.25, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.23639479905884)
-                custom double3 xformOp:scale = (0.7657675887630659, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.1124427535, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512259, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard2"
             {
-                custom double3 xformOp:translate = (1.2690504164999998, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -20.660878040963045)
-                custom double3 xformOp:scale = (1.6438230356322705, 0.08, 0.08)
+                custom double3 xformOp:translate = (0.562213767, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard3"
             {
-                custom double3 xformOp:translate = (2.8071512494999995, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 20.660878040963034)
-                custom double3 xformOp:scale = (1.643823035632271, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.236870287, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 40.6855407853161)
+                custom double3 xformOp:scale = (0.8896973755038903, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "SideTrussBraceStarboard4"
             {
-                custom double3 xformOp:translate = (3.8262016665000003, 0.45, -1.68)
-                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.236394742388356)
-                custom double3 xformOp:scale = (0.7657675894160059, 0.08, 0.08)
+                custom double3 xformOp:translate = (1.6866413004999998, 0.45, -1.36)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -68.80701284854248)
+                custom double3 xformOp:scale = (0.6220719341512257, 0.08, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             }
             over "TreadPort1"
             {
-                custom double3 xformOp:translate = (0.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.224885507, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort2"
             {
-                custom double3 xformOp:translate = (1.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.67465652, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort3"
             {
-                custom double3 xformOp:translate = (2.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.124427533, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadPort4"
             {
-                custom double3 xformOp:translate = (3.5, 0.11499999999999999, 1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.574198546, 0.115, 1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard1"
             {
-                custom double3 xformOp:translate = (0.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.224885507, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard2"
             {
-                custom double3 xformOp:translate = (1.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (0.67465652, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard3"
             {
-                custom double3 xformOp:translate = (2.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.124427533, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             over "TreadStarboard4"
             {
-                custom double3 xformOp:translate = (3.5, 0.11499999999999999, -1.15)
-                custom double3 xformOp:scale = (0.12, 0.05, 0.6)
+                custom double3 xformOp:translate = (1.574198546, 0.115, -1.0)
+                custom double3 xformOp:scale = (0.12, 0.05, 0.58)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
             def "HingeBarrel"
             {
                 double radius = 0.12
-                double height = 3.5
+                double height = 2.86
                 uniform token axis = "Z"
                 custom double3 xformOp:translate = (0.0, -0.18, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -4187,12 +4227,12 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
+                point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, -0.09000000357627869, 0.28999999165534973)]
                 int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                 int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                 bool physics:collisionEnabled = true
                 uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, 1.15)
+                custom double3 xformOp:translate = (0.0, 0.0, 1.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
@@ -4200,12 +4240,12 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                point3f[] points = [(0.0, -0.09000000357627869, -0.30000001192092896), (0.0, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, 0.09000000357627869, -0.30000001192092896), (4.076201438903809, -0.09000000357627869, -0.30000001192092896), (0.0, -0.09000000357627869, 0.30000001192092896), (0.0, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, 0.09000000357627869, 0.30000001192092896), (4.076201438903809, -0.09000000357627869, 0.30000001192092896)]
+                point3f[] points = [(0.0, -0.09000000357627869, -0.28999999165534973), (0.0, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, 0.09000000357627869, -0.28999999165534973), (1.7990840673446655, -0.09000000357627869, -0.28999999165534973), (0.0, -0.09000000357627869, 0.28999999165534973), (0.0, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, 0.09000000357627869, 0.28999999165534973), (1.7990840673446655, -0.09000000357627869, 0.28999999165534973)]
                 int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                 int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]
                 bool physics:collisionEnabled = true
                 uniform token physics:approximation = "convexHull"
-                custom double3 xformOp:translate = (0.0, 0.0, -1.15)
+                custom double3 xformOp:translate = (0.0, 0.0, -1.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             }
@@ -4226,7 +4266,7 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -50.0
         float physics:upperLimit = 60.0
-        point3f physics:localPos0 = (3.242021322250366, 5.200412273406982, 0.0)
+        point3f physics:localPos0 = (1.942021369934082, 2.0004122257232666, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -4247,7 +4287,7 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -60.0
         float physics:upperLimit = 50.0
-        point3f physics:localPos0 = (-3.242021322250366, 5.200412273406982, 0.0)
+        point3f physics:localPos0 = (-1.942021369934082, 2.0004122257232666, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
@@ -4268,10 +4308,10 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -180.0
         float physics:upperLimit = 180.0
-        point3f physics:localPos0 = (4.076201438903809, 0.8100000023841858, 0.0)
+        point3f physics:localPos0 = (1.7990840673446655, 0.8100000023841858, 0.0)
         point3f physics:localPos1 = (0.0, 0.8100000023841858, 0.0)
-        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
-        quatf physics:localRot1 = (0.0, 0.0, -0.7071067690849304, 0.7071067690849304)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.7071067690849304, 0.0, 0.0, -0.7071067690849304)
         uniform token drive:angular:physics:type = "force"
         float drive:angular:physics:targetPosition = 90.0
         float drive:angular:physics:targetVelocity = 0.0
@@ -4289,10 +4329,10 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -180.0
         float physics:upperLimit = 180.0
-        point3f physics:localPos0 = (4.076201438903809, -0.09000000357627869, 0.0)
+        point3f physics:localPos0 = (1.7990840673446655, -0.09000000357627869, 0.0)
         point3f physics:localPos1 = (0.0, -0.09000000357627869, 0.0)
-        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
-        quatf physics:localRot1 = (0.0, 0.0, -0.7071067690849304, 0.7071067690849304)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.7071067690849304, 0.0, 0.0, -0.7071067690849304)
         uniform token drive:angular:physics:type = "force"
         float drive:angular:physics:targetPosition = 90.0
         float drive:angular:physics:targetVelocity = 0.0
@@ -4310,10 +4350,10 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -180.0
         float physics:upperLimit = 180.0
-        point3f physics:localPos0 = (4.076201438903809, 0.8100000023841858, 0.0)
+        point3f physics:localPos0 = (1.7990840673446655, 0.8100000023841858, 0.0)
         point3f physics:localPos1 = (0.0, 0.8100000023841858, 0.0)
-        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
-        quatf physics:localRot1 = (0.0, 0.0, -0.7071067690849304, 0.7071067690849304)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.7071067690849304, 0.0, 0.0, -0.7071067690849304)
         uniform token drive:angular:physics:type = "force"
         float drive:angular:physics:targetPosition = 90.0
         float drive:angular:physics:targetVelocity = 0.0
@@ -4331,10 +4371,10 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -180.0
         float physics:upperLimit = 180.0
-        point3f physics:localPos0 = (4.076201438903809, -0.09000000357627869, 0.0)
+        point3f physics:localPos0 = (1.7990840673446655, -0.09000000357627869, 0.0)
         point3f physics:localPos1 = (0.0, -0.09000000357627869, 0.0)
-        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
-        quatf physics:localRot1 = (0.0, 0.0, -0.7071067690849304, 0.7071067690849304)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.7071067690849304, 0.0, 0.0, -0.7071067690849304)
         uniform token drive:angular:physics:type = "force"
         float drive:angular:physics:targetPosition = 90.0
         float drive:angular:physics:targetVelocity = 0.0
@@ -4347,7 +4387,7 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (0.0, 3.2, 0.0)
+        custom double3 xformOp:translate = (0.0, 1.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         custom rel lunco:mount:sockets = [</Griffin1/Bus/RampSocketPort>, </Griffin1/Bus/RampSocketStarboard>]
@@ -4378,45 +4418,48 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (1.15, 3.2, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+        custom double3 xformOp:translate = (0.85, 1.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.6, 0.6, 0.6)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
     def Xform "TankNX" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (-1.15, 3.2, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+        custom double3 xformOp:translate = (-0.85, 1.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.6, 0.6, 0.6)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
     def Xform "TankPZ" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (0.0, 3.2, 1.15)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+        custom double3 xformOp:translate = (0.0, 1.0, 0.85)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.6, 0.6, 0.6)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
     def Xform "TankNZ" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (0.0, 3.2, -1.15)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (0.9, 0.9, 0.9)
+        custom double3 xformOp:translate = (0.0, 1.0, -0.85)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:scale = (0.6, 0.6, 0.6)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
     def Cube "TopDeckBeamCollider0" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (3.17680015377856, 0.16, 0.16)
+        custom double3 xformOp:scale = (2.210252531694167, 0.16, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (0.0, 4.23, -2.575)
+        custom double3 xformOp:translate = (0.0, 1.71, -1.75)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        uniform token physics:approximation = "convexHull"
         uniform token purpose = "proxy"
         token visibility = "invisible"
         custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
@@ -4425,13 +4468,12 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.6684000768892808, 0.16, 0.16)
+        custom double3 xformOp:scale = (1.1851262658470838, 0.16, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (2.04170003844464, 4.23, -2.04170003844464)
+        custom double3 xformOp:translate = (1.3875631329235416, 1.71, -1.3875631329235416)
         custom double3 xformOp:rotateXYZ = (0.0, -45.0, 0.0)
-        uniform token physics:approximation = "convexHull"
         uniform token purpose = "proxy"
         token visibility = "invisible"
         custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
@@ -4440,13 +4482,12 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (3.17680015377856, 0.16, 0.16)
+        custom double3 xformOp:scale = (2.210252531694167, 0.16, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (2.575, 4.23, 0.0)
+        custom double3 xformOp:translate = (1.75, 1.71, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
-        uniform token physics:approximation = "convexHull"
         uniform token purpose = "proxy"
         token visibility = "invisible"
         custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
@@ -4455,13 +4496,12 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.6684000768892808, 0.16, 0.16)
+        custom double3 xformOp:scale = (1.1851262658470838, 0.16, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (2.04170003844464, 4.23, 2.04170003844464)
+        custom double3 xformOp:translate = (1.3875631329235416, 1.71, 1.3875631329235416)
         custom double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
-        uniform token physics:approximation = "convexHull"
         uniform token purpose = "proxy"
         token visibility = "invisible"
         custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
@@ -4470,13 +4510,12 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (3.17680015377856, 0.16, 0.16)
+        custom double3 xformOp:scale = (2.210252531694167, 0.16, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (0.0, 4.23, 2.575)
+        custom double3 xformOp:translate = (0.0, 1.71, 1.75)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        uniform token physics:approximation = "convexHull"
         uniform token purpose = "proxy"
         token visibility = "invisible"
         custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
@@ -4485,13 +4524,12 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.6684000768892808, 0.16, 0.16)
+        custom double3 xformOp:scale = (1.1851262658470838, 0.16, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (-2.04170003844464, 4.23, 2.04170003844464)
+        custom double3 xformOp:translate = (-1.3875631329235416, 1.71, 1.3875631329235416)
         custom double3 xformOp:rotateXYZ = (0.0, -45.0, 0.0)
-        uniform token physics:approximation = "convexHull"
         uniform token purpose = "proxy"
         token visibility = "invisible"
         custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
@@ -4500,13 +4538,12 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (3.17680015377856, 0.16, 0.16)
+        custom double3 xformOp:scale = (2.210252531694167, 0.16, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (-2.575, 4.23, 0.0)
+        custom double3 xformOp:translate = (-1.75, 1.71, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
-        uniform token physics:approximation = "convexHull"
         uniform token purpose = "proxy"
         token visibility = "invisible"
         custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
@@ -4515,13 +4552,12 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (1.6684000768892808, 0.16, 0.16)
+        custom double3 xformOp:scale = (1.1851262658470838, 0.16, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = true
-        custom double3 xformOp:translate = (-2.04170003844464, 4.23, -2.04170003844464)
+        custom double3 xformOp:translate = (-1.3875631329235416, 1.71, -1.3875631329235416)
         custom double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
-        uniform token physics:approximation = "convexHull"
         uniform token purpose = "proxy"
         token visibility = "invisible"
         custom rel lunco:collider:geometrySource = </Griffin1/Bus/TopDeckOctagon>
@@ -4530,7 +4566,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
     )
     {
-        point3f[] points = [(-1.2887300252914429, 5.119999885559082, 1.600000023841858), (1.2887300252914429, 5.119999885559082, 1.600000023841858), (2.200000047683716, 5.119999885559082, 0.9372580051422119), (2.200000047683716, 5.119999885559082, -0.9372580051422119), (1.2887300252914429, 5.119999885559082, -1.600000023841858), (-1.2887300252914429, 5.119999885559082, -1.600000023841858), (-2.200000047683716, 5.119999885559082, -0.9372580051422119), (-2.200000047683716, 5.119999885559082, 0.9372580051422119), (-1.2887300252914429, 5.28000020980835, 1.600000023841858), (1.2887300252914429, 5.28000020980835, 1.600000023841858), (2.200000047683716, 5.28000020980835, 0.9372580051422119), (2.200000047683716, 5.28000020980835, -0.9372580051422119), (1.2887300252914429, 5.28000020980835, -1.600000023841858), (-1.2887300252914429, 5.28000020980835, -1.600000023841858), (-2.200000047683716, 5.28000020980835, -0.9372580051422119), (-2.200000047683716, 5.28000020980835, 0.9372580051422119)]
+        point3f[] points = [(-0.9372580051422119, 1.9199999570846558, 1.600000023841858), (0.9372580051422119, 1.9199999570846558, 1.600000023841858), (1.600000023841858, 1.9199999570846558, 0.9372580051422119), (1.600000023841858, 1.9199999570846558, -0.9372580051422119), (0.9372580051422119, 1.9199999570846558, -1.600000023841858), (-0.9372580051422119, 1.9199999570846558, -1.600000023841858), (-1.600000023841858, 1.9199999570846558, -0.9372580051422119), (-1.600000023841858, 1.9199999570846558, 0.9372580051422119), (-0.9372580051422119, 2.0799999237060547, 1.600000023841858), (0.9372580051422119, 2.0799999237060547, 1.600000023841858), (1.600000023841858, 2.0799999237060547, 0.9372580051422119), (1.600000023841858, 2.0799999237060547, -0.9372580051422119), (0.9372580051422119, 2.0799999237060547, -1.600000023841858), (-0.9372580051422119, 2.0799999237060547, -1.600000023841858), (-1.600000023841858, 2.0799999237060547, -0.9372580051422119), (-1.600000023841858, 2.0799999237060547, 0.9372580051422119)]
         int[] faceVertexCounts = [8, 8, 4, 4, 4, 4, 4, 4, 4, 4]
         int[] faceVertexIndices = [7, 6, 5, 4, 3, 2, 1, 0, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 9, 8, 1, 2, 10, 9, 2, 3, 11, 10, 3, 4, 12, 11, 4, 5, 13, 12, 5, 6, 14, 13, 6, 7, 15, 14, 7, 0, 8, 15]
         uniform token subdivisionScheme = "none"
@@ -4545,39 +4581,38 @@ def Xform "Griffin1" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (2.9, 3.2, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        custom double3 xformOp:rotateXYZ = (90.0, 0.0, -90.0)
+        custom double3 xformOp:translate = (1.94, 1.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (89.99999999999999, 0.0, -89.99999999999999)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
     }
     def Xform "SolarPanelForward" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (0.0, 3.2, 2.9)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
+        custom double3 xformOp:translate = (0.0, 1.0, 1.94)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (89.99999999999999, 0.0, 0.0)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
     }
     def Xform "SolarPanelFrontStarboard" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (2.2819, 3.2, 2.2819)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        custom double3 xformOp:rotateXYZ = (90.0, 0.0, -45.0)
+        custom double3 xformOp:translate = (1.49, 1.0, 1.49)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, -45.000000000000014)
         custom double3 xformOp:scale = (0.4736465266155053, 1.0, 1.0)
     }
-
     def Xform "TransitionPlatePort" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
     )
     {
-        custom double3 xformOp:translate = (2.2183650000000004, 5.19, 0.0)
+        custom double3 xformOp:translate = (1.45, 1.99, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float physics:mass = 15.0
-        float3 physics:diagonalInertia = (15.352999687194824, 20.131000518798828, 4.859000205993652)
+        float3 physics:diagonalInertia = (10.265000343322754, 11.237000465393066, 1.0529999732971191)
         def Cube "ContactSurface" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
@@ -4585,7 +4620,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-            custom double3 xformOp:scale = (1.96327, 0.18, 3.5)
+            custom double3 xformOp:scale = (0.9, 0.18, 2.86)
             double size = 1.0
             uniform token purpose = "proxy"
             token visibility = "invisible"
@@ -4597,7 +4632,7 @@ def Xform "Griffin1" (
     {
         custom rel physics:body0 = </Griffin1>
         custom rel physics:body1 = </Griffin1/TransitionPlatePort>
-        point3f physics:localPos0 = (2.218364953994751, 5.190000057220459, 0.0)
+        point3f physics:localPos0 = (1.4500000476837158, 1.9900000095367432, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -4607,11 +4642,11 @@ def Xform "Griffin1" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
     )
     {
-        custom double3 xformOp:translate = (-2.2183650000000004, 5.19, 0.0)
+        custom double3 xformOp:translate = (-1.45, 1.99, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float physics:mass = 15.0
-        float3 physics:diagonalInertia = (15.352999687194824, 20.131000518798828, 4.859000205993652)
+        float3 physics:diagonalInertia = (10.265000343322754, 11.237000465393066, 1.0529999732971191)
         def Cube "ContactSurface" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
@@ -4619,7 +4654,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-            custom double3 xformOp:scale = (1.96327, 0.18, 3.5)
+            custom double3 xformOp:scale = (0.9, 0.18, 2.86)
             double size = 1.0
             uniform token purpose = "proxy"
             token visibility = "invisible"
@@ -4631,7 +4666,7 @@ def Xform "Griffin1" (
     {
         custom rel physics:body0 = </Griffin1>
         custom rel physics:body1 = </Griffin1/TransitionPlateStarboard>
-        point3f physics:localPos0 = (-2.218364953994751, 5.190000057220459, 0.0)
+        point3f physics:localPos0 = (-1.4500000476837158, 1.9900000095367432, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)

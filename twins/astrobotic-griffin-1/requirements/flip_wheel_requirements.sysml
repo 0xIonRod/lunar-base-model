@@ -1,6 +1,5 @@
-// Legacy runtime visual-study contract; not the corrected FreeCAD v3 geometry.
-// See flip_cad_requirements.sysml for current CAD behavior and dimensions.
-// Runtime promotion remains OPEN; these builder-consumed values are unchanged.
+// Provisional size reconstruction, 2026-09-30. See griffin-size-evidence.md.
+// CAD dimensions are estimates; geometry promotion does not qualify dynamics.
 package FlipWheelRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::String;
@@ -21,9 +20,9 @@ package FlipWheelRequirements {
         ref part suspension : FlipSuspensionRequirements::FlipSuspensionComponent;
         ref attribute suspensionRestLengthM : FlipRequirements::FlipRover::suspensionRestLengthM;
         attribute hubRadiusM : Real = 0.25;
-        attribute hubWidthM : Real = 0.33;
+        attribute hubWidthM : Real = .24;
         attribute hubCapRadiusM : Real = 0.10;
-        attribute hubCapWidthM : Real = 0.36;
+        attribute hubCapWidthM : Real = .28;
         attribute wheelAxis : FlipWheelAxis = "Z";
     }
 
@@ -46,7 +45,7 @@ package FlipWheelRequirements {
         doc /* FWW-006 [integration] each active wheel station references the detached FlipSuspension component; its internal geometry and collision contract are verified by FlipSuspensionRequirements. */
     }
     requirement def FWW007_WheelEnvelope {
-        doc /* FWW-007 [geometry] each wheel shall contain a Z-axis tire of radius 0.45 m and width 0.30 m, a hub of radius 0.25 m and width 0.33 m, and a cap of radius 0.10 m and width 0.36 m. */
+        doc /* FWW-007 [geometry] tire, metal hub and cap shall match their source radii and widths with a Z axle axis in the reconstructed X-forward frame. Tire dimensions are CAD study estimates; narrower hub/cap widths are packaging estimates keeping them inside the tire envelope; see griffin-size-evidence.md. */
     }
 
     requirement <'FWW-001'> fww001 : FWW001_WheelCount { subject wheels : FlipDirectionalWheelAssembly; }
