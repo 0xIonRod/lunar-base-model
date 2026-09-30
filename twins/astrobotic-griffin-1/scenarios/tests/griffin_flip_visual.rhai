@@ -116,6 +116,17 @@ fn run_visual_review(batch_index) {
              root + "/Griffin1/" + name + "/LandingLegVisual/FootPad"]));
     }
     let antenna=root+"/Griffin1/HighGainDish";
+    for field in [#{input:"crinkle",source:"tankFoilCrinkleDensity"},
+                  #{input:"facet_depth",source:"tankFoilFacetContrast"},
+                  #{input:"sheen",source:"tankFoilSheen"},
+                  #{input:"v_scale",source:"tankFoilAxialPatternScale"}] {
+        checks.push(#{id:"GV-002-tank-foil-"+field.input,component:"lander",
+            requirement:"gv002",verification:"Verify_GriffinVisualRequirements",
+            kind:"attribute",path:root+"/Griffin1/Looks/MliFoil_Mat/Surface",
+            attr:"inputs:"+field.input,
+            expected_attr:"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::"+field.source,
+            tolerance:0.000001});
+    }
     checks.push(visual_children_check("GV-002-high-gain", "lander", "gv002",antenna,
         [antenna+"/Mast",antenna+"/YawHead/DishGimbal/DishHead/Reflector",
          antenna+"/YawHead/DishGimbal/DishHead/FeedArm"]));

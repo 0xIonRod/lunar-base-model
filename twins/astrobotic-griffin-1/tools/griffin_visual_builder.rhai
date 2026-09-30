@@ -5845,6 +5845,38 @@ fn griffin_surface_finish_plan(doc, edit_target, root) {
     let mat = _component_query(doc, material);
     if !mat.ok || mat.type_name != "Material" { return plan_error("Griffin foil material is missing"); }
     let ops = [];
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("Griffin foil appearance source unavailable");}
+    let owner="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    for field in [#{input:"foil_color",source:"tankFoilBrightColor"},
+                  #{input:"shade_color",source:"tankFoilValleyColor"}] {
+        let value=model.value(owner+field.source);
+        if type_of(value)!="array" || value.len()!=3 {
+            return plan_error("Griffin foil palette incomplete: "+field.source);
+        }
+        for channel in value {
+            let c=f64_from(channel);
+            if c==() || !griffin_geometry::scalar_is_finite(c) || c<0.0 || c>1.0 {
+                return plan_error("Griffin foil palette channel invalid: "+field.source);
+            }
+        }
+        let color=assembly_builder::_mesh_tuple3(value,"foil color");
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:material+"/Surface",
+            name:"inputs:"+field.input,type_name:"color3f",value:color}});
+    }
+    for field in [#{input:"crinkle",source:"tankFoilCrinkleDensity",normalized:false},
+                  #{input:"facet_depth",source:"tankFoilFacetContrast",normalized:true},
+                  #{input:"sheen",source:"tankFoilSheen",normalized:true},
+                  #{input:"v_scale",source:"tankFoilAxialPatternScale",normalized:false}] {
+        let value=f64_from(model.value(owner+field.source));
+        if value==() || !griffin_geometry::scalar_is_finite(value) || value<=0.0
+            || (field.normalized && value>1.0) {
+            return plan_error("Griffin foil control invalid: "+field.source);
+        }
+        // ShaderMaterial's declared GPU input uses float; source stays f64.
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:material+"/Surface",
+            name:"inputs:"+field.input,type_name:"float",value:value.to_string()}});
+    }
     for name in griffin_spec::propellant_tank_names() {
         let path = root + "/" + name + "/MliTank";
         let prim = _component_query(doc, path);

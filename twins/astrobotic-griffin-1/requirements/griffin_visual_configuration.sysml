@@ -198,6 +198,23 @@ package GriffinVisualConfigurationRequirements {
         attribute railDisplayColor : Real[3] = (0.035, 0.045, 0.06);
         attribute tankSupportDisplayColor : Real[3] = (0.12, 0.15, 0.19);
         attribute tankCollarDisplayColor : Real[3] = (0.24, 0.28, 0.34);
+        /* Tank blanket appearance follows the visibly crumpled gold wraps in
+         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
+         * and https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander.
+         * These are illustrative sources, not measured optical properties.
+         * Reuse LunCo's object-space mli_foil shader: density 32 per metre
+         * gives roughly 31 mm pattern cells; equal axial/radial pattern scale
+         * avoids elongated smooth bands. Full facet contrast and a darker
+         * valley color make folds legible at assembly distance. All colors,
+         * contrast and sheen are artistic estimates, not blanket thickness,
+         * insulation performance, absorptance or infrared emittance. */
+        attribute tankFoilBrightColor : Real[3] = (.83, .62, .18);
+        attribute tankFoilValleyColor : Real[3] = (.18, .13, .04);
+        attribute tankFoilCrinkleDensity : Real = 32.0;
+        attribute tankFoilFacetContrast : Real = 1.0;
+        attribute tankFoilSheen : Real = .85;
+        attribute tankFoilAxialPatternScale : Real = 1.0;
+
 
         /* Normalized (X, -Z) clipped-square octagon profile. CartesianVectorValue
          * remains a typed native Vec2 in the runtime bridge. The tank support
@@ -395,7 +412,7 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-014 [geometry] outer deck, skirt, and central tank-support perimeters use the eight normalized Cartesian vectors declared once in this configuration, scaled by their typed dimensions. Upper, middle, and lower support planes carry four annular tank collars; open upper and lower eight-sided buckets connect the central structure without covering the tanks. */
     }
     requirement def GVC015_SurfaceAppearance {
-        doc /* GVC-015 [appearance] frame, deck, service skirt, avionics, rails, and tank-support features shall take their linear display colors from this configuration. Each color channel shall remain in the [0,1] interval; Rhai and USD material adapters must not duplicate palette literals. */
+        doc /* GVC-015 [appearance] frame, deck, service skirt, avionics, rails, tank blankets, and tank-support features shall take their linear display colors from this configuration. Each color channel shall remain in the [0,1] interval; Rhai and USD material adapters must not duplicate palette literals. */
     }
 
     requirement <'GVC-001'> gvc001 : GVC001_ConfigurationSelection { subject configuration : GriffinVisualConfiguration; }
