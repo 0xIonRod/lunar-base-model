@@ -169,6 +169,22 @@ package GriffinVisualConfigurationRequirements {
         attribute highGainMastRadiusM : Real = .025;
         attribute highGainHeadScale : Real = .60;
         attribute highGainParkedTiltDeg : Real = -70.0;
+        /* Flat medium-gain panel inferred from PUG v5.02 pp20/30, rather
+         * than another dish. Griffin-specific size is unpublished. The
+         * 320x280x40 mm enclosure is a small visible panel study estimate;
+         * 120 mm square, 35 mm deep mounting block gives a compact standoff.
+         * X station is 22% of bus width to keep it on the straight rear face;
+         * its upper edge aligns with the body skin top and its bracket seats
+         * on the negative-Z body boundary plus the authored skin thickness. This mounting/parked orientation
+         * is a reconstruction, not a supplier interface or gain pattern.
+         * Near-white radome color is an appearance estimate from the guide,
+         * not an RF material or measured optical property.
+         * https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf */
+        attribute mediumGainPanelDimensions : Dimensions = (.32, .28, .04);
+        attribute mediumGainBracketDimensions : Dimensions = (.12, .12, .035);
+        attribute mediumGainMountWidthFraction : Real = .22;
+        attribute mediumGainRadomeDisplayColor : Real[3] = (.90, .90, .87);
+
         attribute avionicsDeckDimensions : Dimensions = (2.00, 0.10, 1.46);
         attribute avionicsDeckCenter : Position = (0.0, 0.46, 0.0);
 

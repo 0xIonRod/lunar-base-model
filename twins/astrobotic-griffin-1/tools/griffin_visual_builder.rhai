@@ -5993,3 +5993,40 @@ fn griffin_high_gain_plan(doc, edit_target, root) {
     ] {ops.push(#{SetAttribute:#{edit_target:edit_target,path:attr.path,name:attr.name,type_name:attr.kind,value:attr.value}});}
     #{ok:true,ops:ops,path:path,mount:position}
 }
+
+// Bus-owned two-part medium-gain study. All placements follow existing skin
+// datums; this parked visual adds no separate actuator or physics body.
+fn griffin_medium_gain_plan(doc, edit_target, root) {
+    let m=sysml_requirements::model();
+    if !sysml_model_is(m) {return plan_error("medium-gain source unavailable");}
+    let o="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let body=m.value(o+"bodyDimensions");let panel=m.value(o+"mediumGainPanelDimensions");
+    let bracket=m.value(o+"mediumGainBracketDimensions");
+    let margin=f64_from(m.value(o+"bodySkinEdgeMarginM"));
+    let skin=f64_from(m.value(o+"bodySkinThicknessM"));
+    let fraction=f64_from(m.value(o+"mediumGainMountWidthFraction"));
+    if !absolute_root(root) || !vec3_is_native(body) || !vec3_is_native(panel)
+        || !vec3_is_native(bracket) || !vec3_is_finite(body) || !vec3_is_finite(panel)
+        || !vec3_is_finite(bracket) || margin==() || skin==() || skin<=0.0 || fraction==()
+        || !griffin_geometry::scalar_is_finite(skin)
+        || !griffin_geometry::scalar_is_finite(margin) || !griffin_geometry::scalar_is_finite(fraction)
+        || margin<0.0 || fraction<0.0 || fraction>=0.5
+        || panel.x<=0.0 || panel.y<=0.0 || panel.z<=0.0
+        || bracket.x<=0.0 || bracket.y<=0.0 || bracket.z<=0.0 {
+        return plan_error("medium-gain source dimensions incomplete");
+    }
+    let parent=root+"/MediumGainAntenna";let ops=[];
+    let existing=_component_query(doc,parent);
+    if !existing.ok {
+        ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:"MediumGainAntenna",type_name:"Xform",reference:(),reference_prim_path:""}});
+    } else if existing.type_name!="Xform" {return plan_error("medium-gain assembly must be Xform");}
+    let origin=vec3(body.x*fraction,body.y/2.0-margin-panel.y/2.0,-body.z/2.0-skin);
+    ops.push(#{SetTranslate:#{edit_target:edit_target,path:parent,value:origin}});
+    for item in [#{name:"Bracket",size:bracket,center:vec3(0.0,0.0,-bracket.z/2.0),color:m.value(o+"silverDisplayColor")},
+        #{name:"Radome",size:panel,center:vec3(0.0,0.0,-bracket.z-panel.z/2.0),color:m.value(o+"mediumGainRadomeDisplayColor")}] {
+        let p=_component_cube_visual_ops(doc,edit_target,parent,item.name,item.center,(),item.size,item.color);
+        if !p.ok {return p;}
+        for op in p.ops {ops.push(op);}
+    }
+    #{ok:true,ops:ops,path:parent,mount:origin}
+}

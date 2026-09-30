@@ -127,6 +127,16 @@ fn run_visual_review(batch_index) {
             expected_attr:"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::"+datum.source,
             tolerance:0.001});
     }
+    let medium=root+"/Griffin1/Bus/MediumGainAntenna";
+    checks.push(visual_children_check("GV-002-medium-gain", "lander", "gv002",medium,
+        [medium+"/Bracket",medium+"/Radome"]));
+    for axis in 0..3 {
+        checks.push(#{id:"GV-002-medium-gain-envelope-"+axis,component:"lander",
+            requirement:"gv002",verification:"Verify_GriffinVisualRequirements",
+            kind:"bounds_component",path:medium+"/Radome",index:axis,multiplier:2.0,
+            expected_attr:"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::mediumGainPanelDimensions",
+            expected_index:axis,tolerance:0.001});
+    }
     checks.push(visual_exists_check("GV-002-deck", "lander", "gv002", "exists", root + "/Griffin1/Bus"));
     checks.push(visual_children_check("GV-002-deck-subparts", "lander", "gv002",
         root + "/Griffin1/Bus",

@@ -637,5 +637,49 @@ def Xform "GriffinBus" (
                 float inputs:roughness = 0.41999998688697815
             }
         }
+        def Material "MediumGainRadome"
+        {
+            custom token outputs:surface
+            token outputs:surface.connect = </GriffinBus/Looks/MediumGainRadome/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                token outputs:surface = ""
+                color3f inputs:diffuseColor = (0.8999999761581421, 0.8999999761581421, 0.8700000047683716)
+                float inputs:metallic = 0.0
+                float inputs:roughness = 0.6499999761581421
+            }
+        }
+    }
+    def Xform "MediumGainAntenna"
+    {
+        custom double3 xformOp:translate = (0.792, 0.18, -1.825)
+        custom token[] xformOpOrder = ["xformOp:translate"]
+        def Cube "Bracket" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.12, 0.12, 0.035)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            custom double3 xformOp:translate = (0.0, 0.0, -0.0175)
+            uniform token purpose = "render"
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            custom rel material:binding = </GriffinBus/Looks/TankFrame>
+        }
+        def Cube "Radome" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.32, 0.28, 0.04)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = false
+            custom double3 xformOp:translate = (0.0, 0.0, -0.05500000000000001)
+            uniform token purpose = "render"
+            color3f[] primvars:displayColor = [(0.8999999761581421, 0.8999999761581421, 0.8700000047683716)]
+            custom rel material:binding = </GriffinBus/Looks/MediumGainRadome>
+        }
     }
 }
