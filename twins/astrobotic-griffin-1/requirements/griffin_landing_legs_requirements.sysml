@@ -74,6 +74,12 @@ package GriffinLandingLegRequirements {
         attribute mountClevisHeightM : Real = .16;
         attribute mountClevisDepthM : Real = .12;
         attribute mountClevisCenterYM : Real = 0.12;
+        // Visual correction requested in the assembly review: the bus-side
+        // cylindrical mount sleeve follows local +X, along BodyMountArm.
+        // Its center is the primary member's upper anchor. This render-only
+        // sleeve is not the axis of the physical prismatic suspension joint.
+        // This is an explicit interface reconstruction, not a flight ICD datum.
+        attribute mountAxleAxis : Direction = (1.0, 0.0, 0.0);
         attribute footPadPlateWidthM : Real = .42;
         attribute footPadPlateHeightM : Real = .04;
         attribute footPadPlateDepthM : Real = .36;

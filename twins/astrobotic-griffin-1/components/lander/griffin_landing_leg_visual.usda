@@ -102,9 +102,9 @@ def Xform "LandingLeg" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, 0.12, 0.0)
+        custom double3 xformOp:translate = (-0.1, 0.12, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        uniform token axis = "Z"
+        uniform token axis = "X"
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]

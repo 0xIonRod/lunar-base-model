@@ -3126,6 +3126,10 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
     let upper=model.value(own+"memberUpperAnchors");
     let lower=model.value(own+"memberLowerAnchor");
     if !array_is(members) || !array_is(upper) || members.len()!=3 || upper.len()!=3 {return plan_error("landing leg needs exactly three source-owned load paths");}
+    let axle_axis=model.value(own+"mountAxleAxis");
+    if !vec3_is_native(axle_axis) || axle_axis.x!=1.0 || axle_axis.y!=0.0 || axle_axis.z!=0.0 {
+        return plan_error("bus mount sleeve must follow the radial arm");
+    }
     let clevis_width=f64_from(model.value(own+"mountClevisWidthM"));
     let clevis_height=f64_from(model.value(own+"mountClevisHeightM"));
     let clevis_depth=f64_from(model.value(own+"mountClevisDepthM"));
@@ -3166,7 +3170,7 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
     for item in [
         #{name:"FootPad",center:[0.0,f64_from(model.value(own+"footPadCenterYM")),0.0],
           radius:f64_from(model.value(own+"footPadRadiusM")),height:f64_from(model.value(own+"footPadHeightM")),axis:"Y"},
-        #{name:"MountAxle",center:[0.0,clevis_y,0.0],radius:clevis_height/2.0,height:clevis_width,axis:"Z"}
+        #{name:"MountAxle",center:vec3_array(upper[0]),radius:clevis_height/2.0,height:clevis_width,axis:"X"}
     ] {
         let part=_component_cylinder_visual_ops(doc,edit_target,root,item.name,item.center,(),item.radius,item.height,item.axis,[0.62,0.65,0.69]);
         if !part.ok {return part;}

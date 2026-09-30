@@ -19,7 +19,7 @@ fn leg_source() {
         "Griffin1Requirements::PublicMissionContext::landingVehicleReferenceTouchdownY",
         "Griffin1Requirements::PublicMissionContext::siteSurfaceY"];
     for name in ["usdRootPath", "childNames", "strutAxis", "strutRadiusM",
-        "shockPistonRadiusM", "footPadRadiusM", "footPadHeightM", "footPadCenterYM",
+        "mountAxleAxis", "shockPistonRadiusM", "footPadRadiusM", "footPadHeightM", "footPadCenterYM",
         "physicalLegRotationToleranceDeg", "physicalLegPlacementToleranceM",
         "springLowerLimitM", "springUpperLimitM", "springStiffnessNPerM",
         "springDampingNsPerM", "springMaxForceN", "springTargetVelocityMps",
@@ -174,6 +174,12 @@ fn on_tick(me, ctx) {
     checks.push(sysml_requirement_checks::source_list_count("GLL-001-count", "landing_legs", "gll001", VERIFICATION, visual("landingLegInstances"), count));
     checks.push(sysml_requirement_checks::source_list_count("GLL-005-stations", "landing_leg", "gll005", VERIFICATION, visual("legStations"), count));
     checks.push(sysml_requirement_checks::source_list_count("GLL-009-leg-rotations", "landing_leg", "gll009", VERIFICATION, visual("legStationRotationYDeg"), count));
+    for name in names {
+        let pin=root+"/"+name+"/LandingLegVisual/MountAxle";
+        checks.push(#{id:"GLL-009-"+name+"-mount-sleeve-axis",component:"landing_leg",
+            requirement:"gll009",verification:VERIFICATION,kind:"attribute",
+            path:pin,attr:"axis",expected:usd_axis(sysml_requirements::native_value(source,own("mountAxleAxis")))});
+    }
     let spring_pose = griffin_requirements::landing_gear_spring_pose_report(
         (), root, source, VERIFICATION);
     for check in spring_pose.checks { checks.push(check); }
