@@ -1,6 +1,6 @@
 import "lunco://scripting/tools/assembly_builder" as assembly_builder;
 import "griffin_geometry" as griffin_geometry;
-import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
+import "usd_geometry_inspection" as usd_geometry_inspection;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 // The bus gate evaluates actual composed geometry against typed SysML
@@ -280,6 +280,24 @@ fn outward_quad_face_count(points, counts, indices, beam_count) {
 
 fn bus_checks(doc, source, bus_root) {
     let checks = [];
+    // Bucket vertices are already in the bus component frame; extra instance
+    // transforms would detach the support from its source-defined datums.
+    for name in ["UpperCentralBucket", "LowerCentralBucket"] {
+        let prim = assembly_builder::composed_query(doc, #{path: bus_root + "/" + name, children: false});
+        let error = if _query_ok(prim) { 0.0 } else { () };
+        if error != () {
+            for attr in ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"] {
+                let actual = prim.attrs[attr];
+                if actual == () { continue; }
+                for axis in 0..3 {
+                    let expected = if attr == "xformOp:scale" { 1.0 } else { 0.0 };
+                    error = _max_number(error, (_point_component(actual, axis) - expected).abs());
+                }
+            }
+        }
+        checks.push(_tolerance_constraint("GBC-011-" + name + "-component-datum", "gbc011", error, 0.000001));
+    }
+
     let root = bus_root;
     let model = sysml_model("twin://astrobotic-griffin-1");
     let source_tolerance = sysml_requirements::number(source,

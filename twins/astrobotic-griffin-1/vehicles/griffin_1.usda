@@ -4481,6 +4481,11 @@ def Xform "Griffin1" (
             token lunco:mount:axis = "Z"
             custom rel lunco:mount:part = </Griffin1/EgressRampStarboard>
         }
+        over "UpperCentralBucket"
+        {
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate"]
+        }
     }
     def Xform "TankPX" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@

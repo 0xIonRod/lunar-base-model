@@ -1343,6 +1343,37 @@ fn _griffin_cooked_geometry_is_valid(actual_geometry, expected_vertex_count,
     true
 }
 
+// A convex cook removes duplicate and interior source vertices. Verify its
+// support envelope in all 26 axis/diagonal directions rather than requiring
+// the source mesh's vertex count. Authored topology is checked separately.
+fn _griffin_cooked_hull_matches_points(actual, points, tolerance) {
+    if actual == () || actual.vertices == () || actual.vertices.len() < 4
+        || actual.vertices.len() > points.len()
+        || !_griffin_cooked_geometry_is_valid(actual, actual.vertices.len(), "convexHull") {
+        return false;
+    }
+    for x in -1..2 { for y in -1..2 { for z in -1..2 {
+        if x == 0 && y == 0 && z == 0 { continue; }
+        let wanted = -1.0e30;
+        let observed = -1.0e30;
+        for p in points {
+            let support = _native_vec3_axis(p, 0) * x.to_float()
+                + _native_vec3_axis(p, 1) * y.to_float()
+                + _native_vec3_axis(p, 2) * z.to_float();
+            if support > wanted { wanted = support; }
+        }
+        for p in actual.vertices {
+            let support = _native_vec3_axis(p, 0) * x.to_float()
+                + _native_vec3_axis(p, 1) * y.to_float()
+                + _native_vec3_axis(p, 2) * z.to_float();
+            if support > observed { observed = support; }
+        }
+        let direction_length = (x*x + y*y + z*z).to_float().sqrt();
+        if (wanted - observed).abs() > tolerance * direction_length { return false; }
+    } } }
+    true
+}
+
 /// Measure the nine source-derived colliders from one composed Avian cook.
 /// Eight separate perimeter boxes preserve the central opening.
 fn physical_top_deck_collider_observation(doc, root) {
@@ -1492,8 +1523,8 @@ fn physical_top_deck_collider_observation(doc, root) {
     let adapter_source_linked = adapter_targets != ()
         && adapter_targets.len() == 1
         && adapter_targets[0] == root + "/Bus/RoverPayloadDeck";
-    let adapter_cooked_geometry_matches = _griffin_cooked_geometry_is_valid(
-        adapter.collision_geometry, expected.adapter_points.len(), "convexHull");
+    let adapter_cooked_geometry_matches = _griffin_cooked_hull_matches_points(
+        adapter.collision_geometry, expected.adapter_points, tolerance);
     let source_geometry_linked = all_beams_source_linked && adapter_source_linked;
     let topology_matches = old_hull_removed && expected.ring_beams.len() == 8
         && all_beams_match && all_beam_geometry_matches && adapter_matches
@@ -2579,6 +2610,11 @@ fn _central_bucket_mesh_plan(doc, edit_target, root, name, profile, segments, co
         ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: root,
             name: name, type_name: "Mesh", reference: (), reference_prim_path: ""}});
     }
+    // Profile points already carry their component-frame datums. Rebuilding
+    // must clear an accidental Editor drag instead of double-applying it.
+    ops.push(#{SetTranslate: #{edit_target: edit_target, path: path, value: [0.0, 0.0, 0.0]}});
+    ops.push(#{SetRotate: #{edit_target: edit_target, path: path, value: [0.0, 0.0, 0.0]}});
+    ops.push(#{SetScale: #{edit_target: edit_target, path: path, value: [1.0, 1.0, 1.0]}});
     ops.push(#{RevolveProfileMesh: #{edit_target: edit_target, path: path,
         profile: profile, angular_segments: segments.to_int(), normal_crease_angle_deg: 0.0, display_color: color,
         collision_enabled: false}});
