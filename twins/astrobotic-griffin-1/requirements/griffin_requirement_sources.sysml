@@ -172,6 +172,15 @@ package GriffinRequirementSources {
         attribute locator : SourceLocator = "https://www.astrobotic.com/griffin-1-mission-update/";
     }
 
+    part source_astrobotic_griffin_rendering_2021 : EvidenceSource {
+        doc /* Selected Griffin artist rendering hosted in the February 2021
+         * image directory. Used for paired lattice-track topology and visual
+         * proportions; no member dimensions or structural rating are given.
+         * Detailed stock sizes and bay count are explicit reconstruction estimates. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png";
+    }
+
     part source_www_astrobotic_com_griffin_lander : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/";
@@ -656,7 +665,7 @@ package GriffinRequirementSources {
 
     part evidence_grr_001 : RequirementEvidence {
         ref targetRequirement = GriffinRampRequirements::grr001;
-        ref sources = (source_www_astrobotic_com_griffin_lander, source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml);
+        ref sources = (source_astrobotic_griffin_rendering_2021, source_www_astrobotic_com_griffin_lander, source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml);
     }
 
     part evidence_grr_002 : RequirementEvidence {
@@ -686,7 +695,7 @@ package GriffinRequirementSources {
 
     part evidence_grr_007 : RequirementEvidence {
         ref targetRequirement = GriffinRampRequirements::grr007;
-        ref sources = (source_astrobotic_griffin_1_tools_griffin_visual_builder_rhai, source_astrobotic_griffin_1_tests_griffin_ramp_requirements_rhai);
+        ref sources = (source_astrobotic_griffin_rendering_2021, source_astrobotic_griffin_1_tools_griffin_visual_builder_rhai, source_astrobotic_griffin_1_tests_griffin_ramp_requirements_rhai);
     }
 
     part evidence_grr_008 : RequirementEvidence {
@@ -745,13 +754,13 @@ package GriffinRequirementSources {
 
     part evidence_grr_018 : RequirementEvidence {
         ref targetRequirement = GriffinRampRequirements::grr018;
-        ref sources = (source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml,
+        ref sources = (source_astrobotic_griffin_rendering_2021, source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml,
             source_astrobotic_griffin_1_components_lander_griffin_ramp_section_visual_usda);
     }
 
     part evidence_grr_019 : RequirementEvidence {
         ref targetRequirement = GriffinRampRequirements::grr019;
-        ref sources = (source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml,
+        ref sources = (source_astrobotic_griffin_rendering_2021, source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml,
             source_astrobotic_griffin_1_components_lander_griffin_ramp_section_visual_usda,
             source_astrobotic_griffin_1_tools_griffin_visual_builder_rhai,
             source_astrobotic_griffin_1_research_griffin_1_assumptions_md);

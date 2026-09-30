@@ -159,7 +159,7 @@ fn on_tick(me, ctx) {
         "transitionBody", "transitionContact", "transitionJoints",
         "rampCount", "rampSurfaceLengthM", "rampSectionCount", "rampSectionLengthM",
         "rampSectionGeometryToleranceM", "rampSurfaceWidthM", "rampSurfaceThicknessM",
-        "rampWheelClearanceM", "rampRailHeightM", "rampRailWidthM", "rampRailOffsetZM",
+        "rampWheelClearanceM", "rampRailHeightM", "rampRailWidthM", "rampRailOffsetZM", "rampCenterRailOffsetZM",
         "rampRailJointPinRadiusM", "rampRailJointPinLengthM",
         "maxRailHeightToSectionLength", "maxPivotDiameterToRailHeight",
         "rampSurfaceCenterYM", "rampRailCenterYM", "rampMaxDeploymentAngleRad",
@@ -466,6 +466,8 @@ fn on_tick(me, ctx) {
             for rail in [
                 #{name: "OuterRail", z: _source_number(source, "rampRailOffsetZM")},
                 #{name: "InnerRail", z: -_source_number(source, "rampRailOffsetZM")},
+                #{name: "CenterRailPort", z: _source_number(source, "rampCenterRailOffsetZM")},
+                #{name: "CenterRailStarboard", z: -_source_number(source, "rampCenterRailOffsetZM")},
             ] {
                 let rail_path = section + "/" + rail.name;
                 for dim in [

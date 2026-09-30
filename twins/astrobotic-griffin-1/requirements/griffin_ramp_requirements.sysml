@@ -4,6 +4,7 @@ package GriffinRampRequirements {
     private import ScalarValues::String;
     private import ScalarValues::Boolean;
     private import FlipRequirements::FlipRover;
+    private import FlipCadRequirements::CadStudy;
     private import GriffinRequirementSources::TwinAssetPath;
 
     enum def GriffinRampSectionIdentity {
@@ -302,8 +303,8 @@ package GriffinRampRequirements {
         attribute rampSurfaceThicknessM : Real = 0.030000000000;
         /* Slimmer truss silhouette estimated from the ESA 2022 Griffin artist
          * impression and Astrobotic product rendering, linked in
-         * griffin-size-evidence.md. 0.27 m walking-plane-to-chord-top versus
-         * 1.799 m section length gives depth/length 0.15; prior 0.81 m gave
+         * griffin-size-evidence.md. 0.20 m walking-plane-to-chord-top versus
+         * 1.799 m section length gives depth/length 0.11; prior 0.81 m gave
          * 0.45 and resembled a large handrail. These are render structural
          * proxies, not strength-qualified stock. Ramp mount, length, angle,
          * walking contact and width datums remain unchanged. */
@@ -312,8 +313,9 @@ package GriffinRampRequirements {
          * Astrobotic rendering: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
          * Both show slender triangulated webs and compact pivot fittings.
          * Neither gives stock dimensions. Chords are estimated at 40 mm
-         * (~2.2% of the 1.799 m section length), posts 25 mm and diagonals
-         * 18 mm. 50 mm hinge/pin diameter avoids the previous oversized
+         * (~2.2% of the 1.799 m section length); finer web members are
+         * estimated below using the selected rendering's shorter lattice bays.
+         * 50 mm hinge/pin diameter avoids the previous oversized
          * 240 mm transverse barrels and 160 mm upper pins. These are visual
          * estimates, not calibrated measurements or strength-qualified stock.
          * Under-beam top derives from the revised plate bottom: -.015 m = -.0375+.045/2.
@@ -325,7 +327,16 @@ package GriffinRampRequirements {
         attribute maxPivotDiameterToRailHeight : Real = 1.5;
         attribute rampRailHeightM : Real = 0.04;
         attribute rampRailWidthM : Real = 0.04;
-        attribute rampRailOffsetZM : Real = 1.36;
+        /* Two guide edges per track. Guide inner faces meet the physical
+         * track edges, retaining the source tire clearance. Centre-side
+         * guides mirror the outside ones around the wheel station. The old
+         * outside guides sat 50 mm away from the tracks, leaving unsupported
+         * posts. With 60 mm post depth, each post overlaps the plate by 10 mm.
+         * This paired-track topology is informed by the two-sided lattice
+         * tracks in https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png ;
+         * member stock and attachments remain unqualified study estimates. */
+        attribute rampRailOffsetZM : Real = CadStudy::trackMm / (2.0 * CadStudy::millimetresPerMetre) + GriffinEgressRamp::assemblyTrackWidthM / 2.0 + GriffinEgressRamp::rampRailWidthM / 2.0;
+        attribute rampCenterRailOffsetZM : Real = CadStudy::trackMm / (2.0 * CadStudy::millimetresPerMetre) - GriffinEgressRamp::assemblyTrackWidthM / 2.0 - GriffinEgressRamp::rampRailWidthM / 2.0;
         attribute rampRailJointPinRadiusM : Real = 0.025;
         attribute rampRailJointPinLengthM : Real = 0.10;
         // Separate traction bars on each wheel track leave the centre open.
@@ -345,25 +356,32 @@ package GriffinRampRequirements {
         attribute assemblyTreadPitchM : Real = 0.449771013;
         // A full-scale ramp needs a visible load path below the walking
         // surface. These are presentation-level structural proxies, not a
-        // supplier drawing: two longitudinal beams sit just below the deck,
-        // The source-owned section geometry uses two underside beams and three
+        // supplier drawing. Two longitudinal beams sit just below the deck.
+        // The source-owned section geometry uses two underside beams and eleven
         // upright posts per edge rail on every rigid ramp section.
         attribute assemblyUnderBeamWidthM : Real = 0.06;
         attribute assemblyUnderBeamHeightM : Real = 0.045;
         attribute assemblyUnderBeamCenterYM : Real = -0.037500000000;
         attribute assemblyUnderBeamCenterOffsetZM : Real = 1.20;
-        attribute assemblySidePostCountPerSectionPerSide : Integer = 3;
-        attribute assemblySidePostWidthM : Real = 0.025;
-        attribute assemblySidePostDepthM : Real = 0.025;
+        /* Equal bays replace long shallow diagonals. Twelve bays per 1.799 m
+         * section give about 150 mm pitch against 125 mm web depth, approaching
+         * the near-square triangular lattice seen in the selected 2021 image.
+         * Count is estimated from an oblique rendering, not measured hardware.
+         * 12 mm uprights, 10 mm diagonals and 25 mm lower chords are silhouette
+         * estimates; the 40 mm upper guard remains the collision boundary.
+         * No structural load capacity is claimed by these visual dimensions. */
+        attribute assemblySidePostCountPerSectionPerSide : Integer = 11;
+        attribute assemblySidePostWidthM : Real = 0.012;
+        attribute assemblySidePostDepthM : Real = 0.06;
         attribute assemblySidePostEmbeddedDepthM : Real = 0.04;
-        attribute assemblySidePostFirstCenterXM : Real = 0.224885507;
-        attribute assemblySidePostPitchM : Real = 0.674656520;
-        attribute assemblySideTrussChordHeightM : Real = 0.035;
+        attribute assemblySidePostFirstCenterXM : Real = GriffinEgressRamp::assemblySidePostPitchM;
+        attribute assemblySidePostPitchM : Real = GriffinEgressRamp::rampSectionLengthM / (GriffinEgressRamp::assemblySidePostCountPerSectionPerSide + 1.0);
+        attribute assemblySideTrussChordHeightM : Real = 0.025;
         attribute assemblySideTrussLowerChordCenterYM : Real = 0.055000000000;
-        attribute assemblySideTrussBraceThicknessM : Real = 0.018;
-        attribute assemblySideTrussBraceCountPerSide : Integer = 4;
+        attribute assemblySideTrussBraceThicknessM : Real = 0.010;
+        attribute assemblySideTrussBraceCountPerSide : Integer = 12;
         attribute rampSectionHingeBarrelRadiusM : Real = 0.025;
-        attribute rampSectionHingeBarrelLengthM : Real = 2.86;
+        attribute rampSectionHingeBarrelLengthM : Real = 2.0 * (GriffinEgressRamp::rampRailOffsetZM + GriffinEgressRamp::rampRailWidthM / 2.0);
         // Root shaft is on the physical deck axis. Middle shaft derives
         // from chord top; toe shaft from plate bottom, matching joint datums.
         attribute rampSectionHingeBarrelCenterYM : Real = 0.0;
@@ -516,7 +534,7 @@ package GriffinRampRequirements {
     }
 
     requirement def GRR001_RampTopology {
-        doc /* Each egress ramp shall be a replaceable component attached at the Griffin upper deck. It shall provide two FLIP-aligned contact tracks separated by an open centre, two top-mounted edge rails, and three rigid sections connected in series. */
+        doc /* Each egress ramp shall be a replaceable component attached at the Griffin upper deck. It shall provide two FLIP-aligned contact tracks separated by an open centre, four top-mounted guide rails (two per track), and three rigid sections connected in series. */
     }
 
     requirement def GRR002_RampHinge {
@@ -555,10 +573,10 @@ package GriffinRampRequirements {
         doc /* Port and starboard egress ramps shall be independently addressable component instances that share the same section geometry source and use mirrored deck mounting stations. */
     }
     requirement def GRR008_RailGeometry {
-        doc /* Both edge rails shall start at the upper-deck hinge, sit above the walking surface, and continue to the toe as one rail segment per rigid ramp section. A visible pivot fitting shall join each rail segment at the deck hinge and at both section hinges. Pin centers shall coincide with the ramp hinge line, and each segment shall match its section length and source-owned rail envelope. */
+        doc /* Both guide edges of each contact track shall start at the upper-deck hinge, sit above the walking surface, and continue to the toe as one rail segment per rigid ramp section. A visible pivot fitting shall join each rail segment at the deck hinge and at both section hinges. Pin centers shall coincide with the ramp hinge line, and each segment shall match its section length and source-owned rail envelope. */
     }
     requirement def GRR009_RailSupportGeometry {
-        doc /* Each section shall connect both upper edge rails to the walking surface with three evenly spaced upright posts per side. Posts shall align with the rail stations and overlap the walking surface and rail so the supports visibly and structurally connect both members. Post height and center shall be derived from the authored surface, rail, and embedment datums. */
+        doc /* Each section shall connect all four upper guide rails to the walking surface with eleven evenly spaced upright posts per side. Posts shall align with the rail stations and overlap the walking surface and rail so the supports visibly and structurally connect both members. Post height and center shall be derived from the authored surface, rail, and embedment datums. */
     }
     requirement def GRR013_TractionTreadGeometry {
         doc /* Each contact track shall have four transverse traction bars on every ramp section. Bars shall span one track, sit above its walking surface, and use the source-owned first station and pitch. The open centre remains clear. */
@@ -614,7 +632,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR018_RailsAboveWalkingSurface {
-        doc /* Each physical section's paired upper chords shall remain above the walking surface with source-owned clearance and continuous upright supports. This preserves the top-side rail orientation when the sections are raised for descent and when lowered for egress. */
+        doc /* Each physical section's four upper chords shall remain above the walking surface with source-owned clearance and continuous upright supports. This preserves the top-side rail orientation when the sections are raised for descent and when lowered for egress. */
         require GRC023_RailsRemainOnUpperTrackFace {
             in railCenterYM = GriffinEgressRamp::rampRailCenterYM;
             in railHeightM = GriffinEgressRamp::rampRailHeightM;
@@ -624,7 +642,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR019_SideTrussBracing {
-        doc /* Each physical ramp section shall show a triangulated side truss on both sides: four alternating diagonal braces connect the track level to the upper chords around the three upright post stations, over continuous lower chords. Member sizes and stations are explicit visual study values because the supplier truss drawing is not public. */
+        doc /* Each physical ramp section shall show a triangulated side truss on both edges of each contact track: twelve alternating diagonal braces connect the track level to the upper chords around the eleven equally spaced upright post stations, over continuous lower chords. Member sizes and stations are explicit visual study values because the supplier truss drawing is not public. */
         require GRC026_SideTrussBracing {
             in braceCountPerSide = GriffinEgressRamp::assemblySideTrussBraceCountPerSide;
             in postCountPerSide = GriffinEgressRamp::assemblySidePostCountPerSectionPerSide;

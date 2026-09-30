@@ -11,7 +11,7 @@ def Xform "RampToeSection" (
 )
 {
     custom token lunco:component:role = "Griffin articulated egress ramp toe section"
-    custom token lunco:ramp:section:identity = "section"
+    custom token lunco:ramp:section:identity = "ToeSection"
     over Mesh "RampTrackPort" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
     )
@@ -46,15 +46,21 @@ def Xform "RampToeSection" (
     }
     over "OuterRail"
     {
-        custom double3 xformOp:translate = (0.899542027, 0.18, 1.36)
+        custom double3 xformOp:translate = (0.899542027, 0.18, 1.31)
         custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = true
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     over "InnerRail"
     {
-        custom double3 xformOp:translate = (0.899542027, 0.18, -1.36)
+        custom double3 xformOp:translate = (0.899542027, 0.18, -1.31)
         custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = true
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     def "OuterRailJointPin" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -66,7 +72,7 @@ def Xform "RampToeSection" (
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
-        custom double3 xformOp:translate = (0.0, 0.18, 1.36)
+        custom double3 xformOp:translate = (0.0, 0.18, 1.31)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
     }
@@ -80,7 +86,7 @@ def Xform "RampToeSection" (
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
-        custom double3 xformOp:translate = (0.0, 0.18, -1.36)
+        custom double3 xformOp:translate = (0.0, 0.18, -1.31)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
     }
@@ -95,110 +101,6 @@ def Xform "RampToeSection" (
         custom double3 xformOp:translate = (0.899542027, -0.0375, -1.2)
         custom double3 xformOp:scale = (1.799084054, 0.045, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-    }
-    over "SidePostPort1"
-    {
-        custom double3 xformOp:translate = (0.224885507, 0.0875, 1.36)
-        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-    }
-    over "SidePostPort2"
-    {
-        custom double3 xformOp:translate = (0.899542027, 0.0875, 1.36)
-        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-    }
-    over "SidePostPort3"
-    {
-        custom double3 xformOp:translate = (1.574198547, 0.0875, 1.36)
-        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-    }
-    over "SideTrussLowerChordPort"
-    {
-        custom double3 xformOp:translate = (0.899542027, 0.055, 1.36)
-        custom double3 xformOp:scale = (1.799084054, 0.035, 0.035)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-    }
-    over "SideTrussBracePort1"
-    {
-        custom double3 xformOp:translate = (0.1124427535, 0.1175, 1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 29.06698620733784)
-        custom double3 xformOp:scale = (0.2572906746437714, 0.018, 0.018)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-    }
-    over "SideTrussBracePort2"
-    {
-        custom double3 xformOp:translate = (0.562213767, 0.1175, 1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -10.496699728868869)
-        custom double3 xformOp:scale = (0.6861387760347832, 0.018, 0.018)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-    }
-    over "SideTrussBracePort3"
-    {
-        custom double3 xformOp:translate = (1.236870287, 0.1175, 1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 10.496699728868869)
-        custom double3 xformOp:scale = (0.6861387760347832, 0.018, 0.018)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-    }
-    over "SideTrussBracePort4"
-    {
-        custom double3 xformOp:translate = (1.6866413004999998, 0.1175, 1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -29.06698620733784)
-        custom double3 xformOp:scale = (0.2572906746437714, 0.018, 0.018)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-    }
-    over "SidePostStarboard1"
-    {
-        custom double3 xformOp:translate = (0.224885507, 0.0875, -1.36)
-        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-    }
-    over "SidePostStarboard2"
-    {
-        custom double3 xformOp:translate = (0.899542027, 0.0875, -1.36)
-        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-    }
-    over "SidePostStarboard3"
-    {
-        custom double3 xformOp:translate = (1.574198547, 0.0875, -1.36)
-        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-    }
-    over "SideTrussLowerChordStarboard"
-    {
-        custom double3 xformOp:translate = (0.899542027, 0.055, -1.36)
-        custom double3 xformOp:scale = (1.799084054, 0.035, 0.035)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-    }
-    over "SideTrussBraceStarboard1"
-    {
-        custom double3 xformOp:translate = (0.1124427535, 0.1175, -1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 29.06698620733784)
-        custom double3 xformOp:scale = (0.2572906746437714, 0.018, 0.018)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-    }
-    over "SideTrussBraceStarboard2"
-    {
-        custom double3 xformOp:translate = (0.562213767, 0.1175, -1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -10.496699728868869)
-        custom double3 xformOp:scale = (0.6861387760347832, 0.018, 0.018)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-    }
-    over "SideTrussBraceStarboard3"
-    {
-        custom double3 xformOp:translate = (1.236870287, 0.1175, -1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 10.496699728868869)
-        custom double3 xformOp:scale = (0.6861387760347832, 0.018, 0.018)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-    }
-    over "SideTrussBraceStarboard4"
-    {
-        custom double3 xformOp:translate = (1.6866413004999998, 0.1175, -1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -29.06698620733784)
-        custom double3 xformOp:scale = (0.2572906746437714, 0.018, 0.018)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
     }
     over "TreadPort1"
     {
@@ -251,10 +153,28 @@ def Xform "RampToeSection" (
     def "HingeBarrel"
     {
         double radius = 0.025
-        double height = 2.86
+        double height = 2.66
         uniform token axis = "Z"
         custom double3 xformOp:translate = (0.0, -0.015, 0.0)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    over "CenterRailPort"
+    {
+        custom double3 xformOp:translate = (0.899542027, 0.18, 0.69)
+        custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = true
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+    }
+    over "CenterRailStarboard"
+    {
+        custom double3 xformOp:translate = (0.899542027, 0.18, -0.69)
+        custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = true
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
 }

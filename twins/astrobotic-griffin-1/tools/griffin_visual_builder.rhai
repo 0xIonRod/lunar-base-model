@@ -4476,8 +4476,20 @@ fn _ramp_section_track_topology() {
 // component is a topology template; all dimensions, stations, and toe bevel
 // are written from the canonical requirement source before the section is
 // accepted by the Editor plan.
+// Contact/guard geometry and each repeated side lattice are separate Editor
+// tasks. Reconcile the four truss groups on the reusable component before
+// assembly placement; the default plan owns the base interface geometry.
 fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     section_name, section_length, section_index, deployment_angle) {
+    _isolated_ramp_section_geometry_ops(doc,edit_target,section_path,section_name,
+        section_length,section_index,deployment_angle,"base")
+}
+
+fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
+    section_name, section_length, section_index, deployment_angle, member_group) {
+    if !["base","Port","Starboard","PortCenter","StarboardCenter"].contains(member_group) {
+        return plan_error("unknown ramp member group: "+member_group);
+    }
     // All required values are revision-pinned typed reads through griffin_spec.
     let source = ();
     let section_count = griffin_spec::ramp_section_count();
@@ -4489,6 +4501,8 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     let rail_width = _sysml_number(source, "rampRailWidthM");
     let rail_y = _sysml_number(source, "rampRailCenterYM");
     let rail_z = _sysml_number(source, "rampRailOffsetZM");
+    let center_rail_z = _sysml_number(source,"rampCenterRailOffsetZM");
+    let structure_color=sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::silverDisplayColor");
     let rail_pin_names = griffin_spec::ramp_rail_joint_pin_names();
     let rail_pin_radius = griffin_spec::ramp_rail_joint_pin_radius_m();
     let rail_pin_length = griffin_spec::ramp_rail_joint_pin_length_m();
@@ -4521,7 +4535,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     let invalid_dimensions = section_length <= 0.0 || total_length == ()
         || thickness == () || surface_y == () || track_width == ();
     let invalid_rail_geometry = rail_height == () || rail_width == ()
-        || rail_y == () || rail_z == ();
+        || rail_y == () || rail_z == () || center_rail_z == () || center_rail_z<=0.0;
     let invalid_rail_pins = rail_pin_names.len() != 2 || rail_pin_radius == ()
         || rail_pin_length == ();
     let invalid_tread_count = tread_count <= 0 || tread_names.len() != tread_count
@@ -4572,131 +4586,137 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     let points = _ramp_section_track_points(section_length, thickness, track_width, toe_bevel);
     let topology = _ramp_section_track_topology();
     let ops = [];
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: section_path,
-        name: "lunco:ramp:section:identity", type_name: "token",
-        value: "\"" + section_name + "\""}});
+    if member_group=="base" {
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: section_path,
+            name: "lunco:ramp:section:identity", type_name: "token",
+            value: "\"" + section_name + "\""}});
 
-    for track in [
-        #{name: "RampTrackPort", center_z: half_track},
-        #{name: "RampTrackStarboard", center_z: -half_track},
-    ] {
-        let track_path = section_path + "/" + track.name;
-        let member = assembly_builder::composed_query(doc,
-            #{path: track_path, children: false});
-        if !query_ok(member) || member.type_name != "Mesh" {
-            return plan_error(track_path + ": section contact-track mesh is missing");
-        }
-        let geometry = assembly_builder::mesh_geometry_update_plan(
-            edit_target, track_path, points,
-            topology.face_counts, topology.face_indices);
-        if !geometry.ok { return geometry; }
-        for op in geometry.ops { ops.push(op); }
-        ops.push(#{SetApiSchemas: #{edit_target: edit_target,
-            path: track_path,
-            schemas: ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]}});
-        for item in [
-            #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
-            #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
-            #{name: "purpose", type_name: "token", value: "\"default\""},
-            #{name: "visibility", type_name: "token", value: "\"inherited\""},
-            #{name: "primvars:displayColor", type_name: "color3f[]",
-              value:_color_literal(sysml_requirements::model().value("GriffinRampRequirements::GriffinEgressRamp::rampTrackDisplayColor"))},
+        for track in [
+            #{name: "RampTrackPort", center_z: half_track},
+            #{name: "RampTrackStarboard", center_z: -half_track},
         ] {
-            ops.push(#{SetAttribute: #{edit_target: edit_target, path: track_path,
-                name: item.name, type_name: item.type_name, value: item.value}});
+            let track_path = section_path + "/" + track.name;
+            let member = assembly_builder::composed_query(doc,
+                #{path: track_path, children: false});
+            if !query_ok(member) || member.type_name != "Mesh" {
+                return plan_error(track_path + ": section contact-track mesh is missing");
+            }
+            let geometry = assembly_builder::mesh_geometry_update_plan(
+                edit_target, track_path, points,
+                topology.face_counts, topology.face_indices);
+            if !geometry.ok { return geometry; }
+            for op in geometry.ops { ops.push(op); }
+            ops.push(#{SetApiSchemas: #{edit_target: edit_target,
+                path: track_path,
+                schemas: ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]}});
+            for item in [
+                #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
+                #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
+                #{name: "purpose", type_name: "token", value: "\"default\""},
+                #{name: "visibility", type_name: "token", value: "\"inherited\""},
+                #{name: "primvars:displayColor", type_name: "color3f[]",
+                  value:_color_literal(sysml_requirements::model().value("GriffinRampRequirements::GriffinEgressRamp::rampTrackDisplayColor"))},
+            ] {
+                ops.push(#{SetAttribute: #{edit_target: edit_target, path: track_path,
+                    name: item.name, type_name: item.type_name, value: item.value}});
+            }
+            let placement = assembly_builder::place_plan(edit_target, track_path,
+                [0.0, surface_y, track.center_z], (), [1.0, 1.0, 1.0]);
+            if !placement.ok { return placement; }
+            for op in placement.ops { ops.push(op); }
         }
-        let placement = assembly_builder::place_plan(edit_target, track_path,
-            [0.0, surface_y, track.center_z], (), [1.0, 1.0, 1.0]);
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
-    }
 
-    for rail in [
-        #{name: "OuterRail", z: rail_z},
-        #{name: "InnerRail", z: -rail_z},
-    ] {
-        let rail_path = section_path + "/" + rail.name;
-        let placement = assembly_builder::place_plan(edit_target, rail_path,
-            [section_length / 2.0, rail_y, rail.z], (),
-            [section_length, rail_height, rail_width]);
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
-    }
-
-    // Each section begins at either the deck pivot or an intermediate pivot.
-    // Place the two edge-rail fittings on that same line so the rail assembly
-    // visibly follows all three revolute joints.
-    for index in 0..rail_pin_names.len() {
-        let pin_name = rail_pin_names[index];
-        let pin_path = section_path + "/" + pin_name;
-        let pin = assembly_builder::composed_query(doc,
-            #{path: pin_path, children: false});
-        if query_ok(pin) && pin.type_name != "Cylinder" {
-            return plan_error(pin_path + ": upper-rail pivot fitting must be a Cylinder");
-        }
-        if !query_ok(pin) {
-            ops.push(#{AddPrim: #{edit_target: edit_target,
-                parent_path: section_path, name: pin_name,
-                type_name: "Cylinder", reference: (),
-                reference_prim_path: ""}});
-        }
-        let pin_z = if pin_name == "OuterRailJointPin" { rail_z } else { -rail_z };
-        ops.push(#{SetApiSchemas: #{edit_target: edit_target,
-            path: pin_path,
-            schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
-        for item in [
-            #{name: "radius", type_name: "double", value: rail_pin_radius.to_string()},
-            #{name: "height", type_name: "double", value: rail_pin_length.to_string()},
-            #{name: "axis", type_name: "token", value: "\"Z\""},
-            #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
-            #{name: "purpose", type_name: "token", value: "\"render\""},
-            #{name: "primvars:displayColor", type_name: "color3f[]",
-              value: "[(0.58, 0.62, 0.67)]"},
+        for rail in [
+            #{name: "OuterRail", z: rail_z},
+            #{name: "InnerRail", z: -rail_z},
+            #{name: "CenterRailPort", z: center_rail_z},
+            #{name: "CenterRailStarboard", z: -center_rail_z},
         ] {
-            ops.push(#{SetAttribute: #{edit_target: edit_target, path: pin_path,
-                name: item.name, type_name: item.type_name, value: item.value}});
+            let rail_path = section_path + "/" + rail.name;
+            let placement = _component_cube_visual_ops(doc,edit_target,section_path,rail.name,
+                [section_length / 2.0, rail_y, rail.z], (),
+                [section_length, rail_height, rail_width],structure_color);
+            if !placement.ok { return placement; }
+            for op in placement.ops { ops.push(op); }
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:rail_path,
+                name:"physics:collisionEnabled",type_name:"bool",value:"true"}});
         }
-        let pin_placement = assembly_builder::place_plan(edit_target, pin_path,
-            [0.0, rail_y, pin_z], (), [1.0, 1.0, 1.0]);
-        if !pin_placement.ok { return pin_placement; }
-        for op in pin_placement.ops { ops.push(op); }
-    }
 
-    for beam in [
-        #{name: "UnderBeamPort", z: beam_z},
-        #{name: "UnderBeamStarboard", z: -beam_z},
-    ] {
-        let beam_path = section_path + "/" + beam.name;
-        let placement = assembly_builder::place_plan(edit_target, beam_path,
-            [section_length / 2.0, beam_y, beam.z],
-            (), [section_length, beam_height, beam_width]);
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
+        // Each section begins at either the deck pivot or an intermediate pivot.
+        // Place the two edge-rail fittings on that same line so the rail assembly
+        // visibly follows all three revolute joints.
+        for index in 0..rail_pin_names.len() {
+            let pin_name = rail_pin_names[index];
+            let pin_path = section_path + "/" + pin_name;
+            let pin = assembly_builder::composed_query(doc,
+                #{path: pin_path, children: false});
+            if query_ok(pin) && pin.type_name != "Cylinder" {
+                return plan_error(pin_path + ": upper-rail pivot fitting must be a Cylinder");
+            }
+            if !query_ok(pin) {
+                ops.push(#{AddPrim: #{edit_target: edit_target,
+                    parent_path: section_path, name: pin_name,
+                    type_name: "Cylinder", reference: (),
+                    reference_prim_path: ""}});
+            }
+            let pin_z = if pin_name == "OuterRailJointPin" { rail_z } else { -rail_z };
+            ops.push(#{SetApiSchemas: #{edit_target: edit_target,
+                path: pin_path,
+                schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
+            for item in [
+                #{name: "radius", type_name: "double", value: rail_pin_radius.to_string()},
+                #{name: "height", type_name: "double", value: rail_pin_length.to_string()},
+                #{name: "axis", type_name: "token", value: "\"Z\""},
+                #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
+                #{name: "purpose", type_name: "token", value: "\"render\""},
+                #{name: "primvars:displayColor", type_name: "color3f[]",
+                  value: "[(0.58, 0.62, 0.67)]"},
+            ] {
+                ops.push(#{SetAttribute: #{edit_target: edit_target, path: pin_path,
+                    name: item.name, type_name: item.type_name, value: item.value}});
+            }
+            let pin_placement = assembly_builder::place_plan(edit_target, pin_path,
+                [0.0, rail_y, pin_z], (), [1.0, 1.0, 1.0]);
+            if !pin_placement.ok { return pin_placement; }
+            for op in pin_placement.ops { ops.push(op); }
+        }
+
+        for beam in [
+            #{name: "UnderBeamPort", z: beam_z},
+            #{name: "UnderBeamStarboard", z: -beam_z},
+        ] {
+            let beam_path = section_path + "/" + beam.name;
+            let placement = assembly_builder::place_plan(edit_target, beam_path,
+                [section_length / 2.0, beam_y, beam.z],
+                (), [section_length, beam_height, beam_width]);
+            if !placement.ok { return placement; }
+            for op in placement.ops { ops.push(op); }
+        }
+
     }
 
     for post_side in [
         #{name: "Port", z: rail_z},
         #{name: "Starboard", z: -rail_z},
+        #{name: "PortCenter", z: center_rail_z},
+        #{name: "StarboardCenter", z: -center_rail_z},
     ] {
+        if member_group!=post_side.name {continue;}
         for index in 0..post_count {
             let post_path = section_path + "/SidePost" + post_side.name
                 + (index + 1).to_string();
-            let placement = assembly_builder::place_plan(edit_target, post_path,
+            let placement = _component_cube_visual_ops(doc,edit_target,section_path,
+                "SidePost"+post_side.name+(index+1).to_string(),
                 [post_first_x + post_pitch * index, post_y, post_side.z],
-                (), [post_width, post_height, post_depth]);
+                (), [post_width, post_height, post_depth],structure_color);
             if !placement.ok { return placement; }
             for op in placement.ops { ops.push(op); }
         }
 
-        let lower_chord_path = section_path + "/SideTrussLowerChord" + post_side.name;
-        let lower_chord = assembly_builder::composed_query(doc,
-            #{path: lower_chord_path, children: false});
-        if !query_ok(lower_chord) || lower_chord.type_name != "Cube" {
-            return plan_error(lower_chord_path + ": source-owned truss lower chord is missing");
-        }
-        let lower_chord_place = assembly_builder::place_plan(edit_target, lower_chord_path,
+        let lower_chord_place = _component_cube_visual_ops(doc,edit_target,section_path,
+            "SideTrussLowerChord"+post_side.name,
             [section_length / 2.0, truss_lower_chord_y, post_side.z], (),
-            [section_length, truss_chord_height, truss_chord_height]);
+            [section_length, truss_chord_height, truss_chord_height],structure_color);
         if !lower_chord_place.ok { return lower_chord_place; }
         for op in lower_chord_place.ops { ops.push(op); }
 
@@ -4705,7 +4725,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
                 else { post_first_x + post_pitch * (brace_index - 1) };
             let x1 = if brace_index == truss_brace_count - 1 { section_length }
                 else { post_first_x + post_pitch * brace_index };
-            let start_low = brace_index == 0 || brace_index == 2;
+            let start_low = brace_index % 2 == 0;
             let y0 = if start_low { truss_lower_chord_y } else { rail_y };
             let y1 = if start_low { rail_y } else { truss_lower_chord_y };
             let dx = x1 - x0;
@@ -4713,58 +4733,56 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             let brace_length = (dx * dx + dy * dy).sqrt();
             let brace_angle = (dy / dx).atan() * 180.0 / 3.141592653589793;
             let brace_name = "SideTrussBrace" + post_side.name + (brace_index + 1).to_string();
-            let brace_path = section_path + "/" + brace_name;
-            let brace = assembly_builder::composed_query(doc,
-                #{path: brace_path, children: false});
-            if !query_ok(brace) || brace.type_name != "Cube" {
-                return plan_error(brace_path + ": source-owned truss brace is missing");
-            }
-            let brace_place = assembly_builder::place_plan(edit_target, brace_path,
+            let brace_place = _component_cube_visual_ops(doc,edit_target,section_path,brace_name,
                 [(x0 + x1) / 2.0, (y0 + y1) / 2.0, post_side.z],
                 [0.0, 0.0, brace_angle],
-                [brace_length, truss_brace_thickness, truss_brace_thickness]);
+                [brace_length, truss_brace_thickness, truss_brace_thickness],structure_color);
             if !brace_place.ok { return brace_place; }
             for op in brace_place.ops { ops.push(op); }
         }
     }
 
-    for track in [
-        #{name: "Port", center_z: half_track},
-        #{name: "Starboard", center_z: -half_track},
-    ] {
-        for index in 0..tread_count {
-            let tread_path = section_path + "/Tread" + track.name
-                + (index + 1).to_string();
-            let tread_y = thickness / 2.0 + tread_height / 2.0;
-            let placement = assembly_builder::place_plan(edit_target, tread_path,
-                [tread_first_x + tread_pitch * index, tread_y, track.center_z],
-                (), [tread_width, tread_height, track_width]);
-            if !placement.ok { return placement; }
-            for op in placement.ops { ops.push(op); }
+    if member_group=="base" {
+        for track in [
+            #{name: "Port", center_z: half_track},
+            #{name: "Starboard", center_z: -half_track},
+        ] {
+            for index in 0..tread_count {
+                let tread_path = section_path + "/Tread" + track.name
+                    + (index + 1).to_string();
+                let tread_y = thickness / 2.0 + tread_height / 2.0;
+                let placement = assembly_builder::place_plan(edit_target, tread_path,
+                    [tread_first_x + tread_pitch * index, tread_y, track.center_z],
+                    (), [tread_width, tread_height, track_width]);
+                if !placement.ok { return placement; }
+                for op in placement.ops { ops.push(op); }
+            }
         }
-    }
 
-    let hinge_path = section_path + "/HingeBarrel";
-    for item in [
-        #{name: "radius", type_name: "double", value: hinge_radius.to_string()},
-        #{name: "height", type_name: "double", value: hinge_length.to_string()},
-        #{name: "axis", type_name: "token", value: "\"Z\""},
-    ] {
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: hinge_path,
-            name: item.name, type_name: item.type_name, value: item.value}});
+        let hinge_path = section_path + "/HingeBarrel";
+        for item in [
+            #{name: "radius", type_name: "double", value: hinge_radius.to_string()},
+            #{name: "height", type_name: "double", value: hinge_length.to_string()},
+            #{name: "axis", type_name: "token", value: "\"Z\""},
+        ] {
+            ops.push(#{SetAttribute: #{edit_target: edit_target, path: hinge_path,
+                name: item.name, type_name: item.type_name, value: item.value}});
+        }
+        let hinge_place = assembly_builder::place_plan(edit_target, hinge_path,
+            [0.0, hinge_y, 0.0], (), [1.0, 1.0, 1.0]);
+        if !hinge_place.ok { return hinge_place; }
+        for op in hinge_place.ops { ops.push(op); }
+
     }
-    let hinge_place = assembly_builder::place_plan(edit_target, hinge_path,
-        [0.0, hinge_y, 0.0], (), [1.0, 1.0, 1.0]);
-    if !hinge_place.ok { return hinge_place; }
-    for op in hinge_place.ops { ops.push(op); }
 
     #{ok: true, kind: "griffin_ramp_section_geometry",
       path: section_path, section: section_name, section_index: section_index,
-      section_length_m: section_length, toe_bevel_m: toe_bevel,
+      section_length_m: section_length, toe_bevel_m: toe_bevel, member_group: member_group,
       contact_track_paths: [section_path + "/RampTrackPort",
           section_path + "/RampTrackStarboard"],
       ops: ops, no_op: ops.len() == 0}
 }
+
 
 // Reconcile the three inherited section instances in the reusable visual
 // assembly and materialize their geometry from the SysML source.

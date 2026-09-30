@@ -114,7 +114,7 @@ fn _qualified_attribute(name) {
         "treadInstances", "railJointPinInstances", "transitionBody", "transitionContact", "transitionJoints",
         "rampSectionCount", "rampSectionLengthM", "rampSectionGeometryToleranceM",
         "rampWheelClearanceM", "rampSurfaceThicknessM", "rampRailHeightM",
-        "rampRailWidthM", "rampRailOffsetZM", "rampRailJointPinRadiusM",
+        "rampRailWidthM", "rampRailOffsetZM", "rampCenterRailOffsetZM", "rampRailJointPinRadiusM",
         "rampRailJointPinLengthM", "rampSurfaceCenterYM", "rampRailCenterYM",
         "rampMaxDeploymentAngleRad",
         "rampPortMountX", "rampStarboardMountX", "rampMountY", "rampMountZ",
