@@ -121,15 +121,16 @@ Acceptance checks:
 ## Historical simulator integration findings (2026-09-01 capture)
 
 The FreeCAD file is not imported directly by LunCoSim. A historical 2026-09-01
-capture describes a project asset path that exported `Part::Feature` geometry
-to OBJ, used Blender to scale millimetres to metres and normalize up-axis,
-wrote GLB, and composed it through USD. That exporter file is not present in
-this checkout; locate the current supported asset pipeline and verify its
-units/axis behavior before use. Do not select an FCStd by modification time or
-duplicate the visual under both FreeCAD and USD. The GLB is visual-only; USD and
-Modelica own collision, joints, mass, and behavior. The saved v5 CAD is already
-globally X-lateral/Y-up/Z-forward, in mm, but exporter behavior still needs a
-round-trip check.
+capture describes an older OBJ/GLB asset path that is absent from this checkout.
+The current [`freecad/flip_rover_v5/export_v5_usd.py`](../freecad/flip_rover_v5/export_v5_usd.py)
+creates [`FLIP_rover_v5.usdc`](../freecad/flip_rover_v5/FLIP_rover_v5.usdc) as
+a standalone, visual-only snapshot, with saved global transforms baked into
+mesh points and one mm-to-m conversion. Its OpenUSD structure, wheel station
+datums, colors and bounds were validated; it has not been composed or tested in
+the LunCoSim runtime. Do not select an FCStd by modification time or duplicate
+the visual under both FreeCAD and USD. USD and Modelica still own collision,
+joints, mass and behavior separately from this render asset.
+
 
 Confirmed runtime issues from the 2026-09-01 capture:
 
@@ -188,7 +189,7 @@ Historical Modelica import issue and fix:
   proxy, EPS, thermal, and sensor composition.
 - `freecad/FLIP_Rover.py` — current reference-inspired FreeCAD packaging macro
   with closed/deployed solar-panel articulation.
-- The 2026-09-01 runtime note mentions `tools/freecad/export_twin_assets_v2.py`; that historical exporter file is absent from this checkout and its current replacement must be located/verified before asset import.
+- The 2026-09-01 runtime note mentions `tools/freecad/export_twin_assets_v2.py`; that historical exporter file is absent. The standalone v5 exporter creates a validated visual USD snapshot, while composition into LunCoSim still requires the supported typed asset workflow and a runtime import check.
 - `luncosim-griffin-1/logs/griffin-1-open-cadfix.err.log` — current runtime
   warnings and recovery evidence.
 - Astrolab FLIP: https://www.astrolab.space/flip-rover/

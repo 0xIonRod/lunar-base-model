@@ -1,0 +1,93 @@
+{
+  "exported_utc": "2026-09-30T13:46:35.967444+00:00",
+  "source_file": "FLIP_rover_v5.FCStd",
+  "source_sha256": "af57d7e22f943f39bc1380663888adb8d8b18d0d35fa93464c2e75f69e24285b",
+  "usd_file": "FLIP_rover_v5.usdc",
+  "usd_format": "USDC binary, self-contained",
+  "stage_up_axis": "Y",
+  "stage_meters_per_unit": 1.0,
+  "source_linear_units": "mm",
+  "linear_scale_mm_to_m": 0.001,
+  "source_global_transforms": "baked into mesh point positions once",
+  "component_transforms": "organizational Xform hierarchy; mesh points are in global stage coordinates",
+  "geometry_role": "visual-only; no collision, mass, physics, or articulated runtime joint",
+  "tessellation_linear_deflection_mm": {
+    "general_geometry": 1.0,
+    "wheel_cable_and_spring_details": 2.0
+  },
+  "normal_policy": "per-face normals omitted; USD consumers derive triangle normals",
+  "mesh_count": 195,
+  "point_count": 4857504,
+  "triangle_count": 9710460,
+  "exact_source_bounds_mm": [
+    -1166.0,
+    -1.7053025658242404e-13,
+    -1315.0,
+    1166.0,
+    2634.3107098991763,
+    1315.0
+  ],
+  "tessellated_bounds_m": [
+    [
+      -1.1660000085830688,
+      -1.705302580647317e-16,
+      -1.3148554563522339
+    ],
+    [
+      1.1660000085830688,
+      2.634310722351074,
+      1.3148554563522339
+    ]
+  ],
+  "tessellated_dimensions_m": [
+    2.3320000171661377,
+    2.634310722351074,
+    2.6297109127044678
+  ],
+  "wheel_centers_m": {
+    "FrontLeft": [
+      -1.0,
+      0.46500000000000025,
+      0.85
+    ],
+    "FrontRight": [
+      1.0,
+      0.46500000000000025,
+      0.85
+    ],
+    "RearLeft": [
+      -1.0,
+      0.4649999999999998,
+      -0.85
+    ],
+    "RearRight": [
+      1.0,
+      0.4649999999999998,
+      -0.85
+    ]
+  },
+  "wheel_dimensions_m": {
+    "FrontLeft": [
+      0.28,
+      0.93,
+      0.9300000000000002
+    ],
+    "FrontRight": [
+      0.28,
+      0.93,
+      0.9300000000000002
+    ],
+    "RearLeft": [
+      0.28,
+      0.93,
+      0.9299999999999999
+    ],
+    "RearRight": [
+      0.28,
+      0.93,
+      0.9299999999999999
+    ]
+  },
+  "saved_solar_angle_deg": 82.0,
+  "usd_sha256": "5fdc36abe1d083c49932b51d15c7968b0d9f8dfcde7d3a84d43d59fe81d1a151"
+}

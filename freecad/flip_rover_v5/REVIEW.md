@@ -3,7 +3,8 @@
 **Reviewed:** 2026-09-30<br>
 **Native application:** FreeCAD 1.1.1<br>
 **Model:** `FLIP_rover_v5.FCStd`<br>
-**Saved model SHA-256:** `af57d7e22f943f39bc1380663888adb8d8b18d0d35fa93464c2e75f69e24285b`
+**Saved model SHA-256:** `af57d7e22f943f39bc1380663888adb8d8b18d0d35fa93464c2e75f69e24285b`<br>
+**USD:** `FLIP_rover_v5.usdc` — SHA-256 `5fdc36abe1d083c49932b51d15c7968b0d9f8dfcde7d3a84d43d59fe81d1a151`
 
 ## Measured native CAD state
 
@@ -21,7 +22,9 @@ The source baseline was the frozen v4 file `FLIP_rover_v4_input.FCStd` (SHA-256 
 | Overall stowed bounds | 2,332 × 1,107 × 2,630 mm | X × Y × Z; measured at CAD pose 0° |
 | Overall deployed bounds | 2,332 × 2,634.311 × 2,630 mm | X × Y × Z; measured at CAD pose 82° |
 
-The saved v5 root transform converts the inherited v4 geometry into the stated global X-lateral/Y-up/+Z-forward frame. This is a CAD transform, not evidence that a LunCoSim exporter preserves it. The former exporter path named in the older handover is absent from this checkout, so no FreeCAD-to-USD/GLB asset export or round-trip check is claimed here.
+The saved v5 root transform converts the inherited v4 geometry into the stated global X-lateral/Y-up/+Z-forward frame. The standalone [`export_v5_usd.py`](export_v5_usd.py) reads that saved global placement, applies it once to each tessellated feature, and converts mm to metres. The resulting [`FLIP_rover_v5.usdc`](FLIP_rover_v5.usdc) opens in OpenUSD 26.8 and passes structural and datum checks: 195 colored named meshes, 9,710,460 triangles, Y-up, 1 metre per unit, all four wheel centers at the expected stations, and a 0.930 m nominal wheel diameter within the declared tessellation tolerance. Its overall tessellated bounds are 2.332000 × 2.634311 × 2.629711 m; the 0.289 mm shortfall in Z versus the exact CAD bound is within the 1 mm general tessellation deflection. Xforms organize the parts; their original global transforms are baked into mesh coordinates.
+
+The USD is a visual-only snapshot, not Twin composition or physical simulation data. It has no colliders, mass properties, dynamic bodies, wheel contact, or solar articulation. Cable and spring detail uses a 2 mm tessellation tolerance; general geometry uses 1 mm. Per-face normals are omitted so target USD consumers derive triangle normals.
 
 ## Requirement and evidence status
 
@@ -34,10 +37,11 @@ The saved v5 root transform converts the inherited v4 geometry into the stated g
 | Main silhouette, upright panel, cameras, two battery envelopes | **Partial.** Separate named pieces and image evidence exist. Chassis and panel shape are block-study geometry; complete flight packaging is unavailable publicly. |
 | Solar-array articulation | **CAD pose samples pass shape recompute only.** The 0–90° controller is presentation-only; 82° deployed pose is not a flight deployment angle. Clearance is not evaluated. |
 | Mass, centre of mass, inertia | **Open / not assigned in CAD.** The 450 kg public vehicle claim and 480 kg launch/space constraint are stored as distinct metadata; neither is used as solid-derived physical mass. |
-| LunCoSim import, USD physics, Rust, Modelica, Rhai | **Not run.** The guide specifies the implementation and test sequence. The current checkout contains no runnable FreeCAD asset-export tool at the historical path and no current Twin runtime pass was produced. |
+| Standalone USD export | **Pass at visual geometry scope.** `usd-core` 26.8 opened the stage and verified 195 meshes, colors, station centers, 1.0 metre-per-unit Y-up metadata and mesh bounds. This does not establish import or performance in LunCoSim. |
+| LunCoSim composition, USD physics, Rust, Modelica, Rhai | **Not run.** The standalone export has no physics; the guide specifies the target Twin workflow and runtime tests. |
 | Exact as-built match | **Not established and not possible from located public material.** No public dimensioned GA, native flight CAD or current flight ICD was found. |
 
-`audit_v5.json` deliberately does not claim geometric collision/clearance verification. The former all-pairs OpenCascade intersection audit was computationally unbounded over the detailed wheel web and coil compounds; the replacement audit checks file/shape integrity, selected exact dimensions, detail counts and pose recomputes. Clearance, articulated mechanism contact, wheel dynamics, mass properties and performance need a dedicated physics/collision representation and runtime tests.
+`audit_v5.json` deliberately does not claim geometric collision/clearance verification. The former all-pairs OpenCascade intersection audit was computationally unbounded over the detailed wheel web and coil compounds; the replacement audit checks file/shape integrity, selected exact dimensions, detail counts and pose recomputes. USD export validates coordinate and visual-mesh consistency only. Clearance, articulated mechanism contact, wheel dynamics, mass properties and performance need a dedicated physics/collision representation and runtime tests.
 
 ## Captures
 
