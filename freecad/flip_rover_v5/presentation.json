@@ -1,0 +1,21 @@
+{
+  "reopened_exact_delivery_file": true,
+  "sha256": "af57d7e22f943f39bc1380663888adb8d8b18d0d35fa93464c2e75f69e24285b",
+  "default_solar_angle_deg": 82,
+  "poses_exercised_deg": [
+    0,
+    82
+  ],
+  "views": [
+    "deployed",
+    "front",
+    "side",
+    "top",
+    "stowed",
+    "wheel_face",
+    "wheel_oblique",
+    "hinge",
+    "equipment_cutaway"
+  ],
+  "notes": "Native FreeCAD rendering; closed pose is shown as a study position; neither pose establishes flight hinge geometry."
+}

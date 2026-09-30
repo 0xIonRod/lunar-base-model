@@ -1,0 +1,143 @@
+import FreeCAD as App
+import FreeCADGui as Gui
+from pathlib import Path
+from PySide import QtCore
+import tempfile
+import shutil
+import json
+import hashlib
+import traceback
+
+W = Path(__file__).resolve().parent
+GEOMETRY = W / "FLIP_rover_v5_geometry.FCStd"
+FINAL = W / "FLIP_rover_v5.FCStd"
+STATE = {"index": 0, "error": None}
+
+
+def orient(view, normal):
+    z = App.Vector(*normal)
+    z.normalize()
+    up = App.Vector(0, 1, 0) if abs(z.y) < 0.99 else App.Vector(0, 0, -1)
+    x = up.cross(z)
+    x.normalize()
+    y = z.cross(x)
+    view.setCameraOrientation(App.Rotation(x, y, z, "ZXY").Q)
+
+
+def colorize(doc):
+    for obj in doc.Objects:
+        if obj.TypeId == "App::Part":
+            obj.ViewObject.Visibility = True
+        elif "StudyColor" in obj.PropertiesList:
+            obj.ViewObject.Visibility = True
+            obj.ViewObject.ShapeColor = tuple(obj.StudyColor)[:3]
+            obj.ViewObject.LineColor = (0.20, 0.21, 0.22)
+            obj.ViewObject.DisplayMode = "Flat Lines"
+        elif getattr(obj, "ViewObject", None):
+            obj.ViewObject.Visibility = False
+
+
+def initial_save_and_reopen():
+    try:
+        doc = App.openDocument(str(GEOMETRY))
+        App.setActiveDocument(doc.Name)
+        Gui.activateWorkbench("PartWorkbench")
+        colorize(doc)
+        doc.Motion.SolarAngle = 82
+        doc.recompute()
+
+        temp_dir = Path(tempfile.mkdtemp(prefix="flip_v5_save_"))
+        temp_file = temp_dir / FINAL.name
+        doc.saveAs(str(temp_file))
+        App.closeDocument(doc.Name)
+        shutil.copy2(temp_file, FINAL)
+
+        # Reopen the exact delivery file before any views or pose-control check.
+        doc = App.openDocument(str(FINAL))
+        App.setActiveDocument(doc.Name)
+        colorize(doc)
+        doc.Motion.SolarAngle = 82
+        doc.recompute()
+        STATE["doc"] = doc
+        STATE["views"] = [
+            ("deployed", 82, (-1, 0.65, 1), "all"),
+            ("front", 82, (0, 0, 1), "all"),
+            ("side", 82, (-1, 0, 0), "all"),
+            ("top", 82, (0, 1, 0), "all"),
+            ("stowed", 0, (-1, 0.65, 1), "all"),
+            ("wheel_face", 82, (-1, 0, 0), "wheel"),
+            ("wheel_oblique", 82, (-1, 0.3, 1), "wheel"),
+            ("hinge", 82, (1, 0.5, 1), "hinge"),
+            ("equipment_cutaway", 82, (1, 0.8, 1), "cutaway"),
+        ]
+        next_view()
+    except Exception:
+        (W / "presentation_error.txt").write_text(traceback.format_exc(), encoding="utf-8")
+
+
+def show_mode(doc, mode):
+    for obj in doc.Objects:
+        if "StudyColor" not in obj.PropertiesList:
+            continue
+        if mode == "all":
+            show = True
+        elif mode == "wheel":
+            show = doc.WheelLF in obj.InListRecursive
+        elif mode == "cutaway":
+            show = doc.Exterior not in obj.InListRecursive and doc.Power not in obj.InListRecursive
+        else:
+            show = obj.Name in ["HingeSupportL", "HingeSupportR", "HingePinL", "HingePinR",
+                                "MovingHingeL", "MovingHingeR", "SolarBackplate", "SolarFrameRear"]
+        obj.ViewObject.Visibility = show
+
+
+def next_view():
+    try:
+        doc = STATE["doc"]
+        index = STATE["index"]
+        if index >= len(STATE["views"]):
+            colorize(doc)
+            doc.Motion.SolarAngle = 82
+            doc.recompute()
+            view = Gui.activeDocument().activeView()
+            orient(view, (-1, 0.65, 1))
+            view.fitAll()
+            Gui.updateGui()
+            doc.recompute()
+            # Persist the selected deployed pose and final camera in the exact
+            # delivery file so opening it starts in the intended review state.
+            doc.save()
+            (W / "presentation.json").write_text(json.dumps({
+                "reopened_exact_delivery_file": True,
+                "sha256": hashlib.sha256(FINAL.read_bytes()).hexdigest(),
+                "default_solar_angle_deg": 82,
+                "poses_exercised_deg": [0, 82],
+                "views": [v[0] for v in STATE["views"]],
+                "notes": "Native FreeCAD rendering; closed pose is shown as a study position; neither pose establishes flight hinge geometry."
+            }, indent=2), encoding="utf-8")
+            return
+
+        name, angle, normal, mode = STATE["views"][index]
+        doc.Motion.SolarAngle = angle
+        doc.recompute()
+        show_mode(doc, mode)
+        view = Gui.activeDocument().activeView()
+        orient(view, normal)
+        view.fitAll()
+        Gui.updateGui()
+        QtCore.QTimer.singleShot(600, capture_view)
+    except Exception:
+        (W / "presentation_error.txt").write_text(traceback.format_exc(), encoding="utf-8")
+
+
+def capture_view():
+    try:
+        view_name = STATE["views"][STATE["index"]][0]
+        Gui.activeDocument().activeView().saveImage(str(W / (view_name + ".png")), 1500, 1150, "White")
+        STATE["index"] += 1
+        QtCore.QTimer.singleShot(100, next_view)
+    except Exception:
+        (W / "presentation_error.txt").write_text(traceback.format_exc(), encoding="utf-8")
+
+
+QtCore.QTimer.singleShot(1500, initial_save_and_reopen)

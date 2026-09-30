@@ -1,0 +1,42 @@
+{
+  "source": "FLIP_rover_v4_input.FCStd",
+  "source_sha256": "926d4b6952a0402d9903004c4b25c03829d550ae0af9bd162faa63b3525d286e",
+  "freecad_version": [
+    "1",
+    "1",
+    "1",
+    "20260414 (Git shallow)",
+    "Unknown",
+    "2026/04/14 22:09:59",
+    "(HEAD detached at 0108fd4b4)",
+    "0108fd4b4850cc46e625b60e53cea7a7bbe69f8d"
+  ],
+  "feature_count": 195,
+  "invalid_features": [],
+  "wheel_names": [
+    "FL",
+    "RL",
+    "FR",
+    "RR"
+  ],
+  "wheel_radius_mm": 465.0,
+  "wheel_width_mm_status": "study choice",
+  "published_cables_per_wheel": 192,
+  "actual_cable_solids_per_wheel": {
+    "CableWebLF": 192,
+    "CableWebLR": 192,
+    "CableWebRF": 192,
+    "CableWebRR": 192
+  },
+  "published_springs_per_wheel": 96,
+  "actual_spring_solids_per_wheel": {
+    "SpringDetailLF": 96,
+    "SpringDetailLR": 96,
+    "SpringDetailRF": 96,
+    "SpringDetailRR": 96
+  },
+  "spring_visual_only": true,
+  "solar_angle_saved_deg": 82.0,
+  "frame": "X lateral, Y up, Z longitudinal; forward +Z; mm",
+  "mass_properties_assigned": false
+}

@@ -1,0 +1,199 @@
+{
+  "started_utc": "2026-09-30T12:31:37.817144+00:00",
+  "audit_scope": "native document integrity, published wheel-family dimensions/counts, saved pose",
+  "clearance_status": "NOT EVALUATED; this visual model has no authoritative flight collision geometry",
+  "mass_properties_status": "NOT ASSIGNED; do not infer from visual B-rep solids",
+  "model_sha256": "af57d7e22f943f39bc1380663888adb8d8b18d0d35fa93464c2e75f69e24285b",
+  "feature_count": 195,
+  "invalid_features": [],
+  "wheel_stations": [
+    "FL",
+    "RL",
+    "FR",
+    "RR"
+  ],
+  "wheel_measurements": {
+    "FL": {
+      "nominal_visual_diameter_mm": 930.0000000000001,
+      "visual_axial_width_mm": 280.0,
+      "center_world_mm": [
+        -1000.0,
+        465.0000000000002,
+        850.0
+      ],
+      "tire_shape_valid": true,
+      "spider_shape_valid": true,
+      "nominal_diameter_source_mm": 930.0,
+      "axial_width_status": "study choice; not publicly dimensioned",
+      "diameter_check_passed": true
+    },
+    "RL": {
+      "nominal_visual_diameter_mm": 930.0,
+      "visual_axial_width_mm": 280.0,
+      "center_world_mm": [
+        -1000.0,
+        464.9999999999998,
+        -850.0
+      ],
+      "tire_shape_valid": true,
+      "spider_shape_valid": true,
+      "nominal_diameter_source_mm": 930.0,
+      "axial_width_status": "study choice; not publicly dimensioned",
+      "diameter_check_passed": true
+    },
+    "FR": {
+      "nominal_visual_diameter_mm": 930.0000000000001,
+      "visual_axial_width_mm": 280.0,
+      "center_world_mm": [
+        1000.0,
+        465.0000000000002,
+        850.0
+      ],
+      "tire_shape_valid": true,
+      "spider_shape_valid": true,
+      "nominal_diameter_source_mm": 930.0,
+      "axial_width_status": "study choice; not publicly dimensioned",
+      "diameter_check_passed": true
+    },
+    "RR": {
+      "nominal_visual_diameter_mm": 930.0,
+      "visual_axial_width_mm": 280.0,
+      "center_world_mm": [
+        1000.0,
+        464.9999999999998,
+        -850.0
+      ],
+      "tire_shape_valid": true,
+      "spider_shape_valid": true,
+      "nominal_diameter_source_mm": 930.0,
+      "axial_width_status": "study choice; not publicly dimensioned",
+      "diameter_check_passed": true
+    }
+  },
+  "wheel_source_count_checks": {
+    "FL": {
+      "expected_cables": 192,
+      "actual_cable_solids": 192,
+      "expected_springs": 96,
+      "actual_spring_solids": 96,
+      "springs_geometry_role": "VISUAL-ONLY spring detail; no physical force, mass, or collision authority",
+      "springs_visual_only": true
+    },
+    "RL": {
+      "expected_cables": 192,
+      "actual_cable_solids": 192,
+      "expected_springs": 96,
+      "actual_spring_solids": 96,
+      "springs_geometry_role": "VISUAL-ONLY spring detail; no physical force, mass, or collision authority",
+      "springs_visual_only": true
+    },
+    "FR": {
+      "expected_cables": 192,
+      "actual_cable_solids": 192,
+      "expected_springs": 96,
+      "actual_spring_solids": 96,
+      "springs_geometry_role": "VISUAL-ONLY spring detail; no physical force, mass, or collision authority",
+      "springs_visual_only": true
+    },
+    "RR": {
+      "expected_cables": 192,
+      "actual_cable_solids": 192,
+      "expected_springs": 96,
+      "actual_spring_solids": 96,
+      "springs_geometry_role": "VISUAL-ONLY spring detail; no physical force, mass, or collision authority",
+      "springs_visual_only": true
+    }
+  },
+  "study_component_bounds_mm": {
+    "Chassis": [
+      1460.0,
+      400.0000000000004,
+      2100.0
+    ],
+    "BatteryPackA": [
+      305.0,
+      220.00000000000017,
+      884.0
+    ],
+    "BatteryPackB": [
+      305.0,
+      220.00000000000017,
+      884.0
+    ]
+  },
+  "saved_solar_angle_deg": 82.0,
+  "solar_pose_samples": [
+    {
+      "angle_deg": 0,
+      "panel_shapes_valid": true,
+      "clearance_checked": false
+    },
+    {
+      "angle_deg": 10,
+      "panel_shapes_valid": true,
+      "clearance_checked": false
+    },
+    {
+      "angle_deg": 20,
+      "panel_shapes_valid": true,
+      "clearance_checked": false
+    },
+    {
+      "angle_deg": 30,
+      "panel_shapes_valid": true,
+      "clearance_checked": false
+    },
+    {
+      "angle_deg": 45,
+      "panel_shapes_valid": true,
+      "clearance_checked": false
+    },
+    {
+      "angle_deg": 60,
+      "panel_shapes_valid": true,
+      "clearance_checked": false
+    },
+    {
+      "angle_deg": 75,
+      "panel_shapes_valid": true,
+      "clearance_checked": false
+    },
+    {
+      "angle_deg": 82,
+      "panel_shapes_valid": true,
+      "clearance_checked": false
+    },
+    {
+      "angle_deg": 90,
+      "panel_shapes_valid": true,
+      "clearance_checked": false
+    }
+  ],
+  "overall_bounds_stowed_mm": [
+    -1166.0,
+    -1.7053025658242404e-13,
+    -1315.0,
+    1166.0,
+    1107.0000000000007,
+    1315.0
+  ],
+  "overall_bounds_deployed_mm": [
+    -1166.0,
+    -1.7053025658242404e-13,
+    -1315.0,
+    1166.0,
+    2634.3107098991763,
+    1315.0
+  ],
+  "overall_dimensions_deployed_mm": [
+    2332.0,
+    2634.3107098991763,
+    2630.0
+  ],
+  "source_frame": "X lateral, Y up, Z longitudinal, forward +Z; native FreeCAD lengths in mm; LunCoSim USD in m",
+  "public_mass_claim_kg": 450.0,
+  "launch_mass_constraint_kg": 480.0,
+  "mass_properties_assigned": false,
+  "model_integrity_passed": true,
+  "passed": true
+}
