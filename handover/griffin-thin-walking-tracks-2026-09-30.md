@@ -1,0 +1,7 @@
+# Griffin thin walking tracks
+
+Walking plates now use estimated 30 mm thickness instead of the 180 mm legacy slabs. Traction strips use estimated 60 mm travel width and 10 mm height instead of 120/50 mm blocks. These values are explicit reference-informed visualization assumptions, not supplier plate gauge, capacity or strength results. Sources: https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander and https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
+
+Visuals and actual contact mesh geometry change together. Hinge translations follow half-thickness projected through the retained deployment slope; transition center follows the preserved Y2.08 top. Toe miter, underside beams, lower chords, folded toe-axis offset and rectangular-envelope proxy inertias are regenerated from the changed thickness. Mass remains the unqualified 95 kg ramp / 15 kg transition study values. Both reusable section templates were updated through the same source-driven builder.
+
+Deployed ramp interface gate passes (/tmp/griffin-thin-track-deployed-gate.log), including composed contact geometry. Flight-stow gate passes (/tmp/griffin-thin-track-stow-gate.log). Fresh owned Editor API49746 reopened saved vehicle for review (/tmp/griffin-thin-track-review.png). The walking slabs and traction blocks are visibly thinner. Surface materials and fitting shape remain under active refinement; passing these gates does not establish overall visual or flight acceptance.

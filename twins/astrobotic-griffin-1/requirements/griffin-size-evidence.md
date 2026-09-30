@@ -376,3 +376,14 @@ center rises from .37 to .41 m, preserving its .45 m upper surface. Source-drive
 contact beams change together. This leaves the body envelope and solar mounts
 unchanged. COPV upper-cap clearance below the payload rails increases from
 14 mm to 94 mm; this is a derived consequence, not a new tank size measurement.
+
+## Ramp walking plates — 2026-09-30
+
+Replace the legacy 180 mm walking slab with an estimated 30 mm plate and
+50 mm high traction blocks with estimated 10 mm strips (60 mm travel width).
+The ESA and Astrobotic renderings linked above show thin walking structures,
+but publish no plate gauge. These dimensions are visual reconstruction
+estimates, not strength calculations. Physical contact meshes use the same
+thickness. Hinge offsets, toe bevel, under-beam seating, transition center
+and box-proxy inertias change together; the deck top, slope and terrain toe
+height stay fixed. Ramp/transition masses remain explicitly unqualified proxies.

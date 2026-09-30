@@ -289,7 +289,17 @@ package GriffinRampRequirements {
         // it is still a visual study value, not a supplier mechanical ICD.
         attribute rampSurfaceWidthM : Real = 2.86;
         attribute rampWheelClearanceM : Real = 0.15;
-        attribute rampSurfaceThicknessM : Real = 0.18;
+        /* Walking plate reconstruction: 30 mm instead of the legacy 180 mm
+         * slab; traction strips 60 mm wide / 10 mm high instead of 120/50 mm.
+         * These are explicit visual estimates from the slender ramp appearance
+         * in https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
+         * and https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
+         * No supplier plate gauge or load capacity is known. Geometry/contact
+         * use the same plate thickness. Hinge offsets and toe miter derive
+         * from half-thickness and deployment slope; deck/terrain tops remain
+         * fixed. Retain the unqualified 95 kg ramp / 15 kg transition proxy
+         * masses and recompute their rectangular-envelope inertias. */
+        attribute rampSurfaceThicknessM : Real = 0.030000000000;
         /* Slimmer truss silhouette estimated from the ESA 2022 Griffin artist
          * impression and Astrobotic product rendering, linked in
          * griffin-size-evidence.md. 0.27 m walking-plane-to-chord-top versus
@@ -306,7 +316,7 @@ package GriffinRampRequirements {
          * 18 mm. 50 mm hinge/pin diameter avoids the previous oversized
          * 240 mm transverse barrels and 160 mm upper pins. These are visual
          * estimates, not calibrated measurements or strength-qualified stock.
-         * Under-beam top derives from deck bottom: -.09 m = -.1125+.045/2.
+         * Under-beam top derives from the revised plate bottom: -.015 m = -.0375+.045/2.
          * Keep walking contact, span, hinge axes and section poses unchanged.
          */
         // Explicit review bounds: chord <=3% section length, fittings <=1.5x
@@ -323,8 +333,8 @@ package GriffinRampRequirements {
         // not published the Griffin ramp tread ICD.
         attribute assemblyTreadCount : Integer = 12;
         attribute assemblyTreadCountPerSection : Integer = 4;
-        attribute assemblyTreadWidthM : Real = 0.12;
-        attribute assemblyTreadHeightM : Real = 0.05;
+        attribute assemblyTreadWidthM : Real = 0.060000000000;
+        attribute assemblyTreadHeightM : Real = 0.010000000000;
         // Source-owned track width; GRC016 constrains it against FLIP's wheel
         // width and the required clearance. Geometry builders use this value.
         // Derive the exact source interface instead of rounding a duplicate
@@ -340,7 +350,7 @@ package GriffinRampRequirements {
         // upright posts per edge rail on every rigid ramp section.
         attribute assemblyUnderBeamWidthM : Real = 0.06;
         attribute assemblyUnderBeamHeightM : Real = 0.045;
-        attribute assemblyUnderBeamCenterYM : Real = -0.1125;
+        attribute assemblyUnderBeamCenterYM : Real = -0.037500000000;
         attribute assemblyUnderBeamCenterOffsetZM : Real = 1.20;
         attribute assemblySidePostCountPerSectionPerSide : Integer = 3;
         attribute assemblySidePostWidthM : Real = 0.025;
@@ -349,7 +359,7 @@ package GriffinRampRequirements {
         attribute assemblySidePostFirstCenterXM : Real = 0.224885507;
         attribute assemblySidePostPitchM : Real = 0.674656520;
         attribute assemblySideTrussChordHeightM : Real = 0.035;
-        attribute assemblySideTrussLowerChordCenterYM : Real = 0.13;
+        attribute assemblySideTrussLowerChordCenterYM : Real = 0.055000000000;
         attribute assemblySideTrussBraceThicknessM : Real = 0.018;
         attribute assemblySideTrussBraceCountPerSide : Integer = 4;
         attribute rampSectionHingeBarrelRadiusM : Real = 0.025;
@@ -434,18 +444,18 @@ package GriffinRampRequirements {
         attribute physicalRampDeckTransitionLengthM : Real = .90;
         attribute physicalRampDeckTransitionInterfaceToleranceM : Real = 0.002;
         attribute physicalRampDeckTransitionOutboardX : Real = 1.90;
-        attribute physicalRampDeckTransitionCenterY : Real = 1.99;
+        attribute physicalRampDeckTransitionCenterY : Real = 2.065000000000;
         // The transition is a separate rigid-body child, fixed to the Griffin
         // deck frame.  Its mass is an explicit simulator assumption because
         // Astrobotic has not released a ramp/transition structural ICD.  The
         // inertia list is the rectangular-prism result for the source-owned
-        // length, 0.18 m thickness, and 2.86 m width. It remains a study
+        // length, 0.03 m thickness, and 2.86 m width. It remains a study
         // estimate until the transition mass properties are measured.
         attribute physicalRampDeckTransitionMassKg : Real = 15.0;
-        attribute physicalRampDeckTransitionInertiaKgM2 : Real[3] = (10.265000000, 11.237000000, 1.053000000);
-        attribute physicalRampPortMountX : Real = 1.942021383;
-        attribute physicalRampStarboardMountX : Real = -1.942021383;
-        attribute physicalRampMountY : Real = 2.000412291;
+        attribute physicalRampDeckTransitionInertiaKgM2 : Real[3] = (10.225625, 11.237, 1.013625);
+        attribute physicalRampPortMountX : Real = 1.907003563827;
+        attribute physicalRampStarboardMountX : Real = -1.907003563827;
+        attribute physicalRampMountY : Real = 2.066735381886;
         attribute physicalRampMountZ : Real = 0.0;
         // At deployment, the ramp hinge position offsets the track half
         // thickness so the upper root edge meets the 2.08 m adapter top. At
@@ -464,9 +474,9 @@ package GriffinRampRequirements {
         // Griffin supplier data or an accepted mass-properties solution.
         attribute physicalRampMassKg : Real = 95.0;
         attribute physicalRampSectionMassKg : Real = 31.666666667;
-        attribute physicalRampSectionInertiaXKgM2 : Real = 21.670555556;
-        attribute physicalRampSectionInertiaYKgM2 : Real = 30.126356280;
-        attribute physicalRampSectionInertiaZKgM2 : Real = 8.626800724;
+        attribute physicalRampSectionInertiaXKgM2 : Real = 21.587430555556;
+        attribute physicalRampSectionInertiaYKgM2 : Real = 30.126356279305;
+        attribute physicalRampSectionInertiaZKgM2 : Real = 8.543675723749;
         attribute physicalRampSectionMassPartitionToleranceKg : Real = 0.001;
         attribute physicalRampPortRootJointStowLimitRad : Real = 1.0471975512;
         attribute physicalRampRootStowedAngleRad : Real = 0.7853981634;
