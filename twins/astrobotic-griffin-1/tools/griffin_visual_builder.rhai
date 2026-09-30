@@ -1025,6 +1025,62 @@ fn apply_isolated_griffin_component(doc, edit_target, root, task, parent_gen) {
 // Use the source-owned normalized Cartesian profile and a shared Rust
 // extrusion. The only serialization below is the typed USD point/index
 // literal emitted at the authoring boundary.
+// One geometry recipe for the visible FLIP support frame and its contact
+// proxy. Keep the perimeter open and support the two source wheel tracks.
+fn _griffin_payload_frame_geometry(model, width, depth, thickness) {
+    let profile = _griffin_model_value(model, "outerBodyProfileCoordinates");
+    let wheel_z = _griffin_model_number_list(model, "wheelStationZ");
+    let track_width = f64_from(model.value("GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM"));
+    if profile == () || profile.len() != 8 || wheel_z.len() != 4
+        || track_width == () || track_width <= 0.0 || thickness <= 0.0
+        || width <= 2.0 * thickness || depth <= 2.0 * thickness {
+        return plan_error("Payload support frame requires source profile, wheel stations and track width");
+    }
+    let stations = [];
+    for point in profile {
+        stations.push(vec3(point.x * (width / 2.0 - thickness / 2.0), 0.0,
+            point.y * (depth / 2.0 - thickness / 2.0)));
+    }
+    let perimeter = griffin_geometry::perimeter_beam_geometry(stations, [0.0], thickness);
+    if !perimeter.ok { return perimeter; }
+    let members = [perimeter];
+    let tracks = [];
+    for z in wheel_z { if !tracks.contains(z) { tracks.push(z); } }
+    if tracks.len() != 2 { return plan_error("FLIP support requires exactly two wheel track stations"); }
+    for z in tracks {
+        // Clip both rail edges to the octagonal footprint, rather than
+        // letting a rectangular rail project beyond a clipped corner.
+        let half_span = width / 2.0;
+        for edge_z in [z - track_width / 2.0, z + track_width / 2.0] {
+            let span = ();
+            for edge in 0..profile.len() {
+                let a = profile[edge]; let b = profile[(edge + 1) % profile.len()];
+                let az = a.y * depth / 2.0; let bz = b.y * depth / 2.0;
+                if az == bz { continue; }
+                let t = (edge_z - az) / (bz - az);
+                if t >= 0.0 && t <= 1.0 {
+                    let x = (a.x + (b.x - a.x) * t) * width / 2.0;
+                    if x > 0.0 && (span == () || x < span) { span = x; }
+                }
+            }
+            if span == () { return plan_error("Wheel support rail is outside the adapter footprint"); }
+            if span < half_span { half_span = span; }
+        }
+        let rail = griffin_geometry::rectangular_prism_geometry(vec3(0.0,0.0,z),
+            vec3(2.0 * half_span, thickness, track_width));
+        if !rail.ok { return rail; }
+        members.push(rail);
+    }
+    let points = []; let counts = []; let indices = [];
+    for member in members {
+        let base = points.len();
+        for point in member.points { points.push(point); }
+        for count in member.face_counts { counts.push(count); }
+        for index in member.face_indices { indices.push(base + index); }
+    }
+    #{ok:true, points:points, face_counts:counts, face_indices:indices}
+}
+
 fn _outer_body_prism_geometry(width, depth, height) {
     let source_profile = griffin_spec::visual_outer_body_profile_coordinates();
     if source_profile.len() != 8 || width <= 0.0 || depth <= 0.0 || height <= 0.0 {
@@ -1132,8 +1188,8 @@ fn physical_top_deck_collider_geometry() {
         || adapter_depth <= 0.0 || adapter_thickness <= 0.0 {
         return plan_error("source-owned rover payload adapter dimensions are incomplete");
     }
-    let adapter_mesh = _outer_body_prism_geometry(adapter_width,
-        adapter_depth, adapter_thickness);
+    let adapter_mesh = _griffin_payload_frame_geometry(sysml_requirements::model(),
+        adapter_width, adapter_depth, adapter_thickness);
     if adapter_mesh.ok != true { return adapter_mesh; }
     let adapter_points = adapter_mesh.points;
     for index in 0..adapter_points.len() { adapter_points[index][1] += adapter_center_y; }
@@ -2791,10 +2847,7 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
             < upper_top_y - 1.0e-6 {
         return plan_error("FLIP payload-adapter footprint or upper-bucket contact datum is invalid");
     }
-    let adapter = _outer_body_component_mesh_plan(doc, edit_target, root,
-        "RoverPayloadDeck", adapter_width, adapter_depth, adapter_thickness,
-        [0.0, adapter_center_y - bus_mount_y, 0.0],
-        deck_color);
+    let adapter = _griffin_payload_frame_component_plan(doc, edit_target, root, model);
     if !adapter.ok { return adapter; }
     for op in adapter.ops { ops.push(op); }
     #{ok: true, kind: "griffin_octagonal_bus_component", root: root,
@@ -5815,4 +5868,29 @@ fn griffin_surface_finish_plan(doc, edit_target, root) {
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_path}});
     }
     #{ok: true, ops: ops}
+}
+
+
+fn _griffin_payload_frame_component_plan(doc, edit_target, root, model) {
+    let dims = _griffin_model_value(model, "payloadAdapterDimensions");
+    let mount = _griffin_model_value(model, "bodyMount");
+    let center = _ramp_model_number(model, "payloadAdapterCenterYM");
+    if !vec3_is_native(dims) || !vec3_is_native(mount) || center == () {
+        return plan_error("Payload support placement source incomplete");
+    }
+    let geometry = _griffin_payload_frame_geometry(model, dims.x, dims.z, dims.y);
+    if !geometry.ok { return geometry; }
+    let color = _griffin_model_number_list(model, "deckDisplayColor");
+    let result = _component_mesh_visual_ops(doc, edit_target, root,
+        "RoverPayloadDeck", geometry, color);
+    if !result.ok { return result; }
+    result.ops.push(#{SetTranslate: #{edit_target:edit_target,path:root+"/RoverPayloadDeck",
+        value:[0.0,center-mount.y,0.0]}});
+    result
+}
+
+fn griffin_payload_frame_component_plan(doc, edit_target, root) {
+    let model = sysml_model("twin://astrobotic-griffin-1");
+    if !sysml_model_is(model) { return plan_error("Griffin model unavailable"); }
+    _griffin_payload_frame_component_plan(doc, edit_target, root, model)
 }
