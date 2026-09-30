@@ -115,6 +115,18 @@ fn run_visual_review(batch_index) {
              root + "/Griffin1/" + name + "/LandingLegVisual/ShockPiston",
              root + "/Griffin1/" + name + "/LandingLegVisual/FootPad"]));
     }
+    let antenna=root+"/Griffin1/HighGainDish";
+    checks.push(visual_children_check("GV-002-high-gain", "lander", "gv002",antenna,
+        [antenna+"/Mast",antenna+"/YawHead/DishGimbal/DishHead/Reflector",
+         antenna+"/YawHead/DishGimbal/DishHead/FeedArm"]));
+    for datum in [#{attr:"height",source:"highGainMastHeightM"},
+                  #{attr:"radius",source:"highGainMastRadiusM"}] {
+        checks.push(#{id:"GV-002-high-gain-"+datum.attr,component:"lander",
+            requirement:"gv002",verification:"Verify_GriffinVisualRequirements",
+            kind:"attribute",path:antenna+"/Mast",attr:datum.attr,
+            expected_attr:"GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::"+datum.source,
+            tolerance:0.001});
+    }
     checks.push(visual_exists_check("GV-002-deck", "lander", "gv002", "exists", root + "/Griffin1/Bus"));
     checks.push(visual_children_check("GV-002-deck-subparts", "lander", "gv002",
         root + "/Griffin1/Bus",

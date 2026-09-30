@@ -933,7 +933,7 @@ package GriffinRequirementSources {
 
     part evidence_gv_002 : RequirementEvidence {
         ref targetRequirement = GriffinVisualRequirements::gv002;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_www_astrobotic_com_griffin_lander, source_astrobotic_griffin_propulsion_pug_2022);
     }
 
     part evidence_gv_003 : RequirementEvidence {
@@ -1067,7 +1067,7 @@ package GriffinRequirementSources {
 
     part evidence_gvc_001 : RequirementEvidence {
         ref targetRequirement = GriffinVisualConfigurationRequirements::gvc001;
-        ref sources = (source_www_astrobotic_com_griffin_lander, source_science_nasa_gov_astrobotic_lunar_landers_pug_pdf);
+        ref sources = (source_www_astrobotic_com_griffin_lander, source_science_nasa_gov_astrobotic_lunar_landers_pug_pdf, source_astrobotic_griffin_propulsion_pug_2022);
     }
 
     part evidence_gvc_002 : RequirementEvidence {

@@ -1239,10 +1239,6 @@ def Xform "Griffin1" (
         float inputs:desired_tilt_z
         float inputs:desired_tilt_z.connect = </Griffin1.outputs:desired_tilt_z>
     }
-    over "HighGainDish"
-    {
-        token visibility = "invisible"
-    }
     def Xform "Nozzle"
     {
         def Xform "MainEngineCluster"
@@ -2473,9 +2469,42 @@ def Xform "Griffin1" (
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
-    over "HighGainDish"
+    def Xform "HighGainDish" (
+        prepend references = @lunco://components/comms/antenna.usda@</CommsAntenna>
+    )
     {
-        token visibility = "invisible"
+        double3 xformOp:translate = (0.0, 1.79, -1.71)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        def "Mast"
+        {
+            double radius = 0.025
+            double height = 0.18
+            double3 xformOp:translate = (0.0, 0.09, 0.0)
+        }
+        def "YawHead"
+        {
+            double3 xformOp:translate = (0.0, 0.18, 0.0)
+            def "DishGimbal"
+            {
+                double3 xformOp:rotateXYZ = (-70.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
+                def "DishHead"
+                {
+                    double3 xformOp:scale = (0.6, 0.6, 0.6)
+                    over "LinkAperture"
+                    {
+                        def "CommsIndicator"
+                        {
+                            token visibility = "invisible"
+                        }
+                        def "LinkBeam"
+                        {
+                            token visibility = "invisible"
+                        }
+                    }
+                }
+            }
+        }
     }
     over "Flame"
     {

@@ -156,6 +156,19 @@ package GriffinVisualConfigurationRequirements {
          * that surface without altering its physical support elevation. */
         attribute deckDimensions : Dimensions = (3.50, 0.08, 3.50);
         attribute deckCenter : Position = (0.0, 0.41, 0.0);
+        /* Griffin high-gain dish: PUG August 2021 v5.02 p.30 labels a dish
+         * at the bus edge. Reuse the parked shared antenna mechanism. Its
+         * default 0.58 m reflector radius times the estimated 0.60 head scale
+         * yields 0.696 m diameter, roughly one fifth of this 3.60 m bus.
+         * 180 mm mast and 70 degree parked tilt are packaging estimates;
+         * they are not supplier CAD or Earth-pointing acceptance. The mount
+         * derives from the top deck elevation and midline of its perimeter
+         * stock at negative Z, clear of FLIP's +/-1 m track stations.
+         * Source: https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf */
+        attribute highGainMastHeightM : Real = .18;
+        attribute highGainMastRadiusM : Real = .025;
+        attribute highGainHeadScale : Real = .60;
+        attribute highGainParkedTiltDeg : Real = -70.0;
         attribute avionicsDeckDimensions : Dimensions = (2.00, 0.10, 1.46);
         attribute avionicsDeckCenter : Position = (0.0, 0.46, 0.0);
 
@@ -324,7 +337,7 @@ package GriffinVisualConfigurationRequirements {
     }
 
     requirement def GVC001_ConfigurationSelection {
-        doc /* GVC-001 [configuration] the review model shall identify the landed polar side-array configuration and stowed ramp state with SysML enumerations, keeping optional deployed egress geometry out of the primary silhouette. */
+        doc /* GVC-001 [configuration] the review model shall identify the landed polar side-array configuration and stowed ramp state with SysML enumerations, keeping optional deployed egress geometry out of the primary silhouette. Include the bus-edge high-gain antenna identified in Astrobotic Payload User Guide August 2021 v5.02 page 30, using the reusable parked mechanism and source-owned study sizing. Its placement derives from the upper deck datum and shall keep the rover tracks clear. The elevated payload mast in the ESA illustration does not establish a Griffin mast size. Antenna operation and Earth pointing are separate future evidence. Source: https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf. */
     }
     requirement def GVC002_FrameAndOrigin {
         doc /* GVC-002 [datum] every component station shall use the declared native Position/Direction assembly frame and origin; this shared frame makes mirror, clearance, and Editor readback checks meaningful. Rationale: the prior diagonal/axis mismatch let the builder and verifier accept different layouts. */

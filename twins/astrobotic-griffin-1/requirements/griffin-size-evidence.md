@@ -448,3 +448,26 @@ They are not measured optical constants, an alloy selection or evidence of
 hardware qualification. The 120 mm ring section and annular radii were retained:
 reducing the collar outer radius alone would break its reconstructed connection
 to the perimeter. Tank clearances and existing datums remain the geometry basis.
+
+### Griffin high-gain antenna, 2026-10-01
+
+Astrobotic Payload User Guide August 2021 v5.02, page 30, explicitly labels
+Griffin's high-gain dish and medium-gain antenna and describes multiple low-gain
+antennas with an actuated medium/high-gain antenna after touchdown:
+https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf.
+The 2022 ESA image is an integrated artist's impression; its elevated payload
+mast does not establish a Griffin bus mast dimension. The model now reuses the
+parked shared CommsAntenna for the bus-edge dish rather than a hidden placeholder.
+
+Its 0.60 head scale gives 0.696 m diameter from the library reflector's 0.58 m
+radius. This is a low-confidence image-proportion estimate (about one fifth of
+the selected 3.60 m bus), not a published antenna diameter. A 180 mm pedestal
+with 25 mm radius gives a slender, compact deck mounting; both dimensions are
+packaging estimates. The parked -70 degree X tilt points outward toward -Z;
+it is a review pose, not an Earth direction. The mount derives from bodyMount,
+deckCenter and deckDimensions: Y is the deck top, Z is the negative edge stock
+midline. Current resulting station is (0,1.79,-1.71) m. Head scale and mount are
+kept separate so the reflector estimate cannot rescale the bus or pedestal.
+Yaw/elevation bodies and tracking stay in the library's disabled parked state;
+operational pointing, actuator sizing and antenna mass qualification are open.
+The medium- and low-gain hardware remains to be reconstructed from evidence.

@@ -5947,3 +5947,49 @@ fn griffin_surface_material_plan(doc, edit_target, root, name, paths, color, met
     }
     #{ok:true,ops:ops}
 }
+
+// One existing parked mechanism; bus owns its mount, source owns study sizing.
+fn griffin_high_gain_plan(doc, edit_target, root) {
+    let m=sysml_requirements::model();
+    if !sysml_model_is(m) {return plan_error("Griffin antenna source unavailable");}
+    let o="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let deck=m.value(o+"deckDimensions");let center=m.value(o+"deckCenter");
+    let mount=m.value(o+"bodyMount");
+    let height=f64_from(m.value(o+"highGainMastHeightM"));
+    let radius=f64_from(m.value(o+"highGainMastRadiusM"));
+    let scale=f64_from(m.value(o+"highGainHeadScale"));
+    let tilt=f64_from(m.value(o+"highGainParkedTiltDeg"));
+    if !absolute_root(root) || !vec3_is_native(deck) || !vec3_is_native(center)
+        || !vec3_is_native(mount) || height==() || height<=0.0 || radius==()
+        || radius<=0.0 || scale==() || scale<=0.0 || tilt==() {
+        return plan_error("Griffin antenna mount/dimensions incomplete");
+    }
+    let path=root+"/HighGainDish";
+    let position=vec3(mount.x,mount.y+center.y+deck.y/2.0,mount.z-deck.z/2.0+deck.y/2.0);
+    let ops=[];
+    let existing=assembly_builder::composed_query(doc,#{path:path,attrs:[],children:false});
+    if query_ok(existing) {
+        let reflector=assembly_builder::composed_query(doc,
+            #{path:path+"/YawHead/DishGimbal/DishHead/Reflector",attrs:[],children:false});
+        if existing.type_name!="Xform" || !query_ok(reflector) || reflector.type_name!="NurbsPatch" {
+            return plan_error("replace the obsolete antenna root before referencing the shared mechanism");
+        }
+    } else {
+        ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:"HighGainDish",
+            type_name:"Xform",reference:"lunco://components/comms/antenna.usda",reference_prim_path:"/CommsAntenna"}});
+    }
+    for attr in [
+        #{path:path,name:"xformOp:translate",kind:"double3",value:"("+position.x+", "+position.y+", "+position.z+")"},
+        #{path:path,name:"xformOpOrder",kind:"token[]",value:"[\"xformOp:translate\"]"},
+        #{path:path+"/Mast",name:"radius",kind:"double",value:radius.to_string()},
+        #{path:path+"/Mast",name:"height",kind:"double",value:height.to_string()},
+        #{path:path+"/Mast",name:"xformOp:translate",kind:"double3",value:"(0, "+(height/2.0)+", 0)"},
+        #{path:path+"/YawHead",name:"xformOp:translate",kind:"double3",value:"(0, "+height+", 0)"},
+        #{path:path+"/YawHead/DishGimbal",name:"xformOp:rotateXYZ",kind:"double3",value:"("+tilt+", 0, 0)"},
+        #{path:path+"/YawHead/DishGimbal",name:"xformOpOrder",kind:"token[]",value:"[\"xformOp:rotateXYZ\"]"},
+        #{path:path+"/YawHead/DishGimbal/DishHead",name:"xformOp:scale",kind:"double3",value:"("+scale+", "+scale+", "+scale+")"},
+        #{path:path+"/YawHead/DishGimbal/DishHead/LinkAperture/CommsIndicator",name:"visibility",kind:"token",value:"\"invisible\""},
+        #{path:path+"/YawHead/DishGimbal/DishHead/LinkAperture/LinkBeam",name:"visibility",kind:"token",value:"\"invisible\""}
+    ] {ops.push(#{SetAttribute:#{edit_target:edit_target,path:attr.path,name:attr.name,type_name:attr.kind,value:attr.value}});}
+    #{ok:true,ops:ops,path:path,mount:position}
+}

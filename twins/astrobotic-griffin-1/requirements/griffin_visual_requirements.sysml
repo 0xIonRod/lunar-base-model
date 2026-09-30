@@ -31,7 +31,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV002_LanderPresentation {
-        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognizable faceted lander with its four legs, payload deck, and seven-engine cluster. The current visual study uses an octagonal open frame and a separate octagonal tank-support perimeter with four study tank openings; this is not a published tank ICD. */
+        doc /* GV-002 [visual] the review shall show Griffin-1 as a recognizable faceted lander with its four legs, payload deck, bus-edge high-gain antenna, and five-engine cluster. Antenna topology follows Astrobotic Payload User Guide August 2021 v5.02 page 30; study mast, scale and parked tilt derive from GriffinVisualConfiguration. Source: https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf. The current visual study uses an octagonal open frame and a separate octagonal tank-support perimeter with four study tank openings; this is not a published tank ICD. */
     }
 
     requirement def GRV003_GriffinSolarAssemblies {
