@@ -77,7 +77,7 @@ Sources:
 | environments/south_pole_surrogate.usda | DEM-backed NOBILE03 South-Pole environment |
 | terrain/nobile03/ | Ignored processed heightfield output, regenerated from the manifest and adapter |
 | tools/terrain/ | Polar-stereo download, reprojection, and provenance instructions |
-| scenarios/griffin_1_surface_ops.rhai | Mission sequencing and route policy |
+| scenarios/griffin_1_surface_ops.rhai | Single mission state owner, event routing, and phase sequencing |
 | scenarios/tests/griffin_requirements.rhai | Twin-owned structural/parameter verdict and boundary checks |
 | scenarios/tests/griffin_lander_requirements.rhai | Rhai observer for the standalone lander-component contract |
 | scenarios/tests/griffin_bus_requirements.rhai | Component-owned Rhai gate for bus geometry, tank-support openings, and source-owned appearance |
@@ -125,6 +125,8 @@ Sources:
 | tools/check_landing_determinism.sh | Twin-local two-process harness comparing the Rhai landing trial at a fixed SI clock |
 | tools/griffin_visual_builder.rhai | Idempotent dry/apply runtime builder using generic `assembly_builder` + `assembly_edit` |
 | tools/griffin_controls.rhai | Twin-local possession, handoff, and control briefing helpers |
+| tools/griffin_surface_ramp_ops.rhai | SysML-targeted atomic ramp hinge command batches |
+| tools/griffin_surface_mission_report.rhai | Bounded mission event trace, phase failure evidence, and final verdict |
 | assets/models/LunCo/Actuation/SignedTorqueAllocator.mo | Reusable signed X/Y/Z RCS torque-to-valve allocator selected through the Griffin USD source-asset contract |
 | ../../requirements/griffin-lander.md | Human-readable requirement IDs, provenance, and executable-check traceability |
 | research/griffin_1_assumptions.md | Public facts, surrogate values, and confidence boundaries |

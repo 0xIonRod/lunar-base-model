@@ -676,10 +676,172 @@ fn _layout_finding(id, path, message) {
     _finding(id, path, message)
 }
 
+fn _landing_near(actual, expected, tolerance) {
+    actual != () && expected != () && actual.is_finite()
+        && expected.is_finite() && (actual - expected).abs() <= tolerance
+}
+
+// Bind the source-owned leg stations, touchdown datum, pad geometry, and
+// spring study parameters to the four composed USD joints. The same report
+// feeds the standalone GLL verification and the powered-descent preflight.
+fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
+    let assembly = "GriffinLandingLegRequirements::GriffinLandingLegAssembly::";
+    let configuration = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let touchdown_y = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("landingVehicleReferenceTouchdownY"));
+    let surface_y = sysml_requirements::number(source,
+        griffin_spec::qualified_attribute_name("siteSurfaceY"));
+    let center_y = sysml_requirements::number(source, assembly + "footPadCenterYM");
+    let height = sysml_requirements::number(source, assembly + "footPadHeightM");
+    let lower_limit = sysml_requirements::number(source, assembly + "springLowerLimitM");
+    let upper_limit = sysml_requirements::number(source, assembly + "springUpperLimitM");
+    let stiffness = sysml_requirements::number(source, assembly + "springStiffnessNPerM");
+    let damping = sysml_requirements::number(source, assembly + "springDampingNsPerM");
+    let max_force = sysml_requirements::number(source, assembly + "springMaxForceN");
+    let target_velocity = sysml_requirements::number(source, assembly + "springTargetVelocityMps");
+    let pose_tolerance = sysml_requirements::number(source, assembly + "springPoseToleranceM");
+    let station_tolerance = sysml_requirements::number(source,
+        assembly + "physicalLegPlacementToleranceM");
+    let names = sysml_requirement_checks::source_enum_identifiers(source,
+        configuration + "landingLegInstances");
+    let stations = sysml_requirement_checks::source_position_list(source,
+        configuration + "legStations");
+    let checks = [];
+    if source == () || source.ok != true || touchdown_y == () || surface_y == ()
+        || center_y == () || height == () || lower_limit == () || upper_limit == ()
+        || stiffness == () || damping == () || max_force == ()
+        || target_velocity == () || pose_tolerance == () || station_tolerance == ()
+        || names.len() != 4 || stations.len() != 4 || lander_path == () {
+        return #{ok: false, error: "typed source is missing a landing datum, spring parameter, or four-leg station list",
+            checks: checks, spring_targets_m: []};
+    }
+    let paths = [];
+    for name in names {
+        let path = lander_path + "/" + name + "_Spring";
+        paths.push(path);
+        checks.push(sysml_requirement_checks::exists("GLL-010-" + name + "-spring",
+            "landing_leg", "gll010", verification, path, "PhysicsPrismaticJoint"));
+        for attribute in [
+            ["physics:lowerLimit", "springLowerLimitM"],
+            ["physics:upperLimit", "springUpperLimitM"],
+            ["drive:linear:physics:targetVelocity", "springTargetVelocityMps"],
+            ["drive:linear:physics:stiffness", "springStiffnessNPerM"],
+            ["drive:linear:physics:damping", "springDampingNsPerM"],
+            ["drive:linear:physics:maxForce", "springMaxForceN"]
+        ] {
+            checks.push(sysml_requirement_checks::attribute_check(
+                "GLL-010-" + name + "-" + attribute[0], "landing_leg", "gll010",
+                verification, path, attribute[0], assembly + attribute[1], 0.001));
+        }
+        checks.push(sysml_requirement_checks::attribute_equals(
+            "GLL-010-" + name + "-drive-mode", "landing_leg", "gll010",
+            verification, path, "drive:linear:physics:type", "force"));
+        let station = stations[paths.len() - 1];
+        for axis in 0..3 {
+            checks.push(#{id: "GLL-009-" + name + "-joint-anchor-" + axis.to_string(),
+                component: "landing_leg", requirement: "gll009",
+                verification: verification, kind: "attribute_component",
+                path: path, attr: "physics:localPos0", index: axis,
+                expected: if axis == 0 { station.x }
+                    else if axis == 1 { station.y } else { station.z },
+                tolerance: station_tolerance});
+        }
+    }
+    let request = #{paths: paths, schemas: true, attrs: [
+        "physics:axis", "physics:localPos0", "physics:lowerLimit", "physics:upperLimit",
+        "drive:linear:physics:type", "drive:linear:physics:targetPosition",
+        "drive:linear:physics:targetVelocity", "drive:linear:physics:stiffness",
+        "drive:linear:physics:damping", "drive:linear:physics:maxForce"]};
+    if doc_id != () { request.doc_id = doc_id; }
+    let snapshot = query("QueryUsdPrims", request);
+    if snapshot == () || snapshot.ok == false || snapshot.records == ()
+        || snapshot.records.len() != paths.len() {
+        let detail = if snapshot == () { "spring joint snapshot returned no response" }
+            else if snapshot.error != () { snapshot.error }
+            else { "spring joint snapshot did not contain all four joints" };
+        return #{ok: false, error: detail, checks: checks, spring_targets_m: []};
+    }
+    let model = sysml_requirements::model();
+    let usage = model.requirement("GriffinLandingLegRequirements::gll010");
+    let constraint_name = "GriffinLandingLegRequirements::GLLC010_SpringRestPoseMatchesTouchdownDatum";
+    let constraint_checks = [];
+    let spring_targets = [];
+    let authored_matches = true;
+    for index in 0..names.len() {
+        let name = names[index];
+        let path = paths[index];
+        let joint = ();
+        for record in snapshot.records {
+            if record.path == path { joint = record; }
+        }
+        if joint == () || joint.attrs == () {
+            authored_matches = false;
+            continue;
+        }
+        let attrs = joint.attrs;
+        let anchor = attrs["physics:localPos0"];
+        let target = attrs["drive:linear:physics:targetPosition"];
+        let actual_lower = attrs["physics:lowerLimit"];
+        let actual_upper = attrs["physics:upperLimit"];
+        let expected_target = surface_y - touchdown_y - stations[index].y
+            - center_y + height / 2.0;
+        spring_targets.push(expected_target);
+        if attrs["physics:axis"] != "Y"
+            || attrs["drive:linear:physics:type"] != "force"
+            || anchor == () || anchor.len() != 3
+            || !_landing_near(anchor[0], stations[index].x, station_tolerance)
+            || !_landing_near(anchor[1], stations[index].y, station_tolerance)
+            || !_landing_near(anchor[2], stations[index].z, station_tolerance)
+            || !_landing_near(attrs["physics:lowerLimit"], lower_limit, 0.001)
+            || !_landing_near(attrs["physics:upperLimit"], upper_limit, 0.001)
+            || !_landing_near(attrs["drive:linear:physics:targetVelocity"], target_velocity, 0.001)
+            || !_landing_near(attrs["drive:linear:physics:stiffness"], stiffness, 0.001)
+            || !_landing_near(attrs["drive:linear:physics:damping"], damping, 0.001)
+            || !_landing_near(attrs["drive:linear:physics:maxForce"], max_force, 0.001) {
+            authored_matches = false;
+        }
+        let inputs = sysml_requirements::required_constraint_input_observations(
+            model, usage, constraint_name, [
+                ["vehicleReferenceTouchdownY", _source_value(touchdown_y, source)],
+                ["legMountY", _source_value(stations[index].y, source)],
+                ["springTargetPositionY", _usd_snapshot_value(target, joint)],
+                ["footPadCenterY", _source_value(center_y, source)],
+                ["footPadHeightM", _source_value(height, source)],
+                ["siteSurfaceY", _source_value(surface_y, source)],
+                ["springLowerLimitY", _usd_snapshot_value(actual_lower, joint)],
+                ["springUpperLimitY", _usd_snapshot_value(actual_upper, joint)],
+                ["toleranceM", _source_value(pose_tolerance, source)]
+            ]);
+        let check = sysml_requirements::required_constraint_check(
+            "GLL-010-" + name + "-touchdown-rest-pose", "landing_leg", "gll010",
+            verification, constraint_name, inputs, "typed", 0.0);
+        checks.push(check);
+        constraint_checks.push(check);
+    }
+    let evaluation = sysml_requirements::evaluate(source, constraint_checks);
+    let constraint_results = if evaluation != () && evaluation.results != () {
+        evaluation.results
+    } else { [] };
+    let constraints_pass = constraint_results.len() == names.len();
+    for result in constraint_results {
+        if result.ok != true { constraints_pass = false; }
+    }
+    let ok = authored_matches && constraints_pass;
+    #{ok: ok,
+      error: if ok { "" } else if !authored_matches {
+          "one or more composed suspension joints disagree with the typed leg station or spring parameters"
+      } else { "one or more touchdown rest-pose constraints failed or produced no verdict" },
+      checks: checks, spring_targets_m: spring_targets,
+      constraint_results: constraint_results,
+      doc_id: snapshot.doc_id,
+      document_generation: snapshot.document_generation,
+      stage_generation: snapshot.stage_generation}
+}
+
 // Check the authored landing target and collision pad against one source
 // revision and one composed USD snapshot. The SysML constraints own both
 // datums; this policy only binds source literals and measured USD geometry.
-fn landing_setup_geometry_check(doc_id, target_path, pad_path) {
+fn landing_setup_geometry_check(doc_id, target_path, pad_path, lander_path) {
     let source = sysml_requirements::source();
     if source == () || source.ok != true {
         return #{ok: false,
@@ -793,6 +955,8 @@ fn landing_setup_geometry_check(doc_id, target_path, pad_path) {
     }
     let target_result = evaluation.results[0];
     let surface_result = evaluation.results[1];
+    let landing_gear = landing_gear_spring_pose_report(doc_id, lander_path,
+        source, "Verify_GriffinLandingLegRequirements");
     let shape_valid = pad.type_name == "Cube" && collision_enabled && collision_schema;
     let surface_ok = surface_result.ok == true && shape_valid;
     let target_ok = target_result.ok == true;
@@ -806,8 +970,12 @@ fn landing_setup_geometry_check(doc_id, target_path, pad_path) {
         if detail != "" { detail += "; "; }
         detail += "landing pad is not a colliding Cube with PhysicsCollisionAPI";
     }
-    #{ok: target_ok && surface_ok,
-      error: if target_ok && surface_ok { "" } else { detail },
+    if landing_gear.ok != true {
+        if detail != "" { detail += "; "; }
+        detail += "landing gear rest-pose preflight failed: " + landing_gear.error;
+    }
+    #{ok: target_ok && surface_ok && landing_gear.ok == true,
+      error: if target_ok && surface_ok && landing_gear.ok == true { "" } else { detail },
       source_revision: source.source_revision,
       source_files: source.source_files,
       target_y_m: target_position[1],
@@ -831,7 +999,9 @@ fn landing_setup_geometry_check(doc_id, target_path, pad_path) {
           error: if surface_ok { "" }
               else if surface_result.ok != true {
                   _constraint_result_failure(surface_result)
-              } else { "landing pad is not a colliding Cube" }}}
+              } else { "landing pad is not a colliding Cube" }},
+      landing_gear: landing_gear
+}
 }
 
 // Visual-only wrappers are not always spawned by the isolated headless

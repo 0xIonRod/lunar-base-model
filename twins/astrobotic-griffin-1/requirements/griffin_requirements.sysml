@@ -202,11 +202,14 @@ package Griffin1Requirements {
     verification def Verify_GriffinSurfaceOperations {
         subject lander : Griffin1Lander;
         subject rover : HostedRoverInterface;
+        subject ramp : GriffinRampRequirements::GriffinEgressRamp;
         objective {
             verify GriffinFunctionalRequirements::gr004;
             verify GriffinFunctionalRequirements::gr007;
             verify GriffinFunctionalRequirements::gr026;
+            verify GriffinRampRequirements::grr017;
             verify GriffinSimulationAccuracyRequirements::gr037;
+            verify GriffinSimulationAccuracyRequirements::gr039;
             verify GriffinSimulationAccuracyRequirements::gr038;
         }
     }

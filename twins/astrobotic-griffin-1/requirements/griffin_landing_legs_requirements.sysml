@@ -54,6 +54,16 @@ package GriffinLandingLegRequirements {
         attribute footPadRadiusM : Real = 0.52;
         attribute footPadHeightM : Real = 0.18;
         attribute footPadCenterYM : Real = -2.05;
+        // Suspension study values. The spring rest target is derived from the
+        // authored vehicle touchdown datum, leg mount, pad, and site surface;
+        // it is not a second hand-entered pose value.
+        attribute springLowerLimitM : Real = -0.80;
+        attribute springUpperLimitM : Real = 0.00;
+        attribute springStiffnessNPerM : Real = 4000.0;
+        attribute springDampingNsPerM : Real = 800.0;
+        attribute springMaxForceN : Real = 12000.0;
+        attribute springTargetVelocityMps : Real = 0.00;
+        attribute springPoseToleranceM : Real = 0.001;
         // Physical and visual roots use the single shared leg stations and
         // outward-facing rotations in GriffinVisualConfiguration.
         attribute physicalLegPlacementToleranceM : Real = 0.001;
@@ -148,12 +158,46 @@ package GriffinLandingLegRequirements {
             and measuredAxleOverlapM + measurementToleranceM >= requiredOverlapM
             and physicalJointStationMatches;
     }
+    constraint def GLLC009_SpringFrameAlignment {
+        doc /* At the zero-articulation starting pose, the body rotation implied by each prismatic joint's two local frames shall match its composed leg-body rotation within physicalLegRotationToleranceDeg. */
+        in seatingErrorDeg : Real;
+        in toleranceDeg : Real;
+        seatingErrorDeg <= toleranceDeg;
+    }
     requirement def GLL009_BusMountConnection {
         require GLLC009_BusAndAxleOverlap {
             in requiredOverlapM = GriffinLandingLegAssembly::bodyMountOverlapM;
             in measurementToleranceM = GriffinLandingLegAssembly::bodyMountOverlapMeasurementToleranceM;
         }
-        doc /* GLL-009 [mechanical interface] each leg's visible BodyMountArm shall overlap the octagonal PerimeterFrame and its MountAxle by at least bodyMountOverlapM. The physical prismatic suspension joint shall connect the leg rigid body to the lander at the same typed leg station. Mount geometry is derived from the bus envelope, frame section, leg station, and clevis dimensions; it is not a second placement table. The explicit measurement tolerance covers floating-point bound readback only and does not reduce the physical overlap datum. */
+        require GLLC009_SpringFrameAlignment {
+            in toleranceDeg = GriffinLandingLegAssembly::physicalLegRotationToleranceDeg;
+        }
+        doc /* GLL-009 [mechanical interface] each leg's visible BodyMountArm shall overlap the octagonal PerimeterFrame and its MountAxle by at least bodyMountOverlapM. The physical prismatic suspension joint shall connect the leg rigid body to the lander at the same typed leg station, with local frames that preserve the source-owned leg orientation when initially seated. Mount geometry is derived from the bus envelope, frame section, leg station, and clevis dimensions; it is not a second placement table. The explicit measurement tolerance covers floating-point bound readback only and does not reduce the physical overlap datum. */
+    }
+    constraint def GLLC010_SpringRestPoseMatchesTouchdownDatum {
+        in vehicleReferenceTouchdownY : Real;
+        in legMountY : Real;
+        in springTargetPositionY : Real;
+        in footPadCenterY : Real;
+        in footPadHeightM : Real;
+        in siteSurfaceY : Real;
+        in springLowerLimitY : Real;
+        in springUpperLimitY : Real;
+        in toleranceM : Real;
+        vehicleReferenceTouchdownY + legMountY + springTargetPositionY
+                + footPadCenterY - footPadHeightM / 2.0
+            >= siteSurfaceY - toleranceM
+            and vehicleReferenceTouchdownY + legMountY + springTargetPositionY
+                + footPadCenterY - footPadHeightM / 2.0
+            <= siteSurfaceY + toleranceM
+            and springTargetPositionY >= springLowerLimitY
+            and springTargetPositionY <= springUpperLimitY;
+    }
+    requirement def GLL010_SpringRestPose {
+        require GLLC010_SpringRestPoseMatchesTouchdownDatum {
+            in toleranceM = GriffinLandingLegAssembly::springPoseToleranceM;
+        }
+        doc /* GLL-010 [landing interface] the source-owned prismatic spring target places each unloaded foot-pad bottom on the landing surface when the body reference is at its powered-descent touchdown datum. The target is derived from that datum, the shared leg station, and composed foot-pad geometry, and must lie inside the authored joint limits. Spring stiffness, damping, limits, and force capacity are explicit replaceable study assumptions because the supplier leg ICD is unavailable. */
     }
 
     requirement <'GLL-001'> gll001 : GLL001_LegCount { subject legs : GriffinLandingLegAssembly; }
@@ -165,6 +209,7 @@ package GriffinLandingLegRequirements {
     requirement <'GLL-007'> gll007 : GLL007_ShockPistonGeometry { subject legs : GriffinLandingLegAssembly; }
     requirement <'GLL-008'> gll008 : GLL008_FootPadGeometry { subject legs : GriffinLandingLegAssembly; }
     requirement <'GLL-009'> gll009 : GLL009_BusMountConnection { subject legs : GriffinLandingLegAssembly; }
+    requirement <'GLL-010'> gll010 : GLL010_SpringRestPose { subject legs : GriffinLandingLegAssembly; }
 
     verification def Verify_GriffinLandingLegRequirements {
         subject legs : GriffinLandingLegAssembly;
@@ -178,6 +223,7 @@ package GriffinLandingLegRequirements {
             verify gll007;
             verify gll008;
             verify gll009;
+            verify gll010;
         }
     }
 }

@@ -1152,4 +1152,9 @@ package GriffinRequirementSources {
         ref sources = (source_astrobotic_griffin_1_requirements_griffin_simulation_accuracy_requiremen, source_astrobotic_griffin_1_requirements_griffin_requirements_sysml);
     }
 
+    part evidence_gr_038 : RequirementEvidence {
+        ref targetRequirement = GriffinSimulationAccuracyRequirements::gr038;
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_simulation_accuracy_requiremen, source_astrobotic_griffin_1_scenes_griffin_1_surface_ops_usda, source_astrobotic_griffin_1_scenarios_griffin_1_surface_ops_rhai);
+    }
+
 }

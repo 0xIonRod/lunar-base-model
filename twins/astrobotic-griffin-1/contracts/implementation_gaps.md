@@ -123,6 +123,18 @@ reported two 180° Avian joint-seating residuals; the transition/landing
 physics investigation and a touchdown verdict remain open. Do not treat the
 static fold/clearance pass as dynamic articulation or landing acceptance.
 
+The leg-frame hypothesis was rechecked against the Avian seating equation
+`r1_target = r0 * localRot0 * inverse(localRot1)` and USD's `(w, x, y, z)`
+quaternion order. The downward `localRot0` is a 180° Z rotation, so it must be
+included when solving for each `localRot1`; the original PZ/NZ values satisfy
+that relation for the authored ±90° Y body rotations. A temporary sign swap
+that omitted `localRot0` has been removed. The earlier two runtime residuals
+therefore remain unexplained and must be captured with the exact joint paths
+and authored/runtime frame values on the next run. GLL-009 now has a formal
+angular-error constraint and a Rhai observer that compares each composed
+spring frame with its composed leg pose, retaining USD generation provenance;
+that scene check has not yet been executed.
+
 ### Landing-leg contact geometry status
 
 Read-only composed-USD checks on the loaded `griffin_1_editor.usda` scene

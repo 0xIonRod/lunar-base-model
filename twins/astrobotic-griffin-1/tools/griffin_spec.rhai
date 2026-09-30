@@ -7,6 +7,23 @@ import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_c
 // the Twin's typed SysML model, including structured collections. Rhai owns
 // reusable planning policy while contracts/*.md records meaning and provenance.
 
+fn rcs_port_mapping() {
+    [
+        #{model_name: "RcsPitchPosModel", valve_port: "pitch_pos_a_valve", thrust_port: "pitch_pos_a_thrust_n"},
+        #{model_name: "RcsPitchPosBModel", valve_port: "pitch_pos_b_valve", thrust_port: "pitch_pos_b_thrust_n"},
+        #{model_name: "RcsPitchNegModel", valve_port: "pitch_neg_a_valve", thrust_port: "pitch_neg_a_thrust_n"},
+        #{model_name: "RcsPitchNegBModel", valve_port: "pitch_neg_b_valve", thrust_port: "pitch_neg_b_thrust_n"},
+        #{model_name: "RcsRollPosModel", valve_port: "roll_pos_a_valve", thrust_port: "roll_pos_a_thrust_n"},
+        #{model_name: "RcsRollPosBModel", valve_port: "roll_pos_b_valve", thrust_port: "roll_pos_b_thrust_n"},
+        #{model_name: "RcsRollNegModel", valve_port: "roll_neg_a_valve", thrust_port: "roll_neg_a_thrust_n"},
+        #{model_name: "RcsRollNegBModel", valve_port: "roll_neg_b_valve", thrust_port: "roll_neg_b_thrust_n"},
+        #{model_name: "RcsYawPosModel", valve_port: "yaw_pos_a_valve", thrust_port: "yaw_pos_a_thrust_n"},
+        #{model_name: "RcsYawPosBModel", valve_port: "yaw_pos_b_valve", thrust_port: "yaw_pos_b_thrust_n"},
+        #{model_name: "RcsYawNegModel", valve_port: "yaw_neg_a_valve", thrust_port: "yaw_neg_a_thrust_n"},
+        #{model_name: "RcsYawNegBModel", valve_port: "yaw_neg_b_valve", thrust_port: "yaw_neg_b_thrust_n"},
+    ]
+}
+
 // Keep repeated Griffin lookups on one Rust-owned, revision-pinned SysML
 // session. The qualified name is an identifier boundary; the engineering
 // value itself remains a native Rust/Rhai value.
@@ -233,6 +250,9 @@ fn _qualified_attribute(name) {
     if name == "landingSurfaceDatumToleranceM" {
         return "GriffinSimulationAccuracyRequirements::GR038_LandingSurfaceDatum::" + name;
     }
+    if name == "guidanceAssemblyMassToleranceKg" {
+        return "GriffinSimulationAccuracyRequirements::GR039_GuidanceUsesDynamicJointIslandMass::" + name;
+    }
     "Griffin1Requirements::PublicMissionContext::" + name
 }
 
@@ -350,6 +370,7 @@ fn ramp_count() { _sysml_integer("rampCount") }
 fn solar_array_count() { _sysml_integer("solarArrayCount") }
 fn route_steering_mode() { _sysml_text("missionSteeringMode") }
 fn landing_stability_horizon_s() { _sysml_attribute("landingStabilityHorizonS") }
+fn guidance_assembly_mass_tolerance_kg() { _sysml_attribute("guidanceAssemblyMassToleranceKg") }
 fn landing_stability_sample_every_n_ticks() {
     _sysml_integer("landingStabilitySampleEveryNTicks")
 }

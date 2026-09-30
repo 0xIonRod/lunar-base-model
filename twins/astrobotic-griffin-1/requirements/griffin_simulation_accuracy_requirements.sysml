@@ -60,6 +60,18 @@ package GriffinSimulationAccuracyRequirements {
             and targetZ <= padCenterZ + requiredPadHalfExtentM + toleranceM;
     }
 
+    constraint def GR039_GuidanceAssemblyMassMatchesPhysics {
+        in solverMassKg : Real;
+        in guidanceMassKg : Real;
+        in solverMassValid : Boolean;
+        in guidanceMassValid : Boolean;
+        in toleranceKg : Real;
+        solverMassValid and guidanceMassValid
+            and solverMassKg > 0.0 and guidanceMassKg > 0.0
+            and guidanceMassKg >= solverMassKg - toleranceKg
+            and guidanceMassKg <= solverMassKg + toleranceKg;
+    }
+
     // Domain-owned requirement definitions. Griffin1Requirements owns only
     // the integrated system subject, requirement usages, and verification.
 
@@ -116,6 +128,14 @@ package GriffinSimulationAccuracyRequirements {
     }
 
 
+    requirement def GR039_GuidanceUsesDynamicJointIslandMass {
+        doc /* GR-039 [flight dynamics] before descent guidance may command thrust, its vehicle_mass input shall equal the current finite positive mass of every dynamic rigid body in the lander's active joint island, within guidanceAssemblyMassToleranceKg. Guidance authority shall remain inhibited while that complete solver measurement is invalid. This preserves the force-to-acceleration balance for the actual articulated vehicle; it never substitutes the lander hull mass or a nominal fallback. Source: Newton's second law and LunCoSim dynamic joint-island mass contract. Assumption: the authored active dynamic-joint island is the controlled vehicle assembly; static and kinematic anchors are excluded. */
+        attribute guidanceAssemblyMassToleranceKg : Real = 0.001;
+        require GR039_GuidanceAssemblyMassMatchesPhysics {
+            in toleranceKg = guidanceAssemblyMassToleranceKg;
+        }
+    }
+
     // System integration requirement usages owned by this domain.
     requirement <'GR-008'> gr008 : GR008_AttitudeCases { subject rover : HostedRoverInterface; }
     requirement <'GR-021'> gr021 : GR021_MassProperties { subject lander : Griffin1Lander; }
@@ -126,6 +146,7 @@ package GriffinSimulationAccuracyRequirements {
     requirement <'GR-036'> gr036 : GR036_LandingStability { subject lander : Griffin1Lander; }
     requirement <'GR-037'> gr037 : GR037_LandingTargetDatum { subject lander : Griffin1Lander; }
     requirement <'GR-038'> gr038 : GR038_LandingSurfaceDatum { subject lander : Griffin1Lander; }
+    requirement <'GR-039'> gr039 : GR039_GuidanceUsesDynamicJointIslandMass { subject lander : Griffin1Lander; }
 
 
     verification def Verify_GriffinLandingStability {

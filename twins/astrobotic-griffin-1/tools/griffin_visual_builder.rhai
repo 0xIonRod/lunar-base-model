@@ -1274,19 +1274,38 @@ fn physical_landing_leg_pad_geometry() {
     let source = sysml_requirements::source_with_selection([
         visual + "footPadRadiusM", visual + "footPadHeightM",
         visual + "footPadCenterYM",
+        visual + "springLowerLimitM", visual + "springUpperLimitM",
+        visual + "springStiffnessNPerM", visual + "springDampingNsPerM",
+        visual + "springMaxForceN", visual + "springTargetVelocityMps",
+        visual + "springPoseToleranceM",
         configuration + "legStations", configuration + "legStationRotationYDeg",
+        "Griffin1Requirements::PublicMissionContext::landingVehicleReferenceTouchdownY",
+        "Griffin1Requirements::PublicMissionContext::siteSurfaceY",
         visual + "physicalLegPlacementToleranceM",
         visual + "physicalLegRotationToleranceDeg",
         visual + "padColliderToleranceM"
     ], ["GriffinLandingLegRequirements::gll005",
-        "GriffinLandingLegRequirements::gll008"],
-       ["GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements"]);
+        "GriffinLandingLegRequirements::gll008",
+        "GriffinLandingLegRequirements::gll010"],
+       ["GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements",
+        "Griffin1Requirements::Verify_GriffinSurfaceOperations"]);
     if source.ok != true {
         return plan_error("SysML landing-leg geometry source is unavailable");
     }
     let radius = sysml_requirements::number(source, visual + "footPadRadiusM");
     let height = sysml_requirements::number(source, visual + "footPadHeightM");
     let center_y = sysml_requirements::number(source, visual + "footPadCenterYM");
+    let lower_limit = sysml_requirements::number(source, visual + "springLowerLimitM");
+    let upper_limit = sysml_requirements::number(source, visual + "springUpperLimitM");
+    let stiffness = sysml_requirements::number(source, visual + "springStiffnessNPerM");
+    let damping = sysml_requirements::number(source, visual + "springDampingNsPerM");
+    let max_force = sysml_requirements::number(source, visual + "springMaxForceN");
+    let target_velocity = sysml_requirements::number(source, visual + "springTargetVelocityMps");
+    let pose_tolerance = sysml_requirements::number(source, visual + "springPoseToleranceM");
+    let touchdown_y = sysml_requirements::number(source,
+        "Griffin1Requirements::PublicMissionContext::landingVehicleReferenceTouchdownY");
+    let surface_y = sysml_requirements::number(source,
+        "Griffin1Requirements::PublicMissionContext::siteSurfaceY");
     let stations = sysml_requirement_checks::source_position_list(source,
         configuration + "legStations");
     let rotations = sysml_requirements::vector(source,
@@ -1297,15 +1316,27 @@ fn physical_landing_leg_pad_geometry() {
         visual + "physicalLegRotationToleranceDeg");
     let tolerance = sysml_requirements::number(source,
         visual + "padColliderToleranceM");
-    if radius == () || height == () || center_y == () || tolerance == ()
-        || station_tolerance == () || rotation_tolerance == ()
-        || stations.len() != 4 || rotations.len() != 4
-        || radius <= 0.0 || height <= 0.0 || tolerance <= 0.0
-        || station_tolerance <= 0.0 || rotation_tolerance <= 0.0 {
-        return plan_error("SysML landing-leg pad or COM-frame station datums are incomplete");
+    let geometry_missing = radius == () || height == () || center_y == ()
+        || tolerance == () || touchdown_y == () || surface_y == ();
+    let spring_missing = lower_limit == () || upper_limit == () || stiffness == ()
+        || damping == () || max_force == () || target_velocity == ()
+        || pose_tolerance == ();
+    let station_missing = station_tolerance == () || rotation_tolerance == ()
+        || stations.len() != 4 || rotations.len() != 4;
+    let values_invalid = radius <= 0.0 || height <= 0.0 || tolerance <= 0.0
+        || lower_limit > upper_limit || stiffness <= 0.0 || damping < 0.0
+        || max_force <= 0.0 || pose_tolerance <= 0.0
+        || station_tolerance <= 0.0 || rotation_tolerance <= 0.0;
+    if geometry_missing || spring_missing || station_missing || values_invalid {
+        return plan_error("SysML landing-leg geometry, spring, or touchdown datums are incomplete or invalid");
     }
     #{ok: true, radius_m: radius, height_m: height, center_y_m: center_y,
       stations: stations, rotations_y_deg: rotations,
+      spring_lower_limit_m: lower_limit, spring_upper_limit_m: upper_limit,
+      spring_stiffness_n_per_m: stiffness, spring_damping_ns_per_m: damping,
+      spring_max_force_n: max_force, spring_target_velocity_mps: target_velocity,
+      spring_pose_tolerance_m: pose_tolerance,
+      touchdown_y_m: touchdown_y, surface_y_m: surface_y,
       tolerance_m: tolerance, station_tolerance_m: station_tolerance,
       rotation_tolerance_deg: rotation_tolerance}
 }
@@ -1319,6 +1350,7 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
     let suffixes = ["PX", "NX", "PZ", "NZ"];
     let ops = [];
     let removed_legacy = [];
+    let spring_targets = [];
     for index in 0..suffixes.len() {
         let leg_path = root + "/Leg" + suffixes[index];
         let leg = assembly_builder::composed_query(doc,
@@ -1344,6 +1376,13 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         // body now share the one SysML leg station. This preserves a real
         // articulated attachment after correcting the legacy low leg pose.
         let joint_path = root + "/Leg" + suffixes[index] + "_Spring";
+        let spring_target = geometry.surface_y_m - geometry.touchdown_y_m
+            - station.y - geometry.center_y_m + geometry.height_m / 2.0;
+        if spring_target < geometry.spring_lower_limit_m
+            || spring_target > geometry.spring_upper_limit_m {
+            return plan_error(joint_path + ": derived touchdown rest pose is outside the source-owned spring limits");
+        }
+        spring_targets.push(spring_target);
         let joint = assembly_builder::composed_query(doc,
             #{path: joint_path, children: false});
         if query_ok(joint) {
@@ -1354,6 +1393,19 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
             ops.push(#{SetAttribute: #{edit_target: edit_target,
                 path: joint_path, name: "physics:localPos1", type_name: "point3f",
                 value: "(0.0, 0.0, 0.0)"}});
+            for attribute in [
+                #{name: "physics:lowerLimit", value: geometry.spring_lower_limit_m},
+                #{name: "physics:upperLimit", value: geometry.spring_upper_limit_m},
+                #{name: "drive:linear:physics:targetPosition", value: spring_target},
+                #{name: "drive:linear:physics:targetVelocity", value: geometry.spring_target_velocity_mps},
+                #{name: "drive:linear:physics:stiffness", value: geometry.spring_stiffness_n_per_m},
+                #{name: "drive:linear:physics:damping", value: geometry.spring_damping_ns_per_m},
+                #{name: "drive:linear:physics:maxForce", value: geometry.spring_max_force_n}
+            ] {
+                ops.push(#{SetAttribute: #{edit_target: edit_target,
+                    path: joint_path, name: attribute.name, type_name: "float",
+                    value: attribute.value.to_string()}});
+            }
         } else {
             return plan_error(joint_path + ": physical suspension joint is missing");
         }
@@ -1485,6 +1537,8 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
     #{ok: true, kind: "griffin_physical_landing_leg_pads", root: root,
       radius_m: geometry.radius_m, height_m: geometry.height_m,
       center_y_m: geometry.center_y_m, tolerance_m: geometry.tolerance_m,
+      spring_target_positions_m: spring_targets,
+      spring_limits_m: [geometry.spring_lower_limit_m, geometry.spring_upper_limit_m],
       removed_legacy_paths: removed_legacy,
       collider_paths: [root + "/LegPX/LandingLegVisual/FootPadCollider",
         root + "/LegNX/LandingLegVisual/FootPadCollider",

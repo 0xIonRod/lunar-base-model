@@ -24,11 +24,136 @@ fn follow_lander() {
     follow(find_path("/Griffin1SurfaceOps/Lander"));
 }
 
+/// Enable descent guidance only after mission preflight has accepted the
+/// current dynamic joint-island mass and its source-linked unit contract.
+fn arm_descent_guidance() {
+    let gnc = find_path("/Griffin1SurfaceOps/Lander/GNC");
+    if gnc < 0 {
+        return #{ok: false, error: "lander guidance entity is unavailable"};
+    }
+    let result = cmd("SetPorts", #{target: gnc, writes: [["engage", 1.0]]});
+    if result == () || result.ok != true {
+        return #{ok: false, error: "descent guidance rejected mission authority"};
+    }
+    #{ok: true, guidance: gnc}
+}
+
 /// Hand the mission view to the rover immediately after the adapter release.
 /// The follow camera makes the physical ramp exit and rover drop visible
 /// without taking control away from the rover's autopilot.
 fn follow_rover() {
     follow(find_path("/Griffin1SurfaceOps/FLIP"));
+}
+
+fn _surface_batch_port(ports, name, direction) {
+    if ports == () { return (); }
+    for port in ports {
+        if port.name == name && port.direction == direction { return port; }
+    }
+    ()
+}
+
+fn _surface_batch_value(ports, name, direction) {
+    let port = _surface_batch_port(ports, name, direction);
+    if port == () { return (); }
+    port.value
+}
+
+fn _surface_batch_unit_identity(port) {
+    if port == () { return (); }
+    let metadata = port.metadata;
+    if metadata == () { return (); }
+    let unit = metadata.unit;
+    if unit == () { return (); }
+    unit.id
+}
+
+// Verify that descent guidance consumes the complete mass of the lander's
+// current dynamic joint island. ReadPortsBatch gives both endpoints one tick;
+// a missing/invalid solver mass stays an explicit failure and cannot become a
+// point-mass estimate.
+fn guidance_assembly_mass_report() {
+    let lander = find_path("/Griffin1SurfaceOps/Lander");
+    let gnc = find_path("/Griffin1SurfaceOps/Lander/GNC");
+    if lander == () || gnc == () || lander < 0 || gnc < 0 {
+        return #{ok: false, ready: true, error: "lander or guidance entity is unavailable",
+            lander: lander, guidance: gnc};
+    }
+    let targets = [
+        #{api_id: lander, port_names: ["dynamic_joint_island_mass_kg",
+            "dynamic_joint_island_mass_valid"]},
+        #{api_id: gnc, port_names: ["vehicle_mass", "mass_properties_valid"]}
+    ];
+    let snapshot = read_ports_batch(targets);
+    if snapshot == () || snapshot.sim_tick == () || snapshot.entities == ()
+        || snapshot.entities.len() != targets.len() {
+        return #{ok: false, ready: true,
+            error: "joint-island mass and guidance ports are not available in one tick snapshot",
+            sim_tick: if snapshot == () { () } else { snapshot.sim_tick },
+            snapshot: snapshot};
+    }
+    let assembly_mass = _surface_batch_port(snapshot.entities[0].ports,
+        "dynamic_joint_island_mass_kg", "out");
+    let assembly_valid = _surface_batch_port(snapshot.entities[0].ports,
+        "dynamic_joint_island_mass_valid", "out");
+    let guidance_mass = _surface_batch_port(snapshot.entities[1].ports,
+        "vehicle_mass", "in");
+    let guidance_valid = _surface_batch_port(snapshot.entities[1].ports,
+        "mass_properties_valid", "in");
+    if assembly_mass == () || assembly_valid == ()
+        || guidance_mass == () || guidance_valid == () {
+        return #{ok: false, ready: true,
+            error: "required mass measurement or guidance input port is missing",
+            sim_tick: snapshot.sim_tick, ports: snapshot.entities};
+    }
+    let mass = assembly_mass.value;
+    let valid = assembly_valid.value;
+    let commanded_mass = guidance_mass.value;
+    let commanded_valid = guidance_valid.value;
+    let mass_unit = _surface_batch_unit_identity(assembly_mass);
+    let guidance_unit = _surface_batch_unit_identity(guidance_mass);
+    let tolerance = griffin_spec::guidance_assembly_mass_tolerance_kg();
+    if mass_unit != "kg" || guidance_unit != "kg"
+        || tolerance == () || !tolerance.is_finite() || tolerance < 0.0 {
+        return #{ok: false, ready: true,
+            error: "mass units or SysML comparison tolerance are missing or invalid",
+            sim_tick: snapshot.sim_tick, mass_unit: mass_unit,
+            guidance_unit: guidance_unit, tolerance_kg: tolerance};
+    }
+    if valid == () || commanded_valid == ()
+        || (valid != 0.0 && valid != 1.0)
+        || (commanded_valid != 0.0 && commanded_valid != 1.0) {
+        return #{ok: false, ready: true,
+            error: "mass validity ports violate their exact 0-or-1 contract",
+            sim_tick: snapshot.sim_tick, mass_valid: valid,
+            guidance_mass_valid: commanded_valid};
+    }
+    if valid == 0.0 || commanded_valid == 0.0 {
+        return #{ok: false, ready: false,
+            error: "waiting for the complete solver mass to propagate to guidance",
+            sim_tick: snapshot.sim_tick, assembly_mass_kg: mass,
+            guidance_mass_kg: commanded_mass, mass_valid: valid,
+            guidance_mass_valid: commanded_valid, mass_unit: mass_unit,
+            guidance_unit: guidance_unit, tolerance_kg: tolerance};
+    }
+    if mass == () || commanded_mass == ()
+        || !mass.is_finite() || !commanded_mass.is_finite()
+        || mass <= 0.0 || commanded_mass <= 0.0 {
+        return #{ok: false, ready: true,
+            error: "a validity-true mass sample is not finite and positive",
+            sim_tick: snapshot.sim_tick, assembly_mass_kg: mass,
+            guidance_mass_kg: commanded_mass, mass_unit: mass_unit,
+            guidance_unit: guidance_unit, tolerance_kg: tolerance};
+    }
+    let difference = (commanded_mass - mass).abs();
+    let ok = difference <= tolerance;
+    #{ok: ok, ready: true,
+        error: if ok { "" } else { "guidance is not using the complete valid dynamic joint-island mass" },
+        sim_tick: snapshot.sim_tick, assembly_mass_kg: mass,
+        guidance_mass_kg: commanded_mass, difference_kg: difference,
+        mass_valid: valid, guidance_mass_valid: commanded_valid,
+        mass_unit: mass_unit, guidance_unit: guidance_unit,
+        tolerance_kg: tolerance}
 }
 
 // Compact, named telemetry probe for the landing study.  This replaces ad-hoc
@@ -44,6 +169,120 @@ fn landing_gate_report() {
     let imu = find_path("/Griffin1SurfaceOps/Lander/IMU");
     let attitude_reference = find_path("/Griffin1SurfaceOps/Lander/AttitudeReference");
     let attitude_propulsion = find_path("/Griffin1SurfaceOps/Lander/AttitudePropulsion");
+    let propulsion = find_path("/Griffin1SurfaceOps/Lander/MainPropulsion");
+    let attitude_actuation = find_path("/Griffin1SurfaceOps/Lander/AttitudeActuation");
+    let lander_port_names = [
+        "all_legs_contact", "upright_axis_y", "ground_speed", "descent_speed",
+        "angular_speed", "maximum_leg_speed", "landing_contact", "touchdown",
+        "dynamic_joint_island_mass_kg", "dynamic_joint_island_mass_valid",
+        "engine_cutoff_contact", "landing_handoff", "desired_tilt_x", "desired_tilt_z",
+        "torque_x", "torque_y", "torque_z", "leg_contact_px", "leg_contact_nx",
+        "leg_contact_pz", "leg_contact_nz", "leg_force_px", "leg_force_nx",
+        "leg_force_pz", "leg_force_nz", "leg_displacement_px", "leg_displacement_nx",
+        "leg_displacement_pz", "leg_displacement_nz", "leg_velocity_px", "leg_velocity_nx",
+        "leg_velocity_pz", "leg_velocity_nz", "throttle", "piloted",
+        "external_throttle", "guidance_throttle"
+    ];
+    let gnc_port_names = [
+        "target_distance_m", "target_zone_gate", "target_recovery_gate", "any_leg_contact",
+        "landing_handoff_request", "landing_engine_cutoff_request", "engage", "piloted",
+        "flight_authority_gate", "engine_alignment_gate_output", "thrust_vertical_projection",
+        "vertical_limiter_output", "thrust_accel", "lateral_accel_magnitude",
+        "lateral_accel_x", "lateral_accel_z", "lateral_support_vertical_command",
+        "altitude_above_target", "unsaturated_throttle", "pid_y_command",
+        "altimeter_altitude_confidence", "vehicle_mass", "max_thrust",
+        "mass_properties_valid",
+        "throttle_cmd", "pitch_cmd", "roll_cmd"
+    ];
+    let attitude_actuation_port_names = [
+        "desired_torque_x", "desired_torque_y", "desired_torque_z",
+        "pitch_pos_a_valve", "pitch_pos_b_valve", "pitch_neg_a_valve", "pitch_neg_b_valve",
+        "roll_pos_a_valve", "roll_pos_b_valve", "roll_neg_a_valve", "roll_neg_b_valve",
+        "yaw_pos_a_valve", "yaw_pos_b_valve", "yaw_neg_a_valve", "yaw_neg_b_valve"
+    ];
+    let rcs_jets = griffin_spec::rcs_port_mapping();
+    let rcs_model_paths = [];
+    let rcs_valve_port_names = [];
+    let rcs_thrust_port_names = [];
+    for jet in rcs_jets {
+        rcs_model_paths.push("/Griffin1SurfaceOps/Lander/AttitudePropulsion/" + jet.model_name);
+        rcs_valve_port_names.push(jet.valve_port);
+        rcs_thrust_port_names.push(jet.thrust_port);
+    }
+    let propulsion_port_names = [
+        "thrust_n", "maximum_thrust_n", "engine_activity", "vehicle_mass_kg", "propellant_mass"
+    ];
+    let attitude_reference_port_names = ["error_x", "error_z"];
+    let control_targets = [
+        #{api_id: lander, port_names: lander_port_names},
+        #{api_id: gnc, port_names: gnc_port_names},
+        #{api_id: attitude_actuation, port_names: attitude_actuation_port_names},
+        #{api_id: attitude_propulsion, port_names: rcs_thrust_port_names},
+        #{api_id: propulsion, port_names: propulsion_port_names},
+        #{api_id: attitude_reference, port_names: attitude_reference_port_names}
+    ];
+    let control_snapshot = read_ports_batch(control_targets);
+    if control_snapshot == () || control_snapshot.sim_tick == ()
+        || control_snapshot.entities == () || control_snapshot.entities.len() != control_targets.len() {
+        return #{ok: false, error: "coherent lander control-port snapshot is unavailable",
+            entities: control_targets, snapshot: control_snapshot};
+    }
+    let rcs_step_snapshot = read_modelica_step_samples([
+        #{api_id: attitude_propulsion,
+            input_names: rcs_valve_port_names,
+            output_names: rcs_thrust_port_names}
+    ]);
+    let rcs_parameter_snapshot = query("QueryUsdPrims", #{
+        paths: rcs_model_paths,
+        attrs: ["inputs:f_nom_n"]
+    });
+    let rcs_step_port_evidence = [];
+    let attitude_propulsion_ports = control_snapshot.entities[3].ports;
+    let attitude_actuation_ports = control_snapshot.entities[2].ports;
+    if rcs_step_snapshot != () && rcs_step_snapshot.entities != ()
+        && rcs_step_snapshot.entities.len() == 1
+        && rcs_parameter_snapshot != () && rcs_parameter_snapshot.records != () {
+        let sample = rcs_step_snapshot.entities[0].sample;
+        for index in 0..rcs_jets.len() {
+            let jet = rcs_jets[index];
+            let latest_actuator_command = _surface_batch_value(attitude_actuation_ports, jet.valve_port, "out");
+            let sampled_valve = if sample == () { () }
+                else { sample.sampled_inputs[jet.valve_port] };
+            let measured_thrust = if sample == () { () }
+                else { sample.sampled_outputs[jet.thrust_port] };
+            let nominal_force = ();
+            for record in rcs_parameter_snapshot.records {
+                if record.path == rcs_model_paths[index] {
+                    nominal_force = record.attrs["inputs:f_nom_n"];
+                    break;
+                }
+            }
+            let expected_thrust = if sampled_valve == () || nominal_force == () { () }
+                else {
+                    let effective_valve = sampled_valve;
+                    if effective_valve < 0.0 { effective_valve = 0.0; }
+                    if effective_valve > 1.0 { effective_valve = 1.0; }
+                    effective_valve * nominal_force
+                };
+            let thrust_residual = if expected_thrust == () || measured_thrust == () { () }
+                else { measured_thrust - expected_thrust };
+            rcs_step_port_evidence.push(#{
+                path: rcs_model_paths[index],
+                api_id: attitude_propulsion,
+                actuator_command_sample_tick: control_snapshot.sim_tick,
+                latest_actuator_command: latest_actuator_command,
+                accepted_valve_input: sampled_valve,
+                measured_thrust_n: measured_thrust,
+                nominal_force_n: nominal_force,
+                thrust_from_accepted_input_n: expected_thrust,
+                thrust_residual_n: thrust_residual
+            });
+        }
+    }
+    let lander_ports = control_snapshot.entities[0].ports;
+    let gnc_ports = control_snapshot.entities[1].ports;
+    let propulsion_ports = control_snapshot.entities[4].ports;
+    let attitude_reference_ports = control_snapshot.entities[5].ports;
     let pose = query("QueryUsdPrim", #{
         path: "/Griffin1SurfaceOps/Lander",
         attrs: ["xformOp:translate"]
@@ -57,7 +296,7 @@ fn landing_gate_report() {
         path: "/Griffin1SurfaceOps/LandingSitePad",
         attrs: ["xformOp:translate", "xformOp:scale"]
     });
-    let lander_port_snapshot = read_ports(lander);
+    let lander_port_snapshot = control_snapshot.entities[0];
     let leg_names = ["LegPX", "LegNX", "LegPZ", "LegNZ"];
     let leg_contact_geometry = [];
     let contact_names = ["leg_contact_px", "leg_contact_nx", "leg_contact_pz", "leg_contact_nz"];
@@ -93,6 +332,28 @@ fn landing_gate_report() {
     // source of allocations during a mission.
     let physics_performance = query("PhysicsPerformance", #{});
     let report = #{
+        control_port_sample_tick: control_snapshot.sim_tick,
+        rcs_command_sample_tick: control_snapshot.sim_tick,
+        rcs_step_sample_tick: if rcs_step_snapshot == () { () } else { rcs_step_snapshot.sim_tick },
+        rcs_step_port_evidence: rcs_step_port_evidence,
+        rcs_step_snapshot: rcs_step_snapshot,
+        rcs_parameter_snapshot: rcs_parameter_snapshot,
+        modelica_clocks: [
+            #{path: "Lander", current_time_s: get(lander, "ModelicaModel.current_time"),
+                communication_period_s: get(lander, "ModelicaModel.communication_period_secs")},
+            #{path: "GNC", current_time_s: get(gnc, "ModelicaModel.current_time"),
+                communication_period_s: get(gnc, "ModelicaModel.communication_period_secs")},
+            #{path: "AttitudeReference", current_time_s: get(attitude_reference, "ModelicaModel.current_time"),
+                communication_period_s: get(attitude_reference, "ModelicaModel.communication_period_secs")},
+            #{path: "AttitudeActuation", current_time_s: get(attitude_actuation, "ModelicaModel.current_time"),
+                communication_period_s: get(attitude_actuation, "ModelicaModel.communication_period_secs")},
+            #{path: "AttitudePropulsion", current_time_s: get(attitude_propulsion, "ModelicaModel.current_time"),
+                communication_period_s: get(attitude_propulsion, "ModelicaModel.communication_period_secs")},
+            #{path: "MainPropulsion", current_time_s: get(propulsion, "ModelicaModel.current_time"),
+                communication_period_s: get(propulsion, "ModelicaModel.communication_period_secs")},
+            #{path: "Altimeter", current_time_s: get(altimeter_model, "ModelicaModel.current_time"),
+                communication_period_s: get(altimeter_model, "ModelicaModel.communication_period_secs")}
+        ],
         position: if pose == () { [] } else { pose.world_position },
         physics_state: physics,
         landing_target_position: if target_pose == () { () } else { target_pose.world_position },
@@ -106,62 +367,92 @@ fn landing_gate_report() {
         rover_brake_command: get(rover, "brake"),
         rover_throttle_command: get(rover, "throttle"),
         rover_steer_command: get(rover, "steer"),
-        all_legs_contact: get(lander, "all_legs_contact"),
-        upright_axis_y: get(lander, "upright_axis_y"),
-        ground_speed: get(lander, "ground_speed"),
-        descent_speed: get(lander, "descent_speed"),
-        angular_speed: get(lander, "angular_speed"),
-        maximum_leg_speed: get(lander, "maximum_leg_speed"),
-        landing_contact: get(lander, "landing_contact"),
-        touchdown: get(lander, "touchdown"),
-        engine_cutoff_contact: get(lander, "engine_cutoff_contact"),
-        landing_handoff: get(lander, "landing_handoff"),
-        target_distance_m: get(gnc, "target_distance_m"),
-        target_zone_gate: get(gnc, "target_zone_gate"),
-        target_recovery_gate: get(gnc, "target_recovery_gate"),
-        any_leg_contact: get(gnc, "any_leg_contact"),
-        landing_handoff_request: get(gnc, "landing_handoff_request"),
-        landing_engine_cutoff_request: get(gnc, "landing_engine_cutoff_request"),
-        guidance_engage: get(gnc, "engage"),
-        guidance_piloted: get(gnc, "piloted"),
-        guidance_authority: get(gnc, "flight_authority_gate"),
-        guidance_alignment: get(gnc, "engine_alignment_gate_output"),
-        guidance_vertical_projection: get(gnc, "thrust_vertical_projection"),
-        guidance_vertical_command: get(gnc, "vertical_limiter_output"),
-        guidance_thrust_accel: get(gnc, "thrust_accel"),
-        guidance_lateral_accel_magnitude: get(gnc, "lateral_accel_magnitude"),
-        guidance_lateral_accel_x: get(gnc, "lateral_accel_x"),
-        guidance_lateral_accel_z: get(gnc, "lateral_accel_z"),
-        guidance_lateral_support_vertical_command: get(gnc, "lateral_support_vertical_command"),
-        guidance_altitude_above_target: get(gnc, "altitude_above_target"),
-        guidance_unsaturated_throttle: get(gnc, "unsaturated_throttle"),
-        guidance_pid_y: get(gnc, "pid_y_command"),
-        guidance_altimeter_confidence: get(gnc, "altimeter_altitude_confidence"),
+        all_legs_contact: _surface_batch_value(lander_ports, "all_legs_contact", "out"),
+        upright_axis_y: _surface_batch_value(lander_ports, "upright_axis_y", "in"),
+        ground_speed: _surface_batch_value(lander_ports, "ground_speed", "out"),
+        descent_speed: _surface_batch_value(lander_ports, "descent_speed", "out"),
+        angular_speed: _surface_batch_value(lander_ports, "angular_speed", "out"),
+        maximum_leg_speed: _surface_batch_value(lander_ports, "maximum_leg_speed", "out"),
+        landing_contact: _surface_batch_value(lander_ports, "landing_contact", "out"),
+        touchdown: _surface_batch_value(lander_ports, "touchdown", "out"),
+        engine_cutoff_contact: _surface_batch_value(lander_ports, "engine_cutoff_contact", "out"),
+        landing_handoff: _surface_batch_value(lander_ports, "landing_handoff", "in"),
+        target_distance_m: _surface_batch_value(gnc_ports, "target_distance_m", "out"),
+        target_zone_gate: _surface_batch_value(gnc_ports, "target_zone_gate", "out"),
+        target_recovery_gate: _surface_batch_value(gnc_ports, "target_recovery_gate", "out"),
+        any_leg_contact: _surface_batch_value(gnc_ports, "any_leg_contact", "in"),
+        landing_handoff_request: _surface_batch_value(gnc_ports, "landing_handoff_request", "out"),
+        landing_engine_cutoff_request: _surface_batch_value(gnc_ports, "landing_engine_cutoff_request", "out"),
+        guidance_engage: _surface_batch_value(gnc_ports, "engage", "in"),
+        guidance_piloted: _surface_batch_value(gnc_ports, "piloted", "in"),
+        guidance_authority: _surface_batch_value(gnc_ports, "flight_authority_gate", "out"),
+        guidance_alignment: _surface_batch_value(gnc_ports, "engine_alignment_gate_output", "out"),
+        guidance_vertical_projection: _surface_batch_value(gnc_ports, "thrust_vertical_projection", "out"),
+        guidance_vertical_command: _surface_batch_value(gnc_ports, "vertical_limiter_output", "out"),
+        guidance_thrust_accel: _surface_batch_value(gnc_ports, "thrust_accel", "out"),
+        guidance_lateral_accel_magnitude: _surface_batch_value(gnc_ports, "lateral_accel_magnitude", "out"),
+        guidance_lateral_accel_x: _surface_batch_value(gnc_ports, "lateral_accel_x", "out"),
+        guidance_lateral_accel_z: _surface_batch_value(gnc_ports, "lateral_accel_z", "out"),
+        guidance_lateral_support_vertical_command: _surface_batch_value(gnc_ports, "lateral_support_vertical_command", "out"),
+        guidance_altitude_above_target: _surface_batch_value(gnc_ports, "altitude_above_target", "out"),
+        guidance_unsaturated_throttle: _surface_batch_value(gnc_ports, "unsaturated_throttle", "out"),
+        guidance_pid_y: _surface_batch_value(gnc_ports, "pid_y_command", "out"),
+        guidance_altimeter_confidence: _surface_batch_value(gnc_ports, "altimeter_altitude_confidence", "in"),
+        guidance_vehicle_mass_kg: _surface_batch_value(gnc_ports, "vehicle_mass", "in"),
+        guidance_mass_properties_valid: _surface_batch_value(gnc_ports, "mass_properties_valid", "in"),
+        dynamic_joint_island_mass_kg: _surface_batch_value(lander_ports, "dynamic_joint_island_mass_kg", "out"),
+        dynamic_joint_island_mass_valid: _surface_batch_value(lander_ports, "dynamic_joint_island_mass_valid", "out"),
+        guidance_max_thrust_n: _surface_batch_value(gnc_ports, "max_thrust", "in"),
+        main_engine_thrust_n: _surface_batch_value(propulsion_ports, "thrust_n", "out"),
+        main_engine_maximum_thrust_n: _surface_batch_value(propulsion_ports, "maximum_thrust_n", "out"),
+        main_engine_activity: _surface_batch_value(propulsion_ports, "engine_activity", "out"),
+        propulsion_vehicle_mass_kg: _surface_batch_value(propulsion_ports, "vehicle_mass_kg", "out"),
+        propellant_mass_kg: _surface_batch_value(propulsion_ports, "propellant_mass", "out"),
         guidance_nav_y: get(gnc, "navigation.nav_pos_y"),
         guidance_nav_velocity_y: get(gnc, "navigation.nav_vel_y"),
         guidance_nav_acceleration_y: get(gnc, "navigation.navigation_accel_y"),
+        guidance_nav_x: get(gnc, "navigation.nav_pos_x"),
+        guidance_nav_z: get(gnc, "navigation.nav_pos_z"),
+        guidance_nav_velocity_x: get(gnc, "navigation.nav_vel_x"),
+        guidance_nav_velocity_z: get(gnc, "navigation.nav_vel_z"),
+        guidance_nav_acceleration_x: get(gnc, "navigation.navigation_accel_x"),
+        guidance_nav_acceleration_z: get(gnc, "navigation.navigation_accel_z"),
         guidance_altitude_position_error: get(gnc, "navigation.altitude_position_error"),
         guidance_altitude_observer_authority: get(gnc, "navigation.altitude_observation_authority.acquisition"),
         guidance_altimeter_vehicle_position_y: get(gnc, "altimeter_vehicle_position_y"),
         environment_gravity_x: get(environment, "gravity_x"),
         environment_gravity_y: get(environment, "gravity_y"),
         environment_gravity_z: get(environment, "gravity_z"),
-        guidance_nav_x: get(gnc, "navigation.nav_pos_x"),
-        guidance_nav_z: get(gnc, "navigation.nav_pos_z"),
         imu_raw_sample_valid: get(imu, "raw_sample_valid"),
         imu_raw_acceleration_y: get(imu, "raw_acceleration_y"),
         imu_specific_force_y: get(imu, "specific_force_y"),
         imu_attitude_quaternion: [get(imu, "attitude_quat_w"), get(imu, "attitude_quat_x"),
             get(imu, "attitude_quat_y"), get(imu, "attitude_quat_z")],
-        measured_attitude_error: [get(attitude_reference, "error_x"),
-            get(attitude_reference, "error_z")],
-        desired_tilt: [get(lander, "desired_tilt_x"), get(lander, "desired_tilt_z")],
-        requested_body_torque: [get(lander, "torque_x"), get(lander, "torque_y"),
-            get(lander, "torque_z")],
-        rcs_pitch_positive_a_thrust: get(attitude_propulsion, "pitch_pos_a_thrust_n"),
-        rcs_pitch_negative_a_thrust: get(attitude_propulsion, "pitch_neg_a_thrust_n"),
-        rcs_roll_positive_a_thrust: get(attitude_propulsion, "roll_pos_a_thrust_n"),
-        rcs_roll_negative_a_thrust: get(attitude_propulsion, "roll_neg_a_thrust_n"),
+        measured_attitude_error: [
+            _surface_batch_value(attitude_reference_ports, "error_x", "out"),
+            _surface_batch_value(attitude_reference_ports, "error_z", "out")],
+        desired_tilt: [
+            _surface_batch_value(lander_ports, "desired_tilt_x", "out"),
+            _surface_batch_value(lander_ports, "desired_tilt_z", "out")],
+        requested_body_torque: [
+            _surface_batch_value(lander_ports, "torque_x", "out"),
+            _surface_batch_value(lander_ports, "torque_y", "out"),
+            _surface_batch_value(lander_ports, "torque_z", "out")],
+        allocator_input_torque: [
+            _surface_batch_value(attitude_actuation_ports, "desired_torque_x", "in"),
+            _surface_batch_value(attitude_actuation_ports, "desired_torque_y", "in"),
+            _surface_batch_value(attitude_actuation_ports, "desired_torque_z", "in")],
+        allocator_port_records: attitude_actuation_ports,
+        rcs_pitch_positive_a_thrust: _surface_batch_value(attitude_propulsion_ports, "pitch_pos_a_thrust_n", "out"),
+        rcs_pitch_negative_a_thrust: _surface_batch_value(attitude_propulsion_ports, "pitch_neg_a_thrust_n", "out"),
+        rcs_roll_positive_a_thrust: _surface_batch_value(attitude_propulsion_ports, "roll_pos_a_thrust_n", "out"),
+        rcs_roll_negative_a_thrust: _surface_batch_value(attitude_propulsion_ports, "roll_neg_a_thrust_n", "out"),
+        rcs_roll_positive_b_thrust: _surface_batch_value(attitude_propulsion_ports, "roll_pos_b_thrust_n", "out"),
+        rcs_roll_negative_b_thrust: _surface_batch_value(attitude_propulsion_ports, "roll_neg_b_thrust_n", "out"),
+        rcs_roll_positive_a_valve: _surface_batch_value(attitude_actuation_ports, "roll_pos_a_valve", "out"),
+        rcs_roll_negative_a_valve: _surface_batch_value(attitude_actuation_ports, "roll_neg_a_valve", "out"),
+        rcs_roll_positive_b_valve: _surface_batch_value(attitude_actuation_ports, "roll_pos_b_valve", "out"),
+        rcs_roll_negative_b_valve: _surface_batch_value(attitude_actuation_ports, "roll_neg_b_valve", "out"),
         ray_hit_valid: get(altimeter, "ray_hit_valid"),
         ray_distance_m: get(altimeter, "ray_distance"),
         ray_hit_position_y: get(altimeter, "ray_hit_position_y"),
@@ -174,6 +465,12 @@ fn landing_gate_report() {
         altimeter_vehicle_position_y: get(altimeter_model, "vehicle_position_y"),
         altimeter_input_ray_distance_m: get(altimeter_model, "ray_distance_m"),
         altimeter_input_ray_valid: get(altimeter_model, "ray_hit_valid"),
+        airframe_piloted: _surface_batch_value(lander_ports, "piloted", "in"),
+        airframe_external_throttle: _surface_batch_value(lander_ports, "external_throttle", "in"),
+        airframe_guidance_throttle_input: _surface_batch_value(lander_ports, "guidance_throttle", "in"),
+        guidance_throttle_cmd: _surface_batch_value(gnc_ports, "throttle_cmd", "out"),
+        airframe_commanded_throttle: get(lander, "cmd_throttle"),
+        airframe_filtered_pilot_throttle: get(lander, "filter_throttle"),
         throttle_cmd: get(gnc, "throttle_cmd"),
         lander_throttle: get(lander, "throttle"),
         pitch_cmd: get(gnc, "pitch_cmd"),
@@ -696,11 +993,7 @@ fn physical_ramp_joint_evidence() {
 }
 
 fn _ramp_hinge_port(ports, name, direction) {
-    if ports == () { return (); }
-    for port in ports {
-        if port.name == name && port.direction == direction { return port; }
-    }
-    ()
+    _surface_batch_port(ports, name, direction)
 }
 
 /// Validate one hinge from the coherent batch snapshot. Runtime metadata is
@@ -759,7 +1052,9 @@ fn physical_ramp_hinge_report() {
         paths.push(path);
         ids.push(id);
     }
-    let snapshot = read_ports_batch(ids);
+    let targets = [];
+    for id in ids { targets.push(#{api_id: id, port_names: ["angle"]}); }
+    let snapshot = read_ports_batch(targets);
     if snapshot == () || snapshot.sim_tick == () || snapshot.entities == ()
         || snapshot.entities.len() != names.len() {
         return #{ok: false, error: "coherent ramp hinge port snapshot is unavailable",
@@ -846,7 +1141,7 @@ fn physical_ramp_hinges_settled(expected_angles, tolerance_rad) {
 fn _ramp_touchdown_ready() {
     let lander = find_path("/Griffin1SurfaceOps/Lander");
     if lander == () || lander < 0 { return false; }
-    let snapshot = read_ports(lander);
+    let snapshot = read_ports(lander, ["landing_handoff", "all_legs_contact"]);
     // `touchdown` is an event-phase signal and clears after the landing
     // supervisor hands flight control to the landing gear. Ramp operations
     // use that persistent handoff latch, together with live four-pad contact.
@@ -1025,23 +1320,14 @@ fn egress_apron_runtime_evidence(rover) {
 // (a) a stale target/pose wire, (b) a guidance sign, and (c) a wheel output or
 // physics convention issue.
 fn route_guidance_evidence(rover) {
-    let snapshot = query("ReadPorts", #{api_id: rover});
+    let names = ["program_active", "autopilot_enable", "autopilot_target_x",
+        "autopilot_target_z", "autopilot_position_x", "autopilot_position_z",
+        "autopilot_yaw", "autopilot_yaw_rate", "autopilot_speed", "autopilot_radius",
+        "guidance_heading_error", "guidance_throttle", "guidance_steer", "drive_left",
+        "drive_right", "heading_fl", "heading_fr"];
+    let snapshot = read_ports(rover, names);
     if snapshot == () || snapshot.ports == () { return []; }
-    let selected = [];
-    for port in snapshot.ports {
-        if port.name == "program_active" || port.name == "autopilot_enable"
-            || port.name == "autopilot_target_x" || port.name == "autopilot_target_z"
-            || port.name == "autopilot_position_x" || port.name == "autopilot_position_z"
-            || port.name == "autopilot_yaw" || port.name == "autopilot_yaw_rate"
-            || port.name == "autopilot_speed" || port.name == "autopilot_radius"
-            || port.name == "guidance_heading_error" || port.name == "guidance_throttle"
-            || port.name == "guidance_steer" || port.name == "drive_left"
-            || port.name == "drive_right" || port.name == "heading_fl"
-            || port.name == "heading_fr" {
-            selected.push(port);
-        }
-    }
-    selected
+    snapshot.ports
 }
 
 // A failed task leaf can terminate its task tree before a nested mission

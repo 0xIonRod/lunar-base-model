@@ -15,6 +15,8 @@ runtime discovers `tools/*.rhai` at the top level only.
 | `tools/griffin_spec.rhai` | Twin authors | Read-only compatibility projection of SysML values for the Rhai test API. |
 | `tools/griffin_requirements.rhai` | Twin authors | Stable Rhai API for lint, reports, live gates, and command limiters. |
 | `tools/griffin_visual_builder.rhai` | Twin authors | Dry/apply component assembly recipe over the generic typed USD tools. |
+| `tools/griffin_surface_ramp_ops.rhai` | Twin authors | Source-targeted physical hinge command batches; mission sequencing and settlement remain in one scenario. |
+| `tools/griffin_surface_mission_report.rhai` | Twin authors | Bounded mission evidence and verdict construction from explicitly passed mission state. |
 | `components/**/*.usda` | Twin authors | Small replaceable render-only component assets; no flight CAD/B-rep. |
 | composed USD | Editor / typed USD command bus | Own authored geometry, transforms, schemas, relationships, and metadata. |
 | scenario test | Twin scenario | Mount the composed stage and emit the production verdict. |

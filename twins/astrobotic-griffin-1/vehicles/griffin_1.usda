@@ -2280,7 +2280,7 @@ def Xform "Griffin1" (
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = 0.0
+        float drive:linear:physics:targetPosition = -0.5
         float drive:linear:physics:targetVelocity = 0.0
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
@@ -2301,7 +2301,7 @@ def Xform "Griffin1" (
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = 0.0
+        float drive:linear:physics:targetPosition = -0.5
         float drive:linear:physics:targetVelocity = 0.0
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
@@ -2322,7 +2322,7 @@ def Xform "Griffin1" (
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = 0.0
+        float drive:linear:physics:targetPosition = -0.5
         float drive:linear:physics:targetVelocity = 0.0
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
@@ -2343,7 +2343,7 @@ def Xform "Griffin1" (
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = 0.0
+        float drive:linear:physics:targetPosition = -0.5
         float drive:linear:physics:targetVelocity = 0.0
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
