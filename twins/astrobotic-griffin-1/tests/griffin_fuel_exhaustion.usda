@@ -1,0 +1,55 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+    def DistantLight "Sun"
+    {
+        float intensity = 1.0
+    }
+    def Scope "Scenario"
+    {
+        def Scope "Test" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_fuel_exhaustion.rhai@
+        }
+    }
+    def Xform "Griffin1" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
+    )
+    {
+        bool physics:rigidBodyEnabled = false
+        def "MainPropulsion"
+        {
+            custom float outputs:test_fuel_mass
+            float outputs:test_fuel_mass.connect = </World/Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+            custom float outputs:test_oxidizer_flow
+            float outputs:test_oxidizer_flow.connect = </World/Griffin1/MainPropulsion/OxidizerPump.outputs:mass_flow_kgs>
+            custom float outputs:test_intensity
+            float outputs:test_intensity.connect = </World/Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+            custom float outputs:test_length
+            float outputs:test_length.connect = </World/Griffin1/MainPropulsion/PlumePhotometry.outputs:length>
+            custom float outputs:test_plume_activity
+            float outputs:test_plume_activity.connect = </World/Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+            def "FuelTank"
+            {
+                float inputs:initial_mass_kg = 5.0
+            }
+            def "OxidizerTank"
+            {
+                float inputs:initial_mass_kg = 100.0
+            }
+            def "PlumePhotometry"
+            {
+                float outputs:length = 0.0
+            }
+        }
+    }
+}

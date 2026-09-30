@@ -21,7 +21,7 @@ package GriffinLanderRequirements {
         // not duplicated here.
         attribute legCount : Integer = 4;
         attribute tankCount : Integer = 4;
-        attribute engineCount : Integer = 7;
+        attribute engineCount : Integer = 5;
         attribute solarArrayCount : Integer = 3;
         // The open-frame mesh is a render study made from bounded member
         // sections. Its composed envelope may differ slightly from the
@@ -41,7 +41,7 @@ package GriffinLanderRequirements {
         doc /* GLR-003 [visual study] exactly four named propellant-tank study assemblies shall expose a tank body and retention bands/cradle. Four is a replaceable Twin visualization assumption; public Griffin-1 sources do not publish tank count, type, stations, or dimensions. */
     }
     requirement def GLR004_EngineCluster {
-        doc /* GLR-004 [visual] exactly seven named main-engine components shall expose a visible bell and throat. */
+        doc /* GLR-004 [visual] exactly five named main-engine components shall expose a visible bell and throat. */
     }
     requirement def GLR005_SolarArrays {
         doc /* GLR-005 [configuration] installed array identities shall match the canonical solarArrayCount and the array configuration defined by GriffinSolarRequirements. Each array shall use the approved installation frame, orientation, deployment state, and panel envelope. */

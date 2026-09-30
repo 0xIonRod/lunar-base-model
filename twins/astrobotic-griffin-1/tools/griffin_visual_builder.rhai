@@ -1,3 +1,4 @@
+import "lunco://scripting/tools/engine_exhaust" as engine_exhaust;
 import "lunco://scripting/tools/assembly_builder" as assembly_builder;
 import "lunco://scripting/tools/assembly_edit" as assembly_edit;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
@@ -4162,31 +4163,54 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
     if !component.ok || component.type_name != "Xform" {
         return plan_error(root + ": engine-bell component root is missing or not Xform");
     }
-    let record = assembly_builder::composed_query(doc, #{path: root,
-        attrs: ["lunco:visual:component"], children: false});
-    let ops = [];
-    if query_ok(record) && record.attrs != ()
-        && record.attrs["lunco:visual:component"] != () {
-        ops.push(#{RemoveAttribute: #{edit_target: edit_target,
-            path: root, name: "lunco:visual:component"}});
+    let model = sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("engine source is not ready");}
+    let own = "GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
+    let contour = f64_from(model.value(own + "bellContourExponent"));
+    let axial = model.value(own + "bellAxialSegments");
+    let wall = f64_from(model.value(own + "bellVisualWallThicknessM"));
+    let segments = model.value(own + "bellAngularSegments");
+    if contour==() || contour<=0.0 || contour>=1.0 || axial<8 || axial>64 || wall==() || wall<=0.0 {
+        return plan_error("engine wall profile is incomplete");
     }
-    #{ok: true, kind: "griffin_engine_bell_component_refinement",
-      root: root, paths: [root], ops: ops, no_op: ops.len() == 0}
+    let throat=f64_from(model.value(own+"throatRadiusM"));
+    let exit=f64_from(model.value(own+"bellRadiusM"));
+    let height=f64_from(model.value(own+"bellHeightM"));
+    if throat==() || exit==() || height==() || throat<=wall || exit<=throat || height<=0.0 {
+        return plan_error("engine envelope is invalid");
+    }
+    let profile = [];
+    for i in 0..(axial+1) {
+        let station = (i.to_float()/axial.to_float()) ** 2.0;
+        profile.push([throat+(exit-throat)*(station ** contour),height*(0.5-station)]);
+    }
+    for i in 0..(axial+1) {
+        let station = ((axial-i).to_float()/axial.to_float()) ** 2.0;
+        profile.push([throat+(exit-throat)*(station ** contour)-wall,height*(0.5-station)]);
+    }
+    let ops = [
+        #{RemovePrim:#{edit_target:edit_target,path:root+"/Bell"}},
+        #{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Bell",type_name:"Mesh",reference:(),reference_prim_path:""}},
+        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Bell",profile:profile,angular_segments:segments,display_color:[0.20,0.22,0.25],collision_enabled:false}},
+        #{SetAttribute:#{edit_target:edit_target,path:root+"/Bell",name:"purpose",type_name:"token",value:"\"render\""}}
+    ];
+    #{ok:true,kind:"griffin_engine_bell_component_refinement",root:root,
+      paths:[root+"/Bell"],ops:ops,no_op:false}
 }
 
 fn apply_refined_griffin_engine_bell(doc, edit_target, root, parent_gen) {
     let plan = refine_griffin_engine_bell_component_plan(doc, edit_target, root);
     if !plan.ok || plan.no_op { return plan; }
     let command = assembly_edit::batch(doc,
-        "Remove stale Griffin engine-bell string metadata", plan.ops, parent_gen);
+        "Reconstruct open Griffin engine bell", plan.ops, parent_gen);
     #{ok: command.ok != false, kind: plan.kind, command: command,
       root: root, paths: plan.paths}
 }
 
-/// Restore the source-owned seven-engine visual cluster as a typed reference
+/// Restore the source-owned five-engine visual cluster as a typed reference
 /// assembly. This is deliberately separate from plume photometry and from the
 /// propulsion Modelica component: it only owns the render references and
-/// placements, using the Griffin source's seven-engine study layout.
+/// placements, using the Griffin source's five-engine study layout.
 fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
         return plan_error("Griffin engine cluster repair requires a document, edit target, and absolute root");
@@ -4208,11 +4232,8 @@ fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
             parent_path: nozzle, name: "MainEngineCluster", type_name: "Xform",
             reference: (), reference_prim_path: ""}});
     }
-    let names = ["Engine01", "Engine02", "Engine03", "Engine04",
-        "Engine05", "Engine06", "Engine07"];
-    let positions = [[0.0, 1.0, 0.0], [1.05, 1.0, 0.0], [-1.05, 1.0, 0.0],
-        [0.525, 1.0, 0.9093266739736606], [-0.525, 1.0, -0.9093266739736606],
-        [-0.525, 1.0, 0.9093266739736606], [0.525, 1.0, -0.9093266739736606]];
+    let names = griffin_spec::main_engine_names();
+    let positions = griffin_spec::component_engine_stations();
     for i in 0..names.len() {
         let path = cluster + "/" + names[i];
         let engine = assembly_builder::composed_query(doc,
@@ -4227,7 +4248,7 @@ fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
                 reference: "twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda",
                 reference_prim_path: "/EngineBell"}});
             ops.push(#{SetTranslate: #{edit_target: edit_target,
-                path: path, value: positions[i]}});
+                path: path, value: vec3_array(positions[i])}});
         }
     }
     let skirt_path = cluster + "/EngineSkirt";
@@ -4252,7 +4273,7 @@ fn apply_griffin_engine_cluster_visual(doc, edit_target, root, parent_gen) {
     let plan = griffin_engine_cluster_visual_plan(doc, edit_target, root);
     if !plan.ok || plan.no_op { return plan; }
     let command = assembly_edit::batch(doc,
-        "Restore Griffin seven-engine visual reference assembly", plan.ops, parent_gen);
+        "Restore Griffin five-engine visual reference assembly", plan.ops, parent_gen);
     #{ok: command.ok != false, kind: plan.kind, command: command,
       root: root, engine_count: plan.engine_count, paths: plan.paths}
 }
@@ -5446,7 +5467,7 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
         || solar_rot_x.len() != solar_names.len()
         || solar_rot_z.len() != solar_names.len()
         || solar_widths.len() != solar_names.len() || solar_frame_width == ()
-        || engine_names.len() != 7 || engine_count != engine_names.len()
+        || engine_names.len() == 0 || engine_count != engine_names.len()
         || engine_stations.len() != engine_names.len()
         || engine_members.len() != 2 || skirt_name == () || skirt_name == ""
         || skirt_members.len() != 6 || skirt_y == () {
@@ -5474,6 +5495,37 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     let engine_parent = root + "/Nozzle/MainEngineCluster";
     let engine_asset = component_asset("lander/griffin_engine_bell_visual.usda");
     let plume_path = root + "/MainPropulsion/PlumePhotometry";
+    let model = sysml_requirements::model();
+    let own = "GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
+    for parameter in [#{input:"fuel_family", source:"plumeFuelFamily"},
+        #{input:"stoichiometric_mixture_ratio", source:"plumeStoichiometricMixtureRatio"}] {
+        let value = f64_from(model.value(own + parameter.source));
+        if value == () {return plan_error("plume source is incomplete: " + parameter.source);}
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume_path,
+            name:"inputs:"+parameter.input,type_name:"float",value:value.to_string()}});
+    }
+    let published = [];
+    for wire in engine_exhaust::wires() {
+        if !published.contains(wire.output) {
+            published.push(wire.output);
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume_path,
+                name:"outputs:"+wire.output,type_name:"float",value:"0.0"}});
+        }
+    }
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:plume_path,
+        name:"inputs:mixture_ratio",type_name:"float",
+        sources:[root+"/MainPropulsion/MainChamber.outputs:mixture_ratio"]}});
+    let cluster_record = assembly_builder::composed_query(doc,
+        #{path:engine_parent,children:true});
+    let expected_paths=[];for name in engine_names {expected_paths.push(engine_parent+"/"+name);}
+    if query_ok(cluster_record) && cluster_record.children != () {
+        for child in cluster_record.children {
+            if child.starts_with(engine_parent+"/Engine") && child!=engine_parent+"/"+skirt_name
+                && !expected_paths.contains(child) {
+                ops.push(#{RemovePrim:#{edit_target:edit_target,path:child}});
+            }
+        }
+    }
     for index in 0..engine_names.len() {
         let result = _migrate_griffin_component_reference(doc, edit_target,
             engine_parent, engine_names[index], engine_asset, "/EngineBell",
@@ -5481,17 +5533,8 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
         let engine_path = engine_parent + "/" + engine_names[index];
-        for wire in [
-            #{child: "Flame", input: "inputs:throttle", output: "render_throttle"},
-            #{child: "Flame", input: "inputs:plume_length_fraction", output: "visual_length_fraction"},
-            #{child: "FlameCore", input: "inputs:throttle", output: "render_throttle"},
-            #{child: "FlameCore", input: "inputs:plume_length_fraction", output: "visual_length_fraction"},
-            #{child: "FlameCore/PlumeLight", input: "inputs:light_intensity", output: "intensity"},
-            #{child: "FlameCore/PlumeLight", input: "inputs:light_radius", output: "radius"},
-        ] {
-            ops.push(#{SetConnection: #{edit_target: edit_target,
-                path: engine_path + "/" + wire.child, name: wire.input,
-                type_name: "float", sources: [plume_path + ".outputs:" + wire.output]}});
+        for op in engine_exhaust::connection_ops(edit_target, engine_path, plume_path) {
+            ops.push(op);
         }
         migrated.push(result.path);
     }
@@ -5507,7 +5550,7 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     for op in skirt_result.ops { ops.push(op); }
     migrated.push(skirt_result.path);
 
-    // MainEngineVisual remains the flight force actuator. Its seven guide
+    // MainEngineVisual remains the flight force actuator. Its obsolete guide
     // cones were a second, non-source-owned nozzle layout and are obsolete.
     let actuator = root + "/MainEngineVisual";
     for name in ["NozzleCenter", "NozzlePX", "NozzleNX", "NozzlePZ",

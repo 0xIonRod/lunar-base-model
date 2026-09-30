@@ -21,6 +21,11 @@ package GriffinRequirementSources {
      * Each source link resolves to one typed SourceLocator value. Requirement
      * identifiers are the standard SysML short names on those usages.
      */
+    part source_astrobotic_griffin_propulsion_pug_2022 : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf";
+    }
+
     part source_astrobotic_griffin_1_lander_griffin_bus_visual_usda : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda";
@@ -487,7 +492,7 @@ package GriffinRequirementSources {
 
     part evidence_glr_004 : RequirementEvidence {
         ref targetRequirement = GriffinLanderRequirements::glr004;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_astrobotic_griffin_propulsion_pug_2022, source_www_astrobotic_com_griffin_lander);
     }
 
     part evidence_glr_005 : RequirementEvidence {
@@ -573,7 +578,7 @@ package GriffinRequirementSources {
 
     part evidence_gpp_001 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp001;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_astrobotic_griffin_propulsion_pug_2022, source_www_astrobotic_com_griffin_lander);
     }
 
     part evidence_gpp_002 : RequirementEvidence {
@@ -603,13 +608,13 @@ package GriffinRequirementSources {
 
     part evidence_gpp_007 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp007;
-        ref sources = (source_www_astrobotic_com_griffin_lander,
+        ref sources = (source_astrobotic_griffin_propulsion_pug_2022, source_www_astrobotic_com_griffin_lander,
             source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
     }
 
     part evidence_gpp_008 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp008;
-        ref sources = (source_astrobotic_griffin_1_tests_griffin_propulsion_requirements_rhai,
+        ref sources = (source_astrobotic_griffin_propulsion_pug_2022, source_astrobotic_griffin_1_tests_griffin_propulsion_requirements_rhai,
             source_astrobotic_griffin_1_vehicles_griffin_1_usda);
     }
 
@@ -1087,7 +1092,7 @@ package GriffinRequirementSources {
 
     part evidence_gvc_008 : RequirementEvidence {
         ref targetRequirement = GriffinVisualConfigurationRequirements::gvc008;
-        ref sources = (source_www_astrobotic_com_griffin_lander, source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
+        ref sources = (source_astrobotic_griffin_propulsion_pug_2022, source_www_astrobotic_com_griffin_lander, source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
     }
 
     part evidence_gvc_009 : RequirementEvidence {

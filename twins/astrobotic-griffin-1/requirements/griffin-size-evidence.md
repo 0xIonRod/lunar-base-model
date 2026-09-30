@@ -269,3 +269,59 @@ and [assembly](../handover/griffin-leg-assembly-crisp-2026-09-30.png). Editor bl
 is disabled by authored render policy. Full visual-scene checks also passed
 112/112. These are geometry/ownership checks; landing dynamics and upper-mount
 articulation remain outside this acceptance.
+
+## Engine and exhaust reconstruction, 2026-09-30
+
+[Astrobotic Payload User Guide, January 2022, page 26](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf)
+specifies five 700 lbf pulsed main engines, twelve 25 lbf attitude engines,
+pressure-fed M20 fuel and MON3 oxidizer, and two tanks for each reactant. The
+previous seven-engine interpretation was wrong. Requirements and USD now use
+five main engines. Centre plus four cardinal stations at radius 1.05 m are an
+explicit symmetric packaging estimate; the guide is not a mounting drawing.
+The existing feed/pump/chamber parameters still represent a generic study
+network, with aggregate thrust capability above the published five-engine
+rating. They do not validate Griffin's flight propulsion performance.
+
+The nozzle is an open hollow revolved bell with 0.12 m throat radius, 0.34 m
+exit radius and 0.52 m height. These dimensions are reconstruction estimates.
+The profile follows the library BellNozzle power law with exponent 0.55;
+16 axial intervals sampled quadratically concentrate resolution near the throat,
+and 48 angular segments reduce visible facets. A 6 mm visual wall is estimated
+for a legible rim; it is not a qualified wall thickness. The outer radius is the
+current presentation/design datum. [NASA nozzle design](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/nozzle-design/)
+supports the throat and expanding exit topology, not these dimensions or an
+optimized manufacturer contour.
+
+The engine component inherits exhaust from LunCoSim's standard engine library.
+The Twin supplies only nozzle-exit placement and physics connections. Modelica
+derives metric plume dimensions from nozzle radius, nominal thrust and exhaust
+velocity, and publishes delivered activity, colour and light. Hypergolic fuel
+family comes from M20/MON3 in the guide. Reference O/F 2.0, RGB palette anchors,
+1000 Pa visibility threshold, radial expansion 1.6 and core radius fraction 0.65
+are explicit visualization estimates, chosen for a readable pressure-based
+jet with a warmer fuel-rich palette. They are not calibrated spectra or CFD.
+
+The fuel-exhaustion fixture starts the unchanged Griffin network with 5 kg fuel
+and 100 kg oxidizer, sufficient to observe a burn followed by fuel starvation
+within three simulated seconds. The command remains on and oxidizer continues
+flowing. Tank availability reduces fuel feed; mixture efficiency makes useful
+combustion, heat and thrust zero; zero delivered jet momentum makes plume
+activity, visible length and luminous power zero. No scenario calculates flame
+state or changes visibility. The regression observes both a positive burn and
+the exact dark endpoint. Omitted Modelica library defaults must survive the
+first physics step; the core lifecycle bridge now reads initialized solver
+values rather than replacing those inputs with zero.
+
+Current geometry/dataflow verification covers 115 checks. The twelve attitude
+engine visuals still use the older Twin-owned hidden presentation and require
+a subsequent shared-library migration; they are not included in the main-engine
+exhaust cutover or this depletion acceptance.
+
+Fresh rebuilt production evidence: fuel-exhaustion regression 7/7 checks at
+180 ticks (3 s), shared plume defaults 11/11 at 120 ticks (2 s), and Griffin
+propulsion geometry/dataflow 115/115 at 12 ticks. The existing lander feed/valve
+spool regression also passed. These do not accept landing or propulsion ratings.
+The Editor's saved nozzle document and projected generation both read 0 in a
+fresh session; the [current bell review](../handover/griffin-five-engine-bell-2026-09-30.png)
+shows the curved shell with remaining flat-shaded facets. Smooth normals and
+finer material work remain visual improvements, not completed acceptance.

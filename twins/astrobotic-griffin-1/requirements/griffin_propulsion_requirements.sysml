@@ -10,26 +10,40 @@ package GriffinPropulsionRequirements {
     private import GriffinVisualConfigurationRequirements::GriffinVisualConfiguration;
 
     attribute def Direction :> CartesianThreeVectorValue;
-    enum def GriffinEngineVisualMember { Bell; Throat; Flame; FlameCore; }
+    enum def GriffinEngineVisualMember { Bell; Throat; }
 
     part def GriffinMainPropulsionAssembly {
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1/Nozzle/MainEngineCluster";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_engine_bell_visual.usda";
-        attribute childNames : GriffinEngineVisualMember[4] =
-            ("Bell", "Throat", "Flame", "FlameCore");
+        attribute childNames : GriffinEngineVisualMember[2] =
+            ("Bell", "Throat");
         attribute bellRadiusM : Real = 0.34;
         attribute bellHeightM : Real = 0.52;
         attribute throatRadiusM : Real = 0.12;
         attribute throatHeightM : Real = 0.16;
         attribute throatCenterYM : Real = 0.28;
         attribute bellAxis : Direction = (0.0, 1.0, 0.0);
+        // Estimated bell contour, using LunCo.Propulsion.BellNozzle's law:
+        // r(s)=throatRadiusM+(bellRadiusM-throatRadiusM)*s^bellContourExponent.
+        // s=0 at the throat, s=1 at the downward-facing open exit.
+        // .55 is the library approximation, not a supplier-qualified Rao design.
+        // 16 axial intervals resolve the curve; 6 mm is a visual shell estimate.
+        attribute bellContourExponent : Real = .55;
+        attribute bellAxialSegments : Integer = 16;
+        attribute bellVisualWallThicknessM : Real = .006;
+        attribute bellAngularSegments : Integer = 48;
+
+        // Hypergolic family from PUG p.26 (M20 / MON3). Palette is heuristic;
+        // 2.0 reference O/F is a provisional chemistry estimate, not flight data.
+        attribute plumeFuelFamily : Real = 3;
+        attribute plumeStoichiometricMixtureRatio : Real = 2.0;
         attribute minimumBellClearanceM : Real = 0.20;
     }
 
     // The skirt is a visual/structural presentation component around the
     // engine adapter plate.  It is deliberately specified independently from
     // the bells: the flight model owns thrust and collision, while this frame
-    // makes the seven-bell cluster legible and provides a stable placement
+    // makes the five-bell cluster legible and provides a stable placement
     // datum for the Editor.
     part def GriffinEngineSkirtComponent {
         attribute usdRootPath : String = "/World/Griffin1/Nozzle/MainEngineCluster";
@@ -58,13 +72,13 @@ package GriffinPropulsionRequirements {
     }
 
     requirement def GPP001_EngineCount {
-        doc /* GPP-001 [topology] exactly seven named main-engine visual owners are present in the cluster. */
+        doc /* GPP-001 [topology] exactly five named main-engine visual owners are present in the cluster. */
     }
     requirement def GPP002_BellGeometry {
         doc /* GPP-002 [visual] each engine includes its modeled bell and throat, with no placeholder circle or duplicate collider geometry. */
     }
     requirement def GPP003_ThrustOwnership {
-        doc /* GPP-003 [physics boundary] bells and plumes are render-only. The Modelica propulsion and nozzle models remain the sole authority for thrust, propellant flow, nozzle design outputs, and plume photometry. */
+        doc /* GPP-003 [physics boundary] bells and plumes are render-only. The Modelica propulsion and nozzle models remain the sole authority for thrust, propellant flow, nozzle design outputs, and plume photometry. Fuel starvation shall stop useful combustion and thrust through the feed/chamber equations; zero delivered jet momentum shall yield zero visible plume and light with the engine command still on. The griffin_fuel_exhaustion production fixture verifies this chain. */
     }
     requirement def GPP004_PropulsionTraceability {
         doc /* GPP-004 [evidence] engine identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and each instance is checked individually. */
@@ -72,8 +86,32 @@ package GriffinPropulsionRequirements {
     requirement def GPP005_EnginePlacement {
         doc /* GPP-005 [layout] each bell owner uses the ordered native Position datum owned by GriffinVisualConfigurationRequirements. */
     }
+    constraint def GPPC006_OpenBellEnvelope {
+        in measuredExitRadiusM : Real;
+        in measuredHeightM : Real;
+        in measuredMinimumRadiusM : Real;
+        in boreOpen : Boolean;
+        in exitRadiusM : Real;
+        in heightM : Real;
+        in throatRadiusM : Real;
+        in wallThicknessM : Real;
+        in toleranceM : Real;
+        measuredExitRadiusM - exitRadiusM <= toleranceM
+            and measuredExitRadiusM - exitRadiusM >= -toleranceM
+            and measuredHeightM - heightM <= toleranceM
+            and measuredHeightM - heightM >= -toleranceM
+            and measuredMinimumRadiusM >= throatRadiusM - wallThicknessM - toleranceM
+            and boreOpen
+    }
     requirement def GPP006_BellAndThroatEnvelope {
-        doc /* GPP-006 [geometry] each engine shall expose a Y-axis bell and throat using the source-owned bellRadiusM, bellHeightM, throatRadiusM, throatHeightM, and throatCenterYM values. */
+        require GPPC006_OpenBellEnvelope {
+            in exitRadiusM = GriffinMainPropulsionAssembly::bellRadiusM;
+            in heightM = GriffinMainPropulsionAssembly::bellHeightM;
+            in throatRadiusM = GriffinMainPropulsionAssembly::throatRadiusM;
+            in wallThicknessM = GriffinMainPropulsionAssembly::bellVisualWallThicknessM;
+            in toleranceM = GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
+        doc /* GPP-006 [geometry] each engine exposes an open Y-axis hollow bell Mesh and a throat using the source-owned radius/height datums. Mesh vertices and faces shall establish the exit envelope, height, positive flow-bore radius and absence of a closing face. bellContourExponent relates the reconstruction contour to those datums using the library BellNozzle law; the exponent and bellVisualWallThicknessM are explicit visual estimates, not flight nozzle design or wall sizing. See griffin-size-evidence.md. */
     }
     constraint def GPPC007_BellSeparation {
         in measuredMinimumClearanceM : Real;
@@ -90,7 +128,7 @@ package GriffinPropulsionRequirements {
             in requiredMinimumClearanceM = GriffinMainPropulsionAssembly::minimumBellClearanceM;
             in bucketOuterRadiusM = GriffinVisualConfiguration::lowerBucketOuterBottomRadiusM;
         }
-        doc /* GPP-007 [layout] the seven bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and six equally spaced perimeter engines, and remain inside the lower central bucket envelope. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
+        doc /* GPP-007 [layout] the five bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and four equally spaced perimeter engines, and remain inside the lower central bucket envelope. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
     }
     constraint def GPPC008_EnginePlumeDataflow {
         in engineCount : Integer;
@@ -110,10 +148,10 @@ package GriffinPropulsionRequirements {
         require GPPC008_EnginePlumeDataflow {
             in engineCount = GriffinLanderComponent::engineCount;
         }
-        doc /* GPP-008 [simulation presentation] each main-engine nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow shared photometry outputs driven by live propulsion state and modeled nozzle geometry. Zero delivered thrust shall produce neither visible exhaust nor light. */
+        doc /* GPP-008 [simulation presentation] each main-engine owner shall inherit its render-only outer plume from the LunCoSim rocket_engine_visual library component, without Twin-authored flame geometry or materials. The library helper connects physics to geometry envelope scale, shader colour and light colour. Nozzle radius and nominal thrust shall determine the envelope; fuel family and mixture richness shall determine a documented heuristic palette. Each nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow shared photometry outputs driven by live propulsion state and modeled nozzle geometry. Zero delivered thrust shall produce neither visible exhaust nor light. */
     }
     requirement def GES001_SkirtTopology {
-        doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the seven-engine cluster. */
+        doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the five-engine cluster. */
     }
     requirement def GES002_SkirtEnvelope {
         doc /* GES-002 [geometry] the rail envelope, rail section, open-ended shell, and adapter plate shall use their typed dimensions and station datums in GriffinEngineSkirtComponent. */

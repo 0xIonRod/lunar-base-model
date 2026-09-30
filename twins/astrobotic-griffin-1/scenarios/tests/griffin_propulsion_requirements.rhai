@@ -129,8 +129,8 @@ fn _required_constraint_bindings(model, requirement_name, constraint_name,
     bindings
 }
 
-fn station_ring_is_centered_hexagon(stations, tolerance) {
-    if stations.len() != 7 { return false; }
+fn station_ring_is_centered_square(stations, tolerance) {
+    if stations.len() != 5 { return false; }
     if absolute(stations[0].x) > tolerance || absolute(stations[0].z) > tolerance {
         return false;
     }
@@ -142,8 +142,8 @@ fn station_ring_is_centered_hexagon(stations, tolerance) {
             + stations[index].z * stations[index].z).sqrt();
         if absolute(station_radius - radius) > tolerance { return false; }
     }
-    let chord = [radius, radius * (3.0).sqrt(), radius * 2.0];
-    let counts = [0, 0, 0];
+    let chord = [radius * (2.0).sqrt(), radius * 2.0];
+    let counts = [0, 0];
     for left in 1..stations.len() {
         for right in left + 1..stations.len() {
             let dx = stations[left].x - stations[right].x;
@@ -151,25 +151,110 @@ fn station_ring_is_centered_hexagon(stations, tolerance) {
             let distance = (dx * dx + dz * dz).sqrt();
             let matched = if absolute(distance - chord[0]) <= tolerance { 0 }
                 else if absolute(distance - chord[1]) <= tolerance { 1 }
-                else if absolute(distance - chord[2]) <= tolerance { 2 }
                 else { -1 };
             if matched < 0 { return false; }
             counts[matched] += 1;
         }
     }
-    counts[0] == 6 && counts[1] == 6 && counts[2] == 3
+    counts[0] == 4 && counts[1] == 2
+}
+
+// Observe the rendered mesh itself: a closed Cone cap cannot pass this gate.
+fn open_bell_mesh(points, counts, indices) {
+    if !array_is(points) || !array_is(counts) || !array_is(indices)
+        || points.len()==0 || counts.len()==0 {return #{available:false};}
+    let vertices=[]; let maximum=0.0; let minimum=1.0e30;
+    let lower=1.0e30; let upper=-1.0e30;
+    for point in points {
+        let p=vec3_from(point);vertices.push(p);
+        let radius=(p.x*p.x+p.z*p.z).sqrt();
+        if radius>maximum {maximum=radius;}
+        if radius<minimum {minimum=radius;}
+        if p.y<lower {lower=p.y;}
+        if p.y>upper {upper=p.y;}
+    }
+    let open=true; let offset=0;
+    for count in counts {
+        if count!=4 || offset+count>indices.len() {return #{available:false};}
+        let x=0.0;let z=0.0;
+        for i in 0..count {
+            let index=indices[offset+i];
+            if index<0 || index>=vertices.len() {return #{available:false};}
+            x+=vertices[index].x;z+=vertices[index].z;
+        }
+        // Annular rim and wall quads remain away from the flow axis.
+        // A face spanning/closing the bore fails, including a flat disk cap.
+        if (x*x+z*z).sqrt()/count < minimum/2.0 {open=false;}
+        offset+=count;
+    }
+    #{available:offset==indices.len(),radius:maximum,height:upper-lower,
+      minimum:minimum,open:open && minimum>0.0}
 }
 
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
+    this.pending_checks = ();
+    this.mesh_results = [];
+    this.mesh_count = ();
+    this.mesh_snapshot = ();
+    this.mesh_source_revision = ();
 }
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
+    if this.pending_checks != () {
+        let current_source=sysml_requirements::source_with_attributes([own("bellRadiusM")]);
+        let current=query("QueryUsdPrim",#{path:this.root,attrs:[]});
+        if current_source.source_revision!=this.source.source_revision
+            || current.doc_id!=this.snapshot.doc_id
+            || current.document_generation!=this.snapshot.document_generation
+            || current.stage_generation!=this.snapshot.stage_generation {
+            throw("Propulsion source or USD snapshot changed before reporting");
+        }
+        sysml_requirement_checks::finish(this.source,this.pending_checks,
+            "GRIFFIN PROPULSION REQUIREMENTS","GRIFFIN_PROPULSION_REQUIREMENTS",
+            this.root,PACKAGE,VERIFICATION);
+        this.done=true;
+        return;
+    }
+    // Measure one actual nozzle mesh per callback. Dense contours must not
+    // exceed the bounded authored-script budget or weaken mesh verification.
+    if this.mesh_count==() || this.mesh_results.len() < this.mesh_count {
+        let mesh_source=sysml_requirements::source_with_attributes([
+            own("usdRootPath"),visual("mainEngineInstances")]);
+        let mesh_names=sysml_requirement_checks::source_enum_identifiers(mesh_source,visual("mainEngineInstances"));
+        if mesh_names.len()==0 {throw("Griffin engine layout is unavailable");}
+        if this.mesh_count!=() && this.mesh_count!=mesh_names.len() {throw("Engine instance count changed during measurement");}
+        this.mesh_count=mesh_names.len();
+        let mesh_root=sysml_requirements::text(mesh_source,own("usdRootPath"));
+        let mesh_path=mesh_root+"/"+mesh_names[this.mesh_results.len()]+"/Bell";
+        // Keep large native arrays in separate observations, below the Rhai
+        // value-size limit. Fence all three against the same USD generation.
+        let record=query("QueryUsdPrim",#{path:mesh_path,attrs:["points"]});
+        let counts=query("QueryUsdPrim",#{path:mesh_path,attrs:["faceVertexCounts"]});
+        let indices=query("QueryUsdPrim",#{path:mesh_path,attrs:["faceVertexIndices"]});
+        for part in 0..2 {
+            let other=if part==0 {counts} else {indices};
+            if other.doc_id!=record.doc_id || other.document_generation!=record.document_generation
+                || other.stage_generation!=record.stage_generation || other.type_name!="Mesh" {
+                throw("Nozzle topology and vertex observations do not share a mesh snapshot");
+            }
+        }
+        let snapshot=#{ok:record!=() && record.doc_id!=(),doc_id:record.doc_id,
+            document_generation:record.document_generation,stage_generation:record.stage_generation};
+        if this.mesh_snapshot!=() && (!_same_snapshot(snapshot,this.mesh_snapshot)
+            || mesh_source.source_revision!=this.mesh_source_revision) {
+            throw("Griffin nozzle observation changed between mesh samples");
+        }
+        this.mesh_snapshot=snapshot;
+        this.mesh_source_revision=mesh_source.source_revision;
+        this.mesh_results.push(open_bell_mesh(record.attrs.points,counts.attrs.faceVertexCounts,indices.attrs.faceVertexIndices));
+        return;
+    }
     let selected_attributes = [];
     for name in ["usdRootPath", "bellRadiusM", "bellHeightM", "throatRadiusM",
-        "throatHeightM", "throatCenterYM", "minimumBellClearanceM"] {
+        "throatHeightM", "throatCenterYM", "minimumBellClearanceM", "bellVisualWallThicknessM", "bellContourExponent"] {
         selected_attributes.push(own(name));
     }
     for name in ["componentRootName", "componentMemberNames", "shellName",
@@ -252,6 +337,10 @@ fn on_tick(me, ctx) {
     checks.push(attribute("GPP-006-nozzle-design-length", "gpp006",
         nozzle_design_path, "inputs:length",
         bell_height, geometry_tolerance));
+    checks.push(attribute("GPP-006-nozzle-design-contour", "gpp006",
+        nozzle_design_path, "inputs:contour",
+        sysml_requirements::number(source,own("bellContourExponent")), geometry_tolerance));
+    if source.source_revision!=this.mesh_source_revision {throw("Source changed after nozzle measurement");}
     for index in 0..names.len() {
         let name = names[index];
         let path = root + "/" + name;
@@ -264,12 +353,27 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirement_checks::attribute_equals("GPP-002-" + name + "-purpose", "engine", "gpp002", VERIFICATION,
             path + "/Bell", "purpose", "render"));
         if bell_radius != () && bell_height != () && throat_radius != () && throat_height != () {
-            checks.push(attribute("GPP-006-" + name + "-bell-radius", "gpp006", path + "/Bell", "radius", bell_radius, geometry_tolerance));
-            checks.push(attribute("GPP-006-" + name + "-bell-height", "gpp006", path + "/Bell", "height", bell_height, geometry_tolerance));
+            let bell=query("QueryUsdPrim",#{path:path+"/Bell",
+                attrs:[]});
+            let mesh=this.mesh_results[index];
+            let snapshot=#{ok:bell!=() && bell.doc_id!=(),doc_id:bell.doc_id,
+                document_generation:bell.document_generation,stage_generation:bell.stage_generation};
+            if !_same_snapshot(snapshot,this.mesh_snapshot) {throw("USD changed after nozzle measurement");}
+            let bindings=_required_constraint_bindings(source_model,"gpp006","GPPC006_OpenBellEnvelope",[
+                ["measuredExitRadiusM",_usd_observation(snapshot,mesh.available,mesh.radius,"bell mesh unavailable")],
+                ["measuredHeightM",_usd_observation(snapshot,mesh.available,mesh.height,"bell mesh unavailable")],
+                ["measuredMinimumRadiusM",_usd_observation(snapshot,mesh.available,mesh.minimum,"bell mesh unavailable")],
+                ["boreOpen",_usd_observation(snapshot,mesh.available,mesh.open,"bell mesh unavailable")],
+                ["exitRadiusM",_source_literal(source_model,own("bellRadiusM"))],
+                ["heightM",_source_literal(source_model,own("bellHeightM"))],
+                ["throatRadiusM",_source_literal(source_model,own("throatRadiusM"))],
+                ["wallThicknessM",_source_literal(source_model,own("bellVisualWallThicknessM"))],
+                ["toleranceM",_source_literal(source_model,visual("geometryVerificationToleranceM"))]
+            ]);
+            checks.push(sysml_requirements::required_constraint_check("GPP-006-"+name+"-open-bell",
+                "engine","gpp006",VERIFICATION,PACKAGE+"::GPPC006_OpenBellEnvelope",bindings,"typed",0.0));
             checks.push(attribute("GPP-006-" + name + "-throat-radius", "gpp006", path + "/Throat", "radius", throat_radius, geometry_tolerance));
             checks.push(attribute("GPP-006-" + name + "-throat-height", "gpp006", path + "/Throat", "height", throat_height, geometry_tolerance));
-            checks.push(sysml_requirement_checks::attribute_equals("GPP-006-" + name + "-bell-axis", "engine", "gpp006", VERIFICATION,
-                path + "/Bell", "axis", "Y"));
             checks.push(#{id: "GPP-006-" + name + "-throat-center", component: "engine",
                 requirement: "gpp006", verification: VERIFICATION, kind: "attribute_component",
                 path: path + "/Throat", attr: "xformOp:translate", index: 1,
@@ -289,9 +393,9 @@ fn on_tick(me, ctx) {
     let plume_paths = [];
     let light_paths = [];
     for path in engine_paths {
-        plume_paths.push(path + "/Flame");
-        plume_paths.push(path + "/FlameCore");
-        light_paths.push(path + "/FlameCore/PlumeLight");
+        plume_paths.push(path + "/Exhaust/Flame");
+        plume_paths.push(path + "/Exhaust/FlameCore");
+        light_paths.push(path + "/Exhaust/FlameCore/PlumeLight");
     }
     let observed_plumes = query("QueryUsdPrims", #{paths: plume_paths,
         attrs: ["purpose", "physics:collisionEnabled"],
@@ -333,8 +437,8 @@ fn on_tick(me, ctx) {
         for index in 0..engine_paths.len() {
             let engine_path = engine_paths[index];
             let engine_record = record_at(observed_engines, engine_path);
-            let flame_path = engine_path + "/Flame";
-            let core_path = engine_path + "/FlameCore";
+            let flame_path = engine_path + "/Exhaust/Flame";
+            let core_path = engine_path + "/Exhaust/FlameCore";
             let flame = record_at(observed_plumes, flame_path);
             let core = record_at(observed_plumes, core_path);
             let light = record_at(observed_lights, core_path + "/PlumeLight");
@@ -357,9 +461,9 @@ fn on_tick(me, ctx) {
             if has_pair {
                 plume_materials_match = plume_materials_match
                     && has_single_relationship_target(flame, "material:binding",
-                        vehicle_root + "/Looks/Flame_Mat")
+                        engine_path + "/Exhaust/Looks/Flame_Mat")
                     && has_single_relationship_target(core, "material:binding",
-                        vehicle_root + "/Looks/FlameCore_Mat");
+                        engine_path + "/Exhaust/Looks/FlameCore_Mat");
                 plume_geometry_is_render_only = plume_geometry_is_render_only
                     && flame.attrs["purpose"] == "render"
                     && flame.attrs["physics:collisionEnabled"] == false
@@ -418,7 +522,7 @@ fn on_tick(me, ctx) {
     let actual_stations = [];
     let measurement_available = observed_engines.records != ()
         && observed_engines.records.len() == names.len()
-        && names.len() == 7 && stations.len() == names.len()
+        && names.len() > 0 && stations.len() == names.len()
         && bell_radius != () && required_clearance != ()
         && bucket_outer_radius != () && geometry_tolerance != ()
         && usd_snapshots_match && usd_snapshot != ()
@@ -462,9 +566,9 @@ fn on_tick(me, ctx) {
                 if clearance < measured_clearance { measured_clearance = clearance; }
             }
         }
-        typed_stations_match = station_ring_is_centered_hexagon(stations,
+        typed_stations_match = station_ring_is_centered_square(stations,
             geometry_tolerance)
-            && station_ring_is_centered_hexagon(actual_stations,
+            && station_ring_is_centered_square(actual_stations,
                 geometry_tolerance)
             && typed_stations_match;
     }
@@ -541,6 +645,9 @@ fn on_tick(me, ctx) {
     }
     checks.push(sysml_requirement_checks::coverage("GPP-003-ownership", "propulsion", "gpp003", VERIFICATION));
     checks.push(sysml_requirement_checks::coverage("GPP-004-traceability", "propulsion", "gpp004", VERIFICATION));
-    sysml_requirement_checks::finish(source, checks, "GRIFFIN PROPULSION REQUIREMENTS", "GRIFFIN_PROPULSION_REQUIREMENTS", root, PACKAGE, VERIFICATION);
-    this.done = true;
+    // Geometry measurement and reporting each use one bounded script turn.
+    this.pending_checks=checks;
+    this.source=source;
+    this.root=root;
+    this.snapshot=usd_snapshot;
 }

@@ -72,8 +72,6 @@ package GriffinVisualConfigurationRequirements {
         Engine03;
         Engine04;
         Engine05;
-        Engine06;
-        Engine07;
     }
 
     part def GriffinVisualConfiguration {
@@ -179,8 +177,8 @@ package GriffinVisualConfigurationRequirements {
             ("LegPX", "LegNX", "LegPZ", "LegNZ");
         attribute solarArrayInstances : GriffinSolarArrayInstanceName[3] =
             ("SolarPanelForward", "SolarPanelFrontStarboard", "SolarPanelStarboard");
-        attribute mainEngineInstances : GriffinMainEngineInstanceName[7] =
-            ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07");
+        attribute mainEngineInstances : GriffinMainEngineInstanceName[5] =
+            ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05");
         attribute rampInstances : GriffinRampInstanceName[2] =
             ("EgressRampPort", "EgressRampStarboard");
         attribute rampHingeInstances : GriffinRampHingeInstanceName[2] =
@@ -272,15 +270,13 @@ package GriffinVisualConfigurationRequirements {
 
         attribute engineClusterMountYM : Real = 1.00;
         attribute engineBellDirection : Direction = (0.0, -1.0, 0.0);
-        /* One center engine and six equally spaced bells on a 1.05 m radius.
-         * The 0.34 m exit radius leaves 0.37 m between adjacent bell envelopes
-         * and keeps all seven inside the lower bucket's 1.54 m outer radius. */
-        attribute engineStations : Position[7] =
+        /* Five engines are documented in Astrobotic's 2022 Payload User Guide,
+         * p.26. Center plus four cardinal stations on a 1.05 m radius is an
+         * explicit layout estimate, not a supplier mounting drawing. It keeps
+         * 0.34 m bell envelopes inside the estimated 1.54 m lower bucket. */
+        attribute engineStations : Position[5] =
             ((0.0, 1.00, 0.0), (1.05, 1.00, 0.0), (-1.05, 1.00, 0.0),
-             (0.525, 1.00, 0.9093266739736606),
-             (-0.525, 1.00, -0.9093266739736606),
-             (-0.525, 1.00, 0.9093266739736606),
-             (0.525, 1.00, -0.9093266739736606));
+             (0.0, 1.00, 1.05), (0.0, 1.00, -1.05));
     }
 
     requirement def GVC001_ConfigurationSelection {
@@ -305,7 +301,7 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-007 [layout] four COPV proxies occupy the source cardinal stations and pass through support-ring openings while satisfying the typed minimumTankFrameClearanceM radial clearance from their bands. Stations, tank scale and geometry are packaging estimates documented in griffin-size-evidence.md, not supplier data. */
     }
     requirement def GVC008_EngineAndSkirtDatum {
-        doc /* GVC-008 [interface] the seven-engine cluster shall remain visibly below the lower flared bucket and bus; the nozzle axis is a typed downward Direction and must not duplicate flight thrust ownership. Source: Astrobotic identifies seven main engines; bucket and skirt dimensions are visual-study assumptions. */
+        doc /* GVC-008 [interface] the five-engine cluster shall remain visibly below the lower flared bucket and bus; the nozzle axis is a typed downward Direction and must not duplicate flight thrust ownership. Source: Astrobotic Payload User Guide (2022), p.26 identifies five main engines; bucket and skirt dimensions are visual-study assumptions. */
     }
     requirement def GVC009_RampState {
         doc /* GVC-009 [configuration] the visual review shall use the typed Stowed ramp state while the physical mission scene may command the deployed state after touchdown. Rationale: optional egress ramps are payload interfaces, not the primary landed silhouette. */
