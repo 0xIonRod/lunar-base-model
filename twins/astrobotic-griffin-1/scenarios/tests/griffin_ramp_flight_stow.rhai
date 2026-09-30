@@ -1,12 +1,12 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 
 const ROOT = "/World/Griffin1";
 const OWN = "GriffinRampRequirements::GriffinEgressRamp::";
 const VERIFICATION = "Verify_GriffinRampFlightStow";
 
 fn simulation_dependencies(me, ctx) {
-    #{modelica_entities: [], entity_reads: [], entity_writes: [],
-      query_reads: ["AnalyzeSysml", "QueryUsdPrim", "QueryUsdPrims"], required_inputs: []}
+    usd_geometry_inspection::dependencies()
 }
 
 fn on_start(me, ctx) {

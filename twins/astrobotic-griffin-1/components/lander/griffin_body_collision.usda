@@ -17,7 +17,7 @@ def Xform "GriffinBody" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:scale = (2.1088311754568574, 1.4, 2.1088311754568574)
+        custom double3 xformOp:scale = (2.1088311754568574, 0.72, 2.1088311754568574)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
@@ -31,7 +31,7 @@ def Xform "GriffinBody" (
         double size = 1.0
         custom double3 xformOp:translate = (0.0, 0.0, 1.4272077938642145)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (2.1088311754568574, 1.4, 0.7455844122715714)
+        custom double3 xformOp:scale = (2.1088311754568574, 0.72, 0.7455844122715714)
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
         token visibility = "invisible"
@@ -43,7 +43,7 @@ def Xform "GriffinBody" (
         double size = 1.0
         custom double3 xformOp:translate = (0.0, 0.0, -1.4272077938642145)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (2.1088311754568574, 1.4, 0.7455844122715714)
+        custom double3 xformOp:scale = (2.1088311754568574, 0.72, 0.7455844122715714)
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
         token visibility = "invisible"
@@ -55,7 +55,7 @@ def Xform "GriffinBody" (
         double size = 1.0
         custom double3 xformOp:translate = (1.4272077938642145, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (0.7455844122715714, 1.4, 2.1088311754568574)
+        custom double3 xformOp:scale = (0.7455844122715714, 0.72, 2.1088311754568574)
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
         token visibility = "invisible"
@@ -67,7 +67,7 @@ def Xform "GriffinBody" (
         double size = 1.0
         custom double3 xformOp:translate = (-1.4272077938642145, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        custom double3 xformOp:scale = (0.7455844122715714, 1.4, 2.1088311754568574)
+        custom double3 xformOp:scale = (0.7455844122715714, 0.72, 2.1088311754568574)
         bool physics:collisionEnabled = true
         uniform token purpose = "proxy"
         token visibility = "invisible"

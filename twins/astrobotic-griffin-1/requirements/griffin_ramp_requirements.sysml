@@ -273,8 +273,15 @@ package GriffinRampRequirements {
         attribute rampSurfaceWidthM : Real = 2.86;
         attribute rampWheelClearanceM : Real = 0.15;
         attribute rampSurfaceThicknessM : Real = 0.18;
-        attribute rampRailHeightM : Real = 0.14;
-        attribute rampRailWidthM : Real = 0.14;
+        /* Slimmer truss silhouette estimated from the ESA 2022 Griffin artist
+         * impression and Astrobotic product rendering, linked in
+         * griffin-size-evidence.md. 0.36 m walking-plane-to-chord-top versus
+         * 1.799 m section length gives depth/length 0.20; prior 0.81 m gave
+         * 0.45 and resembled a large handrail. These are render structural
+         * proxies, not strength-qualified stock. Ramp mount, length, angle,
+         * walking contact and width datums remain unchanged. */
+        attribute rampRailHeightM : Real = 0.08;
+        attribute rampRailWidthM : Real = 0.08;
         attribute rampRailOffsetZM : Real = 1.36;
         attribute rampRailJointPinRadiusM : Real = 0.08;
         attribute rampRailJointPinLengthM : Real = 0.22;
@@ -296,25 +303,25 @@ package GriffinRampRequirements {
         // supplier drawing: two longitudinal beams sit just below the deck,
         // The source-owned section geometry uses two underside beams and three
         // upright posts per edge rail on every rigid ramp section.
-        attribute assemblyUnderBeamWidthM : Real = 0.18;
-        attribute assemblyUnderBeamHeightM : Real = 0.16;
-        attribute assemblyUnderBeamCenterYM : Real = -0.17;
+        attribute assemblyUnderBeamWidthM : Real = 0.12;
+        attribute assemblyUnderBeamHeightM : Real = 0.10;
+        attribute assemblyUnderBeamCenterYM : Real = -0.14;
         attribute assemblyUnderBeamCenterOffsetZM : Real = 1.20;
         attribute assemblySidePostCountPerSectionPerSide : Integer = 3;
-        attribute assemblySidePostWidthM : Real = 0.12;
-        attribute assemblySidePostDepthM : Real = 0.12;
+        attribute assemblySidePostWidthM : Real = 0.06;
+        attribute assemblySidePostDepthM : Real = 0.06;
         attribute assemblySidePostEmbeddedDepthM : Real = 0.04;
         attribute assemblySidePostFirstCenterXM : Real = 0.224885507;
         attribute assemblySidePostPitchM : Real = 0.674656520;
-        attribute assemblySideTrussChordHeightM : Real = 0.14;
-        attribute assemblySideTrussLowerChordCenterYM : Real = 0.16;
-        attribute assemblySideTrussBraceThicknessM : Real = 0.08;
+        attribute assemblySideTrussChordHeightM : Real = 0.08;
+        attribute assemblySideTrussLowerChordCenterYM : Real = 0.13;
+        attribute assemblySideTrussBraceThicknessM : Real = 0.04;
         attribute assemblySideTrussBraceCountPerSide : Integer = 4;
         attribute rampSectionHingeBarrelRadiusM : Real = 0.12;
         attribute rampSectionHingeBarrelLengthM : Real = 2.86;
         attribute rampSectionHingeBarrelCenterYM : Real = -0.18;
         attribute rampSurfaceCenterYM : Real = 0.00;
-        attribute rampRailCenterYM : Real = 0.74;
+        attribute rampRailCenterYM : Real = 0.32;
         attribute rampMaxDeploymentAngleRad : Real = 0.872664626;
         // Render review uses the revised top ring at Y=1.79; hinge center
         // Y=1.70 places a 0.18 m track flush with that ring. The mission

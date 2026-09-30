@@ -1,8 +1,13 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 
 // Twin-owned visual contract.  It checks the authored presentation topology
 // and key SI dimensions; it never hard-codes engine internals or mutates USD.
 const TEST_KIND = "graphics";
+
+fn simulation_dependencies(me, ctx) {
+    usd_geometry_inspection::dependencies()
+}
 
 fn visual_exists_check(id, component, requirement, kind, path) {
     #{ id: id, component: component, requirement: requirement,
@@ -41,18 +46,11 @@ fn _sysml_list(report, name) {
 }
 
 fn _visual_scene_document_id() {
-    let documents = query("ListOpenDocuments");
-    if documents == () || documents.open_documents == () {
-        throw("Griffin visual review cannot enumerate open USD documents");
+    let doc_id = usd_geometry_inspection::document_owner("/GriffinFlipVisual/Griffin1");
+    if doc_id == () {
+        throw("Griffin visual review cannot resolve its composed scene owner");
     }
-    for document in documents.open_documents {
-        if document.kind == "usd" && document.origin != ()
-            && document.origin.path != ()
-            && document.origin.path.ends_with("/tests/griffin_flip_visual.usda") {
-            return document.doc_id;
-        }
-    }
-    throw("Griffin visual review scene document is not open");
+    doc_id
 }
 
 fn on_start(me, ctx) {

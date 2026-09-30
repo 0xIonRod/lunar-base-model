@@ -10,7 +10,7 @@ package GriffinSolarRequirements {
     enum def GriffinSolarVisualMember {
         Frame; Cells; ArrayBackplane; CellDividerX1; CellDividerX2;
         CellDividerX3; CellDividerX4; CellDividerX5; CellDividerZ1;
-        CellDividerZ2; CellDividerZ3; MountBracketNegativeX;
+        CellDividerZ2; CellDividerZ3; CellDividerX6; CellDividerX7; CellDividerX8; CellDividerX9; CellDividerX10; CellDividerX11; CellDividerX12; CellDividerX13; CellDividerZ4; MountBracketNegativeX;
         MountBracketPositiveX; HingeBar; MountLinkNegativeX; MountLinkPositiveX;
     }
 
@@ -18,29 +18,32 @@ package GriffinSolarRequirements {
         doc /* One Griffin-1 solar-array assembly, including its panel, collection surface, and structural attachment interface. */
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_solar_panel_visual.usda";
-        attribute childNames : GriffinSolarVisualMember[16] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "MountBracketNegativeX", "MountBracketPositiveX", "HingeBar", "MountLinkNegativeX", "MountLinkPositiveX");
+        attribute childNames : GriffinSolarVisualMember[25] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "CellDividerX6", "CellDividerX7", "CellDividerX8", "CellDividerX9", "CellDividerX10", "CellDividerX11", "CellDividerX12", "CellDividerX13", "CellDividerZ4", "MountBracketNegativeX", "MountBracketPositiveX", "HingeBar", "MountLinkNegativeX", "MountLinkPositiveX");
         // Panel size revised to fit the smaller bus: 1.716 m maximum face
-        // width comes from rail spacing minus edge margins; 1.80 m height
-        // allows a 1.40 m core plus 0.40 m coverage. Cell size retains frame
+        // width comes from rail spacing minus edge margins; 0.66 m height
+        // fits the 0.72 m body belt. The 14 x 5 grid is observed in the
+        // Astrobotic Griffin product rendering; cells have nearly equal pitch.
+        // https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
+        // Cell size retains frame
         // edge margins. Estimates, not vendor dimensions; griffin-size-evidence.md.
         attribute frameWidthM : Real = 1.716;
         attribute frameThicknessM : Real = 0.14;
-        attribute frameDepthM : Real = 1.80;
+        attribute frameDepthM : Real = 0.66;
         doc /* Width of the centered lower opening as a fraction of the panel frame width. */
         attribute lowerClearanceWidthFraction : Real = 0.32;
         doc /* Depth of the lower opening from the panel edge as a fraction of frame depth. */
         attribute lowerClearanceDepthFraction : Real = 0.28;
         doc /* Lateral position of the opening center as a fraction of frame width; zero centers it on the panel. */
         attribute lowerClearanceCenterXFraction : Real = 0.0;
-        attribute cellWidthM : Real = 1.436;
+        attribute cellWidthM : Real = 1.596;
         attribute cellThicknessM : Real = 0.05;
-        attribute cellDepthM : Real = 1.50;
+        attribute cellDepthM : Real = 0.58;
         attribute cellOffsetYM : Real = 0.075;
         attribute arrayBackplaneThicknessM : Real = 0.04;
         attribute arrayBackplaneCenterYM : Real = 0.03;
-        attribute dividerXWidthM : Real = 0.04;
+        attribute dividerXWidthM : Real = 0.006;
         attribute dividerXThicknessM : Real = 0.04;
-        attribute dividerZWidthM : Real = 0.04;
+        attribute dividerZWidthM : Real = 0.006;
         attribute dividerZThicknessM : Real = 0.04;
         attribute mountBracketWidthM : Real = 0.44;
         attribute mountBracketThicknessM : Real = 0.32;
@@ -53,8 +56,8 @@ package GriffinSolarRequirements {
         attribute mountLinkDepthM : Real = 0.18;
         attribute mountLinkCenterYM : Real = -0.08;
         attribute mountLinkCenterZM : Real = 0.00;
-        attribute gridColumnCount : Integer = 6;
-        attribute gridRowCount : Integer = 4;
+        attribute gridColumnCount : Integer = 14;
+        attribute gridRowCount : Integer = 5;
         attribute cellFaceNormal : Direction = (0.0, 1.0, 0.0);
         attribute minimumMountOverlapM : Real = 0.05;
     }

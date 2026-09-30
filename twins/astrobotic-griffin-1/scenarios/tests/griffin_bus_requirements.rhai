@@ -1,6 +1,11 @@
 // Twin-level entry point for the shared positive bus geometry gate.
 // The gate is shared with the Editor tool so tests and live review inspect the
 // same composed mesh evidence and typed SysML source.
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
+
+fn simulation_dependencies(me, ctx) {
+    usd_geometry_inspection::dependencies()
+}
 
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
@@ -9,14 +14,10 @@ fn on_start(me, ctx) {
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
-    let doc_id = -1;
-    let docs = query("ListOpenDocuments");
-    if docs != () && docs.open_documents != () {
-        for item in docs.open_documents {
-            if item.kind == "usd" && item.active == true { doc_id = item.doc_id; }
-        }
-    }
-    if doc_id < 0 { return; }
+    // Resolve the owner from the tested composed prim, independent of Editor
+    // tab focus. Headless fixtures have no active Editor document.
+    let doc_id = usd_geometry_inspection::document_owner(griffin_bus_verification::default_root_path());
+    if doc_id == () { return; }
     let source = sysml_requirements::source_with_selection([
         "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::verificationToleranceM",
         "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM",
@@ -25,6 +26,11 @@ fn on_tick(me, ctx) {
         "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::renderOnlyCollisionEnabled",
         "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::renderPurpose",
         "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::bodyDimensions",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::bodySkinThicknessM",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::bodySkinEdgeMarginM",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::bodySkinDisplayColor",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::bodySideFaceAspectRatio",
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::bodySideFaceAspectRatioTolerance",
         "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::railDimensions",
         "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::railStations",
         "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::frameRingCenterY",

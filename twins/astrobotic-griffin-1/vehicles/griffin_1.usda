@@ -2410,7 +2410,7 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_body_collision.usda@</GriffinBody>
     )
     {
-        custom double3 xformOp:translate = (0.0, 1.0, 0.0)
+        custom double3 xformOp:translate = (0.0, 1.34, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Xform "LegPX" (
@@ -4387,8 +4387,8 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (0.0, 1.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:translate = (0.0, 1.34, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         custom rel lunco:mount:sockets = [</Griffin1/Bus/RampSocketPort>, </Griffin1/Bus/RampSocketStarboard>]
         def Xform "RampSocketPort" (
@@ -4418,8 +4418,8 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (0.85, 1.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:translate = (0.85, 1.4, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         custom double3 xformOp:scale = (0.6, 0.6, 0.6)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
@@ -4427,8 +4427,8 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (-0.85, 1.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:translate = (-0.85, 1.4, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         custom double3 xformOp:scale = (0.6, 0.6, 0.6)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
@@ -4436,8 +4436,8 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (0.0, 1.0, 0.85)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:translate = (0.0, 1.4, 0.85)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         custom double3 xformOp:scale = (0.6, 0.6, 0.6)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
@@ -4445,8 +4445,8 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda@
     )
     {
-        custom double3 xformOp:translate = (0.0, 1.0, -0.85)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:translate = (0.0, 1.4, -0.85)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         custom double3 xformOp:scale = (0.6, 0.6, 0.6)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
     }
@@ -4581,8 +4581,8 @@ def Xform "Griffin1" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (1.94, 1.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:translate = (1.94, 1.34, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         custom double3 xformOp:rotateXYZ = (89.99999999999999, 0.0, -89.99999999999999)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
     }
@@ -4590,8 +4590,8 @@ def Xform "Griffin1" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (0.0, 1.0, 1.94)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:translate = (0.0, 1.34, 1.94)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         custom double3 xformOp:rotateXYZ = (89.99999999999999, 0.0, 0.0)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
     }
@@ -4599,8 +4599,8 @@ def Xform "Griffin1" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (1.49, 1.0, 1.49)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:translate = (1.49, 1.34, 1.49)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
         custom double3 xformOp:rotateXYZ = (90.0, 0.0, -45.000000000000014)
         custom double3 xformOp:scale = (0.4736465266155053, 1.0, 1.0)
     }

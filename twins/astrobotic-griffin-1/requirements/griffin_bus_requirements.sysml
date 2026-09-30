@@ -70,11 +70,11 @@ package GriffinBusRequirements {
         doc /* GBC-004 [evidence] each bus assumption and its rationale/source shall resolve from the separate SysML provenance catalog, while geometry is verified from typed requirements and composed mesh data. */
     }
     requirement def GBC005_BusFrameGeometry {
-        doc /* GBC-005 [geometry] the open eight-sided frame shall comprise eight upper and eight lower perimeter beams plus eight named corner posts. The rail outside faces define the 4.50 m X/Z plan envelope; the perimeter mesh spans the 2.00 m core-frame height and meets the deck and lower skirt. Source: public Griffin imagery establishes a faceted structural bus, not released CAD. Rationale: a connected, open member layout reveals subsystem placement and removes the visually opaque prism; 0.16 m section stock is a replaceable study assumption shared by ring members and posts. */
+        doc /* GBC-005 [geometry] the internal eight-sided frame shall comprise eight upper and eight lower perimeter beams plus eight named corner posts. Dimensions resolve from GriffinVisualConfiguration, currently an estimated 3.60 m X/Z envelope and 1.40 m frame height. Source and uncertainty: griffin-size-evidence.md; the older NASA whole-lander envelope is not a current core measurement. The 0.16 m member stock is an explicit packaging assumption, not a supplier section specification. */
         require GBC_MeasurementWithinTolerance;
     }
     requirement def GBC006_DeckGeometry {
-        doc /* GBC-006 [geometry] the active TopDeckOctagon shall use the typed deck width, depth, thickness, and center-Y datums resolved from GriffinVisualConfiguration; the separate avionics deck remains a smaller service platform. These are derived presentation datums inside the 4.50 m x 4.50 m x 2.00 m octagonal bus envelope. */
+        doc /* GBC-006 [geometry] the active TopDeckOctagon shall use typed dimensions and center datums from GriffinVisualConfiguration; the separate avionics deck remains a smaller service platform. These are presentation estimates inside the source-owned bus envelope, with rationale in griffin-size-evidence.md. */
         require GBC_ObservedCountEquals;
         require GBC_MeasurementWithinTolerance;
     }
@@ -83,11 +83,13 @@ package GriffinBusRequirements {
         require GBC_MeasurementWithinTolerance;
     }
     requirement def GBC008_OctagonalBodyShape {
-        doc /* GBC-008 [geometry] the primary body shall be an eight-sided open frame built from sixteen perimeter members, with outward-wound quad faces and single-sided rendering. Its eight bays shall expose the internal subsystems. Source: GriffinVisualConfigurationRequirements::GriffinVisualConfiguration and OpenUSD UsdGeomMesh topology. Rationale: verify physical mesh topology and normals directly; a scene label cannot prove geometry. */
+        doc /* GBC-008 [geometry] the internal body frame shall be eight-sided and built from sixteen perimeter members, with outward-wound quad faces and single-sided rendering. The flight exterior is checked separately under GBC-009. Source: typed GriffinVisualConfiguration and OpenUSD UsdGeomMesh topology. Rationale: verify composed mesh topology and normals directly. */
         require GBC_ObservedCountEquals;
     }
     requirement def GBC009_OpenSideBays {
-        doc /* GBC-009 [configuration] legacy side-bay panel parts shall be removed in the open-frame review configuration so all eight bays expose interior structure and hardware. Legacy panel prims are removed from their owning source layer using typed Editor operations. Rationale: inherited skins otherwise reconstruct an opaque shell around an open primary frame. */
+        doc /* GBC-009 [configuration/appearance] obsolete side-bay panels shall remain absent. Eight named ExteriorFacet meshes shall provide the flight exterior over the internal frame. Each shall be a closed six-quad solid with eight points and twelve edges of incidence two, source-owned height, color, render purpose, single-sided faces and disabled collision. Source: Astrobotic Griffin-1 unveiling photo, June 2026, linked in griffin-size-evidence.md, shows covered faceted bays rather than an exposed cage. Thickness and edge gaps are explicitly estimated presentation values, not released thermal-blanket construction. */
+        require GBC_ObservedCountEquals;
+        require GBC_MeasurementWithinTolerance;
     }
     requirement def GBC010_DeckSkirtSeparation {
         doc /* GBC-010 [assembly geometry] the upper payload deck and lower service skirt shall remain distinct, non-intersecting envelopes in the bus frame. Verification uses the oriented-box separating-axis margin computed from their typed SysML Dimensions and Position values. Rationale: this preserves a real service bay instead of allowing two separately named solids to collapse into an overlapping slab. The spacing is derived from the authored centers and thicknesses, not duplicated as another clearance literal. */

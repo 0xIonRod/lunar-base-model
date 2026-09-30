@@ -15,6 +15,14 @@ fn verification_name() { "Verify_GriffinBusRequirements" }
 fn default_root_path() { "/World/Griffin1/Bus" }
 fn _query_ok(record) { record != () && record.ok != false }
 
+fn _model_names(model, name) {
+    let result = [];
+    for value in model.value(visual(name)) {
+        result.push(if sysml_enum_is(value) { value.literal } else { value });
+    }
+    result
+}
+
 fn _native(source, name) {
     sysml_requirements::native_value(source, visual(name))
 }
@@ -74,9 +82,8 @@ fn _mesh_dimensions_error(points, dimensions) {
         _max_number((extent[1] - dimensions.y).abs(), (extent[2] - dimensions.z).abs()))
 }
 
-fn _expected_outer_profile_mesh(dimensions) {
+fn _expected_outer_profile_mesh(dimensions, profile_points) {
     if dimensions == () || !vec3_is_native(dimensions) { return (); }
-    let profile_points = griffin_spec::visual_outer_body_profile_coordinates();
     if profile_points.len() != 8 { return (); }
     let scaled = [];
     for point in profile_points {
@@ -134,7 +141,7 @@ fn _constraint(id, requirement, constraint_name, bindings, provider) {
 
 fn _count_constraint(id, requirement, observed, expected) {
     _constraint(id, requirement, "GBC_ObservedCountEquals",
-        #{observedCount: observed, expectedCount: expected}, "usd")
+        #{observedCount: observed, expectedCount: expected}, "derived")
 }
 
 fn _tolerance_constraint(id, requirement, error, tolerance) {
@@ -177,7 +184,7 @@ fn _opening_radial_error(points, station, inner_radius, outer_radius, segments) 
 }
 
 fn _tank_support_ring_checks(doc, root, name, center_y, profile, radius,
-    section, geometry_tolerance, appearance_tolerance) {
+    section, geometry_tolerance, appearance_tolerance, color) {
     let path = root + "/TankSupportPlate/" + name;
     let ring = assembly_builder::composed_query(doc,
         #{path: path, children: false});
@@ -205,7 +212,7 @@ fn _tank_support_ring_checks(doc, root, name, center_y, profile, radius,
     checks.push(_tolerance_constraint("GBC-011-" + name + "-plane", "gbc011",
         _max_vertical_band_error(points, center_y, section / 2.0), geometry_tolerance));
     for pair in [
-        ["doubleSided", "doubleSidedFacesMust"],
+        ["doubleSided", "doubleSidedFacesMustBe"],
         ["physics:collisionEnabled", "renderOnlyCollisionEnabled"],
         ["purpose", "renderPurpose"]
     ] {
@@ -214,7 +221,7 @@ fn _tank_support_ring_checks(doc, root, name, center_y, profile, radius,
             path: path, attr: pair[0], expected_attr: visual(pair[1])});
     }
     checks.push(_tolerance_constraint("GBC-011-" + name + "-appearance", "gbc011",
-        _display_color_error(ring, griffin_spec::visual_tank_support_display_color()),
+        _display_color_error(ring, color),
         appearance_tolerance));
     #{checks: checks, path: path}
 }
@@ -302,6 +309,7 @@ fn outward_profile_prism_face_count(points, counts, indices, profile_count) {
 fn verify_bus(doc, source, bus_root) {
     let checks = [];
     let root = bus_root;
+    let model = sysml_model("twin://astrobotic-griffin-1");
     let source_tolerance = sysml_requirements::number(source,
         visual("verificationToleranceM"));
     let geometry_tolerance = sysml_requirements::number(source,
@@ -329,8 +337,8 @@ fn verify_bus(doc, source, bus_root) {
     let frame_counts = if _query_ok(frame) { frame.attrs.faceVertexCounts } else { [] };
     let frame_indices = if _query_ok(frame) { frame.attrs.faceVertexIndices } else { [] };
     let body_dimensions = _native(source, "bodyDimensions");
-    let rail_names = griffin_spec::visual_rail_names();
-    let ring_y = griffin_spec::visual_frame_ring_center_y_m();
+    let rail_names = _model_names(model, "frameRails");
+    let ring_y = model.value(visual("frameRingCenterY"));
     let beam_count = rail_names.len() * ring_y.len();
     checks.push(_count_constraint("GBC-008-frame-points", "gbc008",
         frame_points.len(), beam_count * 8));
@@ -350,7 +358,7 @@ fn verify_bus(doc, source, bus_root) {
         path: root + "/PerimeterFrame", attr: "doubleSided",
         expected_attr: visual("doubleSidedFacesMustBe")});
 
-    let rails = griffin_spec::visual_rail_station_plan();
+    
     let rail_color_error = 0.0;
     for index in 0..rail_names.len() {
         let path = root + "/" + rail_names[index];
@@ -379,7 +387,7 @@ fn verify_bus(doc, source, bus_root) {
             kind: "attribute", path: path, attr: "physics:collisionEnabled",
             expected_attr: visual("renderOnlyCollisionEnabled")});
         let color_error = _display_color_error(prim,
-            griffin_spec::visual_rail_display_color());
+            model.value(visual("railDisplayColor")));
         if color_error == () { rail_color_error = (); }
         else if rail_color_error != () { rail_color_error = _max_number(rail_color_error, color_error); }
     }
@@ -390,7 +398,7 @@ fn verify_bus(doc, source, bus_root) {
         #{path: root + "/TopDeckOctagon", children: false});
     let deck_dims = _native(source, "deckDimensions");
     let deck_center = _native(source, "deckCenter");
-    let expected_deck = _expected_outer_profile_mesh(deck_dims);
+    let expected_deck = _expected_outer_profile_mesh(deck_dims, model.value(visual("outerBodyProfileCoordinates")));
     let deck_profile = _mesh_profile_metrics(deck, expected_deck);
     let deck_faces = if _query_ok(deck) { outward_profile_prism_face_count(deck.attrs.points,
         deck.attrs.faceVertexCounts, deck.attrs.faceVertexIndices, 8) } else { 0 };
@@ -417,7 +425,7 @@ fn verify_bus(doc, source, bus_root) {
         #{path: root + "/LowerServiceSkirtOctagon", children: false});
     let skirt_dims = _native(source, "lowerSkirtDimensions");
     let skirt_center = _native(source, "lowerSkirtCenter");
-    let expected_skirt = _expected_outer_profile_mesh(skirt_dims);
+    let expected_skirt = _expected_outer_profile_mesh(skirt_dims, model.value(visual("outerBodyProfileCoordinates")));
     let skirt_profile = _mesh_profile_metrics(skirt, expected_skirt);
     let skirt_faces = if _query_ok(skirt) { outward_profile_prism_face_count(skirt.attrs.points,
         skirt.attrs.faceVertexCounts, skirt.attrs.faceVertexIndices, 8) } else { 0 };
@@ -452,30 +460,34 @@ fn verify_bus(doc, source, bus_root) {
 
     let support = assembly_builder::composed_query(doc,
         #{path: root + "/TankSupportPlate", children: false});
-    let tanks = griffin_spec::component_tank_stations();
-    let tank_names = griffin_spec::propellant_tank_names();
-    let support_planes = griffin_spec::visual_tank_support_planes_m();
-    let segments = griffin_spec::visual_tank_opening_segments();
-    let inner_radius = griffin_spec::visual_tank_opening_inner_radius_m();
-    let outer_radius = griffin_spec::visual_tank_opening_outer_radius_m();
-    let support_profile = griffin_spec::visual_outer_body_profile_coordinates();
-    let support_radius = griffin_spec::visual_tank_support_perimeter_radius_m();
-    let support_section = griffin_spec::visual_tank_support_perimeter_section_m();
+    let tanks = model.value(visual("tankStations"));
+    let tank_names = _model_names(model, "tankInstances");
+    let support_planes = model.value(visual("tankSupportPlanes"));
+    let segments = model.value(visual("tankSupportOpeningSegments"));
+    let inner_radius = model.value(visual("tankSupportOpeningInnerRadiusM"));
+    let outer_radius = model.value(visual("tankSupportOpeningOuterRadiusM"));
+    let support_profile = model.value(visual("outerBodyProfileCoordinates"));
+    let support_radius = model.value(visual("tankSupportPerimeterRadiusM"));
+    let support_section = model.value(visual("tankSupportPerimeterSectionM"));
     checks.push(sysml_requirement_checks::exists("GBC-011-support-root", "bus",
         "gbc011", verification_name(), root + "/TankSupportPlate", "Xform"));
     let ring_names = ["TankSupportPerimeterUpper", "TankSupportPerimeter",
         "TankSupportPerimeterLower"];
     checks.push(_count_constraint("GBC-011-support-ring-count", "gbc011",
         ring_names.len(), support_planes.len()));
+    if !array_is(support_planes) || support_planes.len() != ring_names.len()
+        || !array_is(tanks) || tanks.len() != tank_names.len() {
+        throw("Bus source must contain three support planes and one station per tank");
+    }
     let support_color_errors = [];
     for index in 0..ring_names.len() {
         let ring = _tank_support_ring_checks(doc, root, ring_names[index],
             support_planes[index], support_profile, support_radius,
-            support_section, geometry_tolerance, appearance_tolerance);
+            support_section, geometry_tolerance, appearance_tolerance, model.value(visual("tankSupportDisplayColor")));
         for check in ring.checks { checks.push(check); }
         support_color_errors.push(_display_color_error(
             assembly_builder::composed_query(doc, #{path: ring.path, children: false}),
-            griffin_spec::visual_tank_support_display_color()));
+            model.value(visual("tankSupportDisplayColor"))));
     }
 
     checks.push(_count_constraint("GBC-011-opening-count", "gbc011",
@@ -497,10 +509,10 @@ fn verify_bus(doc, source, bus_root) {
             checks.push(_constraint("GBC-011-opening-topology-" + label,
                 "gbc011", "GBC011_AnnularOpeningTopology",
                 #{observedPointCount: points.len(), observedFaceCount: face_counts.len(),
-                  observedIndexCount: face_indices.len(), segmentCount: segments}, "usd"));
+                  observedIndexCount: face_indices.len(), segmentCount: segments}, "derived"));
             checks.push(_constraint("GBC-011-opening-quads-" + label,
                 "gbc011", "GBC011_OpeningQuadsCoverSurface",
-                #{quadFaceCount: _quad_face_count(face_counts), faceCount: face_counts.len()}, "usd"));
+                #{quadFaceCount: _quad_face_count(face_counts), faceCount: face_counts.len()}, "derived"));
             let bore_error = if points.len() > 2 * segments {
                 let point = points[2 * segments];
                 let dx = point[0] - (tanks[index].x + inner_radius);
@@ -521,7 +533,7 @@ fn verify_bus(doc, source, bus_root) {
                 kind: "attribute", path: path, attr: "doubleSided",
                 expected_attr: visual("doubleSidedFacesMustBe")});
             opening_color_errors.push(_display_color_error(opening,
-                griffin_spec::visual_tank_collar_display_color()));
+                model.value(visual("tankCollarDisplayColor"))));
             checks.push(#{id: "GBC-011-opening-purpose-" + label,
                 component: "bus", requirement: "gbc011", verification: verification_name(),
                 kind: "attribute", path: path, attr: "purpose",
@@ -531,7 +543,7 @@ fn verify_bus(doc, source, bus_root) {
 
     let band_radii = sysml_requirement_checks::source_number_list(source,
         "GriffinTankRequirements::GriffinPropellantTankAssembly::bandRadiusByCenterM");
-    let tank_scales = griffin_spec::component_tank_scale();
+    let tank_scales = model.value(visual("tankScale"));
     let minimum_bore_clearance = sysml_requirements::number(source,
         visual("minimumTankFrameClearanceM"));
     let maximum_band_radius = 0.0;
@@ -550,9 +562,9 @@ fn verify_bus(doc, source, bus_root) {
     }
 
     let source_color_error = _maximum_error([
-        _display_color_error(frame, griffin_spec::visual_frame_display_color()),
-        _display_color_error(deck, griffin_spec::visual_deck_display_color()),
-        _display_color_error(skirt, griffin_spec::visual_lower_skirt_display_color()),
+        _display_color_error(frame, model.value(visual("frameDisplayColor"))),
+        _display_color_error(deck, model.value(visual("deckDisplayColor"))),
+        _display_color_error(skirt, model.value(visual("lowerSkirtDisplayColor"))),
         _maximum_error(support_color_errors),
         rail_color_error, _maximum_error(opening_color_errors)]);
     checks.push(_tolerance_constraint("GBC-012-source-owned-colors", "gbc012",
@@ -562,6 +574,63 @@ fn verify_bus(doc, source, bus_root) {
     for legacy_name in legacy_names {
         checks.push(sysml_requirement_checks::not_exists("GBC-009-legacy-" + legacy_name,
             "bus", "gbc009", verification_name(), root + "/" + legacy_name));
+    }
+
+    // Flight exterior is distinct from the internal open frame. Inspect the
+    // actual mesh, so a name or source parameter cannot stand in for a skin.
+    let skin_thickness = sysml_requirements::number(source, visual("bodySkinThicknessM"));
+    let skin_margin = sysml_requirements::number(source, visual("bodySkinEdgeMarginM"));
+    let skin_color = sysml_requirements::native_value(source, visual("bodySkinDisplayColor"));
+    for index in 1..9 {
+        let label = "ExteriorFacet" + index.to_string();
+        let path = root + "/" + label;
+        let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
+        checks.push(sysml_requirement_checks::exists("GBC-009-" + label,
+            "bus", "gbc009", verification_name(), path, "Mesh"));
+        let points = if _query_ok(prim) { prim.attrs.points } else { [] };
+        let counts = if _query_ok(prim) { prim.attrs.faceVertexCounts } else { [] };
+        let indices = if _query_ok(prim) { prim.attrs.faceVertexIndices } else { [] };
+        checks.push(_count_constraint("GBC-009-points-" + label, "gbc009", points.len(), 8));
+        checks.push(_count_constraint("GBC-009-quads-" + label, "gbc009", _quad_face_count(counts), 6));
+        checks.push(_count_constraint("GBC-009-indices-" + label, "gbc009", indices.len(), 24));
+        // Every undirected edge must have two incident faces, with valid
+        // indices; duplicated faces or an open back cannot satisfy closure.
+        let edges = #{}; let valid = true; let offset = 0;
+        for count in counts {
+            if count != 4 || offset + count > indices.len() { valid = false; break; }
+            for edge in 0..count {
+                let a = indices[offset + edge];
+                let b = indices[offset + (edge + 1) % count];
+                if a < 0 || b < 0 || a >= points.len() || b >= points.len() || a == b {
+                    valid = false; continue;
+                }
+                let key = if a < b { a.to_string() + ":" + b.to_string() }
+                    else { b.to_string() + ":" + a.to_string() };
+                edges[key] = if edges[key] == () { 1 } else { edges[key] + 1 };
+            }
+            offset += count;
+        }
+        for incidence in edges.values() { if incidence != 2 { valid = false; } }
+        checks.push(_count_constraint("GBC-009-closed-" + label, "gbc009",
+            if valid && edges.len() == 12 && offset == indices.len() { 1 } else { 0 }, 1));
+        let extent = _mesh_extent(points);
+        let error = ();
+        if extent != () && skin_thickness != () && skin_margin != () {
+            error = (extent[1] - (body_dimensions.y - 2.0 * skin_margin)).abs();
+            error = _max_number(error, _max_number(0.0, extent[0] - body_dimensions.x - 2.0 * skin_thickness));
+            error = _max_number(error, _max_number(0.0, extent[2] - body_dimensions.z - 2.0 * skin_thickness));
+        }
+        checks.push(_tolerance_constraint("GBC-009-envelope-" + label, "gbc009", error, geometry_tolerance));
+        checks.push(_tolerance_constraint("GBC-009-color-" + label, "gbc009",
+            _display_color_error(prim, skin_color), appearance_tolerance));
+        for attr in ["physics:collisionEnabled", "purpose", "doubleSided"] {
+            let expected = if attr == "purpose" { "renderPurpose" }
+                else if attr == "doubleSided" { "doubleSidedFacesMustBe" }
+                else { "renderOnlyCollisionEnabled" };
+            checks.push(#{id: "GBC-009-" + label + "-" + attr, component: "bus",
+                requirement: "gbc009", verification: verification_name(), kind: "attribute",
+                path: path, attr: attr, expected_attr: visual(expected)});
+        }
     }
 
     let result = sysml_requirement_checks::finish(source, checks,

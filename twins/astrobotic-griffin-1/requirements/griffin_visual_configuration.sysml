@@ -109,29 +109,41 @@ package GriffinVisualConfigurationRequirements {
          * Estimate the bus at 80% of that lateral envelope (3.6 +/-0.4 m).
          * Current hardware photo https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/
          * motivates a taller 2.52 +/-0.5 m landed payload surface, excluding
-         * its ground handling stand. Bus height 1.4 +/-0.3 m and all internal
+         * its ground handling stand. Body belt height 0.72 +/-0.12 m and all internal
          * support coordinates below are packaging estimates, not metrology.
          * A 0.44 m vehicle touchdown datum plus adapter Y=2.0 and half its
          * 0.16 m thickness gives the 2.52 m ground-to-payload height. */
-        attribute bodyDimensions : Dimensions = (3.60, 1.40, 3.60);
-        attribute bodyMount : Position = (0.0, 1.00, 0.0);
+        attribute bodyDimensions : Dimensions = (3.60, 0.72, 3.60);
+        attribute bodyMount : Position = (0.0, 1.34, 0.0);
         /* Exterior blanket/panel presentation follows the faceted wrapped
          * structure visible in the June 2026 Astrobotic hardware photo above.
          * Eight flat facets approximate the envelope; actual blanket folds,
-         * fasteners and cutouts are unknown. Thickness 25 mm and 80 mm edge
+         * fasteners and cutouts are unknown. Thickness 25 mm and 40 mm edge
          * margins are presentation estimates, not structural material sizing.
-         * Muted gold color is an image-informed linear display-color estimate.
+         * Light neutral panel color is an image-informed linear display-color estimate.
          * This cladding is render-only; the frame remains a separate part. */
+        /* ESA artist impression, 23 September 2022:
+         * https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
+         * The user's marked flat face is about 3:1 width/height, not the
+         * full vehicle span. Flat face width = 0.5857864376 * 3.60 = 2.109 m;
+         * /3 gives 0.703 m, rounded to 0.72 m for this study. Perspective
+         * supports only an approximate ratio (2.65-3.35), not metrology.
+         * Keep the body top at vehicle Y=1.70 and payload top Y=2.08;
+         * the shallower belt therefore moves upward rather than moving ramps.
+         * This older artist impression is a user-selected silhouette basis;
+         * it is not a claim of June 2026 as-built panel geometry. */
+        attribute bodySideFaceAspectRatio : Real = 3.0;
+        attribute bodySideFaceAspectRatioTolerance : Real = 0.35;
         attribute bodySkinThicknessM : Real = 0.025;
-        attribute bodySkinEdgeMarginM : Real = 0.08;
-        attribute bodySkinDisplayColor : Real[3] = (0.32, 0.23, 0.09);
+        attribute bodySkinEdgeMarginM : Real = 0.04;
+        attribute bodySkinDisplayColor : Real[3] = (0.32, 0.34, 0.36);
         attribute bodyGroundClearanceM : Real = 0.20;
         attribute lowerSkirtDimensions : Dimensions = (3.40, 0.24, 3.40);
-        attribute lowerSkirtCenter : Position = (0.0, -0.70, 0.0);
+        attribute lowerSkirtCenter : Position = (0.0, -0.36, 0.0);
         attribute deckDimensions : Dimensions = (3.50, 0.16, 3.50);
-        attribute deckCenter : Position = (0.0, 0.71, 0.0);
+        attribute deckCenter : Position = (0.0, 0.37, 0.0);
         attribute avionicsDeckDimensions : Dimensions = (2.00, 0.10, 1.46);
-        attribute avionicsDeckCenter : Position = (0.0, 0.80, 0.0);
+        attribute avionicsDeckCenter : Position = (0.0, 0.46, 0.0);
 
         /* Linear scene-referred display colors are visual design parameters;
          * Rhai consumes these values but does not define a second palette. */
@@ -154,7 +166,7 @@ package GriffinVisualConfigurationRequirements {
              (-1.0, 0.5857864376269049), (-1.0, -0.5857864376269049));
 
         /* Eight upper and eight lower beams close the octagonal outer frame. */
-        attribute frameRingCenterY : Real[2] = (0.62, -0.62);
+        attribute frameRingCenterY : Real[2] = (0.28, -0.28);
         attribute frameRingSectionM : Real = 0.16;
         attribute frameRails : GriffinFrameRailNode[8] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard",
@@ -178,7 +190,7 @@ package GriffinVisualConfigurationRequirements {
              (1.720, 0.0, 1.008), (1.720, 0.0, -1.008),
              (1.008, 0.0, -1.720), (-1.008, 0.0, -1.720),
              (-1.720, 0.0, -1.008), (-1.720, 0.0, 1.008));
-        attribute railDimensions : Dimensions = (0.16, 1.40, 0.16);
+        attribute railDimensions : Dimensions = (0.16, 0.72, 0.16);
 
         /* Separate central tank-support assembly. The four bore centres are
          * derived from tankStations and tankInstances. The polygonal bore
@@ -191,7 +203,7 @@ package GriffinVisualConfigurationRequirements {
         attribute tankSupportOpeningInnerRadiusM : Real = 0.58;
         attribute tankSupportOpeningOuterRadiusM : Real = 0.70;
         attribute tankSupportOpeningSegments : Integer = 16;
-        attribute tankSupportPlanes : Real[3] = (0.71, 0.0, -0.71);
+        attribute tankSupportPlanes : Real[3] = (0.37, 0.0, -0.37);
 
         /* Open eight-sided upper and lower buckets bridge the tank rings;
          * neither shell crosses the four COPV columns. These are replaceable
@@ -203,14 +215,14 @@ package GriffinVisualConfigurationRequirements {
         attribute upperBucketOuterBottomRadiusM : Real = 0.64;
         attribute upperBucketInnerTopRadiusM : Real = 1.42;
         attribute upperBucketOuterTopRadiusM : Real = 1.54;
-        attribute upperBucketBottomCenterYM : Real = 0.80;
-        attribute upperBucketTopCenterYM : Real = 0.92;
+        attribute upperBucketBottomCenterYM : Real = 0.46;
+        attribute upperBucketTopCenterYM : Real = 0.58;
         attribute lowerBucketInnerTopRadiusM : Real = 0.52;
         attribute lowerBucketOuterTopRadiusM : Real = 0.64;
         attribute lowerBucketInnerBottomRadiusM : Real = 1.42;
         attribute lowerBucketOuterBottomRadiusM : Real = 1.54;
-        attribute lowerBucketTopCenterYM : Real = -0.80;
-        attribute lowerBucketBottomCenterYM : Real = -0.92;
+        attribute lowerBucketTopCenterYM : Real = -0.46;
+        attribute lowerBucketBottomCenterYM : Real = -0.58;
         attribute payloadAdapterDimensions : Dimensions = (3.20, .16, 3.20);
         attribute payloadAdapterCenterYM : Real = 2.00;
 
@@ -229,7 +241,7 @@ package GriffinVisualConfigurationRequirements {
          * Panel width derives from each rail pair's spacing minus the common
          * edge clearance; the component's maximum width is owned by GSA. */
         attribute solarStations : Position[3] =
-            ((0.0, 1.00, 1.94), (1.49, 1.00, 1.49), (1.94, 1.00, 0.0));
+            ((0.0, 1.34, 1.94), (1.49, 1.34, 1.49), (1.94, 1.34, 0.0));
         attribute solarMountRails : GriffinFrameRailNode[6] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard",
              "FrameRailFrontStarboard", "FrameRailStarboardFront",
@@ -243,8 +255,8 @@ package GriffinVisualConfigurationRequirements {
          * support openings retain over 0.06 m radial clearance. See
          * griffin-size-evidence.md; no supplier tank dimensions are public. */
         attribute tankStations : Position[4] =
-            ((0.85, 1.00, 0.0), (-0.85, 1.00, 0.0),
-             (0.0, 1.00, 0.85), (0.0, 1.00, -0.85));
+            ((0.85, 1.40, 0.0), (-0.85, 1.40, 0.0),
+             (0.0, 1.40, 0.85), (0.0, 1.40, -0.85));
         attribute tankStationRotationYDeg : Real[4] = (0.0, 0.0, 0.0, 0.0);
         attribute tankScale : Real[4] = (0.60, 0.60, 0.60, 0.60);
         attribute minimumTankInstanceClearanceM : Real = 0.06;
@@ -273,7 +285,7 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-003 [geometry] the primary airframe shall use an open eight-sided clipped-square perimeter with eight posts and upper/lower perimeter beams. The source-owned 3.60 m plan span and 1.40 m core height are low-confidence estimates documented in griffin-size-evidence.md, not supplier dimensions. Separate skirt, payload ring and central supports retain their own geometry. */
     }
     requirement def GVC004_OctagonalPayloadDeck {
-        doc /* GVC-004 [interface] the upper bus datum shall expose a 5.15 m octagonal perimeter deck ring with four tank through-openings; it shall not be a solid plate across the COPV cluster. A raised central payload adapter is supported by the upper flared bucket and shall carry the linked FLIP review asset with all four tire bottoms resting on the adapter. The lander and rover review stations, adapter footprint, and member stock are replaceable study assumptions, not released supplier CAD. */
+        doc /* GVC-004 [interface] the upper bus datum shall expose a source-sized octagonal perimeter deck ring with four tank through-openings; it shall not be a solid plate across the COPV cluster. A raised central payload adapter is supported by the upper flared bucket and shall carry the linked FLIP review asset with all four tire bottoms resting on the adapter. The lander and rover review stations, adapter footprint, and member stock are replaceable study assumptions, not released supplier CAD. */
     }
     requirement def GVC005_LegStations {
         doc /* GVC-005 [layout] four leg roots shall occupy mirrored axial X/Z stations at a 3.10 m radial offset beyond the enlarged octagonal body, with local radial rotations and at least 0.20 m body-to-ground visual clearance. Source: Griffin's four shock-absorbing legs; exact station ICD is not public. */
