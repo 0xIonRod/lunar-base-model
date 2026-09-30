@@ -2396,8 +2396,8 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/LegPX>
         uniform token physics:axis = "Y"
-        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
-        quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
+        quatf physics:localRot0 = (0.9238795042037964, 0.0, -0.3826834261417389, 0.0)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
@@ -2406,7 +2406,7 @@ def Xform "Griffin1" (
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (1.899999976158142, 0.8999999761581421, 0.0)
+        point3f physics:localPos0 = (1.899999976158142, 0.8999999761581421, 1.899999976158142)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2417,8 +2417,8 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/LegNX>
         uniform token physics:axis = "Y"
-        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
-        quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.3826834261417389, 0.0, 0.9238795042037964, 0.0)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
@@ -2427,7 +2427,7 @@ def Xform "Griffin1" (
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (-1.899999976158142, 0.8999999761581421, 0.0)
+        point3f physics:localPos0 = (-1.899999976158142, 0.8999999761581421, -1.899999976158142)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2438,8 +2438,8 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/LegPZ>
         uniform token physics:axis = "Y"
-        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
-        quatf physics:localRot1 = (0.0, 0.7071067690849304, 0.0, 0.7071067690849304)
+        quatf physics:localRot0 = (0.3826834261417389, 0.0, -0.9238795042037964, 0.0)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
@@ -2448,7 +2448,7 @@ def Xform "Griffin1" (
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (0.0, 0.8999999761581421, 1.899999976158142)
+        point3f physics:localPos0 = (-1.899999976158142, 0.8999999761581421, 1.899999976158142)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2459,8 +2459,8 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/LegNZ>
         uniform token physics:axis = "Y"
-        quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
-        quatf physics:localRot1 = (0.0, -0.7071067690849304, 0.0, 0.7071067690849304)
+        quatf physics:localRot0 = (0.9238795042037964, 0.0, 0.3826834261417389, 0.0)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
         float physics:lowerLimit = -0.800000011920929
         float physics:upperLimit = 0.0
         uniform token drive:linear:physics:type = "force"
@@ -2469,7 +2469,7 @@ def Xform "Griffin1" (
         float drive:linear:physics:stiffness = 4000.0
         float drive:linear:physics:damping = 800.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (0.0, 0.8999999761581421, -1.899999976158142)
+        point3f physics:localPos0 = (1.899999976158142, 0.8999999761581421, -1.899999976158142)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2497,9 +2497,9 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (1.9, 0.9, 0.0)
+        custom double3 xformOp:translate = (1.9, 0.9, 1.9)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, -45.0, 0.0)
         custom rel physics:filteredPairs = None
         float physics:mass = 180.0
         float outputs:contact_force = 0.0
@@ -2564,9 +2564,9 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (-1.9, 0.9, 0.0)
+        custom double3 xformOp:translate = (-1.9, 0.9, -1.9)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 135.0, 0.0)
         custom rel physics:filteredPairs = None
         float physics:mass = 180.0
         float outputs:contact_force = 0.0
@@ -2631,9 +2631,9 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, 0.9, 1.9)
+        custom double3 xformOp:translate = (-1.9, 0.9, 1.9)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, -135.0, 0.0)
         custom rel physics:filteredPairs = None
         float physics:mass = 180.0
         float outputs:contact_force = 0.0
@@ -2698,9 +2698,9 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsRigidBodyAPI"
     )
     {
-        custom double3 xformOp:translate = (0.0, 0.9, -1.9)
+        custom double3 xformOp:translate = (1.9, 0.9, -1.9)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
         custom rel physics:filteredPairs = None
         float physics:mass = 180.0
         float outputs:contact_force = 0.0

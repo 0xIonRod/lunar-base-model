@@ -201,6 +201,17 @@ fn on_tick(me, ctx) {
             path:visual_path+"/MountAxle",attr:"xformOp:translate",index:1,
             expected:expected_mount_y,tolerance:f64_from(model.value(own("memberEndpointToleranceM")))});
 
+        // Compare the mount to the actual octagon datum independently of the
+        // tube's own upper-anchor table. Cardinal or oversized mounts fail.
+        let profile=model.value(visual("outerBodyProfileCoordinates"));
+        let cx=(profile[1].x+profile[2].x)*body.x/4.0;
+        let cz=-(profile[1].y+profile[2].y)*body.z/4.0;
+        let station_radius=sqrt(stations[index].x*stations[index].x+stations[index].z*stations[index].z);
+        let expected_mount_x=sqrt(cx*cx+cz*cz)-station_radius;
+        checks.push(#{id:"GLL-009-"+name+"-chamfer-mount",component:"landing_leg",
+            requirement:"gll009",verification:VERIFICATION,kind:"attribute_component",
+            path:visual_path+"/MountAxle",attr:"xformOp:translate",index:0,
+            expected:expected_mount_x,tolerance:f64_from(model.value(own("memberEndpointToleranceM")))});
         if rotations_y.len() == names.len() {
             let joint_path = root + "/" + name + "_Spring";
             checks.push(sysml_requirement_checks::exists("GLL-009-" + name + "-spring-joint",

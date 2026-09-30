@@ -1690,6 +1690,15 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
             ops.push(#{SetAttribute: #{edit_target: edit_target,
                 path: joint_path, name: "physics:localPos1", type_name: "point3f",
                 value: "(0.0, 0.0, 0.0)"}});
+            // Seat the oriented leg in matching joint frames. World travel
+            // remains +Y; only the source-owned yaw changes between corners.
+            let seated=quat_from_euler_xyz_deg(vec3(0.0,geometry.rotations_y_deg[index],0.0));
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:joint_path,
+                name:"physics:localRot0",type_name:"quatf",
+                value:"("+seated.w.to_string()+", "+seated.x.to_string()+", "+seated.y.to_string()+", "+seated.z.to_string()+")"}});
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:joint_path,
+                name:"physics:localRot1",type_name:"quatf",value:"(1.0, 0.0, 0.0, 0.0)"}});
+
             for attribute in [
                 #{name: "physics:lowerLimit", value: geometry.spring_lower_limit_m},
                 #{name: "physics:upperLimit", value: geometry.spring_upper_limit_m},
@@ -3185,8 +3194,14 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
     if clevis_width==() || clevis_height==() || clevis_depth==() || clevis_y==() || section==() || overlap==()
         || !vec3_is_native(body) || !array_is(stations) || stations.len()!=4 {return plan_error("leg mounting datums incomplete");}
     let radial=(stations[0].x*stations[0].x+stations[0].z*stations[0].z).sqrt();
-    let bus_edge=body.x/2.0-section/2.0-overlap;
-    let arm_end=radial-clevis_height/2.0+overlap;
+    let profile=model.value(visual+"outerBodyProfileCoordinates");
+    if !array_is(profile) || profile.len()!=8 {return plan_error("octagonal leg mount profile missing");}
+    // Midpoint of the +X/+Z chamfer. The reusable bracket seats at this
+    // outer-frame datum rather than extending out to the foot/root radius.
+    let corner_x=(profile[1].x+profile[2].x)*body.x/4.0;
+    let corner_z=-(profile[1].y+profile[2].y)*body.z/4.0;
+    let bus_edge=sqrt(corner_x*corner_x+corner_z*corner_z)-section/2.0-overlap;
+    let arm_end=radial+upper[0].x-clevis_width/2.0+overlap;
     if arm_end<=bus_edge {return plan_error("leg mount cannot reach outer frame");}
     let ops=[];
     for i in 0..members.len() {

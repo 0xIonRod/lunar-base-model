@@ -30,16 +30,20 @@ package GriffinLandingLegRequirements {
              "BodyMountArm");
         // Three-member topology follows the user-provided PGH Tech hardware
         // photograph. The source has perspective and no calibrated scale.
-        // Coordinates below are explicit packaging estimates: local +X outward,
-        // Y up, Z tangential. Main top meets the outer bus mount; brace tops
-        // meet the current skirt's X=1.56 m rail at two separated Z stations.
-        // Root Y=.90 puts the sleeve below the body belt. Primary local Y=0;
-        // brace X=-.34 = skirt rail X1.56 - root X1.90, and Y=.10 =
-        // skirt mount Y1.00 - root Y.90. These are interface derivations.
+        // Local +X points outward along a chamfer normal, Y up, Z tangential.
+        // Body edge radius = 1.80*(1+.5857864376269049)/sqrt(2) = 2.0183766 m.
+        // Foot/root radius = 1.90*sqrt(2) = 2.6870058 m. Their difference is
+        // the primary local upper X datum. Both are reconstruction estimates.
+        // Brace tops lie at skirt-frame world X/Z=(1.56,.68) and (.68,1.56)
+        // for the +X/+Z corner. Rotate them into this shared leg frame:
+        // upper X=(1.56+.68)/sqrt(2)-foot radius; tangential Z=+/- .88/sqrt(2).
+        // Y=.10 = skirt mount 1.00 - root .90. The .68 m tangential rail
+        // station remains a packaging estimate. Endpoint poses derive once
+        // from these datums; no independent cylinder length/angle guesses.
         attribute loadMembers : GriffinLandingLegChild[3] =
             ("ShockPiston", "StrutOuter", "StrutInner");
         attribute memberUpperAnchors : Position[3] =
-            ((-.10, 0.0, 0.0), (-.34, .10, .68), (-.34, .10, -.68));
+            ((-0.668629150101524, 0.0, 0.0), (-1.103086578651014, .10, 0.622253967444162), (-1.103086578651014, .10, -0.622253967444162));
         attribute memberLowerAnchor : Position = (0.0, -.83, 0.0);
         // Diameter estimates: 0.12 m main shock and 0.07 m braces. These
         // approximate the slender primary/secondary silhouette, not a flight
@@ -103,7 +107,7 @@ package GriffinLandingLegRequirements {
         doc /* GLL-004 [evidence] leg identities come from GriffinVisualConfigurationRequirements and their collection cardinality agrees with the typed lander count. */
     }
     requirement def GLL005_LegPlacement {
-        doc /* GLL-005 [layout] visual and physical landing-leg roots match the same ordered native Position stations and outward-facing rotations owned by GriffinVisualConfiguration. Each root mounts directly below the corresponding octagonal bus side; there is no second physical station table. */
+        doc /* GLL-005 [layout] visual and physical landing-leg roots match the same ordered native Position stations and outward-facing rotations owned by GriffinVisualConfiguration. Each root sits outward of a different chamfered bus corner; the primary upper anchor meets that chamfer midpoint below the body belt; there is no second physical station table. */
     }
     constraint def GLLC006_MemberClosure {
         in measuredUpperEndpointErrorM : Real;

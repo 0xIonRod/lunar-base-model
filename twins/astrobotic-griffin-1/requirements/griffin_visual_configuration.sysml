@@ -233,11 +233,15 @@ package GriffinVisualConfigurationRequirements {
          * Shift the shared physics/visual root down .30 m and compensate the
          * local foot datums to preserve the previous terrain contact. */
         attribute legStations : Position[4] =
-            ((1.90, .90, 0.0), (-1.90, .90, 0.0),
-             (0.0, .90, 1.90), (0.0, .90, -1.90));
+            ((1.90, .90, 1.90), (-1.90, .90, -1.90),
+             (-1.90, .90, 1.90), (1.90, .90, -1.90));
         /* Each local +X axis points radially outward. This gives the shared
-         * leg mount interface one canonical orientation at every bus side. */
-        attribute legStationRotationYDeg : Real[4] = (0.0, 180.0, -90.0, 90.0);
+         * leg mount interface one canonical orientation at every chamfered corner.
+         * The legacy PX/NX/PZ/NZ instance names are retained as stable IDs,
+         * rather than treated as placement directions. Feet at (+/-1.90,
+         * +/-1.90) preserve the estimated 4.50 m X/Z envelope including pads.
+         * Primary upper anchors meet chamfer midpoints; legs splay outward. */
+        attribute legStationRotationYDeg : Real[4] = (-45.0, 135.0, -135.0, 45.0);
 
         /* The three panel instances occupy consecutive forward, diagonal,
          * and starboard bus faces in the mission Sun quadrant. Stations and
