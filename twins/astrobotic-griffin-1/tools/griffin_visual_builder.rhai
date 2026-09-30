@@ -3876,11 +3876,11 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
             return plan_error("tank component instances must share one Y datum and uniform scale for a common authored cradle");
         }
     }
-    if tank_stations[0].y != body_mount.y || tank_scales[0] <= 0.0 {
-        return plan_error("tank mounting datum must share the bus origin and use a positive uniform scale");
+    if tank_scales[0] <= 0.0 {
+        return plan_error("tank mounting datum requires a positive uniform scale");
     }
-    let skirt_top_y = body_mount.y + skirt_center.y + skirt_dimensions.y / 2.0;
-    let cradle_top_local_y = (skirt_top_y + minimum_skirt_clearance
+    let skirt_seat_y = body_mount.y + skirt_center.y - skirt_dimensions.y / 2.0;
+    let cradle_top_local_y = (skirt_seat_y + minimum_skirt_clearance
         - tank_stations[0].y) / tank_scales[0];
     let cradle_y = cradle_top_local_y - cradle_height / 2.0;
     let cradle_pad_y = cradle_top_local_y + cradle_pad_height / 2.0;
@@ -3888,7 +3888,10 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     let lower_neck_bottom_y = -neck_y - neck_height / 2.0;
     let support_height = lower_neck_bottom_y - pad_top_local_y;
     let support_y = (lower_neck_bottom_y + pad_top_local_y) / 2.0;
-    let bracket_y = pad_top_local_y + bracket_length / 2.0;
+    let brace = griffin_geometry::tank_brace_datum(pad_top_local_y, bracket_offset, bracket_length, bracket_tilt);
+    let bracket_x = brace.center[0];
+    let bracket_y = brace.center[1];
+    let bracket_z = brace.center[2];
     if support_height <= 0.0 || !griffin_geometry::scalar_is_finite(support_height) {
         return plan_error("derived tank support span does not connect the cradle pad to the lower neck");
     }
@@ -4004,10 +4007,10 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
         return plan_error(bracket_group + ": tank bracket group is missing or not Xform");
     }
     let bracket_specs = [
-        #{name: bracket_names[0], translation: [bracket_offset, bracket_y, bracket_offset], rotation: [-bracket_tilt, 0.0, -bracket_tilt]},
-        #{name: bracket_names[1], translation: [-bracket_offset, bracket_y, bracket_offset], rotation: [-bracket_tilt, 0.0, bracket_tilt]},
-        #{name: bracket_names[2], translation: [bracket_offset, bracket_y, -bracket_offset], rotation: [bracket_tilt, 0.0, -bracket_tilt]},
-        #{name: bracket_names[3], translation: [-bracket_offset, bracket_y, -bracket_offset], rotation: [bracket_tilt, 0.0, bracket_tilt]},
+        #{name: bracket_names[0], translation: [bracket_x, bracket_y, bracket_z], rotation: [-bracket_tilt, 0.0, -bracket_tilt]},
+        #{name: bracket_names[1], translation: [-bracket_x, bracket_y, bracket_z], rotation: [-bracket_tilt, 0.0, bracket_tilt]},
+        #{name: bracket_names[2], translation: [bracket_x, bracket_y, -bracket_z], rotation: [bracket_tilt, 0.0, -bracket_tilt]},
+        #{name: bracket_names[3], translation: [-bracket_x, bracket_y, -bracket_z], rotation: [bracket_tilt, 0.0, bracket_tilt]},
     ];
     for bracket in bracket_specs {
         let bracket_path = bracket_group + "/" + bracket.name;

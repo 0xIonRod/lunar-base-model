@@ -40,6 +40,9 @@ package GriffinPropulsionRequirements {
         attribute plumeFuelFamily : Real = 3;
         attribute plumeStoichiometricMixtureRatio : Real = 2.0;
         attribute minimumBellClearanceM : Real = 0.20;
+        // The skirt bounds the engine cluster; the central adapter is an
+        // internal structural shell and must not be treated as its boundary.
+        attribute clusterOuterRadiusM : Real = GriffinEngineSkirtComponent::railLengthM / 2.0;
     }
 
     // The skirt is a visual/structural presentation component around the
@@ -153,18 +156,18 @@ package GriffinPropulsionRequirements {
         in measuredMinimumClearanceM : Real;
         in requiredMinimumClearanceM : Real;
         in maximumRadialExtentM : Real;
-        in bucketOuterRadiusM : Real;
+        in skirtOuterRadiusM : Real;
         in typedStationsMatch : Boolean;
         measuredMinimumClearanceM >= requiredMinimumClearanceM
-            and maximumRadialExtentM <= bucketOuterRadiusM
+            and maximumRadialExtentM <= skirtOuterRadiusM
             and typedStationsMatch;
     }
     requirement def GPP007_BellSeparation {
         require GPPC007_BellSeparation {
             in requiredMinimumClearanceM = GriffinMainPropulsionAssembly::minimumBellClearanceM;
-            in bucketOuterRadiusM = GriffinVisualConfiguration::lowerBucketOuterBottomRadiusM;
+            in skirtOuterRadiusM = GriffinMainPropulsionAssembly::clusterOuterRadiusM;
         }
-        doc /* GPP-007 [layout] the five bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and four equally spaced perimeter engines, and remain inside the lower central bucket envelope. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
+        doc /* GPP-007 [layout] the five bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and four equally spaced perimeter engines, and remain inside the engine-skirt envelope while clearing the central adapter shell. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
     }
     constraint def GPPC008_EnginePlumeDataflow {
         in engineCount : Integer;

@@ -203,22 +203,22 @@ package GriffinVisualConfigurationRequirements {
         attribute tankSupportOpeningSegments : Integer = 16;
         attribute tankSupportPlanes : Real[3] = (0.37, 0.0, -0.37);
 
-        /* Open eight-sided upper and lower buckets bridge the tank rings;
+        /* Central eight-sided upper and lower adapter shells stay inside the tank and engine envelopes. The former 3.08 m top span crossed the four tank columns and peripheral nozzles. The revised 0.54 m upper diameter, 1.28 m lower maximum diameter and 25 mm shell thickness are packaging estimates, not supplier CAD. Source: central adapter architecture in Astrobotic Payload User Guide (August 2021 v5.02), pp.25-26, https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf. Their diameters are limited by this study tank/engine stations and clearances; no public dimensions calibrate them. Upper and lower buckets bridge the central structure;
          * neither shell crosses the four COPV columns. These are replaceable
          * presentation assumptions because the supplier structural ICD is
          * not public. */
         attribute centralBucketSegments : Integer = 8;
-        attribute centralBucketShellThicknessM : Real = 0.12;
-        attribute upperBucketInnerBottomRadiusM : Real = 0.52;
-        attribute upperBucketOuterBottomRadiusM : Real = 0.64;
-        attribute upperBucketInnerTopRadiusM : Real = 1.42;
-        attribute upperBucketOuterTopRadiusM : Real = 1.54;
+        attribute centralBucketShellThicknessM : Real = .025;
+        attribute upperBucketInnerBottomRadiusM : Real = .215;
+        attribute upperBucketOuterBottomRadiusM : Real = .24;
+        attribute upperBucketInnerTopRadiusM : Real = .245;
+        attribute upperBucketOuterTopRadiusM : Real = .27;
         attribute upperBucketBottomCenterYM : Real = 0.46;
         attribute upperBucketTopCenterYM : Real = 0.58;
-        attribute lowerBucketInnerTopRadiusM : Real = 0.52;
-        attribute lowerBucketOuterTopRadiusM : Real = 0.64;
-        attribute lowerBucketInnerBottomRadiusM : Real = 1.42;
-        attribute lowerBucketOuterBottomRadiusM : Real = 1.54;
+        attribute lowerBucketInnerTopRadiusM : Real = .615;
+        attribute lowerBucketOuterTopRadiusM : Real = .64;
+        attribute lowerBucketInnerBottomRadiusM : Real = .555;
+        attribute lowerBucketOuterBottomRadiusM : Real = .58;
         attribute lowerBucketTopCenterYM : Real = -0.46;
         attribute lowerBucketBottomCenterYM : Real = -0.58;
         attribute payloadAdapterDimensions : Dimensions = (3.20, .16, 3.20);
@@ -257,23 +257,32 @@ package GriffinVisualConfigurationRequirements {
         attribute solarArrayEdgeClearanceM : Real = 0.15;
 
         /* Four tank stations and 0.60 instance scale are packaging estimates.
+         * The 1.39 m center exposes approximately 0.23 m of spherical dome above
+         * the 1.66 m skin top, following the exposed-domes silhouette of
+         * https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander.
+         * Dome exposure is limited by the FLIP support-frame underside.
+         * The upper cap has 14 mm vertical clearance. This explicit packing
+         * estimate also leaves a
+         * positive lower-neck support span above the source-derived cradle.
          * Their largest band radius is approximately 0.516 m, so 0.58 m
          * support openings retain over 0.06 m radial clearance. See
          * griffin-size-evidence.md; no supplier tank dimensions are public. */
         attribute tankStations : Position[4] =
-            ((0.85, 1.40, 0.0), (-0.85, 1.40, 0.0),
-             (0.0, 1.40, 0.85), (0.0, 1.40, -0.85));
+            ((0.85, 1.39, 0.0), (-0.85, 1.39, 0.0),
+             (0.0, 1.39, 0.85), (0.0, 1.39, -0.85));
         attribute tankStationRotationYDeg : Real[4] = (0.0, 0.0, 0.0, 0.0);
         attribute tankScale : Real[4] = (0.60, 0.60, 0.60, 0.60);
         attribute minimumTankInstanceClearanceM : Real = 0.06;
         attribute minimumTankFrameClearanceM : Real = 0.06;
+        // Estimated render/hardware separation from the payload underside.
+        attribute minimumTankPayloadClearanceM : Real = 0.01;
 
         attribute engineClusterMountYM : Real = 1.00;
         attribute engineBellDirection : Direction = (0.0, -1.0, 0.0);
         /* Five engines are documented in Astrobotic's August 2021 Payload User Guide v5.02,
          * p.26. Center plus four cardinal stations on a 1.05 m radius is an
          * explicit layout estimate, not a supplier mounting drawing. It keeps
-         * 0.34 m bell envelopes inside the estimated 1.54 m lower bucket. */
+         * 0.34 m bell envelopes inside the estimated 1.60 m engine-skirt half-span. The central adapter shell is smaller and must clear these envelopes. */
         attribute engineStations : Position[5] =
             ((0.0, 1.00, 0.0), (1.05, 1.00, 0.0), (-1.05, 1.00, 0.0),
              (0.0, 1.00, 1.05), (0.0, 1.00, -1.05));

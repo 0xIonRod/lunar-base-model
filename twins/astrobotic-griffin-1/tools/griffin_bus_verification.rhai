@@ -300,6 +300,62 @@ fn bus_checks(doc, source, bus_root) {
 
     let root = bus_root;
     let model = sysml_model("twin://astrobotic-griffin-1");
+    // Check all four profile rings, not only an artist-selected silhouette.
+    let segments = model.value(visual("centralBucketSegments"));
+    let shell_tolerance = model.value(visual("geometryVerificationToleranceM"));
+    for spec in [
+        #{name:"UpperCentralBucket", radii:["upperBucketInnerBottomRadiusM", "upperBucketOuterBottomRadiusM", "upperBucketOuterTopRadiusM", "upperBucketInnerTopRadiusM"], ys:["upperBucketBottomCenterYM", "upperBucketBottomCenterYM", "upperBucketTopCenterYM", "upperBucketTopCenterYM"]},
+        #{name:"LowerCentralBucket", radii:["lowerBucketInnerTopRadiusM", "lowerBucketOuterTopRadiusM", "lowerBucketOuterBottomRadiusM", "lowerBucketInnerBottomRadiusM"], ys:["lowerBucketTopCenterYM", "lowerBucketTopCenterYM", "lowerBucketBottomCenterYM", "lowerBucketBottomCenterYM"]}
+    ] {
+        let prim = assembly_builder::composed_query(doc, #{path:root+"/"+spec.name, children:false});
+        let points = if _query_ok(prim) && prim.attrs.points != () {prim.attrs.points} else {[]};
+        let error = if points.len()==4*segments {0.0} else {()};
+        if error != () {
+            // The revolve kernel normalizes clockwise profiles, so ring
+            // storage order is not a geometry contract. Match radius/height
+            // pairs and require one complete angular ring at each datum.
+            let bins=[0,0,0,0];
+            for point in points {
+                let x=_point_component(point,0);let z=_point_component(point,2);
+                let radial=(x*x+z*z).sqrt();let y=_point_component(point,1);
+                let best=1.0e30;let matched=0;
+                for ring in 0..4 {
+                    let radius=model.value(visual(spec.radii[ring]));
+                    let expected_y=model.value(visual(spec.ys[ring]));
+                    let deviation=_max_number((radial-radius).abs(),(y-expected_y).abs());
+                    if deviation<best {best=deviation;matched=ring;}
+                }
+                bins[matched]+=1;error=_max_number(error,best);
+            }
+            for ring in 0..4 {
+                checks.push(_count_constraint("GBC-011-"+spec.name+"-ring-"+ring.to_string(),"gbc011",bins[ring],segments));
+            }
+        }
+        checks.push(_tolerance_constraint("GBC-011-"+spec.name+"-profile", "gbc011", error, shell_tolerance));
+    }
+
+    let upper_outer = _max_number(model.value(visual("upperBucketOuterBottomRadiusM")), model.value(visual("upperBucketOuterTopRadiusM")));
+    let lower_outer = _max_number(model.value(visual("lowerBucketOuterBottomRadiusM")), model.value(visual("lowerBucketOuterTopRadiusM")));
+    let lower_inner = if model.value(visual("lowerBucketInnerBottomRadiusM")) < model.value(visual("lowerBucketInnerTopRadiusM")) {model.value(visual("lowerBucketInnerBottomRadiusM"))} else {model.value(visual("lowerBucketInnerTopRadiusM"))};
+    let maximum_band = 0.0;
+    for radius in model.value("GriffinTankRequirements::GriffinPropellantTankAssembly::bandRadiusByCenterM") {maximum_band=_max_number(maximum_band,radius);}
+    let stations = model.value(visual("tankStations"));
+    let scales = model.value(visual("tankScale"));
+    let clearance = 1.0e30;
+    for i in 0..stations.len() {
+        let p=stations[i];let gap=(p.x*p.x+p.z*p.z).sqrt()-maximum_band*scales[i]-upper_outer;
+        if gap<clearance {clearance=gap;}
+    }
+    checks.push(_constraint("GBC-011-upper-adapter-tank-clearance", "gbc011", "GBC_SupportClearance",
+        #{measuredClearanceM:clearance,requiredClearanceM:model.value(visual("minimumTankFrameClearanceM"))},"derived"));
+    let bell_radius=model.value("GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::bellRadiusM");
+    let engine_gap=lower_inner-bell_radius;
+    for p in model.value(visual("engineStations")) {
+        let radial=(p.x*p.x+p.z*p.z).sqrt();
+        if radial>0.0 {let gap=radial-bell_radius-lower_outer;if gap<engine_gap {engine_gap=gap;}}
+    }
+    checks.push(_constraint("GBC-011-lower-adapter-engine-clearance", "gbc011", "GBC_SupportClearance",
+        #{measuredClearanceM:engine_gap,requiredClearanceM:model.value(visual("minimumTankFrameClearanceM"))},"derived"));
     let source_tolerance = sysml_requirements::number(source,
         visual("verificationToleranceM"));
     let geometry_tolerance = sysml_requirements::number(source,

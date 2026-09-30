@@ -79,7 +79,12 @@ package GriffinTankRequirements {
         attribute bodyShape : GriffinTankGeometryShape = "Sphere";
         attribute bodyCenter : CartesianThreeVectorValue = (0.0, 0.0, 0.0);
         attribute bodyRadiusM : Real = 0.84;
-        attribute minimumInstalledBodyDiameterM : Real = 1.51;
+        // A 1.00 m lower visual bound replaces the stale 1.51 m bound from
+        // the abandoned 0.90-scale assembly. Current 0.84 m radius x 0.60
+        // scale gives 1.008 m diameter, fits 0.58 m support bores, and leaves
+        // 0.170 m between neighboring maximum band envelopes. This is a
+        // packing-derived study estimate; Astrobotic publishes no diameter.
+        attribute minimumInstalledBodyDiameterM : Real = 1.00;
         attribute neckRadiusM : Real = 0.14;
         attribute neckHeightM : Real = 0.12;
         attribute shoulderCollarRadiusM : Real = 0.54;
@@ -94,7 +99,7 @@ package GriffinTankRequirements {
         attribute transitionRadiusM : Real = 0.54;
         // Axial centers are explicit interface datums.  The verifier mirrors
         // them about the tank datum for the lower train and checks the cradle
-        // against the lower service-skirt top in the shared assembly frame.
+        // against the lower service-skirt bottom in the shared assembly frame.
         attribute shoulderCenterYM : Real = 0.40;
         attribute transitionCenterYM : Real = 0.47;
         attribute neckCenterYM : Real = 0.62;
@@ -130,7 +135,11 @@ package GriffinTankRequirements {
         attribute bracketNames : GriffinTankPartName[4] =
             ("TankMountBracketPX", "TankMountBracketNX", "TankMountBracketPZ", "TankMountBracketNZ");
         attribute bracketShape : GriffinTankGeometryShape = "Cube";
-        attribute bracketLengthM : Real = 0.18;
+        // 0.15 m stock length seats the inward-tilted brace on the spherical
+        // envelope from the derived pad datum at the 1.39 m tank station.
+        // Endpoint radial residual is about 3 mm, inside the 15 mm estimate
+        // tolerance. This is geometric closure, not structural qualification.
+        attribute bracketLengthM : Real = 0.15;
         attribute bracketWidthM : Real = 0.10;
         attribute bracketDepthM : Real = 0.10;
         attribute bracketCenterOffsetM : Real = 0.46;
@@ -152,7 +161,7 @@ package GriffinTankRequirements {
         doc /* GPT-004 [evidence] tank identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and each instance is checked individually. */
     }
     requirement def GPT005_TankPlacement {
-        doc /* GPT-005 [layout] each tank root transform matches its ordered typed cardinal-axis Position datum. The four tanks share the bus-origin plane and satisfy the source-owned inter-instance and frame-envelope clearances. The envelope is derived from typed station and tank geometry; station coordinates and installed dimensions remain replaceable study assumptions, not a flight ICD. */
+        doc /* GPT-005 [layout] each tank root transform matches its ordered typed cardinal-axis Position datum. The four tanks share a tank-center plane, independent of the bus origin, and satisfy the source-owned inter-instance and frame-envelope clearances. The entire upper vessel/cap envelope shall stay below the payload-frame underside by minimumTankPayloadClearanceM. This conservative vertical separation prevents a dome from intersecting the FLIP wheel support rails. The envelope is derived from typed station and tank geometry; station coordinates and installed dimensions remain replaceable study assumptions, not a flight ICD. */
         require GPT005_MinimumClearance;
     }
     requirement def GPT006_TankEndHardware {
@@ -166,7 +175,7 @@ package GriffinTankRequirements {
         doc /* GPT-008 [orientation] the spherical body is centered on the tank datum and all axial service hardware follows the declared local Y axis; no hidden rotations or through-geometry are permitted. */
     }
     requirement def GPT009_TankDeckSeat {
-        doc /* GPT-009 [interface] the component-local lower cradle and adapter pad shall use the typed shape and dimension attributes, with assembly scale applied once to this local envelope. The pad seats above the lower service-skirt datum; a coaxial support post bridges the pad to the lower neck while preserving minimumSkirtClearanceM. These mount sizes are study assumptions because the attachment ICD is unpublished. */
+        doc /* GPT-009 [interface] the component-local lower cradle and adapter pad shall use the typed shape and dimension attributes, with assembly scale applied once to this local envelope. The pad seats above the lower service-skirt bottom datum; a coaxial support post bridges the pad to the lower neck while preserving minimumSkirtClearanceM. These mount sizes are study assumptions because the attachment ICD is unpublished. */
         require GPT009_SkirtClearanceMatchesDatum;
         require GPT009_SupportPostSpansSeat;
     }

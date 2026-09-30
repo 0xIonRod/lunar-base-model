@@ -254,7 +254,7 @@ fn on_tick(me, ctx) {
     }
     let selected_attributes = [];
     for name in ["usdRootPath", "bellRadiusM", "bellHeightM", "throatRadiusM",
-        "throatHeightM", "throatCenterYM", "minimumBellClearanceM", "bellVisualWallThicknessM", "bellContourExponent"] {
+        "throatHeightM", "throatCenterYM", "minimumBellClearanceM", "clusterOuterRadiusM", "bellVisualWallThicknessM", "bellContourExponent"] {
         selected_attributes.push(own(name));
     }
     for name in ["componentRootName", "componentMemberNames", "shellName",
@@ -266,7 +266,7 @@ fn on_tick(me, ctx) {
     }
     selected_attributes.push(parent("engineCount"));
     for name in ["engineClusterMountYM", "engineStations", "geometryVerificationToleranceM",
-        "lowerBucketOuterBottomRadiusM", "mainEngineInstances"] {
+        "mainEngineInstances"] {
         selected_attributes.push(visual(name));
     }
     let selected_requirements = [];
@@ -306,7 +306,7 @@ fn on_tick(me, ctx) {
     let stations = sysml_requirement_checks::source_position_list(source, visual("engineStations"));
     let geometry_tolerance = sysml_requirements::number(source, visual("geometryVerificationToleranceM"));
     let required_clearance = sysml_requirements::number(source, own("minimumBellClearanceM"));
-    let bucket_outer_radius = sysml_requirements::number(source, visual("lowerBucketOuterBottomRadiusM"));
+    let skirt_outer_radius = sysml_requirements::number(source, own("clusterOuterRadiusM"));
     let skirt_root = root + "/" + sysml_requirements::text(source, skirt("componentRootName"));
     let skirt_names = sysml_requirement_checks::source_text_list(source, skirt("componentMemberNames"));
     let skirt_shell = skirt_root + "/" + sysml_requirements::text(source, skirt("shellName"));
@@ -524,7 +524,7 @@ fn on_tick(me, ctx) {
         && observed_engines.records.len() == names.len()
         && names.len() > 0 && stations.len() == names.len()
         && bell_radius != () && required_clearance != ()
-        && bucket_outer_radius != () && geometry_tolerance != ()
+        && skirt_outer_radius != () && geometry_tolerance != ()
         && usd_snapshots_match && usd_snapshot != ()
         && usd_snapshot.ok == true;
     if measurement_available {
@@ -582,8 +582,8 @@ fn on_tick(me, ctx) {
             ["maximumRadialExtentM", _usd_observation(usd_snapshot,
                 measurement_available, maximum_radial_extent,
                 "composed engine station readback unavailable")],
-            ["bucketOuterRadiusM", _source_literal(source_model,
-                visual("lowerBucketOuterBottomRadiusM"))],
+            ["skirtOuterRadiusM", _source_literal(source_model,
+                own("clusterOuterRadiusM"))],
             ["typedStationsMatch", _usd_observation(usd_snapshot,
                 measurement_available, typed_stations_match,
                 "typed engine stations are unavailable")]

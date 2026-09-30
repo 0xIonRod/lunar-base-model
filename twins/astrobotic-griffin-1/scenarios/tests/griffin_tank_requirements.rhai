@@ -1,3 +1,5 @@
+import "twin://astrobotic-griffin-1/tools/griffin_geometry.rhai" as griffin_geometry;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 // Positive, source-backed verification of the reusable Griffin tank assembly.
 // SysML owns requirements and acceptance constraints; Rhai extracts typed
@@ -92,6 +94,8 @@ fn _tank_clearances(stations, perimeter_stations, frame_section, installed_envel
           - installed_envelope_radius}
 }
 
+fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
+
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
@@ -110,6 +114,7 @@ fn on_tick(me, ctx) {
         visual("lowerSkirtDimensions"), visual("railStations"),
         visual("frameRingSectionM"),
         visual("minimumTankInstanceClearanceM"), visual("minimumTankFrameClearanceM"),
+        visual("minimumTankPayloadClearanceM"), visual("payloadAdapterCenterYM"), visual("payloadAdapterDimensions"),
         own("usdRootPath"), own("bodyName"), own("bodyShape"), own("bodyCenter"),
         own("bodyRadiusM"), own("minimumInstalledBodyDiameterM"), own("tankAxis"),
         own("retentionBandNames"), own("retentionBandShape"), own("childNames"),
@@ -252,7 +257,7 @@ fn on_tick(me, ctx) {
         let checks = [sysml_requirement_checks::preflight("GPT-source", false,
             "typed tank source facts are incomplete or have the wrong shape",
             #{tank_count: tank_names.len(), station_count: tank_stations.len(),
-              body_shape: body_shape},
+              body_shape: body_shape, source_ready: source_ready, identities_ready: identities_ready, body_ready: body_ready, band_ready: band_ready, hardware_ready: hardware_ready, transition_ready: transition_ready, cradle_ready: cradle_ready, pad_ready: pad_ready, support_ready: support_ready, skirt_ready: skirt_ready, brackets_ready: brackets_ready, clearance_contract_ready: clearance_contract_ready},
             #{tank_count: 4, station_count: 4, body_shape: "Sphere"})];
         sysml_requirement_checks::finish_preflight(checks, "GRIFFIN TANK REQUIREMENTS",
             "GRIFFIN_TANK_REQUIREMENTS", root, PACKAGE);
@@ -298,6 +303,14 @@ fn on_tick(me, ctx) {
         let tank_path = root + "/" + tank_name;
         let station = tank_stations[tank_index];
         let tank_scale = tank_scales[tank_index];
+        let payload_dimensions = sysml_requirements::native_value(source, visual("payloadAdapterDimensions"));
+        let payload_bottom = sysml_requirements::number(source, visual("payloadAdapterCenterYM")) - payload_dimensions.y / 2.0;
+        let upper_envelope = body_radius;
+        if cap_center_y + cap_height / 2.0 > upper_envelope {upper_envelope=cap_center_y+cap_height/2.0;}
+        checks.push(_constraint("GPT-005-"+tank_name+"-payload-clearance", "gpt005", "GPT005_MinimumClearance",
+            #{actualClearanceM:payload_bottom-station.y-upper_envelope*tank_scale,
+              requiredClearanceM:sysml_requirements::number(source,visual("minimumTankPayloadClearanceM"))}));
+
         if tank_index == 0 {
             checks.push(sysml_requirement_checks::source_list_count("GPT-001-count", "tank", "gpt001",
                 VERIFICATION, visual("tankInstances"), tank_count));
@@ -406,8 +419,8 @@ fn on_tick(me, ctx) {
                 VERIFICATION, transition_path, "axis", tank_axis));
         }
 
-        let skirt_top_world_y = body_mount.y + skirt_center.y + skirt_dimensions.y / 2.0;
-        let cradle_top_world_y = skirt_top_world_y + minimum_skirt_clearance;
+        let skirt_seat_world_y = body_mount.y + skirt_center.y - skirt_dimensions.y / 2.0;
+        let cradle_top_world_y = skirt_seat_world_y + minimum_skirt_clearance;
         let cradle_top_local_y = (cradle_top_world_y - station.y) / tank_scale;
         let cradle_center_local_y = cradle_top_local_y - cradle_height / 2.0;
         let pad_center_local_y = cradle_top_local_y + pad_height / 2.0;
@@ -416,7 +429,10 @@ fn on_tick(me, ctx) {
         let support_top_local_y = -neck_center_y - neck_height / 2.0;
         let support_height = support_top_local_y - support_bottom_local_y;
         let support_center_local_y = (support_top_local_y + support_bottom_local_y) / 2.0;
-        let bracket_center_local_y = pad_top_local_y + bracket_length / 2.0;
+        let brace = griffin_geometry::tank_brace_datum(pad_top_local_y, bracket_offset, bracket_length, bracket_tilt);
+        let bracket_center_x = brace.center[0];
+        let bracket_center_local_y = brace.center[1];
+        let bracket_center_z = brace.center[2];
 
         let cradle_path = tank_path + "/" + cradle_name;
         checks.push(sysml_requirement_checks::exists("GPT-009-" + tank_name + "-cradle",
@@ -460,8 +476,8 @@ fn on_tick(me, ctx) {
             "gpt010", VERIFICATION, bracket_group_path, "Xform"));
         checks.push(sysml_requirement_checks::children("GPT-010-" + tank_name + "-brackets", "tank",
             "gpt010", VERIFICATION, bracket_group_path, bracket_paths));
-        let bracket_x = [bracket_offset, -bracket_offset, bracket_offset, -bracket_offset];
-        let bracket_z = [bracket_offset, bracket_offset, -bracket_offset, -bracket_offset];
+        let bracket_x = [bracket_center_x, -bracket_center_x, bracket_center_x, -bracket_center_x];
+        let bracket_z = [bracket_center_z, bracket_center_z, -bracket_center_z, -bracket_center_z];
         let bracket_rx = [-bracket_tilt, -bracket_tilt, bracket_tilt, bracket_tilt];
         let bracket_rz = [-bracket_tilt, bracket_tilt, -bracket_tilt, bracket_tilt];
         for bracket_index in 0..bracket_names.len() {
@@ -498,7 +514,7 @@ fn on_tick(me, ctx) {
         }
 
         let skirt_clearance = station.y + tank_scale * (cradle_center_local_y + cradle_height / 2.0)
-            - skirt_top_world_y;
+            - skirt_seat_world_y;
         checks.push(_constraint("GPT-009-" + tank_name + "-skirt-clearance",
             "gpt009", "GPT009_SkirtClearanceMatchesDatum",
             #{actualClearanceM: skirt_clearance,
@@ -510,10 +526,7 @@ fn on_tick(me, ctx) {
               upperContactYM: support_top_local_y,
               supportHeightM: support_height,
               toleranceM: verification_tolerance}));
-        let angle = bracket_tilt * 3.141592653589793 / 180.0;
-        let shell_tip_x = bracket_offset - bracket_length * angle.sin() * angle.cos();
-        let shell_tip_y = pad_top_local_y + bracket_length * angle.cos() * angle.cos();
-        let shell_tip_radius = (2.0 * shell_tip_x * shell_tip_x + shell_tip_y * shell_tip_y).sqrt();
+        let shell_tip_radius = (brace.tip[0] * brace.tip[0] + brace.tip[1] * brace.tip[1] + brace.tip[2] * brace.tip[2]).sqrt();
         checks.push(_constraint("GPT-010-" + tank_name + "-shell-contact",
             "gpt010", "GPT010_BraceContactsVesselEnvelope",
             #{radialErrorM: shell_tip_radius - body_radius,

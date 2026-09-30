@@ -29,6 +29,12 @@ package GriffinBusRequirements {
         boreRadiusM - maximumBandRadiusM * tankScale >= minimumClearanceM;
     }
 
+    constraint def GBC_SupportClearance {
+        in measuredClearanceM : Real;
+        in requiredClearanceM : Real;
+        measuredClearanceM >= requiredClearanceM;
+    }
+
     constraint def GBC_ObservedCountEquals {
         in observedCount : Real;
         in expectedCount : Real;
@@ -96,10 +102,11 @@ package GriffinBusRequirements {
         require GBC010_PositiveDeckSkirtClearance;
     }
     requirement def GBC011_TankSupportOpenings {
-        doc /* GBC-011 [assembly geometry] the bus shall contain three separate octagonal tank-support rings on the typed upper, middle, and lower support planes, all using the shared bus profile. Each ring shall carry four annular through-opening collars whose centers and bore radii follow the typed tank stations. The upper and lower central bucket profile vertices are authored directly in the bus component frame; their local translation and rotation shall be zero and scale unity, so no instance offset detaches them from these source-defined planes. This identity placement is a coordinate convention, not a measured hardware dimension. All twelve collars shall clear the scaled retention bands by the shared minimumTankFrameClearanceM datum, preserve open bores, and remain render-only. These are explicitly replaceable visual-study assumptions because the supplier interface drawing is not public. */
+        doc /* GBC-011 [assembly geometry] the bus shall contain three separate octagonal tank-support rings on the typed upper, middle, and lower support planes, all using the shared bus profile. Each ring shall carry four annular through-opening collars whose centers and bore radii follow the typed tank stations. The upper and lower central bucket profile vertices are authored directly in the bus component frame; their local translation and rotation shall be zero and scale unity, so no instance offset detaches them from these source-defined planes. This identity placement is a coordinate convention, not a measured hardware dimension. All twelve collars shall clear the scaled retention bands by the shared minimumTankFrameClearanceM datum, preserve open bores, and remain render-only. Upper and lower shell ring radii and heights shall match the configuration profile within the geometry tolerance. Their compact diameters preserve tank and peripheral nozzle space instead of sweeping a solid shell through those owners. These are explicitly replaceable visual-study assumptions because the supplier interface drawing is not public. */
         require GBC_ObservedCountEquals;
         require GBC_MeasurementWithinTolerance;
         require GBC011_TankBoreClearance;
+        require GBC_SupportClearance;
         require GBC011_AnnularOpeningTopology;
         require GBC011_OpeningQuadsCoverSurface;
     }

@@ -137,3 +137,18 @@ fn tank_support_perimeter_geometry(profile, radius, center_y, section) {
     let levels = if array_is(center_y) { center_y } else { [center_y] };
     perimeter_beam_geometry(stations, levels, section)
 }
+
+
+// The positive-X/Z brace uses Rz(-tilt) * Rx(-tilt). Other braces
+// mirror these coordinates. Anchor its lower endpoint on the pad plane;
+// derive its center and vessel contact from the same actual rotation.
+fn tank_brace_datum(pad_top_y, offset, length, tilt_deg) {
+    let a = tilt_deg * 3.141592653589793 / 180.0;
+    let direction = [-a.sin() * a.cos(), a.cos() * a.cos(), -a.sin()];
+    #{center: [offset + direction[0] * length / 2.0,
+        pad_top_y + direction[1] * length / 2.0,
+        offset + direction[2] * length / 2.0],
+      tip: [offset + direction[0] * length,
+        pad_top_y + direction[1] * length,
+        offset + direction[2] * length]}
+}
