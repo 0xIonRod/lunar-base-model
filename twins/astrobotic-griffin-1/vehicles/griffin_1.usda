@@ -2465,14 +2465,14 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -1.15, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.19, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 double radius = 0.3499999940395355
-                double height = 0.11999999731779099
+                double height = 0.04
                 uniform token axis = "Y"
-                float3[] extent = [(-0.3499999940395355, -0.05999999865889549, -0.3499999940395355), (0.3499999940395355, 0.05999999865889549, 0.3499999940395355)]
+                float3[] extent = [(-0.3499999940395355, -0.019999999552965164, -0.3499999940395355), (0.3499999940395355, 0.019999999552965164, 0.3499999940395355)]
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
@@ -2532,14 +2532,14 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -1.15, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.19, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 double radius = 0.3499999940395355
-                double height = 0.11999999731779099
+                double height = 0.04
                 uniform token axis = "Y"
-                float3[] extent = [(-0.3499999940395355, -0.05999999865889549, -0.3499999940395355), (0.3499999940395355, 0.05999999865889549, 0.3499999940395355)]
+                float3[] extent = [(-0.3499999940395355, -0.019999999552965164, -0.3499999940395355), (0.3499999940395355, 0.019999999552965164, 0.3499999940395355)]
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
@@ -2599,14 +2599,14 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -1.15, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.19, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 double radius = 0.3499999940395355
-                double height = 0.11999999731779099
+                double height = 0.04
                 uniform token axis = "Y"
-                float3[] extent = [(-0.3499999940395355, -0.05999999865889549, -0.3499999940395355), (0.3499999940395355, 0.05999999865889549, 0.3499999940395355)]
+                float3[] extent = [(-0.3499999940395355, -0.019999999552965164, -0.3499999940395355), (0.3499999940395355, 0.019999999552965164, 0.3499999940395355)]
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
@@ -2666,14 +2666,14 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -1.15, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.19, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 double radius = 0.3499999940395355
-                double height = 0.11999999731779099
+                double height = 0.04
                 uniform token axis = "Y"
-                float3[] extent = [(-0.3499999940395355, -0.05999999865889549, -0.3499999940395355), (0.3499999940395355, 0.05999999865889549, 0.3499999940395355)]
+                float3[] extent = [(-0.3499999940395355, -0.019999999552965164, -0.3499999940395355), (0.3499999940395355, 0.019999999552965164, 0.3499999940395355)]
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"

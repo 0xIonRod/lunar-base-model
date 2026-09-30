@@ -28,32 +28,29 @@ package GriffinLandingLegRequirements {
             ("StrutOuter", "StrutInner", "ShockPiston", "FootPad",
              "MountClevisOuter", "MountClevisInner", "FootPadPlate", "MountAxle",
              "BodyMountArm");
-        // The exact landing-leg ICD is not public. Round tubes keep the
-        // revised 1.40 m load path readable without the broad, slab-like silhouette
-        // made by 0.28 m square members. This radius is a replaceable visual
-        // study assumption, not a structural sizing claim.
-        attribute strutRadiusM : Real = 0.08;
-        attribute strutHeightM : Real = 1.40;
+        // Three-member topology follows the user-provided PGH Tech hardware
+        // photograph. The source has perspective and no calibrated scale.
+        // Coordinates below are explicit packaging estimates: local +X outward,
+        // Y up, Z tangential. Main top meets the outer bus mount; brace tops
+        // meet the current skirt's X=1.50 m rail at two separated Z stations.
+        attribute loadMembers : GriffinLandingLegChild[3] =
+            ("ShockPiston", "StrutOuter", "StrutInner");
+        attribute memberUpperAnchors : Position[3] =
+            ((-.10, .12, 0.0), (-.40, -.10, .68), (-.40, -.10, -.68));
+        attribute memberLowerAnchor : Position = (0.0, -1.13, 0.0);
+        // Diameter estimates: 0.12 m main shock and 0.07 m braces. These
+        // approximate the slender primary/secondary silhouette, not a flight
+        // tube section or wall thickness. Length/center/rotation are derived
+        // from the endpoint datums, not separately estimated.
+        attribute strutRadiusM : Real = .035;
         attribute strutAxis : Direction = (0.0, 1.0, 0.0);
-        attribute strutOuterCenterXM : Real = .20;
-        attribute strutInnerCenterXM : Real = -.20;
-        attribute strutCenterYM : Real = -.57;
-        // Positive/negative signs make the lower ends splay toward the foot
-        // while the upper ends meet the bus clevis.  This is the load-path
-        // presentation assumption; the public Griffin material confirms
-        // four shock-absorbing legs but does not publish the strut angles.
-        attribute strutOuterTiltZDeg : Real = 16.0;
-        attribute strutInnerTiltZDeg : Real = -16.0;
-        attribute shockPistonRadiusM : Real = 0.13;
-        // The piston spans from the upper clevis datum (+0.12 m) toward the
-        // load plate, keeping the visible central load path continuous. This
-        // is a presentation study assumption; the Griffin shock ICD is not
-        // public.
-        attribute shockPistonHeightM : Real = 1.15;
-        attribute shockPistonCenterYM : Real = -.45;
+        attribute shockPistonRadiusM : Real = .06;
+        attribute memberEndpointToleranceM : Real = .002;
         attribute footPadRadiusM : Real = .35;
-        attribute footPadHeightM : Real = .12;
-        attribute footPadCenterYM : Real = -1.15;
+        attribute footPadHeightM : Real = .04;
+        // Preserve the previous -1.21 m foot-bottom datum and 4.50 m footprint.
+        // Thin the pad rather than moving terrain/contact or the leg station.
+        attribute footPadCenterYM : Real = -1.19;
         // Suspension study values. The spring rest target is derived from the
         // authored vehicle touchdown datum, leg mount, pad, and site surface;
         // it is not a second hand-entered pose value.
@@ -73,21 +70,21 @@ package GriffinLandingLegRequirements {
         // Numerical allowance for composed floating-point bound arithmetic;
         // it does not change the physical minimum-overlap datum.
         attribute bodyMountOverlapMeasurementToleranceM : Real = 0.000001;
-        attribute mountClevisWidthM : Real = 0.42;
-        attribute mountClevisHeightM : Real = 0.24;
-        attribute mountClevisDepthM : Real = 0.36;
+        attribute mountClevisWidthM : Real = .16;
+        attribute mountClevisHeightM : Real = .16;
+        attribute mountClevisDepthM : Real = .12;
         attribute mountClevisCenterYM : Real = 0.12;
-        attribute footPadPlateWidthM : Real = .62;
-        attribute footPadPlateHeightM : Real = .10;
-        attribute footPadPlateDepthM : Real = .48;
-        attribute footPadPlateCenterYM : Real = -1.07;
+        attribute footPadPlateWidthM : Real = .42;
+        attribute footPadPlateHeightM : Real = .04;
+        attribute footPadPlateDepthM : Real = .36;
+        attribute footPadPlateCenterYM : Real = -1.15;
     }
 
     requirement def GLL001_LegCount {
         doc /* GLL-001 [topology] every instance in the typed landing-leg identity collection is present and visible. */
     }
     requirement def GLL002_LegStructure {
-        doc /* GLL-002 [visual] every landing leg exposes a bus-mount arm, two canted tubular load struts, a shock piston, a mount clevis pair, an axle, and a load-spreading foot pad/plate. These render-only members make the load path inspectable without claiming flight-collider ownership. */
+        doc /* GLL-002 [visual] every landing leg exposes a bus-mount arm, two diagonal skirt braces and one primary shock member, a mount clevis pair, an axle, and a load-spreading foot pad/plate. These render-only members make the load path inspectable without claiming flight-collider ownership. */
     }
     requirement def GLL003_LegFrame {
         doc /* GLL-003 [layout] the four leg stations and pad envelopes extend beyond the source-owned octagonal body. The resulting footprint is derived from the typed stations and pad geometry; its evidence and configuration limits are recorded in griffin-size-evidence.md. */
@@ -98,11 +95,20 @@ package GriffinLandingLegRequirements {
     requirement def GLL005_LegPlacement {
         doc /* GLL-005 [layout] visual and physical landing-leg roots match the same ordered native Position stations and outward-facing rotations owned by GriffinVisualConfiguration. Each root mounts directly below the corresponding octagonal bus side; there is no second physical station table. */
     }
+    constraint def GLLC006_MemberClosure {
+        in measuredUpperEndpointErrorM : Real;
+        in measuredLowerEndpointErrorM : Real;
+        in toleranceM : Real;
+        measuredUpperEndpointErrorM <= toleranceM
+            and measuredLowerEndpointErrorM <= toleranceM
+    }
     requirement def GLL006_StrutGeometry {
-        doc /* GLL-006 [geometry] two cylindrical struts use the typed radius, height, centers and mirrored Z rotations. Shortened geometry is a packaging estimate connecting the revised bus mount to the pad, not supplier structural sizing; see griffin-size-evidence.md. */
+        require GLLC006_MemberClosure;
+        doc /* GLL-006 [geometry] two slender cylindrical braces connect the common foot-side hub to two separated skirt attachment datums. Their lengths and poses derive from memberUpperAnchors and memberLowerAnchor; composed cylinder endpoints shall close to those datums within memberEndpointToleranceM. Topology is reference-informed by https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png; numerical datums and sections are replaceable packaging estimates, not supplier structural sizing. */
     }
     requirement def GLL007_ShockPistonGeometry {
-        doc /* GLL-007 [geometry] the Y-axis shock piston uses the typed radius, height and local center. Its shortened clevis-to-pad path is an explicit packaging estimate in griffin-size-evidence.md. */
+        require GLLC006_MemberClosure;
+        doc /* GLL-007 [geometry] the primary cylindrical shock member connects the outer-frame attachment to the common foot-side hub using the first memberUpperAnchors datum and memberLowerAnchor. Derive length and pose from those endpoints, use shockPistonRadiusM and verify endpoint closure. Exact shock travel and flight joint mechanism are unpublished; the present prismatic dynamics proxy moves the whole visual leg, so moving upper-attachment kinematics remain unqualified. */
     }
     constraint def GLLC008_PadColliderMatchesVisual {
         in geometryDeviationM : Real;

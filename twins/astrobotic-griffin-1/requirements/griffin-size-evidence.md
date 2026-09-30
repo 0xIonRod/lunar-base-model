@@ -212,7 +212,7 @@ powered-descent startup, not an accepted landing.
 
 Four wheel stations remain. Each physical wheel cylinder is now the sole tire geometry source; the redundant three-cylinder visual component is removed. LunCoSim's `spawn_wheel_visual` already transfers the source mesh to a render child driven by suspension and spin. The shared selected tire material supplies tread, rim and hub appearance. Source: simulator `skills/build-vehicle/SKILL.md`, `crates/lunco-usd-sim/src/lib.rs`, `assets/components/mobility/wheel.usda` and `assets/components/mobility/tires/regolith.usda`, inspected 2026-09-30. Existing 0.45 m radius and 0.28 m width remain explicit reconstruction estimates, not newly sourced flight dimensions. Animation must preserve the authored Z axle; a fixed X-axle visual rotation is invalid. Static ownership checks do not establish dynamic acceptance.
 
-## Landing-gear reference for the next geometry pass
+## Landing-gear reconstruction, 2026-09-30
 
 The user-supplied [Pittsburgh Technology Council Griffin hardware photograph](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
 was reviewed on 2026-09-30. It supports a slender primary shock member from the
@@ -225,6 +225,47 @@ packaging estimates, with endpoints derived from the body/skirt datums.
 The large central tapered item beneath the vehicle must not be used as an
 individual engine-bell reference. The Astrobotic PUG page 25 distinguishes a
 launch-vehicle adapter from payload interfaces. Exact correspondence of this
-photographed item to flight engine/skirt hardware is unconfirmed. The current
-USD leg and engine proxies still need this geometry pass; adding a reference
-is not visual acceptance or a structural qualification claim.
+photographed item to flight engine/skirt hardware is unconfirmed. The engine/skirt proxies still need a separate geometry pass. The leg reconstruction below is a study model, not structural qualification.
+
+
+Each local leg frame uses +X outward, +Y upward and Z tangential. The primary
+member runs from `(-0.10, 0.12, 0)` on the outer body mount to the foot hub
+`(0, -1.13, 0)`. Two braces run from `(-0.40, -0.10, ±0.68)` on separated
+skirt/frame mounts to that same hub. With the existing root at radial 1.90 m
+and Y=1.20 m, these mounts meet the body frame near radial 1.80 m/Y=1.32 m
+and the skirt rail at radial 1.50 m/Y=1.10 m. These coordinates are estimated
+from the current assembly's attachment surfaces, informed by the photograph's
+three-member topology; they are not measured flight datums. Length, midpoint
+and Euler rotation are derived from those endpoints rather than independently
+estimated angles.
+
+Primary diameter 0.12 m and brace diameter 0.07 m are visual packaging estimates
+chosen to show the photograph's slender members. Pad diameter remains 0.70 m;
+its thickness is reduced to 0.04 m and its centre moves to Y=-1.19 m, preserving
+the previous underside at Y=-1.21 m. The 0.42 × 0.04 × 0.36 m foot plate
+meets the hub at Y=-1.13 m. Clevises are reduced to 0.16 × 0.16 × 0.12 m.
+These section and fitting dimensions remain uncalibrated estimates; material,
+wall thickness, shock travel and load capacity are unavailable.
+
+The observer measures transformed cylinder endpoints against source-owned
+anchors with a 2 mm reconstruction tolerance. Owner-document readback at
+generation 157 measured maximum closure error 2.24e-16 m. The Editor preview
+and the canonical scene-query projection have distinct owners: the latter
+returned an older generation during live editing, so its stale values were
+not accepted as current geometry evidence. A fresh fixture is required for
+composed-stage acceptance. The existing prismatic leg body moves the complete
+visual leg together; independently articulated upper mounts are not qualified.
+
+
+Fresh production leg verification passed 153/153 checks over ten requirements,
+including all twelve actual member endpoint closures and the four source-linked
+contact pads (`--max-ticks 120 --readiness-timeout 30`, verdict after six ticks).
+The observer selects its component requirements and inputs through the existing
+SysML selection API; loading the complete Twin catalog exhausted Rhai's operation
+budget before reporting. Limits were not increased. The saved component and
+vehicle were reviewed in a rebuilt Editor at matching document/projected
+generation 0: [isolated leg](../handover/griffin-three-member-leg-crisp-2026-09-30.png)
+and [assembly](../handover/griffin-leg-assembly-crisp-2026-09-30.png). Editor bloom
+is disabled by authored render policy. Full visual-scene checks also passed
+112/112. These are geometry/ownership checks; landing dynamics and upper-mount
+articulation remain outside this acceptance.

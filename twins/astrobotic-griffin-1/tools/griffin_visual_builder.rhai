@@ -3058,48 +3058,27 @@ fn _component_cylinder_visual_ops(doc, edit_target, parent, name,
     translation, rotation, radius, height, axis, color) {
     let path = parent + "/" + name;
     let existing = assembly_builder::composed_query(doc,
-        #{path: path, children: false, attrs: ["radius", "height"]});
+        #{path: path, children: false, attrs: ["radius", "height", "extent"]});
     let exists = query_ok(existing);
     let ops = [];
-    // The existing landing-leg source uses float radius/height attributes for
-    // ShockPiston and FootPad, while MountAxle is double. QueryUsdPrim exposes
-    // values but the current property catalog may report the UsdGeom default
-    // double rather than the authored scalar type. Keep this explicit named
-    // mapping typed and fail closed for any future unregistered cylinder.
     let scalar_type = "double";
     if exists {
-        if name == "ShockPiston" || name == "FootPad" {
-            scalar_type = "float";
-        } else if name == "HingeCollarPort" || name == "HingeCollarStarboard" {
-            // The legacy ramp component declares its collar scalar fields as
-            // float.  Preserve that authored schema when refining the
-            // composed child; a typed USD edit must not promote it by name.
-            scalar_type = "float";
-        } else if name == "MountAxle" || name == "HingeBar" {
-            scalar_type = "double";
-        } else if name != "StrutOuter" && name != "StrutInner" {
-            return plan_error(path + ": existing cylinder scalar type is not registered in the component schema map");
+        // UsdGeom radius/height are double; normalize retired float overrides
+        // through typed remove/set operations instead of a name-based schema map.
+        for attr in ["radius", "height", "extent"] {
+            if existing.attrs[attr] != () {
+                ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:path,name:attr}});
+            }
         }
     }
-    let retype_study_strut = exists && existing.type_name == "Cube"
-        && (name == "StrutOuter" || name == "StrutInner");
-    if exists && existing.type_name != "Cylinder" && !retype_study_strut {
+    if exists && existing.type_name != "Cylinder" {
         return plan_error(path + ": expected Cylinder, got " + existing.type_name);
     }
-    if !exists || retype_study_strut {
-        // AddPrim is a typed DefinePrim operation; reusing this exact child
-        // path changes the schema owner from Cube to Cylinder in the component
-        // document. Unit scale clears the old slab proportions while the
-        // native cylinder radius/height carry the SysML dimensions.
+    if !exists {
         let shape = assembly_builder::cylinder_shape_plan_axis(edit_target,
-            parent, name, radius, height, translation, rotation,
-            if retype_study_strut { [1.0, 1.0, 1.0] } else { () }, axis, false);
+            parent, name, radius, height, translation, rotation, (), axis, false);
         if !shape.ok { return shape; }
         for op in shape.ops { ops.push(op); }
-        if retype_study_strut {
-            ops.push(#{RemoveAttribute: #{edit_target: edit_target, path: path,
-                name: "size"}});
-        }
     } else {
         let placement = assembly_builder::place_plan(edit_target, path,
             translation, rotation, ());
@@ -3123,254 +3102,82 @@ fn _component_cylinder_visual_ops(doc, edit_target, parent, name,
     #{ok: true, path: path, ops: ops}
 }
 
-fn _leg_number(source, name) {
-    if source == () || source.ok != true { return (); }
-    sysml_requirements::number(source,
-        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::" + name)
+// Endpoint-owned three-member leg; source datums are the only geometry table.
+fn _leg_member_pose(upper, lower) {
+    if !vec3_is_native(upper) || !vec3_is_native(lower) {return plan_error("leg endpoints must be native Positions");}
+    let dx=upper.x-lower.x;let dy=upper.y-lower.y;let dz=upper.z-lower.z;
+    let h=(dx*dx+dy*dy+dz*dz).sqrt();
+    if !h.is_finite() || h<=0.0 || dy<=0.0 {return plan_error("leg member must rise from foot to mount");}
+    let x=atan(dz/(dx*dx+dy*dy).sqrt())*180.0/acos(-1.0);
+    let z=atan(-dx/dy)*180.0/acos(-1.0);
+    #{ok:true,height:h,center:[(upper.x+lower.x)/2.0,(upper.y+lower.y)/2.0,(upper.z+lower.z)/2.0],rotation:[x,0.0,z]}
 }
 
-fn _leg_usd_axis(direction) {
-    if !vec3_is_native(direction) { return (); }
-    if direction.x == 1.0 && direction.y == 0.0 && direction.z == 0.0 { return "X"; }
-    if direction.x == 0.0 && direction.y == 1.0 && direction.z == 0.0 { return "Y"; }
-    if direction.x == 0.0 && direction.y == 0.0 && direction.z == 1.0 { return "Z"; }
-    ()
-}
-
-// Refine the reusable landing-leg component in its own document.  The
-// previous square struts read as broad slabs. Keep the canted members round,
-// and keep their radius, axis, positions and angles owned by the landing-leg
-// SysML package. No supplier section ICD is implied by this visual study.
 fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("refine_griffin_landing_leg_component_plan requires a document, edit target, and absolute root");
-    }
-    let component = _component_query(doc, root);
-    if !component.ok || component.type_name != "Xform" {
-        return plan_error(root + ": landing-leg component root is missing or not Xform");
-    }
-    let source = sysml_requirements::source();
-    let strut_radius = _leg_number(source, "strutRadiusM");
-    let strut_height = _leg_number(source, "strutHeightM");
-    let strut_axis = _leg_usd_axis(sysml_requirements::native_value(source,
-        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::strutAxis"));
-    let outer_x = _leg_number(source, "strutOuterCenterXM");
-    let inner_x = _leg_number(source, "strutInnerCenterXM");
-    let strut_y = _leg_number(source, "strutCenterYM");
-    let outer_tilt = _leg_number(source, "strutOuterTiltZDeg");
-    let inner_tilt = _leg_number(source, "strutInnerTiltZDeg");
-    let piston_radius = _leg_number(source, "shockPistonRadiusM");
-    let piston_height = _leg_number(source, "shockPistonHeightM");
-    let piston_y = _leg_number(source, "shockPistonCenterYM");
-    let pad_radius = _leg_number(source, "footPadRadiusM");
-    let pad_height = _leg_number(source, "footPadHeightM");
-    let pad_y = _leg_number(source, "footPadCenterYM");
-    let clevis_width = _leg_number(source, "mountClevisWidthM");
-    let clevis_height = _leg_number(source, "mountClevisHeightM");
-    let clevis_depth = _leg_number(source, "mountClevisDepthM");
-    let clevis_y = _leg_number(source, "mountClevisCenterYM");
-    let plate_width = _leg_number(source, "footPadPlateWidthM");
-    let plate_height = _leg_number(source, "footPadPlateHeightM");
-    let plate_depth = _leg_number(source, "footPadPlateDepthM");
-    let plate_y = _leg_number(source, "footPadPlateCenterYM");
-    let overlap = _leg_number(source, "bodyMountOverlapM");
-    let visual = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
-    let body_dimensions = sysml_requirements::native_value(source, visual + "bodyDimensions");
-    let frame_section = sysml_requirements::number(source, visual + "frameRingSectionM");
-    let leg_stations = sysml_requirement_checks::source_position_list(source, visual + "legStations");
-    let missing_strut = strut_radius == () || strut_height == ()
-        || strut_axis == () || outer_x == () || inner_x == ()
-        || strut_y == () || outer_tilt == () || inner_tilt == ();
-    let missing_shock = piston_radius == () || piston_height == ()
-        || piston_y == () || pad_radius == () || pad_height == ()
-        || pad_y == ();
-    let missing_mount = clevis_width == () || clevis_height == ()
-        || clevis_depth == () || clevis_y == () || plate_width == ()
-        || plate_height == () || plate_depth == () || plate_y == ()
-        || overlap == () || body_dimensions == () || frame_section == ();
-    let invalid_mount_source = body_dimensions != ()
-        && !vec3_is_native(body_dimensions);
-    if missing_strut || missing_shock || missing_mount || invalid_mount_source
-        || leg_stations.len() != 4 || (overlap != () && overlap <= 0.0) {
-        return plan_error("landing-leg SysML geometry datums are incomplete");
-    }
-    let radial_station = (leg_stations[0].x * leg_stations[0].x
-        + leg_stations[0].z * leg_stations[0].z).sqrt();
-    let bus_inner_edge = body_dimensions.x / 2.0 - frame_section / 2.0 - overlap;
-    let axle_inner_edge = radial_station - clevis_height / 2.0;
-    let arm_outer_edge = axle_inner_edge + overlap;
-    let arm_length = arm_outer_edge - bus_inner_edge;
-    let arm_center_x = (bus_inner_edge + arm_outer_edge) / 2.0 - radial_station;
-    if radial_station <= 0.0 || arm_length <= 0.0 {
-        return plan_error("landing-leg mount does not span the bus frame to the clevis axle");
-    }
-    let ops = [];
-    for item in [
-        #{name: "MountClevisOuter", translation: [outer_x, clevis_y, 0.0],
-          rotation: (), scale: [clevis_width, clevis_height, clevis_depth],
-          color: [0.18, 0.21, 0.25]},
-        #{name: "MountClevisInner", translation: [inner_x, clevis_y, 0.0],
-          rotation: (), scale: [clevis_width, clevis_height, clevis_depth],
-          color: [0.18, 0.21, 0.25]},
-        #{name: "FootPadPlate", translation: [0.0, plate_y, 0.0],
-          rotation: (), scale: [plate_width, plate_height, plate_depth],
-          color: [0.20, 0.23, 0.27]},
-        #{name: "BodyMountArm", translation: [arm_center_x, clevis_y, 0.0],
-          rotation: (), scale: [arm_length, clevis_height, clevis_width],
-          color: [0.28, 0.32, 0.38]},
-    ] {
-        let part = _component_cube_visual_ops(doc, edit_target, root,
-            item.name, item.translation, item.rotation, item.scale, item.color);
-        if !part.ok { return part; }
-        for op in part.ops { ops.push(op); }
+    if doc==() || edit_target==() || !absolute_root(root) {return plan_error("landing-leg refinement requires a document and absolute root");}
+    let component=_component_query(doc,root);
+    if !component.ok || component.type_name!="Xform" {return plan_error("landing-leg component root is missing");}
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("landing-leg source is not ready: "+model);}
+    let own="GriffinLandingLegRequirements::GriffinLandingLegAssembly::";
+    let visual="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let members=model.value(own+"loadMembers");
+    let upper=model.value(own+"memberUpperAnchors");
+    let lower=model.value(own+"memberLowerAnchor");
+    if !array_is(members) || !array_is(upper) || members.len()!=3 || upper.len()!=3 {return plan_error("landing leg needs exactly three source-owned load paths");}
+    let clevis_width=f64_from(model.value(own+"mountClevisWidthM"));
+    let clevis_height=f64_from(model.value(own+"mountClevisHeightM"));
+    let clevis_depth=f64_from(model.value(own+"mountClevisDepthM"));
+    let clevis_y=f64_from(model.value(own+"mountClevisCenterYM"));
+    let body=model.value(visual+"bodyDimensions");
+    let stations=model.value(visual+"legStations");
+    let section=f64_from(model.value(visual+"frameRingSectionM"));
+    let overlap=f64_from(model.value(own+"bodyMountOverlapM"));
+    if clevis_width==() || clevis_height==() || clevis_depth==() || clevis_y==() || section==() || overlap==()
+        || !vec3_is_native(body) || !array_is(stations) || stations.len()!=4 {return plan_error("leg mounting datums incomplete");}
+    let radial=(stations[0].x*stations[0].x+stations[0].z*stations[0].z).sqrt();
+    let bus_edge=body.x/2.0-section/2.0-overlap;
+    let arm_end=radial-clevis_height/2.0+overlap;
+    if arm_end<=bus_edge {return plan_error("leg mount cannot reach outer frame");}
+    let ops=[];
+    for i in 0..members.len() {
+        if !sysml_enum_is(members[i]) {return plan_error("load member identity is not an enum");}
+        let name=members[i].literal;
+        let pose=_leg_member_pose(upper[i],lower);
+        if !pose.ok {return pose;}
+        let radius=f64_from(model.value(own+if i==0 {"shockPistonRadiusM"} else {"strutRadiusM"}));
+        if radius==() || radius<=0.0 {return plan_error("leg tube radius missing");}
+        let part=_component_cylinder_visual_ops(doc,edit_target,root,name,pose.center,pose.rotation,radius,pose.height,"Y",[0.62,0.65,0.69]);
+        if !part.ok {return part;}
+        for op in part.ops {ops.push(op);}
     }
     for item in [
-        #{name: "StrutOuter", translation: [outer_x, strut_y, 0.0],
-          rotation: [0.0, 0.0, outer_tilt], radius: strut_radius,
-          height: strut_height, axis: strut_axis, color: [0.08, 0.10, 0.13]},
-        #{name: "StrutInner", translation: [inner_x, strut_y, 0.0],
-          rotation: [0.0, 0.0, inner_tilt], radius: strut_radius,
-          height: strut_height, axis: strut_axis, color: [0.08, 0.10, 0.13]},
-        #{name: "ShockPiston", translation: [0.0, piston_y, 0.0],
-          rotation: (), radius: piston_radius, height: piston_height,
-          axis: "Y", color: [0.72, 0.75, 0.80]},
-        #{name: "FootPad", translation: [0.0, pad_y, 0.0],
-          rotation: (), radius: pad_radius, height: pad_height,
-          axis: "Y", color: [0.28, 0.32, 0.38]},
-        #{name: "MountAxle", translation: [0.0, clevis_y, 0.0],
-          rotation: (), radius: clevis_height / 2.0, height: clevis_width,
-          axis: "Z", color: [0.48, 0.52, 0.58]},
+        #{name:"MountClevisOuter",center:vec3_array(upper[1]),size:[clevis_width,clevis_height,clevis_depth]},
+        #{name:"MountClevisInner",center:vec3_array(upper[2]),size:[clevis_width,clevis_height,clevis_depth]},
+        #{name:"FootPadPlate",center:[0.0,f64_from(model.value(own+"footPadPlateCenterYM")),0.0],
+          size:[f64_from(model.value(own+"footPadPlateWidthM")),f64_from(model.value(own+"footPadPlateHeightM")),f64_from(model.value(own+"footPadPlateDepthM"))]},
+        #{name:"BodyMountArm",center:[(bus_edge+arm_end)/2.0-radial,clevis_y,0.0],size:[arm_end-bus_edge,clevis_height,clevis_width]}
     ] {
-        let part = _component_cylinder_visual_ops(doc, edit_target, root,
-            item.name, item.translation, item.rotation, item.radius,
-            item.height, item.axis, item.color);
-        if !part.ok { return part; }
-        for op in part.ops { ops.push(op); }
+        let part=_component_cube_visual_ops(doc,edit_target,root,item.name,item.center,(),item.size,[0.38,0.42,0.47]);
+        if !part.ok {return part;}
+        for op in part.ops {ops.push(op);}
     }
-    let root_record = assembly_builder::composed_query(doc, #{path: root,
-        attrs: ["lunco:visual:component", "lunco:visual:requirement",
-            "lunco:visual:configuration"], children: false});
-    if query_ok(root_record) && root_record.attrs != () {
-        for name in ["lunco:visual:component", "lunco:visual:requirement",
-            "lunco:visual:configuration"] {
-            if root_record.attrs[name] != () {
-                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
-                    path: root, name: name}});
-            }
-        }
+    for item in [
+        #{name:"FootPad",center:[0.0,f64_from(model.value(own+"footPadCenterYM")),0.0],
+          radius:f64_from(model.value(own+"footPadRadiusM")),height:f64_from(model.value(own+"footPadHeightM")),axis:"Y"},
+        #{name:"MountAxle",center:[0.0,clevis_y,0.0],radius:clevis_height/2.0,height:clevis_width,axis:"Z"}
+    ] {
+        let part=_component_cylinder_visual_ops(doc,edit_target,root,item.name,item.center,(),item.radius,item.height,item.axis,[0.62,0.65,0.69]);
+        if !part.ok {return part;}
+        for op in part.ops {ops.push(op);}
     }
-    #{ok: true, kind: "griffin_landing_leg_component_refinement",
-      root: root, paths: [root + "/StrutOuter", root + "/StrutInner",
-        root + "/ShockPiston", root + "/FootPad", root + "/MountClevisOuter",
-        root + "/MountClevisInner", root + "/MountAxle", root + "/FootPadPlate",
-        root + "/BodyMountArm"],
-      ops: ops, no_op: ops.len() == 0}
+    #{ok:true,kind:"griffin_three_member_landing_leg",root:root,ops:ops,no_op:ops.is_empty()}
 }
 
 fn apply_refined_griffin_landing_leg(doc, edit_target, root, parent_gen) {
     let plan = refine_griffin_landing_leg_component_plan(doc, edit_target, root);
     if !plan.ok || plan.no_op { return plan; }
     let command = assembly_edit::batch(doc, "Refine Griffin landing-leg component", plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, command: command,
-      root: root, paths: plan.paths}
-}
-
-// A narrow refinement entry point for the reviewable change to the leg's two
-// load struts.  Unlike the full component normalization above, this emits no
-// operations for the clevis, piston, pad, or plate.  Identity still comes
-// from the SysML enum collection; its literal is converted to a USD child
-// path only at this addressing boundary.
-fn refine_griffin_landing_leg_struts_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("refine_griffin_landing_leg_struts_plan requires a document, edit target, and absolute root");
-    }
-    let component = _component_query(doc, root);
-    if !component.ok || component.type_name != "Xform" {
-        return plan_error(root + ": landing-leg component root is missing or not Xform");
-    }
-    let source = sysml_requirements::source();
-    if source == () || source.ok != true {
-        return plan_error("landing-leg SysML source is unavailable");
-    }
-    let child_names = sysml_requirements::native_value(source,
-        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::childNames");
-    if !array_is(child_names) {
-        return plan_error("landing-leg child identity collection is not a typed enum array");
-    }
-    let outer_name = ();
-    let inner_name = ();
-    for child in child_names {
-        if !sysml_enum_is(child) { continue; }
-        if child.literal == "StrutOuter" { outer_name = child.literal; }
-        if child.literal == "StrutInner" { inner_name = child.literal; }
-    }
-    if outer_name == () || inner_name == () {
-        return plan_error("typed landing-leg child identities omit one of the two struts");
-    }
-    let radius = _leg_number(source, "strutRadiusM");
-    let height = _leg_number(source, "strutHeightM");
-    let axis = _leg_usd_axis(sysml_requirements::native_value(source,
-        "GriffinLandingLegRequirements::GriffinLandingLegAssembly::strutAxis"));
-    let outer_x = _leg_number(source, "strutOuterCenterXM");
-    let inner_x = _leg_number(source, "strutInnerCenterXM");
-    let center_y = _leg_number(source, "strutCenterYM");
-    let outer_tilt = _leg_number(source, "strutOuterTiltZDeg");
-    let inner_tilt = _leg_number(source, "strutInnerTiltZDeg");
-    if radius == () || radius <= 0.0 || height == () || height <= 0.0
-        || axis == () || outer_x == () || inner_x == () || center_y == ()
-        || outer_tilt == () || inner_tilt == () {
-        return plan_error("landing-leg strut dimensions, axis, or stations are incomplete");
-    }
-
-    let specs = [
-        #{name: outer_name, translation: [outer_x, center_y, 0.0],
-          rotation: [0.0, 0.0, outer_tilt], color: [0.08, 0.10, 0.13]},
-        #{name: inner_name, translation: [inner_x, center_y, 0.0],
-          rotation: [0.0, 0.0, inner_tilt], color: [0.08, 0.10, 0.13]},
-    ];
-    let ops = [];
-    let changed_paths = [];
-    for item in specs {
-        let path = root + "/" + item.name;
-        let record = assembly_builder::composed_query(doc,
-            #{path: path, children: false,
-              attrs: ["radius", "height", "axis", "size",
-                "xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale",
-                "physics:collisionEnabled", "purpose", "primvars:displayColor"]});
-        if !query_ok(record) {
-            return plan_error(path + ": composed strut query failed");
-        }
-        let attrs = record.attrs;
-        let color = attrs["primvars:displayColor"];
-        let color_matches = array_is(color) && color.len() == 1
-            && assembly_audit::close_vec(color[0], item.color, 0.001);
-        let matches = record.type_name == "Cylinder"
-            && assembly_audit::close_scalar(attrs["radius"], radius, 0.000001)
-            && assembly_audit::close_scalar(attrs["height"], height, 0.000001)
-            && attrs["axis"] == axis && attrs["size"] == ()
-            && assembly_audit::close_vec(attrs["xformOp:translate"], item.translation, 0.000001)
-            && assembly_audit::close_vec(attrs["xformOp:rotateXYZ"], item.rotation, 0.000001)
-            && assembly_audit::close_vec(attrs["xformOp:scale"], [1.0, 1.0, 1.0], 0.000001)
-            && attrs["physics:collisionEnabled"] == false
-            && attrs["purpose"] == "render" && color_matches;
-        if !matches {
-            let part = _component_cylinder_visual_ops(doc, edit_target, root,
-                item.name, item.translation, item.rotation, radius, height,
-                axis, item.color);
-            if !part.ok { return part; }
-            for op in part.ops { ops.push(op); }
-            changed_paths.push(path);
-        }
-    }
-    #{ok: true, kind: "griffin_landing_leg_strut_refinement", root: root,
-      paths: changed_paths, ops: ops, no_op: ops.is_empty()}
-}
-
-fn apply_refined_griffin_landing_leg_struts(doc, edit_target, root, parent_gen) {
-    let plan = refine_griffin_landing_leg_struts_plan(doc, edit_target, root);
-    if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc,
-        "Refine Griffin landing-leg tubular struts", plan.ops, parent_gen);
     #{ok: command.ok != false, kind: plan.kind, command: command,
       root: root, paths: plan.paths}
 }

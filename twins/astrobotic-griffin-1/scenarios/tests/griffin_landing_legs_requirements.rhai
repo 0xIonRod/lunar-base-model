@@ -12,6 +12,27 @@ fn own(name) { PACKAGE + "::GriffinLandingLegAssembly::" + name }
 fn parent(name) { "GriffinLanderRequirements::GriffinLanderComponent::" + name }
 fn visual(name) { "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::" + name }
 
+// Keep this component pass proportional to its own source contract.
+fn leg_source() {
+    let attributes = [parent("legCount"), visual("landingLegInstances"),
+        visual("legStations"), visual("legStationRotationYDeg"),
+        "Griffin1Requirements::PublicMissionContext::landingVehicleReferenceTouchdownY",
+        "Griffin1Requirements::PublicMissionContext::siteSurfaceY"];
+    for name in ["usdRootPath", "childNames", "strutAxis", "strutRadiusM",
+        "shockPistonRadiusM", "footPadRadiusM", "footPadHeightM", "footPadCenterYM",
+        "physicalLegRotationToleranceDeg", "physicalLegPlacementToleranceM",
+        "springLowerLimitM", "springUpperLimitM", "springStiffnessNPerM",
+        "springDampingNsPerM", "springMaxForceN", "springTargetVelocityMps",
+        "springPoseToleranceM"] { attributes.push(own(name)); }
+    let requirements = [];
+    for name in ["gll001", "gll002", "gll003", "gll004", "gll005",
+        "gll006", "gll007", "gll008", "gll009", "gll010"] {
+        requirements.push(PACKAGE + "::" + name);
+    }
+    sysml_requirements::source_with_selection(attributes, requirements,
+        [PACKAGE + "::" + VERIFICATION])
+}
+
 fn position(id, path, index, expected) {
     #{id: id, component: "landing_leg", requirement: "gll005",
       verification: VERIFICATION, kind: "attribute_component", path: path,
@@ -105,6 +126,27 @@ fn usd_axis(direction) {
     ()
 }
 
+// Measure actual transformed cylinder endpoints rather than comparing a
+// second table of guessed angles/heights with the builder's output.
+fn _member_endpoint_errors(record, upper, lower) {
+    if record==() || record.attrs==() {return #{upper:(),lower:()};}
+    let a=record.attrs;let t=a["xformOp:translate"];let e=a["xformOp:rotateXYZ"];
+    let scale=a["xformOp:scale"];let height=a["height"];
+    if !array_is(t) || !array_is(e) || t.len()!=3 || e.len()!=3 || height==() {return #{upper:(),lower:()};}
+    let order=a["xformOpOrder"];
+    if order != ["xformOp:translate","xformOp:rotateXYZ"]
+        && order != ["xformOp:translate","xformOp:rotateXYZ","xformOp:scale"] {
+        return #{upper:(),lower:()};
+    }
+    if scale!=() && (!array_is(scale) || scale.len()!=3) {return #{upper:(),lower:()};}
+    let y_scale=if array_is(scale) {scale[1]} else {1.0};
+    let center=vec3(t[0],t[1],t[2]);
+    let q=quat_from_euler_xyz_deg(vec3(e[0],e[1],e[2]));
+    let delta=qrot(q,vec3(0.0,height*y_scale/2.0,0.0));
+    let u=center+delta-upper;let l=center-delta-lower;
+    #{upper:(u.x*u.x+u.y*u.y+u.z*u.z).sqrt(),lower:(l.x*l.x+l.y*l.y+l.z*l.z).sqrt()}
+}
+
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
@@ -112,7 +154,7 @@ fn on_start(me, ctx) {
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
-    let source = sysml_requirements::source();
+    let source = leg_source();
     let root = sysml_requirements::text(source, own("usdRootPath"));
     let names = sysml_requirement_checks::source_enum_identifiers(source, visual("landingLegInstances"));
     let part_names = sysml_requirement_checks::source_enum_identifiers(source, own("childNames"));
@@ -172,38 +214,30 @@ fn on_tick(me, ctx) {
         let required_children = [];
         for part_name in part_names { required_children.push(visual_path + "/" + part_name); }
         checks.push(sysml_requirement_checks::children("GLL-002-" + name, "landing_leg", "gll002", VERIFICATION, visual_path, required_children));
-        for strut in ["StrutOuter", "StrutInner"] {
-            let strut_path = visual_path + "/" + strut;
-            checks.push(sysml_requirement_checks::exists("GLL-006-" + name + "-" + strut + "-type", "landing_leg", "gll006", VERIFICATION, strut_path, "Cylinder"));
-            checks.push(sysml_requirement_checks::attribute_check("GLL-006-" + name + "-" + strut + "-radius", "landing_leg", "gll006", VERIFICATION,
-                strut_path, "radius", own("strutRadiusM"), 0.002));
-            checks.push(sysml_requirement_checks::attribute_check("GLL-006-" + name + "-" + strut + "-height", "landing_leg", "gll006", VERIFICATION,
-                strut_path, "height", own("strutHeightM"), 0.002));
-            checks.push(sysml_requirement_checks::attribute_equals("GLL-006-" + name + "-" + strut + "-axis", "landing_leg", "gll006", VERIFICATION,
-                strut_path, "axis", strut_axis));
+        let members=model.value(own("loadMembers"));
+        let anchors=model.value(own("memberUpperAnchors"));
+        let lower=model.value(own("memberLowerAnchor"));
+        let tolerance=model.value(own("memberEndpointToleranceM"));
+        if members.len()!=3 || anchors.len()!=3 {throw("landing leg load paths incomplete");}
+        for member_index in 0..3 {
+            let child=members[member_index].literal;
+            let member_path=visual_path+"/"+child;
+            let req=if member_index==0 {"gll007"} else {"gll006"};
+            checks.push(sysml_requirement_checks::exists("leg-member-"+name+child,"landing_leg",req,VERIFICATION,member_path,"Cylinder"));
+            checks.push(sysml_requirement_checks::attribute_check("leg-radius-"+name+child,"landing_leg",req,VERIFICATION,
+                member_path,"radius",own(if member_index==0 {"shockPistonRadiusM"} else {"strutRadiusM"}),0.002));
+            checks.push(sysml_requirement_checks::attribute_equals("leg-axis-"+name+child,"landing_leg",req,VERIFICATION,member_path,"axis",strut_axis));
+            let record=query("QueryUsdPrim",#{path:member_path,attrs:["height","xformOp:translate","xformOp:rotateXYZ","xformOp:scale","xformOpOrder"]});
+            let errors=_member_endpoint_errors(record,anchors[member_index],lower);
+            let requirement=model.requirement("GriffinLandingLegRequirements::"+req);
+            let predicate="GriffinLandingLegRequirements::GLLC006_MemberClosure";
+            let inputs=sysml_requirements::required_constraint_input_observations(model,requirement,predicate,[
+                ["measuredUpperEndpointErrorM",_usd_value(errors.upper,record)],
+                ["measuredLowerEndpointErrorM",_usd_value(errors.lower,record)],
+                ["toleranceM",_source_value(tolerance,source)]
+            ]);
+            checks.push(sysml_requirements::required_constraint_check("leg-endpoints-"+name+child,"landing_leg",req,VERIFICATION,predicate,inputs,"typed",0.0));
         }
-        checks.push(#{id: "GLL-006-" + name + "-outer-center", component: "landing_leg",
-            requirement: "gll006", verification: VERIFICATION, kind: "attribute_component",
-            path: visual_path + "/StrutOuter", attr: "xformOp:translate", index: 0,
-            expected_attr: own("strutOuterCenterXM"), tolerance: 0.002});
-        checks.push(#{id: "GLL-006-" + name + "-outer-tilt", component: "landing_leg",
-            requirement: "gll006", verification: VERIFICATION, kind: "attribute_component",
-            path: visual_path + "/StrutOuter", attr: "xformOp:rotateXYZ", index: 2,
-            expected_attr: own("strutOuterTiltZDeg"), tolerance: 0.002});
-        checks.push(#{id: "GLL-006-" + name + "-inner-center", component: "landing_leg",
-            requirement: "gll006", verification: VERIFICATION, kind: "attribute_component",
-            path: visual_path + "/StrutInner", attr: "xformOp:translate", index: 0,
-            expected_attr: own("strutInnerCenterXM"), tolerance: 0.002});
-        checks.push(#{id: "GLL-006-" + name + "-inner-tilt", component: "landing_leg",
-            requirement: "gll006", verification: VERIFICATION, kind: "attribute_component",
-            path: visual_path + "/StrutInner", attr: "xformOp:rotateXYZ", index: 2,
-            expected_attr: own("strutInnerTiltZDeg"), tolerance: 0.002});
-        checks.push(#{id: "GLL-007-" + name + "-radius", component: "landing_leg",
-            requirement: "gll007", verification: VERIFICATION, kind: "attribute",
-            path: visual_path + "/ShockPiston", attr: "radius", expected_attr: own("shockPistonRadiusM"), tolerance: 0.002});
-        checks.push(#{id: "GLL-007-" + name + "-height", component: "landing_leg",
-            requirement: "gll007", verification: VERIFICATION, kind: "attribute",
-            path: visual_path + "/ShockPiston", attr: "height", expected_attr: own("shockPistonHeightM"), tolerance: 0.002});
         checks.push(#{id: "GLL-008-" + name + "-radius", component: "landing_leg",
             requirement: "gll008", verification: VERIFICATION, kind: "attribute",
             path: visual_path + "/FootPad", attr: "radius", expected_attr: own("footPadRadiusM"), tolerance: 0.002});

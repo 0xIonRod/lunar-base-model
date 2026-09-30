@@ -13,91 +13,90 @@ def Xform "LandingLeg" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:translate = (0.2, -0.57, 0.0)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 16.0)
+        custom double3 xformOp:translate = (-0.2, -0.615, 0.34)
+        custom double3 xformOp:rotateXYZ = (31.60881137617872, 0.0, 21.223656502766215)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        color3f[] primvars:displayColor = [(0.07999999821186066, 0.10000000149011612, 0.12999999523162842)]
+        color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
-        double radius = 0.08
-        double height = 1.4
         uniform token axis = "Y"
-        float3[] extent = [(-0.07999999821186066, -1.2999999523162842, -0.07999999821186066), (0.07999999821186066, 1.2999999523162842, 0.07999999821186066)]
+        double radius = 0.035
+        double height = 1.2974205177967548
     }
     def Cylinder "StrutInner" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:translate = (-0.2, -0.57, 0.0)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -16.0)
+        custom double3 xformOp:translate = (-0.2, -0.615, -0.34)
+        custom double3 xformOp:rotateXYZ = (-31.60881137617872, 0.0, 21.223656502766215)
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        color3f[] primvars:displayColor = [(0.07999999821186066, 0.10000000149011612, 0.12999999523162842)]
+        color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
-        double radius = 0.08
-        double height = 1.4
         uniform token axis = "Y"
-        float3[] extent = [(-0.07999999821186066, -1.2999999523162842, -0.07999999821186066), (0.07999999821186066, 1.2999999523162842, 0.07999999821186066)]
+        double radius = 0.035
+        double height = 1.2974205177967548
     }
     def Cylinder "ShockPiston"
     {
         uniform token axis = "Y"
-        float radius = 0.12999999523162842
-        float height = 1.149999976158142
-        custom double3 xformOp:translate = (0.0, -0.45, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.7200000286102295, 0.75, 0.800000011920929)]
+        custom double3 xformOp:translate = (-0.05, -0.5049999999999999, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 4.573921259900861)
+        double radius = 0.06
+        double height = 1.2539936203984452
     }
     def Cylinder "FootPad"
     {
         uniform token axis = "Y"
-        float radius = 0.3499999940395355
-        float height = 0.11999999731779099
-        custom double3 xformOp:translate = (0.0, -1.15, 0.0)
+        custom double3 xformOp:translate = (0.0, -1.19, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        color3f[] primvars:displayColor = [(0.2800000011920929, 0.3199999928474426, 0.3799999952316284)]
+        color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
+        double radius = 0.35
+        double height = 0.04
     }
     def Cube "MountClevisOuter" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.42, 0.24, 0.36)
+        custom double3 xformOp:scale = (0.16, 0.16, 0.12)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.2, 0.12, 0.0)
+        custom double3 xformOp:translate = (-0.4, -0.1, 0.68)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.18000000715255737, 0.20999999344348907, 0.25)]
+        color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
     }
     def Cube "MountClevisInner" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.42, 0.24, 0.36)
+        custom double3 xformOp:scale = (0.16, 0.16, 0.12)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-0.2, 0.12, 0.0)
+        custom double3 xformOp:translate = (-0.4, -0.1, -0.68)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.18000000715255737, 0.20999999344348907, 0.25)]
+        color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
     }
     def Cube "FootPadPlate" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.62, 0.1, 0.48)
+        custom double3 xformOp:scale = (0.42, 0.04, 0.36)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (0.0, -1.07, 0.0)
+        custom double3 xformOp:translate = (0.0, -1.15, 0.0)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23000000417232513, 0.27000001072883606)]
+        color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
     }
     def Cylinder "MountAxle" (
         prepend apiSchemas = "PhysicsCollisionAPI"
@@ -105,24 +104,23 @@ def Xform "LandingLeg" (
     {
         custom double3 xformOp:translate = (0.0, 0.12, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        double radius = 0.12
-        double height = 0.42
         uniform token axis = "Z"
-        float3[] extent = [(-0.11999999731779099, -0.11999999731779099, -0.20999999344348907), (0.11999999731779099, 0.11999999731779099, 0.20999999344348907)]
         bool physics:collisionEnabled = false
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.47999998927116394, 0.5199999809265137, 0.5799999833106995)]
+        color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+        double radius = 0.08
+        double height = 0.16
     }
     def Cube "BodyMountArm" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.15999999999999992, 0.24, 0.42)
+        custom double3 xformOp:scale = (0.19999999999999996, 0.16, 0.16)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-0.1499999999999999, 0.12, 0.0)
+        custom double3 xformOp:translate = (-0.1299999999999999, 0.12, 0.0)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.2800000011920929, 0.3199999928474426, 0.3799999952316284)]
+        color3f[] primvars:displayColor = [(0.3799999952316284, 0.41999998688697815, 0.4699999988079071)]
     }
 }
