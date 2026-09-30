@@ -882,6 +882,12 @@ fn ramp_side_truss_brace_count_per_side() { _sysml_integer("assemblySideTrussBra
 fn ramp_section_hinge_barrel_radius_m() { _sysml_attribute("rampSectionHingeBarrelRadiusM") }
 fn ramp_section_hinge_barrel_length_m() { _sysml_attribute("rampSectionHingeBarrelLengthM") }
 fn ramp_section_hinge_barrel_center_y_m() { _sysml_attribute("rampSectionHingeBarrelCenterYM") }
+fn ramp_section_hinge_axis_y_m(index) {
+    if index==0 {return ramp_section_hinge_barrel_center_y_m();}
+    if index==1 {return _sysml_attribute("rampRailCenterYM")+_sysml_attribute("rampRailHeightM")/2.0;}
+    if index==2 {return -_sysml_attribute("rampSurfaceThicknessM")/2.0;}
+    throw("ramp section index is outside the three-section assembly");
+}
 fn ramp_rail_joint_pin_radius_m() { _sysml_attribute("rampRailJointPinRadiusM") }
 fn ramp_rail_joint_pin_length_m() { _sysml_attribute("rampRailJointPinLengthM") }
 fn propellant_tank_names() { _sysml_enum_names("tankInstances") }

@@ -405,3 +405,26 @@ which compressed their metric spacing while raw position attributes appeared
 correct. The component cube planner now authors translate/rotate/scale order;
 a targeted solar regression checks the affected final divider. The complete
 grid and slim fittings were reviewed in a freshly composed vehicle preview.
+
+## Ramp plates, compact trusses and hinge shafts — 2026-09-30
+
+The walking plate now uses the same visible Mesh as physical contact. Sparse
+traction bars are details on the plate, not a replacement for it. This fixes
+the floating bars seen when the contact mesh was hidden; no duplicate visual
+track was created. The silver-gray display color is an appearance estimate.
+
+Upper chord center is estimated at 180 mm above the track datum, replacing
+the 340 mm elevation inherited from the thick slab. With 40 mm upper stock
+and the 55 mm lower-chord center, the triangulated web depth is 125 mm. This
+is a silhouette estimate informed by the selected
+[Astrobotic rendering](https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png),
+not a supplier truss drawing. Fold-axis clearance now derives from the
+200 mm chord top. The contact span, root stow angle, mass proxy and deployed
+plane are retained.
+
+The obsolete −180 mm shaft elevation left detached crossbars. Root shaft
+Y is zero at the deck pivot, middle shaft Y derives from upper chord top,
+and toe shaft Y derives from the plate bottom. These match the section
+revolute frame datums and are shared by native joint placement and shaft
+appearance. Deployed ramp and folded-rail gates passed for these changes;
+rendered review shows continuous tracks and closer-packed folded trusses.

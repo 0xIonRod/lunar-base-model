@@ -12,7 +12,7 @@ def Xform "RampSection" (
     custom token lunco:component:role = "Griffin articulated egress ramp section"
     custom double lunco:section:length_m = 4.076201667
     custom double lunco:section:outside_width_m = 3.5
-    custom token lunco:ramp:section:identity = "DeckSection"
+    custom token lunco:ramp:section:identity = "section"
     def Mesh "RampTrackPort" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
     )
@@ -23,11 +23,11 @@ def Xform "RampSection" (
         uniform token subdivisionScheme = "none"
         custom double3 xformOp:translate = (0.0, 0.0, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.3400000035762787, 0.3799999952316284, 0.4399999976158142)]
-        uniform token purpose = "proxy"
+        color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+        uniform token purpose = "default"
         uniform token physics:approximation = "convexHull"
         bool physics:collisionEnabled = true
-        token visibility = "invisible"
+        token visibility = "inherited"
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
     }
     def Mesh "RampTrackStarboard" (
@@ -40,11 +40,11 @@ def Xform "RampSection" (
         uniform token subdivisionScheme = "none"
         custom double3 xformOp:translate = (0.0, 0.0, -1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.3400000035762787, 0.3799999952316284, 0.4399999976158142)]
-        uniform token purpose = "proxy"
+        color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+        uniform token purpose = "default"
         uniform token physics:approximation = "convexHull"
         bool physics:collisionEnabled = true
-        token visibility = "invisible"
+        token visibility = "inherited"
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
     }
     def Cube "OuterRail" (
@@ -52,7 +52,7 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.899542027, 0.34, 1.36)
+        custom double3 xformOp:translate = (0.899542027, 0.18, 1.36)
         custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
@@ -64,7 +64,7 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.899542027, 0.34, -1.36)
+        custom double3 xformOp:translate = (0.899542027, 0.18, -1.36)
         custom double3 xformOp:scale = (1.799084054, 0.04, 0.04)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
@@ -100,8 +100,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.224885507, 0.1675, 1.36)
-        custom double3 xformOp:scale = (0.025, 0.38500000000000006, 0.025)
+        custom double3 xformOp:translate = (0.224885507, 0.0875, 1.36)
+        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.2199999988079071)]
         uniform token purpose = "render"
@@ -112,8 +112,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.899542027, 0.1675, 1.36)
-        custom double3 xformOp:scale = (0.025, 0.38500000000000006, 0.025)
+        custom double3 xformOp:translate = (0.899542027, 0.0875, 1.36)
+        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.2199999988079071)]
         uniform token purpose = "render"
@@ -124,8 +124,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (1.574198547, 0.1675, 1.36)
-        custom double3 xformOp:scale = (0.025, 0.38500000000000006, 0.025)
+        custom double3 xformOp:translate = (1.574198547, 0.0875, 1.36)
+        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.2199999988079071)]
         uniform token purpose = "render"
@@ -136,8 +136,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.224885507, 0.1675, -1.36)
-        custom double3 xformOp:scale = (0.025, 0.38500000000000006, 0.025)
+        custom double3 xformOp:translate = (0.224885507, 0.0875, -1.36)
+        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.2199999988079071)]
         uniform token purpose = "render"
@@ -148,8 +148,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (0.899542027, 0.1675, -1.36)
-        custom double3 xformOp:scale = (0.025, 0.38500000000000006, 0.025)
+        custom double3 xformOp:translate = (0.899542027, 0.0875, -1.36)
+        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.2199999988079071)]
         uniform token purpose = "render"
@@ -160,8 +160,8 @@ def Xform "RampSection" (
     )
     {
         double size = 1.0
-        custom double3 xformOp:translate = (1.574198547, 0.1675, -1.36)
-        custom double3 xformOp:scale = (0.025, 0.38500000000000006, 0.025)
+        custom double3 xformOp:translate = (1.574198547, 0.0875, -1.36)
+        custom double3 xformOp:scale = (0.025, 0.225, 0.025)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.2199999988079071)]
         uniform token purpose = "render"
@@ -270,7 +270,7 @@ def Xform "RampSection" (
         double radius = 0.025
         double height = 2.86
         uniform token axis = "Z"
-        custom double3 xformOp:translate = (0.0, -0.18, 0.0)
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.2199999988079071, 0.25999999046325684, 0.3100000023841858)]
         uniform token purpose = "render"
@@ -284,7 +284,7 @@ def Xform "RampSection" (
         double radius = 0.025
         double height = 0.1
         uniform token axis = "Z"
-        custom double3 xformOp:translate = (0.0, 0.34, 1.36)
+        custom double3 xformOp:translate = (0.0, 0.18, 1.36)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
         uniform token purpose = "render"
@@ -298,7 +298,7 @@ def Xform "RampSection" (
         double radius = 0.025
         double height = 0.1
         uniform token axis = "Z"
-        custom double3 xformOp:translate = (0.0, 0.34, -1.36)
+        custom double3 xformOp:translate = (0.0, 0.18, -1.36)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.5799999833106995, 0.6200000047683716, 0.6700000166893005)]
         uniform token purpose = "render"
@@ -322,9 +322,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.1124427535, 0.1975, 1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 51.7240192539809)
-        custom double3 xformOp:scale = (0.3630406192957574, 0.018, 0.018)
+        custom double3 xformOp:translate = (0.1124427535, 0.1175, 1.36)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 29.06698620733784)
+        custom double3 xformOp:scale = (0.2572906746437714, 0.018, 0.018)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
         uniform token purpose = "render"
@@ -335,9 +335,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.562213767, 0.1975, 1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -22.901003756901787)
-        custom double3 xformOp:scale = (0.7323840658961052, 0.018, 0.018)
+        custom double3 xformOp:translate = (0.562213767, 0.1175, 1.36)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -10.496699728868869)
+        custom double3 xformOp:scale = (0.6861387760347832, 0.018, 0.018)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
         uniform token purpose = "render"
@@ -348,9 +348,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (1.236870287, 0.1975, 1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 22.901003756901787)
-        custom double3 xformOp:scale = (0.7323840658961052, 0.018, 0.018)
+        custom double3 xformOp:translate = (1.236870287, 0.1175, 1.36)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 10.496699728868869)
+        custom double3 xformOp:scale = (0.6861387760347832, 0.018, 0.018)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
         uniform token purpose = "render"
@@ -361,9 +361,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (1.6866413004999998, 0.1975, 1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -51.724019253980906)
-        custom double3 xformOp:scale = (0.3630406192957574, 0.018, 0.018)
+        custom double3 xformOp:translate = (1.6866413004999998, 0.1175, 1.36)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -29.06698620733784)
+        custom double3 xformOp:scale = (0.2572906746437714, 0.018, 0.018)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
         uniform token purpose = "render"
@@ -387,9 +387,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.1124427535, 0.1975, -1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 51.7240192539809)
-        custom double3 xformOp:scale = (0.3630406192957574, 0.018, 0.018)
+        custom double3 xformOp:translate = (0.1124427535, 0.1175, -1.36)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 29.06698620733784)
+        custom double3 xformOp:scale = (0.2572906746437714, 0.018, 0.018)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
         uniform token purpose = "render"
@@ -400,9 +400,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (0.562213767, 0.1975, -1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -22.901003756901787)
-        custom double3 xformOp:scale = (0.7323840658961052, 0.018, 0.018)
+        custom double3 xformOp:translate = (0.562213767, 0.1175, -1.36)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -10.496699728868869)
+        custom double3 xformOp:scale = (0.6861387760347832, 0.018, 0.018)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
         uniform token purpose = "render"
@@ -413,9 +413,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (1.236870287, 0.1975, -1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 22.901003756901787)
-        custom double3 xformOp:scale = (0.7323840658961052, 0.018, 0.018)
+        custom double3 xformOp:translate = (1.236870287, 0.1175, -1.36)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 10.496699728868869)
+        custom double3 xformOp:scale = (0.6861387760347832, 0.018, 0.018)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
         uniform token purpose = "render"
@@ -426,9 +426,9 @@ def Xform "RampSection" (
         prepend apiSchemas = "MaterialBindingAPI"
     )
     {
-        custom double3 xformOp:translate = (1.6866413004999998, 0.1975, -1.36)
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -51.724019253980906)
-        custom double3 xformOp:scale = (0.3630406192957574, 0.018, 0.018)
+        custom double3 xformOp:translate = (1.6866413004999998, 0.1175, -1.36)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -29.06698620733784)
+        custom double3 xformOp:scale = (0.2572906746437714, 0.018, 0.018)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6800000071525574, 0.7099999785423279, 0.7400000095367432)]
         uniform token purpose = "render"

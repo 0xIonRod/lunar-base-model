@@ -364,11 +364,25 @@ package GriffinRampRequirements {
         attribute assemblySideTrussBraceCountPerSide : Integer = 4;
         attribute rampSectionHingeBarrelRadiusM : Real = 0.025;
         attribute rampSectionHingeBarrelLengthM : Real = 2.86;
-        attribute rampSectionHingeBarrelCenterYM : Real = -0.18;
+        // Root shaft is on the physical deck axis. Middle shaft derives
+        // from chord top; toe shaft from plate bottom, matching joint datums.
+        attribute rampSectionHingeBarrelCenterYM : Real = 0.0;
+        /* The physical contact-track Mesh is also the visible walking plate.
+         * Do not hide it and substitute sparse traction bars, or add a second
+         * render mesh with independent dimensions. Display color is an artistic
+         * silver-gray estimate from the selected Astrobotic 2021 rendering. */
+        attribute rampTrackDisplayColor : Real[3] = (.45, .48, .52);
         attribute rampSurfaceCenterYM : Real = 0.00;
-        // Preserve the existing chord-top/fold-pivot datum at Y=.36 m:
-        // .34 + .04/2 = .36. Thinner stock moves its center, not the hinge.
-        attribute rampRailCenterYM : Real = 0.34;
+        /* Replace the legacy 340 mm rail elevation, retained from the thick
+         * slab, with an estimated 180 mm chord center above the track datum.
+         * With 40 mm stock the fold datum is now 200 mm, and the 55 mm lower
+         * chord leaves a 125 mm triangulated web. This produces the slender
+         * paired folded tracks shown in the selected Astrobotic 2021 render:
+         * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png .
+         * It is a silhouette reconstruction, not released ramp section data.
+         * The middle-fold joint offsets derive from chord top; change them
+         * together. Walking contact, span and root stow angle are retained. */
+        attribute rampRailCenterYM : Real = 0.18;
         attribute rampMaxDeploymentAngleRad : Real = 0.872664626;
         // Render review uses the revised top ring at Y=1.79; hinge center
         // Y=1.70 places a 0.18 m track flush with that ring. The mission
@@ -526,7 +540,7 @@ package GriffinRampRequirements {
     }
 
     requirement def GRR006_RampGeometry {
-        doc /* GRR-006 [geometry/physics] each composed physical ramp shall provide two continuous convex-mesh contact tracks whose top-face length and thickness match the SysML study values. Their lateral centres shall equal the source FLIP wheel stations, and their width shall equal the source wheel width plus twice the wheel clearance. The outer toe face shall be mitered from the track thickness and deployed angle so its upper and lower edges meet the terrain plane together. The centre remains open between tracks; rails and support load paths remain separately inspectable. */
+        doc /* GRR-006 [geometry/physics] each composed physical ramp shall provide two visible continuous convex-mesh contact tracks whose top-face length and thickness match the SysML study values. Their lateral centres shall equal the source FLIP wheel stations, and their width shall equal the source wheel width plus twice the wheel clearance. The outer toe face shall be mitered from the track thickness and deployed angle so its upper and lower edges meet the terrain plane together. The centre remains open between tracks; rails and support load paths remain separately inspectable. */
         require GRC016_ContactTrackClearsTire {
             in trackWidthM = GriffinEgressRamp::assemblyTrackWidthM;
             in wheelWidthM = FlipRover::wheelWidthM;

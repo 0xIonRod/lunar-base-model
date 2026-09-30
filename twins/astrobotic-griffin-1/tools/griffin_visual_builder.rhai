@@ -4515,7 +4515,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     let truss_brace_count = griffin_spec::ramp_side_truss_brace_count_per_side();
     let hinge_radius = griffin_spec::ramp_section_hinge_barrel_radius_m();
     let hinge_length = griffin_spec::ramp_section_hinge_barrel_length_m();
-    let hinge_y = griffin_spec::ramp_section_hinge_barrel_center_y_m();
+    let hinge_y = griffin_spec::ramp_section_hinge_axis_y_m(section_index);
     let invalid_section = section_count != 3 || section_index < 0
         || section_index >= section_count;
     let invalid_dimensions = section_length <= 0.0 || total_length == ()
@@ -4597,6 +4597,10 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         for item in [
             #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
             #{name: "physics:approximation", type_name: "token", value: "\"convexHull\""},
+            #{name: "purpose", type_name: "token", value: "\"default\""},
+            #{name: "visibility", type_name: "token", value: "\"inherited\""},
+            #{name: "primvars:displayColor", type_name: "color3f[]",
+              value:_color_literal(sysml_requirements::model().value("GriffinRampRequirements::GriffinEgressRamp::rampTrackDisplayColor"))},
         ] {
             ops.push(#{SetAttribute: #{edit_target: edit_target, path: track_path,
                 name: item.name, type_name: item.type_name, value: item.value}});
@@ -5119,8 +5123,8 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
     // center plane. The second hinge uses a half-surface-thickness offset to
     // put the toe just above the inverted middle section when both folds are
     // closed; both offsets disappear from the deployed plane at 0 degrees.
-    let middle_fold_axis_y = rail_center_y + rail_height / 2.0;
-    let toe_fold_axis_y = -fold_surface_thickness / 2.0;
+    let middle_fold_axis_y = griffin_spec::ramp_section_hinge_axis_y_m(1);
+    let toe_fold_axis_y = griffin_spec::ramp_section_hinge_axis_y_m(2);
     // The body orientation uses the positive source stow magnitude on both
     // sides. Starboard's Y=180 mount mirrors its forward axis; its revolute
     // coordinate therefore uses the opposite sign for the same physical pose.

@@ -603,7 +603,9 @@ fn on_tick(me, ctx) {
                 expected_attr: _source_attr("rampSectionHingeBarrelLengthM"), tolerance: 0.002});
             checks.push(_attribute_component("GRR-015-" + side + "-" + index.to_string() + "-barrel-y",
                 "grr015", barrel, "xformOp:translate", 1,
-                _source_number(source, "rampSectionHingeBarrelCenterYM")));
+                if index==0 {_source_number(source,"rampSectionHingeBarrelCenterYM")}
+                else if index==1 {_source_number(source,"rampRailCenterYM")+_source_number(source,"rampRailHeightM")/2.0}
+                else {-_source_number(source,"rampSurfaceThicknessM")/2.0}));
         }
 
         if section_index == 0 {

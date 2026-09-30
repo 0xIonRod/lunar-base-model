@@ -187,12 +187,12 @@ fn run_visual_review(batch_index) {
                 for tread in 1..(tread_count.to_int() + 1) {
                     paths.push(section + "/Tread" + track + tread);
                 }
-                // Collision proxies deliberately remain invisible; the
-                // visible walking surface is the source-counted tread set.
+                // One track mesh owns both contact and the visible plate;
+                // sparse traction bars cannot substitute for that surface.
                 let contact = visual_exists_check("GV-002-" + name + "-" + segment + "-contact-" + track,
                     "egress_ramps", "gv002", "exists", section + "/RampTrack" + track);
                 contact.expected_type = "Mesh";
-                contact.visible = false;
+                contact.visible = true;
                 checks.push(contact);
             }
             checks.push(visual_children_check("GV-002-" + name + "-" + segment,
