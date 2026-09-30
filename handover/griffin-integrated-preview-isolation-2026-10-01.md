@@ -36,3 +36,28 @@ Trello workflow was read and its missing official connector reported before
 core work. No available Trello tools were discovered; no external messages
 were sent. No core commit or rendering fix is claimed. The active Griffin goal
 remains incomplete.
+
+## Resolved checkpoint
+
+Core fix committed in terrain/terrain-streaming as a7707995c. The original
+cargo test completed (exit101, expected queue assertion), then all10 crate tests
+passed with the existing ancestry guard. Full app build from terrain passed;
+owned old PID162365 was stopped only after USD InspectUsdDocument reported
+all8documents saved. ListOpenDocuments had stale dirty flags; concrete USD
+owner reports were authoritative. Fresh owned PID627628, exec session47868,
+API49746, high quality, isolated config remains running.
+
+Fresh combined document115591551527336, view8, generation0 ready,50recipe layers.
+Same rear preset target(0,1.65,0), distance27.6 now renders the proper assembly,
+including FLIP and dish. Framing target approximately(0,.26218,0) confirms the
+local presentation frame. Source scene/vehicle transforms were not modified.
+Screenshot committed under twins/astrobotic-griffin-1/handover/
+griffin-flip-preview-fixed-2026-10-01.png.
+
+Core diagnosis refined: preview roots carry UsdPreviewOnly but not UsdSceneRoot,
+so the authored root anchor followed generic geodetic placement, rather than a
+proven SiteAnchor/ActivePhysicsFrame mutation. Guard stops celestial/link domain
+projection for the whole preview hierarchy. Production visual fixture PASS:
+/tmp/griffin-preview-isolation-visual-gate.log,113checks,8ticks,60Hz,one thread,
+seed6840157149251759617. No full mission acceptance follows. Continue model
+fidelity against references now that the integrated preview can be trusted.

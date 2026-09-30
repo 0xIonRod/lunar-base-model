@@ -502,3 +502,19 @@ Those references motivate examining panel/patch geometry, not adding more
 parabolic dishes. Griffin-specific antenna dimensions, count and mounting
 interfaces remain unestablished; they must not be copied from Peregrine as
 verified Griffin hardware.
+
+#### Preview isolation resolved
+
+Terrain commit a7707995c reuses the existing is_preview_only ancestry guard in
+the celestial projector. The focused regression first reproduced preview work
+admission, then passed after the guard; all ten adapter tests pass. A rebuilt
+owned Editor now renders the unchanged combined scene correctly from the local
+rear preset. Selection framing returns approximately (0,.26218,0) m, rather than
+lunar-radius coordinates. The preview root is not a live UsdSceneRoot; its
+previous authored anchor entered the generic geodetic placement path. This
+clarifies the earlier SiteAnchor/ActivePhysicsFrame hypothesis: no active-frame
+mutation was proven in this preview. The correction prevents all celestial and
+link domain admission under the preview marker. Mission georeferencing remains
+owned by the live scene. The production visual fixture passes with the rebuilt
+binary, while landing and egress remain separate open evidence.
+Saved visual evidence: ../handover/griffin-flip-preview-fixed-2026-10-01.png.
