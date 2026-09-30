@@ -171,3 +171,10 @@ Its log has no wgpu validation error and the
 has no degraded-rendering banner. This establishes recovered rendering, not
 finished materials or acceptance of the landing dynamics. The old screenshot
 is retained as the explicit earlier diagnostic state.
+
+The fresh visual gate passes 95 checks on the current renderer build. It now
+checks source-counted visible tread members and rails separately from the
+invisible Mesh collision tracks. Requiring those proxy tracks to be visible
+contradicted the authored render/contact separation. Review placement values
+are read from the gate's selected source snapshot; the final rerun has no
+scenario startup exception. This is presentation topology evidence only.

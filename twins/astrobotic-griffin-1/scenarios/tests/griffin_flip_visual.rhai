@@ -89,7 +89,8 @@ fn run_visual_review(batch_index) {
         griffin_spec::qualified_attribute_name("visualReviewFlipStation"),
         griffin_spec::qualified_attribute_name("deckDimensions"),
         griffin_spec::qualified_attribute_name("landingSitePadExtentM"),
-        griffin_spec::qualified_attribute_name("visualReviewGroundWidthM")
+        griffin_spec::qualified_attribute_name("visualReviewGroundWidthM"),
+        "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadCountPerSection"
     ], [
         "GriffinVisualRequirements::gv001",
         "GriffinVisualRequirements::gv002",
@@ -166,19 +167,27 @@ fn run_visual_review(batch_index) {
         checks.push(visual_children_check("GV-002-" + name + "-sections", "egress_ramps",
             "gv002", ramp,
             [ramp + "/DeckSection", ramp + "/MiddleSection"]));
-        for segment in ["DeckSection", "MiddleSection"] {
+        let tread_count = sysml_requirements::number(source,
+            "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadCountPerSection");
+        if tread_count == () || tread_count <= 0.0 { throw("Ramp tread count source unavailable"); }
+        for segment in ["DeckSection", "MiddleSection", "MiddleSection/ToeSection"] {
             let section = ramp + "/" + segment;
-            let paths = [section + "/RampTrackPort", section + "/RampTrackStarboard",
-                section + "/OuterRail", section + "/InnerRail"];
-            if segment == "MiddleSection" { paths.push(section + "/ToeSection"); }
+            let paths = [section + "/OuterRail", section + "/InnerRail"];
+            for track in ["Port", "Starboard"] {
+                for tread in 1..(tread_count.to_int() + 1) {
+                    paths.push(section + "/Tread" + track + tread);
+                }
+                // Collision proxies deliberately remain invisible; the
+                // visible walking surface is the source-counted tread set.
+                let contact = visual_exists_check("GV-002-" + name + "-" + segment + "-contact-" + track,
+                    "egress_ramps", "gv002", "exists", section + "/RampTrack" + track);
+                contact.expected_type = "Mesh";
+                contact.visible = false;
+                checks.push(contact);
+            }
             checks.push(visual_children_check("GV-002-" + name + "-" + segment,
                 "egress_ramps", "gv002", section, paths));
         }
-        let toe = ramp + "/MiddleSection/ToeSection";
-        checks.push(visual_children_check("GV-002-" + name + "-ToeSection",
-            "egress_ramps", "gv002", toe,
-            [toe + "/RampTrackPort", toe + "/RampTrackStarboard",
-             toe + "/OuterRail", toe + "/InnerRail"]));
     }
     checks.push(visual_children_check("GV-002-ramp-transition-plates", "egress_ramps",
         "gv002", root + "/Griffin1",
@@ -270,8 +279,10 @@ fn run_visual_review(batch_index) {
     checks[checks.len() - 1].expected_index = 0;
     checks[checks.len() - 1].tolerance = 0.001;
     for placement in [
-        #{name: "Griffin1", expected: vec3_array(griffin_spec::visual_review_griffin_station())},
-        #{name: "FLIP", expected: vec3_array(griffin_spec::visual_review_flip_station())}
+        #{name: "Griffin1", expected: vec3_array(sysml_requirements::native_value(source,
+            griffin_spec::qualified_attribute_name("visualReviewGriffinStation")))},
+        #{name: "FLIP", expected: vec3_array(sysml_requirements::native_value(source,
+            griffin_spec::qualified_attribute_name("visualReviewFlipStation")))}
     ] {
         for axis in 0..3 {
             checks.push(#{id: "GV-004-" + placement.name + "-station-" + axis.to_string(),
