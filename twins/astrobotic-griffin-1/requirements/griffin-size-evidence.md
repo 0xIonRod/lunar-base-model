@@ -157,3 +157,17 @@ shows upright panels following their bus faces. It still reports rendering
 Degraded and is a geometry review, not final material/render acceptance.
 The [minimal relationship assembly proposal](../contracts/declarative-assembly.md)
 uses existing named-frame tools; no new CAD solver or loader is implemented.
+
+## Current renderer evidence
+
+The degraded-rendering flag in the earlier preview was a binary/assets version
+mismatch: the layered shader declared group-3 bindings 12–15, while the older
+running binary had no corresponding layout bindings. Current `terrain` source
+already includes those slots in `ShaderMaterial`; no Rust changes were needed.
+A fresh build from `b6c31b8da95b5202814f144f2adf1038a52ef917` completed and
+an owned windowed session on port 49735 rendered the Griffin/FLIP review scene.
+Its log has no wgpu validation error and the
+[new screenshot](../handover/griffin-render-review-2026-09-30.png)
+has no degraded-rendering banner. This establishes recovered rendering, not
+finished materials or acceptance of the landing dynamics. The old screenshot
+is retained as the explicit earlier diagnostic state.

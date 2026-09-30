@@ -296,7 +296,7 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-004 [interface] the upper bus datum shall expose a source-sized octagonal perimeter deck ring with four tank through-openings; it shall not be a solid plate across the COPV cluster. A raised central payload adapter is supported by the upper flared bucket and shall carry the linked FLIP review asset with all four tire bottoms resting on the adapter. The lander and rover review stations, adapter footprint, and member stock are replaceable study assumptions, not released supplier CAD. */
     }
     requirement def GVC005_LegStations {
-        doc /* GVC-005 [layout] four leg roots shall occupy mirrored axial X/Z stations at a 3.10 m radial offset beyond the enlarged octagonal body, with local radial rotations and at least 0.20 m body-to-ground visual clearance. Source: Griffin's four shock-absorbing legs; exact station ICD is not public. */
+        doc /* GVC-005 [layout] four leg roots shall occupy mirrored axial X/Z stations at a 1.90 m radial offset around the 3.60 m octagonal body, with local radial rotations and at least 0.20 m body-to-ground visual clearance. Source: Griffin's four shock-absorbing legs; the 1.90 m station is a packaging estimate that keeps the mount attached to the resized bus perimeter, not a public ICD dimension. See griffin-size-evidence.md. */
     }
     requirement def GVC006_SolarStations {
         doc /* GVC-006 [configuration] for each solar-array identity, the configuration shall provide one assembly-frame station, panel orientation, and supporting bus-rail mapping. The configured stations shall satisfy the adjacent-side Sun-quadrant relationship defined by GriffinSolarRequirements. */

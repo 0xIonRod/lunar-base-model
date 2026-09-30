@@ -819,7 +819,9 @@ fn visual_review_ground_width_m() { _sysml_attribute("visualReviewGroundWidthM")
 // Resolve the source through the same revision-scoped requirement/evidence API
 // used by generic verifiers; the URI remains only the locator leaf.
 fn _visual_asset_locator(role_literal) {
-    let report = sysml_requirements::source();
+    let report = sysml_requirements::source_with_selection([],
+        ["GriffinVisualRequirements::gv006"],
+        ["GriffinVisualRequirements::Verify_GriffinVisualRequirements"]);
     if report == () || report.ok != true { return (); }
     let requirement = sysml_requirements::requirement_handle_by_short_name(report, "GV-006");
     if requirement.ok != true { return (); }
