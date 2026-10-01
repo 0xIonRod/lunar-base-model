@@ -706,6 +706,12 @@ fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
         configuration + "landingLegInstances");
     let stations = sysml_requirement_checks::source_position_list(source,
         configuration + "legStations");
+    let anchors=sysml_requirements::model().value(assembly+"memberUpperAnchors");
+    let hub=sysml_requirements::model().value(assembly+"memberLowerAnchor");
+    if !array_is(anchors) || anchors.len()!=3 || !vec3_is_native(hub) {
+        return #{ok:false,error:"shock endpoint source unavailable",checks:[],spring_targets_m:[]};
+    }
+    let shock_length=vlen(anchors[0]-hub);
     let checks = [];
     if source == () || source.ok != true || touchdown_y == () || surface_y == ()
         || center_y == () || height == () || lower_limit == () || upper_limit == ()
@@ -742,8 +748,7 @@ fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
                 component: "landing_leg", requirement: "gll009",
                 verification: verification, kind: "attribute_component",
                 path: path, attr: "physics:localPos0", index: axis,
-                expected: if axis == 0 { station.x }
-                    else if axis == 1 { station.y } else { station.z },
+                expected: if axis == 1 { -shock_length } else { 0.0 },
                 tolerance: station_tolerance});
         }
     }
@@ -783,15 +788,14 @@ fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
         let target = attrs["drive:linear:physics:targetPosition"];
         let actual_lower = attrs["physics:lowerLimit"];
         let actual_upper = attrs["physics:upperLimit"];
-        let expected_target = surface_y - touchdown_y - stations[index].y
-            - center_y + height / 2.0;
+        let expected_target = 0.0;
         spring_targets.push(expected_target);
         if attrs["physics:axis"] != "Y"
             || attrs["drive:linear:physics:type"] != "force"
             || anchor == () || anchor.len() != 3
-            || !_landing_near(anchor[0], stations[index].x, station_tolerance)
-            || !_landing_near(anchor[1], stations[index].y, station_tolerance)
-            || !_landing_near(anchor[2], stations[index].z, station_tolerance)
+            || !_landing_near(anchor[0], 0.0, station_tolerance)
+            || !_landing_near(anchor[1], -shock_length, station_tolerance)
+            || !_landing_near(anchor[2], 0.0, station_tolerance)
             || !_landing_near(attrs["physics:lowerLimit"], lower_limit, 0.001)
             || !_landing_near(attrs["physics:upperLimit"], upper_limit, 0.001)
             || !_landing_near(attrs["drive:linear:physics:targetVelocity"], target_velocity, 0.001)

@@ -1687,36 +1687,11 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
 
-        // The suspension joint's body-side anchor and the referenced leg
-        // body now share the one SysML leg station. This preserves a real
-        // articulated attachment after correcting the legacy low leg pose.
         let joint_path = root + "/Leg" + suffixes[index] + "_Spring";
-        let spring_target = geometry.surface_y_m - geometry.touchdown_y_m
-            - station.y - geometry.center_y_m + geometry.height_m / 2.0;
-        if spring_target < geometry.spring_lower_limit_m
-            || spring_target > geometry.spring_upper_limit_m {
-            return plan_error(joint_path + ": derived touchdown rest pose is outside the source-owned spring limits");
-        }
+        let spring_target = 0.0;
         spring_targets.push(spring_target);
-        let joint = assembly_builder::composed_query(doc,
-            #{path: joint_path, children: false});
+        let joint = assembly_builder::composed_query(doc, #{path:joint_path,children:false});
         if query_ok(joint) {
-            ops.push(#{SetAttribute: #{edit_target: edit_target,
-                path: joint_path, name: "physics:localPos0", type_name: "point3f",
-                value: "(" + station.x.to_string() + ", "
-                    + station.y.to_string() + ", " + station.z.to_string() + ")"}});
-            ops.push(#{SetAttribute: #{edit_target: edit_target,
-                path: joint_path, name: "physics:localPos1", type_name: "point3f",
-                value: "(0.0, 0.0, 0.0)"}});
-            // Seat the oriented leg in matching joint frames. World travel
-            // remains +Y; only the source-owned yaw changes between corners.
-            let seated=quat_from_euler_xyz_deg(vec3(0.0,geometry.rotations_y_deg[index],0.0));
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:joint_path,
-                name:"physics:localRot0",type_name:"quatf",
-                value:"("+seated.w.to_string()+", "+seated.x.to_string()+", "+seated.y.to_string()+", "+seated.z.to_string()+")"}});
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:joint_path,
-                name:"physics:localRot1",type_name:"quatf",value:"(1.0, 0.0, 0.0, 0.0)"}});
-
             for attribute in [
                 #{name: "physics:lowerLimit", value: geometry.spring_lower_limit_m},
                 #{name: "physics:upperLimit", value: geometry.spring_upper_limit_m},
@@ -1858,6 +1833,9 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
             path: collider_path, name: "lunco:collider:geometrySource",
             targets: [source_path]}});
     }
+    let linkage=articulated_landing_gear_plan(doc,edit_target,root);
+    if !linkage.ok {return linkage;}
+    for op in linkage.ops {ops.push(op);}
     #{ok: true, kind: "griffin_physical_landing_leg_pads", root: root,
       radius_m: geometry.radius_m, height_m: geometry.height_m,
       center_y_m: geometry.center_y_m, tolerance_m: geometry.tolerance_m,
@@ -2060,15 +2038,15 @@ fn physical_landing_leg_pad_observation(doc, root) {
                 detail: leg_path + ": batched composed pad paths do not match their requested order"};
         }
         let mount_arm = assembly_builder::composed_query(doc,
-            #{path: visual_root + "/BodyMountArm", children: false,
+            #{path: root + "/Leg" + suffixes[index] + "_BusMount/BodyMountArm", children: false,
               geometry_bounds: true});
         let mount_axle = assembly_builder::composed_query(doc,
-            #{path: visual_root + "/MountAxle", children: false,
+            #{path: root + "/Leg" + suffixes[index] + "_BusMount/MountAxle", children: false,
               geometry_bounds: true});
         let leg_pose = assembly_builder::composed_query(doc, #{path: leg_path,
             children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ", "physxRigidBody:enableCCD"],
             rels: ["physics:filteredPairs"], schemas: true});
-        let joint_path = root + "/Leg" + suffixes[index] + "_Spring";
+        let joint_path = root + "/Leg" + suffixes[index] + "_BraceHinge";
         let joint = assembly_builder::composed_query(doc, #{path: joint_path,
             children: false, attrs: ["physics:localPos0", "physics:localPos1"],
             rels: ["physics:body0", "physics:body1"]});
@@ -2140,11 +2118,15 @@ fn physical_landing_leg_pad_observation(doc, root) {
         let joint_targets = if joint.relationships == () { () } else { joint.relationships };
         let body0_targets = if joint_targets == () { () } else { joint_targets["physics:body0"] };
         let body1_targets = if joint_targets == () { () } else { joint_targets["physics:body1"] };
-        let expected_joint_anchor = [expected_station.x, expected_station.y, expected_station.z];
+        let source_model=sysml_requirements::model();
+        let upper=source_model.value("GriffinLandingLegRequirements::GriffinLandingLegAssembly::memberUpperAnchors");
+        let pivot=vec3((upper[1].x+upper[2].x)/2.0,(upper[1].y+upper[2].y)/2.0,(upper[1].z+upper[2].z)/2.0);
+        let expected_pin=expected_station+qrot(quat_from_euler_xyz_deg(vec3(0.0,geometry.rotations_y_deg[index],0.0)),pivot);
+        let expected_joint_anchor = vec3_array(expected_pin);
         let joint_anchor = if joint.attrs == () { () } else { joint.attrs["physics:localPos0"] };
         let joint_other_anchor = if joint.attrs == () { () } else { joint.attrs["physics:localPos1"] };
         let joint_anchor_error = physical_vector_deviation(joint_anchor, expected_joint_anchor);
-        let joint_other_anchor_error = physical_vector_deviation(joint_other_anchor, [0.0, 0.0, 0.0]);
+        let joint_other_anchor_error = physical_vector_deviation(joint_other_anchor, vec3_array(pivot));
         if body0_targets == () || body0_targets.len() != 1 || body0_targets[0] != root
             || body1_targets == () || body1_targets.len() != 1 || body1_targets[0] != leg_path
             || joint_anchor == () || joint_other_anchor == ()
@@ -6126,4 +6108,117 @@ fn griffin_medium_gain_plan(doc, edit_target, root) {
         for op in p.ops {ops.push(op);}
     }
     #{ok:true,ops:ops,path:parent,mount:origin}
+}
+
+// The two skirt braces form one rigid V member. Its skirt pin, telescopic
+// primary shock and foot pin close one planar linkage; only the piston slides.
+fn articulated_landing_gear_plan(doc, edit_target, root) {
+    let model = sysml_requirements::model();
+    let prefix = "GriffinLandingLegRequirements::GriffinLandingLegAssembly::";
+    let anchors = model.value(prefix+"memberUpperAnchors");
+    let foot = model.value(prefix+"memberLowerAnchor");
+    let stations = griffin_spec::component_leg_stations();
+    let yaws = griffin_spec::component_leg_station_rotation_y_deg();
+    let g = physical_landing_leg_pad_geometry();
+    if !g.ok || !array_is(anchors) || anchors.len()!=3 || !vec3_is_native(foot)
+        || stations.len()!=4 || yaws.len()!=4 {return plan_error("articulated leg source incomplete");}
+    let pivot = vec3((anchors[1].x+anchors[2].x)/2.0, (anchors[1].y+anchors[2].y)/2.0, (anchors[1].z+anchors[2].z)/2.0);
+    let shock = anchors[0]-foot;
+    let length = vlen(shock);
+    let tilt = atan(-shock.x/shock.y)*180.0/acos(-1.0);
+    let radius = f64_from(model.value(prefix+"shockPistonRadiusM"));
+    let barrel_mass = f64_from(model.value(prefix+"shockBarrelMassKg"));
+    let piston_mass = f64_from(model.value(prefix+"shockPistonMassKg"));
+    let foot_mass = f64_from(model.value(prefix+"braceFootMassKg"));
+    let barrel_fraction = f64_from(model.value(prefix+"shockBarrelLengthFraction"));
+    let piston_fraction = f64_from(model.value(prefix+"shockPistonLengthFraction"));
+    let radius_fraction = f64_from(model.value(prefix+"shockPistonRadiusFraction"));
+    let travel = f64_from(model.value(prefix+"hingeTravelDeg"));
+    if radius==() || barrel_mass==() || piston_mass==() || foot_mass==()
+        || barrel_fraction==() || piston_fraction==() || radius_fraction==()
+        || travel==() || length<=0.0 || shock.y<=0.0 || abs(shock.z)>g.tolerance_m
+        || radius<=0.0 || barrel_mass<=0.0 || piston_mass<=0.0 || foot_mass<=0.0 {
+        return plan_error("shock geometry/mass or planar linkage source invalid");
+    }
+    let ids = ["PX","NX","PZ","NZ"];
+    let ops = [];
+    for i in 0..4 {
+        let name = "Leg"+ids[i]; let leg=root+"/"+name;
+        let qleg=quat_from_euler_xyz_deg(vec3(0.0,yaws[i],0.0));
+        let qtilt=quat_from_euler_xyz_deg(vec3(0.0,0.0,tilt));
+        let qshock=qleg*qtilt;
+        let a=stations[i]+qrot(qleg,anchors[0]);
+        let b=stations[i]+qrot(qleg,pivot);
+        let c=stations[i]+qrot(qleg,foot);
+        let barrel=root+"/"+name+"_ShockBarrel";
+        let piston=root+"/"+name+"_ShockPiston";
+        for body in [#{name:name+"_ShockBarrel",path:barrel,position:a,mass:barrel_mass,
+                center:-length*barrel_fraction/2.0,h:length*barrel_fraction,r:radius},
+            #{name:name+"_ShockPiston",path:piston,position:c,mass:piston_mass,
+                center:length*piston_fraction/2.0,h:length*piston_fraction,r:radius*radius_fraction}] {
+            if !query_ok(assembly_builder::composed_query(doc,#{path:body.path,children:false})) {
+                ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:body.name,type_name:"Xform",reference:(),reference_prim_path:""}});
+            }
+            ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:body.path,schemas:["PhysicsRigidBodyAPI","PhysicsMassAPI"]}});
+            ops.push(#{SetTranslate:#{edit_target:edit_target,path:body.path,value:vec3_array(body.position)}});
+            let lateral=body.mass*(3.0*body.r*body.r+body.h*body.h)/12.0;
+            let params=assembly_builder::parameter_plan(edit_target,body.path,[
+                #{name:"xformOp:orient",type_name:"quatd",value:assembly_edit::quat4_literal([qshock.w,qshock.x,qshock.y,qshock.z])},
+                #{name:"xformOpOrder",type_name:"token[]",value:"[\"xformOp:translate\",\"xformOp:orient\"]"},
+                #{name:"physics:mass",type_name:"float",value:body.mass.to_string()},
+                #{name:"physics:centerOfMass",type_name:"point3f",value:assembly_edit::tuple3_literal([0.0,body.center,0.0])},
+                #{name:"physics:diagonalInertia",type_name:"float3",value:assembly_edit::tuple3_literal([lateral,body.mass*body.r*body.r/2.0,lateral])}
+            ]);
+            if !params.ok {return params;} for op in params.ops {ops.push(op);}
+            let tube_path=body.path+"/Tube";
+            let tube = if query_ok(assembly_builder::composed_query(doc,#{path:tube_path,children:false})) {
+                _component_cylinder_visual_ops(doc,edit_target,body.path,"Tube",[0.0,body.center,0.0],[0.0,0.0,0.0],body.r,body.h,"Y",[0.62,0.65,0.69])
+            } else {
+                assembly_builder::cylinder_shape_plan_axis(edit_target,body.path,"Tube",body.r,body.h,[0.0,body.center,0.0],[0.0,0.0,0.0],(),"Y",false)
+            };
+            if !tube.ok {return tube;} for op in tube.ops {ops.push(op);}
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:tube_path,name:"visibility",type_name:"token",value:"\"inherited\""}});
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:tube_path,name:"primvars:displayColor",type_name:"color3f[]",value:"[(0.62,0.65,0.69)]"}});
+        }
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:leg,name:"physics:mass",type_name:"float",value:foot_mass.to_string()}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:leg,name:"physics:centerOfMass",type_name:"float3",value:assembly_edit::tuple3_literal(vec3_array(foot))}});
+        // The standard pin frames coincide at both fixed skirt anchors because
+        // their midpoint and the shared tangent axis define the V-brace hinge.
+        for hinge in [
+            #{name:name+"_BraceHinge",body0:root,body1:leg,p0:b,p1:pivot,q0:qleg,q1:quat(0.0,0.0,0.0,1.0)},
+            #{name:name+"_ShockUpperPin",body0:root,body1:barrel,p0:a,p1:vec3(0.0,0.0,0.0),q0:qshock,q1:quat(0.0,0.0,0.0,1.0)},
+            #{name:name+"_ShockLowerPin",body0:piston,body1:leg,p0:vec3(0.0,0.0,0.0),p1:foot,q0:quat(0.0,0.0,0.0,1.0),q1:qtilt}
+        ] {
+            let pin=assembly_builder::hinge_plan(edit_target,root,hinge.name,hinge.body0,hinge.body1,"Z",
+                vec3_array(hinge.p0),vec3_array(hinge.p1),[hinge.q0.w,hinge.q0.x,hinge.q0.y,hinge.q0.z],
+                [hinge.q1.w,hinge.q1.x,hinge.q1.y,hinge.q1.z],-travel,travel,false);
+            if !pin.ok {return pin;} for op in pin.ops {ops.push(op);}
+        }
+        let spring=leg+"_Spring";
+        ops.push(#{SetRelationship:#{edit_target:edit_target,path:spring,name:"physics:body0",targets:[barrel]}});
+        ops.push(#{SetRelationship:#{edit_target:edit_target,path:spring,name:"physics:body1",targets:[piston]}});
+        let parameters=assembly_builder::parameter_plan(edit_target,spring,[
+            #{name:"physics:localPos0",type_name:"point3f",value:assembly_edit::tuple3_literal([0.0,-length,0.0])},
+            #{name:"physics:localPos1",type_name:"point3f",value:"(0.0,0.0,0.0)"},
+            #{name:"physics:localRot0",type_name:"quatf",value:"(0.0,1.0,0.0,0.0)"},
+            #{name:"physics:localRot1",type_name:"quatf",value:"(0.0,1.0,0.0,0.0)"},
+            #{name:"drive:linear:physics:targetPosition",type_name:"float",value:"0.0"}
+        ]);
+        if !parameters.ok {return parameters;} for op in parameters.ops {ops.push(op);}
+        let mount=root+"/"+name+"_BusMount";
+        if !query_ok(assembly_builder::composed_query(doc,#{path:mount,children:false})) {
+            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:name+"_BusMount",type_name:"Xform",
+                reference:"twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda",reference_prim_path:"/LandingLeg"}});
+        }
+        let place=assembly_builder::place_plan(edit_target,mount,vec3_array(stations[i]),[0.0,yaws[i],0.0],());
+        if !place.ok {return place;} for op in place.ops {ops.push(op);}
+        for part in ["BodyMountArm","MountAxle","MountClevisOuter","MountClevisInner"] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:leg+"/LandingLegVisual/"+part,name:"visibility",type_name:"token",value:"\"invisible\""}});
+        }
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:leg+"/LandingLegVisual/ShockPiston",name:"visibility",type_name:"token",value:"\"invisible\""}});
+        for part in ["ShockPiston","StrutOuter","StrutInner","FootPad","FootPadPlate"] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:mount+"/"+part,name:"visibility",type_name:"token",value:"\"invisible\""}});
+        }
+    }
+    #{ok:true,ops:ops,shock_neutral_length_m:length,joint_count:16,body_count:12}
 }

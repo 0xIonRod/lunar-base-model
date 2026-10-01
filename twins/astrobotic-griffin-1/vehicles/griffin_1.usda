@@ -2390,20 +2390,20 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsDriveAPI:linear"
     )
     {
-        rel physics:body0 = </Griffin1>
-        rel physics:body1 = </Griffin1/LegPX>
+        custom rel physics:body0 = </Griffin1/LegPX_ShockBarrel>
+        custom rel physics:body1 = </Griffin1/LegPX_ShockPiston>
         uniform token physics:axis = "Y"
-        quatf physics:localRot0 = (0.9238795042037964, 0.0, -0.3826834261417389, 0.0)
-        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
-        float physics:lowerLimit = -0.800000011920929
-        float physics:upperLimit = 0.0
+        quatf physics:localRot0 = (0.0, 1.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
+        float physics:lowerLimit = -0.15000000596046448
+        float physics:upperLimit = 0.019999999552965164
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = -0.4300000071525574
+        float drive:linear:physics:targetPosition = 0.0
         float drive:linear:physics:targetVelocity = 0.0
-        float drive:linear:physics:stiffness = 4000.0
-        float drive:linear:physics:damping = 800.0
+        float drive:linear:physics:stiffness = 40000.0
+        float drive:linear:physics:damping = 8000.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (1.899999976158142, 0.8999999761581421, 1.899999976158142)
+        point3f physics:localPos0 = (0.0, -1.4264168739318848, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2411,20 +2411,20 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsDriveAPI:linear"
     )
     {
-        rel physics:body0 = </Griffin1>
-        rel physics:body1 = </Griffin1/LegNX>
+        custom rel physics:body0 = </Griffin1/LegNX_ShockBarrel>
+        custom rel physics:body1 = </Griffin1/LegNX_ShockPiston>
         uniform token physics:axis = "Y"
-        quatf physics:localRot0 = (0.3826834261417389, 0.0, 0.9238795042037964, 0.0)
-        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
-        float physics:lowerLimit = -0.800000011920929
-        float physics:upperLimit = 0.0
+        quatf physics:localRot0 = (0.0, 1.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
+        float physics:lowerLimit = -0.15000000596046448
+        float physics:upperLimit = 0.019999999552965164
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = -0.4300000071525574
+        float drive:linear:physics:targetPosition = 0.0
         float drive:linear:physics:targetVelocity = 0.0
-        float drive:linear:physics:stiffness = 4000.0
-        float drive:linear:physics:damping = 800.0
+        float drive:linear:physics:stiffness = 40000.0
+        float drive:linear:physics:damping = 8000.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (-1.899999976158142, 0.8999999761581421, -1.899999976158142)
+        point3f physics:localPos0 = (0.0, -1.4264168739318848, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2432,20 +2432,20 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsDriveAPI:linear"
     )
     {
-        rel physics:body0 = </Griffin1>
-        rel physics:body1 = </Griffin1/LegPZ>
+        custom rel physics:body0 = </Griffin1/LegPZ_ShockBarrel>
+        custom rel physics:body1 = </Griffin1/LegPZ_ShockPiston>
         uniform token physics:axis = "Y"
-        quatf physics:localRot0 = (0.3826834261417389, 0.0, -0.9238795042037964, 0.0)
-        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
-        float physics:lowerLimit = -0.800000011920929
-        float physics:upperLimit = 0.0
+        quatf physics:localRot0 = (0.0, 1.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
+        float physics:lowerLimit = -0.15000000596046448
+        float physics:upperLimit = 0.019999999552965164
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = -0.4300000071525574
+        float drive:linear:physics:targetPosition = 0.0
         float drive:linear:physics:targetVelocity = 0.0
-        float drive:linear:physics:stiffness = 4000.0
-        float drive:linear:physics:damping = 800.0
+        float drive:linear:physics:stiffness = 40000.0
+        float drive:linear:physics:damping = 8000.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (-1.899999976158142, 0.8999999761581421, 1.899999976158142)
+        point3f physics:localPos0 = (0.0, -1.4264168739318848, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2453,20 +2453,20 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsDriveAPI:linear"
     )
     {
-        rel physics:body0 = </Griffin1>
-        rel physics:body1 = </Griffin1/LegNZ>
+        custom rel physics:body0 = </Griffin1/LegNZ_ShockBarrel>
+        custom rel physics:body1 = </Griffin1/LegNZ_ShockPiston>
         uniform token physics:axis = "Y"
-        quatf physics:localRot0 = (0.9238795042037964, 0.0, 0.3826834261417389, 0.0)
-        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
-        float physics:lowerLimit = -0.800000011920929
-        float physics:upperLimit = 0.0
+        quatf physics:localRot0 = (0.0, 1.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
+        float physics:lowerLimit = -0.15000000596046448
+        float physics:upperLimit = 0.019999999552965164
         uniform token drive:linear:physics:type = "force"
-        float drive:linear:physics:targetPosition = -0.4300000071525574
+        float drive:linear:physics:targetPosition = 0.0
         float drive:linear:physics:targetVelocity = 0.0
-        float drive:linear:physics:stiffness = 4000.0
-        float drive:linear:physics:damping = 800.0
+        float drive:linear:physics:stiffness = 40000.0
+        float drive:linear:physics:damping = 8000.0
         float drive:linear:physics:maxForce = 12000.0
-        point3f physics:localPos0 = (1.899999976158142, 0.8999999761581421, -1.899999976158142)
+        point3f physics:localPos0 = (0.0, -1.4264168739318848, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         bool physics:collisionEnabled = false
     }
@@ -2531,9 +2531,11 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, -45.0, 0.0)
         custom rel physics:filteredPairs = None
-        float physics:mass = 180.0
+        float physics:mass = 160.0
         float outputs:contact_force = 0.0
         float outputs:contact = 0.0
+        bool physxRigidBody:enableCCD = true
+        float3 physics:centerOfMass = (0.0, -1.2599999904632568, 0.0)
         def "FootPad" (
             active = false
         )
@@ -2574,7 +2576,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -0.89, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.32, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -2587,6 +2589,26 @@ def Xform "Griffin1" (
                 token visibility = "invisible"
                 custom rel lunco:collider:geometrySource = </Griffin1/LegPX/LandingLegVisual/FootPad>
             }
+            def "BodyMountArm"
+            {
+                token visibility = "invisible"
+            }
+            def "MountAxle"
+            {
+                token visibility = "invisible"
+            }
+            def "MountClevisOuter"
+            {
+                token visibility = "invisible"
+            }
+            def "MountClevisInner"
+            {
+                token visibility = "invisible"
+            }
+            def "ShockPiston"
+            {
+                token visibility = "invisible"
+            }
         }
     }
     def Xform "LegNX" (
@@ -2598,9 +2620,11 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 135.0, 0.0)
         custom rel physics:filteredPairs = None
-        float physics:mass = 180.0
+        float physics:mass = 160.0
         float outputs:contact_force = 0.0
         float outputs:contact = 0.0
+        bool physxRigidBody:enableCCD = true
+        float3 physics:centerOfMass = (0.0, -1.2599999904632568, 0.0)
         def "FootPad" (
             active = false
         )
@@ -2641,7 +2665,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -0.89, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.32, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -2654,6 +2678,26 @@ def Xform "Griffin1" (
                 token visibility = "invisible"
                 custom rel lunco:collider:geometrySource = </Griffin1/LegNX/LandingLegVisual/FootPad>
             }
+            def "BodyMountArm"
+            {
+                token visibility = "invisible"
+            }
+            def "MountAxle"
+            {
+                token visibility = "invisible"
+            }
+            def "MountClevisOuter"
+            {
+                token visibility = "invisible"
+            }
+            def "MountClevisInner"
+            {
+                token visibility = "invisible"
+            }
+            def "ShockPiston"
+            {
+                token visibility = "invisible"
+            }
         }
     }
     def Xform "LegPZ" (
@@ -2665,9 +2709,11 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, -135.0, 0.0)
         custom rel physics:filteredPairs = None
-        float physics:mass = 180.0
+        float physics:mass = 160.0
         float outputs:contact_force = 0.0
         float outputs:contact = 0.0
+        bool physxRigidBody:enableCCD = true
+        float3 physics:centerOfMass = (0.0, -1.2599999904632568, 0.0)
         def "FootPad" (
             active = false
         )
@@ -2708,7 +2754,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -0.89, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.32, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -2721,6 +2767,26 @@ def Xform "Griffin1" (
                 token visibility = "invisible"
                 custom rel lunco:collider:geometrySource = </Griffin1/LegPZ/LandingLegVisual/FootPad>
             }
+            def "BodyMountArm"
+            {
+                token visibility = "invisible"
+            }
+            def "MountAxle"
+            {
+                token visibility = "invisible"
+            }
+            def "MountClevisOuter"
+            {
+                token visibility = "invisible"
+            }
+            def "MountClevisInner"
+            {
+                token visibility = "invisible"
+            }
+            def "ShockPiston"
+            {
+                token visibility = "invisible"
+            }
         }
     }
     def Xform "LegNZ" (
@@ -2732,9 +2798,11 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
         custom rel physics:filteredPairs = None
-        float physics:mass = 180.0
+        float physics:mass = 160.0
         float outputs:contact_force = 0.0
         float outputs:contact = 0.0
+        bool physxRigidBody:enableCCD = true
+        float3 physics:centerOfMass = (0.0, -1.2599999904632568, 0.0)
         def "FootPad" (
             active = false
         )
@@ -2775,7 +2843,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = "PhysicsCollisionAPI"
             )
             {
-                custom double3 xformOp:translate = (0.0, -0.89, 0.0)
+                custom double3 xformOp:translate = (0.0, -1.32, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -2787,6 +2855,26 @@ def Xform "Griffin1" (
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
                 custom rel lunco:collider:geometrySource = </Griffin1/LegNZ/LandingLegVisual/FootPad>
+            }
+            def "BodyMountArm"
+            {
+                token visibility = "invisible"
+            }
+            def "MountAxle"
+            {
+                token visibility = "invisible"
+            }
+            def "MountClevisOuter"
+            {
+                token visibility = "invisible"
+            }
+            def "MountClevisInner"
+            {
+                token visibility = "invisible"
+            }
+            def "ShockPiston"
+            {
+                token visibility = "invisible"
             }
         }
     }
@@ -4218,5 +4306,481 @@ def Xform "Griffin1" (
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
         bool physics:collisionEnabled = false
+    }
+    def Xform "LegPX_ShockBarrel" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (1.4272077938642145, 0.9, 1.4272077938642143)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        quatd xformOp:orient = (0.8965279459953308, -0.09242725372314453, -0.37135401368141174, 0.22313912212848663)
+        float physics:mass = 10.0
+        point3f physics:centerOfMass = (0.0, -0.5135100483894348, 0.0)
+        float3 physics:diagonalInertia = (0.88797527551651, 0.017999999225139618, 0.88797527551651)
+        def Cylinder "Tube" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token axis = "Y"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+            double radius = 0.06
+            double height = 1.027020109387089
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def Xform "LegPX_ShockPiston" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (1.9, -0.36, 1.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        quatd xformOp:orient = (0.8965279459953308, -0.09242725372314453, -0.37135401368141174, 0.22313912212848663)
+        float physics:mass = 10.0
+        point3f physics:centerOfMass = (0.0, 0.4635854661464691, 0.0)
+        float3 physics:diagonalInertia = (0.7207816243171692, 0.008820000104606152, 0.7207816243171692)
+        def Cylinder "Tube" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token axis = "Y"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+            double radius = 0.041999999999999996
+            double height = 0.9271709320855664
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def PhysicsRevoluteJoint "LegPX_BraceHinge"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/LegPX>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (1.1200000047683716, 1.0, 1.1200000047683716)
+        point3f physics:localPos1 = (-1.1030865907669067, 0.10000000149011612, 0.0)
+        quatf physics:localRot0 = (0.9238795042037964, 0.0, -0.3826834261417389, 0.0)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "LegPX_ShockUpperPin"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/LegPX_ShockBarrel>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (1.4272078275680542, 0.8999999761581421, 1.4272078275680542)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.8965279459953308, -0.09242725372314453, -0.37135401368141174, 0.22313912212848663)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "LegPX_ShockLowerPin"
+    {
+        custom rel physics:body0 = </Griffin1/LegPX_ShockPiston>
+        custom rel physics:body1 = </Griffin1/LegPX>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (0.0, 0.0, 0.0)
+        point3f physics:localPos1 = (0.0, -1.2599999904632568, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.9703948497772217, 0.0, 0.0, 0.24152405560016632)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def Xform "LegPX_BusMount" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+    )
+    {
+        custom double3 xformOp:translate = (1.9, 0.9, 1.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, -45.0, 0.0)
+        def "ShockPiston"
+        {
+            token visibility = "invisible"
+        }
+        def "StrutOuter"
+        {
+            token visibility = "invisible"
+        }
+        def "StrutInner"
+        {
+            token visibility = "invisible"
+        }
+        def "FootPad"
+        {
+            token visibility = "invisible"
+        }
+        def "FootPadPlate"
+        {
+            token visibility = "invisible"
+        }
+    }
+    def Xform "LegNX_ShockBarrel" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-1.4272077938642145, 0.9, -1.4272077938642143)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        quatd xformOp:orient = (0.37135401368141174, 0.22313912212848663, 0.8965279459953308, 0.09242725372314453)
+        float physics:mass = 10.0
+        point3f physics:centerOfMass = (0.0, -0.5135100483894348, 0.0)
+        float3 physics:diagonalInertia = (0.88797527551651, 0.017999999225139618, 0.88797527551651)
+        def Cylinder "Tube" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token axis = "Y"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+            double radius = 0.06
+            double height = 1.027020109387089
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def Xform "LegNX_ShockPiston" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-1.9, -0.35999999999999976, -1.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        quatd xformOp:orient = (0.37135401368141174, 0.22313912212848663, 0.8965279459953308, 0.09242725372314453)
+        float physics:mass = 10.0
+        point3f physics:centerOfMass = (0.0, 0.4635854661464691, 0.0)
+        float3 physics:diagonalInertia = (0.7207816243171692, 0.008820000104606152, 0.7207816243171692)
+        def Cylinder "Tube" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token axis = "Y"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+            double radius = 0.041999999999999996
+            double height = 0.9271709320855664
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def PhysicsRevoluteJoint "LegNX_BraceHinge"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/LegNX>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (-1.1200000047683716, 1.0, -1.1200000047683716)
+        point3f physics:localPos1 = (-1.1030865907669067, 0.10000000149011612, 0.0)
+        quatf physics:localRot0 = (0.3826834261417389, 0.0, 0.9238795042037964, 0.0)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "LegNX_ShockUpperPin"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/LegNX_ShockBarrel>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (-1.4272078275680542, 0.8999999761581421, -1.4272078275680542)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.37135401368141174, 0.22313912212848663, 0.8965279459953308, 0.09242725372314453)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "LegNX_ShockLowerPin"
+    {
+        custom rel physics:body0 = </Griffin1/LegNX_ShockPiston>
+        custom rel physics:body1 = </Griffin1/LegNX>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (0.0, 0.0, 0.0)
+        point3f physics:localPos1 = (0.0, -1.2599999904632568, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.9703948497772217, 0.0, 0.0, 0.24152405560016632)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def Xform "LegNX_BusMount" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+    )
+    {
+        custom double3 xformOp:translate = (-1.9, 0.9, -1.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 135.0, 0.0)
+        def "ShockPiston"
+        {
+            token visibility = "invisible"
+        }
+        def "StrutOuter"
+        {
+            token visibility = "invisible"
+        }
+        def "StrutInner"
+        {
+            token visibility = "invisible"
+        }
+        def "FootPad"
+        {
+            token visibility = "invisible"
+        }
+        def "FootPadPlate"
+        {
+            token visibility = "invisible"
+        }
+    }
+    def Xform "LegPZ_ShockBarrel" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-1.4272077938642145, 0.9, 1.4272077938642143)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        quatd xformOp:orient = (0.37135401368141174, -0.22313912212848663, -0.8965279459953308, 0.09242725372314453)
+        float physics:mass = 10.0
+        point3f physics:centerOfMass = (0.0, -0.5135100483894348, 0.0)
+        float3 physics:diagonalInertia = (0.88797527551651, 0.017999999225139618, 0.88797527551651)
+        def Cylinder "Tube" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token axis = "Y"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+            double radius = 0.06
+            double height = 1.027020109387089
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def Xform "LegPZ_ShockPiston" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-1.9, -0.35999999999999976, 1.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        quatd xformOp:orient = (0.37135401368141174, -0.22313912212848663, -0.8965279459953308, 0.09242725372314453)
+        float physics:mass = 10.0
+        point3f physics:centerOfMass = (0.0, 0.4635854661464691, 0.0)
+        float3 physics:diagonalInertia = (0.7207816243171692, 0.008820000104606152, 0.7207816243171692)
+        def Cylinder "Tube" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token axis = "Y"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+            double radius = 0.041999999999999996
+            double height = 0.9271709320855664
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def PhysicsRevoluteJoint "LegPZ_BraceHinge"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/LegPZ>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (-1.1200000047683716, 1.0, 1.1200000047683716)
+        point3f physics:localPos1 = (-1.1030865907669067, 0.10000000149011612, 0.0)
+        quatf physics:localRot0 = (0.3826834261417389, 0.0, -0.9238795042037964, 0.0)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "LegPZ_ShockUpperPin"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/LegPZ_ShockBarrel>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (-1.4272078275680542, 0.8999999761581421, 1.4272078275680542)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.37135401368141174, -0.22313912212848663, -0.8965279459953308, 0.09242725372314453)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "LegPZ_ShockLowerPin"
+    {
+        custom rel physics:body0 = </Griffin1/LegPZ_ShockPiston>
+        custom rel physics:body1 = </Griffin1/LegPZ>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (0.0, 0.0, 0.0)
+        point3f physics:localPos1 = (0.0, -1.2599999904632568, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.9703948497772217, 0.0, 0.0, 0.24152405560016632)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def Xform "LegPZ_BusMount" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+    )
+    {
+        custom double3 xformOp:translate = (-1.9, 0.9, 1.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, -135.0, 0.0)
+        def "ShockPiston"
+        {
+            token visibility = "invisible"
+        }
+        def "StrutOuter"
+        {
+            token visibility = "invisible"
+        }
+        def "StrutInner"
+        {
+            token visibility = "invisible"
+        }
+        def "FootPad"
+        {
+            token visibility = "invisible"
+        }
+        def "FootPadPlate"
+        {
+            token visibility = "invisible"
+        }
+    }
+    def Xform "LegNZ_ShockBarrel" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (1.4272077938642145, 0.9, -1.4272077938642143)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        quatd xformOp:orient = (0.8965279459953308, 0.09242725372314453, 0.37135401368141174, 0.22313912212848663)
+        float physics:mass = 10.0
+        point3f physics:centerOfMass = (0.0, -0.5135100483894348, 0.0)
+        float3 physics:diagonalInertia = (0.88797527551651, 0.017999999225139618, 0.88797527551651)
+        def Cylinder "Tube" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token axis = "Y"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+            double radius = 0.06
+            double height = 1.027020109387089
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def Xform "LegNZ_ShockPiston" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (1.9, -0.36, -1.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+        quatd xformOp:orient = (0.8965279459953308, 0.09242725372314453, 0.37135401368141174, 0.22313912212848663)
+        float physics:mass = 10.0
+        point3f physics:centerOfMass = (0.0, 0.4635854661464691, 0.0)
+        float3 physics:diagonalInertia = (0.7207816243171692, 0.008820000104606152, 0.7207816243171692)
+        def Cylinder "Tube" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token axis = "Y"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+            double radius = 0.041999999999999996
+            double height = 0.9271709320855664
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def PhysicsRevoluteJoint "LegNZ_BraceHinge"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/LegNZ>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (1.1200000047683716, 1.0, -1.1200000047683716)
+        point3f physics:localPos1 = (-1.1030865907669067, 0.10000000149011612, 0.0)
+        quatf physics:localRot0 = (0.9238795042037964, 0.0, 0.3826834261417389, 0.0)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "LegNZ_ShockUpperPin"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/LegNZ_ShockBarrel>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (1.4272078275680542, 0.8999999761581421, -1.4272078275680542)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.8965279459953308, 0.09242725372314453, 0.37135401368141174, 0.22313912212848663)
+        quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsRevoluteJoint "LegNZ_ShockLowerPin"
+    {
+        custom rel physics:body0 = </Griffin1/LegNZ_ShockPiston>
+        custom rel physics:body1 = </Griffin1/LegNZ>
+        uniform token physics:axis = "Z"
+        point3f physics:localPos0 = (0.0, 0.0, 0.0)
+        point3f physics:localPos1 = (0.0, -1.2599999904632568, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.9703948497772217, 0.0, 0.0, 0.24152405560016632)
+        float physics:lowerLimit = -45.0
+        float physics:upperLimit = 45.0
+        bool physics:collisionEnabled = false
+    }
+    def Xform "LegNZ_BusMount" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
+    )
+    {
+        custom double3 xformOp:translate = (1.9, 0.9, -1.9)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
+        def "ShockPiston"
+        {
+            token visibility = "invisible"
+        }
+        def "StrutOuter"
+        {
+            token visibility = "invisible"
+        }
+        def "StrutInner"
+        {
+            token visibility = "invisible"
+        }
+        def "FootPad"
+        {
+            token visibility = "invisible"
+        }
+        def "FootPadPlate"
+        {
+            token visibility = "invisible"
+        }
     }
 }

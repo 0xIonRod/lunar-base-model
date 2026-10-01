@@ -752,3 +752,12 @@ Status: mechanism assembly, panel refinement and revised geometry/physics
 checks remain in progress. The earlier leg test counts and manual ramp-command
 acceptance above do not establish acceptance of these proposed changes or a
 fully settled ramp/egress sequence.
+
+The revised leg assembly is now saved through the typed USD document API.
+The standalone production leg fixture passed at tick 6 with the revised
+topology, nominal joint-frame closure, fixed bus mounts and zero-seated axial
+spring checks (`/tmp/griffin-gear-fixture-2.log`). Maximum measured nominal
+joint separation was approximately 6e-8 m and rotation residual 1.71e-6 degrees.
+The visual-review scene explicitly disables both added shock bodies and uses
+the same nominal leg station as the vehicle. These are assembly checks;
+loaded suspension, impact absorption and powered landing remain unverified.

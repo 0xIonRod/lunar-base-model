@@ -55,7 +55,7 @@ fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
 
 fn _joint_frame_observation(root, name) {
     let body_path = root + "/" + name;
-    let joint_path = root + "/" + name + "_Spring";
+    let joint_path = root + "/" + name + "_BraceHinge";
     let snapshot = query("QueryUsdPrims", #{paths: [body_path, joint_path],
         attrs: ["xformOp:rotateXYZ", "physics:localRot0", "physics:localRot1"]});
     if snapshot == () || snapshot.error != () || snapshot.records == () {
@@ -147,6 +147,38 @@ fn _member_endpoint_errors(record, upper, lower) {
     #{upper:(u.x*u.x+u.y*u.y+u.z*u.z).sqrt(),lower:(l.x*l.x+l.y*l.y+l.z*l.z).sqrt()}
 }
 
+// Read both authored joint frames in the vehicle frame; the bus itself is
+// identity in this frame. This checks closed-linkage seating independently
+// of the construction plan and rejects missing body poses.
+fn _gear_joint_closure(root,joint_path) {
+    let joint=query("QueryUsdPrim",#{path:joint_path,attrs:["physics:localPos0","physics:localPos1","physics:localRot0","physics:localRot1"],rels:["physics:body0","physics:body1"]});
+    if joint==() || joint.ok==false || joint.error!=() {return #{ok:false,joint:joint};}
+    let points=[];let rotations=[];
+    for index in 0..2 {
+        let body=joint.relationships["physics:body"+index.to_string()];
+        if !array_is(body) || body.len()!=1 {return #{ok:false,joint:joint};}
+        let t=vec3(0.0,0.0,0.0);let q=quat(0.0,0.0,0.0,1.0);
+        if body[0]!=root {
+            let pose=query("QueryUsdPrim",#{path:body[0],attrs:["xformOp:translate","xformOp:orient","xformOp:rotateXYZ"]});
+            if pose==() || pose.ok==false || pose.error!=() {return #{ok:false,joint:joint};}
+            let a=pose.attrs;let v=a["xformOp:translate"];let o=a["xformOp:orient"];let e=a["xformOp:rotateXYZ"];
+            if !array_is(v) || v.len()!=3 {return #{ok:false,joint:joint};}
+            t=vec3(v[0],v[1],v[2]);
+            if array_is(o) && o.len()==4 {q=quat(o[1],o[2],o[3],o[0]);}
+            else if array_is(e) && e.len()==3 {q=quat_from_euler_xyz_deg(vec3(e[0],e[1],e[2]));}
+            else {return #{ok:false,joint:joint};}
+        }
+        let v=joint.attrs["physics:localPos"+index.to_string()];
+        let o=joint.attrs["physics:localRot"+index.to_string()];
+        if !array_is(v) || v.len()!=3 || !array_is(o) || o.len()!=4 {return #{ok:false,joint:joint};}
+        points.push(t+qrot(q,vec3(v[0],v[1],v[2])));
+        rotations.push(q*quat(o[1],o[2],o[3],o[0]));
+    }
+    let relative=quat_inverse(rotations[0])*rotations[1];
+    let cosine=min(1.0,abs(relative.w));
+    #{ok:true,joint:joint,position_error_m:vlen(points[0]-points[1]),rotation_error_deg:2.0*acos(cosine)*180.0/PI}
+}
+
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
@@ -175,7 +207,7 @@ fn on_tick(me, ctx) {
     checks.push(sysml_requirement_checks::source_list_count("GLL-005-stations", "landing_leg", "gll005", VERIFICATION, visual("legStations"), count));
     checks.push(sysml_requirement_checks::source_list_count("GLL-009-leg-rotations", "landing_leg", "gll009", VERIFICATION, visual("legStationRotationYDeg"), count));
     for name in names {
-        let pin=root+"/"+name+"/LandingLegVisual/MountAxle";
+        let pin=root+"/"+name+"_BusMount/MountAxle";
         checks.push(#{id:"GLL-009-"+name+"-mount-sleeve-axis",component:"landing_leg",
             requirement:"gll009",verification:VERIFICATION,kind:"attribute",
             path:pin,attr:"axis",expected:usd_axis(sysml_requirements::native_value(source,own("mountAxleAxis")))});
@@ -190,6 +222,7 @@ fn on_tick(me, ctx) {
         let name = names[index];
         let path = root + "/" + name;
         let visual_path = path + "/LandingLegVisual";
+        let mount_path=root+"/"+name+"_BusMount";
         // Reject a primary mount buried at belt mid-height even when its tube
         // closes perfectly to a wrong source anchor. Compare to the bus edge.
         let body=model.value(visual("bodyDimensions"));
@@ -198,7 +231,7 @@ fn on_tick(me, ctx) {
         let expected_mount_y=bus_mount.y-body.y/2.0-stations[index].y-sleeve_radius;
         checks.push(#{id:"GLL-009-"+name+"-under-body-edge",component:"landing_leg",
             requirement:"gll009",verification:VERIFICATION,kind:"attribute_component",
-            path:visual_path+"/MountAxle",attr:"xformOp:translate",index:1,
+            path:mount_path+"/MountAxle",attr:"xformOp:translate",index:1,
             expected:expected_mount_y,tolerance:f64_from(model.value(own("memberEndpointToleranceM")))});
 
         // Compare the mount to the actual octagon datum independently of the
@@ -210,16 +243,16 @@ fn on_tick(me, ctx) {
         let expected_mount_x=sqrt(cx*cx+cz*cz)-station_radius;
         checks.push(#{id:"GLL-009-"+name+"-chamfer-mount",component:"landing_leg",
             requirement:"gll009",verification:VERIFICATION,kind:"attribute_component",
-            path:visual_path+"/MountAxle",attr:"xformOp:translate",index:0,
+            path:mount_path+"/MountAxle",attr:"xformOp:translate",index:0,
             expected:expected_mount_x,tolerance:f64_from(model.value(own("memberEndpointToleranceM")))});
         if rotations_y.len() == names.len() {
             let joint_path = root + "/" + name + "_Spring";
             checks.push(sysml_requirement_checks::exists("GLL-009-" + name + "-spring-joint",
                 "landing_leg", "gll009", VERIFICATION, joint_path, "PhysicsPrismaticJoint"));
             checks.push(joint_relationship("GLL-009-" + name + "-spring-body0",
-                joint_path, "physics:body0", root));
+                joint_path, "physics:body0", path+"_ShockBarrel"));
             checks.push(joint_relationship("GLL-009-" + name + "-spring-body1",
-                joint_path, "physics:body1", path));
+                joint_path, "physics:body1", path+"_ShockPiston"));
             checks.push(#{id: "GLL-009-" + name + "-spring-axis", component: "landing_leg",
                 requirement: "gll009", verification: VERIFICATION, kind: "attribute_equals",
                 path: joint_path, attr: "physics:axis", expected: "Y"});
@@ -238,16 +271,47 @@ fn on_tick(me, ctx) {
                 "GLL-009-" + name + "-spring-frame", "landing_leg", "gll009",
                 VERIFICATION, SPRING_FRAME_CONSTRAINT, inputs, "typed", 0.0));
         }
+        for link in [
+            #{suffix:"_BraceHinge",type_name:"PhysicsRevoluteJoint",body0:root,body1:path},
+            #{suffix:"_ShockUpperPin",type_name:"PhysicsRevoluteJoint",body0:root,body1:path+"_ShockBarrel"},
+            #{suffix:"_Spring",type_name:"PhysicsPrismaticJoint",body0:path+"_ShockBarrel",body1:path+"_ShockPiston"},
+            #{suffix:"_ShockLowerPin",type_name:"PhysicsRevoluteJoint",body0:path+"_ShockPiston",body1:path}
+        ] {
+            let jp=path+link.suffix;
+            checks.push(sysml_requirement_checks::exists("gear-joint-"+name+link.suffix,"landing_leg","gll009",VERIFICATION,jp,link.type_name));
+            checks.push(joint_relationship("gear-body0-"+name+link.suffix,jp,"physics:body0",link.body0));
+            checks.push(joint_relationship("gear-body1-"+name+link.suffix,jp,"physics:body1",link.body1));
+            let closure=_gear_joint_closure(root,jp);
+            let inputs=sysml_requirements::required_constraint_input_observations(model,leg_requirement,PACKAGE+"::GLLC006_MemberClosure",[
+                ["measuredUpperEndpointErrorM",_usd_value(if closure.ok {closure.position_error_m} else {()},closure.joint)],
+                ["measuredLowerEndpointErrorM",_usd_value(if closure.ok {closure.position_error_m} else {()},closure.joint)],
+                ["toleranceM",_source_value(model.value(own("memberEndpointToleranceM")),source)]
+            ]);
+            checks.push(sysml_requirements::required_constraint_check("gear-closure-"+name+link.suffix,"landing_leg","gll009",VERIFICATION,PACKAGE+"::GLLC006_MemberClosure",inputs,"typed",0.0));
+            let rot_inputs=sysml_requirements::required_constraint_input_observations(model,leg_requirement,SPRING_FRAME_CONSTRAINT,[
+                ["seatingErrorDeg",_usd_value(if closure.ok {closure.rotation_error_deg} else {()},closure.joint)],
+                ["toleranceDeg",_source_value(frame_tolerance,source)]
+            ]);
+            checks.push(sysml_requirements::required_constraint_check("gear-frame-"+name+link.suffix,"landing_leg","gll009",VERIFICATION,SPRING_FRAME_CONSTRAINT,rot_inputs,"typed",0.0));
+        }
+        for member in ["_ShockBarrel","_ShockPiston"] {
+            checks.push(sysml_requirement_checks::exists("shock-tube-"+name+member,"landing_leg","gll007",VERIFICATION,path+member+"/Tube","Cylinder"));
+            checks.push(sysml_requirement_checks::attribute_equals("shock-visible-"+name+member,"landing_leg","gll007",VERIFICATION,path+member+"/Tube","visibility","inherited"));
+        }
         checks.push(sysml_requirement_checks::exists("GLL-001-" + name, "landing_leg", "gll001", VERIFICATION, path, "Xform"));
         let required_children = [];
-        for part_name in part_names { required_children.push(visual_path + "/" + part_name); }
+        for part_name in part_names {
+            let fixed=part_name=="BodyMountArm" || part_name=="MountAxle" || part_name=="MountClevisOuter" || part_name=="MountClevisInner";
+            if !fixed && part_name!="ShockPiston" {required_children.push(visual_path+"/"+part_name);}
+            if fixed {checks.push(sysml_requirement_checks::exists("fixed-mount-"+name+part_name,"landing_leg","gll002",VERIFICATION,mount_path+"/"+part_name,()));}
+        }
         checks.push(sysml_requirement_checks::children("GLL-002-" + name, "landing_leg", "gll002", VERIFICATION, visual_path, required_children));
         let members=model.value(own("loadMembers"));
         let anchors=model.value(own("memberUpperAnchors"));
         let lower=model.value(own("memberLowerAnchor"));
         let tolerance=model.value(own("memberEndpointToleranceM"));
         if members.len()!=3 || anchors.len()!=3 {throw("landing leg load paths incomplete");}
-        for member_index in 0..3 {
+        for member_index in 1..3 {
             let child=members[member_index].literal;
             let member_path=visual_path+"/"+child;
             let req=if member_index==0 {"gll007"} else {"gll006"};

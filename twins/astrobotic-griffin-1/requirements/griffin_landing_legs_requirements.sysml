@@ -44,7 +44,7 @@ package GriffinLandingLegRequirements {
             ("ShockPiston", "StrutOuter", "StrutInner");
         attribute memberUpperAnchors : Position[3] =
             ((-0.668629150101524, 0.0, 0.0), (-1.103086578651014, .10, 0.622253967444162), (-1.103086578651014, .10, -0.622253967444162));
-        attribute memberLowerAnchor : Position = (0.0, -.83, 0.0);
+        attribute memberLowerAnchor : Position = (0.0, -1.26, 0.0);
         // Diameter estimates: 0.12 m main shock and 0.07 m braces. These
         // approximate the slender primary/secondary silhouette, not a flight
         // tube section or wall thickness. Length/center/rotation are derived
@@ -55,18 +55,32 @@ package GriffinLandingLegRequirements {
         attribute memberEndpointToleranceM : Real = .002;
         attribute footPadRadiusM : Real = .35;
         attribute footPadHeightM : Real = .04;
-        // Root moves down .30 m; local foot datums rise .30 m to preserve
-        // vehicle-frame foot bottom -.01 m and the 4.50 m footprint.
-        // Thin the pad rather than moving terrain/contact or the leg station.
-        attribute footPadCenterYM : Real = -.89;
-        // Suspension study values. The spring rest target is derived from the
-        // authored vehicle touchdown datum, leg mount, pad, and site surface;
-        // it is not a second hand-entered pose value.
-        attribute springLowerLimitM : Real = -0.80;
-        attribute springUpperLimitM : Real = 0.00;
-        attribute springStiffnessNPerM : Real = 4000.0;
-        attribute springDampingNsPerM : Real = 800.0;
+        // Remove the legacy -0.43 m whole-leg rest translation by baking that
+        // offset only into the foot/hub nominal datums. Upper anchors stay at
+        // their bus/skirt stations. At body Y=.44 the pad bottom remains Y=0;
+        // the 4.50 m X/Z footprint is unchanged. No ground mesh is moved.
+        attribute footPadCenterYM : Real = -1.32;
+        // Axial suspension study values. The target is zero at the nominal
+        // seated linkage pose; nominal foot height follows the touchdown datum.
+        attribute springLowerLimitM : Real = -0.15;
+        attribute springUpperLimitM : Real = 0.02;
+        attribute springStiffnessNPerM : Real = 40000.0;
+        attribute springDampingNsPerM : Real = 8000.0;
         attribute springMaxForceN : Real = 12000.0;
+        // Replaceable mechanics study, not flight hardware specifications.
+        // 150 mm compression / 20 mm rebound, 40 kN/m axial stiffness and
+        // 8 kNs/m damping give roughly 55 mm static stroke at a 2.2 kN/leg
+        // lunar load before linkage leverage. The previous 0.80 m whole-leg
+        // slider moved the bus anchors; it was not shock absorption geometry.
+        // Existing 180 kg/leg study mass is conserved: 160 kg V-brace/foot,
+        // 10 kg barrel and 10 kg piston. These masses are uncalibrated proxies.
+        attribute braceFootMassKg : Real = 160.0;
+        attribute shockBarrelMassKg : Real = 10.0;
+        attribute shockPistonMassKg : Real = 10.0;
+        attribute shockBarrelLengthFraction : Real = 0.72;
+        attribute shockPistonLengthFraction : Real = 0.65;
+        attribute shockPistonRadiusFraction : Real = 0.70;
+        attribute hingeTravelDeg : Real = 45.0;
         attribute springTargetVelocityMps : Real = 0.00;
         attribute springPoseToleranceM : Real = 0.001;
         // Physical and visual roots use the single shared leg stations and
@@ -99,7 +113,7 @@ package GriffinLandingLegRequirements {
         attribute footPadPlateWidthM : Real = .42;
         attribute footPadPlateHeightM : Real = .04;
         attribute footPadPlateDepthM : Real = .36;
-        attribute footPadPlateCenterYM : Real = -.85;
+        attribute footPadPlateCenterYM : Real = -1.28;
     }
 
     requirement def GLL001_LegCount {
@@ -130,7 +144,7 @@ package GriffinLandingLegRequirements {
     }
     requirement def GLL007_ShockPistonGeometry {
         require GLLC006_MemberClosure;
-        doc /* GLL-007 [geometry] the primary cylindrical shock member connects the outer-frame attachment to the common foot-side hub using the first memberUpperAnchors datum and memberLowerAnchor. Derive length and pose from those endpoints, use shockPistonRadiusM and verify endpoint closure. Exact shock travel and flight joint mechanism are unpublished; the present prismatic dynamics proxy moves the whole visual leg, so moving upper-attachment kinematics remain unqualified. */
+        doc /* GLL-007 [geometry] the primary cylindrical shock member connects the outer-frame attachment to the common foot-side hub using the first memberUpperAnchors datum and memberLowerAnchor. Derive length and pose from those endpoints, use shockPistonRadiusM and verify endpoint closure. Exact shock travel and flight joint mechanism are unpublished. Reconstruct a planar pinned V-brace plus a telescoping primary shock: brace hinge at the midpoint of the two fixed skirt anchors, shock upper pin at the outer-frame anchor, axial prismatic joint between the barrel and piston, and lower pin at the common foot hub. All three pins use the tangential axis; the slider follows the inclined primary member and is zero-seated at the nominal pose, with negative displacement denoting compression. This idealized mechanism is inferred from the three-member load path in https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png and the shock-absorbing function in https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ ; it is not a supplier linkage ICD. */
     }
     constraint def GLLC008_PadColliderMatchesVisual {
         in geometryDeviationM : Real;
@@ -187,12 +201,13 @@ package GriffinLandingLegRequirements {
             and physicalJointStationMatches;
     }
     constraint def GLLC009_SpringFrameAlignment {
-        doc /* At the zero-articulation starting pose, the body rotation implied by each prismatic joint's two local frames shall match its composed leg-body rotation within physicalLegRotationToleranceDeg. */
+        doc /* At the zero-articulation starting pose, the body rotation implied by each brace hinge's two local frames shall match its composed leg-body rotation within physicalLegRotationToleranceDeg. */
         in seatingErrorDeg : Real;
         in toleranceDeg : Real;
         seatingErrorDeg <= toleranceDeg;
     }
     requirement def GLL009_BusMountConnection {
+        require GLLC006_MemberClosure;
         require GLLC009_BusAndAxleOverlap {
             in requiredOverlapM = GriffinLandingLegAssembly::bodyMountOverlapM;
             in measurementToleranceM = GriffinLandingLegAssembly::bodyMountOverlapMeasurementToleranceM;
@@ -200,7 +215,7 @@ package GriffinLandingLegRequirements {
         require GLLC009_SpringFrameAlignment {
             in toleranceDeg = GriffinLandingLegAssembly::physicalLegRotationToleranceDeg;
         }
-        doc /* GLL-009 [mechanical interface] each leg's visible BodyMountArm shall overlap the octagonal PerimeterFrame and its MountAxle by at least bodyMountOverlapM. The physical prismatic suspension joint shall connect the leg rigid body to the lander at the same typed leg station, with local frames that preserve the source-owned leg orientation when initially seated. The sleeve upper edge shall meet the body belt lower edge within the endpoint tolerance, so the primary shock stays below the side panel. A vertical bus-mount bracket connects that sleeve to the lower perimeter ring. Mount geometry is derived from the bus envelope, frame section, leg station, and clevis dimensions; it is not a second placement table. The explicit measurement tolerance covers floating-point bound readback only and does not reduce the physical overlap datum. */
+        doc /* GLL-009 [mechanical interface] each leg's visible BodyMountArm shall overlap the octagonal PerimeterFrame and its MountAxle by at least bodyMountOverlapM. The brace hinge shall connect the V-brace/foot body to the bus at the midpoint of its two skirt anchors. The primary shock upper and lower pins shall remain attached to the bus and foot hub while the axial spring slides only the piston inside the barrel. Mount sleeves, clevises and the bus bracket belong to the bus, not the translating foot or piston. The four joints form one closed planar mechanism per leg; both halves of every joint frame shall coincide at the nominal pose. The sleeve upper edge shall meet the body belt lower edge within the endpoint tolerance, so the primary shock stays below the side panel. A vertical bus-mount bracket connects that sleeve to the lower perimeter ring. Mount geometry is derived from the bus envelope, frame section, leg station, and clevis dimensions; it is not a second placement table. The explicit measurement tolerance covers floating-point bound readback only and does not reduce the physical overlap datum. */
     }
     constraint def GLLC010_SpringRestPoseMatchesTouchdownDatum {
         in vehicleReferenceTouchdownY : Real;
@@ -212,12 +227,14 @@ package GriffinLandingLegRequirements {
         in springLowerLimitY : Real;
         in springUpperLimitY : Real;
         in toleranceM : Real;
-        vehicleReferenceTouchdownY + legMountY + springTargetPositionY
+        vehicleReferenceTouchdownY + legMountY
                 + footPadCenterY - footPadHeightM / 2.0
             >= siteSurfaceY - toleranceM
-            and vehicleReferenceTouchdownY + legMountY + springTargetPositionY
+            and vehicleReferenceTouchdownY + legMountY
                 + footPadCenterY - footPadHeightM / 2.0
             <= siteSurfaceY + toleranceM
+            and springTargetPositionY >= -toleranceM
+            and springTargetPositionY <= toleranceM
             and springTargetPositionY >= springLowerLimitY
             and springTargetPositionY <= springUpperLimitY;
     }
@@ -225,7 +242,7 @@ package GriffinLandingLegRequirements {
         require GLLC010_SpringRestPoseMatchesTouchdownDatum {
             in toleranceM = GriffinLandingLegAssembly::springPoseToleranceM;
         }
-        doc /* GLL-010 [landing interface] the source-owned prismatic spring target places each unloaded foot-pad bottom on the landing surface when the body reference is at its powered-descent touchdown datum. The target is derived from that datum, the shared leg station, and composed foot-pad geometry, and must lie inside the authored joint limits. Spring stiffness, damping, limits, and force capacity are explicit replaceable study assumptions because the supplier leg ICD is unavailable. */
+        doc /* GLL-010 [landing interface] the zero-seated axial shock and nominal leg linkage place each unloaded foot-pad bottom on the landing surface when the body reference is at its powered-descent touchdown datum. The spring target is zero because both shock frames are seated at the nominal foot hub; that nominal pose derives from the touchdown datum, shared leg station and composed pad geometry. Zero must lie inside the axial travel limits. Spring stiffness, damping, limits, and force capacity are explicit replaceable study assumptions because the supplier leg ICD is unavailable. */
     }
 
     requirement <'GLL-001'> gll001 : GLL001_LegCount { subject legs : GriffinLandingLegAssembly; }

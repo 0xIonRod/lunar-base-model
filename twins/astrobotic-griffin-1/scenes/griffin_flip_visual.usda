@@ -70,22 +70,22 @@ def Xform "GriffinFlipVisual" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "LegPX"
         {
-            custom double3 xformOp:translate = (1.9, 0.47, 1.9)
+            custom double3 xformOp:translate = (1.9, 0.9, 1.9)
             bool physics:rigidBodyEnabled = false
         }
         over "LegNX"
         {
-            custom double3 xformOp:translate = (-1.9, 0.47, -1.9)
+            custom double3 xformOp:translate = (-1.9, 0.9, -1.9)
             bool physics:rigidBodyEnabled = false
         }
         over "LegPZ"
         {
-            custom double3 xformOp:translate = (-1.9, 0.47, 1.9)
+            custom double3 xformOp:translate = (-1.9, 0.9, 1.9)
             bool physics:rigidBodyEnabled = false
         }
         over "LegNZ"
         {
-            custom double3 xformOp:translate = (1.9, 0.47, -1.9)
+            custom double3 xformOp:translate = (1.9, 0.9, -1.9)
             bool physics:rigidBodyEnabled = false
         }
         def "EgressRampPort"
@@ -117,6 +117,38 @@ def Xform "GriffinFlipVisual" (
             }
         }
         def "TransitionPlateStarboard"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "LegPX_ShockBarrel"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "LegPX_ShockPiston"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "LegNX_ShockBarrel"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "LegNX_ShockPiston"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "LegPZ_ShockBarrel"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "LegPZ_ShockPiston"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "LegNZ_ShockBarrel"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "LegNZ_ShockPiston"
         {
             bool physics:rigidBodyEnabled = false
         }
