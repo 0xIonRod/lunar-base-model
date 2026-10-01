@@ -294,6 +294,10 @@ package GriffinVisualConfigurationRequirements {
          * The visible frame and its contact proxy must change together. */
         attribute payloadAdapterDimensions : Dimensions = (3.20, .08, 3.20);
         attribute payloadAdapterCenterYM : Real = 2.04;
+        // Presentation focus is the hosted rover interface top, derived from
+        // the same packaging estimate as the adapter; not a supplier datum.
+        // Rhai derives center Y + native Dimensions.y / 2; indexed SysML
+        // initializers are not currently evaluated by the source bridge.
 
         /* Correct the upper leg mount to the lower body edge, per the user's
          * Astrobotic rendering: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/

@@ -320,15 +320,15 @@ fn sysml_contract_report(verification_name) {
         missing.push("physical deck transition joint identity is missing in SysML");
     }
     let route_names = griffin_spec::surface_route_marker_names();
-    let route_speeds = griffin_spec::surface_route_speed_mps();
+    let route_limits = griffin_spec::surface_route_throttle_limits();
     let route_radii = griffin_spec::surface_route_arrival_radius_m();
-    if route_names.len() == 0 || route_speeds.len() != route_names.len()
+    if route_names.len() == 0 || route_limits.len() != route_names.len()
         || route_radii.len() != route_names.len() {
-        missing.push("surface route marker/speed/radius cardinality mismatch in SysML");
+        missing.push("surface route marker/throttle/radius cardinality mismatch in SysML");
     } else {
         for i in 0..route_names.len() {
-            if route_speeds[i] <= 0.0 || route_radii[i] <= 0.0 {
-                missing.push("surface route speed/radius must be positive in SysML");
+            if route_limits[i] <= 0.0 || route_limits[i] > 1.0 || route_radii[i] <= 0.0 {
+                missing.push("surface route throttle must be in (0,1] and radius positive in SysML");
                 break;
             }
         }

@@ -704,7 +704,7 @@ fn surface_route() {
         throw("Griffin surface route preflight failed: " + findings_text);
     }
     let names = griffin_spec::surface_route_marker_names();
-    let speeds = griffin_spec::surface_route_speed_mps();
+    let speeds = griffin_spec::surface_route_throttle_limits();
     let radii = griffin_spec::surface_route_arrival_radius_m();
     let events = _surface_route_events();
     if names.len() == 0 || speeds.len() != names.len()

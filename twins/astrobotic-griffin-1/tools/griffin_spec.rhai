@@ -401,8 +401,8 @@ fn surface_route_marker_y() { _sysml_number_list("surfaceRouteMarkerY") }
 fn surface_route_marker_z() { _sysml_number_list("surfaceRouteMarkerZ") }
 // Route command limits are source data alongside the marker table.  Keep the
 // ordered event labels in the mission tool because they are verdict vocabulary,
-// while speed and arrival tolerance cross the SysML/Rhai bridge as typed lists.
-fn surface_route_speed_mps() { _sysml_number_list("surfaceRouteSpeedMps") }
+// while normalized throttle and arrival tolerance cross the SysML/Rhai bridge as typed lists.
+fn surface_route_throttle_limits() { _sysml_number_list("surfaceRouteThrottleLimit") }
 fn surface_route_arrival_radius_m() { _sysml_number_list("surfaceRouteArrivalRadiusM") }
 fn egress_apron_name() { _sysml_text("egressApronName") }
 fn egress_apron_center_x_m() { _sysml_attribute("egressApronCenterX") }
@@ -922,3 +922,9 @@ fn ramp_rail_joint_pin_radius_m() { _sysml_attribute("rampRailJointPinRadiusM") 
 fn ramp_rail_joint_pin_length_m() { _sysml_attribute("rampRailJointPinLengthM") }
 fn propellant_tank_names() { _sysml_enum_names("tankInstances") }
 fn main_engine_names() { _sysml_enum_names("mainEngineInstances") }
+
+fn lander_camera_focus_height_m() {
+    let dimensions=_sysml_model_value("payloadAdapterDimensions");
+    if dimensions==() {throw("payload adapter dimensions unavailable");}
+    visual_payload_adapter_center_y_m() + dimensions.y / 2.0
+}

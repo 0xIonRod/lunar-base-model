@@ -258,7 +258,6 @@ fn control_lander() {
     if target == () { return; }
     let result = cmd("AcquireControl", #{ target: target, bind_camera: true });
     if result.ok {
-        follow(target);
         hint("LANDER CONTROL: " + input_hint("thrust") + " thrust · W/S pitch · A/D roll · Q/E yaw · F detach rover");
         notify_kind("Griffin lander under manual control.", "success");
     } else {

@@ -115,10 +115,10 @@ package Griffin1Requirements {
         // the forward (15.60,0.00) exit gate, after the trailing axle clears the ramp;
         // its forward centreline placement avoids asking Ackermann guidance
         // to reverse toward a lateral marker during the transition. The later diagonal legs deliberately reduce
-        // speed to 0.18..0.14 m/s because the shared Ackermann law must turn
+        // normalized throttle limits to 0.18..0.14 because the shared Ackermann law must turn
         // through the bounded corner sequence without overshooting a survey
-        // marker; these are measured study-vehicle limits, not supplier data.
-        attribute surfaceRouteSpeedMps : Real[15] = (0.22, 0.22, 0.35, 0.35, 0.35, 0.22, 0.20, 0.18, 0.16, 0.14, 0.14, 0.15, 0.18, 0.20, 0.22);
+        // marker; these are uncalibrated study command limits, not measured speed or supplier data. Source: RoverAutopilotGuidance.mo consumes speed as a forward throttle limit and reduces it by heading and approach gates.
+        attribute surfaceRouteThrottleLimit : Real[15] = (0.22, 0.22, 0.35, 0.35, 0.35, 0.22, 0.20, 0.18, 0.16, 0.14, 0.14, 0.15, 0.18, 0.20, 0.22);
         // RoverTarget2 is the first survey gate on the finite-turn arc. Its
         // 1.20 m arrival radius is a route-control study value; it is not a
         // ramp-interface tolerance or a claimed current replay measurement.

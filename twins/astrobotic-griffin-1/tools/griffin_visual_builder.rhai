@@ -181,6 +181,16 @@ fn flip_chassis_size_plan(doc, edit_target, root) {
     #{ok:true,ops:ops}
 }
 
+// The orbit focus follows the source payload-interface datum; it does not
+// change the vehicle's control owner or physical root.
+fn griffin_camera_focus_plan(doc, edit_target, root) {
+    let height=griffin_spec::lander_camera_focus_height_m();
+    let controls=_component_query(doc,root+"/Controls");
+    if height==() || !controls.ok {return plan_error("Griffin camera source or control surface missing");}
+    #{ok:true,ops:[#{SetAttribute:#{edit_target:edit_target,path:root+"/Controls",
+        name:"lunco:cameraFollowHeight",type_name:"double",value:height.to_string()}}]}
+}
+
 fn flip_vehicle_size_plan(doc, edit_target, root) {
     let names=griffin_spec::rover_wheel_station_names();
     let xs=griffin_spec::rover_wheel_station_x();

@@ -608,3 +608,21 @@ supported wheels on departure. It later failed a survey-waypoint stall at
 simulation tick 20293; full mission acceptance remains open. The fresh operator
 check accepted U after touchdown and routed F to the existing ramp-settlement
 gate without an event error. Sources: owned logs linked in the handover.
+
+#### Camera focus and route-limit units (2026-10-01)
+
+The Griffin control camera orbits the payload adapter top: local height is
+adapter center Y (2.04 m) plus half its source thickness (0.08 m), hence
+2.08 m above the vehicle root. This is a presentation choice requested for
+inspection of the rover attachment, derived from the same estimated packaging
+geometry; it is not supplier camera data. The core control profile authors
+`lunco:cameraFollowHeight`, using the existing spring-arm vertical focus offset.
+Camera collision probes and arm distance are measured from that focus.
+
+The route command table is now named `surfaceRouteThrottleLimit`, because
+`RoverAutopilotGuidance.mo` treats its speed input as normalized throttle,
+scaling it further by heading alignment and distance-to-target. The former
+m/s identifier and claim of measured vehicle speeds were incorrect. Limits
+0.14–0.35 remain uncalibrated study estimates; observed motion additionally
+depends on motor torque, gearing, slope, contact and steering. No supplier speed
+claim or closed-loop speed regulation follows from that table.
