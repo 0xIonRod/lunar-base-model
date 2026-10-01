@@ -80,7 +80,7 @@ package FlipSensorPowerRequirements {
         doc /* FSP-007 [power] the FLIP electrical-storage model shall realize the published battery energy capacity held in this package's source attribute. */
     }
     requirement def FSP008_SolarArrayPeakPower {
-        doc /* FSP-008 [power] derive the modeled solar collection area from the typed cell dimensions, apply solarArrayEfficiency, and limit electrical output to solarArrayPeakPowerW. */
+        doc /* FSP-008 [power] derive the modeled solar collection area from the typed cell dimensions, apply solarArrayEfficiency, and limit electrical output to solarArrayPeakPowerW. Panel telemetry shall target the FLIP system solar_power output, which is wired from SolarArray.outputs:power_out, rather than treating an internally composed Modelica network node as an independent runtime port surface. Source: vehicles/flip.usda output connection, lunco://components/power/solar_panel.usda and the generic telemetry target contract in crates/lunco-usd-sim-cosim/src/lib.rs. This changes measurement ownership, not the electrical equation or hardware power rating. */
     }
 
     requirement <'FSP-001'> fsp001 : FSP001_MastStructure { subject sensorPower : FlipSensorPowerAssembly; }

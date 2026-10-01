@@ -25,17 +25,6 @@ def Xform "GriffinFlipVisual" (
     double lunco:time:epochJd = 2461395.5
     def Xform "Ground"
     {
-        def Cube "RegolithPad"
-        {
-            double size = 1.0
-            custom double3 xformOp:translate = (3.0, -0.175, 0.0)
-            double3 xformOp:scale = (36.0, 0.35, 14.0)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.12999999523162842, 0.11999999731779099, 0.10999999940395355)]
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-            token visibility = "inherited"
-        }
         def Cylinder "LandingPad"
         {
             float radius = 6.0
@@ -59,6 +48,19 @@ def Xform "GriffinFlipVisual" (
             bool physics:collisionEnabled = false
             uniform token purpose = "guide"
             token visibility = "invisible"
+        }
+        def Plane "FlatReviewSurface" (
+            prepend apiSchemas = ["LunCoTerrainAPI", "PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            double width = 36.0
+            double length = 36.0
+            uniform token axis = "Y"
+            uniform token lunco:terrain:surfaceRole = "flat-site"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.12999999523162842, 0.11999999731779099, 0.10999999940395355)]
+            uniform token purpose = "render"
+            token visibility = "inherited"
         }
     }
     def Xform "Griffin1" (
@@ -151,6 +153,102 @@ def Xform "GriffinFlipVisual" (
         def "LegNZ_ShockPiston"
         {
             bool physics:rigidBodyEnabled = false
+        }
+        def "LegPX_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNX_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegPZ_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNZ_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampHingePort"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampHingeStarboard"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingePort01"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingePort12"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingeStarboard01"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingeStarboard12"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampTransitionJointPort"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampTransitionJointStarboard"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegPX_BraceHinge"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegPX_ShockUpperPin"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegPX_ShockLowerPin"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNX_BraceHinge"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNX_ShockUpperPin"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNX_ShockLowerPin"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegPZ_BraceHinge"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegPZ_ShockUpperPin"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegPZ_ShockLowerPin"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNZ_BraceHinge"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNZ_ShockUpperPin"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNZ_ShockLowerPin"
+        {
+            bool physics:jointEnabled = false
         }
     }
     def Xform "FLIP" (

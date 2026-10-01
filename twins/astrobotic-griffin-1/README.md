@@ -200,11 +200,15 @@ vehicle recipe. Each operation is journaled and saved through the Editor; never
 rewrite scene or component USDA text by hand. Ramp geometry and FLIP wheel-path
 verification remain tied to their shared SysML interface datums.
 
-The combined `scenes/griffin_flip_visual.usda` review scene uses the same
-source-backed `environments/south_pole_surrogate.usda` as the mission scene.
-Its `Terrain` prim is bound to LunCoSim's canonical
-`lunco://shaders/terrain_layered.wgsl` shader and the old `Ground/RegolithPad`
-is retained only as an invisible, non-colliding measurement guide. To repair
+The combined `scenes/griffin_flip_visual.usda` review scene uses a visible,
+non-colliding square `Ground/FlatReviewSurface` Plane at the local zero datum.
+It explicitly owns the `flat-site` terrain role required by the site-to-globe
+handoff. Vehicle and shock-body dynamics and their mechanical joints are disabled for
+this unloaded shape review. Enabled joints between static bodies cannot be
+admitted by the physics runner. The mission scene uses the source-backed
+`environments/south_pole_surrogate.usda` DEM and physical terrain contacts.
+The review retains that environment's shader/material references with its DEM
+terrain disabled. To repair
 or reapply this contract in a live Editor document, use the Twin-local
 `griffin_visual_builder::apply_standard_terrain(doc_id, "@root@",
 "/GriffinFlipVisual", parent_generation)` entry point through `RunRhai`; it
@@ -544,3 +548,22 @@ Replace the surrogates in this order:
 
 Every replacement must update research/griffin_1_assumptions.md and add a
 verification result that distinguishes sourced data from inferred values.
+
+### 2026-10-01 static review contract checkpoint
+
+The flat review surface and FLIP panel telemetry binding now report zero runtime
+errors and warnings in a fresh owned session. The combined visual fixture passed
+124 checks at tick 8 against terrain binary `67c2d91b-dirty`; source revision
+`2502209739513201842`. Its unloaded bodies also disable their 24 mechanical
+joints through `physics:jointEnabled=false`, leaving the production vehicle
+mechanism unchanged. The current rendered review was inspected after readiness
+reported no holds or pending work. These are shape and authoring checks; sustained
+landing and rover egress remain separate acceptance work.
+
+The pad observer compares the cooked cylinder radius and half-height to the
+visible cylinder schema dimensions. A `conservative_geometry_envelope` is a
+transformed local bounding box; its horizontal half-extents grow by sqrt(2)
+under a 45-degree yaw and therefore cannot be treated as cylinder radii.
+The current collider/visible dimension deviation is zero. Combined checks now
+follow the physical shock tubes and derive visible solar members from the same
+installed cell-count helper as the solar fixture.

@@ -193,9 +193,8 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirement_checks::exists("GSA-001-" + name, "solar_array", "gsa001", VERIFICATION, path, "Xform"));
         let layout=griffin_spec::solar_installed_cell_layout(index);
         if layout==() {throw("solar installed cell layout unavailable");}
-        let hidden=[];for column in layout.columns..sysml_requirements::number(source,own("gridColumnCount")).to_int() {hidden.push("CellDividerX"+column.to_string());}
         let required_children = [];
-        for member in members {if !hidden.contains(member) {required_children.push(path+"/"+member);}}
+        for member in griffin_spec::solar_installed_visible_members(index,members) {required_children.push(path+"/"+member);}
         checks.push(sysml_requirement_checks::children("GSA-002-" + name, "solar_array", "gsa002", VERIFICATION, path,
             required_children));
         if stations.len() == names.len() {

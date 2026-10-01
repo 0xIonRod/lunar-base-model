@@ -58,7 +58,7 @@ fn on_start(me, ctx) {
     this.griffin = find("/GriffinFlipVisual/Griffin1");
     this.flip = find("/GriffinFlipVisual/FLIP");
     this.camera = find("/GriffinFlipVisual/VisualCamera");
-    this.ground = find("/GriffinFlipVisual/Ground/RegolithPad");
+    this.ground = find("/GriffinFlipVisual/Ground/FlatReviewSurface");
     this.terrain = find("/GriffinFlipVisual/Environment/Terrain");
     this.done = false;
     this.review_batch = 0;
@@ -112,8 +112,11 @@ fn run_visual_review(batch_index) {
             root + "/Griffin1/" + name + "/LandingLegVisual",
             [root + "/Griffin1/" + name + "/LandingLegVisual/StrutOuter",
              root + "/Griffin1/" + name + "/LandingLegVisual/StrutInner",
-             root + "/Griffin1/" + name + "/LandingLegVisual/ShockPiston",
              root + "/Griffin1/" + name + "/LandingLegVisual/FootPad"]));
+        checks.push(visual_children_check("GV-002-" + name + "-axial-shock", "legs", "gv002",
+            root + "/Griffin1",
+            [root + "/Griffin1/" + name + "_ShockBarrel/Tube",
+             root + "/Griffin1/" + name + "_ShockPiston/Tube"]));
     }
     let antenna=root+"/Griffin1/HighGainDish";
     for field in [#{input:"crinkle",source:"tankFoilCrinkleDensity"},
@@ -239,10 +242,11 @@ fn run_visual_review(batch_index) {
     let solar_names = _sysml_list(source, "solarArrayInstances");
     let solar_member_names = sysml_requirement_checks::source_enum_identifiers(source,
         "GriffinSolarRequirements::GriffinSolarArrayAssembly::childNames");
-    for name in solar_names {
+    for index in 0..solar_names.len() {
+        let name=solar_names[index];
         checks.push(visual_exists_check("GV-003-solar-" + name, "solar_panels", "gv003", "exists", root + "/Griffin1/" + name));
         let solar_children = [];
-        for member in solar_member_names {
+        for member in griffin_spec::solar_installed_visible_members(index,solar_member_names) {
             solar_children.push(root + "/Griffin1/" + name + "/" + member);
         }
         checks.push(visual_children_check("GV-003-solar-" + name + "-layers", "solar_panels", "gv003",
@@ -343,23 +347,23 @@ fn run_visual_review(batch_index) {
     let ground = #{ id: "GV-004-ground-width", component: "context",
         requirement: "gv004",
         verification: "Verify_GriffinVisualRequirements",
-        kind: "bounds_component", path: root + "/Ground/RegolithPad",
+        kind: "bounds_component", path: root + "/Ground/FlatReviewSurface",
         index: 0, multiplier: 2.0, expected_attr: griffin_spec::qualified_attribute_name("visualReviewGroundWidthM"), tolerance: 0.001 };
     checks.push(ground);
     let render = #{ id: "GV-005-ground-render", component: "context",
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",
-        kind: "attribute_equals", path: root + "/Ground/RegolithPad", attr: "purpose", expected: "render" };
+        kind: "attribute_equals", path: root + "/Ground/FlatReviewSurface", attr: "purpose", expected: "render" };
     checks.push(render);
     let collision = #{ id: "GV-005-ground-noncollision", component: "context",
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",
-        kind: "attribute_equals", path: root + "/Ground/RegolithPad", attr: "physics:collisionEnabled", expected: false };
+        kind: "attribute_equals", path: root + "/Ground/FlatReviewSurface", attr: "physics:collisionEnabled", expected: false };
     checks.push(collision);
     checks.push(#{ id: "GV-005-ground-visible", component: "context",
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",
-        kind: "attribute_equals", path: root + "/Ground/RegolithPad", attr: "visibility", expected: "inherited" });
+        kind: "attribute_equals", path: root + "/Ground/FlatReviewSurface", attr: "visibility", expected: "inherited" });
     checks.push(#{ id: "GV-005-landing-pad-hidden", component: "context",
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",

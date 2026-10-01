@@ -2298,9 +2298,14 @@ fn physical_landing_leg_pad_observation(doc, root) {
                 all_cooked_axis_matches = false;
                 all_geometry_semantics_match = false;
             }
+            // Stage bounds explicitly describe a conservative transformed
+            // envelope: yawing a cylinder's local box by 45 degrees expands
+            // its X/Z half-extents to sqrt(2)*radius. That is not its radius.
+            // Compare cooked cylinder dimensions with the visible schema
+            // dimensions; the unit-scale/axis guards below still apply.
             let dimensions_deviation = physical_vector_deviation(
-                [cooked_geometry.radius_m, cooked_geometry.half_height_m,
-                    cooked_geometry.radius_m], visual_bounds.half_extents);
+                [cooked_geometry.radius_m, cooked_geometry.half_height_m],
+                [visual.attrs["radius"], visual.attrs["height"]/2.0]);
             let center_deviation = physical_vector_deviation(
                 cooked_pose.translation_m, visual_bounds.center);
             if dimensions_deviation == () || center_deviation == () {
@@ -5903,15 +5908,21 @@ fn standard_terrain_plan(doc, edit_target, root) {
     }
 
     ops.push(#{SetActive:#{edit_target:edit_target,path:environment+"/Terrain",active:false}});
-    let guide = root + "/Ground/RegolithPad";
-    let guide_record = assembly_builder::composed_query(doc, #{path: guide,
-        attrs:["size","xformOp:scale","xformOp:translate"],children: false});
-    if !query_ok(guide_record) {return plan_error("static review ground missing");}
-    let station=guide_record.attrs["xformOp:translate"];
-    station[1]=-abs(guide_record.attrs["xformOp:scale"][1])*guide_record.attrs.size/2.0;
-    ops.push(#{SetTranslate:#{edit_target:edit_target,path:guide,value:station}});
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:guide,
-        name:"visibility",type_name:"token",value:"\"inherited\""}});
+    let guide = root + "/Ground/FlatReviewSurface";
+    let guide_record=assembly_builder::composed_query(doc,#{path:guide,children:false});
+    let width=griffin_spec::_sysml_attribute("visualReviewGroundWidthM");
+    if !query_ok(guide_record) || guide_record.type_name!="Plane" || width==() || width<=0.0 {
+        return plan_error("static review needs its explicit square flat-site Plane and source width");
+    }
+    ops.push(#{SetTranslate:#{edit_target:edit_target,path:guide,value:[0.0,0.0,0.0]}});
+    for field in [#{name:"width",type_name:"double",value:width.to_string()},
+        #{name:"length",type_name:"double",value:width.to_string()},
+        #{name:"axis",type_name:"token",value:"\"Y\""},
+        #{name:"lunco:terrain:surfaceRole",type_name:"token",value:"\"flat-site\""},
+        #{name:"purpose",type_name:"token",value:"\"render\""},
+        #{name:"visibility",type_name:"token",value:"\"inherited\""}] {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:guide,name:field.name,type_name:field.type_name,value:field.value}});
+    }
     // The source terrain asset contains two optional synthetic berm markers
     // for mission-scale route studies.  They are not part of the visual
     // vehicle context and their 12–16 m radii can dominate a component review

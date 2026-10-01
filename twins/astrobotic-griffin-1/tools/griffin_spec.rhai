@@ -540,6 +540,18 @@ fn solar_installed_cell_layout(index) {
     let scale=widths[index]/frame;
     #{columns:count,pitch_m:pitch,scale_x:scale,local_cell_width_m:count*pitch/scale}
 }
+// Filter the nominal module topology for the fitted panel's cell count.
+fn solar_installed_visible_members(index, members) {
+    let layout=solar_installed_cell_layout(index);
+    if layout==() {throw("solar installed cell layout unavailable");}
+    let hidden=[];
+    for column in layout.columns..solar_component_number("gridColumnCount").to_int() {
+        hidden.push("CellDividerX"+column.to_string());
+    }
+    let visible=[];
+    for member in members {if !hidden.contains(member) {visible.push(member);}}
+    visible
+}
 fn component_engine_stations() { _sysml_native_list("engineStations") }
 fn visual_ramp_mount_x() { [
     _sysml_attribute("rampPortMountX"),
