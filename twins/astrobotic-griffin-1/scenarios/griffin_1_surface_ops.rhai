@@ -32,6 +32,12 @@ fn simulation_dependencies(me, ctx) {
         attitude_reference, attitude_propulsion, attitude_actuation, rover,
         lander_environment, altimeter];
     let entity_writes = [rover];
+    for side in ["Port", "Starboard"] {
+        entity_reads.push(find_path(LANDER+"/EgressRamp"+side));
+    }
+    for station in ["FL", "FR", "RL", "RR"] {
+        entity_reads.push(find_path(ROVER+"/Suspension_"+station+"/Wheel_"+station));
+    }
     let modelica_entities = [lander, gnc, propulsion, altimeter_model, imu,
         attitude_reference, attitude_propulsion, attitude_actuation, rover];
     for joint in ramp_joints {
@@ -45,7 +51,7 @@ fn simulation_dependencies(me, ctx) {
         query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
             "QueryUsdPrim", "QueryUsdPrims", "QueryPhysicsState", "PhysicsPerformance",
             "ReadPorts", "ReadPortsBatch", "ReadModelicaStepSamples",
-            "ListOpenDocuments", "Raycast"],
+            "ListOpenDocuments", "Raycast", "TerrainHeight"],
         required_inputs: []
     }
 }
@@ -595,7 +601,9 @@ fn task(me, ctx) {
             true
         }),
         once(|m| {
-            this.ramp_deployment_expected = griffin_surface_ramp_ops::root_deployment_angle_expectations();
+            let plan=griffin_surface_ramp_ops::landed_root_deployment_plan();
+            this.ramp_terrain_plan=plan;
+            this.ramp_deployment_expected=if plan.ok==true {plan.expected_angles} else {()};
             if this.ramp_deployment_expected!=() {
                 for expected in this.ramp_sections_expected {
                     this.ramp_deployment_expected.push(expected);
@@ -609,7 +617,7 @@ fn task(me, ctx) {
             }
             this.ramp_motion_trace = [];
             this.ramp_motion_trace_last_tick = ();
-            let ramps = griffin_surface_ramp_ops::deploy_roots();
+            let ramps = griffin_surface_ramp_ops::deploy_roots(plan.expected_angles);
             if ramps.ok != true {
                 this.phase_timeout = true;
                 this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deploy-command");

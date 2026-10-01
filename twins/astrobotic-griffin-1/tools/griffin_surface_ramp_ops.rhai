@@ -111,17 +111,118 @@ fn traversal_settle_progress(expected, stable_since) {
     #{ok:true,settled:evidence.settled,stable_since:stable_since,evidence:evidence}
 }
 
-fn deploy_roots() {
+// Plan from the landed hinge frames, not the nominal flat touchdown datum.
+// A single root rotation cannot remove transverse terrain slope. Use the
+// lowest clearance of all eight toe corners, preserving the authored miter.
+fn _toe_clearance(angle, frame, pad) {
+    let delta=frame.sign*(angle-frame.measured);
+    let minimum=1000000.0;
+    let points=[];
+    for z in frame.stations {
+        for edge in [[frame.length,frame.half_thickness],
+            [frame.length-frame.bevel,-frame.half_thickness]] {
+            let local=vec3(edge[0]*cos(delta)-edge[1]*sin(delta),
+                edge[0]*sin(delta)+edge[1]*cos(delta),z);
+            let point=frame.position+qrot(frame.rotation,local);
+            let terrain=query("TerrainHeight",#{x:point.x,z:point.z});
+            if terrain==() || terrain.found!=true || !terrain.height.is_finite() {
+                return #{ok:false,error:"ramp toe has no retained DEM surface"};
+            }
+            let height=terrain.height;
+            if abs(point.x-pad.center[0])<=pad.half[0]
+                && abs(point.z-pad.center[2])<=pad.half[2] {
+                height=max(height,pad.center[1]+pad.half[1]);
+            }
+            let gap=point.y-height;
+            minimum=min(minimum,gap);
+            points.push(#{point:vec3_array(point),surface_y_m:height,clearance_m:gap});
+        }
+    }
+    #{ok:true,minimum_clearance_m:minimum,points:points}
+}
+
+fn landed_root_deployment_plan() {
+    let joints=griffin_spec::ramp_root_joint_names();
+    let snapshot=griffin_surface_ops::physical_ramp_joint_evidence();
+    let limit=griffin_spec::max_ramp_command_rad();
+    let tolerance=griffin_spec::physical_ramp_terrain_contact_tolerance_m();
+    let thickness=griffin_spec::ramp_surface_thickness_m();
+    let width=griffin_spec::ramp_contact_track_width_m();
+    let length=griffin_spec::ramp_section_length_m()*griffin_spec::ramp_section_count();
+    let nominal=abs(griffin_spec::physical_ramp_port_deployment_angle_rad());
+    let pad_prim=query("QueryUsdPrim",#{path:"/Griffin1SurfaceOps/LandingSitePad"});
+    if snapshot.ok!=true || joints.len()!=2 || limit==() || tolerance==()
+        || thickness==() || width==() || length==() || nominal==()
+        || pad_prim==() || pad_prim.type_name!="Cube" {
+        return #{ok:false,error:"landed ramp planning inputs unavailable"};
+    }
+    let attrs=pad_prim.attrs;
+    // This fixture owns an axis-aligned pad; reject unsupported transforms.
+    if attrs["xformOpOrder"]!=["xformOp:translate","xformOp:scale"] {
+        return #{ok:false,error:"landing pad must expose its axis-aligned source transform"};
+    }
+    let pad=#{center:attrs["xformOp:translate"],half:[]};
+    for scale in attrs["xformOp:scale"] {pad.half.push(abs(scale)*attrs.size/2.0);}
+    let stations=[];
+    for z in griffin_spec::rover_wheel_station_z() {
+        for edge in [z-width/2.0,z+width/2.0] {
+            if !stations.contains(edge) {stations.push(edge);}
+        }
+    }
+    if stations.len()!=4 {return #{ok:false,error:"FLIP requires four lateral track edges"};}
+    let expected=[];
+    let evidence=[];
+    for index in 0..2 {
+        let side=if index==0 {"Port"} else {"Starboard"};
+        let id=find_path("/Griffin1SurfaceOps/Lander/EgressRamp"+side);
+        let position=world_pos3(id);
+        let rotation=world_rotation_quat(id);
+        let measured=();
+        for hinge in snapshot.hinges {
+            if hinge.name==joints[index] {measured=hinge.measured_angle_rad;}
+        }
+        if position==() || rotation==() || measured==() {
+            return #{ok:false,error:"landed root frame unavailable"};
+        }
+        let sign=if index==0 {1.0} else {-1.0};
+        let frame=#{position:position,rotation:rotation,measured:measured,
+            sign:sign,length:length,half_thickness:thickness/2.0,
+            bevel:mechanical_relations::planar_horizontal_face_bevel_run(thickness,nominal),
+            stations:stations};
+        let shallow=0.0;
+        let steep=-sign*limit;
+        let raised=_toe_clearance(shallow,frame,pad);
+        let lowered=_toe_clearance(steep,frame,pad);
+        // Half the existing contact tolerance reserves space for imperfect
+        // section alignment; this is an explicit study allowance, not an ICD.
+        let clearance=tolerance/2.0;
+        if raised.ok!=true || lowered.ok!=true
+            || raised.minimum_clearance_m<clearance || lowered.minimum_clearance_m>clearance {
+            return #{ok:false,error:"terrain-contact target is outside root travel",
+                side:side,raised:raised,lowered:lowered};
+        }
+        for iteration in 0..32 {
+            let angle=(shallow+steep)/2.0;
+            let sample=_toe_clearance(angle,frame,pad);
+            if sample.ok!=true {return sample;}
+            if sample.minimum_clearance_m>=clearance {shallow=angle;} else {steep=angle;}
+        }
+        let planned=_toe_clearance(shallow,frame,pad);
+        expected.push(#{name:joints[index],target_rad:shallow});
+        evidence.push(#{side:side,source_tick:snapshot.sim_tick,target_rad:shallow,
+            nominal_target_rad:if index==0 {-nominal} else {nominal},
+            planned_clearance:planned});
+    }
+    #{ok:true,expected_angles:expected,evidence:evidence}
+}
+
+fn deploy_roots(expected) {
     // Lower the roots only after all intermediate sections reach their
     // source-defined level deployment targets.
     let joints = griffin_spec::ramp_root_joint_names();
     if joints.len() != 2 {
         return #{ok: false, error: "SysML must name both top-deck ramp hinges"};
     }
-    let expected = [
-        #{name: joints[0], target_rad: griffin_spec::physical_ramp_port_deployment_angle_rad()},
-        #{name: joints[1], target_rad: griffin_spec::physical_ramp_starboard_deployment_angle_rad()},
-    ];
     let port_angle = expected[0].target_rad;
     let starboard_angle = expected[1].target_rad;
     if port_angle == () || starboard_angle == () {
@@ -137,17 +238,4 @@ fn deploy_roots() {
     print("[griffin] atomic physical egress ramp angle command accepted");
     #{ok: true, command: command,
         port_angle_rad: port_angle, starboard_angle_rad: starboard_angle}
-}
-
-fn root_deployment_angle_expectations() {
-    let root_names = griffin_spec::ramp_root_joint_names();
-    let port = griffin_spec::physical_ramp_port_deployment_angle_rad();
-    let starboard = griffin_spec::physical_ramp_starboard_deployment_angle_rad();
-    if root_names.len() != 2 || port == () || starboard == () {
-        return ();
-    }
-    [
-        #{name: root_names[0], target_rad: port},
-        #{name: root_names[1], target_rad: starboard},
-    ]
 }

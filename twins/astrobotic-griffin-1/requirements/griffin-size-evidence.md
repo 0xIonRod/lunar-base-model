@@ -521,3 +521,33 @@ link domain admission under the preview marker. Mission georeferencing remains
 owned by the live scene. The production visual fixture passes with the rebuilt
 binary, while landing and egress remain separate open evidence.
 Saved visual evidence: ../handover/griffin-flip-preview-fixed-2026-10-01.png.
+
+#### Landed ramp targets and terrain contact (2026-10-01)
+
+The ±0.4857867749 rad root angles remain the nominal flat-plane CAD datums.
+They shall not be unconditional motor commands on the NOBILE03 DEM. The
+owned replay of core `24dd835fa` and Twin `fec3026` landed with body Y
+0.365507 m and upright-axis Y 0.996980044 (about 4.45° tilt), rather than the
+static Y 0.44 m assumption. The middle/toe unfolding stages passed, but final
+toe rates exceeded the unchanged 0.02 rad/s gate at tick 19196.
+
+Source geometry transformed by the recorded native toe poses gives tip X
+about +6.89…+6.97 m and −6.57…−6.65 m. These tips are outside the existing
+12 m square pad. Retained DEM samples at those corners range from −0.235929
+to +0.355317 m; opposite outer corners coincide with the recorded toe heights
+to about 1 mm. This supports terrain contact as the reason nominal angle
+commands load the deployed bundle; it does not prove a complete contact-force
+or solver diagnosis.
+
+Runtime planning therefore uses each measured root hinge frame, the existing
+track length/width/thickness and nominal toe miter, and the retained DEM under
+all eight toe corners. The pad top participates where its source footprint
+applies and is higher. Targets stay inside the existing travel and reserve
+half the existing 20 mm contact tolerance as a 10 mm predicted minimum gap.
+This allowance is an explicit study estimate for section alignment and
+elastic deflection; it is not a supplier clearance or locking specification.
+Missing terrain or an unbracketed target prevents release. Existing angle,
+rate and dwell limits are retained. The planner uses commanded joints, never
+forced body poses or a separate visual animation.
+
+Evidence and exact replay status: [landed ramp checkpoint](../../../handover/griffin-landed-ramp-contact-2026-10-01.md).

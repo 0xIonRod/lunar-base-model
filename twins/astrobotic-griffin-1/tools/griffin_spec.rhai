@@ -781,6 +781,8 @@ fn physical_ramp_transition_joint_name(side) {
     names[index]
 }
 fn physical_ramp_port_deployment_angle_rad() { _sysml_attribute("physicalRampPortDeploymentAngleRad") }
+fn physical_ramp_terrain_contact_tolerance_m() { _sysml_attribute("physicalRampTerrainContactToleranceM") }
+fn ramp_surface_thickness_m() { _sysml_attribute("rampSurfaceThicknessM") }
 fn physical_ramp_starboard_deployment_angle_rad() { _sysml_attribute("physicalRampStarboardDeploymentAngleRad") }
 fn physical_ramp_port_root_stowed_angle_rad() { _sysml_attribute("physicalRampRootStowedAngleRad") }
 fn physical_ramp_starboard_root_stowed_angle_rad() { _sysml_attribute("physicalRampRootStowedAngleRad") }

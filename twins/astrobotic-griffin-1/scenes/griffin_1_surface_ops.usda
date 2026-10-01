@@ -23,7 +23,7 @@ def Xform "Griffin1SurfaceOps" (
     custom string lunco:mission:site = "Nobile regional study anchor backed by LROC NAC DTM NOBILE03; exact touchdown coordinate unresolved"
     custom string lunco:mission:scope = "surface operations only"
     custom string lunco:mission:evidence = "LROC NOBILE03 regional relief is source-backed; Griffin vehicle values and exact touchdown site remain assumptions"
-    custom string lunco:mission:deployment = "top-deck adapter during descent; two physical side ramps deploy after touchdown; FLIP joint release then rover egress"
+    custom string lunco:mission:deployment = "top-deck adapter during descent; middle then toe hinges unfold after touchdown; root targets derive from landed hinge frames and retained DEM toe clearance within source travel; all six hinges satisfy angle/rate/dwell before FLIP release"
     custom string lunco:anchor:status = "MOON_ME ENU frame at NOBILE03 regional center; local height zero is the normalized terrain datum"
     custom string lunco:lighting:contract = "all Griffin and FLIP geometry uses LunarSurface/Sun polar direction and the authored mission epoch"
     custom string lunco:route:status = "ramp entry marker moved outside descent column; center lane remains clear of four solid legs"

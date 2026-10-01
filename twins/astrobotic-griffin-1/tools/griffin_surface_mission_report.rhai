@@ -77,6 +77,7 @@ fn fail_phase(state, phase) {
             ramp_middle_settle: state.ramp_middle_settle_evidence,
             ramp_toe_settle: state.ramp_toe_settle_evidence,
             ramp_root_settle: state.ramp_deployment_settle_evidence,
+            ramp_terrain_plan: state.ramp_terrain_plan,
             ramp_motion_trace: state.ramp_motion_trace,
             route_command_updates: state.route_command_updates}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
