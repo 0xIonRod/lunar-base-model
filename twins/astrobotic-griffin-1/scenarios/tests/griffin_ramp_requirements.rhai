@@ -465,16 +465,29 @@ fn on_tick(me, ctx) {
 
             for rail in griffin_spec::ramp_guide_stations() {
                 let rail_path = section + "/" + rail.name;
+                checks.push(sysml_requirement_checks::exists(
+                    "GRR-008-"+side+"-"+index.to_string()+"-"+rail.name+"-rounded-strip",
+                    "ramp_rail","grr008",VERIFICATION,rail_path,"Mesh"));
+                // Native round-plate profile is long on local Y, then turned
+                // -90 degrees around Z. Observe the actual vertex-derived box.
                 for dim in [
-                    #{name: "length", axis: 0, attr: "rampSectionLengthM"},
-                    #{name: "height", axis: 1, attr: "rampRailHeightM"},
-                    #{name: "width", axis: 2, attr: "rampRailWidthM"},
+                    #{name:"height",axis:0,attr:"rampRailHeightM"},
+                    #{name:"length",axis:1,attr:"rampSectionLengthM"},
+                    #{name:"width",axis:2,attr:"rampRailWidthM"},
                 ] {
-                    checks.push(sysml_requirement_checks::extent_component(
-                        "GRR-008-" + side + "-" + index.to_string() + "-" + rail.name + "-" + dim.name,
-                        "ramp_rail", "grr008", VERIFICATION, rail_path, dim.axis,
-                        _source_attr(dim.attr), 1.0, 0.002));
+                    let dimension_id="GRR-008-"+side+"-"+index.to_string()+"-"+rail.name+"-"+dim.name;
+                    for bound in 0..2 {
+                        let sign=if bound==0 {-0.5} else {0.5};
+                        let expected=_source_number(source,dim.attr)*sign;
+                        checks.push(sysml_requirement_checks::array_component(
+                            dimension_id+"-"+bound.to_string(),
+                            "ramp_rail","grr008",VERIFICATION,rail_path,"extent",
+                            [bound,dim.axis],expected,0.002));
+                    }
                 }
+                checks.push(_attribute_component(
+                    "GRR-008-"+side+"-"+index.to_string()+"-"+rail.name+"-profile-turn",
+                    "grr008",rail_path,"xformOp:rotateXYZ",2,-90.0));
                 checks.push(_attribute_component("GRR-008-" + side + "-" + index.to_string() + "-" + rail.name + "-y",
                     "grr008", rail_path, "xformOp:translate", 1,
                     _source_number(source, "rampRailCenterYM")));

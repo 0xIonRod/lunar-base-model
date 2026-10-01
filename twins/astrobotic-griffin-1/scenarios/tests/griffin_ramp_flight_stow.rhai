@@ -436,9 +436,10 @@ fn on_tick(me, ctx) {
                 checks.push(_attribute_component("GRR-018-" + side + "-" + section_index.to_string() + "-" + rail_name + "-top-y",
                     "grr018", rail, "xformOp:translate", 1,
                     _source_number(source, "rampRailCenterYM")));
-                checks.push(_attribute_component("GRR-018-" + side + "-" + section_index.to_string() + "-" + rail_name + "-height",
-                    "grr018", rail, "xformOp:scale", 1,
-                    _source_number(source, "rampRailHeightM")));
+                checks.push(sysml_requirement_checks::array_component(
+                    "GRR-018-" + side + "-" + section_index.to_string() + "-" + rail_name + "-height",
+                    "ramp", "grr018", VERIFICATION, rail, "extent", [1, 0],
+                    _source_number(source, "rampRailHeightM") / 2.0, 0.002));
             }
             let truss_brace_count = _source_number(source,
                 "assemblySideTrussBraceCountPerSide").to_int();
@@ -464,9 +465,10 @@ fn on_tick(me, ctx) {
             checks.push(_attribute_component("GRR-018-" + side + "-deck-" + rail_name + "-top-y",
                 "grr018", rail, "xformOp:translate", 1,
                 _source_number(source, "rampRailCenterYM")));
-            checks.push(_attribute_component("GRR-018-" + side + "-deck-" + rail_name + "-height",
-                "grr018", rail, "xformOp:scale", 1,
-                _source_number(source, "rampRailHeightM")));
+            checks.push(sysml_requirement_checks::array_component(
+                "GRR-018-" + side + "-deck-" + rail_name + "-height",
+                "ramp", "grr018", VERIFICATION, rail, "extent", [1, 0],
+                _source_number(source, "rampRailHeightM") / 2.0, 0.002));
         }
     }
 

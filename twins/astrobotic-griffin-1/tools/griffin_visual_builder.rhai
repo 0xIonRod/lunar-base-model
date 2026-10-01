@@ -4501,14 +4501,14 @@ fn _ramp_section_track_topology() {
 // Contact/guard geometry and each repeated side lattice are separate Editor
 // tasks. Reconcile the four truss groups on the reusable component before
 // assembly placement; the default plan owns the base interface geometry.
-// Rounded plate blank: source dimensions, native profile extrusion, no
-// extra joint or independent motion. The pin obscures the unmodelled bore.
-fn _ramp_pivot_lug_visual_ops(doc, edit_target, section_path, name,
+// Shared rounded blank for pivot lugs and upper strips, from source dimensions
+// and native profile extrusion. No extra joint or independent motion.
+fn _ramp_round_plate_visual_ops(doc, edit_target, section_path, name,
     width, thickness, bottom, top, station_z, color) {
     let radius = width / 2.0;
     let height = top - bottom;
     if radius <= 0.0 || thickness <= 0.0 || height < width {
-        return plan_error("ramp pivot plate profile dimensions are invalid");
+        return plan_error("ramp rounded plate profile dimensions are invalid");
     }
     let profile = [];
     let half_straight = height / 2.0 - radius;
@@ -4695,17 +4695,6 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             for op in placement.ops { ops.push(op); }
         }
 
-        for rail in griffin_spec::ramp_guide_stations() {
-            let rail_path = section_path + "/" + rail.name;
-            let placement = _component_cube_visual_ops(doc,edit_target,section_path,rail.name,
-                [section_length / 2.0, rail_y, rail.z], (),
-                [section_length, rail_height, rail_width],structure_color);
-            if !placement.ok { return placement; }
-            for op in placement.ops { ops.push(op); }
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:rail_path,
-                name:"physics:collisionEnabled",type_name:"bool",value:"true"}});
-        }
-
         // Fittings belong to the same native hinge axis as the common shaft.
         // Lugs bridge from that axis to the guard; no independent visual motion.
         for guide in griffin_spec::ramp_guide_stations() {
@@ -4766,7 +4755,31 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         let lug_radius=lug_width/2.0;
         let lug_bottom=min(hinge_y-lug_radius, surface_y-thickness/2.0);
         let lug_top=max(hinge_y+lug_radius,rail_y+rail_height/2.0);
-        let lug=_ramp_pivot_lug_visual_ops(doc,edit_target,section_path,
+        // A single rounded strip remains the guard collider. Reuse the
+        // lug profile with a quarter-turn; no overlapping visual proxy.
+        let upper=_ramp_round_plate_visual_ops(doc,edit_target,section_path,
+            guide.name,rail_height,rail_width,-section_length/2.0,
+            section_length/2.0,guide.z,structure_color);
+        if !upper.ok {return upper;}
+        for op in upper.ops {ops.push(op);}
+        let upper_path=section_path+"/"+guide.name;
+        let upper_place=assembly_builder::place_plan(edit_target,upper_path,
+            [section_length/2.0,rail_y,guide.z],[0.0,0.0,-90.0],[1.0,1.0,1.0]);
+        if !upper_place.ok {return upper_place;}
+        for op in upper_place.ops {ops.push(op);}
+        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:upper_path,
+            schemas:["PhysicsCollisionAPI","PhysicsMeshCollisionAPI","MaterialBindingAPI"]}});
+        for item in [
+            #{name:"physics:collisionEnabled",type_name:"bool",value:"true"},
+            #{name:"physics:approximation",type_name:"token",value:"\"convexHull\""},
+            #{name:"purpose",type_name:"token",value:"\"default\""},
+        ] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:upper_path,
+                name:item.name,type_name:item.type_name,value:item.value}});
+        }
+        ops.push(#{SetRelationship:#{edit_target:edit_target,path:upper_path,
+            name:"material:binding",targets:[section_path+"/Looks/RampStructure"]}});
+        let lug=_ramp_round_plate_visual_ops(doc,edit_target,section_path,
             guide.pin+"Lug",lug_width,_ramp_number("rampPivotLugThicknessM"),
             lug_bottom,lug_top,guide.z,structure_color);
         if !lug.ok {return lug;}

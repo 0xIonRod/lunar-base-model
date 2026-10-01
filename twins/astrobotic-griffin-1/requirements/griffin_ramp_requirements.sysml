@@ -328,6 +328,14 @@ package GriffinRampRequirements {
         // chord depth. Selected to preserve the image's slender silhouette.
         attribute maxRailHeightToSectionLength : Real = 0.03;
         attribute maxPivotDiameterToRailHeight : Real = 1.5;
+        /* Upper-strip end profile, 2026-10-01: the ESA and Astrobotic
+         * renderings show compact rounded tips rather than square protruding
+         * blocks. Use semicircular ends with radius half the existing strip
+         * height, retaining its length, height, web thickness and centre.
+         * This is a low-confidence presentation estimate; the images do not
+         * disclose the cut profile, bearings or qualified structural gauge.
+         * https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
+         * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png */
         attribute rampRailHeightM : Real = 0.04;
         /* Side-web refinement, 2026-10-01: the selected Astrobotic artist
          * rendering shows thin, plate-like triangulated sides, rather than
@@ -613,7 +621,7 @@ package GriffinRampRequirements {
         doc /* Port and starboard egress ramps shall be independently addressable component instances that share the same section geometry source and use mirrored deck mounting stations. */
     }
     requirement def GRR008_RailGeometry {
-        doc /* Both guide edges of each contact track shall start at the upper-deck hinge, sit above the walking surface, and continue to the toe as one rail segment per rigid ramp section. Four coaxial pin fittings and rounded extruded plate lugs shall join the guards to each section hinge. Pin centers shall use the native section-axis elevations (root shaft, middle chord top, toe plate bottom), and each segment shall match its section length and source-owned rail envelope. */
+        doc /* Both guide edges of each contact track shall start at the upper-deck hinge, sit above the walking surface, and continue to the toe as one rounded-end plate rail segment per rigid ramp section. Four coaxial pin fittings and rounded extruded plate lugs shall join the guards to each section hinge. Pin centers shall use the native section-axis elevations (root shaft, middle chord top, toe plate bottom), and each segment shall match its section length and source-owned rail envelope. */
     }
     requirement def GRR009_RailSupportGeometry {
         doc /* Each section shall connect all four upper guide rails to the walking surface with two end posts per guide. Posts shall align with the rail stations, meet the contact-track edge, and join the upper chord. Upper/lower chords, uprights and diagonals shall share the source transverse web thickness, giving plate-like triangulated sides with open bays. Post height and center shall be derived from the authored surface, rail, and embedment datums. This is a visual reconstruction; structural qualification requires supplier data. */
