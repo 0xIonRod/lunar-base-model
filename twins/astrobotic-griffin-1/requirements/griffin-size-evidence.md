@@ -602,3 +602,9 @@ old 0.30 m extension estimate had been used as total ray length despite a
 0.30 m extension (0.75 m); the native spring law and tire torque are unchanged.
 Source: `/tmp/griffin-egress-frame-evidence.json`, native PhysicsWheelContact
 snapshot, and core `strut_offset(rest_length, wheel_radius)` contract.
+
+Replay-3 with this relation passed the physical ramp exit and confirmed four
+supported wheels on departure. It later failed a survey-waypoint stall at
+simulation tick 20293; full mission acceptance remains open. The fresh operator
+check accepted U after touchdown and routed F to the existing ramp-settlement
+gate without an event error. Sources: owned logs linked in the handover.

@@ -93,3 +93,11 @@ subscription already establishes identity. U exposed an event-trace bug:
 `sim_tick()` cannot run in lifecycle key events. Trace now preserves the
 native event's `evt.sim_tick` rather than querying the simulation clock.
 A fresh operator reload is required to validate that final correction.
+
+Final fresh-load operator check (`/tmp/griffin-operator-final-validation.log`):
+U emitted `griffin_ramp_unfold_requested`, accepted post-touchdown; F reached
+the release gate and correctly warned that ramps must settle first. No
+on_event failure occurred. The revised visual builder compiled through the
+production RegisterToolLibrary command with no diagnostics. Review checks
+now require the flat ground to be visible and retain shader/light provenance;
+they no longer require the deliberately disabled DEM to be spawned.

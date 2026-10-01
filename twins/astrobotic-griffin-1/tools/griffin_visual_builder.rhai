@@ -5806,13 +5806,9 @@ fn apply_isolated_griffin(doc, edit_target, root, parent_gen) {
 
 // Standard terrain presentation -------------------------------------------
 //
-// The visual-review scene used to rely on a dark, flat RegolithPad proxy.  It
-// is useful as a dimension guide, but it must not be the visible terrain when
-// the Twin has a source-backed terrain asset.  This plan mounts the same
-// South-Pole surrogate used by the mission scene and hides the guide pad
-// through typed, journaled opinions.  The terrain asset owns its
-// LunCoTerrainAPI, DEM layer, physics material, and terrain_layered.wgsl
-// binding; this helper only owns the review-scene composition decision.
+// Retain the mission terrain reference and shader for provenance, but show
+// the static review on a render-only flat datum. Dynamic contact is verified
+// in the live mission, never under a frozen review parent.
 fn standard_terrain_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
         return plan_error("standard_terrain_plan requires a document, edit target, and absolute root");
@@ -5836,13 +5832,6 @@ fn standard_terrain_plan(doc, edit_target, root) {
         if existing.type_name != "Xform" {
             return plan_error(environment + ": existing terrain owner must be an Xform");
         }
-        // A pre-existing owner is accepted only when it already composes the
-        // standard terrain child.  Do not silently overwrite another asset.
-        let terrain = assembly_builder::composed_query(doc,
-            #{path: environment + "/Terrain", children: false});
-        if !query_ok(terrain) {
-            return plan_error(environment + ": existing owner does not contain the standard Terrain prim");
-        }
     } else {
         let reference = assembly_builder::referenced_instance_targeted_plan(
             doc, edit_target, root, "Environment", "Xform", asset,
@@ -5851,20 +5840,20 @@ fn standard_terrain_plan(doc, edit_target, root) {
         for op in reference.ops { ops.push(op); }
     }
 
-    // Preserve the guide's authored dimensions for measurement checks, but
-    // make it invisible so it cannot occlude the standard terrain or create a
-    // second visual surface.  Its render purpose and disabled collision remain
-    // inspectable evidence of the review-only guide contract.
+    ops.push(#{SetActive:#{edit_target:edit_target,path:environment+"/Terrain",active:false}});
     let guide = root + "/Ground/RegolithPad";
-    let guide_record = assembly_builder::composed_query(doc, #{path: guide, children: false});
-    if query_ok(guide_record) {
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: guide,
-            name: "visibility", type_name: "token", value: "\"invisible\""}});
-    }
+    let guide_record = assembly_builder::composed_query(doc, #{path: guide,
+        attrs:["size","xformOp:scale","xformOp:translate"],children: false});
+    if !query_ok(guide_record) {return plan_error("static review ground missing");}
+    let station=guide_record.attrs["xformOp:translate"];
+    station[1]=-abs(guide_record.attrs["xformOp:scale"][1])*guide_record.attrs.size/2.0;
+    ops.push(#{SetTranslate:#{edit_target:edit_target,path:guide,value:station}});
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:guide,
+        name:"visibility",type_name:"token",value:"\"inherited\""}});
     // The source terrain asset contains two optional synthetic berm markers
     // for mission-scale route studies.  They are not part of the visual
     // vehicle context and their 12–16 m radii can dominate a component review
-    // frame.  Keep the DEM and canonical terrain shader visible, but hide
+    // frame.  Retain the canonical terrain shader reference, but hide
     // these optional markers in the vehicle review layer through reversible
     // typed opinions.
     for berm in [environment + "/VisualBerms/BermEast",

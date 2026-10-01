@@ -356,7 +356,7 @@ fn run_visual_review(batch_index) {
         verification: "Verify_GriffinVisualRequirements",
         kind: "attribute_equals", path: root + "/Ground/RegolithPad", attr: "physics:collisionEnabled", expected: false };
     checks.push(collision);
-    checks.push(#{ id: "GV-005-ground-hidden", component: "context",
+    checks.push(#{ id: "GV-005-ground-visible", component: "context",
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",
         kind: "attribute_equals", path: root + "/Ground/RegolithPad", attr: "visibility", expected: "inherited" });
