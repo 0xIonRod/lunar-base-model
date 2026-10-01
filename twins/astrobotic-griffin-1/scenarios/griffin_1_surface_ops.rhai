@@ -1,8 +1,8 @@
 // Griffin-1 landing + surface-operations scenario.
 //
 // Powered descent and rover steering remain in their Modelica domains. This
-// mission commands the six physical ramp hinges only after touchdown, waits
-// for measured section and root settlement, then releases FLIP and runs egress.
+// automatic mission waits for landing and ramp settlement before egress.
+// Manual ramp opening and adapter detachment remain available during flight.
 
 const LANDER = "/Griffin1SurfaceOps/Lander";
 const ROVER = "/Griffin1SurfaceOps/FLIP";
@@ -101,6 +101,7 @@ fn on_start(me, ctx) {
     this.base_site_reached = false;
     this.mission_ready = true;
     this.phase_timeout = false;
+    this.ramp_timeout = false;
     this.rover_brake_held = false;
     this.route_started = false;
     this.route_control_error = false;
@@ -133,7 +134,7 @@ fn on_event(me, evt, ctx) {
     let rover = find_path(ROVER);
 
     // Shared controller and HUD requests converge on the same Twin-owned
-    // post-touchdown gates. The rover can never interpret U/F as drive input.
+    // manual actions. F on FLIP retains its vehicle-specific control meaning.
     if evt.name == "intent.edge" && evt.source == lander {
         let value = evt.value;
         if value != () && value["intent"] == "action" &&
@@ -146,7 +147,7 @@ fn on_event(me, evt, ctx) {
 
     // The native shortcuts are accepted while the lander is the active local
     // vehicle. The HUD uses the same request functions without a possession
-    // requirement, and both routes are checked again by the mission phase.
+    // requirement; neither route is restricted by landing or mission phase.
     if evt.name == "key:KeyU" && owner_of(lander) == 0 && owner_of(rover) != 0 {
         let result = griffin_surface_ops::request_ramp_unfold();
         if result.ok != true { notify_kind(result.error, "warn"); }
@@ -154,22 +155,14 @@ fn on_event(me, evt, ctx) {
     }
 
     if evt.name == "griffin_ramp_unfold_requested" {
-        if !this.lander_settled {
-            notify_kind("Ramp unfold is available after touchdown.", "warn");
-            return;
-        }
         if this.ramp_unfold_requested || this.ramps_deployed { return; }
         this.ramp_unfold_requested = true;
         griffin_controls::show_ramp_unfolding_actions();
-        print("[griffin] post-touchdown ramp unfold accepted");
+        print("[griffin] manual ramp unfold accepted");
         return;
     }
 
     if evt.name == "griffin_rover_release_requested" {
-        if !this.lander_settled || !this.ramps_deployed {
-            notify_kind("Release is enabled after the ramp has unfolded and settled.", "warn");
-            return;
-        }
         if this.release_requested { return; }
         if release_rover(this, false) {
             this.release_requested = true;
@@ -182,7 +175,8 @@ fn on_event(me, evt, ctx) {
     }
 
     if evt.name == "lander_touchdown" && evt.source == lander {
-        this.lander_settled = true;
+        let status = update_landing_status(me, this.lander_settled);
+        if status.ok == true { this.lander_settled = status.landed; }
         return;
     }
     // The route task emits these mission-local edges after the same typed
@@ -270,6 +264,14 @@ fn landing_setup_preflight(state) {
 }
 
 fn begin_descent(state) {
+    let lander = find_path(LANDER);
+    let status = griffin_surface_ops::landed_status();
+    // Recompilation must not re-arm guidance or move the operator's camera
+    // when this vehicle is already landed or under local manual control.
+    if (status.ok == true && status.landed) || owner_of(lander) == 0 {
+        griffin_controls::show_briefing();
+        return true;
+    }
     let mass = state.guidance_assembly_mass_evidence;
     if mass == () || mass.ok != true {
         let detail = if mass == () || mass.error == () { "assembly mass evidence is unavailable" } else { mass.error };
@@ -295,6 +297,17 @@ fn begin_descent(state) {
     true
 }
 
+fn update_landing_status(me, previously_landed) {
+    let status = griffin_surface_ops::landed_status();
+    if status.ok == true {
+        if status.landed && !previously_landed { touchdown_notice(me); }
+        if !status.landed && previously_landed {
+            hint("LANDING NOT CONFIRMED: U opens ramps; F detaches FLIP. Both remain available.");
+        }
+    }
+    status
+}
+
 fn on_stop(me, ctx) {
     // The guided overlay is app-wide, so retire this mission's controls when
     // its scenario is stopped even if the Welcome tab stays open underneath.
@@ -312,10 +325,6 @@ fn touchdown_notice(me) {
 
 fn release_rover(state, already_requested) {
     if already_requested { return true; }
-    if !state.lander_settled || !state.ramps_deployed {
-        notify_kind("FLIP release rejected: touchdown and settled ramps are required.", "warn");
-        return false;
-    }
 
     let joint = find_path(DOCK);
     if joint == () || joint < 0 {
@@ -399,7 +408,238 @@ fn release_rover_settle_brake() {
     #{ok: true}
 }
 
-fn task(me, ctx) {
+fn ramp_unfold_task() {
+    seq([
+        // Manual requests start this independent physical sequence immediately;
+        // unattended runs request it only after their landing gates complete.
+        wait_until(|m| this.ramp_unfold_requested || this.ramp_timeout),
+        check(|m| this.ramp_timeout != true),
+        once(|m| {
+            this.ramp_motion_trace = [];
+            this.ramp_motion_trace_last_tick = ();
+            this.ramp_section_final_commanded = false;
+            let middle = griffin_surface_ramp_ops::unfold_middle_sections();
+            if middle.ok != true {
+                this.ramp_timeout = true;
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-command");
+            } else {
+                this.ramp_sections_expected = middle.expected_angles;
+            }
+            true
+        }),
+        check(|m| this.ramp_timeout != true),
+        par_race([
+            seq([
+                wait_until(|m| {
+                    let trace = griffin_surface_ops::update_physical_ramp_motion_trace(
+                        this.ramp_motion_trace, this.ramp_motion_trace_last_tick,
+                        "middle-unfold");
+                    this.ramp_motion_trace = trace.samples;
+                    this.ramp_motion_trace_last_tick = trace.last_tick;
+                    let tick = sim_tick();
+                    let previous = this.ramp_settle_probe_tick;
+                    if previous != () && tick >= previous && tick - previous < 6 {
+                        return false;
+                    }
+                    this.ramp_settle_probe_tick = tick;
+                    let progress=griffin_surface_ramp_ops::section_unfold_progress(
+                        this.ramp_sections_expected,"middle",this.ramp_section_final_commanded,
+                        this.ramp_unfold_waypoint_evidence);
+                    if progress.ok!=true {
+                        this.ramp_timeout=true;
+                        this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-middle-unfold-progress");
+                        return true;
+                    }
+                    this.ramp_section_settle_evidence=progress.evidence;
+                    this.ramp_sections_expected=progress.expected_angles;
+                    this.ramp_section_final_commanded=progress.final_commanded;
+                    this.ramp_unfold_waypoint_evidence=progress.waypoint_evidence;
+                    progress.settled
+                })
+            ]),
+            seq([
+                wait(20.0),
+                once(|m| {
+                    this.ramp_section_settle_evidence =
+                        griffin_surface_ops::physical_ramp_hinges_settled(
+                            this.ramp_sections_expected, griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
+                    this.ramp_timeout = true;
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-settle");
+                    true
+                })
+            ])
+        ]),
+        check(|m| this.ramp_timeout != true),
+        once(|m| {
+            this.ramp_middle_settle_evidence = this.ramp_section_settle_evidence;
+            emit(griffin_surface_ramp_ops::unfold_event_contract().middle_settled);
+            true
+        }),
+        once(|m| {
+            this.ramp_motion_trace = [];
+            this.ramp_motion_trace_last_tick = ();
+            this.ramp_section_final_commanded = false;
+            let toes = griffin_surface_ramp_ops::unfold_toes();
+            if toes.ok != true {
+                this.ramp_timeout = true;
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-command");
+            } else {
+                this.ramp_sections_expected = toes.expected_angles;
+            }
+            true
+        }),
+        check(|m| this.ramp_timeout != true),
+        par_race([
+            seq([
+                wait_until(|m| {
+                    let trace = griffin_surface_ops::update_physical_ramp_motion_trace(
+                        this.ramp_motion_trace, this.ramp_motion_trace_last_tick,
+                        "toe-unfold");
+                    this.ramp_motion_trace = trace.samples;
+                    this.ramp_motion_trace_last_tick = trace.last_tick;
+                    let tick = sim_tick();
+                    let previous = this.ramp_settle_probe_tick;
+                    if previous != () && tick >= previous && tick - previous < 6 {
+                        return false;
+                    }
+                    this.ramp_settle_probe_tick = tick;
+                    let progress=griffin_surface_ramp_ops::section_unfold_progress(
+                        this.ramp_sections_expected,"toe",this.ramp_section_final_commanded,
+                        this.ramp_unfold_waypoint_evidence);
+                    if progress.ok!=true {
+                        this.ramp_timeout=true;
+                        this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-toe-unfold-progress");
+                        return true;
+                    }
+                    this.ramp_section_settle_evidence=progress.evidence;
+                    this.ramp_sections_expected=progress.expected_angles;
+                    this.ramp_section_final_commanded=progress.final_commanded;
+                    this.ramp_unfold_waypoint_evidence=progress.waypoint_evidence;
+                    progress.settled
+                })
+            ]),
+            seq([
+                wait(30.0),
+                once(|m| {
+                    this.ramp_section_settle_evidence =
+                        griffin_surface_ops::physical_ramp_hinges_settled(
+                            this.ramp_sections_expected, griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
+                    this.ramp_timeout = true;
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-settle");
+                    true
+                })
+            ])
+        ]),
+        check(|m| this.ramp_timeout != true),
+        once(|m| {
+            this.ramp_toe_settle_evidence = this.ramp_section_settle_evidence;
+            emit(griffin_surface_ramp_ops::unfold_event_contract().toes_settled);
+            true
+        }),
+        once(|m| {
+            let plan=griffin_surface_ramp_ops::root_deployment_plan();
+            this.ramp_terrain_plan=plan;
+            this.ramp_deployment_expected=if plan.ok==true {plan.expected_angles} else {()};
+            if this.ramp_deployment_expected!=() {
+                for expected in this.ramp_sections_expected {
+                    this.ramp_deployment_expected.push(expected);
+                }
+            }
+            this.ramp_traversal_stable_since=();
+            if this.ramp_deployment_expected == () {
+                this.ramp_timeout = true;
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-targets");
+                return true;
+            }
+            this.ramp_motion_trace = [];
+            this.ramp_motion_trace_last_tick = ();
+            let ramps = griffin_surface_ramp_ops::deploy_roots(plan.expected_angles);
+            if ramps.ok != true {
+                this.ramp_timeout = true;
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deploy-command");
+            }
+            true
+        }),
+        check(|m| this.ramp_timeout != true),
+        par_race([
+            seq([
+                wait_until(|m| {
+                    let trace = griffin_surface_ops::update_physical_ramp_motion_trace(
+                        this.ramp_motion_trace, this.ramp_motion_trace_last_tick,
+                        "root-deployment");
+                    this.ramp_motion_trace = trace.samples;
+                    this.ramp_motion_trace_last_tick = trace.last_tick;
+                    let tick = sim_tick();
+                    let previous = this.ramp_settle_probe_tick;
+                    if previous != () && tick >= previous && tick - previous < 6 {
+                        return false;
+                    }
+                    this.ramp_settle_probe_tick = tick;
+                    let progress=griffin_surface_ramp_ops::traversal_settle_progress(
+                        this.ramp_deployment_expected,this.ramp_traversal_stable_since);
+                    this.ramp_traversal_stable_since=progress.stable_since;
+                    this.ramp_deployment_settle_evidence=progress.evidence;
+                    progress.ok==true && progress.settled==true
+                })
+            ]),
+            seq([
+                wait(30.0),
+                once(|m| {
+                    let progress=griffin_surface_ramp_ops::traversal_settle_progress(
+                        this.ramp_deployment_expected,this.ramp_traversal_stable_since);
+                    this.ramp_traversal_stable_since=progress.stable_since;
+                    this.ramp_deployment_settle_evidence=progress.evidence;
+                    this.ramp_timeout = true;
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-settle");
+                    true
+                })
+            ])
+        ]),
+        check(|m| this.ramp_timeout != true),
+        once(|m| {
+            this.ramps_deployed = true;
+            emit(griffin_surface_ramp_ops::unfold_event_contract().roots_settled);
+            griffin_controls::show_rover_release_actions();
+            print("[griffin] both physical ramps reached their measured deployment hinge targets");
+            if is_unattended() {
+                if release_rover(this, false) {
+                    this.release_requested = true;
+                } else {
+                    this.ramp_timeout = true;
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "adapter-release");
+                }
+            }
+            true
+        }),
+    ])
+}
+
+fn landing_confirmation_task() {
+    if is_unattended() {
+        par_race([
+            par_all([
+                wait_for_from("lander_engine_cutoff", "/Griffin1SurfaceOps/Lander/GNC"),
+                wait_for_from("lander_flight_handoff", "/Griffin1SurfaceOps/Lander/GNC"),
+                wait_for_from("lander_touchdown", "/Griffin1SurfaceOps/Lander"),
+            ]),
+            seq([
+                // This watchdog cannot create a PASS; the event branch must
+                // complete the powered-descent and physical landing contract.
+                wait(griffin_spec::landing_phase_timeout_s()),
+                once(|m| {
+                    this.phase_timeout = true;
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "landing");
+                    true
+                }),
+            ]),
+        ])
+    } else {
+        // landing_status_task observes the qualified Modelica contact state.
+        wait_until(|m| this.lander_settled)
+    }
+}
+
+fn surface_mission_task() {
     let egress_route = griffin_surface_ops::surface_egress_task(find_path(ROVER));
     let route = griffin_surface_ops::surface_route_task(find_path(ROVER));
     let route_preflight = griffin_surface_ops::surface_route_preflight();
@@ -439,237 +679,27 @@ fn task(me, ctx) {
             true
         }),
         check(|m| this.phase_timeout != true),
-        par_race([
-            par_all([
-                wait_for_from("lander_engine_cutoff", "/Griffin1SurfaceOps/Lander/GNC"),
-                wait_for_from("lander_flight_handoff", "/Griffin1SurfaceOps/Lander/GNC"),
-                wait_for_from("lander_touchdown", "/Griffin1SurfaceOps/Lander"),
-            ]),
-            seq([
-                // This watchdog is a SysML-authored bound for a missing
-                // physical event. It cannot create a PASS; the event branch
-                // must still complete the landing predicates.
-                wait(griffin_spec::landing_phase_timeout_s()),
-                once(|m| { this.phase_timeout = true; this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "landing"); true }),
-            ]),
-        ]),
+        landing_confirmation_task(),
         // `par_race` succeeds when the timeout branch completes; stop the
         // mission immediately after its structured failure verdict instead of
         // falling through to touchdown/egress steps.
         check(|m| this.phase_timeout != true),
         once(|m| {
-            this.lander_settled = true;
-            touchdown_notice(m);
-            // Unattended scene runs have no operator to press U or F. Keep
-            // their authored route deterministic while windowed sessions use
-            // the same explicit command/key/HUD controls as the operator.
-            if is_unattended() { this.ramp_unfold_requested = true; }
+            let status = update_landing_status(m, this.lander_settled);
+            if status.ok == true { this.lander_settled = status.landed; }
             true
         }),
         wait(1.5),
-        // The folded hinge targets are the transport/descent pose. Keep the
-        // rover attached and expose U plus the HUD button until the operator
-        // explicitly requests the staged ramp unfold.
-        wait_until(|m| this.ramp_unfold_requested || this.phase_timeout),
-        check(|m| this.phase_timeout != true),
         once(|m| {
-            this.ramp_motion_trace = [];
-            this.ramp_motion_trace_last_tick = ();
-            this.ramp_section_final_commanded = false;
-            let middle = griffin_surface_ramp_ops::unfold_middle_sections();
-            if middle.ok != true {
-                this.phase_timeout = true;
-                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-command");
-            } else {
-                this.ramp_sections_expected = middle.expected_angles;
-            }
+            // Preserve the autonomous post-touchdown dwell. Manual U starts
+            // the independent hinge sequence whenever the operator requests.
+            if is_unattended() { this.ramp_unfold_requested = true; }
             true
         }),
+        wait_until(|m| this.ramps_deployed || this.ramp_timeout || this.phase_timeout),
         check(|m| this.phase_timeout != true),
-        par_race([
-            seq([
-                wait_until(|m| {
-                    let trace = griffin_surface_ops::update_physical_ramp_motion_trace(
-                        this.ramp_motion_trace, this.ramp_motion_trace_last_tick,
-                        "middle-unfold");
-                    this.ramp_motion_trace = trace.samples;
-                    this.ramp_motion_trace_last_tick = trace.last_tick;
-                    let tick = sim_tick();
-                    let previous = this.ramp_settle_probe_tick;
-                    if previous != () && tick >= previous && tick - previous < 6 {
-                        return false;
-                    }
-                    this.ramp_settle_probe_tick = tick;
-                    let progress=griffin_surface_ramp_ops::section_unfold_progress(
-                        this.ramp_sections_expected,"middle",this.ramp_section_final_commanded,
-                        this.ramp_unfold_waypoint_evidence);
-                    if progress.ok!=true {
-                        this.phase_timeout=true;
-                        this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-middle-unfold-progress");
-                        return true;
-                    }
-                    this.ramp_section_settle_evidence=progress.evidence;
-                    this.ramp_sections_expected=progress.expected_angles;
-                    this.ramp_section_final_commanded=progress.final_commanded;
-                    this.ramp_unfold_waypoint_evidence=progress.waypoint_evidence;
-                    progress.settled
-                })
-            ]),
-            seq([
-                wait(20.0),
-                once(|m| {
-                    this.ramp_section_settle_evidence =
-                        griffin_surface_ops::physical_ramp_hinges_settled(
-                            this.ramp_sections_expected, griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
-                    this.phase_timeout = true;
-                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-settle");
-                    true
-                })
-            ])
-        ]),
-        check(|m| this.phase_timeout != true),
-        once(|m| {
-            this.ramp_middle_settle_evidence = this.ramp_section_settle_evidence;
-            emit(griffin_surface_ramp_ops::unfold_event_contract().middle_settled);
-            true
-        }),
-        once(|m| {
-            this.ramp_motion_trace = [];
-            this.ramp_motion_trace_last_tick = ();
-            this.ramp_section_final_commanded = false;
-            let toes = griffin_surface_ramp_ops::unfold_toes();
-            if toes.ok != true {
-                this.phase_timeout = true;
-                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-command");
-            } else {
-                this.ramp_sections_expected = toes.expected_angles;
-            }
-            true
-        }),
-        check(|m| this.phase_timeout != true),
-        par_race([
-            seq([
-                wait_until(|m| {
-                    let trace = griffin_surface_ops::update_physical_ramp_motion_trace(
-                        this.ramp_motion_trace, this.ramp_motion_trace_last_tick,
-                        "toe-unfold");
-                    this.ramp_motion_trace = trace.samples;
-                    this.ramp_motion_trace_last_tick = trace.last_tick;
-                    let tick = sim_tick();
-                    let previous = this.ramp_settle_probe_tick;
-                    if previous != () && tick >= previous && tick - previous < 6 {
-                        return false;
-                    }
-                    this.ramp_settle_probe_tick = tick;
-                    let progress=griffin_surface_ramp_ops::section_unfold_progress(
-                        this.ramp_sections_expected,"toe",this.ramp_section_final_commanded,
-                        this.ramp_unfold_waypoint_evidence);
-                    if progress.ok!=true {
-                        this.phase_timeout=true;
-                        this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-toe-unfold-progress");
-                        return true;
-                    }
-                    this.ramp_section_settle_evidence=progress.evidence;
-                    this.ramp_sections_expected=progress.expected_angles;
-                    this.ramp_section_final_commanded=progress.final_commanded;
-                    this.ramp_unfold_waypoint_evidence=progress.waypoint_evidence;
-                    progress.settled
-                })
-            ]),
-            seq([
-                wait(30.0),
-                once(|m| {
-                    this.ramp_section_settle_evidence =
-                        griffin_surface_ops::physical_ramp_hinges_settled(
-                            this.ramp_sections_expected, griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
-                    this.phase_timeout = true;
-                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-settle");
-                    true
-                })
-            ])
-        ]),
-        check(|m| this.phase_timeout != true),
-        once(|m| {
-            this.ramp_toe_settle_evidence = this.ramp_section_settle_evidence;
-            emit(griffin_surface_ramp_ops::unfold_event_contract().toes_settled);
-            true
-        }),
-        once(|m| {
-            let plan=griffin_surface_ramp_ops::landed_root_deployment_plan();
-            this.ramp_terrain_plan=plan;
-            this.ramp_deployment_expected=if plan.ok==true {plan.expected_angles} else {()};
-            if this.ramp_deployment_expected!=() {
-                for expected in this.ramp_sections_expected {
-                    this.ramp_deployment_expected.push(expected);
-                }
-            }
-            this.ramp_traversal_stable_since=();
-            if this.ramp_deployment_expected == () {
-                this.phase_timeout = true;
-                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-targets");
-                return true;
-            }
-            this.ramp_motion_trace = [];
-            this.ramp_motion_trace_last_tick = ();
-            let ramps = griffin_surface_ramp_ops::deploy_roots(plan.expected_angles);
-            if ramps.ok != true {
-                this.phase_timeout = true;
-                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deploy-command");
-            }
-            true
-        }),
-        check(|m| this.phase_timeout != true),
-        par_race([
-            seq([
-                wait_until(|m| {
-                    let trace = griffin_surface_ops::update_physical_ramp_motion_trace(
-                        this.ramp_motion_trace, this.ramp_motion_trace_last_tick,
-                        "root-deployment");
-                    this.ramp_motion_trace = trace.samples;
-                    this.ramp_motion_trace_last_tick = trace.last_tick;
-                    let tick = sim_tick();
-                    let previous = this.ramp_settle_probe_tick;
-                    if previous != () && tick >= previous && tick - previous < 6 {
-                        return false;
-                    }
-                    this.ramp_settle_probe_tick = tick;
-                    let progress=griffin_surface_ramp_ops::traversal_settle_progress(
-                        this.ramp_deployment_expected,this.ramp_traversal_stable_since);
-                    this.ramp_traversal_stable_since=progress.stable_since;
-                    this.ramp_deployment_settle_evidence=progress.evidence;
-                    progress.ok==true && progress.settled==true
-                })
-            ]),
-            seq([
-                wait(30.0),
-                once(|m| {
-                    let progress=griffin_surface_ramp_ops::traversal_settle_progress(
-                        this.ramp_deployment_expected,this.ramp_traversal_stable_since);
-                    this.ramp_traversal_stable_since=progress.stable_since;
-                    this.ramp_deployment_settle_evidence=progress.evidence;
-                    this.phase_timeout = true;
-                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-settle");
-                    true
-                })
-            ])
-        ]),
-        check(|m| this.phase_timeout != true),
-        once(|m| {
-            this.ramps_deployed = true;
-            emit(griffin_surface_ramp_ops::unfold_event_contract().roots_settled);
-            griffin_controls::show_rover_release_actions();
-            print("[griffin] both physical ramps reached their measured deployment hinge targets");
-            if is_unattended() {
-                if release_rover(this, false) {
-                    this.release_requested = true;
-                } else {
-                    this.phase_timeout = true;
-                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "adapter-release");
-                }
-            }
-            true
-        }),
-        // The G shortcut and HUD button share the same safe release request.
+        check(|m| this.ramp_timeout != true),
+        // F and the HUD button share the same immediate detach request.
         wait_until(|m| this.release_requested || this.phase_timeout),
         check(|m| this.phase_timeout != true),
         // The command acknowledgement only means the request was accepted.
@@ -756,4 +786,26 @@ fn task(me, ctx) {
             true
         }),
     ])
+}
+
+// Interactive status remains observed even if autonomous mission acceptance
+// fails. Its failure verdict is retained; manual mechanism authority survives.
+fn landing_status_task() {
+    forever(seq([
+        wait(0.1),
+        once(|m| {
+            let status = update_landing_status(m, this.lander_settled);
+            if status.ok == true { this.lander_settled = status.landed; }
+            true
+        })
+    ]))
+}
+
+fn task(me, ctx) {
+    if is_unattended() {
+        par_all([ramp_unfold_task(), surface_mission_task()])
+    } else {
+        let operator = par_all([ramp_unfold_task(), landing_status_task()]);
+        par_race([surface_mission_task(), operator])
+    }
 }

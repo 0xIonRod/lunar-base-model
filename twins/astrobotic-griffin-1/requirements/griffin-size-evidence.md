@@ -654,3 +654,51 @@ penetration, rather than the previous roughly 0.4 m burial. The close rendered
 view confirmed the near feet on the surface. This is bounded landing/contact
 evidence; it does not qualify arbitrary crash speeds, unpublished shock
 kinematics, or the complete surface mission.
+
+#### Manual mechanism authority and landed indication (2026-10-01)
+
+Source: explicit operator request on 2026-10-01 that ramp opening and rover
+detachment remain available in every flight/landing phase. This is simulator
+operator policy, not an Astrobotic flight interlock specification. U and the
+OPEN RAMPS HUD action run the existing middle/toe/root physical sequence in
+parallel with landing. F on the lander and DETACH ROVER request native adapter
+joint retirement immediately; repeated requests are idempotent. The HUD keeps
+both actions enabled while the rover is selected; rover F retains autopilot
+control. Finite angles, physical travel limits and measured mechanism settlement
+remain enforced. The unattended mission retains its GNC handoff, physical
+landing, post-touchdown dwell, settlement and solver-retirement acceptance gates.
+
+The original standing vehicle already had touchdown=1, landing_contact=1 and
+all_legs_contact=1, but landing_handoff=0. The old operator policy conflated
+physical landing with the automatic guidance latch. Landed indication now reads
+Modelica landing_contact directly and observes its current value as well as the
+touchdown event, including after a script reload. Source:
+LunCoSim assets/models/Lander.mo, landing_contact/settled_touchdown_target
+equations. Those equations already qualify four-pad contact, upright attitude,
+ground/descent speed, angular rate and suspension rate. No physical detection
+threshold was weakened. Interactive status uses the existing task scheduler
+at 0.1 simulated seconds; this is a replaceable display sampling choice, not
+a control equation or supplier datum.
+
+Airborne opening uses the existing SysML nominal deployment angles
+(-0.4857867749 / +0.4857867749 rad) as a mechanism pose. Rationale: terrain may
+be beyond ramp travel during flight, so terrain-contact fitting would falsely
+reject an available manual command. Once physically landed, the planner uses
+the measured root frames and retained DEM. An airborne pose never establishes
+traversable egress or terrain contact.
+
+Bounded owned run on port 49747: both manual requests were accepted with
+landing_contact=0 and landing_handoff=0; the solver retired the adapter edge
+and both middle sections, toes and roots received their physical targets. A
+repeat detach request was accepted with the joint already absent. This airborne
+run did not meet the existing root-settlement deadline, so complete mechanical
+settlement/egress is not claimed. Sources: /tmp/griffin-manual-actions.json,
+/tmp/griffin-manual-effects.json and /tmp/griffin-manual-policy-acceptance.log.
+A separate grounded run reported landing_contact=1 and all_legs_contact=1; the
+HUD displayed TOUCHDOWN CONFIRMED with both action buttons enabled. Sources:
+/tmp/griffin-manual-landed-status.json, /tmp/griffin-manual-landed-acceptance.log
+and terrain/griffin-manual-landed-controls.png. That second run had completed
+an automatic handoff; the original no-handoff snapshot and the new single-port
+status reader establish why handoff is no longer an operator prerequisite.
+The Rhai sources compiled and the provenance gate passed (207 requirements,
+207 evidence records). Full mission acceptance remains open.

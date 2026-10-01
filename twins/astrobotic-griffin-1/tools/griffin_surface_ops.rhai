@@ -1155,39 +1155,28 @@ fn physical_ramp_hinges_settled(expected_angles, tolerance_rad) {
       observations: observations, pending: pending}
 }
 
-fn _ramp_touchdown_ready() {
+/// Physical landing status is independent of the automatic guidance handoff.
+/// Modelica qualifies landing_contact with four-pad contact, upright attitude,
+/// velocity, angular rate and suspension rate; the operator UI uses that fact.
+fn landed_status() {
     let lander = find_path("/Griffin1SurfaceOps/Lander");
-    if lander == () || lander < 0 { return false; }
-    let snapshot = read_ports(lander, ["landing_handoff", "all_legs_contact"]);
-    // `touchdown` is an event-phase signal and clears after the landing
-    // supervisor hands flight control to the landing gear. Ramp operations
-    // use that persistent handoff latch, together with live four-pad contact.
-    let handoff_port = _ramp_hinge_port(snapshot.ports, "landing_handoff", "in");
-    let contact_port = _ramp_hinge_port(snapshot.ports, "all_legs_contact", "out");
-    if handoff_port == () || contact_port == () { return false; }
-    let landing_handoff = handoff_port.value;
-    let all_legs_contact = contact_port.value;
-    landing_handoff != () && all_legs_contact != ()
-        && landing_handoff >= 0.999 && all_legs_contact >= 0.999
+    if lander == () || lander < 0 { return #{ok: false, landed: false}; }
+    let snapshot = read_ports(lander, ["landing_contact"]);
+    let port = _ramp_hinge_port(snapshot.ports, "landing_contact", "out");
+    if port == () || port.value == () || !port.value.is_finite() {
+        return #{ok: false, landed: false};
+    }
+    #{ok: true, landed: port.value >= 0.999}
 }
 
-/// Request the mission-owned two-stage ramp unfold after touchdown. The
-/// mission task sequences the four section drives first, then the two deck
-/// drives after the authored dwell.
+/// Manual actions are available in every flight/landing phase. The mission
+/// sequences physical hinge motion; automatic egress retains its own gates.
 fn request_ramp_unfold() {
-    if !_ramp_touchdown_ready() {
-        return #{ok: false, error: "ramp unfold is available only after confirmed touchdown with all four legs in contact"};
-    }
     emit("griffin_ramp_unfold_requested");
     #{ok: true, queued: true, event: "griffin_ramp_unfold_requested"}
 }
 
-/// Request the payload adapter release. The mission owns the final safe-state
-/// gate and calls the generic DetachJoint command only after the ramp settles.
 fn request_rover_release() {
-    if !_ramp_touchdown_ready() {
-        return #{ok: false, error: "rover release is available only after confirmed touchdown with all four legs in contact"};
-    }
     emit("griffin_rover_release_requested");
     #{ok: true, queued: true, event: "griffin_rover_release_requested"}
 }
@@ -1203,9 +1192,6 @@ fn on_hud_action(action) {
 /// Command one physical hinge by its USD prim name. Limits are read from its
 /// active physics component and checked in radians before writing the angular port.
 fn set_physical_ramp_hinge_angles(expected_angles) {
-    if !_ramp_touchdown_ready() {
-        return #{ok: false, error: "ramp hinges may be commanded only after confirmed touchdown with all four legs in contact"};
-    }
     if expected_angles == () || expected_angles.len() < 2 {
         return #{ok: false, error: "atomic ramp motion requires at least two hinge targets"};
     }

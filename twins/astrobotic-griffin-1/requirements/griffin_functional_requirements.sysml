@@ -20,7 +20,7 @@ package GriffinFunctionalRequirements {
     }
 
     requirement def GR004_SurfaceSequence {
-        doc /* GR-004 [mission flow] preserve landing/settle, egress-path preparation, adapter release, FLIP egress, and route order; verify with a Twin Rhai scenario. Source: Twin mission scenario contract. Rationale: the ordered gates prevent control from transferring to an airborne or still-secured rover. */
+        doc /* GR-004 [mission flow+operator policy] the unattended mission preserves powered descent/handoff, landing/settle, egress-path preparation, adapter release, FLIP egress, and route order. Manual U / OPEN RAMPS and lander F / DETACH ROVER shall remain enabled in every flight and landing phase, without requiring touchdown, automatic-guidance handoff, or settled ramps. F requests solver-owned adapter detachment immediately and repeated requests are idempotent. U starts the existing physical middle/toe/root hinge sequence independently of landing; finite target, travel-limit and measured settlement checks remain required. HUD actions remain available while FLIP is selected; its F retains the rover-specific autopilot meaning. Interactive landing presentation uses Modelica landing_contact, qualified by four-pad contact, upright attitude, velocity and angular/suspension rates, independently of the GNC handoff latch; an already-landed state shall be sampled rather than relying solely on a missed event. Automatic egress/control transfer still waits for physical landing, settled ramps and completed adapter retirement. Source: explicit operator instruction, 2026-10-01, and assets/models/Lander.mo landing_contact equation. Rationale: manual mechanism authority is distinct from autonomous mission acceptance; a manually landed vehicle need not have a flight-supervisor handoff. */
     }
 
     requirement def GR006_SolarAssemblies {
@@ -52,7 +52,7 @@ package GriffinFunctionalRequirements {
     }
 
     requirement def GR026_AdapterRelease {
-        doc /* GR-026 [runtime] adapter release leaves no stale joint or pre-release route ownership and transfers FLIP control exactly once. Source: Twin adapter-release runtime contract. Rationale: exactly-once ownership transfer prevents the lander and rover controllers from simultaneously commanding the released vehicle. */
+        doc /* GR-026 [automatic mission runtime] adapter release leaves no stale joint or pre-release route ownership and transfers FLIP control exactly once after the automatic mission gates. The touchdownObserved constraint qualifies automatic mission acceptance, not permission for manual F detachment. Source: Twin adapter-release runtime contract. Rationale: exactly-once ownership transfer prevents the lander and rover controllers from simultaneously commanding the released vehicle. */
         require GR026_ReleaseEvidenceComplete;
     }
 

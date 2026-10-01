@@ -216,6 +216,25 @@ fn landed_root_deployment_plan() {
     #{ok:true,expected_angles:expected,evidence:evidence}
 }
 
+/// Airborne opening is a commanded mechanism pose, not terrain contact.
+/// Reuse the source-owned nominal deployment targets; never fit an unreachable
+/// surface while flying or claim that this pose establishes rover egress.
+fn root_deployment_plan() {
+    let status = griffin_surface_ops::landed_status();
+    if status.ok != true { return #{ok: false, error: "physical landing status unavailable"}; }
+    if status.landed { return landed_root_deployment_plan(); }
+    let joints = griffin_spec::ramp_root_joint_names();
+    let port = griffin_spec::physical_ramp_port_deployment_angle_rad();
+    let starboard = griffin_spec::physical_ramp_starboard_deployment_angle_rad();
+    if joints.len() != 2 || port == () || starboard == () {
+        return #{ok: false, error: "airborne deployment pose unavailable in SysML"};
+    }
+    #{ok: true, mode: "airborne_pose", expected_angles: [
+        #{name: joints[0], target_rad: port},
+        #{name: joints[1], target_rad: starboard}
+    ]}
+}
+
 fn deploy_roots(expected) {
     // Lower the roots only after all intermediate sections reach their
     // source-defined level deployment targets.

@@ -36,13 +36,13 @@ fn show_briefing() {
         #{ text: "FLIP    " + action + " toggles autopilot; manual input takes authority back", state: "pending" },
         #{ text: "HANDOFF " + cancel + " releases the selected vehicle", state: "pending" }
     ]);
-    set_surface_action_buttons(false, false);
+    set_surface_action_buttons();
 }
 
-fn set_surface_action_buttons(unfold_enabled, release_enabled) {
+fn set_surface_action_buttons() {
     let result = guided_hud_actions("griffin_surface_ops", "on_hud_action", [
-        #{id: "unfold_ramps", label: "OPEN RAMPS  U", enabled: unfold_enabled},
-        #{id: "release_rover", label: "DETACH ROVER  F", enabled: release_enabled}
+        #{id: "unfold_ramps", label: "OPEN RAMPS  U", enabled: true},
+        #{id: "release_rover", label: "DETACH ROVER  F", enabled: true}
     ]);
     if result == () || result.ok != true {
         let detail = if result == () || result.error == () { "unknown HUD action update rejection" } else { result.error };
@@ -53,23 +53,23 @@ fn set_surface_action_buttons(unfold_enabled, release_enabled) {
 
 fn show_touchdown_actions() {
     show_briefing();
-    hint("TOUCHDOWN CONFIRMED: U or OPEN RAMPS to lower both ramps. F detaches FLIP after the ramps settle.");
-    set_surface_action_buttons(true, false);
+    hint("TOUCHDOWN CONFIRMED: U or OPEN RAMPS to lower both ramps. F detaches FLIP immediately.");
+    set_surface_action_buttons();
 }
 
 fn show_ramp_unfolding_actions() {
-    hint("RAMP UNFOLDING: section hinges stay straight while both deck hinges lower the ramps to terrain.");
-    set_surface_action_buttons(false, false);
+    hint("RAMP UNFOLDING: middle sections, toes, then deck hinges. F remains available.");
+    set_surface_action_buttons();
 }
 
 fn show_rover_release_actions() {
     hint("RAMPS SETTLED: F or DETACH ROVER detaches FLIP from the top deck.");
-    set_surface_action_buttons(false, true);
+    set_surface_action_buttons();
 }
 
 fn show_rover_release_pending() {
     hint("ROVER RELEASE REQUESTED: waiting for the physics joint to retire.");
-    set_surface_action_buttons(false, false);
+    set_surface_action_buttons();
 }
 
 fn clear_surface_operation_actions() {
@@ -84,7 +84,7 @@ fn show_rover_controls() {
     let action = input_hint("action");
     let cancel = input_hint("cancel");
     let steering_mode = rover_steering_mode_label();
-    clear_surface_operation_actions();
+    set_surface_action_buttons();
     hint("FLIP CONTROL: " + forward + "/" + backward + " drive · " + left + "/" + right + " steer · Space brake · " + cancel + " release");
     objectives_hud([
         #{ text: "FLIP is the active surface vehicle", state: "active" },
