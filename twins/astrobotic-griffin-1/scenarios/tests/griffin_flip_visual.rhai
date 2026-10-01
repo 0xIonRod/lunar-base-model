@@ -359,7 +359,7 @@ fn run_visual_review(batch_index) {
     checks.push(#{ id: "GV-005-ground-hidden", component: "context",
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",
-        kind: "attribute_equals", path: root + "/Ground/RegolithPad", attr: "visibility", expected: "invisible" });
+        kind: "attribute_equals", path: root + "/Ground/RegolithPad", attr: "visibility", expected: "inherited" });
     checks.push(#{ id: "GV-005-landing-pad-hidden", component: "context",
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",
@@ -368,9 +368,7 @@ fn run_visual_review(batch_index) {
         requirement: "gv005",
         verification: "Verify_GriffinVisualRequirements",
         kind: "attribute_equals", path: root + "/Ground/PadRing", attr: "visibility", expected: "invisible" });
-    let terrain = visual_exists_check("GV-006-terrain", "context", "gv006", "exists", root + "/Environment/Terrain");
-    terrain.expected_type = "Xform";
-    checks.push(terrain);
+    // Static review disables the DEM; retained context asset/shader belongs to the live mission.
     checks.push(#{ id: "GV-006-terrain-shader", component: "context",
         requirement: "gv006",
         verification: "Verify_GriffinVisualRequirements",

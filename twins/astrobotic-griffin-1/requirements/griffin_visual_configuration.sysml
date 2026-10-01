@@ -94,11 +94,14 @@ package GriffinVisualConfigurationRequirements {
         attribute renderPurpose : UsdGeomPurpose = "Render";
         attribute reviewCameraName : GriffinReviewCameraName = "VisualCamera";
         attribute reviewLanderName : GriffinReviewLanderName = "Griffin1";
-        attribute visualReviewGriffinStation : Position = (0.0, 0.0, 0.0);
+        // Flat review datum: unloaded feet use the prismatic spring rest
+        // pose and all physics is disabled. Live terrain contact belongs to
+        // griffin_1_surface_ops, which is the Twin default. See size evidence.
+        attribute visualReviewGriffinStation : Position = (0.0, 0.44, 0.0);
         // FLIP is mounted on the payload adapter. Its wheel bottoms (station
         // -0.05 m minus 0.45 m tire radius) meet the adapter top at 2.08 m.
         // This station is the one review-scene placement source.
-        attribute visualReviewFlipStation : Position = (0.0, 2.58, 0.0);
+        attribute visualReviewFlipStation : Position = (0.0, 3.02, 0.0);
 
         /* SIZE ESTIMATE, 2026-09-30; rationale and uncertainties are in
          * requirements/griffin-size-evidence.md. NASA MSS 2024, slide 8

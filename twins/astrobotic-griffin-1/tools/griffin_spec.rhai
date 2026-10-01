@@ -174,7 +174,7 @@ fn _qualified_attribute(name) {
         "egressMode", "solarArrayMode", "mobilityStatus",
         "exactVehicleIcdStatus", "wheelRadiusM", "wheelWidthM",
         "wheelStations", "missionSteeringMode", "chassisWidthM", "chassisLengthM",
-        "sensorMastHeightM", "wheelStationX", "wheelStationY",
+        "sensorMastHeightM", "forwardYawOffsetRad", "wheelStationX", "wheelStationY",
         "wheelStationZ", "suspensionRestLengthM",
         "suspensionStrutScale", "suspensionStrutOffset",
         "suspensionArmScale", "suspensionArmOffsetM",

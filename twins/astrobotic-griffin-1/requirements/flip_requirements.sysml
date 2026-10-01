@@ -48,11 +48,17 @@ package FlipRequirements {
         attribute sensorMastHeightM : Real = 0.70;
         // One station definition drives the simulation, Editor projection,
         // requirements, and wheel-contact verification.
+        // +X is the study travel direction; FL/FR are the positive-X axle.
+        // This is a reconstruction frame choice, not a supplier front datum.
+        // Core axle/steering-axis cross product and Modelica heading use this
+        // same basis. Egress replay 985b084/24dd835fa exposed the old -Z
+        // assumption: GR-004-route-stall at tick 12762, throttle zero.
+        attribute forwardYawOffsetRad : Real = -1.5707963267948966;
         attribute wheelStationX : Real[4] = (
+            FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
             -FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
-             FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
-            -FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
-             FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre));
+            FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
+            -FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre));
         attribute wheelStationY : Real[4] = (-.05, -.05, -.05, -.05);
         attribute wheelStationZ : Real[4] = (
             -FlipCadRequirements::CadStudy::trackMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
@@ -61,7 +67,12 @@ package FlipRequirements {
              FlipCadRequirements::CadStudy::trackMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre));
         // The suspension extension is a Twin simulation assumption shared by
         // the composed vehicle and the independently checked visual module.
-        attribute suspensionRestLengthM : Real = .30;
+        // The core ray length includes wheel radius; 0.30 m is the
+        // estimated strut extension, not the whole mount-to-ground ray.
+        // At replay-2 tick 28045 the shorter ray started below the apron
+        // and front-left contact vanished. No stiffness/torque is increased.
+        attribute suspensionExtensionM : Real = .30;
+        attribute suspensionRestLengthM : Real = wheelRadiusM + suspensionExtensionM;
         // Assembly-owned suspension connector dimensions are shared by the
         // Editor builder and the component requirement source.
         attribute suspensionStrutScale : Real[3] = (0.14, 0.36, 0.14);

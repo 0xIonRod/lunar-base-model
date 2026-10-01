@@ -28,13 +28,13 @@ def Xform "GriffinFlipVisual" (
         def Cube "RegolithPad"
         {
             double size = 1.0
-            double3 xformOp:translate = (3.0, -0.35, 0.0)
+            custom double3 xformOp:translate = (3.0, -0.175, 0.0)
             double3 xformOp:scale = (36.0, 0.35, 14.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.12999999523162842, 0.11999999731779099, 0.10999999940395355)]
             bool physics:collisionEnabled = false
             uniform token purpose = "render"
-            token visibility = "invisible"
+            token visibility = "inherited"
         }
         def Cylinder "LandingPad"
         {
@@ -66,15 +66,67 @@ def Xform "GriffinFlipVisual" (
     )
     {
         bool physics:rigidBodyEnabled = false
-        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        custom double3 xformOp:translate = (0.0, 0.44, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
+        over "LegPX"
+        {
+            custom double3 xformOp:translate = (1.9, 0.47, 1.9)
+            bool physics:rigidBodyEnabled = false
+        }
+        over "LegNX"
+        {
+            custom double3 xformOp:translate = (-1.9, 0.47, -1.9)
+            bool physics:rigidBodyEnabled = false
+        }
+        over "LegPZ"
+        {
+            custom double3 xformOp:translate = (-1.9, 0.47, 1.9)
+            bool physics:rigidBodyEnabled = false
+        }
+        over "LegNZ"
+        {
+            custom double3 xformOp:translate = (1.9, 0.47, -1.9)
+            bool physics:rigidBodyEnabled = false
+        }
+        def "EgressRampPort"
+        {
+            bool physics:rigidBodyEnabled = false
+            def "MiddleSection"
+            {
+                bool physics:rigidBodyEnabled = false
+                def "ToeSection"
+                {
+                    bool physics:rigidBodyEnabled = false
+                }
+            }
+        }
+        def "TransitionPlatePort"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "EgressRampStarboard"
+        {
+            bool physics:rigidBodyEnabled = false
+            def "MiddleSection"
+            {
+                bool physics:rigidBodyEnabled = false
+                def "ToeSection"
+                {
+                    bool physics:rigidBodyEnabled = false
+                }
+            }
+        }
+        def "TransitionPlateStarboard"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
     }
     def Xform "FLIP" (
         references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
     )
     {
         bool physics:rigidBodyEnabled = false
-        custom double3 xformOp:translate = (0.0, 2.58, 0.0)
+        custom double3 xformOp:translate = (0.0, 3.02, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def DomeLight "ReviewFill"
@@ -132,6 +184,11 @@ def Xform "GriffinFlipVisual" (
             {
                 token visibility = "invisible"
             }
+        }
+        def "Terrain" (
+            active = false
+        )
+        {
         }
     }
     def Xform "SolarSystem" (

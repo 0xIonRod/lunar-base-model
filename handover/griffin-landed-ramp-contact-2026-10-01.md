@@ -66,3 +66,30 @@ frame. Do not mask this with a throttle exception or extra visual wheels.
 The first two route datums are also fixed scene markers, so their relation to
 the actual landed ramp centerline must be reconsidered once the physical
 frame is consistent. No correction to those mechanisms is claimed here.
+
+## Egress correction checkpoint
+
+Core commits `abdcbf909` and `4fd526f35` derive wheel travel from authored
+axle/steering axes, add the generic drivetrain heading offset, and align HUD
+manifest namespaces. Two focused wheel-basis unit tests and the production
+build passed. An owned screenshot showed the restored panel after manifest
+reload; `/tmp/griffin-hud-panel-fixed.png`. The flat review foot collider has
+center Y=0.01999994, height 0.04, so its bottom lies at the flat datum.
+
+Replay-2 reached x=13.17 m before a stall at tick 28045. Native evidence
+`/tmp/griffin-egress-frame-evidence.json` showed FL ray origin below the apron
+and no hit. The 0.30 m extension was incorrectly used as total ray length;
+SysML now defines radius + extension = 0.75 m, preserving spring stiffness,
+wheel size and torque. Replay-3 `/tmp/griffin-egress-frame-replay-3.log` passed
+ordered ramp settlement, release and `griffin_ramp_exit_reached_confirmed`.
+It crossed the exit with four supported wheels and continued through survey
+transit gates, then failed a later survey route stall at tick 20293. This is
+egress phase evidence, not complete mission acceptance.
+
+Owned fresh-load keyboard ReadPorts showed Space throttle1, W pitch-1,
+A roll1, Q yaw1 and piloted1. F now reaches the existing safe-release gate;
+the unsigned target-ID comparison was removed because the emitter-scoped
+subscription already establishes identity. U exposed an event-trace bug:
+`sim_tick()` cannot run in lifecycle key events. Trace now preserves the
+native event's `evt.sim_tick` rather than querying the simulation clock.
+A fresh operator reload is required to validate that final correction.

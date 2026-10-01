@@ -207,6 +207,10 @@ fn flip_vehicle_size_plan(doc, edit_target, root) {
         ops.push(#{SetRotate:#{edit_target:edit_target,path:carrier+"/Visual",value:[0.0,if zs[i]<0.0 {-90.0}else{90.0},0.0]}});
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:carrier+"/Visual",name:"xformOpOrder",type_name:"token[]",value:"[\"xformOp:rotateXYZ\"]"}});
     }
+    let offset=griffin_spec::_sysml_attribute("forwardYawOffsetRad");
+    if offset==() {return plan_error("FLIP travel heading source missing");}
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:root+"/Drivetrain",
+        name:"parameters:forward_yaw_offset",type_name:"double",value:offset.to_string()}});
     let surface = flip_wheel_surface_plan(doc, edit_target, root);
     if !surface.ok { return surface; }
     for op in surface.ops { ops.push(op); }

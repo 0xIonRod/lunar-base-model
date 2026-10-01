@@ -47,7 +47,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV006_LunarContext {
-        doc /* GV-006 [visual] the review shall include the South-Pole terrain asset using the canonical terrain_layered.wgsl shader and one project light, without introducing a second physics model. Rationale: the context supports mission readability while keeping terrain physics owned by the simulator. */
+        doc /* GV-006 [visual] the live mission shall retain the South-Pole terrain asset and canonical terrain_layered.wgsl shader; static shape review shall use a visible render-only flat datum and one project light with child dynamics disabled. Source: owned foot-collider query and screenshot 2026-10-01. Rationale: a frozen parent above a varying DEM allowed dynamic legs to sag into the terrain; a flat unloaded review isolates proportions, while mission contact remains physical. */
     }
 
     requirement def GRV007_VisualEvidence {

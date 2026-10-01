@@ -31,7 +31,7 @@ package FlipChassisRequirements {
         attribute detailDimensions : CartesianThreeVectorValue[2] =
             ((0.12, 0.12, 1.20), (1.12, 0.25, 0.025));
         attribute detailCenters : CartesianThreeVectorValue[2] =
-            ((-1.05, 0.06, 0.0), (0.0, 0.258, -0.7425));
+            ((1.05, 0.06, 0.0), (0.0, 0.258, -0.7425));
     }
 
     requirement def FCC001_ChassisIdentity {

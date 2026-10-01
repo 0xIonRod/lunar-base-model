@@ -31,7 +31,7 @@ fn show_briefing() {
     hint("CONTROL: click the lander or FLIP to possess; " + cancel + " releases control");
     objectives_hud([
         #{ text: "LANDER  " + thrust + " thrust | " + forward + "/" + backward + " pitch | " + left + "/" + right + " roll", state: "active" },
-        #{ text: "LANDER  " + yaw_left + "/" + yaw_right + " yaw | U unwind ramp | G release rover", state: "pending" },
+        #{ text: "LANDER  " + yaw_left + "/" + yaw_right + " yaw | U open ramps | F detach rover", state: "pending" },
         #{ text: "FLIP    " + forward + "/" + backward + " drive | " + left + "/" + right + " steer | Space brake", state: "pending" },
         #{ text: "FLIP    " + action + " toggles autopilot; manual input takes authority back", state: "pending" },
         #{ text: "HANDOFF " + cancel + " releases the selected vehicle", state: "pending" }
@@ -41,8 +41,8 @@ fn show_briefing() {
 
 fn set_surface_action_buttons(unfold_enabled, release_enabled) {
     let result = guided_hud_actions("griffin_surface_ops", "on_hud_action", [
-        #{id: "unfold_ramps", label: "UNWIND RAMP  U", enabled: unfold_enabled},
-        #{id: "release_rover", label: "RELEASE ROVER  G", enabled: release_enabled}
+        #{id: "unfold_ramps", label: "OPEN RAMPS  U", enabled: unfold_enabled},
+        #{id: "release_rover", label: "DETACH ROVER  F", enabled: release_enabled}
     ]);
     if result == () || result.ok != true {
         let detail = if result == () || result.error == () { "unknown HUD action update rejection" } else { result.error };
@@ -53,7 +53,7 @@ fn set_surface_action_buttons(unfold_enabled, release_enabled) {
 
 fn show_touchdown_actions() {
     show_briefing();
-    hint("TOUCHDOWN CONFIRMED: U or UNWIND RAMP to lower both ramps. G releases FLIP after the ramps settle.");
+    hint("TOUCHDOWN CONFIRMED: U or OPEN RAMPS to lower both ramps. F detaches FLIP after the ramps settle.");
     set_surface_action_buttons(true, false);
 }
 
@@ -63,7 +63,7 @@ fn show_ramp_unfolding_actions() {
 }
 
 fn show_rover_release_actions() {
-    hint("RAMPS SETTLED: G or RELEASE ROVER detaches FLIP from the top deck.");
+    hint("RAMPS SETTLED: F or DETACH ROVER detaches FLIP from the top deck.");
     set_surface_action_buttons(false, true);
 }
 
@@ -259,7 +259,7 @@ fn control_lander() {
     let result = cmd("AcquireControl", #{ target: target, bind_camera: true });
     if result.ok {
         follow(target);
-        hint("LANDER CONTROL: " + input_hint("thrust") + " thrust · W/S pitch · A/D roll · Q/E yaw · G release");
+        hint("LANDER CONTROL: " + input_hint("thrust") + " thrust · W/S pitch · A/D roll · Q/E yaw · F detach rover");
         notify_kind("Griffin lander under manual control.", "success");
     } else {
         notify_kind("Lander control was rejected: " + result.error, "error");

@@ -1414,6 +1414,24 @@ fn report_route_stall(rover, target, pose, distance, command_updates) {
 // bounded string/value budget.  Keeping the closure frame here makes each
 // leaf capture only the rover and this leg's datum, while `surface_route()`
 // remains the single source of route geometry.
+// Resolve the two egress gates in the landed port-ramp frame. Survey gates
+// retain their scene frame. Distances stay source-owned; no pose is imposed.
+fn _landed_egress_target(target, event) {
+    if event!="griffin_ramp_approach_reached" && event!="griffin_ramp_exit_reached" {return target;}
+    let root=find_path("/Griffin1SurfaceOps/Lander/EgressRampPort");
+    let position=world_pos3(root);
+    let rotation=world_rotation_quat(root);
+    let mount=griffin_spec::_sysml_attribute("physicalRampPortMountX");
+    if position==() || rotation==() || mount==() {throw("landed egress frame unavailable");}
+    let axis=qrot(rotation,vec3(1.0,0.0,0.0));
+    let horizontal=vec3(axis.x,0.0,axis.z);
+    let length=vlen(horizontal);
+    if length<0.001 {throw("landed egress direction is vertical");}
+    let distance=target.x-mount;
+    let point=position+horizontal*(distance/length);
+    vec3(point.x,target.y,point.z)
+}
+
 fn _surface_route_leg_task(rover, leg, stall_timeout) {
     let target = leg.target;
     let target_speed = leg.speed;
@@ -1421,13 +1439,14 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
     let event = leg.event;
     seq([
         once(|m| {
+            this.route_target = griffin_surface_ops::_landed_egress_target(target,event);
             this.route_last_distance = ();
             this.route_progress_time = elapsed_seconds();
             this.route_next_command_at = ();
             if this.route_started != true {
                 this.route_started = true;
                 emit("griffin_surface_route_started");
-                print("[griffin] surface route started; first target=" + target);
+                print("[griffin] surface route started; first target=" + this.route_target);
             }
             true
         }),
@@ -1441,7 +1460,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
             }
             this.route_next_command_at = now + 1.0 / route_command_rate_hz();
             this.route_command_updates += 1;
-            let command = griffin_surface_ops::drive_route_point(rover, target, target_speed, arrival_radius);
+            let command = griffin_surface_ops::drive_route_point(rover, this.route_target, target_speed, arrival_radius);
             if command == () || command.ok != true {
                 if this.route_control_error != true {
                     this.route_control_error = true;
@@ -1449,7 +1468,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
                     let evidence = #{
                         kind: "route_control",
                         error: detail,
-                        target: target,
+                        target: this.route_target,
                         steering_mode: griffin_spec::route_steering_mode(),
                         command_updates: this.route_command_updates,
                         sim_tick: sim_tick(),
@@ -1565,7 +1584,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
                 if trace_lander_up != () {
                     trace_lander_up_text = vec3_array(trace_lander_up);
                 }
-                let trace_line = "[griffin] egress trace target=" + vec3_array(target);
+                let trace_line = "[griffin] egress trace target=" + vec3_array(this.route_target);
                 trace_line += " pose=" + trace_pose_text;
                 trace_line += " speed=" + trace_speed_text;
                 trace_line += " support=" + trace_support_text;
@@ -1587,7 +1606,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
 
             let pose = world_pos3(rover);
             if pose != () {
-                let delta = vsub(pose, vec3_from(target));
+                let delta = vsub(pose, vec3_from(this.route_target));
                 let horizontal_distance = vlen(vec3(delta.x, 0.0, delta.z));
                 if this.route_last_distance == ()
                     || horizontal_distance < this.route_last_distance - 0.02 {
@@ -1596,7 +1615,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
                 } else if this.route_progress_time != ()
                     && now - this.route_progress_time >= stall_timeout {
                     this.route_control_error = true;
-                    report_route_stall(rover, target, pose, horizontal_distance,
+                    report_route_stall(rover, this.route_target, pose, horizontal_distance,
                         this.route_command_updates);
                     return false;
                 }
@@ -1607,7 +1626,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
             // SetPorts command to the same control surface and could
             // overwrite or reject the typed guidance write.
             false
-        }, |m| this.route_control_error == true || arrived(rover, target, arrival_radius)),
+        }, |m| this.route_control_error == true || arrived(rover, this.route_target, arrival_radius)),
         // A control fault makes the step terminal only so this explicit check
         // can propagate Failure through the native task tree.  It must never
         // be interpreted as arrival or allow the following route leg to run.

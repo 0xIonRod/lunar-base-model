@@ -39,7 +39,7 @@ def Xform "FlipChassis" (
     )
     {
         double size = 2.0
-        custom double3 xformOp:translate = (-1.05, 0.06, 0.0)
+        custom double3 xformOp:translate = (1.05, 0.06, 0.0)
         custom double3 xformOp:scale = (0.06, 0.06, 0.6)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]

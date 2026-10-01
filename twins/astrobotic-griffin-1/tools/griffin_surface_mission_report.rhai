@@ -16,7 +16,7 @@ fn trace_event(state, evt) {
         name: evt.name,
         source: source_id,
         source_path: if source_path == () { "" } else { source_path },
-        sim_tick: sim_tick(),
+        sim_tick: evt.sim_tick,
     });
     state.event_trace
 }

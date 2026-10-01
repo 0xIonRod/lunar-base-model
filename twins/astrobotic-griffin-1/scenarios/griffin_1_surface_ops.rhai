@@ -80,7 +80,6 @@ fn on_start(me, ctx) {
     for event_name in griffin_surface_ramp_ops::unfold_event_contract().ordered {
         subscribe(event_name);
     }
-    subscribe("key:KeyG");
     subscribe("key:KeyU");
     for event_name in [
         "griffin_ramp_approach_reached", "griffin_ramp_exit_reached", "griffin_waypoint_1_reached",
@@ -134,13 +133,13 @@ fn on_event(me, evt, ctx) {
     let rover = find_path(ROVER);
 
     // Shared controller and HUD requests converge on the same Twin-owned
-    // post-touchdown gates. The rover can never interpret U/G as drive input.
+    // post-touchdown gates. The rover can never interpret U/F as drive input.
     if evt.name == "intent.edge" && evt.source == lander {
         let value = evt.value;
-        if value != () && value["target_gid"] == lander &&
-           value["intent"] == "release" &&
+        if value != () && value["intent"] == "action" &&
            (value["edge"] == "pressed" || value["edge"] == "pulse") {
-            griffin_surface_ops::request_rover_release();
+            let result=griffin_surface_ops::request_rover_release();
+            if result.ok != true {notify_kind(result.error,"warn");}
         }
         return;
     }
@@ -150,11 +149,6 @@ fn on_event(me, evt, ctx) {
     // requirement, and both routes are checked again by the mission phase.
     if evt.name == "key:KeyU" && owner_of(lander) == 0 && owner_of(rover) != 0 {
         let result = griffin_surface_ops::request_ramp_unfold();
-        if result.ok != true { notify_kind(result.error, "warn"); }
-        return;
-    }
-    if evt.name == "key:KeyG" && owner_of(lander) == 0 && owner_of(rover) != 0 {
-        let result = griffin_surface_ops::request_rover_release();
         if result.ok != true { notify_kind(result.error, "warn"); }
         return;
     }
@@ -466,7 +460,7 @@ fn task(me, ctx) {
         once(|m| {
             this.lander_settled = true;
             touchdown_notice(m);
-            // Unattended scene runs have no operator to press U or G. Keep
+            // Unattended scene runs have no operator to press U or F. Keep
             // their authored route deterministic while windowed sessions use
             // the same explicit command/key/HUD controls as the operator.
             if is_unattended() { this.ramp_unfold_requested = true; }

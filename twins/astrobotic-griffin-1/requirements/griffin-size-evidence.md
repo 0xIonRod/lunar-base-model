@@ -568,3 +568,37 @@ study frame; a corrected realization must explicitly transform that frame or
 consume it consistently in both navigation and wheel contact. The first two
 scene-fixed egress markers must also be checked against the landed ramp
 centerline. Full rover egress and rendered mission acceptance remain open.
+
+#### Operator scene and egress-frame correction (2026-10-01)
+
+The default Twin scene is the live surface-operations mission. Griffin uses
+`vehicle-control-left` with possessed visibility, matching the core lander HUD
+contract. Space commands main thrust; W/S, A/D and Q/E command pitch, roll and
+yaw. U requests the existing gated ramp sequence; F requests the existing gated
+payload release via the source-scoped action intent. These are study UI choices,
+not spacecraft hardware requirements. Release still requires landed support and
+measured ramp settlement.
+
+The visual-review scene is explicitly static on a flat render-only datum. Its
+0.44 m body height and 0.47 m leg-mount height come from the existing spring-rest
+geometry: 0.9 m mount minus 0.43 m spring target, minus 0.89 m foot offset and
+0.02 m pad half-height. All referenced leg/ramp bodies are disabled there to
+prevent gravity from moving children under a frozen parent. The live mission
+retains its terrain and physical suspension.
+
+The correction keeps the +X study travel frame: Cylinder Z axle crossed with
+steering Y gives +X, and guidance receives a −π/2 yaw offset from SysML. Front
+axle names now occupy positive X. The first two route gates use their existing
+source distances from the port root mount, projected along the actual landed
+ramp direction; later survey gates retain their scene frame. This relation is
+estimated mission policy justified by the observed landed tilt and route stall,
+not a supplier navigation ICD. Runtime acceptance remains pending a fresh replay.
+
+Replay-2 (core abdcbf909) reached the apron at x=13.17 m, then failed the
+unchanged stall gate at tick 28045. The front-left ray origin was Y=-0.126 m
+inside the Y=0 apron, with no hits; other wheels carried valid contact. The
+old 0.30 m extension estimate had been used as total ray length despite a
+0.45 m wheel radius. The corrected relation is radius plus the same estimated
+0.30 m extension (0.75 m); the native spring law and tire torque are unchanged.
+Source: `/tmp/griffin-egress-frame-evidence.json`, native PhysicsWheelContact
+snapshot, and core `strut_offset(rest_length, wheel_radius)` contract.

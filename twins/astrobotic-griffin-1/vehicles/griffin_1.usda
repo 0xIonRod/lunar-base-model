@@ -12,8 +12,6 @@ def Xform "Griffin1" (
     prepend references = @lunco://components/avionics/obc_lander.usda@</LanderOBC>
 )
 {
-    bool lunco:ui:controlHud = true
-    int lunco:ui:controlHudColumn = 0
     rel material:binding:physics = </Griffin1/PhysicsMaterials/LandingPadSlide>
     bool lunco:ui:schemaNode = false
     string lunco:ui:schemaRole = "Tracks attitude · applies commands"
@@ -125,6 +123,8 @@ def Xform "Griffin1" (
     float inputs:navigation_velocity_y.connect = </Griffin1.outputs:velocity_y>
     float inputs:navigation_velocity_z
     float inputs:navigation_velocity_z.connect = </Griffin1.outputs:velocity_z>
+    string lunco:ui:surfaceId = "vehicle-control-left"
+    string lunco:ui:visibilityMode = "possessed"
     def Scope "PhysicsMaterials"
     {
         def Material "LandingPadSlide" (
