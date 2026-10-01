@@ -68,7 +68,8 @@ fn unfold_toes() {
 // The scenario owns state and timing. Return the next expected snapshot
 // explicitly; do not try to mutate the caller's Rhai map through a parameter.
 fn section_unfold_progress(expected, stage, final_commanded, waypoints) {
-    let evidence=griffin_surface_ops::physical_ramp_hinges_settled(expected,0.035);
+    let evidence=griffin_surface_ops::physical_ramp_hinges_settled(expected,
+        griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
     if evidence.ok!=true {
         return #{ok:false,error:"section hinge settlement evidence is unavailable",
             evidence:evidence};
@@ -84,6 +85,30 @@ fn section_unfold_progress(expected, stage, final_commanded, waypoints) {
     }
     #{ok:true,settled:evidence.settled && final_commanded,evidence:evidence,
         waypoint_evidence:waypoints,expected_angles:expected,final_commanded:final_commanded}
+}
+
+// Final traversal gate includes every hinge, not only the roots. One angle
+// crossing cannot release the payload while the deployed bundle is moving.
+fn traversal_settle_progress(expected, stable_since) {
+    let evidence=griffin_surface_ops::physical_ramp_hinges_settled(expected,
+        griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
+    let dwell=griffin_spec::physical_ramp_traversal_settle_dwell_s();
+    let clocks=clock_snapshot();
+    let dt=clocks.fixed_dt_s;
+    if evidence.ok!=true || dwell==() || !dwell.is_finite() || dwell<=0.0
+        || dt==() || !dt.is_finite() || dt<=0.0 {
+        return #{ok:false,settled:false,stable_since:(),evidence:evidence,
+            error:"ramp traversal settlement or clock contract is unavailable"};
+    }
+    let tick=evidence.sim_tick;
+    if evidence.settled!=true {stable_since=();}
+    else if stable_since==() {stable_since=tick;}
+    let elapsed=if stable_since==() {0.0} else {(tick-stable_since).to_float()*dt};
+    evidence.instantaneous_settled=evidence.settled;
+    evidence.settled=evidence.settled && elapsed>=dwell;
+    evidence.dwell_elapsed_s=elapsed;
+    evidence.dwell_required_s=dwell;
+    #{ok:true,settled:evidence.settled,stable_since:stable_since,evidence:evidence}
 }
 
 fn deploy_roots() {

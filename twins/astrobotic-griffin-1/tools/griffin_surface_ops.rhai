@@ -986,6 +986,7 @@ fn physical_ramp_joint_evidence() {
         hinges.push(#{name: hinge.name,
             drive_target_rad: hinge.drive_target_rad,
             measured_angle_rad: hinge.measured_angle_rad,
+            measured_angular_speed_rad_per_s:hinge.measured_angular_speed_rad_per_s,
             error_rad: _ramp_angle_error_rad(
                 hinge.measured_angle_rad, hinge.drive_target_rad)});
     }
@@ -1020,7 +1021,15 @@ fn _ramp_hinge_state(name, path, id, ports) {
         return #{ok: false, error: "ramp hinge has missing or invalid runtime angle limits",
             hinge: name, path: path, entity: id, ports: ports};
     }
+    let speed=_ramp_hinge_port(ports,"angular_velocity","out");
+    if speed==() || speed.metadata==() || speed.metadata.unit==()
+        || speed.metadata.unit.id!="rad/s" || speed.value==()
+        || !speed.value.is_finite() {
+        return #{ok:false,error:"ramp hinge angular speed or rad/s contract is unavailable",
+            hinge:name,path:path,entity:id,ports:ports};
+    }
     #{ok: true, name: name, path: path, entity: id,
+        measured_angular_speed_rad_per_s:speed.value,
         minimum_angle_rad: minimum, maximum_angle_rad: maximum,
         drive_target_rad: angle_input.value,
         measured_angle_rad: angle_output.value,
@@ -1053,7 +1062,7 @@ fn physical_ramp_hinge_report() {
         ids.push(id);
     }
     let targets = [];
-    for id in ids { targets.push(#{api_id: id, port_names: ["angle"]}); }
+    for id in ids { targets.push(#{api_id: id, port_names: ["angle", "angular_velocity"]}); }
     let snapshot = read_ports_batch(targets);
     if snapshot == () || snapshot.sim_tick == () || snapshot.entities == ()
         || snapshot.entities.len() != names.len() {
@@ -1092,6 +1101,10 @@ fn physical_ramp_hinges_settled(expected_angles, tolerance_rad) {
         return #{ok: false, settled: false,
             error: "ramp hinge settle check requires expected angles and a finite nonnegative tolerance"};
     }
+    let speed_tolerance=griffin_spec::physical_ramp_hinge_settle_speed_tolerance_rad_per_s();
+    if speed_tolerance==() || !speed_tolerance.is_finite() || speed_tolerance<0.0 {
+        return #{ok:false,settled:false,error:"ramp hinge speed tolerance is unavailable"};
+    }
     let report = physical_ramp_hinge_report();
     if report == () || report.ok != true {
         return #{ok: false, settled: false,
@@ -1124,12 +1137,16 @@ fn physical_ramp_hinges_settled(expected_angles, tolerance_rad) {
         }
         let target_error = _ramp_angle_error_rad(state.drive_target_rad, expected.target_rad);
         let measured_error = _ramp_angle_error_rad(state.measured_angle_rad, expected.target_rad);
-        let settled = target_error <= tolerance_rad && measured_error <= tolerance_rad;
+        let angular_speed=state.measured_angular_speed_rad_per_s;
+        let settled = target_error <= tolerance_rad && measured_error <= tolerance_rad
+            && angular_speed.abs()<=speed_tolerance;
         let observation = #{name: state.name, target_rad: expected.target_rad,
             drive_target_rad: state.drive_target_rad,
             measured_angle_rad: state.measured_angle_rad,
             target_error_rad: target_error, measured_error_rad: measured_error,
-            tolerance_rad: tolerance_rad, settled: settled};
+            tolerance_rad: tolerance_rad, settled: settled,
+            measured_angular_speed_rad_per_s:angular_speed,
+            speed_tolerance_rad_per_s:speed_tolerance};
         observations.push(observation);
         if !settled { pending.push(observation); }
     }

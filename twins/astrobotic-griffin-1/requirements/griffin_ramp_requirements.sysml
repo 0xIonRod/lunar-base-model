@@ -585,6 +585,25 @@ package GriffinRampRequirements {
             (GriffinEgressRamp::physicalRampSectionStowedRelativeAngleRad
              + GriffinEgressRamp::physicalRampSectionDeploymentRelativeAngleRad) / 2.0;
 
+        /* Settlement observation policy, 2026-10-01: the owned mission
+         * replay crossed the root target tolerance at tick8534 but showed
+         * 0.19-0.20 rad root errors by8550. A position crossing is not rest.
+         * Source: handover/griffin-measured-unfold-waypoint-2026-10-01.md.
+         * Retain the existing 0.035 rad observation tolerance; require
+         * abs(relative hinge speed)<=0.02 rad/s at intermediate waypoints
+         * and final targets. Before payload release, all six hinges must
+         * satisfy angle and speed over a 1 s sampled dwell (probed every
+         * six admitted 60 Hz ticks). Reset dwell on any failed sample.
+         * Speed and dwell are unqualified study choices: at this rate a
+         * hinge advances <=0.02 rad in the dwell, below the angle tolerance;
+         * 1 s exceeds the observed 0.25 s overshoot window by four times.
+         * This does not prove toe contact, deck continuity, load capacity or
+         * hardware stability. Supplier actuator and deployed-lock data are
+         * unavailable. The native port is Avian revolute angular_velocity,
+         * SI rad/s, from lunco-cosim/src/joint.rs and ports.rs. */
+        attribute physicalRampHingeSettleAngleToleranceRad : Real = 0.035;
+        attribute physicalRampHingeSettleSpeedToleranceRadPerS : Real = 0.02;
+        attribute physicalRampTraversalSettleDwellS : Real = 1.0;
         attribute physicalRampJointDriveStiffnessNmPerDeg : Real = 6000.0;
         attribute physicalRampRootJointDriveDampingNmPerDegPerSec : Real = 900.0;
         // Replaceable near-critical damping assumption for the authored
@@ -673,7 +692,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR017_FlightStowAndPostTouchdownUnfold {
-        doc /* The descent stow pose shall place the two root ramp axes as mirror images across the lander X=0 centerline: both bodies use a +45 degree Z rotation, and the starboard body is mounted at 180 degrees about Y. Their lander-frame headings are +45 and +135 degrees. One shared 45 degree stow magnitude defines both body poses; the starboard revolute target is -45 degrees because its joint frame reverses the hinge axis. The port root joint spans -50 to +60 degrees and the starboard joint spans -60 to +50 degrees, retaining the authored outward/down deployment targets. Both intermediate hinges fold 180 degrees in the physical section geometry. Their child-side joint frames are offset by -90 degrees, so the transport pose is represented at +90 degrees and the level deployment pose at -90 degrees in the joint coordinate. This keeps both commanded poses inside the +/-180 degree travel. A measured halfway relative pose then selects the intended sweep: a frame offset alone cannot resolve the motor error at an antipodal half-turn. The first hinge axis is offset to the top rail chord and the second by half the walking-surface thickness, so the three sections stack as a compact bundle instead of occupying one plane. At the level physical relative angle, these frame offsets keep the deployed walking surfaces aligned. The image-based angles and fold offsets are replaceable study estimates informed by the 2021 Griffin-1 product image; the image supplies qualitative silhouette only, not released supplier geometry or an ICD. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive the middle hinges through their measured halfway pose to level while the toes remain stowed, then drive the toes through the same halfway pose to level; only then shall the deck hinges enter the deployment envelope. */
+        doc /* The descent stow pose shall place the two root ramp axes as mirror images across the lander X=0 centerline: both bodies use a +45 degree Z rotation, and the starboard body is mounted at 180 degrees about Y. Their lander-frame headings are +45 and +135 degrees. One shared 45 degree stow magnitude defines both body poses; the starboard revolute target is -45 degrees because its joint frame reverses the hinge axis. The port root joint spans -50 to +60 degrees and the starboard joint spans -60 to +50 degrees, retaining the authored outward/down deployment targets. Both intermediate hinges fold 180 degrees in the physical section geometry. Their child-side joint frames are offset by -90 degrees, so the transport pose is represented at +90 degrees and the level deployment pose at -90 degrees in the joint coordinate. This keeps both commanded poses inside the +/-180 degree travel. A measured halfway relative pose then selects the intended sweep: a frame offset alone cannot resolve the motor error at an antipodal half-turn. The first hinge axis is offset to the top rail chord and the second by half the walking-surface thickness, so the three sections stack as a compact bundle instead of occupying one plane. At the level physical relative angle, these frame offsets keep the deployed walking surfaces aligned. The image-based angles and fold offsets are replaceable study estimates informed by the 2021 Griffin-1 product image; the image supplies qualitative silhouette only, not released supplier geometry or an ICD. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive the middle hinges through their measured halfway pose to level while the toes remain stowed, then drive the toes through the same halfway pose to level; only then shall the deck hinges enter the deployment envelope. Every waypoint and final section target shall meet the source angle and speed tolerances. Before rover release, all six hinges shall meet these limits for the source sampled dwell; any failing sample resets the dwell. */
         require GRC022_RampFlightStowAnglesWithinTravel {
             in rootStowAngleRad = GriffinEgressRamp::physicalRampRootStowedAngleRad;
             in sectionStowRelativeAngleRad = GriffinEgressRamp::physicalRampSectionStowedRelativeAngleRad;

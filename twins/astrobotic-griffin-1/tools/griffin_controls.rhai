@@ -9,7 +9,7 @@ fn lander_path() { "/Griffin1SurfaceOps/Lander" }
 fn rover_path() { "/Griffin1SurfaceOps/FLIP" }
 
 fn resolve(path, label) {
-    let target = find(path);
+    let target = find_path(path);
     if target == () || target < 0 {
         notify_kind(label + " is not available in the active scene.", "error");
         return ();

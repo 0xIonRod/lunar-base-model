@@ -111,6 +111,7 @@ fn on_start(me, ctx) {
     this.ramp_section_final_commanded = false;
     this.ramp_unfold_waypoint_evidence = [];
     this.ramp_deployment_expected = ();
+    this.ramp_traversal_stable_since = ();
     this.ramp_middle_settle_evidence = ();
     this.ramp_toe_settle_evidence = ();
     this.ramp_section_settle_evidence = ();
@@ -519,7 +520,7 @@ fn task(me, ctx) {
                 once(|m| {
                     this.ramp_section_settle_evidence =
                         griffin_surface_ops::physical_ramp_hinges_settled(
-                            this.ramp_sections_expected, 0.035);
+                            this.ramp_sections_expected, griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
                     this.phase_timeout = true;
                     this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-settle");
                     true
@@ -580,7 +581,7 @@ fn task(me, ctx) {
                 once(|m| {
                     this.ramp_section_settle_evidence =
                         griffin_surface_ops::physical_ramp_hinges_settled(
-                            this.ramp_sections_expected, 0.035);
+                            this.ramp_sections_expected, griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
                     this.phase_timeout = true;
                     this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-settle");
                     true
@@ -595,6 +596,12 @@ fn task(me, ctx) {
         }),
         once(|m| {
             this.ramp_deployment_expected = griffin_surface_ramp_ops::root_deployment_angle_expectations();
+            if this.ramp_deployment_expected!=() {
+                for expected in this.ramp_sections_expected {
+                    this.ramp_deployment_expected.push(expected);
+                }
+            }
+            this.ramp_traversal_stable_since=();
             if this.ramp_deployment_expected == () {
                 this.phase_timeout = true;
                 this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-targets");
@@ -624,18 +631,20 @@ fn task(me, ctx) {
                         return false;
                     }
                     this.ramp_settle_probe_tick = tick;
-                    let evidence = griffin_surface_ops::physical_ramp_hinges_settled(
-                        this.ramp_deployment_expected, 0.035);
-                    this.ramp_deployment_settle_evidence = evidence;
-                    evidence.ok == true && evidence.settled == true
+                    let progress=griffin_surface_ramp_ops::traversal_settle_progress(
+                        this.ramp_deployment_expected,this.ramp_traversal_stable_since);
+                    this.ramp_traversal_stable_since=progress.stable_since;
+                    this.ramp_deployment_settle_evidence=progress.evidence;
+                    progress.ok==true && progress.settled==true
                 })
             ]),
             seq([
                 wait(30.0),
                 once(|m| {
-                    this.ramp_deployment_settle_evidence =
-                        griffin_surface_ops::physical_ramp_hinges_settled(
-                            this.ramp_deployment_expected, 0.035);
+                    let progress=griffin_surface_ramp_ops::traversal_settle_progress(
+                        this.ramp_deployment_expected,this.ramp_traversal_stable_since);
+                    this.ramp_traversal_stable_since=progress.stable_since;
+                    this.ramp_deployment_settle_evidence=progress.evidence;
                     this.phase_timeout = true;
                     this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-settle");
                     true

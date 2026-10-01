@@ -154,6 +154,9 @@ fn _qualified_attribute(name) {
         "physicalRampSectionStowedRelativeAngleRad", "physicalRampSectionJointFrameOffsetRad",
         "physicalRampSectionDeploymentRelativeAngleRad",
         "physicalRampSectionUnfoldWaypointRelativeAngleRad",
+        "physicalRampHingeSettleAngleToleranceRad",
+        "physicalRampHingeSettleSpeedToleranceRadPerS",
+        "physicalRampTraversalSettleDwellS",
         "physicalRampSectionMassPartitionToleranceKg",
         "physicalRampJointDriveStiffnessNmPerDeg",
         "physicalRampRootJointDriveDampingNmPerDegPerSec",
@@ -803,6 +806,15 @@ fn physical_ramp_section_joint_coordinate_angle(relative_angle_rad) {
 fn physical_ramp_section_stowed_joint_angle_rad() {
     physical_ramp_section_joint_coordinate_angle(
         physical_ramp_section_stowed_relative_angle_rad())
+}
+fn physical_ramp_hinge_settle_angle_tolerance_rad() {
+    _sysml_attribute("physicalRampHingeSettleAngleToleranceRad")
+}
+fn physical_ramp_hinge_settle_speed_tolerance_rad_per_s() {
+    _sysml_attribute("physicalRampHingeSettleSpeedToleranceRadPerS")
+}
+fn physical_ramp_traversal_settle_dwell_s() {
+    _sysml_attribute("physicalRampTraversalSettleDwellS")
 }
 fn physical_ramp_section_unfold_waypoint_joint_angle_rad() {
     physical_ramp_section_joint_coordinate_angle(
