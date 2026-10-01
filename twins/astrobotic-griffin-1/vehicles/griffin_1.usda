@@ -2821,12 +2821,12 @@ def Xform "Griffin1" (
     {
         token visibility = "inherited"
         float physics:mass = 31.66666603088379
-        float3 physics:diagonalInertia = (21.587430953979492, 30.12635612487793, 8.543675422668457)
+        float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)
         custom float lunco:deployment_angle_rad = 0.0
         custom double3 xformOp:translate = (1.907003563827, 2.066735381886, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.00000000014621)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double lunco:operational_width_m = 2.86
+        custom double lunco:operational_width_m = 2.5919999999999996
         custom double lunco:wheel_clearance_m = 0.15
         custom rel lunco:mount:frame = </Griffin1/EgressRampPort/MountFrame>
         uniform token lunco:mount:plug = "egress_ramp"
@@ -2947,7 +2947,7 @@ def Xform "Griffin1" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
             float physics:mass = 31.66666603088379
-            float3 physics:diagonalInertia = (21.587430953979492, 30.12635612487793, 8.543675422668457)
+            float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)
             custom token lunco:ramp:section:identity = "MiddleSection"
             def Xform "ToeSection" (
                 prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
@@ -2958,7 +2958,7 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
                 float physics:mass = 31.66666603088379
-                float3 physics:diagonalInertia = (21.587430953979492, 30.12635612487793, 8.543675422668457)
+                float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)
                 custom token lunco:ramp:section:identity = "ToeSection"
                 over "UnderBeamPort"
                 {
@@ -3301,12 +3301,12 @@ def Xform "Griffin1" (
     {
         token visibility = "inherited"
         float physics:mass = 31.66666603088379
-        float3 physics:diagonalInertia = (21.587430953979492, 30.12635612487793, 8.543675422668457)
+        float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)
         custom float lunco:deployment_angle_rad = 0.0
         custom double3 xformOp:translate = (-1.907003563827, 2.066735381886, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, 180.0, -45.00000000014621)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double lunco:operational_width_m = 2.86
+        custom double lunco:operational_width_m = 2.5919999999999996
         custom double lunco:wheel_clearance_m = 0.15
         custom rel lunco:mount:frame = </Griffin1/EgressRampStarboard/MountFrame>
         uniform token lunco:mount:plug = "egress_ramp"
@@ -3426,7 +3426,7 @@ def Xform "Griffin1" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
             float physics:mass = 31.66666603088379
-            float3 physics:diagonalInertia = (21.587430953979492, 30.12635612487793, 8.543675422668457)
+            float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)
             custom token lunco:ramp:section:identity = "MiddleSection"
             def Xform "ToeSection" (
                 prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
@@ -3437,7 +3437,7 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 180.00000002350313)
                 float physics:mass = 31.66666603088379
-                float3 physics:diagonalInertia = (21.587430953979492, 30.12635612487793, 8.543675422668457)
+                float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)
                 custom token lunco:ramp:section:identity = "ToeSection"
                 over "UnderBeamPort"
                 {
@@ -4158,7 +4158,7 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float physics:mass = 15.0
-        float3 physics:diagonalInertia = (10.225625038146973, 11.237000465393066, 1.0136250257492065)
+        float3 physics:diagonalInertia = (8.399205207824707, 9.410579681396484, 1.0136250257492065)
         def Cube "ContactSurface" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
@@ -4166,7 +4166,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-            custom double3 xformOp:scale = (0.9, 0.03, 2.86)
+            double3 xformOp:scale = (0.9, 0.03, 2.5919999999999996)
             double size = 1.0
             uniform token purpose = "proxy"
             token visibility = "invisible"
@@ -4192,7 +4192,7 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float physics:mass = 15.0
-        float3 physics:diagonalInertia = (10.225625038146973, 11.237000465393066, 1.0136250257492065)
+        float3 physics:diagonalInertia = (8.399205207824707, 9.410579681396484, 1.0136250257492065)
         def Cube "ContactSurface" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
@@ -4200,7 +4200,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-            custom double3 xformOp:scale = (0.9, 0.03, 2.86)
+            double3 xformOp:scale = (0.9, 0.03, 2.5919999999999996)
             double size = 1.0
             uniform token purpose = "proxy"
             token visibility = "invisible"

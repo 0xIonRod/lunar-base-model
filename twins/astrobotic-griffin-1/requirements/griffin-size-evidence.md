@@ -37,13 +37,13 @@ derived hinge coordinates is for interface closure, not measurement accuracy.
 | FLIP wheel envelope | legacy inconsistent envelope | 2.28 m across track; 2.60 m along travel | Derived from 2.0 m track + 0.28 m tire width and 1.7 m wheelbase + two 0.45 m radii. Wheel ribs, deformation and suspension travel excluded. |
 | Ramp length | 12.228605 m | 5.397252161 m | Derived: 2.52 / sin(0.4857867749). Retain the previous **estimated** 27.8335° deployment angle to isolate the height correction; not a published ramp slope. At 2.0–3.0 m deck heights this gives 4.28–6.43 m. |
 | Each of three sections | 4.076201667 m | 1.799084054 m | Total length / 3. Three-section folding topology remains a study assumption. |
-| Ramp outside width | 3.50 m | 2.86 m | 2.00 m track + 0.58 m contact-track width + two 0.14 m rails. Contact width is 0.28 m wheel + twice 0.15 m estimated clearance. |
-| Deck transition | 1.96327 m | 0.90 m | Estimated bridge to the octagonal deck: outboard X=1.90, inboard X=1.00. At outer rail Z=1.43 the deck edge is X≈1.107, leaving >0.05 m overlap. |
+| Ramp outside width | 3.50 m | 2.592 m | 2.00 m track + 0.58 m contact-track width + two 0.006 m rails. Derived from the current outer rail edges; 2.86 m belonged to the superseded 140 mm rails. Contact width is 0.28 m wheel + twice 0.15 m estimated clearance. |
+| Deck transition | 1.96327 m | 0.90 m | Estimated bridge to the octagonal deck: outboard X=1.90, inboard X=1.00. Width follows the current 2.592 m rail corridor; GRR-012 checks composed deck overlap against the 0.05 m study requirement. |
 
 The vehicle touchdown reference remains 0.44 m. Adapter center Y=2.04 plus
 half-thickness 0.04 gives a vehicle-local top of 2.08 m, hence 2.52 m above
-ground. A ramp half-thickness of 0.09 m yields hinge X=1.90+0.09 sin(angle),
-Y=2.08−0.09 cos(angle); the builder's toe miter closes both contact edges.
+ground. A ramp half-thickness of 0.015 m yields hinge X=1.90+0.015 sin(angle),
+Y=2.08−0.015 cos(angle); the builder's toe miter closes both contact edges.
 Section and transition inertia are recomputed as rectangular-envelope proxies
 using the existing estimated masses (95 kg ramp, 15 kg transition). Retaining
 those masses avoids inventing a supplier mass revision; they remain uncertain.
@@ -121,20 +121,23 @@ remaining below the adapter; tank size is unchanged. This reconstructs the
 concept's separation of shallow structure and exposed tank domes, without
 claiming that the June 2026 hardware has the same exterior coverage.
 
-Ramp truss chord top is revised from 0.81 to 0.36 m above the walking plane:
-0.20 of a 1.799 m section length, rather than 0.45. This is a silhouette estimate
-from the two concept images, not a strength calculation. Rail/chord stock is
-0.08 m, posts 0.06 m, diagonal braces 0.04 m, underside beams 0.12×0.10 m.
-Physical walking thickness, conservative width envelope, hinge location,
-length, deployment angle and existing mass proxies are unchanged. The fold
-axis offsets are re-derived from the slimmer chords by the builder.
+Current rail chord top is 0.20 m above the walking plane, about 0.11 of
+its 1.799 m section length. Upper strips are 40 mm high, lower strips 20 mm,
+end posts and diagonals 12 mm in-plane, all with a 6 mm transverse web.
+Twelve alternating diagonal bays per guide, rounded strip tips and rounded
+pivot lugs reconstruct the concept silhouette. These are low-confidence image
+estimates, not structural sizing. The 30 mm contact thickness, wheel clearance,
+length, deployment angle and 95 kg ramp mass proxy remain study assumptions.
+Current rail width and rectangular-envelope inertia derive together from the
+outer rail edges. The two 15 kg transition proxies use that same width.
+Reference rechecked 2026-10-01: https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png .
 
 The shared `usd_geometry_inspection` library owns the read-only fixed-tick USD
 query contract and composed scene-owner lookup. Bus and visual gates do not
 rely on Editor tab focus; the ramp stow gate uses the same dependencies.
 
 
-Latest focused evidence: the bus gate passed 339 checks, the solar gate passed
+Historical focused evidence (before the subsequent rail refinements): the bus gate passed 339 checks, the solar gate passed
 148, ramp stow passed 164 and touchdown geometry passed 6. These are geometry
 checks, not flight or deployment dynamics acceptance. Bus and solar fixtures
 now explicitly declare metres; otherwise USD defaults to centimetres and

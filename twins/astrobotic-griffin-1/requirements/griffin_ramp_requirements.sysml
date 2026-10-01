@@ -291,7 +291,13 @@ package GriffinRampRequirements {
         // wheel stations; track width is wheel width plus twice the clearance.
         // Keep this package's value equal to that derived interface datum;
         // it is still a visual study value, not a supplier mechanical ICD.
-        attribute rampSurfaceWidthM : Real = 2.86;
+        /* 2026-10-01 consistency correction: derive the outside rail span
+         * from its actual outer edges. Retained 2.86 m belonged to 140 mm
+         * rails; the image-based 6 mm web now gives 2.592 m. Wheel spacing,
+         * track clearance and stock rationale are unchanged. Inertia remains
+         * an unqualified rectangular-envelope proxy using this current span. */
+        attribute rampSurfaceWidthM : Real = 2.0 *
+            (GriffinEgressRamp::rampRailOffsetZM + GriffinEgressRamp::rampRailWidthM / 2.0);
         attribute rampWheelClearanceM : Real = 0.15;
         /* Walking plate reconstruction: 30 mm instead of the legacy 180 mm
          * slab; traction strips 60 mm wide / 10 mm high instead of 120/50 mm.
@@ -529,10 +535,13 @@ package GriffinRampRequirements {
         // deck frame.  Its mass is an explicit simulator assumption because
         // Astrobotic has not released a ramp/transition structural ICD.  The
         // inertia list is the rectangular-prism result for the source-owned
-        // length, 0.03 m thickness, and 2.86 m width. It remains a study
+        // length, source contact thickness, and current outside rail width. It remains a study
         // estimate until the transition mass properties are measured.
         attribute physicalRampDeckTransitionMassKg : Real = 15.0;
-        attribute physicalRampDeckTransitionInertiaKgM2 : Real[3] = (10.225625, 11.237, 1.013625);
+        attribute physicalRampDeckTransitionInertiaKgM2 : Real[3] = (
+            GriffinEgressRamp::physicalRampDeckTransitionMassKg * (GriffinEgressRamp::rampSurfaceWidthM * GriffinEgressRamp::rampSurfaceWidthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0,
+            GriffinEgressRamp::physicalRampDeckTransitionMassKg * (GriffinEgressRamp::physicalRampDeckTransitionLengthM * GriffinEgressRamp::physicalRampDeckTransitionLengthM + GriffinEgressRamp::rampSurfaceWidthM * GriffinEgressRamp::rampSurfaceWidthM) / 12.0,
+            GriffinEgressRamp::physicalRampDeckTransitionMassKg * (GriffinEgressRamp::physicalRampDeckTransitionLengthM * GriffinEgressRamp::physicalRampDeckTransitionLengthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0);
         attribute physicalRampPortMountX : Real = 1.907003563827;
         attribute physicalRampStarboardMountX : Real = -1.907003563827;
         attribute physicalRampMountY : Real = 2.066735381886;
@@ -554,9 +563,12 @@ package GriffinRampRequirements {
         // Griffin supplier data or an accepted mass-properties solution.
         attribute physicalRampMassKg : Real = 95.0;
         attribute physicalRampSectionMassKg : Real = 31.666666667;
-        attribute physicalRampSectionInertiaXKgM2 : Real = 21.587430555556;
-        attribute physicalRampSectionInertiaYKgM2 : Real = 30.126356279305;
-        attribute physicalRampSectionInertiaZKgM2 : Real = 8.543675723749;
+        attribute physicalRampSectionInertiaXKgM2 : Real = GriffinEgressRamp::physicalRampSectionMassKg *
+            (GriffinEgressRamp::rampSurfaceWidthM * GriffinEgressRamp::rampSurfaceWidthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0;
+        attribute physicalRampSectionInertiaYKgM2 : Real = GriffinEgressRamp::physicalRampSectionMassKg *
+            (GriffinEgressRamp::rampSectionLengthM * GriffinEgressRamp::rampSectionLengthM + GriffinEgressRamp::rampSurfaceWidthM * GriffinEgressRamp::rampSurfaceWidthM) / 12.0;
+        attribute physicalRampSectionInertiaZKgM2 : Real = GriffinEgressRamp::physicalRampSectionMassKg *
+            (GriffinEgressRamp::rampSectionLengthM * GriffinEgressRamp::rampSectionLengthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0;
         attribute physicalRampSectionMassPartitionToleranceKg : Real = 0.001;
         attribute physicalRampPortRootJointStowLimitRad : Real = 1.0471975512;
         attribute physicalRampRootStowedAngleRad : Real = 0.7853981634;
