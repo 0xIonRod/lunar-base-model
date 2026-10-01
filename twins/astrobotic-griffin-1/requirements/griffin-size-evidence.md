@@ -217,6 +217,10 @@ Four wheel stations remain. Each physical wheel cylinder is now the sole tire ge
 
 ## Landing-gear reconstruction, 2026-09-30
 
+The numerical reconstruction in this historical section is superseded by the
+2026-10-01 suspension review below. Its earlier endpoint check establishes only
+that earlier geometry, not acceptance of the revised mechanism.
+
 The user-supplied [Pittsburgh Technology Council Griffin hardware photograph](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
 was reviewed on 2026-09-30. It supports a slender primary shock member from the
 outer body frame to the foot and two diagonal braces spreading to separated
@@ -702,3 +706,49 @@ an automatic handoff; the original no-handoff snapshot and the new single-port
 status reader establish why handoff is no longer an operator prerequisite.
 The Rhai sources compiled and the provenance gate passed (207 requirements,
 207 evidence records). Full mission acceptance remains open.
+
+## Suspension and panel reference review, 2026-10-01
+
+| Reference | What it supports | What remains estimated |
+|---|---|---|
+| [Pittsburgh Technology Council hardware photograph](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png) | One primary member and two separated diagonal braces converge at each foot; upper attachments belong to the bus/frame. | Hardware revision, calibrated dimensions, internal shock construction, hinge axes, travel and spring properties. Perspective cannot establish these values. |
+| [Astrobotic Griffin lander description](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/) | Four shock-absorbing legs; manufacturer context for the lander. | A released linkage diagram, landing-gear stiffness or exact attachment coordinates. |
+| [Astrobotic product image](https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png) | The user counted 14 cell columns and 5 rows on the broad panel; supports a shallow rectangular panel and slender folded ramps. | Cell pitch in metres and the layout on narrower faces. This older concept rendering is not current flight-panel metrology. |
+| [ESA Griffin artist impression, 23 September 2022](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander) | The user-marked broad bus face is approximately 3:1 in width/height; appearance reference for ramps and exposed tank domes. | Absolute dimensions, hidden mechanisms and structural stock sizes. Perspective and artistic rendering limit precision. |
+
+The previous vertical prismatic joint translated the whole leg, including its
+upper brackets. That violates the reconstructed fixed attachment load path.
+The revised **proposed** mechanism uses a rigid V-brace/foot assembly pivoting
+about its two skirt mounts, plus a primary shock with upper and lower pins and
+an axial barrel/piston slider. This is a mechanically motivated idealization
+of the visible three-member topology, not a linkage disclosed by Astrobotic.
+The image alone does not prove the joint arrangement.
+
+The typed leg requirements now describe a zero-seated nominal shock, 150 mm
+compression allowance, 20 mm rebound, 40 kN/m axial stiffness and 8 kNs/m
+damping. At an estimated 2.2 kN per leg, the stiffness gives approximately
+55 mm static compression **before linkage leverage**. These are replaceable
+simulation study values, not measured supplier properties. The existing
+180 kg per-leg mass proxy is split into 160 kg brace/foot and two 10 kg shock
+bodies to preserve the previous mass budget; no flight mass measurement
+supports that allocation. The 45-degree pin limits and barrel/piston length
+fractions likewise remain packaging estimates.
+
+The nominal foot hub moves to local Y=-1.26 m and pad centre to -1.32 m while
+the upper anchors remain fixed. With vehicle Y=0.44 m, leg station Y=0.90 m
+and 40 mm pad thickness, the nominal pad underside is
+0.44 + 0.90 - 1.32 - 0.02 = 0 m. This preserves the reconstruction's ground
+datum without translating the bus-side brackets. It does not predict loaded
+settlement; that needs articulated physics verification.
+
+For panels, a narrow face must not gain a different cell aspect ratio merely
+by stretching the same 14-column module. Consistent cell pitch and a reduced
+column count on narrow faces are the proposed reconstruction rule. The exact
+flight cell count on those faces is unavailable. The hardware photo and older
+concept rendering show different panel configurations; their layouts must not
+be combined as if they documented the same revision.
+
+Status: mechanism assembly, panel refinement and revised geometry/physics
+checks remain in progress. The earlier leg test counts and manual ramp-command
+acceptance above do not establish acceptance of these proposed changes or a
+fully settled ramp/egress sequence.
