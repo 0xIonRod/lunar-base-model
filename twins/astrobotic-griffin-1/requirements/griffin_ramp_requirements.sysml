@@ -571,6 +571,20 @@ package GriffinRampRequirements {
         // Physical relative angle of a level, deployed section. The joint
         // coordinate target is this angle plus the joint frame offset.
         attribute physicalRampSectionDeploymentRelativeAngleRad : Real = 0.0;
+        /* Deployment sweep policy, 2026-10-01: Avian 0.7.0 wraps the motor
+         * position error to [-pi,pi), so a direct 180-degree command has no
+         * robust direction under settling error. Local joint-frame offsets
+         * do not change that target-to-current difference. Require a measured
+         * halfway pose before the final level target; this selects two
+         * quarter-turns along the intended outward opening sweep.
+         * Derived from the existing study poses, not supplier actuator data.
+         * Inspected source: avian3d-0.7.0/src/dynamics/solver/xpbd/joints/revolute.rs,
+         * apply_motor position_error = (raw_error + PI).rem_euclid(TAU) - PI.
+         * https://docs.rs/avian3d/0.7.0/src/avian3d/dynamics/solver/xpbd/joints/revolute.rs.html */
+        attribute physicalRampSectionUnfoldWaypointRelativeAngleRad : Real =
+            (GriffinEgressRamp::physicalRampSectionStowedRelativeAngleRad
+             + GriffinEgressRamp::physicalRampSectionDeploymentRelativeAngleRad) / 2.0;
+
         attribute physicalRampJointDriveStiffnessNmPerDeg : Real = 6000.0;
         attribute physicalRampRootJointDriveDampingNmPerDegPerSec : Real = 900.0;
         // Replaceable near-critical damping assumption for the authored
@@ -659,7 +673,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR017_FlightStowAndPostTouchdownUnfold {
-        doc /* The descent stow pose shall place the two root ramp axes as mirror images across the lander X=0 centerline: both bodies use a +45 degree Z rotation, and the starboard body is mounted at 180 degrees about Y. Their lander-frame headings are +45 and +135 degrees. One shared 45 degree stow magnitude defines both body poses; the starboard revolute target is -45 degrees because its joint frame reverses the hinge axis. The port root joint spans -50 to +60 degrees and the starboard joint spans -60 to +50 degrees, retaining the authored outward/down deployment targets. Both intermediate hinges fold 180 degrees in the physical section geometry. Their child-side joint frames are offset by -90 degrees, so the transport pose is represented at +90 degrees and the level deployment pose at -90 degrees in the joint coordinate. This keeps both commanded poses inside the +/-180 degree travel and gives deployment a definite signed sweep away from the lander instead of starting at the angular branch cut. The first hinge axis is offset to the top rail chord and the second by half the walking-surface thickness, so the three sections stack as a compact bundle instead of occupying one plane. At the level physical relative angle, these frame offsets keep the deployed walking surfaces aligned. The image-based angles and fold offsets are replaceable study estimates informed by the 2021 Griffin-1 product image; the image supplies qualitative silhouette only, not released supplier geometry or an ICD. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive all four intermediate hinges to their level targets, then move both deck hinges into the deployment envelope. */
+        doc /* The descent stow pose shall place the two root ramp axes as mirror images across the lander X=0 centerline: both bodies use a +45 degree Z rotation, and the starboard body is mounted at 180 degrees about Y. Their lander-frame headings are +45 and +135 degrees. One shared 45 degree stow magnitude defines both body poses; the starboard revolute target is -45 degrees because its joint frame reverses the hinge axis. The port root joint spans -50 to +60 degrees and the starboard joint spans -60 to +50 degrees, retaining the authored outward/down deployment targets. Both intermediate hinges fold 180 degrees in the physical section geometry. Their child-side joint frames are offset by -90 degrees, so the transport pose is represented at +90 degrees and the level deployment pose at -90 degrees in the joint coordinate. This keeps both commanded poses inside the +/-180 degree travel. A measured halfway relative pose then selects the intended sweep: a frame offset alone cannot resolve the motor error at an antipodal half-turn. The first hinge axis is offset to the top rail chord and the second by half the walking-surface thickness, so the three sections stack as a compact bundle instead of occupying one plane. At the level physical relative angle, these frame offsets keep the deployed walking surfaces aligned. The image-based angles and fold offsets are replaceable study estimates informed by the 2021 Griffin-1 product image; the image supplies qualitative silhouette only, not released supplier geometry or an ICD. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. After confirmed touchdown, an operator command shall drive the middle hinges through their measured halfway pose to level while the toes remain stowed, then drive the toes through the same halfway pose to level; only then shall the deck hinges enter the deployment envelope. */
         require GRC022_RampFlightStowAnglesWithinTravel {
             in rootStowAngleRad = GriffinEgressRamp::physicalRampRootStowedAngleRad;
             in sectionStowRelativeAngleRad = GriffinEgressRamp::physicalRampSectionStowedRelativeAngleRad;

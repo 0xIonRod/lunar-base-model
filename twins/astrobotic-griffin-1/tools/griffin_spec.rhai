@@ -153,6 +153,7 @@ fn _qualified_attribute(name) {
         "physicalRampStarboardRootJointStowLimitRad",
         "physicalRampSectionStowedRelativeAngleRad", "physicalRampSectionJointFrameOffsetRad",
         "physicalRampSectionDeploymentRelativeAngleRad",
+        "physicalRampSectionUnfoldWaypointRelativeAngleRad",
         "physicalRampSectionMassPartitionToleranceKg",
         "physicalRampJointDriveStiffnessNmPerDeg",
         "physicalRampRootJointDriveDampingNmPerDegPerSec",
@@ -802,6 +803,10 @@ fn physical_ramp_section_joint_coordinate_angle(relative_angle_rad) {
 fn physical_ramp_section_stowed_joint_angle_rad() {
     physical_ramp_section_joint_coordinate_angle(
         physical_ramp_section_stowed_relative_angle_rad())
+}
+fn physical_ramp_section_unfold_waypoint_joint_angle_rad() {
+    physical_ramp_section_joint_coordinate_angle(
+        _sysml_attribute("physicalRampSectionUnfoldWaypointRelativeAngleRad"))
 }
 fn physical_ramp_section_deployment_joint_angle_rad() {
     physical_ramp_section_joint_coordinate_angle(

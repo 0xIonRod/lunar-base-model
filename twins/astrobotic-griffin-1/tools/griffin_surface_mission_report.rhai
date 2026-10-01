@@ -8,7 +8,7 @@ const ROVER = MISSION_ROOT + "/FLIP";
 const DOCK = MISSION_ROOT + "/FLIPPayloadAdapterJoint";
 
 fn trace_event(state, evt) {
-    if state.event_trace == () || state.event_trace.len() >= 64 { return; }
+    if state.event_trace == () || state.event_trace.len() >= 64 { return state.event_trace; }
     let source_id = if evt.source == () { () } else { evt.source };
     let source_path = ();
     if source_id != () { source_path = usd_path(source_id); }
@@ -18,11 +18,11 @@ fn trace_event(state, evt) {
         source_path: if source_path == () { "" } else { source_path },
         sim_tick: sim_tick(),
     });
+    state.event_trace
 }
 
 fn fail_phase(state, phase) {
-    if state.phase_failure_reported == true { return; }
-    state.phase_failure_reported = true;
+    if state.phase_failure_reported == true { return true; }
     print("[griffin] phase failure: " + phase);
     // Keep a typed, bounded snapshot beside the phase failure. This is a
     // read-only query: a failure must never turn into a hidden pose mutation.
@@ -71,6 +71,9 @@ fn fail_phase(state, phase) {
             guidance_assembly_mass: mass_evidence,
             landing_gates: landing, landing_diagnostics: gates,
             physical_ramps: ramp_runtime, physical_ramp_joints: ramp_joints,
+            ramp_section_settle: state.ramp_section_settle_evidence,
+            ramp_sections_expected: state.ramp_sections_expected,
+            ramp_unfold_waypoints: state.ramp_unfold_waypoint_evidence,
             ramp_middle_settle: state.ramp_middle_settle_evidence,
             ramp_toe_settle: state.ramp_toe_settle_evidence,
             ramp_root_settle: state.ramp_deployment_settle_evidence,
@@ -78,6 +81,7 @@ fn fail_phase(state, phase) {
             route_command_updates: state.route_command_updates}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
     emit("griffin_phase_timeout");
+    true
 }
 
 fn ramp_unfold_order_report(state) {

@@ -108,6 +108,8 @@ fn on_start(me, ctx) {
     this.rover_settle_probe_tick = ();
     this.ramp_settle_probe_tick = ();
     this.ramp_sections_expected = ();
+    this.ramp_section_final_commanded = false;
+    this.ramp_unfold_waypoint_evidence = [];
     this.ramp_deployment_expected = ();
     this.ramp_middle_settle_evidence = ();
     this.ramp_toe_settle_evidence = ();
@@ -120,7 +122,7 @@ fn on_start(me, ctx) {
 }
 
 fn on_event(me, evt, ctx) {
-    griffin_surface_mission_report::trace_event(this, evt);
+    this.event_trace = griffin_surface_mission_report::trace_event(this, evt);
     let lander = find_path(LANDER);
     let rover = find_path(ROVER);
 
@@ -173,7 +175,7 @@ fn on_event(me, evt, ctx) {
             griffin_controls::show_rover_release_pending();
         } else {
             this.phase_timeout = true;
-            griffin_surface_mission_report::fail_phase(this, "adapter-release");
+            this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "adapter-release");
         }
         return;
     }
@@ -406,7 +408,7 @@ fn task(me, ctx) {
             if !landing_setup_preflight(this) {
                 this.mission_ready = false;
                 this.phase_timeout = true;
-                griffin_surface_mission_report::fail_phase(this, "landing-setup-preflight");
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "landing-setup-preflight");
             }
             true
         }),
@@ -421,7 +423,7 @@ fn task(me, ctx) {
                 wait(griffin_spec::landing_phase_timeout_s()),
                 once(|m| {
                     this.phase_timeout = true;
-                    griffin_surface_mission_report::fail_phase(this, "guidance-assembly-mass-readiness");
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "guidance-assembly-mass-readiness");
                     true
                 }),
             ]),
@@ -431,7 +433,7 @@ fn task(me, ctx) {
             if !begin_descent(this) {
                 this.mission_ready = false;
                 this.phase_timeout = true;
-                griffin_surface_mission_report::fail_phase(this, "guidance-assembly-mass-contract");
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "guidance-assembly-mass-contract");
             }
             true
         }),
@@ -447,7 +449,7 @@ fn task(me, ctx) {
                 // physical event. It cannot create a PASS; the event branch
                 // must still complete the landing predicates.
                 wait(griffin_spec::landing_phase_timeout_s()),
-                once(|m| { this.phase_timeout = true; griffin_surface_mission_report::fail_phase(this, "landing"); true }),
+                once(|m| { this.phase_timeout = true; this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "landing"); true }),
             ]),
         ]),
         // `par_race` succeeds when the timeout branch completes; stop the
@@ -472,10 +474,11 @@ fn task(me, ctx) {
         once(|m| {
             this.ramp_motion_trace = [];
             this.ramp_motion_trace_last_tick = ();
+            this.ramp_section_final_commanded = false;
             let middle = griffin_surface_ramp_ops::unfold_middle_sections();
             if middle.ok != true {
                 this.phase_timeout = true;
-                griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-command");
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-command");
             } else {
                 this.ramp_sections_expected = middle.expected_angles;
             }
@@ -496,10 +499,19 @@ fn task(me, ctx) {
                         return false;
                     }
                     this.ramp_settle_probe_tick = tick;
-                    let evidence = griffin_surface_ops::physical_ramp_hinges_settled(
-                        this.ramp_sections_expected, 0.035);
-                    this.ramp_section_settle_evidence = evidence;
-                    evidence.ok == true && evidence.settled == true
+                    let progress=griffin_surface_ramp_ops::section_unfold_progress(
+                        this.ramp_sections_expected,"middle",this.ramp_section_final_commanded,
+                        this.ramp_unfold_waypoint_evidence);
+                    if progress.ok!=true {
+                        this.phase_timeout=true;
+                        this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-middle-unfold-progress");
+                        return true;
+                    }
+                    this.ramp_section_settle_evidence=progress.evidence;
+                    this.ramp_sections_expected=progress.expected_angles;
+                    this.ramp_section_final_commanded=progress.final_commanded;
+                    this.ramp_unfold_waypoint_evidence=progress.waypoint_evidence;
+                    progress.settled
                 })
             ]),
             seq([
@@ -509,7 +521,7 @@ fn task(me, ctx) {
                         griffin_surface_ops::physical_ramp_hinges_settled(
                             this.ramp_sections_expected, 0.035);
                     this.phase_timeout = true;
-                    griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-settle");
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-settle");
                     true
                 })
             ])
@@ -523,10 +535,11 @@ fn task(me, ctx) {
         once(|m| {
             this.ramp_motion_trace = [];
             this.ramp_motion_trace_last_tick = ();
+            this.ramp_section_final_commanded = false;
             let toes = griffin_surface_ramp_ops::unfold_toes();
             if toes.ok != true {
                 this.phase_timeout = true;
-                griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-command");
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-command");
             } else {
                 this.ramp_sections_expected = toes.expected_angles;
             }
@@ -547,10 +560,19 @@ fn task(me, ctx) {
                         return false;
                     }
                     this.ramp_settle_probe_tick = tick;
-                    let evidence = griffin_surface_ops::physical_ramp_hinges_settled(
-                        this.ramp_sections_expected, 0.035);
-                    this.ramp_section_settle_evidence = evidence;
-                    evidence.ok == true && evidence.settled == true
+                    let progress=griffin_surface_ramp_ops::section_unfold_progress(
+                        this.ramp_sections_expected,"toe",this.ramp_section_final_commanded,
+                        this.ramp_unfold_waypoint_evidence);
+                    if progress.ok!=true {
+                        this.phase_timeout=true;
+                        this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-toe-unfold-progress");
+                        return true;
+                    }
+                    this.ramp_section_settle_evidence=progress.evidence;
+                    this.ramp_sections_expected=progress.expected_angles;
+                    this.ramp_section_final_commanded=progress.final_commanded;
+                    this.ramp_unfold_waypoint_evidence=progress.waypoint_evidence;
+                    progress.settled
                 })
             ]),
             seq([
@@ -560,7 +582,7 @@ fn task(me, ctx) {
                         griffin_surface_ops::physical_ramp_hinges_settled(
                             this.ramp_sections_expected, 0.035);
                     this.phase_timeout = true;
-                    griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-settle");
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-settle");
                     true
                 })
             ])
@@ -575,7 +597,7 @@ fn task(me, ctx) {
             this.ramp_deployment_expected = griffin_surface_ramp_ops::root_deployment_angle_expectations();
             if this.ramp_deployment_expected == () {
                 this.phase_timeout = true;
-                griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-targets");
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-targets");
                 return true;
             }
             this.ramp_motion_trace = [];
@@ -583,7 +605,7 @@ fn task(me, ctx) {
             let ramps = griffin_surface_ramp_ops::deploy_roots();
             if ramps.ok != true {
                 this.phase_timeout = true;
-                griffin_surface_mission_report::fail_phase(this, "ramp-root-deploy-command");
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deploy-command");
             }
             true
         }),
@@ -615,7 +637,7 @@ fn task(me, ctx) {
                         griffin_surface_ops::physical_ramp_hinges_settled(
                             this.ramp_deployment_expected, 0.035);
                     this.phase_timeout = true;
-                    griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-settle");
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deployment-settle");
                     true
                 })
             ])
@@ -631,7 +653,7 @@ fn task(me, ctx) {
                     this.release_requested = true;
                 } else {
                     this.phase_timeout = true;
-                    griffin_surface_mission_report::fail_phase(this, "adapter-release");
+                    this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "adapter-release");
                 }
             }
             true
@@ -656,7 +678,7 @@ fn task(me, ctx) {
                 this.rover_brake_held = true;
             } else {
                 this.phase_timeout = true;
-                griffin_surface_mission_report::fail_phase(this, "rover-engage");
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "rover-engage");
             }
             true
         }),
@@ -672,7 +694,7 @@ fn task(me, ctx) {
                 this.rover_brake_held = false;
             } else {
                 this.phase_timeout = true;
-                griffin_surface_mission_report::fail_phase(this, "rover-brake-release");
+                this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "rover-brake-release");
             }
             true
         }),
@@ -697,7 +719,7 @@ fn task(me, ctx) {
                 // it does not, report the physical state instead of allowing
                 // the route task to hang until the outer harness expires.
                 wait(griffin_spec::rover_settle_timeout_s()),
-                once(|m| { this.phase_timeout = true; griffin_surface_mission_report::fail_phase(this, "rover-settle"); true }),
+                once(|m| { this.phase_timeout = true; this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "rover-settle"); true }),
             ]),
         ]),
         check(|m| this.phase_timeout != true),
