@@ -1588,7 +1588,7 @@ fn physical_landing_leg_pad_geometry() {
         visual + "springLowerLimitM", visual + "springUpperLimitM",
         visual + "springStiffnessNPerM", visual + "springDampingNsPerM",
         visual + "springMaxForceN", visual + "springTargetVelocityMps",
-        visual + "springPoseToleranceM",
+        visual + "springPoseToleranceM", visual + "continuousCollisionDetection",
         configuration + "legStations", configuration + "legStationRotationYDeg",
         "Griffin1Requirements::PublicMissionContext::landingVehicleReferenceTouchdownY",
         "Griffin1Requirements::PublicMissionContext::siteSurfaceY",
@@ -1613,6 +1613,7 @@ fn physical_landing_leg_pad_geometry() {
     let max_force = sysml_requirements::number(source, visual + "springMaxForceN");
     let target_velocity = sysml_requirements::number(source, visual + "springTargetVelocityMps");
     let pose_tolerance = sysml_requirements::number(source, visual + "springPoseToleranceM");
+    let ccd = sysml_requirements::boolean(source, visual + "continuousCollisionDetection");
     let touchdown_y = sysml_requirements::number(source,
         "Griffin1Requirements::PublicMissionContext::landingVehicleReferenceTouchdownY");
     let surface_y = sysml_requirements::number(source,
@@ -1631,7 +1632,7 @@ fn physical_landing_leg_pad_geometry() {
         || tolerance == () || touchdown_y == () || surface_y == ();
     let spring_missing = lower_limit == () || upper_limit == () || stiffness == ()
         || damping == () || max_force == () || target_velocity == ()
-        || pose_tolerance == ();
+        || pose_tolerance == () || ccd == ();
     let station_missing = station_tolerance == () || rotation_tolerance == ()
         || stations.len() != 4 || rotations.len() != 4;
     let values_invalid = radius <= 0.0 || height <= 0.0 || tolerance <= 0.0
@@ -1646,7 +1647,7 @@ fn physical_landing_leg_pad_geometry() {
       spring_lower_limit_m: lower_limit, spring_upper_limit_m: upper_limit,
       spring_stiffness_n_per_m: stiffness, spring_damping_ns_per_m: damping,
       spring_max_force_n: max_force, spring_target_velocity_mps: target_velocity,
-      spring_pose_tolerance_m: pose_tolerance,
+      spring_pose_tolerance_m: pose_tolerance, continuous_collision_detection: ccd,
       touchdown_y_m: touchdown_y, surface_y_m: surface_y,
       tolerance_m: tolerance, station_tolerance_m: station_tolerance,
       rotation_tolerance_deg: rotation_tolerance}
@@ -1677,6 +1678,9 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
             path: leg_path, name: "physics:filteredPairs", targets: []}});
         ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: leg_path,
             schemas: ["PhysicsRigidBodyAPI"]}});
+        ops.push(#{SetAttribute: #{edit_target: edit_target, path: leg_path,
+            name: "physxRigidBody:enableCCD", type_name: "bool",
+            value: geometry.continuous_collision_detection.to_string()}});
         let station = geometry.stations[index];
         let placement = assembly_builder::place_plan(edit_target, leg_path,
             vec3_array(station), [0.0, geometry.rotations_y_deg[index], 0.0], ());
@@ -2062,7 +2066,7 @@ fn physical_landing_leg_pad_observation(doc, root) {
             #{path: visual_root + "/MountAxle", children: false,
               geometry_bounds: true});
         let leg_pose = assembly_builder::composed_query(doc, #{path: leg_path,
-            children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ"],
+            children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ", "physxRigidBody:enableCCD"],
             rels: ["physics:filteredPairs"], schemas: true});
         let joint_path = root + "/Leg" + suffixes[index] + "_Spring";
         let joint = assembly_builder::composed_query(doc, #{path: joint_path,
@@ -2291,7 +2295,8 @@ fn physical_landing_leg_pad_observation(doc, root) {
             || visual.attrs["xformOp:translate"][2].abs() > geometry.tolerance_m {
             all_topology = false;
         }
-        if collider.attrs["physics:collisionEnabled"] != true {
+        if collider.attrs["physics:collisionEnabled"] != true
+            || leg_pose.attrs["physxRigidBody:enableCCD"] != geometry.continuous_collision_detection {
             all_collision_enabled = false;
         }
         if collider.attrs["visibility"] != "invisible"

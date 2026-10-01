@@ -15,6 +15,7 @@ def Xform "World" (
     custom string lunco:part:role = "Griffin-1 landing leg module"
     custom string lunco:part:interface = "deck mount to circular touchdown pad; reusable four-way instance"
     custom string lunco:provenance:source = "Twin-authored study geometry; public flight ICD unavailable"
+    bool physxRigidBody:enableCCD = true
     def Cube "TopMount"
     {
         custom double3 xformOp:translate = (0.0, -0.08, 0.0)

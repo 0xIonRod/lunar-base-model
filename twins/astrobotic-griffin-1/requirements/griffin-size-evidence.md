@@ -626,3 +626,31 @@ m/s identifier and claim of measured vehicle speeds were incorrect. Limits
 0.14–0.35 remain uncalibrated study estimates; observed motion additionally
 depends on motor torque, gearing, slope, contact and steering. No supplier speed
 claim or closed-loop speed regulation follows from that table.
+
+### Thin foot-pad collision policy (2026-10-01)
+
+The reported operator scene showed a leg below the surface. In the owned
+pre-change runtime, LegNZ's composed physical pad center reached Y=-0.3949 m
+inside the landing-pad footprint. The proxy was enabled and matched the
+visible 0.35 m radius, 0.04 m tall cylinder; shifting the visible leg would
+therefore conceal a physical contact failure.
+
+Ordinary USD rigid-body projection lacked authored CCD support, whereas
+LunCoSim's native wheel projection already installs Avian swept CCD. Griffin's
+leg physics component now authors `physxRigidBody:enableCCD = true`, inherited
+by all four bodies. The generic bridge projects that flag to Avian 0.7
+nonlinear SweptCcd. This is an explicit numerical anti-tunneling choice for the
+40 mm pads and 100 mm scene slab, not a published Astrobotic hardware value.
+Canonical flag reference:
+https://docs.omniverse.nvidia.com/kit/docs/omni_physics/107.2/dev_guide/schemas/physxschema.html
+The existing leg geometry plan and observation read/check the typed SysML
+policy; no extra visible pad, height correction or terrain offset was added.
+
+Focused projection tests passed (7). In a new headful run after manual control
+was acquired with zero throttle, foot centers were PX=0.3444, NX=0.04114,
+PZ=0.34186, NZ=0.04121 m. NX/NZ had native slab contact; PX/PZ rested on higher
+retained DEM relief. The slab contact sample reported about 4 mm solver
+penetration, rather than the previous roughly 0.4 m burial. The close rendered
+view confirmed the near feet on the surface. This is bounded landing/contact
+evidence; it does not qualify arbitrary crash speeds, unpublished shock
+kinematics, or the complete surface mission.

@@ -73,6 +73,14 @@ package GriffinLandingLegRequirements {
         // outward-facing rotations in GriffinVisualConfiguration.
         attribute physicalLegPlacementToleranceM : Real = 0.001;
         attribute physicalLegRotationToleranceDeg : Real = 0.001;
+        // Numerical anti-tunneling policy, not an Astrobotic hardware datum.
+        // The 40 mm pads can cross the 100 mm site slab between collision
+        // samples during an impact. Sweep the physical leg body against
+        // native terrain/solid colliders; never move the rendered pad alone.
+        // Source: NVIDIA PhysxRigidBodyAPI physxRigidBody:enableCCD;
+        // https://docs.omniverse.nvidia.com/kit/docs/omni_physics/107.2/dev_guide/schemas/physxschema.html
+        // Backend: Avian 0.7 SweptCcd NON_LINEAR (translation and rotation).
+        attribute continuousCollisionDetection : Boolean = true;
         attribute padColliderToleranceM : Real = 0.001;
         attribute bodyMountOverlapM : Real = 0.05;
         // Numerical allowance for composed floating-point bound arithmetic;
@@ -166,7 +174,7 @@ package GriffinLandingLegRequirements {
         require GLLC008_PadColliderStationMatchesSource {
             in toleranceM = GriffinLandingLegAssembly::physicalLegPlacementToleranceM;
         }
-        doc /* GLL-008 [contact geometry] each dynamics leg root shall match the ordered COM-frame legStations and legStationRotationYDeg in GriffinVisualConfiguration. Its hidden Y-axis cylinder contact proxy shall be generated from the composed visible FootPad cylinder and link to it through a typed USD relationship. The effective Avian-cooked contact cylinder shall match the composed visible FootPad cylinder in radius, height, Y-axis orientation, and center within the authored tolerance after both geometries are compared in the canonical-stage metre frame. The visible component remains the geometry source; only the proxy owns contact, and legacy strut/capsule proxies shall not also collide. The visible load-spreading plate shall use the typed footPadPlateWidthM, footPadPlateHeightM, footPadPlateDepthM, and footPadPlateCenterYM datums. */
+        doc /* GLL-008 [contact geometry] each dynamics leg root shall match the ordered COM-frame legStations and legStationRotationYDeg in GriffinVisualConfiguration. Its hidden Y-axis cylinder contact proxy shall be generated from the composed visible FootPad cylinder and link to it through a typed USD relationship. The effective Avian-cooked contact cylinder shall match the composed visible FootPad cylinder in radius, height, Y-axis orientation, and center within the authored tolerance after both geometries are compared in the canonical-stage metre frame. The visible component remains the geometry source; only the proxy owns contact, and legacy strut/capsule proxies shall not also collide. The visible load-spreading plate shall use the typed footPadPlateWidthM, footPadPlateHeightM, footPadPlateDepthM, and footPadPlateCenterYM datums.  The physical leg body shall use the source continuousCollisionDetection policy so thin pad contact is swept through time, rather than accepted from endpoint overlap alone. A runtime landing/impact test must separately establish terrain clearance; source geometry agreement is not that verdict. */
     }
     constraint def GLLC009_BusAndAxleOverlap {
         in measuredBusOverlapM : Real;
