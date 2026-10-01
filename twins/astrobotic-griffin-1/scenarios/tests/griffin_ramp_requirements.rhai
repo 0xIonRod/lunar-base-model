@@ -160,7 +160,7 @@ fn on_tick(me, ctx) {
         "rampCount", "rampSurfaceLengthM", "rampSectionCount", "rampSectionLengthM",
         "rampSectionGeometryToleranceM", "rampSurfaceWidthM", "rampSurfaceThicknessM",
         "rampWheelClearanceM", "rampRailHeightM", "rampRailWidthM", "rampRailOffsetZM", "rampCenterRailOffsetZM",
-        "rampRailJointPinRadiusM", "rampRailJointPinLengthM",
+        "rampRailJointPinRadiusM", "rampRailJointPinLengthM", "rampPivotLugWidthM",
         "maxRailHeightToSectionLength", "maxPivotDiameterToRailHeight",
         "rampSurfaceCenterYM", "rampRailCenterYM", "rampMaxDeploymentAngleRad",
         "assemblyTrackWidthM", "contactTrackGeometryToleranceM", "assemblyTreadCount",
@@ -508,17 +508,26 @@ fn on_tick(me, ctx) {
                 checks.push(_attribute_component("GRR-008-" + side + "-" + index.to_string() + "-" + pin_name + "-z",
                     "grr008", pin_path, "xformOp:translate", 2, pin_z));
                 let axis_y=griffin_spec::ramp_section_hinge_axis_y_m(index);
-                let pin_radius=_source_number(source,"rampRailJointPinRadiusM");
-                let lug_bottom=min(axis_y-pin_radius,
+                let lug_radius=_source_number(source,"rampPivotLugWidthM")/2.0;
+                let lug_bottom=min(axis_y-lug_radius,
                     _source_number(source,"rampSurfaceCenterYM")
                     -_source_number(source,"rampSurfaceThicknessM")/2.0);
-                let lug_top=max(axis_y+pin_radius,
+                let lug_top=max(axis_y+lug_radius,
                     _source_number(source,"rampRailCenterYM")
                     +_source_number(source,"rampRailHeightM")/2.0);
-                checks.push(#{id:"GRR-008-"+side+"-"+index.to_string()+"-"+pin_name+"-lug-span",
-                    component:"ramp_rail_joint",requirement:"grr008",verification:VERIFICATION,
-                    kind:"extent_component",path:pin_path+"Lug",index:1,multiplier:1.0,
-                    expected:lug_top-lug_bottom,tolerance:0.002});
+                checks.push(sysml_requirement_checks::exists(
+                    "GRR-008-"+side+"-"+index.to_string()+"-"+pin_name+"-rounded-plate",
+                    "ramp_rail_joint","grr008",VERIFICATION,pin_path+"Lug","Mesh"));
+                // extent_component is the Cube size*scale observer. For this
+                // Mesh, inspect its vertex-derived local USD extent instead.
+                for end in [#{name:"bottom",index:0,sign:-1.0},#{name:"top",index:1,sign:1.0}] {
+                    checks.push(sysml_requirement_checks::array_component(
+                        "GRR-008-"+side+"-"+index.to_string()+"-"+pin_name+"-lug-"+end.name,
+                        "ramp_rail_joint","grr008",VERIFICATION,pin_path+"Lug","extent",
+                        [end.index,1],end.sign*(lug_top-lug_bottom)/2.0,0.002));
+                }
+                checks.push(_attribute_component("GRR-008-"+side+"-"+index.to_string()+"-"+pin_name+"-lug-z",
+                    "grr008",pin_path+"Lug","xformOp:translate",2,pin_z));
                 checks.push(_attribute_component("GRR-008-"+side+"-"+index.to_string()+"-"+pin_name+"-lug-y",
                     "grr008",pin_path+"Lug","xformOp:translate",1,(lug_top+lug_bottom)/2.0));
             }

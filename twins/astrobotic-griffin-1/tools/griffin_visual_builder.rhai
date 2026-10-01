@@ -4501,6 +4501,53 @@ fn _ramp_section_track_topology() {
 // Contact/guard geometry and each repeated side lattice are separate Editor
 // tasks. Reconcile the four truss groups on the reusable component before
 // assembly placement; the default plan owns the base interface geometry.
+// Rounded plate blank: source dimensions, native profile extrusion, no
+// extra joint or independent motion. The pin obscures the unmodelled bore.
+fn _ramp_pivot_lug_visual_ops(doc, edit_target, section_path, name,
+    width, thickness, bottom, top, station_z, color) {
+    let radius = width / 2.0;
+    let height = top - bottom;
+    if radius <= 0.0 || thickness <= 0.0 || height < width {
+        return plan_error("ramp pivot plate profile dimensions are invalid");
+    }
+    let profile = [];
+    let half_straight = height / 2.0 - radius;
+    // Twelve samples per semicircle are presentation tessellation policy.
+    for i in 0..13 {
+        let angle = 3.141592653589793 * i / 12.0;
+        profile.push(vec2(radius * angle.cos(), half_straight + radius * angle.sin()));
+    }
+    for i in 0..13 {
+        let angle = 3.141592653589793 + 3.141592653589793 * i / 12.0;
+        profile.push(vec2(radius * angle.cos(), -half_straight + radius * angle.sin()));
+    }
+    let mesh = extrude_profile(profile, thickness, profile_plane_xy());
+    let points = [];
+    let minimum = vec3_array(mesh.points[0]);
+    let maximum = vec3_array(mesh.points[0]);
+    for point in mesh.points {
+        let coordinates = vec3_array(point);
+        points.push(coordinates);
+        for axis in 0..3 {
+            minimum[axis] = min(minimum[axis],coordinates[axis]);
+            maximum[axis] = max(maximum[axis],coordinates[axis]);
+        }
+    }
+    let geometry = #{ok:true,points:points,face_counts:mesh.face_vertex_counts,
+        face_indices:mesh.face_vertex_indices};
+    let plan = _component_mesh_visual_ops(doc,edit_target,section_path,name,geometry,color);
+    if !plan.ok { return plan; }
+    plan.ops.push(#{SetAttribute:#{edit_target:edit_target,path:section_path+"/"+name,
+        name:"extent",type_name:"float3[]",value:_mesh_points_literal([minimum,maximum])}});
+    let placement = assembly_builder::place_plan(edit_target,section_path+"/"+name,
+        [0.0,(bottom+top)/2.0,station_z],(),[1.0,1.0,1.0]);
+    if !placement.ok { return placement; }
+    for op in placement.ops { plan.ops.push(op); }
+    plan.ops.push(#{SetAttribute:#{edit_target:edit_target,path:section_path+"/"+name,
+        name:"xformOpOrder",type_name:"token[]",value:"[\"xformOp:translate\", \"xformOp:scale\"]"}});
+    plan
+}
+
 fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     section_name, section_length, section_index, deployment_angle) {
     _isolated_ramp_section_geometry_ops(doc,edit_target,section_path,section_name,
@@ -4695,14 +4742,6 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
                 [0.0, hinge_y, pin_z], (), [1.0, 1.0, 1.0]);
             if !pin_placement.ok { return pin_placement; }
             for op in pin_placement.ops { ops.push(op); }
-            let lug_bottom=min(hinge_y-rail_pin_radius, surface_y-thickness/2.0);
-            let lug_top=max(hinge_y+rail_pin_radius,rail_y+rail_height/2.0);
-            let lug=_component_cube_visual_ops(doc,edit_target,section_path,
-                pin_name+"Lug",[0.0,(lug_top+lug_bottom)/2.0,pin_z],(),
-                [_ramp_number("rampPivotLugWidthM"),lug_top-lug_bottom,
-                 _ramp_number("rampPivotLugThicknessM")],structure_color);
-            if !lug.ok {return lug;}
-            for op in lug.ops {ops.push(op);}
         }
 
         for beam in [
@@ -4722,6 +4761,16 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     for guide in griffin_spec::ramp_guide_stations() {
         let post_side = #{name: guide.side, z: guide.z};
         if member_group!=post_side.name {continue;}
+        // Keep native profile generation bounded to one guide per plan.
+        let lug_width=_ramp_number("rampPivotLugWidthM");
+        let lug_radius=lug_width/2.0;
+        let lug_bottom=min(hinge_y-lug_radius, surface_y-thickness/2.0);
+        let lug_top=max(hinge_y+lug_radius,rail_y+rail_height/2.0);
+        let lug=_ramp_pivot_lug_visual_ops(doc,edit_target,section_path,
+            guide.pin+"Lug",lug_width,_ramp_number("rampPivotLugThicknessM"),
+            lug_bottom,lug_top,guide.z,structure_color);
+        if !lug.ok {return lug;}
+        for op in lug.ops {ops.push(op);}
         for index in 0..post_count {
             let post_path = section_path + "/SidePost" + post_side.name
                 + (index + 1).to_string();
