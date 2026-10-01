@@ -44,3 +44,25 @@ read WheelRaycast tire forces without declaring the four wheel entities as
 read dependencies. The declaration is now corrected without changing the
 physics or acceptance policy. A fresh replay follows. Egress, repeatable
 landing, and owned rendered acceptance remain open.
+
+## Second replay: usable route failure
+
+The dependency-corrected `985b084` replay ended FAIL exit1 at tick 12762 with
+`GR-004-route-stall`. It passed touchdown, ordered section unfolding, root
+settlement and FLIP release again. No missing wheel read dependency blocked
+this run. Log `/tmp/griffin-landed-ramp-replay-2.log`; decoded native packet
+`/tmp/griffin-landed-ramp-evidence-2.json`.
+
+The rover stalled at (0.518135,2.665903,-1.208461) m before its scene-fixed
+(2,0,0) m approach target. The native forward vector was approximately
+(0.031,-0.277,-0.960), guidance heading error 2.222700 rad, steer1 and throttle0.
+This is an inconsistent frame, not evidence that stronger torque is needed:
+`flip_wheel_requirements.sysml` specifies an X-forward reconstruction with Z
+axles, while `VehicleFrame::FORWARD_LOCAL`, `wheel_heading`, and the shared
+`RoverAutopilotGuidance` use −Z forward. `WheelParams` reads the authored axle
+axis, but `WheelRaycast` does not retain that axis for its traction basis.
+Thus both navigation and tire-force direction need a consistent authored
+frame. Do not mask this with a throttle exception or extra visual wheels.
+The first two route datums are also fixed scene markers, so their relation to
+the actual landed ramp centerline must be reconsidered once the physical
+frame is consistent. No correction to those mechanisms is claimed here.

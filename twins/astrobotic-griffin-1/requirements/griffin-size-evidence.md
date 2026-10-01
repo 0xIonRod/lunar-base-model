@@ -551,3 +551,20 @@ rate and dwell limits are retained. The planner uses commanded joints, never
 forced body poses or a separate visual animation.
 
 Evidence and exact replay status: [landed ramp checkpoint](../../../handover/griffin-landed-ramp-contact-2026-10-01.md).
+
+#### FLIP frame inconsistency exposed by egress (2026-10-01)
+
+The dependency-corrected replay of Twin `985b084` and core `24dd835fa` again
+passed ramp deployment and release, then failed `GR-004-route-stall` at tick
+12762. The X-forward CAD reconstruction and its Z wheel axles must define the
+same travel direction for physical tire forces, wheel spin, steering and
+Modelica guidance. Current native wheel/guidance code instead assumes −Z
+forward. Guidance reported a 2.222700 rad heading error and zero throttle for
+the fixed (2,0,0) m target. Source: the owned native route-failure packet and
+trace recorded in the [landed ramp checkpoint](../../../handover/griffin-landed-ramp-contact-2026-10-01.md).
+This is an implementation inconsistency, not a new supplier datum or a reason
+to increase motor torque. The existing X-forward reconstruction remains a
+study frame; a corrected realization must explicitly transform that frame or
+consume it consistently in both navigation and wheel contact. The first two
+scene-fixed egress markers must also be checked against the landed ramp
+centerline. Full rover egress and rendered mission acceptance remain open.
