@@ -518,11 +518,27 @@ fn component_solar_array_widths_m() {
         }
         let dx = endpoints[1].x - endpoints[0].x;
         let dz = endpoints[1].z - endpoints[0].z;
-        let width = sqrt(dx * dx + dz * dz) - clearance;
+        let width = min(sqrt(dx * dx + dz * dz) - clearance, solar_panel_frame_width_m());
         if width <= 0.0 { return []; }
         widths.push(width);
     }
     widths
+}
+// Keep metric cell pitch across fitted faces. The nominal 14x5 module is
+// observed in the 2021 concept image; narrower-face counts are estimates.
+fn solar_installed_cell_layout(index) {
+    let widths=component_solar_array_widths_m();
+    let frame=solar_panel_frame_width_m();
+    let cells=solar_component_number("cellWidthM");
+    let columns=solar_component_number("gridColumnCount");
+    if index<0 || index>=widths.len() || frame==() || cells==() || columns==()
+        || cells<=0.0 || frame<=cells || columns<2.0 {return ();}
+    let pitch=cells/columns;
+    let available=widths[index]-(frame-cells);
+    let count=min(columns,(available/pitch).floor()).to_int();
+    if count<2 {return ();}
+    let scale=widths[index]/frame;
+    #{columns:count,pitch_m:pitch,scale_x:scale,local_cell_width_m:count*pitch/scale}
 }
 fn component_engine_stations() { _sysml_native_list("engineStations") }
 fn visual_ramp_mount_x() { [

@@ -172,9 +172,11 @@ fn on_tick(me, ctx) {
         mesh_paths.push(path + "/Frame");
         mesh_paths.push(path + "/Cells");
         mesh_paths.push(path + "/ArrayBackplane");
+        for column in 1..sysml_requirements::number(source,own("gridColumnCount")).to_int() {mesh_paths.push(path+"/CellDividerX"+column.to_string());}
+        for row in 1..sysml_requirements::number(source,own("gridRowCount")).to_int() {mesh_paths.push(path+"/CellDividerZ"+row.to_string());}
     }
     let mesh_batch = if mesh_paths.len() > 0 {
-        query("QueryUsdPrims", #{paths: mesh_paths, attrs: ["points", "xformOp:scale"]})
+        query("QueryUsdPrims", #{paths: mesh_paths, attrs: ["points", "xformOp:scale","xformOp:translate","visibility"]})
     } else { () };
     let composed = #{};
     if mesh_batch != () && usd_geometry_inspection::same_snapshot(mesh_batch.records) {
@@ -189,8 +191,11 @@ fn on_tick(me, ctx) {
         let name = names[index];
         let path = root + "/" + name;
         checks.push(sysml_requirement_checks::exists("GSA-001-" + name, "solar_array", "gsa001", VERIFICATION, path, "Xform"));
+        let layout=griffin_spec::solar_installed_cell_layout(index);
+        if layout==() {throw("solar installed cell layout unavailable");}
+        let hidden=[];for column in layout.columns..sysml_requirements::number(source,own("gridColumnCount")).to_int() {hidden.push("CellDividerX"+column.to_string());}
         let required_children = [];
-        for member in members { required_children.push(path + "/" + member); }
+        for member in members {if !hidden.contains(member) {required_children.push(path+"/"+member);}}
         checks.push(sysml_requirement_checks::children("GSA-002-" + name, "solar_array", "gsa002", VERIFICATION, path,
             required_children));
         if stations.len() == names.len() {
@@ -217,7 +222,7 @@ fn on_tick(me, ctx) {
         } else { () };
         let expected_installed_width = if negative_rail != () && positive_rail != ()
             && edge_clearance != () {
-            (positive_rail.x - negative_rail.x).abs() - edge_clearance
+            min((positive_rail.x - negative_rail.x).abs() - edge_clearance,frame_width)
         } else { () };
         let placement_constraint = sysml_requirements::required_constraint_ir(model,
             gsa005, "GriffinSolarRequirements::GSAC005_RailSpanFit");
@@ -240,6 +245,7 @@ fn on_tick(me, ctx) {
             ["measuredFrameWidthM", mesh_measurement(composed, path + "/Frame", 0, "extent")],
             ["measuredFrameThicknessM", mesh_measurement(composed, path + "/Frame", 1, "extent")],
             ["measuredFrameDepthM", mesh_measurement(composed, path + "/Frame", 2, "extent")],
+            ["installedLocalCellWidthM", derived_measurement(layout.local_cell_width_m,"whole source-pitch columns in fitted face",model)],
             ["measuredCellWidthM", mesh_measurement(composed, path + "/Cells", 0, "extent")],
             ["measuredCellThicknessM", mesh_measurement(composed, path + "/Cells", 1, "extent")],
             ["measuredCellDepthM", mesh_measurement(composed, path + "/Cells", 2, "extent")],
@@ -261,17 +267,44 @@ fn on_tick(me, ctx) {
             "solar_array", "gsa006", VERIFICATION,
             "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope", panel_envelope_observations, "typed", 0.0));
 
-        // Regression: late-created grid members formerly scaled their own
-        // translations, collapsing eight columns despite correct raw X values.
-        checks.push(sysml_requirement_checks::attribute_equals(
-            "GSA-007-"+name+"-divider-placement-order", "solar_array", "gsa007", VERIFICATION,
-            path+"/CellDividerX13", "xformOpOrder", ["xformOp:translate", "xformOp:scale"]));
+        // Verify the visible metric grid, including excess inherited dividers.
+        let columns=sysml_requirements::number(source,own("gridColumnCount")).to_int();
+        let rows=sysml_requirements::number(source,own("gridRowCount")).to_int();
+        let pitch_x=sysml_requirements::number(source,own("cellWidthM"))/columns;
+        let pitch_z=sysml_requirements::number(source,own("cellDepthM"))/rows;
+        let field=mesh_geometry(composed,path+"/Cells");
+        let max_x_error=0.0;let max_z_error=0.0;let grid_available=field!=();
+        for column in 1..columns {
+            let divider=composed[path+"/CellDividerX"+column.to_string()];
+            let attrs=if divider==() {()} else {divider.attrs};
+            if attrs==() {grid_available=false;continue;}
+            let visible=attrs["visibility"]!="invisible";
+            if visible!=(column<layout.columns) {max_x_error=max(max_x_error,pitch_x);}
+            if visible {
+                let t=attrs["xformOp:translate"];
+                if !array_is(t) || field==() {grid_available=false;continue;}
+                max_x_error=max(max_x_error,abs((t[0]-field.minimum[0])*layout.scale_x-column*pitch_x));
+            }
+        }
+        for row in 1..rows {
+            let divider=mesh_geometry(composed,path+"/CellDividerZ"+row.to_string());
+            if divider==() || field==() {grid_available=false;continue;}
+            max_z_error=max(max_z_error,abs(divider.center[2]-field.minimum[2]-row*pitch_z));
+        }
+        let grid_constraint=sysml_requirements::required_constraint_ir(model,model.requirement(PACKAGE+"::gsa007"),PACKAGE+"::GSAC007_UniformMetricCellPitch");
+        let grid_inputs=sysml_requirements::scalar_constraint_observations(grid_constraint,[
+            ["maximumColumnPitchErrorM",usd_geometry_inspection::measurement(if grid_available {max_x_error} else {()},composed[path+"/Cells"],"visible column spacing unavailable")],
+            ["maximumRowPitchErrorM",usd_geometry_inspection::measurement(if grid_available {max_z_error} else {()},composed[path+"/Cells"],"row spacing unavailable")]
+        ]);
+        grid_inputs.push(source_observation(model,visual("geometryVerificationToleranceM")));
+        checks.push(sysml_requirements::required_constraints_check("GSA-007-"+name+"-metric-cell-pitch","solar_array","gsa007",VERIFICATION,PACKAGE+"::GSAC007_UniformMetricCellPitch",grid_inputs,"typed",0.0));
         for side in ["NegativeX", "PositiveX"] {
             let bracket_path = path + "/MountBracket" + side;
             checks.push(sysml_requirement_checks::exists("GSA-007-" + name + "-" + side + "-bracket",
                 "solar_array", "gsa007", VERIFICATION, bracket_path, "Cube"));
-            checks.push(sysml_requirement_checks::extent_component("GSA-007-" + name + "-" + side + "-mount-width", "solar_array", "gsa007", VERIFICATION,
-                bracket_path, 0, own("mountBracketWidthM"), 1.0, geometry_tolerance));
+            checks.push(#{id:"GSA-007-"+name+side+"-mount-width",component:"solar_array",requirement:"gsa007",verification:VERIFICATION,
+                kind:"attribute_component",path:bracket_path,attr:"xformOp:scale",index:0,
+                expected:sysml_requirements::number(source,own("mountBracketWidthM"))/layout.scale_x,tolerance:geometry_tolerance});
             checks.push(sysml_requirement_checks::extent_component("GSA-007-" + name + "-" + side + "-mount-thickness", "solar_array", "gsa007", VERIFICATION,
                 bracket_path, 1, own("mountBracketThicknessM"), 1.0, geometry_tolerance));
             checks.push(sysml_requirement_checks::extent_component("GSA-007-" + name + "-" + side + "-mount-depth", "solar_array", "gsa007", VERIFICATION,
@@ -281,7 +314,7 @@ fn on_tick(me, ctx) {
                 let sign = if mount_index == 0 { -1.0 } else { 1.0 };
                 let first_rail = local_mount_rails[index * 2];
                 let second_rail = local_mount_rails[index * 2 + 1];
-                let expected_x = sign * frame_width / 2.0;
+                let expected_x = if mount_index==0 {first_rail.x/layout.scale_x} else {second_rail.x/layout.scale_x};
                 let expected_y = (first_rail.y + second_rail.y) / 2.0;
                 let expected_z = (first_rail.z + second_rail.z) / 2.0;
                 checks.push(component_position("GSA-007-" + name + "-" + side + "-bracket-station",
@@ -313,24 +346,21 @@ fn on_tick(me, ctx) {
             let link_path = path + "/MountLink" + side;
             checks.push(sysml_requirement_checks::exists("GSA-008-" + name + "-" + side + "-link",
                 "solar_array", "gsa008", VERIFICATION, link_path, "Cube"));
-            checks.push(sysml_requirement_checks::extent_component("GSA-008-" + name + "-" + side + "-link-height", "solar_array", "gsa008", VERIFICATION,
-                link_path, 1, own("mountLinkHeightM"), 1.0, geometry_tolerance));
-            checks.push(sysml_requirement_checks::extent_component("GSA-008-" + name + "-" + side + "-link-depth", "solar_array", "gsa008", VERIFICATION,
-                link_path, 2, own("mountLinkDepthM"), 1.0, geometry_tolerance));
-            if frame_width != () {
-                let sign = if side == "NegativeX" { -1.0 } else { 1.0 };
-                checks.push(component_position("GSA-008-" + name + "-" + side + "-link-station",
-                    "gsa008", link_path, 0,
-                    sign * frame_width / 2.0, geometry_tolerance));
-                checks.push(component_position("GSA-008-" + name + "-" + side + "-link-y",
-                    "gsa008", link_path, 1,
-                    sysml_requirements::number(source, own("mountLinkCenterYM")), geometry_tolerance));
-                checks.push(component_position("GSA-008-" + name + "-" + side + "-link-z",
-                    "gsa008", link_path, 2,
-                    sysml_requirements::number(source, own("mountLinkCenterZM")), geometry_tolerance));
+            if negative_rail!=() && positive_rail!=() {
+                let rail=if side=="NegativeX" {negative_rail} else {positive_rail};
+                let sign=if side=="NegativeX" {-1.0} else {1.0};
+                let panel_x=sign*frame_width/2.0;let rail_x=rail.x/layout.scale_x;
+                let dx=panel_x-rail_x;let dy=-rail.y;
+                let height=sqrt(dx*dx+dy*dy)+sysml_requirements::number(source,own("mountLinkHeightM"))-dy;
+                let dims=[sysml_requirements::number(source,own("mountBracketWidthM"))/layout.scale_x,height,sysml_requirements::number(source,own("mountLinkDepthM"))];
+                for axis in 0..3 {
+                    checks.push(#{id:"GSA-008-"+name+side+"-link-stock-"+axis.to_string(),component:"solar_array",requirement:"gsa008",verification:VERIFICATION,
+                        kind:"attribute_component",path:link_path,attr:"xformOp:scale",index:axis,expected:dims[axis],tolerance:geometry_tolerance});
+                }
+                for datum in [#{axis:0,value:(panel_x+rail_x)/2.0},#{axis:1,value:rail.y/2.0},#{axis:2,value:rail.z}] {
+                    checks.push(component_position("GSA-008-"+name+side+"-link-center-"+datum.axis.to_string(),"gsa008",link_path,datum.axis,datum.value,geometry_tolerance));
+                }
             }
-            checks.push(sysml_requirement_checks::extent_component("GSA-008-" + name + "-" + side + "-link-width", "solar_array", "gsa008", VERIFICATION,
-                link_path, 0, own("mountBracketWidthM"), 1.0, geometry_tolerance));
         }
     }
     if mount_overlap != () && local_mount_rails.len() == names.len() * 2

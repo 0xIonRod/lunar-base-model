@@ -761,3 +761,29 @@ joint separation was approximately 6e-8 m and rotation residual 1.71e-6 degrees.
 The visual-review scene explicitly disables both added shock bodies and uses
 the same nominal leg station as the vehicle. These are assembly checks;
 loaded suspension, impact absorption and powered landing remain unverified.
+
+The subsequent owned powered-descent run emitted physical touchdown at
+38.1167 simulated seconds and automatic flight handoff at 38.2167 seconds
+with the revised gear (`griffin-gear-mission.log`). The status task also
+reported touchdown confirmed. This demonstrates a working handoff in that
+run; it does not establish a sustained settling horizon or completed egress.
+
+The panel refinement is now saved in the vehicle. Installed broad-face width
+is capped at the source-owned 1.716 m maximum, correcting the previous
+1.866 m inflation. The bevel retains its rail-derived approximately 0.857 m
+frame width. Source cell pitch is 1.596/14 = 0.114 m by 0.58/5 = 0.116 m.
+After reserving the nominal 0.120 m total border allowance, six columns fit
+the bevel; its active width is 0.684 m. Broad faces retain 14 columns and
+1.596 m active width. These pitches and border dimensions are explicit
+reconstruction estimates based on the user-counted grid in the linked 2021
+Astrobotic rendering, not calibrated hardware measurements.
+
+Compact brackets remain seated on the bus rail datums. Their lateral size is
+compensated for the panel instance scale, and each inclined support link is
+derived from its rail attachment and panel edge rather than moving the bus
+rails to fit the smaller frame. The production solar fixture passed with
+metric grid spacing, panel envelopes and mount-path overlap checks
+(`griffin-solar-fixture-4.log`). The rendered review confirms the narrow panel
+uses six columns with approximately square cells rather than fourteen
+compressed columns. Flight electrical area, power and deployment mechanism
+acceptance remain outside this appearance reconstruction.

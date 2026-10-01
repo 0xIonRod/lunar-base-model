@@ -108,13 +108,14 @@ package GriffinSolarRequirements {
         require GSAC005_RailSpanFit {
             in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GSA-005 [installation interface] each array root frame, azimuth, panel normal, support attachment, and stowed/deployed state shall conform to the approved Griffin-1 installation/interface definition. */
+        doc /* GSA-005 [installation interface] installed width is the lesser of the typed bus-rail span minus solarArrayEdgeClearanceM and frameWidthM, so the component maximum cannot inflate on wide faces. Stations and orientations remain source-owned reconstruction datums. Compact brackets seat at the unchanged bus rails; slanted links derive from the rail-to-panel-edge endpoints to preserve the load path. No supplier installation ICD is available. */
     }
     constraint def GSAC006_PanelMeshEnvelope {
         in measuredFrameWidthM : Real;
         in measuredFrameThicknessM : Real;
         in measuredFrameDepthM : Real;
         in measuredCellWidthM : Real;
+        in installedLocalCellWidthM : Real;
         in measuredCellThicknessM : Real;
         in measuredCellDepthM : Real;
         in measuredCellCenterYM : Real;
@@ -136,7 +137,7 @@ package GriffinSolarRequirements {
             and RealFunctions::abs(measuredFrameWidthM - frameWidthM) <= geometryToleranceM
             and RealFunctions::abs(measuredFrameThicknessM - frameThicknessM) <= geometryToleranceM
             and RealFunctions::abs(measuredFrameDepthM - frameDepthM) <= geometryToleranceM
-            and RealFunctions::abs(measuredCellWidthM - cellWidthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredCellWidthM - installedLocalCellWidthM) <= geometryToleranceM
             and RealFunctions::abs(measuredCellThicknessM - cellThicknessM) <= geometryToleranceM
             and RealFunctions::abs(measuredCellDepthM - cellDepthM) <= geometryToleranceM
             and RealFunctions::abs(measuredCellCenterYM - cellOffsetYM) <= geometryToleranceM
@@ -158,10 +159,22 @@ package GriffinSolarRequirements {
             in arrayBackplaneCenterYM = GriffinSolarArrayAssembly::arrayBackplaneCenterYM;
             in geometryToleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GSA-006 [geometry] each array shall match the approved installed panel outline, including its lower structural clearance cutout; the frame, backplane, and cell field shall share that opening within the controlled geometry tolerances. */
+        doc /* GSA-006 [geometry] the frame and backplane use the rectangular 2021 rendering configuration. The installed cell field width derives from a whole number of source-pitch columns, transformed back into the panel local frame. The bus-face scale fits the perimeter without distorting the cells. No lower notch is observed in that rendering; the different hardware-photo configuration is not mixed into this reconstruction. */
+    }
+    constraint def GSAC007_UniformMetricCellPitch {
+        in maximumColumnPitchErrorM : Real;
+        in maximumRowPitchErrorM : Real;
+        in toleranceM : Real;
+        toleranceM >= 0.0 and maximumColumnPitchErrorM >= 0.0
+            and maximumRowPitchErrorM >= 0.0
+            and maximumColumnPitchErrorM <= toleranceM
+            and maximumRowPitchErrorM <= toleranceM;
     }
     requirement def GSA007_CellGridAndMount {
-        doc /* GSA-007 [geometry] each array shall show cell modules, perimeter frame, and mounting features in the arrangement defined by the approved panel layout. */
+        require GSAC007_UniformMetricCellPitch {
+            in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
+        doc /* GSA-007 [geometry] full faces use the 14-column, 5-row module observed by the user in https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png linked from https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ . Installed cell pitch follows cellWidthM/gridColumnCount and cellDepthM/gridRowCount. Narrow faces reduce column count to the largest whole count fitting their rail span minus the nominal frame-to-cell border allowance, capped at gridColumnCount. Keep the metric pitch after instance scaling; never squeeze 14 columns into a narrower panel. A six-column bevel panel is a reconstruction estimate from available space, not an observed flight count. The retained five rows, 114 by 116 mm pitches and frame borders are appearance estimates; supplier panel configuration is unavailable. */
     }
     requirement def GSA008_HingeAndStandoff {
         doc /* GSA-008 [mechanical interface] panel pivots, restraints, support links, deployment envelope, and structural load path shall conform to the approved Griffin-1 mechanism and structural interface definition. */
