@@ -315,10 +315,14 @@ seconds, and emits a `GRIFFIN_LANDING_STABILITY` verdict plus a
 `GRIFFIN_LANDING_STABILITY_METRICS` JSON line. Run two fresh processes with the
 same scene revision and compare those metrics:
 
-The current powered-descent scene has not produced `lander_touchdown`: a
-fixed-clock diagnostic reached 390 simulated seconds before its 650 s wall
-timeout, so it could not start the required post-touchdown window. The mission
-therefore has not exercised the post-landing ramp-unfold step in runtime.
+The 2026-10-01 fixture retains the production `Scenario/Mission` and mounts
+its read-only stability observer under a separate `LandingStability` owner.
+LunCoSim attaches one generic program per owner; placing both programs under
+`Scenario` suppresses both. The former fixture replaced the mission and never
+armed guidance, so its zero-throttle descent could not establish a powered
+landing verdict. The older 390-second no-touchdown diagnostic is historical,
+not acceptance evidence for the updated fixture. A previous owned production
+run observed touchdown and handoff; the full stability window remains pending.
 
     LUNCOSIM_BIN=/path/to/terrain/target/debug/luncosim \
       twins/astrobotic-griffin-1/tools/check_landing_determinism.sh

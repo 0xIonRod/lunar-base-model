@@ -1,6 +1,6 @@
 // Twin-owned fixed-clock landing-stability test.
 //
-// The scene remains a compact composed fixture, while this Rhai observer
+// The scene retains the production mission, while this separate Rhai observer
 // samples the lander for the SysML stability horizon after touchdown. A verification
 // binding selects the stability channel and a Twin-local harness compares the
 // resulting metrics from two fresh processes. SysML owns every limit; Rhai

@@ -5,10 +5,6 @@
     metersPerUnit = 1.0
 )
 
-# Fast Twin-local contract test. It composes the same visual/Modelica scene as
-# the surface mission, then swaps only the scenario program for a short Rhai
-# check of the SysML geometry datum, live telemetry, and deterministic-run
-# contract. The production mission remains in scenes/griffin_1_surface_ops.usda.
 def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda@</Griffin1SurfaceOps>
     kind = "assembly"
@@ -17,8 +13,14 @@ def Xform "Griffin1SurfaceOps" (
 {
     over "Scenario"
     {
-        over "Mission"
+    }
+    def Scope "LandingStability"
+    {
+        def Scope "Observer" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
         {
+            uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_surface_ops_contract.rhai@
         }
     }
