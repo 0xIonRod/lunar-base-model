@@ -9,14 +9,7 @@
 const ROOT = "/Griffin1SurfaceOps";
 
 fn simulation_dependencies(me, ctx) {
-    let lander = find_path(ROOT + "/Lander");
-    let gnc = find_path(ROOT + "/Lander/GNC");
-    let propulsion = find_path(ROOT + "/Lander/MainPropulsion");
-    let altimeter = find_path(ROOT + "/Lander/Altimeter/Model");
-    #{modelica_entities: [lander, gnc, propulsion, altimeter],
-      entity_reads: [lander, gnc, propulsion, altimeter], entity_writes: [],
-      query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
-        "QueryUsdPrim", "QueryPhysicsState"], required_inputs: []}
+    griffin_surface_ops::landing_stability_dependencies()
 }
 
 fn finite_number(value) {
@@ -186,7 +179,7 @@ fn emit_stability_verdict(me, contract, source) {
         all_four_legs_contact: all_four_legs_contact,
         landing_contact: if me.last.landing_contact != () { me.last.landing_contact } else { () },
         engine_cutoff_contact: if me.last.engine_cutoff_contact != () { me.last.engine_cutoff_contact } else { () },
-        source_revision: source.source_revision,
+        source_revision: source.source_revision.to_string(),
         divergence_tolerance_m: contract.divergence_tolerance_m,
         divergence_tolerance_upright: contract.divergence_tolerance_upright,
         divergence_tolerance_speed_mps: contract.divergence_tolerance_speed_mps,

@@ -23,8 +23,13 @@ verification="GriffinSimulationAccuracyRequirements::Verify_GriffinLandingStabil
 # A 70 s bound ended before prior powered-descent diagnostics reached contact.
 max_ticks=${GRIFFIN_LANDING_MAX_TICKS:-30000}
 readiness_timeout=${GRIFFIN_LANDING_READINESS_TIMEOUT:-120}
-work=$(mktemp -d "${TMPDIR:-/tmp}/griffin-landing-determinism.XXXXXX")
-trap 'rm -rf "$work"' EXIT
+if [[ -n "${GRIFFIN_LANDING_EVIDENCE_DIR:-}" ]]; then
+    work=$GRIFFIN_LANDING_EVIDENCE_DIR
+    mkdir -p "$work"
+else
+    work=$(mktemp -d "${TMPDIR:-/tmp}/griffin-landing-determinism.XXXXXX")
+    trap 'rm -rf "$work"' EXIT
+fi
 
 for run in 1 2; do
     log="$work/run-$run.log"

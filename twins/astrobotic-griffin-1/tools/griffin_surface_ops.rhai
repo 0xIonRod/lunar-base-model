@@ -498,6 +498,19 @@ fn physics_performance() {
 // Small observation payload for fixed-clock acceptance tests.  Keep the
 // verbose landing_gate_report available for interactive diagnostics, but do
 // not retain its nested physics snapshots in a per-tick test state map.
+fn landing_stability_dependencies() {
+    let ROOT = "/Griffin1SurfaceOps";
+    let lander = find_path(ROOT + "/Lander");
+    let gnc = find_path(ROOT + "/Lander/GNC");
+    let propulsion = find_path(ROOT + "/Lander/MainPropulsion");
+    let altimeter = find_path(ROOT + "/Lander/Altimeter/Model");
+    #{modelica_entities: [lander, gnc, propulsion, altimeter],
+      entity_reads: [lander, gnc, propulsion, altimeter], entity_writes: [],
+      query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
+        "QueryUsdPrim", "QueryPhysicsState"], required_inputs: []}
+}
+
+
 fn landing_stability_sample() {
     let lander = find_path("/Griffin1SurfaceOps/Lander");
     let gnc = find_path("/Griffin1SurfaceOps/Lander/GNC");

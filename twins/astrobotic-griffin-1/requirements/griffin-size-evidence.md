@@ -812,3 +812,51 @@ and impact capacity remain estimates. The visible arrangement reference is
 [the PGH hardware image](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png).
 The builder now rejects compression travel that reaches the linkage's triangle
 closure limit. These values supersede the earlier estimate that ignored leverage.
+
+
+## Landing and reload audit — 2026-10-03
+
+Fresh-process landing replay passed for the unchanged 60 m surface-contract
+fixture after telemetry was stamped before delivery and shared actuator/tire
+forces were ordered. Both runs recorded touchdown at tick 1406 and identical
+final pose at tick 5010; all 361 post-touchdown samples had four-foot contact.
+Evidence is in the terrain checkout's `target/griffin-contact-order-replay/`.
+This is same-host evidence for that fixture, not flight validation.
+
+The same-app observer `scenarios/tests/griffin_scene_restart.rhai` compares two
+retained `RestartScene` trajectories. It starts each measurement only after the
+replacement generation is admitted. Its 90 s window reserves 30 s for the
+60 m descent at the existing estimated 2.5 m/s speed limit, plus the source-owned
+60 s stability window; this is a diagnostic budget, not flight descent timing.
+The retained dependency lifecycle now rebinds scene identities without
+reinitializing the observer. The current live replay still fails at relative
+tick 1380 near contact, despite matching earlier samples. Contact-phase
+same-app determinism remains unresolved; do not report this as a passing gate.
+
+The user requests axial leg motion along the primary connection line. The
+existing pinned V-brace reconstruction permits the foot to swing during shock
+compression. The hardware photograph remains the appearance reference:
+https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .
+It does not establish a flight linkage or force/stroke curve. A revised axial
+mechanics proxy must explicitly state its brace compliance approximation and
+measure perpendicular displacement, stroke limits and attachment closure.
+
+Fuel review: the existing vehicle starts with 1000 kg fuel and 1000 kg oxidizer,
+with a 2000 kg dry-body proxy. These are unqualified simulator values, not a
+published terminal-descent load. Astrobotic's August 2021 guide, page 26,
+specifies M20/MON3 and two tanks of each reactant, but provides no remaining
+propellant mass for this 60 m scene:
+https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf .
+The historical guide describes five main engines; the current product page
+states seven, so geometry/configuration sources must retain their dates:
+https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
+Do not infer current flight fuel mass or engine count from an older rendering.
+A revised terminal-descent load must account for modeled consumption, mixture
+ratio, reserve, actual tank volume and the attached assembly's mass.
+
+Next acceptance priorities are first-contact leg stroke and sideways motion,
+continuous force-driven descent without pose writes, restart replay, manual
+liftoff after touchdown, fuel/oxidizer starvation, deployed ramp wheel clearance,
+and real terrain wheel/pad contact. Scene cleanup must remove artificial pads
+and revise pad-dependent preflight/egress contracts together; hiding their
+meshes alone would retain an invisible alternate contact surface.
