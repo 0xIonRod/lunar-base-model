@@ -860,3 +860,19 @@ liftoff after touchdown, fuel/oxidizer starvation, deployed ramp wheel clearance
 and real terrain wheel/pad contact. Scene cleanup must remove artificial pads
 and revise pad-dependent preflight/egress contracts together; hiding their
 meshes alone would retain an invisible alternate contact surface.
+
+
+## Surface route simplification — 2026-10-03
+
+The route now contains five operator-facing milestones: ramp approach, ramp
+exit, two survey targets and the base site. Ten intermediate markers and the
+unused base-site collision slab were removed with typed USD document operations.
+The exit moves from X=15.60 m, inherited from the old 12.23 m ramp, to X=8.50 m.
+For the current estimated 5.397 m ramp rooted near X=1.90 m at 27.83 degrees,
+the nominal tip is near X=6.67 m; X=8.50 allows approximately 1.30 m rover
+half-length plus the 0.30 m arrival radius. The later shallow-turn positions
+and normalized throttle limits are mission-study choices requested by the user,
+not a surveyed lunar route. SysML owns the five arrays and the USD builder reads
+them. This pass verifies source and authored geometry consistency; rover traversal
+of the revised route remains unverified. Landing and egress slabs still remain
+until their pad-dependent physics and verification contracts are replaced.

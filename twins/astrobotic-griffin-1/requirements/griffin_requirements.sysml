@@ -11,11 +11,7 @@ package Griffin1Requirements {
     enum def GriffinLandingRegion { NobileSouthPole; }
     enum def HostedRoverDesignation { AstrolabFLIP; }
     enum def GriffinSurfaceRouteMarkerName {
-        RoverRampApproach; RoverRampExit; RoverTarget1;
-        RoverTransit1; RoverTransit2; RoverTransit3; RoverTransit4;
-        RoverTransit5; RoverTransit6; RoverTarget2;
-        RoverBaseArc1; RoverBaseArc2; RoverBaseApproach;
-        RoverBaseFinal; BaseSite;
+        RoverRampApproach; RoverRampExit; RoverTarget1; RoverTarget2; BaseSite;
     }
     enum def GriffinSurfaceFeatureName { LandingSitePad; EgressApron; }
 
@@ -73,56 +69,23 @@ package Griffin1Requirements {
         // circular visual-review boundary.
         attribute landingSitePadExtentM : Real = 6.0;
         attribute visualReviewGroundWidthM : Real = 36.0;
-        // Route markers are mission-interface datums, not navigation-code
-        // constants.  Keep the complete marker table in SysML so the scene
-        // can be regenerated through the typed Editor bridge without a
-        // second literal table in Rhai or a hand-edited USDA file.
-        attribute surfaceRouteMarkerNames : GriffinSurfaceRouteMarkerName[15] =
-            ("RoverRampApproach", "RoverRampExit", "RoverTarget1",
-             "RoverTransit1", "RoverTransit2", "RoverTransit3", "RoverTransit4",
-             "RoverTransit5", "RoverTransit6", "RoverTarget2",
-             "RoverBaseArc1", "RoverBaseArc2", "RoverBaseApproach",
-             "RoverBaseFinal", "BaseSite");
-        // The approach marker is the rover-centre datum before the
-        // 3.20 m ramp hinge. The source-owned transition length reaches the
-        // adapter's full-width octagonal corners with the required overlap.
-        // With FLIP's roughly 1.2 m forward half-envelope, x=2.00 m brings
-        // the front wheels onto the transition without
-        // placing the route target itself on the moving ramp body. The
-        // The 12.228605 m track at 27.833532 degrees reaches terrain near
-        // x=14.06 m (3.20 m hinge plus 10.86 m horizontal track run). Put
-        // the exit gate at x=15.60 m: even at the
-        // near edge of its 0.30 m arrival radius the trailing wheel stations
-        // lie beyond the ramp tip. Recheck the route after applying the new
-        // composed geometry in Editor.
-        attribute surfaceRouteMarkerX : Real[15] = (2.00, 15.60, 16.00, 19.00, 21.00, 22.50, 23.70, 24.60, 25.20, 25.40, 25.80, 26.70, 28.00, 29.50, 31.00);
-        // Route navigation is authored in the terrain x/z plane.  The first
-        // marker used to carry the 6.92 m deck-height value in Y, but the
-        // rover guidance contract intentionally ignores Y and therefore
-        // interpreted that datum as (3.20, 0.00).  Keep all surface markers
-        // on the terrain plane so the SysML datum and the visible marker
-        // agree; deck height belongs to the ramp/lander interface, not this
-        // horizontal route table.
-    attribute surfaceRouteMarkerY : Real[15] = (0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
-    attribute surfaceRouteMarkerZ : Real[15] = (0.00, 0.00, 0.00, 1.00, 0.50, 0.20, -0.30, -1.20, -2.30, -3.60, -4.90, -6.10, -7.20, -8.50, -10.00);
-        // Route commands are part of the mission interface, not controller
-        // implementation constants. The first radius is a 0.35 m approach
-        // lane around the centerline and must reach the composed deck-to-ramp
-        // transition. GRR-012 checks the source-owned transition length and
-        // required full-width overlap against exact composed collider footprints; the
-        // static interface result remains separate from
-        // runtime rover-contact acceptance. The second radius is 0.30 m at
-        // the forward (15.60,0.00) exit gate, after the trailing axle clears the ramp;
-        // its forward centreline placement avoids asking Ackermann guidance
-        // to reverse toward a lateral marker during the transition. The later diagonal legs deliberately reduce
-        // normalized throttle limits to 0.18..0.14 because the shared Ackermann law must turn
-        // through the bounded corner sequence without overshooting a survey
-        // marker; these are uncalibrated study command limits, not measured speed or supplier data. Source: RoverAutopilotGuidance.mo consumes speed as a forward throttle limit and reduces it by heading and approach gates.
-        attribute surfaceRouteThrottleLimit : Real[15] = (0.22, 0.22, 0.35, 0.35, 0.35, 0.22, 0.20, 0.18, 0.16, 0.14, 0.14, 0.15, 0.18, 0.20, 0.22);
-        // RoverTarget2 is the first survey gate on the finite-turn arc. Its
-        // 1.20 m arrival radius is a route-control study value; it is not a
-        // ramp-interface tolerance or a claimed current replay measurement.
-        attribute surfaceRouteArrivalRadiusM : Real[15] = (0.35, 0.30, 1.20, 1.20, 1.20, 1.00, 1.00, 1.00, 1.00, 1.20, 1.00, 1.00, 1.00, 1.00, 1.20);
+        // Operator-selected five-point surface route, 2026-10-03.
+        // The estimated deployed ramp is now 5.397 m, rooted near X=1.90 m;
+        // at 27.83 degrees its tip is approximately X=6.67 m. Exit X=8.50
+        // reserves the 1.30 m rover half-envelope and 0.30 m arrival radius.
+        // Survey/base points form a shallow turn rather than ten closely
+        // spaced intermediate targets. These are simulation mission choices,
+        // not a published Griffin site plan. Source: user scene-cleanup request
+        // and the ramp/FLIP dimensions in griffin-size-evidence.md.
+        attribute surfaceRouteMarkerNames : GriffinSurfaceRouteMarkerName[5] =
+            ("RoverRampApproach", "RoverRampExit", "RoverTarget1", "RoverTarget2", "BaseSite");
+        attribute surfaceRouteMarkerX : Real[5] = (2.00, 8.50, 13.00, 22.00, 31.00);
+        attribute surfaceRouteMarkerY : Real[5] = (0.00, 0.00, 0.00, 0.00, 0.00);
+        attribute surfaceRouteMarkerZ : Real[5] = (0.00, 0.00, 0.00, -4.00, -10.00);
+        // Estimated normalized throttle limits, not flight speeds. Slow down
+        // on the survey/base turn; retain tight egress arrival tolerances.
+        attribute surfaceRouteThrottleLimit : Real[5] = (0.22, 0.22, 0.20, 0.16, 0.16);
+        attribute surfaceRouteArrivalRadiusM : Real[5] = (0.35, 0.30, 1.20, 1.20, 1.20);
         // The deployed 12.228605 m ramp tip is near x=14.06 m, and the
         // 15.60 m exit gate is outside the 12 m landing pad. This
         // named apron is a small prepared transition surface, not a hidden

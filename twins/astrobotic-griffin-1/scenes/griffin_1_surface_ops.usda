@@ -190,7 +190,7 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (15.6, 0.0, 0.0)
+        custom double3 xformOp:translate = (8.5, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {
@@ -201,132 +201,22 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (16.0, 0.0, 0.0)
+        custom double3 xformOp:translate = (13.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {
             token lunco:triggerZone = "griffin_target_1"
         }
     }
-    def Xform "RoverTransit1" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (19.0, 0.0, 1.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_transit_1"
-        }
-    }
-    def Xform "RoverTransit2" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (21.0, 0.0, 0.5)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_transit_2"
-        }
-    }
-    def Xform "RoverTransit3" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (22.5, 0.0, 0.2)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_transit_3"
-        }
-    }
-    def Xform "RoverTransit4" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (23.7, 0.0, -0.3)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_transit_4"
-        }
-    }
-    def Xform "RoverTransit5" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (24.6, 0.0, -1.2)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_transit_5"
-        }
-    }
-    def Xform "RoverTransit6" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (25.2, 0.0, -2.3)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_transit_6"
-        }
-    }
     def Xform "RoverTarget2" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (25.4, 0.0, -3.6)
+        custom double3 xformOp:translate = (22.0, 0.0, -4.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         over "Trigger"
         {
             token lunco:triggerZone = "griffin_target_2"
-        }
-    }
-    def Xform "RoverBaseArc1" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (25.8, 0.0, -4.9)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_base_arc_1"
-        }
-    }
-    def Xform "RoverBaseArc2" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (26.7, 0.0, -6.1)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_base_arc_2"
-        }
-    }
-    def Xform "RoverBaseApproach" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (28.0, 0.0, -7.2)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_base_approach"
-        }
-    }
-    def Xform "RoverBaseFinal" (
-        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
-    )
-    {
-        custom double3 xformOp:translate = (29.5, 0.0, -8.5)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
-        {
-            token lunco:triggerZone = "griffin_base_final"
         }
     }
     def Xform "BaseSite" (
@@ -339,18 +229,6 @@ def Xform "Griffin1SurfaceOps" (
         {
             token lunco:triggerZone = "griffin_base_site"
         }
-    }
-    def Cube "BaseSitePad" (
-        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
-    )
-    {
-        double size = 1.0
-        double3 xformOp:translate = (31.0, -0.05, -12.0)
-        double3 xformOp:scale = (4.0, 0.1, 4.0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.2800000011920929, 0.30000001192092896, 0.3199999928474426)]
-        bool physics:collisionEnabled = true
-        rel material:binding:physics = </Griffin1SurfaceOps/PhysicsMaterials/Friction_1_0>
     }
     def Cube "LandingSitePad" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
