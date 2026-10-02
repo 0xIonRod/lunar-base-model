@@ -680,23 +680,9 @@ fn route_leg(path, speed, radius, event) {
 }
 
 fn _surface_route_events() {
-    [
-        "griffin_ramp_approach_reached",
-        "griffin_ramp_exit_reached",
-        "griffin_waypoint_1_reached",
-        "griffin_transit_1_reached",
-        "griffin_transit_2_reached",
-        "griffin_transit_3_reached",
-        "griffin_transit_4_reached",
-        "griffin_transit_5_reached",
-        "griffin_transit_6_reached",
-        "griffin_waypoint_2_reached",
-        "griffin_base_arc_1_reached",
-        "griffin_base_arc_2_reached",
-        "griffin_base_approach_reached",
-        "griffin_base_final_reached",
-        "griffin_base_site_reached"
-    ]
+    ["griffin_ramp_approach_reached", "griffin_ramp_exit_reached",
+     "griffin_waypoint_1_reached", "griffin_waypoint_2_reached",
+     "griffin_base_site_reached"]
 }
 
 /// The explicit Griffin landing-demo route: first cross the top deck to the
