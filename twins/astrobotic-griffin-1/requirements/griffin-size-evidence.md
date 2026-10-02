@@ -787,3 +787,28 @@ metric grid spacing, panel envelopes and mount-path overlap checks
 uses six columns with approximately square cells rather than fourteen
 compressed columns. Flight electrical area, power and deployment mechanism
 acceptance remain outside this appearance reconstruction.
+
+## Loaded suspension estimate correction — 2026-10-01
+
+The appearance reconstruction's pivot coordinates need a load-aware shock
+estimate. This is an analytical correction to a study proxy, not a measurement
+of Griffin hardware. With upper shock pin A, midpoint skirt pivot B and foot
+hub C from `GriffinLandingLegAssembly`, the nominal lengths are |A-C|=1.426417 m,
+|B-C|=1.751114 m and |A-B|=0.445818 m. The triangle becomes straight when the
+shock shortens by 0.121120 m. The former 0.150 m allowed compression was
+geometrically impossible; a loaded owned readback reached 0.1176–0.1192 m,
+near that singularity, after the body had dropped below its nominal datum.
+
+Differentiating the fixed-brace and shock-length constraints at C gives
+|dC_y/dL|=3.27427. The measured attached assembly mass, 5510 kg, under the
+1.62 m/s² lunar study gravity gives 2231.55 N per leg and roughly 7306.7 N
+axial shock load. A rounded 400 kN/m stiffness predicts 18.3 mm initial static
+stroke and about 60 mm vertical deflection under the linear approximation.
+The corresponding quarter-assembly generalized axial mass gives critical
+damping approximately 153.7 kNs/m, rounded to 150 kNs/m. Compression is capped
+at 50 mm, before the singularity; the 12 kN force cap is retained, with impact
+saturation still to be verified. Exact pivots, damping curves, mass properties
+and impact capacity remain estimates. The visible arrangement reference is
+[the PGH hardware image](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png).
+The builder now rejects compression travel that reaches the linkage's triangle
+closure limit. These values supersede the earlier estimate that ignored leverage.

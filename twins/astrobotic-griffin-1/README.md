@@ -571,3 +571,23 @@ under a 45-degree yaw and therefore cannot be treated as cylinder radii.
 The current collider/visible dimension deviation is zero. Combined checks now
 follow the physical shock tubes and derive visible solar members from the same
 installed cell-count helper as the solar fixture.
+
+### 2026-10-01 loaded linkage diagnostic
+
+The closed-leg linkage cannot accommodate the former 150 mm compression:
+its derived dead-center limit is 121.12 mm. The source now limits compression
+to 50 mm, estimates spring stiffness and damping from the linkage's 3.27427
+nominal leverage, and rejects plans that reach the triangle-closure limit.
+The analytical basis and uncertainty are recorded in the landing-leg SysML
+and `requirements/griffin-size-evidence.md`.
+
+The owned fixed-clock diagnostic with these estimates detected touchdown at
+155.216667 s and guidance handoff at 155.316667 s. Middle-ramp unfolding began
+about two seconds later, followed by a physics escape and failed middle-section
+settlement. The 200 s run ended NO-VERDICT on the stability channel: its original
+observer missed the short touchdown pulse between ten-tick samples. The observer
+now latches the source-scoped qualified touchdown event as well as sampled state.
+Neither the revised observer's full horizon nor deployed-ramp stability/egress
+is accepted. Next investigation must inspect the measured unfolding sweep and
+collision pairs; disabling collision or weakening settlement limits would not
+resolve the mechanism fault.

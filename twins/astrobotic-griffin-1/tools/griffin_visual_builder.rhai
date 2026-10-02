@@ -6201,6 +6201,12 @@ fn articulated_landing_gear_plan(doc, edit_target, root) {
     let pivot = vec3((anchors[1].x+anchors[2].x)/2.0, (anchors[1].y+anchors[2].y)/2.0, (anchors[1].z+anchors[2].z)/2.0);
     let shock = anchors[0]-foot;
     let length = vlen(shock);
+    // Triangle closure must hold throughout the authored compression travel.
+    // Equality is the dead-center singularity, so reserve geometry tolerance.
+    let minimum_length=abs(vlen(pivot-foot)-vlen(pivot-anchors[0]));
+    if length+g.spring_lower_limit_m<=minimum_length+g.tolerance_m {
+        return plan_error("shock compression reaches the closed linkage dead-center limit");
+    }
     let tilt = atan(-shock.x/shock.y)*180.0/acos(-1.0);
     let radius = f64_from(model.value(prefix+"shockPistonRadiusM"));
     let barrel_mass = f64_from(model.value(prefix+"shockBarrelMassKg"));

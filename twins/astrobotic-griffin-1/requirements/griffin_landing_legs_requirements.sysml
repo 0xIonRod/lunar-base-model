@@ -62,16 +62,34 @@ package GriffinLandingLegRequirements {
         attribute footPadCenterYM : Real = -1.32;
         // Axial suspension study values. The target is zero at the nominal
         // seated linkage pose; nominal foot height follows the touchdown datum.
-        attribute springLowerLimitM : Real = -0.15;
+        attribute springLowerLimitM : Real = -0.05;
         attribute springUpperLimitM : Real = 0.02;
-        attribute springStiffnessNPerM : Real = 40000.0;
-        attribute springDampingNsPerM : Real = 8000.0;
+        attribute springStiffnessNPerM : Real = 400000.0;
+        attribute springDampingNsPerM : Real = 150000.0;
         attribute springMaxForceN : Real = 12000.0;
         // Replaceable mechanics study, not flight hardware specifications.
-        // 150 mm compression / 20 mm rebound, 40 kN/m axial stiffness and
-        // 8 kNs/m damping give roughly 55 mm static stroke at a 2.2 kN/leg
-        // lunar load before linkage leverage. The previous 0.80 m whole-leg
-        // slider moved the bus anchors; it was not shock absorption geometry.
+        /* Load-aware estimate, 2026-10-01. The prior values ignored linkage
+         * leverage. Source: the three memberUpperAnchors and memberLowerAnchor
+         * below, plus owned native assembly mass 5510 kg and lunar gravity
+         * 1.62 m/s2. Nominal shock length L=1.4264168 m, brace-pivot to foot
+         * radius R=1.7511139 m, bus-anchor separation d=0.4458175 m.
+         * Triangle closure needs shock length >= abs(R-d); shortening to the
+         * dead-center limit occurs after L-abs(R-d)=0.1211204 m. The old
+         * 0.15 m compression exceeded this and the loaded readback settled at
+         * 0.1176-0.1192 m compression, near singularity, with the body lowered.
+         * Keep compression within 0.05 m, well before that limit; rebound is
+         * 0.02 m. Differentiating the two fixed-anchor length constraints gives
+         * abs(d footY/d shockLength)=3.27427 at the nominal pose. Quarter-load
+         * 5510*1.62/4=2231.55 N therefore needs about 7306.7 N at each shock.
+         * Estimated k=400000 N/m gives ~0.0183 m nominal static compression
+         * (~0.06 m vertical deflection at the linearized pose). Effective
+         * axial mass=(5510/4)*3.27427^2; critical damping 2*sqrt(k*mEff)
+         * is ~153716 Ns/m, rounded to 150000. The retained 12000 N actuator
+         * cap exceeds nominal axial load by ~1.64; impact saturation is still
+         * subject to runtime verification. These are quasi-static proxy
+         * estimates, not flight shock data or demonstrated impact capacity.
+         * Hardware appearance reference: https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
+         * Exact pivot geometry and force/stroke curves remain unmeasured. */
         // Existing 180 kg/leg study mass is conserved: 160 kg V-brace/foot,
         // 10 kg barrel and 10 kg piston. These masses are uncalibrated proxies.
         attribute braceFootMassKg : Real = 160.0;

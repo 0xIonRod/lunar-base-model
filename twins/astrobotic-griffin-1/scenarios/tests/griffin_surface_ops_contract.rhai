@@ -24,6 +24,10 @@ fn finite_number(value) {
 }
 
 fn on_start(me, ctx) {
+    // A qualified touchdown can be shorter than the ten-tick sample cadence.
+    // Latch the native source event; the following samples still require every
+    // physical stability predicate, so the event cannot create a passing run.
+    subscribe_from("lander_touchdown", find_path(ROOT + "/Lander"));
     // SimTick is the shared simulation master. Fixed/virtual elapsed resources
     // also include scheduler bookkeeping while a causal participant is held,
     // so they are diagnostic clocks rather than the test horizon.
@@ -55,6 +59,17 @@ fn on_start(me, ctx) {
     // VM string budget before the first sample is taken.
     this.contract = griffin_surface_ops::landing_stability_contract();
     print("[griffin-landing-stability] waiting for composed Twin stage");
+}
+
+fn on_event(me, ctx, evt) {
+    if evt.name != "lander_touchdown" || this.touchdown_seen {return;}
+    let position=world_pos3(find_path(ROOT + "/Lander"));
+    if position==() {return;}
+    this.touchdown_seen=true;
+    this.touchdown_tick=sim_tick();
+    this.touchdown_position=[position.x,position.y,position.z];
+    print("[griffin-landing-stability] qualified touchdown event latched at tick="
+        + this.touchdown_tick.to_string());
 }
 
 fn _bind_stability_observation(ir, input_name, observation) {
