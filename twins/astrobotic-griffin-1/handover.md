@@ -1,6 +1,29 @@
 # Griffin-1 Twin handover
 
-**Current as of:** 2026-09-26
+**Latest update:** 2026-10-03 (older sections retain their original evidence scope)
+
+
+## Latest landing-gear state
+
+The canonical vehicle uses one inclined bus-to-foot prismatic joint per leg;
+barrel and piston are visuals owned by the bus and foot respectively. The
+previous V-brace hinge and independent shock bodies are removed. The three
+visible members and their attachment datums follow the PGH hardware reference;
+secondary brace compliance and the lumped 180 kg/leg mass are documented
+approximations. See `requirements/griffin_landing_legs_requirements.sysml` and
+the latest section of `requirements/griffin-size-evidence.md` for calculations.
+The nominal joint anchor is the foot hub in the bus frame, not the leg root.
+
+The geometry gate passes. Settled live samples show axial compression with
+transverse error around 12 micrometres or less. Both 60 s landing runs remain
+finite and upright, but four-pad contact briefly drops and fresh-process
+trajectories differ, so stability and determinism gates remain FAIL. Same-app
+contact replay and mounted topology refresh safety are also unresolved. Do not
+merge the pending core changes to main as a deterministic-reload fix yet.
+
+The route has five milestones and matching five completion events. Model
+commit `9cd5a72` is pushed. Artificial landing/egress slabs remain until their
+pad-dependent acceptance contracts are replaced with terrain observations.
 
 ## Model ownership
 
@@ -21,7 +44,7 @@ The Editor observation of the composed vehicle returned, for all four legs:
 - body-mount overlap with `Bus/PerimeterFrame`: 0.114 m;
 - overlap with `MountAxle`: 0.050 m;
 - prismatic joint bodies: `/Griffin1` and the matching `/Griffin1/Leg*` root;
-- joint anchor: the corresponding typed leg station.
+- historical joint anchor: the corresponding typed leg station (superseded by the current foot-hub anchor above).
 
 The leg assembly therefore attaches to the bus structure. `Nozzle/MainEngineCluster/EngineSkirt` is a separate render-only engine surround and is not the leg interface. Astrobotic's public lander guide says the four landing legs are fastened to the bus and describes an internal truss tying the shear panels into the central column. The reference image supplied during review is captioned as an earlier Griffin concept, so it is useful for visual comparison but does not establish current flight geometry. Public sources: [Astrobotic Lunar Landers User Guide](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf), [Space.com's image caption](https://www.space.com/space-exploration/spacex-falcon-heavy-launch-of-private-griffin-moon-lander-now-targeting-mid-2026).
 

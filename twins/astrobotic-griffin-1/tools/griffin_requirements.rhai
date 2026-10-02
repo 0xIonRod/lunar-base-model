@@ -706,12 +706,11 @@ fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
         configuration + "landingLegInstances");
     let stations = sysml_requirement_checks::source_position_list(source,
         configuration + "legStations");
-    let anchors=sysml_requirements::model().value(assembly+"memberUpperAnchors");
+    let yaws=sysml_requirement_checks::source_number_list(source,configuration+"legStationRotationYDeg");
     let hub=sysml_requirements::model().value(assembly+"memberLowerAnchor");
-    if !array_is(anchors) || anchors.len()!=3 || !vec3_is_native(hub) {
+    if yaws.len()!=4 || !vec3_is_native(hub) {
         return #{ok:false,error:"shock endpoint source unavailable",checks:[],spring_targets_m:[]};
     }
-    let shock_length=vlen(anchors[0]-hub);
     let checks = [];
     if source == () || source.ok != true || touchdown_y == () || surface_y == ()
         || center_y == () || height == () || lower_limit == () || upper_limit == ()
@@ -743,12 +742,14 @@ fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
             "GLL-010-" + name + "-drive-mode", "landing_leg", "gll010",
             verification, path, "drive:linear:physics:type", "force"));
         let station = stations[paths.len() - 1];
+        let qleg=quat_from_euler_xyz_deg(vec3(0.0,yaws[paths.len()-1],0.0));
+        let seated_hub=station+qrot(qleg,hub);
         for axis in 0..3 {
             checks.push(#{id: "GLL-009-" + name + "-joint-anchor-" + axis.to_string(),
                 component: "landing_leg", requirement: "gll009",
                 verification: verification, kind: "attribute_component",
                 path: path, attr: "physics:localPos0", index: axis,
-                expected: if axis == 1 { -shock_length } else { 0.0 },
+                expected: if axis==0 {seated_hub.x} else if axis==1 {seated_hub.y} else {seated_hub.z},
                 tolerance: station_tolerance});
         }
     }
@@ -783,6 +784,8 @@ fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
             authored_matches = false;
             continue;
         }
+        let qleg=quat_from_euler_xyz_deg(vec3(0.0,yaws[index],0.0));
+        let seated_hub=stations[index]+qrot(qleg,hub);
         let attrs = joint.attrs;
         let anchor = attrs["physics:localPos0"];
         let target = attrs["drive:linear:physics:targetPosition"];
@@ -793,9 +796,9 @@ fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
         if attrs["physics:axis"] != "Y"
             || attrs["drive:linear:physics:type"] != "force"
             || anchor == () || anchor.len() != 3
-            || !_landing_near(anchor[0], 0.0, station_tolerance)
-            || !_landing_near(anchor[1], -shock_length, station_tolerance)
-            || !_landing_near(anchor[2], 0.0, station_tolerance)
+            || !_landing_near(anchor[0], seated_hub.x, station_tolerance)
+            || !_landing_near(anchor[1], seated_hub.y, station_tolerance)
+            || !_landing_near(anchor[2], seated_hub.z, station_tolerance)
             || !_landing_near(attrs["physics:lowerLimit"], lower_limit, 0.001)
             || !_landing_near(attrs["physics:upperLimit"], upper_limit, 0.001)
             || !_landing_near(attrs["drive:linear:physics:targetVelocity"], target_velocity, 0.001)

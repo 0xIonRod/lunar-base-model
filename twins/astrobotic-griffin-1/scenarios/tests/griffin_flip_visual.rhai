@@ -115,8 +115,8 @@ fn run_visual_review(batch_index) {
              root + "/Griffin1/" + name + "/LandingLegVisual/FootPad"]));
         checks.push(visual_children_check("GV-002-" + name + "-axial-shock", "legs", "gv002",
             root + "/Griffin1",
-            [root + "/Griffin1/" + name + "_ShockBarrel/Tube",
-             root + "/Griffin1/" + name + "_ShockPiston/Tube"]));
+            [root + "/Griffin1/" + name + "_BusMount/ShockBarrel/Tube",
+             root + "/Griffin1/" + name + "/ShockPiston/Tube"]));
     }
     let antenna=root+"/Griffin1/HighGainDish";
     for field in [#{input:"crinkle",source:"tankFoilCrinkleDensity"},

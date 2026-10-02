@@ -876,3 +876,63 @@ not a surveyed lunar route. SysML owns the five arrays and the USD builder reads
 them. This pass verifies source and authored geometry consistency; rover traversal
 of the revised route remains unverified. Landing and egress slabs still remain
 until their pad-dependent physics and verification contracts are replaced.
+
+
+## Axial landing gear revision — 2026-10-03
+
+The vehicle now has four bus-to-foot prismatic joints. Each joint follows the
+primary member's bus-to-hub connection line and locks the other translations
+and rotations. Barrel geometry is attached to the bus mount, piston geometry
+to the moving leg; neither adds an independent rigid body. The inferred skirt
+hinges, shock pins and eight light shock bodies were removed. This supersedes
+the earlier hinged V-brace mechanism and its leverage-based spring tuning.
+The three-member appearance still follows the
+[PGH hardware photograph](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png).
+That image does not establish the flight linkage. Secondary braces retain their
+nominal endpoint geometry and move with the foot: their upper attachment
+compliance is an explicit appearance approximation. Their loaded upper ends
+are not claimed to be rigidly connected to the skirt.
+
+The existing 180 kg per-leg proxy is conserved and lumped into each moving
+leg, including the former barrel/piston allocations. Its mass distribution is
+uncalibrated. The source-owned primary length 1.4264168 m and vertical span
+1.26 m give cosine 0.883332. The previous reconstructed 5510 kg assembly under
+1.62 m/s² gives 2526.3 N nominal axial quarter-load. An estimated 85 kN/m
+spring gives 29.7 mm static compression. Critical damping for generalized
+quarter-mass 1074.83 kg is 19.117 kNs/m, rounded to 19 kNs/m. These calculations
+motivate the revised study values; they are not supplier shock curves. The
+50 mm compression, 20 mm rebound and 12 kN force cap remain study assumptions.
+Recalculate them when the propellant/mass budget changes.
+
+Typed USD operations saved the vehicle and composed readback confirmed the
+single slider and removal of the old mechanism. The component gate passes;
+duplicate existence/body-relationship checks were removed. Live settled-leg
+observations in an owned headful session measured compression 17–37 mm,
+transverse error up to about 12 micrometres and relative rotation error below
+0.0007 degrees across two sampled observations. Evidence:
+`terrain/target/griffin-direct-slider-axis-live.jsonl`. These settled samples
+are not a maximum transient stroke measurement.
+
+Two fresh-process trials completed the full 60 s observation window with finite
+telemetry, maximum angular speed below 0.012 rad/s, maximum horizontal speed
+below 0.030 m/s and drift below 0.221 m. They do **not** pass acceptance:
+359 of 361 observations had four-foot contact, and touchdown ticks differed
+(1388 versus 1394), producing different final poses. The strict limits remain
+unchanged. Raw evidence is in
+`terrain/target/griffin-direct-slider-armed-replay/`. Both trajectories started
+powered descent and continued into rover egress; full egress is not accepted.
+
+A topology edit on the mounted scene also reproduced a simulator panic in
+`sync_twin_overlays` / Avian island cleanup: “Neither body ... is in an island”.
+The proposal was recovered through the document owner and saved with the scene
+unmounted. Live partial-refresh safety remains unresolved; this is not a
+replacement for fixing the core lifecycle. Evidence:
+`terrain/target/griffin-retained-reload-live.log`.
+
+Additional useful acceptance work is first-contact axial error/stroke across
+all four legs, continuously qualified touchdown before the one-time notice,
+startup/restart authority timing, a physically consistent fuel/oxidizer load,
+manual liftoff, and deployed ramp traversal. The remaining visual priorities
+are reference-matched folded-ramp proportions, visible tank/deck structure,
+solar-cell shape and hardware finish contrast; artist-impression and current
+hardware configurations must stay explicitly separated.

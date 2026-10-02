@@ -53,53 +53,6 @@ fn joint_frame_component(id, path, attr, index, expected, tolerance) {
 
 fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
 
-fn _joint_frame_observation(root, name) {
-    let body_path = root + "/" + name;
-    let joint_path = root + "/" + name + "_BraceHinge";
-    let snapshot = query("QueryUsdPrims", #{paths: [body_path, joint_path],
-        attrs: ["xformOp:rotateXYZ", "physics:localRot0", "physics:localRot1"]});
-    if snapshot == () || snapshot.error != () || snapshot.records == () {
-        let detail = if snapshot == () { "QueryUsdPrims returned no response" }
-            else if snapshot.error != () { snapshot.error }
-            else { "QueryUsdPrims returned no records" };
-        return #{ok: false, error: detail, joint: ()};
-    }
-    let body = ();
-    let joint = ();
-    for record in snapshot.records {
-        if record.path == body_path { body = record; }
-        else if record.path == joint_path { joint = record; }
-    }
-    if body == () || joint == () {
-        return #{ok: false, error: "batched frame snapshot omitted the requested leg body or spring joint", joint: joint};
-    }
-    let body_euler = body.attrs["xformOp:rotateXYZ"];
-    let local_rot0 = joint.attrs["physics:localRot0"];
-    let local_rot1 = joint.attrs["physics:localRot1"];
-    if type_of(body_euler) != "array" || body_euler.len() != 3
-        || type_of(local_rot0) != "array" || local_rot0.len() != 4
-        || type_of(local_rot1) != "array" || local_rot1.len() != 4 {
-        return #{ok: false, error: "composed leg pose or authored spring frame is missing or malformed", joint: joint};
-    }
-    // QueryUsdPrims returns USD quaternions in (w, x, y, z) order; the native
-    // Rhai constructor accepts (x, y, z, w). Compare rotations, so q and -q
-    // remain equivalent as required by quaternion semantics.
-    let frame0 = quat(local_rot0[1], local_rot0[2], local_rot0[3], local_rot0[0]);
-    let frame1 = quat(local_rot1[1], local_rot1[2], local_rot1[3], local_rot1[0]);
-    let body_rotation = quat_from_euler_xyz_deg(vec3(body_euler[0], body_euler[1], body_euler[2]));
-    if !quat_is_valid(frame0) || !quat_is_valid(frame1) || !quat_is_valid(body_rotation) {
-        return #{ok: false, error: "composed leg pose or authored spring frame is not a valid rotation", joint: joint};
-    }
-    let seated_rotation = frame0 * quat_inverse(frame1);
-    let relative = quat_inverse(body_rotation) * seated_rotation;
-    let cosine = if relative.w.abs() > 1.0 { 1.0 } else { relative.w.abs() };
-    let error_deg = 2.0 * acos(cosine) * 180.0 / PI;
-    if !error_deg.is_finite() {
-        return #{ok: false, error: "spring-frame seating error is not finite", joint: joint};
-    }
-    #{ok: true, error_deg: error_deg, joint: joint}
-}
-
 fn _usd_value(value, record) {
     let observation = #{provider: "usd",
         state: if value == () { "unavailable" } else { "value" }, value: value};
@@ -148,7 +101,7 @@ fn _member_endpoint_errors(record, upper, lower) {
 }
 
 // Read both authored joint frames in the vehicle frame; the bus itself is
-// identity in this frame. This checks closed-linkage seating independently
+// identity in this frame. This checks nominal attachment seating independently
 // of the construction plan and rejects missing body poses.
 fn _gear_joint_closure(root,joint_path) {
     let joint=query("QueryUsdPrim",#{path:joint_path,attrs:["physics:localPos0","physics:localPos1","physics:localRot0","physics:localRot1"],rels:["physics:body0","physics:body1"]});
@@ -247,35 +200,14 @@ fn on_tick(me, ctx) {
             expected:expected_mount_x,tolerance:f64_from(model.value(own("memberEndpointToleranceM")))});
         if rotations_y.len() == names.len() {
             let joint_path = root + "/" + name + "_Spring";
-            checks.push(sysml_requirement_checks::exists("GLL-009-" + name + "-spring-joint",
-                "landing_leg", "gll009", VERIFICATION, joint_path, "PhysicsPrismaticJoint"));
-            checks.push(joint_relationship("GLL-009-" + name + "-spring-body0",
-                joint_path, "physics:body0", path+"_ShockBarrel"));
-            checks.push(joint_relationship("GLL-009-" + name + "-spring-body1",
-                joint_path, "physics:body1", path+"_ShockPiston"));
             checks.push(#{id: "GLL-009-" + name + "-spring-axis", component: "landing_leg",
                 requirement: "gll009", verification: VERIFICATION, kind: "attribute_equals",
                 path: joint_path, attr: "physics:axis", expected: "Y"});
             checks.push(joint_frame_component("GLL-009-" + name + "-body-rotation-y",
                 path, "xformOp:rotateXYZ", 1, rotations_y[index], frame_tolerance));
-            let frame = _joint_frame_observation(root, name);
-            let error_observation = _usd_value(
-                if frame.ok == true { frame.error_deg } else { () }, frame.joint);
-            if frame.ok != true { error_observation.detail = frame.error; }
-            let inputs = sysml_requirements::required_constraint_input_observations(
-                model, leg_requirement, SPRING_FRAME_CONSTRAINT, [
-                    ["seatingErrorDeg", error_observation],
-                    ["toleranceDeg", _source_value(frame_tolerance, source)]
-                ]);
-            checks.push(sysml_requirements::required_constraint_check(
-                "GLL-009-" + name + "-spring-frame", "landing_leg", "gll009",
-                VERIFICATION, SPRING_FRAME_CONSTRAINT, inputs, "typed", 0.0));
         }
         for link in [
-            #{suffix:"_BraceHinge",type_name:"PhysicsRevoluteJoint",body0:root,body1:path},
-            #{suffix:"_ShockUpperPin",type_name:"PhysicsRevoluteJoint",body0:root,body1:path+"_ShockBarrel"},
-            #{suffix:"_Spring",type_name:"PhysicsPrismaticJoint",body0:path+"_ShockBarrel",body1:path+"_ShockPiston"},
-            #{suffix:"_ShockLowerPin",type_name:"PhysicsRevoluteJoint",body0:path+"_ShockPiston",body1:path}
+            #{suffix:"_Spring",type_name:"PhysicsPrismaticJoint",body0:root,body1:path}
         ] {
             let jp=path+link.suffix;
             checks.push(sysml_requirement_checks::exists("gear-joint-"+name+link.suffix,"landing_leg","gll009",VERIFICATION,jp,link.type_name));
@@ -294,9 +226,9 @@ fn on_tick(me, ctx) {
             ]);
             checks.push(sysml_requirements::required_constraint_check("gear-frame-"+name+link.suffix,"landing_leg","gll009",VERIFICATION,SPRING_FRAME_CONSTRAINT,rot_inputs,"typed",0.0));
         }
-        for member in ["_ShockBarrel","_ShockPiston"] {
-            checks.push(sysml_requirement_checks::exists("shock-tube-"+name+member,"landing_leg","gll007",VERIFICATION,path+member+"/Tube","Cylinder"));
-            checks.push(sysml_requirement_checks::attribute_equals("shock-visible-"+name+member,"landing_leg","gll007",VERIFICATION,path+member+"/Tube","visibility","inherited"));
+        for tube_path in [mount_path+"/ShockBarrel/Tube",path+"/ShockPiston/Tube"] {
+            checks.push(sysml_requirement_checks::exists("shock-tube-"+tube_path,"landing_leg","gll007",VERIFICATION,tube_path,"Cylinder"));
+            checks.push(sysml_requirement_checks::attribute_equals("shock-visible-"+tube_path,"landing_leg","gll007",VERIFICATION,tube_path,"visibility","inherited"));
         }
         checks.push(sysml_requirement_checks::exists("GLL-001-" + name, "landing_leg", "gll001", VERIFICATION, path, "Xform"));
         let required_children = [];
