@@ -96,7 +96,7 @@ package GriffinSimulationAccuracyRequirements {
     }
 
     requirement def GR031_DeterministicVerdict {
-        doc /* GR-031 [test] the production Twin test emits a deterministic verdict with fixed tick rate, threads, and jitter, including inconclusive runtime states. Source: LunCoSim deterministic test runner contract. Rationale: fixed execution settings make regressions reproducible and prevent missing observations from being mistaken for PASS. */
+        doc /* GR-031 [test] the production Twin test emits a deterministic verdict with fixed tick rate, threads, and jitter, including inconclusive runtime states. Source: LunCoSim deterministic test runner contract. Rationale: fixed execution settings make regressions reproducible and prevent missing observations from being mistaken for PASS. Fresh load and same-process reload of the same saved source shall admit the same USD bodies, joints, visible geometry and Modelica state before the first physics tick. Referenced layer revisions belong to this invariant; resetting only root-scene state is insufficient. Source: user acceptance requirement and owned 2026-10-03 warm/cold Griffin review reproduction, where the warm process retained the removed shock-body paths and stalled admission but the cold process resolved the current axial mechanism. Camera/render readiness is separate from geometry PASS; an inactive window camera is not rendered evidence. */
     }
 
     requirement def GR036_LandingStability {

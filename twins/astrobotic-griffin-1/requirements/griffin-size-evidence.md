@@ -972,3 +972,27 @@ not rendered acceptance. The older process still returned the previous shock
 paths after clearing/loading and stayed in physical-admission hold, while the
 fresh process resolved the new piston Tube. That difference remains a core
 dependency/reload defect to investigate; do not hide it by weakening checks.
+
+## Blanket perimeter detail — 2026-10-03
+
+Eight render-only tape meshes follow the existing panel face perimeters.
+The [PGH hardware photo](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
+shows thin gold edge tape. Width 10 mm, a 1 mm surface offset to avoid coincident
+render faces, and linear color (0.55, 0.36, 0.05) are explicit appearance estimates.
+Each mesh has four quads forming a ring with an open center, derived directly
+from its composed ExteriorFacet outer vertices; no independent bus pose, rigid
+body or collision geometry is added. GBC-009 owns the detail and its uncertainty.
+
+A directly launched scene initially had an inactive window camera. Opening the
+Twin enabled the window camera; this explains the blank cold screenshot and is
+separate from the warm-process stale dependency/admission defect. The current
+full assembly, before edge tape, was inspected in
+`terrain/target/assembly-editor/griffin-current-finish-twin.png`.
+
+All eight composed tape meshes were observed spawned, single-sided, render-only
+and non-colliding with eight points/four quads each. Evidence:
+`terrain/target/assembly-editor/griffin-blanket-composed.json` and the inspected
+`griffin-blanket-framed-current.png`. The component source refresh changed the
+camera orientation before it was framed again through SetCameraLookAt; preserving
+the camera across such refreshes remains unresolved. The geometry observation
+and subsequent frame are not a camera-refresh PASS.

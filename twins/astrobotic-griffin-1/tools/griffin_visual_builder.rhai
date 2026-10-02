@@ -224,6 +224,60 @@ fn griffin_bus_finish_plan(doc, edit_target, root) {
         f64_from(model.value(prefix+"panelRoughness")))
 }
 
+// Blanket tape follows the already composed panel perimeter; no second bus pose.
+fn griffin_bus_blanket_seams_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("Griffin blanket appearance source unavailable");}
+    let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let width=f64_from(model.value(prefix+"blanketEdgeTapeWidthM"));
+    let offset=f64_from(model.value(prefix+"blanketEdgeTapeOffsetM"));
+    let color=model.value(prefix+"blanketEdgeTapeDisplayColor");
+    let profile=model.value(prefix+"outerBodyProfileCoordinates");
+    if width==() || width<=0.0 || offset==() || offset<=0.0
+        || !array_is(color) || color.len()!=3 || !array_is(profile) || profile.len()!=8 {
+        return plan_error("Griffin blanket seam parameters incomplete");
+    }
+    let ops=[];
+    for i in 0..profile.len() {
+        let facet=root+"/ExteriorFacet"+(i+1).to_string();
+        let record=assembly_builder::composed_query(doc,#{path:facet,attrs:["points"]});
+        if !query_ok(record) || !record.attrs.contains("points") || record.attrs.points.len()!=8 {
+            return plan_error("Blanket seam requires the composed eight-point facet: "+facet);
+        }
+        let p=record.attrs.points;
+        let a=vec3(p[4][0],p[4][1],p[4][2]);let b=vec3(p[7][0],p[7][1],p[7][2]);
+        let c=vec3(p[6][0],p[6][1],p[6][2]);let d=vec3(p[5][0],p[5][1],p[5][2]);
+        let edge=b-a;let up=d-a;
+        if vlen(edge)<=2.0*width || vlen(up)<=2.0*width {
+            return plan_error("Blanket tape consumes its panel face: "+facet);
+        }
+        let normal=vnorm(vcross(edge,up))*offset;
+        let along=vnorm(edge)*width;let vertical=vnorm(up)*width;
+        let points=[];
+        for v in [a,b,c,d,a+along+vertical,b-along+vertical,c-along-vertical,d+along-vertical] {
+            points.push(vec3_array(v+normal));
+        }
+        let name="BlanketEdgeTape"+(i+1).to_string();let path=root+"/"+name;
+        let counts=[4,4,4,4];let indices=[0,1,5,4,1,2,6,5,2,3,7,6,3,0,4,7];
+        let existing=assembly_builder::composed_query(doc,#{path:path});
+        let plan=if query_ok(existing) {
+            if existing.type_name!="Mesh" {return plan_error("Blanket tape target must be Mesh: "+path);}
+            assembly_builder::mesh_geometry_update_plan(edit_target,path,points,counts,indices)
+        } else {
+            assembly_builder::mesh_shape_plan(edit_target,root,name,points,counts,indices,color,false)
+        };
+        if !plan.ok {return plan;} for op in plan.ops {ops.push(op);}
+        for field in [#{name:"purpose",kind:"token",value:"\"render\""},
+            #{name:"physics:collisionEnabled",kind:"bool",value:"false"},
+            #{name:"doubleSided",kind:"bool",value:"false"},
+            #{name:"primvars:displayColor",kind:"color3f[]",value:_color_literal(color)}] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:field.name,
+                type_name:field.kind,value:field.value}});
+        }
+    }
+    #{ok:true,ops:ops}
+}
+
 fn flip_chassis_size_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
     let prefix="FlipRequirements::FlipRover::";

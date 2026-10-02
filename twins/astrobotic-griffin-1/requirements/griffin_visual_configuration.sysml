@@ -139,6 +139,15 @@ package GriffinVisualConfigurationRequirements {
         attribute bodySkinThicknessM : Real = 0.025;
         attribute bodySkinEdgeMarginM : Real = 0.04;
         attribute bodySkinDisplayColor : Real[3] = (0.65, 0.66, 0.64);
+        /* Thin gold edge tape is visible in the PGH hardware photo:
+         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .
+         * Estimate 10 mm width and 1 mm presentation offset, because the image
+         * has no calibrated scale. Strips follow the composed exterior facet
+         * perimeter; they do not assign a blanket stack or thermal properties.
+         * Linear RGB is a replaceable appearance estimate. */
+        attribute blanketEdgeTapeWidthM : Real = .010;
+        attribute blanketEdgeTapeOffsetM : Real = .001;
+        attribute blanketEdgeTapeDisplayColor : Real[3] = (.55, .36, .05);
         /* Standard UsdPreviewSurface presentation parameters. ESA/Astrobotic
          * reference renderings show pale exterior panels
          * and silver ramp/leg members. These linear RGB colors, metallic and
