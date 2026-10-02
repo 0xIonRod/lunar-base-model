@@ -952,3 +952,23 @@ washed out. The shadowed side becomes dark; this is a static shape inspection,
 not acceptance of mission exposure, terrain appearance or flight physics.
 The visual requirement's stale five-engine description was corrected to seven,
 matching the existing current-product requirement and vehicle.
+
+## Exterior finish and review cleanup — 2026-10-03
+
+The bus ExteriorPanels UsdPreviewSurface now uses the source-owned metallic
+0.55 and roughness 0.45, replacing 0 and 0.65. This is an appearance estimate
+informed by the broad soft reflections on the pale exterior in the
+[PGH hardware photograph](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png),
+not measured optical properties. The existing material is reused; no texture,
+extra geometry, collider or mass was added. `griffin_bus_finish_plan` reads the
+SysML values and uses the existing material-network planner after the cladding
+is composed. Saved owner and dependent-stage reads confirm these values.
+
+Twenty obsolete review-only shock-body and pin/brace-hinge overrides were
+removed after the axial mechanism revision. A fresh-process static geometry
+check passes all 126 checks, source revision 13849370287358511557, in
+`terrain/target/griffin-current-visual-fresh.log`. This is structural evidence,
+not rendered acceptance. The older process still returned the previous shock
+paths after clearing/loading and stayed in physical-admission hold, while the
+fresh process resolved the new piston Tube. That difference remains a core
+dependency/reload defect to investigate; do not hide it by weakening checks.

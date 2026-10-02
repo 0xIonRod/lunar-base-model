@@ -210,6 +210,20 @@ fn griffin_bus_cladding_plan(doc, edit_target, root) {
     #{ok:true,ops:ops}
 }
 
+// Apply after cladding is composed; the material planner verifies each target.
+fn griffin_bus_finish_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("Griffin appearance source unavailable");}
+    let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let profile=model.value(prefix+"outerBodyProfileCoordinates");
+    if !array_is(profile) || profile.len()!=8 {return plan_error("Griffin bus profile unavailable");}
+    let paths=[];
+    for i in 0..profile.len() { paths.push(root+"/ExteriorFacet"+(i+1).to_string()); }
+    griffin_surface_material_plan(doc,edit_target,root,"ExteriorPanels",paths,
+        model.value(prefix+"bodySkinDisplayColor"),f64_from(model.value(prefix+"panelMetallic")),
+        f64_from(model.value(prefix+"panelRoughness")))
+}
+
 fn flip_chassis_size_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
     let prefix="FlipRequirements::FlipRover::";

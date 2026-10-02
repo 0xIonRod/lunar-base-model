@@ -607,8 +607,8 @@ def Xform "GriffinBus" (
                 uniform token info:id = "UsdPreviewSurface"
                 token outputs:surface = ""
                 color3f inputs:diffuseColor = (0.6499999761581421, 0.6600000262260437, 0.6399999856948853)
-                float inputs:metallic = 0.0
-                float inputs:roughness = 0.6499999761581421
+                float inputs:metallic = 0.550000011920929
+                float inputs:roughness = 0.44999998807907104
             }
         }
         def Material "TankFrame"

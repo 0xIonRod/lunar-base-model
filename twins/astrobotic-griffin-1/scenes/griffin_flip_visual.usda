@@ -122,38 +122,6 @@ def Xform "GriffinFlipVisual" (
         {
             bool physics:rigidBodyEnabled = false
         }
-        def "LegPX_ShockBarrel"
-        {
-            bool physics:rigidBodyEnabled = false
-        }
-        def "LegPX_ShockPiston"
-        {
-            bool physics:rigidBodyEnabled = false
-        }
-        def "LegNX_ShockBarrel"
-        {
-            bool physics:rigidBodyEnabled = false
-        }
-        def "LegNX_ShockPiston"
-        {
-            bool physics:rigidBodyEnabled = false
-        }
-        def "LegPZ_ShockBarrel"
-        {
-            bool physics:rigidBodyEnabled = false
-        }
-        def "LegPZ_ShockPiston"
-        {
-            bool physics:rigidBodyEnabled = false
-        }
-        def "LegNZ_ShockBarrel"
-        {
-            bool physics:rigidBodyEnabled = false
-        }
-        def "LegNZ_ShockPiston"
-        {
-            bool physics:rigidBodyEnabled = false
-        }
         def "LegPX_Spring"
         {
             bool physics:jointEnabled = false
@@ -199,54 +167,6 @@ def Xform "GriffinFlipVisual" (
             bool physics:jointEnabled = false
         }
         def "RampTransitionJointStarboard"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegPX_BraceHinge"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegPX_ShockUpperPin"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegPX_ShockLowerPin"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegNX_BraceHinge"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegNX_ShockUpperPin"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegNX_ShockLowerPin"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegPZ_BraceHinge"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegPZ_ShockUpperPin"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegPZ_ShockLowerPin"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegNZ_BraceHinge"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegNZ_ShockUpperPin"
-        {
-            bool physics:jointEnabled = false
-        }
-        def "LegNZ_ShockLowerPin"
         {
             bool physics:jointEnabled = false
         }

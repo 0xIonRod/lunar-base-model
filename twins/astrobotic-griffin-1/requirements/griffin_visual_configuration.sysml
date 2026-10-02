@@ -149,8 +149,13 @@ package GriffinVisualConfigurationRequirements {
         attribute silverDisplayColor : Real[3] = (.55, .58, .62);
         attribute silverMetallic : Real = .75;
         attribute silverRoughness : Real = .42;
-        attribute panelMetallic : Real = .0;
-        attribute panelRoughness : Real = .65;
+        /* Exterior finish estimate revised 2026-10-03: the silver blanket/panel
+         * faces in https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
+         * retain broad soft reflections. Metallic .55 and roughness .45
+         * approximate that finish in UsdPreviewSurface; neither is measured
+         * optical data or a claim that blanket fabric is solid metal. */
+        attribute panelMetallic : Real = .55;
+        attribute panelRoughness : Real = .45;
         attribute bodyGroundClearanceM : Real = 0.20;
         attribute lowerSkirtDimensions : Dimensions = (3.40, 0.24, 3.40);
         attribute lowerSkirtCenter : Position = (0.0, -0.36, 0.0);
