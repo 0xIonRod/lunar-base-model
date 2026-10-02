@@ -68,6 +68,8 @@ def Xform "FLIP" (
     double inputs:target_mount_y.connect = </FLIP/SolarArray/Environment.outputs:sun_mount_y>
     custom double inputs:target_mount_z
     double inputs:target_mount_z.connect = </FLIP/SolarArray/Environment.outputs:sun_mount_z>
+    string lunco:ui:surfaceId = "vehicle-control-right"
+    string lunco:ui:visibilityMode = "possessed"
     variantSet "drivetrain" = {
         "raycast" {
         }
