@@ -111,3 +111,22 @@ clearance or traversal acceptance for the revised geometry.
 instances in the Griffin vehicle document. It supplies typed USD facts and FLIP
 wheel measurements to generic source constraints; it does not author a second
 ramp limit or reinterpret a boolean Rhai predicate as requirement evidence.
+
+### Bus attachment reconstruction (2026-10-02)
+
+Each root hinge now has two visible inner-track pedestals, with short deck shoes
+that overlap the bus perimeter. Their height comes from the difference between
+the bus deck top and native root hinge; their lateral stations reuse the inner
+rail offsets. Member width reuses the estimated pivot lug width. The builder
+materializes these relationships rather than introducing independent positions.
+These are render-only members of the bus, with no extra body, mass or collider.
+
+The operator's screenshot exposed the missing visual load path. The
+[ESA artist rendering](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander)
+supports bus-mounted ramps but does not resolve bracket construction. The
+[Astrobotic hardware photo](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
+is useful for bus and leg structure; it does not establish these ramp brackets.
+Pedestal shape and stock therefore remain low-confidence study estimates under
+GRR-015. They sit inside the wheel tracks, outside the tire corridors, and leave
+the walking surfaces clear. A rendered review and actual rover traversal are
+separate acceptance steps.

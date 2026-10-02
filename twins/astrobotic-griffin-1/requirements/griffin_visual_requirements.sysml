@@ -35,7 +35,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV003_GriffinSolarAssemblies {
-        doc /* GV-003 [visual] the review shall show the solar configuration defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout as upright frame/cell assemblies across adjacent lander sides, each with a visible structural support path and the approved panel outline and clearances. */
+        doc /* GV-003 [visual] the review shall show the solar configuration defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout as upright frame/cell assemblies across the three original adjacent lander sides and the opposite broad-face study station, each with a visible structural support path and the approved panel outline and clearances. */
     }
 
     requirement def GRV004_ScaleDatums {

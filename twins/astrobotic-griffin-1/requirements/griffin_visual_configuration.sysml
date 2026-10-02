@@ -54,6 +54,7 @@ package GriffinVisualConfigurationRequirements {
         SolarPanelForward;
         SolarPanelFrontStarboard;
         SolarPanelStarboard;
+        SolarPanelRear;
     }
     enum def GriffinRampInstanceName {
         EgressRampPort;
@@ -240,8 +241,8 @@ package GriffinVisualConfigurationRequirements {
             ("TankPX", "TankNX", "TankPZ", "TankNZ");
         attribute landingLegInstances : GriffinLandingLegInstanceName[4] =
             ("LegPX", "LegNX", "LegPZ", "LegNZ");
-        attribute solarArrayInstances : GriffinSolarArrayInstanceName[3] =
-            ("SolarPanelForward", "SolarPanelFrontStarboard", "SolarPanelStarboard");
+        attribute solarArrayInstances : GriffinSolarArrayInstanceName[4] =
+            ("SolarPanelForward", "SolarPanelFrontStarboard", "SolarPanelStarboard", "SolarPanelRear");
         attribute mainEngineInstances : GriffinMainEngineInstanceName[5] =
             ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05");
         attribute rampInstances : GriffinRampInstanceName[2] =
@@ -329,18 +330,28 @@ package GriffinVisualConfigurationRequirements {
          * 0.22/sqrt(2), so all three arrays share the same local bracket
          * depth as the axial station (1.94 - 1.72 = 0.22 m). This is a
          * mount-closure derivation, not an image measurement. */
-        attribute solarStations : Position[3] =
-            ((0.0, 1.34, 1.94), (1.519563492, 1.34, 1.519563492), (1.94, 1.34, 0.0));
-        attribute solarMountRails : GriffinFrameRailNode[6] =
+        /* Opposite broad-face panel: reflect the forward station through Z=0,
+         * rotate its normal 180 degrees, and reverse the rear rail pair so the
+         * same bracket/end-point construction remains connected to the bus.
+         * Source: operator image/placement request, 2026-10-02, and visible
+         * belt-mounted arrays in https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
+         * and https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png .
+         * The images establish side-mounted panel proportions, not coverage
+         * of the hidden face. Opposite-face placement/count is explicitly a
+         * low-confidence study estimate; no Sun-envelope pass is claimed. */
+        attribute solarStations : Position[4] =
+            ((0.0, 1.34, 1.94), (1.519563492, 1.34, 1.519563492), (1.94, 1.34, 0.0), (0.0, 1.34, -1.94));
+        attribute solarMountRails : GriffinFrameRailNode[8] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard",
              "FrameRailFrontStarboard", "FrameRailStarboardFront",
-             "FrameRailStarboardFront", "FrameRailStarboardRear");
+             "FrameRailStarboardFront", "FrameRailStarboardRear",
+             "FrameRailRearStarboard", "FrameRailRearPort");
         /* X is panel tilt; negative signed Z values below name the clockwise
          * plan bearing, not a literal USD rotateXYZ triple. The authored
          * quaternion composes Y(-bearing) after local X(tilt), keeping all
          * panels upright and their normal on the intended octagonal face. */
-        attribute solarStationRotationXDeg : Real[3] = (90.0, 90.0, 90.0);
-        attribute solarStationRotationZDeg : Real[3] = (0.0, -45.0, -90.0);
+        attribute solarStationRotationXDeg : Real[4] = (90.0, 90.0, 90.0, 90.0);
+        attribute solarStationRotationZDeg : Real[4] = (0.0, -45.0, -90.0, -180.0);
         attribute solarArrayEdgeClearanceM : Real = 0.15;
 
         /* Four tank stations and 0.60 instance scale are packaging estimates.

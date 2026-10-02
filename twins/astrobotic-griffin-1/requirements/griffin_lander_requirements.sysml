@@ -22,7 +22,10 @@ package GriffinLanderRequirements {
         attribute legCount : Integer = 4;
         attribute tankCount : Integer = 4;
         attribute engineCount : Integer = 5;
-        attribute solarArrayCount : Integer = 3;
+        /* Four arrays is a study configuration, not a released hardware count.
+         * The fourth restores a belt panel on the opposite broad face requested
+         * by the operator on 2026-10-02. See solar layout rationale. */
+        attribute solarArrayCount : Integer = 4;
         // The open-frame mesh is a render study made from bounded member
         // sections. Its composed envelope may differ slightly from the
         // nominal station datum at clipped beam corners. This tolerance is

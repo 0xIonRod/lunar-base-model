@@ -91,7 +91,7 @@ package GriffinSolarRequirements {
         doc /* GSA-002 [visual] each array exposes a frame and cell surface with owned geometry. */
     }
     requirement def GSA003_SunQuadrantLayout {
-        doc /* GSA-003 [mission layout] the three array assemblies shall occupy the consecutive forward, forward-starboard bevel, and starboard lander faces within the surface quadrant traversed by the mission-window Sun path. Their installed frames and panel normals shall satisfy the site-local Sun azimuth/elevation envelope and the approved installation configuration. */
+        doc /* GSA-003 [mission layout] the forward, forward-starboard bevel, and starboard arrays occupy the original mission Sun quadrant. A fourth study array occupies the opposite broad face to reconstruct the belt-panel appearance requested by the operator on 2026-10-02; hidden-face hardware coverage is not established by the available renderings. Their installed frames and panel normals shall satisfy the site-local Sun azimuth/elevation envelope and the approved installation configuration. */
     }
     requirement def GSA004_ArrayTraceability {
         doc /* GSA-004 [evidence] array identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and deployment status is explicit. */

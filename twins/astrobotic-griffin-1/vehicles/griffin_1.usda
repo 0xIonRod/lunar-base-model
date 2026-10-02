@@ -5457,4 +5457,347 @@ def Xform "Griffin1" (
             token visibility = "invisible"
         }
     }
+    def Xform "SolarPanelRear" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 1.34, -1.94)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        quatd xformOp:orient = (0.00000000000000004329780301713277, 0.00000000000000004329780301713277, 0.7071067690849304, -0.7071067690849304)
+        def "Cells" (
+            active = true
+        )
+        {
+            point3f[] points = [(-0.7979999780654907, 0.006000000052154064, 0.28999999165534973), (0.7979999780654907, 0.006000000052154064, 0.28999999165534973), (0.7979999780654907, 0.006000000052154064, -0.28999999165534973), (-0.7979999780654907, 0.006000000052154064, -0.28999999165534973), (-0.7979999780654907, 0.00800000037997961, 0.28999999165534973), (0.7979999780654907, 0.00800000037997961, 0.28999999165534973), (0.7979999780654907, 0.00800000037997961, -0.28999999165534973), (-0.7979999780654907, 0.00800000037997961, -0.28999999165534973)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [3, 2, 1, 0, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            uniform token subdivisionScheme = "none"
+            uniform bool doubleSided = false
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.014999999664723873, 0.02500000037252903, 0.05999999865889549)]
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        }
+        over "CellDividerX1"
+        {
+            custom double3 xformOp:translate = (-0.684, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX2"
+        {
+            custom double3 xformOp:translate = (-0.5700000000000001, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX3"
+        {
+            custom double3 xformOp:translate = (-0.456, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX4"
+        {
+            custom double3 xformOp:translate = (-0.342, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX5"
+        {
+            custom double3 xformOp:translate = (-0.22799999999999998, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX6"
+        {
+            custom double3 xformOp:translate = (-0.11399999999999999, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX7"
+        {
+            custom double3 xformOp:translate = (0.0, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX8"
+        {
+            custom double3 xformOp:translate = (0.11399999999999999, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX9"
+        {
+            custom double3 xformOp:translate = (0.22799999999999998, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX10"
+        {
+            custom double3 xformOp:translate = (0.3420000000000001, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX11"
+        {
+            custom double3 xformOp:translate = (0.45599999999999996, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX12"
+        {
+            custom double3 xformOp:translate = (0.5700000000000001, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        over "CellDividerX13"
+        {
+            custom double3 xformOp:translate = (0.6839999999999999, 0.008, 0.0)
+            custom double3 xformOp:scale = (0.006, 0.001, 0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            token visibility = "inherited"
+        }
+        def "CellDividerZ1" (
+            active = true
+        )
+        {
+            point3f[] points = [(-0.7979999780654907, 0.007499999832361937, -0.17100000381469727), (0.7979999780654907, 0.007499999832361937, -0.17100000381469727), (0.7979999780654907, 0.007499999832361937, -0.1770000010728836), (-0.7979999780654907, 0.007499999832361937, -0.1770000010728836), (-0.7979999780654907, 0.008500000461935997, -0.17100000381469727), (0.7979999780654907, 0.008500000461935997, -0.17100000381469727), (0.7979999780654907, 0.008500000461935997, -0.1770000010728836), (-0.7979999780654907, 0.008500000461935997, -0.1770000010728836)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [3, 2, 1, 0, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            uniform token subdivisionScheme = "none"
+            uniform bool doubleSided = false
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        }
+        def "CellDividerZ2" (
+            active = true
+        )
+        {
+            point3f[] points = [(-0.7979999780654907, 0.007499999832361937, -0.054999999701976776), (0.7979999780654907, 0.007499999832361937, -0.054999999701976776), (0.7979999780654907, 0.007499999832361937, -0.061000000685453415), (-0.7979999780654907, 0.007499999832361937, -0.061000000685453415), (-0.7979999780654907, 0.008500000461935997, -0.054999999701976776), (0.7979999780654907, 0.008500000461935997, -0.054999999701976776), (0.7979999780654907, 0.008500000461935997, -0.061000000685453415), (-0.7979999780654907, 0.008500000461935997, -0.061000000685453415)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [3, 2, 1, 0, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            uniform token subdivisionScheme = "none"
+            uniform bool doubleSided = false
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        }
+        def "CellDividerZ3" (
+            active = true
+        )
+        {
+            point3f[] points = [(-0.7979999780654907, 0.007499999832361937, 0.061000000685453415), (0.7979999780654907, 0.007499999832361937, 0.061000000685453415), (0.7979999780654907, 0.007499999832361937, 0.054999999701976776), (-0.7979999780654907, 0.007499999832361937, 0.054999999701976776), (-0.7979999780654907, 0.008500000461935997, 0.061000000685453415), (0.7979999780654907, 0.008500000461935997, 0.061000000685453415), (0.7979999780654907, 0.008500000461935997, 0.054999999701976776), (-0.7979999780654907, 0.008500000461935997, 0.054999999701976776)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [3, 2, 1, 0, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            uniform token subdivisionScheme = "none"
+            uniform bool doubleSided = false
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        }
+        def "CellDividerZ4" (
+            active = true
+        )
+        {
+            point3f[] points = [(-0.7979999780654907, 0.007499999832361937, 0.1770000010728836), (0.7979999780654907, 0.007499999832361937, 0.1770000010728836), (0.7979999780654907, 0.007499999832361937, 0.17100000381469727), (-0.7979999780654907, 0.007499999832361937, 0.17100000381469727), (-0.7979999780654907, 0.008500000461935997, 0.1770000010728836), (0.7979999780654907, 0.008500000461935997, 0.1770000010728836), (0.7979999780654907, 0.008500000461935997, 0.17100000381469727), (-0.7979999780654907, 0.008500000461935997, 0.17100000381469727)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [3, 2, 1, 0, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            uniform token subdivisionScheme = "none"
+            uniform bool doubleSided = false
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.7200000286102295, 0.7799999713897705, 0.8799999952316284)]
+            custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        }
+        over "MountBracketNegativeX"
+        {
+            custom double3 xformOp:translate = (-1.008, -0.21999999999999983, -0.00000000000000004930010378548904)
+            custom double3 xformOp:scale = (0.1, 0.08, 0.12)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
+        }
+        over "MountLinkNegativeX"
+        {
+            custom double3 xformOp:translate = (-0.933, -0.10999999999999992, -0.00000000000000004930010378548904)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -34.28687697720899)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.1, 0.32627053911388704, 0.04)
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
+        }
+        over "MountBracketPositiveX"
+        {
+            custom double3 xformOp:translate = (1.008, -0.2200000000000001, -0.000000000000000006211047445768786)
+            custom double3 xformOp:scale = (0.1, 0.08, 0.12)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
+        }
+        over "MountLinkPositiveX"
+        {
+            custom double3 xformOp:translate = (0.933, -0.11000000000000006, -0.000000000000000006211047445768786)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 34.286876977208955)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.1, 0.3262705391138869, 0.04)
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
+        }
+    }
+    def Cube "RampMountPortInnerRear" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.06, 0.301735381886, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.907003563827, 1.940867690943, -0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+    }
+    def Cube "RampMountPortInnerRearDeckShoe" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.247003563827, 0.06, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.8135017819135, 1.76, -0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+    }
+    def Cube "RampMountPortInnerFront" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.06, 0.301735381886, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.907003563827, 1.940867690943, 0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+    }
+    def Cube "RampMountPortInnerFrontDeckShoe" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.247003563827, 0.06, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.8135017819135, 1.76, 0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+    }
+    def Cube "RampMountStarboardInnerRear" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.06, 0.301735381886, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-1.907003563827, 1.940867690943, -0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+    }
+    def Cube "RampMountStarboardInnerRearDeckShoe" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.247003563827, 0.06, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-1.8135017819135, 1.76, -0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+    }
+    def Cube "RampMountStarboardInnerFront" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.06, 0.301735381886, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-1.907003563827, 1.940867690943, 0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+    }
+    def Cube "RampMountStarboardInnerFrontDeckShoe" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.247003563827, 0.06, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-1.8135017819135, 1.76, 0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+    }
 }

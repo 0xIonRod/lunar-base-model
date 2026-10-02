@@ -43,7 +43,7 @@ package GriffinVehicleAssemblyRequirements {
         part engineVisuals : GriffinEngineVisualAssembly[7];
         part propellantTanks : GriffinPropellantTankAssembly[4];
         part landingLegs : GriffinLandingLegAssembly[4];
-        part solarArrays : GriffinSolarArrayAssembly[3];
+        part solarArrays : GriffinSolarArrayAssembly[4];
         part optionalEgressRamps : GriffinEgressRamp[0..2];
         part payloadInterface : GriffinPayloadAdapterInterface;
         part engineSkirt : GriffinEngineSkirtComponent;

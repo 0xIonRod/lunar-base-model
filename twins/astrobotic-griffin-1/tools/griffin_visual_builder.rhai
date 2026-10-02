@@ -5144,6 +5144,42 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
       joint_anchor_x_m: anchor_x, ops: ops}
 }
 
+// Visual load path from the existing bus deck to each native root hinge.
+// GRR-015 records the low-confidence pedestal reconstruction; these members
+// belong to the bus body and introduce no independent dynamics or collider.
+fn griffin_ramp_mount_plan(doc, edit_target, lander_root, side) {
+    if side != "port" && side != "starboard" { return plan_error("unknown ramp side"); }
+    let x = _ramp_number(if side == "port" { "physicalRampPortMountX" } else { "physicalRampStarboardMountX" });
+    let y = _ramp_number("physicalRampMountY");
+    let z = _ramp_number("physicalRampMountZ");
+    let inner = _ramp_number("rampCenterRailOffsetZM");
+    let stock = _ramp_number("rampPivotLugWidthM");
+    let bearing = _ramp_number("rampSectionHingeBarrelRadiusM");
+    let bottom = griffin_spec::component_bus_mount_y()
+        + griffin_spec::visual_deck_center_y_m() + griffin_spec::visual_deck_thickness_m()/2.0;
+    if x == () || y == () || z == () || inner == () || stock == () || bearing == ()
+        || stock <= 0.0 || y <= bottom { return plan_error("ramp mount datums incomplete"); }
+    let top = y + bearing;
+    let color = griffin_spec::visual_deck_display_color();
+    let suffix = if side == "port" { "Port" } else { "Starboard" };
+    let ops = [];
+    for sign in [-1.0, 1.0] {
+        let name = "RampMount" + suffix + if sign < 0.0 { "InnerRear" } else { "InnerFront" };
+        let p = _component_cube_visual_ops(doc, edit_target, lander_root, name,
+            [x,(bottom+top)/2.0,z+sign*inner],(),[stock,top-bottom,stock],color);
+        if !p.ok { return p; }
+        for op in p.ops { ops.push(op); }
+        let inboard = (if x < 0.0 { -1.0 } else { 1.0 })
+            * (griffin_spec::visual_deck_width_m()/2.0-stock/2.0);
+        let foot = _component_cube_visual_ops(doc, edit_target, lander_root, name+"DeckShoe",
+            [(x+inboard)/2.0,bottom-stock/2.0,z+sign*inner],(),
+            [(x-inboard).abs()+stock,stock,stock],color);
+        if !foot.ok { return foot; }
+        for op in foot.ops { ops.push(op); }
+    }
+    #{ok:true,ops:ops}
+}
+
 // Reconcile the physical ramp as a top-deck hinge plus three rigid sections.
 // Geometry is materialized by the same source-driven section builder used by
 // the visual assembly; this plan adds section masses, placement, and joints.
@@ -5452,6 +5488,9 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         lander_root, ramp_path, side, transition_length, thickness, width);
     if !transition.ok { return transition; }
     for op in transition.ops { ops.push(op); }
+    let mounts = griffin_ramp_mount_plan(doc, edit_target, lander_root, side);
+    if !mounts.ok { return mounts; }
+    for op in mounts.ops { ops.push(op); }
     #{ok: true, kind: "griffin_articulated_physical_ramp",
       root: ramp_path, side: side, section_count: section_count,
       section_length_m: section_length, mass_per_section_kg: section_mass,
