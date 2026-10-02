@@ -435,7 +435,15 @@ package GriffinRampRequirements {
         attribute assemblySideTrussBraceThicknessM : Real = 0.012;
         attribute assemblySideTrussBraceCountPerSide : Integer = 12;
         attribute rampSectionHingeBarrelRadiusM : Real = 0.025;
-        attribute rampSectionHingeBarrelLengthM : Real = 2.0 * (GriffinEgressRamp::rampRailOffsetZM + GriffinEgressRamp::rampRailWidthM / 2.0);
+        /* Keep the central hinge shaft inside the open gap between wheel tracks.
+         * The four rail-local pins represent the coaxial track-side bearings;
+         * no shaft crosses either tire corridor above the walking surface.
+         * Source: operator obstruction report, 2026-10-02, and the paired
+         * open trusses in https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png .
+         * This split-shaft layout is an explicit low-confidence reconstruction,
+         * not a released hinge design. Length derives from inner rail clearance,
+         * rather than the former outside-to-outside full-width shaft. */
+        attribute rampSectionHingeBarrelLengthM : Real = 2.0 * (GriffinEgressRamp::rampCenterRailOffsetZM - GriffinEgressRamp::rampRailWidthM / 2.0);
         // Root shaft is on the physical deck axis. Middle shaft derives
         // from chord top; toe shaft from plate bottom, matching joint datums.
         attribute rampSectionHingeBarrelCenterYM : Real = 0.0;
@@ -698,7 +706,7 @@ package GriffinRampRequirements {
         doc /* Every rigid ramp section shall have two longitudinal underside beams and the source-owned edge support posts. Each section body shall own positive mass and diagonal inertia that partition the ramp mass and match its section envelope. */
     }
     requirement def GRR015_RampHingeGussetGeometry {
-        doc /* The deck hinge and both intermediate section hinges shall be visible at the ramp assembly joints. Every intermediate joint shall use a Z-axis revolute connection at the adjacent section endpoints, and its hinge barrel shall remain below the walking surface. */
+        doc /* The deck hinge and both intermediate section hinges shall be visible at the ramp assembly joints. Every intermediate joint shall use a Z-axis revolute connection at the adjacent section endpoints, and its hinge fittings shall remain outside the tire corridors. The central shaft shall end at the inner rail edges; local coaxial bearings shall join each track guard without a full-width bar above the wheel paths. This split-shaft reconstruction retains the folding axes needed for stowage; it is an explicit image-based study estimate, not supplier geometry. */
         require GRC028_RailAndPivotSlenderness {
             in chordHeightM = GriffinEgressRamp::rampRailHeightM;
             in sectionLengthM = GriffinEgressRamp::rampSectionLengthM;

@@ -89,6 +89,7 @@ fn on_start(me, ctx) {
         subscribe(event_name);
     }
     this.lander_settled = false;
+    this.touchdown_announced = false;
     this.release_requested = false;
     this.rover_detached = false;
     this.ramps_deployed = false;
@@ -175,8 +176,8 @@ fn on_event(me, evt, ctx) {
     }
 
     if evt.name == "lander_touchdown" && evt.source == lander {
-        let status = update_landing_status(me, this.lander_settled);
-        if status.ok == true { this.lander_settled = status.landed; }
+        let status = update_landing_status(this.lander_settled, this.touchdown_announced);
+        if status.ok == true { this.lander_settled = status.landed; this.touchdown_announced = status.touchdown_announced; }
         return;
     }
     // The route task emits these mission-local edges after the same typed
@@ -297,10 +298,16 @@ fn begin_descent(state) {
     true
 }
 
-fn update_landing_status(me, previously_landed) {
+fn update_landing_status(previously_landed, already_announced) {
     let status = griffin_surface_ops::landed_status();
+    status.touchdown_announced = already_announced;
     if status.ok == true {
-        if status.landed && !previously_landed { touchdown_notice(me); }
+        // Contact qualification may flicker while suspension settles. Announce
+        // once for this scene descent; keep reporting the actual live status.
+        if status.landed && !already_announced {
+            touchdown_notice();
+            status.touchdown_announced = true;
+        }
         if !status.landed && previously_landed {
             hint("LANDING NOT CONFIRMED: U opens ramps; F detaches FLIP. Both remain available.");
         }
@@ -316,7 +323,7 @@ fn on_stop(me, ctx) {
     griffin_controls::clear_surface_operation_actions();
 }
 
-fn touchdown_notice(me) {
+fn touchdown_notice() {
     griffin_controls::show_touchdown_actions();
     emit("griffin_touchdown_confirmed");
     notify_kind("Griffin-1 touchdown confirmed.", "success");
@@ -685,8 +692,8 @@ fn surface_mission_task() {
         // falling through to touchdown/egress steps.
         check(|m| this.phase_timeout != true),
         once(|m| {
-            let status = update_landing_status(m, this.lander_settled);
-            if status.ok == true { this.lander_settled = status.landed; }
+            let status = update_landing_status(this.lander_settled, this.touchdown_announced);
+            if status.ok == true { this.lander_settled = status.landed; this.touchdown_announced = status.touchdown_announced; }
             true
         }),
         wait(1.5),
@@ -794,8 +801,8 @@ fn landing_status_task() {
     forever(seq([
         wait(0.1),
         once(|m| {
-            let status = update_landing_status(m, this.lander_settled);
-            if status.ok == true { this.lander_settled = status.landed; }
+            let status = update_landing_status(this.lander_settled, this.touchdown_announced);
+            if status.ok == true { this.lander_settled = status.landed; this.touchdown_announced = status.touchdown_announced; }
             true
         })
     ]))

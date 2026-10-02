@@ -226,7 +226,7 @@ def Xform "RampSection" (
     )
     {
         double radius = 0.025
-        double height = 2.5919999999999996
+        double height = 1.408
         uniform token axis = "Z"
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]

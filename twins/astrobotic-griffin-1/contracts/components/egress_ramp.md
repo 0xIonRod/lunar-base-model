@@ -83,20 +83,27 @@ this study pose; the mirrored +45/-45 degree local Z rotations, starboard
 180 degree Y mount, and asymmetric travel remain explicit replaceable
 assumptions, not a claim of released flight-hardware geometry.
 
-After touchdown and four-leg contact are confirmed, press **U** or choose
-**UNWIND RAMP** in the guided HUD. After a 1.5 s touchdown settle, the mission
-commands zero at all four intermediate hinges, waits 3 s, then lowers the two
-straight ramp assemblies from their raised pose to the terrain angles and
-waits 4 s for settling. **G** or **RELEASE ROVER** becomes available after
-that settle interval. The `griffin_surface_ops::request_ramp_unfold()` Rhai
-function provides the command path. `physical_ramp_hinge_report()` returns the
-minimum and maximum for all six hinges in degrees and radians plus any live
-angle-port records; `set_physical_ramp_hinge_angle(name, radians)` checks the
-composed limits before commanding one hinge. The focused flight-stow
-verification is static pose and source evidence; it does not exercise the
-touchdown, operator unfold, deck deployment, rover release, or 60 s
-post-touchdown stability. Those still require a full mission run that reaches
-them.
+Press **U** or choose **OPEN RAMPS** to unfold, and **F** or **DETACH ROVER**
+to release FLIP. Both manual actions remain available during flight and landing.
+The autonomous mission waits for touchdown. Intermediate hinges move through
+measured halfway poses before leveling; the root hinges then lower. Automatic
+release requires the source-owned sampled hinge settlement dwell. A flight
+opening is a mechanism pose, not terrain-contact or egress acceptance.
+
+The 2026-10-02 wheel-path correction shortens each central hinge shaft from
+2.592 m to 1.408 m, the derived gap inside the two inner rails. Four rail-local
+coaxial pins retain the visible bearings. This avoids a transverse shaft above
+the tire corridors while preserving the folding axes. The split-shaft layout
+is a low-confidence reconstruction from the paired open trusses in the
+[Astrobotic reference](https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png)
+and the operator's obstruction report; public supplier hinge drawings are
+unavailable. GRR-015 owns this clearance requirement. The USD section assets
+and integrated vehicle use the same derived shaft length.
+
+Before this change, the owned live scene measured all three deployed port
+section normals upward (Y > 0.890) and aligned, and recorded FLIP ramp exit.
+That excludes an inverted section in that run, but does not establish general
+clearance or traversal acceptance for the revised geometry.
 
 ## Evidence
 

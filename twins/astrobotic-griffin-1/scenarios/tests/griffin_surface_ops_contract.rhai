@@ -61,7 +61,7 @@ fn on_start(me, ctx) {
     print("[griffin-landing-stability] waiting for composed Twin stage");
 }
 
-fn on_event(me, ctx, evt) {
+fn on_event(me, evt, ctx) {
     if evt.name != "lander_touchdown" || this.touchdown_seen {return;}
     let position=world_pos3(find_path(ROOT + "/Lander"));
     if position==() {return;}

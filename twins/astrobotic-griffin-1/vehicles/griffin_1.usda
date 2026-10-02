@@ -3112,7 +3112,7 @@ def Xform "Griffin1" (
                 def "HingeBarrel"
                 {
                     double radius = 0.025
-                    double height = 2.5919999999999996
+                    double height = 1.408
                     uniform token axis = "Z"
                     custom double3 xformOp:translate = (0.0, -0.015, 0.0)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -3242,7 +3242,7 @@ def Xform "Griffin1" (
             def "HingeBarrel"
             {
                 double radius = 0.025
-                double height = 2.5919999999999996
+                double height = 1.408
                 uniform token axis = "Z"
                 custom double3 xformOp:translate = (0.0, 0.2, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -3382,6 +3382,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, -23.468608878924055)
+        }
+        def "HingeBarrel"
+        {
+            double height = 1.408
         }
     }
     def Xform "EgressRampStarboard" (
@@ -3591,7 +3595,7 @@ def Xform "Griffin1" (
                 def "HingeBarrel"
                 {
                     double radius = 0.025
-                    double height = 2.5919999999999996
+                    double height = 1.408
                     uniform token axis = "Z"
                     custom double3 xformOp:translate = (0.0, -0.015, 0.0)
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -3721,7 +3725,7 @@ def Xform "Griffin1" (
             def "HingeBarrel"
             {
                 double radius = 0.025
-                double height = 2.5919999999999996
+                double height = 1.408
                 uniform token axis = "Z"
                 custom double3 xformOp:translate = (0.0, 0.2, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
@@ -3861,6 +3865,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 180.0, 23.468608878924055)
+        }
+        def "HingeBarrel"
+        {
+            double height = 1.408
         }
     }
     def PhysicsRevoluteJoint "RampHingePort" (
