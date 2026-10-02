@@ -936,3 +936,19 @@ manual liftoff, and deployed ramp traversal. The remaining visual priorities
 are reference-matched folded-ramp proportions, visible tank/deck structure,
 solar-cell shape and hardware finish contrast; artist-impression and current
 hardware configurations must stay explicitly separated.
+
+## Inspection lighting revision — 2026-10-03
+
+The review composition retains its directional Sun and reduces the neutral
+DomeLight inspection fill from 18000 at exposure 2 to 300 at exposure 0.
+LunCoSim's `crates/lunco-usd-bevy-light/src/light.rs` maps this untextured dome
+to ambient brightness as intensity times 2^exposure. These are renderer units,
+not calibrated lunar lux or an Earthshine estimate. The mission light is unchanged.
+
+Owned rendered A/B evidence: `terrain/target/assembly-editor/griffin-axial-full-review.png`
+and `griffin-review-fill-300.png`. The lower fill reveals rail shadows, metallic
+leg highlights and solar-cell contrast that the previous 72000 ambient brightness
+washed out. The shadowed side becomes dark; this is a static shape inspection,
+not acceptance of mission exposure, terrain appearance or flight physics.
+The visual requirement's stale five-engine description was corrected to seven,
+matching the existing current-product requirement and vehicle.

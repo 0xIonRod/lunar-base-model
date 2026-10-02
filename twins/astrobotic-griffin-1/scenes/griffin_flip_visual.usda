@@ -261,9 +261,9 @@ def Xform "GriffinFlipVisual" (
     }
     def DomeLight "ReviewFill"
     {
-        float inputs:intensity = 18000.0
-        float inputs:exposure = 2.0
-        color3f inputs:color = (0.6200000047683716, 0.6800000071525574, 0.7799999713897705)
+        float inputs:intensity = 300.0
+        float inputs:exposure = 0.0
+        color3f inputs:color = (1.0, 1.0, 1.0)
     }
     over "Sun"
     {
