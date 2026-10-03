@@ -4345,7 +4345,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     if !adapter_placement.ok { return adapter_placement; }
     for op in adapter_placement.ops { ops.push(op); }
     // Add the visible beveled octagonal shroud as its own replaceable visual part.
-    // It is open at both ends so the five bells remain readable, and it is
+    // It is open at both ends so the bells remain readable, and it is
     // double-sided because a study-level thin shell must not disappear when
     // the Editor camera moves underneath the lander.
     let shell_path = root + "/EngineSkirtShell";
@@ -4492,75 +4492,111 @@ fn apply_refined_griffin_engine_bell(doc, edit_target, root, parent_gen) {
       root: root, paths: plan.paths}
 }
 
-/// Restore the source-owned five-engine visual cluster as a typed reference
-/// assembly. This is deliberately separate from plume photometry and from the
-/// propulsion Modelica component: it only owns the render references and
-/// placements, using the Griffin source's five-engine study layout.
+/// Source-owned engine references and placements; aggregate Modelica thrust
+/// stays with the existing force actuator. Existing instances move as well.
 fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("Griffin engine cluster repair requires a document, edit target, and absolute root");
+        return plan_error("Griffin engine cluster requires a document, edit target, and absolute root");
+    }
+    let names = griffin_spec::main_engine_names();
+    let positions = griffin_spec::component_engine_stations();
+    let count = griffin_spec::main_engine_count();
+    let skirt_y = griffin_spec::visual_engine_skirt_mount_y();
+    if count == () || count <= 0 || names.len() != count
+        || positions.len() != count || skirt_y == () {
+        return plan_error("typed engine identities, count, stations or skirt mount are incomplete");
+    }
+    for position in positions {
+        if !vec3_is_native(position) || !vec3_is_finite(position) {
+            return plan_error("engine station must be a finite native Vec3");
+        }
     }
     let nozzle = root + "/Nozzle";
     let cluster = nozzle + "/MainEngineCluster";
     let ops = [];
-    let nozzle_query = assembly_builder::composed_query(doc,
-        #{path: nozzle, children: false});
-    if !query_ok(nozzle_query) || nozzle_query.type_name != "Xform" {
-        ops.push(#{AddPrim: #{edit_target: edit_target,
-            parent_path: root, name: "Nozzle", type_name: "Xform",
-            reference: (), reference_prim_path: ""}});
-    }
-    let cluster_query = assembly_builder::composed_query(doc,
-        #{path: cluster, children: false});
-    if !query_ok(cluster_query) || cluster_query.type_name != "Xform" {
-        ops.push(#{AddPrim: #{edit_target: edit_target,
-            parent_path: nozzle, name: "MainEngineCluster", type_name: "Xform",
-            reference: (), reference_prim_path: ""}});
-    }
-    let names = griffin_spec::main_engine_names();
-    let positions = griffin_spec::component_engine_stations();
-    for i in 0..names.len() {
-        let path = cluster + "/" + names[i];
-        let engine = assembly_builder::composed_query(doc,
-            #{path: path, children: false});
-        let bell_path = path + "/Bell";
-        let bell = assembly_builder::composed_query(doc,
-            #{path: bell_path, children: false});
-        if !query_ok(engine) || engine.type_name != "Xform"
-            || !query_ok(bell) {
-            ops.push(#{AddPrim: #{edit_target: edit_target,
-                parent_path: cluster, name: names[i], type_name: "Xform",
-                reference: "twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda",
-                reference_prim_path: "/EngineBell"}});
-            ops.push(#{SetTranslate: #{edit_target: edit_target,
-                path: path, value: vec3_array(positions[i])}});
+    for container in [#{path:nozzle,parent:root,name:"Nozzle"},
+        #{path:cluster,parent:nozzle,name:"MainEngineCluster"}] {
+        let record = assembly_builder::composed_query(doc,
+            #{path:container.path,children:false});
+        if query_ok(record) && record.type_name != "Xform" {
+            return plan_error(container.path + ": expected Xform");
+        }
+        if !query_ok(record) {
+            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:container.parent,
+                name:container.name,type_name:"Xform",reference:(),reference_prim_path:""}});
         }
     }
-    let skirt_path = cluster + "/EngineSkirt";
-    let skirt = assembly_builder::composed_query(doc,
-        #{path: skirt_path, children: false});
-    let skirt_shell = assembly_builder::composed_query(doc,
-        #{path: skirt_path + "/EngineSkirtShell", children: false});
-    if !query_ok(skirt) || skirt.type_name != "Xform" || !query_ok(skirt_shell) {
-        ops.push(#{AddPrim: #{edit_target: edit_target,
-            parent_path: cluster, name: "EngineSkirt", type_name: "Xform",
-            reference: "twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda",
-            reference_prim_path: "/World/EngineSkirt"}});
-        ops.push(#{SetTranslate: #{edit_target: edit_target,
-            path: skirt_path, value: [0.0, 1.0, 0.0]}});
+    let paths = [];
+    for i in 0..names.len() {
+        let path = cluster + "/" + names[i];
+        let engine = assembly_builder::composed_query(doc,#{path:path,children:false});
+        if query_ok(engine) && engine.type_name != "Xform" {
+            return plan_error(path + ": expected Xform");
+        }
+        if !query_ok(engine) {
+            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:cluster,
+                name:names[i],type_name:"Xform",
+                reference:component_asset("lander/griffin_engine_bell_visual.usda"),
+                reference_prim_path:"/EngineBell"}});
+        }
+        ops.push(#{SetTranslate:#{edit_target:edit_target,path:path,
+            value:vec3_array(positions[i])}});
+        paths.push(path);
     }
-    #{ok: true, kind: "griffin_engine_cluster_visual", root: root,
-      paths: [nozzle, cluster, skirt_path], engine_count: names.len(),
-      ops: ops, no_op: ops.len() == 0}
+    let skirt_path = cluster + "/EngineSkirt";
+    let skirt = assembly_builder::composed_query(doc,#{path:skirt_path,children:false});
+    if query_ok(skirt) && skirt.type_name != "Xform" {
+        return plan_error(skirt_path + ": expected Xform");
+    }
+    if !query_ok(skirt) {
+        ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:cluster,
+            name:"EngineSkirt",type_name:"Xform",
+            reference:component_asset("lander/griffin_engine_skirt_visual.usda"),
+            reference_prim_path:"/World/EngineSkirt"}});
+    }
+    ops.push(#{SetTranslate:#{edit_target:edit_target,path:skirt_path,
+        value:[0.0,skirt_y,0.0]}});
+    paths.push(skirt_path);
+    #{ok:true,kind:"griffin_engine_cluster_visual",root:root,
+      paths:paths,engine_count:count,ops:ops,no_op:false}
 }
 
 fn apply_griffin_engine_cluster_visual(doc, edit_target, root, parent_gen) {
     let plan = griffin_engine_cluster_visual_plan(doc, edit_target, root);
     if !plan.ok || plan.no_op { return plan; }
     let command = assembly_edit::batch(doc,
-        "Restore Griffin five-engine visual reference assembly", plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, command: command,
-      root: root, engine_count: plan.engine_count, paths: plan.paths}
+        "Place Griffin source-owned engine references", plan.ops, parent_gen);
+    #{ok:command.ok != false,kind:plan.kind,command:command,
+      root:root,engine_count:plan.engine_count,paths:plan.paths}
+}
+
+/// Bind composed engines only after their referenced visuals have projected.
+/// Shared engine_exhaust owns all plume geometry; no Twin-authored flames.
+fn griffin_engine_cluster_exhaust_plan(doc, edit_target, root) {
+    let names = griffin_spec::main_engine_names();
+    let count = griffin_spec::main_engine_count();
+    if doc == () || edit_target == () || !absolute_root(root)
+        || count == () || count <= 0 || names.len() != count {
+        return plan_error("engine exhaust plan requires complete typed engine identities");
+    }
+    let cluster = root + "/Nozzle/MainEngineCluster";
+    let plume = root + "/MainPropulsion/PlumePhotometry";
+    let model = assembly_builder::composed_query(doc,#{path:plume,children:false});
+    if !query_ok(model) { return plan_error("aggregate plume Modelica component is missing"); }
+    let ops = [];
+    for name in names {
+        let path = cluster + "/" + name;
+        let visual = assembly_builder::composed_query(doc,
+            #{path:path+"/Exhaust/Flame",children:false});
+        if !query_ok(visual) { return plan_error(path+": shared exhaust has not composed"); }
+        for op in engine_exhaust::connection_ops(edit_target,path,plume,#{}) {
+            ops.push(op);
+        }
+    }
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,
+        name:"inputs:engine_count",type_name:"float",value:count.to_string()+".0"}});
+    #{ok:true,kind:"griffin_engine_cluster_exhaust",engine_count:count,
+      ops:ops,no_op:false}
 }
 
 fn _isolated_ramp_spec(root, side) {

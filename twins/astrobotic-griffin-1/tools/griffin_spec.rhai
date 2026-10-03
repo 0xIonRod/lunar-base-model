@@ -704,8 +704,10 @@ fn visual_component_transform_plan() {
         || !_visual_plan_lengths_match(solar_rot_z, solar_count)
         || solar_names.len() != solar_count || solar_widths.len() != solar_count;
     let engine_skirt_y = visual_engine_skirt_mount_y();
-    let bad_engines = !_native_positions_match(engine_stations, 7) || engine_names.len() != 7
-        || engine_skirt_y == ();
+    let engine_count = main_engine_count();
+    let bad_engines = engine_count == () || engine_count <= 0
+        || !_native_positions_match(engine_stations, engine_count)
+        || engine_names.len() != engine_count || engine_skirt_y == ();
     let bad_ramps = ramp_x.len() != 2 || ramp_y == () || ramp_z == () || ramp_scale == ();
     let bad_rover = wheel_names.len() != 4 || !_visual_plan_lengths_match(wheel_x, 4)
         || !_visual_plan_lengths_match(wheel_y, 4) || !_visual_plan_lengths_match(wheel_z, 4);

@@ -53,6 +53,10 @@ package GriffinPropulsionRequirements {
         attribute plumeFuelFamily : Real = 3;
         attribute plumeStoichiometricMixtureRatio : Real = 2.0;
         attribute minimumBellClearanceM : Real = 0.20;
+        // Conservative reconstruction allowance to all named tank shapes,
+        // including cradle/pad, lower fittings and mounting brackets. A 20 mm
+        // gap is a study packaging allowance, not a thermal/flight margin.
+        attribute minimumTankHardwareClearanceM : Real = 0.02;
         // The skirt bounds the engine cluster; the central adapter is an
         // internal structural shell and must not be treated as its boundary.
         attribute clusterOuterRadiusM : Real = GriffinEngineSkirtComponent::railLengthM / 2.0;
@@ -61,7 +65,7 @@ package GriffinPropulsionRequirements {
     // The skirt is a visual/structural presentation component around the
     // engine adapter plate.  It is deliberately specified independently from
     // the bells: the flight model owns thrust and collision, while this frame
-    // makes the five-bell cluster legible and provides a stable placement
+    // makes the seven-bell cluster legible and provides a stable placement
     // datum for the Editor.
     part def GriffinEngineSkirtComponent {
         attribute usdRootPath : String = "/World/Griffin1/Nozzle/MainEngineCluster";
@@ -71,7 +75,10 @@ package GriffinPropulsionRequirements {
         attribute railRearCenterZM : Real = -railFrontCenterZM;
         attribute railPortCenterXM : Real = railFrontCenterZM;
         attribute railStarboardCenterXM : Real = -railPortCenterXM;
-        attribute railLengthM : Real = 3.20;
+        // Match the estimated 3.44 m bus span and leave 110 mm from the
+        // 1.19 m ring's full bell envelopes to the inner rail faces.
+        // Packaging estimate, not a supplier engine-frame dimension.
+        attribute railLengthM : Real = 3.44;
         attribute railWidthM : Real = 0.08;
         attribute railHeightM : Real = 0.08;
         attribute shellName : String = "EngineSkirtShell";
@@ -87,10 +94,12 @@ package GriffinPropulsionRequirements {
         attribute shellBottomInsetM : Real = 0.06;
         attribute shellUpperYM : Real = componentLocalCenterYM + railHeightM / 2.0;
         attribute shellLowerYM : Real = shellUpperYM - shellDepthM;
-        attribute componentLocalCenterYM : Real = 0.00;
+        // Rail tops seat against the lower bus skirt at the estimated
+        // adapter plane; do not surround the expanding nozzle exits.
+        attribute componentLocalCenterYM : Real = adapterPlateCenterYM;
         attribute minimumSkirtBellClearanceM : Real = 0.10;
         // Seat the plate's lower face at the upper throat end. A plate
-        // centered on the rail plane would intersect all five bell walls.
+        // centered on the rail plane would intersect all bell walls.
         attribute adapterPlateCenterYM : Real = GriffinMainPropulsionAssembly::throatCenterYM + GriffinMainPropulsionAssembly::throatHeightM / 2.0 + adapterPlateHeightM / 2.0;
         // Estimated minimum exposure below the shroud, to reject geometry
         // that encloses the bell exits while passing simple dimension checks.
@@ -134,7 +143,7 @@ package GriffinPropulsionRequirements {
     }
 
     requirement def GPP001_EngineCount {
-        doc /* GPP-001 [topology] exactly five named main-engine visual owners are present in the cluster. */
+        doc /* GPP-001 [topology] exactly seven named main-engine visual owners are present in the cluster. Source: current Astrobotic product page https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ accessed 2026-10-03. Five in the August 2021 PUG is a historical configuration. Current unit performance is unavailable; this topology change must not rescale aggregate Modelica thrust. */
     }
     requirement def GPP002_BellGeometry {
         doc /* GPP-002 [visual] each engine includes its modeled bell and throat, with no placeholder circle or duplicate collider geometry. */
@@ -205,7 +214,7 @@ package GriffinPropulsionRequirements {
             in requiredMinimumClearanceM = GriffinMainPropulsionAssembly::minimumBellClearanceM;
             in skirtOuterRadiusM = GriffinMainPropulsionAssembly::clusterOuterRadiusM;
         }
-        doc /* GPP-007 [layout] the five bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and four equally spaced perimeter engines, and remain inside the engine-skirt envelope while clearing the central adapter shell. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
+        doc /* GPP-007 [layout] the seven bell exit envelopes shall have at least minimumBellClearanceM pairwise clearance, be arranged as one centered engine and six equally spaced perimeter engines, and remain inside the engine-skirt envelope while clearing the central adapter shell. The layout is derived from the typed engineStations; the bell radius is owned by this propulsion component. */
     }
     constraint def GPPC008_EnginePlumeDataflow {
         in engineCount : Integer;
@@ -227,8 +236,20 @@ package GriffinPropulsionRequirements {
         }
         doc /* GPP-008 [simulation presentation] each main-engine owner shall inherit its render-only outer plume from the LunCoSim rocket_engine_visual library component, without Twin-authored flame geometry or materials. The library helper connects physics to geometry envelope scale, shader colour and light colour. Nozzle radius and nominal thrust shall determine the envelope; fuel family and mixture richness shall determine a documented heuristic palette. Each nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow shared photometry outputs driven by live propulsion state and modeled nozzle geometry. Zero delivered thrust shall produce neither visible exhaust nor light. */
     }
+    constraint def GPPC009_TankHardwareSeparation {
+        in measuredVerticalGapM : Real;
+        in requiredClearanceM : Real;
+        measuredVerticalGapM >= requiredClearanceM;
+    }
+    requirement def GPP009_TankHardwareClearance {
+        require GPPC009_TankHardwareSeparation {
+            in requiredClearanceM = GriffinMainPropulsionAssembly::minimumTankHardwareClearanceM;
+        }
+        doc /* GPP-009 [interface] all bell and throat envelopes shall remain below the complete named tank vessel, cradle/pad, fittings and mounting brackets by at least minimumTankHardwareClearanceM. Observe composed geometry bounds in the same canonical frame, including assembly scale and transforms. This deliberately conservative vertical separation is a study packaging rule: Astrobotic publishes no current engine/tank mounting ICD. It prevents spacing-only checks from accepting a nozzle collar through lower tank hardware. Source architecture: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ and https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png ; envelope sizes and clearance are explicit estimates. Structural tank-seat/adapter contacts are separate mount interfaces. */
+    }
+
     requirement def GES001_SkirtTopology {
-        doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the five-engine cluster. */
+        doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the seven-engine cluster. */
     }
     requirement def GES002_SkirtEnvelope {
         doc /* GES-002 [geometry] the rail envelope, rail section, open-ended shell, and adapter plate shall use their typed dimensions and station datums in GriffinEngineSkirtComponent. */
@@ -273,6 +294,7 @@ package GriffinPropulsionRequirements {
     requirement <'GPP-006'> gpp006 : GPP006_BellAndThroatEnvelope { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GPP-007'> gpp007 : GPP007_BellSeparation { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GPP-008'> gpp008 : GPP008_EnginePlumeDataflow { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-009'> gpp009 : GPP009_TankHardwareClearance { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GES-001'> ges001 : GES001_SkirtTopology { subject skirt : GriffinEngineSkirtComponent; }
     requirement <'GES-002'> ges002 : GES002_SkirtEnvelope { subject skirt : GriffinEngineSkirtComponent; }
     requirement <'GES-003'> ges003 : GES003_SkirtDatum { subject skirt : GriffinEngineSkirtComponent; }
@@ -293,6 +315,7 @@ package GriffinPropulsionRequirements {
             verify gpp006;
             verify gpp007;
             verify gpp008;
+            verify gpp009;
             verify ges001;
             verify ges002;
             verify ges003;

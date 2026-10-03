@@ -628,6 +628,13 @@ package GriffinRequirementSources {
             source_astrobotic_griffin_1_vehicles_griffin_1_usda);
     }
 
+    part evidence_gpp_009 : RequirementEvidence {
+        ref targetRequirement = GriffinPropulsionRequirements::gpp009;
+        ref sources = (source_www_astrobotic_com_griffin_lander,
+            source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml,
+            source_astrobotic_griffin_1_requirements_griffin_lander_requirements_sysml);
+    }
+
     part evidence_ges_001 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::ges001;
         ref sources = (source_www_astrobotic_com_griffin_lander);

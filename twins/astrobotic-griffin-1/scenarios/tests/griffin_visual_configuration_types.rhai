@@ -4,8 +4,14 @@ import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_c
 
 import "lunco://scripting/tools/mechanical_relations" as mechanical_relations;
 
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
+
+fn simulation_dependencies(me, ctx) {
+    usd_geometry_inspection::dependencies()
+}
+
 const PACKAGE = "GriffinVisualConfigurationRequirements";
-const PART = PACKAGE + "::GriffinVisualConfiguration::";
+const PART = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
 const VERIFICATION = "Verify_GriffinVisualConfiguration";
 
 fn _resolved(source, name) {
@@ -50,7 +56,10 @@ fn typed_spatial_scalar_check(source, id, field) {
     let ok = value != () && vec3_is_native(value) && vec3_is_finite(value);
     sysml_requirement_checks::preflight(id, ok,
         "SysML spatial value must project to the shared finite f64 Vec3: " + field,
-        #{field: field, value: value}, "finite Vec3")
+        #{field: field, value: value, native_type: type_of(value),
+          resolved_ok: _resolved(source, field).ok,
+          qualified_name: PART + field, source_error: _resolved(source, field).error,
+          source_revision: source.source_revision}, "finite Vec3")
 }
 
 fn typed_enum_check(source, id, field, expected_literal) {
@@ -59,7 +68,8 @@ fn typed_enum_check(source, id, field, expected_literal) {
         && value.literal == expected_literal;
     sysml_requirement_checks::preflight(id, ok,
         "configuration choice must remain a SysML enumeration: " + field,
-        #{field: field, value: value}, expected_literal)
+        #{field: field, native_type: type_of(value),
+          literal: if sysml_enum_is(value) { value.literal } else { () }}, expected_literal)
 }
 
 fn display_color_check(source) {
@@ -105,7 +115,7 @@ fn tank_station_layout_check(source) {
         for index in 0..stations.len() {
             let station = stations[index];
             if !vec3_is_native(station) || !vec3_is_finite(station)
-                || (station.y - body_mount.y).abs() > 0.000001
+                || (station.y - stations[0].y).abs() > 0.000001
                 || (station.x * station.z).abs() > 0.000001
                 || ((station.x * station.x + station.z * station.z).sqrt()
                     - orbital_radius).abs() > 0.000001 {
@@ -121,11 +131,11 @@ fn tank_station_layout_check(source) {
         }
     }
     sysml_requirement_checks::preflight("GVC-T-tank-layout", ok,
-        "the four named tanks occupy equally spaced cardinal stations on the bus-origin plane",
+        "the four named tanks occupy equally spaced cardinal stations on their common tank-center plane",
         #{tank_count: tank_count,
           station_y: if station_count == 0 { () } else { stations[0].y },
           body_mount_y: if body_mount == () { () } else { body_mount.y }},
-        #{tank_count: 4, station_y: if body_mount == () { () } else { body_mount.y }})
+        #{tank_count: 4, coplanar: true})
 }
 
 fn native_transform_plan_check() {
@@ -164,7 +174,7 @@ fn typed_relation_check(source) {
     let tolerance = sysml_requirements::number(source, PART + "verificationToleranceM");
     let ok = vec3_is_native(body_mount) && vec3_is_native(axis_up)
         && array_is(tank_stations) && array_is(leg_stations)
-        && array_is(engine_stations) && tolerance != ()
+        && array_is(engine_stations) && tank_stations.len() == 4 && tolerance != ()
         && vec3_is_finite(body_mount) && vec3_is_finite(axis_up)
         && vlen(axis_up) > 1.0e-12;
     let plane_relations = [];
@@ -172,7 +182,7 @@ fn typed_relation_check(source) {
     if ok {
         for station in tank_stations {
             let distance = mechanical_relations::plane_signed_distance(
-                station, body_mount, axis_up);
+                station, tank_stations[0], axis_up);
             let relation = mechanical_relations::equal(distance, 0.0, tolerance);
             plane_relations.push(relation);
             if relation == () || relation.status != "passed" { ok = false; }
@@ -193,7 +203,7 @@ fn typed_relation_check(source) {
         }
     }
     sysml_requirement_checks::preflight("GVC-T-relations", ok,
-        "source-backed stations must satisfy generic plane-coincidence and under relations",
+        "source-backed tank stations must be coplanar; leg and engine stations must lie below the body datum",
         #{plane_relations: plane_relations, under_relations: under_relations,
           tolerance_m: tolerance},
         #{tank_plane_distance_m: 0.0, legs_and_engines_under_body: true,
@@ -220,9 +230,9 @@ fn typed_symmetry_check(source) {
         relations.push(mechanical_relations::symmetric_pairs_about_plane(
             [tank_stations[2]], [tank_stations[3]], body_mount, axis_forward, tolerance));
         relations.push(mechanical_relations::symmetric_pairs_about_plane(
-            [leg_stations[0]], [leg_stations[1]], body_mount, axis_port, tolerance));
+            [leg_stations[0],leg_stations[1]], [leg_stations[2],leg_stations[3]], body_mount, axis_port, tolerance));
         relations.push(mechanical_relations::symmetric_pairs_about_plane(
-            [leg_stations[2]], [leg_stations[3]], body_mount, axis_forward, tolerance));
+            [leg_stations[0],leg_stations[2]], [leg_stations[3],leg_stations[1]], body_mount, axis_forward, tolerance));
         for relation in relations {
             if relation == () || relation.status != "passed" { ok = false; }
         }
@@ -230,7 +240,7 @@ fn typed_symmetry_check(source) {
     sysml_requirement_checks::preflight("GVC-T-symmetry", ok,
         "ordered component stations must be mirrored across their authored symmetry planes",
         #{relations: relations, tolerance_m: tolerance},
-        #{tank_pairs: 2, leg_pairs: 2, tolerance_m: tolerance})
+        #{tank_pairs: 2, leg_pairs: 4, tolerance_m: tolerance})
 }
 
 fn on_start(me, ctx) {
@@ -263,6 +273,7 @@ fn on_tick(me, ctx) {
         PACKAGE + "::gvc010", PACKAGE + "::gvc011", PACKAGE + "::gvc012",
         PACKAGE + "::gvc013", PACKAGE + "::gvc014", PACKAGE + "::gvc015"
     ], [PACKAGE + "::" + VERIFICATION]);
+    if source.ok != true { throw("Visual configuration source unavailable: " + source.to_string()); }
     let checks = [
         typed_spatial_scalar_check(source, "GVC-T-body-dimensions", "bodyDimensions"),
         typed_spatial_scalar_check(source, "GVC-T-body-mount", "bodyMount"),

@@ -21,7 +21,12 @@ package GriffinLanderRequirements {
         // not duplicated here.
         attribute legCount : Integer = 4;
         attribute tankCount : Integer = 4;
-        attribute engineCount : Integer = 5;
+        // Current Astrobotic Griffin product page specifies seven main engines.
+        // The August 2021 PUG v5.02 p.26 describes five: retain that as historical
+        // configuration evidence, not the current topology. Exact unit thrust
+        // and current propellant loading remain unpublished study inputs.
+        // https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
+        attribute engineCount : Integer = 7;
         /* Four arrays is a study configuration, not a released hardware count.
          * The fourth restores a belt panel on the opposite broad face requested
          * by the operator on 2026-10-02. See solar layout rationale. */
@@ -44,7 +49,7 @@ package GriffinLanderRequirements {
         doc /* GLR-003 [visual study] exactly four named propellant-tank study assemblies shall expose a tank body and retention bands/cradle. The August 2021 Astrobotic Payload User Guide v5.02 p.26 documents two fuel and two oxidizer tanks. Their detailed shapes, attachment stations and dimensions remain explicit Twin estimates. */
     }
     requirement def GLR004_EngineCluster {
-        doc /* GLR-004 [visual] exactly five named main-engine components shall expose a visible bell and throat. */
+        doc /* GLR-004 [visual] exactly seven named main-engine components shall expose a visible bell and throat. */
     }
     requirement def GLR005_SolarArrays {
         doc /* GLR-005 [configuration] installed array identities shall match the canonical solarArrayCount and the array configuration defined by GriffinSolarRequirements. Each array shall use the approved installation frame, orientation, deployment state, and panel envelope. */

@@ -130,8 +130,8 @@ fn _required_constraint_bindings(model, requirement_name, constraint_name,
     bindings
 }
 
-fn station_ring_is_centered_square(stations, tolerance) {
-    if stations.len() != 5 { return false; }
+fn station_ring_is_centered_hexagon(stations, tolerance) {
+    if stations.len() != 7 { return false; }
     if absolute(stations[0].x) > tolerance || absolute(stations[0].z) > tolerance {
         return false;
     }
@@ -143,8 +143,8 @@ fn station_ring_is_centered_square(stations, tolerance) {
             + stations[index].z * stations[index].z).sqrt();
         if absolute(station_radius - radius) > tolerance { return false; }
     }
-    let chord = [radius * (2.0).sqrt(), radius * 2.0];
-    let counts = [0, 0];
+    let chord = [radius, radius * (3.0).sqrt(), radius * 2.0];
+    let counts = [0, 0, 0];
     for left in 1..stations.len() {
         for right in left + 1..stations.len() {
             let dx = stations[left].x - stations[right].x;
@@ -152,12 +152,13 @@ fn station_ring_is_centered_square(stations, tolerance) {
             let distance = (dx * dx + dz * dz).sqrt();
             let matched = if absolute(distance - chord[0]) <= tolerance { 0 }
                 else if absolute(distance - chord[1]) <= tolerance { 1 }
+                else if absolute(distance - chord[2]) <= tolerance { 2 }
                 else { -1 };
             if matched < 0 { return false; }
             counts[matched] += 1;
         }
     }
-    counts[0] == 4 && counts[1] == 2
+    counts[0] == 6 && counts[1] == 6 && counts[2] == 3
 }
 
 // Observe the rendered mesh itself: a closed Cone cap cannot pass this gate.
@@ -239,6 +240,50 @@ fn skirt_fit_observation(skirt_root, engine_records, bell_observations, toleranc
     #{available:true,snapshot:snapshot,clearance:clearance,visible:visible,separation:separation}
 }
 
+// Whole engine/tank interface: composed bounds include scaling and all named
+// tank hardware. Reduce each small query immediately to keep Rhai bounded.
+fn tank_hardware_gap(vehicle, engines, source, snapshot) {
+    let names = sysml_requirement_checks::source_enum_identifiers(source,
+        visual("tankInstances"));
+    let members = sysml_requirement_checks::source_enum_identifiers(source,
+        "GriffinTankRequirements::GriffinPropellantTankAssembly::childNames");
+    let brackets = sysml_requirement_checks::source_enum_identifiers(source,
+        "GriffinTankRequirements::GriffinPropellantTankAssembly::bracketNames");
+    if names.len() != 4 || members.len() == 0 || brackets.len() == 0 {
+        return #{available:false};
+    }
+    let tank_bottom = 1.0e30;
+    for name in names {
+        let paths = [];
+        for member in members { paths.push(vehicle+"/"+name+"/"+member); }
+        for bracket in brackets {
+            paths.push(vehicle+"/"+name+"/TankMountBrackets/"+bracket);
+        }
+        let batch = query("QueryUsdPrims",#{paths:paths,attrs:[],geometry_bounds:true});
+        if !_same_snapshot(_query_snapshot(batch),snapshot)
+            || batch.records.len() != paths.len() {return #{available:false};}
+        for record in batch.records {
+            let bounds = record.geometry_bounds;
+            if bounds == () || bounds.min == () {return #{available:false};}
+            if bounds.min[1] < tank_bottom {tank_bottom=bounds.min[1];}
+        }
+    }
+    let paths=[];
+    for engine in engines {
+        paths.push(engine.path+"/Bell");paths.push(engine.path+"/Throat");
+    }
+    let batch=query("QueryUsdPrims",#{paths:paths,attrs:[],geometry_bounds:true});
+    if !_same_snapshot(_query_snapshot(batch),snapshot)
+        || batch.records.len() != paths.len() {return #{available:false};}
+    let engine_top=-1.0e30;
+    for record in batch.records {
+        let bounds=record.geometry_bounds;
+        if bounds==() || bounds.max==() {return #{available:false};}
+        if bounds.max[1]>engine_top {engine_top=bounds.max[1];}
+    }
+    #{available:true,gap:tank_bottom-engine_top,tank_bottom:tank_bottom,engine_top:engine_top}
+}
+
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
@@ -302,24 +347,28 @@ fn on_tick(me, ctx) {
     }
     let selected_attributes = [];
     for name in ["usdRootPath", "bellRadiusM", "bellHeightM", "throatRadiusM",
-        "throatHeightM", "throatCenterYM", "minimumBellClearanceM", "clusterOuterRadiusM", "bellVisualWallThicknessM", "bellContourExponent"] {
+        "throatHeightM", "throatCenterYM", "minimumBellClearanceM", "minimumTankHardwareClearanceM", "clusterOuterRadiusM", "bellVisualWallThicknessM", "bellContourExponent"] {
         selected_attributes.push(own(name));
     }
     for name in ["componentRootName", "componentMemberNames", "shellName",
-        "adapterPlateName", "railFrontCenterZM", "railRearCenterZM",
+        "adapterPlateName", "componentLocalCenterYM", "railFrontCenterZM", "railRearCenterZM",
         "railPortCenterXM", "railStarboardCenterXM", "railLengthM",
         "railWidthM", "railHeightM", "shellDepthM", "adapterPlateWidthM",
         "adapterPlateHeightM", "adapterPlateDepthM", "adapterPlateCenterYM", "minimumSkirtBellClearanceM", "minimumVisibleBellHeightFraction", "transformOrder"] {
         selected_attributes.push(skirt(name));
     }
     selected_attributes.push(parent("engineCount"));
+    selected_attributes.push(visual("tankInstances"));
+    for name in ["childNames","bracketNames"] {
+        selected_attributes.push("GriffinTankRequirements::GriffinPropellantTankAssembly::"+name);
+    }
     for name in ["engineClusterMountYM", "engineStations", "geometryVerificationToleranceM",
         "mainEngineInstances"] {
         selected_attributes.push(visual(name));
     }
     let selected_requirements = [];
     for name in ["gpp001", "gpp002", "gpp003", "gpp004", "gpp005", "gpp006",
-        "gpp007", "gpp008"] {
+        "gpp007", "gpp008", "gpp009"] {
         selected_requirements.push(PACKAGE + "::" + name);
     }
     for name in ["ges001", "ges002", "ges003", "ges004", "ges005", "ges006", "ges007"] {
@@ -622,9 +671,9 @@ fn on_tick(me, ctx) {
                 if clearance < measured_clearance { measured_clearance = clearance; }
             }
         }
-        typed_stations_match = station_ring_is_centered_square(stations,
+        typed_stations_match = station_ring_is_centered_hexagon(stations,
             geometry_tolerance)
-            && station_ring_is_centered_square(actual_stations,
+            && station_ring_is_centered_hexagon(actual_stations,
                 geometry_tolerance)
             && typed_stations_match;
     }
@@ -649,6 +698,17 @@ fn on_tick(me, ctx) {
         "GriffinPropulsionRequirements::GPPC007_BellSeparation",
         separation_requirement_bindings,
         "typed", 0.0));
+    let tank_fit=tank_hardware_gap(vehicle_root,observed_engines.records,source,usd_snapshot);
+    let tank_bindings=_required_constraint_bindings(source_model,"gpp009",
+        "GPPC009_TankHardwareSeparation",[
+            ["measuredVerticalGapM",_usd_observation(usd_snapshot,
+                tank_fit.available,tank_fit.gap,"engine/tank hardware bounds unavailable")],
+            ["requiredClearanceM",_source_literal(source_model,own("minimumTankHardwareClearanceM"))]
+        ]);
+    checks.push(sysml_requirements::required_constraint_check("GPP-009-tank-hardware-gap",
+        "engine","gpp009",VERIFICATION,
+        "GriffinPropulsionRequirements::GPPC009_TankHardwareSeparation",
+        tank_bindings,"typed",0.0));
     // The skirt is a separate referenced component.  Validate its four rails
     // and shell in the composed assembly; the source file remains the only
     // owner of the component geometry.
@@ -665,6 +725,8 @@ fn on_tick(me, ctx) {
         checks.push(component_position("GES-003-assembly-y", skirt_root, 1, skirt_assembly_y, geometry_tolerance));
         for index in 0..skirt_names.len() {
             let rail = rail_paths[index];
+            checks.push(component_position("GES-006-"+skirt_names[index]+"-y",rail,1,
+                sysml_requirements::number(source,skirt("componentLocalCenterYM")),geometry_tolerance));
             checks.push(sysml_requirement_checks::exists("GES-001-" + skirt_names[index], "engine_skirt", "ges001", VERIFICATION, rail, "Cube"));
             checks.push(sysml_requirement_checks::attribute_equals("GES-005-" + skirt_names[index] + "-purpose", "engine_skirt", "ges005", VERIFICATION, rail, "purpose", "render"));
             checks.push(sysml_requirement_checks::attribute_equals("GES-005-" + skirt_names[index] + "-collision", "engine_skirt", "ges005", VERIFICATION, rail, "physics:collisionEnabled", false));

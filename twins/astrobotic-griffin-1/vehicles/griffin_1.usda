@@ -403,7 +403,7 @@ def Xform "Griffin1" (
             float inputs:design_chamber_pressure_pa = 0.0
             float inputs:ambient_pressure_pa = 0.0
             float inputs:pressure_threshold_pa = 1000.0
-            float inputs:engine_count = 5.0
+            float inputs:engine_count = 7.0
             float inputs:throttle
             float inputs:throttle.connect = </Griffin1/MainPropulsion.outputs:engine_activity>
             float inputs:thrust_n
@@ -1248,7 +1248,7 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
+                custom double3 xformOp:translate = (0.0, 0.34, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 def "Exhaust"
                 {
@@ -1313,7 +1313,7 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (1.05, 1.0, 0.0)
+                custom double3 xformOp:translate = (1.19, 0.34, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 def "Exhaust"
                 {
@@ -1378,7 +1378,7 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (-1.05, 1.0, 0.0)
+                custom double3 xformOp:translate = (0.595, 0.34, 1.030570230503)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 def "Exhaust"
                 {
@@ -1443,7 +1443,7 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (0.0, 1.0, 1.05)
+                custom double3 xformOp:translate = (-0.595, 0.34, 1.030570230503)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 def "Exhaust"
                 {
@@ -1508,7 +1508,7 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
             )
             {
-                custom double3 xformOp:translate = (0.0, 1.0, -1.05)
+                custom double3 xformOp:translate = (-1.19, 0.34, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 def "Exhaust"
                 {
@@ -1573,8 +1573,138 @@ def Xform "Griffin1" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda@</World/EngineSkirt>
             )
             {
-                custom double3 xformOp:translate = (0.0, 1.0, 0.0)
+                custom double3 xformOp:translate = (0.0, 0.34, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+            def Xform "Engine06" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
+            {
+                custom double3 xformOp:translate = (-0.595, 0.34, -1.030570230503)
+                custom token[] xformOpOrder = ["xformOp:translate"]
+                def "Exhaust"
+                {
+                    def "Flame"
+                    {
+                        custom float inputs:throttle
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        custom float inputs:plume_length_fraction
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        custom float inputs:fuel_color_r
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        custom float inputs:fuel_color_g
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        custom float inputs:fuel_color_b
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        custom float inputs:scale_x
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        custom float inputs:scale_z
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        custom float inputs:scale_y
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        custom float inputs:translation_y
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                    }
+                    def "FlameCore"
+                    {
+                        custom float inputs:throttle
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        custom float inputs:plume_length_fraction
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        custom float inputs:fuel_color_r
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        custom float inputs:fuel_color_g
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        custom float inputs:fuel_color_b
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        custom float inputs:scale_x
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        custom float inputs:scale_z
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        custom float inputs:scale_y
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        custom float inputs:translation_y
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        def "PlumeLight"
+                        {
+                            custom float inputs:light_intensity
+                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                            custom float inputs:light_radius
+                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                            custom float inputs:light_color_r
+                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                            custom float inputs:light_color_g
+                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                            custom float inputs:light_color_b
+                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        }
+                    }
+                }
+            }
+            def Xform "Engine07" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+            )
+            {
+                custom double3 xformOp:translate = (0.595, 0.34, -1.030570230503)
+                custom token[] xformOpOrder = ["xformOp:translate"]
+                def "Exhaust"
+                {
+                    def "Flame"
+                    {
+                        custom float inputs:throttle
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        custom float inputs:plume_length_fraction
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        custom float inputs:fuel_color_r
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        custom float inputs:fuel_color_g
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        custom float inputs:fuel_color_b
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        custom float inputs:scale_x
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        custom float inputs:scale_z
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        custom float inputs:scale_y
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        custom float inputs:translation_y
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                    }
+                    def "FlameCore"
+                    {
+                        custom float inputs:throttle
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        custom float inputs:plume_length_fraction
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        custom float inputs:fuel_color_r
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        custom float inputs:fuel_color_g
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        custom float inputs:fuel_color_b
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        custom float inputs:scale_x
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        custom float inputs:scale_z
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        custom float inputs:scale_y
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        custom float inputs:translation_y
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        def "PlumeLight"
+                        {
+                            custom float inputs:light_intensity
+                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                            custom float inputs:light_radius
+                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                            custom float inputs:light_color_r
+                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                            custom float inputs:light_color_g
+                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                            custom float inputs:light_color_b
+                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        }
+                    }
+                }
             }
         }
     }

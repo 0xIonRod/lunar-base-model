@@ -73,6 +73,8 @@ package GriffinVisualConfigurationRequirements {
         Engine03;
         Engine04;
         Engine05;
+        Engine06;
+        Engine07;
     }
 
     part def GriffinVisualConfiguration {
@@ -263,8 +265,8 @@ package GriffinVisualConfigurationRequirements {
             ("LegPX", "LegNX", "LegPZ", "LegNZ");
         attribute solarArrayInstances : GriffinSolarArrayInstanceName[4] =
             ("SolarPanelForward", "SolarPanelFrontStarboard", "SolarPanelStarboard", "SolarPanelRear");
-        attribute mainEngineInstances : GriffinMainEngineInstanceName[5] =
-            ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05");
+        attribute mainEngineInstances : GriffinMainEngineInstanceName[7] =
+            ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07");
         attribute rampInstances : GriffinRampInstanceName[2] =
             ("EgressRampPort", "EgressRampStarboard");
         attribute rampHingeInstances : GriffinRampHingeInstanceName[2] =
@@ -396,15 +398,33 @@ package GriffinVisualConfigurationRequirements {
         // Estimated render/hardware separation from the payload underside.
         attribute minimumTankPayloadClearanceM : Real = 0.01;
 
-        attribute engineClusterMountYM : Real = 1.00;
+        attribute engineClusterMountYM : Real = 0.34;
         attribute engineBellDirection : Direction = (0.0, -1.0, 0.0);
-        /* Five engines are documented in Astrobotic's August 2021 Payload User Guide v5.02,
-         * p.26. Center plus four cardinal stations on a 1.05 m radius is an
-         * explicit layout estimate, not a supplier mounting drawing. It keeps
-         * 0.34 m bell envelopes inside the estimated 1.60 m engine-skirt half-span. The central adapter shell is smaller and must clear these envelopes. */
-        attribute engineStations : Position[5] =
-            ((0.0, 1.00, 0.0), (1.05, 1.00, 0.0), (-1.05, 1.00, 0.0),
-             (0.0, 1.00, 1.05), (0.0, 1.00, -1.05));
+        /* Seven engines: current Astrobotic Griffin product page, accessed
+         * 2026-10-03: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
+         * The August 2021 PUG v5.02 p.26 five-engine configuration is historical.
+         * No current mounting drawing is available. One center plus a regular
+         * six-engine ring is an explicit symmetric packaging estimate, not
+         * supplier geometry. The 1.19 m ring leaves 0.51 m between 0.34 m bell
+         * exits, at least 0.11 m to the 3.44 m frame's inner rail edges, and
+         * collar clearance below the four estimated tank envelopes and their
+         * lower end hardware. Y=0.34 m puts the uppermost collar at 0.76 m,
+         * below the tank cradle bottoms at 0.784 m (24 mm separation).
+         * The adapter plate occupies Y=0.76..0.88 m. Its frame centers at
+         * Y=0.82 m, with rail tops at the lower service-skirt bottom Y=0.86 m.
+         * Thus the frame supports the upper engine interface rather than
+         * surrounding the bell exits. The lowest exit Y=0.08 m plus the
+         * 0.44 m touchdown root elevation leaves 0.52 m ground clearance.
+         * Shared aluminum tank-seat/adapter interfaces are structural joins;
+         * their geometry is a study proxy, not a released attachment ICD.
+         * This visual-only placement does not alter aggregate Modelica thrust
+         * or add force actuators. Current thrust/mass calibration remains open.
+         */
+        attribute engineStations : Position[7] =
+            ((0.0, 0.34, 0.0), (1.19, 0.34, 0.0),
+             (0.595, 0.34, 1.030570230503), (-0.595, 0.34, 1.030570230503),
+             (-1.19, 0.34, 0.0), (-0.595, 0.34, -1.030570230503),
+             (0.595, 0.34, -1.030570230503));
     }
 
     requirement def GVC001_ConfigurationSelection {
@@ -429,7 +449,7 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-007 [layout] four COPV proxies occupy the source cardinal stations and pass through support-ring openings while satisfying the typed minimumTankFrameClearanceM radial clearance from their bands. Stations, tank scale and geometry are packaging estimates documented in griffin-size-evidence.md, not supplier data. */
     }
     requirement def GVC008_EngineAndSkirtDatum {
-        doc /* GVC-008 [interface] the five-engine cluster shall remain visibly below the lower flared bucket and bus; the nozzle axis is a typed downward Direction and must not duplicate flight thrust ownership. Source: Astrobotic Payload User Guide (2022), p.26 identifies five main engines; bucket and skirt dimensions are visual-study assumptions. */
+        doc /* GVC-008 [interface] the seven-engine cluster shall remain visibly below the lower flared bucket and bus; the nozzle axis is a typed downward Direction and must not duplicate flight thrust ownership. Source: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ specifies seven engines. Center-plus-six layout, dimensions and mount heights are explicit packaging estimates; no current supplier mounting drawing is available. The earlier PUG five-engine configuration is historical. */
     }
     requirement def GVC009_RampState {
         doc /* GVC-009 [configuration] the visual review shall use the typed Stowed ramp state while the physical mission scene may command the deployed state after touchdown. Rationale: optional egress ramps are payload interfaces, not the primary landed silhouette. */

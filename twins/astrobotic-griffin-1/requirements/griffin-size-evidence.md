@@ -1038,3 +1038,74 @@ description is a requirement, not evidence of a realized seven-engine model.
 Astrobotic's current product page specifies seven engines; reconciling the
 model, propulsion source, placement and checks remains open. Do not replace
 the seven-engine expectation with five to obtain a green report.
+
+
+## Seven-engine underside and tank clearance — 2026-10-03
+
+The current product page specifies **seven** main engines:
+https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ (accessed
+2026-10-03). The August 2021 PUG v5.02 p.26 describes five; it is historical
+configuration evidence, not the current count. The supplied hardware reference
+https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png helps with
+structure and finish but does not establish the current nozzle station drawing.
+
+The realized study layout is explicitly estimated: one center nozzle and six
+on a regular 1.19 m ring, all facing down. With the retained 0.34 m exit radius,
+neighboring exits have 0.51 m clearance. The 3.44 m skirt frame leaves at least
+0.11 m to its inner rail edges. Bell and collar centers are at lander-local
+Y=0.34 m, putting the highest collar point at Y=0.76 m. The lowest composed
+tank hardware point is Y=0.784 m, giving **24 mm vertical separation**. At the
+0.44 m touchdown-root datum, the lowest exit is 0.52 m above ground. These
+clearances are reconstruction allowances, not qualified thermal/flight margins.
+
+Skirt rails now share the adapter's component-local Y=0.48 m plane. Their
+assembly tops are at Y=0.86 m, the lower service-skirt bottom; the shallow
+open shroud surrounds the mounting interface rather than the bell exits.
+Tank seats and adapter contacts remain structural attachment proxies. No
+current supplier engine/tank attachment ICD is available. GPP-009 verifies a
+conservative gap from the complete named vessel, cradle/pad, lower fittings
+and brackets, using composed geometry bounds in one canonical snapshot. This
+is necessary because an engine-spacing check alone missed collar penetration.
+
+Engine06 and Engine07 reference the same reusable hollow bell/shared LunCoSim
+exhaust component as the existing nozzles. All seven use aggregate Modelica
+photometry; its count is seven. Total thrust, actuator ownership, physics mass,
+nozzle dimensions and propellant state were unchanged. Current unit thrust,
+current propellant loading/densities and mass allocation remain uncalibrated
+study inputs; seven nozzles does not establish current flight performance.
+
+Typed authoring changed the engine references/placements, then their plume
+connections after composition, then the isolated skirt. Final authoring owners
+were vehicle 115970293813770 (generation 0 -> 8, saved) and skirt
+115970293813765 (generation 0 -> 34, saved). Earlier seven-engine reference and
+190-operation photometry batches are retained in the vehicle journal/source.
+Warm authoring sessions read stale source/geometry while reporting current
+projection generations. A fresh owned process was required for exact saved
+source readback; this is a recorded reload failure, not an accepted workaround.
+
+Saved-source production checks, 60 Hz, one thread, zero jitter, source revision
+16119617851389158153:
+
+- Propulsion **PASS 123**, tick 14: `terrain/target/griffin-seven-clearance-saved-gate.log`.
+- Configuration types **PASS 22**, tick 6: `terrain/target/griffin-seven-types-corner-gate.log`.
+- Typed source registry **PASS 208 targets / 208 evidence / 47 sources / 3 roles**.
+
+The configuration fixture lacked the shared read-only query dependency
+contract, which prevented its source analysis; it now reuses
+`usd_geometry_inspection::dependencies`. Native enum observations are reported
+as literal/type evidence, preserving native evaluation without an unsupported
+telemetry payload. Its outdated bus-center tank-plane and cardinal-leg pairing
+assumptions were replaced by tank coplanarity and the authored corner-leg
+mirror pairs. Numeric tolerances were not widened. Component checks do not
+establish touchdown, warm reload, takeoff or rover egress acceptance.
+
+Fresh saved-source Editor evidence used owned port 49753, vehicle document /
+preview 115970812930734, view 7, projected generation 0 ready. Readback
+`/tmp/griffin-seven-saved-readback.json` observes collar maximum Y=0.7599999869 m
+and cradle minimum Y=0.7840000000 m in the same canonical frame, plus Engine07
+and the elevated frame rail. Focused underside screenshot:
+`terrain/target/assembly-editor/griffin-seven-saved-underside-framed.png`.
+Seven hollow exits and the four corner-leg tripods are visible. Underside
+inspection lighting remains too dark, and the frame-selection command rejected
+the bus path; the view was manually framed using ordinary Editor orbit/zoom
+input. Neither that framing failure nor warm camera/reload behavior is a PASS.
