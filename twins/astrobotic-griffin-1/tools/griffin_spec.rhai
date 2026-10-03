@@ -7,6 +7,15 @@ import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_c
 // the Twin's typed SysML model, including structured collections. Rhai owns
 // reusable planning policy while contracts/*.md records meaning and provenance.
 
+fn bus_foil_shader_inputs() {
+    [#{input:"foil_color",source:"bodySkinDisplayColor",color:true,normalized:true},
+     #{input:"shade_color",source:"busFoilValleyColor",color:true,normalized:true},
+     #{input:"crinkle",source:"busFoilCrinkleDensity",color:false,normalized:false},
+     #{input:"facet_depth",source:"busFoilFacetContrast",color:false,normalized:true},
+     #{input:"sheen",source:"busFoilSheen",color:false,normalized:true},
+     #{input:"v_scale",source:"busFoilAxialPatternScale",color:false,normalized:false}]
+}
+
 fn rcs_port_mapping() {
     [
         #{model_name: "RcsPitchPosModel", valve_port: "pitch_pos_a_valve", thrust_port: "pitch_pos_a_thrust_n"},

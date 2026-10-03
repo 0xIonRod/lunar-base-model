@@ -160,13 +160,23 @@ package GriffinVisualConfigurationRequirements {
         attribute silverDisplayColor : Real[3] = (.55, .58, .62);
         attribute silverMetallic : Real = .75;
         attribute silverRoughness : Real = .42;
-        /* Exterior finish estimate revised 2026-10-03: the silver blanket/panel
-         * faces in https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
-         * retain broad soft reflections. Metallic .55 and roughness .45
-         * approximate that finish in UsdPreviewSurface; neither is measured
-         * optical data or a claim that blanket fabric is solid metal. */
-        attribute panelMetallic : Real = .55;
-        attribute panelRoughness : Real = .45;
+        /* Silver exterior blanket appearance, 2026-10-03. Crumpled silver
+         * surfaces and narrow gold edge tape are visible in the hardware photo:
+         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .
+         * Reuse LunCoSim's mli_foil shader with bodySkinDisplayColor as the
+         * bright color. Valley RGB (.58,.59,.57), contrast .65 and sheen .10
+         * retain broad silver reflections in the shared foil shader. The low
+         * sheen avoids nearly black grazing faces in inspection lighting. Density 26
+         * per metre gives centimetre-scale shading detail on the 0.72 m belt;
+         * axial scale 1 keeps the object-space pattern isotropic. These are
+         * artistic estimates from an uncalibrated photograph, not measured
+         * reflectance, thermal properties, blanket construction or wrinkles
+         * in the actual mesh. Shader inputs narrow only at the GPU boundary. */
+        attribute busFoilValleyColor : Real[3] = (.58, .59, .57);
+        attribute busFoilCrinkleDensity : Real = 26.0;
+        attribute busFoilFacetContrast : Real = .65;
+        attribute busFoilSheen : Real = .10;
+        attribute busFoilAxialPatternScale : Real = 1.0;
         attribute bodyGroundClearanceM : Real = 0.20;
         attribute lowerSkirtDimensions : Dimensions = (3.40, 0.24, 3.40);
         attribute lowerSkirtCenter : Position = (0.0, -0.36, 0.0);

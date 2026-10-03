@@ -160,6 +160,7 @@ fn _solar_instance_geometry_ops(doc,edit_target,root,index) {
 
 fn griffin_bus_cladding_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("Griffin cladding source unavailable");}
     let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let dims=model.value(prefix+"bodyDimensions");
     let profile=model.value(prefix+"outerBodyProfileCoordinates");
@@ -217,11 +218,50 @@ fn griffin_bus_finish_plan(doc, edit_target, root) {
     let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let profile=model.value(prefix+"outerBodyProfileCoordinates");
     if !array_is(profile) || profile.len()!=8 {return plan_error("Griffin bus profile unavailable");}
-    let paths=[];
-    for i in 0..profile.len() { paths.push(root+"/ExteriorFacet"+(i+1).to_string()); }
-    griffin_surface_material_plan(doc,edit_target,root,"ExteriorPanels",paths,
-        model.value(prefix+"bodySkinDisplayColor"),f64_from(model.value(prefix+"panelMetallic")),
-        f64_from(model.value(prefix+"panelRoughness")))
+    let material=root+"/Looks/ExteriorPanels";let shader=material+"/Surface";
+    let surface=assembly_builder::composed_query(doc,#{path:shader,attrs:[]});
+    if !query_ok(surface) || surface.type_name!="Shader" {
+        return plan_error("Griffin exterior material network is missing: "+shader);
+    }
+    let ops=[];
+    for input in griffin_spec::bus_foil_shader_inputs() {
+        let value=model.value(prefix+input.source);
+        let literal=();
+        if input.color {
+            if !array_is(value) || value.len()!=3 {return plan_error("Bus foil color missing: "+input.source);}
+            for c in value {
+                let channel=f64_from(c);
+                if channel==() || !griffin_geometry::scalar_is_finite(channel) || channel<0.0 || channel>1.0 {
+                    return plan_error("Bus foil color invalid: "+input.source);
+                }
+            }
+            literal=assembly_builder::_mesh_tuple3(value,"bus foil color");
+        } else {
+            let number=f64_from(value);
+            if number==() || !griffin_geometry::scalar_is_finite(number) || number<=0.0
+                || (input.normalized && number>1.0) {return plan_error("Bus foil control invalid: "+input.source);}
+            literal=number.to_string();
+        }
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:shader,name:"inputs:"+input.input,
+            type_name:if input.color {"color3f"} else {"float"},value:literal}});
+    }
+    for name in ["info:id","inputs:diffuseColor","inputs:metallic","inputs:roughness"] {
+        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:shader,name:name}});
+    }
+    for attr in [#{name:"info:implementationSource",kind:"token",value:"\"sourceAsset\""},
+        #{name:"info:wgsl:sourceAsset",kind:"asset",value:"@lunco://shaders/mli_foil.wgsl@"}] {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:shader,name:attr.name,type_name:attr.kind,value:attr.value}});
+    }
+    for i in 0..profile.len() {
+        let path=root+"/ExteriorFacet"+(i+1).to_string();
+        let prim=assembly_builder::composed_query(doc,#{path:path,schemas:true,attrs:[]});
+        if !query_ok(prim) || prim.type_name!="Mesh" {return plan_error("Bus blanket facet missing: "+path);}
+        let schemas=prim.api_schemas;
+        if !schemas.contains("MaterialBindingAPI") {schemas.push("MaterialBindingAPI");}
+        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:schemas}});
+        ops.push(#{SetRelationship:#{edit_target:edit_target,path:path,name:"material:binding",targets:[material]}});
+    }
+    #{ok:true,ops:ops}
 }
 
 // Keep the exposed frame distinct from blanket faces. Geometry is unchanged.
@@ -4689,7 +4729,7 @@ fn _ramp_section_track_topology() {
     // reference when its points are replaced for the deployment toe.
     #{face_counts: [4, 4, 4, 4, 4, 4],
       face_indices: [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1,
-          3, 7, 6, 2, 1, 5, 6, 2, 0, 3, 7, 4]}
+          3, 2, 6, 7, 1, 5, 6, 2, 0, 3, 7, 4]}
 }
 
 // Materialize one physical ramp section from its SysML dimensions. The USD

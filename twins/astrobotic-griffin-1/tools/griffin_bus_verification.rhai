@@ -635,9 +635,9 @@ fn bus_checks(doc, source, bus_root) {
         checks.push(_count_constraint("GBC-009-points-" + label, "gbc009", points.len(), 8));
         checks.push(_count_constraint("GBC-009-quads-" + label, "gbc009", _quad_face_count(counts), 6));
         checks.push(_count_constraint("GBC-009-indices-" + label, "gbc009", indices.len(), 24));
-        // Every undirected edge must have two incident faces, with valid
-        // indices; duplicated faces or an open back cannot satisfy closure.
-        let edges = #{}; let valid = true; let offset = 0;
+        // Every edge has two oppositely directed uses. Incidence alone would
+        // accept a reversed face and its incorrect single-sided lighting.
+        let edges = #{}; let directions=#{}; let valid = true; let offset = 0;
         for count in counts {
             if count != 4 || offset + count > indices.len() { valid = false; break; }
             for edge in 0..count {
@@ -649,10 +649,13 @@ fn bus_checks(doc, source, bus_root) {
                 let key = if a < b { a.to_string() + ":" + b.to_string() }
                     else { b.to_string() + ":" + a.to_string() };
                 edges[key] = if edges[key] == () { 1 } else { edges[key] + 1 };
+                let direction=if a<b {1} else {-1};
+                directions[key]=if directions[key]==() {direction} else {directions[key]+direction};
             }
             offset += count;
         }
         for incidence in edges.values() { if incidence != 2 { valid = false; } }
+        for balance in directions.values() {if balance!=0 {valid=false;}}
         checks.push(_count_constraint("GBC-009-closed-" + label, "gbc009",
             if valid && edges.len() == 12 && offset == indices.len() { 1 } else { 0 }, 1));
         let extent = _mesh_extent(points);
@@ -692,6 +695,41 @@ fn bus_checks(doc, source, bus_root) {
         }
     }
 
+    // One material owns all blanket faces; evaluate the source-owned shader
+    // controls together rather than adding a requirement for every input.
+    let material=root+"/Looks/ExteriorPanels";let shader=material+"/Surface";
+    let surface=assembly_builder::composed_query(doc,#{path:shader,children:false});
+    let finish_error=1.0;
+    if _query_ok(surface) && surface.type_name=="Shader"
+        && surface.attrs["info:implementationSource"]=="sourceAsset"
+        && surface.attrs["info:wgsl:sourceAsset"]=="lunco://shaders/mli_foil.wgsl"
+        && surface.attrs["info:id"]==() {
+        finish_error=0.0;
+        for input in griffin_spec::bus_foil_shader_inputs() {
+            let expected=model.value(visual(input.source));
+            let actual=surface.attrs["inputs:"+input.input];
+            if input.color {
+                if !array_is(actual) || actual.len()!=3 || !array_is(expected) || expected.len()!=3 {
+                    finish_error=1.0;continue;
+                }
+                for axis in 0..3 {finish_error=_max_number(finish_error,(actual[axis]-expected[axis]).abs());}
+            } else {
+                let actual_number=f64_from(actual);let expected_number=f64_from(expected);
+                if actual_number==() || expected_number==() {finish_error=1.0;continue;}
+                finish_error=_max_number(finish_error,(actual_number-expected_number).abs());
+            }
+        }
+    }
+    checks.push(_tolerance_constraint("GBC-012-blanket-shader-inputs", "gbc012",
+        finish_error, appearance_tolerance));
+    let binding_error=0.0;
+    for index in 1..9 {
+        let facet=assembly_builder::composed_query(doc,#{path:root+"/ExteriorFacet"+index.to_string(),
+            attrs:[],rels:["material:binding"]});
+        if !_query_ok(facet) || facet.relationships["material:binding"]!=[material] {binding_error=1.0;}
+    }
+    checks.push(_tolerance_constraint("GBC-012-blanket-shared-binding", "gbc012",
+        binding_error, appearance_tolerance));
     checks
 }
 

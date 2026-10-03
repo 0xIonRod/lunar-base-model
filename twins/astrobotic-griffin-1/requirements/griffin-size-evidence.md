@@ -1109,3 +1109,58 @@ Seven hollow exits and the four corner-leg tripods are visible. Underside
 inspection lighting remains too dark, and the frame-selection command rejected
 the bus path; the view was manually framed using ordinary Editor orbit/zoom
 input. Neither that framing failure nor warm camera/reload behavior is a PASS.
+
+
+## Silver bus blankets and unobstructed ramp shafts — 2026-10-03
+
+The pale crumpled exterior blankets and narrow gold seams in
+https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png are the
+appearance reference. The existing LunCoSim `mli_foil` shader is reused on one
+shared bus material, with controls owned by GriffinVisualConfiguration. Valley
+RGB (0.58, 0.59, 0.57), crinkle density 26/m, facet contrast 0.65, sheen 0.10
+and axial scale 1.0 are explicit artistic estimates from an uncalibrated photo.
+They retain a pale silver belt with centimetre-scale shading; lower sheen avoids
+nearly black grazing faces under Editor inspection lighting. They do not
+establish measured optical or thermal properties, actual blanket construction
+or mesh wrinkles. The original flat-material controls were removed.
+
+A reversed end quad in the shared prism topology affected eight bus facets,
+four standalone ramp track meshes and twelve integrated ramp track meshes.
+The existing closure observation now requires two opposite directed uses of
+each edge; incidence two alone had accepted the reversed face. The corrected
+indices change surface winding without changing vertices, bounds or the convex
+collision point cloud. No new requirement was added for each individual face.
+
+The two root ramp hinge shafts still spanned 2.592 m despite the existing
+source-owned split-shaft layout. They now match its 1.408 m span, derived from
+`2 * (rampCenterRailOffsetZM - rampRailWidthM / 2)`, leaving tire corridors
+clear. The reference is https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png
+and the operator's observed hinge obstruction. This remains an approximate
+reconstruction of paired open trusses, not a released hinge drawing. The other
+four section shafts already matched this value.
+
+Typed owners saved the bus document 115973312757691 through generation 60,
+vehicle 115973305098730 through generation 17, and standalone section documents
+115976141711457/115976141711458 through generation 2. Saved-source production
+gates at 60 Hz, one thread, zero jitter, source revision
+5926034440915050438:
+
+- Bus **PASS 355**, tick 28: `terrain/target/griffin-silver-blanket-bus-gate.log`.
+- Ramp **PASS 1277**: `terrain/target/griffin-ramp-winding-hinge-gate.log`.
+
+Fresh owned Editor port 49756 loaded the combined review source, document /
+preview 115976867617853, view 7, projected generation 0 ready. Its composed
+bus shader read back the shared foil asset and final controls. The focused
+assembled view is `terrain/target/assembly-editor/griffin-silver-foil-assembled.png`;
+the close finish view is `terrain/target/assembly-editor/griffin-silver-foil-refined.png`.
+This is visual/component evidence, not a landing or egress verdict.
+
+A separate generic Editor query defect was corrected in local core commit
+2711489c1: explicit document queries now recognize a live standalone preview
+as the canonical geometry owner. The production `usd_material_edit_projection`
+windowed gate passes, including translate/scale readback and source replacement.
+However, clearing a simulation scene can still leave a retained preview empty
+and pending; the accepted frame-selection command also did not reframe this
+review view. Ordinary Editor zoom provided the inspected image. Warm scene
+reload, landing replay and camera lifecycle remain unresolved and are not
+claimed by either component PASS above.

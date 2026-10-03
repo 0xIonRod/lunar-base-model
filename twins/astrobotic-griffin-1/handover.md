@@ -3,6 +3,21 @@
 **Latest update:** 2026-10-03 (older sections retain their original evidence scope)
 
 
+## Latest visual and Editor update
+
+Seven hollow main nozzles and the raised skirt frame are committed in `fed8e99`.
+The silver exterior now reuses the shared LunCoSim foil shader with explicit
+photo-based estimates in GriffinVisualConfiguration. Prism end-face winding
+is corrected, and the two root ramp shafts match the existing 1.408 m
+source-owned split-shaft layout. Saved-source bus PASS 355 and ramp PASS 1277;
+see the latest evidence section and focused assembled screenshot. Physical
+egress remains unaccepted.
+
+Core commit `2711489c1` fixes stale explicit geometry queries in standalone
+Editor previews; its windowed production projection gate passes. It is local
+and unmerged. ClearScene can still empty retained previews, and deterministic
+landing/reload remains FAIL; keep these separate from visual gate results.
+
 ## Latest landing-gear state
 
 The canonical vehicle uses one inclined bus-to-foot prismatic joint per leg;

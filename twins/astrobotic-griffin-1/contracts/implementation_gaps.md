@@ -5,6 +5,22 @@
 vehicle, and the generic Rust/Rhai/Editor capabilities needed to build and
 verify the model.
 
+## Current bounded update — 2026-10-03
+
+The current saved bus/ramp fixtures pass 355/1277 checks after shared silver
+foil authoring, directed mesh-winding correction and root shaft clearance.
+Photo estimates and owner/readback evidence are recorded in
+`requirements/griffin-size-evidence.md`. The current seven-engine underside
+passed its separate clearance and configuration gates. These close bounded
+geometry assertions, not physical landing, egress or reload.
+
+Local core `2711489c1` admits the tracked standalone Editor preview as a live
+canonical reader for explicit document geometry queries. The production
+windowed material/geometry projection regression passes. Retained previews
+can still be emptied by ClearScene; warm reload and deterministic landing
+remain unresolved. Do not merge the pending core stack as an accepted
+deterministic-reload fix.
+
 ## Finding
 
 The Twin has source-owned parameters, split requirements, a componentized
