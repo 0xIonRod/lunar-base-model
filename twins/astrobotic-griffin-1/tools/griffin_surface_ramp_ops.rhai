@@ -51,23 +51,57 @@ fn _command_section_unfold(stage, target, publish_start) {
         emit(if stage=="middle" {unfold_event_contract().middle_commanded}
             else {unfold_event_contract().toes_commanded});
     }
-    print("[griffin] "+stage+" section unfold target accepted: "+target.to_string()+" rad");
+    if publish_start {print("[griffin] "+stage+" section unfold started");}
     #{ok:true,command:command,expected_angles:expected}
 }
 
+// Quintic command interpolation has zero endpoint speed and acceleration.
+// Avian still owns the driven bodies: no pose or velocity is overwritten.
+fn _begin_section_motion(stage, start, target, publish_start) {
+    let duration=griffin_spec::physical_ramp_unfold_quarter_turn_duration_s();
+    if duration==() || !duration.is_finite() || duration<=0.0
+        || start==() || target==() || !start.is_finite() || !target.is_finite() {
+        return #{ok:false,error:"ramp quarter-turn source is unavailable or invalid"};
+    }
+    let result=_command_section_unfold(stage,start,publish_start);
+    if result.ok!=true {return result;}
+    result.motion=#{start_tick:sim_tick(),start_target:start,target:target,duration_s:duration};
+    result
+}
+
 fn unfold_middle_sections() {
-    _command_section_unfold("middle",
+    _begin_section_motion("middle",griffin_spec::physical_ramp_section_stowed_joint_angle_rad(),
         griffin_spec::physical_ramp_section_unfold_waypoint_joint_angle_rad(),true)
 }
 
 fn unfold_toes() {
-    _command_section_unfold("toe",
+    _begin_section_motion("toe",griffin_spec::physical_ramp_section_stowed_joint_angle_rad(),
         griffin_spec::physical_ramp_section_unfold_waypoint_joint_angle_rad(),true)
 }
 
 // The scenario owns state and timing. Return the next expected snapshot
 // explicitly; do not try to mutate the caller's Rhai map through a parameter.
-fn section_unfold_progress(expected, stage, final_commanded, waypoints) {
+fn section_unfold_progress(expected, stage, final_commanded, waypoints, motion) {
+    if motion!=() {
+        let clocks=clock_snapshot();
+        if clocks.fixed_dt_s==() || !clocks.fixed_dt_s.is_finite() || clocks.fixed_dt_s<=0.0
+            || clocks.sim_tick<motion.start_tick {
+            return #{ok:false,error:"ramp motion has no valid admitted simulation clock"};
+        }
+        let elapsed=(clocks.sim_tick-motion.start_tick).to_float()*clocks.fixed_dt_s;
+        let u=min(1.0,max(0.0,elapsed/motion.duration_s));
+        let fraction=u*u*u*(10.0+u*(-15.0+6.0*u));
+        let target=if u>=1.0 {motion.target}
+            else {motion.start_target+(motion.target-motion.start_target)*fraction};
+        let command=_command_section_unfold(stage,target,false);
+        if command.ok!=true {return command;}
+        expected=command.expected_angles;
+        if u<1.0 {
+            return #{ok:true,settled:false,evidence:(),waypoint_evidence:waypoints,
+                expected_angles:expected,final_commanded:final_commanded,motion:motion};
+        }
+        motion=();
+    }
     let evidence=griffin_surface_ops::physical_ramp_hinges_settled(expected,
         griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
     if evidence.ok!=true {
@@ -75,16 +109,17 @@ fn section_unfold_progress(expected, stage, final_commanded, waypoints) {
             evidence:evidence};
     }
     if evidence.settled==true && !final_commanded {
-        let next=_command_section_unfold(stage,
+        let next=_begin_section_motion(stage,
+            griffin_spec::physical_ramp_section_unfold_waypoint_joint_angle_rad(),
             griffin_spec::physical_ramp_section_deployment_joint_angle_rad(),false);
         if next.ok!=true {return next;}
         waypoints.push(#{stage:stage,evidence:evidence});
         return #{ok:true,settled:false,evidence:evidence,
             waypoint_evidence:waypoints,expected_angles:next.expected_angles,
-            final_commanded:true};
+            final_commanded:true,motion:next.motion};
     }
     #{ok:true,settled:evidence.settled && final_commanded,evidence:evidence,
-        waypoint_evidence:waypoints,expected_angles:expected,final_commanded:final_commanded}
+        waypoint_evidence:waypoints,expected_angles:expected,final_commanded:final_commanded,motion:motion}
 }
 
 // Final traversal gate includes every hinge, not only the roots. One angle

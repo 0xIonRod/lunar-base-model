@@ -45,6 +45,7 @@ fn on_start(me, ctx) {
     this.minimum_position_y = 1.0e30;
     this.maximum_position_y = -1.0e30;
     this.all_four_contact_samples = 0;
+    this.contact_drop_samples = [];
     this.touchdown_samples = 0;
     this.last = #{};
     // Resolve the SysML projection once. Re-querying the full validation map
@@ -164,6 +165,7 @@ fn emit_stability_verdict(me, contract, source) {
         minimum_reference_y_m: if me.sample_count > 0 { me.minimum_position_y } else { () },
         maximum_reference_y_m: if me.sample_count > 0 { me.maximum_position_y } else { () },
         all_four_contact_samples: me.all_four_contact_samples,
+        contact_drop_samples: me.contact_drop_samples,
         touchdown_samples: me.touchdown_samples,
         all_post_touchdown_samples_contact: me.all_post_touchdown_samples_contact,
         finite: me.finite,
@@ -352,6 +354,14 @@ fn on_tick(me, ctx) {
                 this.all_four_contact_samples += 1;
             } else {
                 this.all_post_touchdown_samples_contact = false;
+                // Keep bounded diagnostic evidence for the failed existing
+                // contact predicate; this does not change its acceptance rule.
+                if this.contact_drop_samples.len() < 16 {
+                    this.contact_drop_samples.push(#{tick:tick, position:position,
+                        leg_contacts:sample.leg_contacts, linear_velocity_mps:sample.linear_velocity_mps,
+                        angular_speed:sample.angular_speed, thrust_n:sample.engine_thrust_n,
+                        landing_handoff:sample.landing_handoff});
+                }
             }
             if sample.touchdown != () && sample.touchdown >= 0.999 {
                 this.touchdown_samples += 1;

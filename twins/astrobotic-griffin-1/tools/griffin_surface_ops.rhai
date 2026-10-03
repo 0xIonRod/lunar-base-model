@@ -550,6 +550,8 @@ fn landing_stability_sample() {
         angular_speed: angular_speed,
         touchdown: get(lander, "touchdown"),
         all_legs_contact: get(lander, "all_legs_contact"),
+        leg_contacts: [get(lander, "leg_contact_px"), get(lander, "leg_contact_nx"),
+            get(lander, "leg_contact_pz"), get(lander, "leg_contact_nz")],
         landing_contact: get(lander, "landing_contact"),
         any_leg_contact: get(lander, "any_leg_contact"),
         engine_cutoff_contact: get(lander, "engine_cutoff_contact"),

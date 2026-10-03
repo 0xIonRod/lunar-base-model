@@ -21,6 +21,16 @@ can still be emptied by ClearScene; warm reload and deterministic landing
 remain unresolved. Do not merge the pending core stack as an accepted
 deterministic-reload fix.
 
+The latest smooth-ramp pair passes the unchanged 60-second landing stability
+predicate: four-foot contact in all 361 samples of each fresh run, no contact
+drop records, measured ramp deployment and adapter release. Six-second
+quintic quarter-turn commands are an explicit SysML study estimate; the source
+ramp gate remains PASS 1277. Fresh-process determinism still FAILS (0.11 mm X
+divergence versus 1 micrometre limit). Full route and warm reload remain open.
+Local core `3a70f8692` fixes script-admitted command sampling before Modelica
+dispatch, with red/green production rocket evidence (PASS 15 after the fix).
+The lander-controls fixture fails the same eight assertions on both binaries.
+
 ## Finding
 
 The Twin has source-owned parameters, split requirements, a componentized

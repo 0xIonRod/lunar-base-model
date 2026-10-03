@@ -115,6 +115,7 @@ fn on_start(me, ctx) {
     this.rover_settle_probe_tick = ();
     this.ramp_settle_probe_tick = ();
     this.ramp_sections_expected = ();
+    this.ramp_section_motion = ();
     this.ramp_section_final_commanded = false;
     this.ramp_unfold_waypoint_evidence = [];
     this.ramp_deployment_expected = ();
@@ -431,6 +432,7 @@ fn ramp_unfold_task() {
                 this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-middle-unfold-command");
             } else {
                 this.ramp_sections_expected = middle.expected_angles;
+                this.ramp_section_motion = middle.motion;
             }
             true
         }),
@@ -451,7 +453,7 @@ fn ramp_unfold_task() {
                     this.ramp_settle_probe_tick = tick;
                     let progress=griffin_surface_ramp_ops::section_unfold_progress(
                         this.ramp_sections_expected,"middle",this.ramp_section_final_commanded,
-                        this.ramp_unfold_waypoint_evidence);
+                        this.ramp_unfold_waypoint_evidence,this.ramp_section_motion);
                     if progress.ok!=true {
                         this.ramp_timeout=true;
                         this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-middle-unfold-progress");
@@ -460,6 +462,7 @@ fn ramp_unfold_task() {
                     this.ramp_section_settle_evidence=progress.evidence;
                     this.ramp_sections_expected=progress.expected_angles;
                     this.ramp_section_final_commanded=progress.final_commanded;
+                    this.ramp_section_motion=progress.motion;
                     this.ramp_unfold_waypoint_evidence=progress.waypoint_evidence;
                     progress.settled
                 })
@@ -492,6 +495,7 @@ fn ramp_unfold_task() {
                 this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-toe-unfold-command");
             } else {
                 this.ramp_sections_expected = toes.expected_angles;
+                this.ramp_section_motion = toes.motion;
             }
             true
         }),
@@ -512,7 +516,7 @@ fn ramp_unfold_task() {
                     this.ramp_settle_probe_tick = tick;
                     let progress=griffin_surface_ramp_ops::section_unfold_progress(
                         this.ramp_sections_expected,"toe",this.ramp_section_final_commanded,
-                        this.ramp_unfold_waypoint_evidence);
+                        this.ramp_unfold_waypoint_evidence,this.ramp_section_motion);
                     if progress.ok!=true {
                         this.ramp_timeout=true;
                         this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-toe-unfold-progress");
@@ -521,6 +525,7 @@ fn ramp_unfold_task() {
                     this.ramp_section_settle_evidence=progress.evidence;
                     this.ramp_sections_expected=progress.expected_angles;
                     this.ramp_section_final_commanded=progress.final_commanded;
+                    this.ramp_section_motion=progress.motion;
                     this.ramp_unfold_waypoint_evidence=progress.waypoint_evidence;
                     progress.settled
                 })

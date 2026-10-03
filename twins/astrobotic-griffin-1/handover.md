@@ -10,8 +10,9 @@ The silver exterior now reuses the shared LunCoSim foil shader with explicit
 photo-based estimates in GriffinVisualConfiguration. Prism end-face winding
 is corrected, and the two root ramp shafts match the existing 1.408 m
 source-owned split-shaft layout. Saved-source bus PASS 355 and ramp PASS 1277;
-see the latest evidence section and focused assembled screenshot. Physical
-egress remains unaccepted.
+see the latest evidence section. The correctly framed assembly screenshot is
+`terrain/target/assembly-editor/griffin-current-framed.png`. Full-route egress
+remains unaccepted.
 
 Core commit `2711489c1` fixes stale explicit geometry queries in standalone
 Editor previews; its windowed production projection gate passes. It is local
@@ -30,9 +31,14 @@ the latest section of `requirements/griffin-size-evidence.md` for calculations.
 The nominal joint anchor is the foot hub in the bus frame, not the leg root.
 
 The geometry gate passes. Settled live samples show axial compression with
-transverse error around 12 micrometres or less. Both 60 s landing runs remain
-finite and upright, but four-pad contact briefly drops and fresh-process
-trajectories differ, so stability and determinism gates remain FAIL. Same-app
+transverse error around 12 micrometres or less. The latest smooth-ramp pair
+passes the unchanged 60 s landing stability predicate with 361/361 four-foot
+samples in each run. Six-second quintic quarter-turn commands reduce the
+observed ramp reaction; timing is explicitly a study estimate in SysML.
+Fresh-process trajectories still differ by 0.11 mm in X, above the 1 micrometre
+limit, so determinism remains FAIL. Core `3a70f8692` fixes script command
+sampling before Modelica dispatch (rocket regression PASS 15); the separate
+lander-controls fixture still fails eight assertions with both binaries. Same-app
 contact replay and mounted topology refresh safety are also unresolved. Do not
 merge the pending core changes to main as a deterministic-reload fix yet.
 

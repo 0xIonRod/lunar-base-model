@@ -1151,7 +1151,7 @@ gates at 60 Hz, one thread, zero jitter, source revision
 Fresh owned Editor port 49756 loaded the combined review source, document /
 preview 115976867617853, view 7, projected generation 0 ready. Its composed
 bus shader read back the shared foil asset and final controls. The focused
-assembled view is `terrain/target/assembly-editor/griffin-silver-foil-assembled.png`;
+assembled view is `terrain/target/assembly-editor/griffin-current-framed.png`;
 the close finish view is `terrain/target/assembly-editor/griffin-silver-foil-refined.png`.
 This is visual/component evidence, not a landing or egress verdict.
 
@@ -1160,7 +1160,49 @@ A separate generic Editor query defect was corrected in local core commit
 as the canonical geometry owner. The production `usd_material_edit_projection`
 windowed gate passes, including translate/scale readback and source replacement.
 However, clearing a simulation scene can still leave a retained preview empty
-and pending; the accepted frame-selection command also did not reframe this
-review view. Ordinary Editor zoom provided the inspected image. Warm scene
+and pending. The earlier frame-selection attempt targeted a nonexistent prim;
+the correct `/GriffinFlipVisual/Griffin1` path frames the complete assembly.
+This was an invocation error, not evidence of a frame-selection defect. Warm scene
 reload, landing replay and camera lifecycle remain unresolved and are not
 claimed by either component PASS above.
+
+## Ramp reaction loads and fresh landing trials — 2026-10-03
+
+The post-command-ordering trial lost the NZ foot at ticks 1520 and 1560,
+inside the middle-section unfold (start 1491, settled 1563). Native engine
+thrust was zero at both losses. The bounded contact-drop records retain the
+four individual contacts, position, velocity, angular speed and handoff;
+they diagnose the existing four-foot predicate without changing it.
+
+`physicalRampUnfoldQuarterTurnDurationS = 6.0` now owns the command timing.
+Each quarter-turn follows quintic interpolation with zero endpoint speed and
+acceleration, on the admitted simulation tick lattice. A 90-degree motion has
+15 degrees/s average and 28.125 degrees/s peak commanded speed. Six seconds
+is a conservative simulation-study estimate chosen to reduce the measured
+gear reaction to the former abrupt command, not a supplier actuator rating.
+The qualitative fold reference is
+https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png ; it supplies no
+actuation timing. The existing angle/speed settlement checks remain mandatory
+between quarters and before payload release. Avian owns all body motion.
+
+Two fresh production trials at 60 Hz, one thread, zero jitter, source revision
+13873018758900720979, each passed the unchanged 60-second landing-stability
+predicate: **361/361 four-foot samples**, no contact-drop records, touchdown
+tick 1394, final tick 5000. Maximum angular speed was 0.01072/0.02021 rad/s;
+maximum horizontal drift was 0.21562/0.21559 m. Both completed measured ramp
+deployment and adapter release before the horizon. The separate saved-source
+ramp gate passed **1277** checks at that revision.
+
+Evidence: `terrain/target/griffin-smooth-ramp-landing-replay/run-{1,2}.json`
+and `.log`, plus `terrain/target/griffin-smooth-ramp-source-gate.log`.
+Fresh-process repeatability still **FAILS**: final X differs by 0.000112161 m,
+above the unchanged 0.000001 m replay limit. Stability PASS does not establish
+deterministic reload, full route completion, reflight or flight qualification.
+
+Local core commit `3a70f8692` samples script-admitted inputs after ScriptingSet
+and before Modelica step dispatch. The production rocket-engine boundary
+regression failed with an adjacent accepted step consuming the old throttle;
+the corrected ordering passes all 15 checks. The separate lander-controls
+fixture fails the same eight assertions with both the old and new binaries.
+It remains an independent control/fixture defect; no tolerance was weakened.
+The pending core stack is not merged as a deterministic-reload fix.
