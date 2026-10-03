@@ -1206,3 +1206,26 @@ the corrected ordering passes all 15 checks. The separate lander-controls
 fixture fails the same eight assertions with both the old and new binaries.
 It remains an independent control/fixture defect; no tolerance was weakened.
 The pending core stack is not merged as a deterministic-reload fix.
+
+## Retained observer identity and report lifecycle — 2026-10-03
+
+The isolated Twin host created by RunScenarioAsset had no global identity;
+simulation queries rejected it with “no live scenario owns this simulation
+access.” The core host now declares authoritative provenance and receives its
+identity from the existing session admission owner. Production rebuild and
+same-app readback confirm a nonzero retained identity and working declared
+physics reads across replacement. This closes the observer authorization
+defect, not physical determinism.
+
+The landing-stability observer also mutated its report latch on a copied Rhai
+map argument. It therefore rebuilt the full report every tick after its
+horizon, slowing longer diagnostics substantially. The scenario caller now
+owns that latch. The corrected live trial emitted exactly one stability
+metrics record through its first 90-second trajectory.
+
+Evidence: `terrain/target/griffin-twin-host-single-report-reload.log`.
+Two same-app replacements still **FAIL** at relative tick 60, before ground
+contact: reference/sample Y position 59.199830788144354/59.1998353552034 m,
+angular speed 0.3271466051275888/0.3390591487815587 rad/s, with identical zero
+engine thrust and identical reported vehicle mass. Articulated initialization
+must be traced before the pending core stack is merged as a reload fix.

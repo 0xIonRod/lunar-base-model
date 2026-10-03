@@ -266,7 +266,6 @@ fn emit_stability_verdict(me, contract, source) {
     report.metrics = metrics;
     report.contract = contract;
     report_structured_verdict(report, "GRIFFIN LANDING STABILITY", "GRIFFIN_LANDING_STABILITY");
-    me.stability_done = true;
 }
 
 fn on_tick(me, ctx) {
@@ -398,4 +397,7 @@ fn on_tick(me, ctx) {
     if !this.touchdown_seen || this.elapsed < contract.horizon_s { return; }
     let source = sysml_requirements::source();
     emit_stability_verdict(this, contract, source);
+    // Rhai map arguments are values. The caller owns the report latch; a
+    // helper's mutation of `me` does not persist in scenario state.
+    this.stability_done = true;
 }
