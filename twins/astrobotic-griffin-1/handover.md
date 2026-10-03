@@ -118,3 +118,12 @@ The current prioritized implementation gaps and standards review live in
 [`contracts/implementation_gaps.md`](contracts/implementation_gaps.md). Keep
 that review as the current status source; this handover records the Twin's
 authored ownership and work sequence.
+
+2026-10-04: corrected the protruding engine-skirt corners. One mitered octagonal
+rail and matching shell now derive from the body profile; the source records
+image references and estimated stock/envelope sizes. Existing propulsion gate:
+PASS 94, with bell fit and bus-footprint containment. Fresh Editor review on
+owned 49758 confirms the square corners are gone. Warm-reload mismatch remains
+open. Next priority is the reported held-Space short hop versus repeated-Space
+liftoff: compare live control ownership, held input, delivered force and mass;
+chamber feed pressure is not a thrust measurement.

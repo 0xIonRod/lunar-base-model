@@ -70,14 +70,15 @@ package GriffinPropulsionRequirements {
     part def GriffinEngineSkirtComponent {
         attribute usdRootPath : String = "/World/Griffin1/Nozzle/MainEngineCluster";
         attribute componentRootName : String = "EngineSkirt";
-        attribute componentMemberNames : String[4] = ("RailFront", "RailRear", "RailPort", "RailStarboard");
-        attribute railFrontCenterZM : Real = railLengthM / 2.0 - railWidthM / 2.0;
-        attribute railRearCenterZM : Real = -railFrontCenterZM;
-        attribute railPortCenterXM : Real = railFrontCenterZM;
-        attribute railStarboardCenterXM : Real = -railPortCenterXM;
-        // Match the estimated 3.44 m bus span and leave 110 mm from the
-        // 1.19 m ring's full bell envelopes to the inner rail faces.
-        // Packaging estimate, not a supplier engine-frame dimension.
+        attribute perimeterRailName : String = "PerimeterRail";
+        // Continuous mitered octagon, sharing the normalized outerBodyProfileCoordinates
+        // of GriffinVisualConfiguration. The 3.44 m across-flats envelope is
+        // inset 80 mm from the estimated 3.60 m bus on each cardinal side.
+        // This avoids a square frame extending outside the bus chamfers.
+        // PGH photo: https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
+        // ESA depiction: https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
+        // Both establish the clipped footprint qualitatively; 80 mm stock,
+        // envelope and taper remain packaging estimates, not measured hardware.
         attribute railLengthM : Real = 3.44;
         attribute railWidthM : Real = 0.08;
         attribute railHeightM : Real = 0.08;
@@ -105,7 +106,6 @@ package GriffinPropulsionRequirements {
         // that encloses the bell exits while passing simple dimension checks.
         attribute minimumVisibleBellHeightFraction : Real = 0.30;
         attribute colliderPolicy : String = "render-only frame; no physics collision or thrust authority";
-        attribute transformOrder : String[2] = ("xformOp:translate", "xformOp:scale");
     }
 
     part def GriffinAttitudeEngineAssembly {
@@ -249,7 +249,7 @@ package GriffinPropulsionRequirements {
     }
 
     requirement def GES001_SkirtTopology {
-        doc /* GES-001 [topology] exactly four named skirt rails form one closed frame around the seven-engine cluster. */
+        doc /* GES-001 [topology] one named continuous mitered octagonal skirt rail forms a closed frame around the seven-engine cluster. */
     }
     requirement def GES002_SkirtEnvelope {
         doc /* GES-002 [geometry] the rail envelope, rail section, open-ended shell, and adapter plate shall use their typed dimensions and station datums in GriffinEngineSkirtComponent. */
@@ -279,8 +279,22 @@ package GriffinPropulsionRequirements {
     requirement def GES005_SkirtOwnership {
         doc /* GES-005 [ownership] skirt geometry is render-only and cannot introduce thrust, collider, or physics authority. */
     }
+    constraint def GESC006_OctagonalProfile {
+        in topologyMismatches : Integer;
+        in maximumRailPointErrorM : Real;
+        in maximumShellPointErrorM : Real;
+        in maximumBusOverhangM : Real;
+        in toleranceM : Real;
+        topologyMismatches == 0
+            and maximumRailPointErrorM <= toleranceM
+            and maximumShellPointErrorM <= toleranceM
+            and maximumBusOverhangM <= toleranceM;
+    }
     requirement def GES006_RailGeometry {
-        doc /* GES-006 [geometry] the four named skirt rails shall match railLengthM, railWidthM, railHeightM, and the signed center stations in GriffinEngineSkirtComponent. */
+        require GESC006_OctagonalProfile {
+            in toleranceM = GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
+        doc /* GES-006 [geometry] the continuous skirt rail shall match railLengthM across flats, railWidthM normal to each edge, railHeightM and componentLocalCenterYM. Both rail and shell shall follow GriffinVisualConfiguration::outerBodyProfileCoordinates; all of their vertices shall remain inside the bus footprint. The bottom inset tapers the shell; it shall not define the plan-view corner clip. */
     }
     requirement def GES007_ShellAndAdapterEnvelope {
         doc /* GES-007 [geometry] the tapered shell shall use its typed upper/lower Y limits, and the adapter plate shall match its typed dimensions and declared datum. The plate center derives from the throat upper end and its own thickness, not from the skirt rail plane. */

@@ -4299,10 +4299,13 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         return plan_error("refine_griffin_engine_skirt_plan requires a document, edit target, and absolute root");
     }
     let selected=[];
-    for name in ["railLengthM","railHeightM","railWidthM","shellDepthM","shellBottomInsetM","adapterPlateName","adapterPlateWidthM","adapterPlateDepthM","adapterPlateHeightM","componentLocalCenterYM","adapterPlateCenterYM"] {
+    for name in ["perimeterRailName","railLengthM","railHeightM","railWidthM","shellDepthM","shellBottomInsetM","adapterPlateName","adapterPlateWidthM","adapterPlateDepthM","adapterPlateHeightM","componentLocalCenterYM","adapterPlateCenterYM"] {
         selected.push("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::"+name);
     }
     let source = sysml_requirements::source_with_attributes(selected);
+    let name=sysml_requirements::text(source,
+        "GriffinPropulsionRequirements::GriffinEngineSkirtComponent::perimeterRailName");
+    if name==() || name=="" {return plan_error("engine-skirt requires a continuous rail identity");}
     // The component owns its typed rail envelope. Avoid duplicated lander
     // geometry fields and source-path indirection.
     let width = _skirt_number(source, "railLengthM");
@@ -4326,45 +4329,31 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         || shell_depth <= 0.0 || shell_inset <= 0.0
         || shell_inset >= width / 2.0 || shell_inset >= depth / 2.0
         || adapter_width <= 0.0 || adapter_depth <= 0.0 || adapter_height <= 0.0 {
-        return plan_error("engine-skirt SysML metric dimensions are missing");
+        return plan_error("engine-skirt SysML metric dimensions are missing or invalid: "+[width,depth,height,section,shell_depth,shell_inset,local_center_y,adapter_name,adapter_width,adapter_depth,adapter_height,adapter_center_y].to_string());
     }
-    // The isolated component owns the skirt geometry; assembly-local legacy
-    // beam opinions are removed during the one-time Editor migration.
-    let paths = [
-        root + "/RailFront", root + "/RailRear",
-        root + "/RailPort", root + "/RailStarboard",
-    ];
-    let rail_x = width / 2.0 - section / 2.0;
-    let rail_z = depth / 2.0 - section / 2.0;
-    // This document is the reusable component asset.  Its parent instance
-    // owns the global engineClusterMountYM; applying that global value here would
-    // double-translate every rail when the component is referenced.
-    let rail_y = local_center_y;
-    let specs = [
-        // Rails run to the outer envelope; their centres are inset by half
-        // the section so adjacent members meet without a corner gap.
-        // USD Cube size is one metre, so these are full physical envelopes;
-        // halving them here silently produced rails that were half the SysML
-        // requirement and made the skirt look detached from the engine bay.
-        #{path: paths[0], translation: [0.0, rail_y, rail_z], scale: [width, height, section]},
-        #{path: paths[1], translation: [0.0, rail_y, -rail_z], scale: [width, height, section]},
-        #{path: paths[2], translation: [rail_x, rail_y, 0.0], scale: [section, height, depth]},
-        #{path: paths[3], translation: [-rail_x, rail_y, 0.0], scale: [section, height, depth]},
-    ];
-    let ops = [];
-    for spec in specs {
-        let existing = _component_query(doc, spec.path);
-        if !query_ok(existing) { return plan_error(spec.path + ": engine-skirt rail is missing"); }
-        if existing.type_name != "Cube" { return plan_error(spec.path + ": expected Cube, got " + existing.type_name); }
-        let placement = assembly_builder::place_plan(edit_target, spec.path,
-            spec.translation, (), spec.scale);
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: spec.path,
-            name: "purpose", type_name: "token", value: "\"render\""}});
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: spec.path,
-            name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
+    let profile=griffin_spec::visual_outer_body_profile_coordinates();
+    let ring=griffin_geometry::octagonal_ring_geometry(profile,width/2.0,
+        local_center_y,section,height);
+    if !ring.ok {return plan_error(ring.error);}
+    let paths=[root+"/"+name];
+    let ops=[];
+    // Retire the square-frame topology through the document owner.
+    for name in ["RailFront","RailRear","RailPort","RailStarboard"] {
+        let path=root+"/"+name;
+        if query_ok(_component_query(doc,path)) {
+            ops.push(#{RemovePrim:#{edit_target:edit_target,path:path}});
+        }
     }
+    let existing=_component_query(doc,paths[0]);
+    if query_ok(existing) && existing.type_name!="Mesh" {
+        return plan_error(paths[0]+": expected Mesh");
+    }
+    let rail=assembly_builder::mesh_shape_plan(edit_target,root,name,
+        ring.points,ring.face_counts,ring.face_indices,[0.07,0.09,0.12],false);
+    if !rail.ok {return rail;}
+    for op in rail.ops {if query_ok(existing) && op.AddPrim!=() {continue;} ops.push(op);}
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:paths[0],
+        name:"purpose",type_name:"token",value:"\"render\""}});
     let adapter_path = root + "/" + adapter_name;
     let adapter = _component_query(doc, adapter_path);
     if query_ok(adapter) && adapter.type_name != "Cube" {
@@ -4396,26 +4385,12 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     {
         let y_top = local_center_y + height / 2.0;
         let y_bottom = y_top - shell_depth;
-        let top_x = width / 2.0;
-        let top_z = depth / 2.0;
-        let corner = shell_inset;
-        let top_x_bevel = top_x - corner;
-        let top_z_bevel = top_z - corner;
-        let points = [
-            [-top_x, y_top, top_z_bevel], [-top_x_bevel, y_top, top_z],
-            [top_x_bevel, y_top, top_z], [top_x, y_top, top_z_bevel],
-            [top_x, y_top, -top_z_bevel], [top_x_bevel, y_top, -top_z],
-            [-top_x_bevel, y_top, -top_z], [-top_x, y_top, -top_z_bevel],
-            [-top_x, y_bottom, top_z_bevel], [-top_x_bevel, y_bottom, top_z],
-            [top_x_bevel, y_bottom, top_z], [top_x, y_bottom, top_z_bevel],
-            [top_x, y_bottom, -top_z_bevel], [top_x_bevel, y_bottom, -top_z],
-            [-top_x_bevel, y_bottom, -top_z], [-top_x, y_bottom, -top_z_bevel],
-        ];
-        for index in 8..16 {
-            for axis in [0,2] {
-                let coordinate=points[index][axis];
-                points[index][axis]=coordinate + if coordinate>0.0 {-shell_inset} else {shell_inset};
-            }
+        let points=[];
+        // The fairing shares the bus outline; bottom inset is taper only,
+        // not an unrelated 60 mm corner clip.
+        for radius in [width/2.0,width/2.0-shell_inset] {
+            let y=if points.len()==0 {y_top} else {y_bottom};
+            for point in profile {points.push([point.x*radius,y,point.y*radius]);}
         }
         let mesh = assembly_builder::mesh_shape_plan(edit_target, root,
             "EngineSkirtShell", points, [4, 4, 4, 4, 4, 4, 4, 4],

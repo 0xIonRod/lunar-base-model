@@ -194,9 +194,9 @@ fn open_bell_mesh(points, counts, indices) {
 }
 
 // One composed snapshot of the skirt, plate, rail stock and throat ends.
-fn skirt_fit_observation(skirt_root, engine_records, bell_observations, tolerance) {
+fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observations, tolerance, profile, body_dimensions, radius, center_y, width, height, shell_depth, shell_inset) {
     let paths=[skirt_root+"/EngineSkirtShell",skirt_root+"/EngineAdapterPlate",skirt_root];
-    for name in ["RailFront","RailRear","RailPort","RailStarboard"] {paths.push(skirt_root+"/"+name);}
+    paths.push(skirt_root+"/"+rail_name);
     for record in engine_records {paths.push(record.path+"/Throat");}
     let batch=query("QueryUsdPrims",#{paths:paths,attrs:["points","xformOp:translate","xformOp:scale"]});
     let snapshot=_query_snapshot(batch);
@@ -212,6 +212,52 @@ fn skirt_fit_observation(skirt_root, engine_records, bell_observations, toleranc
     if contour.len()!=8 {return #{available:false,snapshot:snapshot};}
     let mount_y=mount.attrs["xformOp:translate"][1];
     let plate_bottom=mount_y+plate.attrs["xformOp:translate"][1]-plate.attrs["xformOp:scale"][1]/2.0;
+    let rail=batch.records[3];
+    let topology_record=query("QueryUsdPrim",#{path:skirt_root+"/"+rail_name,
+        attrs:["faceVertexCounts","faceVertexIndices"]});
+    if topology_record.doc_id!=snapshot.doc_id
+        || topology_record.document_generation!=snapshot.document_generation
+        || topology_record.stage_generation!=snapshot.stage_generation {
+        return #{available:false,snapshot:snapshot};
+    }
+    rail.attrs.faceVertexCounts=topology_record.attrs.faceVertexCounts;
+    rail.attrs.faceVertexIndices=topology_record.attrs.faceVertexIndices;
+    let expected=griffin_geometry::octagonal_ring_geometry(profile,radius,center_y,width,height);
+    if !expected.ok || rail.attrs.points==() || rail.attrs.points.len()!=32
+        || rail.attrs.faceVertexCounts==() || rail.attrs.faceVertexIndices==() {
+        return #{available:false,snapshot:snapshot};
+    }
+    let topology=(rail.attrs.faceVertexCounts.len()-expected.face_counts.len()).abs()
+        +(rail.attrs.faceVertexIndices.len()-expected.face_indices.len()).abs();
+    for i in 0..rail.attrs.faceVertexCounts.len() {
+        if i>=expected.face_counts.len() || rail.attrs.faceVertexCounts[i]!=expected.face_counts[i] {topology+=1;}
+    }
+    for i in 0..rail.attrs.faceVertexIndices.len() {
+        if i>=expected.face_indices.len() || rail.attrs.faceVertexIndices[i]!=expected.face_indices[i] {topology+=1;}
+    }
+    let rail_error=0.0;let shell_error=0.0;let overhang=0.0;
+    let body_contour=[];let inner_contour=[];
+    for point in profile {body_contour.push(vec3(point.x*body_dimensions.x/2.0,0.0,point.y*body_dimensions.z/2.0));}
+    for i in 0..rail.attrs.points.len() {
+        let actual=rail.attrs.points[i];
+        for axis in 0..3 {
+            let delta=(actual[axis]-expected.points[i][axis]).abs();
+            if delta>rail_error {rail_error=delta;}
+        }
+        let gap=griffin_geometry::convex_polygon_clearance_xz(vec3_from(actual),body_contour);
+        if gap==() {return #{available:false,snapshot:snapshot};}
+        if -gap>overhang {overhang=-gap;}
+        if i>=8 && i<16 {inner_contour.push(vec3_from(actual));}
+    }
+    for i in 0..16 {
+        let r=if i<8 {radius} else {radius-shell_inset};
+        let y=if i<8 {center_y+height/2.0} else {center_y+height/2.0-shell_depth};
+        let p=profile[i%8];let target=[p.x*r,y,p.y*r];let actual=shell.attrs.points[i];
+        for axis in 0..3 {let delta=(actual[axis]-target[axis]).abs();if delta>shell_error {shell_error=delta;}}
+        let gap=griffin_geometry::convex_polygon_clearance_xz(vec3_from(actual),body_contour);
+        if gap==() {return #{available:false,snapshot:snapshot};}
+        if -gap>overhang {overhang=-gap;}
+    }
     let clearance=1.0e30;let visible=1.0e30;let separation=1.0e30;
     for i in 0..engine_records.len() {
         let record=engine_records[i];let bell=bell_observations[i];
@@ -221,23 +267,18 @@ fn skirt_fit_observation(skirt_root, engine_records, bell_observations, toleranc
         if gap-bell.radius<clearance {clearance=gap-bell.radius;}
         let exposed=(mount_y+lower-center.y-bell.lower)/bell.height;
         if exposed<visible {visible=exposed;}
-        for rail_index in 3..7 {
-            let rail=batch.records[rail_index];let t=rail.attrs["xformOp:translate"];let scale=rail.attrs["xformOp:scale"];
-            if t==() || scale==() {return #{available:false,snapshot:snapshot};}
-            let dx=(center.x-t[0]).abs()-scale[0]/2.0;
-            let dz=(center.z-t[2]).abs()-scale[2]/2.0;
-            if dx<0.0 {dx=0.0;}if dz<0.0 {dz=0.0;}
-            let rail_gap=(dx*dx+dz*dz).sqrt()-bell.radius;
-            if rail_gap<clearance {clearance=rail_gap;}
-        }
-        let throat=batch.records[7+i];let points=throat.attrs.points;
+        let rail_gap=griffin_geometry::convex_polygon_clearance_xz(center,inner_contour);
+        if rail_gap==() {return #{available:false,snapshot:snapshot};}
+        rail_gap-=bell.radius;
+        if rail_gap<clearance {clearance=rail_gap;}
+        let throat=batch.records[4+i];let points=throat.attrs.points;
         if points==() || points.len()==0 {return #{available:false,snapshot:snapshot};}
         let throat_upper=-1.0e30;
         for p in points {if p[1]>throat_upper {throat_upper=p[1];}}
         let gap=plate_bottom-center.y-throat_upper;
         if gap<separation {separation=gap;}
     }
-    #{available:true,snapshot:snapshot,clearance:clearance,visible:visible,separation:separation}
+    #{available:true,snapshot:snapshot,clearance:clearance,visible:visible,separation:separation,topology:topology,rail_error:rail_error,shell_error:shell_error,overhang:overhang}
 }
 
 // Whole engine/tank interface: composed bounds include scaling and all named
@@ -350,11 +391,10 @@ fn on_tick(me, ctx) {
         "throatHeightM", "throatCenterYM", "minimumBellClearanceM", "minimumTankHardwareClearanceM", "clusterOuterRadiusM", "bellVisualWallThicknessM", "bellContourExponent"] {
         selected_attributes.push(own(name));
     }
-    for name in ["componentRootName", "componentMemberNames", "shellName",
-        "adapterPlateName", "componentLocalCenterYM", "railFrontCenterZM", "railRearCenterZM",
-        "railPortCenterXM", "railStarboardCenterXM", "railLengthM",
+    for name in ["componentRootName", "perimeterRailName", "shellName",
+        "adapterPlateName", "componentLocalCenterYM", "railLengthM",
         "railWidthM", "railHeightM", "shellDepthM", "adapterPlateWidthM",
-        "adapterPlateHeightM", "adapterPlateDepthM", "adapterPlateCenterYM", "minimumSkirtBellClearanceM", "minimumVisibleBellHeightFraction", "transformOrder"] {
+        "adapterPlateHeightM", "adapterPlateDepthM", "adapterPlateCenterYM", "minimumSkirtBellClearanceM", "minimumVisibleBellHeightFraction", "shellBottomInsetM"] {
         selected_attributes.push(skirt(name));
     }
     selected_attributes.push(parent("engineCount"));
@@ -363,7 +403,7 @@ fn on_tick(me, ctx) {
         selected_attributes.push("GriffinTankRequirements::GriffinPropellantTankAssembly::"+name);
     }
     for name in ["engineClusterMountYM", "engineStations", "geometryVerificationToleranceM",
-        "mainEngineInstances"] {
+        "mainEngineInstances", "outerBodyProfileCoordinates", "bodyDimensions"] {
         selected_attributes.push(visual(name));
     }
     let selected_requirements = [];
@@ -405,7 +445,7 @@ fn on_tick(me, ctx) {
     let required_clearance = sysml_requirements::number(source, own("minimumBellClearanceM"));
     let skirt_outer_radius = sysml_requirements::number(source, own("clusterOuterRadiusM"));
     let skirt_root = root + "/" + sysml_requirements::text(source, skirt("componentRootName"));
-    let skirt_names = sysml_requirement_checks::source_text_list(source, skirt("componentMemberNames"));
+    let rail_name=sysml_requirements::text(source,skirt("perimeterRailName"));
     let skirt_shell = skirt_root + "/" + sysml_requirements::text(source, skirt("shellName"));
     let skirt_width = sysml_requirements::number(source, skirt("railLengthM"));
     let skirt_depth = skirt_width;
@@ -417,8 +457,7 @@ fn on_tick(me, ctx) {
     let adapter_width = sysml_requirements::number(source, skirt("adapterPlateWidthM"));
     let adapter_depth = sysml_requirements::number(source, skirt("adapterPlateDepthM"));
     let adapter_height = sysml_requirements::number(source, skirt("adapterPlateHeightM"));
-    let skirt_transform_order = sysml_requirements::string_vector(source, skirt("transformOrder"));
-    let skirt_transform_order = if skirt_transform_order == () { [] } else { skirt_transform_order };
+
     let checks = [];
     checks.push(sysml_requirement_checks::source_list_count("GPP-001-count", "propulsion", "gpp001", VERIFICATION, visual("mainEngineInstances"), parent("engineCount")));
     checks.push(sysml_requirement_checks::source_list_count("GPP-005-stations", "engine", "gpp005", VERIFICATION, visual("engineStations"), parent("engineCount")));
@@ -709,40 +748,24 @@ fn on_tick(me, ctx) {
         "engine","gpp009",VERIFICATION,
         "GriffinPropulsionRequirements::GPPC009_TankHardwareSeparation",
         tank_bindings,"typed",0.0));
-    // The skirt is a separate referenced component.  Validate its four rails
+    // The skirt is a separate referenced component. Validate its continuous rail
     // and shell in the composed assembly; the source file remains the only
     // owner of the component geometry.
-    if skirt_names.len() == 4 && skirt_width != () && skirt_depth != ()
+    if rail_name!=() && rail_name!="" && skirt_width != () && skirt_depth != ()
         && skirt_height != () && skirt_section != ()
         && skirt_shell_depth != () && skirt_assembly_y != ()
         && adapter_name != () && adapter_name != ""
         && adapter_width != () && adapter_depth != () && adapter_height != ()
-        && skirt_transform_order.len() == 2 {
-        let rail_paths = [];
-        for name in skirt_names { rail_paths.push(skirt_root + "/" + name); }
+        {
+        let rail=skirt_root+"/"+rail_name;
         checks.push(sysml_requirement_checks::exists("GES-001-component", "engine_skirt", "ges001", VERIFICATION, skirt_root, "Xform"));
-        checks.push(sysml_requirement_checks::children("GES-001-rails", "engine_skirt", "ges001", VERIFICATION, skirt_root, rail_paths));
+        checks.push(sysml_requirement_checks::exists("GES-001-rail", "engine_skirt", "ges001", VERIFICATION, rail, "Mesh"));
         checks.push(component_position("GES-003-assembly-y", skirt_root, 1, skirt_assembly_y, geometry_tolerance));
-        for index in 0..skirt_names.len() {
-            let rail = rail_paths[index];
-            checks.push(component_position("GES-006-"+skirt_names[index]+"-y",rail,1,
-                sysml_requirements::number(source,skirt("componentLocalCenterYM")),geometry_tolerance));
-            checks.push(sysml_requirement_checks::exists("GES-001-" + skirt_names[index], "engine_skirt", "ges001", VERIFICATION, rail, "Cube"));
-            checks.push(sysml_requirement_checks::attribute_equals("GES-005-" + skirt_names[index] + "-purpose", "engine_skirt", "ges005", VERIFICATION, rail, "purpose", "render"));
-            checks.push(sysml_requirement_checks::attribute_equals("GES-005-" + skirt_names[index] + "-collision", "engine_skirt", "ges005", VERIFICATION, rail, "physics:collisionEnabled", false));
-            checks.push(sysml_requirement_checks::attribute_equals("GES-005-" + skirt_names[index] + "-order", "engine_skirt", "ges005", VERIFICATION, rail, "xformOpOrder", skirt_transform_order));
-            if index < 2 {
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-length", "engine_skirt", "ges006", VERIFICATION, rail, 0, skirt("railLengthM"), 1.0, geometry_tolerance));
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-height", "engine_skirt", "ges006", VERIFICATION, rail, 1, skirt("railHeightM"), 1.0, geometry_tolerance));
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-width", "engine_skirt", "ges006", VERIFICATION, rail, 2, skirt("railWidthM"), 1.0, geometry_tolerance));
-                checks.push(component_position("GES-006-" + skirt_names[index] + "-z", rail, 2, if index == 0 { sysml_requirements::number(source, skirt("railFrontCenterZM")) } else { sysml_requirements::number(source, skirt("railRearCenterZM")) }, geometry_tolerance));
-            } else {
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-length", "engine_skirt", "ges006", VERIFICATION, rail, 2, skirt("railLengthM"), 1.0, geometry_tolerance));
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-height", "engine_skirt", "ges006", VERIFICATION, rail, 1, skirt("railHeightM"), 1.0, geometry_tolerance));
-                checks.push(sysml_requirement_checks::extent_component("GES-006-" + skirt_names[index] + "-width", "engine_skirt", "ges006", VERIFICATION, rail, 0, skirt("railWidthM"), 1.0, geometry_tolerance));
-                checks.push(component_position("GES-006-" + skirt_names[index] + "-x", rail, 0, if index == 2 { sysml_requirements::number(source, skirt("railPortCenterXM")) } else { sysml_requirements::number(source, skirt("railStarboardCenterXM")) }, geometry_tolerance));
-            }
+        for name in ["RailFront","RailRear","RailPort","RailStarboard"] {
+            checks.push(sysml_requirement_checks::not_exists("GES-001-no-square-"+name,"engine_skirt","ges001",VERIFICATION,skirt_root+"/"+name));
         }
+        checks.push(sysml_requirement_checks::attribute_equals("GES-005-rail-purpose","engine_skirt","ges005",VERIFICATION,rail,"purpose","render"));
+        checks.push(sysml_requirement_checks::attribute_equals("GES-005-rail-collision","engine_skirt","ges005",VERIFICATION,rail,"physics:collisionEnabled",false));
         checks.push(sysml_requirement_checks::exists("GES-002-shell", "engine_skirt", "ges002", VERIFICATION, skirt_shell, "Mesh"));
         checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-width", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 0, skirt("railLengthM"), 2.0, geometry_tolerance));
         checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-depth-y", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 1, skirt("shellDepthM"), 2.0, geometry_tolerance));
@@ -750,8 +773,20 @@ fn on_tick(me, ctx) {
         let adapter_path = skirt_root + "/" + adapter_name;
         checks.push(component_position("GES-007-adapter-y", adapter_path, 1,
             sysml_requirements::number(source,skirt("adapterPlateCenterYM")),geometry_tolerance));
-        let fit=skirt_fit_observation(skirt_root,observed_engines.records,this.mesh_results,geometry_tolerance);
+        let fit=skirt_fit_observation(skirt_root,rail_name,observed_engines.records,this.mesh_results,geometry_tolerance,
+            sysml_requirements::native_value(source,visual("outerBodyProfileCoordinates")),
+            sysml_requirements::native_value(source,visual("bodyDimensions")),skirt_width/2.0,
+            sysml_requirements::number(source,skirt("componentLocalCenterYM")),skirt_section,skirt_height,
+            skirt_shell_depth,sysml_requirements::number(source,skirt("shellBottomInsetM")));
         let fit_available=fit.available==true && _same_snapshot(fit.snapshot,usd_snapshot);
+        let profile_bindings=_required_constraint_bindings(source_model,"ges006","GESC006_OctagonalProfile",[
+            ["topologyMismatches",_usd_observation(fit.snapshot,fit_available,fit.topology,"rail topology unavailable")],
+            ["maximumRailPointErrorM",_usd_observation(fit.snapshot,fit_available,fit.rail_error,"rail geometry unavailable")],
+            ["maximumShellPointErrorM",_usd_observation(fit.snapshot,fit_available,fit.shell_error,"shell geometry unavailable")],
+            ["maximumBusOverhangM",_usd_observation(fit.snapshot,fit_available,fit.overhang,"bus footprint unavailable")],
+            ["toleranceM",_source_literal(source_model,visual("geometryVerificationToleranceM"))]
+        ]);
+        checks.push(sysml_requirements::required_constraint_check("GES-006-octagonal-profile","engine_skirt","ges006",VERIFICATION,"GriffinPropulsionRequirements::GESC006_OctagonalProfile",profile_bindings,"typed",0.0));
         let fit_bindings=_required_constraint_bindings(source_model,"ges004","GESC004_SkirtAndBellFit",[
             ["minimumRadialClearanceM",_usd_observation(fit.snapshot,fit_available,fit.clearance,"skirt/rail contour unavailable")],
             ["visibleBellHeightFraction",_usd_observation(fit.snapshot,fit_available,fit.visible,"bell exposure unavailable")],

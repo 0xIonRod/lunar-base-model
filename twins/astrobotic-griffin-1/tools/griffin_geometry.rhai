@@ -138,6 +138,35 @@ fn tank_support_perimeter_geometry(profile, radius, center_y, section) {
     perimeter_beam_geometry(stations, levels, section)
 }
 
+// A continuous mitered ring for the source's regular clipped-square profile.
+// Scaling the inner profile reduces every edge's apothem by the stock width;
+// it avoids square beam ends projecting beyond the bus chamfers.
+fn octagonal_ring_geometry(profile, radius, center_y, width, height) {
+    if !array_is(profile) || profile.len()!=8 || radius<=width
+        || width<=0.0 || height<=0.0 || !scalar_is_finite(center_y) {
+        return #{ok:false,error:"octagonal ring requires eight profile vertices and positive stock dimensions"};
+    }
+    let points=[];let counts=[];let indices=[];
+    for y in [center_y-height/2.0,center_y+height/2.0] {
+        for r in [radius,radius-width] {
+            for p in profile {
+                if !vec2_is_native(p) || !vec2_is_finite(p) {
+                    return #{ok:false,error:"octagonal ring profile must be finite typed Vec2 values"};
+                }
+                points.push([p.x*r,y,p.y*r]);
+            }
+        }
+    }
+    for i in 0..8 {
+        let j=(i+1)%8;
+        for face in [[i,i+16,j+16,j], [i+8,j+8,j+24,i+24],
+            [i,j,j+8,i+8], [i+16,i+24,j+24,j+16]] {
+            counts.push(4);for v in face {indices.push(v);}
+        }
+    }
+    #{ok:true,points:points,face_counts:counts,face_indices:indices}
+}
+
 
 // The positive-X/Z brace uses Rz(-tilt) * Rx(-tilt). Other braces
 // mirror these coordinates. Anchor its lower endpoint on the pad plane;

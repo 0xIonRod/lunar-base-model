@@ -1229,3 +1229,24 @@ contact: reference/sample Y position 59.199830788144354/59.1998353552034 m,
 angular speed 0.3271466051275888/0.3390591487815587 rad/s, with identical zero
 engine thrust and identical reported vehicle mass. Articulated initialization
 must be traced before the pending core stack is merged as a reload fix.
+
+### Engine-skirt corners, 2026-10-04
+
+The user's close-up showed square skirt rails extending past the bus chamfers.
+The four square rails are replaced by one continuous mitered octagonal mesh;
+its outline and the shallow shell use the existing typed body profile. The
+3.44 m across-flats envelope, 80 mm stock and 60 mm shell taper remain study
+packaging estimates. The shell taper no longer doubles as its plan-view corner
+clip. Qualitative footprint references are the [PGH hardware image](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
+and [ESA Griffin depiction](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander).
+These images are not engineering drawings or proof of stock dimensions.
+
+Authoring used the live document owner (`ApplyUsdOps`, source generation 28,
+explicit `SaveDocument`), with requirements edited through `ApplySysmlOps`.
+The existing propulsion fixture passes all 94 checks, including the updated
+GES-006 profile/topology/footprint constraint and unchanged GES-004 bell fit.
+Evidence: `terrain/target/griffin-octagonal-skirt-gate.log`.
+The combined assembly was reviewed in a fresh owned Editor session on 49758:
+`terrain/target/assembly-editor/griffin-octagonal-skirt-reviewed.png`. The lower
+square corners are absent; nozzle and landing-leg placement is unchanged.
+This is visual/component acceptance, not closure of the warm-reload failure.
