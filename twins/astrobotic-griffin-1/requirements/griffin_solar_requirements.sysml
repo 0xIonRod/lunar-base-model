@@ -20,14 +20,14 @@ package GriffinSolarRequirements {
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_solar_panel_visual.usda";
         attribute childNames : GriffinSolarVisualMember[25] = ("Frame", "Cells", "ArrayBackplane", "CellDividerX1", "CellDividerX2", "CellDividerX3", "CellDividerX4", "CellDividerX5", "CellDividerZ1", "CellDividerZ2", "CellDividerZ3", "CellDividerX6", "CellDividerX7", "CellDividerX8", "CellDividerX9", "CellDividerX10", "CellDividerX11", "CellDividerX12", "CellDividerX13", "CellDividerZ4", "MountBracketNegativeX", "MountBracketPositiveX", "HingeBar", "MountLinkNegativeX", "MountLinkPositiveX");
-        // Panel size revised to fit the smaller bus: 1.716 m maximum face
-        // width comes from rail spacing minus edge margins; 0.66 m height
-        // fits the 0.72 m body belt. The 14 x 5 grid is observed in the
-        // Astrobotic Griffin product rendering; cells have nearly equal pitch.
+        // Reference module: 14 columns by 5 rows in Astrobotic's image
+        // https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png
         // https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
-        // Cell size retains frame
-        // edge margins. Estimates, not vendor dimensions; griffin-size-evidence.md.
-        attribute frameWidthM : Real = 1.716;
+        // 1.866 m frame width is the estimated 2.016 m mount span minus
+        // 0.15 m edge allowance. Preserve square cell pitch: cell depth and
+        // overall panel height derive from the 14:5 count and 30 mm border.
+        // 2026-10-04 reconstruction estimate, not published supplier sizing.
+        attribute frameWidthM : Real = 1.866;
         /* Panel/support stock is an explicit visual estimate from the 2021
          * product rendering https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png
          * linked from https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
@@ -43,7 +43,7 @@ package GriffinSolarRequirements {
         attribute cellMetallic : Real = .15;
         attribute cellRoughness : Real = .25;
         attribute frameThicknessM : Real = 0.03;
-        attribute frameDepthM : Real = 0.66;
+        attribute frameDepthM : Real = cellDepthM + 2.0 * frameThicknessM;
         /* This reconstruction follows the 2021 product rendering's rectangular
          * 14 x 5 arrays. No lower notch is visible there and corner leg sleeves
          * now sit below the belt. Zero width/depth explicitly selects a full
@@ -54,9 +54,9 @@ package GriffinSolarRequirements {
         attribute lowerClearanceDepthFraction : Real = 0.0;
         doc /* Lateral position of the opening center as a fraction of frame width; zero centers it on the panel. */
         attribute lowerClearanceCenterXFraction : Real = 0.0;
-        attribute cellWidthM : Real = 1.596;
+        attribute cellWidthM : Real = frameWidthM - 2.0 * frameThicknessM;
         attribute cellThicknessM : Real = 0.002;
-        attribute cellDepthM : Real = 0.58;
+        attribute cellDepthM : Real = cellWidthM * gridRowCount / gridColumnCount;
         attribute cellOffsetYM : Real = 0.007;
         attribute arrayBackplaneThicknessM : Real = 0.012;
         attribute arrayBackplaneCenterYM : Real = 0;
@@ -68,7 +68,7 @@ package GriffinSolarRequirements {
         attribute mountBracketThicknessM : Real = 0.08;
         attribute mountBracketDepthM : Real = 0.12;
         attribute hingeBarRadiusM : Real = 0.025;
-        attribute hingeBarLengthM : Real = 1.716;
+        attribute hingeBarLengthM : Real = frameWidthM;
         attribute hingeBarCenterYM : Real = -0.18;
         attribute hingeBarCenterZM : Real = 0.00;
         attribute mountLinkHeightM : Real = 0.28;
@@ -91,7 +91,7 @@ package GriffinSolarRequirements {
         doc /* GSA-002 [visual] each array exposes a frame and cell surface with owned geometry. */
     }
     requirement def GSA003_SunQuadrantLayout {
-        doc /* GSA-003 [mission layout] the forward, forward-starboard bevel, and starboard arrays occupy the original mission Sun quadrant. A fourth study array occupies the opposite broad face to reconstruct the belt-panel appearance requested by the operator on 2026-10-02; hidden-face hardware coverage is not established by the available renderings. Their installed frames and panel normals shall satisfy the site-local Sun azimuth/elevation envelope and the approved installation configuration. */
+        doc /* GSA-003 [mission layout] the forward, forward-starboard bevel, and starboard arrays occupy the original mission Sun quadrant. The three arrays wrap one Sun-facing quadrant, following the selected Astrobotic 2021 belt-panel configuration. The speculative opposite-face array is removed for the operator's one-side layout request on 2026-10-04; no hidden-face array is inferred. Their installed frames and panel normals shall satisfy the site-local Sun azimuth/elevation envelope and the approved installation configuration. */
     }
     requirement def GSA004_ArrayTraceability {
         doc /* GSA-004 [evidence] array identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and deployment status is explicit. */
@@ -174,7 +174,7 @@ package GriffinSolarRequirements {
         require GSAC007_UniformMetricCellPitch {
             in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GSA-007 [geometry] full faces use the 14-column, 5-row module observed by the user in https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png linked from https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ . Installed cell pitch follows cellWidthM/gridColumnCount and cellDepthM/gridRowCount. Narrow faces reduce column count to the largest whole count fitting their rail span minus the nominal frame-to-cell border allowance, capped at gridColumnCount. Keep the metric pitch after instance scaling; never squeeze 14 columns into a narrower panel. A six-column bevel panel is a reconstruction estimate from available space, not an observed flight count. The retained five rows, 114 by 116 mm pitches and frame borders are appearance estimates; supplier panel configuration is unavailable. */
+        doc /* GSA-007 [geometry] full faces use the 14-column, 5-row module observed by the user in https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png linked from https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ . Installed cell pitch follows cellWidthM/gridColumnCount and cellDepthM/gridRowCount. Narrow faces reduce column count to the largest whole count fitting their rail span minus the nominal frame-to-cell border allowance, capped at gridColumnCount. Keep the metric pitch after instance scaling; never squeeze 14 columns into a narrower panel. A reduced-column bevel panel is a reconstruction estimate from available space, not an observed flight count. The retained five rows, square pitches derived from the module width and frame borders are appearance estimates; supplier panel configuration is unavailable. */
     }
     requirement def GSA008_HingeAndStandoff {
         doc /* GSA-008 [mechanical interface] panel pivots, restraints, support links, deployment envelope, and structural load path shall conform to the approved Griffin-1 mechanism and structural interface definition. */

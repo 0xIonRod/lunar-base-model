@@ -191,6 +191,14 @@ package GriffinRampRequirements {
     // A visual-review guard, not a structural strength limit. The image
     // evidence cannot calibrate stock sizes; these explicit estimated bounds
     // reject the earlier thick chords and oversized transverse cylinders.
+    constraint def GRC029_PivotFittingsMatchJoint {
+        in maximumDatumErrorM : Real;
+        in invalidFittingCount : Integer;
+        in toleranceM : Real;
+        toleranceM >= 0.0 and maximumDatumErrorM <= toleranceM
+            and invalidFittingCount == 0;
+    }
+
     constraint def GRC028_RailAndPivotSlenderness {
         in chordHeightM : Real;
         in sectionLengthM : Real;
@@ -370,25 +378,25 @@ package GriffinRampRequirements {
         attribute rampCenterRailOffsetZM : Real = CadStudy::trackMm / (2.0 * CadStudy::millimetresPerMetre) - GriffinEgressRamp::assemblyTrackWidthM / 2.0 - GriffinEgressRamp::rampRailWidthM / 2.0;
         attribute rampRailJointPinRadiusM : Real = 0.020;
         attribute rampRailJointPinLengthM : Real = 0.06;
-        /* Pivot lugs connect each guard to its section's native hinge axis.
-         * Their height derives from axis elevation, outer lug radius and chord top;
-         * four coaxial pin visuals share the common section shaft. 60 mm lug
-         * travel width and 10 mm plate thickness are unqualified assembly
-         * estimates to bridge the observed rail/hinge separation. The image
-         * establishes folded tracks but gives no hinge bracket drawing:
-         * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png .
-         * These pieces follow the existing rigid section; no new joints,
-         * mass copies or separate deployment motion are introduced. */
-        /* Rounded pivot plate reconstruction, 2026-10-01: replace the
-         * square lug silhouette with semicircular ends. Outer end radius
-         * derives from half the 60 mm plate width, giving 10 mm radial stock
-         * beyond a 40 mm pin. Both plate profiles and their placement derive
-         * from the section's native axis and the upper-strip/track datums.
-         * The images establish compact pivots but do not resolve machining,
-         * bore, bearing, fasteners or plate outline. The rounded outline and
-         * radial stock are low-confidence visual assembly estimates:
-         * https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
-         * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png */
+        /* Pivot reconstruction, 2026-10-04: the 60 mm circular tongue
+         * and its 40 mm pin sit on each native section hinge axis, leaving
+         * 10 mm radial stock. The tongue is 10 mm thick. Each intermediate
+         * parent section carries two fork cheeks of rampRailWidthM stock;
+         * their Z offsets are +/-(tongue thickness + cheek thickness)/2.
+         * This seats the tongue between the cheeks without overlapping it.
+         * Parent and child plates use physics:localPos0 and localPos1;
+         * they follow their existing section bodies with no added collider,
+         * mass, motor, joint or independent animation. The old full-height
+         * lugs incorrectly stretched from track bottom to guard top.
+         * Circular plate shape and stock are low-confidence study estimates,
+         * not a machined bearing design. Images establish three folding
+         * sections and compact interfaces, but no bearing ICD or released
+         * deployment sequence. Astrobotic's stowed 2021 configuration is
+         * the selected layout; ESA's 2022 artist impression is a different
+         * partly-open pose, not a commanded unfolding trajectory:
+         * https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png
+         * https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
+         * https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander */
         attribute rampPivotLugWidthM : Real = 0.06;
         attribute rampPivotLugThicknessM : Real = 0.010;
         // Separate traction bars on each wheel track leave the centre open.
@@ -719,7 +727,10 @@ package GriffinRampRequirements {
         doc /* Every rigid ramp section shall have two longitudinal underside beams and the source-owned edge support posts. Each section body shall own positive mass and diagonal inertia that partition the ramp mass and match its section envelope. */
     }
     requirement def GRR015_RampHingeGussetGeometry {
-        doc /* GRR-015 root bearings shall have a visible load path to the bus perimeter deck. Two inner-track pedestals per ramp derive their upper elevation from physicalRampMountY plus the bearing radius and their lower elevation from bodyMount.y plus deckCenter.y plus half deckDimensions.y. Short deck shoes overlap the bus edge and reach the native root hinge X station. Square member width reuses rampPivotLugWidthM; stations reuse rampCenterRailOffsetZM, outside tire corridors. These are render-only members of the existing bus rigid body, with no extra mass or contact owner. Bracket shape and stock are low-confidence reconstruction estimates prompted by the operator's floating-ramp image on 2026-10-02. ESA's artist rendering shows bus-mounted ramps but supplies no bracket ICD: https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander . The Astrobotic hardware photo documents the bus/leg structure, not a deployed ramp bracket: https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .  The deck hinge and both intermediate section hinges shall be visible at the ramp assembly joints. Every intermediate joint shall use a Z-axis revolute connection at the adjacent section endpoints, and its hinge fittings shall remain outside the tire corridors. The central shaft shall end at the inner rail edges; local coaxial bearings shall join each track guard without a full-width bar above the wheel paths. This split-shaft reconstruction retains the folding axes needed for stowage; it is an explicit image-based study estimate, not supplier geometry. */
+        doc /* GRR-015 root bearings shall have a visible load path to the bus perimeter deck. Two inner-track pedestals per ramp derive their upper elevation from physicalRampMountY plus the bearing radius and their lower elevation from bodyMount.y plus deckCenter.y plus half deckDimensions.y. Short deck shoes overlap the bus edge and reach the native root hinge X station. Square member width reuses rampPivotLugWidthM; stations reuse rampCenterRailOffsetZM, outside tire corridors. These are render-only members of the existing bus rigid body, with no extra mass or contact owner. Bracket shape and stock are low-confidence reconstruction estimates prompted by the operator's floating-ramp image on 2026-10-02. ESA's artist rendering shows bus-mounted ramps but supplies no bracket ICD: https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander . The Astrobotic hardware photo documents the bus/leg structure, not a deployed ramp bracket: https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .  The deck hinge and both intermediate section hinges shall be visible at the ramp assembly joints. Every intermediate joint shall use a Z-axis revolute connection at the adjacent section endpoints, and its hinge fittings shall remain outside the tire corridors. The central shaft shall end at the inner rail edges; local coaxial bearings shall join each track guard without a full-width bar above the wheel paths. Each intermediate parent shall carry paired circular fork cheeks around a compact child tongue, with centres at the existing native joint anchors. Their thickness and spacing derive from the source plate stock. The fittings shall remain render-only and shall not span the tire paths. This split-shaft reconstruction retains the folding axes needed for stowage; it is an explicit image-based study estimate, not supplier geometry. */
+        require GRC029_PivotFittingsMatchJoint {
+            in toleranceM = GriffinEgressRamp::rampSectionGeometryToleranceM;
+        }
         require GRC028_RailAndPivotSlenderness {
             in chordHeightM = GriffinEgressRamp::rampRailHeightM;
             in sectionLengthM = GriffinEgressRamp::rampSectionLengthM;

@@ -81,6 +81,59 @@ fn _measurement_value(observation, field, label) {
       document_generation: observation.document_generation,
       stage_generation: observation.stage_generation}
 }
+// One aggregate observation per intermediate hinge: the plates are measured
+// in their owning body frames against the composed native joint datums.
+fn _pivot_fittings(source, joint_path, parent, child) {
+    let doc=usd_geometry_inspection::document_owner(joint_path);
+    let joint=query("QueryUsdPrim",#{doc_id:doc,path:joint_path,
+        attrs:["physics:localPos0","physics:localPos1"]});
+    if joint==() || joint.error!=() {return #{ok:false};}
+    let anchors=[vec3_from(joint.attrs["physics:localPos0"]),
+        vec3_from(joint.attrs["physics:localPos1"])];
+    if !vec3_is_finite(anchors[0]) || !vec3_is_finite(anchors[1]) {return #{ok:false};}
+    let diameter=_source_number(source,"rampPivotLugWidthM");
+    let tongue=_source_number(source,"rampPivotLugThicknessM");
+    let cheek=_source_number(source,"rampRailWidthM");
+    let specs=[];let paths=[];
+    for guide in griffin_spec::ramp_guide_stations() {
+        specs.push(#{path:child+"/"+guide.pin+"Lug",anchor:anchors[1],z:guide.z,stock:tongue});
+        for side in [#{name:"Negative",sign:-1.0},#{name:"Positive",sign:1.0}] {
+            specs.push(#{path:parent+"/"+guide.pin+"Distal"+side.name+"Lug",
+                anchor:anchors[0],z:guide.z+side.sign*(tongue+cheek)/2.0,stock:cheek});
+        }
+    }
+    for spec in specs {paths.push(spec.path);}
+    let batch=query("QueryUsdPrims",#{doc_id:doc,paths:paths,
+        attrs:["extent","xformOp:translate","xformOp:scale","physics:collisionEnabled"]});
+    if batch==() || batch.records==() {return #{ok:false};}
+    let records=batch.records; records.push(joint);
+    if !usd_geometry_inspection::same_snapshot(records) {return #{ok:false};}
+    let found=#{};for record in batch.records {found[record.path]=record;}
+    let invalid=0;let error_m=0.0;
+    for spec in specs {
+        let record=found[spec.path];
+        if record==() || record.type_name!="Mesh" || record.attrs["physics:collisionEnabled"]!=false {
+            invalid+=1;continue;
+        }
+        let position=vec3_from(record.attrs["xformOp:translate"]);
+        let scale=vec3_from(record.attrs["xformOp:scale"]);
+        let extent=record.attrs["extent"];
+        if !vec3_is_finite(position) || !vec3_is_finite(scale)
+            || extent==() || extent.len()!=2 {invalid+=1;continue;}
+        error_m=max(error_m,vlen(position-vec3(spec.anchor.x,spec.anchor.y,spec.z)));
+        for axis in 0..3 {
+            let half=if axis==2 {spec.stock/2.0} else {diameter/2.0};
+            if extent[0].len()!=3 || extent[1].len()!=3 {invalid+=1;break;}
+            for end in [#{index:0,sign:-1.0},#{index:1,sign:1.0}] {
+                error_m=max(error_m,(extent[end.index][axis]*vec3_array(scale)[axis]-end.sign*half).abs());
+            }
+        }
+    }
+    #{ok:true,maximumDatumErrorM:error_m,invalidFittingCount:invalid,
+        doc_id:joint.doc_id,document_generation:joint.document_generation,
+        stage_generation:joint.stage_generation}
+}
+
 fn _maximum_abs(values) {
     if values == () || values.len() == 0 { return (); }
     let maximum = 0.0;
@@ -160,7 +213,7 @@ fn on_tick(me, ctx) {
         "rampCount", "rampSurfaceLengthM", "rampSectionCount", "rampSectionLengthM",
         "rampSectionGeometryToleranceM", "rampSurfaceWidthM", "rampSurfaceThicknessM",
         "rampWheelClearanceM", "rampRailHeightM", "rampRailWidthM", "rampRailOffsetZM", "rampCenterRailOffsetZM",
-        "rampRailJointPinRadiusM", "rampRailJointPinLengthM", "rampPivotLugWidthM",
+        "rampRailJointPinRadiusM", "rampRailJointPinLengthM", "rampPivotLugWidthM", "rampPivotLugThicknessM",
         "maxRailHeightToSectionLength", "maxPivotDiameterToRailHeight",
         "rampSurfaceCenterYM", "rampRailCenterYM", "rampMaxDeploymentAngleRad",
         "assemblyTrackWidthM", "contactTrackGeometryToleranceM", "assemblyTreadCount",
@@ -217,7 +270,11 @@ fn on_tick(me, ctx) {
         || rail_pin_names.len() != 4
         || transition_body_name == "" || transition_contact_name == ""
         || transition_joint_names.len() != 2 {
-        throw("Griffin ramp SysML identity collections are incomplete");
+        throw(#{error:"Griffin ramp SysML identity collections are incomplete",
+            sections:section_names.len(),joints:joint_names.len(),treads:tread_names.len(),
+            pins:rail_pin_names.len(),transition_body:transition_body_name,
+            transition_contact:transition_contact_name,transition_joints:transition_joint_names.len(),
+            source_ok:source.ok,source_error:source.error});
     }
     let checks = [];
     if batch==0 {
@@ -522,12 +579,8 @@ fn on_tick(me, ctx) {
                     "grr008", pin_path, "xformOp:translate", 2, pin_z));
                 let axis_y=griffin_spec::ramp_section_hinge_axis_y_m(index);
                 let lug_radius=_source_number(source,"rampPivotLugWidthM")/2.0;
-                let lug_bottom=min(axis_y-lug_radius,
-                    _source_number(source,"rampSurfaceCenterYM")
-                    -_source_number(source,"rampSurfaceThicknessM")/2.0);
-                let lug_top=max(axis_y+lug_radius,
-                    _source_number(source,"rampRailCenterYM")
-                    +_source_number(source,"rampRailHeightM")/2.0);
+                let lug_bottom=axis_y-lug_radius;
+                let lug_top=axis_y+lug_radius;
                 checks.push(sysml_requirement_checks::exists(
                     "GRR-008-"+side+"-"+index.to_string()+"-"+pin_name+"-rounded-plate",
                     "ramp_rail_joint","grr008",VERIFICATION,pin_path+"Lug","Mesh"));
@@ -719,6 +772,12 @@ fn on_tick(me, ctx) {
                 "grr016", joint_path, "physics:localPos0", 0, section_length));
             checks.push(_attribute_component("GRR-016-" + side + "-" + joint_name + "-anchor1",
                 "grr016", joint_path, "physics:localPos1", 0, 0.0));
+            let fittings=_pivot_fittings(source,joint_path,body0,body1);
+            checks.push(_constraint(source,"GRR-015-"+joint_name+"-native-pivot-fit","grr015",
+                "GRC029_PivotFittingsMatchJoint",#{
+                    maximumDatumErrorM:_measurement_value(fittings,"maximumDatumErrorM","pivot plate datums"),
+                    invalidFittingCount:_measurement_value(fittings,"invalidFittingCount","render-only pivot plate count"),
+                    toleranceM:_source_number(source,"rampSectionGeometryToleranceM")}));
             let joint_limit_deg = _source_number(source, "physicalRampSectionJointLimitRad") * 180.0 / pi;
             checks.push(_attribute_value("GRR-016-" + side + "-" + joint_name + "-lower-limit",
                 "grr016", joint_path, "physics:lowerLimit", -joint_limit_deg));

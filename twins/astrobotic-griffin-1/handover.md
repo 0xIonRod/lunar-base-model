@@ -127,3 +127,14 @@ owned 49758 confirms the square corners are gone. Warm-reload mismatch remains
 open. Next priority is the reported held-Space short hop versus repeated-Space
 liftoff: compare live control ownership, held input, delivered force and mass;
 chamber feed pressure is not a thrust measurement.
+
+2026-10-04: solar belt now uses two 1.866 x 0.705 m modules plus a narrower
+six-column chamfer module on one quadrant, with 129 mm square cell pitch.
+Removed the speculative opposite-face array. Ramp intermediate hinges have
+compact circular tongues and matching parent fork cheeks at native joint
+anchors. Source-backed rationale distinguishes the Astrobotic 2021 layout
+from ESA's partly-open artist pose; stock and deployment sequence remain
+explicit study estimates. Solar, ramp geometry and flight-stow gates pass.
+Fresh owned Editor 49759 confirms saved fittings; earlier 49758 had a stale
+canonical-query owner despite current authored data. No physics drives or
+masses changed. Held-Space hop/reflight and warm-reload mismatch remain open.

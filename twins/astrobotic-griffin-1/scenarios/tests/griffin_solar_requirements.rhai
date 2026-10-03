@@ -187,6 +187,8 @@ fn on_tick(me, ctx) {
     checks.push(sysml_requirement_checks::source_list_count("GSA-005-stations", "solar_array", "gsa005", VERIFICATION, visual("solarStations"), count));
     checks.push(sysml_requirement_checks::source_list_count("GSA-005-rotation-x", "solar_array", "gsa005", VERIFICATION, visual("solarStationRotationXDeg"), count));
     checks.push(sysml_requirement_checks::source_list_count("GSA-005-rotation-z", "solar_array", "gsa005", VERIFICATION, visual("solarStationRotationZDeg"), count));
+    checks.push(sysml_requirement_checks::not_exists("GSA-003-no-speculative-opposite-array",
+        "solar_array", "gsa003", VERIFICATION, root+"/SolarPanelRear"));
     for index in 0..names.len() {
         let name = names[index];
         let path = root + "/" + name;

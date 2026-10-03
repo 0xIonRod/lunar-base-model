@@ -491,7 +491,9 @@ fn engine_skirt_component_root_name() {
     _typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::componentRootName")
 }
 fn engine_skirt_component_member_names() {
-    _typed_model_text_list("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::componentMemberNames")
+    let name=_typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::perimeterRailName");
+    if name==() || name=="" {return [];}
+    [name]
 }
 fn engine_skirt_component_shell_name() {
     _typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::shellName")

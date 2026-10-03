@@ -4726,13 +4726,20 @@ fn _ramp_round_plate_visual_ops(doc, edit_target, section_path, name,
     let profile = [];
     let half_straight = height / 2.0 - radius;
     // Twelve samples per semicircle are presentation tessellation policy.
-    for i in 0..13 {
-        let angle = 3.141592653589793 * i / 12.0;
-        profile.push(vec2(radius * angle.cos(), half_straight + radius * angle.sin()));
-    }
-    for i in 0..13 {
-        let angle = 3.141592653589793 + 3.141592653589793 * i / 12.0;
-        profile.push(vec2(radius * angle.cos(), -half_straight + radius * angle.sin()));
+    if half_straight <= 0.0 {
+        for i in 0..24 {
+            let angle=2.0*3.141592653589793*i/24.0;
+            profile.push(vec2(radius*angle.cos(),radius*angle.sin()));
+        }
+    } else {
+        for i in 0..13 {
+            let angle = 3.141592653589793 * i / 12.0;
+            profile.push(vec2(radius * angle.cos(), half_straight + radius * angle.sin()));
+        }
+        for i in 0..13 {
+            let angle = 3.141592653589793 + 3.141592653589793 * i / 12.0;
+            profile.push(vec2(radius * angle.cos(), -half_straight + radius * angle.sin()));
+        }
     }
     let mesh = extrude_profile(profile, thickness, profile_plane_xy());
     let points = [];
@@ -4759,6 +4766,73 @@ fn _ramp_round_plate_visual_ops(doc, edit_target, section_path, name,
     plan.ops.push(#{SetAttribute:#{edit_target:edit_target,path:section_path+"/"+name,
         name:"xformOpOrder",type_name:"token[]",value:"[\"xformOp:translate\", \"xformOp:scale\"]"}});
     plan
+}
+
+// Reconstruct a section interface using the owning joint's local anchors.
+// Fork cheeks belong to body0; the compact tongue belongs to body1. These
+// replaceable visual fittings add no body, collider, motor or joint.
+fn griffin_ramp_pivot_plan(doc, edit_target, root, joint_name, guide_index) {
+    let joint=assembly_builder::composed_query(doc,#{path:root+"/"+joint_name,
+        attrs:["physics:localPos0","physics:localPos1","physics:axis"],
+        rels:["physics:body0","physics:body1"]});
+    if !query_ok(joint) || joint.type_name!="PhysicsRevoluteJoint"
+        || joint.attrs==() || joint.attrs["physics:axis"]!="Z"
+        || joint.relationships==()
+        || joint.relationships["physics:body0"]==()
+        || joint.relationships["physics:body1"]==()
+        || joint.relationships["physics:body0"].len()!=1
+        || joint.relationships["physics:body1"].len()!=1 {
+        return plan_error("ramp pivot requires a complete Z-axis section joint");
+    }
+    let parent=joint.relationships["physics:body0"][0];
+    let child=joint.relationships["physics:body1"][0];
+    let parent_material=if child==parent+"/MiddleSection" {
+        parent+"/DeckSection/Looks/RampStructure"
+    } else {parent+"/Looks/RampStructure"};
+    let a=vec3_from(joint.attrs["physics:localPos0"]);
+    let b=vec3_from(joint.attrs["physics:localPos1"]);
+    let diameter=_ramp_number("rampPivotLugWidthM");
+    let tongue=_ramp_number("rampPivotLugThicknessM");
+    let cheek=_ramp_number("rampRailWidthM");
+    if !vec3_is_finite(a) || !vec3_is_finite(b) || diameter<=0.0
+        || tongue<=0.0 || cheek<=0.0 {return plan_error("ramp pivot stock or anchors unavailable");}
+    let color=sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::silverDisplayColor");
+    let ops=[];
+    let guides=griffin_spec::ramp_guide_stations();
+    if guide_index<0 || guide_index>=guides.len() {return plan_error("ramp pivot guide index is unavailable");}
+    for guide in [guides[guide_index]] {
+        let specs=[#{parent:child,name:guide.pin+"Lug",anchor:b,z:guide.z,stock:tongue}];
+        for side in [#{suffix:"Negative",sign:-1.0},#{suffix:"Positive",sign:1.0}] {
+            specs.push(#{parent:parent,name:guide.pin+"Distal"+side.suffix+"Lug",
+                anchor:a,z:guide.z+side.sign*(tongue+cheek)/2.0,stock:cheek});
+        }
+        for spec in specs {
+            let p=_ramp_round_plate_visual_ops(doc,edit_target,spec.parent,spec.name,
+                diameter,spec.stock,-diameter/2.0,diameter/2.0,0.0,color);
+            if !p.ok {return p;}
+            for op in p.ops {ops.push(op);}
+            ops.push(#{SetTranslate:#{edit_target:edit_target,path:spec.parent+"/"+spec.name,
+                value:[spec.anchor.x,spec.anchor.y,spec.z]}});
+            ops.push(#{SetRelationship:#{edit_target:edit_target,path:spec.parent+"/"+spec.name,
+                name:"material:binding",targets:[if spec.parent==parent {parent_material}
+                    else {child+"/Looks/RampStructure"}]}});
+        }
+    }
+    #{ok:true,ops:ops,no_op:false,kind:"griffin_ramp_pivot_pair",joint:joint.path}
+}
+
+fn griffin_ramp_component_pivot_plan(doc, edit_target, root, section_index, guide_index) {
+    let guides=griffin_spec::ramp_guide_stations();
+    if guide_index<0 || guide_index>=guides.len() {return plan_error("ramp pivot guide unavailable");}
+    let guide=guides[guide_index];
+    let width=_ramp_number("rampPivotLugWidthM");
+    let color=sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::silverDisplayColor");
+    let p=_ramp_round_plate_visual_ops(doc,edit_target,root,guide.pin+"Lug",width,
+        _ramp_number("rampPivotLugThicknessM"),-width/2.0,width/2.0,guide.z,color);
+    if !p.ok {return p;}
+    p.ops.push(#{SetTranslate:#{edit_target:edit_target,path:root+"/"+guide.pin+"Lug",
+        value:[0.0,griffin_spec::ramp_section_hinge_axis_y_m(section_index),guide.z]}});
+    p
 }
 
 fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
@@ -4966,8 +5040,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         // Keep native profile generation bounded to one guide per plan.
         let lug_width=_ramp_number("rampPivotLugWidthM");
         let lug_radius=lug_width/2.0;
-        let lug_bottom=min(hinge_y-lug_radius, surface_y-thickness/2.0);
-        let lug_top=max(hinge_y+lug_radius,rail_y+rail_height/2.0);
+
         // A single rounded strip remains the guard collider. Reuse the
         // lug profile with a quarter-turn; no overlapping visual proxy.
         let upper=_ramp_round_plate_visual_ops(doc,edit_target,section_path,
@@ -4994,9 +5067,11 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             name:"material:binding",targets:[section_path+"/Looks/RampStructure"]}});
         let lug=_ramp_round_plate_visual_ops(doc,edit_target,section_path,
             guide.pin+"Lug",lug_width,_ramp_number("rampPivotLugThicknessM"),
-            lug_bottom,lug_top,guide.z,structure_color);
+            -lug_radius,lug_radius,guide.z,structure_color);
         if !lug.ok {return lug;}
         for op in lug.ops {ops.push(op);}
+        ops.push(#{SetTranslate:#{edit_target:edit_target,path:section_path+"/"+guide.pin+"Lug",
+            value:[0.0,hinge_y,guide.z]}});
         for index in 0..post_count {
             let post_path = section_path + "/SidePost" + post_side.name
                 + (index + 1).to_string();
@@ -5926,7 +6001,7 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
         || engine_names.len() == 0 || engine_count != engine_names.len()
         || engine_stations.len() != engine_names.len()
         || engine_members.len() != 2 || skirt_name == () || skirt_name == ""
-        || skirt_members.len() != 6 || skirt_y == () {
+        || skirt_members.len() != 3 || skirt_y == () {
         return plan_error("typed Griffin leg, solar, or propulsion stations are incomplete");
     }
     let ops = [];

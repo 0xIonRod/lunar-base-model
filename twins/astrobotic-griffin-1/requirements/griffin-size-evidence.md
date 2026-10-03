@@ -1250,3 +1250,53 @@ The combined assembly was reviewed in a fresh owned Editor session on 49758:
 `terrain/target/assembly-editor/griffin-octagonal-skirt-reviewed.png`. The lower
 square corners are absent; nozzle and landing-leg placement is unchanged.
 This is visual/component acceptance, not closure of the warm-reload failure.
+
+### One-side solar belt and section pivot fittings, 2026-10-04
+
+Selected the shallow belt-array configuration in Astrobotic's
+[2021 g1 image](https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png),
+linked from its [Griffin product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/).
+Two full panels and a narrower chamfer panel wrap one Sun-facing quadrant;
+the speculative opposite broad-face panel is removed. This is a selected
+reconstruction configuration, not proof of hidden-side flight hardware.
+
+The full frame is 1.866 m wide: the estimated 2.016 m mounting span minus
+150 mm edge allowance. A 30 mm border leaves a 1.806 m active width.
+The observed 14 by 5 cell count gives a square 129 mm pitch and 645 mm
+active height, hence a 705 mm overall height. The chamfer frame is about
+857 mm wide and carries six columns at the same metric pitch. The module
+count and aspect ratio are image observations; absolute dimensions, border,
+standoff and support stock are study estimates. SysML owns these values and
+the derived dimensions; the USD component and installed instances were
+updated through generation-checked live typed operations and explicit saves.
+
+The intermediate ramp hinges lacked mating parent-side plates and used
+child lugs stretched from the track underside to the top rail. Each now has
+a compact 60 mm circular, 10 mm thick child tongue between two 6 mm parent
+cheeks. All plate centres derive from the existing joint's localPos0/1;
+cheek spacing derives from the tongue and cheek thickness. The existing
+40 mm pins are retained. Circular shape, stock and fit are low-confidence
+visual estimates, not a qualified bearing design. The source records both
+Astrobotic's stowed rendering and the [ESA 2022 artist impression](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander).
+ESA's partly opened pose does not establish a deployment trajectory.
+The three-section accordion configuration and commanded motion remain study
+assumptions. No body mass, contact track, joint frame or drive was changed.
+
+The existing solar gate passes 152 checks, the ramp geometry gate passes
+1281, and the separate flight-stow gate passes. The four added ramp checks
+aggregate fitting dimensions, render-only ownership and native-anchor fit
+per intermediate joint; they do not multiply every plate into separate
+requirements. Evidence: `terrain/target/griffin-solar-one-side-gate.log`,
+`terrain/target/griffin-compact-pivot-gate.log`, and
+`terrain/target/griffin-compact-pivot-stow-gate.log`.
+
+During editing, the document inspection contained the new prims while its
+canonical composed query reverted to an older stage. Reopening the preview
+restored projection readiness but did not refresh that query owner. Thus the
+save-before-gate portion of the normal authoring sequence could not be
+completed in that session: authored inspection and explicit saves were
+followed by fresh saved-source production gates and a new Editor session.
+Fresh owned port 49759 reads the new fittings correctly and reports a ready
+preview. Reviewed image: `terrain/target/assembly-editor/griffin-solar-ramp-saved-reviewed.png`.
+This is visual/component acceptance. Held-Space reflight, warm reload
+repeatability and full rover traversal remain open.
