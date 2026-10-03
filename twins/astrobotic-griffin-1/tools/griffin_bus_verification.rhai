@@ -433,7 +433,7 @@ fn bus_checks(doc, source, bus_root) {
             kind: "attribute", path: path, attr: "physics:collisionEnabled",
             expected_attr: visual("renderOnlyCollisionEnabled")});
         let color_error = _display_color_error(prim,
-            model.value(visual("railDisplayColor")));
+            model.value(visual("silverDisplayColor")));
         if color_error == () { rail_color_error = (); }
         else if rail_color_error != () { rail_color_error = _max_number(rail_color_error, color_error); }
     }
@@ -604,9 +604,9 @@ fn bus_checks(doc, source, bus_root) {
     }
 
     let source_color_error = _maximum_error([
-        _display_color_error(frame, model.value(visual("frameDisplayColor"))),
-        _display_color_error(deck, model.value(visual("deckDisplayColor"))),
-        _display_color_error(skirt, model.value(visual("lowerSkirtDisplayColor"))),
+        _display_color_error(frame, model.value(visual("silverDisplayColor"))),
+        _display_color_error(deck, model.value(visual("silverDisplayColor"))),
+        _display_color_error(skirt, model.value(visual("silverDisplayColor"))),
         _maximum_error(support_color_errors),
         rail_color_error, _maximum_error(opening_color_errors)]);
     checks.push(_tolerance_constraint("GBC-012-source-owned-colors", "gbc012",

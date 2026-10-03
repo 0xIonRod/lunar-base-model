@@ -111,7 +111,7 @@ package GriffinBusRequirements {
         require GBC011_OpeningQuadsCoverSurface;
     }
     requirement def GBC012_SourceOwnedAppearance {
-        doc /* GBC-012 [appearance] the composed bus display colors shall match the linear values declared once in GriffinVisualConfiguration; scene builders shall not author an independent palette. */
+        doc /* GBC-012 [appearance] the composed bus display colors shall match the linear values declared once in GriffinVisualConfiguration; scene builders shall not author an independent palette. Exposed perimeter, deck, payload support, rails and service-skirt members shall share one standard USD material using silverDisplayColor, silverMetallic and silverRoughness; avoid per-member copies of that palette. Astrobotic identifies the frame as aluminum, https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ ; silver structure is visible in https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png . Renderer values are appearance estimates, not measured reflectance or qualified alloy/coating properties. */
         require GBC_MeasurementWithinTolerance;
     }
 

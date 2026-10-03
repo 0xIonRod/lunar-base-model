@@ -224,6 +224,30 @@ fn griffin_bus_finish_plan(doc, edit_target, root) {
         f64_from(model.value(prefix+"panelRoughness")))
 }
 
+// Keep the exposed frame distinct from blanket faces. Geometry is unchanged.
+fn griffin_bus_frame_finish_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("Griffin frame appearance source unavailable");}
+    let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let rails=_griffin_model_enum_names(model,"frameRails");
+    if rails.len()!=8 {return plan_error("Griffin frame rail inventory unavailable");}
+    let paths=[root+"/PerimeterFrame",root+"/TopDeckOctagon",
+        root+"/RoverPayloadDeck",root+"/LowerServiceSkirtOctagon"];
+    for name in rails {paths.push(root+"/"+name);}
+    let color=model.value(prefix+"silverDisplayColor");
+    if !array_is(color) || color.len()!=3 {return plan_error("Griffin silver frame palette missing");}
+    let plan=griffin_surface_material_plan(doc,edit_target,root,"FrameMetal",paths,color,
+        f64_from(model.value(prefix+"silverMetallic")),f64_from(model.value(prefix+"silverRoughness")));
+    if !plan.ok {return plan;}
+    let ops=[];
+    for op in plan.ops {ops.push(op);}
+    for path in paths {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
+            name:"primvars:displayColor",type_name:"color3f[]",value:_color_literal(color)}});
+    }
+    #{ok:true,ops:ops}
+}
+
 // Blanket tape follows the already composed panel perimeter; no second bus pose.
 fn griffin_bus_blanket_seams_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
@@ -2896,7 +2920,7 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
     let skirt_name = "LowerServiceSkirtOctagon";
     let ring_y = _griffin_model_number_list(model, "frameRingCenterY");
     let ring_section = _ramp_model_number(model, "frameRingSectionM");
-    let frame_color = _griffin_model_number_list(model, "frameDisplayColor");
+    let frame_color = _griffin_model_number_list(model, "silverDisplayColor");
     if body_width == () || body_depth == () || body_height == () || deck_width == ()
         || deck_depth == () || deck_thickness == () || deck_y == () || skirt_width == ()
         || skirt_depth == () || skirt_height == () || skirt_y == ()
@@ -2915,7 +2939,7 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
         || ring_section <= 0.0 || rail_width == () || rail_length == () || rail_depth == () {
         return plan_error("typed Griffin open-frame station vectors or member dimensions are incomplete");
     }
-    let rail_color = _griffin_model_number_list(model, "railDisplayColor");
+    let rail_color = _griffin_model_number_list(model, "silverDisplayColor");
     if rail_color.len() != 3 { return plan_error("typed Griffin rail color is incomplete"); }
     let frame = _octagonal_open_frame_mesh_plan(doc, edit_target, root,
         body_name, rail_stations, ring_y, ring_section,
@@ -2927,8 +2951,8 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
         return plan_error("Griffin deck and service-skirt plan profiles must remain octagonal and square");
     }
     let profile = _griffin_model_value(model, "outerBodyProfileCoordinates");
-    let deck_color = _griffin_model_number_list(model, "deckDisplayColor");
-    let skirt_color = _griffin_model_number_list(model, "lowerSkirtDisplayColor");
+    let deck_color = _griffin_model_number_list(model, "silverDisplayColor");
+    let skirt_color = _griffin_model_number_list(model, "silverDisplayColor");
     if profile == () || profile.len() != 8 || deck_color.len() != 3 || skirt_color.len() != 3 {
         return plan_error("typed Griffin octagonal profile or display colors are incomplete");
     }
@@ -6138,7 +6162,7 @@ fn _griffin_payload_frame_component_plan(doc, edit_target, root, model) {
     }
     let geometry = _griffin_payload_frame_geometry(model, dims.x, dims.z, dims.y);
     if !geometry.ok { return geometry; }
-    let color = _griffin_model_number_list(model, "deckDisplayColor");
+    let color = _griffin_model_number_list(model, "silverDisplayColor");
     let result = _component_mesh_visual_ops(doc, edit_target, root,
         "RoverPayloadDeck", geometry, color);
     if !result.ok { return result; }

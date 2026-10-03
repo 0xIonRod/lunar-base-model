@@ -211,8 +211,8 @@ fn _qualified_attribute(name) {
         "bodyDimensions", "bodyMount", "bodyGroundClearanceM",
         "lowerSkirtDimensions", "lowerSkirtCenter", "deckDimensions", "deckCenter",
         "avionicsDeckDimensions", "avionicsDeckCenter", "outerBodyProfileCoordinates",
-        "frameDisplayColor", "deckDisplayColor", "lowerSkirtDisplayColor",
-        "avionicsDeckDisplayColor", "avionicsPodDisplayColor", "railDisplayColor",
+        "silverDisplayColor",
+        "avionicsDeckDisplayColor", "avionicsPodDisplayColor",
         "tankSupportDisplayColor", "tankCollarDisplayColor",
         "frameRingCenterY", "frameRingSectionM",
         "frameRails", "tankInstances", "landingLegInstances", "solarArrayInstances",
@@ -604,12 +604,12 @@ fn visual_rail_length_m() { _dimensions_component("railDimensions", "y") }
 fn visual_rail_depth_m() { _dimensions_component("railDimensions", "z") }
 fn visual_frame_ring_center_y_m() { _sysml_number_list("frameRingCenterY") }
 fn visual_frame_ring_section_m() { _sysml_attribute("frameRingSectionM") }
-fn visual_frame_display_color() { _sysml_number_list("frameDisplayColor") }
-fn visual_deck_display_color() { _sysml_number_list("deckDisplayColor") }
-fn visual_lower_skirt_display_color() { _sysml_number_list("lowerSkirtDisplayColor") }
+fn visual_frame_display_color() { _sysml_number_list("silverDisplayColor") }
+fn visual_deck_display_color() { _sysml_number_list("silverDisplayColor") }
+fn visual_lower_skirt_display_color() { _sysml_number_list("silverDisplayColor") }
 fn visual_avionics_deck_display_color() { _sysml_number_list("avionicsDeckDisplayColor") }
 fn visual_avionics_pod_display_color() { _sysml_number_list("avionicsPodDisplayColor") }
-fn visual_rail_display_color() { _sysml_number_list("railDisplayColor") }
+fn visual_rail_display_color() { _sysml_number_list("silverDisplayColor") }
 fn visual_tank_support_display_color() { _sysml_number_list("tankSupportDisplayColor") }
 fn visual_tank_collar_display_color() { _sysml_number_list("tankCollarDisplayColor") }
 fn visual_tank_support_perimeter_radius_m() { _sysml_attribute("tankSupportPerimeterRadiusM") }

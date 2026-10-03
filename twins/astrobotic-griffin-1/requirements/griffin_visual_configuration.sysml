@@ -208,12 +208,18 @@ package GriffinVisualConfigurationRequirements {
 
         /* Linear scene-referred display colors are visual design parameters;
          * Rhai consumes these values but does not define a second palette. */
-        attribute frameDisplayColor : Real[3] = (0.04, 0.06, 0.09);
-        attribute deckDisplayColor : Real[3] = (0.025, 0.035, 0.05);
-        attribute lowerSkirtDisplayColor : Real[3] = (0.02, 0.025, 0.035);
+        /* Exposed aluminum frame appearance, revised 2026-10-03.
+         * Astrobotic describes an aluminum frame:
+         * https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
+         * Silver members are visible in the hardware photograph:
+         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .
+         * Reuse the source silver palette and metallic/roughness controls for
+         * perimeter, payload frame, rails and service-skirt members. This
+         * replaces the unsourced dark-blue finish, not geometry or mass.
+         * Color and finish remain display estimates, not alloy qualification,
+         * measured reflectance or the as-built coating specification. */
         attribute avionicsDeckDisplayColor : Real[3] = (0.10, 0.13, 0.17);
         attribute avionicsPodDisplayColor : Real[3] = (0.22, 0.25, 0.29);
-        attribute railDisplayColor : Real[3] = (0.035, 0.045, 0.06);
         attribute tankSupportDisplayColor : Real[3] = (0.12, 0.15, 0.19);
         attribute tankCollarDisplayColor : Real[3] = (0.24, 0.28, 0.34);
         /* Tank blanket appearance follows the visibly crumpled gold wraps in

@@ -2,10 +2,11 @@ import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_c
 // Twin-level positive verification for native SysML-to-Rhai geometry values.
 // Engineering stations and envelopes cross as f64 vectors and typed enums.
 
-import "/scripting/tools/mechanical_relations" as mechanical_relations;
+import "lunco://scripting/tools/mechanical_relations" as mechanical_relations;
 
 const PACKAGE = "GriffinVisualConfigurationRequirements";
 const PART = PACKAGE + "::GriffinVisualConfiguration::";
+const VERIFICATION = "Verify_GriffinVisualConfiguration";
 
 fn _resolved(source, name) {
     sysml_requirements::attribute(source, PART + name)
@@ -62,8 +63,8 @@ fn typed_enum_check(source, id, field, expected_literal) {
 }
 
 fn display_color_check(source) {
-    let fields = ["frameDisplayColor", "deckDisplayColor", "lowerSkirtDisplayColor",
-        "avionicsDeckDisplayColor", "avionicsPodDisplayColor", "railDisplayColor",
+    let fields = ["silverDisplayColor",
+        "avionicsDeckDisplayColor", "avionicsPodDisplayColor",
         "tankSupportDisplayColor", "tankCollarDisplayColor"];
     let evidence = [];
     let ok = true;
@@ -249,9 +250,9 @@ fn on_tick(me, ctx) {
         PART + "tankInstances",
         PART + "landingLegInstances", PART + "solarArrayInstances",
         PART + "mainEngineInstances", PART + "bodyProfile", PART + "rampState",
-        PART + "frameDisplayColor", PART + "deckDisplayColor", PART + "lowerSkirtDisplayColor",
+        PART + "silverDisplayColor",
         PART + "avionicsDeckDisplayColor", PART + "avionicsPodDisplayColor",
-        PART + "railDisplayColor", PART + "tankSupportDisplayColor", PART + "tankCollarDisplayColor",
+        PART + "tankSupportDisplayColor", PART + "tankCollarDisplayColor",
         PART + "verificationToleranceM",
         "GriffinRampRequirements::GriffinEgressRamp::rampPortMountX",
         "GriffinRampRequirements::GriffinEgressRamp::rampStarboardMountX"

@@ -996,3 +996,45 @@ and non-colliding with eight points/four quads each. Evidence:
 camera orientation before it was framed again through SetCameraLookAt; preserving
 the camera across such refreshes remains unresolved. The geometry observation
 and subsequent frame are not a camera-refresh PASS.
+
+## Exposed-frame finish — 2026-10-03
+
+The product description identifies an aluminum frame:
+https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ . Silver
+members are visible in the supplied hardware photograph:
+https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .
+The earlier almost-black perimeter and payload frame were unsourced appearance
+choices that obscured the open structure. Twelve exposed members now share
+one `FrameMetal` standard USD material, using the existing SysML silver color,
+metallic and roughness controls. Four redundant per-role palette fields were
+removed, and their builders and observations consume `silverDisplayColor`.
+These renderer settings remain estimates, not measured optical or structural
+material properties. Geometry, joint axes, collision and mass were unchanged.
+
+Authoring used bus document 115957121335495, root target, generation 126 ->
+170, one 44-operation typed Editor batch. Preview 115957121335495/view 7
+reported projected generation 170 and ready. Focused inspection:
+`terrain/target/assembly-editor/griffin-silver-frame-editor-focused.png`;
+full view: `terrain/target/assembly-editor/griffin-silver-frame-full.png`.
+The saved-source production bus gate passed 353 existing checks at tick 28,
+60 Hz, one thread, jitter zero, source revision 12429294179393803632:
+`terrain/target/griffin-silver-frame-bus-gate.log`.
+
+A live component source refresh also left the same-process review's
+co-simulation barrier held: eight active participants, seven shared-clock
+participants, worst lag about 0.10 s, transport playing but simulation paused.
+That blocked the attached streamed check; the fresh component gate above does
+not establish warm-refresh or mission acceptance. A console-only bus check
+also exceeded its operation budget; neither failure was converted to a PASS.
+
+The additional configuration-types fixture remains ERROR
+(`terrain/target/griffin-silver-frame-types-gate.log`). Its obsolete absolute
+mechanical-relations import and missing verification constant were corrected,
+but its native-source observations still fail. Separately, direct source
+inspection found five engine stations, five engine instance names and a
+five-engine lander count, while that fixture expects seven. The saved vehicle
+also contains only Engine01..Engine05. Thus the earlier seven-engine review
+description is a requirement, not evidence of a realized seven-engine model.
+Astrobotic's current product page specifies seven engines; reconciling the
+model, propulsion source, placement and checks remains open. Do not replace
+the seven-engine expectation with five to obtain a green report.
