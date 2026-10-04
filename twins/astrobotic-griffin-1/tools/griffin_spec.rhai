@@ -414,16 +414,7 @@ fn surface_route_marker_z() { _sysml_number_list("surfaceRouteMarkerZ") }
 // while normalized throttle and arrival tolerance cross the SysML/Rhai bridge as typed lists.
 fn surface_route_throttle_limits() { _sysml_number_list("surfaceRouteThrottleLimit") }
 fn surface_route_arrival_radius_m() { _sysml_number_list("surfaceRouteArrivalRadiusM") }
-fn egress_apron_name() { _sysml_text("egressApronName") }
-fn egress_apron_center_x_m() { _sysml_attribute("egressApronCenterX") }
-fn egress_apron_center_z_m() { _sysml_attribute("egressApronCenterZ") }
-fn egress_apron_length_m() { _sysml_attribute("egressApronLengthM") }
-fn egress_apron_width_m() { _sysml_attribute("egressApronWidthM") }
-fn egress_apron_thickness_m() { _sysml_attribute("egressApronThicknessM") }
 fn site_surface_y_m() { _sysml_attribute("siteSurfaceY") }
-fn landing_site_pad_name() { _sysml_text("landingSitePadName") }
-fn landing_site_pad_extent_m() { _sysml_attribute("landingSitePadExtentM") }
-fn landing_site_pad_thickness_m() { _sysml_attribute("landingSitePadThicknessM") }
 fn visual_camera_name() { _sysml_text("reviewCameraName") }
 fn visual_lander_name() { _sysml_text("reviewLanderName") }
 fn visual_lander_deck_width_m() { _sysml_attribute("visualLanderDeckWidthM") }

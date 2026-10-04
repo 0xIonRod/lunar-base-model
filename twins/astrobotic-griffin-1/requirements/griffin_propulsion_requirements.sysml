@@ -140,18 +140,21 @@ package GriffinPropulsionRequirements {
     }
 
     part def GriffinAttitudeEngineAssembly {
-        doc /* Pending RCS integration requirements, deferred by the user:
-         * retain twelve existing force-actuator identities, command connections
-         * and force axes; render one hollow nozzle per physics actuator, with
-         * exhaust opposite thrust. No additional Twin-authored flame geometry.
-         * Reference the shared LunCoSim engine visual and bind its geometry,
-         * colour and light inputs to RCSJet outputs. Connect RCSJet fuel and
-         * oxidizer availability to the owning Griffin tank mass outputs; test
-         * positive firing, fuel starvation and oxidizer starvation while valve
-         * demand remains open. Group the nozzles three per corner, deriving
-         * mounts from the bus chamfer faces and top datum. Verify clearances
-         * and actuator torque capacity after changing poses/force ratings.
-         * None of these vehicle changes is implemented by this source entry.
+        doc /* RCS study reconstruction: twelve retained scalar force identities,
+         * three per bus chamfer station, each with one referenced hollow bell.
+         * Shared library exhaust is opposite the actuator's body-frame force;
+         * no Twin-owned flame/core/light proxies. Fuel and oxidizer availability
+         * are wired to live tank mass outputs. The 2021 PUG supplies a historical
+         * 25 lbf rating; using that rating with the 2026 four-cluster topology is
+         * an explicit study assumption, not a current flight-engine specification.
+         * Reference https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf
+         * Mounts derive from the source bus chamfer midpoint, top minus 40 mm,
+         * 60 mm outward standoff and +/-120 mm tangent spacing. These packaging
+         * estimates use https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
+         * and the current hardware photo https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/.
+         * Symmetric offsets keep each pair's resultant translation and unwanted
+         * moments zero. Torque capacities are 2*nominalForce*effective arm,
+         * computed from the same mount geometry and checked by composed wrench.
          */
         // Astrobotic PUG August 2021 v5.02 p.26: twelve 25 lbf ACS
         // engines, arranged in groups of three. SI force uses exact
@@ -165,12 +168,59 @@ package GriffinPropulsionRequirements {
         attribute throatRadiusM : Real = .012;
         attribute bellHeightM : Real = .12;
         attribute collarHeightM : Real = .03;
+        // Study shell, not a qualified pressure wall. 1 mm retains an open
+        // bore at the estimated 12 mm throat and keeps a readable nozzle rim.
+        attribute visualWallThicknessM : Real = .001;
+        attribute bellContourExponent : Real = .55;
+        attribute bellAngularSegments : Integer = 32;
+        attribute bellAxialSegments : Integer = 12;
+        attribute geometryToleranceM : Real = .00001;
+        // Numerical acceptance relative to the commanded moment/force capacity;
+        // an observation tolerance, not a physical pointing requirement.
+        attribute wrenchRelativeTolerance : Real = .00001;
+        // Keep 10% reserve below the smallest pure-axis pair capacity derived
+        // from composed mounts. This prevents an infeasible torque request
+        // from trading unwanted translation against attitude correction.
+        // Study control margin, not an Astrobotic released flight setting.
+        attribute commandTorqueCapacityFraction : Real = .90;
+        // Six seconds includes decay of the pilot's 0.35 s filter and the
+        // observed allocator/feed publication delay before comparing directions.
+        attribute commandSettlingS : Real = 6.0;
+        // M20/MON3 is sourced from the historical PUG, not confirmed flight
+        // composition for the 2026 vehicle. Shared plume class 3 = hypergolic.
+        attribute plumeFuelFamily : Real = 3;
         // Packaging estimates relative to the bus top and diagonal faces.
         // 60 mm outward standoff clears the skin; +/-120 mm tangent offsets
         // separate the three retained actuator identities at each corner.
         attribute mountBelowBusTopM : Real = .04;
         attribute mountStandoffM : Real = .06;
         attribute memberTangentOffsetM : Real = .12;
+    }
+
+    requirement def GPP011_RcsFeedAvailability {
+        doc /* GPP-011 [physics boundary] all twelve RCSJet instances receive fuel
+         * and oxidizer availability from the owning live tank mass outputs.
+         * Positive demand produces useful thrust only with both reactants.
+         * Fuel or oxidizer depletion extinguishes delivered thrust, shared
+         * plume activity and emitted light through Modelica equations, without
+         * a Griffin-specific visibility rule. Source: user engine/no-fuel
+         * contract; physical rationale: a bipropellant thruster needs both feeds.
+         */
+    }
+
+    requirement def GPP012_RcsCommandWrench {
+        doc /* GPP-012 [command boundary] positive and negative pitch, yaw and
+         * roll demand shall select their corresponding one-sided valve pairs.
+         * Each pair's composed position cross delivered force shall have the
+         * requested moment sign, zero unwanted moments and zero net force within
+         * the source numerical tolerance. The allocator's Newton-metre capacities
+         * are synthesized from composed mount poses and nominal jet forces.
+         * Normalized valve allocation metadata and physical force commands have
+         * separate units and ownership. Force actuators
+         * receive computed thrust in newtons, never normalized valve opening.
+         * Source: user request to improve engine command reception; physical
+         * rationale: paired attitude thrusters implement pure body torque.
+         */
     }
 
     requirement def GPP001_EngineCount {
@@ -340,6 +390,22 @@ package GriffinPropulsionRequirements {
     requirement <'GPP-007'> gpp007 : GPP007_BellSeparation { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GPP-008'> gpp008 : GPP008_EnginePlumeDataflow { subject propulsion : GriffinMainPropulsionAssembly; }
     requirement <'GPP-009'> gpp009 : GPP009_TankHardwareClearance { subject propulsion : GriffinMainPropulsionAssembly; }
+    requirement <'GPP-011'> gpp011 : GPP011_RcsFeedAvailability {
+        subject rcs : GriffinAttitudeEngineAssembly;
+    }
+    requirement <'GPP-012'> gpp012 : GPP012_RcsCommandWrench {
+        subject rcs : GriffinAttitudeEngineAssembly;
+    }
+    verification def Verify_GriffinRcsRuntime {
+        doc /* Production fixtures griffin_fuel_exhaustion and
+         * griffin_oxidizer_exhaustion observe the same live feed/chamber/RCS
+         * network with complementary depleted reservoirs. Geometry is checked
+         * by griffin_rcs_wrench_check; runtime command acceptance must observe
+         * all six signed demands through the generated allocator and jet models.
+         */
+        subject rcs : GriffinAttitudeEngineAssembly;
+        objective { verify gpp011; verify gpp012; }
+    }
     requirement <'GES-001'> ges001 : GES001_SkirtTopology { subject skirt : GriffinEngineSkirtComponent; }
     requirement <'GES-002'> ges002 : GES002_SkirtEnvelope { subject skirt : GriffinEngineSkirtComponent; }
     requirement <'GES-003'> ges003 : GES003_SkirtDatum { subject skirt : GriffinEngineSkirtComponent; }

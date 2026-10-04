@@ -161,38 +161,6 @@ fn station_ring_is_centered_hexagon(stations, tolerance) {
     counts[0] == 6 && counts[1] == 6 && counts[2] == 3
 }
 
-// Observe the rendered mesh itself: a closed Cone cap cannot pass this gate.
-fn open_bell_mesh(points, counts, indices) {
-    if !array_is(points) || !array_is(counts) || !array_is(indices)
-        || points.len()==0 || counts.len()==0 {return #{available:false};}
-    let vertices=[]; let maximum=0.0; let minimum=1.0e30;
-    let lower=1.0e30; let upper=-1.0e30;
-    for point in points {
-        let p=vec3_from(point);vertices.push(p);
-        let radius=(p.x*p.x+p.z*p.z).sqrt();
-        if radius>maximum {maximum=radius;}
-        if radius<minimum {minimum=radius;}
-        if p.y<lower {lower=p.y;}
-        if p.y>upper {upper=p.y;}
-    }
-    let open=true; let offset=0;
-    for count in counts {
-        if count!=4 || offset+count>indices.len() {return #{available:false};}
-        let x=0.0;let z=0.0;
-        for i in 0..count {
-            let index=indices[offset+i];
-            if index<0 || index>=vertices.len() {return #{available:false};}
-            x+=vertices[index].x;z+=vertices[index].z;
-        }
-        // Annular rim and wall quads remain away from the flow axis.
-        // A face spanning/closing the bore fails, including a flat disk cap.
-        if (x*x+z*z).sqrt()/count < minimum/2.0 {open=false;}
-        offset+=count;
-    }
-    #{available:offset==indices.len(),radius:maximum,height:upper-lower,
-      minimum:minimum,lower:lower,upper:upper,open:open && minimum>0.0}
-}
-
 // One composed snapshot of the skirt, plate, rail stock and throat ends.
 fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observations, tolerance, profile, body_dimensions, radius, center_y, width, height, shell_depth, shell_inset) {
     let paths=[skirt_root+"/EngineSkirtShell",skirt_root+"/EngineAdapterPlate",skirt_root];
@@ -383,7 +351,7 @@ fn on_tick(me, ctx) {
         }
         this.mesh_snapshot=snapshot;
         this.mesh_source_revision=mesh_source.source_revision;
-        this.mesh_results.push(open_bell_mesh(record.attrs.points,counts.attrs.faceVertexCounts,indices.attrs.faceVertexIndices));
+        this.mesh_results.push(griffin_geometry::open_bell_mesh(record.attrs.points,counts.attrs.faceVertexCounts,indices.attrs.faceVertexIndices));
         return;
     }
     let selected_attributes = [];
@@ -501,7 +469,7 @@ fn on_tick(me, ctx) {
                 document_generation:throat_mesh.document_generation,stage_generation:throat_mesh.stage_generation}) {
                 throw("USD changed while measuring the throat");
             }
-            let neck=open_bell_mesh(throat_mesh.attrs.points,throat_mesh.attrs.faceVertexCounts,throat_mesh.attrs.faceVertexIndices);
+            let neck=griffin_geometry::open_bell_mesh(throat_mesh.attrs.points,throat_mesh.attrs.faceVertexCounts,throat_mesh.attrs.faceVertexIndices);
             let bindings=_required_constraint_bindings(source_model,"gpp006","GPPC006_OpenBellEnvelope",[
                 ["measuredExitRadiusM",_usd_observation(snapshot,mesh.available,mesh.radius,"bell mesh unavailable")],
                 ["measuredHeightM",_usd_observation(snapshot,mesh.available,mesh.height,"bell mesh unavailable")],

@@ -33,31 +33,13 @@ package GriffinSimulationAccuracyRequirements {
             and authoredTargetY <= sourceTargetY + toleranceM;
     }
 
-    constraint def GR038_LandingSurfaceContainsTargetOnTerrainPlane {
-        in authoredPadTopY : Real;
-        in sourceSurfaceY : Real;
-        in padCenterX : Real;
-        in padCenterZ : Real;
-        in targetX : Real;
-        in targetZ : Real;
-        in actualPadHalfExtentX : Real;
-        in actualPadHalfExtentZ : Real;
-        in requiredPadHalfExtentM : Real;
-        in actualPadThicknessM : Real;
-        in requiredPadThicknessM : Real;
+    constraint def GR038_LandingTerrainDatum {
+        in measuredTerrainY : Real;
+        in sourceTerrainY : Real;
+        in surfaceAvailable : Boolean;
         in toleranceM : Real;
-        authoredPadTopY >= sourceSurfaceY - toleranceM
-            and authoredPadTopY <= sourceSurfaceY + toleranceM
-            and actualPadHalfExtentX >= requiredPadHalfExtentM - toleranceM
-            and actualPadHalfExtentX <= requiredPadHalfExtentM + toleranceM
-            and actualPadHalfExtentZ >= requiredPadHalfExtentM - toleranceM
-            and actualPadHalfExtentZ <= requiredPadHalfExtentM + toleranceM
-            and actualPadThicknessM >= requiredPadThicknessM - toleranceM
-            and actualPadThicknessM <= requiredPadThicknessM + toleranceM
-            and targetX >= padCenterX - requiredPadHalfExtentM - toleranceM
-            and targetX <= padCenterX + requiredPadHalfExtentM + toleranceM
-            and targetZ >= padCenterZ - requiredPadHalfExtentM - toleranceM
-            and targetZ <= padCenterZ + requiredPadHalfExtentM + toleranceM;
+        surfaceAvailable and measuredTerrainY >= sourceTerrainY - toleranceM
+            and measuredTerrainY <= sourceTerrainY + toleranceM;
     }
 
     constraint def GR039_GuidanceAssemblyMassMatchesPhysics {
@@ -116,15 +98,15 @@ package GriffinSimulationAccuracyRequirements {
     }
 
     requirement def GR037_LandingTargetDatum {
-        doc /* GR-037 [simulation setup] the mission's authored landing-target Y datum shall agree with the SysML vehicle-reference touchdown datum within the source-owned tolerance before descent starts. This is a setup consistency check, not evidence that the vehicle has landed or that the touchdown dynamics are accurate. */
+        doc /* GR-037 [simulation setup] the mission's authored landing-target Y datum shall agree with the sum of the DEM height and the SysML vehicle-reference touchdown height above support within the source-owned tolerance before descent starts. This is a setup consistency check, not evidence that the vehicle has landed or that the touchdown dynamics are accurate. */
         attribute landingTargetDatumToleranceM : Real = 0.001;
         require GR037_LandingTargetDatumMatchesSource;
     }
 
     requirement def GR038_LandingSurfaceDatum {
-        doc /* GR-038 [simulation setup] the collision pad top shall be continuous with the normalized terrain surface, and the landing target shall lie within the pad footprint. This setup check does not substitute for native four-leg contact or touchdown stability evidence. */
+        doc /* GR-038 [simulation setup] the source-backed DEM shall provide a finite support height at the landing target; that height shall agree with the pinned study anchor datum. Artificial landing slabs are excluded from the production scene. The measured DEM height is added to the vehicle-reference height for target placement. Source: processed LROC NOBILE03 crop sampled through TerrainHeight on 2026-10-04. This setup check does not substitute for native four-leg contact or touchdown stability evidence. */
         attribute landingSurfaceDatumToleranceM : Real = 0.001;
-        require GR038_LandingSurfaceContainsTargetOnTerrainPlane;
+        require GR038_LandingTerrainDatum;
     }
 
 

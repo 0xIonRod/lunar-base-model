@@ -292,10 +292,6 @@ fn landing_gate_report() {
         path: "/Griffin1SurfaceOps/LandingTarget",
         attrs: ["xformOp:translate"]
     });
-    let pad_pose = query("QueryUsdPrim", #{
-        path: "/Griffin1SurfaceOps/LandingSitePad",
-        attrs: ["xformOp:translate", "xformOp:scale"]
-    });
     let lander_port_snapshot = control_snapshot.entities[0];
     let leg_names = ["LegPX", "LegNX", "LegPZ", "LegNZ"];
     let leg_contact_geometry = [];
@@ -357,8 +353,6 @@ fn landing_gate_report() {
         position: if pose == () { [] } else { pose.world_position },
         physics_state: physics,
         landing_target_position: if target_pose == () { () } else { target_pose.world_position },
-        landing_pad_position: if pad_pose == () { () } else { pad_pose.world_position },
-        landing_pad_scale: if pad_pose == () { () } else { pad_pose.attrs["xformOp:scale"] },
         leg_contact_geometry: leg_contact_geometry,
         minimum_leg_compression_m: get(lander, "minimum_leg_compression"),
         rover_physics_state: rover_physics,
@@ -746,7 +740,7 @@ fn drive_route_point(rover, target, speed, radius) {
         brake(rover);
         return #{ok: false, arrived: false, error: "navigation command unavailable"};
     }
-    if command.arrived || command.brake > 0.5 {
+    if command.arrived {
         // Modelica owns FLIP's actuator path.  The generic brake verb does
         // not clear the authored waypoint program, so use the typed stop
         // ports at the route boundary or the previous target can continue
@@ -1246,76 +1240,31 @@ fn set_physical_ramp_hinge_angles(expected_angles) {
         hinge_states: report.hinges, result: result}
 }
 
-// Capture the authored egress apron and the native wheel-contact snapshot at
-// the ramp-exit boundary. The composed USD query proves the source-backed
-// geometry/collision contract; the physics query proves that FLIP actually
-// crossed that collider. This is sampled once at the mission boundary, not
-// from the fixed-step steering loop.
-fn egress_apron_runtime_evidence(rover) {
-    let path = "/Griffin1SurfaceOps/EgressApron";
-    let apron = query("QueryUsdPrim", #{
-        path: path,
-        attrs: ["size", "xformOp:scale", "xformOp:translate",
-            "physics:collisionEnabled", "lunco:source_status",
-            "lunco:egress:surfaceY"],
-        schemas: true,
-        collision_bounds: true
-    });
-    let physics = query("QueryPhysicsState", #{id: rover});
-    let wheel_contacts = if physics == () || physics.wheel_contacts == () {
-        []
-    } else {
-        physics.wheel_contacts
-    };
-    let apron_contacts = [];
-    for contact in wheel_contacts {
-        if contact.hit_usd_prim_path_available == true
-            && contact.hit_usd_prim_path == path
-            && contact.contact_valid == true {
-            apron_contacts.push(contact);
-        }
+// Observe the real DEM support once at the ramp-exit boundary. A valid
+// suspension ray alone could hit the ramp or another vehicle: compare each
+// measured hit point to the DEM instead of accepting an arbitrary collider.
+fn egress_terrain_runtime_evidence(rover) {
+    let physics = query("QueryPhysicsState", #{id:rover});
+    let contacts = if physics == () || physics.wheel_contacts == () {[]} else {physics.wheel_contacts};
+    let required = griffin_spec::_sysml_integer("egressTerrainWheelContactCount");
+    let tolerance = griffin_spec::_sysml_attribute("egressTerrainContactHeightToleranceM");
+    if required == () || tolerance == () {throw("missing DEM egress contact contract");}
+    let evidence=[];
+    for contact in contacts {
+        if !contact.contact_valid || !contact.distance_available {continue;}
+        let origin=contact.ray_origin; let direction=contact.ray_direction;
+        let hit=[]; for axis in 0..3 {hit.push(origin[axis]+direction[axis]*contact.distance_m);}
+        let terrain=terrain_height(hit[0],hit[2]);
+        if terrain == () || !terrain.is_finite() {continue;}
+        let error=(hit[1]-terrain).abs();
+        evidence.push(#{wheel:contact.wheel_usd_prim_path,sample_tick:contact.sample_tick,
+            measured_hit_m:hit,terrain_height_m:terrain,height_error_m:error,
+            normal:contact.normal,ok:error<=tolerance && contact.normal[1]>0.0});
     }
-
-    let expected_center = [
-        griffin_spec::egress_apron_center_x_m(),
-        griffin_spec::site_surface_y_m()
-            - griffin_spec::egress_apron_thickness_m() * 0.5,
-        griffin_spec::egress_apron_center_z_m(),
-    ];
-    let expected_half_extents = [
-        griffin_spec::egress_apron_length_m() * 0.5,
-        griffin_spec::egress_apron_thickness_m() * 0.5,
-        griffin_spec::egress_apron_width_m() * 0.5,
-    ];
-    let bounds = if apron == () { () } else { apron.collision_bounds };
-    let bounds_ok = bounds != () && bounds.center != ()
-        && bounds.half_extents != ()
-        && bounds.center.len() == 3 && bounds.half_extents.len() == 3;
-    let dimensions_match = if !bounds_ok { false } else {
-        (bounds.center[0] - expected_center[0]).abs() <= 0.01
-        && (bounds.center[1] - expected_center[1]).abs() <= 0.01
-        && (bounds.center[2] - expected_center[2]).abs() <= 0.01
-        && (bounds.half_extents[0] - expected_half_extents[0]).abs() <= 0.01
-        && (bounds.half_extents[1] - expected_half_extents[1]).abs() <= 0.01
-        && (bounds.half_extents[2] - expected_half_extents[2]).abs() <= 0.01
-    };
-    let geometry_ok = apron != () && apron.path == path
-        && apron.type_name == "Cube"
-        && apron.attrs["physics:collisionEnabled"] == true
-        && apron.api_schemas != ()
-        && dimensions_match;
-    #{ok: geometry_ok && apron_contacts.len() > 0,
-      path: path,
-      requirement: "GR-035",
-      authored_geometry: apron,
-      collision_bounds: bounds,
-      expected_center_m: expected_center,
-      expected_half_extents_m: expected_half_extents,
-      dimensions_match: dimensions_match,
-      wheel_contacts: wheel_contacts,
-      apron_wheel_contacts: apron_contacts,
-      apron_contact_count: apron_contacts.len(),
-      physics_query_ok: physics != () && physics.ok != false}
+    let valid=0; for item in evidence {if item.ok {valid+=1;}}
+    #{ok:contacts.len()==required && valid==required,requirement:"GR-035",
+      required_contacts:required,terrain_contact_count:valid,
+      height_tolerance_m:tolerance,contacts:evidence}
 }
 
 // Read the authored guidance boundary only when a route verdict is produced.
@@ -1620,7 +1569,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
         check(|m| this.route_control_error != true),
         once(|m| {
             if event == "griffin_ramp_exit_reached" {
-                this.egress_apron_evidence = griffin_surface_ops::egress_apron_runtime_evidence(rover);
+                this.egress_terrain_evidence = griffin_surface_ops::egress_terrain_runtime_evidence(rover);
             }
             emit(event);
             true

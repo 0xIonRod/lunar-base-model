@@ -31,8 +31,56 @@ else
     trap 'rm -rf "$work"' EXIT
 fi
 
+# Pin all executable Twin/library sources, not only the SysML revision. An
+# edited USD between trials invalidates repeatability even if its requirements
+# are unchanged. Resolve the same native asset owner as LunCoSim.
+source_snapshot() {
+    python3 - "$twin_root" "$LUNCOSIM_BIN" <<'SOURCE_PY'
+import hashlib
+import json
+import os
+from pathlib import Path
+import sys
+
+twin = Path(sys.argv[1]).resolve()
+binary = Path(sys.argv[2]).resolve()
+configured = os.environ.get("LUNCO_ASSET_ROOT")
+if configured:
+    library = Path(configured).resolve()
+else:
+    library = next((parent / "assets" for parent in binary.parents
+                    if (parent / "assets").is_dir()), None)
+if library is None or not library.is_dir():
+    raise SystemExit("Cannot pin the simulator asset owner; set LUNCO_ASSET_ROOT")
+extensions = {".usda", ".usd", ".usdc", ".rhai", ".sysml", ".kerml", ".mo", ".toml"}
+def digest_file(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+def digest_tree(root):
+    digest = hashlib.sha256()
+    for path in sorted(root.rglob("*")):
+        if path.is_file() and path.suffix in extensions:
+            digest.update(str(path.relative_to(root)).encode())
+            digest.update(b"\0")
+            digest.update(digest_file(path).encode())
+            digest.update(b"\0")
+    return digest.hexdigest()
+print(json.dumps({"binary": digest_file(binary), "twin": digest_tree(twin),
+                  "library": digest_tree(library)}, sort_keys=True))
+SOURCE_PY
+}
+source_snapshot >"$work/source-baseline.json"
+
 for run in 1 2; do
     log="$work/run-$run.log"
+    source_snapshot >"$work/source-before-$run.json"
+    if ! cmp -s "$work/source-baseline.json" "$work/source-before-$run.json"; then
+        echo "INVALID landing trial $run: executable sources changed before the run" >&2
+        exit 2
+    fi
     set +e
     "$LUNCOSIM_BIN" test \
         --scene "$scene" \
@@ -44,6 +92,11 @@ for run in 1 2; do
         --readiness-timeout "$readiness_timeout" >"$log" 2>&1
     exit_code=$?
     set -e
+    source_snapshot >"$work/source-after-$run.json"
+    if ! cmp -s "$work/source-baseline.json" "$work/source-after-$run.json"; then
+        echo "INVALID landing trial $run: executable sources changed during the run" >&2
+        exit 2
+    fi
     printf '%s\n' "$exit_code" >"$work/run-$run.exit"
     if [[ $exit_code -ne 0 ]]; then
         # Keep collecting the second fresh process. A Rhai stability verdict

@@ -1,7 +1,50 @@
 # Griffin-1 Twin handover
 
-**Latest update:** 2026-10-04 (older sections retain their original evidence scope)
+**Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
+
+## Current engine and terrain checkpoint
+
+RCS now uses twelve referenced hollow nozzles and library exhaust effects.
+Historical 25 lbf ratings, nozzle envelopes, mounts and the hypergolic palette
+are explicitly sourced or estimated in GriffinPropulsionRequirements and
+`requirements/griffin-size-evidence.md`. The geometry-derived allocator owns
+normalized valve allocation; force actuators consume computed Newton thrust.
+Tank availability crosses public MainPropulsion/AttitudePropulsion ports.
+
+The controller's attitude limit is derived from the weakest composed pure-axis
+pair with a source-owned 10% reserve (277.19165 Nm). Generic Lander yaw shares
+that bound. Shared Modelica WrenchAllocator uses cyclic coordinate equations;
+the earlier simultaneous solve left about 18 N of sideways force for a feasible
+pitch request. Current production six-direction command fixture PASS 13,
+2160 ticks / 36 simulated seconds, with pitch net force below 1e-6 N. Fuel and
+oxidizer starvation each PASS 11 at 180 ticks / 3 seconds with demand held.
+Four bounded nozzle mesh checks pass at the saved component generation.
+Evidence logs and source rationale are in the latest size-evidence section.
+
+The mission no longer includes the artificial landing slab, egress apron or
+wrong-axis visual berm cylinders. Its target Y is the measured DEM height plus
+the vehicle reference-to-foot height. Preflight and egress observations use
+native TerrainHeight and wheel contacts. The last clean-DEM trial retained all
+four feet through the stability horizon, but the full route overshot its first
+survey target; route acceptance remains open. These observations predate the
+new RCS/controller checkpoint and must be rerun before claiming current landing
+or egress acceptance.
+
+Core camera/input commits ad5813405 and 48b81a302 are local; production
+lander-controls now PASS 16. Pending fixed-boundary and terrain causal/order
+changes have built, but strict fresh/warm landing replay is still unaccepted.
+The previous pair overlapped USD edits and cannot establish unchanged-fixture
+repeatability. The fresh-process harness now pins binary, Twin and library
+source hashes before and after each trial as well as the runtime SysML revision.
+Do not merge the core stack as a deterministic-reload fix before those runs pass.
+
+Remaining appearance work: bus/chamfer and panel packaging, actual folded-ramp
+backs/mechanism, leg sleeves and footpad articulation, exposed equipment and
+plumbing. Remaining physics work: repeatable landing/reload, full DEM-supported
+FLIP route, pressure-fed main-engine fidelity and reconciled nozzle/feed/fuel
+parameters. Public current engine performance and propellant inventories are
+unavailable; do not substitute historical topology or call study values real.
 
 ## Latest visual and Editor update
 

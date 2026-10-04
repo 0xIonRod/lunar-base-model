@@ -2,34 +2,61 @@
 // solved by the production Griffin Modelica network. Fixture boundary outputs
 // expose grouped member observations without creating separate physics models.
 fn simulation_dependencies(me,ctx) {
-    #{modelica_entities:[find_path("/World/Griffin1"),find_path("/World/Griffin1/MainPropulsion")],
+    #{modelica_entities:[find_path("/World/Griffin1"),find_path("/World/Griffin1/MainPropulsion"),
+          find_path("/World/Griffin1/AttitudeActuation"),find_path("/World/Griffin1/AttitudePropulsion")],
       entity_reads:[],
       entity_writes:[],query_reads:[],required_inputs:[]}
 }
 fn on_start(me,ctx) {
     this.griffin=find_path("/World/Griffin1");
     this.main=find_path("/World/Griffin1/MainPropulsion");
-    this.elapsed=0.0;this.burn_seen=false;this.done=false;
+    this.rcs=find_path("/World/Griffin1/AttitudePropulsion");
+    this.allocator=find_path("/World/Griffin1/AttitudeActuation");
+    this.elapsed=0.0;this.burn_seen=false;this.rcs_burn_seen=false;this.done=false;
     let control=cmd("AcquireControl",#{target:this.griffin,bind_camera:false});
-    let command=cmd("SetPorts",#{target:this.griffin,writes:[["external_throttle",1.0]]});
+    let command=cmd("SetPorts",#{target:this.griffin,writes:[["external_throttle",1.0],["yaw",1.0]]});
     this.command_ok=control.ok && command.ok;
 }
 fn on_tick(me,ctx) {
     if this.done {return;}this.elapsed+=dt();
     let thrust=get(this.main,"thrust_n");let light=get(this.main,"test_intensity");
     if thrust!=() && thrust>1.0 && light>0.0 {this.burn_seen=true;}
+    if get(this.rcs,"yaw_pos_a_thrust_n")>1.0 && get(this.rcs,"test_rcs_intensity")>0.0 {
+        this.rcs_burn_seen=true;
+    }
+    if this.elapsed>=3.0 {
+        print("[griffin-rcs-feed] t="+this.elapsed+" valve="+get(this.allocator,"yaw_pos_a_valve")
+            +" thrust="+get(this.rcs,"yaw_pos_a_thrust_n")
+            +" activity="+get(this.rcs,"yaw_pos_a_activity")
+            +" light="+get(this.rcs,"test_rcs_intensity"));
+    }
     if this.elapsed<3.0 {return;}
     let failures=[];
     failures.push(t_true(this.command_ok,"engine command was rejected"));
     failures.push(t_true(this.burn_seen,"fuel never produced thrust and a plume"));
     failures.push(t_true(get(this.griffin,"throttle")>0.99,"engine command stopped before fuel exhaustion"));
-    failures.push(t_true(get(this.main,"test_fuel_mass")==0.0,"fuel tank did not empty"));
-    failures.push(t_true(get(this.main,"test_oxidizer_flow")>0.0,"oxidizer did not remain available"));
+    let fuel=get(this.main,"test_fuel_mass");
+    let oxidizer=get(this.main,"test_oxidizer_mass");
+    let fuel_empty=fuel==0.0 && oxidizer>0.0;
+    let oxidizer_empty=oxidizer==0.0 && fuel>0.0;
+    failures.push(t_true(fuel_empty || oxidizer_empty,
+        "exactly one reservoir must deplete while the other remains available"));
+    failures.push(t_true((fuel_empty && get(this.main,"test_oxidizer_flow")>0.0)
+        || (oxidizer_empty && get(this.main,"test_fuel_flow")>0.0),
+        "the opposite reactant feed must remain available"));
     failures.push(t_true(thrust==0.0 && get(this.main,"engine_activity")==0.0,
-        "engine continued combustion without fuel"));
+        "engine continued combustion without both reactants"));
     failures.push(t_true(light==0.0 && get(this.main,"test_length")==0.0
         && get(this.main,"test_plume_activity")==0.0,"inactive engine left a plume"));
+    failures.push(t_true(get(this.rcs,"test_rcs_intensity")!=(),"RCS light telemetry unavailable"));
+    failures.push(t_true(this.rcs_burn_seen,"RCS never fired with available propellant"));
+    failures.push(t_true(get(this.allocator,"yaw_pos_a_valve")>0.0,
+        "RCS valve demand did not remain open after fuel exhaustion"));
+    failures.push(t_true(get(this.rcs,"yaw_pos_a_thrust_n")==0.0
+        && get(this.rcs,"yaw_pos_a_activity")==0.0
+        && get(this.rcs,"test_rcs_intensity")==0.0,
+        "RCS useful thrust or shared light persisted without both reactants"));
     print("[griffin-fuel-exhaustion] burn_seen="+this.burn_seen+" fuel="+get(this.main,"test_fuel_mass")
-        +" thrust="+thrust+" intensity="+light);
+        +" oxidizer="+oxidizer+" thrust="+thrust+" intensity="+light);
     this.done=true;report_verdict(failures,"GRIFFIN FUEL EXHAUSTION","GRIFFIN_FUEL_EXHAUSTION");
 }

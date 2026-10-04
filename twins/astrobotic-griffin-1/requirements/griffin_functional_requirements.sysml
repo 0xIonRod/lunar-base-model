@@ -64,8 +64,19 @@ package GriffinFunctionalRequirements {
         doc /* GR-034 [provisional mission interface] author every surface-operations route marker, speed, and arrival radius from one ordered SysML table; the approach marker and 0.35 m approach-lane radius shall require FLIP's front wheels to reach the composed deck-to-ramp transition, and the centreline exit gate shall place the trailing wheels beyond the deployed ramp tip even at the edge of its source-owned arrival radius. The transition length and required overlap are owned by GriffinRampRequirements::GriffinEgressRamp and measured across the full octagonal adapter width; route acceptance also requires composed transition, wheel-path, and octagonal deck evidence. The later diagonal survey legs use the conservative 0.22..0.14 m/s study-speed envelope. Rationale: route control must target the composed component interface and must not declare egress complete while FLIP's trailing wheels are still on the ramp. */
     }
 
-    requirement def GR035_EgressApronContact {
-        doc /* GR-035 [mission interface+physics] provide a named, collidable EgressApron that overlaps the deployed ramp tip near x=11.22 m and extends beyond the (12.80,0.00) centreline exit gate so the released FLIP transitions to a continuous surface before survey navigation. The public sources do not publish a Griffin site-apron ICD, so the 10.00 m x 8.00 m x 0.10 m apron at (13.50,-0.05,-1.00) is an explicit replaceable Twin study assumption. Its top y=0.00 m matches the normalized ramp-tip terrain datum and its centreline placement works with the straight exit gate; it overlaps the composed 12.228605 m ramp tip and extends beyond the original landing-pad boundary at x=6.00 m. It must be authored through the typed Editor and verified through composed collision and wheel-contact evidence, never by moving the rover. */
+    requirement def GR035_EgressTerrainContact {
+        doc /* GR-035 [mission interface+physics] after leaving the deployed
+         * ramp, FLIP shall have four valid native wheel contacts whose measured
+         * hit heights match the source-backed DEM within the study tolerance
+         * owned by GriffinSimulation. Production landing and egress surfaces
+         * shall contain no artificial slabs. The terrain source is the locally
+         * reprojected LROC NOBILE03 crop; the selected touchdown anchor remains
+         * a study location, not an Astrobotic site ICD. Contact observations,
+         * DEM heights and sample ticks are retained at the ramp-exit boundary.
+         * Source/rationale: user removal request and the artificial apron edge
+         * causing route stall in the 2026-10-04 production run. Verify through
+         * Griffin1Requirements::Verify_GriffinSurfaceOperations.
+         */
     }
 
 
@@ -80,7 +91,7 @@ package GriffinFunctionalRequirements {
     requirement <'GR-026'> gr026 : GR026_AdapterRelease { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
     requirement <'GR-028'> gr028 : GR028_InterfaceResolution { subject lander : Griffin1Lander; subject rover : HostedRoverInterface; }
     requirement <'GR-034'> gr034 : GR034_SurfaceRouteDatums { subject rover : HostedRoverInterface; }
-    requirement <'GR-035'> gr035 : GR035_EgressApronContact { subject rover : HostedRoverInterface; }
+    requirement <'GR-035'> gr035 : GR035_EgressTerrainContact { subject rover : HostedRoverInterface; }
 
 
     verification def Verify_GriffinAdapterRelease {

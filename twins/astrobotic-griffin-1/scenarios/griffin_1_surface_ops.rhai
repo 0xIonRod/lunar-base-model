@@ -109,7 +109,7 @@ fn on_start(me, ctx) {
     this.route_command_updates = 0;
     this.route_failure_evidence = ();
     this.route_preflight = ();
-    this.egress_apron_evidence = ();
+    this.egress_terrain_evidence = ();
     this.landing_setup_evidence = ();
     this.guidance_assembly_mass_evidence = ();
     this.rover_settle_probe_tick = ();
@@ -187,7 +187,7 @@ fn on_event(me, evt, ctx) {
     // authored marker triggers instead of the deterministic route task.
     if evt.name == "griffin_ramp_exit_reached" {
         this.ramp_exit_reached = true;
-        this.egress_apron_evidence = griffin_surface_ops::egress_apron_runtime_evidence(rover);
+        this.egress_terrain_evidence = griffin_surface_ops::egress_terrain_runtime_evidence(rover);
         emit("griffin_ramp_exit_reached_confirmed");
         return;
     }
@@ -224,7 +224,7 @@ fn on_event(me, evt, ctx) {
         print("[griffin] rover reached ramp approach");
     } else if path == "/Griffin1SurfaceOps/RoverRampExit" {
         this.ramp_exit_reached = true;
-        this.egress_apron_evidence = griffin_surface_ops::egress_apron_runtime_evidence(rover);
+        this.egress_terrain_evidence = griffin_surface_ops::egress_terrain_runtime_evidence(rover);
         emit("griffin_ramp_exit_reached");
         print("[griffin] rover cleared ramp");
     } else if path == "/Griffin1SurfaceOps/RoverTarget1" {
@@ -246,7 +246,6 @@ fn on_event(me, evt, ctx) {
 fn landing_setup_preflight(state) {
     let setup = griffin_requirements::landing_setup_geometry_check(
         (), "/Griffin1SurfaceOps/LandingTarget",
-        "/Griffin1SurfaceOps/LandingSitePad",
         "/Griffin1SurfaceOps/Lander");
     state.landing_setup_evidence = setup;
     if setup.ok != true {
@@ -256,12 +255,12 @@ fn landing_setup_preflight(state) {
             detail = "landing geometry check failed without a diagnostic";
         }
         print("[griffin] landing geometry preflight failed: " + detail);
-        notify_kind("Griffin landing target or contact pad does not match the SysML geometry.", "error");
+        notify_kind("Griffin landing target or DEM datum does not match the SysML geometry.", "error");
         emit("griffin_surface_ops_geometry_failed");
         return false;
     }
     print("[griffin] landing geometry and four-leg spring rest-pose preflight PASS (target Y="
-        + setup.target_y_m + " m, pad top Y=" + setup.pad_top_y_m + " m)");
+        + setup.landing_target.actual_y + " m, DEM Y=" + setup.landing_surface.measured_surface_y + " m)");
     true
 }
 

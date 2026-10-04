@@ -54,7 +54,7 @@ def Xform "Griffin1" (
     string unit = "rad/s"
 }
     )
-    float inputs:hold_torque_limit_nm = 6000.0
+    float inputs:hold_torque_limit_nm = 277.191650390625
     float inputs:mass
     float inputs:mass.connect = </Griffin1/MainPropulsion.outputs:vehicle_mass_kg>
     float inputs:com_x
@@ -193,6 +193,10 @@ def Xform "Griffin1" (
         float outputs:vehicle_com_y_m.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_com_y_m>
         float outputs:vehicle_com_z_m
         float outputs:vehicle_com_z_m.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_com_z_m>
+        custom float outputs:fuel_mass_kg
+        float outputs:fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+        custom float outputs:oxidizer_mass_kg
+        float outputs:oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
         def Scope "FuelRemainingTelemetry" (
             prepend apiSchemas = "LunCoTelemetryAPI"
         )
@@ -602,6 +606,10 @@ def Xform "Griffin1" (
         float outputs:fuel_mass_flow_kgs.connect = </Griffin1/AttitudePropulsion/RcsFlowAggregator.outputs:fuel_flow_kgs>
         float outputs:oxidizer_mass_flow_kgs
         float outputs:oxidizer_mass_flow_kgs.connect = </Griffin1/AttitudePropulsion/RcsFlowAggregator.outputs:oxidizer_flow_kgs>
+        custom float inputs:available_fuel_mass_kg
+        float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion.outputs:fuel_mass_kg>
+        custom float inputs:available_oxidizer_mass_kg
+        float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion.outputs:oxidizer_mass_kg>
         def Scope "RcsPitchPosModel" (
             prepend apiSchemas = "LunCoProgramAPI"
         )
@@ -609,12 +617,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -628,6 +636,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:pitch_pos_a_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsPitchPosBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -636,12 +656,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -655,6 +675,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:pitch_pos_b_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsPitchNegModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -663,12 +695,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -682,6 +714,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:pitch_neg_a_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsPitchNegBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -690,12 +734,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -709,6 +753,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:pitch_neg_b_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsRollPosModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -717,12 +773,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -736,6 +792,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:roll_pos_a_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsRollPosBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -744,12 +812,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -763,6 +831,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:roll_pos_b_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsRollNegModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -771,12 +851,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -790,6 +870,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:roll_neg_a_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsRollNegBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -798,12 +890,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -817,6 +909,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:roll_neg_b_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsYawPosModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -825,12 +929,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -845,6 +949,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:yaw_pos_a_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsYawPosBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -853,12 +969,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -872,6 +988,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:yaw_pos_b_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsYawNegModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -880,12 +1008,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -900,6 +1028,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:yaw_neg_a_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsYawNegBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -908,12 +1048,12 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 1250.0
+            float inputs:f_nom_n = 111.2055435180664
             float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.18000000715255737
-            float inputs:geometry_capacity_m = 0.7200000286102295
-            float inputs:plume_luminance = 5.474999904632568
+            float inputs:plume_width_m = 0.03999999910593033
+            float inputs:geometry_capacity_m = 0.0
+            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -927,6 +1067,18 @@ def Xform "Griffin1" (
             float outputs:visual_length_fraction
             float inputs:valve_opening
             float inputs:valve_opening.connect = </Griffin1/AttitudePropulsion.inputs:yaw_neg_b_valve>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
+            float inputs:fuel_family = 3.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
         }
         def Scope "RcsFlowAggregator" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -978,48 +1130,6 @@ def Xform "Griffin1" (
                 float inputs:metallic = 0.8500000238418579
                 float inputs:roughness = 0.3799999952316284
                 color3f inputs:emissiveColor = (0.05999999865889549, 0.02500000037252903, 0.00800000037997961)
-                token outputs:surface
-            }
-        }
-        def Material "RcsFlame_Mat"
-        {
-            token outputs:surface
-            token outputs:surface.connect = </Griffin1/Looks/RcsFlame_Mat/Surface.outputs:surface>
-            def Shader "Surface"
-            {
-                uniform token info:implementationSource = "sourceAsset"
-                uniform asset info:wgsl:sourceAsset = @lunco://shaders/plume.wgsl@
-                color3f inputs:core_color = (0.3499999940395355, 2.799999952316284, 7.0)
-                color3f inputs:edge_color = (0.029999999329447746, 0.3499999940395355, 1.7999999523162842)
-                float inputs:throttle = 0.0
-                float inputs:plume_length_fraction = 1.0
-                float inputs:throttle_exponent = 0.3499999940395355
-                float inputs:flicker = 0.800000011920929
-                float inputs:flicker_speed = 11.0
-                float inputs:flicker_scale = 10.0
-                float inputs:density = 14.0
-                float inputs:steps = 18.0
-                token outputs:surface
-            }
-        }
-        def Material "RcsFlameCore_Mat"
-        {
-            token outputs:surface
-            token outputs:surface.connect = </Griffin1/Looks/RcsFlameCore_Mat/Surface.outputs:surface>
-            def Shader "Surface"
-            {
-                uniform token info:implementationSource = "sourceAsset"
-                uniform asset info:wgsl:sourceAsset = @lunco://shaders/plume.wgsl@
-                color3f inputs:core_color = (1.5, 6.0, 12.0)
-                color3f inputs:edge_color = (0.20000000298023224, 1.2000000476837158, 4.0)
-                float inputs:throttle = 0.0
-                float inputs:plume_length_fraction = 1.0
-                float inputs:throttle_exponent = 0.3499999940395355
-                float inputs:flicker = 0.3499999940395355
-                float inputs:flicker_speed = 9.0
-                float inputs:flicker_scale = 8.0
-                float inputs:density = 18.0
-                float inputs:steps = 18.0
                 token outputs:surface
             }
         }
@@ -1758,762 +1868,6 @@ def Xform "Griffin1" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.6200000047683716, 0.6399999856948853, 0.6800000071525574)]
         bool physics:collisionEnabled = false
-        token visibility = "invisible"
-    }
-    def Cone "RcsPitchPos" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.18, 0.72, 0.18)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_pos_a_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_a_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsPitchPosCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.09, 0.45, 0.09)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsPitchNeg" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.18, 0.72, 0.18)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_neg_a_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_a_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsPitchNegCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.09, 0.45, 0.09)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsRollPos" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.18, 0.72, 0.18)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_pos_a_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_a_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsRollPosCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.09, 0.45, 0.09)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsRollNeg" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.18, 0.72, 0.18)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_neg_a_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_a_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsRollNegCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.09, 0.45, 0.09)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsYawPos" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.16, 0.62, 0.16)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_pos_a_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_a_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsYawPosCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.08, 0.38, 0.08)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsYawNeg" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.16, 0.62, 0.16)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_neg_a_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_a_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsYawNegCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.08, 0.38, 0.08)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_a_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsPitchPosB" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.18, 0.72, 0.18)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_pos_b_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_b_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsPitchPosBCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.09, 0.45, 0.09)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsPitchNegB" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.18, 0.72, 0.18)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_neg_b_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_b_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsPitchNegBCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.09, 0.45, 0.09)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsRollPosB" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.18, 0.72, 0.18)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_pos_b_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_b_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsRollPosBCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.09, 0.45, 0.09)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsRollNegB" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.18, 0.72, 0.18)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_neg_b_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_b_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsRollNegBCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.09, 0.45, 0.09)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsYawPosB" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.16, 0.62, 0.16)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_pos_b_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_b_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsYawPosBCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (-1.8, 0.65, -1.8)
-        double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.08, 0.38, 0.08)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-    }
-    def Cone "RcsYawNegB" (
-        prepend apiSchemas = ["LunCoForceActuatorAPI", "MaterialBindingAPI"]
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.16, 0.62, 0.16)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlame_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        custom float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 1250.0
-        rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_neg_b_valve>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_b_thrust_n>
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:visual_length_fraction>
-        token visibility = "invisible"
-        def SphereLight "RcsLight" (
-            prepend apiSchemas = ["ShadowAPI", "LunCoLightAPI"]
-        )
-        {
-            float inputs:intensity = 0.0
-            float inputs:radius = 0.05999999865889549
-            bool inputs:shadow:enable = false
-            color3f inputs:color = (0.20000000298023224, 0.6499999761581421, 1.0)
-            float lunco:light:range = 12.0
-            float inputs:light_intensity
-            float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:light_intensity>
-            float inputs:light_radius
-            float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:light_radius>
-        }
-    }
-    def Cone "RcsYawNegBCore" (
-        prepend apiSchemas = "MaterialBindingAPI"
-    )
-    {
-        uniform token axis = "Y"
-        double radius = 1.0
-        double height = 1.0
-        double3 xformOp:translate = (1.8, 0.65, 1.8)
-        double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
-        double3 xformOp:scale = (0.08, 0.38, 0.08)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
-        rel material:binding = </Griffin1/Looks/RcsFlameCore_Mat>
-        uniform bool doubleSided = true
-        bool lunco:surface:additive = true
-        bool physics:collisionEnabled = false
-        bool primvars:doNotCastShadows = true
-        float inputs:throttle
-        float inputs:throttle.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_b_activity>
-        float inputs:plume_length_fraction
-        float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:visual_length_fraction>
         token visibility = "invisible"
     }
     def PhysicsPrismaticJoint "LegPX_Spring" (
@@ -6724,5 +6078,941 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (-1.8135017819135, 1.76, 0.707)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+    }
+    def Xform "RcsPitchPos" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (-1.554487014477793, 1.6600000000000001, 1.3847813869930217)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_pos_a_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_a_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsPitchPosB" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (-1.554487014477793, 1.6600000000000001, -1.3847813869930217)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_pos_b_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_b_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsPitchNeg" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (1.554487014477793, 1.6600000000000001, 1.3847813869930217)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_neg_a_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_a_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsPitchNegB" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (1.554487014477793, 1.6600000000000001, -1.3847813869930217)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_neg_b_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_b_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsRollPos" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (1.3847813869930217, 1.6600000000000001, -1.554487014477793)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_pos_a_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_a_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsRollPosB" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (-1.3847813869930217, 1.6600000000000001, -1.554487014477793)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_pos_b_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_b_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsRollNeg" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (-1.3847813869930217, 1.6600000000000001, 1.554487014477793)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_neg_a_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_a_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsRollNegB" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (1.3847813869930217, 1.6600000000000001, 1.554487014477793)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_neg_b_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_b_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsYawPos" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (1.4696342007354073, 1.6600000000000001, -1.4696342007354073)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_pos_a_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_a_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsYawPosB" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (-1.4696342007354073, 1.6600000000000001, -1.4696342007354073)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_pos_b_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_b_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsYawNeg" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (-1.4696342007354073, 1.6600000000000001, 1.4696342007354073)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_neg_a_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_a_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_b>
+                    }
+                }
+            }
+        }
+    }
+    def Xform "RcsYawNegB" (
+        prepend apiSchemas = "LunCoForceActuatorAPI"
+    )
+    {
+        custom double3 xformOp:translate = (1.4696342007354073, 1.6600000000000001, 1.4696342007354073)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
+        float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
+        double lunco:forceActuator:maxForce = 111.2055403815125
+        custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_neg_b_valve>
+        custom float inputs:force_command
+        float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_b_thrust_n>
+        def Xform "Nozzle" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda@</World>
+        )
+        {
+            custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
+            custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
+            def "Exhaust"
+            {
+                def "Flame"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:envelope_center_y_m>
+                }
+                def "FlameCore"
+                {
+                    custom float inputs:throttle
+                    float inputs:throttle.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:activity>
+                    custom float inputs:plume_length_fraction
+                    float inputs:plume_length_fraction.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:visual_length_fraction>
+                    custom float inputs:fuel_color_r
+                    float inputs:fuel_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_r>
+                    custom float inputs:fuel_color_g
+                    float inputs:fuel_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_g>
+                    custom float inputs:fuel_color_b
+                    float inputs:fuel_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_b>
+                    custom float inputs:scale_x
+                    float inputs:scale_x.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_z
+                    float inputs:scale_z.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:core_envelope_radius_m>
+                    custom float inputs:scale_y
+                    float inputs:scale_y.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:envelope_length_m>
+                    custom float inputs:translation_y
+                    float inputs:translation_y.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:envelope_center_y_m>
+                    def "PlumeLight"
+                    {
+                        custom float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:light_intensity>
+                        custom float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:light_radius>
+                        custom float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_r>
+                        custom float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_g>
+                        custom float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_b>
+                    }
+                }
+            }
+        }
     }
 }

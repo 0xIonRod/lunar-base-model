@@ -461,7 +461,7 @@ fn sysml_contract_report(verification_name) {
         }
     }
     for name in ["visualLanderDeckWidthM", "wheelRadiusM",
-        "landingSitePadExtentM", "visualReviewGroundWidthM"] {
+        "visualReviewPadHalfExtentM", "visualReviewGroundWidthM"] {
         let value = _sysml_number(report, name);
         if value == () || value <= 0.0 {
             missing.push("positive visual SysML datum " + name);
@@ -845,170 +845,58 @@ fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
       stage_generation: snapshot.stage_generation}
 }
 
-// Check the authored landing target and collision pad against one source
-// revision and one composed USD snapshot. The SysML constraints own both
-// datums; this policy only binds source literals and measured USD geometry.
-fn landing_setup_geometry_check(doc_id, target_path, pad_path, lander_path) {
-    let source = sysml_requirements::source();
-    if source == () || source.ok != true {
-        return #{ok: false,
-            error: "typed SysML source is unavailable for the landing setup constraints",
-            landing_target: #{ok: false, path: target_path,
-                error: "typed SysML source is unavailable"},
-            landing_surface: #{ok: false, path: pad_path,
-                error: "typed SysML source is unavailable"}};
+// One composed target, one pinned source revision and the retained DEM datum.
+// The surface measurement is telemetry, not a fictitious authored collider.
+fn landing_setup_geometry_check(doc_id, target_path, lander_path) {
+    let source=sysml_requirements::source();
+    if source==() || source.ok!=true {return #{ok:false,error:"landing SysML source unavailable"};}
+    let reference=griffin_spec::_sysml_attribute("landingVehicleReferenceTouchdownY");
+    let ground=griffin_spec::_sysml_attribute("landingTerrainDatumY");
+    let target_tolerance=griffin_spec::_typed_model_number("GriffinSimulationAccuracyRequirements::GR037_LandingTargetDatum::landingTargetDatumToleranceM");
+    let surface_tolerance=griffin_spec::_typed_model_number("GriffinSimulationAccuracyRequirements::GR038_LandingSurfaceDatum::landingSurfaceDatumToleranceM");
+    if reference==() || ground==() || target_tolerance==() || surface_tolerance==() {
+        return #{ok:false,error:"landing target/DEM source datums incomplete"};
     }
-    let expected_target_y = sysml_requirements::number(source,
-        griffin_spec::qualified_attribute_name("landingVehicleReferenceTouchdownY"));
-    let target_tolerance = sysml_requirements::number(source,
-        griffin_spec::qualified_attribute_name("landingTargetDatumToleranceM"));
-    let surface_y = sysml_requirements::number(source,
-        griffin_spec::qualified_attribute_name("siteSurfaceY"));
-    let pad_extent = sysml_requirements::number(source,
-        griffin_spec::qualified_attribute_name("landingSitePadExtentM"));
-    let pad_thickness = sysml_requirements::number(source,
-        griffin_spec::qualified_attribute_name("landingSitePadThicknessM"));
-    let surface_tolerance = sysml_requirements::number(source,
-        griffin_spec::qualified_attribute_name("landingSurfaceDatumToleranceM"));
-    if expected_target_y == () || target_tolerance == () || surface_y == ()
-        || pad_extent == () || pad_thickness == () || surface_tolerance == () {
-        return #{ok: false, error: "landing setup datums are incomplete in the SysML source"};
+    let request=#{path:target_path,attrs:["xformOp:translate"]};
+    if doc_id!=() {request.doc_id=doc_id;}
+    let target=query("QueryUsdPrim",request);
+    if target==() || target.attrs==() {return #{ok:false,error:"landing target unavailable"};}
+    let position=target.attrs["xformOp:translate"];
+    if position==() || position.len()!=3 {return #{ok:false,error:"landing target translation unavailable"};}
+    let terrain=query("TerrainHeight",#{x:position[0],z:position[2]});
+    let available=terrain!=() && terrain.found==true && terrain.height.is_finite();
+    let height=if available {terrain.height} else {()};
+    let surface_observation=#{provider:"telemetry",state:if available {"value"} else {"unavailable"},
+        value:height,provider_generation:clock_snapshot().sim_tick,source_revision:source.source_revision,
+        document_id:(),document_generation:(),sample_interval:#{clock:"simulation",start_tick:clock_snapshot().sim_tick,end_tick:clock_snapshot().sim_tick}};
+    let available_observation=#{provider:"telemetry",state:"value",value:available,
+        provider_generation:clock_snapshot().sim_tick,source_revision:source.source_revision,
+        document_id:(),document_generation:(),sample_interval:#{clock:"simulation",start_tick:clock_snapshot().sim_tick,end_tick:clock_snapshot().sim_tick}};
+    let checks=[
+        sysml_requirements::required_constraint_check("GR-037-landing-target-datum","lander","gr037",
+            "Verify_GriffinSurfaceOperations","GriffinSimulationAccuracyRequirements::GR037_LandingTargetDatumMatchesSource",
+            #{authoredTargetY:_usd_snapshot_value(position[1],target),
+              sourceTargetY:_source_value(reference+ground,source),
+              toleranceM:_source_value(target_tolerance,source)},"typed",0.0),
+        sysml_requirements::required_constraint_check("GR-038-landing-terrain-datum","lander","gr038",
+            "Verify_GriffinSurfaceOperations","GriffinSimulationAccuracyRequirements::GR038_LandingTerrainDatum",
+            #{measuredTerrainY:surface_observation,surfaceAvailable:available_observation,
+              sourceTerrainY:_source_value(ground,source),toleranceM:_source_value(surface_tolerance,source)},"typed",0.0)
+    ];
+    let evaluated=sysml_requirements::evaluate(source,checks);
+    if evaluated==() || evaluated.results==() || evaluated.results.len()!=2 {
+        return #{ok:false,error:"landing setup constraint evaluation unavailable"};
     }
-    let request = #{paths: [target_path, pad_path], schemas: true,
-        attrs: ["xformOp:translate", "xformOp:scale", "size",
-            "physics:collisionEnabled"]};
-    if doc_id != () { request.doc_id = doc_id; }
-    let snapshot = query("QueryUsdPrims", request);
-    if snapshot == () || snapshot.ok == false {
-        let detail = if snapshot == () {
-            "QueryUsdPrims returned no response"
-        } else if snapshot.error == () {
-            "QueryUsdPrims failed without a provider diagnostic"
-        } else { snapshot.error };
-        return #{ok: false, error: detail,
-            landing_target: #{ok: false, path: target_path, error: detail},
-            landing_surface: #{ok: false, path: pad_path, error: detail}};
-    }
-    if snapshot.records == () || snapshot.records.len() != 2 {
-        let detail = if snapshot.records == () {
-            "QueryUsdPrims succeeded without a records array"
-        } else {
-            "QueryUsdPrims returned " + snapshot.records.len()
-                + " records for the two requested landing setup prims"
-        };
-        return #{ok: false, error: detail,
-            landing_target: #{ok: false, path: target_path, error: detail},
-            landing_surface: #{ok: false, path: pad_path, error: detail}};
-    }
-    let target = snapshot.records[0];
-    let pad = snapshot.records[1];
-    let target_position = target.attrs["xformOp:translate"];
-    let pad_center = pad.attrs["xformOp:translate"];
-    let pad_scale = pad.attrs["xformOp:scale"];
-    let cube_size = pad.attrs["size"];
-    if target.path != target_path || pad.path != pad_path
-        || target_position == () || target_position.len() != 3
-        || pad_center == () || pad_center.len() != 3
-        || pad_scale == () || pad_scale.len() != 3 || cube_size == ()
-        || cube_size <= 0.0 {
-        return #{ok: false, error: "landing target or pad has incomplete composed geometry",
-            landing_target: #{ok: false, path: target_path,
-                error: "landing target has no composed three-axis translate"},
-            landing_surface: #{ok: false, path: pad_path,
-                error: "landing pad has no complete composed cube geometry"}};
-    }
-    let actual_pad_half_extent_x = (pad_scale[0] * cube_size * 0.5).abs();
-    let actual_pad_half_extent_y = (pad_scale[1] * cube_size * 0.5).abs();
-    let actual_pad_half_extent_z = (pad_scale[2] * cube_size * 0.5).abs();
-    let actual_pad_top_y = pad_center[1] + actual_pad_half_extent_y;
-    let collision_enabled = pad.attrs["physics:collisionEnabled"] == true;
-    let collision_schema = pad.api_schemas != ()
-        && _has(pad.api_schemas, "PhysicsCollisionAPI");
-
-    let target_constraint = sysml_requirements::required_constraint_check(
-        "GR-037-landing-target-datum", "lander", "gr037",
-        "Verify_GriffinSurfaceOperations",
-        "GriffinSimulationAccuracyRequirements::GR037_LandingTargetDatumMatchesSource",
-        #{authoredTargetY: _usd_snapshot_value(target_position[1], target),
-          sourceTargetY: _source_value(expected_target_y, source),
-          toleranceM: _source_value(target_tolerance, source)}, "typed", 0.0);
-    let surface_constraint = sysml_requirements::required_constraint_check(
-        "GR-038-landing-surface-datum", "lander", "gr038",
-        "Verify_GriffinSurfaceOperations",
-        "GriffinSimulationAccuracyRequirements::GR038_LandingSurfaceContainsTargetOnTerrainPlane",
-        #{authoredPadTopY: _derived_snapshot_value(actual_pad_top_y, pad),
-          sourceSurfaceY: _source_value(surface_y, source),
-          padCenterX: _usd_snapshot_value(pad_center[0], pad),
-          padCenterZ: _usd_snapshot_value(pad_center[2], pad),
-          targetX: _usd_snapshot_value(target_position[0], target),
-          targetZ: _usd_snapshot_value(target_position[2], target),
-          actualPadHalfExtentX: _derived_snapshot_value(actual_pad_half_extent_x, pad),
-          actualPadHalfExtentZ: _derived_snapshot_value(actual_pad_half_extent_z, pad),
-          requiredPadHalfExtentM: _source_value(pad_extent, source),
-          actualPadThicknessM: _derived_snapshot_value(
-              actual_pad_half_extent_y * 2.0, pad),
-          requiredPadThicknessM: _source_value(pad_thickness, source),
-          toleranceM: _source_value(surface_tolerance, source)}, "typed", 0.0);
-    let evaluation = sysml_requirements::evaluate(source,
-        [target_constraint, surface_constraint]);
-    if evaluation == () || evaluation.results == ()
-        || evaluation.results.len() != 2 {
-        return #{ok: false,
-            error: "SysML landing setup constraints did not produce two results",
-            landing_target: #{ok: false, path: target_path,
-                error: "GR-037 constraint evaluation failed"},
-            landing_surface: #{ok: false, path: pad_path,
-                error: "GR-038 constraint evaluation failed"}};
-    }
-    let target_result = evaluation.results[0];
-    let surface_result = evaluation.results[1];
-    let landing_gear = landing_gear_spring_pose_report(doc_id, lander_path,
-        source, "Verify_GriffinLandingLegRequirements");
-    let shape_valid = pad.type_name == "Cube" && collision_enabled && collision_schema;
-    let surface_ok = surface_result.ok == true && shape_valid;
-    let target_ok = target_result.ok == true;
-    let detail = "";
-    if !target_ok { detail = _constraint_result_failure(target_result); }
-    if surface_result.ok != true {
-        if detail != "" { detail += "; "; }
-        detail += _constraint_result_failure(surface_result);
-    }
-    if !shape_valid {
-        if detail != "" { detail += "; "; }
-        detail += "landing pad is not a colliding Cube with PhysicsCollisionAPI";
-    }
-    if landing_gear.ok != true {
-        if detail != "" { detail += "; "; }
-        detail += "landing gear rest-pose preflight failed: " + landing_gear.error;
-    }
-    #{ok: target_ok && surface_ok && landing_gear.ok == true,
-      error: if target_ok && surface_ok && landing_gear.ok == true { "" } else { detail },
-      source_revision: source.source_revision,
-      source_files: source.source_files,
-      target_y_m: target_position[1],
-      pad_top_y_m: actual_pad_top_y,
-      pad_center: pad_center,
-      pad_half_extents_m: [actual_pad_half_extent_x,
-          actual_pad_half_extent_y, actual_pad_half_extent_z],
-      pad_collision_enabled: collision_enabled,
-      landing_target: #{ok: target_ok, path: target_path,
-          expected_y: expected_target_y, actual_y: target_position[1],
-          tolerance: target_tolerance, constraint: target_result,
-          error: _constraint_result_failure(target_result)},
-      landing_surface: #{ok: surface_ok, path: pad_path,
-          expected_surface_y: surface_y, actual_pad_top_y: actual_pad_top_y,
-          expected_half_extent_m: pad_extent,
-          expected_thickness_m: pad_thickness,
-          target_position: target_position,
-          collision_enabled: collision_enabled,
-          collision_schema: collision_schema,
-          constraint: surface_result,
-          error: if surface_ok { "" }
-              else if surface_result.ok != true {
-                  _constraint_result_failure(surface_result)
-              } else { "landing pad is not a colliding Cube" }},
-      landing_gear: landing_gear
-}
+    let gear=landing_gear_spring_pose_report(doc_id,lander_path,source,"Verify_GriffinLandingLegRequirements");
+    let target_result=evaluated.results[0];let surface_result=evaluated.results[1];
+    let ok=target_result.ok==true && surface_result.ok==true && gear.ok==true;
+    #{ok:ok,error:if ok {""} else {"landing target/DEM/gear preflight failed"},
+      source_revision:source.source_revision,source_files:source.source_files,
+      landing_target:#{ok:target_result.ok==true,path:target_path,expected_y:reference+ground,
+          actual_y:position[1],constraint:target_result},
+      landing_surface:#{ok:surface_result.ok==true,path:"/Griffin1SurfaceOps/Environment/Terrain",
+          expected_surface_y:ground,measured_surface_y:height,sample_tick:clock_snapshot().sim_tick,constraint:surface_result},
+      landing_gear:gear}
 }
 
 // Visual-only wrappers are not always spawned by the isolated headless

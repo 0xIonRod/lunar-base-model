@@ -1,0 +1,26 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World" (
+    prepend references = @twin://astrobotic-griffin-1/tests/griffin_fuel_exhaustion.usda@</World>
+)
+{
+    def "Griffin1"
+    {
+        def "MainPropulsion"
+        {
+            def "FuelTank"
+            {
+                float inputs:initial_mass_kg = 100.0
+            }
+            def "OxidizerTank"
+            {
+                float inputs:initial_mass_kg = 5.0
+            }
+        }
+    }
+}

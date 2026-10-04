@@ -1462,3 +1462,71 @@ readback confirmed the source-derived force envelope. Core source at this run
 was `ad5813405` plus the pending fixed-step physics admission and terrain
 causal-admission changes. Log: `target/griffin-engine-force-contract-live.log`
 in the owned terrain checkout, API port 49766.
+
+## RCS nozzles and physical command reception, 2026-10-05
+
+Each of twelve attitude-force identities now owns one referenced hollow bell,
+with curved walls and an open throat. The shared library engine exhaust supplies
+plume/core/light; retired Twin cone/flame/light proxies are removed. Bell shape
+construction and inspection share `griffin_geometry`; there is no second engine
+mesh algorithm. Editor projection and four bounded mesh checks agree at the
+saved source generation. Focused view: `target/griffin-rcs-bell-current-framed.png`
+in the owned terrain checkout, port 49772.
+
+The historical [August 2021 PUG v5.02, p.26](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf)
+gives twelve 25 lbf ACS engines. The current [Astrobotic product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
+gives four attitude clusters. Combining twelve jets, four corner clusters and
+111.2055403815125 N per jet is an explicit study choice, not a released 2026
+engine specification. The 80 mm exit diameter, 120 mm bell height, 24 mm throat
+diameter, 30 mm collar and 1 mm visual wall are packaging estimates from small
+nozzle silhouettes in the [PGH image](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
+and [June 2026 hardware photographs](https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/).
+The 60 mm standoff, 40 mm below-bus-top datum and 120 mm member spacing are
+estimated clearances. They keep the nozzles on the chamfers and preserve paired
+zero-translation moment geometry. They are not supplier mount dimensions.
+Historical M20/MON3 identifies the hypergolic plume family; its RGB/photometry
+are illustrative library estimates, not measured Griffin spectra.
+
+The command path has two distinct units. The geometry-derived allocator emits
+normalized valve openings. Those output relationships identify allocator
+columns; each physical force input receives the RCSJet's computed thrust in
+newtons. Fuel and oxidizer mass pass through public MainPropulsion outputs and
+AttitudePropulsion inputs before entering each jet. Direct child-to-child
+connections across compiled network boundaries were rejected and are removed.
+
+The previous 6000 Nm controller bound exceeded the small modeled jet bank's
+pure-axis capacity and could saturate it into unwanted translation. The current
+bound is 277.19165 Nm: 90% of the weakest composed pure-axis pair capacity.
+The 10% reserve is an explicit control study margin. The builder derives the
+capacity from composed force directions, positions and ratings; it does not
+maintain a copied torque table. The generic Lander yaw command now shares this
+physical bound with its attitude-hold requests.
+
+The shared Modelica allocator now performs bounded cyclic coordinate sweeps.
+The previous simultaneous gradient iterations left about 18 N of unintended
+sideways force for a feasible pitch request. The production command fixture
+passes thirteen checks covering positive/negative pitch, yaw and roll, requested
+moment magnitude, unwanted moments and net force. It observes the generated
+allocator and live RCS outputs at 60 Hz, one physics thread and zero jitter:
+2160 ticks / 36 simulated seconds. Pitch net force is below 1e-6 N. Evidence:
+`target/griffin-rcs-coordinate-equations.log`. The source-owned relative numerical
+tolerance is 1e-5; six-second settling includes the existing 0.35-second pilot
+filter and network publication delay. This proves the control boundary in a
+motion-disabled fixture, not free-flight pointing performance.
+
+Fuel and oxidizer starvation each pass eleven checks through the accepted
+allocator and production propulsion network: 180 ticks / 3 simulated seconds,
+one physics thread, zero jitter. Both main engines and RCS produce useful
+thrust/light before depletion, then reach zero thrust, activity and light while
+main demand and a positive allocated RCS valve demand remain held. The two
+fixtures share one observer and one propulsion composition; their tank loads
+are complementary test stimuli, not proposed flight inventories. Evidence:
+`target/griffin-fuel-coordinate-equations.log` and
+`target/griffin-oxidizer-coordinate-equations.log`. All twelve jets receive both
+live availability inputs through the common network boundaries.
+
+The main-engine feed architecture, total fuel inventory, aggregate throat area
+and current flight engine ratings remain engineering-data gaps. This RCS/control
+checkpoint does not resolve them or qualify flight performance. Fresh landing,
+warm reload, full FLIP route and the remaining hardware appearance refinements
+must still pass independently.

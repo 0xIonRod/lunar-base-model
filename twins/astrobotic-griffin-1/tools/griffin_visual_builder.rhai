@@ -931,142 +931,6 @@ fn apply_surface_route_markers(doc, edit_target, root, parent_gen) {
       command: command}
 }
 
-// The physical ramp ends before the original landing pad.  Author the
-// prepared egress surface as a named scene component so the route can prove
-// four-wheel support after the ramp instead of relying on a route-coordinate
-// exception or a rover teleport. All geometry datums cross the typed SysML bridge;
-// requirement provenance remains in the requirement source model rather than
-// being copied into scene string metadata. This function only projects them
-// into the active scene through the journaled Editor command.
-fn egress_apron_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("egress_apron_plan requires a document, edit target, and absolute root");
-    }
-    let name = griffin_spec::egress_apron_name();
-    let cx = griffin_spec::egress_apron_center_x_m();
-    let cz = griffin_spec::egress_apron_center_z_m();
-    let length = griffin_spec::egress_apron_length_m();
-    let width = griffin_spec::egress_apron_width_m();
-    let thickness = griffin_spec::egress_apron_thickness_m();
-    let surface_y = griffin_spec::site_surface_y_m();
-    if name == () || name == ""
-        || cx == () || cz == ()
-        || length == () || width == () || thickness == () || surface_y == ()
-        || length <= 0.0 || width <= 0.0 || thickness <= 0.0 {
-        return plan_error("typed EgressApron datums are incomplete or non-positive");
-    }
-    let cy = surface_y - thickness * 0.5;
-    let path = root + "/" + name;
-    let existing = assembly_builder::composed_query(doc,
-        #{path: path, children: false, attrs: ["physics:collisionEnabled"]});
-    let ops = [];
-    if !query_ok(existing) {
-        let shape = assembly_builder::cube_shape_plan(edit_target, root, name, 1.0,
-            [length, thickness, width], true);
-        if !shape.ok { return shape; }
-        for op in shape.ops { ops.push(op); }
-        let placement = assembly_builder::place_plan(edit_target, path,
-            [cx, cy, cz], (), [length, thickness, width]);
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
-    } else {
-        if existing.type_name != "Cube" {
-            return plan_error(path + ": expected Cube, got " + existing.type_name);
-        }
-        let placement = assembly_builder::place_plan(edit_target, path,
-            [cx, cy, cz], (), [length, thickness, width]);
-        if !placement.ok { return placement; }
-        for op in placement.ops { ops.push(op); }
-    }
-    ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path,
-        schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "physics:collisionEnabled", type_name: "bool", value: "true"}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "primvars:displayColor", type_name: "color3f[]",
-        value: _color_literal([0.22, 0.24, 0.28])}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "lunco:component", type_name: "token", value: "\"Griffin" + name + "\""}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "lunco:source_status", type_name: "string", value: "\"study assumption\""}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "lunco:egress:surfaceY", type_name: "double",
-        value: surface_y.to_string()}});
-    ops.push(#{SetRelationship: #{edit_target: edit_target, path: path,
-        name: "material:binding:physics",
-        targets: [root + "/PhysicsMaterials/Friction_1_0"]}});
-    #{ok: true, kind: "griffin_egress_apron", path: path, name: name,
-      center: [cx, cy, cz], length_m: length, width_m: width,
-      thickness_m: thickness, surface_y: surface_y, ops: ops,
-      no_op: ops.len() == 0}
-}
-
-fn landing_site_pad_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("landing_site_pad_plan requires a document, edit target, and absolute root");
-    }
-    let name = griffin_spec::landing_site_pad_name();
-    let extent = griffin_spec::landing_site_pad_extent_m();
-    let thickness = griffin_spec::landing_site_pad_thickness_m();
-    let surface_y = griffin_spec::site_surface_y_m();
-    if name == () || name == "" || extent == () || thickness == () || surface_y == ()
-        || extent <= 0.0 || thickness <= 0.0 {
-        return plan_error("typed landing-site pad datums are incomplete or non-positive");
-    }
-    let path = root + "/" + name;
-    let existing = assembly_builder::composed_query(doc,
-        #{path: path, children: false, attrs: ["physics:collisionEnabled"]});
-    let ops = [];
-    if !query_ok(existing) {
-        let shape = assembly_builder::cube_shape_plan(edit_target, root, name, 1.0,
-            [extent * 2.0, thickness, extent * 2.0], true);
-        if !shape.ok { return shape; }
-        for op in shape.ops { ops.push(op); }
-    } else if existing.type_name != "Cube" {
-        return plan_error(path + ": expected Cube, got " + existing.type_name);
-    }
-    let placement = assembly_builder::place_plan(edit_target, path,
-        [0.0, surface_y - thickness * 0.5, 0.0], (),
-        [extent * 2.0, thickness, extent * 2.0]);
-    if !placement.ok { return placement; }
-    for op in placement.ops { ops.push(op); }
-    ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path,
-        schemas: ["PhysicsCollisionAPI", "MaterialBindingAPI"]}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "physics:collisionEnabled", type_name: "bool", value: "true"}});
-    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-        name: "primvars:displayColor", type_name: "color3f[]",
-        value: _color_literal([0.24, 0.25, 0.27])}});
-    ops.push(#{SetRelationship: #{edit_target: edit_target, path: path,
-        name: "material:binding:physics",
-        targets: [root + "/PhysicsMaterials/Friction_1_0"]}});
-    #{ok: true, kind: "griffin_landing_site_pad", path: path,
-      center: [0.0, surface_y - thickness * 0.5, 0.0],
-      half_extents: [extent, thickness * 0.5, extent],
-      surface_y: surface_y, ops: ops, no_op: ops.len() == 0}
-}
-
-fn apply_landing_site_pad(doc, edit_target, root, parent_gen) {
-    let plan = landing_site_pad_plan(doc, edit_target, root);
-    if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc, "Author Griffin landing-site contact pad",
-        plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, path: plan.path,
-      center: plan.center, half_extents: plan.half_extents,
-      surface_y: plan.surface_y, command: command}
-}
-
-fn apply_egress_apron(doc, edit_target, root, parent_gen) {
-    let plan = egress_apron_plan(doc, edit_target, root);
-    if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc, "Author Griffin physical egress apron",
-        plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, path: plan.path,
-      center: plan.center, length_m: plan.length_m, width_m: plan.width_m,
-      thickness_m: plan.thickness_m, surface_y: plan.surface_y,
-      command: command}
-}
-
 // Isolated Editor plans -----------------------------------------------------
 //
 // The combined review scene above remains useful as a regression fixture, but
@@ -4178,15 +4042,7 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
     if throat==() || exit==() || height==() || throat<=wall || exit<=throat || height<=0.0 {
         return plan_error("engine envelope is invalid");
     }
-    let profile = [];
-    for i in 0..(axial+1) {
-        let station = (i.to_float()/axial.to_float()) ** 2.0;
-        profile.push([throat+(exit-throat)*(station ** contour),height*(0.5-station)]);
-    }
-    for i in 0..(axial+1) {
-        let station = ((axial-i).to_float()/axial.to_float()) ** 2.0;
-        profile.push([throat+(exit-throat)*(station ** contour)-wall,height*(0.5-station)]);
-    }
+    let profile=griffin_geometry::hollow_bell_profile(throat,exit,height,wall,contour,axial);
     let neck_height=f64_from(model.value(own+"throatHeightM"));
     let neck_center=f64_from(model.value(own+"throatCenterYM"));
     if neck_height==() || neck_height<=0.0 || neck_center==() {
@@ -6253,4 +6109,227 @@ fn axial_landing_gear_plan(doc, edit_target, root) {
         }
     }
     #{ok:true,ops:ops,shock_neutral_length_m:length,joint_count:4,body_count:4}
+}
+
+// One reusable RCS bell, expressed in SI from the owning SysML study contract.
+fn griffin_rcs_bell_component_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("RCS source is unavailable");}
+    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
+    let throat=f64_from(model.value(own+"throatRadiusM"));
+    let exit=f64_from(model.value(own+"exitRadiusM"));
+    let height=f64_from(model.value(own+"bellHeightM"));
+    let collar=f64_from(model.value(own+"collarHeightM"));
+    let wall=f64_from(model.value(own+"visualWallThicknessM"));
+    let contour=f64_from(model.value(own+"bellContourExponent"));
+    let axial=model.value(own+"bellAxialSegments");
+    let segments=model.value(own+"bellAngularSegments");
+    if throat==() || exit==() || height==() || collar==() || wall==()
+        || contour==() || axial==() || segments==() || throat<=wall
+        || exit<=throat || height<=0.0 || collar<=0.0 || axial<8 || segments<16 {
+        return plan_error("RCS nozzle dimensions are incomplete");
+    }
+    let profile=griffin_geometry::hollow_bell_profile(throat,exit,height,wall,contour,axial);
+    let neck=[[throat,height/2.0],[throat,height/2.0+collar],
+        [throat-wall,height/2.0+collar],[throat-wall,height/2.0]];
+    let ops=[#{SetReferenceArcs:#{edit_target:edit_target,path:root,
+        references:[#{asset_path:"lunco://components/propulsion/rocket_engine_visual.usda",prim_path:"/Engine"}],list_op:"Prepend"}},
+        #{SetStageMetrics:#{edit_target:edit_target,metrics:#{meters_per_unit:1.0,up_axis:"Y"}}}];
+    let color=model.value("GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::bellDisplayColor");
+    for member in [#{name:"Bell",profile:profile},#{name:"Throat",profile:neck}] {
+        let path=root+"/"+member.name;
+        ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:member.name,type_name:"Mesh",reference:(),reference_prim_path:()}});
+        ops.push(#{RevolveProfileMesh:#{edit_target:edit_target,path:path,
+            profile:member.profile,angular_segments:segments,
+            normal_crease_angle_deg:60.0,display_color:color,collision_enabled:false}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"purpose",type_name:"token",value:"\"render\""}});
+        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:["MaterialBindingAPI"]}});
+        ops.push(#{SetRelationship:#{edit_target:edit_target,path:path,name:"material:binding",targets:[root+"/Looks/Nozzle_Mat"]}});
+    }
+    ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Exhaust",type_name:"Xform",reference:(),reference_prim_path:()}});
+    ops.push(#{SetTranslate:#{edit_target:edit_target,path:root+"/Exhaust",value:[0.0,-height/2.0,0.0]}});
+    #{ok:true,ops:ops,exit_radius_m:exit,bell_height_m:height,throat_radius_m:throat}
+}
+
+// The complete feed wiring belongs to the single attitude propulsion network.
+fn griffin_rcs_feed_plan(doc, edit_target, root) {
+    let fuel=griffin_spec::_typed_model_number(
+        "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::plumeFuelFamily");
+    let radius=griffin_spec::_typed_model_number(
+        "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::exitRadiusM");
+    if fuel==() || radius==() || radius<=0.0 {return plan_error("RCS feed source incomplete");}
+    let ops=[];
+    for reactant in [#{name:"fuel",tank:"FuelTank"},#{name:"oxidizer",tank:"OxidizerTank"}] {
+        ops.push(#{SetConnection:#{edit_target:edit_target,path:root+"/MainPropulsion",
+            name:"outputs:"+reactant.name+"_mass_kg",type_name:"float",
+            sources:[root+"/MainPropulsion/"+reactant.tank+".outputs:mass_kg"]}});
+        ops.push(#{SetConnection:#{edit_target:edit_target,path:root+"/AttitudePropulsion",
+            name:"inputs:available_"+reactant.name+"_mass_kg",type_name:"float",
+            sources:[root+"/MainPropulsion.outputs:"+reactant.name+"_mass_kg"]}});
+    }
+    for jet in griffin_spec::rcs_port_mapping() {
+        let path=root+"/AttitudePropulsion/"+jet.model_name;
+        for reactant in [#{input:"available_fuel_mass_kg",tank:"FuelTank"},
+            #{input:"available_oxidizer_mass_kg",tank:"OxidizerTank"}] {
+            ops.push(#{SetConnection:#{edit_target:edit_target,path:path,
+                name:"inputs:"+reactant.input,type_name:"float",
+                sources:[root+"/AttitudePropulsion.inputs:"+reactant.input]}});
+        }
+        for output in ["color_r","color_g","color_b","envelope_radius_m",
+            "core_envelope_radius_m","envelope_length_m","envelope_center_y_m"] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
+                name:"outputs:"+output,type_name:"float",value:"0.0"}});
+        }
+        for parameter in [#{name:"fuel_family",value:fuel},
+            #{name:"plume_width_m",value:radius},#{name:"geometry_capacity_m",value:0.0},
+            #{name:"plume_luminance",value:0.0}] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
+                name:"inputs:"+parameter.name,type_name:"float",value:parameter.value.to_string()}});
+        }
+    }
+    #{ok:true,ops:ops,jet_count:griffin_spec::rcs_port_mapping().len()}
+}
+
+// Bounded face batches keep mesh observations inside the normal Editor budget.
+// Accept the component only after all four batches at one document generation.
+fn griffin_rcs_bell_check(doc, root, batch) {
+    if batch<0 || batch>=4 {return plan_error("RCS mesh batch must be 0..3");}
+    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
+    let record=assembly_builder::composed_query(doc,#{path:root+"/Bell",
+        attrs:["points","faceVertexCounts","faceVertexIndices","physics:collisionEnabled"]});
+    if !query_ok(record) || record.attrs.points==() {return plan_error("RCS mesh unavailable");}
+    let counts=record.attrs.faceVertexCounts;
+    let indices=record.attrs.faceVertexIndices;
+    let lower=counts.len()*batch/4;let upper=counts.len()*(batch+1)/4;
+    let first=0;for i in 0..lower {first+=counts[i];}
+    let end=first;for i in lower..upper {end+=counts[i];}
+    let mesh=griffin_geometry::open_bell_mesh(record.attrs.points,
+        counts.extract(lower,upper-lower),indices.extract(first,end-first));
+    let radius=griffin_spec::_typed_model_number(own+"exitRadiusM");
+    let height=griffin_spec::_typed_model_number(own+"bellHeightM");
+    let throat=griffin_spec::_typed_model_number(own+"throatRadiusM");
+    let wall=griffin_spec::_typed_model_number(own+"visualWallThicknessM");
+    let tolerance=griffin_spec::_typed_model_number(own+"geometryToleranceM");
+    if radius==() || height==() || throat==() || wall==() || tolerance==() {return plan_error("RCS source incomplete");}
+    #{ok:mesh.available && mesh.open && (mesh.radius-radius).abs()<=tolerance
+        && (mesh.height-height).abs()<=tolerance
+        && (mesh.minimum-(throat-wall)).abs()<=tolerance
+        && record.attrs["physics:collisionEnabled"]==false,
+      batch:batch,batches:4,doc_id:record.doc_id,
+      document_generation:record.document_generation,mesh:mesh}
+}
+
+fn griffin_rcs_nozzle_station_plan(doc, edit_target, root, index) {
+    let jets=griffin_spec::rcs_port_mapping();
+    if index<0 || index>=jets.len() {return plan_error("RCS station index invalid");}
+    let jet=jets[index];let name=jet.model_name.sub_string(0,jet.model_name.len()-5);
+    let path=root+"/"+name;let model=root+"/AttitudePropulsion/"+jet.model_name;
+    let record=assembly_builder::composed_query(doc,#{path:path,
+        attrs:["xformOp:translate","xformOp:rotateXYZ","lunco:forceActuator:direction","lunco:forceActuator:maxForce"]});
+    if !query_ok(record) || record.attrs["xformOp:translate"]==()
+        || record.attrs["xformOp:rotateXYZ"]==()
+        || record.attrs["lunco:forceActuator:direction"]==() {
+        return plan_error("RCS physical station unavailable");
+    }
+    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
+    let force=griffin_spec::_typed_model_number(own+"nominalForceN");
+    let below=griffin_spec::_typed_model_number(own+"mountBelowBusTopM");
+    let standoff=griffin_spec::_typed_model_number(own+"mountStandoffM");
+    let offset=griffin_spec::_typed_model_number(own+"memberTangentOffsetM");
+    let dimensions=griffin_spec::visual_body_dimensions();
+    let mount=griffin_spec::visual_body_mount();
+    let profile=griffin_spec::visual_outer_body_profile_coordinates();
+    if force==() || below==() || standoff==() || offset==()
+        || dimensions==() || mount==() || profile.len()!=8 {
+        return plan_error("RCS mount and rating source unavailable");
+    }
+    let old=vec3_from(record.attrs["xformOp:translate"]);
+    let sx=old.x/old.x.abs();let sz=old.z/old.z.abs();
+    let chamfer=(1.0+profile[0].x.abs())/2.0;
+    let arm_x=dimensions.x/2.0*chamfer+standoff/2.0.sqrt();
+    let arm_z=dimensions.z/2.0*chamfer+standoff/2.0.sqrt();
+    let tangent=if jet.valve_port.contains("pitch") {-offset}
+        else if jet.valve_port.contains("roll") {offset} else {0.0};
+    tangent*=sx*sz;
+    let position=[sx*arm_x-sz*tangent/2.0.sqrt(),
+        mount.y+dimensions.y/2.0-below,
+        sz*arm_z+sx*tangent/2.0.sqrt()];
+    let ops=[#{RemovePrim:#{edit_target:edit_target,path:path}},
+        #{AddPrim:#{edit_target:edit_target,parent_path:root,name:name,type_name:"Xform",reference:(),reference_prim_path:()}},
+        #{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:["LunCoForceActuatorAPI"]}},
+        #{SetTranslate:#{edit_target:edit_target,path:path,value:position}},
+        #{SetRotate:#{edit_target:edit_target,path:path,value:record.attrs["xformOp:rotateXYZ"]}},
+        #{SetAttribute:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:direction",type_name:"float3",value:_color3_literal(record.attrs["lunco:forceActuator:direction"])}},
+        #{SetAttribute:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:maxForce",type_name:"double",value:force.to_string()}},
+        #{SetRelationship:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:commandSource",targets:[root+"/AttitudeActuation.outputs:"+jet.valve_port]}},
+        #{SetConnection:#{edit_target:edit_target,path:path,name:"inputs:force_command",type_name:"float",sources:[root+"/AttitudePropulsion.outputs:"+jet.thrust_port]}},
+        #{AddPrim:#{edit_target:edit_target,parent_path:path,name:"Nozzle",type_name:"Xform",
+            reference:component_asset("lander/griffin_rcs_bell_visual.usda"),reference_prim_path:"/World"}},
+        // Force is local -Y; the nozzle's exhaust must point local +Y.
+        #{SetRotate:#{edit_target:edit_target,path:path+"/Nozzle",value:[180.0,0.0,0.0]}}];
+    let core=assembly_builder::composed_query(doc,#{path:root+"/"+name+"Core"});
+    if query_ok(core) {ops.push(#{RemovePrim:#{edit_target:edit_target,path:root+"/"+name+"Core"}});}
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:model,name:"inputs:f_nom_n",type_name:"float",value:force.to_string()}});
+    for op in engine_exhaust::connection_ops(edit_target,path+"/Nozzle",model,
+        #{render_throttle:"activity",intensity:"light_intensity",radius:"light_radius"}) {ops.push(op);}
+    #{ok:true,ops:ops,path:path,model:model}
+}
+
+// Positive-conformance wrench evidence from the composed physics datums.
+fn griffin_rcs_wrench_check(doc, root) {
+    let groups=#{pitch_pos:vec3(0.0,0.0,0.0),pitch_neg:vec3(0.0,0.0,0.0),
+        roll_pos:vec3(0.0,0.0,0.0),roll_neg:vec3(0.0,0.0,0.0),
+        yaw_pos:vec3(0.0,0.0,0.0),yaw_neg:vec3(0.0,0.0,0.0)};
+    let forces=#{};
+    for group in groups.keys() {forces[group]=vec3(0.0,0.0,0.0);}
+    let generation=();
+    for jet in griffin_spec::rcs_port_mapping() {
+        let name=jet.model_name.sub_string(0,jet.model_name.len()-5);
+        let record=assembly_builder::composed_query(doc,#{path:root+"/"+name,
+            attrs:["xformOp:translate","xformOp:rotateXYZ","lunco:forceActuator:direction","lunco:forceActuator:maxForce"]});
+        if !query_ok(record) {return plan_error("RCS wrench datum missing");}
+        if generation==() {generation=record.document_generation;}
+        if generation!=record.document_generation {return plan_error("RCS wrench generation changed");}
+        let point=vec3_from(record.attrs["xformOp:translate"]);
+        let rotation=quat_from_euler_xyz_deg(vec3_from(record.attrs["xformOp:rotateXYZ"]));
+        let force=qrot(rotation,vec3_from(record.attrs["lunco:forceActuator:direction"]))
+            *f64_from(record.attrs["lunco:forceActuator:maxForce"]);
+        let group=jet.valve_port.sub_string(0,jet.valve_port.len()-8);
+        groups[group]+=vcross(point,force);forces[group]+=force;
+    }
+    let checks=[];
+    let tolerance=griffin_spec::_typed_model_number(
+        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM");
+    for row in [#{name:"pitch_pos",axis:0,sign:1.0},#{name:"pitch_neg",axis:0,sign:-1.0},
+        #{name:"yaw_pos",axis:1,sign:1.0},#{name:"yaw_neg",axis:1,sign:-1.0},
+        #{name:"roll_pos",axis:2,sign:1.0},#{name:"roll_neg",axis:2,sign:-1.0}] {
+        let values=vec3_array(groups[row.name]);
+        let off_axis=0.0;for index in 0..3 {if index!=row.axis {off_axis+=values[index].abs();}}
+        checks.push(#{group:row.name,moment:groups[row.name],net_force:forces[row.name],
+            ok:values[row.axis]*row.sign>0.0 && off_axis<=tolerance
+                && vlen(forces[row.name])<=tolerance});
+    }
+    let ok=true;for check in checks {ok=ok && check.ok;}
+    #{ok:ok,doc_id:doc,document_generation:generation,checks:checks}
+}
+
+// Controller authority follows the weakest pure-axis pair in the composed
+// physical mounts. The source owns the reserve fraction; no copied torque table.
+fn griffin_rcs_command_envelope_plan(doc,edit_target,root) {
+    let pairs=griffin_rcs_wrench_check(doc,root);
+    if !pairs.ok {return plan_error("RCS pure-axis geometry unavailable");}
+    let fraction=griffin_spec::_typed_model_number(
+        "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::commandTorqueCapacityFraction");
+    if fraction==() || fraction<=0.0 || fraction>=1.0 {
+        return plan_error("RCS command reserve must be strictly between zero and one");
+    }
+    let capacity=();
+    for pair in pairs.checks {
+        let magnitude=vlen(pair.moment);
+        if capacity==() || magnitude<capacity {capacity=magnitude;}
+    }
+    let limit=capacity*fraction;
+    #{ok:true,document_generation:pairs.document_generation,torque_limit_nm:limit,
+      ops:[#{SetAttribute:#{edit_target:edit_target,path:root,
+        name:"inputs:hold_torque_limit_nm",type_name:"float",value:limit.to_string()}}]}
 }

@@ -149,7 +149,7 @@ fn traversal_settle_progress(expected, stable_since) {
 // Plan from the landed hinge frames, not the nominal flat touchdown datum.
 // A single root rotation cannot remove transverse terrain slope. Use the
 // lowest clearance of all eight toe corners, preserving the authored miter.
-fn _toe_clearance(angle, frame, pad) {
+fn _toe_clearance(angle, frame) {
     let delta=frame.sign*(angle-frame.measured);
     let minimum=1000000.0;
     let points=[];
@@ -164,10 +164,6 @@ fn _toe_clearance(angle, frame, pad) {
                 return #{ok:false,error:"ramp toe has no retained DEM surface"};
             }
             let height=terrain.height;
-            if abs(point.x-pad.center[0])<=pad.half[0]
-                && abs(point.z-pad.center[2])<=pad.half[2] {
-                height=max(height,pad.center[1]+pad.half[1]);
-            }
             let gap=point.y-height;
             minimum=min(minimum,gap);
             points.push(#{point:vec3_array(point),surface_y_m:height,clearance_m:gap});
@@ -185,19 +181,10 @@ fn landed_root_deployment_plan() {
     let width=griffin_spec::ramp_contact_track_width_m();
     let length=griffin_spec::ramp_section_length_m()*griffin_spec::ramp_section_count();
     let nominal=abs(griffin_spec::physical_ramp_port_deployment_angle_rad());
-    let pad_prim=query("QueryUsdPrim",#{path:"/Griffin1SurfaceOps/LandingSitePad"});
     if snapshot.ok!=true || joints.len()!=2 || limit==() || tolerance==()
-        || thickness==() || width==() || length==() || nominal==()
-        || pad_prim==() || pad_prim.type_name!="Cube" {
+        || thickness==() || width==() || length==() || nominal==() {
         return #{ok:false,error:"landed ramp planning inputs unavailable"};
     }
-    let attrs=pad_prim.attrs;
-    // This fixture owns an axis-aligned pad; reject unsupported transforms.
-    if attrs["xformOpOrder"]!=["xformOp:translate","xformOp:scale"] {
-        return #{ok:false,error:"landing pad must expose its axis-aligned source transform"};
-    }
-    let pad=#{center:attrs["xformOp:translate"],half:[]};
-    for scale in attrs["xformOp:scale"] {pad.half.push(abs(scale)*attrs.size/2.0);}
     let stations=[];
     for z in griffin_spec::rover_wheel_station_z() {
         for edge in [z-width/2.0,z+width/2.0] {
@@ -226,8 +213,8 @@ fn landed_root_deployment_plan() {
             stations:stations};
         let shallow=0.0;
         let steep=-sign*limit;
-        let raised=_toe_clearance(shallow,frame,pad);
-        let lowered=_toe_clearance(steep,frame,pad);
+        let raised=_toe_clearance(shallow,frame);
+        let lowered=_toe_clearance(steep,frame);
         // Half the existing contact tolerance reserves space for imperfect
         // section alignment; this is an explicit study allowance, not an ICD.
         let clearance=tolerance/2.0;
@@ -238,11 +225,11 @@ fn landed_root_deployment_plan() {
         }
         for iteration in 0..32 {
             let angle=(shallow+steep)/2.0;
-            let sample=_toe_clearance(angle,frame,pad);
+            let sample=_toe_clearance(angle,frame);
             if sample.ok!=true {return sample;}
             if sample.minimum_clearance_m>=clearance {shallow=angle;} else {steep=angle;}
         }
-        let planned=_toe_clearance(shallow,frame,pad);
+        let planned=_toe_clearance(shallow,frame);
         expected.push(#{name:joints[index],target_rad:shallow});
         evidence.push(#{side:side,source_tick:snapshot.sim_tick,target_rad:shallow,
             nominal_target_rad:if index==0 {-nominal} else {nominal},

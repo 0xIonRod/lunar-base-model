@@ -281,3 +281,51 @@ fn solar_contour_frame_geometry(layout, width, section) {
     }
     perimeter_beam_geometry(stations,[0.0],section)
 }
+
+// Observe the rendered mesh itself: a closed Cone cap cannot pass this gate.
+fn open_bell_mesh(points, counts, indices) {
+    if !array_is(points) || !array_is(counts) || !array_is(indices)
+        || points.len()==0 || counts.len()==0 {return #{available:false};}
+    let vertices=[]; let maximum=0.0; let minimum=1.0e30;
+    let lower=1.0e30; let upper=-1.0e30;
+    for point in points {
+        let p=vec3_from(point);vertices.push(p);
+        let radius=(p.x*p.x+p.z*p.z).sqrt();
+        if radius>maximum {maximum=radius;}
+        if radius<minimum {minimum=radius;}
+        if p.y<lower {lower=p.y;}
+        if p.y>upper {upper=p.y;}
+    }
+    let open=true; let offset=0;
+    for count in counts {
+        if count!=4 || offset+count>indices.len() {return #{available:false};}
+        let x=0.0;let z=0.0;
+        for i in 0..count {
+            let index=indices[offset+i];
+            if index<0 || index>=vertices.len() {return #{available:false};}
+            x+=vertices[index].x;z+=vertices[index].z;
+        }
+        // Annular rim and wall quads remain away from the flow axis.
+        // A face spanning/closing the bore fails, including a flat disk cap.
+        if (x*x+z*z).sqrt()/count < minimum/2.0 {open=false;}
+        offset+=count;
+    }
+    #{available:offset==indices.len(),radius:maximum,height:upper-lower,
+      minimum:minimum,lower:lower,upper:upper,open:open && minimum>0.0}
+}
+
+
+// Shared SI section for an open, thin bell shell. The caller owns the sourced
+// engineering dimensions; the profile includes both surfaces and annular rims.
+fn hollow_bell_profile(throat, exit, height, wall, contour, axial) {
+    let profile=[];
+    for i in 0..(axial+1) {
+        let station=(i.to_float()/axial.to_float()) ** 2.0;
+        profile.push([throat+(exit-throat)*(station ** contour),height*(0.5-station)]);
+    }
+    for i in 0..(axial+1) {
+        let station=((axial-i).to_float()/axial.to_float()) ** 2.0;
+        profile.push([throat+(exit-throat)*(station ** contour)-wall,height*(0.5-station)]);
+    }
+    profile
+}

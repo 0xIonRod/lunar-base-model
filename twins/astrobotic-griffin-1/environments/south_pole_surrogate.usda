@@ -41,25 +41,6 @@ def Xform "SouthPoleSurrogate" (
             }
         }
     }
-    def Scope "VisualBerms"
-    {
-        def Cylinder "BermEast"
-        {
-            float radius = 16.0
-            float height = 0.3499999940395355
-            double3 xformOp:translate = (28.0, 0.15, 12.0)
-            color3f[] primvars:displayColor = [(0.18000000715255737, 0.17000000178813934, 0.1599999964237213)]
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-        }
-        def Cylinder "BermWest"
-        {
-            float radius = 12.0
-            float height = 0.25
-            double3 xformOp:translate = (-24.0, 0.1, -18.0)
-            color3f[] primvars:displayColor = [(0.18000000715255737, 0.17000000178813934, 0.1599999964237213)]
-            uniform token[] xformOpOrder = ["xformOp:translate"]
-        }
-    }
     def Xform "Terrain" (
         prepend apiSchemas = ["LunCoTerrainAPI", "MaterialBindingAPI"]
     )

@@ -89,7 +89,7 @@ fn run_visual_review(batch_index) {
         griffin_spec::qualified_attribute_name("visualReviewGriffinStation"),
         griffin_spec::qualified_attribute_name("visualReviewFlipStation"),
         griffin_spec::qualified_attribute_name("deckDimensions"),
-        griffin_spec::qualified_attribute_name("landingSitePadExtentM"),
+        griffin_spec::qualified_attribute_name("visualReviewPadHalfExtentM"),
         griffin_spec::qualified_attribute_name("visualReviewGroundWidthM"),
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTreadCountPerSection"
     ], [
@@ -342,7 +342,7 @@ fn run_visual_review(batch_index) {
         requirement: "gv004",
         verification: "Verify_GriffinVisualRequirements",
         kind: "bounds_component", path: root + "/Ground/LandingPad", index: 0,
-        multiplier: 1.0, expected_attr: griffin_spec::qualified_attribute_name("landingSitePadExtentM"), tolerance: 0.001 };
+        multiplier: 1.0, expected_attr: griffin_spec::qualified_attribute_name("visualReviewPadHalfExtentM"), tolerance: 0.001 };
     checks.push(pad);
     let ground = #{ id: "GV-004-ground-width", component: "context",
         requirement: "gv004",

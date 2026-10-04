@@ -574,7 +574,7 @@ package GriffinRampRequirements {
         // Nominal angles above describe the static flat-plane geometry only.
         // GRR-017 runtime targets shall instead use the measured landed root
         // hinge frames and retained NOBILE03 DEM under all eight toe corners,
-        // including the existing axis-aligned pad top where it is higher.
+        // without an artificial pad or apron overriding that native terrain.
         // Choose the shallowest terrain-contact solution inside the existing
         // joint travel with minimum predicted clearance = half the contact
         // tolerance below. This 10 mm allowance is an unqualified study

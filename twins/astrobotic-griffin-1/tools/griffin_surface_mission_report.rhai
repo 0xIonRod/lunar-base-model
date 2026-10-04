@@ -123,12 +123,12 @@ fn finish_surface_ops(state) {
         toe_settle: state.ramp_toe_settle_evidence,
         root_settle: state.ramp_deployment_settle_evidence};
     let source = sysml_requirements::source();
-    let egress_apron = if state.egress_apron_evidence == () {
-        griffin_surface_ops::egress_apron_runtime_evidence(find_path(global::ROVER))
+    let egress_terrain = if state.egress_terrain_evidence == () {
+        griffin_surface_ops::egress_terrain_runtime_evidence(find_path(global::ROVER))
     } else {
-        state.egress_apron_evidence
+        state.egress_terrain_evidence
     };
-    let egress_apron_ok = egress_apron != () && egress_apron.ok == true;
+    let egress_terrain_ok = egress_terrain != () && egress_terrain.ok == true;
     let checks = [
         #{id: "GR-004-lander-settled", component: "landing", requirement: "GriffinFunctionalRequirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander", actual: state.lander_settled, expected: true, ok: state.lander_settled, error: "lander did not settle"},
         #{id: "GR-003-ramps-deployed", component: "egress_ramps", requirement: "GriffinFunctionalRequirements::gr003", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander/EgressRampPort", actual: state.ramps_deployed, expected: true, ok: state.ramps_deployed, error: "ramps were not deployed"},
@@ -143,8 +143,8 @@ fn finish_surface_ops(state) {
         #{id: "GR-039-guidance-assembly-mass", component: "guidance", requirement: "GriffinSimulationAccuracyRequirements::gr039", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: global::MISSION_ROOT + "/Lander/GNC", actual: state.guidance_assembly_mass_evidence, expected: "guidance input equals the complete current dynamic joint-island mass in kilograms", ok: state.guidance_assembly_mass_evidence != () && state.guidance_assembly_mass_evidence.ok == true, error: "complete solver mass, guidance input, units, or validity evidence is missing or mismatched"},
         #{id: "GR-034-route-frame", component: "rover", requirement: "GriffinFunctionalRequirements::gr034", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: global::MISSION_ROOT, actual: state.route_preflight, expected: true, ok: state.route_preflight != () && state.route_preflight.ok == true, error: "route markers do not agree with the active rover frame"},
         #{id: "GR-037-landing-target-datum", component: "landing", requirement: "GriffinSimulationAccuracyRequirements::gr037", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: global::MISSION_ROOT + "/LandingTarget", actual: if state.landing_setup_evidence == () { () } else { state.landing_setup_evidence.landing_target }, expected: "SysML body-reference touchdown Y", ok: state.landing_setup_evidence != () && state.landing_setup_evidence.landing_target != () && state.landing_setup_evidence.landing_target.ok == true, error: "landing target Y does not satisfy GR-037"},
-        #{id: "GR-038-landing-surface-datum", component: "landing", requirement: "GriffinSimulationAccuracyRequirements::gr038", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: global::MISSION_ROOT + "/LandingSitePad", actual: if state.landing_setup_evidence == () { () } else { state.landing_setup_evidence.landing_surface }, expected: "collision pad top on the normalized terrain plane with target inside its footprint", ok: state.landing_setup_evidence != () && state.landing_setup_evidence.landing_surface != () && state.landing_setup_evidence.landing_surface.ok == true, error: "landing pad surface does not satisfy GR-038"},
-        #{id: "GR-035-egress-apron-contact", component: "egress_apron", requirement: "GriffinFunctionalRequirements::gr035", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "contact", path: global::MISSION_ROOT + "/EgressApron", actual: egress_apron, expected: "typed 10 x 8 x 0.1 m collision apron with native FLIP wheel contact at ramp exit", ok: egress_apron_ok, error: "GR-035 apron geometry or native wheel contact evidence is missing"},
+        #{id: "GR-038-landing-surface-datum", component: "landing", requirement: "GriffinSimulationAccuracyRequirements::gr038", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: global::MISSION_ROOT + "/Environment/Terrain", actual: if state.landing_setup_evidence == () { () } else { state.landing_setup_evidence.landing_surface }, expected: "finite source-backed DEM height and target above the measured terrain datum", ok: state.landing_setup_evidence != () && state.landing_setup_evidence.landing_surface != () && state.landing_setup_evidence.landing_surface.ok == true, error: "landing DEM datum does not satisfy GR-038"},
+        #{id: "GR-035-egress-terrain-contact", component: "egress_terrain", requirement: "GriffinFunctionalRequirements::gr035", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "contact", path: global::MISSION_ROOT + "/Environment/Terrain", actual: egress_terrain, expected: "four native FLIP wheel contacts on the DEM at ramp exit", ok: egress_terrain_ok, error: "GR-035 native DEM wheel contact evidence is missing"},
         #{id: "GRR-017-ramp-unfold-order", component: "egress_ramps", requirement: "GriffinRampRequirements::grr017", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander/EgressRampPort", actual: ramp_deployment_evidence, expected: ramp_unfold_order.expected, ok: ramp_unfold_order.ok && ramp_middle_settled && ramp_toe_settled && ramp_root_settled, error: "ramp middle hinges, toe hinges, and deck hinges did not command and settle in the required order"}
     ];
     let failures = [];
@@ -158,7 +158,7 @@ fn finish_surface_ops(state) {
             landing_setup: state.landing_setup_evidence,
             guidance_assembly_mass: state.guidance_assembly_mass_evidence,
             ramp_deployment: ramp_deployment_evidence,
-            egress_apron: egress_apron,
+            egress_terrain: egress_terrain,
             final_state: state}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
 }

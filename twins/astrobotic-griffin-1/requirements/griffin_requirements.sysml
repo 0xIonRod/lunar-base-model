@@ -13,7 +13,6 @@ package Griffin1Requirements {
     enum def GriffinSurfaceRouteMarkerName {
         RoverRampApproach; RoverRampExit; RoverTarget1; RoverTarget2; BaseSite;
     }
-    enum def GriffinSurfaceFeatureName { LandingSitePad; EgressApron; }
 
     // Public mission context uses typed designations and numeric bounds. The
     // evidence catalog owns external citations; this part stores no URL or
@@ -65,9 +64,12 @@ package Griffin1Requirements {
         // Visual review dimensions are compared with composed USD geometry;
         // they are presentation requirements, not supplier CAD data.
         attribute visualLanderDeckWidthM : Real = 4.50;
-        // Study extent shared by the physical square contact pad and its
-        // circular visual-review boundary.
-        attribute landingSitePadExtentM : Real = 6.0;
+        // Isolated Editor review pad only; absent from the surface mission.
+        attribute visualReviewPadHalfExtentM : Real = 6.0;
+        // Measured from the processed NOBILE03 DEM at scene X=Z=0 using
+        // TerrainHeight, 2026-10-04. The crop datum is 5187.322 m. This is
+        // the selected study anchor height, not a confirmed mission site.
+        attribute landingTerrainDatumY : Real = .21062861382961273;
         attribute visualReviewGroundWidthM : Real = 36.0;
         // Operator-selected five-point surface route, 2026-10-03.
         // The estimated deployed ramp is now 5.397 m, rooted near X=1.90 m;
@@ -86,23 +88,16 @@ package Griffin1Requirements {
         // on the survey/base turn; retain tight egress arrival tolerances.
         attribute surfaceRouteThrottleLimit : Real[5] = (0.22, 0.22, 0.20, 0.16, 0.16);
         attribute surfaceRouteArrivalRadiusM : Real[5] = (0.35, 0.30, 1.20, 1.20, 1.20);
-        // The deployed 12.228605 m ramp tip is near x=14.06 m, and the
-        // 15.60 m exit gate is outside the 12 m landing pad. This
-        // named apron is a small prepared transition surface, not a hidden
-        // teleport or terrain override: it overlaps the ramp tip and gives
-        // all four wheels a continuous collision plane before survey route
-        // control begins.  Its dimensions are replaceable Twin study values
-        // until the Griffin site ICD is available.
-        attribute landingSitePadName : GriffinSurfaceFeatureName = "LandingSitePad";
-        attribute landingSitePadThicknessM : Real = 0.10;
-        attribute egressApronName : GriffinSurfaceFeatureName = "EgressApron";
-        attribute egressApronCenterX : Real = 13.50;
-        attribute egressApronCenterZ : Real = -1.00;
-        attribute egressApronLengthM : Real = 10.00;
-        attribute egressApronWidthM : Real = 8.00;
-        attribute egressApronThicknessM : Real = 0.10;
-        // Shared top plane for the landing pad and prepared egress apron. Each
-        // collision cube is centered half its thickness below this datum.
+        // Source-backed DEM is the physical support surface. No artificial
+        // landing slab or egress apron is allowed in the production mission.
+        // Four raycast wheel contacts must reach that DEM at the exit gate.
+        // 0.10 m allows bilinear height sampling vs collider triangulation of
+        // the 4 m LROC cells; it is a study tolerance, not survey precision.
+        // Source: local processed NOBILE03 crop and user scene-cleanup request.
+        attribute egressTerrainWheelContactCount : Integer = 4;
+        attribute egressTerrainContactHeightToleranceM : Real = .10;
+        // Zero is only the component geometry-test datum. Runtime touchdown
+        // and toe support are measured against the DEM, not this flat plane.
         attribute siteSurfaceY : Real = 0.00;
     }
 
