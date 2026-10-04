@@ -1355,3 +1355,78 @@ full exposed-side visual clearance is still to be reviewed. Images:
 `terrain/target/assembly-editor/griffin-tall-solar-camera.png`.
 This is component geometry acceptance, not landing, reload, power-performance
 or rover-egress acceptance.
+
+
+### June 2026 hardware appearance update, 2026-10-04
+
+This pass supersedes the preceding single-tall-ESA-panel configuration. The
+appearance reference is the actual integrated vehicle photographed on June 15:
+[Astrobotic's unveiling release](https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/),
+[Astrobotic 1348 image](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg),
+and [NASA's 1419 photo credited to Astrobotic](https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1419-edit-2/).
+These photographs show three tall adjacent solar faces, stepped edges,
+equipment/leg recesses, dark rounded rectangular cells, warm inter-cell gaps
+and silver perimeter frames. Their ground stands, protective covers and
+raised footpad pose are excluded from the lunar vehicle.
+
+| Realization | Evidence and explicit assumption |
+| --- | --- |
+| Nominal broad field: 13 columns × 24 rows, horizontal/vertical pitch ratio 2:1 | Approximate count and cell aspect from the frontal photos; clipped/stepped rows have fewer cells. Supplier count and dimensions are unavailable. |
+| Broad frame: 1.866 × 1.727077 m | Retain the existing estimated rail-fitted width, with 30 mm border. Active width 1.806 m / 13 yields 138.923 mm horizontal pitch; half that yields 69.462 mm vertical pitch. Twenty-four rows plus two borders determines height. This is packaging reconstruction, not photogrammetric scale. |
+| Chamfer frame: 0.856920 m wide, five columns at the same metric pitch | Existing corner-post span minus the source edge allowance caps the face. Whole-column fitting leaves edge clearance. The actual flight bus facets and panel interface may differ; this narrow chamfer is a retained packaging approximation. |
+| Panel centre Y: 1.851038 m; lower edge Y: 0.9875 m | Keep the original bus lower-edge datum: raise the old 1.34 m centre by half the difference between the new frame height and 0.705 m installation datum. Retain rail sockets and derive links in the panel frame. |
+| Distinct front/chamfer/side silhouettes | SysML vertices are in cell-pitch coordinates. Front face has upper-left steps and a right equipment recess; the chamfer has a lower leg opening; the side has a lower corner opening. Shape and face assignment adapt the photographs to the retained octagonal bus. Unseen contours and exact dimensions remain estimates. |
+| Clipped corners, 5 mm gaps, 7 mm corner clips | Approximate the photographed rounded cell tiles with a simple eight-corner profile. These are visual approximations, not cell manufacturing specifications. |
+| Dark cells, copper-colored gaps, silver frames | Photographic appearance only. Source RGB/metallic/roughness values select standard USD materials; they do not assert substrate alloy, electrical efficiency or thermal properties. |
+
+Each cell row is one mesh, avoiding a separate entity for each cell. Convex
+native extrusion builds clipped tiles and rectangular substrate bands; source
+contours drive the band partition and perimeter beams. Reusable component
+and installed instances share one planner. The obsolete divider primitives,
+notched-rectangle-only builder and duplicate mesh writes were removed.
+
+The live component envelope gate passed two observations; each installed
+panel height passed its own document-scoped gate. Warm vehicle preview
+projection stalled after dependency edits (generation fence remained false
+at 49759 despite lease renewal and reopening). Its authored document was
+explicitly saved through the owner, then validated from disk in fresh runs.
+Fresh 49760 reports `projection_ready=true`, generation 0, for the saved
+vehicle. Focused component and whole-assembly screenshots were inspected.
+Evidence: `terrain/target/assembly-editor/griffin-hardware-solar-component.png`
+and `terrain/target/assembly-editor/griffin-hardware-fresh-editor.png`.
+
+Production saved-source acceptance:
+
+- Solar fixture: **PASS 152**, exit 0, tick 78 / 1.3 simulated seconds;
+  `terrain/target/griffin-hardware-solar-gate.log`.
+- Combined Griffin/FLIP visual fixture: **PASS 126**, exit 0, tick 8;
+  `terrain/target/griffin-hardware-visual-gate.log`.
+
+The solar observer measures cell centres, dimensions and contour omissions
+one row per tick. It keeps only scalar residuals plus source/document/stage
+identity and rejects mixed revisions; the final packet still reports once.
+This avoids raising Rhai's operation or aggregate-array limits. These gates
+verify the authored study geometry, not flight dimensions or landing physics.
+
+Remaining work, in order:
+
+1. Reconcile bus plan shape and facet widths with multiple real views. Current
+   normalized corner coordinate 0.585786 is a clipped-square study octagon,
+   not a regular octagon (whose coordinate would be 0.414214). Do not change
+   it blindly: tank openings, physical hull, panel mount rails and leg
+   interfaces must be evaluated together. The current narrow middle panel
+   is the clearest visible sign of this unresolved packaging choice.
+2. Reconstruct the folded ramp backs and confirm the mechanism from actual
+   deployment footage/drawings. The photographs suggest broad dark backs;
+   the current three-section accordion and quarter-turn path remain a study
+   configuration. Preserve track collision and joint ownership while checking
+   toe-to-ground continuity and rover clearance through the full sequence.
+3. Refine leg sleeves, hinges, tilted footpads and exposed equipment/plumbing
+   from hardware views. Keep motion on the bus-to-foot axis and never use the
+   ground-test stand pose to set flight suspension compression.
+4. Close warm reload/contact repeatability, held-Space reflight and complete
+   FLIP traversal separately. The current appearance pass changes no masses,
+   colliders, contact laws, fuel inventory or guidance behavior.
+5. Replace panel supplier/count/contour and electrical/thermal placeholders
+   with controlled data. Revisit blankets, tank supports and nozzle/interface
+   details where those data change the study geometry.

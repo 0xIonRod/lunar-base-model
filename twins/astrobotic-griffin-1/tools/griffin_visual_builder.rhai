@@ -81,7 +81,7 @@ fn _solar_station_ops(doc, edit_target, root, index, group) {
             value: "("+q.w.to_string()+", "+q.x.to_string()+", "+q.y.to_string()+", "+q.z.to_string()+")"}},
         #{SetAttribute: #{edit_target: edit_target, path: path, name: "xformOpOrder", type_name: "token[]",
             value: "[\"xformOp:translate\", \"xformOp:orient\", \"xformOp:scale\"]"}}];
-    let geometry=_solar_instance_geometry_ops(doc,edit_target,root,index,group);
+    let geometry=_solar_panel_geometry_ops(doc,edit_target,path,index,group);
     if !geometry.ok {return geometry;}
     for op in geometry.ops {ops.push(op);}
     #{ok: true, ops: ops}
@@ -93,7 +93,7 @@ fn griffin_solar_station_plan(doc, edit_target, root, index) {
 
 // Bound live edits to one named panel task without duplicating geometry policy.
 fn griffin_solar_station_plan(doc, edit_target, root, index, group) {
-    if !["all","surface","columns","rows","mounts"].contains(group) {return plan_error("unknown solar edit group");}
+    if !["all","surface","cleanup","mounts"].contains(group) {return plan_error("unknown solar edit group");}
     let plan = _solar_station_ops(doc, edit_target, root, index, group);
     if !plan.ok { return plan; }
     let path = root + "/" + griffin_spec::solar_array_names()[index];
@@ -106,55 +106,48 @@ fn griffin_solar_station_plan(doc, edit_target, root, index, group) {
     plan
 }
 
-fn _solar_instance_geometry_ops(doc,edit_target,root,index,group) {
+fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
     let plan=#{ok:true,ops:[]};
-    let path=root+"/"+griffin_spec::solar_array_names()[index];
     let layout=griffin_spec::solar_installed_cell_layout(index);
-    if layout==() {return plan_error("installed solar cell field cannot fit a source module");}
+    if layout==() {return plan_error("installed solar field cannot fit the source module");}
     let cw=layout.local_cell_width_m;let sx=layout.scale_x;
-    let depth=layout.cell_depth_m;let cy=_solar_number("cellOffsetYM");
-    let thickness=_solar_number("cellThicknessM");
+    let color=sysml_requirements::model().value("GriffinSolarRequirements::GriffinSolarArrayAssembly::substrateDisplayColor");
     if group=="all" || group=="surface" {
-        let frame=_solar_frame_plan(doc,edit_target,path,_solar_number("frameWidthM"),
-            layout.frame_depth_m,_solar_number("frameThicknessM"),0.0,0.0,0.0,[0.44,0.48,0.55]);
-        if !frame.ok {return frame;} for op in frame.ops {plan.ops.push(op);}
-        let backplane=_component_mesh_visual_ops(doc,edit_target,path,"ArrayBackplane",
-            _solar_notched_surface_geometry(_solar_number("cellWidthM"),_solar_number("arrayBackplaneThicknessM"),
-                layout.cell_depth_m,_solar_number("arrayBackplaneCenterYM"),0.0,0.0,0.0),[0.015,0.035,0.12]);
-        if !backplane.ok {return backplane;} for op in backplane.ops {plan.ops.push(op);}
-        // Keep the hinge at the authored belt datum when the panel grows upward.
+        let frame_color=sysml_requirements::model().value("GriffinSolarRequirements::GriffinSolarArrayAssembly::frameDisplayColor");
+        let frame=_component_mesh_visual_ops(doc,edit_target,path,"Frame",
+            griffin_geometry::solar_contour_frame_geometry(layout,_solar_number("frameWidthM"),_solar_number("frameThicknessM")),frame_color);
+        if !frame.ok {return frame;}for op in frame.ops {plan.ops.push(op);}
+        for surface in [#{name:"ArrayBackplane",width:_solar_number("cellWidthM"),thickness:_solar_number("arrayBackplaneThicknessM"),y:_solar_number("arrayBackplaneCenterYM")},
+            #{name:"Cells",width:cw,thickness:_solar_number("cellThicknessM"),y:_solar_number("cellOffsetYM")}] {
+            let part=_component_mesh_visual_ops(doc,edit_target,path,surface.name,
+                griffin_geometry::solar_contour_geometry(layout,surface.width,surface.y,surface.thickness),color);
+            if !part.ok {return part;}for op in part.ops {plan.ops.push(op);}
+        }
         plan.ops.push(#{SetTranslate:#{edit_target:edit_target,path:path+"/HingeBar",
-            value:[0.0,_solar_number("hingeBarCenterYM"),_solar_number("hingeBarCenterZM")
-                +(layout.frame_depth_m-_solar_number("frameDepthM"))/2.0]}});
-
-        let color=sysml_requirements::model().value("GriffinSolarRequirements::GriffinSolarArrayAssembly::cellDisplayColor");
-        let mesh=_solar_notched_surface_geometry(cw,thickness,depth,cy,0.0,0.0,0.0);
-        let cells=_component_mesh_visual_ops(doc,edit_target,path,"Cells",mesh,color);
-        if !cells.ok {return cells;} for op in cells.ops {plan.ops.push(op);}
+            value:[0.0,_solar_number("hingeBarCenterYM"),_solar_number("hingeBarCenterZM")+layout.datum_offset_m]}});
+        for material in [#{name:"Substrate",target:"Cells",prefix:"substrate"},#{name:"PanelFrame",target:"Frame",prefix:"frame"}] {
+            let owner="GriffinSolarRequirements::GriffinSolarArrayAssembly::";
+            let model=sysml_requirements::model();
+            let look=griffin_surface_material_plan(doc,edit_target,path,material.name,[path+"/"+material.target],
+                model.value(owner+material.prefix+"DisplayColor"),f64_from(model.value(owner+material.prefix+"Metallic")),f64_from(model.value(owner+material.prefix+"Roughness")));
+            if !look.ok {return look;}for op in look.ops {plan.ops.push(op);}
+        }
+        let model=sysml_requirements::model();let owner="GriffinSolarRequirements::GriffinSolarArrayAssembly::";
+        for parameter in [#{name:"diffuseColor",kind:"color3f",value:_color3_literal(model.value(owner+"cellDisplayColor"))},
+            #{name:"metallic",kind:"float",value:model.value(owner+"cellMetallic").to_string()},
+            #{name:"roughness",kind:"float",value:model.value(owner+"cellRoughness").to_string()}] {
+            plan.ops.push(#{SetAttribute:#{edit_target:edit_target,path:path+"/Looks/SolarCells/Surface",name:"inputs:"+parameter.name,type_name:parameter.kind,value:parameter.value}});
+        }
     }
-    let columns=_solar_number("gridColumnCount").to_int();let rows=layout.rows;
-    if group=="all" || group=="columns" {
-        for column in 1..columns {
-            let name="CellDividerX"+column.to_string();
-            let visible=column<layout.columns;
-            if visible {
-                let divider=_component_cube_visual_ops(doc,edit_target,path,name,
-                    [-cw/2.0+layout.pitch_m*column/sx,cy+thickness/2.0,0.0],(),
-                    [_solar_number("dividerXWidthM")/sx,_solar_number("dividerXThicknessM"),depth],[0.72,0.78,0.88]);
-                if !divider.ok {return divider;}for op in divider.ops {plan.ops.push(op);}
+    if group=="all" || group=="cleanup" {
+        let current=assembly_builder::composed_query(doc,#{path:path,children:true,attrs:[]});
+        if !query_ok(current) {return plan_error("solar cleanup cannot inspect component");}
+        for child in current.children {
+            let child_path=if string_is(child) {child} else {child.path};
+            if child_path!=() && child_path.contains("/CellDivider") {
+                plan.ops.push(#{RemovePrim:#{edit_target:edit_target,path:child_path}});
             }
-            plan.ops.push(#{SetAttribute:#{edit_target:edit_target,path:path+"/"+name,name:"visibility",type_name:"token",
-                value:if visible {"\"inherited\""} else {"\"invisible\""}}});
-    }
-    }
-    if group=="all" || group=="rows" {
-        for row in 1..rows {
-            let geometry=griffin_geometry::rectangular_prism_geometry(
-                vec3(0.0,cy+thickness/2.0,-depth/2.0+depth*row/rows),
-                vec3(cw,_solar_number("dividerZThicknessM"),_solar_number("dividerZWidthM")));
-            let divider=_component_mesh_visual_ops(doc,edit_target,path,"CellDividerZ"+row.to_string(),geometry,[0.72,0.78,0.88]);
-            if !divider.ok {return divider;}for op in divider.ops {plan.ops.push(op);}
-    }
+        }
     }
     if group=="all" || group=="mounts" {
         // Bus rail datums stay fixed as the face width is capped. Pin each compact
@@ -183,9 +176,38 @@ fn _solar_instance_geometry_ops(doc,edit_target,root,index,group) {
             let link=_component_cube_visual_ops(doc,edit_target,path,"MountLink"+side,[(panel_x+rail_x)/2.0,local.y/2.0,local.z],
                 [0.0,0.0,angle],[_solar_number("mountBracketWidthM")/sx,length,_solar_number("mountLinkDepthM")],[0.10,0.13,0.18]);
             if !link.ok {return link;}for op in link.ops {plan.ops.push(op);}
+        }
     }
+    if group=="all" {
+        for row in 0..layout.rows {
+            let part=griffin_solar_cell_row_plan(doc,edit_target,path,index,row);
+            if !part.ok {return part;}for op in part.ops {plan.ops.push(op);}
+        }
     }
     plan
+}
+
+fn _color3_literal(color) {
+    "("+color[0].to_string()+", "+color[1].to_string()+", "+color[2].to_string()+")"
+}
+
+fn griffin_solar_cell_row_plan(doc,edit_target,path,index,row) {
+    let layout=griffin_spec::solar_installed_cell_layout(index);
+    if layout==() {return plan_error("solar row source unavailable");}
+    let geometry=griffin_geometry::solar_cell_row_geometry(layout,row,
+        _solar_number("cellOffsetYM")+_solar_number("cellThicknessM"),_solar_number("cellThicknessM"),
+        _solar_number("cellGapM"),_solar_number("cellCornerClipM"));
+    let color=sysml_requirements::model().value("GriffinSolarRequirements::GriffinSolarArrayAssembly::cellDisplayColor");
+    let part=_component_mesh_visual_ops(doc,edit_target,path,"CellRow"+row.to_string(),geometry,color);
+    if !part.ok {return part;}
+    part.ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:part.path,schemas:["MaterialBindingAPI"]}});
+    part.ops.push(#{SetRelationship:#{edit_target:edit_target,path:part.path,name:"material:binding",targets:[path+"/Looks/SolarCells"]}});
+    part
+}
+
+fn griffin_solar_component_group_plan(doc,edit_target,root,group) {
+    if !["all","surface","cleanup","mounts"].contains(group) {return plan_error("unknown solar edit group");}
+    _solar_panel_geometry_ops(doc,edit_target,root,0,group)
 }
 
 fn griffin_bus_cladding_plan(doc, edit_target, root) {
@@ -3496,369 +3518,30 @@ fn _component_mesh_visual_ops(doc, edit_target, parent, name, geometry, color) {
     let path = parent + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
     let ops = [];
-    if query_ok(current) && current.type_name != "Mesh" {
-        ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
-        let shape = assembly_builder::mesh_shape_plan(edit_target, parent, name,
-            geometry.points, geometry.face_counts, geometry.face_indices, color, false);
-        if !shape.ok { return shape; }
-        for op in shape.ops { ops.push(op); }
-    } else if query_ok(current) {
+    let shape = ();
+    if query_ok(current) && current.type_name == "Mesh" {
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
+        shape = assembly_builder::mesh_shape_update_plan(edit_target, path,
+            geometry.points, geometry.face_counts, geometry.face_indices, color, false, ());
     } else {
-        let shape = assembly_builder::mesh_shape_plan(edit_target, parent, name,
+        if query_ok(current) {ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});}
+        shape = assembly_builder::mesh_shape_plan(edit_target, parent, name,
             geometry.points, geometry.face_counts, geometry.face_indices, color, false);
-        if !shape.ok { return shape; }
-        for op in shape.ops { ops.push(op); }
     }
-    for item in [
-        #{name: "points", type_name: "point3f[]", value: _mesh_points_literal(geometry.points)},
-        #{name: "faceVertexCounts", type_name: "int[]", value: _mesh_ints_literal(geometry.face_counts)},
-        #{name: "faceVertexIndices", type_name: "int[]", value: _mesh_ints_literal(geometry.face_indices)},
-        #{name: "subdivisionScheme", type_name: "token", value: "\"none\""},
-        #{name: "doubleSided", type_name: "bool", value: "false"},
-        #{name: "purpose", type_name: "token", value: "\"render\""},
-        #{name: "physics:collisionEnabled", type_name: "bool", value: "false"},
-        #{name: "primvars:displayColor", type_name: "color3f[]", value: _color_literal(color)}
-    ] {
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
-            name: item.name, type_name: item.type_name, value: item.value}});
-    }
+    if !shape.ok {return shape;}
+    for op in shape.ops {ops.push(op);}
+    ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
+        name: "doubleSided", type_name: "bool", value: "false"}});
     ops.push(#{SetTranslate: #{edit_target: edit_target, path: path, value: [0.0, 0.0, 0.0]}});
     #{ok: true, path: path, ops: ops}
 }
 
-fn _solar_frame_plan(doc, edit_target, root, width, depth, section,
-    clearance_center_x, clearance_width, clearance_depth, color) {
-    let offset_x = width / 2.0 - section / 2.0;
-    let offset_z = depth / 2.0 - section / 2.0;
-    if clearance_width==0.0 && clearance_depth==0.0 {
-        let geometry=griffin_geometry::perimeter_beam_geometry([
-            vec3(-offset_x,0.0,-offset_z),vec3(offset_x,0.0,-offset_z),
-            vec3(offset_x,0.0,offset_z),vec3(-offset_x,0.0,offset_z)], [0.0], section);
-        if !geometry.ok {return plan_error(geometry.error);}
-        return _component_mesh_visual_ops(doc,edit_target,root,"Frame",geometry,color);
-    }
-    let notch_left_x = clearance_center_x - clearance_width / 2.0;
-    let notch_right_x = clearance_center_x + clearance_width / 2.0;
-    let notch_start_z = depth / 2.0 - clearance_depth;
-    if clearance_width <= section || notch_left_x <= -offset_x
-        || notch_right_x >= offset_x
-        || clearance_depth <= section || clearance_depth >= depth - section {
-        return plan_error("solar-panel lower clearance cutout does not fit within the source-owned frame envelope");
-    }
-    let stations = [
-        vec3(-offset_x, 0.0, -offset_z),
-        vec3(offset_x, 0.0, -offset_z),
-        vec3(offset_x, 0.0, offset_z),
-        vec3(notch_right_x, 0.0, offset_z),
-        vec3(notch_right_x, 0.0, notch_start_z),
-        vec3(notch_left_x, 0.0, notch_start_z),
-        vec3(notch_left_x, 0.0, offset_z),
-        vec3(-offset_x, 0.0, offset_z),
-    ];
-    let geometry = griffin_geometry::perimeter_beam_geometry(stations, [0.0], section);
-    if geometry.ok != true { return plan_error(geometry.error); }
-    _component_mesh_visual_ops(doc, edit_target, root, "Frame", geometry, color)
-}
-
-fn _solar_notched_surface_geometry(width, thickness, depth, center_y,
-    clearance_center_x, clearance_width, clearance_depth) {
-    if width>0.0 && thickness>0.0 && depth>0.0 && clearance_width==0.0 && clearance_depth==0.0 {
-        return griffin_geometry::rectangular_prism_geometry(vec3(0.0,center_y,0.0),vec3(width,thickness,depth));
-    }
-    if width <= 0.0 || thickness <= 0.0 || depth <= 0.0
-        || clearance_width <= 0.0
-        || clearance_center_x - clearance_width / 2.0 <= -width / 2.0
-        || clearance_center_x + clearance_width / 2.0 >= width / 2.0
-        || clearance_depth <= 0.0 || clearance_depth >= depth {
-        return #{ok: false, error: "solar-panel surface clearance cutout must fit inside a positive panel envelope"};
-    }
-    let z_min = -depth / 2.0;
-    let z_max = depth / 2.0;
-    let notch_start_z = z_max - clearance_depth;
-    let upper_depth = notch_start_z - z_min;
-    let wing_depth = clearance_depth;
-    let notch_left_x = clearance_center_x - clearance_width / 2.0;
-    let notch_right_x = clearance_center_x + clearance_width / 2.0;
-    let left_wing_width = notch_left_x + width / 2.0;
-    let right_wing_width = width / 2.0 - notch_right_x;
-    if upper_depth <= 0.0 || left_wing_width <= 0.0 || right_wing_width <= 0.0 {
-        return #{ok: false, error: "solar-panel surface cutout leaves no connected cell or backplane material"};
-    }
-    let upper = griffin_geometry::rectangular_prism_geometry(
-        vec3(0.0, center_y, (z_min + notch_start_z) / 2.0),
-        vec3(width, thickness, upper_depth));
-    let left = griffin_geometry::rectangular_prism_geometry(
-        vec3((-width / 2.0 + notch_left_x) / 2.0, center_y,
-            (notch_start_z + z_max) / 2.0),
-        vec3(left_wing_width, thickness, wing_depth));
-    let right = griffin_geometry::rectangular_prism_geometry(
-        vec3((notch_right_x + width / 2.0) / 2.0, center_y,
-            (notch_start_z + z_max) / 2.0),
-        vec3(right_wing_width, thickness, wing_depth));
-    if upper.ok != true || left.ok != true || right.ok != true {
-        return #{ok: false, error: "solar-panel clearance surface mesh could not be generated"};
-    }
-    griffin_geometry::merge_mesh_geometries([upper, left, right])
-}
-
 // Refine the reusable solar-array component in its own document.  The
 // outward-facing root rotation is owned by GriffinLanderComponent; this
-// operation owns only the panel's local frame, blue cell face, grid members,
+// operation owns only the panel's local frame, cell rows, substrate,
 // and bracket geometry.
-fn refine_griffin_solar_panel_component_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("refine_griffin_solar_panel_component_plan requires a document, edit target, and absolute root");
-    }
-    let component = _component_query(doc, root);
-    if !component.ok || component.type_name != "Xform" {
-        return plan_error(root + ": solar-panel component root is missing or not Xform");
-    }
-    let frame_width = _solar_number("frameWidthM");
-    let frame_thickness = _solar_number("frameThicknessM");
-    let frame_depth = _solar_number("frameDepthM");
-    let clearance_center_x_fraction = _solar_number("lowerClearanceCenterXFraction");
-    let clearance_width_fraction = _solar_number("lowerClearanceWidthFraction");
-    let clearance_depth_fraction = _solar_number("lowerClearanceDepthFraction");
-    let cell_width = _solar_number("cellWidthM");
-    let cell_thickness = _solar_number("cellThicknessM");
-    let cell_depth = _solar_number("cellDepthM");
-    let cell_offset = _solar_number("cellOffsetYM");
-    let backplane_thickness = _solar_number("arrayBackplaneThicknessM");
-    let backplane_center = _solar_number("arrayBackplaneCenterYM");
-    let columns_value = _solar_number("gridColumnCount");
-    let rows_value = _solar_number("gridRowCount");
-    let columns = if columns_value == () { 0 } else { columns_value.to_int() };
-    let rows = if rows_value == () { 0 } else { rows_value.to_int() };
-    let divider_width = _solar_number("dividerXWidthM");
-    let divider_x_thickness = _solar_number("dividerXThicknessM");
-    let divider_span = _solar_number("dividerZWidthM");
-    let divider_z_thickness = _solar_number("dividerZThicknessM");
-    let bracket_width = _solar_number("mountBracketWidthM");
-    let bracket_thickness = _solar_number("mountBracketThicknessM");
-    let bracket_depth = _solar_number("mountBracketDepthM");
-    let hinge_radius = _solar_number("hingeBarRadiusM");
-    let hinge_length = _solar_number("hingeBarLengthM");
-    let hinge_y = _solar_number("hingeBarCenterYM");
-    let hinge_z = _solar_number("hingeBarCenterZM");
-    let link_height = _solar_number("mountLinkHeightM");
-    let link_depth = _solar_number("mountLinkDepthM");
-    let link_y = _solar_number("mountLinkCenterYM");
-    let link_z = _solar_number("mountLinkCenterZM");
-    let frame_rail_names = griffin_spec::visual_rail_names();
-    let frame_rail_stations = griffin_spec::visual_rail_station_positions();
-    let solar_stations = griffin_spec::component_solar_stations();
-    let solar_rotations_x = griffin_spec::component_solar_station_rotation_x_deg();
-    let solar_rotations_z = griffin_spec::component_solar_station_rotation_z_deg();
-    let mount_rail_names = griffin_spec::solar_mount_rail_names();
-    let solar_count = griffin_spec::solar_array_count();
-    let solar_widths = griffin_spec::component_solar_array_widths_m();
-    let bus_mount = griffin_spec::component_bus_mount();
-    if frame_width == () || frame_thickness == () || frame_depth == ()
-        || clearance_center_x_fraction == () || clearance_width_fraction == ()
-        || clearance_depth_fraction == () || clearance_center_x_fraction <= -0.5
-        || clearance_center_x_fraction >= 0.5
-        || clearance_width_fraction < 0.0 || clearance_width_fraction >= 1.0
-        || clearance_depth_fraction < 0.0 || clearance_depth_fraction >= 1.0
-        || ((clearance_width_fraction==0.0) != (clearance_depth_fraction==0.0))
-        || cell_width == () || cell_thickness == () || cell_depth == ()
-        || cell_offset == () || backplane_thickness == () || backplane_center == () {
-        return plan_error("solar-panel SysML geometry datums are incomplete");
-    }
-    if columns < 2 || rows < 2 {
-        return plan_error("solar-panel grid must have at least two columns and rows");
-    }
-    if divider_width == () || divider_x_thickness == () || divider_span == ()
-        || divider_z_thickness == ()
-        || bracket_width == () || bracket_thickness == () || bracket_depth == () {
-        return plan_error("solar-panel divider or bracket datums are incomplete");
-    }
-    if hinge_radius == () || hinge_length == () || hinge_y == () || hinge_z == ()
-        || link_height == () || link_depth == () || link_y == () || link_z == ()
-        || solar_count <= 0 || solar_stations.len() != solar_count
-        || solar_rotations_x.len() != solar_count || solar_rotations_z.len() != solar_count
-        || solar_widths.len() != solar_count || mount_rail_names.len() != solar_count * 2
-        || frame_rail_names.len() != frame_rail_stations.len()
-        || bus_mount == () || !vec3_is_native(bus_mount) {
-        return plan_error("solar-panel installation requires one typed station, orientation, and bus-rail pair per canonical array");
-    }
-    let ops = [];
-    let clearance_center_x = frame_width * clearance_center_x_fraction;
-    let clearance_width = frame_width * clearance_width_fraction;
-    let clearance_depth = frame_depth * clearance_depth_fraction;
-    if clearance_width >= cell_width || clearance_depth >= cell_depth {
-        return plan_error("solar-panel lower clearance cutout exceeds the typed cell field");
-    }
-    let frame = _solar_frame_plan(doc, edit_target, root,
-        frame_width, frame_depth, frame_thickness, clearance_center_x, clearance_width,
-        clearance_depth, [0.44, 0.48, 0.55]);
-    if !frame.ok { return frame; }
-    for op in frame.ops { ops.push(op); }
-    let cell_color=sysml_requirements::model().value("GriffinSolarRequirements::GriffinSolarArrayAssembly::cellDisplayColor");
-    if !array_is(cell_color) || cell_color.len()!=3 {return plan_error("solar cell color missing");}
-    let surface_specs = [
-        #{name: "ArrayBackplane", center_y: backplane_center,
-          thickness: backplane_thickness, color: [0.015, 0.035, 0.12]},
-        #{name: "Cells", center_y: cell_offset,
-          thickness: cell_thickness, color: cell_color},
-    ];
-    for item in surface_specs {
-        let geometry = _solar_notched_surface_geometry(cell_width,
-            item.thickness, cell_depth, item.center_y,
-            clearance_center_x, clearance_width, clearance_depth);
-        if geometry.ok != true { return plan_error(geometry.error); }
-        let part = _component_mesh_visual_ops(doc, edit_target, root,
-            item.name, geometry, item.color);
-        if !part.ok { return part; }
-        for op in part.ops { ops.push(op); }
-    }
-    let divider_y = cell_offset + cell_thickness / 2.0;
-    let notch_start_z = cell_depth / 2.0 - clearance_depth;
-    for index in 1..columns {
-        let name = "CellDividerX" + index.to_string();
-        let x = -cell_width / 2.0 + cell_width * index / columns;
-        let inside_clearance = x >= clearance_center_x - clearance_width / 2.0
-            && x <= clearance_center_x + clearance_width / 2.0;
-        let divider_depth = if inside_clearance { cell_depth - clearance_depth } else { cell_depth };
-        let divider_center_z = if inside_clearance { -clearance_depth / 2.0 } else { 0.0 };
-        let divider = _component_cube_visual_ops(doc, edit_target, root, name,
-            [x, divider_y, divider_center_z], (),
-            [divider_width, divider_x_thickness, divider_depth],
-            [0.72, 0.78, 0.88]);
-        if !divider.ok { return divider; }
-        for op in divider.ops { ops.push(op); }
-    }
-    for index in 1..rows {
-        let name = "CellDividerZ" + index.to_string();
-        let z = -cell_depth / 2.0 + cell_depth * index / rows;
-        let divider = if z > notch_start_z {
-            let notch_left_x = clearance_center_x - clearance_width / 2.0;
-            let notch_right_x = clearance_center_x + clearance_width / 2.0;
-            let left_width = notch_left_x + cell_width / 2.0;
-            let right_width = cell_width / 2.0 - notch_right_x;
-            let left = griffin_geometry::rectangular_prism_geometry(
-                vec3((-cell_width / 2.0 + notch_left_x) / 2.0, divider_y, z),
-                vec3(left_width, divider_z_thickness, divider_span));
-            let right = griffin_geometry::rectangular_prism_geometry(
-                vec3((notch_right_x + cell_width / 2.0) / 2.0, divider_y, z),
-                vec3(right_width, divider_z_thickness, divider_span));
-            let geometry = griffin_geometry::merge_mesh_geometries([left, right]);
-            _component_mesh_visual_ops(doc, edit_target, root, name,
-                geometry, [0.72, 0.78, 0.88])
-        } else {
-            // Stable Mesh identity in both notch configurations: changing
-            // row count must also work for a former split row divider.
-            let geometry = griffin_geometry::rectangular_prism_geometry(
-                vec3(0.0, divider_y, z), vec3(cell_width, divider_z_thickness, divider_span));
-            _component_mesh_visual_ops(doc, edit_target, root, name, geometry,
-                [0.72, 0.78, 0.88])
-        };
-        if !divider.ok { return divider; }
-        for op in divider.ops { ops.push(op); }
-    }
-    for name in ["CellDividerX", "CellDividerXLeft", "CellDividerXRight",
-        "CellDividerZ", "CellDividerZUpper", "CellDividerZLower"] {
-        let path = root + "/" + name;
-        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) {
-            ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
-        }
-    }
-    let hinge = _component_cylinder_visual_ops(doc, edit_target, root,
-        "HingeBar", [0.0, hinge_y, hinge_z], (), hinge_radius,
-        hinge_length, "X", [0.16, 0.19, 0.24]);
-    if !hinge.ok { return hinge; }
-    for op in hinge.ops { ops.push(op); }
-    let mount_names = ["NegativeX", "PositiveX"];
-    let half_frame_width = frame_width / 2.0;
-    let minimum_overlap = _solar_number("minimumMountOverlapM");
-    if minimum_overlap == () || minimum_overlap <= 0.0 {
-        return plan_error("solar-panel minimum mount overlap is missing from SysML");
-    }
-    let bracket_center_y_values = [];
-    let bracket_center_z_values = [];
-    for array_index in 0..solar_count {
-        if (solar_rotations_x[array_index] - 90.0).abs() > 0.001 {
-            return plan_error("all upright Griffin panel faces use the shared +90 degree X orientation");
-        }
-        let alpha = solar_rotations_z[array_index] * griffin_spec::pi_value() / 180.0;
-        let c = cos(alpha);
-        let s = sin(alpha);
-        let pair_local = [];
-        for endpoint in 0..2 {
-            let rail_name = mount_rail_names[array_index * 2 + endpoint];
-            let rail_station = ();
-            for rail_index in 0..frame_rail_names.len() {
-                if frame_rail_names[rail_index] == rail_name {
-                    rail_station = frame_rail_stations[rail_index];
-                    break;
-                }
-            }
-            if rail_station == () {
-                return plan_error("solar installation references an unknown bus rail station");
-            }
-            let dx = rail_station.x + bus_mount.x - solar_stations[array_index].x;
-            let dy = rail_station.y + bus_mount.y - solar_stations[array_index].y;
-            let dz = rail_station.z + bus_mount.z - solar_stations[array_index].z;
-            let local = vec3(c * dx + s * dz, -s * dx + c * dz, -dy);
-            pair_local.push(local);
-        }
-        if pair_local[0].x >= 0.0 || pair_local[1].x <= 0.0
-            || (pair_local[0].y - pair_local[1].y).abs() > minimum_overlap
-            || pair_local[0].z.abs() > minimum_overlap
-            || pair_local[1].z.abs() > minimum_overlap {
-            return plan_error("each adjacent-face panel must map its negative and positive local X mounts to coplanar bus rails");
-        }
-        bracket_center_y_values.push((pair_local[0].y + pair_local[1].y) / 2.0);
-        bracket_center_z_values.push((pair_local[0].z + pair_local[1].z) / 2.0);
-    }
-    let bracket_center_y = bracket_center_y_values[0];
-    let bracket_center_z = bracket_center_z_values[0];
-    for index in 1..solar_count {
-        if (bracket_center_y_values[index] - bracket_center_y).abs() > minimum_overlap
-            || (bracket_center_z_values[index] - bracket_center_z).abs() > minimum_overlap {
-            return plan_error("adjacent solar panel mount rails do not share the reusable component attachment plane");
-        }
-    }
-    for index in 0..mount_names.len() {
-        let side = mount_names[index];
-        let sign = if index == 0 { -1.0 } else { 1.0 };
-        let bracket_x = sign * half_frame_width;
-        let bracket = _component_cube_visual_ops(doc, edit_target, root,
-            "MountBracket" + side, [bracket_x, bracket_center_y, bracket_center_z], (),
-            [bracket_width, bracket_thickness, bracket_depth],
-            [0.12, 0.15, 0.20]);
-        if !bracket.ok { return bracket; }
-        for op in bracket.ops { ops.push(op); }
-        let link = _component_cube_visual_ops(doc, edit_target, root,
-            "MountLink" + side, [bracket_x, link_y, link_z], (),
-            [bracket_width, link_height, link_depth],
-            [0.10, 0.13, 0.18]);
-        if !link.ok { return link; }
-        for op in link.ops { ops.push(op); }
-    }
-    let root_record = assembly_builder::composed_query(doc, #{path: root,
-        attrs: ["lunco:visual:component", "lunco:visual:requirement",
-            "lunco:visual:cell_face_normal"], children: false});
-    if query_ok(root_record) && root_record.attrs != () {
-        for name in ["lunco:visual:component", "lunco:visual:requirement",
-            "lunco:visual:cell_face_normal"] {
-            if root_record.attrs[name] != () {
-                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
-                    path: root, name: name}});
-            }
-        }
-    }
-    let paths = [root + "/Frame", root + "/ArrayBackplane", root + "/Cells"];
-    for index in 1..columns { paths.push(root + "/CellDividerX" + index.to_string()); }
-    for index in 1..rows { paths.push(root + "/CellDividerZ" + index.to_string()); }
-    paths.push(root + "/HingeBar");
-    for side in ["NegativeX", "PositiveX"] {
-        paths.push(root + "/MountBracket" + side);
-        paths.push(root + "/MountLink" + side);
-    }
-    #{ok: true, kind: "griffin_solar_panel_component_refinement",
-      root: root, paths: paths,
-      ops: ops, no_op: ops.len() == 0}
+fn refine_griffin_solar_panel_component_plan(doc,edit_target,root) {
+    griffin_solar_component_group_plan(doc,edit_target,root,"all")
 }
 
 fn apply_refined_griffin_solar_panel(doc, edit_target, root, parent_gen) {

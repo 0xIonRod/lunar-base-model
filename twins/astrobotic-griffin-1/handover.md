@@ -5,13 +5,34 @@
 
 ## Latest visual and Editor update
 
-The starboard solar array now follows the user-selected tall ESA silhouette:
-estimated 1.350 × 1.866 m, with a 10 × 14 grid and fixed bus attachment datums.
-The saved solar fixture passes 152 checks. June 15, 2026 real Astrobotic photos
-have also been reviewed and linked in `requirements/griffin-size-evidence.md`
-and the solar SysML rationale. They show larger three-face coverage and shaped
-cutouts; the current reconstruction does not yet match that flight hardware.
+The solar quadrant now follows the June 15, 2026 real Astrobotic hardware
+photos rather than the previous mix of the 2021 belt and tall ESA rendering.
+All three faces are tall, with source-owned stepped/equipment/leg contours,
+clipped rectangular cells, copper-colored substrate gaps and silver frames.
+The estimated broad frame is 1.866 × 1.727 m with a nominal 13 × 24 field;
+the rail-fitted chamfer uses five columns at the same pitch. The distinct
+contours omit cells instead of placing decorative bars across the openings.
+Geometry, appearance and rationale live in `griffin_solar_requirements.sysml`;
+source links and remaining gaps are in `requirements/griffin-size-evidence.md`.
+Counts, dimensions, face assignment and unseen contours remain study estimates.
 
+Saved-source solar PASS 152 (78 ticks, 1.3 simulated seconds); combined
+Griffin/FLIP visual PASS 126 (8 ticks). Both CLI processes exited 0.
+One-row-per-tick solar observations retain one source revision and USD snapshot
+identity without exceeding Rhai's operation/array limits. The old divider
+prims and duplicate solar-component builder were removed. Fresh owned port
+49760 reads the saved vehicle with a ready preview at generation 0. Close-up
+component review: `terrain/target/assembly-editor/griffin-hardware-solar-component.png`;
+whole-vehicle review: `terrain/target/assembly-editor/griffin-hardware-fresh-editor.png`.
+
+Warm port 49759 lost its vehicle preview projection fence after component
+reference updates; same-identity renewal and reopening did not restore it.
+Explicit authored saves were therefore followed by fresh saved-source gates
+and fresh Editor review. This is a recorded generic Editor/reload gap, not
+reload acceptance. No landing/contact parameters changed in this appearance
+pass. Next visual work is the bus plan shape and array interface, folded ramp
+backs/confirmed mechanism, then leg sleeves, footpad joints and exposed
+plumbing. Warm reload, held-throttle reflight and full rover egress remain open.
 
 Seven hollow main nozzles and the raised skirt frame are committed in `fed8e99`.
 The silver exterior now reuses the shared LunCoSim foil shader with explicit
@@ -104,7 +125,7 @@ Current authoring state:
 - Landing-leg readback returned `ok`, with visual-to-proxy pad geometry matching within 0.001 m and all four bus mount/joint observations available.
 - The visual-review scene now shares the surface-operations scene's typed site/epoch and celestial-system reference. Its composed root and solar-system child were queried after projection, visually inspected, and saved.
 - The solar configuration has three typed identities and stations on the forward, beveled forward-starboard, and starboard faces. The panel component uses paired local brackets and support links; each vehicle instance references that shared asset, uses its rail-derived width, and is checked at the configured station and orientation.
-- The shared solar component now has a lower clearance opening in its frame, backplane, and cell field. Typed study fractions control its width, depth, and lateral position; dividers stop at the opening or split around it. Editor readback confirmed the cell opening is clear and the notched row divider is split. The values are visual-study assumptions guided by the photo, not approved dimensions; the render-only panel has no collision proxy.
+- The solar component and instances now use source-owned pitch-coordinate contours through the frame, backplane, substrate and clipped cell rows. Their distinct equipment/leg openings remain open; old grid dividers were removed. The values are visual-study assumptions guided by the photo, not approved dimensions; the render-only panel has no collision proxy.
 - The three-array layout has been visually inspected in the open Editor. Its lower clearance shape is modeled qualitatively, but the released panel contour, installation dimensions, array envelope, and support datums remain replaceable study values pending controlled mission data.
 
 These are Editor and composed-readback observations. They do not establish mission-level landing or egress acceptance. The Editor-loaded review scenario emitted a failing visual packet; the current counts and physics blockers are recorded in `contracts/implementation_gaps.md`. No headless test suite was started during this authoring pass.
@@ -113,7 +134,7 @@ These are Editor and composed-readback observations. They do not establish missi
 
 1. Run `requirement_quality_audit()` explicitly from the Griffin requirements tool and review its findings. Apply only justified requirement edits; startup remains policy-neutral.
 2. Migrate remaining Griffin parameter maps to typed feature-path observations. GSA-005, GSA-006, and GSA-009 now author source-owned expected values and tolerances through standard constraint-usage feature bindings; `SysmlModel.required_constraint_irs()` exposes the effective dependency paths and `source_literal_observation()` supplies resolved source literals. No Editor/runtime execution was made for this update.
-3. Replace the solar-panel study fractions and other approximate panel datums with the controlled Griffin-1 panel definition when available; verify cutout clearance, installed transforms, support and hinge interfaces, and electrical behavior against that definition.
+3. Replace the solar-panel contour estimates and other approximate panel datums with the controlled Griffin-1 panel definition when available; verify cutout clearance, installed transforms, support and hinge interfaces, and electrical behavior against that definition.
 4. Compose the saved ramp visual component under the integrated port and starboard physical ramp roots. Preserve the physical track colliders, avoid duplicate visible geometry, and derive both poses from the ramp SysML configuration.
 5. Review the leg-to-bus mount appearance in the Editor against current Griffin-1 references. Define any additional visual bracing as a source-backed study requirement derived from the bus and leg interfaces.
 6. Use one dry Rhai plan, one generation-checked typed Editor batch, composed readback, and save for each geometry edit. Separate focused requirement observations from full Twin/runtime acceptance.

@@ -117,15 +117,73 @@ fn panel_local_rail(rail, bus_mount, station, rotation_z_deg) {
       z: -dy}
 }
 
+// One row per tick keeps geometry observations below Rhai's execution and
+// aggregate-array limits. Retain only scalar errors and the snapshot identity.
+fn observe_cell_row(path, layout, row, gap) {
+    let max_x_error=0.0;let max_z_error=0.0;let max_extent_error=0.0;let count_error=0.0;
+    let record=query("QueryUsdPrim",#{path:path+"/CellRow"+row.to_string(),attrs:["points"]});
+    let points=if record==() || record.attrs==() {()} else {record.attrs["points"]};
+    if !array_is(points) || points.len()%16!=0 {return #{available:false,identity:()};}
+    let actual_count=points.len()/16;let expected_columns=[];
+    // Independent ray crossing over the source contour selects this row.
+    for column in 0..layout.columns {
+        let x=column+0.5;let z=row+0.5;let crossings=0;
+        let previous=layout.contour[layout.contour.len()-1];
+        for point in layout.contour {
+            if (point.z>z)!=(previous.z>z)
+                && x<point.x+(previous.x-point.x)*(z-point.z)/(previous.z-point.z) {crossings+=1;}
+            previous=point;
+        }
+        if crossings%2==1 {expected_columns.push(column);}
+    }
+    count_error=max(count_error,abs(actual_count-expected_columns.len()).to_float());
+    for cell in 0..min(actual_count,expected_columns.len()) {
+        let cell_points=[];
+        for point in cell*16..(cell+1)*16 {cell_points.push(points[point]);}
+        let measured=point_bounds(cell_points);
+        let expected_x=-layout.local_cell_width_m/2.0+(expected_columns[cell]+0.5)*layout.pitch_m/layout.scale_x;
+        let expected_z=-layout.cell_depth_m/2.0+(row+0.5)*layout.pitch_z_m;
+        max_x_error=max(max_x_error,abs(measured.center[0]-expected_x)*layout.scale_x);
+        max_z_error=max(max_z_error,abs(measured.center[2]-expected_z));
+        max_extent_error=max(max_extent_error,abs(measured.extent[0]*layout.scale_x-(layout.pitch_m-gap)));
+        max_extent_error=max(max_extent_error,abs(measured.extent[2]-(layout.pitch_z_m-gap)));
+    }
+    #{available:true,x:max_x_error,z:max_z_error,extent:max_extent_error,count:count_error,
+      identity:#{doc_id:record.doc_id,document_generation:record.document_generation,stage_generation:record.stage_generation}}
+}
+
 fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
+    this.grid=[];this.grid_panel=0;this.grid_row=0;this.grid_source_revision=();
 }
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
-    let source = sysml_requirements::source();
     let model = sysml_requirements::model();
+    if this.grid_source_revision==() {this.grid_source_revision=model.source_revision;}
+    if this.grid_source_revision!=model.source_revision {throw("Solar source changed during cell observations");}
+    let array_names=griffin_spec::solar_array_names();
+    if this.grid_panel<array_names.len() {
+        let index=this.grid_panel;let layout=griffin_spec::solar_installed_cell_layout(index);
+        if layout==() {throw("Solar row source unavailable");}
+        let root=model.value(own("usdRootPath"));
+        let gap=f64_from(model.value(own("cellGapM")));
+        let row=observe_cell_row(root+"/"+array_names[index],layout,this.grid_row,gap);
+        if this.grid_row==0 {
+            this.grid.push(#{available:row.available,identity:row.identity,x:0.0,z:0.0,extent:0.0,count:0.0});
+        }
+        let grid=this.grid[index];
+        grid.available=grid.available && row.available && usd_geometry_inspection::same_snapshot([grid.identity,row.identity]);
+        if row.available {
+            grid.x=max(grid.x,row.x);grid.z=max(grid.z,row.z);
+            grid.extent=max(grid.extent,row.extent);grid.count=max(grid.count,row.count);
+        }
+        this.grid[index]=grid;this.grid_row+=1;
+        if this.grid_row>=layout.rows {this.grid_row=0;this.grid_panel+=1;}
+        return;
+    }
+    let source = sysml_requirements::source();
     let gsa005 = model.requirement(PACKAGE + "::gsa005");
     let gsa006 = model.requirement(PACKAGE + "::gsa006");
     let gsa009 = model.requirement(PACKAGE + "::gsa009");
@@ -175,8 +233,6 @@ fn on_tick(me, ctx) {
         mesh_paths.push(path + "/Frame");
         mesh_paths.push(path + "/Cells");
         mesh_paths.push(path + "/ArrayBackplane");
-        for column in 1..sysml_requirements::number(source,own("gridColumnCount")).to_int() {mesh_paths.push(path+"/CellDividerX"+column.to_string());}
-        for row in 1..layout.rows {mesh_paths.push(path+"/CellDividerZ"+row.to_string());}
     }
     let mesh_batch = if mesh_paths.len() > 0 {
         query("QueryUsdPrims", #{paths: mesh_paths, attrs: ["points", "xformOp:scale","xformOp:translate","visibility"]})
@@ -273,34 +329,16 @@ fn on_tick(me, ctx) {
             "solar_array", "gsa006", VERIFICATION,
             "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope", panel_envelope_observations, "typed", 0.0));
 
-        // Verify the visible metric grid, including excess inherited dividers.
-        let columns=sysml_requirements::number(source,own("gridColumnCount")).to_int();
-        let rows=layout.rows;
-        let pitch_x=sysml_requirements::number(source,own("cellWidthM"))/columns;
-        let pitch_z=layout.pitch_m;
-        let field=mesh_geometry(composed,path+"/Cells");
-        let max_x_error=0.0;let max_z_error=0.0;let grid_available=field!=();
-        for column in 1..columns {
-            let divider=composed[path+"/CellDividerX"+column.to_string()];
-            let attrs=if divider==() {()} else {divider.attrs};
-            if attrs==() {grid_available=false;continue;}
-            let visible=attrs["visibility"]!="invisible";
-            if visible!=(column<layout.columns) {max_x_error=max(max_x_error,pitch_x);}
-            if visible {
-                let t=attrs["xformOp:translate"];
-                if !array_is(t) || field==() {grid_available=false;continue;}
-                max_x_error=max(max_x_error,abs((t[0]-field.minimum[0])*layout.scale_x-column*pitch_x));
-            }
-        }
-        for row in 1..rows {
-            let divider=mesh_geometry(composed,path+"/CellDividerZ"+row.to_string());
-            if divider==() || field==() {grid_available=false;continue;}
-            max_z_error=max(max_z_error,abs(divider.center[2]-field.minimum[2]-row*pitch_z));
-        }
+        let grid=this.grid[index];
+        let grid_available=grid.available && usd_geometry_inspection::same_snapshot([grid.identity,composed[path+"/Cells"]]);
+        let max_x_error=grid.x;let max_z_error=grid.z;
+        let max_extent_error=grid.extent;let count_error=grid.count;
         let grid_constraint=sysml_requirements::required_constraint_ir(model,model.requirement(PACKAGE+"::gsa007"),PACKAGE+"::GSAC007_UniformMetricCellPitch");
         let grid_inputs=sysml_requirements::scalar_constraint_observations(grid_constraint,[
             ["maximumColumnPitchErrorM",usd_geometry_inspection::measurement(if grid_available {max_x_error} else {()},composed[path+"/Cells"],"visible column spacing unavailable")],
-            ["maximumRowPitchErrorM",usd_geometry_inspection::measurement(if grid_available {max_z_error} else {()},composed[path+"/Cells"],"row spacing unavailable")]
+            ["maximumRowPitchErrorM",usd_geometry_inspection::measurement(if grid_available {max_z_error} else {()},composed[path+"/Cells"],"row spacing unavailable")],
+            ["maximumCellExtentErrorM",usd_geometry_inspection::measurement(if grid_available {max_extent_error} else {()},composed[path+"/Cells"],"cell dimensions unavailable")],
+            ["maximumCellCountError",usd_geometry_inspection::measurement(if grid_available {count_error} else {()},composed[path+"/Cells"],"contour cell count unavailable")]
         ]);
         grid_inputs.push(source_observation(model,visual("geometryVerificationToleranceM")));
         checks.push(sysml_requirements::required_constraints_check("GSA-007-"+name+"-metric-cell-pitch","solar_array","gsa007",VERIFICATION,PACKAGE+"::GSAC007_UniformMetricCellPitch",grid_inputs,"typed",0.0));
@@ -348,7 +386,7 @@ fn on_tick(me, ctx) {
             requirement: "gsa008", verification: VERIFICATION, kind: "attribute_component",
             path: path + "/HingeBar", attr: "xformOp:translate", index: 2,
             expected:sysml_requirements::number(source,own("hingeBarCenterZM"))
-                +(layout.frame_depth_m-sysml_requirements::number(source,own("frameDepthM")))/2.0, tolerance: geometry_tolerance});
+                +layout.datum_offset_m, tolerance: geometry_tolerance});
         for side in ["NegativeX", "PositiveX"] {
             let link_path = path + "/MountLink" + side;
             checks.push(sysml_requirement_checks::exists("GSA-008-" + name + "-" + side + "-link",

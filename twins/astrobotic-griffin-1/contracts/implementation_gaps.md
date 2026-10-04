@@ -5,6 +5,23 @@
 vehicle, and the generic Rust/Rhai/Editor capabilities needed to build and
 verify the model.
 
+## Hardware appearance checkpoint — 2026-10-04
+
+The June 15 real-hardware photos now drive three tall, shaped solar faces,
+clipped rectangular cells and copper/silver appearance. SysML documents each
+metric and silhouette estimate; the solar fixture passes 152 checks and the
+combined visual fixture passes 126. These are saved-source component/graphics
+results. The broad frame is estimated 1.866 × 1.727 m; the retained clipped-square
+bus yields a much narrower chamfer panel. Bus plan shape, panel interface and
+folded ramp backs/mechanism remain the next visual gaps. Detailed priorities
+and references are in `requirements/griffin-size-evidence.md`.
+
+A warm Editor dependency update stalled the vehicle preview fence at port
+49759 even after lease renewal/reopening. Fresh port 49760 reads and renders
+the saved vehicle with a ready generation-0 preview. This does not close warm
+reload, deterministic contact, reflight or full route acceptance. No physical
+landing or guidance parameters changed in this appearance pass.
+
 ## Current bounded update — 2026-10-03
 
 The current saved bus/ramp fixtures pass 355/1277 checks after shared silver

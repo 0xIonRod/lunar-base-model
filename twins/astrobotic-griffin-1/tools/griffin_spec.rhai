@@ -448,7 +448,7 @@ fn component_leg_stations() { _sysml_native_list("legStations") }
 fn component_leg_station_rotation_y_deg() { _sysml_number_list("legStationRotationYDeg") }
 fn component_solar_stations() {
     let belt=_sysml_native_list("solarStations");
-    let nominal_depth=solar_component_number("frameDepthM");
+    let nominal_depth=solar_component_number("installationDatumHeightM");
     let stations=[];
     for index in 0..belt.len() {
         let layout=solar_installed_cell_layout(index);
@@ -478,12 +478,10 @@ fn component_solar_orientation_components(index) {
 }
 fn solar_component_number(name) {
     let fields = ["frameWidthM", "frameThicknessM", "frameDepthM",
-        "lowerClearanceWidthFraction", "lowerClearanceDepthFraction",
-        "lowerClearanceCenterXFraction",
+        "installationDatumHeightM", "cellPitchAspectRatio", "cellGapM", "cellCornerClipM",
         "cellWidthM", "cellThicknessM", "cellDepthM", "cellOffsetYM",
         "arrayBackplaneThicknessM", "arrayBackplaneCenterYM",
-        "gridColumnCount", "gridRowCount", "dividerXWidthM",
-        "dividerXThicknessM", "dividerZWidthM", "dividerZThicknessM",
+        "gridColumnCount", "gridRowCount",
         "mountBracketWidthM", "mountBracketThicknessM", "mountBracketDepthM",
         "hingeBarRadiusM", "hingeBarLengthM", "hingeBarCenterYM",
         "hingeBarCenterZM", "mountLinkHeightM", "mountLinkDepthM",
@@ -551,8 +549,7 @@ fn component_solar_array_widths_m() {
     }
     widths
 }
-// Keep metric cell pitch across fitted faces. The nominal 14x5 module is
-// observed in the 2021 concept image; narrower-face counts are estimates.
+// Preserve the photo-estimated rectangular pitch across fitted faces.
 fn solar_installed_cell_layout(index) {
     let widths=component_solar_array_widths_m();
     let frame=solar_panel_frame_width_m();
@@ -571,25 +568,38 @@ fn solar_installed_cell_layout(index) {
         else {min(requested[index],(available/pitch).floor()).to_int()};
     if count<2 {return ();}
     let scale=widths[index]/frame;
-    #{columns:count,rows:row_counts[index].to_int(),pitch_m:pitch,scale_x:scale,
-      local_cell_width_m:count*pitch/scale,cell_depth_m:row_counts[index]*pitch,
-      frame_depth_m:row_counts[index]*pitch+2.0*solar_component_number("frameThicknessM")}
+    let aspect=solar_component_number("cellPitchAspectRatio");
+    let contour_names=["frontCellContour","chamferCellContour","sideCellContour"];
+    let source_contour=_typed_model_value("GriffinSolarRequirements::GriffinSolarArrayAssembly::"+contour_names[index]);
+    let contour=[];
+    if !array_is(source_contour) {return ();}
+    for point in source_contour {
+        if !array_is(point) || point.len()!=3 {return ();}
+        let native=vec3(f64_from(point[0]),f64_from(point[1]),f64_from(point[2]));
+        if !vec3_is_finite(native) {return ();}
+        contour.push(native);
+    }
+    if aspect==() || aspect<=0.0 || !array_is(contour) || contour.len()<4 {return ();}
+    for point in contour {
+        if !vec3_is_native(point) || point.x<0.0 || point.x>count || point.z<0.0 || point.z>row_counts[index] {return ();}
+    }
+    let pz=pitch/aspect;let cell_depth=row_counts[index]*pz;
+    let depth=cell_depth+2.0*solar_component_number("frameThicknessM");
+    #{columns:count,rows:row_counts[index].to_int(),pitch_m:pitch,pitch_z_m:pz,scale_x:scale,
+      local_cell_width_m:count*pitch/scale,cell_depth_m:cell_depth,frame_depth_m:depth,
+      contour:contour,
+      datum_offset_m:(depth-solar_component_number("installationDatumHeightM"))/2.0}
 }
 // Filter the nominal module topology for the fitted panel's cell count.
 fn solar_installed_visible_members(index, members) {
     let layout=solar_installed_cell_layout(index);
     if layout==() {throw("solar installed cell layout unavailable");}
-    let hidden=[];
-    for column in layout.columns..solar_component_number("gridColumnCount").to_int() {
-        hidden.push("CellDividerX"+column.to_string());
-    }
     let visible=[];
-    for member in members {if !hidden.contains(member) {visible.push(member);}}
-    for row in solar_component_number("gridRowCount").to_int()..layout.rows {
-        visible.push("CellDividerZ"+row.to_string());
-    }
+    for member in members {visible.push(member);}
+    for row in 0..layout.rows {visible.push("CellRow"+row.to_string());}
     visible
 }
+
 fn component_engine_stations() { _sysml_native_list("engineStations") }
 fn visual_ramp_mount_x() { [
     _sysml_attribute("rampPortMountX"),

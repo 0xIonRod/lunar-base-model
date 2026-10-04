@@ -201,3 +201,83 @@ fn convex_polygon_clearance_xz(point, polygon) {
     }
     minimum
 }
+
+
+// One row of thin, corner-clipped solar cells. Native extrusion owns topology;
+// a row is one render mesh, rather than one entity/draw per cell.
+fn solar_cell_row_geometry(layout, row, center_y, thickness, gap, corner) {
+    if layout==() || row<0 || row>=layout.rows || gap<=0.0
+        || gap>=layout.pitch_z_m || corner<=0.0
+        || corner*2.0>=layout.pitch_z_m-gap || thickness<=0.0 {
+        return #{ok:false,error:"solar row dimensions incomplete"};
+    }
+    let sx=layout.scale_x;let half_x=(layout.pitch_m-gap)/2.0;
+    let half_z=(layout.pitch_z_m-gap)/2.0;
+    let profile=[vec2((-half_x+corner)/sx,-half_z),vec2((half_x-corner)/sx,-half_z),
+        vec2(half_x/sx,-half_z+corner),vec2(half_x/sx,half_z-corner),
+        vec2((half_x-corner)/sx,half_z),vec2((-half_x+corner)/sx,half_z),
+        vec2(-half_x/sx,half_z-corner),vec2(-half_x/sx,-half_z+corner)];
+    let cell=extrude_profile(profile,thickness,profile_plane_xz());let pieces=[];
+    let z=-layout.cell_depth_m/2.0+(row+0.5)*layout.pitch_z_m;
+    for column in 0..layout.columns {
+        let x=-layout.local_cell_width_m/2.0+(column+0.5)*layout.pitch_m/sx;
+        if !solar_contour_contains(layout.contour,column+0.5,row+0.5) {continue;}
+        let points=[];
+        for point in cell.points {points.push([point.x+x,point.y+center_y,point.z+z]);}
+        pieces.push(#{ok:true,points:points,face_counts:cell.face_vertex_counts,face_indices:cell.face_vertex_indices});
+    }
+    merge_mesh_geometries(pieces)
+}
+
+// Contours are simple, source-owned orthogonal polygons in cell-pitch units.
+fn solar_contour_contains(contour, x, z) {
+    let inside=false;let previous=contour[contour.len()-1];
+    for point in contour {
+        if (point.z>z)!=(previous.z>z)
+            && x<(previous.x-point.x)*(z-point.z)/(previous.z-point.z)+point.x {inside=!inside;}
+        previous=point;
+    }
+    inside
+}
+
+fn solar_contour_geometry(layout, width, center_y, thickness) {
+    // Native extrusion accepts convex profiles. Partition the orthogonal
+    // source contour at its row boundaries into closed rectangular bands.
+    let levels=[];
+    for point in layout.contour {if !levels.contains(point.z) {levels.push(point.z);}}
+    levels.sort();let pieces=[];
+    for band in 0..levels.len()-1 {
+        let middle=(levels[band]+levels[band+1])/2.0;let crosses=[];
+        let previous=layout.contour[layout.contour.len()-1];
+        for point in layout.contour {
+            if (point.z>middle)!=(previous.z>middle) {
+                crosses.push(point.x+(previous.x-point.x)*(middle-point.z)/(previous.z-point.z));
+            }
+            previous=point;
+        }
+        crosses.sort();
+        if crosses.len()%2!=0 {return #{ok:false,error:"solar contour has unpaired edges"};}
+        for pair in 0..crosses.len()/2 {
+            let x0=-width/2.0+crosses[pair*2]*width/layout.columns;
+            let x1=-width/2.0+crosses[pair*2+1]*width/layout.columns;
+            let z0=-layout.cell_depth_m/2.0+levels[band]*layout.pitch_z_m;
+            let z1=-layout.cell_depth_m/2.0+levels[band+1]*layout.pitch_z_m;
+            pieces.push(rectangular_prism_geometry(vec3((x0+x1)/2.0,center_y,(z0+z1)/2.0),vec3(x1-x0,thickness,z1-z0)));
+        }
+    }
+    merge_mesh_geometries(pieces)
+}
+
+fn solar_contour_frame_geometry(layout, width, section) {
+    let stations=[];let cell_width=layout.local_cell_width_m;
+    for point in layout.contour {
+        let x=-cell_width/2.0+point.x*cell_width/layout.columns;
+        let z=-layout.cell_depth_m/2.0+point.z*layout.pitch_z_m;
+        if point.x==0.0 {x=-width/2.0+section/2.0;}
+        if point.x==layout.columns.to_float() {x=width/2.0-section/2.0;}
+        if point.z==0.0 {z=-layout.frame_depth_m/2.0+section/2.0;}
+        if point.z==layout.rows.to_float() {z=layout.frame_depth_m/2.0-section/2.0;}
+        stations.push(vec3(x,0.0,z));
+    }
+    perimeter_beam_geometry(stations,[0.0],section)
+}
