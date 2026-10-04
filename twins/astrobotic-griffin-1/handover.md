@@ -1,9 +1,17 @@
 # Griffin-1 Twin handover
 
-**Latest update:** 2026-10-03 (older sections retain their original evidence scope)
+**Latest update:** 2026-10-04 (older sections retain their original evidence scope)
 
 
 ## Latest visual and Editor update
+
+The starboard solar array now follows the user-selected tall ESA silhouette:
+estimated 1.350 × 1.866 m, with a 10 × 14 grid and fixed bus attachment datums.
+The saved solar fixture passes 152 checks. June 15, 2026 real Astrobotic photos
+have also been reviewed and linked in `requirements/griffin-size-evidence.md`
+and the solar SysML rationale. They show larger three-face coverage and shaped
+cutouts; the current reconstruction does not yet match that flight hardware.
+
 
 Seven hollow main nozzles and the raised skirt frame are committed in `fed8e99`.
 The silver exterior now reuses the shared LunCoSim foil shader with explicit

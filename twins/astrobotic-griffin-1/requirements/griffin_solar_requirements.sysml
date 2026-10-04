@@ -77,6 +77,39 @@ package GriffinSolarRequirements {
         attribute mountLinkCenterZM : Real = 0.00;
         attribute gridColumnCount : Integer = 14;
         attribute gridRowCount : Integer = 5;
+        /* 2026-10-04: the operator points out the much larger side array.
+         * ESA's 2022 artist impression has a tall panel projecting above the
+         * belt: https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander .
+         * Select a 10-column, 14-row side module; those counts are an approximate
+         * visual reconstruction of its grid, not a released hardware count.
+         * Retain the Astrobotic 14-by-5 front module and square 129 mm pitch
+         * as the available scale datum. The resulting side frame is 1.350 m
+         * wide by 1.866 m tall. Matching pitch across the two image revisions
+         * is an explicit assumption, not evidence of identical flight cells.
+         * Ordered entries follow the source solarArrayInstances. Width also
+         * respects the mount-rail span; the chamfer fits fewer columns.
+         * solarStations are belt-centre datums. Installed centre Y is raised
+         * by half (installed frame height - nominal belt frame height), keeping
+         * the lower edge aligned. Existing bus sockets remain fixed. This is
+         * a user-directed appearance reconstruction combining front and side
+         * references; it is not asserted to be a single released configuration. */
+        /* Hardware evidence checked 2026-10-04: Astrobotic's real clean-room
+         * photographs taken 2026-06-15 show large arrays across three adjacent
+         * faces, with stepped lower/equipment clearances and dark rounded cells.
+         * https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/
+         * https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg
+         * https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1348-edit/
+         * These supersede the old renderings as hardware evidence; they do not
+         * provide metric dimensions. The user explicitly selected one tall ESA
+         * side panel for this pass, so the current three installed modules remain
+         * a reconstruction, not the June 2026 flight-hardware configuration.
+         * Remaining photo-backed deltas: tall coverage on the other two faces,
+         * shaped leg/equipment cutouts, cell shape and support details. Ground
+         * wheeled stands and temporarily retracted footpads are test equipment
+         * and pose observations, not lunar landing datums. */
+        attribute installedMaximumColumnCounts : Integer[3] = (14, 14, 10);
+        attribute installedRowCounts : Integer[3] = (5, 5, 14);
+
         attribute cellFaceNormal : Direction = (0.0, 1.0, 0.0);
         /* Quaternion component tolerance covers authored serialization precision,
          * not an angular hardware tolerance. USD orient uses (w,x,y,z). */
@@ -91,7 +124,7 @@ package GriffinSolarRequirements {
         doc /* GSA-002 [visual] each array exposes a frame and cell surface with owned geometry. */
     }
     requirement def GSA003_SunQuadrantLayout {
-        doc /* GSA-003 [mission layout] the forward, forward-starboard bevel, and starboard arrays occupy the original mission Sun quadrant. The three arrays wrap one Sun-facing quadrant, following the selected Astrobotic 2021 belt-panel configuration. The speculative opposite-face array is removed for the operator's one-side layout request on 2026-10-04; no hidden-face array is inferred. Their installed frames and panel normals shall satisfy the site-local Sun azimuth/elevation envelope and the approved installation configuration. */
+        doc /* GSA-003 [mission layout] the forward, forward-starboard bevel, and starboard arrays occupy the original mission Sun quadrant. The three arrays wrap one Sun-facing quadrant, with the tall side-panel correction selected from the ESA reference on 2026-10-04. The speculative opposite-face array is removed for the operator's one-side layout request on 2026-10-04; no hidden-face array is inferred. Their installed frames and panel normals shall satisfy the site-local Sun azimuth/elevation envelope and the approved installation configuration. */
     }
     requirement def GSA004_ArrayTraceability {
         doc /* GSA-004 [evidence] array identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and deployment status is explicit. */
@@ -108,7 +141,7 @@ package GriffinSolarRequirements {
         require GSAC005_RailSpanFit {
             in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GSA-005 [installation interface] installed width is the lesser of the typed bus-rail span minus solarArrayEdgeClearanceM and frameWidthM, so the component maximum cannot inflate on wide faces. Stations and orientations remain source-owned reconstruction datums. Compact brackets seat at the unchanged bus rails; slanted links derive from the rail-to-panel-edge endpoints to preserve the load path. No supplier installation ICD is available. */
+        doc /* GSA-005 [installation interface] installed width is the lesser of the typed bus-rail span minus solarArrayEdgeClearanceM and the selected module column count times metric cell pitch plus the nominal frame border. Installed row count sets frame height; centre Y derives from the belt-centre datum plus half the height increase, preserving the lower-edge alignment. Stations and orientations remain source-owned reconstruction datums. Compact brackets seat at the unchanged bus rails; slanted links derive from the rail-to-panel-edge endpoints to preserve the load path. No supplier installation ICD is available. */
     }
     constraint def GSAC006_PanelMeshEnvelope {
         in measuredFrameWidthM : Real;
@@ -125,10 +158,10 @@ package GriffinSolarRequirements {
         in measuredBackplaneCenterYM : Real;
         in frameWidthM : Real;
         in frameThicknessM : Real;
-        in frameDepthM : Real;
+        in installedLocalFrameDepthM : Real;
         in cellWidthM : Real;
         in cellThicknessM : Real;
-        in cellDepthM : Real;
+        in installedLocalCellDepthM : Real;
         in cellOffsetYM : Real;
         in arrayBackplaneThicknessM : Real;
         in arrayBackplaneCenterYM : Real;
@@ -136,30 +169,28 @@ package GriffinSolarRequirements {
         geometryToleranceM >= 0.0
             and RealFunctions::abs(measuredFrameWidthM - frameWidthM) <= geometryToleranceM
             and RealFunctions::abs(measuredFrameThicknessM - frameThicknessM) <= geometryToleranceM
-            and RealFunctions::abs(measuredFrameDepthM - frameDepthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredFrameDepthM - installedLocalFrameDepthM) <= geometryToleranceM
             and RealFunctions::abs(measuredCellWidthM - installedLocalCellWidthM) <= geometryToleranceM
             and RealFunctions::abs(measuredCellThicknessM - cellThicknessM) <= geometryToleranceM
-            and RealFunctions::abs(measuredCellDepthM - cellDepthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredCellDepthM - installedLocalCellDepthM) <= geometryToleranceM
             and RealFunctions::abs(measuredCellCenterYM - cellOffsetYM) <= geometryToleranceM
             and RealFunctions::abs(measuredBackplaneWidthM - cellWidthM) <= geometryToleranceM
             and RealFunctions::abs(measuredBackplaneThicknessM - arrayBackplaneThicknessM) <= geometryToleranceM
-            and RealFunctions::abs(measuredBackplaneDepthM - cellDepthM) <= geometryToleranceM
+            and RealFunctions::abs(measuredBackplaneDepthM - installedLocalCellDepthM) <= geometryToleranceM
             and RealFunctions::abs(measuredBackplaneCenterYM - arrayBackplaneCenterYM) <= geometryToleranceM;
     }
     requirement def GSA006_PanelEnvelope {
         require GSAC006_PanelMeshEnvelope {
             in frameWidthM = GriffinSolarArrayAssembly::frameWidthM;
             in frameThicknessM = GriffinSolarArrayAssembly::frameThicknessM;
-            in frameDepthM = GriffinSolarArrayAssembly::frameDepthM;
             in cellWidthM = GriffinSolarArrayAssembly::cellWidthM;
             in cellThicknessM = GriffinSolarArrayAssembly::cellThicknessM;
-            in cellDepthM = GriffinSolarArrayAssembly::cellDepthM;
             in cellOffsetYM = GriffinSolarArrayAssembly::cellOffsetYM;
             in arrayBackplaneThicknessM = GriffinSolarArrayAssembly::arrayBackplaneThicknessM;
             in arrayBackplaneCenterYM = GriffinSolarArrayAssembly::arrayBackplaneCenterYM;
             in geometryToleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GSA-006 [geometry] the frame and backplane use the rectangular 2021 rendering configuration. The installed cell field width derives from a whole number of source-pitch columns, transformed back into the panel local frame. The bus-face scale fits the perimeter without distorting the cells. No lower notch is observed in that rendering; the different hardware-photo configuration is not mixed into this reconstruction. */
+        doc /* GSA-006 [geometry] the frame and backplane use rectangular modules. Front/chamfer modules retain the 2021 shallow belt layout; the side module follows the taller 2022 ESA silhouette under the explicitly estimated grid/pitch configuration. The installed cell field width derives from a whole number of source-pitch columns, transformed back into the panel local frame. The bus-face scale fits the perimeter without distorting the cells. No lower notch is observed in that rendering; the different hardware-photo configuration is not mixed into this reconstruction. */
     }
     constraint def GSAC007_UniformMetricCellPitch {
         in maximumColumnPitchErrorM : Real;
@@ -174,7 +205,7 @@ package GriffinSolarRequirements {
         require GSAC007_UniformMetricCellPitch {
             in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GSA-007 [geometry] full faces use the 14-column, 5-row module observed by the user in https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png linked from https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ . Installed cell pitch follows cellWidthM/gridColumnCount and cellDepthM/gridRowCount. Narrow faces reduce column count to the largest whole count fitting their rail span minus the nominal frame-to-cell border allowance, capped at gridColumnCount. Keep the metric pitch after instance scaling; never squeeze 14 columns into a narrower panel. A reduced-column bevel panel is a reconstruction estimate from available space, not an observed flight count. The retained five rows, square pitches derived from the module width and frame borders are appearance estimates; supplier panel configuration is unavailable. */
+        doc /* GSA-007 [geometry] the nominal front module uses the 14-column, 5-row layout observed by the user in https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png linked from https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ . Installed cell pitch follows cellWidthM/gridColumnCount and cellDepthM/gridRowCount. Narrow faces reduce column count to the largest whole count fitting their rail span minus the nominal frame-to-cell border allowance, capped at the selected installedMaximumColumnCounts entry. Keep the metric pitch after instance scaling; never squeeze 14 columns into a narrower panel. A reduced-column bevel panel is a reconstruction estimate from available space, not an observed flight count. Installed row counts and maximum column counts select the shallow front and tall side modules. Square pitches derived from the front module width and frame borders are appearance estimates; supplier panel configuration is unavailable. */
     }
     requirement def GSA008_HingeAndStandoff {
         doc /* GSA-008 [mechanical interface] panel pivots, restraints, support links, deployment envelope, and structural load path shall conform to the approved Griffin-1 mechanism and structural interface definition. */

@@ -132,7 +132,7 @@ fn on_tick(me, ctx) {
     let root = sysml_requirements::text(source, own("usdRootPath"));
     let geometry_tolerance = sysml_requirements::number(source, visual("geometryVerificationToleranceM"));
     let names = sysml_requirement_checks::source_enum_identifiers(source, visual("solarArrayInstances"));
-    let stations = sysml_requirement_checks::source_position_list(source, visual("solarStations"));
+    let stations = griffin_spec::component_solar_stations();
     let members = sysml_requirement_checks::source_enum_identifiers(source, own("childNames"));
     let count = "GriffinLanderRequirements::GriffinLanderComponent::solarArrayCount";
     let rotx = sysml_requirement_checks::source_number_list(source, visual("solarStationRotationXDeg"));
@@ -166,14 +166,17 @@ fn on_tick(me, ctx) {
     }
     let mount_overlap = sysml_requirements::number(source, own("minimumMountOverlapM"));
     let mesh_paths = [];
-    for name in names {
+    for index in 0..names.len() {
+        let name=names[index];
+        let layout=griffin_spec::solar_installed_cell_layout(index);
+        if layout==() {throw("solar installed cell layout unavailable");}
         let path = root + "/" + name;
         mesh_paths.push(path);
         mesh_paths.push(path + "/Frame");
         mesh_paths.push(path + "/Cells");
         mesh_paths.push(path + "/ArrayBackplane");
         for column in 1..sysml_requirements::number(source,own("gridColumnCount")).to_int() {mesh_paths.push(path+"/CellDividerX"+column.to_string());}
-        for row in 1..sysml_requirements::number(source,own("gridRowCount")).to_int() {mesh_paths.push(path+"/CellDividerZ"+row.to_string());}
+        for row in 1..layout.rows {mesh_paths.push(path+"/CellDividerZ"+row.to_string());}
     }
     let mesh_batch = if mesh_paths.len() > 0 {
         query("QueryUsdPrims", #{paths: mesh_paths, attrs: ["points", "xformOp:scale","xformOp:translate","visibility"]})
@@ -223,7 +226,7 @@ fn on_tick(me, ctx) {
         } else { () };
         let expected_installed_width = if negative_rail != () && positive_rail != ()
             && edge_clearance != () {
-            min((positive_rail.x - negative_rail.x).abs() - edge_clearance,frame_width)
+            griffin_spec::component_solar_array_widths_m()[index]
         } else { () };
         let placement_constraint = sysml_requirements::required_constraint_ir(model,
             gsa005, "GriffinSolarRequirements::GSAC005_RailSpanFit");
@@ -247,6 +250,8 @@ fn on_tick(me, ctx) {
             ["measuredFrameThicknessM", mesh_measurement(composed, path + "/Frame", 1, "extent")],
             ["measuredFrameDepthM", mesh_measurement(composed, path + "/Frame", 2, "extent")],
             ["installedLocalCellWidthM", derived_measurement(layout.local_cell_width_m,"whole source-pitch columns in fitted face",model)],
+            ["installedLocalFrameDepthM", derived_measurement(layout.frame_depth_m,"selected rows plus frame border",model)],
+            ["installedLocalCellDepthM", derived_measurement(layout.cell_depth_m,"selected rows at source cell pitch",model)],
             ["measuredCellWidthM", mesh_measurement(composed, path + "/Cells", 0, "extent")],
             ["measuredCellThicknessM", mesh_measurement(composed, path + "/Cells", 1, "extent")],
             ["measuredCellDepthM", mesh_measurement(composed, path + "/Cells", 2, "extent")],
@@ -257,8 +262,8 @@ fn on_tick(me, ctx) {
             ["measuredBackplaneCenterYM", mesh_measurement(composed, path + "/ArrayBackplane", 1, "center")]
         ]);
         for source_name in [
-            own("frameWidthM"), own("frameThicknessM"), own("frameDepthM"),
-            own("cellWidthM"), own("cellThicknessM"), own("cellDepthM"),
+            own("frameWidthM"), own("frameThicknessM"),
+            own("cellWidthM"), own("cellThicknessM"),
             own("cellOffsetYM"), own("arrayBackplaneThicknessM"),
             own("arrayBackplaneCenterYM"), visual("geometryVerificationToleranceM")
         ] {
@@ -270,9 +275,9 @@ fn on_tick(me, ctx) {
 
         // Verify the visible metric grid, including excess inherited dividers.
         let columns=sysml_requirements::number(source,own("gridColumnCount")).to_int();
-        let rows=sysml_requirements::number(source,own("gridRowCount")).to_int();
+        let rows=layout.rows;
         let pitch_x=sysml_requirements::number(source,own("cellWidthM"))/columns;
-        let pitch_z=sysml_requirements::number(source,own("cellDepthM"))/rows;
+        let pitch_z=layout.pitch_m;
         let field=mesh_geometry(composed,path+"/Cells");
         let max_x_error=0.0;let max_z_error=0.0;let grid_available=field!=();
         for column in 1..columns {
@@ -342,7 +347,8 @@ fn on_tick(me, ctx) {
         checks.push(#{id: "GSA-008-" + name + "-hinge-z", component: "solar_array",
             requirement: "gsa008", verification: VERIFICATION, kind: "attribute_component",
             path: path + "/HingeBar", attr: "xformOp:translate", index: 2,
-            expected_attr: own("hingeBarCenterZM"), tolerance: geometry_tolerance});
+            expected:sysml_requirements::number(source,own("hingeBarCenterZM"))
+                +(layout.frame_depth_m-sysml_requirements::number(source,own("frameDepthM")))/2.0, tolerance: geometry_tolerance});
         for side in ["NegativeX", "PositiveX"] {
             let link_path = path + "/MountLink" + side;
             checks.push(sysml_requirement_checks::exists("GSA-008-" + name + "-" + side + "-link",

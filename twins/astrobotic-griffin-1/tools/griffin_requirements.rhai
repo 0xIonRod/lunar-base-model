@@ -2687,7 +2687,7 @@ fn visual_report(doc_id, root) {
     }
 
     let solar_names = griffin_spec::solar_array_names();
-    let solar_stations = sysml_requirement_checks::source_position_list(source, _visual_configuration_attr("solarStations"));
+    let solar_stations = griffin_spec::component_solar_stations();
     let solar_widths = griffin_spec::component_solar_array_widths_m();
     let solar_frame_width = griffin_spec::solar_panel_frame_width_m();
     for index in 0..solar_names.len() {

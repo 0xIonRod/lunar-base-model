@@ -1300,3 +1300,58 @@ Fresh owned port 49759 reads the new fittings correctly and reports a ready
 preview. Reviewed image: `terrain/target/assembly-editor/griffin-solar-ramp-saved-reviewed.png`.
 This is visual/component acceptance. Held-Space reflight, warm reload
 repeatability and full rover traversal remain open.
+
+
+### Tall side array and current hardware references, 2026-10-04
+
+The user selected a tall panel on one side, as in the [ESA 2022 artist
+impression](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander).
+This supersedes the previous pass's assumption that every installed panel
+should use the shallow belt module. The front and chamfer retain their
+Astrobotic rendering proportions; the starboard panel now has an estimated
+10-column by 14-row field. The same assumed 129 mm pitch gives a 1.350 m wide
+by 1.866 m tall frame. Grid count is an approximate visual reconstruction;
+matching pitch between different rendering revisions is an explicit study
+assumption, not a flight-hardware dimension. Its lower edge stays at the
+existing belt edge. Centre height derives from that relationship, and bracket,
+link and hinge stations retain the existing bus sockets. Rhai reads the ordered
+SysML column/row arrays; it does not own another dimension table.
+
+The latest real hardware photos located in this search are Astrobotic's
+June 15, 2026 unveiling photos. Reviewed both the
+[1348 clean-room view](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg)
+and the [1419 opposite view, credited to Astrobotic by NASA](https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1419-edit-2/).
+Source context: [Astrobotic's unveiling release](https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/)
+and [NASA's hardware gallery](https://www.nasa.gov/gallery/astrobotics-griffin-1/).
+These are photographs of the integrated lander in a ground-test pose, unlike
+the older product/ESA renderings. They are stronger evidence for hardware
+shape and placement, but supply no metric panel dimensions.
+
+The photos show large solar-covered faces around one quadrant, stepped
+lower and equipment openings, dark cells with rounded corners and warm-colored
+inter-cell substrate, silver frames, and substantial landing-gear sleeves.
+Folded ramp backs also have broad dark surfaces rather than only an open
+ladder appearance. Current-model gaps remain: tall coverage of the other two
+faces, shaped openings and cell/support appearance, ramp deck/back geometry,
+and hardware-specific leg details. The current single tall rectangular panel
+is the user-selected reconstruction; it is **not** asserted to reproduce the
+June 2026 flight vehicle. Ground wheeled stands, protective covers and elevated
+footpads must not become lunar landing geometry or nominal leg compression.
+
+Live Editor editing used four bounded named groups (surface, columns, rows,
+mounts), all submitted through the same typed planner/document owner. The
+preview lease was renewed at the same document identity to restore projection
+readiness at generation 355. The pre-save document-scoped SysML envelope gate
+passed four observations (frame/cell/backplane heights and derived centre).
+The saved-source production solar fixture passed its existing 152 checks,
+including the full 14-row grid and mount overlap. Evidence:
+`terrain/target/griffin-tall-solar-gate.log`;
+local live envelope report `/tmp/griffin-tall-solar-live-envelope.json`.
+The full one-shot solar observer exceeded the Editor's operation ceiling, so
+no additional observer library or increased limit was added. The focused
+Editor images show the taller silhouette partly occluded by stowed ramps;
+full exposed-side visual clearance is still to be reviewed. Images:
+`terrain/target/assembly-editor/griffin-tall-solar-focused.png` and
+`terrain/target/assembly-editor/griffin-tall-solar-camera.png`.
+This is component geometry acceptance, not landing, reload, power-performance
+or rover-egress acceptance.
