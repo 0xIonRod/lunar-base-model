@@ -1530,3 +1530,27 @@ and current flight engine ratings remain engineering-data gaps. This RCS/control
 checkpoint does not resolve them or qualify flight performance. Fresh landing,
 warm reload, full FLIP route and the remaining hardware appearance refinements
 must still pass independently.
+
+## Reachable engine cutoff, 2026-10-05
+
+The first current-engine descent missed touchdown and rebounded repeatedly.
+At 22 seconds the attitude was upright but retained about 0.013 rad/s rotation.
+The generic Lander stopped damping below 0.02 rad/s, while its touchdown and
+engine-cutoff rate predicate required less than 0.005 rad/s. The controller
+therefore could leave a spin that prevented its own handoff. These are simulator
+values from `lunco://models/Lander.mo`, not measured Griffin thresholds.
+
+The effective damping deadband now caps at half the settled-rate tolerance.
+The half-tolerance margin is an explicit control study choice to leave damping
+authority inside the acceptance envelope; no touchdown threshold was widened.
+With this law, the production descent reached qualified touchdown at tick 1484
+(about 24.7 seconds) and passed the unchanged GR-036 stability requirement:
+361/361 samples retained four-foot contact over 60 seconds, minimum upright
+projection 0.995907 and maximum horizontal drift 0.157619 m. Evidence:
+`terrain/target/griffin-engine-contact-rate-margin.log`, exit 0, 5090 ticks.
+This is one physical run, not deterministic fresh/warm reload acceptance.
+
+The observer now reports at the existing source-owned 300-second landing
+watchdog if touchdown is missing, rather than waiting forever for a
+post-touchdown window. Its diagnostics include target error, requested torque
+and physical attitude; the stability limits and predicates are unchanged.

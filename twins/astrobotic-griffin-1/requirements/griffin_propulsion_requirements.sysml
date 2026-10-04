@@ -26,6 +26,14 @@ package GriffinPropulsionRequirements {
          * Equation sources: lunco://models/LunCo/Propulsion/Turbopump.mo and
          * CombustionChamber.mo. Those pump equations are an acknowledged
          * integration approximation for the publicly pressure-fed architecture.
+         * Control closure source: lunco://models/Lander.mo. Its effective gyro
+         * damping deadband shall lie below the settled-touchdown angular-rate
+         * tolerance. The generic law caps it at half that tolerance, an explicit
+         * study margin so residual spin cannot prevent engine cutoff. This is
+         * not an Astrobotic flight-controller specification. The former 0.02
+         * rad/s deadband exceeded the modeled 0.005 rad/s touchdown threshold.
+         * First qualified contact closes autonomous main demand; possession
+         * selects pilot demand without refilling or bypassing feed availability.
          */
         attribute exhaustVelocityMps : Real = 2940.0;
         attribute combustionEfficiency : Real = .96;

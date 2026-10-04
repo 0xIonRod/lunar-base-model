@@ -31,6 +31,17 @@ survey target; route acceptance remains open. These observations predate the
 new RCS/controller checkpoint and must be rerun before claiming current landing
 or egress acceptance.
 
+Core Lander commit b6c1c24e1 caps damping deadband below its own touchdown
+angular-rate tolerance. The earlier 0.02 rad/s damping deadband could retain
+rotation above the 0.005 rad/s cutoff threshold. The half-tolerance control
+margin and simulator provenance are explicit in GriffinEngineControlStudy.
+Current production landing stability PASS 1 at 5090 ticks: qualified touchdown
+at tick 1484, followed by 361/361 four-foot-contact samples over the unchanged
+60-second window including ramp deployment/release. Evidence:
+`terrain/target/griffin-engine-contact-rate-margin.log`. This is a single run;
+strict fresh/warm replay and current held-thrust reflight still need acceptance.
+The observer now reports missing touchdown at the existing 300-second watchdog.
+
 Core camera/input commits ad5813405 and 48b81a302 are local; production
 lander-controls now PASS 16. Pending fixed-boundary and terrain causal/order
 changes have built, but strict fresh/warm landing replay is still unaccepted.

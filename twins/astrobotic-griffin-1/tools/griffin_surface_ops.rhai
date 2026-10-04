@@ -558,6 +558,10 @@ fn landing_stability_sample() {
         altimeter_position_y: get(altimeter, "vehicle_position_y"),
         engine_thrust_n: get(propulsion, "thrust_n"),
         engine_vehicle_mass_kg: get(propulsion, "vehicle_mass_kg"),
+        horizontal_target_error_m: get(gnc, "horizontal_target_error"),
+        desired_tilt_rad: [get(lander, "desired_tilt_x"), get(lander, "desired_tilt_z")],
+        requested_torque_nm: [get(lander, "torque_x"), get(lander, "torque_y"),
+            get(lander, "torque_z")],
         landing_engine_cutoff: get(gnc, "landing_engine_cutoff"),
         landing_handoff: get(gnc, "landing_handoff")
     }
@@ -568,6 +572,7 @@ fn landing_stability_sample() {
 fn landing_stability_contract() {
     #{
         horizon_s: griffin_spec::landing_stability_horizon_s(),
+        touchdown_timeout_s: griffin_spec::landing_phase_timeout_s(),
         sample_every_n_ticks: griffin_spec::landing_stability_sample_every_n_ticks(),
         min_upright_axis_y: griffin_spec::landing_minimum_upright_axis_y(),
         max_ground_speed_mps: griffin_spec::landing_max_ground_speed_mps(),

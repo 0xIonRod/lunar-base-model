@@ -128,7 +128,8 @@ fn emit_stability_verdict(me, contract, source) {
         && me.post_touchdown_unready_count == 0;
     let clocks = clock_snapshot();
     let clock_tick_delta = clocks.sim_tick - me.clock_start.sim_tick;
-    let post_touchdown_tick_delta = clocks.sim_tick - me.touchdown_tick;
+    let post_touchdown_tick_delta = if me.touchdown_tick == () {0}
+        else {clocks.sim_tick - me.touchdown_tick};
     let simulation_elapsed_delta = clock_tick_delta.to_float() * clocks.fixed_dt_s;
     let clock_elapsed_delta = post_touchdown_tick_delta.to_float() * clocks.fixed_dt_s;
     let fixed_elapsed_delta = clocks.fixed_elapsed_s - me.clock_start.fixed_elapsed_s;
@@ -176,6 +177,7 @@ fn emit_stability_verdict(me, contract, source) {
             } else { () },
         touchdown: if me.last.touchdown != () { me.last.touchdown } else { 0.0 },
         touchdown_observed: touchdown_observed,
+        touchdown_timeout_s: contract.touchdown_timeout_s,
         any_leg_contact: if me.last.any_leg_contact != () { me.last.any_leg_contact } else { () },
         all_legs_contact: if me.last.all_legs_contact != () { me.last.all_legs_contact } else { () },
         all_four_legs_contact: all_four_legs_contact,
@@ -327,6 +329,14 @@ fn on_tick(me, ctx) {
                 + " all_legs_contact=" + sample.all_legs_contact.to_string()
                 + " touchdown=" + sample.touchdown.to_string());
             print("[griffin-landing-stability] t=" + diagnostic_time
+                + " position_m=" + position.to_string()
+                + " upright=" + sample.upright_axis_y.to_string()
+                + " angular_speed_radps=" + sample.angular_speed.to_string()
+                + " target_error_m=" + sample.horizontal_target_error_m.to_string()
+                + " cutoff_contact=" + sample.engine_cutoff_contact.to_string()
+                + " requested_torque_nm=" + sample.requested_torque_nm.to_string()
+                + " desired_tilt_rad=" + sample.desired_tilt_rad.to_string());
+            print("[griffin-landing-stability] t=" + diagnostic_time
                 + " nav_y_m=" + sample.navigation_position_y.to_string()
                 + " altimeter_y_m=" + sample.altimeter_position_y.to_string()
                 + " altimeter_range_m=" + sample.altimeter_range_m.to_string());
@@ -394,7 +404,10 @@ fn on_tick(me, ctx) {
         }
     }
 
-    if !this.touchdown_seen || this.elapsed < contract.horizon_s { return; }
+    let touchdown_expired = !this.touchdown_seen
+        && relative_tick.to_float() * dt() >= contract.touchdown_timeout_s;
+    if !touchdown_expired
+        && (!this.touchdown_seen || this.elapsed < contract.horizon_s) {return;}
     let source = sysml_requirements::source();
     emit_stability_verdict(this, contract, source);
     // Rhai map arguments are values. The caller owns the report latch; a
