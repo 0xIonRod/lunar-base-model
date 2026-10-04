@@ -1430,3 +1430,35 @@ Remaining work, in order:
 5. Replace panel supplier/count/contour and electrical/thermal placeholders
    with controlled data. Revisit blankets, tank supports and nozzle/interface
    details where those data change the study geometry.
+
+## Sustained engine commands, 2026-10-04
+
+The full pilot path exposed an inconsistent scalar contract: the main force
+actuator accepted only 60,000 N, while the chamber produced about 88,600 N at
+full demand. Above the actuator limit, port validation rejected the command
+before force delivery. Spooling through the accepted range caused a brief hop;
+repeated input edges could repeat those impulses. The actuator now accepts
+90,316.8 N, derived from the explicit 32 kg/s feed envelope, 2940 m/s effective
+exhaust velocity and 0.96 combustion efficiency in `GriffinEngineControlStudy`.
+The upward rounding from 31.7685 kg/s bounds the existing pressure-dependent
+feed equations. It changes the interface limit, not the chamber equations or
+the claimed flight rating.
+
+Current hardware topology follows the [Astrobotic product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
+(seven main engines and four attitude clusters, checked 2026-10-04). Fuel and
+pressure-fed architecture are historical [August 2021 PUG v5.02, p.26](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf).
+The feed model, impulse and efficiency remain integration estimates; the
+current flight engine rating is unavailable. Turbopump equations in this Twin
+remain an approximation that requires replacement for pressure-fed fidelity.
+
+GPP-010 now requires sustained end-of-burn climb, rather than just a peak
+height. Production `griffin_engine_commands.rhai` passed five checks on the
+surface scene with one five-second input hold, about 137.7 m lift and 58.9 m/s
+upward speed at burn end, fuel consumption, and extinguished thrust after a
+three-second release interval. This verifies command delivery and reflight;
+it does not qualify flight performance, camera behavior or the full rover route.
+The canonical vehicle was saved through the Editor at generation 1; composed
+readback confirmed the source-derived force envelope. Core source at this run
+was `ad5813405` plus the pending fixed-step physics admission and terrain
+causal-admission changes. Log: `target/griffin-engine-force-contract-live.log`
+in the owned terrain checkout, API port 49766.

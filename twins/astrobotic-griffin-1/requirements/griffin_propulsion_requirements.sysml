@@ -12,6 +12,37 @@ package GriffinPropulsionRequirements {
     attribute def Direction :> CartesianThreeVectorValue;
     enum def GriffinEngineVisualMember { Bell; Throat; }
 
+    part def GriffinEngineControlStudy {
+        doc /* Integration study, not current flight performance. The existing
+         * chamber uses 2940 m/s effective exhaust velocity and 0.96 combustion
+         * efficiency; the feed models admit 8 + 21 kg/s at 2.5 MPa tank pressure,
+         * rising to sqrt(3.0/2.5) times that flow at the authored 3.0 MPa maximum.
+         * The resulting 31.7685 kg/s bound is rounded upward to 32 kg/s for the
+         * scalar actuator contract. This accepts the entire modeled feed range
+         * without rejecting full pilot demand. No manufacturer rating is
+         * inferred: current seven-engine unit ratings are unpublished here.
+         * Architecture/fuel reference: Astrobotic August 2021 PUG v5.02 p.26,
+         * https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf.
+         * Equation sources: lunco://models/LunCo/Propulsion/Turbopump.mo and
+         * CombustionChamber.mo. Those pump equations are an acknowledged
+         * integration approximation for the publicly pressure-fed architecture.
+         */
+        attribute exhaustVelocityMps : Real = 2940.0;
+        attribute combustionEfficiency : Real = .96;
+        attribute actuatorFlowEnvelopeKgs : Real = 32.0;
+        attribute actuatorForceEnvelopeN : Real = actuatorFlowEnvelopeKgs * exhaustVelocityMps * combustionEfficiency;
+        // One input edge held for 5 s must still be climbing at the end,
+        // rather than merely reaching a transient hop peak. 2 m clearance
+        // and 2 m/s upward speed are study acceptance thresholds for this
+        // initial lunar surface fixture, not a flight qualification criterion.
+        attribute burnDurationS : Real = 5.0;
+        attribute releaseDurationS : Real = 3.0;
+        attribute minimumSustainedLiftM : Real = 2.0;
+        attribute minimumEndVerticalSpeedMps : Real = 2.0;
+        attribute extinguishedThrustThresholdN : Real = 100.0;
+        attribute touchdownTimeoutS : Real = 150.0;
+    }
+
     part def GriffinMainPropulsionAssembly {
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1/Nozzle/MainEngineCluster";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_engine_bell_visual.usda";
@@ -339,4 +370,22 @@ package GriffinPropulsionRequirements {
             verify ges007;
         }
     }
+    requirement def GPP010_SustainedPilotThrust {
+        doc /* GPP-010 [runtime integration] after qualified touchdown, one
+         * semantic thrust input held for burnDurationS shall lift the vehicle
+         * by minimumSustainedLiftM and retain at least minimumEndVerticalSpeedMps
+         * upward velocity at the end of the burn. Releasing the input shall
+         * reduce delivered chamber thrust below extinguishedThrustThresholdN
+         * after releaseDurationS. Fuel must decrease during the burn. The
+         * force actuator input envelope shall accept the modeled feed range
+         * derived in GriffinEngineControlStudy. Verify through the production
+         * pilot/controller/Modelica/physics path in
+         * scenarios/tests/griffin_engine_commands.rhai. This is integration
+         * acceptance with explicit study thresholds, not flight qualification.
+         */
+    }
+    requirement <'GPP-010'> gpp010 : GPP010_SustainedPilotThrust {
+        subject control : GriffinEngineControlStudy;
+    }
+
 }

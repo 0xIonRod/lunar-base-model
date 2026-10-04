@@ -3097,7 +3097,7 @@ def Xform "Griffin1" (
     )
     {
         custom float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
-        custom double lunco:forceActuator:maxForce = 60000.0
+        double lunco:forceActuator:maxForce = 90316.8
         rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:thrust_n>
         float inputs:force_command
         float inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:thrust_n>

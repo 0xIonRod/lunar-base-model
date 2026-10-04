@@ -19,6 +19,14 @@ fn query_ok(record) {
     record != () && record.ok != false
 }
 
+fn griffin_main_engine_command_contract_plan(doc, edit_target, root) {
+    let limit = griffin_spec::_typed_model_number(
+        "GriffinPropulsionRequirements::GriffinEngineControlStudy::actuatorForceEnvelopeN");
+    if limit == () || limit <= 0.0 {return #{ok:false,error:"missing main-engine force envelope"};}
+    #{ok:true,ops:[#{SetAttribute:#{edit_target:edit_target,path:root+"/MainEngineVisual",
+        name:"lunco:forceActuator:maxForce",type_name:"double",value:limit.to_string()}}]}
+}
+
 // Size reconstruction plans consume the canonical typed source. These are
 // explicit collision/presentation proxies; see requirements/griffin-size-evidence.md.
 fn _resize_cube_ops(edit_target, path, dimensions, center, cube_size) {
