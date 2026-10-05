@@ -1,0 +1,10 @@
+name = "flip_rover_v5"
+version = "0.1.0"
+description = "CAD-visible FLIP rigid-body study rover and panel mechanism"
+
+[usd]
+default_scene = "FLIP_simulation.usda"
+
+[modelica]
+# Standalone sourceAsset program, not a package library root.
+paths = []

@@ -1,0 +1,30 @@
+{
+  "asset": "FLIP_rover_v5",
+  "purpose": "Functional-form requirements for LunCoSim wheel physics",
+  "source_facts": {
+    "wheel_count": 4,
+    "wheel_radius_m": 0.465,
+    "wheel_width_m": 0.280,
+    "vehicle_mass_kg": 450.0,
+    "wheel_stations": ["FL", "FR", "RL", "RR"],
+    "cables_per_wheel": 192,
+    "springs_per_wheel": 96
+  },
+  "functional_forms": {
+    "lunar_gravity_m_s2": {"value": 1.62, "status": "assumption"},
+    "wheel_mass_kg": {"value": 18.0, "status": "tunable_assumption"},
+    "wheel_inertia_kg_m2": "0.5 * wheel_mass_kg * wheel_radius_m^2",
+    "static_normal_load_n": "vehicle_mass_kg * lunar_gravity_m_s2 / wheel_count",
+    "suspension_force_n": "spring_rate_n_m * compression_m + damper_rate_n_s_m * compression_rate_m_s",
+    "contact_friction_limit_n": "friction_coefficient * normal_load_n",
+    "drive_force_n": "drive_torque_nm / wheel_radius_m"
+  },
+  "tunable_parameters": {
+    "spring_rate_n_m": {"value": 12000.0, "status": "tunable_assumption"},
+    "damper_rate_n_s_m": {"value": 1800.0, "status": "tunable_assumption"},
+    "friction_coefficient": {"value": 0.65, "status": "tunable_assumption"},
+    "max_drive_torque_nm": {"value": 250.0, "status": "tunable_assumption"},
+    "suspension_travel_m": {"value": 0.12, "status": "tunable_assumption"}
+  },
+  "evidence_boundary": "CAD visual solids do not establish mass distribution, inertia, stiffness, damping, friction, or motor limits. Tune these values against vehicle data or calibration runs."
+}

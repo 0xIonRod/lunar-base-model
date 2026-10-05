@@ -1,0 +1,8 @@
+2026-10-01T09:30:19.033605Z  WARN lunco_assets_runtime::font: [lunco-assets] DejaVu Sans not found at C:\Users\salek\OneDrive\Desktop\lunco_sim\assets\fonts\DejaVuSans.ttf: The system cannot find the file specified. (os error 2) — text that needs it will be missing
+[test] scene-readiness freeze held 1073 updates (4.1s wall)
+[test] physics admission settled in 3 zero-duration updates (4.1s wall)
+[test] participant preparation settled in 0 zero-duration updates after 1073 load and 3 physics-admission updates (4.1s wall)
+2026-10-01T09:30:23.095283Z  WARN lunco_celestial_spatial::cadence: [celestial] cadence tolerance is 0 (EXACT): the gate solves EVERY frame by definition, costing ~10 ms/frame. That is intended for `scene_test` determinism — outside one it is a misconfiguration.
+2026-10-01T09:30:23.095377Z  WARN lunco_settings: [Settings:celestial_cadence] refusing to persist invalid runtime section: tolerance_deg must be finite and greater than zero
+2026-10-01T09:30:26.871465Z  WARN lunco_core_runtime::gate: [gate] `environment_sun_light_projection` fired on 300/300 evaluations (100%) — this run condition is not gating. The system it guards is running as if unconditional, and is paying the cost the gate was added to avoid. Check what marks its inputs dirty every frame.
+luncosim test FAIL  scene=C:\Users\salek\OneDrive\Desktop\NASA-lunar-base-model\lunar-base-model\freecad\flip_rover_v5\FLIP_test_negative_mass.usda  channel=FLIP_ACCEPTANCE  ticks=1140  updates=1157  sim=19.00s  threads=1  jitter=0.000  seed=6840157149251759617  tick_hz=60.0000

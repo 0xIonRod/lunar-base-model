@@ -45,6 +45,19 @@ saved `FLIP_rover_v5.FCStd`. It uses 1 mm tessellation for general geometry and
 practical to serialize. The USD mesh remains a tessellated approximation; the
 FCStd file is the editable source.
 
+## Simulation study delivery
+
+Register this folder as Twin `flip_rover_v5` in LunCoSim and open the default
+scene `FLIP_simulation.usda` from `twin.toml`. The five `FLIP_visual_*.usda`
+layers preserve CAD geometry; hidden physics proxies provide rigid bodies,
+wheel contacts and the panel hinge. This scene also requires LunCoSim's bundled
+`skid_rover.usda` and `lunar_surface.usda`; it is not standalone OpenUSD.
+
+See [`DELIVERY_REPORT.md`](DELIVERY_REPORT.md) for tested evidence, known engine
+limitations, excluded scratch files and blocked authoring helpers. The delivered
+saved scenes are usable study artifacts, not a qualified rebuild workflow or
+flight mechanics model. Local engine fixes are not included in this repository.
+
 ## Delivered evidence
 
 - [`parameters_v5.json`](parameters_v5.json): public facts, study choices, unknowns and units/status.

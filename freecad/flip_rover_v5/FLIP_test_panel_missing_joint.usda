@@ -1,0 +1,1166 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+    def Xform "FLIP" (
+        prepend references = [@lunco://vessels/rovers/skid_rover.usda@</SkidRover>]
+        variants = { string "drivetrain" = "physical" }
+    )
+    {
+        double3 xformOp:translate = (0.0, 0.7, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        float physics:mass = 343.0
+        float3 physics:diagonalInertia = (132.4629364013672, 190.2515869140625, 66.75328826904297)
+        float3 physics:centerOfMass = (0.0, -0.13500000536441803, 0.0)
+        def "Chassis"
+        {
+            double3 xformOp:scale = (1.476, 0.396, 2.116)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+            double size = 1.0
+            double3 xformOp:translate = (0.0, -0.135, 0.0)
+        }
+        def "Headlight_L" (
+            active = false
+        )
+        {
+        }
+        def "Headlight_R" (
+            active = false
+        )
+        {
+        }
+        def "FrontCamera" (
+            active = false
+        )
+        {
+        }
+        def "Suspension_FL"
+        {
+            double3 xformOp:translate = (-1.0, -0.235, -0.85)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            def Cylinder "Wheel_FL"
+            {
+                double radius = 0.465
+                double height = 0.28
+                float physxVehicleWheel:radius = 0.4650000035762787
+                float physxVehicleWheel:width = 0.2800000011920929
+                float physxVehicleWheel:mass = 18.0
+                float physxVehicleWheel:moi = 1.946025013923645
+                float physics:mass = 18.0
+                float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
+                float physics:dynamicFriction = 0.6499999761581421
+                float physxVehicleTire:restLoad = 182.25
+                uniform token purpose = "proxy"
+                float[] primvars:displayOpacity = [0.0]
+                custom rel material:binding = None
+                def Xform "CADVisuals" (
+                    prepend references = [@twin://flip_rover_v5/FLIP_visual_FL.usda@</World>]
+                )
+                {
+                    uniform token purpose = "render"
+                }
+                def Cylinder "ContactProxy" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                    active = false
+                )
+                {
+                    uniform token axis = "X"
+                    double radius = 0.465
+                    double height = 0.28
+                    uniform token purpose = "proxy"
+                    token visibility = "invisible"
+                    bool physics:collisionEnabled = true
+                }
+                def "SuspensionCasing"
+                {
+                    token visibility = "invisible"
+                }
+                def "SuspensionPiston"
+                {
+                    token visibility = "invisible"
+                }
+                def "SuspensionSpring"
+                {
+                    token visibility = "invisible"
+                }
+            }
+        }
+        def "Suspension_FL_Slider"
+        {
+            point3f physics:localPos0 = (-1.0, -0.23499999940395355, -0.8500000238418579)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+            float physics:lowerLimit = -0.05999999865889549
+            float physics:upperLimit = 0.05999999865889549
+            float drive:linear:physics:stiffness = 12000.0
+            float drive:linear:physics:damping = 1800.0
+        }
+        def "Wheel_FL_Hinge"
+        {
+            point3f physics:localPos0 = (0.0, 0.0, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        }
+        def "Suspension_FR"
+        {
+            double3 xformOp:translate = (1.0, -0.235, -0.85)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            def Cylinder "Wheel_FR"
+            {
+                double radius = 0.465
+                double height = 0.28
+                float physxVehicleWheel:radius = 0.4650000035762787
+                float physxVehicleWheel:width = 0.2800000011920929
+                float physxVehicleWheel:mass = 18.0
+                float physxVehicleWheel:moi = 1.946025013923645
+                float physics:mass = 18.0
+                float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
+                float physics:dynamicFriction = 0.6499999761581421
+                float physxVehicleTire:restLoad = 182.25
+                uniform token purpose = "proxy"
+                float[] primvars:displayOpacity = [0.0]
+                custom rel material:binding = None
+                def Xform "CADVisuals" (
+                    prepend references = [@twin://flip_rover_v5/FLIP_visual_FR.usda@</World>]
+                )
+                {
+                    uniform token purpose = "render"
+                }
+                def Cylinder "ContactProxy" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                    active = false
+                )
+                {
+                    uniform token axis = "X"
+                    double radius = 0.465
+                    double height = 0.28
+                    uniform token purpose = "proxy"
+                    token visibility = "invisible"
+                    bool physics:collisionEnabled = true
+                }
+                def "SuspensionCasing"
+                {
+                    token visibility = "invisible"
+                }
+                def "SuspensionPiston"
+                {
+                    token visibility = "invisible"
+                }
+                def "SuspensionSpring"
+                {
+                    token visibility = "invisible"
+                }
+            }
+        }
+        def "Suspension_FR_Slider"
+        {
+            point3f physics:localPos0 = (1.0, -0.23499999940395355, -0.8500000238418579)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+            float physics:lowerLimit = -0.05999999865889549
+            float physics:upperLimit = 0.05999999865889549
+            float drive:linear:physics:stiffness = 12000.0
+            float drive:linear:physics:damping = 1800.0
+        }
+        def "Wheel_FR_Hinge"
+        {
+            point3f physics:localPos0 = (0.0, 0.0, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        }
+        def "Suspension_RL"
+        {
+            double3 xformOp:translate = (-1.0, -0.235, 0.85)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            def Cylinder "Wheel_RL"
+            {
+                double radius = 0.465
+                double height = 0.28
+                float physxVehicleWheel:radius = 0.4650000035762787
+                float physxVehicleWheel:width = 0.2800000011920929
+                float physxVehicleWheel:mass = 18.0
+                float physxVehicleWheel:moi = 1.946025013923645
+                float physics:mass = 18.0
+                float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
+                float physics:dynamicFriction = 0.6499999761581421
+                float physxVehicleTire:restLoad = 182.25
+                uniform token purpose = "proxy"
+                float[] primvars:displayOpacity = [0.0]
+                custom rel material:binding = None
+                def Xform "CADVisuals" (
+                    prepend references = [@twin://flip_rover_v5/FLIP_visual_RL.usda@</World>]
+                )
+                {
+                    uniform token purpose = "render"
+                }
+                def Cylinder "ContactProxy" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                    active = false
+                )
+                {
+                    uniform token axis = "X"
+                    double radius = 0.465
+                    double height = 0.28
+                    uniform token purpose = "proxy"
+                    token visibility = "invisible"
+                    bool physics:collisionEnabled = true
+                }
+                def "SuspensionCasing"
+                {
+                    token visibility = "invisible"
+                }
+                def "SuspensionPiston"
+                {
+                    token visibility = "invisible"
+                }
+                def "SuspensionSpring"
+                {
+                    token visibility = "invisible"
+                }
+            }
+        }
+        def "Suspension_RL_Slider"
+        {
+            point3f physics:localPos0 = (-1.0, -0.23499999940395355, 0.8500000238418579)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+            float physics:lowerLimit = -0.05999999865889549
+            float physics:upperLimit = 0.05999999865889549
+            float drive:linear:physics:stiffness = 12000.0
+            float drive:linear:physics:damping = 1800.0
+        }
+        def "Wheel_RL_Hinge"
+        {
+            point3f physics:localPos0 = (0.0, 0.0, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        }
+        def "Suspension_RR"
+        {
+            double3 xformOp:translate = (1.0, -0.235, 0.85)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            def Cylinder "Wheel_RR"
+            {
+                double radius = 0.465
+                double height = 0.28
+                float physxVehicleWheel:radius = 0.4650000035762787
+                float physxVehicleWheel:width = 0.2800000011920929
+                float physxVehicleWheel:mass = 18.0
+                float physxVehicleWheel:moi = 1.946025013923645
+                float physics:mass = 18.0
+                float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
+                float physics:dynamicFriction = 0.6499999761581421
+                float physxVehicleTire:restLoad = 182.25
+                uniform token purpose = "proxy"
+                float[] primvars:displayOpacity = [0.0]
+                custom rel material:binding = None
+                def Xform "CADVisuals" (
+                    prepend references = [@twin://flip_rover_v5/FLIP_visual_RR.usda@</World>]
+                )
+                {
+                    uniform token purpose = "render"
+                }
+                def Cylinder "ContactProxy" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                    active = false
+                )
+                {
+                    uniform token axis = "X"
+                    double radius = 0.465
+                    double height = 0.28
+                    uniform token purpose = "proxy"
+                    token visibility = "invisible"
+                    bool physics:collisionEnabled = true
+                }
+                def "SuspensionCasing"
+                {
+                    token visibility = "invisible"
+                }
+                def "SuspensionPiston"
+                {
+                    token visibility = "invisible"
+                }
+                def "SuspensionSpring"
+                {
+                    token visibility = "invisible"
+                }
+            }
+        }
+        def "Suspension_RR_Slider"
+        {
+            point3f physics:localPos0 = (1.0, -0.23499999940395355, 0.8500000238418579)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+            float physics:lowerLimit = -0.05999999865889549
+            float physics:upperLimit = 0.05999999865889549
+            float drive:linear:physics:stiffness = 12000.0
+            float drive:linear:physics:damping = 1800.0
+        }
+        def "Wheel_RR_Hinge"
+        {
+            point3f physics:localPos0 = (0.0, 0.0, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        }
+        def Xform "CADVisuals" (
+            prepend references = [@twin://flip_rover_v5/FLIP_visual_Body.usda@</World>]
+        )
+        {
+            uniform token purpose = "render"
+            def "Cell01_08" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_03" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_06" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_06" (
+                active = false
+            )
+            {
+            }
+            def "SensorMast" (
+                active = false
+            )
+            {
+            }
+            def "Cell01_07" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_08" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_01" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_02" (
+                active = false
+            )
+            {
+            }
+            def "SensorBar" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_04" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_03" (
+                active = false
+            )
+            {
+            }
+            def "SolarFrameRear" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_07" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_00" (
+                active = false
+            )
+            {
+            }
+            def "MovingHingeR" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_02" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_05" (
+                active = false
+            )
+            {
+            }
+            def "SensorFootL" (
+                active = false
+            )
+            {
+            }
+            def "Cell01_02" (
+                active = false
+            )
+            {
+            }
+            def "SolarFrameR" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_03" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_06" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_01" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_04" (
+                active = false
+            )
+            {
+            }
+            def "Cell01_01" (
+                active = false
+            )
+            {
+            }
+            def "SolarFrameFront" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_02" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_00" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_01" (
+                active = false
+            )
+            {
+            }
+            def "Cell01_00" (
+                active = false
+            )
+            {
+            }
+            def "LensL" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_04" (
+                active = false
+            )
+            {
+            }
+            def "CameraR" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_01" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_03" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_04" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_05" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_06" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_08" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_09" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_09" (
+                active = false
+            )
+            {
+            }
+            def "LensR" (
+                active = false
+            )
+            {
+            }
+            def "SolarBackplate" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_00" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_02" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_08" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_07" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_01" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_06" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_09" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_07" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_05" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_04" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_00" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_08" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_02" (
+                active = false
+            )
+            {
+            }
+            def "CameraL" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_08" (
+                active = false
+            )
+            {
+            }
+            def "Cell01_04" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_09" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_02" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_03" (
+                active = false
+            )
+            {
+            }
+            def "Cell01_05" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_00" (
+                active = false
+            )
+            {
+            }
+            def "Cell01_09" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_09" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_00" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_02" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_06" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_08" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_06" (
+                active = false
+            )
+            {
+            }
+            def "Cell01_03" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_01" (
+                active = false
+            )
+            {
+            }
+            def "SensorFootR" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_04" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_07" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_05" (
+                active = false
+            )
+            {
+            }
+            def "Cell02_01" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_09" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_04" (
+                active = false
+            )
+            {
+            }
+            def "Cell03_05" (
+                active = false
+            )
+            {
+            }
+            def "MovingHingeL" (
+                active = false
+            )
+            {
+            }
+            def "Cell00_03" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_05" (
+                active = false
+            )
+            {
+            }
+            def "Cell07_07" (
+                active = false
+            )
+            {
+            }
+            def "SolarFrameL" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_07" (
+                active = false
+            )
+            {
+            }
+            def "AntennaStub" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_05" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_08" (
+                active = false
+            )
+            {
+            }
+            def "Cell06_07" (
+                active = false
+            )
+            {
+            }
+            def "Cell04_00" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_09" (
+                active = false
+            )
+            {
+            }
+            def "Cell05_03" (
+                active = false
+            )
+            {
+            }
+            def "Cell01_06" (
+                active = false
+            )
+            {
+            }
+        }
+        def "Comms" (
+            active = false
+        )
+        {
+        }
+        over "Battery"
+        {
+            def "Body"
+            {
+                token visibility = "invisible"
+                bool physics:collisionEnabled = false
+            }
+        }
+        over "Motor_FL"
+        {
+            def "Body"
+            {
+                token visibility = "invisible"
+            }
+        }
+        over "Motor_FR"
+        {
+            def "Body"
+            {
+                token visibility = "invisible"
+            }
+        }
+        over "Motor_RL"
+        {
+            def "Body"
+            {
+                token visibility = "invisible"
+            }
+        }
+        over "Motor_RR"
+        {
+            def "Body"
+            {
+                token visibility = "invisible"
+            }
+        }
+        over "WifiRadio"
+        {
+            def "RadioHousing"
+            {
+                token visibility = "invisible"
+            }
+            def "Whip"
+            {
+                token visibility = "invisible"
+            }
+        }
+        def Xform "SolarMechanism" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            bool physics:rigidBodyEnabled = true
+            float physics:mass = 15.0
+            float3 physics:centerOfMass = (-0.6899999976158142, 0.009999999776482582, 0.0)
+            float3 physics:diagonalInertia = (4.05049991607666, 6.430500030517578, 2.38100004196167)
+            double3 xformOp:translate = (0.69, 0.257, 0.0)
+            double3 xformOp:rotateXYZ = (0.0, 0.0, -82.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            def Xform "CADVisuals" (
+                prepend references = [@twin://flip_rover_v5/FLIP_visual_Body.usda@</World>]
+            )
+            {
+                uniform token purpose = "render"
+                matrix4d xformOp:transform = ((0.139173101, 0.990268069, 0.0, 0.0), (-0.990268069, 0.139173101, 0.0, 0.0), (0.0, 0.0, 1.0, 0.0), (0.158469454, -0.719052454, 0.0, 1.0))
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+                def "LanderMount3" (
+                    active = false
+                )
+                {
+                }
+                def "LanderMount2" (
+                    active = false
+                )
+                {
+                }
+                def "BatteryTray" (
+                    active = false
+                )
+                {
+                }
+                def "PayloadMount2" (
+                    active = false
+                )
+                {
+                }
+                def "SkinRear" (
+                    active = false
+                )
+                {
+                }
+                def "BatteryPackB" (
+                    active = false
+                )
+                {
+                }
+                def "SkinL" (
+                    active = false
+                )
+                {
+                }
+                def "UpperCrossR" (
+                    active = false
+                )
+                {
+                }
+                def "PowerControllerTray" (
+                    active = false
+                )
+                {
+                }
+                def "BatteryEnclosure" (
+                    active = false
+                )
+                {
+                }
+                def "PayloadDeck" (
+                    active = false
+                )
+                {
+                }
+                def "HingePinR" (
+                    active = false
+                )
+                {
+                }
+                def "PostLR" (
+                    active = false
+                )
+                {
+                }
+                def "Baseplate" (
+                    active = false
+                )
+                {
+                }
+                def "PayloadRail1" (
+                    active = false
+                )
+                {
+                }
+                def "FloorCross2" (
+                    active = false
+                )
+                {
+                }
+                def "HingePinL" (
+                    active = false
+                )
+                {
+                }
+                def "PostRR" (
+                    active = false
+                )
+                {
+                }
+                def "AvionicsEnclosure" (
+                    active = false
+                )
+                {
+                }
+                def "PowerControllerEnclosure" (
+                    active = false
+                )
+                {
+                }
+                def "FloorCross0" (
+                    active = false
+                )
+                {
+                }
+                def "LanderMount0" (
+                    active = false
+                )
+                {
+                }
+                def "LanderMount1" (
+                    active = false
+                )
+                {
+                }
+                def "PayloadMount3" (
+                    active = false
+                )
+                {
+                }
+                def "SkinFront" (
+                    active = false
+                )
+                {
+                }
+                def "StowRestR" (
+                    active = false
+                )
+                {
+                }
+                def "PayloadRail0" (
+                    active = false
+                )
+                {
+                }
+                def "UpperCrossF" (
+                    active = false
+                )
+                {
+                }
+                def "PostRF" (
+                    active = false
+                )
+                {
+                }
+                def "FloorCross1" (
+                    active = false
+                )
+                {
+                }
+                def "UpperRailR" (
+                    active = false
+                )
+                {
+                }
+                def "PayloadMount0" (
+                    active = false
+                )
+                {
+                }
+                def "PostLF" (
+                    active = false
+                )
+                {
+                }
+                def "AvionicsTray" (
+                    active = false
+                )
+                {
+                }
+                def "TopDeck" (
+                    active = false
+                )
+                {
+                }
+                def "SkinR" (
+                    active = false
+                )
+                {
+                }
+                def "LowerRailR" (
+                    active = false
+                )
+                {
+                }
+                def "UpperRailL" (
+                    active = false
+                )
+                {
+                }
+                def "HingeSupportL" (
+                    active = false
+                )
+                {
+                }
+                def "LowerRailL" (
+                    active = false
+                )
+                {
+                }
+                def "StowRestL" (
+                    active = false
+                )
+                {
+                }
+                def "HingeSupportR" (
+                    active = false
+                )
+                {
+                }
+                def "PayloadMount1" (
+                    active = false
+                )
+                {
+                }
+            }
+            def Cube "Contact" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                double size = 1.0
+                uniform token purpose = "proxy"
+                token visibility = "invisible"
+                bool physics:collisionEnabled = true
+                double3 xformOp:translate = (-0.69, 0.01, 0.0)
+                double3 xformOp:scale = (1.38, 0.02, 1.8)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Xform "Controller" (
+                prepend apiSchemas = ["LunCoProgramAPI"]
+            )
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:sourceAsset = @twin://flip_rover_v5/models/FlipPanelController.mo@
+                double inputs:command_deg = 82.0
+                double outputs:angle = -1.4311699866353502
+                double outputs:deployment_deg = 82.0
+                double inputs:rate_deg_s = 10.0
+                double inputs:tau_s = 0.4
+                double inputs:initial_deg = 82.0
+            }
+        }
+        def PhysicsRevoluteJoint "PanelHinge" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+            active = false
+        )
+        {
+            custom rel physics:body0 = </World/FLIP>
+            custom rel physics:body1 = </World/FLIP/SolarMechanism>
+            uniform token physics:axis = "Z"
+            point3f physics:localPos0 = (0.6899999976158142, 0.25699999928474426, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+            quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+            quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+            float physics:lowerLimit = -90.0
+            float physics:upperLimit = 0.0
+            bool physics:collisionEnabled = false
+            token drive:angular:physics:type = "force"
+            float drive:angular:physics:maxForce = 60.0
+            float drive:angular:physics:stiffness = 1.0
+            float drive:angular:physics:damping = 0.10000000149011612
+            float drive:angular:physics:targetPosition = -82.0
+            float drive:angular:physics:targetVelocity = 0.0
+            double inputs:angle = -1.4311699866353502
+            double inputs:angle.connect = [</World/FLIP/SolarMechanism/Controller.outputs:angle>]
+        }
+    }
+    def Xform "Site" (
+        prepend references = [@lunco://scenes/base/lunar_surface.usda@</LunarSurface>]
+    )
+    {
+    }
+    def Cube "Ground" (
+        prepend apiSchemas = ["PhysicsCollisionAPI"]
+    )
+    {
+        double3 xformOp:scale = (50.0, 0.1, 50.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double3 xformOp:translate = (0.0, -0.1, 0.0)
+        bool physics:collisionEnabled = true
+    }
+    def Scope "Acceptance" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+        active = false
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @flip_acceptance.rhai@
+    }
+    def Camera "InspectionCamera" (
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        matrix4d xformOp:transform = ((0.707106781, 0.0, -0.707106781, 0.0), (-0.210067545, 0.954852477, -0.210067545, 0.0), (0.675182662, 0.297080371, 0.675182662, 0.0), (5.0, 3.0, 5.0, 1.0))
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+        float focalLength = 28.0
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "authored"
+    }
+    def Scope "PanelAcceptance" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @twin://flip_rover_v5/scenarios/tests/flip_panel_acceptance.rhai@
+    }
+}
