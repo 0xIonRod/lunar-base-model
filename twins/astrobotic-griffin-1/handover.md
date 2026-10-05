@@ -23,14 +23,21 @@ Two shared-core faults are reproduced and corrected:
   regression fails before the fix and passes after it; all 44 projection tests
   pass. The native bounds query now exposes this mismatch directly.
 
-Strict same-process replay remains **unresolved**. Admission, cooked rover
-bounds and the first three solver steps match within the existing strict
-limits. A 90-second paused replacement preserves all sampled touchdown and
-handoff states, but its maximum pose difference is 0.000652 m, velocity
-0.001186 m/s, angular speed 0.000685 rad/s and upright-axis Y 0.00001299.
-Thrust differs by at most 0.08658 N and throttle by 0.000001190. These exceed
-strict replay limits; neither limits nor exact signal checks were relaxed.
-The full mission PASS does not imply deterministic replay PASS.
+Strict same-process replay now **passes** on final core `75f376e5e` and
+owned production API 49833: two 90-second replacements match at all 94 samples,
+including admission, cooked rover bounds, first three solver steps, continuous
+trajectory limits, exact thrust/throttle and touchdown/handoff states. Both end
+in qualified four-pad contact. Existing tolerances and exact signal checks are
+unchanged. The same run completes all 16 surface mission checks and all 10 manual
+engine-command checks (one five-second hold, 26.860 m lift, 21,794 N peak thrust).
+
+The final lifecycle correction waits for incoming scene readiness before a
+retained VM rebinds its dependency plan. Before it, rendered 49832 validated a
+new Modelica entity before participant admission and permanently stopped the
+observer. Native retained-lifecycle regression is RED before/GREEN after; all
+30 scripting tests pass. Strict replay was failing before this correction and
+passes afterwards. Prior failed diagnostic measurements are retained for history
+and are not the verdict for this revision.
 
 Evidence: `terrain/target/griffin-active-compound-production-49830.log`,
 `griffin-collider-projection-green.log`, and `/tmp/griffin-{strict-replay-original,
@@ -53,9 +60,17 @@ Both rendered apps have exited.
 The live contact notice now restores after suspension settling without
 re-emitting touchdown or resetting egress actions. Fresh rendered 49832
 confirms the restored notice in `griffin-restored-notice-49832.png`.
-A retained diagnostic exposed premature dependency rebinding while replacement
-Modelica participants are still held; its native regression/fix is in progress.
-This does not yet explain the strict continuous replay drift.
+Final owned 49833 also passes the retained observer and strict replay with the
+replacement-readiness gate. Evidence: `terrain/target/griffin-retained-admission-
+production-49833.log`, `griffin-retained-admission-{red,green}.log`,
+`/tmp/griffin-latest-strict-replay.json`, `/tmp/griffin-final-engine-commands-49833.json`.
+Owned 49833 has exited. Current-source fresh-process landing acceptance passes
+in both runs (touchdown tick 1502; all four contacts in 361/361 stability samples),
+but strict fresh-process repeatability FAILS: final X differs by 0.000257979 m
+against the unchanged 1e-6 m limit. Source revision 11206743143509313692;
+`terrain/target/griffin-final-fresh-replay/` and its driver log. Same-process PASS
+must not be presented as universal startup determinism. Contact-order tracing is
+in progress; the temporary query/test instrumentation is not a production fix.
 
 Route markers display the same frozen landed frame as navigation through the
 disposable `@view@` layer. Marker triggers and domes are disabled; only
