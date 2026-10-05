@@ -72,9 +72,6 @@ fn on_start(me, ctx) {
         subscribe_from("intent.edge", lander_gid);
         subscribe_from("lander_touchdown", lander_gid);
     }
-    if rover_gid >= 0 {
-        subscribe_from("waypoint.reached", rover_gid);
-    }
     subscribe("griffin_ramp_unfold_requested");
     subscribe("griffin_rover_release_requested");
     for event_name in griffin_surface_ramp_ops::unfold_event_contract().ordered {
@@ -182,10 +179,8 @@ fn on_event(me, evt, ctx) {
         if status.ok == true { this.lander_settled = status.landed; this.touchdown_announced = status.touchdown_announced; }
         return;
     }
-    // The route task emits these mission-local edges after the same typed
-    // arrival predicate used by navigation.  Keep accepting the generic
-    // waypoint sensor events below for interactive/editor runs that use the
-    // authored marker triggers instead of the deterministic route task.
+    // The route task emits these edges from its horizontal arrival predicate.
+    // Markers only present the frozen landed route; they do not qualify arrival.
     if evt.name == "griffin_ramp_approach_reached" {
         this.ramp_approach_reached = true;
         return;
@@ -215,37 +210,6 @@ fn on_event(me, evt, ctx) {
     // Route helpers emit their structured verdict at the observation point.
     // A failed task leaf may finish before this nested event hook runs, so
     // this hook is intentionally trace-only for route failure events.
-    if evt.name != "waypoint.reached" || evt.source != rover { return; }
-    let path = waypoint_event_path(evt);
-    if path == () { return; }
-    // Keep the marker presentation static during this mission. The generic
-    // helper writes the runtime USD layer, which can rebuild a live physical
-    // vehicle while its post-detach bodies are settling. Mission milestones
-    // are already carried by this typed waypoint event; no color write is
-    // worth disturbing the drivetrain.
-    if path == "/Griffin1SurfaceOps/RoverRampApproach" {
-        this.ramp_approach_reached = true;
-        emit("griffin_ramp_approach_reached");
-        print("[griffin] rover reached ramp approach");
-    } else if path == "/Griffin1SurfaceOps/RoverRampExit" {
-        this.ramp_exit_reached = true;
-        this.egress_terrain_evidence = griffin_surface_ops::egress_terrain_runtime_evidence(rover);
-        emit("griffin_ramp_exit_reached");
-        print("[griffin] rover cleared ramp");
-    } else if path == "/Griffin1SurfaceOps/RoverTarget1" {
-        this.waypoint_1_reached = true;
-        emit("griffin_waypoint_1_reached");
-        print("[griffin] waypoint 1 reached");
-    } else if path == "/Griffin1SurfaceOps/RoverTarget2" {
-        this.waypoint_2_reached = true;
-        emit("griffin_waypoint_2_reached");
-        print("[griffin] waypoint 2 reached");
-    } else if path == "/Griffin1SurfaceOps/BaseSite" {
-        this.base_site_reached = true;
-        emit("griffin_base_site_reached");
-        emit("griffin_surface_ops_complete");
-        print("[griffin] base site reached; surface operations complete");
-    }
 }
 
 fn landing_setup_preflight() {

@@ -1393,6 +1393,28 @@ fn surface_route_target(target, frame) {
     vec3(point.x,target.y,point.z)
 }
 
+// Display the same frozen datums used by navigation. @view@ edits are
+// disposable presentation: saves and reloads retain the authored route table.
+fn present_surface_route(frame) {
+    let names=griffin_spec::surface_route_marker_names();
+    let x=griffin_spec::surface_route_marker_x();
+    let y=griffin_spec::surface_route_marker_y();
+    let z=griffin_spec::surface_route_marker_z();
+    let record=query("QueryUsdPrim",#{path:"/Griffin1SurfaceOps/"+names[0],attrs:[]});
+    if record==() || record.doc_id==() {throw("route presentation document unavailable");}
+    let ops=[];
+    for i in 0..names.len() {
+        let path="/Griffin1SurfaceOps/"+names[i];
+        let point=surface_route_target(vec3(x[i],y[i],z[i]),frame);
+        ops.push(#{SetTranslate:#{edit_target:"@view@",path:path,value:vec3_array(point)}});
+        ops.push(#{SetAttribute:#{edit_target:"@view@",path:path,
+            name:"lunco:billboard",type_name:"bool",value:"true"}});
+    }
+    cmd("ApplyUsdTransientOps",#{doc_id:record.doc_id,
+        parent_gen:usd_document_generation(record.doc_id),
+        label:"Present landed Griffin route",ops:ops})
+}
+
 fn _surface_route_leg_task(rover, leg, stall_timeout) {
     let target = leg.target;
     let guidance_target = leg.guidance_target;
@@ -1403,6 +1425,8 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
         once(|m| {
             if event=="griffin_ramp_approach_reached" {
                 this.surface_route_frame=griffin_surface_ops::landed_surface_route_frame();
+                let shown=griffin_surface_ops::present_surface_route(this.surface_route_frame);
+                if shown.ok!=true {throw("route presentation rejected: "+shown);}
             }
             if this.surface_route_frame==() {throw("surface route frame was not established by egress");}
             this.route_target = griffin_surface_ops::surface_route_target(target,this.surface_route_frame);

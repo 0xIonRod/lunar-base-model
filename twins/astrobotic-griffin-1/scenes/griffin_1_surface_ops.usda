@@ -181,9 +181,20 @@ def Xform "Griffin1SurfaceOps" (
     {
         custom double3 xformOp:translate = (2.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
+        bool lunco:billboard = false
+        string lunco:billboard:text = "Ramp entry"
+        float lunco:billboard:offsetY = 0.800000011920929
+        float lunco:billboard:fadeEnd = 60.0
+        def "Trigger" (
+            active = false
+        )
         {
             token lunco:triggerZone = "griffin_ramp_approach"
+        }
+        def "Dome" (
+            active = false
+        )
+        {
         }
     }
     def Xform "RoverRampExit" (
@@ -192,9 +203,20 @@ def Xform "Griffin1SurfaceOps" (
     {
         custom double3 xformOp:translate = (8.5, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
+        bool lunco:billboard = false
+        string lunco:billboard:text = "Ramp exit"
+        float lunco:billboard:offsetY = 0.800000011920929
+        float lunco:billboard:fadeEnd = 60.0
+        def "Trigger" (
+            active = false
+        )
         {
             token lunco:triggerZone = "griffin_ramp_exit"
+        }
+        def "Dome" (
+            active = false
+        )
+        {
         }
     }
     def Xform "RoverTarget1" (
@@ -203,9 +225,20 @@ def Xform "Griffin1SurfaceOps" (
     {
         custom double3 xformOp:translate = (13.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
+        bool lunco:billboard = false
+        string lunco:billboard:text = "Survey 1"
+        float lunco:billboard:offsetY = 0.800000011920929
+        float lunco:billboard:fadeEnd = 60.0
+        def "Trigger" (
+            active = false
+        )
         {
             token lunco:triggerZone = "griffin_target_1"
+        }
+        def "Dome" (
+            active = false
+        )
+        {
         }
     }
     def Xform "RoverTarget2" (
@@ -214,9 +247,20 @@ def Xform "Griffin1SurfaceOps" (
     {
         custom double3 xformOp:translate = (22.0, 0.0, -4.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
+        bool lunco:billboard = false
+        string lunco:billboard:text = "Survey 2"
+        float lunco:billboard:offsetY = 0.800000011920929
+        float lunco:billboard:fadeEnd = 60.0
+        def "Trigger" (
+            active = false
+        )
         {
             token lunco:triggerZone = "griffin_target_2"
+        }
+        def "Dome" (
+            active = false
+        )
+        {
         }
     }
     def Xform "BaseSite" (
@@ -225,9 +269,20 @@ def Xform "Griffin1SurfaceOps" (
     {
         custom double3 xformOp:translate = (31.0, 0.0, -10.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        over "Trigger"
+        bool lunco:billboard = false
+        string lunco:billboard:text = "Base"
+        float lunco:billboard:offsetY = 0.800000011920929
+        float lunco:billboard:fadeEnd = 60.0
+        def "Trigger" (
+            active = false
+        )
         {
             token lunco:triggerZone = "griffin_base_site"
+        }
+        def "Dome" (
+            active = false
+        )
+        {
         }
     }
     def Xform "LandingTarget" (

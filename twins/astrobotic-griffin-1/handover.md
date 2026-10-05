@@ -2,6 +2,29 @@
 
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
+## Current landing investigation, 2026-10-05
+
+The latest allocator/compiler and route-presentation stack is **not yet accepted
+for deterministic landing**. Owned 49826 completed the full 16-gate surface
+mission in a fresh run and a playing warm replacement, but paused replacements
+failed landing. Earlier deterministic checkpoint results below apply only to
+their stated source revision and executable.
+
+Owned 49827 isolates an uncommanded first-step yaw impulse to the leg-joint
+assembly: detaching the four leg joints removes it; detaching ramps does not.
+All bodies admit at zero velocity. Live cooked rover, ramp, bus and pad bounds
+match authored dimensions. A minimal native oblique prismatic rest-pose test
+passes; USD-to-native admission is still under investigation. These are
+observations, not a completed fix or a reason to resize collision geometry.
+Evidence is in `terrain/target/griffin-cooked-collider-49827.log` and the
+first-step snapshots under `/tmp/griffin-*`.
+
+Route markers now display the same frozen landed frame as navigation through
+the disposable `@view@` layer. Marker triggers and domes are disabled; only
+horizontal route arrival qualifies progress. A warm replacement clears view
+edits while retaining persistent authored edits. Native 49826 confirmed the
+source positions and hidden initial billboards return after replacement.
+
 ## Deterministic contact checkpoint, 2026-10-05
 
 The source-pinned production fresh pair now passes strict replay: both runs
