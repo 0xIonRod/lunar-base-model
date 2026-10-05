@@ -3,6 +3,52 @@
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
 
+## Geometry-derived main-engine sizing, 2026-10-05
+
+The saved main-engine study replaces inherited 33 kg/s command capability with
+7.24479842644317 kg/s. It extrapolates the **historical** 700 lbf unit rating to
+seven units, giving 21.7962859 kN; current flight ratings are unconfirmed.
+The native isentropic nozzle model derives Mach, exit pressure and effective
+velocity from the same bore dimensions used by the visual meshes. References,
+applicability limits and numerical derivation are in the latest section of
+`requirements/griffin-size-evidence.md` and `GriffinPressureFedStudy`.
+
+The isolated native nozzle benchmark passes Mach 2/Mach 3 analytical cases,
+a finite cold chamber and the Griffin rating. Early production runs failed;
+those logs remain recorded in `griffin-size-evidence.md`. Rumoca topic fixes
+`42c9ab55`, `9267b7bd`, `fb5eaa86`, `2d5ca942` and `da77eb4b` address runtime
+start-value folding, Newton domain overshoot, restart selection and feedback
+block ownership. Focused checks: 825 lowering, 119 algebraic-runtime and 328
+foundation/structural tests pass. The normal locked LunCoSim build with exact
+Git pin `da77eb4b200c3b9941c53b36fc2edf1c77b241ff` passes.
+No final-refresh fallback or tolerance relaxation was added.
+
+Current production evidence:
+- Engine-command PASS 8, owned 49800, tick 2049 / 34.15 s. One held five-second
+  pilot demand sustained liftoff; release extinguished useful thrust. During
+  this short ascent angular speed stayed below .053 rad/s and upright Y above
+  .996; this observation is not full powered-flight attitude acceptance.
+  Trace: `terrain/target/griffin-feedback-block-engine-49800.log.gz`.
+- Fuel exhaustion PASS 11, owned 49802, tick 241 / 4.016667 s; oxidizer
+  exhaustion PASS 11, owned 49803, tick 151 / 2.516667 s. Held commands remain
+  demanded; either depleted reactant removes native main/ACS thrust and shared
+  plume/light outputs. Logs: `griffin-feedback-block-{fuel,oxidizer}-*.log`.
+- Revised propulsion geometry PASS 94 on 49806, tick 2512 / 41.866667 s,
+  including the converging chamber mesh. `griffin-engine-geometry-final-49806.log`
+  and its status snapshot preserve the current source verdict. Focused Editor
+  screenshot/readback at saved generation 30 and the assembled Griffin preview
+  separately establish component appearance and saved state.
+- Trial 49805 attached the geometry observer to the wrong scene root, replacing
+  its command observer. It emitted no valid engine or geometry verdict; exclude
+  it from acceptance. The valid command evidence remains 49800.
+
+Starvation observers wait for measured depletion and one second of physical
+valve settling, bounded by ten seconds. Fuel loads remain 1000 kg each as
+inherited unsourced study inputs, not actual Griffin flight inventory.
+Strict warm/fresh replay and full mission acceptance remain unresolved.
+Core engine checkpoint `03bdc5018` is published on
+`griffin-pressure-fed-engines`; main stays unmerged.
+
 ## Pressure-fed engine integration checkpoint, 2026-10-05
 
 Requires core engine/library checkpoint `af6e0f7bf` and its pinned Rumoca

@@ -23,7 +23,7 @@ package GriffinPropulsionRequirements {
          * Passive valve/injector loss and choked chamber pressure are solved
          * together by LunCo.Propulsion.PressureFedValve and
          * PressureFedCombustionChamber. They add no artificial pump work.
-         * 50 kg/s bounds 28.8*sqrt(3 MPa/1 MPa) even at zero chamber pressure;
+         * 13 kg/s bounds 7.24479843*sqrt(3 MPa/1 MPa) even at zero chamber pressure;
          * it is an actuator admission envelope, not predicted current flow.
          * Control closure source: lunco://models/Lander.mo. Its gyro damping
          * deadband is capped at half the settled-touchdown rate tolerance so
@@ -32,9 +32,9 @@ package GriffinPropulsionRequirements {
          * contact closes autonomous main demand; possession selects pilot
          * demand without refilling or bypassing propellant availability.
          */
-        attribute exhaustVelocityMps : Real = 2940.0;
+        attribute exhaustVelocityMps : Real = GriffinPressureFedStudy::nozzleThrustCoefficient * GriffinPressureFedStudy::characteristicVelocityMps;
         attribute combustionEfficiency : Real = .96;
-        attribute actuatorFlowEnvelopeKgs : Real = 50.0;
+        attribute actuatorFlowEnvelopeKgs : Real = 13.0;
         attribute actuatorForceEnvelopeN : Real = actuatorFlowEnvelopeKgs * exhaustVelocityMps * combustionEfficiency;
         // One input edge held for 5 s must still be climbing at the end,
         // rather than merely reaching a transient hop peak. 2 m clearance
@@ -54,30 +54,37 @@ package GriffinPropulsionRequirements {
     part def GriffinPressureFedStudy {
         doc /* Reduced pressure-fed integration study, checked 2026-10-05.
          * Architecture source: https://www.linkedin.com/posts/astrobotic_the-astrobotic-team-recently-completed-a-activity-7402458294524530689-09jf.
-         * Numerical pressures, flow, fuel load, O/F and response below are
-         * simulator assumptions, not current flight specifications. Retain the
-         * inherited 8 kg/s fuel reference and set oxidizer to 8*2.6 kg/s for
-         * consistent modeled mixture. The inherited 2.5..3 MPa tank envelope
-         * and 0.08 s valve response remain explicit study assumptions.
-         * Chamber reference 1.5 MPa is chosen below the 2.5 MPa minimum supply
-         * to leave 1 MPa valve/injector pressure loss. Effective c-star is
-         * 1550 m/s times the inherited combustion efficiency 0.96. Aggregate
-         * throat bore area follows nominal mass flow*c-star/Pc. Seven equal
-         * bore radii are sqrt(area/(7*pi)); the written literal is derived.
-         * At 3 MPa supply the coupled steady flow solves to 32.7588079 kg/s;
-         * 33 kg/s is its upward-rounded controller capability. Throttle requests
-         * this fraction of flow split at O/F 2.6. Each valve computes required
-         * travel from current pressure head and retains the 0.08 s response
-         * and physical saturation. This study feed compensation prevents
-         * raw valve travel from amplifying low-throttle guidance demands;
-         * it is not a sourced Astrobotic command interface. The actuator
-         * admission bound is separately conservative at zero chamber pressure.
+         * Current seven-engine ratings remain unavailable. Historical PUG
+         * p.26 gives five pulsed 700 lbf main engines using M20/MON3:
+         * https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf.
+         * ESTIMATE: apply the old unit rating to seven current units, yielding
+         * 21,796.2859 N aggregate. This is not a current flight thrust ICD.
+         * The older 93 kN value came from inherited flow and is superseded.
+         * Numerical pressures, fuel load, O/F and response below remain
+         * simulator assumptions. Chamber reference 1.5 MPa is chosen below
+         * the inherited 2.5 MPa minimum supply for 1 MPa feed/injector loss.
+         * c-star 1550 m/s, combustion efficiency .96 and gamma 1.2 are
+         * reduced gas assumptions, not an equilibrium chemistry solution.
+         * Preserve the .334 m exit bore visual estimate. Solve each throat
+         * radius from F=Cf(epsilon)*Pc*pi*r^2, with the supersonic isentropic
+         * area-Mach relation and exit pressure ratio from NASA Glenn:
+         * https://www.grc.nasa.gov/WWW/BGH/isentrop.html.
+         * Bisection gives r=.018077777339853586 m, Cf=2.0218701400894896,
+         * aggregate bore area .007186840039031625 m2 and reacting flow
+         * 7.24479842644317 kg/s at Pc=1.5 MPa. These derived literals must
+         * be checked against the native BellNozzle model, not inferred from
+         * screenshots. O/F 2.6 remains an inherited integration assumption;
+         * excess-gas chemistry and current flight mixture remain unknown.
+         * Throttle requests a fraction of this nominal flow, split at O/F.
+         * Each valve compensates travel using current pressure head, physical
+         * saturation and the inherited .08 s response. This is a study
+         * command interface, not sourced Astrobotic flight firmware.
          * The helium regulator is represented by the existing tank pressure
          * envelope; finite pressurant inventory, slosh, detailed injector loss
          * and discrete pulsing remain unresolved. 1000 kg per reactant is an
          * inherited integration load, not a sourced flight inventory.
          */
-        attribute fuelReferenceFlowKgs : Real = 8.0;
+        attribute fuelReferenceFlowKgs : Real = referenceChamberPressurePa * totalThroatBoreAreaM2 / (characteristicVelocityMps * combustionEfficiency * (1.0 + oxidizerToFuelRatio));
         attribute oxidizerToFuelRatio : Real = 2.6;
         attribute oxidizerReferenceFlowKgs : Real = fuelReferenceFlowKgs * oxidizerToFuelRatio;
         attribute referenceTotalFlowKgs : Real = fuelReferenceFlowKgs + oxidizerReferenceFlowKgs;
@@ -87,9 +94,12 @@ package GriffinPropulsionRequirements {
         attribute referencePressureDropPa : Real = nominalTankPressurePa - referenceChamberPressurePa;
         attribute characteristicVelocityMps : Real = 1550.0;
         attribute combustionEfficiency : Real = GriffinEngineControlStudy::combustionEfficiency;
-        attribute totalThroatBoreAreaM2 : Real = referenceTotalFlowKgs * characteristicVelocityMps * combustionEfficiency / referenceChamberPressurePa;
-        attribute throatBoreRadiusM : Real = .03604359686410814;
-        attribute controllerFlowCapabilityKgs : Real = 33.0;
+        attribute totalThroatBoreAreaM2 : Real = .007186840039031625;
+        attribute throatBoreRadiusM : Real = .018077777339853586;
+        attribute gasGamma : Real = 1.2;
+        attribute nozzleThrustCoefficient : Real = 2.0218701400894896;
+        attribute estimatedMainEngineUnitThrustN : Real = 3113.7551306823498;
+        attribute controllerFlowCapabilityKgs : Real = referenceTotalFlowKgs;
         attribute fuelCommandFlowKgs : Real = controllerFlowCapabilityKgs / (1.0 + oxidizerToFuelRatio);
         attribute oxidizerCommandFlowKgs : Real = fuelCommandFlowKgs * oxidizerToFuelRatio;
         attribute valveResponseS : Real = .08;
@@ -111,6 +121,15 @@ package GriffinPropulsionRequirements {
         attribute throatRadiusM : Real = GriffinPressureFedStudy::throatBoreRadiusM + GriffinMainPropulsionAssembly::bellVisualWallThicknessM;
         attribute exitBoreRadiusM : Real = bellRadiusM - bellVisualWallThicknessM;
         attribute throatHeightM : Real = 0.16;
+        // Reconstruction estimate: chamber bore is four times the calculated
+        // throat bore (area ratio 16), providing a visibly wider chamber above
+        // a convergent half-neck. The retained 0.16 m package splits equally
+        // between convergence and cylindrical chamber; no flight ICD exists.
+        // Flow topology, not these dimensions, is supported by NASA:
+        // https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/nozzle-design/
+        attribute chamberBoreRadiusM : Real = GriffinPressureFedStudy::throatBoreRadiusM * 4.0;
+        attribute chamberOuterRadiusM : Real = chamberBoreRadiusM + bellVisualWallThicknessM;
+        attribute convergentHeightFraction : Real = .5;
         // Neck starts at the bell throat plane and extends upwards; the old
         // solid cylinder started inside the expanding bore and capped it.
         // Radius/height and the shared 6 mm visual wall remain reconstruction
@@ -329,6 +348,7 @@ package GriffinPropulsionRequirements {
         in exitRadiusM : Real;
         in heightM : Real;
         in throatRadiusM : Real;
+        in chamberOuterRadiusM : Real;
         in throatHeightM : Real;
         in throatCenterYM : Real;
         in wallThicknessM : Real;
@@ -339,8 +359,8 @@ package GriffinPropulsionRequirements {
             and measuredHeightM - heightM >= -toleranceM
             and measuredMinimumRadiusM >= throatRadiusM - wallThicknessM - toleranceM
             and boreOpen
-            and measuredThroatOuterRadiusM - throatRadiusM <= toleranceM
-            and measuredThroatOuterRadiusM - throatRadiusM >= -toleranceM
+            and measuredThroatOuterRadiusM - chamberOuterRadiusM <= toleranceM
+            and measuredThroatOuterRadiusM - chamberOuterRadiusM >= -toleranceM
             and measuredThroatHeightM - throatHeightM <= toleranceM
             and measuredThroatHeightM - throatHeightM >= -toleranceM
             and measuredThroatCenterYM - throatCenterYM <= toleranceM
@@ -352,12 +372,13 @@ package GriffinPropulsionRequirements {
             in exitRadiusM = GriffinMainPropulsionAssembly::bellRadiusM;
             in heightM = GriffinMainPropulsionAssembly::bellHeightM;
             in throatRadiusM = GriffinMainPropulsionAssembly::throatRadiusM;
+            in chamberOuterRadiusM = GriffinMainPropulsionAssembly::chamberOuterRadiusM;
             in throatHeightM = GriffinMainPropulsionAssembly::throatHeightM;
             in throatCenterYM = GriffinMainPropulsionAssembly::throatCenterYM;
             in wallThicknessM = GriffinMainPropulsionAssembly::bellVisualWallThicknessM;
             in toleranceM = GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GPP-006 [geometry] each engine exposes an open Y-axis hollow bell Mesh and an uncapped hollow throat Mesh using the source-owned radius/height datums. Mesh vertices and faces shall establish the exit envelope, height, positive flow-bore radius and absence of a closing face in both parts. The throat lower rim shall meet the bell throat plane, and the upper rim seats against the adapter plate. bellContourExponent relates the reconstruction contour to those datums using the library BellNozzle law; the exponent and bellVisualWallThicknessM are explicit visual estimates, not flight nozzle design or wall sizing. See griffin-size-evidence.md. */
+        doc /* GPP-006 [geometry] each engine exposes an open Y-axis hollow bell Mesh and an uncapped hollow converging chamber/throat Mesh using the source-owned radius/height datums. Mesh vertices and faces shall establish the exit envelope, height, positive flow-bore radius and absence of a closing face in both parts. The throat lower rim shall meet the bell throat plane, and the upper rim seats against the adapter plate. bellContourExponent relates the reconstruction contour to those datums using the library BellNozzle law; the exponent and bellVisualWallThicknessM are explicit visual estimates, not flight nozzle design or wall sizing. See griffin-size-evidence.md. */
     }
     constraint def GPPC007_BellSeparation {
         in measuredMinimumClearanceM : Real;

@@ -1621,7 +1621,7 @@ end, consumed fuel, and extinguished thrust after release. Log:
 command delivery with the current modeled feed; it does not accept strict
 reload replay or current flight-engine performance.
 
-## Pressure-fed main-engine study, 2026-10-05
+## Earlier pressure-fed main-engine tuning, 2026-10-05 (superseded sizing)
 
 This supersedes the pump approximation and outer-radius nozzle datum in the
 older checkpoints above. [Astrobotic's current product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
@@ -1725,3 +1725,138 @@ geometry/provenance observer PASS 94 on the same runtime and source revision
 14210885191415472004. Oxidizer exhaustion also PASS 11 at tick 180 / 3 s
 (`griffin-pressure-fed-oxidizer-final-49790.log`). These checks do not
 accept powered-flight attitude, warm reload or full rover egress.
+
+
+## Geometry-derived nozzle performance and rating estimate, 2026-10-05
+
+This supersedes the inherited 33 kg/s / 93 kN sizing above. The current
+[Astrobotic product](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
+provides the seven-engine count. The historical
+[Payload User Guide, p.26](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf)
+provides a **five-engine** baseline with 700 lbf units. Applying that older
+unit rating to today's seven units is an explicit estimate, not a current
+flight specification. It is better constrained than the inherited generic
+93 kN thrust value, but remains subject to replacement by supplier data.
+
+The shared `LunCo.Propulsion.BellNozzle` now inverts the supersonic area–Mach
+relation and obtains the exit/chamber pressure ratio from
+[NASA Glenn's isentropic relations](https://www.grc.nasa.gov/WWW/BGH/isentrop.html).
+The exit pressure is no longer an independent 8 kPa input. Its authored c-star
+and thrust coefficient supply the chamber's effective exhaust velocity;
+pressure and thrust use the same gas and throat assumptions. The model assumes
+choked, attached ideal-gas expansion. It does not solve equilibrium chemistry,
+flow separation, injector geometry, finite helium inventory or discrete engine
+pulsing. Fuel energy is now applied to fuel mass flow rather than total
+bipropellant flow.
+
+| Current study datum | Value | Source or explicit estimation rationale |
+| --- | --- | --- |
+| Unit / aggregate design thrust | 3,113.755 N / 21,796.286 N | Historical 700 lbf rating extrapolated to seven current units; applicability is unconfirmed |
+| Chamber / supply reference | 1.5 MPa / 2.5–3 MPa | Retained pressure study; leaves at least 1 MPa for valve/injector loss |
+| Gas gamma / c-star / efficiency | 1.2 / 1550 m/s / .96 | Reduced gas assumptions; not measured Griffin performance |
+| Exit bore radius / bell length / visual wall | .334 m / .52 m / .006 m | Retained visual estimates; no nozzle drawing was found |
+| Throat bore radius / aggregate bore area | .018077777339853586 m / .007186840039031625 m² | Solve F=Cf(epsilon) Pc At against the estimated unit rating, using the retained exit bore |
+| Vacuum thrust coefficient | 2.0218701400894896 | Native nozzle result for the above geometry and gamma |
+| Nominal aggregate / fuel / oxidizer flow | 7.244798426 / 2.012444007 / 5.232354419 kg/s | Pc At divided by c-star and efficiency, then split at the inherited O/F 2.6 |
+| Ideal / efficiency-adjusted exhaust velocity | 3133.898717 / 3008.542768 m/s | Native Cf × c-star, then the single chamber efficiency factor |
+| Actuator admission envelope | 39,111.056 N | ceil(nominal flow × sqrt(3 MPa / 1 MPa)) = 13 kg/s, multiplied by the same efficiency-adjusted velocity; not nominal thrust |
+| Initial reactant inventories | 1000 kg each | Still inherited, unsourced integration loads; not accepted flight loading |
+
+Nozzle verification used the exact maintained model body in a temporary native
+Modelica document, with explicit test inputs. Mach 2 at area ratio 1.6875 and
+Mach 3 at 4.234567901234568 both match within 1e-10; pressure ratios are
+.12780452546292945 and .02722368370385856. A zero-pressure chamber has finite
+coefficient and zero design thrust. Griffin's native unit result is
+3113.7551306823484 N. Evidence:
+`terrain/target/griffin-nozzle-benchmark-final.json`. The temporary document was
+closed, without persisting an alternate physics model.
+
+The first production attempt at this sizing failed its Modelica step at 4.8 s
+before touchdown: `terrain/target/griffin-nozzle-engine-49793.log`. Preserve that
+failure. The upstream branch now includes start-guess constant-folding repair
+(825 solve-lowering tests pass) and bounded Newton backtracking (117 algebraic
+runtime tests pass). A generic square-root regression proves that a full step
+can leave a valid root's domain; backtracking keeps the original convergence
+tolerance. These focused passes do not accept production landing or replay.
+
+The starvation observer now waits for **actual** reservoir depletion, then
+allows one second for the public availability boundary and .08 s valve response
+to settle while commands stay held. Its 10 s timeout bounds a failed command or
+feed. This is an explicit test allowance: the 5 kg fuel fixture needs about
+5/2.01244=2.48 s at nominal flow, plus startup and settlement. The old fixed
+three-second deadline assumed the superseded larger flow. The observer still
+requires the opposite feed to remain available and native combustion, RCS and
+shared plume outputs to become exactly zero.
+
+
+The chamber's chemical-power estimate counts fuel flow, rather than total
+fuel plus oxidizer flow, against the authored fuel energy. Its reduced
+reacting-temperature estimate uses the authored full temperature and mixture
+loss instead of scaling temperature by throttle: at fixed chemistry, reducing
+mass flow reduces total released power, rather than requiring a proportionally
+colder combustion gas. The mixture curve, full temperature and efficiency
+remain simulator estimates; no equilibrium chemistry or chamber thermal
+transient is claimed. Missing either reactant still removes useful combustion
+through the native mixture/availability equations.
+
+Production follow-up: the domain-backtracking revision `9267b7bd` still failed
+at target 4.4 s on owned port 49794. Its debug repetition on 49795 showed a
+near-root late sweep followed by a restart from the cold first sweep. Upstream
+`fb5eaa86` retains improving finite sweeps, with 118 focused tests passing,
+but its production run on 49796 still failed before touchdown. The retained
+49797 trace showed that unscaled update ranking mixed flow, pressure and
+chemical power. Revision `2d5ca942` ranks finite sweeps by scaled change;
+a regression with a large dependent output fails before and passes after,
+and all 118 runtime tests pass. Absolute convergence and the bounded roundoff
+floor are unchanged. The production rerun remains required; these focused
+checks do not establish landing, pilot-flight stability or deterministic reload.
+
+
+The 49798 production run with `2d5ca942` passed the earlier failing feed step
+but later faulted on `PlumePhotometry.visual_intensity`: residual
+6.693881e-10, beyond its unchanged convergence bound, with the Newton line
+search exhausted. A bounded-output refresh was considered, but the focused
+Solve-IR reproduction exposed the more general cause: runtime refresh was
+solving a feedback cycle together with its one-way outputs. A dependent
+exponential at gain 30 / scale 1e8 failed the whole Newton system although
+it did not feed back into the two-equation cycle.
+
+Upstream `da77eb4b` partitions that existing dependency graph into ordered
+feedback blocks. It reuses the structural phase's Tarjan implementation from
+one shared foundation owner; acyclic blocks follow their solved producers,
+with stable independent ordering and multi-output batching retained. No
+special Griffin/plume solver, relaxed tolerance or final-refresh fallback was
+added. The dependent-output reproduction now passes all six selected scales;
+119 runtime, 96 foundation and 232 structural tests pass. Full-scene
+acceptance still requires a fresh run with this exact dependency pin.
+
+
+Current production with exact pin `da77eb4b` passes the engine-command trial
+(8 checks, 2049 ticks / 34.15 s, owned 49800), fuel exhaustion (11 checks,
+241 ticks / 4.016667 s, owned 49802) and oxidizer exhaustion (11 checks,
+151 ticks / 2.516667 s, owned 49803). Release pressure is 25.0432 Pa and
+thrust .3639 N after four seconds. Five-second burn samples stay nearly
+upright (Y >= .996, angular speed <= .053 rad/s); these short-run observations
+do not qualify full flight control or deterministic reload. Full traces and
+status snapshots are under `terrain/target/griffin-feedback-block-*`.
+
+The visible chamber/neck now converges into the calculated throat instead
+of depicting the whole .16 m neck as a throat-width pipe. Its bore radius is
+**estimated** at four throat radii (chamber/throat area ratio 16), with the
+retained package split equally between a convergent half and cylindrical
+chamber half. This gives a recognizable chamber-to-throat topology while
+preserving the adapter datum and open flow path. NASA describes that topology:
+https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/nozzle-design/ .
+The radius multiplier, package length, split and 6 mm visual wall are not
+measured flight hardware dimensions. They do not claim chamber volume,
+residence time, cooling or transient thermodynamics. The latest real photo
+mostly hides the main engines beneath black insulation; it cannot establish
+these internal dimensions. The existing inherited nozzle-library material
+is retained, rather than inventing a flight alloy from the photograph.
+
+Revised chamber/bell geometry PASS 94 on owned 49806, 2512 ticks / 41.866667 s,
+The verdict packet pins its analyzed source revision; use that packet
+rather than assuming it matches later source changes.
+Editor generation 30 is saved and visually inspected; an assembled Griffin
+preview resolves the revised reference. These checks do not accept reload or
+landing stability. Invalid observer attachment 49805 is excluded.

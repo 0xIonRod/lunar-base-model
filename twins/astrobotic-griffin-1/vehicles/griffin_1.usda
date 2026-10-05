@@ -278,7 +278,6 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedCombustionChamber.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:effective_exhaust_velocity_mps = 2940.0
             float inputs:chamber_temperature_full_k = 3300.0
             float inputs:minimum_flow_kgs = 0.0000009999999974752427
             float inputs:minimum_throat_area_m2 = 0.0000000009999999717180685
@@ -303,9 +302,11 @@ def Xform "Griffin1" (
             float outputs:heat_release_w
             double inputs:oxidizer_to_fuel_ratio = 2.6
             double inputs:characteristic_velocity_mps = 1550.0
-            double inputs:throat_area_m2 = 0.0285696
+            double inputs:throat_area_m2 = 0.007186840039031625
             double inputs:combustion_efficiency = 0.96
-            double inputs:nominal_flow_kgs = 33.0
+            double inputs:nominal_flow_kgs = 7.24479842644317
+            custom float inputs:effective_exhaust_velocity_mps
+            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
         }
         def Scope "NozzleDesign" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -318,13 +319,14 @@ def Xform "Griffin1" (
             float inputs:contour = 0.550000011920929
             float outputs:exit_area
             float outputs:exit_radius_m
-            float inputs:gamma = 1.2000000476837158
-            float inputs:p_exit = 8000.0
             float inputs:p_ambient = 0.0
             float inputs:g0 = 9.806650161743164
-            double inputs:throat_radius = 0.03604359686410814
+            double inputs:throat_radius = 0.018077777339853586
             double inputs:exit_radius = 0.334
             double inputs:p_chamber = 1500000.0
+            double inputs:gamma = 1.2
+            double inputs:characteristic_velocity_mps = 1550.0
+            float outputs:ideal_exhaust_velocity_mps = 0.0
         }
         def Scope "PlumePhotometry" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -414,7 +416,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedValve.mo@
             uniform bool lunco:program:realtimeSafe = true
-            double inputs:maximum_flow_kgs = 8.0
+            double inputs:maximum_flow_kgs = 2.012444007345325
             double inputs:nominal_pressure_drop_pa = 1000000.0
             double inputs:opening_time_constant_s = 0.08
             double inputs:availability_transition_mass_kg = 0.01
@@ -428,7 +430,7 @@ def Xform "Griffin1" (
             double outputs:outlet_pressure_pa = 0.0
             double outputs:pressure_drop_pa = 0.0
             double outputs:activity = 0.0
-            double inputs:commanded_flow_kgs = 9.166666666666666
+            double inputs:commanded_flow_kgs = 2.012444007345325
             custom float inputs:flow_fraction_command
             float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
         }
@@ -439,7 +441,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedValve.mo@
             uniform bool lunco:program:realtimeSafe = true
-            double inputs:maximum_flow_kgs = 20.8
+            double inputs:maximum_flow_kgs = 5.232354419097845
             double inputs:nominal_pressure_drop_pa = 1000000.0
             double inputs:opening_time_constant_s = 0.08
             double inputs:availability_transition_mass_kg = 0.01
@@ -453,7 +455,7 @@ def Xform "Griffin1" (
             double outputs:outlet_pressure_pa = 0.0
             double outputs:pressure_drop_pa = 0.0
             double outputs:activity = 0.0
-            double inputs:commanded_flow_kgs = 23.833333333333332
+            double inputs:commanded_flow_kgs = 5.232354419097845
             custom float inputs:flow_fraction_command
             float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
         }
@@ -2459,7 +2461,7 @@ def Xform "Griffin1" (
     )
     {
         custom float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
-        double lunco:forceActuator:maxForce = 141120.0
+        double lunco:forceActuator:maxForce = 39111.05598989109
         rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:thrust_n>
         float inputs:force_command
         float inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:thrust_n>

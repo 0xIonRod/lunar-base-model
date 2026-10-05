@@ -484,6 +484,7 @@ fn on_tick(me, ctx) {
                 ["exitRadiusM",_source_literal(source_model,own("bellRadiusM"))],
                 ["heightM",_source_literal(source_model,own("bellHeightM"))],
                 ["throatRadiusM",_source_literal(source_model,own("throatRadiusM"))],
+                ["chamberOuterRadiusM",_source_literal(source_model,own("chamberOuterRadiusM"))],
                 ["throatHeightM",_source_literal(source_model,own("throatHeightM"))],
                 ["throatCenterYM",_source_literal(source_model,own("throatCenterYM"))],
                 ["wallThicknessM",_source_literal(source_model,own("bellVisualWallThicknessM"))],

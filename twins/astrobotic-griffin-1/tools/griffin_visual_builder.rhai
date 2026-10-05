@@ -110,13 +110,20 @@ fn griffin_pressure_fed_plan(doc, edit_target, root) {
         #{path:main+"/MainChamber",name:"nominal_flow_kgs",source:own+"controllerFlowCapabilityKgs"},
         #{path:main+"/NozzleDesign",name:"throat_radius",source:own+"throatBoreRadiusM"},
         #{path:main+"/NozzleDesign",name:"exit_radius",source:nozzle+"exitBoreRadiusM"},
-        #{path:main+"/NozzleDesign",name:"p_chamber",source:own+"referenceChamberPressurePa"}] {
+        #{path:main+"/NozzleDesign",name:"p_chamber",source:own+"referenceChamberPressurePa"},
+        #{path:main+"/NozzleDesign",name:"gamma",source:own+"gasGamma"},
+        #{path:main+"/NozzleDesign",name:"characteristic_velocity_mps",source:own+"characteristicVelocityMps"}] {
         let value=f64_from(model.value(item.source));
         if value==() || value<=0.0 {return plan_error("missing chamber/nozzle datum: "+item.source);}
         ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:item.path,name:"inputs:"+item.name}});
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:item.path,name:"inputs:"+item.name,
             type_name:"double",value:value.to_string()}});
     }
+    // Exit pressure follows expansion; no independent design pressure knob.
+    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:main+"/NozzleDesign",name:"inputs:p_exit"}});
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:main+"/NozzleDesign",name:"outputs:ideal_exhaust_velocity_mps",type_name:"float",value:"0.0"}});
+    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:main+"/MainChamber",name:"inputs:effective_exhaust_velocity_mps"}});
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/MainChamber",name:"inputs:effective_exhaust_velocity_mps",type_name:"float",sources:[main+"/NozzleDesign.outputs:ideal_exhaust_velocity_mps"]}});
     let contract=griffin_main_engine_command_contract_plan(doc,edit_target,root);
     if !contract.ok {return contract;} for op in contract.ops {ops.push(op);}
     #{ok:true,ops:ops,feed_model:"LunCo.Propulsion.PressureFedValve"}
@@ -4140,13 +4147,17 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
     let profile=griffin_geometry::hollow_bell_profile(throat,exit,height,wall,contour,axial);
     let neck_height=f64_from(model.value(own+"throatHeightM"));
     let neck_center=f64_from(model.value(own+"throatCenterYM"));
-    if neck_height==() || neck_height<=0.0 || neck_center==() {
-        return plan_error("engine throat envelope is invalid");
+    let chamber=f64_from(model.value(own+"chamberOuterRadiusM"));
+    let convergence=f64_from(model.value(own+"convergentHeightFraction"));
+    if neck_height==() || neck_height<=0.0 || neck_center==() || chamber==()
+        || chamber<=throat || convergence==() || convergence<=0.0 || convergence>=1.0 {
+        return plan_error("engine chamber and convergent envelope is invalid");
     }
     let neck_lower=neck_center-neck_height/2.0;
     let neck_upper=neck_center+neck_height/2.0;
-    let neck_profile=[[throat,neck_lower],[throat,neck_upper],
-        [throat-wall,neck_upper],[throat-wall,neck_lower]];
+    let chamber_lower=neck_lower+neck_height*convergence;
+    let neck_profile=[[throat,neck_lower],[chamber,chamber_lower],[chamber,neck_upper],
+        [chamber-wall,neck_upper],[chamber-wall,chamber_lower],[throat-wall,neck_lower]];
     let ops = [
         #{RemovePrim:#{edit_target:edit_target,path:root+"/Bell"}},
         #{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Bell",type_name:"Mesh",reference:(),reference_prim_path:""}},

@@ -613,7 +613,8 @@ package GriffinRequirementSources {
 
     part evidence_gpp_006 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp006;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_www_astrobotic_com_griffin_lander,
+            source_nasa_nozzle_topology, source_griffin_propulsion_study);
     }
 
     part evidence_gpp_007 : RequirementEvidence {
@@ -1287,4 +1288,50 @@ package GriffinRequirementSources {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png";
     }
+
+    part source_griffin_engine_commands : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_engine_commands.rhai";
+    }
+
+    part source_griffin_rcs_commands : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_rcs_commands.rhai";
+    }
+
+    part source_griffin_starvation : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_fuel_exhaustion.rhai";
+    }
+
+    part source_griffin_propulsion_study : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml";
+    }
+
+    part source_nasa_nozzle_topology : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/nozzle-design/";
+    }
+
+    part source_agile_a110 : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://static1.squarespace.com/static/634ee7b32099c80fdfcc8cac/t/6418ea80e1144560207215ca/1679505951405/AgileSpace_A110SpecDoc.pdf";
+    }
+
+    part evidence_gpp_010 : RequirementEvidence {
+        ref targetRequirement = GriffinPropulsionRequirements::gpp010;
+        ref sources = (source_griffin_engine_commands, source_griffin_propulsion_study);
+    }
+
+    part evidence_gpp_011 : RequirementEvidence {
+        ref targetRequirement = GriffinPropulsionRequirements::gpp011;
+        ref sources = (source_griffin_starvation, source_griffin_propulsion_study);
+    }
+
+    part evidence_gpp_012 : RequirementEvidence {
+        ref targetRequirement = GriffinPropulsionRequirements::gpp012;
+        ref sources = (source_griffin_rcs_commands, source_agile_a110, source_griffin_propulsion_study);
+    }
+
 }
