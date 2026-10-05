@@ -15,11 +15,11 @@ def Xform "World" (
         {
             def "FuelTank"
             {
-                float inputs:initial_mass_kg = 100.0
+                double inputs:initial_mass_kg = 100.0
             }
             def "OxidizerTank"
             {
-                float inputs:initial_mass_kg = 5.0
+                double inputs:initial_mass_kg = 5.0
             }
         }
     }

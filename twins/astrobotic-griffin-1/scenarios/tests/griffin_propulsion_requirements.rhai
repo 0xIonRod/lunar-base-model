@@ -355,7 +355,7 @@ fn on_tick(me, ctx) {
         return;
     }
     let selected_attributes = [];
-    for name in ["usdRootPath", "bellRadiusM", "bellHeightM", "throatRadiusM",
+    for name in ["usdRootPath", "bellRadiusM", "exitBoreRadiusM", "bellHeightM", "throatRadiusM",
         "throatHeightM", "throatCenterYM", "minimumBellClearanceM", "minimumTankHardwareClearanceM", "clusterOuterRadiusM", "bellVisualWallThicknessM", "bellContourExponent"] {
         selected_attributes.push(own(name));
     }
@@ -366,6 +366,7 @@ fn on_tick(me, ctx) {
         selected_attributes.push(skirt(name));
     }
     selected_attributes.push(parent("engineCount"));
+    selected_attributes.push("GriffinPropulsionRequirements::GriffinPressureFedStudy::throatBoreRadiusM");
     selected_attributes.push(visual("tankInstances"));
     for name in ["childNames","bracketNames"] {
         selected_attributes.push("GriffinTankRequirements::GriffinPropellantTankAssembly::"+name);
@@ -434,10 +435,11 @@ fn on_tick(me, ctx) {
         names.len(), 0.0));
     checks.push(attribute("GPP-006-nozzle-design-exit-radius", "gpp006",
         nozzle_design_path, "inputs:exit_radius",
-        bell_radius, geometry_tolerance));
+        sysml_requirements::number(source, own("exitBoreRadiusM")), geometry_tolerance));
     checks.push(attribute("GPP-006-nozzle-design-throat-radius", "gpp006",
         nozzle_design_path, "inputs:throat_radius",
-        throat_radius, geometry_tolerance));
+        sysml_requirements::number(source,
+            "GriffinPropulsionRequirements::GriffinPressureFedStudy::throatBoreRadiusM"), geometry_tolerance));
     checks.push(attribute("GPP-006-nozzle-design-length", "gpp006",
         nozzle_design_path, "inputs:length",
         bell_height, geometry_tolerance));

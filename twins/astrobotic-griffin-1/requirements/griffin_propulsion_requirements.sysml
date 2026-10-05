@@ -13,42 +13,90 @@ package GriffinPropulsionRequirements {
     enum def GriffinEngineVisualMember { Bell; Throat; }
 
     part def GriffinEngineControlStudy {
-        doc /* Integration study, not current flight performance. The existing
-         * chamber uses 2940 m/s effective exhaust velocity and 0.96 combustion
-         * efficiency; the feed models admit 8 + 21 kg/s at 2.5 MPa tank pressure,
-         * rising to sqrt(3.0/2.5) times that flow at the authored 3.0 MPa maximum.
-         * The resulting 31.7685 kg/s bound is rounded upward to 32 kg/s for the
-         * scalar actuator contract. This accepts the entire modeled feed range
-         * without rejecting full pilot demand. No manufacturer rating is
-         * inferred: current seven-engine unit ratings are unpublished here.
-         * Architecture/fuel reference: Astrobotic August 2021 PUG v5.02 p.26,
-         * https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf.
-         * Equation sources: lunco://models/LunCo/Propulsion/Turbopump.mo and
-         * CombustionChamber.mo. Those pump equations are an acknowledged
-         * integration approximation for the publicly pressure-fed architecture.
-         * Control closure source: lunco://models/Lander.mo. Its effective gyro
-         * damping deadband shall lie below the settled-touchdown angular-rate
-         * tolerance. The generic law caps it at half that tolerance, an explicit
-         * study margin so residual spin cannot prevent engine cutoff. This is
-         * not an Astrobotic flight-controller specification. The former 0.02
-         * rad/s deadband exceeded the modeled 0.005 rad/s touchdown threshold.
-         * First qualified contact closes autonomous main demand; possession
-         * selects pilot demand without refilling or bypassing feed availability.
+        doc /* Integration study, not current flight performance. Current
+         * Astrobotic full-system hot-fire report confirms pressure-fed
+         * hypergolic main/ACS operation with two fuel, two oxidizer and three
+         * helium tanks: https://www.linkedin.com/posts/astrobotic_the-astrobotic-team-recently-completed-a-activity-7402458294524530689-09jf.
+         * Checked 2026-10-05. Current seven-engine unit ratings, inventories,
+         * regulator pressures and valve transients are unpublished here.
+         * GriffinPressureFedStudy owns the explicit numerical assumptions.
+         * Passive valve/injector loss and choked chamber pressure are solved
+         * together by LunCo.Propulsion.PressureFedValve and
+         * PressureFedCombustionChamber. They add no artificial pump work.
+         * 50 kg/s bounds 28.8*sqrt(3 MPa/1 MPa) even at zero chamber pressure;
+         * it is an actuator admission envelope, not predicted current flow.
+         * Control closure source: lunco://models/Lander.mo. Its gyro damping
+         * deadband is capped at half the settled-touchdown rate tolerance so
+         * residual spin cannot prevent cutoff. This is a study control margin,
+         * not an Astrobotic flight-controller specification. First qualified
+         * contact closes autonomous main demand; possession selects pilot
+         * demand without refilling or bypassing propellant availability.
          */
         attribute exhaustVelocityMps : Real = 2940.0;
         attribute combustionEfficiency : Real = .96;
-        attribute actuatorFlowEnvelopeKgs : Real = 32.0;
+        attribute actuatorFlowEnvelopeKgs : Real = 50.0;
         attribute actuatorForceEnvelopeN : Real = actuatorFlowEnvelopeKgs * exhaustVelocityMps * combustionEfficiency;
         // One input edge held for 5 s must still be climbing at the end,
         // rather than merely reaching a transient hop peak. 2 m clearance
         // and 2 m/s upward speed are study acceptance thresholds for this
         // initial lunar surface fixture, not a flight qualification criterion.
         attribute burnDurationS : Real = 5.0;
-        attribute releaseDurationS : Real = 3.0;
+        // Study settling allowance: throttle spool tau=.35 s plus valve tau=.08 s.
+        // .35*ln(1.706e6/100)=3.41 s for the pressure criterion; 4 s leaves
+        // margin for cascaded valve response. Not a supplier shutdown rating.
+        attribute releaseDurationS : Real = 4.0;
         attribute minimumSustainedLiftM : Real = 2.0;
         attribute minimumEndVerticalSpeedMps : Real = 2.0;
         attribute extinguishedThrustThresholdN : Real = 100.0;
         attribute touchdownTimeoutS : Real = 150.0;
+    }
+
+    part def GriffinPressureFedStudy {
+        doc /* Reduced pressure-fed integration study, checked 2026-10-05.
+         * Architecture source: https://www.linkedin.com/posts/astrobotic_the-astrobotic-team-recently-completed-a-activity-7402458294524530689-09jf.
+         * Numerical pressures, flow, fuel load, O/F and response below are
+         * simulator assumptions, not current flight specifications. Retain the
+         * inherited 8 kg/s fuel reference and set oxidizer to 8*2.6 kg/s for
+         * consistent modeled mixture. The inherited 2.5..3 MPa tank envelope
+         * and 0.08 s valve response remain explicit study assumptions.
+         * Chamber reference 1.5 MPa is chosen below the 2.5 MPa minimum supply
+         * to leave 1 MPa valve/injector pressure loss. Effective c-star is
+         * 1550 m/s times the inherited combustion efficiency 0.96. Aggregate
+         * throat bore area follows nominal mass flow*c-star/Pc. Seven equal
+         * bore radii are sqrt(area/(7*pi)); the written literal is derived.
+         * At 3 MPa supply the coupled steady flow solves to 32.7588079 kg/s;
+         * 33 kg/s is its upward-rounded controller capability. Throttle requests
+         * this fraction of flow split at O/F 2.6. Each valve computes required
+         * travel from current pressure head and retains the 0.08 s response
+         * and physical saturation. This study feed compensation prevents
+         * raw valve travel from amplifying low-throttle guidance demands;
+         * it is not a sourced Astrobotic command interface. The actuator
+         * admission bound is separately conservative at zero chamber pressure.
+         * The helium regulator is represented by the existing tank pressure
+         * envelope; finite pressurant inventory, slosh, detailed injector loss
+         * and discrete pulsing remain unresolved. 1000 kg per reactant is an
+         * inherited integration load, not a sourced flight inventory.
+         */
+        attribute fuelReferenceFlowKgs : Real = 8.0;
+        attribute oxidizerToFuelRatio : Real = 2.6;
+        attribute oxidizerReferenceFlowKgs : Real = fuelReferenceFlowKgs * oxidizerToFuelRatio;
+        attribute referenceTotalFlowKgs : Real = fuelReferenceFlowKgs + oxidizerReferenceFlowKgs;
+        attribute nominalTankPressurePa : Real = 2500000.0;
+        attribute tankPressureHeadroomPa : Real = 500000.0;
+        attribute referenceChamberPressurePa : Real = 1500000.0;
+        attribute referencePressureDropPa : Real = nominalTankPressurePa - referenceChamberPressurePa;
+        attribute characteristicVelocityMps : Real = 1550.0;
+        attribute combustionEfficiency : Real = GriffinEngineControlStudy::combustionEfficiency;
+        attribute totalThroatBoreAreaM2 : Real = referenceTotalFlowKgs * characteristicVelocityMps * combustionEfficiency / referenceChamberPressurePa;
+        attribute throatBoreRadiusM : Real = .03604359686410814;
+        attribute controllerFlowCapabilityKgs : Real = 33.0;
+        attribute fuelCommandFlowKgs : Real = controllerFlowCapabilityKgs / (1.0 + oxidizerToFuelRatio);
+        attribute oxidizerCommandFlowKgs : Real = fuelCommandFlowKgs * oxidizerToFuelRatio;
+        attribute valveResponseS : Real = .08;
+        attribute availabilityTransitionMassKg : Real = .01;
+        attribute initialFuelMassKg : Real = 1000.0;
+        attribute initialOxidizerMassKg : Real = 1000.0;
+        attribute pressureObservationTolerancePa : Real = 100.0;
     }
 
     part def GriffinMainPropulsionAssembly {
@@ -58,7 +106,10 @@ package GriffinPropulsionRequirements {
             ("Bell", "Throat");
         attribute bellRadiusM : Real = 0.34;
         attribute bellHeightM : Real = 0.52;
-        attribute throatRadiusM : Real = 0.12;
+        // Exterior radius includes the source-owned render wall. Modelica uses
+        // the bore radius, so gas area and visible bore share one dimension.
+        attribute throatRadiusM : Real = GriffinPressureFedStudy::throatBoreRadiusM + GriffinMainPropulsionAssembly::bellVisualWallThicknessM;
+        attribute exitBoreRadiusM : Real = bellRadiusM - bellVisualWallThicknessM;
         attribute throatHeightM : Real = 0.16;
         // Neck starts at the bell throat plane and extends upwards; the old
         // solid cylinder started inside the expanding bore and capped it.
@@ -476,7 +527,12 @@ package GriffinPropulsionRequirements {
          * reduce delivered chamber thrust below extinguishedThrustThresholdN
          * after releaseDurationS. Fuel must decrease during the burn. The
          * force actuator input envelope shall accept the modeled feed range
-         * derived in GriffinEngineControlStudy. Verify through the production
+         * derived in GriffinEngineControlStudy. Cold/released chamber pressure
+         * shall remain below GriffinPressureFedStudy::pressureObservationTolerancePa;
+         * commanded combustion pressure shall follow useful reacting mass flow*c-star/throat
+         * bore area within that tolerance, including the modeled combustion and mixture
+         * efficiencies. No supply-line pressure shall be
+         * substituted for combustion pressure. Verify through the production
          * pilot/controller/Modelica/physics path in
          * scenarios/tests/griffin_engine_commands.rhai. This is integration
          * acceptance with explicit study thresholds, not flight qualification.

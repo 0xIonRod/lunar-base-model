@@ -1620,3 +1620,108 @@ end, consumed fuel, and extinguished thrust after release. Log:
 `terrain/target/griffin-a110-held-thrust.log`, exit 0. This verifies sustained
 command delivery with the current modeled feed; it does not accept strict
 reload replay or current flight-engine performance.
+
+## Pressure-fed main-engine study, 2026-10-05
+
+This supersedes the pump approximation and outer-radius nozzle datum in the
+older checkpoints above. [Astrobotic's current product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
+confirms seven main engines and four attitude clusters; the
+[full-system hot-fire report](https://www.linkedin.com/posts/astrobotic_the-astrobotic-team-recently-completed-a-activity-7402458294524530689-09jf)
+confirms pressure-fed hypergolic operation and the two fuel/two oxidizer/three
+helium tank architecture. Neither source supplies current flight pressures,
+flow rates, chamber dimensions, valve response or propellant inventories.
+
+`GriffinPressureFedStudy` owns the numerical assumptions and derivations:
+
+| Datum | Value | Status and rationale |
+| --- | --- | --- |
+| Fuel reference flow | 8 kg/s aggregate | Inherited integration assumption; not a flight rating |
+| Oxidizer/fuel ratio | 2.6 | Inherited mixture assumption; oxidizer reference becomes 20.8 kg/s to use the same mixture in both feeds and chamber |
+| Supply pressure | 2.5–3 MPa | Inherited tank envelope; an ideal regulator approximation, without finite helium depletion |
+| Reference chamber pressure | 1.5 MPa | Chosen below minimum supply to leave 1 MPa of passive valve/injector pressure loss |
+| Effective c-star | 1550 × 0.96 m/s | Inherited characteristic velocity and combustion-efficiency assumptions |
+| Aggregate throat bore area | 0.0285696 m² | Derived from 28.8 kg/s × effective c-star / reference chamber pressure |
+| Each of seven throat bore radii | 0.03604359686410814 m | Derived as sqrt(aggregate area / (7 × pi)) |
+| Bell exit bore radius | 0.334 m | Existing estimated 0.34 m outer radius minus estimated 6 mm visual wall |
+| Full-opening flow capability | 33 kg/s aggregate | Upward rounding of the 32.7588079 kg/s coupled steady solution at 3 MPa supply |
+| Actuator admission bound | 141120 N | Conservative 50 kg/s × 2940 m/s × 0.96; bounds passive feed flow even at zero chamber pressure, not predicted flight thrust |
+| Valve opening/closing response | 0.08 s | Inherited lumped response; discrete flight-engine pulses are not resolved |
+| Fuel/oxidizer initial load | 1000 kg each | Inherited integration inventory; current flight loading remains unknown |
+
+The USD circuit now connects each tank through a `PressureFedValve` to a
+`PressureFedCombustionChamber`. Passive flow follows opening × availability ×
+sqrt(actual differential pressure / reference differential pressure). Both
+injector outlets share the combustion-pressure node. Useful flow, mixture,
+c-star and the common bore determine chamber pressure; liquid supply pressure
+is no longer reported as chamber pressure. A missing reactant removes useful
+combustion, chamber pressure, thrust and the library exhaust effect through the
+same Modelica dataflow. Tank mass has a fixed authored initial condition.
+
+The main bell was rebuilt through the typed Editor owner at saved component
+generation 30. Measured inner neck radius is 0.0360435955 m; outer exit radius
+is 0.3400000143 m, consistent with float mesh-point precision. Focused view:
+`terrain/target/assembly-editor/griffin-pressure-fed-main-bell-focused.png`.
+These are dimensional/visual observations, not flight-engine qualification.
+
+A source-body numerical experiment, with opening held from 1 to 3 s, completed
+five simulated seconds and reached about 1.706 MPa, 32.759 kg/s and 92.458 kN.
+After closing, pressure and thrust decayed to zero. This proves the reduced
+equations in isolation; it does not accept landing, replay or the full vehicle.
+
+Full-scene trials exposed two generic Rumoca evaluation defects: Newton retry
+discarded already-evaluated constants, causing an unrelated nozzle-area
+division by zero; then the global absolute convergence check rejected a
+2.9802322388e-8 W residual at approximately 152 MW, one representable double
+step at that magnitude. The focused generic reproduction and trace are in
+`terrain/target/griffin-solver-newton-before.log` and
+`terrain/target/griffin-pressure-fed-refresh-trace-49781.log`. The owning Rumoca
+fix retains the first finite sweep and allows at most sixteen representable
+steps of roundoff per variable in addition to the requested absolute tolerance.
+The bound is twice the eight-step residual observed in compound plume
+photometry after the feed solution settled; it is a numerical integration
+choice, not a change to the physical requirement. Failures now name the first
+unmet variable and its residual instead of returning an unlocated error.
+Authored landing/replay tolerances are unchanged. Production acceptance of
+this new feed circuit is pending; old pump-circuit PASS results cannot accept it.
+
+The first full production trial using raw normalized valve travel stayed
+numerically healthy beyond 100 s but oscillated in descent and did not qualify
+touchdown before it was stopped for command correction. At low chamber pressure,
+flow per unit opening exceeds the controller's nominal capability. The valve now
+converts requested flow fraction to target opening using current differential
+pressure, then applies the same 0.08 s actuator dynamics and physical saturation.
+The 33 kg/s capability is split into 9.1666667 kg/s fuel and 23.8333333 kg/s
+oxidizer at the study O/F 2.6. This is a simulator control approximation, not a
+published Astrobotic throttle/valve interface. Main command ports are explicitly
+named `flow_fraction_command`; Modelica owns the conversion and delivered force.
+The prior isolated opening trial proves the passive feed equations only and
+predates this flow-command correction. New production acceptance is pending.
+
+The upstream solver fix is committed and published on
+`fix/algebraic-refresh-roundoff` at `135d8d393026bf06fde1e97e1899d1046117d351`.
+All 116 focused owner tests pass. The core dependency is now pinned to that
+immutable Git revision; the normal locked build passes. Neither the
+solver fix nor this engine change establishes deterministic Griffin reload.
+
+The pressure-compensated production trial reached qualified touchdown near
+25 s, then sustained climb from one held pilot command. Six of eight command
+checks passed; two new pressure checks failed. The observer incorrectly treated
+all flow as reacting flow during valve saturation; it now includes the native
+mixture-efficiency output. The 3 s shutdown observation also conflicted with
+the existing 0.35 s pilot spool plus 0.08 s valve dynamics: reducing 1.706 MPa
+below 100 Pa alone takes 0.35*ln(1.706e6/100)=3.41 s. The study requirement now
+allows 4 s with cascade margin, retaining the 100 Pa threshold. This is an
+explicit settling estimate, not a flight-engine shutdown rating. The sustained
+burn developed increasing angular rate; upright powered-flight stability
+remains unaccepted independently of command/pressure closure.
+
+Current reduced-model acceptance, before the next performance estimate update:
+normal locked Git build passes; production pilot command/pressure trial PASS 8
+at tick 2037 / 33.95 s (`griffin-pressure-fed-engine-final-49788.log`). After
+release it measures 28.695 Pa and 1.555 N. Fuel exhaustion PASS 11 at tick 180 /
+3 s (`griffin-pressure-fed-fuel-final-49789.log`), including commanded-open ACS
+extinction through shared tank availability. The affected existing propulsion
+geometry/provenance observer PASS 94 on the same runtime and source revision
+14210885191415472004. Oxidizer exhaustion also PASS 11 at tick 180 / 3 s
+(`griffin-pressure-fed-oxidizer-final-49790.log`). These checks do not
+accept powered-flight attitude, warm reload or full rover egress.

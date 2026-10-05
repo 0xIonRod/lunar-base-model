@@ -27,6 +27,101 @@ fn griffin_main_engine_command_contract_plan(doc, edit_target, root) {
         name:"lunco:forceActuator:maxForce",type_name:"double",value:limit.to_string()}}]}
 }
 
+// Replace the inherited pump circuit with source-owned passive liquid feeds.
+// The chamber closes both downstream pressure nodes through its choked bore.
+fn griffin_pressure_fed_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("pressure-fed source unavailable");}
+    let own="GriffinPropulsionRequirements::GriffinPressureFedStudy::";
+    let nozzle="GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
+    let main=root+"/MainPropulsion";
+    let ops=[];
+    // Declare the Lander.mo output used by this new authored connection.
+    // Runtime Modelica remains the writer; the cold output is zero.
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:root,name:"outputs:throttle",
+        type_name:"float",value:"0.0"}});
+    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:main,name:"inputs:valve_opening"}});
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:main,name:"inputs:flow_fraction_command",
+        type_name:"float",sources:[root+".outputs:throttle"]}});
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:main,name:"outputs:mixture_efficiency",
+        type_name:"float",sources:[main+"/MainChamber.outputs:mixture_efficiency"]}});
+    for side in [#{name:"Fuel",flow:"fuelReferenceFlowKgs",command:"fuelCommandFlowKgs",mass:"initialFuelMassKg",port:"fuel_in"},
+        #{name:"Oxidizer",flow:"oxidizerReferenceFlowKgs",command:"oxidizerCommandFlowKgs",mass:"initialOxidizerMassKg",port:"oxidizer_in"}] {
+        let valve=main+"/"+side.name+"Valve";
+        let tank=main+"/"+side.name+"Tank";
+        let old=query("QueryUsdPrim",#{doc_id:doc,path:main+"/"+side.name+"Pump",children:false});
+        if query_ok(old) {
+            ops.push(#{RemovePrim:#{edit_target:edit_target,path:main+"/"+side.name+"Pump"}});
+        }
+        let existing=query("QueryUsdPrim",#{doc_id:doc,path:valve,children:false});
+        if !query_ok(existing) {
+            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:side.name+"Valve",
+                type_name:"Scope",reference:(),reference_prim_path:()}});
+        }
+        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:valve,schemas:["LunCoProgramAPI"]}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:valve,name:"info:implementationSource",
+            type_name:"token",value:"\"sourceAsset\""}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:valve,name:"info:sourceAsset",
+            type_name:"asset",value:"@lunco://models/LunCo/Propulsion/PressureFedValve.mo@"}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:valve,name:"lunco:program:realtimeSafe",
+            type_name:"bool",value:"true"}});
+        for item in [#{path:valve,name:"maximum_flow_kgs",source:side.flow},
+            #{path:valve,name:"commanded_flow_kgs",source:side.command},
+            #{path:valve,name:"nominal_pressure_drop_pa",source:"referencePressureDropPa"},
+            #{path:valve,name:"opening_time_constant_s",source:"valveResponseS"},
+            #{path:valve,name:"availability_transition_mass_kg",source:"availabilityTransitionMassKg"},
+            #{path:tank,name:"initial_mass_kg",source:side.mass},
+            #{path:tank,name:"nominal_pressure_pa",source:"nominalTankPressurePa"},
+            #{path:tank,name:"pressure_headroom_pa",source:"tankPressureHeadroomPa"}] {
+            let value=f64_from(model.value(own+item.source));
+            if value==() || value<=0.0 {return plan_error("missing pressure-fed datum: "+item.source);}
+            if item.path==tank {ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:tank,name:"inputs:"+item.name}});}
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:item.path,name:"inputs:"+item.name,
+                type_name:"double",value:value.to_string()}});
+        }
+        let obsolete=query("QueryUsdPrim",#{doc_id:doc,path:valve,children:false});
+        // Remove the old travel command when updating an existing feed.
+        if query_ok(obsolete) {
+            ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:valve,name:"inputs:valve_opening"}});
+        }
+        for connection in [#{path:valve,name:"inputs:flow_fraction_command",source:main+".inputs:flow_fraction_command",kind:"float"},
+            #{path:valve,name:"inputs:available_mass_kg",source:tank+".outputs:mass_kg",kind:"float"},
+            #{path:tank,name:"connectors:outlet",source:valve+".connectors:inlet",kind:"token"},
+            #{path:valve,name:"connectors:inlet",source:tank+".connectors:outlet",kind:"token"},
+            #{path:valve,name:"connectors:outlet",source:main+"/MainChamber.connectors:"+side.port,kind:"token"}] {
+            ops.push(#{SetConnection:#{edit_target:edit_target,path:connection.path,name:connection.name,
+                type_name:connection.kind,sources:[connection.source]}});
+        }
+        for output in ["mass_flow_kgs","outlet_pressure_pa","pressure_drop_pa","activity"] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:valve,name:"outputs:"+output,
+                type_name:"double",value:"0.0"}});
+        }
+    }
+    let members=[];
+    for member in ["FuelTank","OxidizerTank","FuelValve","OxidizerValve","MainChamber",
+        "NozzleDesign","PlumePhotometry","PropellantStatus"] {members.push(main+"/"+member);}
+    ops.push(#{SetRelationship:#{edit_target:edit_target,path:main,name:"collection:components:includes",targets:members}});
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:main+"/MainChamber",name:"info:sourceAsset",
+        type_name:"asset",value:"@lunco://models/LunCo/Propulsion/PressureFedCombustionChamber.mo@"}});
+    for item in [#{path:main+"/MainChamber",name:"oxidizer_to_fuel_ratio",source:own+"oxidizerToFuelRatio"},
+        #{path:main+"/MainChamber",name:"characteristic_velocity_mps",source:own+"characteristicVelocityMps"},
+        #{path:main+"/MainChamber",name:"throat_area_m2",source:own+"totalThroatBoreAreaM2"},
+        #{path:main+"/MainChamber",name:"combustion_efficiency",source:own+"combustionEfficiency"},
+        #{path:main+"/MainChamber",name:"nominal_flow_kgs",source:own+"controllerFlowCapabilityKgs"},
+        #{path:main+"/NozzleDesign",name:"throat_radius",source:own+"throatBoreRadiusM"},
+        #{path:main+"/NozzleDesign",name:"exit_radius",source:nozzle+"exitBoreRadiusM"},
+        #{path:main+"/NozzleDesign",name:"p_chamber",source:own+"referenceChamberPressurePa"}] {
+        let value=f64_from(model.value(item.source));
+        if value==() || value<=0.0 {return plan_error("missing chamber/nozzle datum: "+item.source);}
+        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:item.path,name:"inputs:"+item.name}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:item.path,name:"inputs:"+item.name,
+            type_name:"double",value:value.to_string()}});
+    }
+    let contract=griffin_main_engine_command_contract_plan(doc,edit_target,root);
+    if !contract.ok {return contract;} for op in contract.ops {ops.push(op);}
+    #{ok:true,ops:ops,feed_model:"LunCo.Propulsion.PressureFedValve"}
+}
+
 // Size reconstruction plans consume the canonical typed source. These are
 // explicit collision/presentation proxies; see requirements/griffin-size-evidence.md.
 fn _resize_cube_ops(edit_target, path, dimensions, center, cube_size) {

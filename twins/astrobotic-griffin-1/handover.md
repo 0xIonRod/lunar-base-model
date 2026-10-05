@@ -3,7 +3,38 @@
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
 
-## A110 engine checkpoint, 2026-10-05
+## Pressure-fed engine integration checkpoint, 2026-10-05
+
+Requires core engine/library checkpoint `af6e0f7bf` and its pinned Rumoca
+revision `135d8d39`. The core remains unmerged to main because replay fails.
+
+
+Saved USD now uses two passive valves and a pressure-fed chamber in place of
+the pump approximation. Numerical study values and sources are centralized in
+`GriffinPressureFedStudy`; the visible seven-engine throat bores match its
+derived area. Main bell saved generation 30 has focused Editor/readback evidence.
+Production command/pressure PASS 8 at tick 2037 / 33.95 s. Fuel and oxidizer
+exhaustion each PASS 11 at tick 180 / 3 s; affected propulsion geometry and
+reference observer PASS 94. Logs: `terrain/target/griffin-pressure-fed-*-final-*`
+(and `griffin-pressure-fed-engine-final-49788.log`). The first raw-opening
+production descent oscillated; the revised
+Modelica valve compensates pressure head from normalized flow demand while
+retaining valve dynamics and physical saturation. The old command/depletion
+PASS results below predate this feed change.
+
+Full-scene trials exposed generic Rumoca Newton restart and compound-row
+roundoff failures. The upstream fix is committed/published on Rumoca topic branch
+`fix/algebraic-refresh-roundoff` at `135d8d39`; 116 focused tests pass. Core
+dependencies now pin that Git revision; the normal locked build passes.
+The runtime now reports the unmet variable in convergence failures. Do not
+promote the current inherited 33 kg/s capability as real Griffin performance:
+it is too aggressive relative to the published historical main-engine rating.
+Next revise that estimate, with explicit sources and applicability limits.
+Powered-flight attitude stability is still unaccepted, independently of the
+command and starvation checks.
+Do not merge the core stack as deterministic: fresh/warm replay still fails.
+
+## Earlier A110 engine checkpoint, 2026-10-05
 
 The twelve ACS jets now follow the supplier A110 reference: hollow 60.96 mm
 exit, narrower chamber and two valve/inlet branches. Published dimensions,

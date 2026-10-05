@@ -30,8 +30,6 @@ def Xform "World"
         {
             custom float outputs:test_fuel_mass
             float outputs:test_fuel_mass.connect = </World/Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
-            custom float outputs:test_oxidizer_flow
-            float outputs:test_oxidizer_flow.connect = </World/Griffin1/MainPropulsion/OxidizerPump.outputs:mass_flow_kgs>
             custom float outputs:test_intensity
             float outputs:test_intensity.connect = </World/Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
             custom float outputs:test_length
@@ -40,15 +38,17 @@ def Xform "World"
             float outputs:test_plume_activity.connect = </World/Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
             custom float outputs:test_oxidizer_mass
             float outputs:test_oxidizer_mass.connect = </World/Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom float outputs:test_fuel_flow
-            float outputs:test_fuel_flow.connect = </World/Griffin1/MainPropulsion/FuelPump.outputs:mass_flow_kgs>
+            custom double outputs:test_fuel_flow
+            double outputs:test_fuel_flow.connect = </World/Griffin1/MainPropulsion/FuelValve.outputs:mass_flow_kgs>
+            custom double outputs:test_oxidizer_flow
+            double outputs:test_oxidizer_flow.connect = </World/Griffin1/MainPropulsion/OxidizerValve.outputs:mass_flow_kgs>
             def "FuelTank"
             {
-                float inputs:initial_mass_kg = 5.0
+                double inputs:initial_mass_kg = 5.0
             }
             def "OxidizerTank"
             {
-                float inputs:initial_mass_kg = 100.0
+                double inputs:initial_mass_kg = 100.0
             }
             def "PlumePhotometry"
             {
