@@ -479,3 +479,21 @@ explicit study estimates. Solar, ramp geometry and flight-stow gates pass.
 Fresh owned Editor 49759 confirms saved fittings; earlier 49758 had a stale
 canonical-query owner despite current authored data. No physics drives or
 masses changed. Held-Space hop/reflight and warm-reload mismatch remain open.
+# Ramp appearance checkpoint — 2026-10-05
+
+The physical walking plates now carry the sourced dark finish on the two
+reusable ramp assets and all six installed sections. Geometry and physics
+attributes are unchanged. Owned Editor API 49838 vehicle generation 74 is
+projected and saved, including the last toe after lease renewal/reopening.
+Focused component and assembly screenshots are inspected. The saved-source
+ramp gate passes 1281 checks; flight-stow also passes. Both observers now
+measure the sloped root guide's existing breakover datum correctly.
+Logs: `terrain/target/griffin-ramp-finish-final-gate.log` and
+`griffin-ramp-finish-stow-gate.log`. Sources and rationale are at the start of
+`requirements/griffin-size-evidence.md` and in the owning ramp requirements.
+
+Next correctness defect: the tall side panel intersects the folded toe and
+guides. Composed toe origin X=1.602948 m, guide minimum X=1.469811 m, panel
+plane X=1.94 m. The 60 mm RCS skin standoff also predates the 220 mm panel
+standoff. Repair and verify the actual mount/transition/exhaust interfaces;
+do not hide either defect with an independent visual proxy.

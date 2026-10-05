@@ -1894,3 +1894,37 @@ final target distance about 1.235 m versus the 1.20 m radius). The 50 mm
 smoothing width and 35 percent crawl fraction are controller-study choices,
 not supplier values. Owner: `LunCo.Mobility.RoverAutopilotGuidance`.
 Full mission acceptance of the final controller revision is pending.
+# Ramp finish and assembly interference — 2026-10-05
+
+The real June 15 hardware photo shows broad dark folded ramp backs next to
+silver framing: [NASA photo](https://www.nasa.gov/wp-content/uploads/2026/06/26-06-15-griffin-1-pressconference-1348-edit.jpg),
+[gallery and date](https://www.nasa.gov/gallery/astrobotics-griffin-1/).
+The existing physical walking Mesh now owns this finish on both faces; no
+separate back, body, collider, mass or animated proxy is added. Coloring the
+whole plate is explicitly a visual reconstruction estimate: the photograph
+does not resolve the walking-face finish or structural laminate. Color,
+metallic and roughness are source-owned display controls, not material data.
+
+Typed Editor batches update the two reusable assets and six installed sections.
+API 49838 vehicle generation 74 is projected and saved. All geometric and
+physics attributes are unchanged; focused screenshots are
+`terrain/target/griffin-ramp-dark-reusable-49838.png`,
+`griffin-dark-reusable-toe-49838.png` and
+`griffin-dark-starboard-toe-ready-49838.png`.
+The saved-source ramp gate passes all 1281 existing checks. Its root-guide
+length, turn and centre checks now follow the previously authored sloped
+deck-breakover datum, rather than incorrectly requiring level guides.
+Evidence: `terrain/target/griffin-ramp-finish-final-gate.log`.
+The final warm preview required lease renewal and close/reopen before its
+generation-74 readiness fence completed; earlier pending screenshots are not
+visual acceptance.
+
+The operator's new screenshot identifies a separate clearance defect. Typed
+composed transforms put the folded toe origin at X=1.602948 m and the minimum
+silver-guide vertex at X=1.469811 m; the side panel is at X=1.94 m. Thus the
+current assembly intersects. The photographic finish pass does not close this
+defect. Clearance must include the entire fold/deploy travel and a connected
+deck transition, not just a moved visual plate. RCS mounts also need review
+against the tall diagonal panel: their 60 mm skin standoff predates the
+panel's 220 mm standoff. These measurements are model evidence, not released
+Astrobotic installation dimensions.

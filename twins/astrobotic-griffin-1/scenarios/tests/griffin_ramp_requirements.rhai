@@ -522,11 +522,16 @@ fn on_tick(me, ctx) {
 
             for rail in griffin_spec::ramp_guide_stations() {
                 let rail_path = section + "/" + rail.name;
+                let entry_y = griffin_spec::ramp_guide_center_y_m(index, 0.0);
+                let exit_y = griffin_spec::ramp_guide_center_y_m(index, section_length);
+                let rise = exit_y - entry_y;
+                let guide_length = (section_length * section_length + rise * rise).sqrt();
                 checks.push(sysml_requirement_checks::exists(
                     "GRR-008-"+side+"-"+index.to_string()+"-"+rail.name+"-rounded-strip",
                     "ramp_rail","grr008",VERIFICATION,rail_path,"Mesh"));
-                // Native round-plate profile is long on local Y, then turned
-                // -90 degrees around Z. Observe the actual vertex-derived box.
+                // Root guides rise from the deck breakover datum to the fold
+                // datum; the remaining guides are level in the section frame.
+                // Observe stock width/height and the endpoint-derived length.
                 for dim in [
                     #{name:"height",axis:0,attr:"rampRailHeightM"},
                     #{name:"length",axis:1,attr:"rampSectionLengthM"},
@@ -535,7 +540,9 @@ fn on_tick(me, ctx) {
                     let dimension_id="GRR-008-"+side+"-"+index.to_string()+"-"+rail.name+"-"+dim.name;
                     for bound in 0..2 {
                         let sign=if bound==0 {-0.5} else {0.5};
-                        let expected=_source_number(source,dim.attr)*sign;
+                        let size = if dim.name == "length" { guide_length }
+                            else { _source_number(source, dim.attr) };
+                        let expected=size*sign;
                         checks.push(sysml_requirement_checks::array_component(
                             dimension_id+"-"+bound.to_string(),
                             "ramp_rail","grr008",VERIFICATION,rail_path,"extent",
@@ -544,10 +551,11 @@ fn on_tick(me, ctx) {
                 }
                 checks.push(_attribute_component(
                     "GRR-008-"+side+"-"+index.to_string()+"-"+rail.name+"-profile-turn",
-                    "grr008",rail_path,"xformOp:rotateXYZ",2,-90.0));
+                    "grr008",rail_path,"xformOp:rotateXYZ",2,
+                    -90.0 + (rise / section_length).atan() * 180.0 / pi));
                 checks.push(_attribute_component("GRR-008-" + side + "-" + index.to_string() + "-" + rail.name + "-y",
                     "grr008", rail_path, "xformOp:translate", 1,
-                    _source_number(source, "rampRailCenterYM")));
+                    (entry_y + exit_y) / 2.0));
                 checks.push(_attribute_component("GRR-008-" + side + "-" + index.to_string() + "-" + rail.name + "-z",
                     "grr008", rail_path, "xformOp:translate", 2, rail.z));
                 checks.push(_attribute_component("GRR-008-" + side + "-" + index.to_string() + "-" + rail.name + "-x",

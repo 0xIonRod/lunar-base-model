@@ -26,7 +26,8 @@ def Xform "RampToeSection" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         uniform token purpose = "default"
         token visibility = "inherited"
-        color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+        custom rel material:binding = </RampToeSection/Looks/RampWalkingPlate>
     }
     over Mesh "RampTrackStarboard" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
@@ -42,7 +43,8 @@ def Xform "RampToeSection" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         uniform token purpose = "default"
         token visibility = "inherited"
-        color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+        custom rel material:binding = </RampToeSection/Looks/RampWalkingPlate>
     }
     def "OuterRailJointPin" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -236,5 +238,21 @@ def Xform "RampToeSection" (
         uniform token subdivisionScheme = "none"
         uniform bool doubleSided = false
         float3[] extent = [(-0.029999999329447746, -0.029999999329447746, -0.004999999888241291), (0.029999999329447746, 0.029999999329447746, 0.004999999888241291)]
+    }
+    over "Looks"
+    {
+        over "RampWalkingPlate"
+        {
+            custom token outputs:surface
+            token outputs:surface.connect = </RampToeSection/Looks/RampWalkingPlate/Surface.outputs:surface>
+            def "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                token outputs:surface = ""
+                color3f inputs:diffuseColor = (0.02500000037252903, 0.02800000086426735, 0.032999999821186066)
+                float inputs:metallic = 0.10000000149011612
+                float inputs:roughness = 0.6800000071525574
+            }
+        }
     }
 }

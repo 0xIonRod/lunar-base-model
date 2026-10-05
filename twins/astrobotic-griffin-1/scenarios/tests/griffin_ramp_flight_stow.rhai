@@ -464,7 +464,8 @@ fn on_tick(me, ctx) {
             let rail = deck_section + "/" + rail_name;
             checks.push(_attribute_component("GRR-018-" + side + "-deck-" + rail_name + "-top-y",
                 "grr018", rail, "xformOp:translate", 1,
-                _source_number(source, "rampRailCenterYM")));
+                (griffin_spec::ramp_guide_center_y_m(0, 0.0)
+                    + griffin_spec::ramp_guide_center_y_m(0, section_length)) / 2.0));
             checks.push(sysml_requirement_checks::array_component(
                 "GRR-018-" + side + "-deck-" + rail_name + "-height",
                 "ramp", "grr018", VERIFICATION, rail, "extent", [1, 0],

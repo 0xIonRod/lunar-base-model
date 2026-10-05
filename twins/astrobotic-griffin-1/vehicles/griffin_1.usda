@@ -2587,7 +2587,8 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "default"
                 token visibility = "inherited"
-                color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </Griffin1/EgressRampPort/DeckSection/Looks/RampWalkingPlate>
             }
             def Mesh "RampTrackStarboard" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
@@ -2603,7 +2604,8 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "default"
                 token visibility = "inherited"
-                color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </Griffin1/EgressRampPort/DeckSection/Looks/RampWalkingPlate>
             }
             def "OuterRail" (
                 active = true
@@ -3349,6 +3351,22 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = false
                 color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
             }
+            over "Looks"
+            {
+                def Material "RampWalkingPlate"
+                {
+                    custom token outputs:surface
+                    token outputs:surface.connect = </Griffin1/EgressRampPort/DeckSection/Looks/RampWalkingPlate/Surface.outputs:surface>
+                    def Shader "Surface"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        token outputs:surface = ""
+                        color3f inputs:diffuseColor = (0.02500000037252903, 0.02800000086426735, 0.032999999821186066)
+                        float inputs:metallic = 0.10000000149011612
+                        float inputs:roughness = 0.6800000071525574
+                    }
+                }
+            }
         }
         def Xform "MiddleSection" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
@@ -3455,7 +3473,8 @@ def Xform "Griffin1" (
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     uniform token purpose = "default"
                     token visibility = "inherited"
-                    color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                    color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                    custom rel material:binding = </Griffin1/EgressRampPort/MiddleSection/ToeSection/Looks/RampWalkingPlate>
                 }
                 def Mesh "RampTrackStarboard" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
@@ -3471,7 +3490,8 @@ def Xform "Griffin1" (
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     uniform token purpose = "default"
                     token visibility = "inherited"
-                    color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                    color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                    custom rel material:binding = </Griffin1/EgressRampPort/MiddleSection/ToeSection/Looks/RampWalkingPlate>
                 }
                 def "OuterRailJointPinLug" (
                     active = true
@@ -3544,6 +3564,22 @@ def Xform "Griffin1" (
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     custom rel material:binding = </Griffin1/EgressRampPort/MiddleSection/ToeSection/Looks/RampStructure>
+                }
+                over "Looks"
+                {
+                    over "RampWalkingPlate"
+                    {
+                        custom token outputs:surface
+                        token outputs:surface.connect = </Griffin1/EgressRampPort/MiddleSection/ToeSection/Looks/RampWalkingPlate/Surface.outputs:surface>
+                        def "Surface"
+                        {
+                            uniform token info:id = "UsdPreviewSurface"
+                            token outputs:surface = ""
+                            color3f inputs:diffuseColor = (0.02500000037252903, 0.02800000086426735, 0.032999999821186066)
+                            float inputs:metallic = 0.10000000149011612
+                            float inputs:roughness = 0.6800000071525574
+                        }
+                    }
                 }
             }
             def "OuterRailJointPin" (
@@ -3657,7 +3693,8 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "default"
                 token visibility = "inherited"
-                color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </Griffin1/EgressRampPort/MiddleSection/Looks/RampWalkingPlate>
             }
             def Mesh "RampTrackStarboard" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
@@ -3673,7 +3710,8 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "default"
                 token visibility = "inherited"
-                color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </Griffin1/EgressRampPort/MiddleSection/Looks/RampWalkingPlate>
             }
             def "InnerRailJointPinLug" (
                 active = true
@@ -3919,6 +3957,22 @@ def Xform "Griffin1" (
                 float3[] extent = [(-0.029999999329447746, -0.029999999329447746, -0.003000000026077032), (0.029999999329447746, 0.029999999329447746, 0.003000000026077032)]
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 custom rel material:binding = </Griffin1/EgressRampPort/MiddleSection/Looks/RampStructure>
+            }
+            over "Looks"
+            {
+                over "RampWalkingPlate"
+                {
+                    custom token outputs:surface
+                    token outputs:surface.connect = </Griffin1/EgressRampPort/MiddleSection/Looks/RampWalkingPlate/Surface.outputs:surface>
+                    def "Surface"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        token outputs:surface = ""
+                        color3f inputs:diffuseColor = (0.02500000037252903, 0.02800000086426735, 0.032999999821186066)
+                        float inputs:metallic = 0.10000000149011612
+                        float inputs:roughness = 0.6800000071525574
+                    }
+                }
             }
         }
         def Xform "MountFrame"
@@ -4182,7 +4236,8 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "default"
                 token visibility = "inherited"
-                color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampWalkingPlate>
             }
             def Mesh "RampTrackStarboard" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
@@ -4198,7 +4253,8 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "default"
                 token visibility = "inherited"
-                color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampWalkingPlate>
             }
             def "OuterRail" (
                 active = true
@@ -4944,6 +5000,22 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = false
                 color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
             }
+            over "Looks"
+            {
+                over "RampWalkingPlate"
+                {
+                    custom token outputs:surface
+                    token outputs:surface.connect = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampWalkingPlate/Surface.outputs:surface>
+                    def "Surface"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        token outputs:surface = ""
+                        color3f inputs:diffuseColor = (0.02500000037252903, 0.02800000086426735, 0.032999999821186066)
+                        float inputs:metallic = 0.10000000149011612
+                        float inputs:roughness = 0.6800000071525574
+                    }
+                }
+            }
         }
         def Xform "MiddleSection" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
@@ -5050,7 +5122,8 @@ def Xform "Griffin1" (
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     uniform token purpose = "default"
                     token visibility = "inherited"
-                    color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                    color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                    custom rel material:binding = </Griffin1/EgressRampStarboard/MiddleSection/ToeSection/Looks/RampWalkingPlate>
                 }
                 def Mesh "RampTrackStarboard" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
@@ -5066,7 +5139,8 @@ def Xform "Griffin1" (
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     uniform token purpose = "default"
                     token visibility = "inherited"
-                    color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                    color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                    custom rel material:binding = </Griffin1/EgressRampStarboard/MiddleSection/ToeSection/Looks/RampWalkingPlate>
                 }
                 def "OuterRailJointPinLug" (
                     active = true
@@ -5139,6 +5213,22 @@ def Xform "Griffin1" (
                     custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     custom rel material:binding = </Griffin1/EgressRampStarboard/MiddleSection/ToeSection/Looks/RampStructure>
+                }
+                over "Looks"
+                {
+                    over "RampWalkingPlate"
+                    {
+                        custom token outputs:surface
+                        token outputs:surface.connect = </Griffin1/EgressRampStarboard/MiddleSection/ToeSection/Looks/RampWalkingPlate/Surface.outputs:surface>
+                        def "Surface"
+                        {
+                            uniform token info:id = "UsdPreviewSurface"
+                            token outputs:surface = ""
+                            color3f inputs:diffuseColor = (0.02500000037252903, 0.02800000086426735, 0.032999999821186066)
+                            float inputs:metallic = 0.10000000149011612
+                            float inputs:roughness = 0.6800000071525574
+                        }
+                    }
                 }
             }
             def "OuterRailJointPin" (
@@ -5252,7 +5342,8 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "default"
                 token visibility = "inherited"
-                color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </Griffin1/EgressRampStarboard/MiddleSection/Looks/RampWalkingPlate>
             }
             def Mesh "RampTrackStarboard" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
@@ -5268,7 +5359,8 @@ def Xform "Griffin1" (
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 uniform token purpose = "default"
                 token visibility = "inherited"
-                color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </Griffin1/EgressRampStarboard/MiddleSection/Looks/RampWalkingPlate>
             }
             def "OuterRailJointPinLug" (
                 active = true
@@ -5513,6 +5605,22 @@ def Xform "Griffin1" (
                 float3[] extent = [(-0.029999999329447746, -0.029999999329447746, -0.003000000026077032), (0.029999999329447746, 0.029999999329447746, 0.003000000026077032)]
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 custom rel material:binding = </Griffin1/EgressRampStarboard/MiddleSection/Looks/RampStructure>
+            }
+            over "Looks"
+            {
+                over "RampWalkingPlate"
+                {
+                    custom token outputs:surface
+                    token outputs:surface.connect = </Griffin1/EgressRampStarboard/MiddleSection/Looks/RampWalkingPlate/Surface.outputs:surface>
+                    def "Surface"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        token outputs:surface = ""
+                        color3f inputs:diffuseColor = (0.02500000037252903, 0.02800000086426735, 0.032999999821186066)
+                        float inputs:metallic = 0.10000000149011612
+                        float inputs:roughness = 0.6800000071525574
+                    }
+                }
             }
         }
         def Xform "MountFrame"

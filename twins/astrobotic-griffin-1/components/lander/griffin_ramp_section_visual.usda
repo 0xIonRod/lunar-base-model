@@ -23,12 +23,13 @@ def Xform "RampSection" (
         uniform token subdivisionScheme = "none"
         custom double3 xformOp:translate = (0.0, 0.0, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
         uniform token purpose = "default"
         uniform token physics:approximation = "convexHull"
         bool physics:collisionEnabled = true
         token visibility = "inherited"
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampWalkingPlate>
     }
     def Mesh "RampTrackStarboard" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
@@ -40,12 +41,13 @@ def Xform "RampSection" (
         uniform token subdivisionScheme = "none"
         custom double3 xformOp:translate = (0.0, 0.0, -1.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-        color3f[] primvars:displayColor = [(0.44999998807907104, 0.47999998927116394, 0.5199999809265137)]
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
         uniform token purpose = "default"
         uniform token physics:approximation = "convexHull"
         bool physics:collisionEnabled = true
         token visibility = "inherited"
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampWalkingPlate>
     }
     def Cube "UnderBeamPort" (
         prepend apiSchemas = "MaterialBindingAPI"
@@ -1125,6 +1127,19 @@ def Xform "RampSection" (
                 color3f inputs:diffuseColor = (0.550000011920929, 0.5799999833106995, 0.6200000047683716)
                 float inputs:metallic = 0.75
                 float inputs:roughness = 0.41999998688697815
+            }
+        }
+        def Material "RampWalkingPlate"
+        {
+            custom token outputs:surface
+            token outputs:surface.connect = </RampSection/Looks/RampWalkingPlate/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                token outputs:surface = ""
+                color3f inputs:diffuseColor = (0.02500000037252903, 0.02800000086426735, 0.032999999821186066)
+                float inputs:metallic = 0.10000000149011612
+                float inputs:roughness = 0.6800000071525574
             }
         }
     }

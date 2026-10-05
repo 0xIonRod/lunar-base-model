@@ -4665,6 +4665,9 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             for op in placement.ops { ops.push(op); }
         }
 
+        let finish=griffin_ramp_walking_surface_plan(doc,edit_target,section_path);
+        if !finish.ok {return finish;} for op in finish.ops {ops.push(op);}
+
         // Fittings belong to the same native hinge axis as the common shaft.
         // Lugs bridge from that axis to the guard; no independent visual motion.
         for guide in griffin_spec::ramp_guide_stations() {
@@ -6056,6 +6059,34 @@ fn griffin_surface_material_plan(doc, edit_target, root, name, paths, color, met
         ops.push(#{SetRelationship:#{edit_target:edit_target,path:path,name:"material:binding",targets:[mat]}});
     }
     #{ok:true,ops:ops}
+}
+
+// The walking contact Mesh also owns the visible plate and folded back.
+fn griffin_ramp_walking_surface_plan(doc, edit_target, section_path) {
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("ramp appearance source unavailable");}
+    let own="GriffinRampRequirements::GriffinEgressRamp::";
+    let color=model.value(own+"rampTrackDisplayColor");
+    let metallic=model.value(own+"rampTrackMetallic");
+    let roughness=model.value(own+"rampTrackRoughness");
+    if color==() || metallic==() || roughness==() {
+        return plan_error("ramp plate finish source incomplete");
+    }
+    let paths=[section_path+"/RampTrackPort",section_path+"/RampTrackStarboard"];
+    for path in paths {
+        let mesh=_component_query(doc,path);
+        if !query_ok(mesh) || mesh.type_name!="Mesh" {
+            return plan_error(path+": physical walking plate Mesh unavailable");
+        }
+    }
+    let plan=griffin_surface_material_plan(doc,edit_target,section_path,
+        "RampWalkingPlate",paths,color,f64_from(metallic),f64_from(roughness));
+    if !plan.ok {return plan;}
+    for path in paths {
+        plan.ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
+            name:"primvars:displayColor",type_name:"color3f[]",value:_color_literal(color)}});
+    }
+    plan
 }
 
 // One existing parked mechanism; bus owns its mount, source owns study sizing.

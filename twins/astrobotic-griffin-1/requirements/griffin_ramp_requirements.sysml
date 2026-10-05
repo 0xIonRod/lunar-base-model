@@ -459,7 +459,21 @@ package GriffinRampRequirements {
          * Do not hide it and substitute sparse traction bars, or add a second
          * render mesh with independent dimensions. Display color is an artistic
          * silver-gray estimate from the selected Astrobotic 2021 rendering. */
-        attribute rampTrackDisplayColor : Real[3] = (.45, .48, .52);
+        /* Dark walking-plate/back finish, 2026-10-05. June 15 hardware
+         * photo shows broad dark stowed ramp faces beside silver framing:
+         * https://www.nasa.gov/wp-content/uploads/2026/06/26-06-15-griffin-1-pressconference-1348-edit.jpg
+         * https://www.nasa.gov/gallery/astrobotics-griffin-1/
+         * Use the existing physical walking Mesh for both visible faces; do
+         * not add a separate animated back, collider, mass or joint. The
+         * photograph does not establish flight laminate, coating or exposed
+         * walking-side finish. Applying one dark finish to the whole plate
+         * is a replaceable appearance estimate. Linear display RGB, metallic
+         * and roughness are rendering choices, not measured optical or
+         * structural properties. Keep guide rails and traction strips silver.
+         */
+        attribute rampTrackDisplayColor : Real[3] = (.025, .028, .033);
+        attribute rampTrackMetallic : Real = .10;
+        attribute rampTrackRoughness : Real = .68;
         attribute rampSurfaceCenterYM : Real = 0.00;
         /* Replace the legacy 340 mm rail elevation, retained from the thick
          * slab, with an estimated 180 mm chord center above the track datum.
