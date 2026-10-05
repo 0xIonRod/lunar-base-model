@@ -304,15 +304,16 @@ package GriffinPropulsionRequirements {
         // M20/MON3 is the vendor A110 propellant specification. The shared
         // plume class 3 is a heuristic hypergolic palette, not spectrometry.
         attribute plumeFuelFamily : Real = 3;
-        /* The former bus-top mounts were behind the tall solar faces. The
-         * new four pods sit 200 mm above the payload walking plane to keep
-         * the complete A110 valve/nozzle envelopes clear of the arrays and
-         * support plates. Each 20 mm plate bridges the payload-frame chamfer
-         * to its three retained physical force owners, with 40 mm overlap.
-         * These dimensions and the twelve-jet topology are integration-study
-         * estimates; neither a Griffin ACS mounting ICD nor a verified current
-         * nozzle-count layout is public. Agile confirms the A110 hardware;
-         * the hardware photos inform exposed upper-corner placement only. */
+        /* Four retained physical three-jet pods follow the payload-frame datum
+         * at +200 mm. After moving the arrays away from the exits, this source
+         * lowers the pods with the deck instead of preserving the rejected high
+         * platform. Each 20 mm plate bridges the frame chamfer with 40 mm overlap.
+         * Stock and twelve-jet topology remain study estimates. Astrobotic's
+         * current product page confirms four attitude clusters, but neither a
+         * mounting ICD nor a verified current count of jets per cluster is public:
+         * https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
+         * Current photos inform exposed corner hardware; complete plume/panel
+         * interaction is not validated by a geometric attachment check. */
         attribute mountHeightAbovePayloadDeckM : Real = .20;
         attribute podMountPlateThicknessM : Real = .02;
         attribute podMountPlateOverlapM : Real = .04;

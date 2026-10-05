@@ -1,3 +1,4 @@
+import "twin://astrobotic-griffin-1/tools/griffin_spec.rhai" as griffin_spec;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 
@@ -493,8 +494,9 @@ fn on_tick(me, ctx) {
           starboardForwardY: starboard_forward_y,
           tolerance: _source_number(source, "physicalRampRootAxisMirrorTolerance")}));
 
+    let panel_names = griffin_spec::solar_array_names();
     let panel_paths = [];
-    for name in ["SolarPanelForward", "SolarPanelFrontStarboard", "SolarPanelStarboard"] {
+    for name in panel_names {
         panel_paths.push(ROOT + "/" + name + "/Frame");
         panel_paths.push(ROOT + "/" + name + "/ArrayBackplane");
     }
@@ -502,7 +504,8 @@ fn on_tick(me, ctx) {
     for side in ["EgressRampPort", "EgressRampStarboard"] {
         for section in ["DeckSection", "MiddleSection", "MiddleSection/ToeSection"] {
             for member in ["RampTrackPort", "RampTrackStarboard", "OuterRail", "InnerRail",
-                "CenterRailPort", "CenterRailStarboard"] {
+                "CenterRailPort", "CenterRailStarboard", "HingeBarrel",
+                "OuterRailJointPin", "InnerRailJointPin", "UnderBeamPort", "UnderBeamStarboard"] {
                 ramp_paths.push(ROOT + "/" + side + "/" + section + "/" + member);
             }
         }
@@ -511,25 +514,40 @@ fn on_tick(me, ctx) {
     // Bounds are the measurement. Do not pull every Mesh topology/material
     // attribute into this multi-part snapshot and exhaust the Rhai array budget.
     let batch = query("QueryUsdPrims", #{paths: paths, attrs:["purpose"], geometry_bounds: true});
-    let valid = batch != () && batch.error == () && batch.records != ()
+    let valid = panel_names.len() > 0 && panel_names.len() == griffin_spec::solar_array_count()
+        && batch != () && batch.error == () && batch.records != ()
         && batch.records.len() == paths.len() && usd_geometry_inspection::same_snapshot(batch.records);
-    let panel_max = -1.0e30;
-    let port_min = 1.0e30; let starboard_min = 1.0e30;
     if valid {
-        for record in batch.records {
-            let bounds = record.geometry_bounds;
-            if bounds == () || bounds.min == () || bounds.max == () { valid = false; break; }
-            if panel_paths.contains(record.path) {
-                panel_max = max(panel_max, bounds.max[1]);
-            } else if record.path.contains("/EgressRampPort/") {
-                port_min = min(port_min, bounds.min[1]);
-            } else { starboard_min = min(starboard_min, bounds.min[1]); }
+        for index in 0..paths.len() {
+            if batch.records[index].path != paths[index] { valid = false; break; }
+        }
+    }
+    let port_gap = 1.0e30; let starboard_gap = 1.0e30;
+    if valid {
+        for panel in batch.records {
+            if !panel_paths.contains(panel.path) { continue; }
+            for ramp in batch.records {
+                if !ramp_paths.contains(ramp.path) { continue; }
+                let a = panel.geometry_bounds; let b = ramp.geometry_bounds;
+                if a == () || b == () || a.min == () || a.max == ()
+                    || b.min == () || b.max == () || a.min.len() != 3 || a.max.len() != 3
+                    || b.min.len() != 3 || b.max.len() != 3 { valid = false; break; }
+                // A separating axis is sufficient to certify disjoint AABBs.
+                // Do not force vertical separation: the panels sit alongside
+                // the payload, with clear lateral rover/ramp corridors.
+                let gap = -1.0e30;
+                for axis in 0..3 {
+                    gap = max(gap, max(a.min[axis]-b.max[axis], b.min[axis]-a.max[axis]));
+                }
+                if ramp.path.contains("/EgressRampPort/") { port_gap = min(port_gap, gap); }
+                else { starboard_gap = min(starboard_gap, gap); }
+            }
         }
     }
     for side in ["port", "starboard"] {
-        let gap = (if side == "port" { port_min } else { starboard_min }) - panel_max;
+        let gap = if side == "port" { port_gap } else { starboard_gap };
         let observation = if valid {
-            usd_geometry_inspection::measurement(gap, batch.records[0], "stowed ramp/panel envelope separation")
+            usd_geometry_inspection::measurement(gap, batch.records[0], "stowed ramp/panel 3D envelope separation")
         } else { #{provider: "usd", state: "unavailable", detail: "one composed ramp/panel bounds snapshot is required"} };
         checks.push(_constraint(source, "GRR-020-" + side + "-panel-clearance", "grr020",
             "GRC030_StowedRampClearsSolarPanels", #{gapM: observation,
@@ -562,6 +580,9 @@ fn on_tick(me, ctx) {
         component_package: "GriffinRampRequirements",
         verification: VERIFICATION, separate_component_document: true,
         root_axis_mirror: axis_observation,
+        stowed_panel_clearance: #{available: valid, panel_count: panel_names.len(),
+            port_gap_m: if valid { port_gap } else { () },
+            starboard_gap_m: if valid { starboard_gap } else { () }},
         stowed_rail_leg_envelope: envelope,
         lowest_stowed_rail_path: if envelope.ok == true {
             envelope.lowest_stowed_rail_path

@@ -38,7 +38,7 @@ package GriffinSolarRequirements {
          * Use 30 mm frame stock, 12 mm backplane, 2 mm visual cell surface,
          * 100 x 80 x 120 mm brackets and 50 mm hinge diameter.
          * These are appearance envelopes, not laminate/hinge design dimensions.
-         * The 280 mm link bridges the unchanged 220 mm bus standoff; 10 mm
+         * The 460 mm link stock covers the retained 220 mm normal standoff plus the 180 mm forward bank offset; 10 mm
          * overlap is a visual seating tolerance, not a structural engagement spec.
          * Current cell geometry and silhouette use the June 2026 source below;
          * these retained attachment stocks are still packaging estimates. */
@@ -77,14 +77,14 @@ package GriffinSolarRequirements {
         attribute hingeBarLengthM : Real = frameWidthM;
         attribute hingeBarCenterYM : Real = -0.18;
         attribute hingeBarCenterZM : Real = 0.00;
-        attribute mountLinkHeightM : Real = 0.28;
+        attribute mountLinkHeightM : Real = .46;
         attribute mountLinkDepthM : Real = 0.04;
         attribute mountLinkCenterYM : Real = -0.11;
         attribute mountLinkCenterZM : Real = 0.00;
         attribute gridColumnCount : Integer = 13;
         attribute gridRowCount : Integer = 24;
         /* Ordered entries follow solarArrayInstances. All three faces are tall;
-         * the chamfer carries fewer columns at the same pitch. Source solarStations
+         * both chamfers carry fewer columns at the same pitch. Source solarStations
          * stay bus attachment datums; the installed centre rises by half the
          * difference between frame height and installationDatumHeightM. The
          * 705 mm datum retains the previously fitted bus lower edge and the
@@ -94,20 +94,20 @@ package GriffinSolarRequirements {
          * Real imagery supersedes the 2021/ESA renderings for this appearance
          * pass. Remaining unknowns: exact stepped contours, laminate, fasteners,
          * support ICD, cell supplier/count and electrical/thermal qualification. */
-        attribute installedMaximumColumnCounts : Integer[3] = (13, 13, 13);
+        attribute installedMaximumColumnCounts : Integer[3] = (13, 5, 5);
         attribute installedRowCounts : Integer[3] = (24, 24, 24);
 
         /* Outline vertices use cell-pitch coordinates (x column, y unused,
          * z row counted downward). They describe only the silhouette; they
          * are not measured flight dimensions. Front broad face: upper-left
          * steps and right equipment recess. Chamfer face: bottom leg opening.
-         * Side broad face: lower corner opening beside that leg. Face assignment
-         * adapts the photographed quadrant to the retained octagonal bus.
+         * Port chamfer: retained lower corner opening scaled to five columns. Face assignment
+         * adapts the photographed panel silhouettes to the operator-selected forward-side bank.
          * Broad/front contour is read from the two June 15 photos; unseen
-         * edge details and the five-column chamfer are packaging estimates. */
+         * edge details and both five-column chamfers are packaging estimates, not photographed cell counts. */
         attribute frontCellContour : CellContourPoint[12] = ((3,0,0), (13,0,0), (13,0,11), (11,0,11), (11,0,19), (13,0,19), (13,0,24), (0,0,24), (0,0,15), (2,0,15), (2,0,12), (3,0,12));
         attribute chamferCellContour : CellContourPoint[8] = ((0,0,0), (5,0,0), (5,0,24), (4,0,24), (4,0,18), (1,0,18), (1,0,24), (0,0,24));
-        attribute sideCellContour : CellContourPoint[6] = ((0,0,0), (13,0,0), (13,0,24), (2,0,24), (2,0,18), (0,0,18));
+        attribute sideCellContour : CellContourPoint[6] = ((0,0,0), (5,0,0), (5,0,24), (2,0,24), (2,0,18), (0,0,18));
 
         attribute cellFaceNormal : Direction = (0.0, 1.0, 0.0);
         /* Quaternion component tolerance covers authored serialization precision,
@@ -123,7 +123,7 @@ package GriffinSolarRequirements {
         doc /* GSA-002 [visual] each array exposes a frame and cell surface with owned geometry. */
     }
     requirement def GSA003_SunQuadrantLayout {
-        doc /* GSA-003 [mission layout] the forward, forward-starboard bevel, and starboard arrays occupy the original mission Sun quadrant. The three arrays wrap one Sun-facing quadrant, with tall three-face coverage guided by the June 2026 flight-hardware photos. The speculative opposite-face array is removed for the operator's one-side layout request on 2026-10-04; no hidden-face array is inferred. Their installed frames and panel normals shall satisfy the site-local Sun azimuth/elevation envelope and the approved installation configuration. */
+        doc /* GSA-003 [study layout] three tall arrays occupy the forward face and the two forward chamfers. Both +/-X ramp/rover corridors remain open; the rover walking plane is below the panel tops. This operator-selected one-side layout corrects the former +X exit obstruction. The June 2026 hardware photographs inform array appearance, not an exact flight mounting ICD or a verified site-Sun coverage envelope. */
     }
     requirement def GSA004_ArrayTraceability {
         doc /* GSA-004 [evidence] array identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and deployment status is explicit. */

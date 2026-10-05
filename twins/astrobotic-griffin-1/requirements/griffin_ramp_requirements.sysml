@@ -571,21 +571,18 @@ package GriffinRampRequirements {
         // remain enabled. The public June 2026 hardware photographs do not
         // resolve this hidden interface; no flight ICD is available.
         // Photo reference: https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/
-        /* 2026-10-05 assembly correction, prompted by the operator's ramp
-         * crossing the tall panel. The side-panel top is Y=2.714577 m while
-         * the old walking deck top was Y=2.08 m: this blocks both stow and
-         * the actual egress path. Moving a ramp outward leaves the fixed
-         * transition and rover crossing the panel, so it is not a solution.
-         * Raise the common rover walking surface to Y=2.84 m: 125 mm above
-         * the panel top, preserving the 1.90 m transition edge and 0.90 m span.
-         * This is a conservative integration-study estimate, not measured
-         * hardware height. https://www.nasa.gov/gallery/astrobotics-griffin-1/
-         * shows top-mounted ramps above the arrays but supplies no mount ICD.
-         * The nominal flat-plane slope derives as asin((.44+2.84)/5.397252161).
-         * Root X/Y then offset the plate half-thickness along that slope,
-         * preserving the transition top seam. Update physical and visual deck,
-         * payload joint, rover placement and support structure together.
-         * Dynamic terrain fitting still uses the measured retained DEM. */
+        /* 2026-10-05 operator correction: tall arrays belong on one side of
+         * the payload bay, not across a rover exit. Lower the shared rover and
+         * ramp walking plane to Y=2.12 m and move the array bank forward instead
+         * of requiring the rover to ride above the arrays. Source imagery:
+         * https://www.nasa.gov/gallery/astrobotics-griffin-1/ ; exact mount ICD
+         * remains unknown. The nominal angle derives as asin((.44+2.12)/5.397252161).
+         * The 40 mm rise over the old Y2.08 deck keeps the crossmembers
+         * clear of the tank caps. Root X/Y offset half the plate thickness along that slope to preserve
+         * the transition seam. The 50 mm spatial clearance is an explicit study
+         * margin. Compare full 3D composed envelopes; vertical clearance alone
+         * is not required. Physics and visual deck, rover joint, camera, supports
+         * and ramp interfaces share this datum. Live deployment still fits DEM. */
         // 50 mm is a conservative reconstruction clearance, not a flight
         // installation tolerance. Measure the full composed plate/guide
         // envelope against all three installed panel-frame envelopes.
@@ -594,7 +591,7 @@ package GriffinRampRequirements {
         attribute physicalRampDeckTransitionLengthM : Real = .90;
         attribute physicalRampDeckTransitionInterfaceToleranceM : Real = 0.002;
         attribute physicalRampDeckTransitionOutboardX : Real = 1.90;
-        attribute physicalRampDeckTransitionCenterY : Real = 2.825;
+        attribute physicalRampDeckTransitionCenterY : Real = 2.105;
         // The transition is a separate rigid-body child, fixed to the Griffin
         // deck frame.  Its mass is an explicit simulator assumption because
         // Astrobotic has not released a ramp/transition structural ICD.  The
@@ -606,14 +603,14 @@ package GriffinRampRequirements {
             GriffinEgressRamp::physicalRampDeckTransitionMassKg * (GriffinEgressRamp::rampSurfaceWidthM * GriffinEgressRamp::rampSurfaceWidthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0,
             GriffinEgressRamp::physicalRampDeckTransitionMassKg * (GriffinEgressRamp::physicalRampDeckTransitionLengthM * GriffinEgressRamp::physicalRampDeckTransitionLengthM + GriffinEgressRamp::rampSurfaceWidthM * GriffinEgressRamp::rampSurfaceWidthM) / 12.0,
             GriffinEgressRamp::physicalRampDeckTransitionMassKg * (GriffinEgressRamp::physicalRampDeckTransitionLengthM * GriffinEgressRamp::physicalRampDeckTransitionLengthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0);
-        attribute physicalRampPortMountX : Real = 1.909115749743;
-        attribute physicalRampStarboardMountX : Real = -1.909115749743;
-        attribute physicalRampMountY : Real = 2.828087690962;
+        attribute physicalRampPortMountX : Real = 1.907114731507;
+        attribute physicalRampStarboardMountX : Real = -1.907114731507;
+        attribute physicalRampMountY : Real = 2.106794675483;
         attribute physicalRampMountZ : Real = 0.0;
         // At deployment, the ramp hinge position offsets the track half
-        // thickness so the upper root edge meets the 2.84 m adapter top. At
+        // thickness so the upper root edge meets the 2.12 m adapter top. At
         // the 0.44 m nominal touchdown reference height,
-        // the 5.397252161 m track deployed 37.424584 degrees places both mitered
+        // the 5.397252161 m track deployed 28.314787 degrees places both mitered
         // toe edges on the normalized terrain plane.
         // A thickness-and-angle-derived toe miter brings the lower toe edge
         // to that same plane and avoids a full-thickness collider penetrating
@@ -635,8 +632,8 @@ package GriffinRampRequirements {
         // 0.996980044 and actual root targets differ from the flat-plane datum.
         // Keep angle/rate/dwell gates unchanged; this plan is not acceptance.
         attribute physicalRampTerrainContactToleranceM : Real = 0.02;
-        attribute physicalRampPortDeploymentAngleRad : Real = -0.653182218121;
-        attribute physicalRampStarboardDeploymentAngleRad : Real = 0.653182218121;
+        attribute physicalRampPortDeploymentAngleRad : Real = -0.494186266192;
+        attribute physicalRampStarboardDeploymentAngleRad : Real = 0.494186266192;
         // These values migrate the existing Twin dynamics proxy into the
         // requirement source. They are explicit replaceable assumptions, not
         // Griffin supplier data or an accepted mass-properties solution.
@@ -895,10 +892,10 @@ package GriffinRampRequirements {
     requirement <'GRR-018'> grr018 : GRR018_RailsAboveWalkingSurface { subject ramp : GriffinEgressRamp; }
     requirement def GRR020_StowedPanelClearance {
         doc /* GRR-020 the complete stowed plate and guide envelopes shall remain
-         * above the installed solar-panel frame envelopes by at least
+         * spatially clear of the installed solar-panel frame envelopes by at least
          * physicalRampPanelClearanceM. Use composed bounds from one typed USD
          * snapshot; missing geometry or provenance is unavailable evidence.
-         * This is conservative vertical separation of axis-aligned envelopes, not
+         * This is conservative three-dimensional separation of axis-aligned envelopes, not
          * minimum-distance metrology. The static check does not establish
          * clearance during unfolding; GRR-017 and mission inspection cover
          * the deployment sequence separately. Source: operator image,

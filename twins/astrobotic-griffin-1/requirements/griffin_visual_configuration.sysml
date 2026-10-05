@@ -53,7 +53,7 @@ package GriffinVisualConfigurationRequirements {
     enum def GriffinSolarArrayInstanceName {
         SolarPanelForward;
         SolarPanelFrontStarboard;
-        SolarPanelStarboard;
+        SolarPanelFrontPort;
     }
     enum def GriffinRampInstanceName {
         EgressRampPort;
@@ -101,9 +101,9 @@ package GriffinVisualConfigurationRequirements {
         // griffin_1_surface_ops, which is the Twin default. See size evidence.
         attribute visualReviewGriffinStation : Position = (0.0, 0.44, 0.0);
         // FLIP is mounted on the payload adapter. Its wheel bottoms (station
-        // -0.05 m minus 0.45 m tire radius) meet the adapter top at 2.84 m.
+        // -0.05 m minus 0.45 m tire radius) meet the adapter top at 2.12 m.
         // This station is the one review-scene placement source.
-        attribute visualReviewFlipStation : Position = (0.0, 3.78, 0.0);
+        attribute visualReviewFlipStation : Position = (0.0, 3.06, 0.0);
 
         /* SIZE ESTIMATE, 2026-09-30; rationale and uncertainties are in
          * requirements/griffin-size-evidence.md. NASA MSS 2024, slide 8
@@ -111,11 +111,12 @@ package GriffinVisualConfigurationRequirements {
          * VIPER-configured vehicle envelope 4.5 m by 2.0 m, not its bus.
          * Estimate the bus at 80% of that lateral envelope (3.6 +/-0.4 m).
          * Current hardware photo https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/
-         * motivates a taller payload surface; the revised 3.28 +/-0.5 m study datum, excluding
-         * its ground handling stand. Body belt height 0.72 +/-0.12 m and all internal
-         * support coordinates below are packaging estimates, not metrology.
-         * A 0.44 m vehicle touchdown datum plus adapter Y=2.80 and half its
-         * 0.08 m thickness gives the revised 3.28 m ground-to-payload height. */
+         * supplies a relative peripheral-array silhouette, not a calibrated bus
+         * span or deck height. Retain the 2.56 +/-0.5 m landed payload datum:
+         * vehicle touchdown .44 m + adapter centre 2.08 m + half-stock .04 m.
+         * Body belt height .72 +/- .12 m and internal support dimensions remain
+         * packaging estimates. The rejected 3.28 m deck was an interference
+         * workaround and must not be cited as a photo-derived dimension. */
         attribute bodyDimensions : Dimensions = (3.60, 0.72, 3.60);
         attribute bodyMount : Position = (0.0, 1.34, 0.0);
         /* Exterior blanket/panel presentation follows the faceted wrapped
@@ -131,7 +132,7 @@ package GriffinVisualConfigurationRequirements {
          * full vehicle span. Flat face width = 0.5857864376 * 3.60 = 2.109 m;
          * /3 gives 0.703 m, rounded to 0.72 m for this study. Perspective
          * supports only an approximate ratio (2.65-3.35), not metrology.
-         * Keep the body top at vehicle Y=1.70 and payload top Y=2.84;
+         * Keep the body top at vehicle Y=1.70 and payload top Y=2.12;
          * the shallower belt therefore moves upward rather than moving ramps.
          * This older artist impression is a user-selected silhouette basis;
          * it is not a claim of June 2026 as-built panel geometry. */
@@ -281,7 +282,7 @@ package GriffinVisualConfigurationRequirements {
         attribute landingLegInstances : GriffinLandingLegInstanceName[4] =
             ("LegPX", "LegNX", "LegPZ", "LegNZ");
         attribute solarArrayInstances : GriffinSolarArrayInstanceName[3] =
-            ("SolarPanelForward", "SolarPanelFrontStarboard", "SolarPanelStarboard");
+            ("SolarPanelForward", "SolarPanelFrontStarboard", "SolarPanelFrontPort");
         attribute mainEngineInstances : GriffinMainEngineInstanceName[7] =
             ("Engine01", "Engine02", "Engine03", "Engine04", "Engine05", "Engine06", "Engine07");
         attribute rampInstances : GriffinRampInstanceName[2] =
@@ -319,7 +320,7 @@ package GriffinVisualConfigurationRequirements {
         attribute upperBucketInnerTopRadiusM : Real = .245;
         attribute upperBucketOuterTopRadiusM : Real = .27;
         attribute upperBucketBottomCenterYM : Real = .45;
-        attribute upperBucketTopCenterYM : Real = 1.34;
+        attribute upperBucketTopCenterYM : Real = .62;
         attribute lowerBucketInnerTopRadiusM : Real = .615;
         attribute lowerBucketOuterTopRadiusM : Real = .64;
         attribute lowerBucketInnerBottomRadiusM : Real = .555;
@@ -330,7 +331,7 @@ package GriffinVisualConfigurationRequirements {
          * silhouette and hid tank domes. Use 80 mm stock as an explicit visual
          * estimate (not load-qualified supplier sizing), informed by the slender
          * open structure in https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
-         * Preserve the wheel contact top: center 2.80 + .08/2 = 2.84 m.
+         * Preserve the wheel contact top: center 2.08 + .08/2 = 2.12 m.
          * The visible frame and its contact proxy must change together. */
         attribute payloadAdapterDimensions : Dimensions = (3.20, .08, 3.20);
         /* Retain the existing 1.30 m square central payload interface footprint;
@@ -339,22 +340,27 @@ package GriffinVisualConfigurationRequirements {
          * orthogonal 80 mm crossmembers beneath it connect the four cardinal
          * columns and the central upper shell. Column ends derive from the
          * bus-deck top and payload-frame underside, avoiding the tank domes.
-         * The upper-shell bottom Y=.45 meets the bus-deck top; its top Y=1.34
-         * equals 2.80 - bodyMount.y(1.34) - 1.5*.08, meeting the crossmember
+         * The upper-shell bottom Y=.45 meets the bus-deck top; its top Y=.62
+         * equals 2.08 - bodyMount.y(1.34) - 1.5*.08, meeting the crossmember
          * underside. Its radii remain the previous clearance-constrained study
          * envelope. All added members are render-only within the lander's mass
          * owner; this reconstruction does not qualify their structural strength.
          * Architecture reference: Astrobotic PUG v5.02 pp.25-26,
          * https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf . */
         attribute payloadInterfacePlateDimensions : Dimensions = (1.30, .08, 1.30);
-        /* The former Y=2.08 m walking top was below the 2.714577 m tall-panel
-         * top, making folded ramps and rover egress intersect the array.
-         * Y=2.84 m preserves 125 mm of top clearance as a packaging estimate.
-         * Raise the rover/deck/ramp interfaces together and provide supports.
-         * This supersedes the earlier 2.52 m landed height; photos establish
-         * relative placement, not this dimension. Source, 2026-10-05:
-         * https://www.nasa.gov/gallery/astrobotics-griffin-1/ . */
-        attribute payloadAdapterCenterYM : Real = 2.80;
+        /* 2026-10-05 operator correction: the rover belongs inside the open
+         * payload bay, with tall arrays on its forward side. Raising the walking
+         * plane above every array was a mistaken layout assumption, not evidence
+         * from the photographs. Restore the 2.12 m local walking top (2.08 m
+         * frame centre plus 40 mm half-stock). The added 40 mm over the old
+         * 2.08 m plane keeps the 80 mm crossmember underside at Y1.96,
+         * above the approximately Y1.946 tank caps by 14 mm. This clears the reconstructed tank
+         * domes while placing the wheel contact below the 2.714577 m panel top.
+         * The June 2026 hardware photos establish tall peripheral arrays, not a
+         * calibrated payload height: https://www.nasa.gov/gallery/astrobotics-griffin-1/ .
+         * The 3.60 m span, 2.12 m platform and support stock remain explicit study
+         * estimates pending a current mechanical ICD. */
+        attribute payloadAdapterCenterYM : Real = 2.08;
         // Presentation focus is the hosted rover interface top, derived from
         // the same packaging estimate as the adapter; not a supplier datum.
         // Rhai derives center Y + native Dimensions.y / 2; indexed SysML
@@ -379,33 +385,29 @@ package GriffinVisualConfigurationRequirements {
          * Primary upper anchors meet chamfer midpoints; legs splay outward. */
         attribute legStationRotationYDeg : Real[4] = (-45.0, 135.0, -135.0, 45.0);
 
-        /* The three panel instances occupy consecutive forward, diagonal,
-         * and starboard bus faces in the mission Sun quadrant. Stations and
-         * orientations use lander coordinates; rail stations are Bus-local.
-         * The diagonal station follows the beveled octagonal face normal.
-         * Each pair maps local panel -X then +X to the corresponding rails.
-         * Panel width derives from each rail pair's spacing minus the common
-         * edge clearance; the component's maximum width is owned by GSA. */
-        /* Diagonal center = mean of adjacent rail X/Z (1.364 m) plus
-         * 0.22/sqrt(2), so all three arrays share the same local bracket
-         * depth as the axial station (1.94 - 1.72 = 0.22 m). This is a
-         * mount-closure derivation, not an image measurement. */
-        /* 2026-10-04: one Sun-facing quadrant follows the 2021
-         * Astrobotic rendering https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png .
-         * Stations and 220 mm standoff remain installation estimates;
-         * no opposite hidden-face coverage or flight ICD is inferred. */
+        /* One forward-side array bank, leaving both +/-X egress corridors open.
+         * Forward and both forward chamfers replace the former forward-to-+X
+         * quadrant, which put a tall panel through the ramp/rover exit. This is
+         * the operator-selected one-side reconstruction, not a measured current
+         * flight installation. June 2026 photographs show tall faceted arrays:
+         * https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1419-edit-2/ .
+         * Rail-derived X datums and 220 mm normal stand-off are retained, with
+         * an additional 180 mm +Z offset of the bank. The extra offset is a
+         * packaging estimate: it reserves >50 mm Z separation between the full
+         * panel frames and the 2.592 m-wide ramp corridors at every fold angle.
+         * Brackets remain at the original rails; links derive their new span.
+         * Absolute bus span and unequal face widths are unresolved photo-scale
+         * assumptions; no current as-built CAD is publicly available here. */
         attribute solarStations : Position[3] =
-            ((0.0, 1.34, 1.94), (1.519563492, 1.34, 1.519563492), (1.94, 1.34, 0.0));
+            ((0.0, 1.34, 2.12), (1.519563492, 1.34, 1.699563492), (-1.519563492, 1.34, 1.699563492));
         attribute solarMountRails : GriffinFrameRailNode[6] =
-            ("FrameRailFrontPort", "FrameRailFrontStarboard",
-             "FrameRailFrontStarboard", "FrameRailStarboardFront",
-             "FrameRailStarboardFront", "FrameRailStarboardRear");
+            ("FrameRailFrontPort", "FrameRailFrontStarboard", "FrameRailFrontStarboard", "FrameRailStarboardFront", "FrameRailPortFront", "FrameRailFrontPort");
         /* X is panel tilt; negative signed Z values below name the clockwise
          * plan bearing, not a literal USD rotateXYZ triple. The authored
          * quaternion composes Y(-bearing) after local X(tilt), keeping all
          * panels upright and their normal on the intended octagonal face. */
         attribute solarStationRotationXDeg : Real[3] = (90.0, 90.0, 90.0);
-        attribute solarStationRotationZDeg : Real[3] = (0.0, -45.0, -90.0);
+        attribute solarStationRotationZDeg : Real[3] = (0.0, -45.0, 45.0);
         attribute solarArrayEdgeClearanceM : Real = 0.15;
 
         /* Four tank stations and 0.60 instance scale are packaging estimates.

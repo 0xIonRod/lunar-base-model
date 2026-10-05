@@ -176,7 +176,7 @@ def Xform "GriffinFlipVisual" (
     )
     {
         bool physics:rigidBodyEnabled = false
-        custom double3 xformOp:translate = (0.0, 3.78, 0.0)
+        custom double3 xformOp:translate = (0.0, 3.06, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def DomeLight "ReviewFill"

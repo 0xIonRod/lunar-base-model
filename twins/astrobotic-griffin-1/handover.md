@@ -2,6 +2,64 @@
 
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
+## Nested payload bay and one-side arrays — 2026-10-05
+
+Supersedes the raised-deck checkpoint below. The operator identified the wrong
+layout assumption: a tall array occupied an egress side, and lifting the entire
+payload above it preserved that error. Arrays now occupy the forward face and
+both forward chamfers; the +/-X exits remain clear. The 3.60 m bus is retained
+as a low-confidence reconstruction because the study 2.60 x 2.28 m wheel envelope
+fits it. The public photos do not calibrate a current flight bus dimension.
+See `requirements/griffin-size-evidence.md` and the linked current hardware
+photographs for assumptions and the historical/current configuration boundary.
+
+The local walking plane is Y2.12, 0.72 m below the rejected Y2.84 platform,
+and 0.5946 m below the panel tops. The 40 mm addition over the old Y2.08 plane
+keeps 80 mm crossmembers about 14 mm above the tank caps. Columns, central mast,
+contact deck, FLIP station/fixed joint, camera focus, both hinges/bridges/toe
+miters and RCS stations follow this datum. Solar clearance now checks a
+conservative separating axis in 3D instead of requiring vertical separation.
+Missing panel identities or incomplete snapshots cannot pass; the source-sized
+three-panel snapshot measured 99.16 mm minimum stowed clearance on each exit.
+The 180 mm forward bank offset, narrow five-column chamfers and longer links
+are explicit packaging estimates. Current photographs do not qualify them.
+
+Saved-source bus, nominal ramp, flight-stow and propulsion gates passed.
+The six signed production RCS commands also passed without changing the
+allocator or relaxing its tolerance; the rejected high mounting had failed.
+The solar gate caught stale geometry on the narrowed forward-starboard panel;
+its rows were regenerated and the saved-source solar gate passed all 152 checks.
+The main-engine continuous-burn test passed on the preceding raised assembly;
+that scope must not be silently promoted to the revised payload geometry.
+
+Editor 49840 lost dependent layer refreshes and reported a terrain material
+fault. All edits remained in typed document operations and explicit saves.
+Fresh Editor 49841 completed the lowered component edits. Fresh High
+review 49843 resolved the saved rover station at Y3.06 and the one-side arrays;
+its overview and array-side captures were inspected. Later row updates also
+required explicit SaveDocument followed by fresh-load inspection because the
+matching Editor preview generation stopped advancing. A warm Editor query
+can still expose an older referenced stage; fresh source gates and captures
+are required. Smooth CAD-style animated focus remains a generic Editor task;
+only component focus has been exercised here.
+
+The source-pinned fresh landing pair passed for this saved assembly: both
+confirmed touchdown at tick 1502 and ended at tick 5110. All 361 samples over
+60.1333 s after touchdown retained four-pad contact, with no unready samples.
+Final position, upright axis and speed deltas were exactly zero. Maximum drift
+was 0.151482 m, minimum upright Y 0.995968 and maximum angular speed 0.009388 rad/s.
+Evidence: `terrain/target/griffin-nested-landing-pair/` and
+`terrain/target/griffin-nested-landing-driver.log`. Binary SHA-256:
+`158c6cb7c1b2fde13bc2cc4b9075af8a5544eed726dfebd1075373d6ea9f9fcd`;
+Twin source fingerprint: `ca0991d67ace9fc16a5af5a27567fc36b3730d0b0ae110a4b81a680356d5b4cd`.
+The executable identifies itself as `75f376e5-dirty`; this evidence identifies
+that frozen artifact, not a fresh build of the current core checkout.
+After the pair, only the separate static stow observer gained fail-closed
+cardinality/path guards and clearance metrics; its rerun passed 230 checks
+(`terrain/target/griffin-nested-stow-final.log`). Physical/guidance sources
+were unchanged. Full unfolding sweep, retained GUI reload, mission traversal
+and uncontended performance still require separate acceptance.
+
 ## Raised deck and recessed engine bay — 2026-10-05
 
 The current unqualified integration study raises the payload walking top to
