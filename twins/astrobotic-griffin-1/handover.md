@@ -4,79 +4,70 @@
 
 ## Current runtime checkpoint, 2026-10-05
 
-The allocator/compiler stack now completes the full 16-gate surface mission on
-owned API 49830. The production manual-command trial passes all 10 checks:
-a single five-second held thrust command sustains 27.274 m lift and ends at
-12.440 m/s upward speed. Release settles to 25.043 Pa chamber pressure and
-0.364 N thrust. No repeated key edges are needed.
+Core `568f5146f` closes the two remaining reproduced determinism faults:
 
-Two shared-core faults are reproduced and corrected:
+- Fresh native traces matched through tick 2362, then ramp-to-toe contacts
+  appeared with opposite collider/body endpoint roles at tick 2363. Canonical
+  composed USD identity now selects roles before narrow phase creates oriented
+  manifolds and caches. Edge and pair roles change together; existing solved
+  manifolds are preserved. Native/generated identities remain backend owned.
+  The 40-step native contact regression is RED before/GREEN after; all nine
+  bridge tests pass. No contact removal, rounding or tolerance changes.
+- Rendered replay diverged at tick 300 in exact thrust by about 0.000740 N.
+  Surface gravity now reads native double-precision Position in the admitted
+  frame, and composes the provider into that frame through their common
+  ancestor. Render interpolation, f32 writeback and astronomical ancestor
+  motion no longer perturb the force. The deliberately mismatched native/render
+  pose regression is RED before/GREEN after; all 15 environment tests pass.
 
-- A pose refresh changed a seated leg quaternion to its equivalent opposite
-  sign, reversing Avian's XPBD fixed-angle correction. Preserve the current
-  native quaternion hemisphere. The regression fails before the bridge fix
-  and passes after it; all eight bridge tests pass.
-- Compound discovery included deactivated solar-panel geometry. Before the
-  fix, a warm admission grew FLIP's cooked width from 2.168 m to 6.2 m and
-  generated six ramp contacts with about 0.546 m penetration. Skip inactive
-  subtrees before proxy selection and collider collection. The live/prepared
-  regression fails before the fix and passes after it; all 44 projection tests
-  pass. The native bounds query now exposes this mismatch directly.
+The clean production binary passes both required replay modes:
 
-Strict same-process replay now **passes** on final core `75f376e5e` and
-owned production API 49833: two 90-second replacements match at all 94 samples,
-including admission, cooked rover bounds, first three solver steps, continuous
-trajectory limits, exact thrust/throttle and touchdown/handoff states. Both end
-in qualified four-pad contact. Existing tolerances and exact signal checks are
-unchanged. The same run completes all 16 surface mission checks and all 10 manual
-engine-command checks (one five-second hold, 26.860 m lift, 21,794 N peak thrust).
+- Source-pinned fresh processes: both land at tick 1502, finish at tick 5110,
+  and retain four-pad contact in 361/361 samples over 60 seconds. Final position,
+  upright axis, ground speed and angular speed deltas are exactly zero. Drift
+  is 0.150166 m and minimum upright Y is 0.996041. Evidence:
+  `terrain/target/griffin-native-gravity-fresh-replay/` and
+  `griffin-native-gravity-fresh-driver.log`.
+- Owned High rendered API 49835: strict retained replay PASS, two 90-second
+  replacements, 94 samples including admission and the first three solver
+  steps, cooked FLIP bounds, exact thrust/throttle and touchdown/handoff states.
+  Evidence: `terrain/target/griffin-native-gravity-rendered-49835.log` and
+  `/tmp/griffin-native-gravity-rendered-replay-49835.json`.
 
-The final lifecycle correction waits for incoming scene readiness before a
-retained VM rebinds its dependency plan. Before it, rendered 49832 validated a
-new Modelica entity before participant admission and permanently stopped the
-observer. Native retained-lifecycle regression is RED before/GREEN after; all
-30 scripting tests pass. Strict replay was failing before this correction and
-passes afterwards. Prior failed diagnostic measurements are retained for history
-and are not the verdict for this revision.
+Rendered 49835 also passes all 16 surface mission gates after U then F. The
+rover physically drives down the connected ramps onto DEM, completes the survey
+route and selects the FLIP HUD. Visible footpads remain above terrain and the
+bus stays upright. Capture:
+`terrain/target/griffin-native-gravity-egress-49835.png`.
+The subsequent production pilot trial passes all 10 engine-command checks:
+one five-second held command yields 26.240 m sustained lift, 12.199 m/s upward
+speed and 21,794 N peak thrust, consuming 32.132 kg of propellant. At the end
+of the three-second release window, chamber pressure is 33.325 Pa and thrust
+0.484 N. Evidence: the same rendered log and
+`/tmp/griffin-native-gravity-engine-49835.json`.
 
-Evidence: `terrain/target/griffin-active-compound-production-49830.log`,
-`griffin-collider-projection-green.log`, and `/tmp/griffin-{strict-replay-original,
-repeatability-measurements,active-compound-engine-commands}.json`.
-Owned 49830 has exited. High-quality unprofiled 49831 additionally confirms
-physical ramp unfolding, rover egress onto DEM, visible seated footpads and
-HUD switching from Lander to FLIP. The measured 240-sample post-egress frame
-window is p50 11.076 ms, p95 19.492 ms, p99 20.933 ms and max 22.930 ms at
-2560 x 1568. This is a short local acceptance window, not a sustained FPS claim.
-Captures are `terrain/target/griffin-high-{deployed,opposite,rover-hud}-49831.png`;
-telemetry is `/tmp/griffin-high-frame-time-49831.json`.
+Executable acceptance source revision is `10696714418594102912`. The later
+GR-031 documentation addition changes no geometry, limits or physical inputs;
+it was applied through the typed SysML API, saved and read back exactly at
+owned 49835. Core is pushed to `origin/griffin-pressure-fed-engines` and
+fast-forwarded into local core main. Remote core main is not pushed. All owned
+validation apps have exited; incomplete duplicate headless 49836 supplies no
+additional acceptance claim.
 
-Separate owned High-quality Tracy 49832 is captured at
-`/tmp/griffin-post-fix-49832.tracy` (65 s, PID/listener verified). Modelica output
-sync averages 0.557 ms, input sync 0.049 ms; this warm-cache trace contains no
-`PrepareModelica` event and does not establish cold compilation speed. CSVs:
-`terrain/target/griffin-post-fix-{modelica,rhai,preparation}.csv`.
-Both rendered apps have exited.
+Previous source-pinned fresh A/B failures and rendered 49834 failure remain
+historical evidence, not the verdict for `568f5146f`. Headless, rendered,
+component geometry and performance remain separate evidence scopes. No new
+sustained FPS or hardware flight-qualification claim is made. Prior High
+49831 short post-egress timing window was p50 11.076 ms, p95 19.492 ms,
+p99 20.933 ms and max 22.930 ms at 2560 x 1568. Prior warm Tracy 49832 contains
+no PrepareModelica event and does not prove cold compilation speed.
 
-The live contact notice now restores after suspension settling without
-re-emitting touchdown or resetting egress actions. Fresh rendered 49832
-confirms the restored notice in `griffin-restored-notice-49832.png`.
-Final owned 49833 also passes the retained observer and strict replay with the
-replacement-readiness gate. Evidence: `terrain/target/griffin-retained-admission-
-production-49833.log`, `griffin-retained-admission-{red,green}.log`,
-`/tmp/griffin-latest-strict-replay.json`, `/tmp/griffin-final-engine-commands-49833.json`.
-Owned 49833 has exited. Current-source fresh-process landing acceptance passes
-in both runs (touchdown tick 1502; all four contacts in 361/361 stability samples),
-but strict fresh-process repeatability FAILS: final X differs by 0.000257979 m
-against the unchanged 1e-6 m limit. Source revision 11206743143509313692;
-`terrain/target/griffin-final-fresh-replay/` and its driver log. Same-process PASS
-must not be presented as universal startup determinism. Contact-order tracing is
-in progress; the temporary query/test instrumentation is not a production fix.
-
-Route markers display the same frozen landed frame as navigation through the
-disposable `@view@` layer. Marker triggers and domes are disabled; only
-horizontal arrival qualifies progress. Restart clears view edits from the
-mounted source closure while preserving persistent authored edits and dirty
-state. The native document retirement regression passes.
+Earlier core fixes remain: exclude inactive compound subtrees, preserve seated
+quaternion hemisphere, retain authored participant names, clear disposable view
+edits at restart, and wait for replacement readiness before retained dependency
+rebinding. Live contact notices restore without re-emitting touchdown/resetting
+egress. Route markers use the same frozen landing frame as navigation; progress
+uses horizontal arrival, without marker triggers or domes.
 
 ## Deterministic contact checkpoint, 2026-10-05
 

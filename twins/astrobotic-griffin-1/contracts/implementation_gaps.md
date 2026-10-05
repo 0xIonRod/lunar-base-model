@@ -5,6 +5,25 @@
 vehicle, and the generic Rust/Rhai/Editor capabilities needed to build and
 verify the model.
 
+## Current runtime acceptance — 2026-10-05
+
+Core `568f5146f` canonicalizes authored USD contact endpoints before narrow
+phase and computes surface gravity from native Position in the active frame.
+Both mechanisms have native RED/GREEN regressions; nine bridge and fifteen
+environment tests pass. The source-pinned fresh-process pair has exactly zero
+final trajectory deltas, with four-pad contact in all 361 stability samples of
+each run. Owned High rendered 49835 passes the unchanged strict 94-sample
+retained replay, all 16 surface mission gates, and all 10 held-command reflight
+checks. Actual rendered rover egress, seated legs, connected ramps and FLIP HUD
+switching are inspected. Requirements record sources and rationale under GR-031.
+See the current handover for artifact paths and the separation of evidence
+scopes. Earlier reload/contact failures below describe earlier revisions.
+
+The hardware model remains a source-documented integration study. Unpublished
+flight dimensions, detailed bus plan shape/panel interfaces and folded ramp
+backs remain estimates; runtime PASS does not establish hardware equivalence
+or flight qualification. No new sustained FPS acceptance is claimed.
+
 ## Hardware appearance checkpoint — 2026-10-04
 
 The June 15 real-hardware photos now drive three tall, shaped solar faces,
