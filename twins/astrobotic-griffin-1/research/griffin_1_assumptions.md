@@ -51,7 +51,8 @@ mission-owner data is supplied, do not present these as Griffin flight values:
 |---|---|---|
 | Griffin dimensions and geometry | unknown | inherited visual/physical surrogate; public material describes a stout aluminum frame and isogrid deck, not an as-built dimension set |
 | dry mass, propellant load, inertia, center of mass | unknown | NASA says Griffin-1 completed mass-properties testing but public numerical values were not found; inherited lander values remain proxies |
-| engine thrust, throttle, station and cant angles | unknown | inherited powered-descent model; current product page supports seven main engines, while older Griffin/VIPER guidance describes five |
+| main-engine ratings, throttle and stations | numerical flight data unknown | current seven-engine topology is source-backed; thrust/flow, dimensions and mounting remain study assumptions. Current Astrobotic hot-fire report confirms pressure-fed pulsed operation; a turbopump approximation remains to replace |
+| attitude-engine reference | manufacturer specification, configuration applicability limited | Agile confirms A110 delivery to Griffin in 2023. Its 2023 datasheet supplies 111.2 N, M20/MON3, O/F 0.90, nominal flows and exit diameter; current as-built mounting and configuration remain unconfirmed. See `../requirements/griffin-size-evidence.md`, A110 section |
 | FLIP geometry, wheel loads, motor data, battery and steering ICD | mostly unknown | the active study configuration is owned by the FLIP SysML packages; Astrolab's public material does not provide the vehicle ICD |
 | exact landing coordinates | unresolved | reproducible NOBILE03 regional study anchor; not a flight touchdown coordinate |
 | terrain relief | source-backed regional product | 512 m NOBILE03 crop, locally reprojected and vertically normalized for the Twin |
@@ -61,7 +62,7 @@ mission-owner data is supplied, do not present these as Griffin flight values:
 | Griffin payload capacity | source-backed product value | 625 kg published by Astrobotic; integrated mission load is a separate manifest quantity |
 | deck and egress | qualitative public image; mechanical ICD not released | Griffin owns the isogrid deck and ramp interface in its requirements. The 2021 Astrobotic image informs a raised, folded ramp silhouette only; hinge angles, section offsets, deployment kinematics, and FLIP's detailed interface remain Twin study values or unresolved |
 | Griffin-1 solar configuration | Three arrays, transit Sun-pointing intent, and the surface Sun quadrant are source-backed; exact installation data is unpublished | SysML owns three named arrays across the consecutive forward, bevel, and starboard faces. The Editor-authored vehicle references the shared panel component at all three rail-derived stations and uses panel widths derived from the mounting-rail pairs. Stations, panel normals, cutout outlines, support/hinge interfaces, deployment limits, control limits, and electrical behavior remain visual-study values or unresolved |
-| propellant tank count/type | unknown | four COPV-style visual assemblies are a Twin study assumption, not a published Griffin-1 tank ICD |
+| propellant/pressurant architecture | count and feed architecture source-backed; type, dimensions, inventories and regulator behavior unknown | Astrobotic full-propulsion hot-fire report confirms two fuel, two oxidizer and three helium tanks with pressure-fed hypergolic propulsion. COPV materials, geometry and mass remain visual/engineering study assumptions. [Official report](https://www.linkedin.com/posts/astrobotic_the-astrobotic-team-recently-completed-a-activity-7402458294524530689-09jf), checked 2026-10-05 |
 
 ## NOBILE03 terrain processing record
 

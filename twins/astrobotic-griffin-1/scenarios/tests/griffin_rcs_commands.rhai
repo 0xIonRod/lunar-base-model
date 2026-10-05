@@ -23,6 +23,14 @@ fn on_start(me,ctx) {
     this.tolerance=griffin_spec::_typed_model_number(
         "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::wrenchRelativeTolerance");
     if this.settling==() || this.tolerance==() {throw("RCS command acceptance source unavailable");}
+    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
+    this.nominal=griffin_spec::_typed_model_number(own+"nominalForceN");
+    this.flow=griffin_spec::_typed_model_number(own+"nominalFuelFlowKgs")
+        +griffin_spec::_typed_model_number(own+"nominalOxidizerFlowKgs");
+    this.mixture=griffin_spec::_typed_model_number(own+"oxidizerToFuelRatio");
+    if this.nominal==() || this.flow==() || this.mixture==() {
+        throw("A110 vendor operating point is unavailable");
+    }
     for jet in griffin_spec::rcs_port_mapping() {
         let name=jet.model_name.sub_string(0,jet.model_name.len()-5);
         let record=query("QueryUsdPrim",#{path:"/World/Griffin1/"+name,
@@ -42,11 +50,13 @@ fn on_start(me,ctx) {
 fn on_tick(me,ctx) {
     if this.done {return;}this.elapsed+=dt();if this.elapsed<this.settling {return;}
     let moment=vec3(0.0,0.0,0.0);let net=moment;let force_capacity=0.0;
+    let delivered=0.0;
     for station in this.stations {
         let thrust=get(this.rcs,station.port);
         if thrust==() {throw("RCS thrust telemetry unavailable: "+station.port);}
         let force=station.direction*thrust;
         moment+=vcross(station.position,force);net+=force;force_capacity+=station.nominal;
+        delivered+=thrust;
     }
     let row=this.cases[this.index];let components=vec3_array(moment);
     let wanted=components[row.axis]*row.sign;let unwanted=0.0;
@@ -57,6 +67,15 @@ fn on_tick(me,ctx) {
         && unwanted<=wanted*this.tolerance
         && vlen(net)<=force_capacity*this.tolerance,
         "command did not produce the requested pure moment: "+row.name));
+    let expected_flow=delivered/this.nominal*this.flow;
+    let measured_flow=get(this.rcs,"mass_flow_kgs");
+    let fuel_flow=get(this.rcs,"fuel_mass_flow_kgs");
+    let oxidizer_flow=get(this.rcs,"oxidizer_mass_flow_kgs");
+    this.failures.push(t_true(measured_flow!=() && fuel_flow!=() && oxidizer_flow!=()
+        && expected_flow>0.0
+        && (measured_flow-expected_flow).abs()<=expected_flow*this.tolerance
+        && (oxidizer_flow-fuel_flow*this.mixture).abs()<=expected_flow*this.tolerance,
+        "A110 propellant consumption does not follow delivered impulse: "+row.name));
     print("[griffin-rcs-command] case="+row.name+" moment_Nm="+vec3_array(moment)
         +" net_force_N="+vec3_array(net)+" desired_Nm="
         +[get(this.griffin,"torque_x"),get(this.griffin,"torque_y"),get(this.griffin,"torque_z")]);

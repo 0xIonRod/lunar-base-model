@@ -1554,3 +1554,69 @@ The observer now reports at the existing source-owned 300-second landing
 watchdog if touchdown is missing, rather than waiting forever for a
 post-touchdown window. Its diagnostics include target error, requested torque
 and physical attitude; the stability limits and predicates are unchanged.
+
+
+## A110 supplier reference and command verification, 2026-10-05
+
+This supersedes the estimated RCS dimensions in the 2026-10-04 section.
+Agile confirms [A110 flight-unit delivery to Astrobotic in December 2023](https://agilespaceindustries.com/press/2023-year-in-review).
+The [manufacturer's 2023 A110 datasheet](https://static1.squarespace.com/static/634ee7b32099c80fdfcc8cac/t/6418ea80e1144560207215ca/1679505951405/AgileSpace_A110SpecDoc.pdf)
+is the reference configuration, not a current Griffin as-built ICD. Checked
+2026-10-05. It identifies two direct-acting solenoid valves, refractory chamber
+and nozzle, titanium inlet tubes and a stainless valve body. The drawing gives
+a 2.4 inch exit diameter (60.96 mm) and 9 inch overall envelope. Griffin's
+component uses that exit diameter, expansion ratio 70 and a derived 3.643 mm
+throat radius. Bell height 84 mm and chamber length 85 mm are estimates from
+157/430 and 160/430 of the drawing's 9 inch dimension. Valve/inlet cylinder
+sizes, 45 degree separation, 0.5 mm visual wall and contour exponent 0.55 are
+explicit visual estimates; mounting orientation remains a reconstruction.
+
+The nominal operating point is 111.2 N, M20/MON3, O/F 0.90, 19.25 g/s fuel,
+17.33 g/s oxidizer and 220 psia chamber pressure (1.5168466 MPa). The nominal
+Isp used by the simulation is **derived** from thrust divided by total flow
+and standard gravity: 309.9848083 s. The published Isp >=305.5 s is a minimum,
+not a nominal value. These are A110 reference values, not measured Griffin
+flight-unit performance. Commands represent averaged valve duty at 60 Hz;
+the published sub-5 ms pulse capability and sub-10 ms transients require a
+finer discrete valve model and are not reproduced by this duty approximation.
+
+All twelve normalized commands are allocated from the composed mount wrench.
+Their physics actuators read delivered Newton thrust, not raw valve duty.
+Shared Modelica flow consumes both tank inventories; missing either reactant
+extinguishes combustion and the library plume. The composed pure-axis capacity
+with the unchanged 10% reserve is now 277.1778424 Nm. The production six-axis
+command fixture passed **19 checks**, including actual nominal-flow and O/F
+closure in each direction, at 2160 ticks / 36 s, one thread, zero jitter:
+`terrain/target/griffin-a110-command-flow.log` (exit 0). Four bounded hollow-mesh
+checks passed at component generation 80; focused Editor image:
+`terrain/target/assembly-editor/griffin-a110-vendor-component-framed.png`.
+The saved assembly's fresh preview is ready at generation 0 in owned port
+49777; the component reference is loaded. The warm Editor lost projection
+readiness after reference updates and reported terrain material-continuation
+failure; this does not establish hot-reload acceptance.
+
+Current [Astrobotic full propulsion hot-fire report](https://www.linkedin.com/posts/astrobotic_the-astrobotic-team-recently-completed-a-activity-7402458294524530689-09jf)
+confirms two fuel tanks, two oxidizer tanks, three helium pressurant tanks,
+pressure-fed hypergolic propulsion and pulsed main/ACS operation. It identifies
+Frontier main engines but supplies no current seven-engine unit ratings, tank
+loads, regulator settings or chamber geometry. Thus main-engine numerical
+performance remains a study assumption; the old turbopump representation
+requires replacement. The known architecture must no longer be called unknown.
+
+Strict replay remains **FAIL**. Two pinned fresh trials both qualified touchdown
+at tick 1478 with identical position and retained 361/361 four-foot samples,
+but final X differed by 2.11176 mm against the unchanged 1 micrometre tolerance.
+Logs: `terrain/target/griffin-engine-rate-margin-replay/run-{1,2}.log`.
+The single-observer same-process restart failed at tick 60, before contact,
+with a 5.74177 micrometre Y difference. Its baseline retained 91 samples over
+90 s. Log: `terrain/target/griffin-engine-warm-49775.log`,
+`GRIFFIN_RELOAD_FAIL`. These failures predate the A110 reference update and
+remain unresolved. Do not merge the core stack as a determinism fix.
+
+The saved production engine-command fixture passed all five checks at 1959
+ticks / 32.65 s, one thread and zero jitter. It landed, acquired semantic pilot
+ownership, held thrust once for five seconds, retained upward flight at the
+end, consumed fuel, and extinguished thrust after release. Log:
+`terrain/target/griffin-a110-held-thrust.log`, exit 0. This verifies sustained
+command delivery with the current modeled feed; it does not accept strict
+reload replay or current flight-engine performance.

@@ -3,6 +3,33 @@
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
 
+## A110 engine checkpoint, 2026-10-05
+
+The twelve ACS jets now follow the supplier A110 reference: hollow 60.96 mm
+exit, narrower chamber and two valve/inlet branches. Published dimensions,
+derived performance and visual estimates are separated in the propulsion
+requirements and latest size-evidence section. Production command/flow PASS
+19 at 2160 ticks / 36 s; mesh checks PASS at saved component generation 80.
+Normalized duty goes to the allocator; native delivered thrust goes to physics.
+The current pure-axis control reserve is 277.1778424 Nm.
+
+The sustained pilot observer now has a thin production fixture
+`tests/griffin_engine_commands.usda` and a registered verification case.
+It passed five checks at 1959 ticks / 32.65 s, including continuous five-second
+liftoff and extinction after release (`griffin-a110-held-thrust.log`, exit 0).
+Current main-feed architecture is confirmed
+pressure-fed by Astrobotic's full-system hot-fire report; numerical flight
+ratings remain unavailable and the old pump approximation remains to replace.
+
+Strict fresh replay FAIL: 2.11176 mm final X divergence after identical
+qualified touchdown. Same-process single-observer replay FAIL: 5.74177
+micrometre Y divergence at tick 60, before contact. The restart observer now
+retains the failed sample/field in ScriptInspect and prints the complete
+structured result. Original tolerances and 90-second horizon are unchanged.
+Do not merge the core stack as deterministic. Owned Editor 49776 also faulted
+on terrain material continuation after reference updates; fresh saved-source
+49777 has a ready assembly preview. Neither substitutes for warm reload.
+
 ## Current engine and terrain checkpoint
 
 RCS now uses twelve referenced hollow nozzles and library exhaust effects.

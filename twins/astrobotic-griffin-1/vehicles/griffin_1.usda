@@ -54,7 +54,6 @@ def Xform "Griffin1" (
     string unit = "rad/s"
 }
     )
-    float inputs:hold_torque_limit_nm = 277.191650390625
     float inputs:mass
     float inputs:mass.connect = </Griffin1/MainPropulsion.outputs:vehicle_mass_kg>
     float inputs:com_x
@@ -125,6 +124,7 @@ def Xform "Griffin1" (
     float inputs:navigation_velocity_z.connect = </Griffin1.outputs:velocity_z>
     string lunco:ui:surfaceId = "vehicle-control-left"
     string lunco:ui:visibilityMode = "possessed"
+    double inputs:hold_torque_limit_nm = 277.1778424205232
     def Scope "PhysicsMaterials"
     {
         def Material "LandingPadSlide" (
@@ -617,12 +617,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -640,7 +635,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -648,6 +642,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsPitchPosBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -656,12 +658,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -679,7 +676,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -687,6 +683,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsPitchNegModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -695,12 +699,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -718,7 +717,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -726,6 +724,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsPitchNegBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -734,12 +740,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -757,7 +758,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -765,6 +765,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsRollPosModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -773,12 +781,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -796,7 +799,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -804,6 +806,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsRollPosBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -812,12 +822,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -835,7 +840,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -843,6 +847,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsRollNegModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -851,12 +863,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -874,7 +881,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -882,6 +888,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsRollNegBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -890,12 +904,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -913,7 +922,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -921,6 +929,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsYawPosModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -929,12 +945,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -953,7 +964,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -961,6 +971,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsYawPosBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -969,12 +987,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -992,7 +1005,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -1000,6 +1012,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsYawNegModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -1008,12 +1028,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -1032,7 +1047,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -1040,6 +1054,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsYawNegBModel" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -1048,12 +1070,7 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSJet.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:f_nom_n = 111.2055435180664
-            float inputs:isp_sec = 220.0
             float inputs:g0 = 9.806650161743164
-            float inputs:plume_width_m = 0.03999999910593033
-            float inputs:geometry_capacity_m = 0.0
-            float inputs:plume_luminance = 0.0
             float inputs:plume_exitance = 44200.0
             float inputs:plume_width_idle = 0.2800000011920929
             float inputs:plume_throttle_exponent = 0.3499999940395355
@@ -1071,7 +1088,6 @@ def Xform "Griffin1" (
             float inputs:available_fuel_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_fuel_mass_kg>
             custom float inputs:available_oxidizer_mass_kg
             float inputs:available_oxidizer_mass_kg.connect = </Griffin1/AttitudePropulsion.inputs:available_oxidizer_mass_kg>
-            float inputs:fuel_family = 3.0
             float outputs:color_r = 0.0
             float outputs:color_g = 0.0
             float outputs:color_b = 0.0
@@ -1079,6 +1095,14 @@ def Xform "Griffin1" (
             float outputs:core_envelope_radius_m = 0.0
             float outputs:envelope_length_m = 0.0
             float outputs:envelope_center_y_m = 0.0
+            double inputs:fuel_family = 3.0
+            double inputs:plume_width_m = 0.03048
+            double inputs:geometry_capacity_m = 0.0
+            double inputs:plume_luminance = 0.0
+            double inputs:f_nom_n = 111.2
+            double inputs:isp_sec = 309.98480831915157
+            double inputs:mixture_ratio = 0.9
+            double inputs:design_chamber_pressure_pa = 1516846.6044969598
         }
         def Scope "RcsFlowAggregator" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -1087,7 +1111,6 @@ def Xform "Griffin1" (
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/RCSFlowAggregator.mo@
             uniform bool lunco:program:realtimeSafe = true
-            float inputs:oxidizer_to_fuel_ratio = 2.5999999046325684
             float outputs:total_flow_kgs
             float outputs:fuel_flow_kgs
             float outputs:oxidizer_flow_kgs
@@ -1115,6 +1138,7 @@ def Xform "Griffin1" (
             float inputs:flow_11.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:mass_flow_kgs>
             float inputs:flow_12
             float inputs:flow_12.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:mass_flow_kgs>
+            double inputs:oxidizer_to_fuel_ratio = 0.9
         }
     }
     def Scope "Looks"
@@ -6087,7 +6111,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_pos_a_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_a_thrust_n>
@@ -6165,7 +6189,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_pos_b_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_pos_b_thrust_n>
@@ -6243,7 +6267,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_neg_a_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_a_thrust_n>
@@ -6321,7 +6345,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:pitch_neg_b_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:pitch_neg_b_thrust_n>
@@ -6399,7 +6423,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_pos_a_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_a_thrust_n>
@@ -6477,7 +6501,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_pos_b_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_pos_b_thrust_n>
@@ -6555,7 +6579,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_neg_a_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_a_thrust_n>
@@ -6633,7 +6657,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:roll_neg_b_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:roll_neg_b_thrust_n>
@@ -6711,7 +6735,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_pos_a_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_a_thrust_n>
@@ -6789,7 +6813,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_pos_b_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_pos_b_thrust_n>
@@ -6867,7 +6891,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_neg_a_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_a_thrust_n>
@@ -6945,7 +6969,7 @@ def Xform "Griffin1" (
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
-        double lunco:forceActuator:maxForce = 111.2055403815125
+        double lunco:forceActuator:maxForce = 111.2
         custom rel lunco:forceActuator:commandSource = </Griffin1/AttitudeActuation.outputs:yaw_neg_b_valve>
         custom float inputs:force_command
         float inputs:force_command.connect = </Griffin1/AttitudePropulsion.outputs:yaw_neg_b_thrust_n>

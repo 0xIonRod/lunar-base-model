@@ -1,6 +1,11 @@
 // Retained observer: compare two RestartScene trajectories in one app.
-// Launch with RunScenarioAsset on the World Grid, scene_asset set to the surface contract
-// fixture and reload_policy=retain. Model state is observed, never overwritten.
+// Mount the surface contract fixture first, then attach one RunScenarioAsset
+// observer on WorldGrid with reload_policy=Retain and no scene_asset. on_start
+// owns the first restart. Model state is observed, never overwritten.
+fn report_restart(name, result) {
+    print(name + " " + result);
+    emit(name, result);
+}
 fn simulation_dependencies(me, ctx) {
     griffin_surface_ops::landing_stability_dependencies()
 }
@@ -29,7 +34,8 @@ fn on_tick(me, ctx) {
     let sample = griffin_surface_ops::landing_stability_sample();
     if sample.ok != true {
         this.done = true;
-        emit("GRIFFIN_RELOAD_FAIL", #{tick: tick, run: this.run, sample: sample});
+        this.result = #{tick: tick, run: this.run, sample: sample};
+        report_restart("GRIFFIN_RELOAD_FAIL", this.result);
         return;
     }
     if this.run == 1 {
@@ -43,8 +49,9 @@ fn on_tick(me, ctx) {
                     > if field == "position" {this.contract.replay_tolerance_m}
                         else {this.contract.replay_tolerance_speed_mps} {
                     this.done = true;
-                    emit("GRIFFIN_RELOAD_FAIL", #{tick: tick, field: field,
-                        axis: axis, reference: reference, sample: sample});
+                    this.result = #{tick: tick, field: field,
+                        axis: axis, reference: reference, sample: sample};
+                    report_restart("GRIFFIN_RELOAD_FAIL", this.result);
                     return;
                 }
             }
@@ -54,8 +61,9 @@ fn on_tick(me, ctx) {
                 else {this.contract.replay_tolerance_speed_mps};
             if (sample[field] - reference[field]).abs() > tolerance {
                 this.done = true;
-                emit("GRIFFIN_RELOAD_FAIL", #{tick: tick, field: field,
-                    reference: reference, sample: sample});
+                this.result = #{tick: tick, field: field,
+                    reference: reference, sample: sample};
+                report_restart("GRIFFIN_RELOAD_FAIL", this.result);
                 return;
             }
         }
@@ -65,8 +73,9 @@ fn on_tick(me, ctx) {
             if sample[field] == () || reference[field] == ()
                 || sample[field] != reference[field] {
                 this.done = true;
-                emit("GRIFFIN_RELOAD_FAIL", #{tick: tick, field: field,
-                    reference: reference, sample: sample});
+                this.result = #{tick: tick, field: field,
+                    reference: reference, sample: sample};
+                report_restart("GRIFFIN_RELOAD_FAIL", this.result);
                 return;
             }
         }
@@ -78,7 +87,8 @@ fn on_tick(me, ctx) {
             print("GRIFFIN_RELOAD_RESTART " + restart);
         } else {
             this.done = true;
-            emit("GRIFFIN_RELOAD_PASS", #{sample_count: this.samples.len(), ticks: tick});
+            this.result = #{sample_count: this.samples.len(), ticks: tick};
+            report_restart("GRIFFIN_RELOAD_PASS", this.result);
         }
     }
 }

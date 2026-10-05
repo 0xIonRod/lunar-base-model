@@ -6111,7 +6111,8 @@ fn axial_landing_gear_plan(doc, edit_target, root) {
     #{ok:true,ops:ops,shock_neutral_length_m:length,joint_count:4,body_count:4}
 }
 
-// One reusable RCS bell, expressed in SI from the owning SysML study contract.
+// One reusable A110 reconstruction, with vendor bore dimensions and explicitly
+// estimated chamber/valve envelopes in the owning SysML contract.
 fn griffin_rcs_bell_component_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
     if !sysml_model_is(model) {return plan_error("RCS source is unavailable");}
@@ -6120,18 +6121,20 @@ fn griffin_rcs_bell_component_plan(doc, edit_target, root) {
     let exit=f64_from(model.value(own+"exitRadiusM"));
     let height=f64_from(model.value(own+"bellHeightM"));
     let collar=f64_from(model.value(own+"collarHeightM"));
+    let chamber=f64_from(model.value(own+"chamberRadiusM"));
     let wall=f64_from(model.value(own+"visualWallThicknessM"));
     let contour=f64_from(model.value(own+"bellContourExponent"));
     let axial=model.value(own+"bellAxialSegments");
     let segments=model.value(own+"bellAngularSegments");
-    if throat==() || exit==() || height==() || collar==() || wall==()
+    if throat==() || exit==() || height==() || collar==() || chamber==() || wall==()
         || contour==() || axial==() || segments==() || throat<=wall
-        || exit<=throat || height<=0.0 || collar<=0.0 || axial<8 || segments<16 {
+        || exit<=throat || chamber<=throat || height<=0.0 || collar<=0.0 || axial<8 || segments<16 {
         return plan_error("RCS nozzle dimensions are incomplete");
     }
     let profile=griffin_geometry::hollow_bell_profile(throat,exit,height,wall,contour,axial);
-    let neck=[[throat,height/2.0],[throat,height/2.0+collar],
-        [throat-wall,height/2.0+collar],[throat-wall,height/2.0]];
+    let neck=[[throat,height/2.0],[chamber,height/2.0+chamber],
+        [chamber,height/2.0+collar],[chamber-wall,height/2.0+collar],
+        [chamber-wall,height/2.0+chamber],[throat-wall,height/2.0]];
     let ops=[#{SetReferenceArcs:#{edit_target:edit_target,path:root,
         references:[#{asset_path:"lunco://components/propulsion/rocket_engine_visual.usda",prim_path:"/Engine"}],list_op:"Prepend"}},
         #{SetStageMetrics:#{edit_target:edit_target,metrics:#{meters_per_unit:1.0,up_axis:"Y"}}}];
@@ -6146,6 +6149,32 @@ fn griffin_rcs_bell_component_plan(doc, edit_target, root) {
         ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:["MaterialBindingAPI"]}});
         ops.push(#{SetRelationship:#{edit_target:edit_target,path:path,name:"material:binding",targets:[root+"/Looks/Nozzle_Mat"]}});
     }
+    let valve_radius=f64_from(model.value(own+"valveRadiusM"));
+    let valve_length=f64_from(model.value(own+"valveLengthM"));
+    let valve_offset=f64_from(model.value(own+"valveCenterOffsetM"));
+    let inlet_radius=f64_from(model.value(own+"inletTubeRadiusM"));
+    let inlet_length=f64_from(model.value(own+"inletTubeLengthM"));
+    let inlet_offset=f64_from(model.value(own+"inletTubeCenterOffsetM"));
+    let cant=f64_from(model.value(own+"valveCantDeg"));
+    if valve_radius==() || valve_length==() || valve_offset==()
+        || inlet_radius==() || inlet_length==() || inlet_offset==() || cant==() {
+        return plan_error("A110 valve envelope source is incomplete");
+    }
+    let head_y=height/2.0+collar;
+    // Cylinders are visual solenoid/tube envelopes, not independent bodies.
+    // The two feeds share the chamber's datum and the parent RCS force owner.
+    for side in [#{name:"Fuel",sign:-1.0},#{name:"Oxidizer",sign:1.0}] {
+        for part in [#{name:side.name+"Valve",radius:valve_radius,length:valve_length,
+                offset:valve_offset},
+            #{name:side.name+"Inlet",radius:inlet_radius,length:inlet_length,
+                offset:inlet_offset}] {
+            let shape=_component_cylinder_visual_ops(doc,edit_target,root,
+                part.name,
+                [side.sign*part.offset,head_y+part.offset,0.0],
+                [0.0,0.0,-side.sign*cant],part.radius,part.length,"Y",[0.68,0.71,0.73]);
+            if !shape.ok {return shape;} for op in shape.ops {ops.push(op);}
+        }
+    }
     ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Exhaust",type_name:"Xform",reference:(),reference_prim_path:()}});
     ops.push(#{SetTranslate:#{edit_target:edit_target,path:root+"/Exhaust",value:[0.0,-height/2.0,0.0]}});
     #{ok:true,ops:ops,exit_radius_m:exit,bell_height_m:height,throat_radius_m:throat}
@@ -6157,8 +6186,18 @@ fn griffin_rcs_feed_plan(doc, edit_target, root) {
         "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::plumeFuelFamily");
     let radius=griffin_spec::_typed_model_number(
         "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::exitRadiusM");
-    if fuel==() || radius==() || radius<=0.0 {return plan_error("RCS feed source incomplete");}
+    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
+    let isp=griffin_spec::_typed_model_number(own+"nominalSpecificImpulseS");
+    let mixture=griffin_spec::_typed_model_number(own+"oxidizerToFuelRatio");
+    let pressure=griffin_spec::_typed_model_number(own+"chamberPressurePa");
+    let force=griffin_spec::_typed_model_number(own+"nominalForceN");
+    if fuel==() || radius==() || radius<=0.0 || isp==() || mixture==()
+        || pressure==() || force==() {return plan_error("RCS feed source incomplete");}
     let ops=[];
+    let aggregate=root+"/AttitudePropulsion/RcsFlowAggregator";
+    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:aggregate,name:"inputs:oxidizer_to_fuel_ratio"}});
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:aggregate,
+        name:"inputs:oxidizer_to_fuel_ratio",type_name:"double",value:mixture.to_string()}});
     for reactant in [#{name:"fuel",tank:"FuelTank"},#{name:"oxidizer",tank:"OxidizerTank"}] {
         ops.push(#{SetConnection:#{edit_target:edit_target,path:root+"/MainPropulsion",
             name:"outputs:"+reactant.name+"_mass_kg",type_name:"float",
@@ -6182,9 +6221,12 @@ fn griffin_rcs_feed_plan(doc, edit_target, root) {
         }
         for parameter in [#{name:"fuel_family",value:fuel},
             #{name:"plume_width_m",value:radius},#{name:"geometry_capacity_m",value:0.0},
-            #{name:"plume_luminance",value:0.0}] {
+            #{name:"plume_luminance",value:0.0},#{name:"f_nom_n",value:force},
+            #{name:"isp_sec",value:isp},#{name:"mixture_ratio",value:mixture},
+            #{name:"design_chamber_pressure_pa",value:pressure}] {
+            ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:path,name:"inputs:"+parameter.name}});
             ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
-                name:"inputs:"+parameter.name,type_name:"float",value:parameter.value.to_string()}});
+                name:"inputs:"+parameter.name,type_name:"double",value:parameter.value.to_string()}});
         }
     }
     #{ok:true,ops:ops,jet_count:griffin_spec::rcs_port_mapping().len()}
@@ -6330,6 +6372,8 @@ fn griffin_rcs_command_envelope_plan(doc,edit_target,root) {
     }
     let limit=capacity*fraction;
     #{ok:true,document_generation:pairs.document_generation,torque_limit_nm:limit,
-      ops:[#{SetAttribute:#{edit_target:edit_target,path:root,
-        name:"inputs:hold_torque_limit_nm",type_name:"float",value:limit.to_string()}}]}
+      ops:[#{RemoveAttribute:#{edit_target:edit_target,path:root,
+        name:"inputs:hold_torque_limit_nm"}},
+        #{SetAttribute:#{edit_target:edit_target,path:root,
+        name:"inputs:hold_torque_limit_nm",type_name:"double",value:limit.to_string()}}]}
 }

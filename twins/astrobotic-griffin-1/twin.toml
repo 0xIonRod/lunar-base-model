@@ -129,6 +129,12 @@ script = "scenarios/tests/griffin_surface_ops_contract.rhai"
 verdict_channel = "GRIFFIN_LANDING_STABILITY"
 
 [[verification.cases]]
+name = "GriffinPropulsionRequirements::Verify_GriffinEngineCommands"
+scene = "tests/griffin_engine_commands.usda"
+script = "scenarios/tests/griffin_engine_commands.rhai"
+verdict_channel = "GRIFFIN_ENGINE_COMMANDS"
+
+[[verification.cases]]
 name = "GriffinFunctionalRequirements::Verify_GriffinAdapterRelease"
 scene = "scenes/griffin_1_detach_stability_test.usda"
 script = "scenarios/tests/griffin_detach_stability.rhai"

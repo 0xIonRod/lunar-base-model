@@ -148,37 +148,57 @@ package GriffinPropulsionRequirements {
     }
 
     part def GriffinAttitudeEngineAssembly {
-        doc /* RCS study reconstruction: twelve retained scalar force identities,
-         * three per bus chamfer station, each with one referenced hollow bell.
-         * Shared library exhaust is opposite the actuator's body-frame force;
-         * no Twin-owned flame/core/light proxies. Fuel and oxidizer availability
-         * are wired to live tank mass outputs. The 2021 PUG supplies a historical
-         * 25 lbf rating; using that rating with the 2026 four-cluster topology is
-         * an explicit study assumption, not a current flight-engine specification.
-         * Reference https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf
-         * Mounts derive from the source bus chamfer midpoint, top minus 40 mm,
-         * 60 mm outward standoff and +/-120 mm tangent spacing. These packaging
-         * estimates use https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
-         * and the current hardware photo https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/.
-         * Symmetric offsets keep each pair's resultant translation and unwanted
-         * moments zero. Torque capacities are 2*nominalForce*effective arm,
-         * computed from the same mount geometry and checked by composed wrench.
+        doc /* A110 vendor-reference reconstruction, checked 2026-10-05.
+         * Agile's 2023 Year in Review confirms delivery of A110 flight units
+         * for Griffin: https://agilespaceindustries.com/press/2023-year-in-review.
+         * Vendor datasheet: https://static1.squarespace.com/static/634ee7b32099c80fdfcc8cac/t/6418ea80e1144560207215ca/1679505951405/AgileSpace_A110SpecDoc.pdf.
+         * It gives M20/MON3, 111.2 N nominal thrust, O/F 0.90, Isp >=305.5 s,
+         * 19.25/17.33 g/s nominal flows, 220 psia chamber pressure, expansion
+         * ratio 70 and startup/shutdown <10 ms. The 2.4-in exit diameter and
+         * 9.0-in overall drawing dimensions convert exactly by 0.0254 m/in.
+         * The model uses nominal Isp derived from thrust and stated total flow;
+         * 305.5 s is a guaranteed lower bound, not that nominal operating point.
+         * The bore throat radius derives as exitRadiusM/sqrt(expansionRatio).
+         * Bell/chamber lengths and dual-valve envelopes are drawing-scaled
+         * estimates, not an ICD. The contour and shell are visual estimates.
+         * Twelve retained scalar force identities form four triples. Shared
+         * library exhaust follows delivered thrust; no Twin flame proxies.
+         * Mounts remain packaging estimates from bus chamfer midpoint, 40 mm
+         * below the top, 60 mm outward and +/-120 mm tangent spacing, using
+         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
+         * and https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/.
+         * Symmetric mount offsets retain a pure requested attitude wrench.
+         * Commands represent tick-averaged pulse duty. The 60 Hz physics step
+         * cannot resolve the vendor's sub-5-ms pulses or <10-ms valve edges.
+         * Do not claim pulse-transient fidelity from this averaged model.
          */
-        // Astrobotic PUG August 2021 v5.02 p.26: twelve 25 lbf ACS
-        // engines, arranged in groups of three. SI force uses exact
-        // standard lbf conversion; detailed vendor envelopes are unavailable.
-        attribute nominalForceN : Real = 111.2055403815125;
-        // Envelope estimates from small attitude-nozzle silhouettes in the
-        // supplied PGH Tech photo: 80 mm exit, 120 mm bell, 24 mm throat.
-        // Reuse the curved main-bell mesh with separate geometry transforms;
-        // exhaust geometry has no inherited scaling from those mesh transforms.
-        attribute exitRadiusM : Real = .04;
-        attribute throatRadiusM : Real = .012;
-        attribute bellHeightM : Real = .12;
-        attribute collarHeightM : Real = .03;
-        // Study shell, not a qualified pressure wall. 1 mm retains an open
-        // bore at the estimated 12 mm throat and keeps a readable nozzle rim.
-        attribute visualWallThicknessM : Real = .001;
+        attribute nominalForceN : Real = 111.2;
+        attribute nominalFuelFlowKgs : Real = .01925;
+        attribute nominalOxidizerFlowKgs : Real = .01733;
+        attribute standardGravityMps2 : Real = 9.80665;
+        attribute minimumSpecificImpulseS : Real = 305.5;
+        attribute nominalSpecificImpulseS : Real = nominalForceN / ((nominalFuelFlowKgs + nominalOxidizerFlowKgs) * standardGravityMps2);
+        attribute oxidizerToFuelRatio : Real = .90;
+        attribute chamberPressurePa : Real = 1516846.6044969598;
+        attribute expansionRatio : Real = 70.0;
+        attribute exitRadiusM : Real = .03048;
+        // Derived from the published bore-area ratio; sqrt is written out to
+        // retain a resolved literal in the current scalar SysML projection.
+        attribute throatRadiusM : Real = .0036430568012512316;
+        // Drawing estimates: 157/430 of the 9-in total is the bell; 160/430
+        // is the chamber neck. Rounded to 84 and 85 mm for the reconstruction.
+        attribute bellHeightM : Real = .084;
+        attribute collarHeightM : Real = .085;
+        attribute chamberRadiusM : Real = .0085;
+        attribute valveRadiusM : Real = .0065;
+        attribute valveLengthM : Real = .028;
+        attribute valveCenterOffsetM : Real = .012;
+        attribute inletTubeRadiusM : Real = .0025;
+        attribute inletTubeLengthM : Real = .030;
+        attribute inletTubeCenterOffsetM : Real = .034;
+        attribute valveCantDeg : Real = 45.0;
+        // 0.5 mm is an explicit render-shell estimate, not pressure-wall sizing.
+        attribute visualWallThicknessM : Real = .0005;
         attribute bellContourExponent : Real = .55;
         attribute bellAngularSegments : Integer = 32;
         attribute bellAxialSegments : Integer = 12;
@@ -194,8 +214,8 @@ package GriffinPropulsionRequirements {
         // Six seconds includes decay of the pilot's 0.35 s filter and the
         // observed allocator/feed publication delay before comparing directions.
         attribute commandSettlingS : Real = 6.0;
-        // M20/MON3 is sourced from the historical PUG, not confirmed flight
-        // composition for the 2026 vehicle. Shared plume class 3 = hypergolic.
+        // M20/MON3 is the vendor A110 propellant specification. The shared
+        // plume class 3 is a heuristic hypergolic palette, not spectrometry.
         attribute plumeFuelFamily : Real = 3;
         // Packaging estimates relative to the bus top and diagonal faces.
         // 60 mm outward standoff clears the skin; +/-120 mm tangent offsets
@@ -443,6 +463,10 @@ package GriffinPropulsionRequirements {
             verify ges006;
             verify ges007;
         }
+    }
+    verification def Verify_GriffinEngineCommands {
+        subject control : GriffinEngineControlStudy;
+        objective { verify gpp010; }
     }
     requirement def GPP010_SustainedPilotThrust {
         doc /* GPP-010 [runtime integration] after qualified touchdown, one
