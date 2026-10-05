@@ -1860,3 +1860,12 @@ rather than assuming it matches later source changes.
 Editor generation 30 is saved and visually inspected; an assembled Griffin
 preview resolves the revised reference. These checks do not accept reload or
 landing stability. Invalid observer attachment 49805 is excluded.
+
+The straight-up command trial additionally bounds tilt to 10 degrees
+(upright Y >= cos(10deg)) and angular speed to .1 rad/s (~5.73deg/s) throughout
+its five-second burn. These are **chosen integration limits**, intended to
+reject a tipping liftoff even when altitude rises; they are not sourced Griffin
+flight GNC tolerances. Existing lift/climb/extinction checks remain unchanged.
+All ten checks pass on owned 49809 at tick 2049 / 34.15 s. Current landing
+stability passes both fresh runs, but strict fresh and warm replay still fail;
+see the current handover for exact failures and retained source-pinned evidence.

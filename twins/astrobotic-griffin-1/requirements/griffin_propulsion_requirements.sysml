@@ -47,6 +47,11 @@ package GriffinPropulsionRequirements {
         attribute releaseDurationS : Real = 4.0;
         attribute minimumSustainedLiftM : Real = 2.0;
         attribute minimumEndVerticalSpeedMps : Real = 2.0;
+        // Straight-up five-second integration acceptance: <= 10 degrees tilt
+        // (cos(10deg)) and <= .1 rad/s spin (~5.73 deg/s). These are chosen
+        // simulator limits that reject a tipping liftoff; not flight GNC specs.
+        attribute minimumBurnUprightY : Real = .984807753012208;
+        attribute maximumBurnAngularSpeedRadS : Real = .1;
         attribute extinguishedThrustThresholdN : Real = 100.0;
         attribute touchdownTimeoutS : Real = 150.0;
     }
@@ -544,7 +549,9 @@ package GriffinPropulsionRequirements {
         doc /* GPP-010 [runtime integration] after qualified touchdown, one
          * semantic thrust input held for burnDurationS shall lift the vehicle
          * by minimumSustainedLiftM and retain at least minimumEndVerticalSpeedMps
-         * upward velocity at the end of the burn. Releasing the input shall
+         * upward velocity at the end of the burn. Through the straight-up burn,
+         * upright Y shall exceed minimumBurnUprightY and angular speed shall
+         * remain below maximumBurnAngularSpeedRadS. Releasing the input shall
          * reduce delivered chamber thrust below extinguishedThrustThresholdN
          * after releaseDurationS. Fuel must decrease during the burn. The
          * force actuator input envelope shall accept the modeled feed range

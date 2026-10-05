@@ -49,6 +49,31 @@ Strict warm/fresh replay and full mission acceptance remain unresolved.
 Core engine checkpoint `03bdc5018` is published on
 `griffin-pressure-fed-engines`; main stays unmerged.
 
+## Flight attitude and replay follow-up, 2026-10-05
+
+Engine-command observer now also checks every burn tick for <= .1 rad/s
+angular speed and upright Y >= cos(10 degrees). These source-owned simulator
+acceptance limits reject a tipping straight-up liftoff; no flight GNC tolerance
+is implied. Owned 49809 PASS 10, tick 2049 / 34.15 s:
+`terrain/target/griffin-held-flight-attitude-49809.log` and status snapshot.
+49807 was stopped before a verdict to correct an observer field name; exclude
+it. No new alternate command path was introduced.
+
+Latest source-pinned fresh pair: both landing-stability verdicts PASS, with
+361/361 four-foot-contact samples over 60 seconds after touchdown. Replay FAIL:
+5110 vs 5100 total ticks, touchdown ticks 1508 vs 1496 and different final poses.
+Evidence: `terrain/target/griffin-sized-engine-replay/` and its driver log.
+Same-process observer on persistent WorldGrid, owned 49808, FAIL at tick 60
+of its second restart: Y differs 5.741181185e-6 m before contact. Main thrust
+is zero and fuel mass identical at that sample; angular speed differs too.
+The generated allocator source is unchanged across the compared reloads.
+`terrain/target/griffin-sized-engine-warm-reload-49808.log`, status/readiness and
+allocator-source snapshots preserve this failure. Neither test relaxes replay
+limits. Initial target attachment by USD path was rejected (WorldGrid is a
+runtime named entity); the single valid observer used `find("WorldGrid")`.
+Core is published on its topic only; main integration remains prohibited until
+strict reload is repaired and passes.
+
 ## Pressure-fed engine integration checkpoint, 2026-10-05
 
 Requires core engine/library checkpoint `af6e0f7bf` and its pinned Rumoca

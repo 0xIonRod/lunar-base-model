@@ -24,6 +24,8 @@ fn on_start(me, ctx) {
     this.done = false;
     this.samples = [];
     this.peak_thrust = 0.0;
+    this.peak_angular_speed = 0.0;
+    this.minimum_upright_y = 1.0;
     this.lift = 0.0;
     let own="GriffinPropulsionRequirements::GriffinPressureFedStudy::";
     this.pressure_tolerance=griffin_spec::_typed_model_number(own+"pressureObservationTolerancePa");
@@ -70,6 +72,8 @@ fn on_tick(me, ctx) {
     let tick = sim_tick() - this.phase_tick;
     if this.phase == "burn" {
         this.peak_thrust = max(this.peak_thrust, sample.engine_thrust_n);
+        this.peak_angular_speed = max(this.peak_angular_speed, sample.angular_speed);
+        this.minimum_upright_y = min(this.minimum_upright_y, sample.upright_axis_y);
         this.lift = max(this.lift, sample.position[1] - this.rest_y);
         // Pressure closes with useful reacting flow. Tank pressure imbalance
         // and physical valve saturation can reduce the mixture efficiency.
@@ -103,6 +107,10 @@ fn on_tick(me, ctx) {
         t_true(this.end_vertical_speed > _trial_number("minimumEndVerticalSpeedMps"),
             "held thrust ended without sustained climb: vertical speed=" + this.end_vertical_speed),
         t_true(this.fuel_after < this.fuel_before, "burn did not consume propellant"),
+        t_true(this.peak_angular_speed <= _trial_number("maximumBurnAngularSpeedRadS"),
+            "straight-up burn spun too fast: " + this.peak_angular_speed),
+        t_true(this.minimum_upright_y >= _trial_number("minimumBurnUprightY"),
+            "straight-up burn exceeded attitude envelope: upright Y=" + this.minimum_upright_y),
         t_true(sample.engine_thrust_n < _trial_number("extinguishedThrustThresholdN"), "release did not extinguish engine thrust"),
         t_true(this.cold_pressure!=() && this.cold_pressure<this.pressure_tolerance,
             "cold chamber retained liquid-feed pressure"),
