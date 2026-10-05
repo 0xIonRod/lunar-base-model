@@ -55,8 +55,36 @@ that frozen artifact, not a fresh build of the current core checkout.
 After the pair, only the separate static stow observer gained fail-closed
 cardinality/path guards and clearance metrics; its rerun passed 230 checks
 (`terrain/target/griffin-nested-stow-final.log`). Physical/guidance sources
-were unchanged. Full unfolding sweep, retained GUI reload, mission traversal
-and uncontended performance still require separate acceptance.
+were unchanged.
+
+Additional runtime acceptance, 2026-10-06 local time (2026-10-05 UTC): the
+nested assembly passed all ten production held-engine-command checks on the
+headless fixture. A single five-second command sustained climb; after the
+three-second release window chamber pressure was 25.043 Pa and thrust 0.364 N.
+Evidence: `terrain/target/griffin-nested-engine-commands.log`.
+
+Owned High rendered API 49844 passed all 16 surface mission gates after the
+shared U/F request functions: middle, toe and root hinges commanded and settled
+in order; the rover drove down the ramp onto four native DEM contacts and
+completed the survey route. No pose teleport was used. The inspected captures
+`griffin-nested-unfold-close-49844.png` and
+`griffin-nested-egress-array-side-49844.png` are under `terrain/target/`.
+Visible pads remained on terrain and the skirt contained the main nozzles.
+The final lander observation had four-pad contact, upright Y 0.995806 and
+angular speed 0.000434 rad/s. The route switched to the FLIP HUD. This mission
+pass does not establish minimum clearance at every intermediate motion sample.
+
+Strict rendered retained replay FAILED at relative tick 300: main thrust was
+11574.437294925785 N versus 11574.436325920178 N (difference about 0.000969 N).
+The saved failure is in `terrain/target/griffin-nested-runtime-49844.log` and
+`/tmp/griffin-nested-rendered-replay-49844.json`. The process reported eight
+physics compute threads, compared with one in the passing fresh-process pair;
+threading is a diagnostic distinction, not an established cause or a workaround.
+Disassembly confirmed the recovered binary's gravity path contains the new
+`pose_in_grid` calls; its old build banner alone does not identify this failure
+as a stale gravity implementation. No limits were relaxed and no core fix is
+claimed. Strict rendered reload, continuous sweep clearance and uncontended
+performance remain open. The owned validation app has exited.
 
 
 **Reviewed:** 2026-09-27

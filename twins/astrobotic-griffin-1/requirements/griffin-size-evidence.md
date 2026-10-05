@@ -57,8 +57,10 @@ Static stow clearance, bus support closure, nominal ramp interfaces and nozzle
 containment have focused gates. The exact nested-bay assembly also passed two
 source-pinned fresh landing runs with identical final metrics and four-pad
 contact in all 361 samples over 60.1333 seconds after touchdown (see handover).
-This does not establish retained GUI reload, the entire unfolding sweep or
-physical rover egress; those require separate acceptance.
+The revised assembly subsequently passed the rendered physical rover egress
+and survey route gates and the held-engine-command trial (see handover). Strict
+rendered retained replay still failed; continuous minimum sweep clearance and
+uncontended performance remain separate acceptance obligations.
 
 ## Evidence and configuration boundaries
 
@@ -85,7 +87,7 @@ physical rover egress; those require separate acceptance.
 | Griffin body plan span | 5.40 m | 3.60 m | Estimate: 80% of the historical 4.5 m overall envelope reserves 0.45 m per side for leg/foot extension. Plausible range 3.2–4.0 m; low confidence. |
 | Body belt and frame-member height | 2.00 m; first pass 1.40 m | 0.72 m | User-selected ESA face ratio ≈3:1; broad octagon face = 0.585786 × 3.60 = 2.109 m; 2.109 / 3 = 0.703 m, rounded to 0.72 m. Approximate range 0.60–0.84 m; low-confidence presentation estimate. The earlier 1.40 m entry was stale and did not match the authored geometry. |
 | Payload surface above nominal terrain | 5.72 m; earlier study 2.52 m | 2.56 m | .44 m touchdown datum + 2.12 m walking top. The rejected 3.28 m deck compensated for an exit-side panel. New height keeps the rover in the bay and crossmembers about 14 mm above tank caps. No calibrated photo or flight drawing establishes it. |
-| Footprint across opposed pad edges | 7.24 m | 4.50 m | Diagonal foot stations at X/Z=+/-1.90 m plus 0.35 m pad radii on each side; selected to match the historical envelope approximately. Current footprint unconfirmed. |
+| Axis-aligned footpad envelope in X/Z | 7.24 m | 4.50 m | Stations at X/Z=+/-1.90 m plus 0.35 m pad radii give 4.50 m projected width. Opposed diagonal pad edges span about 6.074 m (2 × sqrt(2) × 1.90 + 0.70); 4.50 m is not that diagonal diameter. This is an estimated square-plan fit to the historical envelope, not a current footprint measurement. |
 | Payload adapter | 4.40 × 3.20 m | 3.20 × 3.20 m | Estimated octagonal footprint fitting inside the bus and covering the reconstructed FLIP wheels after clipping the corners. 80 mm stock is an explicit silhouette estimate; center Y2.08 gives the Y2.12 contact top below the tall arrays. |
 | FLIP body | 4.40 × 2.76 m lower frame | 2.116 × 1.476 m | Promote the estimated CAD plan dimensions with an explicit axis mapping. Allow approximately 20% dimensional uncertainty. The 0.12 m lower-frame height is a visualization/collision proxy; equipment box height 0.396 m comes from CAD. |
 | FLIP wheel envelope | legacy inconsistent envelope | 2.28 m across track; 2.60 m along travel | Derived from 2.0 m track + 0.28 m tire width and 1.7 m wheelbase + two 0.45 m radii. Wheel ribs, deformation and suspension travel excluded. |
