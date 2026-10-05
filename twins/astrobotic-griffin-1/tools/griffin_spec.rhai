@@ -969,6 +969,16 @@ fn ramp_guide_stations() {
      #{name:"CenterRailPort",side:"PortCenter",pin:pins[2],z:inner},
      #{name:"CenterRailStarboard",side:"StarboardCenter",pin:pins[3],z:-inner}]
 }
+// The root guide rises from track level, clearing the horizontal-deck
+// breakover. Middle/toe guides retain the full-height fold datum.
+fn ramp_guide_center_y_m(section_index, x_m) {
+    let full=_sysml_attribute("rampRailCenterYM");
+    if section_index!=0 {return full;}
+    let entry=_sysml_attribute("rampSurfaceCenterYM")
+        +_sysml_attribute("rampSurfaceThicknessM")/2.0
+        +_sysml_attribute("rampRailHeightM")/2.0;
+    entry+(full-entry)*x_m/ramp_section_length_m()
+}
 fn ramp_transition_joint_names() { _sysml_enum_names("transitionJoints") }
 fn ramp_tread_count_per_section() { _sysml_integer("assemblyTreadCountPerSection") }
 fn ramp_side_post_count_per_section_per_side() { _sysml_integer("assemblySidePostCountPerSectionPerSide") }

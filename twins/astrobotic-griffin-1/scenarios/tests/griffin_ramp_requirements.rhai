@@ -600,12 +600,8 @@ fn on_tick(me, ctx) {
 
             let walking_surface_top_y = _source_number(source, "rampSurfaceCenterYM")
                 + _source_number(source, "rampSurfaceThicknessM") / 2.0;
-            let rail_top_y = _source_number(source, "rampRailCenterYM")
-                + _source_number(source, "rampRailHeightM") / 2.0;
             let post_bottom_y = walking_surface_top_y
                 - _source_number(source, "assemblySidePostEmbeddedDepthM");
-            let post_height = rail_top_y - post_bottom_y;
-            let post_center_y = (rail_top_y + post_bottom_y) / 2.0;
             for post_side in [
                 #{name: "Port", z: _source_number(source, "rampRailOffsetZM")},
                 #{name: "Starboard", z: -_source_number(source, "rampRailOffsetZM")},
@@ -613,6 +609,12 @@ fn on_tick(me, ctx) {
                 for post_index in 0.._source_number(source, "assemblySidePostCountPerSectionPerSide").to_int() {
                     let post_path = section + "/SidePost" + post_side.name
                         + (post_index + 1).to_string();
+                    let post_x=_source_number(source,"assemblySidePostFirstCenterXM")
+                        +_source_number(source,"assemblySidePostPitchM")*post_index;
+                    let rail_top_y=griffin_spec::ramp_guide_center_y_m(index,post_x)
+                        +_source_number(source,"rampRailHeightM")/2.0;
+                    let post_height=rail_top_y-post_bottom_y;
+                    let post_center_y=(rail_top_y+post_bottom_y)/2.0;
                     checks.push(#{id: "GRR-009-" + side + "-" + index.to_string() + "-" + post_side.name + post_index.to_string(),
                         component: "ramp_support", requirement: "grr009", verification: VERIFICATION,
                         kind: "extent_component", path: post_path, index: 1, multiplier: 1.0,

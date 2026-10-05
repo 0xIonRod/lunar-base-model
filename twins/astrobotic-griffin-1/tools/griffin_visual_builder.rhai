@@ -4726,14 +4726,19 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
 
         // A single rounded strip remains the guard collider. Reuse the
         // lug profile with a quarter-turn; no overlapping visual proxy.
+        let entry_y=griffin_spec::ramp_guide_center_y_m(section_index,0.0);
+        let exit_y=griffin_spec::ramp_guide_center_y_m(section_index,section_length);
+        let rise=exit_y-entry_y;
+        let guide_length=(section_length*section_length+rise*rise).sqrt();
+        let guide_angle=(rise/section_length).atan()*180.0/3.141592653589793;
         let upper=_ramp_round_plate_visual_ops(doc,edit_target,section_path,
-            guide.name,rail_height,rail_width,-section_length/2.0,
-            section_length/2.0,guide.z,structure_color);
+            guide.name,rail_height,rail_width,-guide_length/2.0,
+            guide_length/2.0,guide.z,structure_color);
         if !upper.ok {return upper;}
         for op in upper.ops {ops.push(op);}
         let upper_path=section_path+"/"+guide.name;
         let upper_place=assembly_builder::place_plan(edit_target,upper_path,
-            [section_length/2.0,rail_y,guide.z],[0.0,0.0,-90.0],[1.0,1.0,1.0]);
+            [section_length/2.0,(entry_y+exit_y)/2.0,guide.z],[0.0,0.0,-90.0+guide_angle],[1.0,1.0,1.0]);
         if !upper_place.ok {return upper_place;}
         for op in upper_place.ops {ops.push(op);}
         ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:upper_path,
@@ -4758,10 +4763,12 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         for index in 0..post_count {
             let post_path = section_path + "/SidePost" + post_side.name
                 + (index + 1).to_string();
+            let post_x=post_first_x+post_pitch*index;
+            let top_y=griffin_spec::ramp_guide_center_y_m(section_index,post_x)+rail_height/2.0;
             let placement = _component_cube_visual_ops(doc,edit_target,section_path,
                 "SidePost"+post_side.name+(index+1).to_string(),
-                [post_first_x + post_pitch * index, post_y, post_side.z],
-                (), [post_width, post_height, post_depth],structure_color);
+                [post_x,(top_y+post_bottom_y)/2.0,post_side.z],
+                (), [post_width,top_y-post_bottom_y,post_depth],structure_color);
             if !placement.ok { return placement; }
             for op in placement.ops { ops.push(op); }
         }
@@ -4778,8 +4785,8 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             let x0 = bay_pitch * brace_index;
             let x1 = bay_pitch * (brace_index + 1);
             let start_low = brace_index % 2 == 0;
-            let y0 = if start_low { truss_lower_chord_y } else { rail_y };
-            let y1 = if start_low { rail_y } else { truss_lower_chord_y };
+            let y0 = if start_low { truss_lower_chord_y } else { griffin_spec::ramp_guide_center_y_m(section_index,x0) };
+            let y1 = if start_low { griffin_spec::ramp_guide_center_y_m(section_index,x1) } else { truss_lower_chord_y };
             let dx = x1 - x0;
             let dy = y1 - y0;
             let brace_length = (dx * dx + dy * dy).sqrt();

@@ -24,12 +24,45 @@ use the same readiness boundary. The root-ramp/fixed-transition mating pair
 alone excludes proxy overlap contact; rover and terrain collisions remain
 enabled. These results are same-host evidence, not a cross-platform promise.
 
-Full mission acceptance remains open: ramp deployment and adapter release
-complete, but FLIP stalls near the first approach waypoint. Held manual thrust
-reaches about 97 percent of nominal thrust in 1.42 simulation seconds and
-sustains ascent; the late-mission trial tips while the detached rover remains
-off-center on the deck. Empty-deck reflight and uncontended performance still
-need acceptance. Do not equate the replay pass with complete mission readiness.
+Egress checkpoint: native support casts now follow the mounted local strut
+axis without wheel-spin rotation (core `51d7725af`, published and integrated
+locally). Root-section guide entries rise from track level rather than placing
+a full-height cross-member across the chassis breakover. Their measured guard
+contact and explicit estimated profile are recorded in GRR-017 and the size
+evidence document. Owned 49820 physically reaches the approach, ramp exit and
+both survey gates; all four exit wheel casts hit the DEM within 0.5 mm of the
+terrain sampler. Owned 49822 also reaches Base at tick 9408 / 156.8 simulation seconds.
+The Modelica arrival taper lies inside the accepted arrival circle; the shared
+Ackermann controller now supports forward/reverse recovery.
+
+The route uses one landed port-ramp horizontal frame, frozen when egress
+begins. Survey points are through-gates with a one-wheelbase guidance lead;
+Base is a stop. Numeric source radii are unchanged. Static marker presentation
+still needs to follow the same frozen frame.
+
+Owned headful 49821 exposed a separate source mismatch: workspace restore
+retained older dirty Griffin, FLIP chassis and bell buffers. Fresh mount used
+the current file, but reload consumed the old referenced-document overlay,
+including obsolete pumps and a 0.12 m nozzle throat. Those buffers were
+preserved as recovered untitled documents and a workspace snapshot backup;
+the file-backed documents now contain the current saved sources. Core reload
+must republish current persistent dependency overlays before asset reload;
+that fix is core `cdaf079d7`; its focused test and production build pass.
+Core `cea9295b5` contains the accepted final-arrival controller and both are
+integrated into local core main. Headful source/reload acceptance remains open. This trial does not supersede the
+strict same-source replay evidence above.
+
+Releasing FLIP while ramps were still moving also failed the approach; the
+candidate release now commands the ordinary wheel parking brake before native
+adapter removal. The previously verified unattended unfold-then-release route
+and this early manual release are separate acceptance cases. Owned 49822's empty-deck, deployed-ramp sustained pilot burn passes all ten
+engine-command checks, including lift, continuing climb, angular envelope,
+consumption and extinction. The first full-route verdict had two missing
+landing-evidence checks: the preflight assigned a copied Rhai map. The caller
+now retains the returned evidence. Final reporting now emits bounded milestone
+fields rather than the task tree's function values. A warm full-route verdict
+is running. Interactive early release, headful reload and uncontended
+performance still need acceptance.
 
 
 ## Geometry-derived main-engine sizing, 2026-10-05

@@ -100,6 +100,7 @@ fn on_start(me, ctx) {
     this.waypoint_1_reached = false;
     this.waypoint_2_reached = false;
     this.base_site_reached = false;
+    this.surface_route_frame = ();
     this.mission_ready = true;
     this.phase_timeout = false;
     this.ramp_timeout = false;
@@ -185,6 +186,10 @@ fn on_event(me, evt, ctx) {
     // arrival predicate used by navigation.  Keep accepting the generic
     // waypoint sensor events below for interactive/editor runs that use the
     // authored marker triggers instead of the deterministic route task.
+    if evt.name == "griffin_ramp_approach_reached" {
+        this.ramp_approach_reached = true;
+        return;
+    }
     if evt.name == "griffin_ramp_exit_reached" {
         this.ramp_exit_reached = true;
         this.egress_terrain_evidence = griffin_surface_ops::egress_terrain_runtime_evidence(rover);
@@ -243,11 +248,10 @@ fn on_event(me, evt, ctx) {
     }
 }
 
-fn landing_setup_preflight(state) {
+fn landing_setup_preflight() {
     let setup = griffin_requirements::landing_setup_geometry_check(
         (), "/Griffin1SurfaceOps/LandingTarget",
         "/Griffin1SurfaceOps/Lander");
-    state.landing_setup_evidence = setup;
     if setup.ok != true {
         let detail = setup.error;
         print("[griffin] landing geometry preflight evidence: " + setup);
@@ -257,11 +261,11 @@ fn landing_setup_preflight(state) {
         print("[griffin] landing geometry preflight failed: " + detail);
         notify_kind("Griffin landing target or DEM datum does not match the SysML geometry.", "error");
         emit("griffin_surface_ops_geometry_failed");
-        return false;
+        return setup;
     }
     print("[griffin] landing geometry and four-leg spring rest-pose preflight PASS (target Y="
         + setup.landing_target.actual_y + " m, DEM Y=" + setup.landing_surface.measured_surface_y + " m)");
-    true
+    setup
 }
 
 fn begin_descent(state) {
@@ -339,6 +343,17 @@ fn release_rover(state, already_requested) {
         // requested detach so the mission never treats a command acknowledgement
         // as proof of topology removal.
         return true;
+    }
+
+    // F may precede completed ramp deployment. Hold the normal wheel brake
+    // before removing the adapter; navigation releases it after its settle
+    // gate. A later manual brake intent remains ordinary operator authority.
+    let rover = find_path(ROVER);
+    let brake = cmd("SetPorts", #{target: rover,
+        writes: [["throttle", 0.0], ["steer", 0.0], ["brake", 1.0]]});
+    if brake == () || brake.ok != true {
+        notify_kind("FLIP release brake was rejected.", "error");
+        return false;
     }
 
     // This is an execution-time release request. The generic physics bridge
@@ -657,7 +672,8 @@ fn surface_mission_task() {
     seq([
         once(|m| {
             this.route_preflight = route_preflight;
-            if !landing_setup_preflight(this) {
+            this.landing_setup_evidence = landing_setup_preflight();
+            if this.landing_setup_evidence.ok != true {
                 this.mission_ready = false;
                 this.phase_timeout = true;
                 this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "landing-setup-preflight");

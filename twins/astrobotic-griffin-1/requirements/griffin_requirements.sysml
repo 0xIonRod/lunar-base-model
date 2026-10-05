@@ -75,8 +75,21 @@ package Griffin1Requirements {
         // The estimated deployed ramp is now 5.397 m, rooted near X=1.90 m;
         // at 27.83 degrees its tip is approximately X=6.67 m. Exit X=8.50
         // reserves the 1.30 m rover half-envelope and 0.30 m arrival radius.
-        // Survey/base points form a shallow turn rather than ten closely
-        // spaced intermediate targets. These are simulation mission choices,
+        // All five datums share the port ramp's horizontal frame, captured
+        // once at the first egress command after landing. Survey/base points
+        // continue away from the lander and form a shallow turn rather than
+        // reversing from a yawed exit toward static scene-frame points.
+        // Rationale/evidence: owned 49820 reached the terrain exit at tick
+        // 8397, then the old world-frame X=13 survey gate drove FLIP back onto
+        // its ramp. These are relative demo gates, not geodetic destinations.
+        // The frame stays fixed if the lander subsequently moves.
+        // Intermediate survey gates use a guidance lead of one authored
+        // wheelbase into the next segment, capped at that segment's length.
+        // Their arrival circles and order remain unchanged; the final base
+        // point remains a stop. Rationale: trial 49820 cleared the ramp and
+        // first survey gate, then stalled 1.239 m from the 1.20 m second
+        // arrival circle while point guidance tried to park and steer there.
+        // This is a replaceable demo route policy, not flight guidance data. These are simulation mission choices,
         // not a published Griffin site plan. Source: user scene-cleanup request
         // and the ramp/FLIP dimensions in griffin-size-evidence.md.
         attribute surfaceRouteMarkerNames : GriffinSurfaceRouteMarkerName[5] =

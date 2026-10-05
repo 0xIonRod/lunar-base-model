@@ -676,7 +676,8 @@ fn surface_route_preflight() {
 }
 
 fn route_leg(path, speed, radius, event) {
-    #{ kind: "drive_to", target: route_marker_target(path),
+    let target = route_marker_target(path);
+    #{ kind: "drive_to", target: target, guidance_target: target,
        speed: speed, radius: radius, event: event }
 }
 
@@ -716,6 +717,21 @@ fn surface_route() {
         children.push(route_leg("/Griffin1SurfaceOps/" + names[i],
             speeds[i], radii[i], events[i]));
     }
+    // The approach is a milestone on the straight egress lane. Aim at its
+    // exit while measuring arrival at the approach, so an Ackermann chassis
+    // does not try to turn in place toward a nearby deck-edge point.
+    children[0].guidance_target = children[1].target;
+    // Survey gates are through-points on the authored route, not parking
+    // targets. A one-wheelbase lead into the following segment keeps the
+    // Ackermann controller moving through each arrival circle.
+    let stations=griffin_spec::rover_wheel_station_x();
+    let lead=(stations[0]-stations[1]).abs();
+    for i in 2..children.len()-1 {
+        let segment=children[i+1].target-children[i].target;
+        let distance=vlen(segment);
+        children[i].guidance_target=children[i].target
+            +segment*(min(lead,distance)/distance);
+    }
     #{kind: "sequence", children: children, preflight: preflight}
 }
 
@@ -739,7 +755,7 @@ fn engage_route_subject() {
     #{ ok: true, rover: rover }
 }
 
-fn drive_route_point(rover, target, speed, radius) {
+fn drive_route_point(rover, target, guidance_target, speed, radius) {
     let command = nav_command(rover, target, speed, radius);
     if command == () {
         brake(rover);
@@ -762,7 +778,7 @@ fn drive_route_point(rover, target, speed, radius) {
     // mission boundary and write the authored Modelica input ports directly;
     // this avoids the older array adapter's null-valued optional-parameter
     // path while keeping the target, speed, and radius numeric on the wire.
-    let waypoint = vec3_array(target);
+    let waypoint = vec3_array(guidance_target);
     if waypoint == () || waypoint.len() != 3 {
         return #{ok: false, arrived: false,
             error: "native route target could not be lowered to an array"};
@@ -1355,32 +1371,42 @@ fn report_route_stall(rover, target, pose, distance, command_updates) {
 // bounded string/value budget.  Keeping the closure frame here makes each
 // leaf capture only the rover and this leg's datum, while `surface_route()`
 // remains the single source of route geometry.
-// Resolve the two egress gates in the landed port-ramp frame. Survey gates
-// retain their scene frame. Distances stay source-owned; no pose is imposed.
-fn _landed_egress_target(target, event) {
-    if event!="griffin_ramp_approach_reached" && event!="griffin_ramp_exit_reached" {return target;}
+// Freeze the demo route's horizontal frame at the first egress command.
+// All gates share that frame, so a yawed touchdown cannot route FLIP back
+// through the lander after clearing its port ramp.
+fn landed_surface_route_frame() {
     let root=find_path("/Griffin1SurfaceOps/Lander/EgressRampPort");
     let position=world_pos3(root);
     let rotation=world_rotation_quat(root);
     let mount=griffin_spec::_sysml_attribute("physicalRampPortMountX");
-    if position==() || rotation==() || mount==() {throw("landed egress frame unavailable");}
+    if position==() || rotation==() || mount==() {throw("landed route frame unavailable");}
     let axis=qrot(rotation,vec3(1.0,0.0,0.0));
     let horizontal=vec3(axis.x,0.0,axis.z);
     let length=vlen(horizontal);
     if length<0.001 {throw("landed egress direction is vertical");}
-    let distance=target.x-mount;
-    let point=position+horizontal*(distance/length);
+    let forward=horizontal*(1.0/length);
+    #{origin:position-forward*mount,forward:forward,
+      lateral:vec3(-forward.z,0.0,forward.x)}
+}
+fn surface_route_target(target, frame) {
+    let point=frame.origin+frame.forward*target.x+frame.lateral*target.z;
     vec3(point.x,target.y,point.z)
 }
 
 fn _surface_route_leg_task(rover, leg, stall_timeout) {
     let target = leg.target;
+    let guidance_target = leg.guidance_target;
     let target_speed = leg.speed;
     let arrival_radius = leg.radius;
     let event = leg.event;
     seq([
         once(|m| {
-            this.route_target = griffin_surface_ops::_landed_egress_target(target,event);
+            if event=="griffin_ramp_approach_reached" {
+                this.surface_route_frame=griffin_surface_ops::landed_surface_route_frame();
+            }
+            if this.surface_route_frame==() {throw("surface route frame was not established by egress");}
+            this.route_target = griffin_surface_ops::surface_route_target(target,this.surface_route_frame);
+            this.route_guidance_target = griffin_surface_ops::surface_route_target(guidance_target,this.surface_route_frame);
             this.route_last_distance = ();
             this.route_progress_time = elapsed_seconds();
             this.route_next_command_at = ();
@@ -1401,7 +1427,8 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
             }
             this.route_next_command_at = now + 1.0 / route_command_rate_hz();
             this.route_command_updates += 1;
-            let command = griffin_surface_ops::drive_route_point(rover, this.route_target, target_speed, arrival_radius);
+            let command = griffin_surface_ops::drive_route_point(rover, this.route_target,
+                this.route_guidance_target, target_speed, arrival_radius);
             if command == () || command.ok != true {
                 if this.route_control_error != true {
                     this.route_control_error = true;

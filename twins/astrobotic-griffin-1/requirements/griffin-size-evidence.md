@@ -1869,3 +1869,28 @@ flight GNC tolerances. Existing lift/climb/extinction checks remain unchanged.
 All ten checks pass on owned 49809 at tick 2049 / 34.15 s. Current landing
 stability passes both fresh runs, but strict fresh and warm replay still fail;
 see the current handover for exact failures and retained source-pinned evidence.
+
+### Ramp breakover and route acceptance, 2026-10-05
+
+The root guard now rises from a centre one half-strip height above the track
+surface to the existing full-height downstream fold datum. Posts and web
+braces follow that line. Its shape is a low-confidence interface estimate;
+public Astrobotic/ESA images establish folding tracks, not the entrance ICD.
+An owned production contact sample on API 49819 placed the old guard contact
+at root-local `(0.00845, 0.17307, 0.70984)` m with 59.96 N s opposing impulse.
+Corrected owned 49820 trials physically crossed the ramp; all four exit wheel
+hits matched the retained DEM within 0.5 mm. Contact remains enabled.
+The 2026 hardware release does not show integrated FLIP or deployed ramps:
+https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/ .
+
+All five demo route datums now use one horizontal port-ramp frame captured at
+first egress. They are relative simulation gates, not geodetic flight goals.
+Intermediate survey guidance leads one source wheelbase (1.70 m) into the
+following segment, capped by its length; arrival radii remain unchanged.
+The final base point remains a stop. The shared Modelica Ackermann arrival
+slowdown band lies inside the arrival circle: tapering demand in the former
+50 mm outside band balanced the local slope before arrival (owned 49820,
+final target distance about 1.235 m versus the 1.20 m radius). The 50 mm
+smoothing width and 35 percent crawl fraction are controller-study choices,
+not supplier values. Owner: `LunCo.Mobility.RoverAutopilotGuidance`.
+Full mission acceptance of the final controller revision is pending.
