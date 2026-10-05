@@ -4027,24 +4027,18 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:paths[0],
         name:"purpose",type_name:"token",value:"\"render\""}});
     let adapter_path = root + "/" + adapter_name;
-    let adapter = _component_query(doc, adapter_path);
-    if query_ok(adapter) && adapter.type_name != "Cube" {
-        return plan_error(adapter_path + ": expected Cube, got " + adapter.type_name);
-    }
-    if !query_ok(adapter) {
-        let adapter_plan = assembly_builder::cube_shape_plan(edit_target, root, adapter_name,
-            1.0, [adapter_width, adapter_height, adapter_depth], false);
-        if !adapter_plan.ok { return adapter_plan; }
-        for op in adapter_plan.ops { ops.push(op); }
-        ops.push(#{SetTranslate: #{edit_target: edit_target, path: adapter_path,
-            value: [0.0, adapter_center_y, 0.0]}});
-        ops.push(#{SetAttribute: #{edit_target: edit_target, path: adapter_path,
-            name: "purpose", type_name: "token", value: "\"render\""}});
-    }
-    let adapter_placement = assembly_builder::place_plan(edit_target, adapter_path,
-        [0.0, adapter_center_y, 0.0], (), [adapter_width, adapter_height, adapter_depth]);
-    if !adapter_placement.ok { return adapter_placement; }
-    for op in adapter_placement.ops { ops.push(op); }
+    let adapter_geometry=_outer_body_prism_geometry(adapter_width,adapter_depth,adapter_height);
+    if !adapter_geometry.ok {return adapter_geometry;}
+    let adapter=_component_mesh_visual_ops(doc,edit_target,root,adapter_name,
+        adapter_geometry,[0.55,0.58,0.62]);
+    if !adapter.ok {return adapter;}
+    for op in adapter.ops {ops.push(op);}
+    ops.push(#{SetTranslate:#{edit_target:edit_target,path:adapter_path,
+        value:[0.0,adapter_center_y,0.0]}});
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:adapter_path,
+        name:"purpose",type_name:"token",value:"\"render\""}});
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:adapter_path,
+        name:"physics:collisionEnabled",type_name:"bool",value:"false"}});
     // Add the visible beveled octagonal shroud as its own replaceable visual part.
     // It is open at both ends so the bells remain readable, and it is
     // double-sided because a study-level thin shell must not disappear when
@@ -4087,7 +4081,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         ops.push(#{AddPrim:#{edit_target:edit_target,path:blanket,type_name:"Material"}});
     }
     ops.push(#{SetReferenceArcs:#{edit_target:edit_target,path:blanket,list_op:"Explicit",references:[
-        #{asset_path:"twin://components/lander/griffin_bus_visual.usda",
+        #{asset_path:"twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda",
           prim_path:"/GriffinBus/Looks/ExteriorPanels"}]}});
     ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:shell_path,
         schemas:["PhysicsCollisionAPI","MaterialBindingAPI"]}});

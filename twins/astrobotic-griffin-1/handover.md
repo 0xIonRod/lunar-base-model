@@ -13,6 +13,10 @@ the central tank/mast space open. All seven main nozzles fit inside the deep
 open skirt with a 20 mm recessed exit. Twelve existing A110 force owners now
 sit in four exposed upper-corner groups; no extra thruster proxies were added.
 Sources and explicit dimensional guesses are in SysML and the size evidence.
+The square engine adapter has also been replaced by the shared octagonal
+profile; the existing containment observation now includes its vertices. An
+initial shared-material reference omitted the Twin identity and was unresolved;
+that authored path was corrected before restarting runtime acceptance.
 
 Focused saved-source gates pass: flight stow 230, bus 356, nominal ramp 1281,
 propulsion 94 checks. The RCS wrench check retains all six pure-axis groups.

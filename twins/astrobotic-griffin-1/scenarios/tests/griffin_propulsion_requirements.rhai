@@ -171,7 +171,7 @@ fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observation
     if snapshot.ok!=true || batch.records.len()!=paths.len() {return #{available:false,snapshot:snapshot};}
     let shell=batch.records[0];let plate=batch.records[1];let mount=batch.records[2];
     if shell.attrs.points==() || shell.attrs.points.len()!=16
-        || plate.attrs["xformOp:translate"]==() || plate.attrs["xformOp:scale"]==()
+        || plate.attrs["xformOp:translate"]==() || plate.attrs.points==() || plate.attrs.points.len()!=16
         || mount.attrs["xformOp:translate"]==() {return #{available:false,snapshot:snapshot};}
     let lower=1.0e30;
     for p in shell.attrs.points {if p[1]<lower {lower=p[1];}}
@@ -179,7 +179,9 @@ fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observation
     for p in shell.attrs.points {if (p[1]-lower).abs()<=tolerance {contour.push(vec3_from(p));}}
     if contour.len()!=8 {return #{available:false,snapshot:snapshot};}
     let mount_y=mount.attrs["xformOp:translate"][1];
-    let plate_bottom=mount_y+plate.attrs["xformOp:translate"][1]-plate.attrs["xformOp:scale"][1]/2.0;
+    let plate_min=1.0e30;
+    for p in plate.attrs.points {if p[1]<plate_min {plate_min=p[1];}}
+    let plate_bottom=mount_y+plate.attrs["xformOp:translate"][1]+plate_min;
     let rail=batch.records[3];
     let topology_record=query("QueryUsdPrim",#{path:skirt_root+"/"+rail_name,
         attrs:["faceVertexCounts","faceVertexIndices"]});
@@ -222,6 +224,12 @@ fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observation
         let y=if i<8 {center_y+height/2.0} else {center_y+height/2.0-shell_depth};
         let p=profile[i%8];let target=[p.x*r,y,p.y*r];let actual=shell.attrs.points[i];
         for axis in 0..3 {let delta=(actual[axis]-target[axis]).abs();if delta>shell_error {shell_error=delta;}}
+        let gap=griffin_geometry::convex_polygon_clearance_xz(vec3_from(actual),body_contour);
+        if gap==() {return #{available:false,snapshot:snapshot};}
+        if -gap>overhang {overhang=-gap;}
+    }
+    // The adapter must also fit the bus/skirt plan, including its corners.
+    for actual in plate.attrs.points {
         let gap=griffin_geometry::convex_polygon_clearance_xz(vec3_from(actual),body_contour);
         if gap==() {return #{available:false,snapshot:snapshot};}
         if -gap>overhang {overhang=-gap;}
@@ -768,10 +776,10 @@ fn on_tick(me, ctx) {
         ]);
         checks.push(sysml_requirements::required_constraint_check("GES-004-skirt-fit","engine_skirt","ges004",VERIFICATION,"GriffinPropulsionRequirements::GESC004_SkirtAndBellFit",fit_bindings,"typed",0.0));
 
-        checks.push(sysml_requirement_checks::exists("GES-007-adapter-plate", "engine_skirt", "ges007", VERIFICATION, adapter_path, "Cube"));
-        checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-width", "engine_skirt", "ges007", VERIFICATION, adapter_path, 0, skirt("adapterPlateWidthM"), 1.0, geometry_tolerance));
-        checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-height", "engine_skirt", "ges007", VERIFICATION, adapter_path, 1, skirt("adapterPlateHeightM"), 1.0, geometry_tolerance));
-        checks.push(sysml_requirement_checks::extent_component("GES-007-adapter-depth", "engine_skirt", "ges007", VERIFICATION, adapter_path, 2, skirt("adapterPlateDepthM"), 1.0, geometry_tolerance));
+        checks.push(sysml_requirement_checks::exists("GES-007-adapter-plate", "engine_skirt", "ges007", VERIFICATION, adapter_path, "Mesh"));
+        checks.push(sysml_requirement_checks::bounds_component("GES-007-adapter-width", "engine_skirt", "ges007", VERIFICATION, adapter_path, 0, skirt("adapterPlateWidthM"), 2.0, geometry_tolerance));
+        checks.push(sysml_requirement_checks::bounds_component("GES-007-adapter-height", "engine_skirt", "ges007", VERIFICATION, adapter_path, 1, skirt("adapterPlateHeightM"), 2.0, geometry_tolerance));
+        checks.push(sysml_requirement_checks::bounds_component("GES-007-adapter-depth", "engine_skirt", "ges007", VERIFICATION, adapter_path, 2, skirt("adapterPlateDepthM"), 2.0, geometry_tolerance));
         checks.push(sysml_requirement_checks::attribute_equals("GES-005-adapter-purpose", "engine_skirt", "ges005", VERIFICATION, adapter_path, "purpose", "render"));
         checks.push(sysml_requirement_checks::attribute_equals("GES-005-adapter-collision", "engine_skirt", "ges005", VERIFICATION, adapter_path, "physics:collisionEnabled", false));
         checks.push(sysml_requirement_checks::attribute_equals("GES-005-shell-purpose", "engine_skirt", "ges005", VERIFICATION, skirt_shell, "purpose", "render"));

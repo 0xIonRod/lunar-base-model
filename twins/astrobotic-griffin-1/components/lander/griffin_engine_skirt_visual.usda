@@ -25,18 +25,6 @@ def Xform "World"
             bool physics:collisionEnabled = false
             custom rel material:binding = </World/EngineSkirt/Looks/BayBlanket>
         }
-        def Cube "EngineAdapterPlate" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
-        )
-        {
-            custom double3 xformOp:translate = (0.0, 0.48000000000000004, 0.0)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            custom double3 xformOp:scale = (2.84, 0.12, 2.84)
-            double size = 1.0
-            bool physics:collisionEnabled = false
-            uniform token purpose = "render"
-            color3f[] primvars:displayColor = [(0.18000000715255737, 0.20000000298023224, 0.23000000417232513)]
-        }
         def Mesh "PerimeterRail" (
             prepend apiSchemas = "PhysicsCollisionAPI"
         )
@@ -52,10 +40,25 @@ def Xform "World"
         def Scope "Looks"
         {
             def Material "BayBlanket" (
-                references = @twin://components/lander/griffin_bus_visual.usda@</GriffinBus/Looks/ExteriorPanels>
+                references = @twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda@</GriffinBus/Looks/ExteriorPanels>
             )
             {
             }
+        }
+        def Mesh "EngineAdapterPlate" (
+            prepend apiSchemas = "PhysicsCollisionAPI"
+        )
+        {
+            point3f[] points = [(-0.8318167328834534, -0.05999999865889549, 1.4199999570846558), (0.8318167328834534, -0.05999999865889549, 1.4199999570846558), (1.4199999570846558, -0.05999999865889549, 0.8318167328834534), (1.4199999570846558, -0.05999999865889549, -0.8318167328834534), (0.8318167328834534, -0.05999999865889549, -1.4199999570846558), (-0.8318167328834534, -0.05999999865889549, -1.4199999570846558), (-1.4199999570846558, -0.05999999865889549, -0.8318167328834534), (-1.4199999570846558, -0.05999999865889549, 0.8318167328834534), (-0.8318167328834534, 0.05999999865889549, 1.4199999570846558), (0.8318167328834534, 0.05999999865889549, 1.4199999570846558), (1.4199999570846558, 0.05999999865889549, 0.8318167328834534), (1.4199999570846558, 0.05999999865889549, -0.8318167328834534), (0.8318167328834534, 0.05999999865889549, -1.4199999570846558), (-0.8318167328834534, 0.05999999865889549, -1.4199999570846558), (-1.4199999570846558, 0.05999999865889549, -0.8318167328834534), (-1.4199999570846558, 0.05999999865889549, 0.8318167328834534)]
+            int[] faceVertexCounts = [8, 8, 4, 4, 4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [7, 6, 5, 4, 3, 2, 1, 0, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 9, 8, 1, 2, 10, 9, 2, 3, 11, 10, 3, 4, 12, 11, 4, 5, 13, 12, 5, 6, 14, 13, 6, 7, 15, 14, 7, 0, 8, 15]
+            uniform token subdivisionScheme = "none"
+            uniform token purpose = "render"
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            bool physics:collisionEnabled = false
+            uniform bool doubleSided = false
+            custom double3 xformOp:translate = (0.0, 0.48000000000000004, 0.0)
+            custom token[] xformOpOrder = ["xformOp:translate"]
         }
     }
 }

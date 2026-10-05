@@ -198,6 +198,9 @@ package GriffinPropulsionRequirements {
         attribute railHeightM : Real = 0.08;
         attribute shellName : String = "EngineSkirtShell";
         attribute adapterPlateName : String = "EngineAdapterPlate";
+        // Uncalibrated adapter span retained; corners follow the shared octagon
+        // to avoid protruding through the skirt. PGH/NASA photos show the
+        // wrapped bay, not a supplier plate drawing.
         attribute adapterPlateWidthM : Real = 2.84;
         attribute adapterPlateDepthM : Real = 2.84;
         attribute adapterPlateHeightM : Real = 0.12;
@@ -498,7 +501,7 @@ package GriffinPropulsionRequirements {
         require GESC006_OctagonalProfile {
             in toleranceM = GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GES-006 [geometry] the continuous skirt rail shall match railLengthM across flats, railWidthM normal to each edge, railHeightM and componentLocalCenterYM. Both rail and shell shall follow GriffinVisualConfiguration::outerBodyProfileCoordinates; all of their vertices shall remain inside the bus footprint. The bottom inset tapers the shell; it shall not define the plan-view corner clip. */
+        doc /* GES-006 [geometry] the continuous skirt rail shall match railLengthM across flats, railWidthM normal to each edge, railHeightM and componentLocalCenterYM. Rail, shell and adapter plate shall follow GriffinVisualConfiguration::outerBodyProfileCoordinates; all of their vertices shall remain inside the bus footprint. The former square adapter violated this at its corners. The bottom inset tapers the shell; it shall not define the plan-view corner clip. */
     }
     requirement def GES007_ShellAndAdapterEnvelope {
         doc /* GES-007 [geometry] the tapered shell shall use its typed upper/lower Y limits, and the adapter plate shall match its typed dimensions and declared datum. The plate center derives from the throat upper end and its own thickness, not from the skirt rail plane. */

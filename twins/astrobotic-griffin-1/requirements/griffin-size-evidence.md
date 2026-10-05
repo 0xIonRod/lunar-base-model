@@ -25,7 +25,9 @@ bodies. GBC-011 verifies actual mating faces; it does not calculate strength.
 The seven main bells are contained by an open octagonal skirt. Its lower lip
 is Y0.06; nozzle exits are Y0.08, a chosen 20 mm recess. The 0.80 m shell depth
 is derived from that recess, the nozzle envelope and adapter plane. Radial
-clearance is checked against the actual perimeter. Shared bus foil gives the
+clearance is checked against the actual perimeter. The former square adapter
+plate projected beyond the shell corners; its retained 2.84 m envelope now
+follows the same octagonal profile, and its vertices are checked for containment. Shared bus foil gives the
 photographed silver blanket finish. Heat protection and plume interaction
 are unmodelled. A110 RCS members retain their original force/fuel identities
 on four upper corner platforms; their station height is deck top + 0.20 m.
