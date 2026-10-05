@@ -226,15 +226,15 @@ fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observation
         if gap==() {return #{available:false,snapshot:snapshot};}
         if -gap>overhang {overhang=-gap;}
     }
-    let clearance=1.0e30;let visible=1.0e30;let separation=1.0e30;
+    let clearance=1.0e30;let recess=1.0e30;let separation=1.0e30;
     for i in 0..engine_records.len() {
         let record=engine_records[i];let bell=bell_observations[i];
         let center=vec3_from(record.attrs["xformOp:translate"]);
         let gap=griffin_geometry::convex_polygon_clearance_xz(center,contour);
         if gap==() || !bell.available {return #{available:false,snapshot:snapshot};}
         if gap-bell.radius<clearance {clearance=gap-bell.radius;}
-        let exposed=(mount_y+lower-center.y-bell.lower)/bell.height;
-        if exposed<visible {visible=exposed;}
+        let inset=center.y+bell.lower-(mount_y+lower);
+        if inset<recess {recess=inset;}
         let rail_gap=griffin_geometry::convex_polygon_clearance_xz(center,inner_contour);
         if rail_gap==() {return #{available:false,snapshot:snapshot};}
         rail_gap-=bell.radius;
@@ -246,7 +246,7 @@ fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observation
         let gap=plate_bottom-center.y-throat_upper;
         if gap<separation {separation=gap;}
     }
-    #{available:true,snapshot:snapshot,clearance:clearance,visible:visible,separation:separation,topology:topology,rail_error:rail_error,shell_error:shell_error,overhang:overhang}
+    #{available:true,snapshot:snapshot,clearance:clearance,recess:recess,separation:separation,topology:topology,rail_error:rail_error,shell_error:shell_error,overhang:overhang}
 }
 
 // Whole engine/tank interface: composed bounds include scaling and all named
@@ -362,7 +362,7 @@ fn on_tick(me, ctx) {
     for name in ["componentRootName", "perimeterRailName", "shellName",
         "adapterPlateName", "componentLocalCenterYM", "railLengthM",
         "railWidthM", "railHeightM", "shellDepthM", "adapterPlateWidthM",
-        "adapterPlateHeightM", "adapterPlateDepthM", "adapterPlateCenterYM", "minimumSkirtBellClearanceM", "minimumVisibleBellHeightFraction", "shellBottomInsetM"] {
+        "adapterPlateHeightM", "adapterPlateDepthM", "adapterPlateCenterYM", "minimumSkirtBellClearanceM", "nozzleExitRecessM", "shellBottomInsetM"] {
         selected_attributes.push(skirt(name));
     }
     selected_attributes.push(parent("engineCount"));
@@ -760,10 +760,10 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirements::required_constraint_check("GES-006-octagonal-profile","engine_skirt","ges006",VERIFICATION,"GriffinPropulsionRequirements::GESC006_OctagonalProfile",profile_bindings,"typed",0.0));
         let fit_bindings=_required_constraint_bindings(source_model,"ges004","GESC004_SkirtAndBellFit",[
             ["minimumRadialClearanceM",_usd_observation(fit.snapshot,fit_available,fit.clearance,"skirt/rail contour unavailable")],
-            ["visibleBellHeightFraction",_usd_observation(fit.snapshot,fit_available,fit.visible,"bell exposure unavailable")],
+            ["nozzleExitRecessM",_usd_observation(fit.snapshot,fit_available,fit.recess,"bell exit recess unavailable")],
             ["adapterThroatSeparationM",_usd_observation(fit.snapshot,fit_available,fit.separation,"adapter/throat datums unavailable")],
             ["requiredRadialClearanceM",_source_literal(source_model,skirt("minimumSkirtBellClearanceM"))],
-            ["requiredVisibleBellHeightFraction",_source_literal(source_model,skirt("minimumVisibleBellHeightFraction"))],
+            ["requiredNozzleExitRecessM",_source_literal(source_model,skirt("nozzleExitRecessM"))],
             ["toleranceM",_source_literal(source_model,visual("geometryVerificationToleranceM"))]
         ]);
         checks.push(sysml_requirements::required_constraint_check("GES-004-skirt-fit","engine_skirt","ges004",VERIFICATION,"GriffinPropulsionRequirements::GESC004_SkirtAndBellFit",fit_bindings,"typed",0.0));

@@ -13,12 +13,12 @@ def Xform "World"
     {
         def "EgressRampPort"
         {
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -27.833531945041752)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -37.42458435132686)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         }
         def "EgressRampStarboard"
         {
-            custom double3 xformOp:rotateXYZ = (0.0, 180.0, 27.833531945041752)
+            custom double3 xformOp:rotateXYZ = (0.0, 180.0, 37.42458435132686)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         }
     }

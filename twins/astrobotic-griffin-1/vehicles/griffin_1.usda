@@ -1258,7 +1258,7 @@ def Xform "Griffin1" (
         prepend references = @lunco://vessels/control_profiles.usda@</LanderControls>
     )
     {
-        custom double lunco:cameraFollowHeight = 2.08
+        custom double lunco:cameraFollowHeight = 2.84
     }
     def "Altimeter" (
         prepend references = @lunco://vessels/sensors/altimeter.usda@</Altimeter>
@@ -2474,8 +2474,8 @@ def Xform "Griffin1" (
         )
         {
             double size = 1.0
-            double3 xformOp:translate = (0.0, 2.02, 0.0)
-            double3 xformOp:scale = (1.3, 0.12, 1.3)
+            custom double3 xformOp:translate = (0.0, 2.8, 0.0)
+            custom double3 xformOp:scale = (1.3, 0.08, 1.3)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             color3f[] primvars:displayColor = [(0.6600000262260437, 0.41999998688697815, 0.18000000715255737)]
             bool physics:collisionEnabled = true
@@ -2491,7 +2491,7 @@ def Xform "Griffin1" (
         float physics:mass = 31.66666603088379
         float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)
         custom float lunco:deployment_angle_rad = 0.0
-        custom double3 xformOp:translate = (1.907003563827, 2.066735381886, 0.0)
+        custom double3 xformOp:translate = (1.909115749743, 2.828087690962, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.00000000014621)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double lunco:operational_width_m = 2.5919999999999996
@@ -3463,7 +3463,7 @@ def Xform "Griffin1" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
                 )
                 {
-                    point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.7990840673446655, 0.014999999664723873, -0.28999999165534973), (1.7422646284103394, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.7990840673446655, 0.014999999664723873, 0.28999999165534973), (1.7422646284103394, -0.014999999664723873, 0.28999999165534973)]
+                    point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.799083948135376, 0.014999999664723873, -0.28999999165534973), (1.7598810195922852, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.799083948135376, 0.014999999664723873, 0.28999999165534973), (1.7598810195922852, -0.014999999664723873, 0.28999999165534973)]
                     int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                     int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 2, 6, 7, 1, 5, 6, 2, 0, 3, 7, 4]
                     bool physics:collisionEnabled = true
@@ -3480,7 +3480,7 @@ def Xform "Griffin1" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
                 )
                 {
-                    point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.7990840673446655, 0.014999999664723873, -0.28999999165534973), (1.7422646284103394, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.7990840673446655, 0.014999999664723873, 0.28999999165534973), (1.7422646284103394, -0.014999999664723873, 0.28999999165534973)]
+                    point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.799083948135376, 0.014999999664723873, -0.28999999165534973), (1.7598810195922852, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.799083948135376, 0.014999999664723873, 0.28999999165534973), (1.7598810195922852, -0.014999999664723873, 0.28999999165534973)]
                     int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                     int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 2, 6, 7, 1, 5, 6, 2, 0, 3, 7, 4]
                     bool physics:collisionEnabled = true
@@ -4141,7 +4141,7 @@ def Xform "Griffin1" (
         float physics:mass = 31.66666603088379
         float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)
         custom float lunco:deployment_angle_rad = 0.0
-        custom double3 xformOp:translate = (-1.907003563827, 2.066735381886, 0.0)
+        custom double3 xformOp:translate = (-1.909115749743, 2.828087690962, 0.0)
         custom double3 xformOp:rotateXYZ = (0.0, 180.0, -45.00000000014621)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double lunco:operational_width_m = 2.5919999999999996
@@ -5112,7 +5112,7 @@ def Xform "Griffin1" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
                 )
                 {
-                    point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.7990840673446655, 0.014999999664723873, -0.28999999165534973), (1.7422646284103394, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.7990840673446655, 0.014999999664723873, 0.28999999165534973), (1.7422646284103394, -0.014999999664723873, 0.28999999165534973)]
+                    point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.799083948135376, 0.014999999664723873, -0.28999999165534973), (1.7598810195922852, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.799083948135376, 0.014999999664723873, 0.28999999165534973), (1.7598810195922852, -0.014999999664723873, 0.28999999165534973)]
                     int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                     int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 2, 6, 7, 1, 5, 6, 2, 0, 3, 7, 4]
                     bool physics:collisionEnabled = true
@@ -5129,7 +5129,7 @@ def Xform "Griffin1" (
                     prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
                 )
                 {
-                    point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.7990840673446655, 0.014999999664723873, -0.28999999165534973), (1.7422646284103394, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.7990840673446655, 0.014999999664723873, 0.28999999165534973), (1.7422646284103394, -0.014999999664723873, 0.28999999165534973)]
+                    point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.799083948135376, 0.014999999664723873, -0.28999999165534973), (1.7598810195922852, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.799083948135376, 0.014999999664723873, 0.28999999165534973), (1.7598810195922852, -0.014999999664723873, 0.28999999165534973)]
                     int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
                     int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 2, 6, 7, 1, 5, 6, 2, 0, 3, 7, 4]
                     bool physics:collisionEnabled = true
@@ -5787,7 +5787,7 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -50.0
         float physics:upperLimit = 60.0
-        point3f physics:localPos0 = (1.9070035219192505, 2.06673526763916, 0.0)
+        point3f physics:localPos0 = (1.9091157913208008, 2.82808780670166, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -5808,7 +5808,7 @@ def Xform "Griffin1" (
         uniform token physics:axis = "Z"
         float physics:lowerLimit = -60.0
         float physics:upperLimit = 50.0
-        point3f physics:localPos0 = (-1.9070035219192505, 2.06673526763916, 0.0)
+        point3f physics:localPos0 = (-1.9091157913208008, 2.82808780670166, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 1.0, 0.0, 0.0)
@@ -6116,7 +6116,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
     )
     {
-        point3f[] points = [(-0.9138270020484924, 2.0, -1.600000023841858), (0.9138270020484924, 2.0, -1.600000023841858), (0.9138270020484924, 2.0799999237060547, -1.600000023841858), (-0.9138270020484924, 2.0799999237060547, -1.600000023841858), (-0.9138270020484924, 2.0, -1.5199999809265137), (0.9138270020484924, 2.0, -1.5199999809265137), (0.9138270020484924, 2.0799999237060547, -1.5199999809265137), (-0.9138270020484924, 2.0799999237060547, -1.5199999809265137), (0.9421110153198242, 2.0, -1.5882840156555176), (1.5882840156555176, 2.0, -0.9421110153198242), (1.5882840156555176, 2.0799999237060547, -0.9421110153198242), (0.9421110153198242, 2.0799999237060547, -1.5882840156555176), (0.8855429887771606, 2.0, -1.531715989112854), (1.531715989112854, 2.0, -0.8855429887771606), (1.531715989112854, 2.0799999237060547, -0.8855429887771606), (0.8855429887771606, 2.0799999237060547, -1.531715989112854), (1.600000023841858, 2.0, -0.9138270020484924), (1.600000023841858, 2.0, 0.9138270020484924), (1.600000023841858, 2.0799999237060547, 0.9138270020484924), (1.600000023841858, 2.0799999237060547, -0.9138270020484924), (1.5199999809265137, 2.0, -0.9138270020484924), (1.5199999809265137, 2.0, 0.9138270020484924), (1.5199999809265137, 2.0799999237060547, 0.9138270020484924), (1.5199999809265137, 2.0799999237060547, -0.9138270020484924), (1.5882840156555176, 2.0, 0.9421110153198242), (0.9421110153198242, 2.0, 1.5882840156555176), (0.9421110153198242, 2.0799999237060547, 1.5882840156555176), (1.5882840156555176, 2.0799999237060547, 0.9421110153198242), (1.531715989112854, 2.0, 0.8855429887771606), (0.8855429887771606, 2.0, 1.531715989112854), (0.8855429887771606, 2.0799999237060547, 1.531715989112854), (1.531715989112854, 2.0799999237060547, 0.8855429887771606), (0.9138270020484924, 2.0, 1.600000023841858), (-0.9138270020484924, 2.0, 1.600000023841858), (-0.9138270020484924, 2.0799999237060547, 1.600000023841858), (0.9138270020484924, 2.0799999237060547, 1.600000023841858), (0.9138270020484924, 2.0, 1.5199999809265137), (-0.9138270020484924, 2.0, 1.5199999809265137), (-0.9138270020484924, 2.0799999237060547, 1.5199999809265137), (0.9138270020484924, 2.0799999237060547, 1.5199999809265137), (-0.9421110153198242, 2.0, 1.5882840156555176), (-1.5882840156555176, 2.0, 0.9421110153198242), (-1.5882840156555176, 2.0799999237060547, 0.9421110153198242), (-0.9421110153198242, 2.0799999237060547, 1.5882840156555176), (-0.8855429887771606, 2.0, 1.531715989112854), (-1.531715989112854, 2.0, 0.8855429887771606), (-1.531715989112854, 2.0799999237060547, 0.8855429887771606), (-0.8855429887771606, 2.0799999237060547, 1.531715989112854), (-1.600000023841858, 2.0, 0.9138270020484924), (-1.600000023841858, 2.0, -0.9138270020484924), (-1.600000023841858, 2.0799999237060547, -0.9138270020484924), (-1.600000023841858, 2.0799999237060547, 0.9138270020484924), (-1.5199999809265137, 2.0, 0.9138270020484924), (-1.5199999809265137, 2.0, -0.9138270020484924), (-1.5199999809265137, 2.0799999237060547, -0.9138270020484924), (-1.5199999809265137, 2.0799999237060547, 0.9138270020484924), (-1.5882840156555176, 2.0, -0.9421110153198242), (-0.9421110153198242, 2.0, -1.5882840156555176), (-0.9421110153198242, 2.0799999237060547, -1.5882840156555176), (-1.5882840156555176, 2.0799999237060547, -0.9421110153198242), (-1.531715989112854, 2.0, -0.8855429887771606), (-0.8855429887771606, 2.0, -1.531715989112854), (-0.8855429887771606, 2.0799999237060547, -1.531715989112854), (-1.531715989112854, 2.0799999237060547, -0.8855429887771606), (-1.247257947921753, 2.0, -0.7099999785423279), (1.247257947921753, 2.0, -0.7099999785423279), (1.247257947921753, 2.0, -1.2899999618530273), (-1.247257947921753, 2.0, -1.2899999618530273), (-1.247257947921753, 2.0799999237060547, -0.7099999785423279), (1.247257947921753, 2.0799999237060547, -0.7099999785423279), (1.247257947921753, 2.0799999237060547, -1.2899999618530273), (-1.247257947921753, 2.0799999237060547, -1.2899999618530273), (-1.247257947921753, 2.0, 1.2899999618530273), (1.247257947921753, 2.0, 1.2899999618530273), (1.247257947921753, 2.0, 0.7099999785423279), (-1.247257947921753, 2.0, 0.7099999785423279), (-1.247257947921753, 2.0799999237060547, 1.2899999618530273), (1.247257947921753, 2.0799999237060547, 1.2899999618530273), (1.247257947921753, 2.0799999237060547, 0.7099999785423279), (-1.247257947921753, 2.0799999237060547, 0.7099999785423279)]
+        point3f[] points = [(-0.9138270020484924, 2.759999990463257, -1.600000023841858), (0.9138270020484924, 2.759999990463257, -1.600000023841858), (0.9138270020484924, 2.8399999141693115, -1.600000023841858), (-0.9138270020484924, 2.8399999141693115, -1.600000023841858), (-0.9138270020484924, 2.759999990463257, -1.5199999809265137), (0.9138270020484924, 2.759999990463257, -1.5199999809265137), (0.9138270020484924, 2.8399999141693115, -1.5199999809265137), (-0.9138270020484924, 2.8399999141693115, -1.5199999809265137), (0.9421110153198242, 2.759999990463257, -1.5882840156555176), (1.5882840156555176, 2.759999990463257, -0.9421110153198242), (1.5882840156555176, 2.8399999141693115, -0.9421110153198242), (0.9421110153198242, 2.8399999141693115, -1.5882840156555176), (0.8855429887771606, 2.759999990463257, -1.531715989112854), (1.531715989112854, 2.759999990463257, -0.8855429887771606), (1.531715989112854, 2.8399999141693115, -0.8855429887771606), (0.8855429887771606, 2.8399999141693115, -1.531715989112854), (1.600000023841858, 2.759999990463257, -0.9138270020484924), (1.600000023841858, 2.759999990463257, 0.9138270020484924), (1.600000023841858, 2.8399999141693115, 0.9138270020484924), (1.600000023841858, 2.8399999141693115, -0.9138270020484924), (1.5199999809265137, 2.759999990463257, -0.9138270020484924), (1.5199999809265137, 2.759999990463257, 0.9138270020484924), (1.5199999809265137, 2.8399999141693115, 0.9138270020484924), (1.5199999809265137, 2.8399999141693115, -0.9138270020484924), (1.5882840156555176, 2.759999990463257, 0.9421110153198242), (0.9421110153198242, 2.759999990463257, 1.5882840156555176), (0.9421110153198242, 2.8399999141693115, 1.5882840156555176), (1.5882840156555176, 2.8399999141693115, 0.9421110153198242), (1.531715989112854, 2.759999990463257, 0.8855429887771606), (0.8855429887771606, 2.759999990463257, 1.531715989112854), (0.8855429887771606, 2.8399999141693115, 1.531715989112854), (1.531715989112854, 2.8399999141693115, 0.8855429887771606), (0.9138270020484924, 2.759999990463257, 1.600000023841858), (-0.9138270020484924, 2.759999990463257, 1.600000023841858), (-0.9138270020484924, 2.8399999141693115, 1.600000023841858), (0.9138270020484924, 2.8399999141693115, 1.600000023841858), (0.9138270020484924, 2.759999990463257, 1.5199999809265137), (-0.9138270020484924, 2.759999990463257, 1.5199999809265137), (-0.9138270020484924, 2.8399999141693115, 1.5199999809265137), (0.9138270020484924, 2.8399999141693115, 1.5199999809265137), (-0.9421110153198242, 2.759999990463257, 1.5882840156555176), (-1.5882840156555176, 2.759999990463257, 0.9421110153198242), (-1.5882840156555176, 2.8399999141693115, 0.9421110153198242), (-0.9421110153198242, 2.8399999141693115, 1.5882840156555176), (-0.8855429887771606, 2.759999990463257, 1.531715989112854), (-1.531715989112854, 2.759999990463257, 0.8855429887771606), (-1.531715989112854, 2.8399999141693115, 0.8855429887771606), (-0.8855429887771606, 2.8399999141693115, 1.531715989112854), (-1.600000023841858, 2.759999990463257, 0.9138270020484924), (-1.600000023841858, 2.759999990463257, -0.9138270020484924), (-1.600000023841858, 2.8399999141693115, -0.9138270020484924), (-1.600000023841858, 2.8399999141693115, 0.9138270020484924), (-1.5199999809265137, 2.759999990463257, 0.9138270020484924), (-1.5199999809265137, 2.759999990463257, -0.9138270020484924), (-1.5199999809265137, 2.8399999141693115, -0.9138270020484924), (-1.5199999809265137, 2.8399999141693115, 0.9138270020484924), (-1.5882840156555176, 2.759999990463257, -0.9421110153198242), (-0.9421110153198242, 2.759999990463257, -1.5882840156555176), (-0.9421110153198242, 2.8399999141693115, -1.5882840156555176), (-1.5882840156555176, 2.8399999141693115, -0.9421110153198242), (-1.531715989112854, 2.759999990463257, -0.8855429887771606), (-0.8855429887771606, 2.759999990463257, -1.531715989112854), (-0.8855429887771606, 2.8399999141693115, -1.531715989112854), (-1.531715989112854, 2.8399999141693115, -0.8855429887771606), (-1.247257947921753, 2.759999990463257, -0.7099999785423279), (1.247257947921753, 2.759999990463257, -0.7099999785423279), (1.247257947921753, 2.759999990463257, -1.2899999618530273), (-1.247257947921753, 2.759999990463257, -1.2899999618530273), (-1.247257947921753, 2.8399999141693115, -0.7099999785423279), (1.247257947921753, 2.8399999141693115, -0.7099999785423279), (1.247257947921753, 2.8399999141693115, -1.2899999618530273), (-1.247257947921753, 2.8399999141693115, -1.2899999618530273), (-1.247257947921753, 2.759999990463257, 1.2899999618530273), (1.247257947921753, 2.759999990463257, 1.2899999618530273), (1.247257947921753, 2.759999990463257, 0.7099999785423279), (-1.247257947921753, 2.759999990463257, 0.7099999785423279), (-1.247257947921753, 2.8399999141693115, 1.2899999618530273), (1.247257947921753, 2.8399999141693115, 1.2899999618530273), (1.247257947921753, 2.8399999141693115, 0.7099999785423279), (-1.247257947921753, 2.8399999141693115, 0.7099999785423279)]
         int[] faceVertexCounts = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
         int[] faceVertexIndices = [0, 4, 7, 3, 1, 2, 6, 5, 0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 3, 7, 6, 2, 8, 12, 15, 11, 9, 10, 14, 13, 8, 11, 10, 9, 12, 13, 14, 15, 8, 9, 13, 12, 11, 15, 14, 10, 16, 20, 23, 19, 17, 18, 22, 21, 16, 19, 18, 17, 20, 21, 22, 23, 16, 17, 21, 20, 19, 23, 22, 18, 24, 28, 31, 27, 25, 26, 30, 29, 24, 27, 26, 25, 28, 29, 30, 31, 24, 25, 29, 28, 27, 31, 30, 26, 32, 36, 39, 35, 33, 34, 38, 37, 32, 35, 34, 33, 36, 37, 38, 39, 32, 33, 37, 36, 35, 39, 38, 34, 40, 44, 47, 43, 41, 42, 46, 45, 40, 43, 42, 41, 44, 45, 46, 47, 40, 41, 45, 44, 43, 47, 46, 42, 48, 52, 55, 51, 49, 50, 54, 53, 48, 51, 50, 49, 52, 53, 54, 55, 48, 49, 53, 52, 51, 55, 54, 50, 56, 60, 63, 59, 57, 58, 62, 61, 56, 59, 58, 57, 60, 61, 62, 63, 56, 57, 61, 60, 59, 63, 62, 58, 67, 66, 65, 64, 68, 69, 70, 71, 64, 65, 69, 68, 65, 66, 70, 69, 66, 67, 71, 70, 67, 64, 68, 71, 75, 74, 73, 72, 76, 77, 78, 79, 72, 73, 77, 76, 73, 74, 78, 77, 74, 75, 79, 78, 75, 72, 76, 79]
         uniform token subdivisionScheme = "none"
@@ -7331,7 +7331,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
     )
     {
-        custom double3 xformOp:translate = (1.45, 2.065, 0.0)
+        custom double3 xformOp:translate = (1.45, 2.825, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float physics:mass = 15.0
@@ -7343,7 +7343,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-            double3 xformOp:scale = (0.9, 0.03, 2.5919999999999996)
+            custom double3 xformOp:scale = (0.9, 0.03, 2.5919999999999996)
             double size = 1.0
             uniform token purpose = "proxy"
             token visibility = "invisible"
@@ -7355,7 +7355,7 @@ def Xform "Griffin1" (
     {
         custom rel physics:body0 = </Griffin1>
         custom rel physics:body1 = </Griffin1/TransitionPlatePort>
-        point3f physics:localPos0 = (1.4500000476837158, 2.065000057220459, 0.0)
+        point3f physics:localPos0 = (1.4500000476837158, 2.825000047683716, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -7365,7 +7365,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
     )
     {
-        custom double3 xformOp:translate = (-1.45, 2.065, 0.0)
+        custom double3 xformOp:translate = (-1.45, 2.825, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float physics:mass = 15.0
@@ -7377,7 +7377,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-            double3 xformOp:scale = (0.9, 0.03, 2.5919999999999996)
+            custom double3 xformOp:scale = (0.9, 0.03, 2.5919999999999996)
             double size = 1.0
             uniform token purpose = "proxy"
             token visibility = "invisible"
@@ -7389,7 +7389,7 @@ def Xform "Griffin1" (
     {
         custom rel physics:body0 = </Griffin1>
         custom rel physics:body1 = </Griffin1/TransitionPlateStarboard>
-        point3f physics:localPos0 = (-1.4500000476837158, 2.065000057220459, 0.0)
+        point3f physics:localPos0 = (-1.4500000476837158, 2.825000047683716, 0.0)
         point3f physics:localPos1 = (0.0, 0.0, 0.0)
         quatf physics:localRot0 = (0.0, 0.0, 0.0, 1.0)
         quatf physics:localRot1 = (0.0, 0.0, 0.0, 1.0)
@@ -7595,103 +7595,103 @@ def Xform "Griffin1" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.06, 0.301735381886, 0.06)
+        custom double3 xformOp:scale = (0.06, 1.063087690962, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.907003563827, 1.940867690943, -0.707)
+        custom double3 xformOp:translate = (1.909115749743, 2.321543845481, -0.707)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     def Cube "RampMountPortInnerRearDeckShoe" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.247003563827, 0.06, 0.06)
+        custom double3 xformOp:scale = (0.24911574974300005, 0.06, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.8135017819135, 1.76, -0.707)
+        custom double3 xformOp:translate = (1.8145578748714999, 1.76, -0.707)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     def Cube "RampMountPortInnerFront" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.06, 0.301735381886, 0.06)
+        custom double3 xformOp:scale = (0.06, 1.063087690962, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.907003563827, 1.940867690943, 0.707)
+        custom double3 xformOp:translate = (1.909115749743, 2.321543845481, 0.707)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     def Cube "RampMountPortInnerFrontDeckShoe" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.247003563827, 0.06, 0.06)
+        custom double3 xformOp:scale = (0.24911574974300005, 0.06, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (1.8135017819135, 1.76, 0.707)
+        custom double3 xformOp:translate = (1.8145578748714999, 1.76, 0.707)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     def Cube "RampMountStarboardInnerRear" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.06, 0.301735381886, 0.06)
+        custom double3 xformOp:scale = (0.06, 1.063087690962, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-1.907003563827, 1.940867690943, -0.707)
+        custom double3 xformOp:translate = (-1.909115749743, 2.321543845481, -0.707)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     def Cube "RampMountStarboardInnerRearDeckShoe" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.247003563827, 0.06, 0.06)
+        custom double3 xformOp:scale = (0.24911574974300005, 0.06, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-1.8135017819135, 1.76, -0.707)
+        custom double3 xformOp:translate = (-1.8145578748714999, 1.76, -0.707)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     def Cube "RampMountStarboardInnerFront" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.06, 0.301735381886, 0.06)
+        custom double3 xformOp:scale = (0.06, 1.063087690962, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-1.907003563827, 1.940867690943, 0.707)
+        custom double3 xformOp:translate = (-1.909115749743, 2.321543845481, 0.707)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     def Cube "RampMountStarboardInnerFrontDeckShoe" (
         prepend apiSchemas = "PhysicsCollisionAPI"
     )
     {
-        custom double3 xformOp:scale = (0.247003563827, 0.06, 0.06)
+        custom double3 xformOp:scale = (0.24911574974300005, 0.06, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         double size = 1.0
         bool physics:collisionEnabled = false
-        custom double3 xformOp:translate = (-1.8135017819135, 1.76, 0.707)
+        custom double3 xformOp:translate = (-1.8145578748714999, 1.76, 0.707)
         uniform token purpose = "render"
-        color3f[] primvars:displayColor = [(0.02500000037252903, 0.03500000014901161, 0.05000000074505806)]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
     def Xform "RcsPitchPos" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (-1.554487014477793, 1.6600000000000001, 1.3847813869930217)
+        custom double3 xformOp:translate = (-1.554487014477793, 3.04, 1.3847813869930217)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -7769,7 +7769,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (-1.554487014477793, 1.6600000000000001, -1.3847813869930217)
+        custom double3 xformOp:translate = (-1.554487014477793, 3.04, -1.3847813869930217)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -7847,7 +7847,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (1.554487014477793, 1.6600000000000001, 1.3847813869930217)
+        custom double3 xformOp:translate = (1.554487014477793, 3.04, 1.3847813869930217)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -7925,7 +7925,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (1.554487014477793, 1.6600000000000001, -1.3847813869930217)
+        custom double3 xformOp:translate = (1.554487014477793, 3.04, -1.3847813869930217)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -8003,7 +8003,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (1.3847813869930217, 1.6600000000000001, -1.554487014477793)
+        custom double3 xformOp:translate = (1.3847813869930217, 3.04, -1.554487014477793)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -8081,7 +8081,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (-1.3847813869930217, 1.6600000000000001, -1.554487014477793)
+        custom double3 xformOp:translate = (-1.3847813869930217, 3.04, -1.554487014477793)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -8159,7 +8159,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (-1.3847813869930217, 1.6600000000000001, 1.554487014477793)
+        custom double3 xformOp:translate = (-1.3847813869930217, 3.04, 1.554487014477793)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (180.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -8237,7 +8237,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (1.3847813869930217, 1.6600000000000001, 1.554487014477793)
+        custom double3 xformOp:translate = (1.3847813869930217, 3.04, 1.554487014477793)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -8315,7 +8315,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (1.4696342007354073, 1.6600000000000001, -1.4696342007354073)
+        custom double3 xformOp:translate = (1.4696342007354073, 3.04, -1.4696342007354073)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -8393,7 +8393,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (-1.4696342007354073, 1.6600000000000001, -1.4696342007354073)
+        custom double3 xformOp:translate = (-1.4696342007354073, 3.04, -1.4696342007354073)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -8471,7 +8471,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (-1.4696342007354073, 1.6600000000000001, 1.4696342007354073)
+        custom double3 xformOp:translate = (-1.4696342007354073, 3.04, 1.4696342007354073)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (90.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -8549,7 +8549,7 @@ def Xform "Griffin1" (
         prepend apiSchemas = "LunCoForceActuatorAPI"
     )
     {
-        custom double3 xformOp:translate = (1.4696342007354073, 1.6600000000000001, 1.4696342007354073)
+        custom double3 xformOp:translate = (1.4696342007354073, 3.04, 1.4696342007354073)
         custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         custom double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
         float3 lunco:forceActuator:direction = (0.0, -1.0, 0.0)
@@ -8622,5 +8622,57 @@ def Xform "Griffin1" (
                 }
             }
         }
+    }
+    def Cube "RcsPodMountPXPZ" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.3642640687119286, 0.02, 0.34096)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.3691316754184655, 2.8499999999999996, 1.3691316754184655)
+        custom double3 xformOp:rotateXYZ = (0.0, -45.0, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+    }
+    def Cube "RcsPodMountNXPZ" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.3642640687119286, 0.02, 0.34096)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-1.3691316754184655, 2.8499999999999996, 1.3691316754184655)
+        custom double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+    }
+    def Cube "RcsPodMountPXNZ" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.3642640687119286, 0.02, 0.34096)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.3691316754184655, 2.8499999999999996, -1.3691316754184655)
+        custom double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+    }
+    def Cube "RcsPodMountNXNZ" (
+        prepend apiSchemas = "PhysicsCollisionAPI"
+    )
+    {
+        custom double3 xformOp:scale = (0.3642640687119286, 0.02, 0.34096)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (-1.3691316754184655, 2.8499999999999996, -1.3691316754184655)
+        custom double3 xformOp:rotateXYZ = (0.0, -45.0, 0.0)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
     }
 }

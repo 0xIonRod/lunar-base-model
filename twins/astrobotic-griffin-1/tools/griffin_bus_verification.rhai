@@ -300,6 +300,39 @@ fn bus_checks(doc, source, bus_root) {
 
     let root = bus_root;
     let model = sysml_model("twin://astrobotic-griffin-1");
+    // Measure the complete support chain in one composed frame. Separate
+    // correct-looking parts must not pass while their mating faces float.
+    let owners=["TopDeckOctagon","RoverPayloadDeck","UpperCentralBucket",
+        "PayloadSupportPort","PayloadSupportStarboard","PayloadSupportForward","PayloadSupportRear",
+        "PayloadCrossmemberAcrossX","PayloadCrossmemberAcrossZ"];
+    let support_paths=[];for name in owners {support_paths.push(root+"/"+name);}
+    let parent=root.sub_string(0,root.len()-4);
+    support_paths.push(parent+"/PayloadAdapter/AdapterPlate");
+    let support_batch=query("QueryUsdPrims",#{doc_id:doc,paths:support_paths,
+        attrs:["purpose"],geometry_bounds:true});
+    let chain_error=();
+    if support_batch.records!=() && support_batch.records.len()==support_paths.len()
+        && usd_geometry_inspection::same_snapshot(support_batch.records) {
+        let bounds=[];let available=true;
+        for record in support_batch.records {
+            if record.geometry_bounds==() {available=false;break;}
+            bounds.push(record.geometry_bounds);
+        }
+        if available {
+            chain_error=(bounds[2].min[1]-bounds[0].max[1]).abs();
+            for index in 3..7 {
+                chain_error=_max_number(chain_error,(bounds[index].min[1]-bounds[0].max[1]).abs());
+                chain_error=_max_number(chain_error,(bounds[index].max[1]-bounds[1].min[1]).abs());
+            }
+            for index in [7,8] {
+                chain_error=_max_number(chain_error,(bounds[index].max[1]-bounds[1].min[1]).abs());
+                chain_error=_max_number(chain_error,(bounds[index].min[1]-bounds[2].max[1]).abs());
+                chain_error=_max_number(chain_error,(bounds[index].max[1]-bounds[9].min[1]).abs());
+            }
+        }
+    }
+    checks.push(_tolerance_constraint("GBC-011-payload-support-chain","gbc011",chain_error,
+        model.value(visual("geometryVerificationToleranceM"))));
     // Check all four profile rings, not only an artist-selected silhouette.
     let segments = model.value(visual("centralBucketSegments"));
     let shell_tolerance = model.value(visual("geometryVerificationToleranceM"));

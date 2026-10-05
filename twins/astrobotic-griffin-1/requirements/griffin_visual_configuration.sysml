@@ -101,9 +101,9 @@ package GriffinVisualConfigurationRequirements {
         // griffin_1_surface_ops, which is the Twin default. See size evidence.
         attribute visualReviewGriffinStation : Position = (0.0, 0.44, 0.0);
         // FLIP is mounted on the payload adapter. Its wheel bottoms (station
-        // -0.05 m minus 0.45 m tire radius) meet the adapter top at 2.08 m.
+        // -0.05 m minus 0.45 m tire radius) meet the adapter top at 2.84 m.
         // This station is the one review-scene placement source.
-        attribute visualReviewFlipStation : Position = (0.0, 3.02, 0.0);
+        attribute visualReviewFlipStation : Position = (0.0, 3.78, 0.0);
 
         /* SIZE ESTIMATE, 2026-09-30; rationale and uncertainties are in
          * requirements/griffin-size-evidence.md. NASA MSS 2024, slide 8
@@ -111,11 +111,11 @@ package GriffinVisualConfigurationRequirements {
          * VIPER-configured vehicle envelope 4.5 m by 2.0 m, not its bus.
          * Estimate the bus at 80% of that lateral envelope (3.6 +/-0.4 m).
          * Current hardware photo https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/
-         * motivates a taller 2.52 +/-0.5 m landed payload surface, excluding
+         * motivates a taller payload surface; the revised 3.28 +/-0.5 m study datum, excluding
          * its ground handling stand. Body belt height 0.72 +/-0.12 m and all internal
          * support coordinates below are packaging estimates, not metrology.
-         * A 0.44 m vehicle touchdown datum plus adapter Y=2.04 and half its
-         * 0.08 m thickness gives the 2.52 m ground-to-payload height. */
+         * A 0.44 m vehicle touchdown datum plus adapter Y=2.80 and half its
+         * 0.08 m thickness gives the revised 3.28 m ground-to-payload height. */
         attribute bodyDimensions : Dimensions = (3.60, 0.72, 3.60);
         attribute bodyMount : Position = (0.0, 1.34, 0.0);
         /* Exterior blanket/panel presentation follows the faceted wrapped
@@ -131,7 +131,7 @@ package GriffinVisualConfigurationRequirements {
          * full vehicle span. Flat face width = 0.5857864376 * 3.60 = 2.109 m;
          * /3 gives 0.703 m, rounded to 0.72 m for this study. Perspective
          * supports only an approximate ratio (2.65-3.35), not metrology.
-         * Keep the body top at vehicle Y=1.70 and payload top Y=2.08;
+         * Keep the body top at vehicle Y=1.70 and payload top Y=2.84;
          * the shallower belt therefore moves upward rather than moving ramps.
          * This older artist impression is a user-selected silhouette basis;
          * it is not a claim of June 2026 as-built panel geometry. */
@@ -214,8 +214,16 @@ package GriffinVisualConfigurationRequirements {
         attribute mediumGainMountWidthFraction : Real = .22;
         attribute mediumGainRadomeDisplayColor : Real[3] = (.90, .90, .87);
 
-        attribute avionicsDeckDimensions : Dimensions = (2.00, 0.10, 1.46);
-        attribute avionicsDeckCenter : Position = (0.0, 0.46, 0.0);
+        /* Rear inner-face electronics shelf. The old central 2.00 x 1.46 m
+         * shelf and 0.72 m box crossed tank domes and the upper central shell.
+         * The rear bay at Z=-1.58 avoids the four cardinal COPV envelopes;
+         * the box bottom sits on the shelf top. Shelf and rack dimensions are
+         * explicit packaging estimates, not a vendor electronics drawing.
+         * References: PUG v5.02 pp.25-26 internal structure and June 2026
+         * hardware, https://www.nasa.gov/gallery/astrobotics-griffin-1/ . */
+        attribute avionicsPodDimensions : Dimensions = (.72, .36, .12);
+        attribute avionicsDeckDimensions : Dimensions = (.80, .05, .16);
+        attribute avionicsDeckCenter : Position = (0.0, -.205, -1.58);
 
         /* Linear scene-referred display colors are visual design parameters;
          * Rhai consumes these values but does not define a second palette. */
@@ -310,8 +318,8 @@ package GriffinVisualConfigurationRequirements {
         attribute upperBucketOuterBottomRadiusM : Real = .24;
         attribute upperBucketInnerTopRadiusM : Real = .245;
         attribute upperBucketOuterTopRadiusM : Real = .27;
-        attribute upperBucketBottomCenterYM : Real = 0.46;
-        attribute upperBucketTopCenterYM : Real = 0.58;
+        attribute upperBucketBottomCenterYM : Real = .45;
+        attribute upperBucketTopCenterYM : Real = 1.34;
         attribute lowerBucketInnerTopRadiusM : Real = .615;
         attribute lowerBucketOuterTopRadiusM : Real = .64;
         attribute lowerBucketInnerBottomRadiusM : Real = .555;
@@ -322,10 +330,31 @@ package GriffinVisualConfigurationRequirements {
          * silhouette and hid tank domes. Use 80 mm stock as an explicit visual
          * estimate (not load-qualified supplier sizing), informed by the slender
          * open structure in https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
-         * Preserve the wheel contact top: center 2.04 + .08/2 = 2.08 m.
+         * Preserve the wheel contact top: center 2.80 + .08/2 = 2.84 m.
          * The visible frame and its contact proxy must change together. */
         attribute payloadAdapterDimensions : Dimensions = (3.20, .08, 3.20);
-        attribute payloadAdapterCenterYM : Real = 2.04;
+        /* Retain the existing 1.30 m square central payload interface footprint;
+         * align its thickness with the 80 mm walking frame. This is a simulator
+         * interface estimate, not a released FLIP attachment drawing. Two
+         * orthogonal 80 mm crossmembers beneath it connect the four cardinal
+         * columns and the central upper shell. Column ends derive from the
+         * bus-deck top and payload-frame underside, avoiding the tank domes.
+         * The upper-shell bottom Y=.45 meets the bus-deck top; its top Y=1.34
+         * equals 2.80 - bodyMount.y(1.34) - 1.5*.08, meeting the crossmember
+         * underside. Its radii remain the previous clearance-constrained study
+         * envelope. All added members are render-only within the lander's mass
+         * owner; this reconstruction does not qualify their structural strength.
+         * Architecture reference: Astrobotic PUG v5.02 pp.25-26,
+         * https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf . */
+        attribute payloadInterfacePlateDimensions : Dimensions = (1.30, .08, 1.30);
+        /* The former Y=2.08 m walking top was below the 2.714577 m tall-panel
+         * top, making folded ramps and rover egress intersect the array.
+         * Y=2.84 m preserves 125 mm of top clearance as a packaging estimate.
+         * Raise the rover/deck/ramp interfaces together and provide supports.
+         * This supersedes the earlier 2.52 m landed height; photos establish
+         * relative placement, not this dimension. Source, 2026-10-05:
+         * https://www.nasa.gov/gallery/astrobotics-griffin-1/ . */
+        attribute payloadAdapterCenterYM : Real = 2.80;
         // Presentation focus is the hosted rover interface top, derived from
         // the same packaging estimate as the adapter; not a supplier datum.
         // Rhai derives center Y + native Dimensions.y / 2; indexed SysML
@@ -440,7 +469,7 @@ package GriffinVisualConfigurationRequirements {
         doc /* GVC-003 [geometry] the primary airframe shall use an open eight-sided clipped-square perimeter with eight posts and upper/lower perimeter beams. Its envelope and member dimensions shall resolve from the typed GriffinVisualConfiguration values; they are low-confidence presentation estimates documented in griffin-size-evidence.md, not supplier dimensions. Separate skirt, payload ring and central supports retain their own geometry. */
     }
     requirement def GVC004_OctagonalPayloadDeck {
-        doc /* GVC-004 [interface] the upper bus datum shall expose a source-sized octagonal perimeter deck ring with four tank through-openings; it shall not be a solid plate across the COPV cluster. A raised open payload support frame is supported by the upper flared bucket and shall carry the linked FLIP review asset with all four tire bottoms resting on its two wheel-track rails. The perimeter uses the adapter thickness as square-stock section; rails follow FlipRover::wheelStationZ and reuse GriffinEgressRamp::assemblyTrackWidthM as the wheel-width-plus-clearance datum. Rails are clipped to the source octagonal footprint. This is an explicit FLIP packaging estimate; the overall footprint and top elevation stay at the study datums. Astrobotic Payload User Guide (August 2021 v5.02), page 25, shows a central upper cone and large surrounding openings and says the illustrated payload interface is VIPER-specific: https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf. That drawing motivates an open surrounding structure, but does not specify these FLIP rails. The contact realization uses a convex-envelope proxy for this frame, which fills internal gaps; it supports wheel-track contact but is not exact gap-contact geometry. The lander and rover review stations, adapter footprint, and member stock are replaceable study assumptions, not released supplier CAD. */
+        doc /* GVC-004 [interface] the upper bus datum shall expose a source-sized octagonal perimeter deck ring with four tank through-openings; it shall not be a solid plate across the COPV cluster. A raised open payload support frame is supported by four cardinal columns and two crossmembers, with the central upper shell meeting their underside and shall carry the linked FLIP review asset with all four tire bottoms resting on its two wheel-track rails. The perimeter uses the adapter thickness as square-stock section; rails follow FlipRover::wheelStationZ and reuse GriffinEgressRamp::assemblyTrackWidthM as the wheel-width-plus-clearance datum. Rails are clipped to the source octagonal footprint. This is an explicit FLIP packaging estimate; the overall footprint and top elevation stay at the study datums. Astrobotic Payload User Guide (August 2021 v5.02), page 25, shows a central upper cone and large surrounding openings and says the illustrated payload interface is VIPER-specific: https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf. That drawing motivates an open surrounding structure, but does not specify these FLIP rails. The contact realization uses a convex-envelope proxy for this frame, which fills internal gaps; it supports wheel-track contact but is not exact gap-contact geometry. The lander and rover review stations, adapter footprint, and member stock are replaceable study assumptions, not released supplier CAD. */
     }
     requirement def GVC005_LegStations {
         doc /* GVC-005 [layout] four leg roots shall match the ordered typed leg stations and radial rotations. Their pad envelope shall satisfy the source-owned body-to-ground clearance. Exact station and pad geometry remains a replaceable study assumption because the supplier ICD is not public. */

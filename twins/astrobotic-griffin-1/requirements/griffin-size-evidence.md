@@ -1,10 +1,40 @@
-# Griffin and FLIP size basis — 2026-09-30
+# Griffin and FLIP size basis — updated 2026-10-05
 
 These are provisional reconstruction requirements, not an as-built mechanical
 ICD. A successful geometry check proves implementation of the assumptions; it
 does not prove the assumptions describe flight hardware. Replace estimates when
 better configuration-specific evidence becomes available. Numerical precision in
 derived hinge coordinates is for interface closure, not measurement accuracy.
+
+## Current packaging study, 2026-10-05
+
+The [NASA June 15 hardware gallery](https://www.nasa.gov/gallery/astrobotics-griffin-1/)
+and [PGH reference](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
+show tall side arrays, folded ramps above them, a supported upper deck, corner
+attitude hardware and a wrapped lower engine bay. They do not provide flight
+clearances, hinge coordinates, qualified load paths or calibrated dimensions.
+SysML owns the estimates and builder relationships; the table below is current.
+
+Four 80 mm cardinal columns meet the bus deck at Y1.79 and upper frame at
+Y2.76. Two crossmembers span the frame at Y2.68–2.76, joining its central mast
+to the interface plate. A narrow rear avionics shelf replaces the obsolete
+central box that occupied the tank/mast volume. These are visible integration
+members under the existing lander mass, not separately qualified structural
+bodies. GBC-011 verifies actual mating faces; it does not calculate strength.
+
+The seven main bells are contained by an open octagonal skirt. Its lower lip
+is Y0.06; nozzle exits are Y0.08, a chosen 20 mm recess. The 0.80 m shell depth
+is derived from that recess, the nozzle envelope and adapter plane. Radial
+clearance is checked against the actual perimeter. Shared bus foil gives the
+photographed silver blanket finish. Heat protection and plume interaction
+are unmodelled. A110 RCS members retain their original force/fuel identities
+on four upper corner platforms; their station height is deck top + 0.20 m.
+Flight count, arrangement and mounting dimensions remain explicit estimates.
+
+Static stow clearance, bus support closure, nominal ramp interfaces and nozzle
+containment have focused gates. Full unfolding sweep, physical egress and
+landing acceptance must be assessed for this exact raised assembly; older
+flight acceptance below cannot establish them.
 
 ## Evidence and configuration boundaries
 
@@ -30,20 +60,23 @@ derived hinge coordinates is for interface closure, not measurement accuracy.
 |---|---:|---:|---|
 | Griffin body plan span | 5.40 m | 3.60 m | Estimate: 80% of the historical 4.5 m overall envelope reserves 0.45 m per side for leg/foot extension. Plausible range 3.2–4.0 m; low confidence. |
 | Body belt and frame-member height | 2.00 m; first pass 1.40 m | 0.72 m | User-selected ESA face ratio ≈3:1; broad octagon face = 0.585786 × 3.60 = 2.109 m; 2.109 / 3 = 0.703 m, rounded to 0.72 m. Approximate range 0.60–0.84 m; low-confidence presentation estimate. The earlier 1.40 m entry was stale and did not match the authored geometry. |
-| Payload surface above terrain | 5.72 m | 2.52 m | Estimate: older 2.0 m overall-height anchor plus approximately 0.5 m allowance for the current higher deck/structure. Range 2.0–3.0 m. Not a photograph measurement. |
+| Payload surface above nominal terrain | 5.72 m; earlier study 2.52 m | 3.28 m | Integration estimate: local deck top 2.84 m clears the reconstructed current tall-panel top 2.714577 m by 0.125423 m, plus the 0.44 m nominal touchdown reference. This supersedes the older height study. No calibrated photo or flight drawing establishes this height. |
 | Footprint across opposed pad edges | 7.24 m | 4.50 m | Diagonal foot stations at X/Z=+/-1.90 m plus 0.35 m pad radii on each side; selected to match the historical envelope approximately. Current footprint unconfirmed. |
-| Payload adapter | 4.40 × 3.20 m | 3.20 × 3.20 m | Estimated octagonal footprint fitting inside the bus and covering the reconstructed FLIP wheels after clipping the corners. 80 mm stock is an explicit silhouette estimate; center Y2.04 preserves the Y2.08 contact top. |
+| Payload adapter | 4.40 × 3.20 m | 3.20 × 3.20 m | Estimated octagonal footprint fitting inside the bus and covering the reconstructed FLIP wheels after clipping the corners. 80 mm stock is an explicit silhouette estimate; center Y2.80 gives the Y2.84 contact top above current tall panels. |
 | FLIP body | 4.40 × 2.76 m lower frame | 2.116 × 1.476 m | Promote the estimated CAD plan dimensions with an explicit axis mapping. Allow approximately 20% dimensional uncertainty. The 0.12 m lower-frame height is a visualization/collision proxy; equipment box height 0.396 m comes from CAD. |
 | FLIP wheel envelope | legacy inconsistent envelope | 2.28 m across track; 2.60 m along travel | Derived from 2.0 m track + 0.28 m tire width and 1.7 m wheelbase + two 0.45 m radii. Wheel ribs, deformation and suspension travel excluded. |
-| Ramp length | 12.228605 m | 5.397252161 m | Derived: 2.52 / sin(0.4857867749). Retain the previous **estimated** 27.8335° deployment angle to isolate the height correction; not a published ramp slope. At 2.0–3.0 m deck heights this gives 4.28–6.43 m. |
+| Ramp length | 12.228605 m | 5.397252161 m | Retain the earlier derived study length; new nominal angle is asin(3.28 / 5.397252161) = 37.4246°. Both length and slope remain unconfirmed; terrain fitting uses live toe height. |
 | Each of three sections | 4.076201667 m | 1.799084054 m | Total length / 3. Three-section folding topology remains a study assumption. |
 | Ramp outside width | 3.50 m | 2.592 m | 2.00 m track + 0.58 m contact-track width + two 0.006 m rails. Derived from the current outer rail edges; 2.86 m belonged to the superseded 140 mm rails. Contact width is 0.28 m wheel + twice 0.15 m estimated clearance. |
 | Deck transition | 1.96327 m | 0.90 m | Estimated bridge to the octagonal deck: outboard X=1.90, inboard X=1.00. Width follows the current 2.592 m rail corridor; GRR-012 checks composed deck overlap against the 0.05 m study requirement. |
 
-The vehicle touchdown reference remains 0.44 m. Adapter center Y=2.04 plus
-half-thickness 0.04 gives a vehicle-local top of 2.08 m, hence 2.52 m above
-ground. A ramp half-thickness of 0.015 m yields hinge X=1.90+0.015 sin(angle),
-Y=2.08−0.015 cos(angle); the builder's toe miter closes both contact edges.
+The vehicle touchdown reference remains 0.44 m. Adapter center Y=2.80 plus
+half-thickness 0.04 gives a vehicle-local top of 2.84 m, hence 3.28 m above
+nominal ground. With 30 mm ramp plate thickness, source-derived hinge stations
+are X=±1.909115750, Y=2.828087691. The earlier Y2.08 platform let the
+folded toe and guides pass through the tall panels. Moving ramps outward alone
+was rejected because it left the bridge and rover crossing the same wall.
+Raised support columns and crossmembers now close the deck-to-bus structure.
 Section and transition inertia are recomputed as rectangular-envelope proxies
 using the existing estimated masses (95 kg ramp, 15 kg transition). Retaining
 those masses avoids inventing a supplier mass revision; they remain uncertain.

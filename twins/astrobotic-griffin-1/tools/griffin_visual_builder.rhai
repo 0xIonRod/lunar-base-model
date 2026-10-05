@@ -435,6 +435,8 @@ fn griffin_bus_frame_finish_plan(doc, edit_target, root) {
     if rails.len()!=8 {return plan_error("Griffin frame rail inventory unavailable");}
     let paths=[root+"/PerimeterFrame",root+"/TopDeckOctagon",
         root+"/RoverPayloadDeck",root+"/LowerServiceSkirtOctagon"];
+    for name in ["PayloadSupportPort","PayloadSupportStarboard","PayloadSupportForward","PayloadSupportRear",
+        "PayloadCrossmemberAcrossX","PayloadCrossmemberAcrossZ"] {paths.push(root+"/"+name);}
     for name in rails {paths.push(root+"/"+name);}
     let color=model.value(prefix+"silverDisplayColor");
     if !array_is(color) || color.len()!=3 {return plan_error("Griffin silver frame palette missing");}
@@ -3037,24 +3039,7 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
         if !plan.ok { return plan; }
         for op in plan.ops { ops.push(op); }
     }
-    let avionics_dimensions = _griffin_model_value(model, "avionicsDeckDimensions");
-    let avionics_center = _griffin_model_value(model, "avionicsDeckCenter");
-    let avionics_color = _griffin_model_number_list(model, "avionicsDeckDisplayColor");
-    let avionics_deck_y = _native_vec3_axis(avionics_center, 1);
-    if avionics_dimensions == () || avionics_center == () || avionics_color.len() != 3 {
-        return plan_error("typed Griffin avionics deck datums are incomplete");
-    }
-    let avionics = _bus_detail_cube_plan(doc, edit_target, root, "AvionicsDeck", 1.0,
-        [_native_vec3_axis(avionics_dimensions, 0), _native_vec3_axis(avionics_dimensions, 1), _native_vec3_axis(avionics_dimensions, 2)],
-        [0.0, avionics_deck_y, 0.0], avionics_color);
-    if !avionics.ok { return avionics; }
-    for op in avionics.ops { ops.push(op); }
-    let pod_color = _griffin_model_number_list(model, "avionicsPodDisplayColor");
-    if pod_color.len() != 3 { return plan_error("typed Griffin avionics pod color is incomplete"); }
-    let pod = _bus_detail_cube_plan(doc, edit_target, root, "AvionicsPod", 1.0,
-        [0.72, 0.36, 0.72], [0.0, avionics_deck_y + 0.21, 0.0], pod_color);
-    if !pod.ok { return pod; }
-    for op in pod.ops { ops.push(op); }
+    // Electronics placement is shared with the payload-support component plan below.
     for index in 0..rail_names.len() {
         let station = rail_stations[index];
         let plan = _bus_detail_cube_plan(doc, edit_target, root, rail_names[index], 1.0,
@@ -4093,6 +4078,21 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         name: "purpose", type_name: "token", value: "\"render\""}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
         name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
+    // Reference the bus blanket network rather than copying its shader palette.
+    let looks=root+"/Looks"; let blanket=looks+"/BayBlanket";
+    if !query_ok(_component_query(doc,looks)) {
+        ops.push(#{AddPrim:#{edit_target:edit_target,path:looks,type_name:"Scope"}});
+    }
+    if !query_ok(_component_query(doc,blanket)) {
+        ops.push(#{AddPrim:#{edit_target:edit_target,path:blanket,type_name:"Material"}});
+    }
+    ops.push(#{SetReferenceArcs:#{edit_target:edit_target,path:blanket,list_op:"Explicit",references:[
+        #{asset_path:"twin://components/lander/griffin_bus_visual.usda",
+          prim_path:"/GriffinBus/Looks/ExteriorPanels"}]}});
+    ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:shell_path,
+        schemas:["PhysicsCollisionAPI","MaterialBindingAPI"]}});
+    ops.push(#{SetRelationship:#{edit_target:edit_target,path:shell_path,
+        name:"material:binding",targets:[blanket]}});
     let component_record = assembly_builder::composed_query(doc,
         #{path: root, attrs: ["lunco:visual:component",
             "lunco:visual:datum", "lunco:visual:skirt_metric_envelope"],
@@ -5057,6 +5057,52 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
 // Visual load path from the existing bus deck to each native root hinge.
 // GRR-015 records the low-confidence pedestal reconstruction; these members
 // belong to the bus body and introduce no independent dynamics or collider.
+// Adjust only the installation interface; retain section geometry and poses.
+fn griffin_ramp_installation_plan(doc, edit_target, lander_root, side) {
+    if side != "port" && side != "starboard" { return plan_error("unknown ramp side"); }
+    let index = if side == "port" { 0 } else { 1 };
+    let path = lander_root + "/" + griffin_spec::ramp_names()[index];
+    let joint = lander_root + "/" + griffin_spec::ramp_root_joint_names()[index];
+    let x = _ramp_number(if side == "port" { "physicalRampPortMountX" } else { "physicalRampStarboardMountX" });
+    let position = [x, _ramp_number("physicalRampMountY"), _ramp_number("physicalRampMountZ")];
+    let root = _component_query(doc, path);
+    let bearing = _component_query(doc, joint);
+    if !query_ok(root) || !query_ok(bearing) || bearing.type_name != "PhysicsRevoluteJoint" {
+        return plan_error("physical ramp installation owner or bearing is unavailable");
+    }
+    let transition = _physical_ramp_transition_ops(doc, edit_target, lander_root, path, side,
+        griffin_spec::physical_ramp_deck_transition_length_m(),
+        _ramp_number("rampSurfaceThicknessM"), _ramp_number("rampSurfaceWidthM"));
+    if !transition.ok { return transition; }
+    let mounts = griffin_ramp_mount_plan(doc, edit_target, lander_root, side);
+    if !mounts.ok { return mounts; }
+    let ops = [#{SetTranslate: #{edit_target: edit_target, path: path, value: position}},
+        #{SetAttribute: #{edit_target: edit_target, path: joint, name: "physics:localPos0",
+            type_name: "point3f", value: assembly_edit::tuple3_literal(position)}}];
+    for op in transition.ops { ops.push(op); }
+    for op in mounts.ops { ops.push(op); }
+    let toe = griffin_ramp_toe_miter_plan(doc,edit_target,path+"/MiddleSection/ToeSection");
+    if !toe.ok {return toe;}
+    for op in toe.ops {ops.push(op);}
+    #{ok: true, ops: ops}
+}
+
+fn griffin_ramp_toe_miter_plan(doc,edit_target,root) {
+    let angle = _ramp_number("physicalRampPortDeploymentAngleRad");
+    let thickness = _ramp_number("rampSurfaceThicknessM");
+    let bevel = mechanical_relations::planar_horizontal_face_bevel_run(thickness, angle);
+    if bevel == () { return plan_error("nominal deployment toe miter is unavailable"); }
+    let points = _ramp_section_track_points(_ramp_number("rampSectionLengthM"), thickness,
+        _ramp_number("assemblyTrackWidthM"), bevel);
+    let ops=[];
+    for track in ["RampTrackPort", "RampTrackStarboard"] {
+        ops.push(#{SetAttribute: #{edit_target:edit_target,
+            path:root+"/"+track, name:"points", type_name:"point3f[]",
+            value:_mesh_points_literal(points)}});
+    }
+    #{ok: true, ops: ops}
+}
+
 fn griffin_ramp_mount_plan(doc, edit_target, lander_root, side) {
     if side != "port" && side != "starboard" { return plan_error("unknown ramp side"); }
     let x = _ramp_number(if side == "port" { "physicalRampPortMountX" } else { "physicalRampStarboardMountX" });
@@ -5996,13 +6042,100 @@ fn _griffin_payload_frame_component_plan(doc, edit_target, root, model) {
     if !result.ok { return result; }
     result.ops.push(#{SetTranslate: #{edit_target:edit_target,path:root+"/RoverPayloadDeck",
         value:[0.0,center-mount.y,0.0]}});
+    let deck = _griffin_model_value(model, "deckCenter");
+    let deck_dims = _griffin_model_value(model, "deckDimensions");
+    let bottom = deck.y + deck_dims.y / 2.0;
+    let top = center - mount.y - dims.y / 2.0;
+    if top <= bottom { return plan_error("payload support must rise above the bus deck"); }
+    // Four cardinal columns avoid the four tank domes. Stock reuses the
+    // platform thickness; their ends close the two source-owned deck datums.
+    for station in [#{name:"Port",x:dims.x/2.0-dims.y/2.0,z:0.0},
+        #{name:"Starboard",x:-dims.x/2.0+dims.y/2.0,z:0.0},
+        #{name:"Forward",x:0.0,z:dims.z/2.0-dims.y/2.0},
+        #{name:"Rear",x:0.0,z:-dims.z/2.0+dims.y/2.0}] {
+        let support = _component_cube_visual_ops(doc, edit_target, root,
+            "PayloadSupport"+station.name, [station.x,(top+bottom)/2.0,station.z], (),
+            [dims.y,top-bottom,dims.y], color);
+        if !support.ok { return support; }
+        for op in support.ops { result.ops.push(op); }
+    }
+    for beam in [#{name:"AcrossX",scale:[dims.x-dims.y,dims.y,dims.y]},
+        #{name:"AcrossZ",scale:[dims.y,dims.y,dims.z-dims.y]}] {
+        let plan = _component_cube_visual_ops(doc,edit_target,root,
+            "PayloadCrossmember"+beam.name,[0.0,top-dims.y/2.0,0.0],(),beam.scale,color);
+        if !plan.ok {return plan;}
+        for op in plan.ops {result.ops.push(op);}
+    }
+    let profile=[];
+    for point in [#{r:"upperBucketInnerBottomRadiusM",y:"upperBucketBottomCenterYM"},
+        #{r:"upperBucketOuterBottomRadiusM",y:"upperBucketBottomCenterYM"},
+        #{r:"upperBucketOuterTopRadiusM",y:"upperBucketTopCenterYM"},
+        #{r:"upperBucketInnerTopRadiusM",y:"upperBucketTopCenterYM"}] {
+        profile.push([_ramp_model_number(model,point.r),_ramp_model_number(model,point.y)]);
+    }
+    let central=_central_bucket_mesh_plan(doc,edit_target,root,"UpperCentralBucket",
+        profile,_ramp_model_number(model,"centralBucketSegments"),
+        _griffin_model_number_list(model,"tankSupportDisplayColor"));
+    if !central.ok {return central;}
+    for op in central.ops {result.ops.push(op);}
+    let avionics=griffin_avionics_component_plan(doc,edit_target,root);
+    if !avionics.ok {return avionics;}
+    for op in avionics.ops {result.ops.push(op);}
     result
+}
+
+fn griffin_avionics_component_plan(doc,edit_target,root) {
+    let model=sysml_requirements::model();let ops=[];
+    let avionics_dims=_griffin_model_value(model,"avionicsDeckDimensions");
+    let avionics_center=_griffin_model_value(model,"avionicsDeckCenter");
+    let pod_dims=_griffin_model_value(model,"avionicsPodDimensions");
+    if !vec3_is_native(avionics_dims) || !vec3_is_native(avionics_center)
+        || !vec3_is_native(pod_dims) {return plan_error("electronics bay source unavailable");}
+    for member in [#{name:"AvionicsDeck",position:vec3_array(avionics_center),
+            scale:vec3_array(avionics_dims),color:"avionicsDeckDisplayColor"},
+        #{name:"AvionicsPod",position:[avionics_center.x,
+            avionics_center.y+avionics_dims.y/2.0+pod_dims.y/2.0,avionics_center.z],
+            scale:vec3_array(pod_dims),color:"avionicsPodDisplayColor"}] {
+        let plan=_component_cube_visual_ops(doc,edit_target,root,member.name,
+            member.position,(),member.scale,_griffin_model_number_list(model,member.color));
+        if !plan.ok {return plan;}
+        for op in plan.ops {ops.push(op);}
+    }
+    #{ok:true,ops:ops}
 }
 
 fn griffin_payload_frame_component_plan(doc, edit_target, root) {
     let model = sysml_model("twin://astrobotic-griffin-1");
     if !sysml_model_is(model) { return plan_error("Griffin model unavailable"); }
     _griffin_payload_frame_component_plan(doc, edit_target, root, model)
+}
+
+fn griffin_payload_installation_plan(doc, edit_target, root) {
+    // The reusable Bus asset owns the platform and its columns. The parent
+    // installation owns only contact geometry, the payload plate and camera.
+    let frame = #{ok:true,ops:[]};
+    let geometry = physical_top_deck_collider_geometry();
+    if !geometry.ok { return geometry; }
+    let plate_path = root+"/PayloadAdapter/AdapterPlate";
+    let plate = assembly_builder::composed_query(doc, #{path:plate_path,
+        children:false, attrs:[]});
+    let m=sysml_requirements::model();
+    let dims=m.value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::payloadInterfacePlateDimensions");
+    if !query_ok(plate) || plate.type_name!="Cube" || !vec3_is_native(dims)
+        || !vec3_is_finite(dims) || dims.x<=0.0 || dims.y<=0.0 || dims.z<=0.0 {
+        return plan_error("payload interface plate dimensions unavailable");
+    }
+    let top = geometry.adapter_center_y_m + geometry.adapter_thickness_m/2.0;
+    frame.ops.push(#{SetTranslate: #{edit_target:edit_target,path:plate_path,
+        value:[0.0,top-dims.y/2.0,0.0]}});
+    frame.ops.push(#{SetScale: #{edit_target:edit_target,path:plate_path,
+        value:[dims.x,dims.y,dims.z]}});
+    frame.ops.push(#{SetAttribute: #{edit_target:edit_target,path:root+"/RoverPayloadDeckCollider",
+        name:"points",type_name:"point3f[]",value:_mesh_points_literal(geometry.adapter_points)}});
+    let focus = griffin_camera_focus_plan(doc, edit_target, root);
+    if !focus.ok { return focus; }
+    for op in focus.ops { frame.ops.push(op); }
+    frame
 }
 
 // The shared wheel projector owns the render child and its animated pose.
@@ -6414,6 +6547,35 @@ fn griffin_rcs_bell_check(doc, root, batch) {
       document_generation:record.document_generation,mesh:mesh}
 }
 
+fn _griffin_rcs_mount_frame(record, jet) {
+    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
+    let force=griffin_spec::_typed_model_number(own+"nominalForceN");
+    let height=griffin_spec::_typed_model_number(own+"mountHeightAbovePayloadDeckM");
+    let standoff=griffin_spec::_typed_model_number(own+"mountStandoffM");
+    let offset=griffin_spec::_typed_model_number(own+"memberTangentOffsetM");
+    let dimensions=griffin_spec::visual_body_dimensions();
+    let profile=griffin_spec::visual_outer_body_profile_coordinates();
+    if force==() || height==() || standoff==() || offset==()
+        || dimensions==() || profile.len()!=8 {
+        return plan_error("RCS mount and rating source unavailable");
+    }
+    let old=vec3_from(record.attrs["xformOp:translate"]);
+    if !vec3_is_finite(old) || old.x==0.0 || old.z==0.0 {
+        return plan_error("RCS corner identity requires a finite nonzero X/Z position");
+    }
+    let sx=old.x/old.x.abs();let sz=old.z/old.z.abs();
+    let chamfer=(1.0+profile[0].x.abs())/2.0;
+    let arm_x=dimensions.x/2.0*chamfer+standoff/2.0.sqrt();
+    let arm_z=dimensions.z/2.0*chamfer+standoff/2.0.sqrt();
+    let tangent=if jet.valve_port.contains("pitch") {-offset}
+        else if jet.valve_port.contains("roll") {offset} else {0.0};
+    tangent*=sx*sz;
+    let position=[sx*arm_x-sz*tangent/2.0.sqrt(),
+        griffin_spec::visual_payload_adapter_center_y_m()+griffin_spec::visual_payload_adapter_thickness_m()/2.0+height,
+        sz*arm_z+sx*tangent/2.0.sqrt()];
+    #{ok:true,position:position,force:force,sx:sx,sz:sz,arm_x:arm_x,arm_z:arm_z}
+}
+
 fn griffin_rcs_nozzle_station_plan(doc, edit_target, root, index) {
     let jets=griffin_spec::rcs_port_mapping();
     if index<0 || index>=jets.len() {return plan_error("RCS station index invalid");}
@@ -6426,29 +6588,9 @@ fn griffin_rcs_nozzle_station_plan(doc, edit_target, root, index) {
         || record.attrs["lunco:forceActuator:direction"]==() {
         return plan_error("RCS physical station unavailable");
     }
-    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
-    let force=griffin_spec::_typed_model_number(own+"nominalForceN");
-    let below=griffin_spec::_typed_model_number(own+"mountBelowBusTopM");
-    let standoff=griffin_spec::_typed_model_number(own+"mountStandoffM");
-    let offset=griffin_spec::_typed_model_number(own+"memberTangentOffsetM");
-    let dimensions=griffin_spec::visual_body_dimensions();
-    let mount=griffin_spec::visual_body_mount();
-    let profile=griffin_spec::visual_outer_body_profile_coordinates();
-    if force==() || below==() || standoff==() || offset==()
-        || dimensions==() || mount==() || profile.len()!=8 {
-        return plan_error("RCS mount and rating source unavailable");
-    }
-    let old=vec3_from(record.attrs["xformOp:translate"]);
-    let sx=old.x/old.x.abs();let sz=old.z/old.z.abs();
-    let chamfer=(1.0+profile[0].x.abs())/2.0;
-    let arm_x=dimensions.x/2.0*chamfer+standoff/2.0.sqrt();
-    let arm_z=dimensions.z/2.0*chamfer+standoff/2.0.sqrt();
-    let tangent=if jet.valve_port.contains("pitch") {-offset}
-        else if jet.valve_port.contains("roll") {offset} else {0.0};
-    tangent*=sx*sz;
-    let position=[sx*arm_x-sz*tangent/2.0.sqrt(),
-        mount.y+dimensions.y/2.0-below,
-        sz*arm_z+sx*tangent/2.0.sqrt()];
+    let frame=_griffin_rcs_mount_frame(record,jet);
+    if !frame.ok {return frame;}
+    let position=frame.position;let force=frame.force;
     let ops=[#{RemovePrim:#{edit_target:edit_target,path:path}},
         #{AddPrim:#{edit_target:edit_target,parent_path:root,name:name,type_name:"Xform",reference:(),reference_prim_path:()}},
         #{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:["LunCoForceActuatorAPI"]}},
@@ -6529,4 +6671,49 @@ fn griffin_rcs_command_envelope_plan(doc,edit_target,root) {
         name:"inputs:hold_torque_limit_nm"}},
         #{SetAttribute:#{edit_target:edit_target,path:root,
         name:"inputs:hold_torque_limit_nm",type_name:"double",value:limit.to_string()}}]}
+}
+
+// One upper-corner mount group, preserving each nozzle/feed/force identity.
+fn griffin_rcs_pod_mount_plan(doc,edit_target,root,sx,sz) {
+    if (sx!=1.0 && sx!=-1.0) || (sz!=1.0 && sz!=-1.0) {return plan_error("RCS corner signs invalid");}
+    let ops=[];let frame=();let count=0;
+    for jet in griffin_spec::rcs_port_mapping() {
+        let name=jet.model_name.sub_string(0,jet.model_name.len()-5);
+        let path=root+"/"+name;
+        let record=assembly_builder::composed_query(doc,#{path:path,
+            attrs:["xformOp:translate"],schemas:true});
+        if !query_ok(record) || !record.api_schemas.contains("LunCoForceActuatorAPI") {
+            return plan_error("RCS force owner missing: "+path);
+        }
+        let point=vec3_from(record.attrs["xformOp:translate"]);
+        if point.x*sx<=0.0 || point.z*sz<=0.0 {continue;}
+        frame=_griffin_rcs_mount_frame(record,jet);if !frame.ok {return frame;}
+        ops.push(#{SetTranslate:#{edit_target:edit_target,path:path,value:frame.position}});
+        count+=1;
+    }
+    if count!=3 {return plan_error("RCS pod requires three existing physical members");}
+    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
+    let plate=griffin_spec::_typed_model_number(own+"podMountPlateThicknessM");
+    let overlap=griffin_spec::_typed_model_number(own+"podMountPlateOverlapM");
+    let offset=griffin_spec::_typed_model_number(own+"memberTangentOffsetM");
+    let radius=griffin_spec::_typed_model_number(own+"exitRadiusM");
+    let dims=griffin_spec::_sysml_model_value("payloadAdapterDimensions");
+    let profile=griffin_spec::visual_outer_body_profile_coordinates();
+    if plate==() || overlap==() || offset==() || radius==() || !vec3_is_native(dims) {
+        return plan_error("RCS support plate source unavailable");
+    }
+    let chamfer=(1.0+profile[0].x.abs())/2.0;
+    let inner=vec3(sx*dims.x/2.0*chamfer,0.0,sz*dims.z/2.0*chamfer);
+    let outer=vec3(sx*frame.arm_x,0.0,sz*frame.arm_z);
+    let delta=outer-inner;let mid=(outer+inner)*0.5;
+    let top=griffin_spec::visual_payload_adapter_center_y_m()+dims.y/2.0;
+    let angle=(-delta.z/delta.x).atan()*180.0/3.141592653589793;
+    let name="RcsPodMount"+if sx>0.0 {"PX"} else {"NX"}+if sz>0.0 {"PZ"} else {"NZ"};
+    let plan=_component_cube_visual_ops(doc,edit_target,root,name,
+        [mid.x,top+plate/2.0,mid.z],[0.0,angle,0.0],
+        [vlen(delta)+2.0*overlap,plate,2.0*offset+2.0*radius+overlap],
+        griffin_spec::_sysml_model_value("silverDisplayColor"));
+    if !plan.ok {return plan;}
+    for op in plan.ops {ops.push(op);}
+    #{ok:true,ops:ops,member_count:count}
 }

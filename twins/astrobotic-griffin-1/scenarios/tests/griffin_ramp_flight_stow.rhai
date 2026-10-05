@@ -227,7 +227,7 @@ fn on_tick(me, ctx) {
         "assemblySidePostPitchM", "assemblySideTrussChordHeightM",
         "assemblySideTrussLowerChordCenterYM", "assemblySideTrussBraceThicknessM",
         "assemblySideTrussBraceCountPerSide", "physicalRampMountY", "physicalRampPortMountX",
-        "physicalRampStarboardMountX", "physicalRampSectionJointLimitRad",
+        "physicalRampStarboardMountX", "physicalRampPanelClearanceM", "physicalRampSectionJointLimitRad",
         "physicalRampPortRootJointStowLimitRad", "physicalRampRootStowedAngleRad",
         "physicalRampStarboardRootJointStowLimitRad",
         "physicalRampSectionStowedRelativeAngleRad",
@@ -237,7 +237,7 @@ fn on_tick(me, ctx) {
     }
     let source = sysml_requirements::source_with_selection(attributes,
         ["GriffinRampRequirements::grr017", "GriffinRampRequirements::grr018",
-         "GriffinRampRequirements::grr019"],
+         "GriffinRampRequirements::grr019", "GriffinRampRequirements::grr020"],
         ["GriffinRampRequirements::Verify_GriffinRampFlightStow"]);
     if source == () || source.ok != true {
         throw("Griffin ramp flight-stow SysML source selection is invalid");
@@ -493,6 +493,48 @@ fn on_tick(me, ctx) {
           starboardForwardY: starboard_forward_y,
           tolerance: _source_number(source, "physicalRampRootAxisMirrorTolerance")}));
 
+    let panel_paths = [];
+    for name in ["SolarPanelForward", "SolarPanelFrontStarboard", "SolarPanelStarboard"] {
+        panel_paths.push(ROOT + "/" + name + "/Frame");
+        panel_paths.push(ROOT + "/" + name + "/ArrayBackplane");
+    }
+    let ramp_paths = [];
+    for side in ["EgressRampPort", "EgressRampStarboard"] {
+        for section in ["DeckSection", "MiddleSection", "MiddleSection/ToeSection"] {
+            for member in ["RampTrackPort", "RampTrackStarboard", "OuterRail", "InnerRail",
+                "CenterRailPort", "CenterRailStarboard"] {
+                ramp_paths.push(ROOT + "/" + side + "/" + section + "/" + member);
+            }
+        }
+    }
+    let paths = panel_paths + ramp_paths;
+    // Bounds are the measurement. Do not pull every Mesh topology/material
+    // attribute into this multi-part snapshot and exhaust the Rhai array budget.
+    let batch = query("QueryUsdPrims", #{paths: paths, attrs:["purpose"], geometry_bounds: true});
+    let valid = batch != () && batch.error == () && batch.records != ()
+        && batch.records.len() == paths.len() && usd_geometry_inspection::same_snapshot(batch.records);
+    let panel_max = -1.0e30;
+    let port_min = 1.0e30; let starboard_min = 1.0e30;
+    if valid {
+        for record in batch.records {
+            let bounds = record.geometry_bounds;
+            if bounds == () || bounds.min == () || bounds.max == () { valid = false; break; }
+            if panel_paths.contains(record.path) {
+                panel_max = max(panel_max, bounds.max[1]);
+            } else if record.path.contains("/EgressRampPort/") {
+                port_min = min(port_min, bounds.min[1]);
+            } else { starboard_min = min(starboard_min, bounds.min[1]); }
+        }
+    }
+    for side in ["port", "starboard"] {
+        let gap = (if side == "port" { port_min } else { starboard_min }) - panel_max;
+        let observation = if valid {
+            usd_geometry_inspection::measurement(gap, batch.records[0], "stowed ramp/panel envelope separation")
+        } else { #{provider: "usd", state: "unavailable", detail: "one composed ramp/panel bounds snapshot is required"} };
+        checks.push(_constraint(source, "GRR-020-" + side + "-panel-clearance", "grr020",
+            "GRC030_StowedRampClearsSolarPanels", #{gapM: observation,
+                requiredGapM: _source_number(source, "physicalRampPanelClearanceM")}));
+    }
     let result = sysml_requirements::evaluate(source, checks);
     let evidence = [];
     let evidence_failures = [];

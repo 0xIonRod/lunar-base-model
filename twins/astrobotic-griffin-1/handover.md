@@ -2,6 +2,36 @@
 
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
+## Raised deck and recessed engine bay — 2026-10-05
+
+The current unqualified integration study raises the payload walking top to
+vehicle Y2.84 above the tall-array top, restores the original inboard bridge
+span, recalculates the nominal slope/toe miter, and updates FLIP attachment,
+initial position and camera focus together. Four cardinal columns and two
+crossmembers join bus, central mast and payload plate. Rear avionics leaves
+the central tank/mast space open. All seven main nozzles fit inside the deep
+open skirt with a 20 mm recessed exit. Twelve existing A110 force owners now
+sit in four exposed upper-corner groups; no extra thruster proxies were added.
+Sources and explicit dimensional guesses are in SysML and the size evidence.
+
+Focused saved-source gates pass: flight stow 230, bus 356, nominal ramp 1281,
+propulsion 94 checks. The RCS wrench check retains all six pure-axis groups.
+These are geometry/authority results, not landing or unfolding acceptance.
+The fresh integrated Editor preview was inspected after reopening the saved
+vehicle. A warm parent preview can retain old referenced geometry despite a
+ready fence; dependency invalidation remains a generic Editor gap. The target
+cache was removed externally during this work; the exact running core568
+executable was recovered through /proc without rebuilding. Older target
+artifacts named below were deleted; surviving /tmp JSON has narrower scope.
+
+CAD-style edit feedback requested by the operator remains a small Editor
+requirement: focus the changed component, smoothly reframe after its projection
+fence, and highlight changed paths briefly. Cancel the transition on manual
+camera input or document/generation replacement. Respect the active preview
+and leave simulation camera/physical poses untouched. Implement through the
+existing Editor camera policy and interpolation mechanism rather than a Twin
+animation framework. Smooth reframing is not implemented by this checkpoint.
+
 ## Current runtime checkpoint, 2026-10-05
 
 Core `568f5146f` closes the two remaining reproduced determinism faults:

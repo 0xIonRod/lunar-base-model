@@ -201,24 +201,33 @@ package GriffinPropulsionRequirements {
         attribute adapterPlateWidthM : Real = 2.84;
         attribute adapterPlateDepthM : Real = 2.84;
         attribute adapterPlateHeightM : Real = 0.12;
-        // The PGH hardware photograph shows an open underside, rather than
-        // a deep opaque shroud: https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png.
-        // 80 mm frame stock, a 120 mm shallow fairing, and 60 mm taper are
-        // explicit visualization estimates, not calibrated stock dimensions.
-        attribute shellDepthM : Real = 0.12;
+        /* Operator-requested recessed engine bay, 2026-10-05. All seven
+         * nozzle envelopes stay inside the octagonal perimeter; their open
+         * exits sit 20 mm above the skirt lip, visible from below. The shell
+         * depth derives from the bell exit and this recess, rather than hiding
+         * a nozzle with a second proxy. This supersedes the former 120 mm
+         * shallow fairing/30% exposed-bell study. The PGH hardware photo and
+         * June 2026 NASA gallery establish a wrapped lower bay but do not
+         * publish a skirt contour or recess measurement. The 20 mm recess,
+         * 60 mm taper and 80 mm rail are explicit packaging estimates; no
+         * thermal shield qualification or exhaust-flow simulation is implied.
+         * The shroud references the bus ExteriorPanels foil material; its
+         * silver blanket finish follows photographs, not coating data.
+         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
+         * https://www.nasa.gov/gallery/astrobotics-griffin-1/ */
+        attribute nozzleExitRecessM : Real = .02;
+        attribute shellDepthM : Real = shellUpperYM + GriffinMainPropulsionAssembly::bellHeightM / 2.0 + nozzleExitRecessM;
         attribute shellBottomInsetM : Real = 0.06;
         attribute shellUpperYM : Real = componentLocalCenterYM + railHeightM / 2.0;
         attribute shellLowerYM : Real = shellUpperYM - shellDepthM;
         // Rail tops seat against the lower bus skirt at the estimated
-        // adapter plane; do not surround the expanding nozzle exits.
+        // adapter plane. The open lower lip surrounds the recessed exits.
         attribute componentLocalCenterYM : Real = adapterPlateCenterYM;
         attribute minimumSkirtBellClearanceM : Real = 0.10;
         // Seat the plate's lower face at the upper throat end. A plate
         // centered on the rail plane would intersect all bell walls.
         attribute adapterPlateCenterYM : Real = GriffinMainPropulsionAssembly::throatCenterYM + GriffinMainPropulsionAssembly::throatHeightM / 2.0 + adapterPlateHeightM / 2.0;
-        // Estimated minimum exposure below the shroud, to reject geometry
-        // that encloses the bell exits while passing simple dimension checks.
-        attribute minimumVisibleBellHeightFraction : Real = 0.30;
+
         attribute colliderPolicy : String = "render-only frame; no physics collision or thrust authority";
     }
 
@@ -238,8 +247,8 @@ package GriffinPropulsionRequirements {
          * estimates, not an ICD. The contour and shell are visual estimates.
          * Twelve retained scalar force identities form four triples. Shared
          * library exhaust follows delivered thrust; no Twin flame proxies.
-         * Mounts remain packaging estimates from bus chamfer midpoint, 40 mm
-         * below the top, 60 mm outward and +/-120 mm tangent spacing, using
+         * Mounts remain packaging estimates from bus chamfer midpoint, 200 mm
+         * above the payload walking plane, 60 mm outward and +/-120 mm tangent spacing, using
          * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
          * and https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/.
          * Symmetric mount offsets retain a pure requested attitude wrench.
@@ -292,10 +301,18 @@ package GriffinPropulsionRequirements {
         // M20/MON3 is the vendor A110 propellant specification. The shared
         // plume class 3 is a heuristic hypergolic palette, not spectrometry.
         attribute plumeFuelFamily : Real = 3;
-        // Packaging estimates relative to the bus top and diagonal faces.
-        // 60 mm outward standoff clears the skin; +/-120 mm tangent offsets
-        // separate the three retained actuator identities at each corner.
-        attribute mountBelowBusTopM : Real = .04;
+        /* The former bus-top mounts were behind the tall solar faces. The
+         * new four pods sit 200 mm above the payload walking plane to keep
+         * the complete A110 valve/nozzle envelopes clear of the arrays and
+         * support plates. Each 20 mm plate bridges the payload-frame chamfer
+         * to its three retained physical force owners, with 40 mm overlap.
+         * These dimensions and the twelve-jet topology are integration-study
+         * estimates; neither a Griffin ACS mounting ICD nor a verified current
+         * nozzle-count layout is public. Agile confirms the A110 hardware;
+         * the hardware photos inform exposed upper-corner placement only. */
+        attribute mountHeightAbovePayloadDeckM : Real = .20;
+        attribute podMountPlateThicknessM : Real = .02;
+        attribute podMountPlateOverlapM : Real = .04;
         attribute mountStandoffM : Real = .06;
         attribute memberTangentOffsetM : Real = .12;
     }
@@ -446,21 +463,22 @@ package GriffinPropulsionRequirements {
     constraint def GESC004_SkirtAndBellFit {
         in minimumRadialClearanceM : Real;
         in requiredRadialClearanceM : Real;
-        in visibleBellHeightFraction : Real;
-        in requiredVisibleBellHeightFraction : Real;
+        in nozzleExitRecessM : Real;
+        in requiredNozzleExitRecessM : Real;
         in adapterThroatSeparationM : Real;
         in toleranceM : Real;
         minimumRadialClearanceM >= requiredRadialClearanceM
-            and visibleBellHeightFraction >= requiredVisibleBellHeightFraction
+            and nozzleExitRecessM - requiredNozzleExitRecessM <= toleranceM
+            and nozzleExitRecessM - requiredNozzleExitRecessM >= -toleranceM
             and adapterThroatSeparationM >= -toleranceM;
     }
     requirement def GES004_BellClearance {
         require GESC004_SkirtAndBellFit {
             in requiredRadialClearanceM = GriffinEngineSkirtComponent::minimumSkirtBellClearanceM;
-            in requiredVisibleBellHeightFraction = GriffinEngineSkirtComponent::minimumVisibleBellHeightFraction;
+            in requiredNozzleExitRecessM = GriffinEngineSkirtComponent::nozzleExitRecessM;
             in toleranceM = GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GES-004 [clearance] the rails and lower shroud contour leave at least minimumSkirtBellClearanceM clearance to the full bell envelopes. At least minimumVisibleBellHeightFraction of bell height remains below the shroud edge, and the adapter plate lower face is at or above the upper throat ends. These conservative packaging checks must use composed geometry; a named shroud is not evidence of clearance. */
+        doc /* GES-004 [clearance] the rails and lower shroud contour leave at least minimumSkirtBellClearanceM clearance to the full bell envelopes. Every open bell exit is recessed by nozzleExitRecessM above the open skirt lip, and the adapter plate lower face is at or above the upper throat ends. These conservative packaging checks must use composed geometry; a named shroud is not evidence of clearance. */
     }
     requirement def GES005_SkirtOwnership {
         doc /* GES-005 [ownership] skirt geometry is render-only and cannot introduce thrust, collider, or physics authority. */
