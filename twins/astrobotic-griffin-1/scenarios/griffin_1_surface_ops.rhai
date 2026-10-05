@@ -278,6 +278,10 @@ fn update_landing_status(previously_landed, already_announced) {
         }
         if !status.landed && previously_landed {
             hint("LANDING NOT CONFIRMED: U opens ramps; F detaches FLIP. Both remain available.");
+        } else if status.landed && !previously_landed && already_announced {
+            // Restore the live contact notice after suspension settling without
+            // announcing touchdown again or resetting the egress action phase.
+            hint("FOUR-PAD CONTACT RESTORED: U opens ramps; F detaches FLIP.");
         }
     }
     status

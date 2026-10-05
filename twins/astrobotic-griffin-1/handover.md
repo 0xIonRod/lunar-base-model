@@ -35,8 +35,27 @@ The full mission PASS does not imply deterministic replay PASS.
 Evidence: `terrain/target/griffin-active-compound-production-49830.log`,
 `griffin-collider-projection-green.log`, and `/tmp/griffin-{strict-replay-original,
 repeatability-measurements,active-compound-engine-commands}.json`.
-Owned 49830 has exited. Current High-quality camera/HUD inspection and the
-post-change Tracy profile are still pending.
+Owned 49830 has exited. High-quality unprofiled 49831 additionally confirms
+physical ramp unfolding, rover egress onto DEM, visible seated footpads and
+HUD switching from Lander to FLIP. The measured 240-sample post-egress frame
+window is p50 11.076 ms, p95 19.492 ms, p99 20.933 ms and max 22.930 ms at
+2560 x 1568. This is a short local acceptance window, not a sustained FPS claim.
+Captures are `terrain/target/griffin-high-{deployed,opposite,rover-hud}-49831.png`;
+telemetry is `/tmp/griffin-high-frame-time-49831.json`.
+
+Separate owned High-quality Tracy 49832 is captured at
+`/tmp/griffin-post-fix-49832.tracy` (65 s, PID/listener verified). Modelica output
+sync averages 0.557 ms, input sync 0.049 ms; this warm-cache trace contains no
+`PrepareModelica` event and does not establish cold compilation speed. CSVs:
+`terrain/target/griffin-post-fix-{modelica,rhai,preparation}.csv`.
+Both rendered apps have exited.
+
+The live contact notice now restores after suspension settling without
+re-emitting touchdown or resetting egress actions. Fresh rendered 49832
+confirms the restored notice in `griffin-restored-notice-49832.png`.
+A retained diagnostic exposed premature dependency rebinding while replacement
+Modelica participants are still held; its native regression/fix is in progress.
+This does not yet explain the strict continuous replay drift.
 
 Route markers display the same frozen landed frame as navigation through the
 disposable `@view@` layer. Marker triggers and domes are disabled; only
