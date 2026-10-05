@@ -5388,6 +5388,15 @@ fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, s
         lander_root, ramp_path, side, transition_length, thickness, width);
     if !transition.ok { return transition; }
     for op in transition.ops { ops.push(op); }
+    // The fixed deck plate and its hinged root section are adjacent mating
+    // parts. Their simplified collision envelopes overlap at the pin; retain
+    // rover/terrain contact while excluding this one mechanical interface.
+    ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: ramp_path,
+        schemas: ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI",
+            "PhysicsFilteredPairsAPI"]}});
+    ops.push(#{SetRelationship: #{edit_target: edit_target, path: ramp_path,
+        name: "physics:filteredPairs", targets: [lander_root + "/"
+            + griffin_spec::physical_ramp_transition_body_name(side)]}});
     let mounts = griffin_ramp_mount_plan(doc, edit_target, lander_root, side);
     if !mounts.ok { return mounts; }
     for op in mounts.ops { ops.push(op); }

@@ -2,6 +2,35 @@
 
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
+## Deterministic contact checkpoint, 2026-10-05
+
+The source-pinned production fresh pair now passes strict replay: both runs
+reach touchdown at tick 1508, finish at tick 5110, and retain all four contacts
+in 361/361 samples over the following 60 seconds. Final position, upright
+axis, ground speed and angular speed deltas are exactly zero. Evidence:
+`terrain/target/griffin-enhanced-determinism-replay/` and its driver log;
+Twin source revision `8632437958443190011`.
+
+Warm replay also passes on owned API 49817: one retained observer compares 91
+samples across two 5400-tick replacements, including pose, velocity, thrust,
+guidance and touchdown signals. Evidence:
+`terrain/target/griffin-egress-contact-deterministic-49817.log` and
+`griffin-enhanced-determinism-warm-49817-status.json`.
+
+The production build enables Avian's maintained `enhanced-determinism`
+feature, which selects Parry's ordered contact-subdetector caches as well as
+deterministic math. Terrain collider admission and fixed-clock force delivery
+use the same readiness boundary. The root-ramp/fixed-transition mating pair
+alone excludes proxy overlap contact; rover and terrain collisions remain
+enabled. These results are same-host evidence, not a cross-platform promise.
+
+Full mission acceptance remains open: ramp deployment and adapter release
+complete, but FLIP stalls near the first approach waypoint. Held manual thrust
+reaches about 97 percent of nominal thrust in 1.42 simulation seconds and
+sustains ascent; the late-mission trial tips while the detached rover remains
+off-center on the deck. Empty-deck reflight and uncontended performance still
+need acceptance. Do not equate the replay pass with complete mission readiness.
+
 
 ## Geometry-derived main-engine sizing, 2026-10-05
 

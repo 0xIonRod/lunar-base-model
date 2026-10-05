@@ -2483,9 +2483,10 @@ def Xform "Griffin1" (
         }
     }
     def Xform "EgressRampPort" (
-        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysicsFilteredPairsAPI"]
     )
     {
+        rel physics:filteredPairs = [</Griffin1/TransitionPlatePort>]
         token visibility = "inherited"
         float physics:mass = 31.66666603088379
         float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)
@@ -3334,9 +3335,10 @@ def Xform "Griffin1" (
         }
     }
     def Xform "EgressRampStarboard" (
-        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysicsFilteredPairsAPI"]
     )
     {
+        rel physics:filteredPairs = [</Griffin1/TransitionPlateStarboard>]
         token visibility = "inherited"
         float physics:mass = 31.66666603088379
         float3 physics:diagonalInertia = (17.73165512084961, 26.270580291748047, 8.543675422668457)

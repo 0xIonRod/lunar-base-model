@@ -542,6 +542,15 @@ package GriffinRampRequirements {
         // face beyond that edge by the required overlap and interface margin.
         // These are replaceable study datums until the supplier mechanical
         // ICD exists.
+        // Simulator interface policy: exclude contact only between each fixed
+        // TransitionPlate and its matching hinged root ramp. The simplified
+        // envelopes meet around a pin that is already constrained by joints.
+        // Owned 49811 measured 3.603 mm initial overlap; 49812 removes that
+        // contact through PhysicsFilteredPairsAPI. This is a proxy-model
+        // assumption, not supplier clearance data. Rover and terrain contact
+        // remain enabled. The public June 2026 hardware photographs do not
+        // resolve this hidden interface; no flight ICD is available.
+        // Photo reference: https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/
         attribute physicalRampDeckTransitionRequiredOverlapM : Real = 0.05;
         attribute physicalRampDeckTransitionLengthM : Real = .90;
         attribute physicalRampDeckTransitionInterfaceToleranceM : Real = 0.002;
