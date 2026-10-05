@@ -7,9 +7,12 @@ fn report_restart(name, result) {
     emit(name, result);
 }
 fn simulation_dependencies(me, ctx) {
-    griffin_surface_ops::landing_stability_dependencies()
+    let dependencies = griffin_surface_ops::landing_stability_dependencies();
+    dependencies.entity_reads.push(find_path("/Griffin1SurfaceOps/FLIP"));
+    dependencies
 }
 fn on_start(me, ctx) {
+    subscribe("griffin_reload_observer_unused");
     this.generation = execution_context().generation;
     this.run = 0;
     this.samples = [];
@@ -27,10 +30,15 @@ fn on_tick(me, ctx) {
         this.generation = generation;
         this.run += 1;
         this.start_tick = sim_tick();
+        this.sample_index = 0;
         print("GRIFFIN_RELOAD_BEGIN run=" + this.run + " tick=" + this.start_tick);
     }
     let tick = sim_tick() - this.start_tick;
-    if tick % 60 != 0 {return;}
+    // Capture admission and its first three solver steps as well as the
+    // settled trajectory. A first-step impulse must not hide between samples.
+    if tick > 3 && tick % 60 != 0 {return;}
+    let index = this.sample_index;
+    this.sample_index += 1;
     let sample = griffin_surface_ops::landing_stability_sample();
     if sample.ok != true {
         this.done = true;
@@ -38,10 +46,35 @@ fn on_tick(me, ctx) {
         report_restart("GRIFFIN_RELOAD_FAIL", this.result);
         return;
     }
+    if tick == 0 {
+        let flip = query("QueryPhysicsState", #{id:find_path("/Griffin1SurfaceOps/FLIP")});
+        let bounds = flip.collider_local_bounds;
+        if bounds == () {
+            this.done = true;
+            report_restart("GRIFFIN_RELOAD_FAIL", #{tick:tick,run:this.run,
+                reason:"mounted rover has no cooked collision bounds"});
+            return;
+        }
+        if this.run == 1 {
+            this.rover_collision_bounds = bounds;
+        } else {
+            for corner in ["min", "max"] {
+                for axis in 0..3 {
+                    if (bounds[corner][axis] - this.rover_collision_bounds[corner][axis]).abs()
+                        > this.contract.replay_tolerance_m {
+                        this.done = true;
+                        report_restart("GRIFFIN_RELOAD_FAIL", #{tick:tick,
+                            field:"rover_collision_bounds",corner:corner,axis:axis,
+                            reference:this.rover_collision_bounds,sample:bounds});
+                        return;
+                    }
+                }
+            }
+        }
+    }
     if this.run == 1 {
         this.samples.push(sample);
     } else {
-        let index = tick / 60;
         let reference = this.samples[index];
         for field in ["position", "linear_velocity_mps"] {
             for axis in 0..3 {
@@ -82,6 +115,12 @@ fn on_tick(me, ctx) {
     }
     // 90 seconds includes descent plus the source-owned 60 s stability horizon.
     if tick >= 5400 {
+        if sample.touchdown < 0.999 || sample.all_legs_contact < 0.999 {
+            this.done = true;
+            report_restart("GRIFFIN_RELOAD_FAIL", #{tick:tick,run:this.run,
+                reason:"replay ended without qualified four-pad touchdown",sample:sample});
+            return;
+        }
         if this.run == 1 {
             let restart = cmd("RestartScene", #{});
             print("GRIFFIN_RELOAD_RESTART " + restart);

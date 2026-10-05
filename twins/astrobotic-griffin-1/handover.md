@@ -2,28 +2,47 @@
 
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
-## Current landing investigation, 2026-10-05
+## Current runtime checkpoint, 2026-10-05
 
-The latest allocator/compiler and route-presentation stack is **not yet accepted
-for deterministic landing**. Owned 49826 completed the full 16-gate surface
-mission in a fresh run and a playing warm replacement, but paused replacements
-failed landing. Earlier deterministic checkpoint results below apply only to
-their stated source revision and executable.
+The allocator/compiler stack now completes the full 16-gate surface mission on
+owned API 49830. The production manual-command trial passes all 10 checks:
+a single five-second held thrust command sustains 27.274 m lift and ends at
+12.440 m/s upward speed. Release settles to 25.043 Pa chamber pressure and
+0.364 N thrust. No repeated key edges are needed.
 
-Owned 49827 isolates an uncommanded first-step yaw impulse to the leg-joint
-assembly: detaching the four leg joints removes it; detaching ramps does not.
-All bodies admit at zero velocity. Live cooked rover, ramp, bus and pad bounds
-match authored dimensions. A minimal native oblique prismatic rest-pose test
-passes; USD-to-native admission is still under investigation. These are
-observations, not a completed fix or a reason to resize collision geometry.
-Evidence is in `terrain/target/griffin-cooked-collider-49827.log` and the
-first-step snapshots under `/tmp/griffin-*`.
+Two shared-core faults are reproduced and corrected:
 
-Route markers now display the same frozen landed frame as navigation through
-the disposable `@view@` layer. Marker triggers and domes are disabled; only
-horizontal route arrival qualifies progress. A warm replacement clears view
-edits while retaining persistent authored edits. Native 49826 confirmed the
-source positions and hidden initial billboards return after replacement.
+- A pose refresh changed a seated leg quaternion to its equivalent opposite
+  sign, reversing Avian's XPBD fixed-angle correction. Preserve the current
+  native quaternion hemisphere. The regression fails before the bridge fix
+  and passes after it; all eight bridge tests pass.
+- Compound discovery included deactivated solar-panel geometry. Before the
+  fix, a warm admission grew FLIP's cooked width from 2.168 m to 6.2 m and
+  generated six ramp contacts with about 0.546 m penetration. Skip inactive
+  subtrees before proxy selection and collider collection. The live/prepared
+  regression fails before the fix and passes after it; all 44 projection tests
+  pass. The native bounds query now exposes this mismatch directly.
+
+Strict same-process replay remains **unresolved**. Admission, cooked rover
+bounds and the first three solver steps match within the existing strict
+limits. A 90-second paused replacement preserves all sampled touchdown and
+handoff states, but its maximum pose difference is 0.000652 m, velocity
+0.001186 m/s, angular speed 0.000685 rad/s and upright-axis Y 0.00001299.
+Thrust differs by at most 0.08658 N and throttle by 0.000001190. These exceed
+strict replay limits; neither limits nor exact signal checks were relaxed.
+The full mission PASS does not imply deterministic replay PASS.
+
+Evidence: `terrain/target/griffin-active-compound-production-49830.log`,
+`griffin-collider-projection-green.log`, and `/tmp/griffin-{strict-replay-original,
+repeatability-measurements,active-compound-engine-commands}.json`.
+Owned 49830 has exited. Current High-quality camera/HUD inspection and the
+post-change Tracy profile are still pending.
+
+Route markers display the same frozen landed frame as navigation through the
+disposable `@view@` layer. Marker triggers and domes are disabled; only
+horizontal arrival qualifies progress. Restart clears view edits from the
+mounted source closure while preserving persistent authored edits and dirty
+state. The native document retirement regression passes.
 
 ## Deterministic contact checkpoint, 2026-10-05
 
