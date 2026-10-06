@@ -2,6 +2,20 @@
 
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
+## Surface-ops settle verdict and ramp tick cost — 2026-10-06
+
+Unattended surface operations now keep `landing_status_task` running until the
+mission completes, so GR-004 reads the live qualified landing state instead of
+the first post-touchdown sample, taken while the hull still rocks above the
+0.005 rad/s gate. A GR-004 failure now names each live landing predicate.
+Production `Verify_GriffinSurfaceOperations` PASS 16 at 7173 ticks / 119.55 s
+(core `9aa272c94`).
+
+Ramp-unfold stalls (160-460 ms fixed ticks) came from `griffin_spec`
+accessors: each opened `sysml_model`, which rebuilt the full validation report
+(~10 ms). Core `9aa272c94` opens Twin models from the prepared analysis; ramp
+ticks now peak at 8-26 ms and the full unfold completes in about 34 s.
+
 ## Nested payload bay and one-side arrays — 2026-10-05
 
 Supersedes the raised-deck checkpoint below. The operator identified the wrong

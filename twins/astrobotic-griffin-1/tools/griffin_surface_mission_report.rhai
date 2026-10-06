@@ -129,8 +129,14 @@ fn finish_surface_ops(state) {
         state.egress_terrain_evidence
     };
     let egress_terrain_ok = egress_terrain != () && egress_terrain.ok == true;
+    // Name the live landing predicate that is false, not only the latched flag.
+    let gates = griffin_surface_ops::landing_gate_report();
+    let settle_error = "lander did not settle: all_legs_contact=" + gates.all_legs_contact
+        + " upright_axis_y=" + gates.upright_axis_y + " ground_speed=" + gates.ground_speed
+        + " descent_speed=" + gates.descent_speed + " angular_speed=" + gates.angular_speed
+        + " landing_contact=" + gates.landing_contact;
     let checks = [
-        #{id: "GR-004-lander-settled", component: "landing", requirement: "GriffinFunctionalRequirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander", actual: state.lander_settled, expected: true, ok: state.lander_settled, error: "lander did not settle"},
+        #{id: "GR-004-lander-settled", component: "landing", requirement: "GriffinFunctionalRequirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander", actual: state.lander_settled, expected: true, ok: state.lander_settled, error: settle_error},
         #{id: "GR-003-ramps-deployed", component: "egress_ramps", requirement: "GriffinFunctionalRequirements::gr003", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander/EgressRampPort", actual: state.ramps_deployed, expected: true, ok: state.ramps_deployed, error: "ramps were not deployed"},
         #{id: "GR-026-adapter-release", component: "payload_adapter", requirement: "GriffinFunctionalRequirements::gr026", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::DOCK, actual: state.rover_detached, expected: true, ok: state.rover_detached, error: "FLIP adapter was not released"},
         #{id: "GR-004-route-engaged", component: "rover", requirement: "GriffinFunctionalRequirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::ROVER, actual: state.route_engaged, expected: true, ok: state.route_engaged, error: "FLIP route was not engaged"},

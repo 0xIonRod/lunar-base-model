@@ -798,7 +798,13 @@ fn landing_status_task() {
 
 fn task(me, ctx) {
     if is_unattended() {
-        par_all([ramp_unfold_task(), surface_mission_task()])
+        // The final verdict reads the live qualified landing state, so keep it
+        // observed until the mission completes rather than latching the first
+        // post-touchdown sample taken while the hull is still rocking.
+        par_all([
+            ramp_unfold_task(),
+            par_race([surface_mission_task(), landing_status_task()]),
+        ])
     } else {
         let operator = par_all([ramp_unfold_task(), landing_status_task()]);
         par_race([surface_mission_task(), operator])
