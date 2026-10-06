@@ -1198,10 +1198,11 @@ fn request_rover_release() {
 }
 
 /// Shared typed HUD action hook. It is also callable through RunRhaiToolHook
-/// with `unfold_ramps` or `release_rover` as its string argument.
+/// with `unfold_ramps`, `release_rover` or `toggle_gnc` as its string argument.
 fn on_hud_action(action) {
     if action == "unfold_ramps" { return request_ramp_unfold(); }
     if action == "release_rover" { return request_rover_release(); }
+    if action == "toggle_gnc" { return griffin_controls::toggle_gnc(); }
     #{ok: false, error: "unknown Griffin surface-operation HUD action", action: action}
 }
 

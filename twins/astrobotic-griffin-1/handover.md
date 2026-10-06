@@ -2,6 +2,17 @@
 
 **Latest update:** 2026-10-05 (older sections retain their original evidence scope)
 
+## HUD GNC disconnect — 2026-10-06
+
+The surface-operation HUD has a DISCONNECT GNC / RECONNECT GNC action. It
+takes or releases the lander's `piloted` authority through the existing
+`AcquireControl`/`ReleaseControlSource` commands, so the flight law ignores or
+resumes guidance; no second control path exists. Production
+`tests/griffin_gnc_toggle.usda` (GRIFFIN_GNC_TOGGLE) PASS 7 during powered
+descent, including the unknown-action rejection. Manual powered flight is not
+yet stable: at full thrust a single pitch input grows into a flip although the
+RCS delivers the requested torque (diagnosis in the 2026-10-06 session notes).
+
 ## Surface-ops settle verdict and ramp tick cost — 2026-10-06
 
 Unattended surface operations now keep `landing_status_task` running until the

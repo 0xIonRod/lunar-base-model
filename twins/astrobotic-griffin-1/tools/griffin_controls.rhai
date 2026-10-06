@@ -39,10 +39,28 @@ fn show_briefing() {
     set_surface_action_buttons();
 }
 
+/// Whether the lander's guidance (GNC) currently commands it: true while no
+/// pilot holds the lander's `piloted` authority, () when it cannot be read.
+fn gnc_connected() {
+    let lander = find_path(lander_path());
+    if lander == () || lander < 0 { return (); }
+    let piloted = get(lander, "piloted");
+    if piloted == () { return (); }
+    piloted < 0.5
+}
+
 fn set_surface_action_buttons() {
+    set_surface_action_buttons_for(gnc_connected())
+}
+
+/// `gnc` is the guidance state the GNC button offers to change.
+fn set_surface_action_buttons_for(gnc) {
     let result = guided_hud_actions("griffin_surface_ops", "on_hud_action", [
         #{id: "unfold_ramps", label: "OPEN RAMPS  U", enabled: true},
-        #{id: "release_rover", label: "DETACH ROVER  F", enabled: true}
+        #{id: "release_rover", label: "DETACH ROVER  F", enabled: true},
+        #{id: "toggle_gnc",
+          label: if gnc == false { "RECONNECT GNC" } else { "DISCONNECT GNC" },
+          enabled: gnc != ()}
     ]);
     if result == () || result.ok != true {
         let detail = if result == () || result.error == () { "unknown HUD action update rejection" } else { result.error };
@@ -264,6 +282,30 @@ fn control_lander() {
         notify_kind("Lander control was rejected: " + result.error, "error");
     }
     result
+}
+
+/// Disconnect GNC by taking manual possession of the lander (its `piloted`
+/// authority makes the flight law ignore guidance commands), or reconnect it
+/// by releasing that possession. Uses the existing control commands only.
+fn toggle_gnc() {
+    let connected = gnc_connected();
+    if connected == () {
+        notify_kind("Griffin GNC state is not readable from the active scene.", "error");
+        return #{ok: false, error: "lander piloted authority is unavailable"};
+    }
+    let result = if connected { control_lander() } else { release_lander() };
+    if result == () || result.ok != true {
+        let detail = if result == () || result.error == () { "control command rejected" } else { result.error };
+        return #{ok: false, error: detail};
+    }
+    if connected {
+        notify_kind("Griffin GNC disconnected: manual flight.", "warning");
+    } else {
+        hint("GNC RECONNECTED: guidance commands the lander again.");
+        notify_kind("Griffin GNC reconnected.", "success");
+    }
+    set_surface_action_buttons_for(!connected);
+    #{ok: true, gnc_connected: !connected}
 }
 
 fn control_rover() {

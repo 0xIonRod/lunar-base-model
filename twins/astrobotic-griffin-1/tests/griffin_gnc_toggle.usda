@@ -1,0 +1,23 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda@</Griffin1SurfaceOps>
+    documentation = "Production Griffin HUD GNC handoff: disconnect and reconnect guidance during powered descent."
+)
+{
+    def Scope "GncToggle"
+    {
+        def Scope "Observer" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_gnc_toggle.rhai@
+        }
+    }
+}
