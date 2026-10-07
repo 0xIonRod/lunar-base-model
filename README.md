@@ -28,6 +28,24 @@ public facts and unknowns are recorded in
 | [`tools/`](tools/) | Scripts and notebooks; analysis code does not live beside project data. |
 | [`NASA_LUNAR_BASE_OVERVIEW.md`](NASA_LUNAR_BASE_OVERVIEW.md) | Plain-language lunar-base context. |
 
+## Download the Griffin Twin
+
+Download `astrobotic-griffin-1.zip` from a Griffin Twin entry on the
+[Releases page](https://github.com/0xIonRod/lunar-base-model/releases).
+Extract it and open the `astrobotic-griffin-1` folder as a Twin in a compatible
+LunCoSim installation. The archive includes the vehicle assets, scenes,
+scripts, requirements, research, and processed NOBILE03 terrain. LunCoSim
+provides the shared `lunco://` assets and runtime separately.
+
+To publish an archive, use **Actions → Package Astrobotic Griffin Twin →
+Run workflow**, then select the source branch. The workflow must first be
+committed and pushed to the default branch for the manual button to appear.
+Each run publishes a separate release with a ZIP and SHA-256 checksum and
+links to it from the run summary. The workflow runs only when manually
+requested; it does not compile LunCoSim or run simulations. Terrain inputs
+are downloaded from `Assets.toml`, verified against its SHA-256 values, and
+processed with the checked-in Python adapter.
+
 ## Working rules
 
 - Keep facts, assumptions, and simulator inputs separate.
