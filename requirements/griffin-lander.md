@@ -61,7 +61,7 @@ that are specific to this vehicle.
 | `hull` | `/Griffin1/BoxyAirframe` | visible rectangular hull with enabled collider | Boxy study surrogate | As-built dimensions, height, and mass |
 | `upper_deck` | `/Griffin1/IsogridDeck` | visible upper-deck geometry and deck-plate collider | Isogrid-deck study surrogate | As-built deck geometry |
 | `payload_adapter` | `/Griffin1/PayloadAdapter` | `AdapterPlate` enabled collider | FLIP interface role | Release datum and as-built interface |
-| `main_propulsion` | `/Griffin1/MainPropulsion` | chamber, fuel tank, oxidizer tank interfaces | Subassembly presence | Thrust, propellant, mass, inertia, nozzle ICD |
+| `main_propulsion` | `/Griffin1/MainPropulsion` | fuel tank, oxidizer tank and one engine member per main engine | Subassembly presence | Thrust, propellant, mass, inertia, nozzle ICD |
 | `landing_leg_*` | `/Griffin1/LegPX/NX/PZ/NZ` | `Strut` plus one enabled foot-pad collider | Four functional legs; positive inherited study mass | As-built leg geometry and load data |
 | `egress_ramp_*` | `/Griffin1/EgressRampPort/Starboard` | surface and two enabled edge-rail colliders | Positive study mass; command envelope ±0.58 rad | Mechanical stop, actuator, deformation, exact dimensions |
 | `solar_*` | `/Griffin1/SolarPanelPort/Starboard` | visible Xform, cell geometry, and installation metadata | Two separate visual/power proxy arrays | Electrical ICD and flight deployment |

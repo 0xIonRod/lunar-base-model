@@ -93,8 +93,6 @@ def Xform "Griffin1SurfaceOps" (
             float inputs:any_leg_contact.connect = </Griffin1SurfaceOps/Lander.outputs:any_leg_contact>
             float inputs:landing_contact
             float inputs:landing_contact.connect = </Griffin1SurfaceOps/Lander.outputs:landing_contact>
-            float inputs:max_thrust
-            float inputs:max_thrust.connect = </Griffin1SurfaceOps/Lander/MainPropulsion.outputs:maximum_thrust_n>
             float inputs:altimeter_range
             float inputs:altimeter_range.connect = </Griffin1SurfaceOps/Lander/Altimeter/Model.outputs:range_m>
             float inputs:altimeter_position_valid
@@ -143,6 +141,7 @@ def Xform "Griffin1SurfaceOps" (
             double inputs:vehicle_mass.connect = </Griffin1SurfaceOps/Lander.outputs:dynamic_joint_island_mass_kg>
             double inputs:mass_properties_valid
             double inputs:mass_properties_valid.connect = </Griffin1SurfaceOps/Lander.outputs:dynamic_joint_island_mass_valid>
+            float inputs:max_thrust = 21796.28515625
         }
         def "RampHingePort"
         {

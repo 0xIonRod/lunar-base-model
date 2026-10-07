@@ -12,6 +12,29 @@ fn _trial_number(name) {
     value
 }
 
+// Highest chamber pressure across the cluster; () when any engine is unread.
+fn _peak_engine_pressure(main) {
+    let peak=0.0;
+    for name in griffin_spec::main_engine_names() {
+        let value=get(main,griffin_spec::main_engine_port(name,"chamber_pressure_pa"));
+        if value==() {return ();}
+        peak=max(peak,value);
+    }
+    peak
+}
+
+// Each engine's chamber pressure closes with its own reacting flow and bore.
+fn _engine_pressures_close(main, pressure_per_flow, tolerance) {
+    for name in griffin_spec::main_engine_names() {
+        let pressure=get(main,griffin_spec::main_engine_port(name,"chamber_pressure_pa"));
+        let mass_flow=get(main,griffin_spec::main_engine_port(name,"propellant_flow"));
+        let efficiency=get(main,griffin_spec::main_engine_port(name,"mixture_efficiency"));
+        if pressure==() || mass_flow==() || efficiency==()
+            || (pressure-mass_flow*efficiency*pressure_per_flow).abs()>tolerance {return false;}
+    }
+    true
+}
+
 fn _elapsed(start_tick) {
     (sim_tick() - start_tick).to_float() * clock_snapshot().fixed_dt_s
 }
@@ -31,7 +54,7 @@ fn on_start(me, ctx) {
     this.pressure_tolerance=griffin_spec::_typed_model_number(own+"pressureObservationTolerancePa");
     this.pressure_per_flow=griffin_spec::_typed_model_number(own+"characteristicVelocityMps")
         *griffin_spec::_typed_model_number(own+"combustionEfficiency")
-        /griffin_spec::_typed_model_number(own+"totalThroatBoreAreaM2");
+        /griffin_spec::_typed_model_number(own+"engineThroatBoreAreaM2");
     this.pressure_closure_ok=true;
 }
 
@@ -50,7 +73,7 @@ fn on_tick(me, ctx) {
         }
         this.rest_y = sample.position[1];
         this.fuel_before = sample.engine_vehicle_mass_kg;
-        this.cold_pressure=get(this.main,"chamber_pressure_pa");
+        this.cold_pressure=_peak_engine_pressure(this.main);
         // Explicit controller ownership is required when no render camera is
         // bound. A session-only possession cannot deliver semantic pilot input.
         let avatar = find_path("/Griffin1SurfaceOps/Avatar");
@@ -77,12 +100,8 @@ fn on_tick(me, ctx) {
         this.lift = max(this.lift, sample.position[1] - this.rest_y);
         // Pressure closes with useful reacting flow. Tank pressure imbalance
         // and physical valve saturation can reduce the mixture efficiency.
-        let pressure=get(this.main,"chamber_pressure_pa");
-        let mass_flow=get(this.main,"propellant_flow");
-        let mixture_efficiency=get(this.main,"mixture_efficiency");
-        this.pressure_closure_ok=this.pressure_closure_ok && pressure!=() && mass_flow!=()
-            && mixture_efficiency!=()
-            && (pressure-mass_flow*mixture_efficiency*this.pressure_per_flow).abs()<=this.pressure_tolerance;
+        this.pressure_closure_ok=this.pressure_closure_ok
+            && _engine_pressures_close(this.main,this.pressure_per_flow,this.pressure_tolerance);
         if tick % 60 == 0 {
             this.samples.push(sample);
             print("GRIFFIN_ENGINE_COMMAND_SAMPLE " + sample);
@@ -99,7 +118,7 @@ fn on_tick(me, ctx) {
     }
     if _elapsed(this.phase_tick) < _trial_number("releaseDurationS") {return;}
     this.done = true;
-    let final_pressure=get(this.main,"chamber_pressure_pa");
+    let final_pressure=_peak_engine_pressure(this.main);
     print("GRIFFIN_ENGINE_RELEASE pressure_pa="+final_pressure+" thrust_n="+sample.engine_thrust_n);
     report_verdict([
         t_true(this.peak_thrust > _trial_number("extinguishedThrustThresholdN"), "held pilot demand did not produce useful thrust"),
@@ -115,7 +134,7 @@ fn on_tick(me, ctx) {
         t_true(this.cold_pressure!=() && this.cold_pressure<this.pressure_tolerance,
             "cold chamber retained liquid-feed pressure"),
         t_true(this.pressure_closure_ok,"chamber pressure did not follow combustion flow and bore area"),
-        t_true(final_pressure<this.pressure_tolerance,
+        t_true(final_pressure!=() && final_pressure<this.pressure_tolerance,
             "release chamber pressure remained above settling threshold: "+final_pressure),
     ], "GRIFFIN ENGINE COMMANDS", "GRIFFIN_ENGINE_COMMANDS");
 }

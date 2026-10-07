@@ -148,25 +148,11 @@ def Xform "Griffin1" (
         int lunco:ui:schemaRow = 1
         string lunco:ui:schemaRole = "Throttle in · downward braking"
         uniform token collection:components:expansionRule = "explicitOnly"
-        custom rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/FuelValve>, </Griffin1/MainPropulsion/OxidizerValve>, </Griffin1/MainPropulsion/MainChamber>, </Griffin1/MainPropulsion/NozzleDesign>, </Griffin1/MainPropulsion/PlumePhotometry>, </Griffin1/MainPropulsion/PropellantStatus>]
+        custom rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/NozzleDesign>, </Griffin1/MainPropulsion/PropellantStatus>, </Griffin1/MainPropulsion/Engine01>, </Griffin1/MainPropulsion/Engine01Plume>, </Griffin1/MainPropulsion/Engine02>, </Griffin1/MainPropulsion/Engine02Plume>, </Griffin1/MainPropulsion/Engine03>, </Griffin1/MainPropulsion/Engine03Plume>, </Griffin1/MainPropulsion/Engine04>, </Griffin1/MainPropulsion/Engine04Plume>, </Griffin1/MainPropulsion/Engine05>, </Griffin1/MainPropulsion/Engine05Plume>, </Griffin1/MainPropulsion/Engine06>, </Griffin1/MainPropulsion/Engine06Plume>, </Griffin1/MainPropulsion/Engine07>, </Griffin1/MainPropulsion/Engine07Plume>]
         float inputs:rcs_fuel_mass_flow_kgs
         float inputs:rcs_fuel_mass_flow_kgs.connect = </Griffin1/AttitudePropulsion.outputs:fuel_mass_flow_kgs>
         float inputs:rcs_oxidizer_mass_flow_kgs
         float inputs:rcs_oxidizer_mass_flow_kgs.connect = </Griffin1/AttitudePropulsion.outputs:oxidizer_mass_flow_kgs>
-        float outputs:thrust_n
-        float outputs:thrust_n.connect = </Griffin1/MainPropulsion/MainChamber.outputs:thrust_n>
-        float outputs:exhaust_velocity_mps
-        float outputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/MainChamber.outputs:exhaust_velocity_mps>
-        float outputs:design_exhaust_velocity_mps
-        float outputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/MainChamber.outputs:design_exhaust_velocity_mps>
-        float outputs:maximum_thrust_n
-        float outputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/MainChamber.outputs:maximum_thrust_n>
-        float outputs:engine_activity
-        float outputs:engine_activity.connect = </Griffin1/MainPropulsion/MainChamber.outputs:activity>
-        float outputs:propellant_flow
-        float outputs:propellant_flow.connect = </Griffin1/MainPropulsion/MainChamber.outputs:propellant_flow>
-        float outputs:chamber_pressure_pa
-        float outputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion/MainChamber.outputs:chamber_pressure_pa>
         float outputs:propellant_mass
         float outputs:propellant_mass.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:propellant_mass_kg>
         float outputs:propellant_fraction
@@ -197,8 +183,125 @@ def Xform "Griffin1" (
         float outputs:oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
         custom float inputs:flow_fraction_command
         float inputs:flow_fraction_command.connect = </Griffin1.outputs:throttle>
-        custom float outputs:mixture_efficiency
-        float outputs:mixture_efficiency.connect = </Griffin1/MainPropulsion/MainChamber.outputs:mixture_efficiency>
+        float inputs:engine01_enabled = 1.0
+        custom double outputs:engine01_thrust_n
+        double outputs:engine01_thrust_n.connect = </Griffin1/MainPropulsion/Engine01.outputs:thrust_n>
+        custom double outputs:engine01_maximum_thrust_n
+        double outputs:engine01_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine01.outputs:maximum_thrust_n>
+        custom double outputs:engine01_activity
+        double outputs:engine01_activity.connect = </Griffin1/MainPropulsion/Engine01.outputs:activity>
+        custom double outputs:engine01_chamber_pressure_pa
+        double outputs:engine01_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine01.outputs:chamber_pressure_pa>
+        custom double outputs:engine01_propellant_flow
+        double outputs:engine01_propellant_flow.connect = </Griffin1/MainPropulsion/Engine01.outputs:propellant_flow>
+        custom double outputs:engine01_fuel_flow_kgs
+        double outputs:engine01_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:fuel_flow_kgs>
+        custom double outputs:engine01_oxidizer_flow_kgs
+        double outputs:engine01_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:oxidizer_flow_kgs>
+        custom double outputs:engine01_mixture_efficiency
+        double outputs:engine01_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine01.outputs:mixture_efficiency>
+        float inputs:engine02_enabled = 1.0
+        custom double outputs:engine02_thrust_n
+        double outputs:engine02_thrust_n.connect = </Griffin1/MainPropulsion/Engine02.outputs:thrust_n>
+        custom double outputs:engine02_maximum_thrust_n
+        double outputs:engine02_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine02.outputs:maximum_thrust_n>
+        custom double outputs:engine02_activity
+        double outputs:engine02_activity.connect = </Griffin1/MainPropulsion/Engine02.outputs:activity>
+        custom double outputs:engine02_chamber_pressure_pa
+        double outputs:engine02_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine02.outputs:chamber_pressure_pa>
+        custom double outputs:engine02_propellant_flow
+        double outputs:engine02_propellant_flow.connect = </Griffin1/MainPropulsion/Engine02.outputs:propellant_flow>
+        custom double outputs:engine02_fuel_flow_kgs
+        double outputs:engine02_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:fuel_flow_kgs>
+        custom double outputs:engine02_oxidizer_flow_kgs
+        double outputs:engine02_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:oxidizer_flow_kgs>
+        custom double outputs:engine02_mixture_efficiency
+        double outputs:engine02_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine02.outputs:mixture_efficiency>
+        float inputs:engine03_enabled = 1.0
+        custom double outputs:engine03_thrust_n
+        double outputs:engine03_thrust_n.connect = </Griffin1/MainPropulsion/Engine03.outputs:thrust_n>
+        custom double outputs:engine03_maximum_thrust_n
+        double outputs:engine03_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine03.outputs:maximum_thrust_n>
+        custom double outputs:engine03_activity
+        double outputs:engine03_activity.connect = </Griffin1/MainPropulsion/Engine03.outputs:activity>
+        custom double outputs:engine03_chamber_pressure_pa
+        double outputs:engine03_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine03.outputs:chamber_pressure_pa>
+        custom double outputs:engine03_propellant_flow
+        double outputs:engine03_propellant_flow.connect = </Griffin1/MainPropulsion/Engine03.outputs:propellant_flow>
+        custom double outputs:engine03_fuel_flow_kgs
+        double outputs:engine03_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:fuel_flow_kgs>
+        custom double outputs:engine03_oxidizer_flow_kgs
+        double outputs:engine03_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:oxidizer_flow_kgs>
+        custom double outputs:engine03_mixture_efficiency
+        double outputs:engine03_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine03.outputs:mixture_efficiency>
+        float inputs:engine04_enabled = 1.0
+        custom double outputs:engine04_thrust_n
+        double outputs:engine04_thrust_n.connect = </Griffin1/MainPropulsion/Engine04.outputs:thrust_n>
+        custom double outputs:engine04_maximum_thrust_n
+        double outputs:engine04_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine04.outputs:maximum_thrust_n>
+        custom double outputs:engine04_activity
+        double outputs:engine04_activity.connect = </Griffin1/MainPropulsion/Engine04.outputs:activity>
+        custom double outputs:engine04_chamber_pressure_pa
+        double outputs:engine04_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine04.outputs:chamber_pressure_pa>
+        custom double outputs:engine04_propellant_flow
+        double outputs:engine04_propellant_flow.connect = </Griffin1/MainPropulsion/Engine04.outputs:propellant_flow>
+        custom double outputs:engine04_fuel_flow_kgs
+        double outputs:engine04_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:fuel_flow_kgs>
+        custom double outputs:engine04_oxidizer_flow_kgs
+        double outputs:engine04_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:oxidizer_flow_kgs>
+        custom double outputs:engine04_mixture_efficiency
+        double outputs:engine04_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine04.outputs:mixture_efficiency>
+        float inputs:engine05_enabled = 1.0
+        custom double outputs:engine05_thrust_n
+        double outputs:engine05_thrust_n.connect = </Griffin1/MainPropulsion/Engine05.outputs:thrust_n>
+        custom double outputs:engine05_maximum_thrust_n
+        double outputs:engine05_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine05.outputs:maximum_thrust_n>
+        custom double outputs:engine05_activity
+        double outputs:engine05_activity.connect = </Griffin1/MainPropulsion/Engine05.outputs:activity>
+        custom double outputs:engine05_chamber_pressure_pa
+        double outputs:engine05_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine05.outputs:chamber_pressure_pa>
+        custom double outputs:engine05_propellant_flow
+        double outputs:engine05_propellant_flow.connect = </Griffin1/MainPropulsion/Engine05.outputs:propellant_flow>
+        custom double outputs:engine05_fuel_flow_kgs
+        double outputs:engine05_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:fuel_flow_kgs>
+        custom double outputs:engine05_oxidizer_flow_kgs
+        double outputs:engine05_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:oxidizer_flow_kgs>
+        custom double outputs:engine05_mixture_efficiency
+        double outputs:engine05_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine05.outputs:mixture_efficiency>
+        float inputs:engine06_enabled = 1.0
+        custom double outputs:engine06_thrust_n
+        double outputs:engine06_thrust_n.connect = </Griffin1/MainPropulsion/Engine06.outputs:thrust_n>
+        custom double outputs:engine06_maximum_thrust_n
+        double outputs:engine06_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine06.outputs:maximum_thrust_n>
+        custom double outputs:engine06_activity
+        double outputs:engine06_activity.connect = </Griffin1/MainPropulsion/Engine06.outputs:activity>
+        custom double outputs:engine06_chamber_pressure_pa
+        double outputs:engine06_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine06.outputs:chamber_pressure_pa>
+        custom double outputs:engine06_propellant_flow
+        double outputs:engine06_propellant_flow.connect = </Griffin1/MainPropulsion/Engine06.outputs:propellant_flow>
+        custom double outputs:engine06_fuel_flow_kgs
+        double outputs:engine06_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:fuel_flow_kgs>
+        custom double outputs:engine06_oxidizer_flow_kgs
+        double outputs:engine06_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:oxidizer_flow_kgs>
+        custom double outputs:engine06_mixture_efficiency
+        double outputs:engine06_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine06.outputs:mixture_efficiency>
+        float inputs:engine07_enabled = 1.0
+        custom double outputs:engine07_thrust_n
+        double outputs:engine07_thrust_n.connect = </Griffin1/MainPropulsion/Engine07.outputs:thrust_n>
+        custom double outputs:engine07_maximum_thrust_n
+        double outputs:engine07_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine07.outputs:maximum_thrust_n>
+        custom double outputs:engine07_activity
+        double outputs:engine07_activity.connect = </Griffin1/MainPropulsion/Engine07.outputs:activity>
+        custom double outputs:engine07_chamber_pressure_pa
+        double outputs:engine07_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine07.outputs:chamber_pressure_pa>
+        custom double outputs:engine07_propellant_flow
+        double outputs:engine07_propellant_flow.connect = </Griffin1/MainPropulsion/Engine07.outputs:propellant_flow>
+        custom double outputs:engine07_fuel_flow_kgs
+        double outputs:engine07_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:fuel_flow_kgs>
+        custom double outputs:engine07_oxidizer_flow_kgs
+        double outputs:engine07_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:oxidizer_flow_kgs>
+        custom double outputs:engine07_mixture_efficiency
+        double outputs:engine07_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine07.outputs:mixture_efficiency>
         def Scope "FuelRemainingTelemetry" (
             prepend apiSchemas = "LunCoTelemetryAPI"
         )
@@ -209,18 +312,6 @@ def Xform "Griffin1" (
             token lunco:telemetry:name = "lander.fuel_remaining"
             token lunco:telemetry:unit = "kg"
             string lunco:telemetry:description = "Remaining fuel and oxidizer mass from the lander's PropellantStatus model."
-            rel lunco:telemetry:target = </Griffin1/MainPropulsion>
-        }
-        def Scope "MainThrustTelemetry" (
-            prepend apiSchemas = "LunCoTelemetryAPI"
-        )
-        {
-            bool lunco:telemetry = true
-            string ui:displayName = "THRUST"
-            token lunco:telemetry:port = "thrust_n"
-            token lunco:telemetry:name = "lander.main_thrust"
-            token lunco:telemetry:unit = "N"
-            string lunco:telemetry:description = "Delivered main-engine thrust from the lander's Modelica propulsion model."
             rel lunco:telemetry:target = </Griffin1/MainPropulsion>
         }
         def Scope "FuelTank" (
@@ -242,7 +333,7 @@ def Xform "Griffin1" (
             float inputs:auxiliary_mass_flow_kgs
             float inputs:auxiliary_mass_flow_kgs.connect = </Griffin1/MainPropulsion.inputs:rcs_fuel_mass_flow_kgs>
             custom token connectors:outlet
-            token connectors:outlet.connect = </Griffin1/MainPropulsion/FuelValve.connectors:inlet>
+            token connectors:outlet.connect = [</Griffin1/MainPropulsion/Engine01.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine02.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine03.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine04.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine05.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine06.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine07.connectors:fuel_in>]
             double inputs:initial_mass_kg = 1000.0
             double inputs:nominal_pressure_pa = 2500000.0
             double inputs:pressure_headroom_pa = 500000.0
@@ -266,47 +357,10 @@ def Xform "Griffin1" (
             float inputs:auxiliary_mass_flow_kgs
             float inputs:auxiliary_mass_flow_kgs.connect = </Griffin1/MainPropulsion.inputs:rcs_oxidizer_mass_flow_kgs>
             custom token connectors:outlet
-            token connectors:outlet.connect = </Griffin1/MainPropulsion/OxidizerValve.connectors:inlet>
+            token connectors:outlet.connect = [</Griffin1/MainPropulsion/Engine01.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine02.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine03.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine04.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine05.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine06.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine07.connectors:oxidizer_in>]
             double inputs:initial_mass_kg = 1000.0
             double inputs:nominal_pressure_pa = 2500000.0
             double inputs:pressure_headroom_pa = 500000.0
-        }
-        def Scope "MainChamber" (
-            prepend apiSchemas = "LunCoProgramAPI"
-        )
-        {
-            uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedCombustionChamber.mo@
-            uniform bool lunco:program:realtimeSafe = true
-            float inputs:chamber_temperature_full_k = 3300.0
-            float inputs:minimum_flow_kgs = 0.0000009999999974752427
-            float inputs:minimum_throat_area_m2 = 0.0000000009999999717180685
-            float inputs:minimum_mixture_ratio = 0.0000009999999974752427
-            float inputs:fuel_energy_j_kg = 40000000.0
-            custom token connectors:fuel_in
-            custom token connectors:oxidizer_in
-            float outputs:fuel_flow_kgs
-            float outputs:oxidizer_flow_kgs
-            float outputs:propellant_flow
-            float outputs:mixture_ratio
-            float outputs:mixture_ratio_error
-            float outputs:mixture_efficiency
-            float outputs:chamber_pressure_pa
-            float outputs:ideal_chamber_pressure_pa
-            float outputs:chamber_temperature_k
-            float outputs:thrust_n
-            float outputs:exhaust_velocity_mps
-            float outputs:design_exhaust_velocity_mps
-            float outputs:maximum_thrust_n
-            float outputs:activity
-            float outputs:heat_release_w
-            double inputs:oxidizer_to_fuel_ratio = 2.6
-            double inputs:characteristic_velocity_mps = 1550.0
-            double inputs:throat_area_m2 = 0.007186840039031625
-            double inputs:combustion_efficiency = 0.96
-            double inputs:nominal_flow_kgs = 7.24479842644317
-            custom float inputs:effective_exhaust_velocity_mps
-            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
         }
         def Scope "NozzleDesign" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -321,58 +375,12 @@ def Xform "Griffin1" (
             float outputs:exit_radius_m
             float inputs:p_ambient = 0.0
             float inputs:g0 = 9.806650161743164
+            float outputs:ideal_exhaust_velocity_mps = 0.0
             double inputs:throat_radius = 0.018077777339853586
             double inputs:exit_radius = 0.334
             double inputs:p_chamber = 1500000.0
             double inputs:gamma = 1.2
             double inputs:characteristic_velocity_mps = 1550.0
-            float outputs:ideal_exhaust_velocity_mps = 0.0
-        }
-        def Scope "PlumePhotometry" (
-            prepend apiSchemas = "LunCoProgramAPI"
-        )
-        {
-            uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
-            uniform bool lunco:program:realtimeSafe = true
-            float outputs:render_throttle = 0.0
-            float outputs:visual_length_fraction = 0.0
-            float outputs:intensity = 0.0
-            float outputs:radius = 0.0
-            float inputs:nozzle_exit_pressure_pa = 0.0
-            float inputs:design_chamber_pressure_pa = 0.0
-            float inputs:ambient_pressure_pa = 0.0
-            float inputs:pressure_threshold_pa = 1000.0
-            float inputs:engine_count = 7.0
-            float inputs:throttle
-            float inputs:throttle.connect = </Griffin1/MainPropulsion.outputs:engine_activity>
-            float inputs:thrust_n
-            float inputs:thrust_n.connect = </Griffin1/MainPropulsion.outputs:thrust_n>
-            float inputs:maximum_thrust_n
-            float inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion.outputs:maximum_thrust_n>
-            float inputs:propellant_flow_kgs
-            float inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion.outputs:propellant_flow>
-            float inputs:exhaust_velocity_mps
-            float inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:exhaust_velocity_mps>
-            float inputs:design_exhaust_velocity_mps
-            float inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion.outputs:design_exhaust_velocity_mps>
-            float inputs:nozzle_exit_radius_m
-            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
-            float inputs:nozzle_exit_area_m2
-            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
-            float inputs:chamber_pressure_pa
-            float inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion.outputs:chamber_pressure_pa>
-            float inputs:fuel_family = 3.0
-            float inputs:stoichiometric_mixture_ratio = 2.0
-            custom float inputs:mixture_ratio
-            float inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/MainChamber.outputs:mixture_ratio>
-            float outputs:color_b = 0.0
-            float outputs:color_g = 0.0
-            float outputs:color_r = 0.0
-            float outputs:core_envelope_radius_m = 0.0
-            float outputs:envelope_center_y_m = 0.0
-            float outputs:envelope_length_m = 0.0
-            float outputs:envelope_radius_m = 0.0
         }
         def Scope "PropellantStatus" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -409,55 +417,726 @@ def Xform "Griffin1" (
             float inputs:oxidizer_mass_kg
             float inputs:oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
         }
-        def Scope "FuelValve" (
+        def Scope "Engine01" (
             prepend apiSchemas = "LunCoProgramAPI"
         )
         {
             uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedValve.mo@
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
             uniform bool lunco:program:realtimeSafe = true
-            double inputs:maximum_flow_kgs = 2.012444007345325
+            double inputs:fuel_maximum_flow_kgs = 0.28749200104933215
+            double inputs:fuel_commanded_flow_kgs = 0.28749200104933215
+            double inputs:oxidizer_maximum_flow_kgs = 0.7474792027282636
+            double inputs:oxidizer_commanded_flow_kgs = 0.7474792027282636
             double inputs:nominal_pressure_drop_pa = 1000000.0
             double inputs:opening_time_constant_s = 0.08
             double inputs:availability_transition_mass_kg = 0.01
-            custom float inputs:available_mass_kg
-            float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
-            custom token connectors:inlet
-            token connectors:inlet.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
-            custom token connectors:outlet
-            token connectors:outlet.connect = </Griffin1/MainPropulsion/MainChamber.connectors:fuel_in>
-            double outputs:mass_flow_kgs = 0.0
-            double outputs:outlet_pressure_pa = 0.0
-            double outputs:pressure_drop_pa = 0.0
-            double outputs:activity = 0.0
-            double inputs:commanded_flow_kgs = 2.012444007345325
+            double inputs:oxidizer_to_fuel_ratio = 2.6
+            double inputs:characteristic_velocity_mps = 1550.0
+            double inputs:throat_area_m2 = 0.001026691434147375
+            double inputs:combustion_efficiency = 0.96
+            double inputs:nominal_flow_kgs = 1.0349712037775958
             custom float inputs:flow_fraction_command
             float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+            custom float inputs:enabled
+            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine01_enabled>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+            custom float inputs:effective_exhaust_velocity_mps
+            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            custom token connectors:fuel_in
+            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            custom token connectors:oxidizer_in
+            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            double outputs:thrust_n = 0.0
+            double outputs:maximum_thrust_n = 0.0
+            double outputs:activity = 0.0
+            double outputs:chamber_pressure_pa = 0.0
+            double outputs:propellant_flow = 0.0
+            double outputs:fuel_flow_kgs = 0.0
+            double outputs:oxidizer_flow_kgs = 0.0
+            double outputs:mixture_ratio = 0.0
+            double outputs:mixture_efficiency = 0.0
+            double outputs:exhaust_velocity_mps = 0.0
+            double outputs:design_exhaust_velocity_mps = 0.0
         }
-        def Scope "OxidizerValve" (
+        def Scope "Engine01Plume" (
             prepend apiSchemas = "LunCoProgramAPI"
         )
         {
             uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedValve.mo@
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
-            double inputs:maximum_flow_kgs = 5.232354419097845
+            custom double inputs:throttle
+            double inputs:throttle.connect = </Griffin1/MainPropulsion/Engine01.outputs:activity>
+            custom double inputs:thrust_n
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine01.outputs:thrust_n>
+            custom double inputs:maximum_thrust_n
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine01.outputs:maximum_thrust_n>
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:propellant_flow>
+            custom double inputs:exhaust_velocity_mps
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine01.outputs:exhaust_velocity_mps>
+            custom double inputs:design_exhaust_velocity_mps
+            double inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine01.outputs:design_exhaust_velocity_mps>
+            custom double inputs:chamber_pressure_pa
+            double inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine01.outputs:chamber_pressure_pa>
+            custom double inputs:mixture_ratio
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine01.outputs:mixture_ratio>
+            custom float inputs:nozzle_exit_radius_m
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom float inputs:nozzle_exit_area_m2
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:engine_count = 1.0
+            float inputs:fuel_family = 3.0
+            float inputs:stoichiometric_mixture_ratio = 2.0
+            float inputs:nozzle_exit_pressure_pa = 0.0
+            float inputs:ambient_pressure_pa = 0.0
+            float inputs:pressure_threshold_pa = 1000.0
+            float outputs:length = 0.0
+            float outputs:render_throttle = 0.0
+            float outputs:visual_length_fraction = 0.0
+            float outputs:intensity = 0.0
+            float outputs:radius = 0.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+        }
+        def Scope "Engine01ThrustTelemetry" (
+            prepend apiSchemas = "LunCoTelemetryAPI"
+        )
+        {
+            bool lunco:telemetry = true
+            string ui:displayName = '"ENGINE01 THRUST"'
+            token lunco:telemetry:port = "engine01_thrust_n"
+            token lunco:telemetry:name = "lander.engine01_thrust"
+            token lunco:telemetry:unit = "N"
+            string lunco:telemetry:description = '"Delivered thrust of main engine Engine01 from its PressureFedEngine model."'
+            custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
+        }
+        def Scope "Engine02" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            double inputs:fuel_maximum_flow_kgs = 0.28749200104933215
+            double inputs:fuel_commanded_flow_kgs = 0.28749200104933215
+            double inputs:oxidizer_maximum_flow_kgs = 0.7474792027282636
+            double inputs:oxidizer_commanded_flow_kgs = 0.7474792027282636
             double inputs:nominal_pressure_drop_pa = 1000000.0
             double inputs:opening_time_constant_s = 0.08
             double inputs:availability_transition_mass_kg = 0.01
-            custom float inputs:available_mass_kg
-            float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom token connectors:inlet
-            token connectors:inlet.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
-            custom token connectors:outlet
-            token connectors:outlet.connect = </Griffin1/MainPropulsion/MainChamber.connectors:oxidizer_in>
-            double outputs:mass_flow_kgs = 0.0
-            double outputs:outlet_pressure_pa = 0.0
-            double outputs:pressure_drop_pa = 0.0
-            double outputs:activity = 0.0
-            double inputs:commanded_flow_kgs = 5.232354419097845
+            double inputs:oxidizer_to_fuel_ratio = 2.6
+            double inputs:characteristic_velocity_mps = 1550.0
+            double inputs:throat_area_m2 = 0.001026691434147375
+            double inputs:combustion_efficiency = 0.96
+            double inputs:nominal_flow_kgs = 1.0349712037775958
             custom float inputs:flow_fraction_command
             float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+            custom float inputs:enabled
+            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine02_enabled>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+            custom float inputs:effective_exhaust_velocity_mps
+            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            custom token connectors:fuel_in
+            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            custom token connectors:oxidizer_in
+            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            double outputs:thrust_n = 0.0
+            double outputs:maximum_thrust_n = 0.0
+            double outputs:activity = 0.0
+            double outputs:chamber_pressure_pa = 0.0
+            double outputs:propellant_flow = 0.0
+            double outputs:fuel_flow_kgs = 0.0
+            double outputs:oxidizer_flow_kgs = 0.0
+            double outputs:mixture_ratio = 0.0
+            double outputs:mixture_efficiency = 0.0
+            double outputs:exhaust_velocity_mps = 0.0
+            double outputs:design_exhaust_velocity_mps = 0.0
+        }
+        def Scope "Engine02Plume" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:throttle
+            double inputs:throttle.connect = </Griffin1/MainPropulsion/Engine02.outputs:activity>
+            custom double inputs:thrust_n
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine02.outputs:thrust_n>
+            custom double inputs:maximum_thrust_n
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine02.outputs:maximum_thrust_n>
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:propellant_flow>
+            custom double inputs:exhaust_velocity_mps
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine02.outputs:exhaust_velocity_mps>
+            custom double inputs:design_exhaust_velocity_mps
+            double inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine02.outputs:design_exhaust_velocity_mps>
+            custom double inputs:chamber_pressure_pa
+            double inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine02.outputs:chamber_pressure_pa>
+            custom double inputs:mixture_ratio
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine02.outputs:mixture_ratio>
+            custom float inputs:nozzle_exit_radius_m
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom float inputs:nozzle_exit_area_m2
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:engine_count = 1.0
+            float inputs:fuel_family = 3.0
+            float inputs:stoichiometric_mixture_ratio = 2.0
+            float inputs:nozzle_exit_pressure_pa = 0.0
+            float inputs:ambient_pressure_pa = 0.0
+            float inputs:pressure_threshold_pa = 1000.0
+            float outputs:length = 0.0
+            float outputs:render_throttle = 0.0
+            float outputs:visual_length_fraction = 0.0
+            float outputs:intensity = 0.0
+            float outputs:radius = 0.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+        }
+        def Scope "Engine02ThrustTelemetry" (
+            prepend apiSchemas = "LunCoTelemetryAPI"
+        )
+        {
+            bool lunco:telemetry = true
+            string ui:displayName = '"ENGINE02 THRUST"'
+            token lunco:telemetry:port = "engine02_thrust_n"
+            token lunco:telemetry:name = "lander.engine02_thrust"
+            token lunco:telemetry:unit = "N"
+            string lunco:telemetry:description = '"Delivered thrust of main engine Engine02 from its PressureFedEngine model."'
+            custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
+        }
+        def Scope "Engine03" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            double inputs:fuel_maximum_flow_kgs = 0.28749200104933215
+            double inputs:fuel_commanded_flow_kgs = 0.28749200104933215
+            double inputs:oxidizer_maximum_flow_kgs = 0.7474792027282636
+            double inputs:oxidizer_commanded_flow_kgs = 0.7474792027282636
+            double inputs:nominal_pressure_drop_pa = 1000000.0
+            double inputs:opening_time_constant_s = 0.08
+            double inputs:availability_transition_mass_kg = 0.01
+            double inputs:oxidizer_to_fuel_ratio = 2.6
+            double inputs:characteristic_velocity_mps = 1550.0
+            double inputs:throat_area_m2 = 0.001026691434147375
+            double inputs:combustion_efficiency = 0.96
+            double inputs:nominal_flow_kgs = 1.0349712037775958
+            custom float inputs:flow_fraction_command
+            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+            custom float inputs:enabled
+            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine03_enabled>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+            custom float inputs:effective_exhaust_velocity_mps
+            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            custom token connectors:fuel_in
+            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            custom token connectors:oxidizer_in
+            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            double outputs:thrust_n = 0.0
+            double outputs:maximum_thrust_n = 0.0
+            double outputs:activity = 0.0
+            double outputs:chamber_pressure_pa = 0.0
+            double outputs:propellant_flow = 0.0
+            double outputs:fuel_flow_kgs = 0.0
+            double outputs:oxidizer_flow_kgs = 0.0
+            double outputs:mixture_ratio = 0.0
+            double outputs:mixture_efficiency = 0.0
+            double outputs:exhaust_velocity_mps = 0.0
+            double outputs:design_exhaust_velocity_mps = 0.0
+        }
+        def Scope "Engine03Plume" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:throttle
+            double inputs:throttle.connect = </Griffin1/MainPropulsion/Engine03.outputs:activity>
+            custom double inputs:thrust_n
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine03.outputs:thrust_n>
+            custom double inputs:maximum_thrust_n
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine03.outputs:maximum_thrust_n>
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:propellant_flow>
+            custom double inputs:exhaust_velocity_mps
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine03.outputs:exhaust_velocity_mps>
+            custom double inputs:design_exhaust_velocity_mps
+            double inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine03.outputs:design_exhaust_velocity_mps>
+            custom double inputs:chamber_pressure_pa
+            double inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine03.outputs:chamber_pressure_pa>
+            custom double inputs:mixture_ratio
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine03.outputs:mixture_ratio>
+            custom float inputs:nozzle_exit_radius_m
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom float inputs:nozzle_exit_area_m2
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:engine_count = 1.0
+            float inputs:fuel_family = 3.0
+            float inputs:stoichiometric_mixture_ratio = 2.0
+            float inputs:nozzle_exit_pressure_pa = 0.0
+            float inputs:ambient_pressure_pa = 0.0
+            float inputs:pressure_threshold_pa = 1000.0
+            float outputs:length = 0.0
+            float outputs:render_throttle = 0.0
+            float outputs:visual_length_fraction = 0.0
+            float outputs:intensity = 0.0
+            float outputs:radius = 0.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+        }
+        def Scope "Engine03ThrustTelemetry" (
+            prepend apiSchemas = "LunCoTelemetryAPI"
+        )
+        {
+            bool lunco:telemetry = true
+            string ui:displayName = '"ENGINE03 THRUST"'
+            token lunco:telemetry:port = "engine03_thrust_n"
+            token lunco:telemetry:name = "lander.engine03_thrust"
+            token lunco:telemetry:unit = "N"
+            string lunco:telemetry:description = '"Delivered thrust of main engine Engine03 from its PressureFedEngine model."'
+            custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
+        }
+        def Scope "Engine04" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            double inputs:fuel_maximum_flow_kgs = 0.28749200104933215
+            double inputs:fuel_commanded_flow_kgs = 0.28749200104933215
+            double inputs:oxidizer_maximum_flow_kgs = 0.7474792027282636
+            double inputs:oxidizer_commanded_flow_kgs = 0.7474792027282636
+            double inputs:nominal_pressure_drop_pa = 1000000.0
+            double inputs:opening_time_constant_s = 0.08
+            double inputs:availability_transition_mass_kg = 0.01
+            double inputs:oxidizer_to_fuel_ratio = 2.6
+            double inputs:characteristic_velocity_mps = 1550.0
+            double inputs:throat_area_m2 = 0.001026691434147375
+            double inputs:combustion_efficiency = 0.96
+            double inputs:nominal_flow_kgs = 1.0349712037775958
+            custom float inputs:flow_fraction_command
+            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+            custom float inputs:enabled
+            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine04_enabled>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+            custom float inputs:effective_exhaust_velocity_mps
+            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            custom token connectors:fuel_in
+            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            custom token connectors:oxidizer_in
+            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            double outputs:thrust_n = 0.0
+            double outputs:maximum_thrust_n = 0.0
+            double outputs:activity = 0.0
+            double outputs:chamber_pressure_pa = 0.0
+            double outputs:propellant_flow = 0.0
+            double outputs:fuel_flow_kgs = 0.0
+            double outputs:oxidizer_flow_kgs = 0.0
+            double outputs:mixture_ratio = 0.0
+            double outputs:mixture_efficiency = 0.0
+            double outputs:exhaust_velocity_mps = 0.0
+            double outputs:design_exhaust_velocity_mps = 0.0
+        }
+        def Scope "Engine04Plume" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:throttle
+            double inputs:throttle.connect = </Griffin1/MainPropulsion/Engine04.outputs:activity>
+            custom double inputs:thrust_n
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine04.outputs:thrust_n>
+            custom double inputs:maximum_thrust_n
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine04.outputs:maximum_thrust_n>
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:propellant_flow>
+            custom double inputs:exhaust_velocity_mps
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine04.outputs:exhaust_velocity_mps>
+            custom double inputs:design_exhaust_velocity_mps
+            double inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine04.outputs:design_exhaust_velocity_mps>
+            custom double inputs:chamber_pressure_pa
+            double inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine04.outputs:chamber_pressure_pa>
+            custom double inputs:mixture_ratio
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine04.outputs:mixture_ratio>
+            custom float inputs:nozzle_exit_radius_m
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom float inputs:nozzle_exit_area_m2
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:engine_count = 1.0
+            float inputs:fuel_family = 3.0
+            float inputs:stoichiometric_mixture_ratio = 2.0
+            float inputs:nozzle_exit_pressure_pa = 0.0
+            float inputs:ambient_pressure_pa = 0.0
+            float inputs:pressure_threshold_pa = 1000.0
+            float outputs:length = 0.0
+            float outputs:render_throttle = 0.0
+            float outputs:visual_length_fraction = 0.0
+            float outputs:intensity = 0.0
+            float outputs:radius = 0.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+        }
+        def Scope "Engine04ThrustTelemetry" (
+            prepend apiSchemas = "LunCoTelemetryAPI"
+        )
+        {
+            bool lunco:telemetry = true
+            string ui:displayName = '"ENGINE04 THRUST"'
+            token lunco:telemetry:port = "engine04_thrust_n"
+            token lunco:telemetry:name = "lander.engine04_thrust"
+            token lunco:telemetry:unit = "N"
+            string lunco:telemetry:description = '"Delivered thrust of main engine Engine04 from its PressureFedEngine model."'
+            custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
+        }
+        def Scope "Engine05" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            double inputs:fuel_maximum_flow_kgs = 0.28749200104933215
+            double inputs:fuel_commanded_flow_kgs = 0.28749200104933215
+            double inputs:oxidizer_maximum_flow_kgs = 0.7474792027282636
+            double inputs:oxidizer_commanded_flow_kgs = 0.7474792027282636
+            double inputs:nominal_pressure_drop_pa = 1000000.0
+            double inputs:opening_time_constant_s = 0.08
+            double inputs:availability_transition_mass_kg = 0.01
+            double inputs:oxidizer_to_fuel_ratio = 2.6
+            double inputs:characteristic_velocity_mps = 1550.0
+            double inputs:throat_area_m2 = 0.001026691434147375
+            double inputs:combustion_efficiency = 0.96
+            double inputs:nominal_flow_kgs = 1.0349712037775958
+            custom float inputs:flow_fraction_command
+            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+            custom float inputs:enabled
+            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine05_enabled>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+            custom float inputs:effective_exhaust_velocity_mps
+            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            custom token connectors:fuel_in
+            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            custom token connectors:oxidizer_in
+            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            double outputs:thrust_n = 0.0
+            double outputs:maximum_thrust_n = 0.0
+            double outputs:activity = 0.0
+            double outputs:chamber_pressure_pa = 0.0
+            double outputs:propellant_flow = 0.0
+            double outputs:fuel_flow_kgs = 0.0
+            double outputs:oxidizer_flow_kgs = 0.0
+            double outputs:mixture_ratio = 0.0
+            double outputs:mixture_efficiency = 0.0
+            double outputs:exhaust_velocity_mps = 0.0
+            double outputs:design_exhaust_velocity_mps = 0.0
+        }
+        def Scope "Engine05Plume" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:throttle
+            double inputs:throttle.connect = </Griffin1/MainPropulsion/Engine05.outputs:activity>
+            custom double inputs:thrust_n
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine05.outputs:thrust_n>
+            custom double inputs:maximum_thrust_n
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine05.outputs:maximum_thrust_n>
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:propellant_flow>
+            custom double inputs:exhaust_velocity_mps
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine05.outputs:exhaust_velocity_mps>
+            custom double inputs:design_exhaust_velocity_mps
+            double inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine05.outputs:design_exhaust_velocity_mps>
+            custom double inputs:chamber_pressure_pa
+            double inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine05.outputs:chamber_pressure_pa>
+            custom double inputs:mixture_ratio
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine05.outputs:mixture_ratio>
+            custom float inputs:nozzle_exit_radius_m
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom float inputs:nozzle_exit_area_m2
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:engine_count = 1.0
+            float inputs:fuel_family = 3.0
+            float inputs:stoichiometric_mixture_ratio = 2.0
+            float inputs:nozzle_exit_pressure_pa = 0.0
+            float inputs:ambient_pressure_pa = 0.0
+            float inputs:pressure_threshold_pa = 1000.0
+            float outputs:length = 0.0
+            float outputs:render_throttle = 0.0
+            float outputs:visual_length_fraction = 0.0
+            float outputs:intensity = 0.0
+            float outputs:radius = 0.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+        }
+        def Scope "Engine05ThrustTelemetry" (
+            prepend apiSchemas = "LunCoTelemetryAPI"
+        )
+        {
+            bool lunco:telemetry = true
+            string ui:displayName = '"ENGINE05 THRUST"'
+            token lunco:telemetry:port = "engine05_thrust_n"
+            token lunco:telemetry:name = "lander.engine05_thrust"
+            token lunco:telemetry:unit = "N"
+            string lunco:telemetry:description = '"Delivered thrust of main engine Engine05 from its PressureFedEngine model."'
+            custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
+        }
+        def Scope "Engine06" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            double inputs:fuel_maximum_flow_kgs = 0.28749200104933215
+            double inputs:fuel_commanded_flow_kgs = 0.28749200104933215
+            double inputs:oxidizer_maximum_flow_kgs = 0.7474792027282636
+            double inputs:oxidizer_commanded_flow_kgs = 0.7474792027282636
+            double inputs:nominal_pressure_drop_pa = 1000000.0
+            double inputs:opening_time_constant_s = 0.08
+            double inputs:availability_transition_mass_kg = 0.01
+            double inputs:oxidizer_to_fuel_ratio = 2.6
+            double inputs:characteristic_velocity_mps = 1550.0
+            double inputs:throat_area_m2 = 0.001026691434147375
+            double inputs:combustion_efficiency = 0.96
+            double inputs:nominal_flow_kgs = 1.0349712037775958
+            custom float inputs:flow_fraction_command
+            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+            custom float inputs:enabled
+            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine06_enabled>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+            custom float inputs:effective_exhaust_velocity_mps
+            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            custom token connectors:fuel_in
+            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            custom token connectors:oxidizer_in
+            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            double outputs:thrust_n = 0.0
+            double outputs:maximum_thrust_n = 0.0
+            double outputs:activity = 0.0
+            double outputs:chamber_pressure_pa = 0.0
+            double outputs:propellant_flow = 0.0
+            double outputs:fuel_flow_kgs = 0.0
+            double outputs:oxidizer_flow_kgs = 0.0
+            double outputs:mixture_ratio = 0.0
+            double outputs:mixture_efficiency = 0.0
+            double outputs:exhaust_velocity_mps = 0.0
+            double outputs:design_exhaust_velocity_mps = 0.0
+        }
+        def Scope "Engine06Plume" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:throttle
+            double inputs:throttle.connect = </Griffin1/MainPropulsion/Engine06.outputs:activity>
+            custom double inputs:thrust_n
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine06.outputs:thrust_n>
+            custom double inputs:maximum_thrust_n
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine06.outputs:maximum_thrust_n>
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:propellant_flow>
+            custom double inputs:exhaust_velocity_mps
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine06.outputs:exhaust_velocity_mps>
+            custom double inputs:design_exhaust_velocity_mps
+            double inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine06.outputs:design_exhaust_velocity_mps>
+            custom double inputs:chamber_pressure_pa
+            double inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine06.outputs:chamber_pressure_pa>
+            custom double inputs:mixture_ratio
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine06.outputs:mixture_ratio>
+            custom float inputs:nozzle_exit_radius_m
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom float inputs:nozzle_exit_area_m2
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:engine_count = 1.0
+            float inputs:fuel_family = 3.0
+            float inputs:stoichiometric_mixture_ratio = 2.0
+            float inputs:nozzle_exit_pressure_pa = 0.0
+            float inputs:ambient_pressure_pa = 0.0
+            float inputs:pressure_threshold_pa = 1000.0
+            float outputs:length = 0.0
+            float outputs:render_throttle = 0.0
+            float outputs:visual_length_fraction = 0.0
+            float outputs:intensity = 0.0
+            float outputs:radius = 0.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+        }
+        def Scope "Engine06ThrustTelemetry" (
+            prepend apiSchemas = "LunCoTelemetryAPI"
+        )
+        {
+            bool lunco:telemetry = true
+            string ui:displayName = '"ENGINE06 THRUST"'
+            token lunco:telemetry:port = "engine06_thrust_n"
+            token lunco:telemetry:name = "lander.engine06_thrust"
+            token lunco:telemetry:unit = "N"
+            string lunco:telemetry:description = '"Delivered thrust of main engine Engine06 from its PressureFedEngine model."'
+            custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
+        }
+        def Scope "Engine07" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            double inputs:fuel_maximum_flow_kgs = 0.28749200104933215
+            double inputs:fuel_commanded_flow_kgs = 0.28749200104933215
+            double inputs:oxidizer_maximum_flow_kgs = 0.7474792027282636
+            double inputs:oxidizer_commanded_flow_kgs = 0.7474792027282636
+            double inputs:nominal_pressure_drop_pa = 1000000.0
+            double inputs:opening_time_constant_s = 0.08
+            double inputs:availability_transition_mass_kg = 0.01
+            double inputs:oxidizer_to_fuel_ratio = 2.6
+            double inputs:characteristic_velocity_mps = 1550.0
+            double inputs:throat_area_m2 = 0.001026691434147375
+            double inputs:combustion_efficiency = 0.96
+            double inputs:nominal_flow_kgs = 1.0349712037775958
+            custom float inputs:flow_fraction_command
+            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+            custom float inputs:enabled
+            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine07_enabled>
+            custom float inputs:available_fuel_mass_kg
+            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+            custom float inputs:available_oxidizer_mass_kg
+            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+            custom float inputs:effective_exhaust_velocity_mps
+            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            custom token connectors:fuel_in
+            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            custom token connectors:oxidizer_in
+            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            double outputs:thrust_n = 0.0
+            double outputs:maximum_thrust_n = 0.0
+            double outputs:activity = 0.0
+            double outputs:chamber_pressure_pa = 0.0
+            double outputs:propellant_flow = 0.0
+            double outputs:fuel_flow_kgs = 0.0
+            double outputs:oxidizer_flow_kgs = 0.0
+            double outputs:mixture_ratio = 0.0
+            double outputs:mixture_efficiency = 0.0
+            double outputs:exhaust_velocity_mps = 0.0
+            double outputs:design_exhaust_velocity_mps = 0.0
+        }
+        def Scope "Engine07Plume" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:throttle
+            double inputs:throttle.connect = </Griffin1/MainPropulsion/Engine07.outputs:activity>
+            custom double inputs:thrust_n
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine07.outputs:thrust_n>
+            custom double inputs:maximum_thrust_n
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine07.outputs:maximum_thrust_n>
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:propellant_flow>
+            custom double inputs:exhaust_velocity_mps
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine07.outputs:exhaust_velocity_mps>
+            custom double inputs:design_exhaust_velocity_mps
+            double inputs:design_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine07.outputs:design_exhaust_velocity_mps>
+            custom double inputs:chamber_pressure_pa
+            double inputs:chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine07.outputs:chamber_pressure_pa>
+            custom double inputs:mixture_ratio
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine07.outputs:mixture_ratio>
+            custom float inputs:nozzle_exit_radius_m
+            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom float inputs:nozzle_exit_area_m2
+            float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
+            float inputs:engine_count = 1.0
+            float inputs:fuel_family = 3.0
+            float inputs:stoichiometric_mixture_ratio = 2.0
+            float inputs:nozzle_exit_pressure_pa = 0.0
+            float inputs:ambient_pressure_pa = 0.0
+            float inputs:pressure_threshold_pa = 1000.0
+            float outputs:length = 0.0
+            float outputs:render_throttle = 0.0
+            float outputs:visual_length_fraction = 0.0
+            float outputs:intensity = 0.0
+            float outputs:radius = 0.0
+            float outputs:color_r = 0.0
+            float outputs:color_g = 0.0
+            float outputs:color_b = 0.0
+            float outputs:envelope_radius_m = 0.0
+            float outputs:envelope_length_m = 0.0
+            float outputs:envelope_center_y_m = 0.0
+            float outputs:core_envelope_radius_m = 0.0
+        }
+        def Scope "Engine07ThrustTelemetry" (
+            prepend apiSchemas = "LunCoTelemetryAPI"
+        )
+        {
+            bool lunco:telemetry = true
+            string ui:displayName = '"ENGINE07 THRUST"'
+            token lunco:telemetry:port = "engine07_thrust_n"
+            token lunco:telemetry:name = "lander.engine07_thrust"
+            token lunco:telemetry:unit = "N"
+            string lunco:telemetry:description = '"Delivered thrust of main engine Engine07 from its PressureFedEngine model."'
+            custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
         }
     }
     def Scope "AttitudeActuation" (
@@ -1366,325 +2045,355 @@ def Xform "Griffin1" (
         {
             def Xform "Engine01" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+                prepend apiSchemas = "LunCoForceActuatorAPI"
             )
             {
                 custom double3 xformOp:translate = (0.0, 0.34, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
+                float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
+                double lunco:forceActuator:maxForce = 5587.293712841584
+                custom rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:engine01_thrust_n>
+                custom double inputs:force_command
+                double inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:engine01_thrust_n>
                 def "Exhaust"
                 {
                     def "Flame"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:envelope_center_y_m>
                     }
                     def "FlameCore"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:envelope_center_y_m>
                         def "PlumeLight"
                         {
                             custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:intensity>
                             custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:radius>
                             custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_r>
                             custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_g>
                             custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_b>
                         }
                     }
                 }
             }
             def Xform "Engine02" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+                prepend apiSchemas = "LunCoForceActuatorAPI"
             )
             {
                 custom double3 xformOp:translate = (1.19, 0.34, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
+                float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
+                double lunco:forceActuator:maxForce = 5587.293712841584
+                custom rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:engine02_thrust_n>
+                custom double inputs:force_command
+                double inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:engine02_thrust_n>
                 def "Exhaust"
                 {
                     def "Flame"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:envelope_center_y_m>
                     }
                     def "FlameCore"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:envelope_center_y_m>
                         def "PlumeLight"
                         {
                             custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:intensity>
                             custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:radius>
                             custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_r>
                             custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_g>
                             custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_b>
                         }
                     }
                 }
             }
             def Xform "Engine03" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+                prepend apiSchemas = "LunCoForceActuatorAPI"
             )
             {
                 custom double3 xformOp:translate = (0.595, 0.34, 1.030570230503)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
+                float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
+                double lunco:forceActuator:maxForce = 5587.293712841584
+                custom rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:engine03_thrust_n>
+                custom double inputs:force_command
+                double inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:engine03_thrust_n>
                 def "Exhaust"
                 {
                     def "Flame"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:envelope_center_y_m>
                     }
                     def "FlameCore"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:envelope_center_y_m>
                         def "PlumeLight"
                         {
                             custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:intensity>
                             custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:radius>
                             custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_r>
                             custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_g>
                             custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_b>
                         }
                     }
                 }
             }
             def Xform "Engine04" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+                prepend apiSchemas = "LunCoForceActuatorAPI"
             )
             {
                 custom double3 xformOp:translate = (-0.595, 0.34, 1.030570230503)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
+                float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
+                double lunco:forceActuator:maxForce = 5587.293712841584
+                custom rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:engine04_thrust_n>
+                custom double inputs:force_command
+                double inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:engine04_thrust_n>
                 def "Exhaust"
                 {
                     def "Flame"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:envelope_center_y_m>
                     }
                     def "FlameCore"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:envelope_center_y_m>
                         def "PlumeLight"
                         {
                             custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:intensity>
                             custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:radius>
                             custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_r>
                             custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_g>
                             custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_b>
                         }
                     }
                 }
             }
             def Xform "Engine05" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+                prepend apiSchemas = "LunCoForceActuatorAPI"
             )
             {
                 custom double3 xformOp:translate = (-1.19, 0.34, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
+                float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
+                double lunco:forceActuator:maxForce = 5587.293712841584
+                custom rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:engine05_thrust_n>
+                custom double inputs:force_command
+                double inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:engine05_thrust_n>
                 def "Exhaust"
                 {
                     def "Flame"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:envelope_center_y_m>
                     }
                     def "FlameCore"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:envelope_center_y_m>
                         def "PlumeLight"
                         {
                             custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:intensity>
                             custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:radius>
                             custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_r>
                             custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_g>
                             custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_b>
                         }
                     }
                 }
@@ -1698,130 +2407,142 @@ def Xform "Griffin1" (
             }
             def Xform "Engine06" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+                prepend apiSchemas = "LunCoForceActuatorAPI"
             )
             {
                 custom double3 xformOp:translate = (-0.595, 0.34, -1.030570230503)
                 custom token[] xformOpOrder = ["xformOp:translate"]
+                float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
+                double lunco:forceActuator:maxForce = 5587.293712841584
+                custom rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:engine06_thrust_n>
+                custom double inputs:force_command
+                double inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:engine06_thrust_n>
                 def "Exhaust"
                 {
                     def "Flame"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:envelope_center_y_m>
                     }
                     def "FlameCore"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:envelope_center_y_m>
                         def "PlumeLight"
                         {
                             custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:intensity>
                             custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:radius>
                             custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_r>
                             custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_g>
                             custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_b>
                         }
                     }
                 }
             }
             def Xform "Engine07" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
+                prepend apiSchemas = "LunCoForceActuatorAPI"
             )
             {
                 custom double3 xformOp:translate = (0.595, 0.34, -1.030570230503)
                 custom token[] xformOpOrder = ["xformOp:translate"]
+                float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
+                double lunco:forceActuator:maxForce = 5587.293712841584
+                custom rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:engine07_thrust_n>
+                custom double inputs:force_command
+                double inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:engine07_thrust_n>
                 def "Exhaust"
                 {
                     def "Flame"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:envelope_center_y_m>
                     }
                     def "FlameCore"
                     {
                         custom float inputs:throttle
-                        float inputs:throttle.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:render_throttle>
+                        float inputs:throttle.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:render_throttle>
                         custom float inputs:plume_length_fraction
-                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:visual_length_fraction>
+                        float inputs:plume_length_fraction.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:visual_length_fraction>
                         custom float inputs:fuel_color_r
-                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                        float inputs:fuel_color_r.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_r>
                         custom float inputs:fuel_color_g
-                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                        float inputs:fuel_color_g.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_g>
                         custom float inputs:fuel_color_b
-                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                        float inputs:fuel_color_b.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_b>
                         custom float inputs:scale_x
-                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_x.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_z
-                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:core_envelope_radius_m>
+                        float inputs:scale_z.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:core_envelope_radius_m>
                         custom float inputs:scale_y
-                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_length_m>
+                        float inputs:scale_y.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:envelope_length_m>
                         custom float inputs:translation_y
-                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:envelope_center_y_m>
+                        float inputs:translation_y.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:envelope_center_y_m>
                         def "PlumeLight"
                         {
                             custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:intensity>
+                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:intensity>
                             custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:radius>
+                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:radius>
                             custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_r>
+                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_r>
                             custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_g>
+                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_g>
                             custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/PlumePhotometry.outputs:color_b>
+                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_b>
                         }
                     }
                 }
@@ -2455,16 +3176,6 @@ def Xform "Griffin1" (
                 color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
             }
         }
-    }
-    def Xform "MainEngineVisual" (
-        prepend apiSchemas = "LunCoForceActuatorAPI"
-    )
-    {
-        custom float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
-        double lunco:forceActuator:maxForce = 39111.05598989109
-        rel lunco:forceActuator:commandSource = </Griffin1/MainPropulsion.outputs:thrust_n>
-        float inputs:force_command
-        float inputs:force_command.connect = </Griffin1/MainPropulsion.outputs:thrust_n>
     }
     def Xform "PayloadAdapter"
     {

@@ -59,6 +59,25 @@ fn _surface_batch_value(ports, name, direction) {
     port.value
 }
 
+// Per-engine values in typed engine order; () when any engine is unread.
+fn _surface_engine_values(ports, port) {
+    let values = [];
+    for name in griffin_spec::main_engine_names() {
+        let value = _surface_batch_value(ports, griffin_spec::main_engine_port(name, port), "out");
+        if value == () { return (); }
+        values.push(value);
+    }
+    values
+}
+
+fn _surface_engine_total(ports, port) {
+    let values = _surface_engine_values(ports, port);
+    if values == () { return (); }
+    let total = 0.0;
+    for value in values { total += value; }
+    total
+}
+
 fn _surface_batch_unit_identity(port) {
     if port == () { return (); }
     let metadata = port.metadata;
@@ -209,9 +228,12 @@ fn landing_gate_report() {
         rcs_valve_port_names.push(jet.valve_port);
         rcs_thrust_port_names.push(jet.thrust_port);
     }
-    let propulsion_port_names = [
-        "thrust_n", "maximum_thrust_n", "engine_activity", "vehicle_mass_kg", "propellant_mass"
-    ];
+    let propulsion_port_names = ["vehicle_mass_kg", "propellant_mass"];
+    for name in griffin_spec::main_engine_names() {
+        for port in ["thrust_n", "maximum_thrust_n", "activity"] {
+            propulsion_port_names.push(griffin_spec::main_engine_port(name, port));
+        }
+    }
     let attitude_reference_port_names = ["error_x", "error_z"];
     let control_targets = [
         #{api_id: lander, port_names: lander_port_names},
@@ -397,9 +419,9 @@ fn landing_gate_report() {
         dynamic_joint_island_mass_kg: _surface_batch_value(lander_ports, "dynamic_joint_island_mass_kg", "out"),
         dynamic_joint_island_mass_valid: _surface_batch_value(lander_ports, "dynamic_joint_island_mass_valid", "out"),
         guidance_max_thrust_n: _surface_batch_value(gnc_ports, "max_thrust", "in"),
-        main_engine_thrust_n: _surface_batch_value(propulsion_ports, "thrust_n", "out"),
-        main_engine_maximum_thrust_n: _surface_batch_value(propulsion_ports, "maximum_thrust_n", "out"),
-        main_engine_activity: _surface_batch_value(propulsion_ports, "engine_activity", "out"),
+        main_engine_thrust_n: _surface_engine_total(propulsion_ports, "thrust_n"),
+        main_engine_maximum_thrust_n: _surface_engine_total(propulsion_ports, "maximum_thrust_n"),
+        main_engine_activity: _surface_engine_values(propulsion_ports, "activity"),
         propulsion_vehicle_mass_kg: _surface_batch_value(propulsion_ports, "vehicle_mass_kg", "out"),
         propellant_mass_kg: _surface_batch_value(propulsion_ports, "propellant_mass", "out"),
         guidance_nav_y: get(gnc, "navigation.nav_pos_y"),
@@ -556,7 +578,7 @@ fn landing_stability_sample() {
         navigation_position_y: get(gnc, "navigation.nav_pos_y"),
         altimeter_range_m: get(altimeter, "range_m"),
         altimeter_position_y: get(altimeter, "vehicle_position_y"),
-        engine_thrust_n: get(propulsion, "thrust_n"),
+        engine_thrust_n: griffin_spec::main_engine_total(propulsion, "thrust_n"),
         engine_vehicle_mass_kg: get(propulsion, "vehicle_mass_kg"),
         horizontal_target_error_m: get(gnc, "horizontal_target_error"),
         desired_tilt_rad: [get(lander, "desired_tilt_x"), get(lander, "desired_tilt_z")],

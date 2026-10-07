@@ -107,6 +107,20 @@ package GriffinPropulsionRequirements {
         attribute controllerFlowCapabilityKgs : Real = referenceTotalFlowKgs;
         attribute fuelCommandFlowKgs : Real = controllerFlowCapabilityKgs / (1.0 + oxidizerToFuelRatio);
         attribute oxidizerCommandFlowKgs : Real = fuelCommandFlowKgs * oxidizerToFuelRatio;
+        // Each identical main engine owns its own valves and chamber and one
+        // engine's share of the aggregate bore, flow and actuator envelope.
+        // An engine-out case therefore removes exactly this share.
+        attribute engineThroatBoreAreaM2 : Real = totalThroatBoreAreaM2 / GriffinLanderComponent::engineCount;
+        attribute engineFuelReferenceFlowKgs : Real = fuelReferenceFlowKgs / GriffinLanderComponent::engineCount;
+        attribute engineOxidizerReferenceFlowKgs : Real = oxidizerReferenceFlowKgs / GriffinLanderComponent::engineCount;
+        attribute engineFuelCommandFlowKgs : Real = fuelCommandFlowKgs / GriffinLanderComponent::engineCount;
+        attribute engineOxidizerCommandFlowKgs : Real = oxidizerCommandFlowKgs / GriffinLanderComponent::engineCount;
+        attribute engineNominalFlowKgs : Real = controllerFlowCapabilityKgs / GriffinLanderComponent::engineCount;
+        attribute engineActuatorForceEnvelopeN : Real = GriffinEngineControlStudy::actuatorForceEnvelopeN / GriffinLanderComponent::engineCount;
+        // Guidance converts acceleration demand with the nominal cluster
+        // rating. It is not told about a failed engine; closed-loop guidance
+        // and RCS absorb the lost thrust and its torque.
+        attribute guidanceClusterThrustN : Real = estimatedMainEngineUnitThrustN * GriffinLanderComponent::engineCount;
         attribute valveResponseS : Real = .08;
         attribute availabilityTransitionMassKg : Real = .01;
         attribute initialFuelMassKg : Real = 1000.0;
@@ -354,7 +368,7 @@ package GriffinPropulsionRequirements {
         doc /* GPP-002 [visual] each engine includes its modeled bell and throat, with no placeholder circle or duplicate collider geometry. */
     }
     requirement def GPP003_ThrustOwnership {
-        doc /* GPP-003 [physics boundary] bells and plumes are render-only. The Modelica propulsion and nozzle models remain the sole authority for thrust, propellant flow, nozzle design outputs, and plume photometry. Fuel starvation shall stop useful combustion and thrust through the feed/chamber equations; zero delivered jet momentum shall yield zero visible plume and light with the engine command still on. The griffin_fuel_exhaustion production fixture verifies this chain. */
+        doc /* GPP-003 [physics boundary] bells and plumes are render-only. The Modelica propulsion and nozzle models remain the sole authority for thrust, propellant flow, nozzle design outputs, and plume photometry. Each main engine is one LunCo.Propulsion.PressureFedEngine member fed acausally by the shared tanks; its own force actuator applies its delivered thrust at its station, and its enabled input models an engine-out failure, verified by the griffin_engine_out production fixture. Fuel starvation shall stop useful combustion and thrust through the feed/chamber equations; zero delivered jet momentum shall yield zero visible plume and light with the engine command still on. The griffin_fuel_exhaustion production fixture verifies this chain. */
     }
     requirement def GPP004_PropulsionTraceability {
         doc /* GPP-004 [evidence] engine identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and each instance is checked individually. */
@@ -441,7 +455,7 @@ package GriffinPropulsionRequirements {
         require GPPC008_EnginePlumeDataflow {
             in engineCount = GriffinLanderComponent::engineCount;
         }
-        doc /* GPP-008 [simulation presentation] each main-engine owner shall inherit its render-only outer plume from the LunCoSim rocket_engine_visual library component, without Twin-authored flame geometry or materials. The library helper connects physics to geometry envelope scale, shader colour and light colour. Nozzle radius and nominal thrust shall determine the envelope; fuel family and mixture richness shall determine a documented heuristic palette. Each nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow shared photometry outputs driven by live propulsion state and modeled nozzle geometry. Zero delivered thrust shall produce neither visible exhaust nor light. */
+        doc /* GPP-008 [simulation presentation] each main-engine owner shall inherit its render-only outer plume from the LunCoSim rocket_engine_visual library component, without Twin-authored flame geometry or materials. The library helper connects physics to geometry envelope scale, shader colour and light colour. Nozzle radius and nominal thrust shall determine the envelope; fuel family and mixture richness shall determine a documented heuristic palette. Each nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow that engine's own photometry outputs driven by its live propulsion state and the modeled nozzle geometry, so a failed engine shows no plume while the others burn. Zero delivered thrust shall produce neither visible exhaust nor light. */
     }
     constraint def GPPC009_TankHardwareSeparation {
         in measuredVerticalGapM : Real;

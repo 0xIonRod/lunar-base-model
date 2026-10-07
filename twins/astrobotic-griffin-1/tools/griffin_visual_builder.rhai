@@ -19,114 +19,284 @@ fn query_ok(record) {
     record != () && record.ok != false
 }
 
-fn griffin_main_engine_command_contract_plan(doc, edit_target, root) {
-    let limit = griffin_spec::_typed_model_number(
-        "GriffinPropulsionRequirements::GriffinEngineControlStudy::actuatorForceEnvelopeN");
-    if limit == () || limit <= 0.0 {return #{ok:false,error:"missing main-engine force envelope"};}
-    #{ok:true,ops:[#{SetAttribute:#{edit_target:edit_target,path:root+"/MainEngineVisual",
-        name:"lunco:forceActuator:maxForce",type_name:"double",value:limit.to_string()}}]}
+fn main_engine_model_path(root, name) { root + "/MainPropulsion/" + name }
+fn main_engine_plume_path(root, name) { root + "/MainPropulsion/" + name + "Plume" }
+fn main_engine_outputs() {
+    ["thrust_n","maximum_thrust_n","activity","chamber_pressure_pa","propellant_flow",
+     "fuel_flow_kgs","oxidizer_flow_kgs","mixture_ratio","mixture_efficiency",
+     "exhaust_velocity_mps","design_exhaust_velocity_mps"]
+}
+// Root signals republished per engine for actuators, HUD, telemetry and tests.
+fn main_engine_root_outputs() {
+    ["thrust_n","maximum_thrust_n","activity","chamber_pressure_pa","propellant_flow",
+     "fuel_flow_kgs","oxidizer_flow_kgs","mixture_efficiency"]
 }
 
-// Replace the inherited pump circuit with source-owned passive liquid feeds.
-// The chamber closes both downstream pressure nodes through its choked bore.
-fn griffin_pressure_fed_plan(doc, edit_target, root) {
-    let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("pressure-fed source unavailable");}
+fn _source_number(model, name) { f64_from(model.value(name)) }
+
+fn _exists(doc, path) {
+    query_ok(assembly_builder::composed_query(doc,#{path:path,children:false}))
+}
+
+fn _engine_parameters(model) {
     let own="GriffinPropulsionRequirements::GriffinPressureFedStudy::";
-    let nozzle="GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
+    let resolved=[];
+    for item in [
+        #{name:"fuel_maximum_flow_kgs",source:"engineFuelReferenceFlowKgs"},
+        #{name:"fuel_commanded_flow_kgs",source:"engineFuelCommandFlowKgs"},
+        #{name:"oxidizer_maximum_flow_kgs",source:"engineOxidizerReferenceFlowKgs"},
+        #{name:"oxidizer_commanded_flow_kgs",source:"engineOxidizerCommandFlowKgs"},
+        #{name:"nominal_pressure_drop_pa",source:"referencePressureDropPa"},
+        #{name:"opening_time_constant_s",source:"valveResponseS"},
+        #{name:"availability_transition_mass_kg",source:"availabilityTransitionMassKg"},
+        #{name:"oxidizer_to_fuel_ratio",source:"oxidizerToFuelRatio"},
+        #{name:"characteristic_velocity_mps",source:"characteristicVelocityMps"},
+        #{name:"throat_area_m2",source:"engineThroatBoreAreaM2"},
+        #{name:"combustion_efficiency",source:"combustionEfficiency"},
+        #{name:"nominal_flow_kgs",source:"engineNominalFlowKgs"}] {
+        let value=_source_number(model,own+item.source);
+        if value==() || value<=0.0 {return plan_error("missing main-engine datum: "+item.source);}
+        resolved.push(#{name:item.name,value:value});
+    }
+    #{ok:true,parameters:resolved}
+}
+
+// Seven identical pressure-fed engines. Each is one PressureFedEngine member
+// and one PlumePhotometry member in the MainPropulsion network; both shared
+// tanks feed every engine through acausal connectors, so the synthesized
+// Modelica network splits and drains propellant per engine. Each bell carries
+// its engine's force actuator at its station, so an engine-out removes that
+// engine's thrust and produces the matching torque. `<engine>_enabled` is the
+// failure input. One engine is one batch: the whole cluster's typed ops
+// exceed one Rhai value's data budget. Apply every engine, then the feed plan,
+// which admits the engines into the network.
+fn griffin_main_engine_plan(doc, edit_target, root, name) {
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("main-engine source unavailable");}
+    if !griffin_spec::main_engine_names().contains(name) {
+        return plan_error(name+" is not a typed main-engine identity");
+    }
+    let nozzle_source="GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
+    let parameters=_engine_parameters(model);
+    if !parameters.ok {return parameters;}
+    let force=_source_number(model,
+        "GriffinPropulsionRequirements::GriffinPressureFedStudy::engineActuatorForceEnvelopeN");
+    let fuel_family=_source_number(model,nozzle_source+"plumeFuelFamily");
+    let stoichiometric=_source_number(model,nozzle_source+"plumeStoichiometricMixtureRatio");
+    if force==() || force<=0.0 || fuel_family==() || stoichiometric==() || stoichiometric<=0.0 {
+        return plan_error("main-engine actuator or plume source is incomplete");
+    }
     let main=root+"/MainPropulsion";
+    let nozzle=main+"/NozzleDesign";
+    let engine=main_engine_model_path(root,name);
+    let plume=main_engine_plume_path(root,name);
+    let visual=root+"/Nozzle/MainEngineCluster/"+name;
+    if !_exists(doc,visual) {return plan_error(visual+": engine bell has not composed");}
     let ops=[];
-    // Declare the Lander.mo output used by this new authored connection.
-    // Runtime Modelica remains the writer; the cold output is zero.
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:root,name:"outputs:throttle",
-        type_name:"float",value:"0.0"}});
-    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:main,name:"inputs:valve_opening"}});
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:main,name:"inputs:flow_fraction_command",
-        type_name:"float",sources:[root+".outputs:throttle"]}});
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:main,name:"outputs:mixture_efficiency",
-        type_name:"float",sources:[main+"/MainChamber.outputs:mixture_efficiency"]}});
-    for side in [#{name:"Fuel",flow:"fuelReferenceFlowKgs",command:"fuelCommandFlowKgs",mass:"initialFuelMassKg",port:"fuel_in"},
-        #{name:"Oxidizer",flow:"oxidizerReferenceFlowKgs",command:"oxidizerCommandFlowKgs",mass:"initialOxidizerMassKg",port:"oxidizer_in"}] {
-        let valve=main+"/"+side.name+"Valve";
-        let tank=main+"/"+side.name+"Tank";
-        let old=query("QueryUsdPrim",#{doc_id:doc,path:main+"/"+side.name+"Pump",children:false});
-        if query_ok(old) {
-            ops.push(#{RemovePrim:#{edit_target:edit_target,path:main+"/"+side.name+"Pump"}});
-        }
-        let existing=query("QueryUsdPrim",#{doc_id:doc,path:valve,children:false});
-        if !query_ok(existing) {
-            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:side.name+"Valve",
+    for prim in [#{path:engine,name:name,asset:"PressureFedEngine.mo"},
+        #{path:plume,name:name+"Plume",asset:"PlumePhotometry.mo"}] {
+        if !_exists(doc,prim.path) {
+            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:prim.name,
                 type_name:"Scope",reference:(),reference_prim_path:()}});
         }
-        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:valve,schemas:["LunCoProgramAPI"]}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:valve,name:"info:implementationSource",
+        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:prim.path,schemas:["LunCoProgramAPI"]}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:prim.path,name:"info:implementationSource",
             type_name:"token",value:"\"sourceAsset\""}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:valve,name:"info:sourceAsset",
-            type_name:"asset",value:"@lunco://models/LunCo/Propulsion/PressureFedValve.mo@"}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:valve,name:"lunco:program:realtimeSafe",
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:prim.path,name:"info:sourceAsset",
+            type_name:"asset",value:"@lunco://models/LunCo/Propulsion/"+prim.asset+"@"}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:prim.path,name:"lunco:program:realtimeSafe",
             type_name:"bool",value:"true"}});
-        for item in [#{path:valve,name:"maximum_flow_kgs",source:side.flow},
-            #{path:valve,name:"commanded_flow_kgs",source:side.command},
-            #{path:valve,name:"nominal_pressure_drop_pa",source:"referencePressureDropPa"},
-            #{path:valve,name:"opening_time_constant_s",source:"valveResponseS"},
-            #{path:valve,name:"availability_transition_mass_kg",source:"availabilityTransitionMassKg"},
-            #{path:tank,name:"initial_mass_kg",source:side.mass},
-            #{path:tank,name:"nominal_pressure_pa",source:"nominalTankPressurePa"},
-            #{path:tank,name:"pressure_headroom_pa",source:"tankPressureHeadroomPa"}] {
-            let value=f64_from(model.value(own+item.source));
-            if value==() || value<=0.0 {return plan_error("missing pressure-fed datum: "+item.source);}
-            if item.path==tank {ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:tank,name:"inputs:"+item.name}});}
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:item.path,name:"inputs:"+item.name,
+    }
+    for item in parameters.parameters {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:engine,name:"inputs:"+item.name,
+            type_name:"double",value:item.value.to_string()}});
+    }
+    let enabled=griffin_spec::main_engine_port(name,"enabled");
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:main,name:"inputs:"+enabled,
+        type_name:"float",value:"1.0"}});
+    for connection in [
+        #{path:engine,name:"inputs:flow_fraction_command",source:main+".inputs:flow_fraction_command",kind:"float"},
+        #{path:engine,name:"inputs:enabled",source:main+".inputs:"+enabled,kind:"float"},
+        #{path:engine,name:"inputs:available_fuel_mass_kg",source:main+"/FuelTank.outputs:mass_kg",kind:"float"},
+        #{path:engine,name:"inputs:available_oxidizer_mass_kg",source:main+"/OxidizerTank.outputs:mass_kg",kind:"float"},
+        #{path:engine,name:"inputs:effective_exhaust_velocity_mps",source:nozzle+".outputs:ideal_exhaust_velocity_mps",kind:"float"},
+        #{path:engine,name:"connectors:fuel_in",source:main+"/FuelTank.connectors:outlet",kind:"token"},
+        #{path:engine,name:"connectors:oxidizer_in",source:main+"/OxidizerTank.connectors:outlet",kind:"token"},
+        #{path:plume,name:"inputs:throttle",source:engine+".outputs:activity",kind:"double"},
+        #{path:plume,name:"inputs:thrust_n",source:engine+".outputs:thrust_n",kind:"double"},
+        #{path:plume,name:"inputs:maximum_thrust_n",source:engine+".outputs:maximum_thrust_n",kind:"double"},
+        #{path:plume,name:"inputs:propellant_flow_kgs",source:engine+".outputs:propellant_flow",kind:"double"},
+        #{path:plume,name:"inputs:exhaust_velocity_mps",source:engine+".outputs:exhaust_velocity_mps",kind:"double"},
+        #{path:plume,name:"inputs:design_exhaust_velocity_mps",source:engine+".outputs:design_exhaust_velocity_mps",kind:"double"},
+        #{path:plume,name:"inputs:chamber_pressure_pa",source:engine+".outputs:chamber_pressure_pa",kind:"double"},
+        #{path:plume,name:"inputs:mixture_ratio",source:engine+".outputs:mixture_ratio",kind:"double"},
+        #{path:plume,name:"inputs:nozzle_exit_radius_m",source:nozzle+".outputs:exit_radius_m",kind:"float"},
+        #{path:plume,name:"inputs:nozzle_exit_area_m2",source:nozzle+".outputs:exit_area",kind:"float"}] {
+        ops.push(#{SetConnection:#{edit_target:edit_target,path:connection.path,name:connection.name,
+            type_name:connection.kind,sources:[connection.source]}});
+    }
+    for output in main_engine_outputs() {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:engine,name:"outputs:"+output,
+            type_name:"double",value:"0.0"}});
+    }
+    for output in main_engine_root_outputs() {
+        ops.push(#{SetConnection:#{edit_target:edit_target,path:main,
+            name:"outputs:"+griffin_spec::main_engine_port(name,output),type_name:"double",
+            sources:[engine+".outputs:"+output]}});
+    }
+    for parameter in [#{name:"engine_count",value:"1.0"},
+        #{name:"fuel_family",value:fuel_family.to_string()},
+        #{name:"stoichiometric_mixture_ratio",value:stoichiometric.to_string()},
+        #{name:"nozzle_exit_pressure_pa",value:"0.0"},
+        #{name:"ambient_pressure_pa",value:"0.0"},
+        #{name:"pressure_threshold_pa",value:"1000.0"}] {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"inputs:"+parameter.name,
+            type_name:"float",value:parameter.value}});
+    }
+    let published=["length"];
+    for wire in engine_exhaust::wires() {
+        if !published.contains(wire.output) {published.push(wire.output);}
+    }
+    for output in published {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"outputs:"+output,
+            type_name:"float",value:"0.0"}});
+    }
+    for op in engine_exhaust::connection_ops(edit_target,visual,plume,#{}) {ops.push(op);}
+
+    // The bell owns its engine's thrust: force at the engine station, along
+    // the body +Y axis, commanded by that engine's delivered thrust.
+    let thrust=main+".outputs:"+griffin_spec::main_engine_port(name,"thrust_n");
+    ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:visual,schemas:["LunCoForceActuatorAPI"]}});
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:visual,name:"lunco:forceActuator:direction",
+        type_name:"float3",value:"(0, 1, 0)"}});
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:visual,name:"lunco:forceActuator:maxForce",
+        type_name:"double",value:force.to_string()}});
+    ops.push(#{SetRelationship:#{edit_target:edit_target,path:visual,
+        name:"lunco:forceActuator:commandSource",targets:[thrust]}});
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:visual,name:"inputs:force_command",
+        type_name:"double",sources:[thrust]}});
+
+    let telemetry=main+"/"+name+"ThrustTelemetry";
+    if !_exists(doc,telemetry) {
+        ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:name+"ThrustTelemetry",
+            type_name:"Scope",reference:(),reference_prim_path:()}});
+    }
+    ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:telemetry,schemas:["LunCoTelemetryAPI"]}});
+    for field in [#{name:"lunco:telemetry",type_name:"bool",value:"true"},
+        #{name:"ui:displayName",type_name:"string",value:"\""+name.to_upper()+" THRUST\""},
+        #{name:"lunco:telemetry:port",type_name:"token",value:"\""+griffin_spec::main_engine_port(name,"thrust_n")+"\""},
+        #{name:"lunco:telemetry:name",type_name:"token",value:"\"lander."+griffin_spec::main_engine_port(name,"thrust")+"\""},
+        #{name:"lunco:telemetry:unit",type_name:"token",value:"\"N\""},
+        #{name:"lunco:telemetry:description",type_name:"string",
+            value:"\"Delivered thrust of main engine "+name+" from its PressureFedEngine model.\""}] {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:telemetry,name:field.name,
+            type_name:field.type_name,value:field.value}});
+    }
+    ops.push(#{SetRelationship:#{edit_target:edit_target,path:telemetry,
+        name:"lunco:telemetry:target",targets:[main]}});
+    #{ok:true,kind:"griffin_main_engine",engine:name,ops:ops,no_op:false}
+}
+
+// Admit every engine into the MainPropulsion network: shared throttle, tank
+// outlets, nozzle design, and the explicit member collection.
+fn griffin_main_engine_feed_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("main-engine source unavailable");}
+    let names=griffin_spec::main_engine_names();
+    let count=griffin_spec::main_engine_count();
+    if count==() || count<=0 || names.len()!=count {
+        return plan_error("typed main-engine identities and count are incomplete");
+    }
+    let own="GriffinPropulsionRequirements::GriffinPressureFedStudy::";
+    let nozzle_source="GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
+    let main=root+"/MainPropulsion";
+    let nozzle=main+"/NozzleDesign";
+    let ops=[];
+    // Lander.mo publishes the shared throttle; runtime Modelica is the writer.
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:root,name:"outputs:throttle",
+        type_name:"float",value:"0.0"}});
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:main,name:"inputs:flow_fraction_command",
+        type_name:"float",sources:[root+".outputs:throttle"]}});
+    for tank in [#{name:"FuelTank",mass:"initialFuelMassKg"},#{name:"OxidizerTank",mass:"initialOxidizerMassKg"}] {
+        let path=main+"/"+tank.name;
+        for item in [#{name:"initial_mass_kg",source:tank.mass},
+            #{name:"nominal_pressure_pa",source:"nominalTankPressurePa"},
+            #{name:"pressure_headroom_pa",source:"tankPressureHeadroomPa"}] {
+            let value=_source_number(model,own+item.source);
+            if value==() || value<=0.0 {return plan_error("missing tank datum: "+item.source);}
+            ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:path,name:"inputs:"+item.name}});
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"inputs:"+item.name,
                 type_name:"double",value:value.to_string()}});
         }
-        let obsolete=query("QueryUsdPrim",#{doc_id:doc,path:valve,children:false});
-        // Remove the old travel command when updating an existing feed.
-        if query_ok(obsolete) {
-            ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:valve,name:"inputs:valve_opening"}});
-        }
-        for connection in [#{path:valve,name:"inputs:flow_fraction_command",source:main+".inputs:flow_fraction_command",kind:"float"},
-            #{path:valve,name:"inputs:available_mass_kg",source:tank+".outputs:mass_kg",kind:"float"},
-            #{path:tank,name:"connectors:outlet",source:valve+".connectors:inlet",kind:"token"},
-            #{path:valve,name:"connectors:inlet",source:tank+".connectors:outlet",kind:"token"},
-            #{path:valve,name:"connectors:outlet",source:main+"/MainChamber.connectors:"+side.port,kind:"token"}] {
-            ops.push(#{SetConnection:#{edit_target:edit_target,path:connection.path,name:connection.name,
-                type_name:connection.kind,sources:[connection.source]}});
-        }
-        for output in ["mass_flow_kgs","outlet_pressure_pa","pressure_drop_pa","activity"] {
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:valve,name:"outputs:"+output,
-                type_name:"double",value:"0.0"}});
-        }
     }
-    let members=[];
-    for member in ["FuelTank","OxidizerTank","FuelValve","OxidizerValve","MainChamber",
-        "NozzleDesign","PlumePhotometry","PropellantStatus"] {members.push(main+"/"+member);}
+    let members=[main+"/FuelTank",main+"/OxidizerTank",nozzle,main+"/PropellantStatus"];
+    let fuel_inlets=[];
+    let oxidizer_inlets=[];
+    for name in names {
+        let engine=main_engine_model_path(root,name);
+        let plume=main_engine_plume_path(root,name);
+        if !_exists(doc,engine) || !_exists(doc,plume) {
+            return plan_error(name+": apply griffin_main_engine_plan before admitting the feed");
+        }
+        members.push(engine);
+        members.push(plume);
+        fuel_inlets.push(engine+".connectors:fuel_in");
+        oxidizer_inlets.push(engine+".connectors:oxidizer_in");
+    }
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/FuelTank",name:"connectors:outlet",
+        type_name:"token",sources:fuel_inlets}});
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/OxidizerTank",name:"connectors:outlet",
+        type_name:"token",sources:oxidizer_inlets}});
     ops.push(#{SetRelationship:#{edit_target:edit_target,path:main,name:"collection:components:includes",targets:members}});
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:main+"/MainChamber",name:"info:sourceAsset",
-        type_name:"asset",value:"@lunco://models/LunCo/Propulsion/PressureFedCombustionChamber.mo@"}});
-    for item in [#{path:main+"/MainChamber",name:"oxidizer_to_fuel_ratio",source:own+"oxidizerToFuelRatio"},
-        #{path:main+"/MainChamber",name:"characteristic_velocity_mps",source:own+"characteristicVelocityMps"},
-        #{path:main+"/MainChamber",name:"throat_area_m2",source:own+"totalThroatBoreAreaM2"},
-        #{path:main+"/MainChamber",name:"combustion_efficiency",source:own+"combustionEfficiency"},
-        #{path:main+"/MainChamber",name:"nominal_flow_kgs",source:own+"controllerFlowCapabilityKgs"},
-        #{path:main+"/NozzleDesign",name:"throat_radius",source:own+"throatBoreRadiusM"},
-        #{path:main+"/NozzleDesign",name:"exit_radius",source:nozzle+"exitBoreRadiusM"},
-        #{path:main+"/NozzleDesign",name:"p_chamber",source:own+"referenceChamberPressurePa"},
-        #{path:main+"/NozzleDesign",name:"gamma",source:own+"gasGamma"},
-        #{path:main+"/NozzleDesign",name:"characteristic_velocity_mps",source:own+"characteristicVelocityMps"}] {
-        let value=f64_from(model.value(item.source));
-        if value==() || value<=0.0 {return plan_error("missing chamber/nozzle datum: "+item.source);}
-        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:item.path,name:"inputs:"+item.name}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:item.path,name:"inputs:"+item.name,
+    for item in [#{name:"throat_radius",source:own+"throatBoreRadiusM"},
+        #{name:"exit_radius",source:nozzle_source+"exitBoreRadiusM"},
+        #{name:"p_chamber",source:own+"referenceChamberPressurePa"},
+        #{name:"gamma",source:own+"gasGamma"},
+        #{name:"characteristic_velocity_mps",source:own+"characteristicVelocityMps"}] {
+        let value=_source_number(model,item.source);
+        if value==() || value<=0.0 {return plan_error("missing nozzle datum: "+item.source);}
+        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:nozzle,name:"inputs:"+item.name}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:nozzle,name:"inputs:"+item.name,
             type_name:"double",value:value.to_string()}});
     }
-    // Exit pressure follows expansion; no independent design pressure knob.
-    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:main+"/NozzleDesign",name:"inputs:p_exit"}});
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:main+"/NozzleDesign",name:"outputs:ideal_exhaust_velocity_mps",type_name:"float",value:"0.0"}});
-    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:main+"/MainChamber",name:"inputs:effective_exhaust_velocity_mps"}});
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/MainChamber",name:"inputs:effective_exhaust_velocity_mps",type_name:"float",sources:[main+"/NozzleDesign.outputs:ideal_exhaust_velocity_mps"]}});
-    let contract=griffin_main_engine_command_contract_plan(doc,edit_target,root);
-    if !contract.ok {return contract;} for op in contract.ops {ops.push(op);}
-    #{ok:true,ops:ops,feed_model:"LunCo.Propulsion.PressureFedValve"}
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:nozzle,name:"outputs:ideal_exhaust_velocity_mps",
+        type_name:"float",value:"0.0"}});
+    #{ok:true,kind:"griffin_main_engine_feed",engine_count:count,ops:ops,no_op:false}
+}
+
+fn apply_griffin_main_engine(doc, edit_target, root, name, parent_gen) {
+    let plan=griffin_main_engine_plan(doc,edit_target,root,name);
+    if !plan.ok {return plan;}
+    let command=assembly_edit::batch(doc,"Model Griffin main engine "+name,plan.ops,parent_gen);
+    #{ok:command.ok!=false,kind:plan.kind,command:command,engine:name}
+}
+
+fn apply_griffin_main_engine_feed(doc, edit_target, root, parent_gen) {
+    let plan=griffin_main_engine_feed_plan(doc,edit_target,root);
+    if !plan.ok {return plan;}
+    let command=assembly_edit::batch(doc,"Feed Griffin main engines from shared tanks",plan.ops,parent_gen);
+    #{ok:command.ok!=false,kind:plan.kind,command:command,engine_count:plan.engine_count}
+}
+
+// Guidance converts acceleration demand with the nominal cluster rating. It is
+// a configuration fact, not a live sum, so an engine failure is not signalled
+// to guidance; closed-loop guidance and RCS absorb it.
+fn griffin_guidance_thrust_rating_plan(doc, edit_target, gnc) {
+    let rating=griffin_spec::_typed_model_number(
+        "GriffinPropulsionRequirements::GriffinPressureFedStudy::guidanceClusterThrustN");
+    if rating==() || rating<=0.0 {return plan_error("guidance cluster thrust rating unavailable");}
+    if !_exists(doc,gnc) {return plan_error(gnc+": guidance prim has not composed");}
+    #{ok:true,kind:"griffin_guidance_thrust_rating",rating:rating,no_op:false,ops:[
+        #{RemoveAttribute:#{edit_target:edit_target,path:gnc,name:"inputs:max_thrust"}},
+        #{SetAttribute:#{edit_target:edit_target,path:gnc,name:"inputs:max_thrust",
+            type_name:"float",value:rating.to_string()}}]}
+}
+
+fn apply_griffin_guidance_thrust_rating(doc, edit_target, gnc, parent_gen) {
+    let plan=griffin_guidance_thrust_rating_plan(doc,edit_target,gnc);
+    if !plan.ok {return plan;}
+    let command=assembly_edit::batch(doc,"Use nominal Griffin cluster thrust rating",plan.ops,parent_gen);
+    #{ok:command.ok!=false,kind:plan.kind,command:command,rating:plan.rating}
 }
 
 // Size reconstruction plans consume the canonical typed source. These are
@@ -4184,8 +4354,8 @@ fn apply_refined_griffin_engine_bell(doc, edit_target, root, parent_gen) {
       root: root, paths: plan.paths}
 }
 
-/// Source-owned engine references and placements; aggregate Modelica thrust
-/// stays with the existing force actuator. Existing instances move as well.
+/// Source-owned engine references and placements. Existing instances move as
+/// well; `griffin_main_engines_plan` adds each bell's force actuator.
 fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
         return plan_error("Griffin engine cluster requires a document, edit target, and absolute root");
@@ -4272,12 +4442,11 @@ fn griffin_engine_cluster_exhaust_plan(doc, edit_target, root) {
         return plan_error("engine exhaust plan requires complete typed engine identities");
     }
     let cluster = root + "/Nozzle/MainEngineCluster";
-    let plume = root + "/MainPropulsion/PlumePhotometry";
-    let model = assembly_builder::composed_query(doc,#{path:plume,children:false});
-    if !query_ok(model) { return plan_error("aggregate plume Modelica component is missing"); }
     let ops = [];
     for name in names {
         let path = cluster + "/" + name;
+        let plume = main_engine_plume_path(root, name);
+        if !_exists(doc, plume) { return plan_error(plume+": engine plume Modelica component is missing"); }
         let visual = assembly_builder::composed_query(doc,
             #{path:path+"/Exhaust/Flame",children:false});
         if !query_ok(visual) { return plan_error(path+": shared exhaust has not composed"); }
@@ -4285,8 +4454,6 @@ fn griffin_engine_cluster_exhaust_plan(doc, edit_target, root) {
             ops.push(op);
         }
     }
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,
-        name:"inputs:engine_count",type_name:"float",value:count.to_string()+".0"}});
     #{ok:true,kind:"griffin_engine_cluster_exhaust",engine_count:count,
       ops:ops,no_op:false}
 }
@@ -5767,27 +5934,6 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     }
     let engine_parent = root + "/Nozzle/MainEngineCluster";
     let engine_asset = component_asset("lander/griffin_engine_bell_visual.usda");
-    let plume_path = root + "/MainPropulsion/PlumePhotometry";
-    let model = sysml_requirements::model();
-    let own = "GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
-    for parameter in [#{input:"fuel_family", source:"plumeFuelFamily"},
-        #{input:"stoichiometric_mixture_ratio", source:"plumeStoichiometricMixtureRatio"}] {
-        let value = f64_from(model.value(own + parameter.source));
-        if value == () {return plan_error("plume source is incomplete: " + parameter.source);}
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume_path,
-            name:"inputs:"+parameter.input,type_name:"float",value:value.to_string()}});
-    }
-    let published = [];
-    for wire in engine_exhaust::wires() {
-        if !published.contains(wire.output) {
-            published.push(wire.output);
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume_path,
-                name:"outputs:"+wire.output,type_name:"float",value:"0.0"}});
-        }
-    }
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:plume_path,
-        name:"inputs:mixture_ratio",type_name:"float",
-        sources:[root+"/MainPropulsion/MainChamber.outputs:mixture_ratio"]}});
     let cluster_record = assembly_builder::composed_query(doc,
         #{path:engine_parent,children:true});
     let expected_paths=[];for name in engine_names {expected_paths.push(engine_parent+"/"+name);}
@@ -5806,14 +5952,12 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
         let engine_path = engine_parent + "/" + engine_names[index];
+        let plume_path = main_engine_plume_path(root, engine_names[index]);
         for op in engine_exhaust::connection_ops(edit_target, engine_path, plume_path, #{}) {
             ops.push(op);
         }
         migrated.push(result.path);
     }
-    ops.push(#{SetAttribute: #{edit_target: edit_target,
-        path: plume_path, name: "inputs:engine_count", type_name: "float",
-        value: engine_count.to_string() + ".0"}});
 
     let skirt_asset = component_asset("lander/griffin_engine_skirt_visual.usda");
     let skirt_result = _migrate_griffin_component_reference(doc, edit_target,
@@ -5823,17 +5967,6 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     for op in skirt_result.ops { ops.push(op); }
     migrated.push(skirt_result.path);
 
-    // MainEngineVisual remains the flight force actuator. Its obsolete guide
-    // cones were a second, non-source-owned nozzle layout and are obsolete.
-    let actuator = root + "/MainEngineVisual";
-    for name in ["NozzleCenter", "NozzlePX", "NozzleNX", "NozzlePZ",
-        "NozzleNZ", "NozzleDiagP", "NozzleDiagN"] {
-        let path = actuator + "/" + name;
-        if query_ok(assembly_builder::composed_query(doc,
-            #{path: path, children: false})) {
-            ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
-        }
-    }
     let nozzle = root + "/Nozzle";
     let nozzle_record = assembly_builder::composed_query(doc,
         #{path: nozzle, attrs: ["lunco:parameter_status",

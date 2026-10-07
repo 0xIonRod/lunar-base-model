@@ -20,8 +20,8 @@ graph still needs canonical identity migration and generated realization links.
 | `RoverPayloadDeckCollider` | Hidden clipped-square convex collider matching the central FLIP payload adapter | Enabled, separate from the octagonal perimeter ring | Geometry is derived from adapter dimensions; supplier interface and load rating remain TBD |
 | `TankPX/NX/PZ/NZ` | `components/lander/griffin_tank_visual.usda` through four source references | Four render-only COPV study assemblies at the ordered SysML stations; MainPropulsion owns flight propellant mass | Tank count, type, dimensions, and stations are not established by a public Griffin-1 ICD |
 | `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider; the surface scene owns one fixed FLIP payload joint | The graph names the adapter and release-joint paths and requires both touchdown/settling and a ready egress path before release; mechanical interface dimensions and release-load ICD remain TBD |
-| `MainPropulsion` | Chamber, fuel and oxidizer tanks and pumps, representative nozzle design, shared plume photometry | The chamber remains the sole thrust and propellant authority; plume photometry derives per-nozzle rendering and light from aggregate simulated thrust, flow, velocity, chamber pressure, and nozzle geometry | Nozzle contour, engine-out behavior, and supplier propulsion data remain TBD |
-| `Nozzle` | `MainEngineCluster/Engine01..07`, each with a bell, throat, outer plume, hot core, and local plume light | Seven non-colliding bells and flame pairs; all seven receive the same cluster state through the shared photometry model, which divides aggregate engine outputs by its configured nozzle count | Seven main engines are public; bell contour and spacing remain study geometry |
+| `MainPropulsion` | Shared fuel and oxidizer tanks, seven `PressureFedEngine` members with one `PlumePhotometry` each, representative nozzle design | Each engine is the thrust and propellant authority for its own valves and chamber; `engineNN_enabled` models an engine-out | Nozzle contour, engine-out guidance response, and supplier propulsion data remain TBD |
+| `Nozzle` | `MainEngineCluster/Engine01..07`, each with a bell, throat, outer plume, hot core, local plume light and force actuator | Seven non-colliding bells; each applies its own engine's thrust at its station and shows its own plume | Seven main engines are public; bell contour and spacing remain study geometry |
 | `SolarPanelForward`, `SolarPanelFrontStarboard`, `SolarPanelStarboard` | Each root references `components/lander/griffin_solar_panel_visual.usda`, with `Cells`, `Frame`, dividers, hinge, brackets, and links | Three independently oriented panels use paired bus rails; each installed width derives from its rail span and shared edge clearance | The lower clearance cutout, as-built outline, installation datums, mechanism limits, and electrical behavior require the controlled panel and interface definitions |
 | `LegPX/NX/PZ/NZ` | `Strut` and matching `PadPX/NX/PZ/NZ` | Positive mass body, visible strut, enabled pad collider | Four functional legs; dimensions and damping TBD |
 | `EgressRampPort/Starboard` | Three rigid ramp sections from the upper deck; each section has two source-aligned wheel tracks, an open centre, and two upper edge-rail segments | Positive-mass rigid sections; both geometry-derived track colliders enabled | Track stations follow FLIP wheel datums; dimensions and ramp kinematics remain study values |
@@ -66,14 +66,27 @@ wheel and drivetrain model with the chassis, wheel, suspension, mast, and solar
 visual components. SysML owns wheel identities, station datums, and dimensions;
 the references keep repeated geometry in one component source.
 
-The Griffin main-engine plume is authored as a direct presentation of the
-propulsion simulation. `MainPropulsion/PlumePhotometry` consumes combustion
-activity and the chamber's total thrust, flow, and exhaust velocity, plus nozzle
-area and radius from `MainPropulsion/NozzleDesign`. Its `engine_count`
-parameter normalizes the cluster totals to each of the seven equal nozzles. The
-program declares `outputs:render_throttle`,
-`outputs:visual_length_fraction`, `outputs:intensity`, and `outputs:radius`;
-the seven bell flame pairs and local lights connect to those outputs. At zero
-delivered thrust the model specifies zero plume and zero light. Rhai does not
-animate plume transforms or brightness. The propulsion network must compile
-and produce live values before this behavior is considered demonstrated.
+Each Griffin main engine is modelled separately. `MainPropulsion/EngineNN` is
+one `LunCo.Propulsion.PressureFedEngine` (its own fuel/oxidizer valves and
+choked chamber), and both shared tanks feed every engine through acausal
+connectors, so the synthesized MainPropulsion network divides and drains
+propellant per engine. `MainPropulsion.inputs:engineNN_enabled` (default 1) is
+the engine's health input: 0 closes its valves, which models an engine-out.
+The root republishes each engine as `engineNN_thrust_n`, `_maximum_thrust_n`,
+`_activity`, `_chamber_pressure_pa`, `_propellant_flow`, `_fuel_flow_kgs`,
+`_oxidizer_flow_kgs` and `_mixture_efficiency`; a consumer that needs a cluster
+total sums them (`griffin_spec::main_engine_total`). Each bell
+`Nozzle/MainEngineCluster/EngineNN` carries that engine's
+`LunCoForceActuatorAPI` at its station, so a failed engine removes its thrust
+and creates the matching torque for RCS to hold. Guidance converts demand with
+the nominal SysML cluster rating (`guidanceClusterThrustN`) and is not told
+about a failure.
+
+Each engine's plume is a direct presentation of its own simulation.
+`MainPropulsion/EngineNNPlume` (`PlumePhotometry`, `engine_count = 1`) consumes
+that engine's activity, thrust, flow, exhaust velocity and chamber pressure,
+plus nozzle area and radius from the shared `MainPropulsion/NozzleDesign`. The
+bell's flame pair and local light connect to its outputs, so a failed engine
+shows no plume while the others burn. At zero delivered thrust the model
+specifies zero plume and zero light. Rhai does not animate plume transforms or
+brightness.

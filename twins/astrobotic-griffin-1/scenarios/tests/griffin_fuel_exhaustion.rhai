@@ -1,6 +1,7 @@
 // Stimulus/verdict only. Tank availability, feed flow, combustion and plume are
 // solved by the production Griffin Modelica network. Fixture boundary outputs
-// expose grouped member observations without creating separate physics models.
+// expose Engine01's plume as the representative per-engine observation without
+// creating separate physics models; cluster thrust and activity are summed.
 fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path("/World/Griffin1"),find_path("/World/Griffin1/MainPropulsion"),
           find_path("/World/Griffin1/AttitudeActuation"),find_path("/World/Griffin1/AttitudePropulsion")],
@@ -19,7 +20,7 @@ fn on_start(me,ctx) {
 }
 fn on_tick(me,ctx) {
     if this.done {return;}this.elapsed+=dt();
-    let thrust=get(this.main,"thrust_n");let light=get(this.main,"test_intensity");
+    let thrust=griffin_spec::main_engine_total(this.main,"thrust_n");let light=get(this.main,"test_intensity");
     if thrust!=() && thrust>1.0 && light>0.0 {this.burn_seen=true;}
     if get(this.rcs,"yaw_pos_a_thrust_n")>1.0 && get(this.rcs,"test_rcs_intensity")>0.0 {
         this.rcs_burn_seen=true;
@@ -50,10 +51,10 @@ fn on_tick(me,ctx) {
     let oxidizer_empty=oxidizer==0.0 && fuel>0.0;
     failures.push(t_true(fuel_empty || oxidizer_empty,
         "exactly one reservoir must deplete while the other remains available"));
-    failures.push(t_true((fuel_empty && get(this.main,"test_oxidizer_flow")>0.0)
-        || (oxidizer_empty && get(this.main,"test_fuel_flow")>0.0),
+    failures.push(t_true((fuel_empty && griffin_spec::main_engine_total(this.main,"oxidizer_flow_kgs")>0.0)
+        || (oxidizer_empty && griffin_spec::main_engine_total(this.main,"fuel_flow_kgs")>0.0),
         "the opposite reactant feed must remain available"));
-    failures.push(t_true(thrust==0.0 && get(this.main,"engine_activity")==0.0,
+    failures.push(t_true(thrust==0.0 && griffin_spec::main_engine_total(this.main,"activity")==0.0,
         "engine continued combustion without both reactants"));
     failures.push(t_true(light==0.0 && get(this.main,"test_length")==0.0
         && get(this.main,"test_plume_activity")==0.0,"inactive engine left a plume"));

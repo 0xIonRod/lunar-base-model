@@ -260,13 +260,10 @@ realized feature, and evidence result.
 
 ### Main-engine plume runtime status
 
-The vehicle declares the four typed `PlumePhotometry` outputs used by the seven
-flame pairs and engine lights: `render_throttle`,
-`visual_length_fraction`, `intensity`, and `radius`. The pulled model update
-`86796da` fixes the propulsion inputs. A fresh production surface-operations
-session compiled the main propulsion, attitude, GNC, sensor, and FLIP systems
-successfully. This confirms model compilation only; simulated plume values
-and visible plume behavior remain unverified.
+Each `MainPropulsion/EngineNNPlume` declares the typed `PlumePhotometry`
+outputs its bell's flame pair and light consume: `render_throttle`,
+`visual_length_fraction`, `intensity`, and `radius`. The fuel-exhaustion
+fixture observes Engine01's plume going dark when a reactant depletes.
 
 ### Surface mission run status
 

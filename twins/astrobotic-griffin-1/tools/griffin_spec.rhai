@@ -1004,6 +1004,19 @@ fn ramp_rail_joint_pin_radius_m() { _sysml_attribute("rampRailJointPinRadiusM") 
 fn ramp_rail_joint_pin_length_m() { _sysml_attribute("rampRailJointPinLengthM") }
 fn propellant_tank_names() { _sysml_enum_names("tankInstances") }
 fn main_engine_names() { _sysml_enum_names("mainEngineInstances") }
+// Each main engine publishes `<engine>_<port>` on the MainPropulsion network
+// root. A cluster total is the sum over the typed engine identities; a missing
+// engine port leaves the total unavailable instead of under-reporting it.
+fn main_engine_port(name, port) { name.to_lower() + "_" + port }
+fn main_engine_total(propulsion, port) {
+    let total=0.0;
+    for name in main_engine_names() {
+        let value=get(propulsion, main_engine_port(name, port));
+        if value==() {return ();}
+        total+=value;
+    }
+    total
+}
 
 fn lander_camera_focus_height_m() {
     let dimensions=_sysml_model_value("payloadAdapterDimensions");

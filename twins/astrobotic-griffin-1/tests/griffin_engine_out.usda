@@ -1,0 +1,44 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+    def DistantLight "Sun"
+    {
+        float intensity = 1.0
+    }
+    def Scope "Scenario"
+    {
+        def Scope "Test" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_engine_out.rhai@
+        }
+    }
+    def Xform "Griffin1" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
+    )
+    {
+        bool physics:rigidBodyEnabled = false
+        def "MainPropulsion"
+        {
+            custom float outputs:test_failed_plume_intensity
+            float outputs:test_failed_plume_intensity.connect = </World/Griffin1/MainPropulsion/Engine03Plume.outputs:intensity>
+            def "FuelTank"
+            {
+            }
+            def "OxidizerTank"
+            {
+            }
+        }
+        def Scope "AttitudePropulsion"
+        {
+        }
+    }
+}

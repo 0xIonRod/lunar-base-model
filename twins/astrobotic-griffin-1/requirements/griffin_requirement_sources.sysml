@@ -1304,6 +1304,11 @@ package GriffinRequirementSources {
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_fuel_exhaustion.rhai";
     }
 
+    part source_griffin_engine_out : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_engine_out.rhai";
+    }
+
     part source_griffin_propulsion_study : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml";
@@ -1317,6 +1322,11 @@ package GriffinRequirementSources {
     part source_agile_a110 : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "https://static1.squarespace.com/static/634ee7b32099c80fdfcc8cac/t/6418ea80e1144560207215ca/1679505951405/AgileSpace_A110SpecDoc.pdf";
+    }
+
+    part evidence_gpp_003 : RequirementEvidence {
+        ref targetRequirement = GriffinPropulsionRequirements::gpp003;
+        ref sources = (source_griffin_engine_out, source_griffin_starvation, source_griffin_propulsion_study);
     }
 
     part evidence_gpp_010 : RequirementEvidence {

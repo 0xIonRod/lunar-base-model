@@ -411,7 +411,6 @@ fn on_tick(me, ctx) {
     let vehicle_root = root.sub_string(0, vehicle_root_end);
     let propulsion_path = vehicle_root + "/MainPropulsion";
     let nozzle_design_path = propulsion_path + "/NozzleDesign";
-    let photometry_path = propulsion_path + "/PlumePhotometry";
     let bell_radius = sysml_requirements::number(source, own("bellRadiusM"));
     let bell_height = sysml_requirements::number(source, own("bellHeightM"));
     let throat_radius = sysml_requirements::number(source, own("throatRadiusM"));
@@ -438,9 +437,10 @@ fn on_tick(me, ctx) {
     let checks = [];
     checks.push(sysml_requirement_checks::source_list_count("GPP-001-count", "propulsion", "gpp001", VERIFICATION, visual("mainEngineInstances"), parent("engineCount")));
     checks.push(sysml_requirement_checks::source_list_count("GPP-005-stations", "engine", "gpp005", VERIFICATION, visual("engineStations"), parent("engineCount")));
-    checks.push(attribute("GPP-001-photometry-engine-count", "gpp001",
-        photometry_path, "inputs:engine_count",
-        names.len(), 0.0));
+    for name in names {
+        checks.push(attribute("GPP-001-" + name + "-photometry-engine-count", "gpp001",
+            (propulsion_path + "/" + name) + "Plume", "inputs:engine_count", 1.0, 0.0));
+    }
     checks.push(attribute("GPP-006-nozzle-design-exit-radius", "gpp006",
         nozzle_design_path, "inputs:exit_radius",
         sysml_requirements::number(source, own("exitBoreRadiusM")), geometry_tolerance));
@@ -525,8 +525,10 @@ fn on_tick(me, ctx) {
         relationships: true, connections: true});
     let observed_lights = query("QueryUsdPrims", #{paths: light_paths,
         connections: true});
+    let photometry_paths = [];
+    for name in names { photometry_paths.push((propulsion_path + "/" + name) + "Plume"); }
     let observed_photometry = query("QueryUsdPrims", #{
-        paths: [photometry_path], connections: true});
+        paths: photometry_paths, connections: true});
     let snapshots = [
         _query_snapshot(observed_engines),
         _query_snapshot(observed_plumes),
@@ -555,7 +557,8 @@ fn on_tick(me, ctx) {
         && observed_plumes.records.len() == plume_paths.len()
         && observed_lights.records != ()
         && observed_lights.records.len() == light_paths.len()
-        && record_at(observed_photometry, photometry_path) != ();
+        && observed_photometry.records != ()
+        && observed_photometry.records.len() == photometry_paths.len();
     if plume_observations_available {
         for index in 0..engine_paths.len() {
             let engine_path = engine_paths[index];
@@ -567,7 +570,7 @@ fn on_tick(me, ctx) {
             let light = record_at(observed_lights, core_path + "/PlumeLight");
             let has_pair = flame != () && core != () && light != ();
             if has_pair { plume_engine_count += 1; }
-            let model_source = photometry_path + ".outputs:";
+            let model_source = photometry_paths[index] + ".outputs:";
             plume_connections_match = plume_connections_match
                 && has_single_connection(flame, "inputs:throttle",
                     model_source + "render_throttle")
@@ -597,27 +600,27 @@ fn on_tick(me, ctx) {
             }
         }
     }
-    let photometry_record = record_at(observed_photometry,
-        photometry_path);
-    let photometry_consumes_engine_state = plume_observations_available
-        && has_single_connection(photometry_record, "inputs:throttle",
-            propulsion_path + ".outputs:engine_activity")
-        && has_single_connection(photometry_record, "inputs:thrust_n",
-            propulsion_path + ".outputs:thrust_n")
-        && has_single_connection(photometry_record, "inputs:maximum_thrust_n",
-            propulsion_path + ".outputs:maximum_thrust_n")
-        && has_single_connection(photometry_record, "inputs:propellant_flow_kgs",
-            propulsion_path + ".outputs:propellant_flow")
-        && has_single_connection(photometry_record, "inputs:exhaust_velocity_mps",
-            propulsion_path + ".outputs:exhaust_velocity_mps")
-        && has_single_connection(photometry_record, "inputs:design_exhaust_velocity_mps",
-            propulsion_path + ".outputs:design_exhaust_velocity_mps")
-        && has_single_connection(photometry_record, "inputs:nozzle_exit_radius_m",
-            nozzle_design_path + ".outputs:exit_radius_m")
-        && has_single_connection(photometry_record, "inputs:nozzle_exit_area_m2",
-            nozzle_design_path + ".outputs:exit_area")
-        && has_single_connection(photometry_record, "inputs:chamber_pressure_pa",
-            propulsion_path + ".outputs:chamber_pressure_pa");
+    // Each plume model consumes its own engine's state and the shared
+    // nozzle design, so a failed engine's plume goes dark on its own.
+    let photometry_consumes_engine_state = plume_observations_available;
+    for index in 0..names.len() {
+        if !photometry_consumes_engine_state { break; }
+        let engine = (propulsion_path + "/" + names[index]) + ".outputs:";
+        let record = record_at(observed_photometry, photometry_paths[index]);
+        photometry_consumes_engine_state = record != ()
+            && has_single_connection(record, "inputs:throttle", engine + "activity")
+            && has_single_connection(record, "inputs:thrust_n", engine + "thrust_n")
+            && has_single_connection(record, "inputs:maximum_thrust_n", engine + "maximum_thrust_n")
+            && has_single_connection(record, "inputs:propellant_flow_kgs", engine + "propellant_flow")
+            && has_single_connection(record, "inputs:exhaust_velocity_mps", engine + "exhaust_velocity_mps")
+            && has_single_connection(record, "inputs:design_exhaust_velocity_mps",
+                engine + "design_exhaust_velocity_mps")
+            && has_single_connection(record, "inputs:chamber_pressure_pa", engine + "chamber_pressure_pa")
+            && has_single_connection(record, "inputs:nozzle_exit_radius_m",
+                nozzle_design_path + ".outputs:exit_radius_m")
+            && has_single_connection(record, "inputs:nozzle_exit_area_m2",
+                nozzle_design_path + ".outputs:exit_area");
+    }
     let plume_requirement_bindings = _required_constraint_bindings(source_model,
         "gpp008", "GPPC008_EnginePlumeDataflow", [
             ["engineCount", _source_literal(source_model, parent("engineCount"))],
