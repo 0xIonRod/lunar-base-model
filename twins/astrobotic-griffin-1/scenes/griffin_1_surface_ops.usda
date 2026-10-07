@@ -316,4 +316,9 @@ def Xform "Griffin1SurfaceOps" (
             custom rel inputs:subject = </Griffin1SurfaceOps/FLIP>
         }
     }
+    def Xform "StarfieldSky" (
+        prepend references = @lunco://components/environment/starfield_sky.usda@</StarfieldSky>
+    )
+    {
+    }
 }

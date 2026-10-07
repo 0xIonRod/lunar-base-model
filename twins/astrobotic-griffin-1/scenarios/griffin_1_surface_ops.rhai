@@ -77,6 +77,7 @@ fn on_start(me, ctx) {
         subscribe_from("intent.edge", lander_gid);
         subscribe_from("lander_touchdown", lander_gid);
     }
+    if rover_gid >= 0 {subscribe_from("intent.edge", rover_gid);}
     subscribe("griffin_ramp_unfold_requested");
     subscribe("griffin_rover_release_requested");
     for event_name in griffin_surface_ramp_ops::unfold_event_contract().ordered {
@@ -97,6 +98,7 @@ fn on_start(me, ctx) {
     this.ramps_deployed = false;
     this.ramp_unfold_requested = false;
     this.route_engaged = false;
+    this.route_interrupted = false;
     this.ramp_approach_reached = false;
     this.ramp_exit_reached = false;
     this.waypoint_1_reached = false;
@@ -137,6 +139,28 @@ fn on_event(me, evt, ctx) {
     this.event_trace = griffin_surface_mission_report::trace_event(this, evt);
     let lander = find_path(LANDER);
     let rover = find_path(ROVER);
+
+    if evt.name=="intent.edge" && evt.source==rover && this.route_engaged {
+        let value=evt.value;
+        if value!=() && value["target_gid"]!=()
+            && value["target_gid"].to_string()==rover.to_string() && is_controlled(rover)
+            && (value["edge"]=="pressed" || value["edge"]=="pulse") {
+            // Yield only the mission's guidance inputs. The controller owns
+            // the pressed intent and its matching release edge.
+            this.route_interrupted=true;
+            this.route_engaged=false;
+            let released=cmd("SetPorts",#{target:rover,writes:[
+                ["program_active",0.0],["autopilot_enable",0.0]]});
+            if released==() || released.ok!=true {
+                this.route_control_error=true;
+                notify_kind("FLIP mission guidance release was rejected.","error");
+                throw("FLIP mission guidance release was rejected");
+            }
+            emit("griffin_surface_route_interrupted",#{rover:rover,intent:value["intent"]});
+            print("[griffin] surface route yielded to operator intent="+value["intent"]);
+        }
+        return;
+    }
 
     // Shared controller and HUD requests converge on the same Twin-owned
     // manual actions. F on FLIP retains its vehicle-specific control meaning.
@@ -293,6 +317,11 @@ fn update_landing_status(previously_landed, already_announced) {
 }
 
 fn on_stop(me, ctx) {
+    if this.route_engaged {
+        let result=modelica_waypoint_stop(find_path(ROVER));
+        if result==() || result.ok!=true {notify_kind("FLIP mission stop was rejected.","error");}
+        this.route_engaged=false;
+    }
     // The guided overlay is app-wide, so retire this mission's controls when
     // its scenario is stopped even if the Welcome tab stays open underneath.
     hint("");
@@ -777,6 +806,11 @@ fn surface_mission_task() {
         // records the child-task result directly for the final structured
         // verdict.
         once(|m| {
+            let stopped=modelica_waypoint_stop(find_path(ROVER));
+            if stopped==() || stopped.ok!=true {
+                throw("FLIP completed mission guidance stop was rejected");
+            }
+            this.route_engaged=false;
             this.ramp_approach_reached = true;
             this.ramp_exit_reached = true;
             this.waypoint_1_reached = true;
@@ -802,16 +836,19 @@ fn landing_status_task() {
 }
 
 fn task(me, ctx) {
+    // A semantic operator edge cancels the entire mission branch, including
+    // pending settle/release leaves, before any later route write can run.
+    let mission=par_race([surface_mission_task(),wait_until(|m| this.route_interrupted)]);
     if is_unattended() {
         // The final verdict reads the live qualified landing state, so keep it
         // observed until the mission completes rather than latching the first
         // post-touchdown sample taken while the hull is still rocking.
         par_all([
             ramp_unfold_task(),
-            par_race([surface_mission_task(), landing_status_task()]),
+            par_race([mission, landing_status_task()]),
         ])
     } else {
         let operator = par_all([ramp_unfold_task(), landing_status_task()]);
-        par_race([surface_mission_task(), operator])
+        par_race([mission, operator])
     }
 }

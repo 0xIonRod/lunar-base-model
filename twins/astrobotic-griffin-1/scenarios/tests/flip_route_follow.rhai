@@ -1,6 +1,7 @@
-// FLIP operator route: points are added through the production Alt+left-click
-// route policy (no explicit route; the route is discovered from the possessed
-// subject), the action intent starts following, and FLIP must visit every
+// FLIP operator route: the first point uses an unpossessed terrain-pointer
+// context and the next two resolve from the possessed subject. This headless
+// policy gate supplies semantic contexts; window input is covered separately.
+// The action intent starts following, and FLIP must visit every
 // point upright on the DEM terrain. Wheel traces are a windowed presentation
 // and are verified in a live session, not by this headless gate.
 import "lunco://scripting/tools/waypoint_editor" as waypoint_editor;
@@ -138,6 +139,12 @@ fn on_tick(me, ctx) {
         }
         let offset = POINT_OFFSETS[this.add_results.len()];
         let gesture = _gesture(this.doc, this.origin[0] + offset[0], this.origin[2] + offset[1]);
+        if gesture != () && this.add_results.len() == 0 {
+            gesture.remove("controlled_path");
+            gesture.target_path = ROOT + "/Environment/Terrain";
+            gesture.hit_path = gesture.target_path;
+            gesture.prim_paths = [gesture.target_path, ROOT + "/Environment", ROOT];
+        }
         let result = if gesture == () { #{ ok: false, error: "terrain height unavailable" } }
             else { waypoint_editor::route_pointer_action(gesture) };
         this.add_results.push(result);

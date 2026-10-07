@@ -1446,6 +1446,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
     let event = leg.event;
     seq([
         once(|m| {
+            if this.route_interrupted==true {return false;}
             if event=="griffin_ramp_approach_reached" {
                 this.surface_route_frame=griffin_surface_ops::landed_surface_route_frame();
                 let shown=griffin_surface_ops::present_surface_route(this.surface_route_frame);
@@ -1465,6 +1466,7 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
             true
         }),
         step(|m| {
+            if this.route_interrupted==true {return false;}
             // `step` is the supported native task node. Keep the route's
             // source-owned command cadence here so policy remains at 10 Hz
             // while the generic task kernel advances at the simulation rate.
@@ -1637,11 +1639,12 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
             // SetPorts command to the same control surface and could
             // overwrite or reject the typed guidance write.
             false
-        }, |m| this.route_control_error == true || arrived(rover, this.route_target, arrival_radius)),
+        }, |m| this.route_interrupted == true || this.route_control_error == true
+            || arrived(rover, this.route_target, arrival_radius)),
         // A control fault makes the step terminal only so this explicit check
         // can propagate Failure through the native task tree.  It must never
         // be interpreted as arrival or allow the following route leg to run.
-        check(|m| this.route_control_error != true),
+        check(|m| this.route_control_error != true && this.route_interrupted != true),
         once(|m| {
             if event == "griffin_ramp_exit_reached" {
                 this.egress_terrain_evidence = griffin_surface_ops::egress_terrain_runtime_evidence(rover);

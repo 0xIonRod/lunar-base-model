@@ -524,13 +524,28 @@ provides `control_lander()`, `control_rover()`, and `release_control()` for
 the Rhai console. While FLIP is possessed, the
 standard vessel HUD shows its telemetry and the route program button, which
 runs or stops FLIP's operator route. Alt+left-click adds a route point to that
-route; manual drive input takes control back from it at any time. Route points
+route even before possession when it is the scene's unique route. Manual drive
+input takes control back from both the operator route and the automatic mission
+route. Mission completion releases its guidance inputs. Route points
 are runtime edits and are not saved (`usd.runtime_persistence` is false).
 
 The controller's configured bindings command lander pitch, roll, yaw, thrust
 and release, or FLIP drive, skid-turn, brake and route action. The vehicle HUD
 shows the current input hints. Manual driving takes over from route guidance;
 the mission route remains a visible phase after adapter release.
+
+The default scene includes the shared procedural starfield and physical Sun
+disk, driven by its existing celestial Sun. Native W/S, A/D and Space press and
+release acceptance is available while FLIP is possessed:
+
+```sh
+python3 scripts/api/test_flip_manual_controls.py --api 4117 \
+  --twin /home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1
+```
+
+Run the command from the LunCoSim checkout against your own ready session. Its
+assertions live in `scenarios/tests/flip_manual_controls.rhai`; the driver
+delivers native window events and releases every test key before returning.
 
 The controls are a study interface, not a claim about the flight command
 dictionary. The generic simulator still owns possession, input routing,
