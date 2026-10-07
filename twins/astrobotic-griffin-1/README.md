@@ -150,6 +150,13 @@ gates remain fast.
 
 ## Provision the NOBILE03 terrain
 
+The downloadable Griffin Twin ZIP already contains the verified NOBILE03 TIF
+and PDS3 label in `.cache/sources/nobile03/`, plus the processed heightfield in
+`.cache/terrain/nobile03/materials/textures/heightmap.tif`. Extract the entire
+folder, including `.cache/`, and open it in a compatible LunCoSim installation.
+No terrain downloads or preprocessing are needed for the distributed archive.
+The instructions below apply to source checkouts.
+
 The checked-in `Assets.toml` is the source manifest. Raw downloads are stored
 under the Twin-local `.cache/` directory and are ignored by Git. The processed
 heightfield is also ignored because it is reproducible; only the manifest,

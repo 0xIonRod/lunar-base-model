@@ -26,13 +26,13 @@ jobs:
               --exclude=astrobotic-griffin-1/.cache
           mkdir -p package/astrobotic-griffin-1/tools/terrain
           cp tools/terrain/README.md tools/terrain/reproject_lroc_polar_dem.py \
+            tools/terrain/verify_griffin_bundle.py \
             package/astrobotic-griffin-1/tools/terrain/
 
       - name: Download and verify terrain sources
         shell: python
         run: |
           import hashlib
-          import os
           from pathlib import Path
           import shutil
           import tomllib
@@ -40,11 +40,10 @@ jobs:
 
           twin = Path("package/astrobotic-griffin-1")
           manifest = tomllib.loads((twin / "Assets.toml").read_text())
-          sources = Path(os.environ["RUNNER_TEMP"]) / "griffin-terrain"
-          sources.mkdir()
           for key in ("nobile03_dem", "nobile03_label"):
               asset = manifest[key]
-              target = sources / Path(asset["dest"]).name
+              target = twin / ".cache" / asset["dest"]
+              target.parent.mkdir(parents=True, exist_ok=True)
               with urllib.request.urlopen(asset["url"], timeout=120) as response:
                   with target.open("wb") as output:
                       shutil.copyfileobj(response, output)
@@ -58,9 +57,9 @@ jobs:
         shell: bash
         run: |
           python3 package/astrobotic-griffin-1/tools/terrain/reproject_lroc_polar_dem.py \
-            --source "$RUNNER_TEMP/griffin-terrain/NAC_DTM_NOBILE03.TIF" \
-            --label "$RUNNER_TEMP/griffin-terrain/NAC_DTM_NOBILE03.LBL" \
-            --output package/astrobotic-griffin-1/terrain/nobile03/materials/textures/heightmap.tif \
+            --source package/astrobotic-griffin-1/.cache/sources/nobile03/NAC_DTM_NOBILE03.TIF \
+            --label package/astrobotic-griffin-1/.cache/sources/nobile03/NAC_DTM_NOBILE03.LBL \
+            --output package/astrobotic-griffin-1/.cache/terrain/nobile03/materials/textures/heightmap.tif \
             --center-lat -84.72672255 --center-lon 29.14428685 \
             --window-m 512 --resolution 129 --vertical-offset -5187.322
 
@@ -68,13 +67,20 @@ jobs:
         shell: bash
         run: |
           test -s package/astrobotic-griffin-1/twin.toml
-          test -s package/astrobotic-griffin-1/terrain/nobile03/materials/textures/heightmap.tif
+          test -s package/astrobotic-griffin-1/.cache/terrain/nobile03/materials/textures/heightmap.tif
           printf '%s\n' "$GITHUB_SHA" > package/astrobotic-griffin-1/SOURCE_COMMIT.txt
           cd package
           zip -qr ../astrobotic-griffin-1.zip astrobotic-griffin-1
           cd ..
           unzip -tq astrobotic-griffin-1.zip
           sha256sum astrobotic-griffin-1.zip > astrobotic-griffin-1.zip.sha256
+
+      - name: Verify extracted Twin offline
+        shell: bash
+        run: |
+          unzip -q astrobotic-griffin-1.zip -d "$RUNNER_TEMP/griffin-offline"
+          python3 "$RUNNER_TEMP/griffin-offline/astrobotic-griffin-1/tools/terrain/verify_griffin_bundle.py" \
+            "$RUNNER_TEMP/griffin-offline/astrobotic-griffin-1"
 
       - name: Publish downloadable release
         shell: bash
@@ -87,7 +93,9 @@ jobs:
           Open that folder as a Twin in a compatible LunCoSim installation.
 
           Includes Griffin/FLIP vehicles, scenes, Rhai scripts, SysML requirements,
-          research records, and the processed NOBILE03 terrain crop.
+          research records, and a complete Twin-local NOBILE03 cache (verified
+          source TIF/label and processed terrain). No terrain downloads or
+          preprocessing are needed after extraction.
           LunCoSim supplies the shared lunco:// assets and runtime; it is not included.
           This is a study model, not a flight-validated vehicle or mission.
 

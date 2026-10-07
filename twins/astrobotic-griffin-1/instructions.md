@@ -57,6 +57,11 @@ to absolute Windows paths.
 
 ## Step 3: provision the reproducible regional terrain
 
+If you downloaded a Griffin Twin release ZIP, this step is already complete.
+Keep the included `.cache/` directory: it contains both pinned NOBILE03 sources
+and the processed terrain crop. Open the extracted Twin with a compatible
+installed LunCoSim runtime; archive users do not need the source-build step below.
+
 From the repository root, follow [`tools/terrain/README.md`](../../tools/terrain/README.md)
 to download the two pinned NOBILE03 source files and generate the local
 heightfield. Downloads and generated terrain bytes must remain ignored; verify

@@ -35,7 +35,10 @@ Download `astrobotic-griffin-1.zip` from a Griffin Twin entry on the
 Extract it and open the `astrobotic-griffin-1` folder as a Twin in a compatible
 LunCoSim installation. The archive includes the vehicle assets, scenes,
 scripts, requirements, research, and processed NOBILE03 terrain. LunCoSim
-provides the shared `lunco://` assets and runtime separately.
+provides the shared `lunco://` assets and runtime separately. The ZIP carries
+both verified NOBILE03 source files and the processed DEM in the Twin-local
+`.cache/` directory; no terrain downloads or preprocessing are needed after
+extraction. Keep the `.cache/` directory when copying the Twin.
 
 To publish an archive, use **Actions → Package Astrobotic Griffin Twin →
 Run workflow**, then select the source branch. The workflow must first be
@@ -44,7 +47,8 @@ Each run publishes a separate release with a ZIP and SHA-256 checksum and
 links to it from the run summary. The workflow runs only when manually
 requested; it does not compile LunCoSim or run simulations. Terrain inputs
 are downloaded from `Assets.toml`, verified against its SHA-256 values, and
-processed with the checked-in Python adapter.
+processed with the checked-in Python adapter. Before publishing, the workflow
+extracts the ZIP into a fresh folder and verifies its DEM payload offline.
 
 ## Working rules
 

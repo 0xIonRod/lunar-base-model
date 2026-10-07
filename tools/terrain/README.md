@@ -1,5 +1,22 @@
 # Griffin-1 terrain asset workflow
 
+Published Griffin Twin ZIPs already include the two verified source files under
+`.cache/sources/nobile03/` and the processed crop under
+`.cache/terrain/nobile03/materials/textures/heightmap.tif`. Extract the complete
+folder, including `.cache/`, and open it in a compatible LunCoSim installation;
+there is no terrain download or preprocessing step for archive users.
+LunCoSim resolves `terrain/nobile03` through the Twin's local cache and recognizes
+the manifest sources as installed after checking their SHA-256 values.
+
+To check an extracted archive without network access or a machine-global cache:
+
+```sh
+python3 /path/to/astrobotic-griffin-1/tools/terrain/verify_griffin_bundle.py \
+  /path/to/astrobotic-griffin-1
+```
+
+The steps below are for regenerating terrain from a source checkout.
+
 The Twin uses the official LROC NAC DTM `NOBILE03`, a 4 m/pixel product whose
 PDS3 label declares a south-polar stereographic projection. The native
 `lunco-assets` cropper currently accepts equirectangular products only, so the
