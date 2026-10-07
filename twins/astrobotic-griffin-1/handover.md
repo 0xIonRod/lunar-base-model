@@ -1,6 +1,56 @@
 # Griffin-1 Twin handover
 
-**Latest update:** 2026-10-05 (older sections retain their original evidence scope)
+**Latest update:** 2026-10-07 (older sections retain their original evidence scope)
+
+## Differential FLIP and verified component completion — 2026-10-07
+
+FLIP uses the skid Modelica law and standard TankDifferentialAPI, with fixed
+wheel headings and differential steering geometry. Its possessed vehicle HUD
+starts/stops the route; manual input takes control. Alt-click route points use
+the core waypoint program. Twin runtime persistence is disabled. USD changes
+were saved and read back through the simulator document API.
+
+Production evidence from the built source integrated as simulator `804c54144`
+(binary stamp `cd1c7918-dirty`; final Rust edits were formatting only):
+
+- Route/HUD/manual takeover: PASS 16; three points visited in 26.5 s,
+  minimum upright Y 0.992339. A fresh process began with an empty route.
+- FLIP wheel requirements: PASS 73.
+- Griffin/FLIP visual contract: PASS 126; the static fixture disables its
+  inherited flight latches alongside its other disabled joints.
+- Lander requirements: PASS 122.
+- Engine pilot hold/release and native mass properties: PASS 13 at
+  2073 ticks / 34.55 s. Fuel reduces native mass and X/Z inertia; Y inertia
+  retains the source model value. COM and all inertia endpoints track current
+  or preceding Modelica samples within binary64 roundoff.
+- Flight stow topology and negative plans: PASS 272. The powered pilot run
+  held all six flight latches within 0.000057 rad.
+- Full surface operations: PASS 16 at 7273 ticks / 121.22 s, including
+  sequential release of the six flight locks, deployment and differential egress.
+- General Griffin requirements now finish with a passing verdict and valid
+  full SysML projection. Mesh geometry is measured separately from explicitly
+  source-bound design constraint parameters.
+
+The native f64 mass/COM/inertia path and strict-closure prepared-solver cache
+are committed in the simulator. Low-level owner gates passed (2 native mass
+checks, 3 cache closure checks), as did the production build and worker CLI
+compile check. See the simulator performance handover for measured cold/warm
+preparation costs; sustained FPS and faster cold lowering are not established.
+
+Manual pilot attitude stability remains unresolved. The new
+`tests/griffin_pilot_attitude.usda` reproduces the failure after a 0.1 s semantic
+pitch tap with thrust held. Tight flight locks and retiring all four leg
+spring joints do not eliminate it. All 12 commanded RCS jets reconstruct the
+correct restoring pitch moment, approximately -277.178 N m, while rotation
+grows. This proves commanded wrench, not native backend delivery. The next
+causal check must separate external angular acceleration from attachment
+constraint contributions; no controller gain changes were made.
+
+The earlier standalone trail result does not prove mission rendered-trail
+continuity. A headful exact surface scene reached touchdown and ramp deployment
+and displayed FLIP's standard HUD while possessed. It did not reach a rover
+trail-cutoff observation before the requested finalization. Trace-cutoff
+reproduction remains open.
 
 ## HUD GNC disconnect — 2026-10-06
 
@@ -245,7 +295,7 @@ evidence document. Owned 49820 physically reaches the approach, ramp exit and
 both survey gates; all four exit wheel casts hit the DEM within 0.5 mm of the
 terrain sampler. Owned 49822 also reaches Base at tick 9408 / 156.8 simulation seconds.
 The Modelica arrival taper lies inside the accepted arrival circle; the shared
-Ackermann controller now supports forward/reverse recovery.
+The differential controller supports forward/reverse recovery.
 
 The route uses one landed port-ramp horizontal frame, frozen when egress
 begins. Survey points are through-gates with a one-wheelbase guidance lead;

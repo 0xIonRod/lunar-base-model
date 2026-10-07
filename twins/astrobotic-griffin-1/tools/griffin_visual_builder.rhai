@@ -1790,7 +1790,7 @@ fn physical_top_deck_collider_observation(doc, root) {
     if expected.ok != true {
         return #{ok: false, state: "invalid", detail: expected.error};
     }
-    let tolerance = sysml_requirements::number(sysml_requirements::source(),
+    let tolerance = griffin_spec::_typed_model_number(
         "GriffinMechanicalRequirements::GR018_HullAndDeck::topDeckProfileToleranceM");
     if tolerance == () || tolerance <= 0.0 {
         return #{ok: false, state: "invalid", detail: "shared geometry tolerance is missing from SysML"};
@@ -2439,7 +2439,7 @@ fn physical_landing_leg_pad_observation(doc, root) {
             #{path: root + "/Leg" + suffixes[index] + "_BusMount/MountAxle", children: false,
               geometry_bounds: true});
         let leg_pose = assembly_builder::composed_query(doc, #{path: leg_path,
-            children: false, attrs: ["xformOp:translate", "xformOp:rotateXYZ", "physxRigidBody:enableCCD"],
+            children: true, attrs: ["xformOp:translate", "xformOp:rotateXYZ", "physxRigidBody:enableCCD"],
             rels: ["physics:filteredPairs"], schemas: true});
         let joint_path = root + "/Leg" + suffixes[index] + "_Spring";
         let joint = assembly_builder::composed_query(doc, #{path: joint_path,
@@ -2450,7 +2450,7 @@ fn physical_landing_leg_pad_observation(doc, root) {
             || !query_ok(leg_pose) || !query_ok(joint)
             || mount_arm.geometry_bounds == () || mount_axle.geometry_bounds == ()
             || collider.attrs == () || visual.attrs == ()
-            || leg_pose.attrs == () {
+            || leg_pose.attrs == () || leg_pose.children == () {
             return #{ok: false, state: "unavailable",
                 detail: leg_path + ": composed pad proxy or visual source geometry is missing"};
         }
@@ -2697,8 +2697,12 @@ fn physical_landing_leg_pad_observation(doc, root) {
             all_visual_disabled = false;
         }
         for legacy_name in ["OuterStrut", "FootPad"] {
+            let legacy_path = leg_path + "/" + legacy_name;
+            // Inactive prims have no composed contact geometry. Inspect only
+            // children admitted by this same composed leg snapshot.
+            if !leg_pose.children.contains(legacy_path) { continue; }
             let legacy = assembly_builder::composed_query(doc,
-                #{path: leg_path + "/" + legacy_name, children: false,
+                #{path: legacy_path, children: false,
                   attrs: ["physics:collisionEnabled", "visibility"]});
             if !query_ok(legacy) || legacy.attrs == ()
                 || legacy.attrs["physics:collisionEnabled"] != false

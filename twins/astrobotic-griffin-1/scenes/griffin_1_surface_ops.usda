@@ -159,7 +159,7 @@ def Xform "Griffin1SurfaceOps" (
         double3 physics:velocity = (0.0, 0.0, 0.0)
         custom token lunco:mission:deploymentState = "top_deck_attached_until_touchdown"
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-        float physxVehicleAckermannSteering:strength = 1.0
+        custom rel programs = </Griffin1SurfaceOps/FlipRoute/Program>
     }
     def PhysicsFixedJoint "FLIPPayloadAdapterJoint"
     {
@@ -300,6 +300,20 @@ def Xform "Griffin1SurfaceOps" (
         {
             uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/griffin_1_surface_ops.rhai@
+        }
+    }
+    def Scope "FlipRoute" (
+        documentation = "Operator route for FLIP: Alt+left-click adds a point to this route while FLIP is selected or possessed; the action key starts or stops following. Points live in the runtime layer and are not saved (usd.runtime_persistence is false)."
+    )
+    {
+        def Scope "Program" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://scenarios/route_follow.rhai@
+            float inputs:enabled = 0.0
+            custom rel inputs:subject = </Griffin1SurfaceOps/FLIP>
         }
     }
 }

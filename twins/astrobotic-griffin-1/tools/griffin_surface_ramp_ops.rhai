@@ -4,6 +4,72 @@
 // scenario remains the single owner of sequencing, measured settlement, and
 // phase state.
 
+// Validate the complete pair before retiring either solver latch. USD owns
+// the fixed attachment; SysML owns its hinge pairing; Rhai owns release order.
+fn flight_latch_release_plan(root, hinge_names) {
+    if root==() || root=="" || hinge_names==() || hinge_names.len()!=2 {
+        return #{ok:false,error:"flight latch release requires a root and two hinge identities"};
+    }
+    let bindings=griffin_spec::ramp_flight_latch_bindings();
+    let selected=[];
+    let paths=[];
+    for hinge in hinge_names {
+        let binding=();
+        for candidate in bindings {if candidate.hinge==hinge {binding=candidate;}}
+        if binding==() || paths.contains(root+"/"+binding.latch) {
+            return #{ok:false,error:"unknown or duplicate flight latch hinge identity",hinge:hinge};
+        }
+        selected.push(binding);
+        paths.push(root+"/"+binding.latch);
+        paths.push(root+"/"+binding.hinge);
+    }
+    let snapshot=query("QueryUsdPrims",#{paths:paths,rels:["physics:body0","physics:body1"]});
+    if snapshot==() || snapshot.error!=() || snapshot.records==()
+        || snapshot.records.len()!=paths.len() {
+        return #{ok:false,error:"flight latch topology snapshot unavailable",snapshot:snapshot};
+    }
+    let targets=[];
+    for index in 0..selected.len() {
+        let latch=snapshot.records[2*index];
+        let hinge=snapshot.records[2*index+1];
+        if latch.type_name!="PhysicsFixedJoint" || hinge.type_name!="PhysicsRevoluteJoint"
+            || latch.active!=true || hinge.active!=true
+            || latch.relationships==() || hinge.relationships==() {
+            return #{ok:false,error:"flight latch and revolute joint must be active standard joints",
+                latch:latch,hinge:hinge};
+        }
+        for name in ["physics:body0","physics:body1"] {
+            let locked=latch.relationships[name];
+            let driven=hinge.relationships[name];
+            if locked==() || driven==() || locked.len()!=1 || driven.len()!=1
+                || locked[0]!=driven[0] {
+                return #{ok:false,error:"flight latch body endpoint differs from its source-paired hinge",
+                    relationship:name,latch:latch,hinge:hinge};
+            }
+        }
+        let entity=find_path(paths[2*index]);
+        if entity==() || entity<0 {
+            return #{ok:false,error:"flight latch runtime entity unavailable",path:paths[2*index]};
+        }
+        targets.push(#{target:entity,path:paths[2*index],hinge:selected[index].hinge});
+    }
+    #{ok:true,targets:targets,snapshot:snapshot}
+}
+
+fn _release_flight_latches(hinge_names) {
+    let plan=flight_latch_release_plan("/Griffin1SurfaceOps/Lander",hinge_names);
+    if plan.ok!=true {return plan;}
+    let commands=[];
+    for target in plan.targets {
+        let result=cmd("DetachJoint",#{target:target.target,intent:"Interactive"});
+        commands.push(#{path:target.path,result:result});
+        if result==() || result.ok!=true {
+            return #{ok:false,error:"flight latch release rejected",plan:plan,commands:commands};
+        }
+    }
+    #{ok:true,plan:plan,commands:commands}
+}
+
 fn unfold_event_contract() {
     let middle_commanded = "griffin_ramp_middle_sections_unfold_commanded";
     let middle_settled = "griffin_ramp_middle_sections_unfold_settled";
@@ -63,9 +129,20 @@ fn _begin_section_motion(stage, start, target, publish_start) {
         || start==() || target==() || !start.is_finite() || !target.is_finite() {
         return #{ok:false,error:"ramp quarter-turn source is unavailable or invalid"};
     }
+    let release=();
+    if publish_start {
+        let names=griffin_spec::ramp_intermediate_joint_names();
+        if names.len()!=4 || (stage!="middle" && stage!="toe") {
+            return #{ok:false,error:"ramp section release identities unavailable"};
+        }
+        let offset=if stage=="middle" {0} else {1};
+        release=_release_flight_latches([names[offset],names[offset+2]]);
+        if release.ok!=true {return release;}
+    }
     let result=_command_section_unfold(stage,start,publish_start);
     if result.ok!=true {return result;}
     result.motion=#{start_tick:sim_tick(),start_target:start,target:target,duration_s:duration};
+    result.flight_latch_release=release;
     result
 }
 
@@ -269,6 +346,8 @@ fn deploy_roots(expected) {
     if port_angle == () || starboard_angle == () {
         return #{ok: false, error: "physical ramp deployment angles are missing from SysML"};
     }
+    let release=_release_flight_latches(joints);
+    if release.ok!=true {return release;}
     let command = griffin_surface_ops::set_physical_ramp_hinge_angles(expected);
     if command == () || command.ok != true {
         return #{ok: false, error: "atomic physical ramp deployment command was rejected",
@@ -277,6 +356,6 @@ fn deploy_roots(expected) {
     emit(unfold_event_contract().roots_commanded);
     notify_kind("Griffin solid side ramps are deploying after touchdown.", "info");
     print("[griffin] atomic physical egress ramp angle command accepted");
-    #{ok: true, command: command,
+    #{ok: true, command: command,flight_latch_release:release,
         port_angle_rad: port_angle, starboard_angle_rad: starboard_angle}
 }

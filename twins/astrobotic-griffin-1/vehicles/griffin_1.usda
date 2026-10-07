@@ -62,12 +62,6 @@ def Xform "Griffin1" (
     float inputs:com_y.connect = </Griffin1/MainPropulsion.outputs:vehicle_com_y_m>
     float inputs:com_z
     float inputs:com_z.connect = </Griffin1/MainPropulsion.outputs:vehicle_com_z_m>
-    float inputs:controller_inertia_xx
-    float inputs:controller_inertia_xx.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_xx_kg_m2>
-    float inputs:controller_inertia_yy
-    float inputs:controller_inertia_yy.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_yy_kg_m2>
-    float inputs:controller_inertia_zz
-    float inputs:controller_inertia_zz.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_zz_kg_m2>
     float inputs:piloted
     float inputs:piloted.connect = </Griffin1.outputs:piloted>
     float inputs:gyro_x
@@ -126,6 +120,18 @@ def Xform "Griffin1" (
     string lunco:ui:visibilityMode = "possessed"
     double inputs:hold_torque_limit_nm = 277.1778424205232
     float outputs:throttle = 0.0
+    custom double inputs:controller_inertia_xx
+    double inputs:controller_inertia_xx.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_xx_kg_m2>
+    custom double inputs:inertia_xx
+    double inputs:inertia_xx.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_xx_kg_m2>
+    custom double inputs:controller_inertia_yy
+    double inputs:controller_inertia_yy.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_yy_kg_m2>
+    custom double inputs:inertia_yy
+    double inputs:inertia_yy.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_yy_kg_m2>
+    custom double inputs:controller_inertia_zz
+    double inputs:controller_inertia_zz.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_zz_kg_m2>
+    custom double inputs:inertia_zz
+    double inputs:inertia_zz.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_zz_kg_m2>
     def Scope "PhysicsMaterials"
     {
         def Material "LandingPadSlide" (
@@ -165,12 +171,6 @@ def Xform "Griffin1" (
         float outputs:depleted.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:depleted>
         float outputs:vehicle_mass_kg
         float outputs:vehicle_mass_kg.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_mass_kg>
-        float outputs:vehicle_inertia_xx_kg_m2
-        float outputs:vehicle_inertia_xx_kg_m2.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_inertia_xx_kg_m2>
-        float outputs:vehicle_inertia_yy_kg_m2
-        float outputs:vehicle_inertia_yy_kg_m2.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_inertia_yy_kg_m2>
-        float outputs:vehicle_inertia_zz_kg_m2
-        float outputs:vehicle_inertia_zz_kg_m2.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_inertia_zz_kg_m2>
         float outputs:vehicle_com_x_m
         float outputs:vehicle_com_x_m.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_com_x_m>
         float outputs:vehicle_com_y_m
@@ -302,6 +302,12 @@ def Xform "Griffin1" (
         double outputs:engine07_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:oxidizer_flow_kgs>
         custom double outputs:engine07_mixture_efficiency
         double outputs:engine07_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine07.outputs:mixture_efficiency>
+        custom double outputs:vehicle_inertia_xx_kg_m2
+        double outputs:vehicle_inertia_xx_kg_m2.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_inertia_xx_kg_m2>
+        custom double outputs:vehicle_inertia_yy_kg_m2
+        double outputs:vehicle_inertia_yy_kg_m2.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_inertia_yy_kg_m2>
+        custom double outputs:vehicle_inertia_zz_kg_m2
+        double outputs:vehicle_inertia_zz_kg_m2.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_inertia_zz_kg_m2>
         def Scope "FuelRemainingTelemetry" (
             prepend apiSchemas = "LunCoTelemetryAPI"
         )
@@ -406,9 +412,6 @@ def Xform "Griffin1" (
             float outputs:low_fuel
             float outputs:depleted
             float outputs:vehicle_mass_kg
-            float outputs:vehicle_inertia_xx_kg_m2
-            float outputs:vehicle_inertia_yy_kg_m2
-            float outputs:vehicle_inertia_zz_kg_m2
             float outputs:vehicle_com_x_m
             float outputs:vehicle_com_y_m
             float outputs:vehicle_com_z_m
@@ -416,6 +419,12 @@ def Xform "Griffin1" (
             float inputs:fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
             float inputs:oxidizer_mass_kg
             float inputs:oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+            custom double outputs:vehicle_inertia_xx_kg_m2
+            double outputs:vehicle_inertia_xx_kg_m2.connect = []
+            custom double outputs:vehicle_inertia_yy_kg_m2
+            double outputs:vehicle_inertia_yy_kg_m2.connect = []
+            custom double outputs:vehicle_inertia_zz_kg_m2
+            double outputs:vehicle_inertia_zz_kg_m2.connect = []
         }
         def Scope "Engine01" (
             prepend apiSchemas = "LunCoProgramAPI"
@@ -9385,5 +9394,65 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 0.0)
             custom rel material:binding = </Griffin1/SolarPanelFrontPort/Looks/SolarCells>
         }
+    }
+    def PhysicsFixedJoint "RampFlightLatchPortRoot"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/EgressRampPort>
+        point3f physics:localPos0 = (1.9071147441864014, 2.106794595718384, 0.0)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.9238795042037964, 0.0, 0.0, -0.3826834261417389)
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsFixedJoint "RampFlightLatchStarboardRoot"
+    {
+        custom rel physics:body0 = </Griffin1>
+        custom rel physics:body1 = </Griffin1/EgressRampStarboard>
+        point3f physics:localPos0 = (-1.9071147441864014, 2.106794595718384, 0.0)
+        point3f physics:localPos1 = (0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (0.00000000000000005657130560897519, -0.3826834261417389, -0.9238795042037964, 0.000000000000000023432602348612458)
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsFixedJoint "RampFlightLatchPortMiddle"
+    {
+        custom rel physics:body0 = </Griffin1/EgressRampPort>
+        custom rel physics:body1 = </Griffin1/EgressRampPort/MiddleSection>
+        point3f physics:localPos0 = (1.7990840673446655, 0.20000000298023224, 0.0)
+        point3f physics:localPos1 = (0.0, 0.20000000298023224, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (-0.0000000002051034342365199, 0.0, 0.0, -1.0)
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsFixedJoint "RampFlightLatchPortToe"
+    {
+        custom rel physics:body0 = </Griffin1/EgressRampPort/MiddleSection>
+        custom rel physics:body1 = </Griffin1/EgressRampPort/MiddleSection/ToeSection>
+        point3f physics:localPos0 = (1.7990840673446655, -0.014999999664723873, 0.0)
+        point3f physics:localPos1 = (0.0, -0.014999999664723873, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (-0.0000000002051034342365199, 0.0, 0.0, -1.0)
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsFixedJoint "RampFlightLatchStarboardMiddle"
+    {
+        custom rel physics:body0 = </Griffin1/EgressRampStarboard>
+        custom rel physics:body1 = </Griffin1/EgressRampStarboard/MiddleSection>
+        point3f physics:localPos0 = (1.7990840673446655, 0.20000000298023224, 0.0)
+        point3f physics:localPos1 = (0.0, 0.20000000298023224, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (-0.0000000002051034342365199, 0.0, 0.0, -1.0)
+        bool physics:collisionEnabled = false
+    }
+    def PhysicsFixedJoint "RampFlightLatchStarboardToe"
+    {
+        custom rel physics:body0 = </Griffin1/EgressRampStarboard/MiddleSection>
+        custom rel physics:body1 = </Griffin1/EgressRampStarboard/MiddleSection/ToeSection>
+        point3f physics:localPos0 = (1.7990840673446655, -0.014999999664723873, 0.0)
+        point3f physics:localPos1 = (0.0, -0.014999999664723873, 0.0)
+        quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot1 = (-0.0000000002051034342365199, 0.0, 0.0, -1.0)
+        bool physics:collisionEnabled = false
     }
 }

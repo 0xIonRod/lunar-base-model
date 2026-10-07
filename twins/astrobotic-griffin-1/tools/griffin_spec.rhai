@@ -52,6 +52,20 @@ fn _typed_model_value(qualified) {
     value
 }
 
+// Numeric collections preserve unavailable/invalid state for their consumer.
+fn _typed_model_number_list(qualified) {
+    let native = _typed_model_value(qualified);
+    if native == () || !array_is(native) { return (); }
+    let values = [];
+    for value in native {
+        let scalar = if sysml_quantity_is(value) { f64_from(value.value) }
+            else { f64_from(value) };
+        if scalar == () || !scalar.is_finite() { return (); }
+        values.push(scalar);
+    }
+    values
+}
+
 fn _typed_model_number(qualified) {
     let native = _typed_model_value(qualified);
     if native != () {
@@ -120,6 +134,7 @@ fn _qualified_attribute(name) {
     let ramp = [
         "rampCount", "rampSurfaceLengthM", "rampSurfaceWidthM",
         "sectionAsset", "sectionInstances", "rootJointInstances", "intermediateJointInstances",
+        "rootFlightLatchInstances", "intermediateFlightLatchInstances",
         "treadInstances", "railJointPinInstances", "transitionBody", "transitionContact", "transitionJoints",
         "rampSectionCount", "rampSectionLengthM", "rampSectionGeometryToleranceM",
         "rampWheelClearanceM", "rampSurfaceThicknessM", "rampRailHeightM",
@@ -293,27 +308,11 @@ fn _sysml_list(name) {
     items
 }
 
-// Parse a comma-separated numeric datum list owned by SysML.  Returning an
-// empty list for a missing/empty source is intentional: callers must validate
-// the expected cardinality before indexing, so malformed station data fails
-// loudly instead of silently inventing a placement.
+// Collection readers use the same typed, revision-pinned numeric path.
+// Callers validate cardinality before indexing.
 fn _sysml_number_list(name) {
-    let native = _sysml_model_value(name);
-    if native != () && array_is(native) {
-        let values = [];
-        for value in native {
-            let scalar = f64_from(value);
-            if scalar == () { return []; }
-            values.push(scalar);
-        }
-        return values;
-    }
-    let qualified = _qualified_attribute(name);
-    let source = sysml_requirements::source_with_attributes([qualified]);
-    if source == () || source.ok != true { return []; }
-    let typed = sysml_requirements::vector(source, qualified);
-    if typed == () { return []; }
-    typed
+    let values = _typed_model_number_list(_qualified_attribute(name));
+    if values == () { [] } else { values }
 }
 
 // Return the Rust-native value produced by ValidateSysml's typed projection.
@@ -954,8 +953,31 @@ fn ramp_under_beam_center_offset_z_m() { _sysml_attribute("assemblyUnderBeamCent
 fn ramp_section_count() { _sysml_integer("rampSectionCount") }
 fn ramp_section_length_m() { _sysml_attribute("rampSectionLengthM") }
 fn ramp_section_names() { _sysml_enum_names("sectionInstances") }
+// The first visual section belongs to the root body. Subsequent sections
+// are nested rigid bodies in the authored articulated assembly.
+fn ramp_section_paths(root) {
+    let names = ramp_section_names();
+    if names.len() != ramp_section_count() || names.len() != 3 { return (); }
+    [root + "/" + names[0], root + "/" + names[1],
+        root + "/" + names[1] + "/" + names[2]]
+}
 fn ramp_root_joint_names() { _sysml_enum_names("rootJointInstances") }
 fn ramp_intermediate_joint_names() { _sysml_enum_names("intermediateJointInstances") }
+fn ramp_flight_latch_bindings() {
+    let bindings = [];
+    for pair in [
+        #{hinges:ramp_root_joint_names(), latches:_sysml_enum_names("rootFlightLatchInstances"), count:2},
+        #{hinges:ramp_intermediate_joint_names(), latches:_sysml_enum_names("intermediateFlightLatchInstances"), count:4}
+    ] {
+        if pair.hinges.len()!=pair.count || pair.latches.len()!=pair.count {
+            throw("ramp flight latches require all six sourced hinge/latch identity pairs");
+        }
+        for index in 0..pair.count {
+            bindings.push(#{hinge:pair.hinges[index], latch:pair.latches[index]});
+        }
+    }
+    bindings
+}
 fn ramp_tread_names() { _sysml_enum_names("treadInstances") }
 fn ramp_rail_joint_pin_names() { _sysml_enum_names("railJointPinInstances") }
 // Stable guide identities pair each inherited rail with its coaxial fitting.

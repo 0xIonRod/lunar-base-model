@@ -129,7 +129,7 @@ source tables, when accepting this correction.
 
 Geometry promotion does not establish the real spring deployment mechanism,
 supplier load paths, actuator dynamics, calibrated masses/inertias, landing
-control, or successful rover egress. The legacy Ackermann simulation policy
+control, or successful rover egress. The differential steering simulation policy
 also remains a separate mismatch with the public skid-steer configuration;
 correcting its controller requires its own behavior validation.
 
@@ -1946,7 +1946,7 @@ All five demo route datums now use one horizontal port-ramp frame captured at
 first egress. They are relative simulation gates, not geodetic flight goals.
 Intermediate survey guidance leads one source wheelbase (1.70 m) into the
 following segment, capped by its length; arrival radii remain unchanged.
-The final base point remains a stop. The shared Modelica Ackermann arrival
+The final base point remains a stop. The shared Modelica skid-steer arrival
 slowdown band lies inside the arrival circle: tapering demand in the former
 50 mm outside band balanced the local slope before arrival (owned 49820,
 final target distance about 1.235 m versus the 1.20 m radius). The 50 mm

@@ -740,12 +740,12 @@ fn surface_route() {
             speeds[i], radii[i], events[i]));
     }
     // The approach is a milestone on the straight egress lane. Aim at its
-    // exit while measuring arrival at the approach, so an Ackermann chassis
-    // does not try to turn in place toward a nearby deck-edge point.
+    // exit while measuring arrival at the approach, so the skid-steered chassis
+    // does not pivot in place toward a nearby deck-edge point.
     children[0].guidance_target = children[1].target;
     // Survey gates are through-points on the authored route, not parking
     // targets. A one-wheelbase lead into the following segment keeps the
-    // Ackermann controller moving through each arrival circle.
+    // skid-steer guidance law moving through each arrival circle.
     let stations=griffin_spec::rover_wheel_station_x();
     let lead=(stations[0]-stations[1]).abs();
     for i in 2..children.len()-1 {
@@ -761,7 +761,7 @@ fn surface_route() {
 /// shared navigation law.  This is deliberately a small Twin helper rather
 /// than a second autopilot implementation: `nav_command` supplies the typed
 /// arrival predicate, while `modelica_waypoint` sends the target to the
-/// authored Ackermann guidance law that closes the loop on live pose, yaw,
+/// authored skid-steer guidance law that closes the loop on live pose, yaw,
 /// and yaw rate.
 fn engage_route_subject() {
     let rover = find_path("/Griffin1SurfaceOps/FLIP");
@@ -1321,7 +1321,7 @@ fn route_guidance_evidence(rover) {
         "autopilot_target_z", "autopilot_position_x", "autopilot_position_z",
         "autopilot_yaw", "autopilot_yaw_rate", "autopilot_speed", "autopilot_radius",
         "guidance_heading_error", "guidance_throttle", "guidance_steer", "drive_left",
-        "drive_right", "heading_fl", "heading_fr"];
+        "drive_right"];
     let snapshot = read_ports(rover, names);
     if snapshot == () || snapshot.ports == () { return []; }
     snapshot.ports
@@ -1521,7 +1521,6 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
                     trace_support_text = trace_physics.support_contact_count.to_string();
                 }
                 let trace_steer_text = "()";
-                let trace_heading_text = "()";
                 let trace_forward_text = "()";
                 let trace_tire_text = "()";
                 let trace_tire_fr_text = "()";
@@ -1534,7 +1533,6 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
                 let trace_sleeping_text = "()";
                 let trace_lander_up_text = "()";
                 let trace_steer = get(rover, "guidance_steer");
-                let trace_heading = get(rover, "heading_fl");
                 let trace_forward = world_forward3(rover);
                 let trace_lander = find_path("/Griffin1SurfaceOps/Lander");
                 let trace_lander_up = if trace_lander == () || trace_lander < 0 {
@@ -1577,7 +1575,6 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
                     world_rotation_quat(trace_wheel)
                 };
                 if trace_steer != () { trace_steer_text = trace_steer.to_string(); }
-                if trace_heading != () { trace_heading_text = trace_heading.to_string(); }
                 if trace_forward != () { trace_forward_text = vec3_array(trace_forward); }
                 if trace_tire != () { trace_tire_text = trace_tire.to_string(); }
                 if trace_tire_fr != () { trace_tire_fr_text = trace_tire_fr.to_string(); }
@@ -1604,7 +1601,6 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
                 trace_line += " speed=" + trace_speed_text;
                 trace_line += " support=" + trace_support_text;
                 trace_line += " steer=" + trace_steer_text;
-                trace_line += " heading_fl=" + trace_heading_text;
                 trace_line += " forward=" + trace_forward_text;
                 trace_line += " tire_fl=" + trace_tire_text;
                 trace_line += " tire_fr=" + trace_tire_fr_text;

@@ -170,6 +170,30 @@ def Xform "GriffinFlipVisual" (
         {
             bool physics:jointEnabled = false
         }
+        def PhysicsFixedJoint "RampFlightLatchPortRoot"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchStarboardRoot"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchPortMiddle"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchPortToe"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchStarboardMiddle"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchStarboardToe"
+        {
+            bool physics:jointEnabled = false
+        }
     }
     def Xform "FLIP" (
         references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>

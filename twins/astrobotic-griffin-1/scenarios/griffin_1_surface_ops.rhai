@@ -44,6 +44,11 @@ fn simulation_dependencies(me, ctx) {
         entity_reads.push(joint);
         entity_writes.push(joint);
     }
+    for binding in griffin_spec::ramp_flight_latch_bindings() {
+        let latch=find_path(LANDER+"/"+binding.latch);
+        entity_reads.push(latch);
+        entity_writes.push(latch);
+    }
     #{
         modelica_entities: modelica_entities,
         entity_reads: entity_reads,

@@ -1,6 +1,7 @@
 import "twin://astrobotic-griffin-1/tools/griffin_spec.rhai" as griffin_spec;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
+import "twin://astrobotic-griffin-1/tools/griffin_surface_ramp_ops.rhai" as ramp_ops;
 
 const ROOT = "/World/Griffin1";
 const OWN = "GriffinRampRequirements::GriffinEgressRamp::";
@@ -233,7 +234,8 @@ fn on_tick(me, ctx) {
         "physicalRampStarboardRootJointStowLimitRad",
         "physicalRampSectionStowedRelativeAngleRad",
         "physicalRampSectionJointFrameOffsetRad",
-        "physicalRampSectionDeploymentRelativeAngleRad"] {
+        "physicalRampSectionDeploymentRelativeAngleRad",
+        "rootFlightLatchInstances", "intermediateFlightLatchInstances"] {
         attributes.push(_source_attr(name));
     }
     let source = sysml_requirements::source_with_selection(attributes,
@@ -553,7 +555,52 @@ fn on_tick(me, ctx) {
             "GRC030_StowedRampClearsSolarPanels", #{gapM: observation,
                 requiredGapM: _source_number(source, "physicalRampPanelClearanceM")}));
     }
+    let latch_bindings=griffin_spec::ramp_flight_latch_bindings();
+    let hinge_paths=[];
+    for binding in latch_bindings {hinge_paths.push(ROOT+"/"+binding.hinge);}
+    let hinge_topology=query("QueryUsdPrims",#{paths:hinge_paths,rels:["physics:body0","physics:body1"]});
+    if hinge_topology==() || hinge_topology.records==() || hinge_topology.records.len()!=6 {
+        throw("flight latch verification requires all six source-paired hinge endpoints");
+    }
+    for index in 0..latch_bindings.len() {
+        let binding=latch_bindings[index];
+        let latch=ROOT+"/"+binding.latch;
+        let id="GRR-017-flight-latch-"+binding.latch;
+        let exists=_check(id,"grr017","exists",latch);
+        exists.expected_type="PhysicsFixedJoint";
+        checks.push(exists);
+        for name in ["physics:body0","physics:body1"] {
+            let targets=hinge_topology.records[index].relationships[name];
+            if targets==() || targets.len()!=1 {throw("flight latch source-paired hinge endpoint unavailable");}
+            checks.push(_relationship(id+"-"+name,"grr017",latch,name,targets[0]));
+        }
+        for component in 0..4 {
+            checks.push(_attribute_component(id+"-parent-basis-"+component,"grr017",latch,
+                "physics:localRot0",component,if component==0 {1.0} else {0.0}));
+        }
+    }
     let result = sysml_requirements::evaluate(source, checks);
+    // Dry negative release plans must reject an unknown second identity before
+    // dispatching any command. This is policy preflight, not geometry evidence.
+    let unknown=ramp_ops::flight_latch_release_plan(ROOT,
+        [latch_bindings[0].hinge,"unregistered_ramp_hinge"]);
+    let duplicate=ramp_ops::flight_latch_release_plan(ROOT,
+        [latch_bindings[0].hinge,latch_bindings[0].hinge]);
+    let policy_checks=[
+        sysml_requirement_checks::preflight("flight-latch-unknown-hinge",unknown.ok==false,
+            "unknown hinge release plan must be rejected",unknown,false),
+        sysml_requirement_checks::preflight("flight-latch-duplicate-hinge",duplicate.ok==false,
+            "duplicate hinge release plan must be rejected",duplicate,false)
+    ];
+    for check in policy_checks {
+        if check.ok!=true {
+            result.ok=false;
+            result.verdict="error";
+            result.non_pass_results.push(check);
+            result.error_count+=1;
+            result.non_pass_count+=1;
+        }
+    }
     let evidence = [];
     let evidence_failures = [];
     for requirement_name in ["GRR-017", "GRR-018"] {
@@ -580,6 +627,7 @@ fn on_tick(me, ctx) {
         component_package: "GriffinRampRequirements",
         verification: VERIFICATION, separate_component_document: true,
         root_axis_mirror: axis_observation,
+        flight_latch_policy_preflight:policy_checks,
         stowed_panel_clearance: #{available: valid, panel_count: panel_names.len(),
             port_gap_m: if valid { port_gap } else { () },
             starboard_gap_m: if valid { starboard_gap } else { () }},

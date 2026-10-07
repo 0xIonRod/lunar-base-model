@@ -453,10 +453,15 @@ The current stable boundary demonstrates:
    stations and supports remain visual-study values. The four-tank set is
    also a Twin study assumption, not published flight configuration data.
    The wrapper includes a top-deck adapter and two optional ramps with paired
-   rails. Geometry, mass properties, and mechanism details remain non-flight
+   rails. Six standard fixed joints lock the ramp sections in their transport
+   pose. The authored deployment sequence releases each source-paired middle,
+   toe and root latch immediately before commanding that section; a full
+   scene reload restores them. Missing latch topology ends deployment with
+   a diagnostic. Geometry, mass properties, and mechanism details remain non-flight
    surrogates.
-6. The canonical FLIP vehicle uses a four-wheel front-steer Ackermann study
-   configuration with chassis collision geometry, explicit wheel assemblies,
+6. The canonical FLIP vehicle uses the public four-wheel skid-steer
+   architecture (fixed-axis wheels, independent left/right drive) with chassis
+   collision geometry, explicit wheel assemblies,
    a rear-deck solar-panel proxy, motor/gearbox, finite-EPS, and motor-thermal
    Modelica contracts. Geometry, mass, and mobility values remain study
    assumptions until the FLIP ICD is available.
@@ -513,32 +518,21 @@ the missing Rust capabilities.
 The mission starts with an explicit persistent control brief. Click the
 vehicle in the viewport to possess it; the Command Deck and vehicle HUD remain
 the authority/status surface. The Twin-local `griffin_controls` library also
-provides `control_lander()`, `control_rover()`, `release_control()`,
-`toggle_rover_autopilot()`, `start_rover_autopilot()`, and
-`stop_rover_autopilot()` for the Rhai console. For FLIP steering, use
-`griffin_controls::crab_walk()` for the parallel steering experiment,
-`griffin_controls::ackermann_steering()` for the source-selected front-steer
-Ackermann study mode, or
-`griffin_controls::toggle_rover_steering_mode()` to switch between them from
-one command. Change the steering mode while FLIP is stopped; if it is moving,
-the helper holds the brake until the crawl threshold is reached and reports
-the active mode in the HUD. The HUD repeats these commands after rover
-possession.
+provides `control_lander()`, `control_rover()`, and `release_control()` for
+the Rhai console. While FLIP is possessed, the
+standard vessel HUD shows its telemetry and the route program button, which
+runs or stops FLIP's operator route. Alt+left-click adds a route point to that
+route; manual drive input takes control back from it at any time. Route points
+are runtime edits and are not saved (`usd.runtime_persistence` is false).
 
-While the Griffin lander is possessed, `W/S` command pitch, `A/D` command roll,
-`Q/E` command yaw, `Space` commands thrust, and `G` is the authored release
-action. While FLIP is possessed, `W/S` drive, `A/D` steer, `Space` brakes, and
-`F` toggles the authored rover route. `Escape`/`Backspace` releases the active
-vehicle. Manual input disengages rover autopilot; the mission route remains a
-separate, visible autopilot phase after adapter release.
+The controller's configured bindings command lander pitch, roll, yaw, thrust
+and release, or FLIP drive, skid-turn, brake and route action. The vehicle HUD
+shows the current input hints. Manual driving takes over from route guidance;
+the mission route remains a visible phase after adapter release.
 
 The controls are a study interface, not a claim about the flight command
 dictionary. The generic simulator still owns possession, input routing,
-autopilot authority, and release semantics. The steering-mode helpers are
-Twin-local live control commands: they stop a moving route, write the vehicle
-Ackermann-strength attribute, and rely on the runtime's in-place steering
-resync. Public FLIP information does not specify the production steering
-geometry, so this remains a simulation-study configuration.
+autopilot authority, and release semantics.
 
 ## Next required data
 

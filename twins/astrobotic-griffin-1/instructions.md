@@ -117,7 +117,7 @@ The persistent control brief is part of the interactive acceptance check:
 - click the Griffin lander to possess it and verify the lander control card;
 - use `W/S` pitch, `A/D` roll, `Q/E` yaw, `Space` thrust, and `G` release;
 - after rover release, click FLIP to possess it and verify the rover HUD;
-- use `W/S` drive, `A/D` steer, `Space` brake, and `F` to toggle autopilot;
+- use the configured drive/turn/brake controls; Alt+left-click adds operator route points and the action control starts or stops the route;
 - use `Escape` or `Backspace` to return to free flight.
 
 The Twin-local Rhai tool library exposes the same handoff explicitly for the

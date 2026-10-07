@@ -1,0 +1,95 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
+    prepend apiSchemas = ["LunCoCatalogAPI", "LunCoEpochAPI"]
+    kind = "assembly"
+    documentation = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
+)
+{
+    uniform bool lunco:spawnable = false
+    double lunco:anchor:lat = -84.72672255
+    double lunco:anchor:lon = 29.14428685
+    double lunco:anchor:height = 0.0
+    int lunco:anchor:body = 301
+    double lunco:time:epochJd = 2461395.5
+    custom string lunco:mission:id = "M02"
+    custom string lunco:mission:name = "Astrobotic Griffin Mission One"
+    custom string lunco:mission:site = "Nobile regional study anchor backed by LROC NAC DTM NOBILE03; exact touchdown coordinate unresolved"
+    custom string lunco:mission:scope = "surface operations only"
+    custom string lunco:mission:evidence = "LROC NOBILE03 regional relief is source-backed; Griffin vehicle values and exact touchdown site remain assumptions"
+    custom string lunco:mission:deployment = "top-deck adapter during descent; middle then toe hinges unfold after touchdown; root targets derive from landed hinge frames and retained DEM toe clearance within source travel; all six hinges satisfy angle/rate/dwell before FLIP release"
+    custom string lunco:anchor:status = "MOON_ME ENU frame at NOBILE03 regional center; local height zero is the normalized terrain datum"
+    custom string lunco:lighting:contract = "all Griffin and FLIP geometry uses LunarSurface/Sun polar direction and the authored mission epoch"
+    custom string lunco:route:status = "ramp entry marker moved outside descent column; center lane remains clear of four solid legs"
+    custom string lunco:terrain:source = "twin://astrobotic-griffin-1/Assets.toml → NOBILE03 TIF/LBL → tools/terrain/reproject_lroc_polar_dem.py"
+    def "SolarSystem" (
+        prepend references = @lunco://celestial/solar_system.usda@</SolarSystem>
+    )
+    {
+    }
+    def Xform "Environment" (
+        prepend references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
+    )
+    {
+    }
+    def Camera "Avatar" (
+        prepend apiSchemas = "LunCoAvatarAPI"
+        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+    )
+    {
+        uniform bool lunco:avatar = true
+        uniform token lunco:cameraMode = "freeflight"
+        custom double3 xformOp:translate = (30.0, 30.0, 30.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (-31.65, 45.0, 0.0)
+    }
+    def Scope "CameraTrack" (
+        prepend apiSchemas = "LunCoCameraTrackAPI"
+    )
+    {
+        token lunco:activeCamera
+        token lunco:activeCamera.timeSamples = {
+            0.0: "Avatar",
+        }
+    }
+    def "FLIP" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 1.8, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        double3 physics:velocity = (0.0, 0.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        custom rel programs = </Griffin1SurfaceOps/FlipRoute/Program>
+    }
+    def Scope "FlipRoute" (
+        documentation = "Operator route for FLIP: Alt+left-click adds a point to this route while FLIP is selected or possessed; the action key starts or stops following. Points live in the runtime layer and are not saved (usd.runtime_persistence is false)."
+    )
+    {
+        def Scope "Program" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://scenarios/route_follow.rhai@
+            float inputs:enabled = 0.0
+            custom rel inputs:subject = </Griffin1SurfaceOps/FLIP>
+        }
+    }
+    def Scope "Scenario"
+    {
+        def Scope "Test" (
+            prepend apiSchemas = "LunCoProgramAPI"
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/flip_route_follow.rhai@
+        }
+    }
+}

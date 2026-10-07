@@ -6,6 +6,7 @@
 // against an open Editor document through griffin_requirements::lint_live().
 
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
+import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 
 const ROOT = "/GriffinRequirementsTest/Griffin1";
 const VERIFICATION = "Verify_GriffinRequirements";
@@ -41,18 +42,49 @@ fn usd_observation_binding(observation, field, label) {
     binding
 }
 
+fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
+
 fn on_start(me, ctx) {
     this.start_elapsed = elapsed_seconds();
     this.elapsed = 0.0;
     this.done = false;
+    this.phase = "sysml";
     print("[griffin-requirements] waiting for composed Twin stage");
 }
 
-fn on_tick(me, ctx) {
-    if this.done { return; }
-    this.elapsed = elapsed_seconds() - this.start_elapsed;
-    if this.elapsed < 0.1 { return; }
-    let report = griffin_requirements::runtime_report((), ROOT, VERIFICATION);
+// Evaluate each audit on its own turn against the composed fixture, then
+// assemble their observations without repeating the expensive USD queries.
+fn _advance_audit(state) {
+    if state.phase == "sysml" {
+        // The source query returns one immutable resolved projection or a
+        // terminal diagnostic. Preserve its error in the test verdict.
+        let audit = griffin_requirements::sysml_contract_report(VERIFICATION);
+        if audit.ok != true {
+            print("[griffin-requirements] SysML projection unavailable: " + audit.error);
+        }
+        for detail in audit.sysml_missing {
+            print("[griffin-requirements] source finding: " + detail);
+        }
+        state.sysml_audit = griffin_requirements::sysml_contract_summary(audit);
+        state.phase = "parts";
+    } else if state.phase == "parts" {
+        state.parts_audit = griffin_requirements::part_report((), ROOT);
+        state.phase = "layout";
+    } else if state.phase == "layout" {
+        state.layout_audit = griffin_requirements::layout_report((), ROOT);
+        state.phase = "lint";
+    } else if state.phase == "lint" {
+        state.lint_audit = griffin_requirements::lint_with_audits((), ROOT,
+            state.parts_audit, state.layout_audit);
+        state.phase = "verdict";
+    }
+    print("[griffin-requirements] audit phase complete; next " + state.phase);
+    state
+}
+
+fn _finish_audit(state) {
+    let report = griffin_requirements::assemble_runtime_report((), ROOT,
+        state.sysml_audit, state.lint_audit, state.parts_audit, state.layout_audit);
     let failures = [];
     for error in report.errors { failures.push(error); }
 
@@ -69,17 +101,18 @@ fn on_tick(me, ctx) {
         sysml.provenance_requirement_handle);
     let provenance_record = if provenance.ok == true { provenance.evidence } else { () };
     let provenance_sources = if provenance.ok == true { provenance_record.sources } else { [] };
-    print("[griffin-requirements] sysml_ok=" + sysml.sysml_ok
-        + " requirements=" + sysml.sysml_required_count
-        + " verification_cases=" + sysml.sysml_verification_count
-        + " verifies=" + sysml.sysml_verifies
-        + " moonbase_requirements=" + sysml.sysml_general_required_count
-        + " moonbase_verifies=" + sysml.sysml_general_verifies
-        + " source_files=" + sysml.source_file_count
-        + " source_revision=" + sysml.source_revision.to_string()
-        + " missing=" + if sysml.sysml_missing.len() > 0 {
-            sysml.sysml_missing[0]
-        } else { "none" });
+    let summary = "[griffin-requirements] sysml_ok=" + sysml.sysml_ok;
+    summary += " requirements=" + sysml.sysml_required_count;
+    summary += " verification_cases=" + sysml.sysml_verification_count;
+    summary += " verifies=" + sysml.sysml_verifies;
+    summary += " moonbase_requirements=" + sysml.sysml_general_required_count;
+    summary += " moonbase_verifies=" + sysml.sysml_general_verifies;
+    summary += " source_files=" + sysml.source_file_count;
+    summary += " source_revision=" + sysml.source_revision.to_string();
+    let missing = if sysml.sysml_missing.len() > 0 { sysml.sysml_missing[0] }
+        else { "none" };
+    summary += " missing=" + missing;
+    print(summary);
     let sysml_failure = if sysml.sysml_missing.len() > 0 {
         sysml.sysml_missing[0]
     } else { "source contract failed without a diagnostic" };
@@ -128,12 +161,10 @@ fn on_tick(me, ctx) {
         "GriffinMechanicalRequirements::GRC018_FlightBodyColliderMatchesCookedCube";
     let deck_requirement_usage = deck_model.requirement(
         "GriffinMechanicalRequirements::gr018");
-    let deck_tolerance_observation = if deck_tolerance == () {
-        #{provider: "source_literal", state: "unavailable",
-          detail: "GR-018 source tolerance is unavailable"}
-    } else { #{provider: "source_literal", state: "value", value: deck_tolerance} };
+    let deck_tolerance_observation = griffin_requirements::_source_value(
+        deck_tolerance, deck_requirement);
     let deck_checks = [
-        sysml_requirements::constraint_check("GR-018-source-topology", "lander",
+        sysml_requirements::required_constraint_check("GR-018-source-topology", "lander",
             "gr018", VERIFICATION,
             deck_topology_constraint,
             sysml_requirements::required_constraint_input_observations(deck_model,
@@ -142,16 +173,16 @@ fn on_tick(me, ctx) {
                         "topology_matches", "GR-018 topology")],
                     ["sourceGeometryLinked", usd_observation_binding(deck_observation,
                         "source_geometry_linked", "GR-018 typed geometry source")]]),
-            "usd", 0.0),
-        sysml_requirements::constraint_check("GR-018-source-profile", "lander",
+            "typed", 0.0),
+        sysml_requirements::required_constraint_check("GR-018-source-profile", "lander",
             "gr018", VERIFICATION,
             deck_profile_constraint,
             sysml_requirements::required_constraint_input_observations(deck_model,
                 deck_requirement_usage, deck_profile_constraint, [
                     ["profileDeviationM", usd_observation_binding(deck_observation,
                         "profile_deviation_m", "GR-018 profile deviation")],
-                    ["toleranceM", deck_tolerance_observation]]), "usd", 0.0),
-        sysml_requirements::constraint_check("GR-018-collision-role", "lander",
+                    ["toleranceM", deck_tolerance_observation]]), "typed", 0.0),
+        sysml_requirements::required_constraint_check("GR-018-collision-role", "lander",
             "gr018", VERIFICATION,
             deck_contact_constraint,
             sysml_requirements::required_constraint_input_observations(deck_model,
@@ -162,10 +193,10 @@ fn on_tick(me, ctx) {
                         "proxy_hidden", "GR-018 proxy visibility")],
                     ["cookedConvexGeometry", usd_observation_binding(deck_observation,
                         "cooked_convex_geometry", "GR-018 cooked collision geometry")]]),
-            "usd", 0.0)
+            "typed", 0.0)
     ];
     let body_observation = report.layout.body_collider_observation;
-    deck_checks.push(sysml_requirements::constraint_check(
+    deck_checks.push(sysml_requirements::required_constraint_check(
         "GR-018-flight-body-collider", "lander", "gr018", VERIFICATION,
         body_collider_constraint,
         sysml_requirements::required_constraint_input_observations(deck_model,
@@ -176,7 +207,7 @@ fn on_tick(me, ctx) {
                     "cookedCubeHull", "GR-018 body cooked Cube hull")],
                 ["exactCanonicalBounds", usd_observation_binding(body_observation,
                     "exactCanonicalBounds", "GR-018 body collider bounds")]]),
-        "usd", 0.0));
+        "typed", 0.0));
     let deck_constraint_report = if deck_requirement.ok == true {
         sysml_requirements::evaluate(deck_requirement, deck_checks)
     } else { #{ok: false, error: "GR-018 requirement source is unavailable", results: []} };
@@ -239,20 +270,14 @@ fn on_tick(me, ctx) {
         "GriffinLandingLegRequirements::GLLC008_PadColliderStationMatchesSource";
     let mount_constraint =
         "GriffinLandingLegRequirements::GLLC009_BusAndAxleOverlap";
-    let pad_tolerance_observation = if pad_tolerance == () {
-        #{provider: "source_literal", state: "unavailable",
-          detail: "GLL-008 source tolerance is unavailable"}
-    } else { #{provider: "source_literal", state: "value", value: pad_tolerance} };
-    let station_tolerance_observation = if station_tolerance == () {
-        #{provider: "source_literal", state: "unavailable",
-          detail: "GLL-008 physical station tolerance is unavailable"}
-    } else { #{provider: "source_literal", state: "value", value: station_tolerance} };
-    let mount_overlap_observation = if body_mount_overlap == () {
-        #{provider: "source_literal", state: "unavailable",
-          detail: "GLL-009 mount overlap requirement is unavailable"}
-    } else { #{provider: "source_literal", state: "value", value: body_mount_overlap} };
+    let pad_tolerance_observation = griffin_requirements::_source_value(
+        pad_tolerance, pad_requirement);
+    let station_tolerance_observation = griffin_requirements::_source_value(
+        station_tolerance, pad_requirement);
+    let mount_overlap_observation = griffin_requirements::_source_value(
+        body_mount_overlap, pad_requirement);
     let pad_checks = [
-        sysml_requirements::constraint_check("GLL-008-pad-geometry", "landing_leg",
+        sysml_requirements::required_constraint_check("GLL-008-pad-geometry", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             pad_geometry_constraint,
             sysml_requirements::required_constraint_input_observations(pad_model,
@@ -267,8 +292,8 @@ fn on_tick(me, ctx) {
                         "source_center_deviation_m", "GLL-008 visible pad local center")],
                     ["padGeometrySemanticsMatch", usd_observation_binding(pad_observation,
                         "pad_geometry_semantics_match", "GLL-008 cylinder axis and transform")],
-                    ["toleranceM", pad_tolerance_observation]]), "usd", 0.0),
-        sysml_requirements::constraint_check("GLL-008-contact-ownership", "landing_leg",
+                    ["toleranceM", pad_tolerance_observation]]), "typed", 0.0),
+        sysml_requirements::required_constraint_check("GLL-008-contact-ownership", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             pad_ownership_constraint,
             sysml_requirements::required_constraint_input_observations(pad_model,
@@ -287,8 +312,8 @@ fn on_tick(me, ctx) {
                         "self_collision_filter_clear", "GLL-008 compound-body collision filtering")],
                     ["legacyCollisionDisabled", usd_observation_binding(pad_observation,
                         "legacy_collision_disabled", "GLL-008 stale collider ownership")]]),
-            "usd", 0.0),
-        sysml_requirements::constraint_check("GLL-008-physical-stations", "landing_leg",
+            "typed", 0.0),
+        sysml_requirements::required_constraint_check("GLL-008-physical-stations", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             pad_station_constraint,
             sysml_requirements::required_constraint_input_observations(pad_model,
@@ -297,8 +322,8 @@ fn on_tick(me, ctx) {
                         "station_deviation_m", "GLL-008 COM-frame leg stations")],
                     ["toleranceM", station_tolerance_observation],
                     ["rotationMatches", usd_observation_binding(pad_observation,
-                        "rotation_matches", "GLL-008 leg orientation")]]), "usd", 0.0),
-        sysml_requirements::constraint_check("GLL-009-body-mount-path", "landing_leg",
+                        "rotation_matches", "GLL-008 leg orientation")]]), "typed", 0.0),
+        sysml_requirements::required_constraint_check("GLL-009-body-mount-path", "landing_leg",
             "gll009", "Verify_GriffinLandingLegRequirements",
             mount_constraint,
             sysml_requirements::required_constraint_input_observations(pad_model,
@@ -308,14 +333,11 @@ fn on_tick(me, ctx) {
                     ["measuredAxleOverlapM", usd_observation_binding(pad_observation,
                         "mount_axle_overlap_m", "GLL-009 leg arm to clevis axle")],
                     ["requiredOverlapM", mount_overlap_observation],
-                    ["measurementToleranceM", if body_mount_measurement_tolerance == () {
-                        #{provider: "source_literal", state: "unavailable",
-                          detail: "GLL-009 overlap measurement tolerance is unavailable"}
-                    } else { #{provider: "source_literal", state: "value",
-                        value: body_mount_measurement_tolerance} }],
+                    ["measurementToleranceM", griffin_requirements::_source_value(
+                        body_mount_measurement_tolerance, pad_requirement)],
                     ["physicalJointStationMatches", usd_observation_binding(pad_observation,
                         "physical_joints_match", "GLL-009 physical attachment joints")]]),
-            "usd", 0.0)
+            "typed", 0.0)
     ];
     let pad_constraint_report = if pad_requirement.ok == true {
         sysml_requirements::evaluate(pad_requirement, pad_checks)
@@ -390,12 +412,12 @@ fn on_tick(me, ctx) {
     for failure in failures {
         if failure != "" { failure_count += 1; }
     }
-    this.assertion_count = failures.len();
-    this.failure_count = failure_count;
-    this.failures = failures;
-    this.rule_count = constraint_evidence.len();
-    this.part_count = report.parts.len();
-    this.verdict = if failure_count == 0 { "PASS" } else { "FAIL" };
+    state.assertion_count = failures.len();
+    state.failure_count = failure_count;
+    state.failures = failures;
+    state.rule_count = constraint_evidence.len();
+    state.part_count = report.parts.len();
+    state.verdict = if failure_count == 0 { "PASS" } else { "FAIL" };
     // Preserve measured requirement results; authored status labels are not
     // emitted as run evidence.
     let evidence_results = [
@@ -428,5 +450,34 @@ fn on_tick(me, ctx) {
         source_files: sysml.source_files,
         source_revision: sysml.source_revision},
         "GRIFFIN REQUIREMENTS", "GRIFFIN_REQUIREMENTS");
-    this.done = true;
+    state.done = true;
+    state
+}
+
+fn on_tick(me, ctx) {
+    if this.done { return; }
+    try {
+    this.elapsed = elapsed_seconds() - this.start_elapsed;
+    if this.elapsed < 0.1 { return; }
+    if this.phase != "verdict" {
+        this = _advance_audit(this);
+        return;
+    }
+    this = _finish_audit(this);
+    } catch (error) {
+        // A rejected query or invalid observation ends this run with evidence;
+        // subsequent ticks must not repeat a failed audit indefinitely.
+        this.done = true;
+        this.verdict = "FAIL";
+        let phase = this.phase;
+        this = #{done: true, verdict: "FAIL", phase: phase};
+        let message = error.to_string();
+        if message.len() > 1024 { message = message.sub_string(0, 1024) + " [truncated]"; }
+        let detail = "requirement audit failed in phase " + phase + ": " + message;
+        report_structured_verdict(#{ok: false, failures: [detail],
+            results: [#{id: "GR-audit-error", kind: "audit_error", ok: false,
+                phase: phase, error: message}],
+            verification: VERIFICATION},
+            "GRIFFIN REQUIREMENTS", "GRIFFIN_REQUIREMENTS");
+    }
 }

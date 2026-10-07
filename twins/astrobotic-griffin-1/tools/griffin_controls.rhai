@@ -101,28 +101,10 @@ fn show_rover_controls() {
     let right = input_hint("right");
     let action = input_hint("action");
     let cancel = input_hint("cancel");
-    let steering_mode = rover_steering_mode_label();
-    set_surface_action_buttons();
-    hint("FLIP CONTROL: " + forward + "/" + backward + " drive · " + left + "/" + right + " steer · Space brake · " + cancel + " release");
-    objectives_hud([
-        #{ text: "FLIP is the active surface vehicle", state: "active" },
-        #{ text: "Drive  " + forward + "/" + backward + "   Steer  " + left + "/" + right + "   Brake  Space", state: "active" },
-        #{ text: "STEERING MODE  " + steering_mode + "  (CRAB = parallel / ACKERMANN = wheel geometry)", state: "active" },
-        #{ text: "Stopped FLIP: toggle_rover_steering_mode() switches the vehicle once", state: "pending" },
-        #{ text: action + " is reserved for the authored route; manual input takes control", state: "pending" },
-        #{ text: cancel + " releases FLIP and returns to free flight", state: "pending" }
-    ]);
-}
-
-fn rover_steering_mode_label() {
-    let state = query("QueryUsdPrim", #{
-        path: "/Griffin1SurfaceOps/FLIP",
-        attrs: ["physxVehicleAckermannSteering:strength"]
-    });
-    if state.ok == false { return "UNKNOWN"; }
-    let strength = state.attrs["physxVehicleAckermannSteering:strength"];
-    if strength == () { return "UNKNOWN"; }
-    if strength > 0.5 { "ACKERMANN" } else { "CRAB WALK" }
+    // The vessel HUD carries telemetry and the route program run/stop button;
+    // this brief only names the manual skid-steer controls.
+    hint("FLIP CONTROL: " + forward + "/" + backward + " drive · " + left + "/" + right
+        + " skid turn · Space brake · " + action + " run/stop route · " + cancel + " release");
 }
 
 // SimulateIntent is the controller-owned persistent hold used by the keyboard;
@@ -158,117 +140,24 @@ fn release_rover_brake() {
     })
 }
 
-// Configure FLIP's front steering actuators as one vehicle-level mode. The
-// shared vehicle attribute selects Ackermann correction (1.0) for finite-turn
-// motion or parallel front-wheel angles (0.0) for crab walk. Rear wheels remain
-// straight in both modes.
-//
-// The steering mode is an authored assembly fact, not a physics-time command.
-// Stop FLIP before changing it so the steering axes do not slew underneath a
-// moving chassis, then use the Editor's typed ApplyUsdOp wrapper. The wrapper
-// preserves the document generation and journal, so a later reload sees the
-// same mode that the operator saw in Edit perspective.
-fn set_rover_steering_mode(mode) {
-    if mode != "ackermann" && mode != "crab" {
-        notify_kind("FLIP steering mode must be ackermann or crab.", "error");
-        return #{ ok: false, error: "unknown steering mode" };
-    }
-
-    let target = resolve(rover_path(), "FLIP rover");
-    if target == () { return #{ ok: false, error: "rover is unavailable" }; }
-
-    let speed = get(target, "speed");
-    if speed == () {
-        notify_kind("FLIP speed is not available; steering mode was not changed.", "error");
-        return #{ ok: false, error: "rover speed is unavailable" };
-    }
-    if speed.abs() > 0.08 {
-        // Take route authority away and hold the brake through the same
-        // per-vessel intent path as Space. The caller can issue the same
-        // toggle again after the vehicle settles.
-        hold_rover_brake();
-        notify_kind("FLIP is still moving; brake is held. Try the steering mode again below 0.08 m/s.", "warning");
-        return #{ ok: false, error: "rover must be stopped", speed: speed, brake_held: true };
-    }
-
-    release_rover_brake();
-    let strength = if mode == "crab" { 0.0 } else { 1.0 };
-    let viewport = assembly_edit::viewport();
-    if viewport == () || viewport.focused_preview == () {
-        notify_kind("FLIP steering mode needs a focused Editor preview.", "error");
-        return #{ ok: false, error: "no focused Editor preview" };
-    }
-    let preview = ();
-    for candidate in viewport.previews {
-        if candidate.preview == viewport.focused_preview {
-            preview = candidate;
-            break;
-        }
-    }
-    if preview == () || preview.doc_id == () || preview.edit_target == () {
-        notify_kind("FLIP steering mode could not resolve the focused USD document.", "error");
-        return #{ ok: false, error: "focused USD document is unavailable" };
-    }
-    let result = assembly_edit::attribute(preview.doc_id, preview.edit_target,
-        rover_path(), "physxVehicleAckermannSteering:strength", "float",
-        strength.to_string(), preview.projected_generation);
-    if result == () || result.ok != true {
-        let detail = if result == () { "typed Editor edit returned no result" } else { result.error };
-        notify_kind("FLIP steering mode command was rejected: " + detail, "error");
-        return #{ ok: false, error: detail };
-    }
-    let label = if mode == "crab" { "CRAB WALK" } else { "ACKERMANN" };
-    notify_kind("FLIP steering mode: " + label + " queued on all four wheel joints.", "success");
-    show_rover_controls();
-    #{ ok: true, mode: mode, strength: strength, speed: speed }
-}
-
-fn crab_walk() {
-    set_rover_steering_mode("crab")
-}
-
-fn ackermann_steering() {
-    set_rover_steering_mode("ackermann")
-}
-
-// The authored surface mission reads its requested steering mode from SysML
-// and verifies the corresponding authored assembly fact. The mission must not
-// mutate USD while physics is running: Editor edits go through the typed
-// ApplyUsdOp wrapper above, and this check makes a missing/stale scene fact a
-// visible mission failure instead of silently selecting a numeric default.
+// FLIP's steering architecture is a SysML-selected, authored assembly fact
+// (`lunco:steeringGeometry`). The mission verifies it before route control
+// instead of mutating USD while physics runs.
 fn configure_route_steering() {
     let mode = griffin_spec::route_steering_mode();
-    if mode != "ackermann" && mode != "crab" {
-        return #{ ok: false, error: "SysML missionSteeringMode must be ackermann or crab" };
+    if mode == () || mode == "" {
+        return #{ ok: false, error: "SysML missionSteeringMode is unavailable" };
     }
-    let state = query("QueryUsdPrim", #{
-        path: rover_path(),
-        attrs: ["physxVehicleAckermannSteering:strength"]
-    });
+    let state = query("QueryUsdPrim", #{ path: rover_path(), attrs: ["lunco:steeringGeometry"] });
     if state == () || state.ok == false {
-        return #{ ok: false, error: "authored route steering attribute is unavailable" };
+        return #{ ok: false, error: "authored FLIP steering geometry is unavailable" };
     }
-    let strength = state.attrs["physxVehicleAckermannSteering:strength"];
-    let expected = if mode == "ackermann" { 1.0 } else { 0.0 };
-    if strength == () || (strength - expected).abs() > 0.001 {
-        return #{ ok: false, error: "authored route steering mode does not match SysML" };
+    let geometry = state.attrs["lunco:steeringGeometry"];
+    if geometry != mode {
+        return #{ ok: false, error: "authored FLIP steering geometry " + geometry
+            + " does not match SysML " + mode };
     }
-    let label = if mode == "ackermann" { "ACKERMANN" } else { "CRAB" };
-    notify_kind("FLIP route steering verified: " + label, "info");
-    #{ ok: true, mode: mode, strength: strength }
-}
-
-fn toggle_rover_steering_mode() {
-    let state = query("QueryUsdPrim", #{
-        path: "/Griffin1SurfaceOps/FLIP",
-        attrs: ["physxVehicleAckermannSteering:strength"]
-    });
-    let strength = state.attrs["physxVehicleAckermannSteering:strength"];
-    if strength == () {
-        notify_kind("FLIP steering mode is not readable from the active scene.", "error");
-        return #{ ok: false, error: "steering mode is unavailable" };
-    }
-    if strength > 0.5 { crab_walk() } else { ackermann_steering() }
+    #{ ok: true, mode: mode }
 }
 
 fn control_lander() {
@@ -339,19 +228,4 @@ fn release_control() {
     let rover = release_rover();
     hint("FREE FLIGHT: click Griffin or FLIP to take control; " + input_hint("cancel") + " releases control");
     #{ lander: lander, rover: rover }
-}
-
-fn toggle_rover_autopilot() {
-    notify_kind("FLIP autopilot toggle is not a registered command; use the authored route task.", "error");
-    #{ ok: false, error: "ToggleAutopilot is not a registered command" }
-}
-
-fn start_rover_autopilot() {
-    notify_kind("FLIP autopilot start is not registered; use the authored route task.", "error");
-    #{ ok: false, error: "StartAutopilot is not a registered command" }
-}
-
-fn stop_rover_autopilot() {
-    notify_kind("FLIP autopilot stop is not registered; use the authored route task.", "error");
-    #{ ok: false, error: "DisengageAutopilot is not a registered command" }
 }

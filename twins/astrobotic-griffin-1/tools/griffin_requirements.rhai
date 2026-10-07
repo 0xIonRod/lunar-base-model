@@ -87,6 +87,10 @@ fn _verification_covers_usage(verification, requirement_name) {
 fn _sysml_contract_failure(report, fallback) {
     let missing = [];
     let error = fallback;
+    if report != () && report.error != () && report.error != "" {
+        missing.push(report.error);
+        error = report.error;
+    }
     if report != () && report.errors != () {
         for detail in report.errors { missing.push(detail); }
         if missing.len() > 0 { error = missing[0]; }
@@ -316,7 +320,7 @@ fn sysml_contract_report(verification_name) {
     if transition_inertia.len() != 3 {
         missing.push("physical deck transition inertia must have three values in SysML");
     }
-    if griffin_spec::physical_ramp_transition_joint_name_prefix() == () {
+    if griffin_spec::ramp_transition_joint_names().len() != 2 {
         missing.push("physical deck transition joint identity is missing in SysML");
     }
     let route_names = griffin_spec::surface_route_marker_names();
@@ -393,7 +397,8 @@ fn sysml_contract_report(verification_name) {
     let visual_usages = [];
     if requirements != () {
         for requirement in requirements {
-            if _qualified(requirement).starts_with("GriffinVisualRequirements::gv") {
+            if _qualified(requirement).starts_with("GriffinVisualRequirements::gv")
+                || _qualified(requirement) == "FlipRequirements::fvg001" {
                 visual_usages.push(_qualified(requirement));
             }
         }
@@ -483,7 +488,7 @@ fn sysml_contract_report(verification_name) {
     report.sysml_visual_verifies = if visual_case == () || visual_case.verifies == () {
         0
     } else { visual_case.verifies.len() };
-    report.sysml_visual_wheel_count = visual_wheel_count;
+    report.sysml_visual_wheel_count = wheel_names.len();
     report.sysml_visual_case_name = if visual_case == () { "" } else { _qualified(visual_case) };
     report.sysml_verification_name = if verification == () { "" } else { _qualified(verification) };
     let provenance_handle = sysml_requirements::requirement_handle_by_short_name(
@@ -495,7 +500,7 @@ fn sysml_contract_report(verification_name) {
     report.sysml_ok = missing.len() == 0;
     if !report.sysml_ok {
         report.ok = false;
-        report.error = "required Griffin SysML definitions are missing";
+        report.error = missing[0];
     }
     report
 }
@@ -572,6 +577,9 @@ fn _maximum_value(a, b) { if a > b { a } else { b } }
 
 fn _constraint_result_failure(result) {
     if result.ok == true { return ""; }
+    if result.diagnostics != () && result.diagnostics.len() > 0 {
+        return result.diagnostics[0].message;
+    }
     if result.error != () { return result.error; }
     result.id + " verdict: " + result.verdict
 }
@@ -596,10 +604,11 @@ fn _source_value(value, source) {
       provider_generation: revision}
 }
 
-fn _usd_value(value) {
-    #{provider: "usd",
+fn _external_value(value) {
+    #{provider: "external",
       state: if value == () { "unavailable" } else { "value" },
-      value: value}
+      value: value, provider_generation: sim_tick(),
+      document_id: (), document_generation: ()}
 }
 
 fn _usd_snapshot_value(value, observation) {
@@ -1012,9 +1021,9 @@ fn _ramp_layout_report(doc_id, root) {
     let port_path = root + "/" + names[0];
     let starboard_path = root + "/" + names[1];
     let port = _layout_query(doc_id, port_path,
-        ["xformOp:translate", "xformOp:rotateXYZ", "lunco:deployment_angle_rad"], true);
+        ["xformOp:translate", "xformOp:rotateXYZ"], true);
     let starboard = _layout_query(doc_id, starboard_path,
-        ["xformOp:translate", "xformOp:rotateXYZ", "lunco:deployment_angle_rad"], true);
+        ["xformOp:translate", "xformOp:rotateXYZ"], true);
     if !_ok(port) || !_ok(starboard) {
         return findings;
     }
@@ -1034,42 +1043,33 @@ fn _ramp_layout_report(doc_id, root) {
         findings.push(_layout_finding("GR-017", root,
             "port/starboard ramps must be opposite side ramps on the X axis"));
     }
-    let port_rot = port.attrs["xformOp:rotateXYZ"];
-    let starboard_rot = starboard.attrs["xformOp:rotateXYZ"];
-    if port_rot != () && starboard_rot != () {
-        if !_near(port_rot[0], 0.0, 0.02) || !_near(port_rot[1], 0.0, 0.02)
-            || !_near(starboard_rot[0], 0.0, 0.02)
-            || (!_near(starboard_rot[1], 0.0, 0.02)
-                && !_near(starboard_rot[1], 180.0, 0.02))
-            || !_near(port_rot[2], -starboard_rot[2], 0.02) {
+    let rotations = [port.attrs["xformOp:rotateXYZ"],
+        starboard.attrs["xformOp:rotateXYZ"]];
+    let stowed = [griffin_spec::physical_ramp_port_root_stowed_angle_rad(),
+        -griffin_spec::physical_ramp_starboard_root_stowed_angle_rad()];
+    for i in 0..2 {
+        let rotation = rotations[i];
+        if rotation == () || rotation.len() != 3 || stowed[i] == ()
+            || !_near(rotation[0], 0.0, 0.02)
+            || !_near(rotation[1], if i == 0 { 0.0 } else { 180.0 }, 0.02)
+            || !_near(rotation[2] * pi_value() / 180.0, stowed[i], 0.002) {
+            findings.push(_layout_finding("GR-017", root + "/" + names[i],
+                "installed ramp stow rotation disagrees with the SysML joint-frame datum"));
+        }
+        let sections = griffin_spec::ramp_section_paths(root + "/" + names[i]);
+        if sections == () {
             findings.push(_layout_finding("GR-017", root,
-                "ramp rotations must mirror about the Z hinge axis"));
+                "articulated ramp section identities are incomplete in SysML"));
+            continue;
         }
-    }
-    let port_angle = port.attrs["lunco:deployment_angle_rad"];
-    let starboard_angle = starboard.attrs["lunco:deployment_angle_rad"];
-    if port_angle != () && starboard_angle != () {
-        if !_near(port_angle, -starboard_angle, 0.002) {
-            findings.push(_layout_finding("GR-017", root,
-                "ramp deployment metadata must be equal and opposite"));
+        for section in sections {
+            let body = _layout_query(doc_id, section, [], true);
+            if !_ok(body) || !_has(body.children, section + "/RampTrackPort")
+                || !_has(body.children, section + "/RampTrackStarboard") {
+                findings.push(_layout_finding("GR-017", section,
+                    "each articulated section must contain both source-aligned FLIP wheel tracks"));
+            }
         }
-        if port_rot != () && !_near(port_rot[2] * pi_value() / 180.0,
-            port_angle, 0.02) {
-            findings.push(_layout_finding("GR-017", port_path,
-                "ramp transform rotation and deployment metadata disagree"));
-        }
-        if starboard_rot != () && !_near(starboard_rot[2] * pi_value() / 180.0,
-            starboard_angle, 0.02) {
-            findings.push(_layout_finding("GR-017", starboard_path,
-                "ramp transform rotation and deployment metadata disagree"));
-        }
-    }
-    if !_has(port.children, port_path + "/RampTrackPort")
-        || !_has(port.children, port_path + "/RampTrackStarboard")
-        || !_has(starboard.children, starboard_path + "/RampTrackPort")
-        || !_has(starboard.children, starboard_path + "/RampTrackStarboard") {
-        findings.push(_layout_finding("GR-017", root,
-            "each ramp must contain both source-aligned FLIP wheel tracks"));
     }
     findings
 }
@@ -1089,6 +1089,7 @@ fn _body_collider_observation(doc_id, root) {
         && collision.vertices != () && collision.vertices.len() == 8;
     body.exactCanonicalBounds = bounds != () && bounds.fidelity == "exact"
         && bounds.frame == "canonical_stage";
+    body.ok = true;
     body
 }
 
@@ -1233,19 +1234,21 @@ fn _engine_layout_report(doc_id, root) {
                 "main engine reference must compose as an Xform assembly"));
         }
         let bell_path = path + "/Bell";
-        let bell = _layout_query(doc_id, bell_path,
-            ["visibility", "radius1", "radius2", "height", "physics:collisionEnabled"], false);
+        let bell = _query_geometry(doc_id, bell_path,
+            ["visibility", "physics:collisionEnabled"], (), false);
         if !_ok(bell) {
             findings.push(_layout_finding("GR-032", bell_path,
                 "referenced main engine bell geometry is missing"));
             continue;
         }
-        if bell.type_name != "Cone" || !_visible(bell)
-            || bell.attrs["radius1"] == () || bell.attrs["radius1"] <= 0.0
-            || bell.attrs["radius2"] == () || bell.attrs["radius2"] <= 0.0
-            || bell.attrs["height"] == () || bell.attrs["height"] <= 0.0 {
+        let bounds = bell.geometry_bounds;
+        if bell.type_name != "Mesh" || !_visible(bell) || bounds == ()
+            || bounds.fidelity != "exact" || bounds.half_extents == ()
+            || bounds.half_extents.len() != 3
+            || bounds.half_extents[0] <= 0.0 || bounds.half_extents[1] <= 0.0
+            || bounds.half_extents[2] <= 0.0 {
             findings.push(_layout_finding("GR-032", bell_path,
-                "each main engine must be a visible positive Cone bell"));
+                "each main engine must have a visible Mesh bell with exact positive geometry bounds"));
         }
         if bell.attrs["physics:collisionEnabled"] == true {
             findings.push(_layout_finding("GR-032", bell_path,
@@ -1263,9 +1266,10 @@ fn _leg_layout_report(doc_id, root) {
     let findings = [];
     let names = griffin_spec::landing_leg_names();
     let expected_rotations = griffin_spec::component_leg_station_rotation_y_deg();
+    let expected_stations = griffin_spec::component_leg_stations();
     let expected = landing_leg_count();
     if names.len() != 4 || expected != names.len()
-        || expected_rotations.len() != names.len() {
+        || expected_rotations.len() != names.len() || expected_stations.len() != names.len() {
         findings.push(_layout_finding("GR-019", root,
             "typed SysML landing-leg and radial-orientation lists must contain four entries"));
         return findings;
@@ -1287,17 +1291,9 @@ fn _leg_layout_report(doc_id, root) {
                 "resolved world position is required for leg-to-pad placement"));
             continue;
         }
-        if i == 0 && (pos[0] <= 0.0 || !_near(pos[2], 0.0, 0.02)) {
-            findings.push(_layout_finding("GR-019", path, "LegPX must attach on +X"));
-        }
-        if i == 1 && (pos[0] >= 0.0 || !_near(pos[2], 0.0, 0.02)) {
-            findings.push(_layout_finding("GR-019", path, "LegNX must attach on -X"));
-        }
-        if i == 2 && (pos[2] <= 0.0 || !_near(pos[0], 0.0, 0.02)) {
-            findings.push(_layout_finding("GR-019", path, "LegPZ must attach on +Z"));
-        }
-        if i == 3 && (pos[2] >= 0.0 || !_near(pos[0], 0.0, 0.02)) {
-            findings.push(_layout_finding("GR-019", path, "LegNZ must attach on -Z"));
+        if _vector_max_deviation(pos, vec3_array(expected_stations[i])) > 0.002 {
+            findings.push(_layout_finding("GR-019", path,
+                "landing leg station disagrees with the ordered SysML COM-frame datum"));
         }
         let rotation = leg.attrs["xformOp:rotateXYZ"];
         if rotation == () || rotation.len() != 3 {
@@ -1333,13 +1329,13 @@ fn _leg_layout_report(doc_id, root) {
                 "foot pad must keep collision enabled"));
         }
     }
-    if _ok(legs[0]) && _ok(legs[1]) {
-        _pair_mirror_check(findings, "GR-019", root + "/LegPX", legs[0],
-            root + "/LegNX", legs[1], "X", "X-axis landing legs");
+    if _ok(legs[0]) && _ok(legs[2]) {
+        _pair_mirror_check(findings, "GR-019", root + "/" + names[0], legs[0],
+            root + "/" + names[2], legs[2], "X", "landing leg stations");
     }
-    if _ok(legs[2]) && _ok(legs[3]) {
-        _pair_mirror_check(findings, "GR-019", root + "/LegPZ", legs[2],
-            root + "/LegNZ", legs[3], "Z", "Z-axis landing legs");
+    if _ok(legs[0]) && _ok(legs[3]) {
+        _pair_mirror_check(findings, "GR-019", root + "/" + names[0], legs[0],
+            root + "/" + names[3], legs[3], "Z", "landing leg stations");
     }
     if _ok(legs[0]) && _ok(legs[2]) {
         let px = _horizontal_radius_squared(_authored_position(legs[0]));
@@ -1539,7 +1535,12 @@ fn part_manifest(root) {
         let geometry_children = [];
         if visual_child_names != () {
             for child_name in visual_child_names {
-                let child_path = leg_path + "/LandingLegVisual/" + child_name;
+                let child_path = if child_name == "ShockPiston" {
+                    leg_path + "/ShockPiston/Tube"
+                } else if ["BodyMountArm", "MountAxle", "MountClevisOuter",
+                    "MountClevisInner"].contains(child_name) {
+                    leg_path + "_BusMount/" + child_name
+                } else { leg_path + "/LandingLegVisual/" + child_name };
                 required_children.push(child_path);
                 geometry_children.push(#{label: child_name,
                     path: child_path, geometry: true, visible: true});
@@ -1567,31 +1568,31 @@ fn part_manifest(root) {
     let ramps = [];
     for name in griffin_spec::ramp_names() {
         let ramp_path = root + "/" + name;
-        ramps.push(#{
-            id: "egress_ramp_" + name,
-            label: "egress ramp " + name,
-            rule: "GR-003",
-            path: ramp_path,
-            attrs: ["visibility", "physics:mass", "lunco:deployment_angle_rad"],
-            expected_type: "Xform",
-            visible: true,
-            required_children: [
-                ramp_path + "/RampTrackPort",
-                ramp_path + "/RampTrackStarboard",
-                ramp_path + "/EdgeRail",
-                ramp_path + "/EdgeRailInner",
-            ],
-            geometry_children: [
-                #{label: "port wheel track", path: ramp_path + "/RampTrackPort", geometry: true, visible: true, collider: true},
-                #{label: "starboard wheel track", path: ramp_path + "/RampTrackStarboard", geometry: true, visible: true, collider: true},
-                #{label: "outer edge rail", path: ramp_path + "/EdgeRail", geometry: true, visible: true, collider: true},
-                #{label: "inner edge rail", path: ramp_path + "/EdgeRailInner", geometry: true, visible: true, collider: true},
-            ],
-            parameters: [
-                #{name: "ramp mass", attr: "physics:mass", positive: true},
-                #{name: "deployment command", attr: "lunco:deployment_angle_rad", max_abs: max_ramp_command_rad()},
-            ],
-        });
+        let sections = griffin_spec::ramp_section_paths(ramp_path);
+        let required_children = [];
+        let geometry_children = [];
+        if sections != () {
+            for section in sections {
+                required_children.push(section);
+                for child in ["RampTrackPort", "RampTrackStarboard"] {
+                    let path = section + "/" + child;
+                    required_children.push(path);
+                    geometry_children.push(#{label: child, path: path,
+                        geometry: true, visible: true, collider: true});
+                }
+                for guide in griffin_spec::ramp_guide_stations() {
+                    let path = section + "/" + guide.name;
+                    required_children.push(path);
+                    geometry_children.push(#{label: guide.name, path: path,
+                        geometry: true, visible: true, collider: true});
+                }
+            }
+        }
+        ramps.push(#{id: "egress_ramp_" + name, label: "egress ramp " + name,
+            rule: "GR-003", path: ramp_path, attrs: ["visibility", "physics:mass"],
+            expected_type: "Xform", visible: true,
+            required_children: required_children, geometry_children: geometry_children,
+            parameters: [#{name: "ramp mass", attr: "physics:mass", positive: true}]});
     }
 
     let tanks = [];
@@ -1752,33 +1753,18 @@ fn part_report(doc_id, root) {
 /// validated SysML source; this report contains only current observations.
 fn runtime_report(doc_id, root, verification_name) {
     let sysml = sysml_contract_report(verification_name);
-    let lint_report = lint(doc_id, root);
     let parts = part_report(doc_id, root);
     let layout = layout_report(doc_id, root);
-    let errors = [];
+    assemble_runtime_report(doc_id, root, sysml,
+        lint_with_audits(doc_id, root, parts, layout), parts, layout)
+}
 
-    for error in lint_report.errors { errors.push(error); }
-    if sysml.ok != true || sysml.sysml_ok != true {
-        let message = sysml.error;
-        if message == () { message = "SysML requirement source failed validation"; }
-        errors.push("SysML requirement contract: " + message);
-    }
-
-    let part_failures = [];
-    for part in parts.parts {
-        if !part.ok { part_failures.push(part.id); }
-    }
-    for id in part_failures {
-        errors.push("part contract failed: " + id);
-    }
-    if !layout.ok {
-        let finding_count = if layout.findings == () { 0 } else { layout.findings.len() };
-        errors.push("relational layout report has " + finding_count + " finding(s)");
-    }
-
-    // Keep the runtime verdict compact while retaining the source identity
-    // needed by typed provenance projections.
-    let sysml_summary = #{
+/// Combine the four independently bounded audits. Callers with a per-turn
+/// Rhai operation budget (scene tests) evaluate each audit on its own turn.
+// Keep only source identity and completed audit facts across scenario turns.
+// Requirement tables remain in the Rust-owned model, queried by typed handle.
+fn sysml_contract_summary(sysml) {
+    #{
         // Preserve the Twin URI needed by bounded typed projections such as
         // sysml_requirements::provenance().  The summary intentionally drops
         // the large AST/attribute tables, but it must retain the source
@@ -1803,7 +1789,33 @@ fn runtime_report(doc_id, root, verification_name) {
         source_files: sysml.source_files,
         source_file_count: if sysml.source_files == () { 0 } else { sysml.source_files.len() },
         source_revision: sysml.source_revision,
-    };
+    }
+
+}
+
+fn assemble_runtime_report(doc_id, root, sysml, lint_report, parts, layout) {
+    let errors = [];
+
+    for error in lint_report.errors { errors.push(error); }
+    if sysml.ok != true || sysml.sysml_ok != true {
+        let message = sysml.error;
+        if message == () { message = "SysML requirement source failed validation"; }
+        errors.push("SysML requirement contract: " + message);
+    }
+
+    let part_failures = [];
+    for part in parts.parts {
+        if !part.ok { part_failures.push(part.id); }
+    }
+    for id in part_failures {
+        errors.push("part contract failed: " + id);
+    }
+    if !layout.ok {
+        let finding_count = if layout.findings == () { 0 } else { layout.findings.len() };
+        errors.push("relational layout report has " + finding_count + " finding(s)");
+    }
+
+    let sysml_summary = sysml_contract_summary(sysml);
 
     #{
         ok: errors.len() == 0,
@@ -1849,8 +1861,8 @@ fn _evaluate_source_constraint(source, id, requirement, verification,
     let model = sysml_requirements::model();
     let observations = sysml_requirements::required_constraint_input_observations(
         model, requirement_usage, constraint_name, inputs);
-    let check = sysml_requirements::constraint_check(id, "lander", requirement,
-        verification, constraint_name, observations, "derived", 0.0);
+    let check = sysml_requirements::required_constraint_check(id, "lander", requirement,
+        verification, constraint_name, observations, "typed", 0.0);
     let report = sysml_requirements::evaluate(source, [check]);
     if report.results == () || report.results.len() != 1 {
         return #{ok: false, verdict: "error",
@@ -1869,16 +1881,14 @@ fn payload_load_check(payload_kg) {
     let result = _evaluate_source_constraint(source, "GR-009-payload-capacity", "gr009",
         "Verify_GriffinPayloadCapacity", requirement_usage,
         "GriffinFunctionalRequirements::GR009_PayloadWithinCapacity",
-        [["payloadKg", #{provider: "external",
-             state: if payload_kg == () { "unavailable" } else { "value" },
-             value: payload_kg}],
+        [["payloadKg", _external_value(payload_kg)],
          ["capacityKg", _source_value(capacity, source)]]);
     result.payload_kg = payload_kg;
     result.capacity_kg = capacity;
     result
 }
 
-fn _payload_scene_checks(root, payload_kg, capacity_kg) {
+fn _payload_scene_checks(root, payload_observation, capacity_kg) {
     let source = _payload_requirement_source();
     let capacity_attribute = griffin_spec::qualified_attribute_name("payloadCapacityKg");
     let constraint_name = "GriffinFunctionalRequirements::GR009_PayloadWithinCapacity";
@@ -1886,16 +1896,16 @@ fn _payload_scene_checks(root, payload_kg, capacity_kg) {
     let requirement_usage = model.requirement("GriffinFunctionalRequirements::gr009");
     let observations = sysml_requirements::required_constraint_input_observations(
         model, requirement_usage, constraint_name,
-        [["payloadKg", _usd_value(payload_kg)],
+        [["payloadKg", payload_observation],
          ["capacityKg", _source_value(capacity_kg, source)]]);
     [
         #{id: "GR-009-authored-capacity", component: "lander",
           requirement: "gr009", verification: "Verify_GriffinPayloadCapacity",
           kind: "attribute", path: root, attr: "lunco:payload_class_kg",
           expected_attr: capacity_attribute, tolerance: 0.0},
-        sysml_requirements::constraint_check("GR-009-payload-load", "lander",
+        sysml_requirements::required_constraint_check("GR-009-payload-load", "lander",
             "gr009", "Verify_GriffinPayloadCapacity",
-            constraint_name, observations, "derived", 0.0),
+            constraint_name, observations, "typed", 0.0),
     ]
 }
 
@@ -1938,14 +1948,14 @@ fn _landing_leg_requirement_source() {
 
 fn _physical_ramp_geometry_source() {
     sysml_requirements::source_with_selection([
-        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceLengthM",
+        "GriffinRampRequirements::GriffinEgressRamp::rampSectionLengthM",
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceThicknessM",
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceCenterYM",
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM",
         "GriffinRampRequirements::GriffinEgressRamp::contactTrackGeometryToleranceM",
         "GriffinRampRequirements::GriffinEgressRamp::rampWheelClearanceM",
         "FlipRequirements::FlipRover::wheelStationZ",
-        "FlipWheelRequirements::FlipDirectionalWheelAssembly::tireWidthM"
+        "FlipRequirements::FlipRover::wheelWidthM"
     ], ["GriffinRampRequirements::grr006"],
        ["GriffinRampRequirements::Verify_GriffinRampRequirements"])
 }
@@ -1981,6 +1991,20 @@ fn _landing_pad_requirement_findings(doc_id, root) {
             } else { observation.detail }));
         return findings;
     }
+    if !observation.collision_enabled || !observation.proxy_hidden
+        || !observation.visual_collision_disabled || !observation.collision_matches_visual
+        || !observation.source_relationships_valid || !observation.self_collision_filter_clear
+        || !observation.legacy_collision_disabled {
+        print("[griffin-requirements] pad contact facts: " + #{
+            collision: observation.collision_enabled, proxy: observation.proxy_hidden,
+            visual_disabled: observation.visual_collision_disabled,
+            geometry_matches: observation.collision_matches_visual,
+            source_linked: observation.source_relationships_valid,
+            filters_clear: observation.self_collision_filter_clear,
+            legacy_disabled: observation.legacy_collision_disabled,
+            geometry_deviation_m: observation.geometry_deviation_m,
+            tolerance_m: observation.tolerance_m});
+    }
     let pad_geometry_constraint =
         "GriffinLandingLegRequirements::GLLC008_PadColliderMatchesVisual";
     let pad_ownership_constraint =
@@ -1993,7 +2017,7 @@ fn _landing_pad_requirement_findings(doc_id, root) {
     let pad_requirement = model.requirement("GriffinLandingLegRequirements::gll008");
     let mount_requirement = model.requirement("GriffinLandingLegRequirements::gll009");
     let checks = [
-        sysml_requirements::constraint_check("GLL-008-pad-geometry", "landing_leg",
+        sysml_requirements::required_constraint_check("GLL-008-pad-geometry", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             pad_geometry_constraint,
             sysml_requirements::required_constraint_input_observations(model,
@@ -2008,8 +2032,8 @@ fn _landing_pad_requirement_findings(doc_id, root) {
                     _usd_snapshot_value(observation.source_center_deviation_m, observation)],
                 ["padGeometrySemanticsMatch",
                     _usd_snapshot_value(observation.pad_geometry_semantics_match, observation)],
-                ["toleranceM", _source_value(tolerance, source)]]), "usd", 0.0),
-        sysml_requirements::constraint_check("GLL-008-contact-ownership", "landing_leg",
+                ["toleranceM", _source_value(tolerance, source)]]), "typed", 0.0),
+        sysml_requirements::required_constraint_check("GLL-008-contact-ownership", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             pad_ownership_constraint,
             sysml_requirements::required_constraint_input_observations(model,
@@ -2028,8 +2052,8 @@ fn _landing_pad_requirement_findings(doc_id, root) {
                     _usd_snapshot_value(observation.self_collision_filter_clear, observation)],
                 ["legacyCollisionDisabled",
                     _usd_snapshot_value(observation.legacy_collision_disabled, observation)]]),
-            "usd", 0.0),
-        sysml_requirements::constraint_check("GLL-008-physical-stations", "landing_leg",
+            "typed", 0.0),
+        sysml_requirements::required_constraint_check("GLL-008-physical-stations", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
             pad_station_constraint,
             sysml_requirements::required_constraint_input_observations(model,
@@ -2038,8 +2062,8 @@ fn _landing_pad_requirement_findings(doc_id, root) {
                     _usd_snapshot_value(observation.station_deviation_m, observation)],
                 ["toleranceM", _source_value(station_tolerance, source)],
                 ["rotationMatches",
-                    _usd_snapshot_value(observation.rotation_matches, observation)]]), "usd", 0.0),
-        sysml_requirements::constraint_check("GLL-009-body-mount-path", "landing_leg",
+                    _usd_snapshot_value(observation.rotation_matches, observation)]]), "typed", 0.0),
+        sysml_requirements::required_constraint_check("GLL-009-body-mount-path", "landing_leg",
             "gll009", "Verify_GriffinLandingLegRequirements",
             mount_constraint,
             sysml_requirements::required_constraint_input_observations(model,
@@ -2049,7 +2073,7 @@ fn _landing_pad_requirement_findings(doc_id, root) {
                 ["requiredOverlapM", _source_value(mount_overlap, source)],
                 ["measurementToleranceM", _source_value(mount_measurement_tolerance, source)],
                 ["physicalJointStationMatches", _usd_snapshot_value(observation.physical_joints_match, observation)]]),
-            "usd", 0.0)
+            "typed", 0.0)
     ];
     let evaluation = sysml_requirements::evaluate(source, checks);
     if evaluation.results == () || evaluation.results.len() != checks.len() {
@@ -2065,7 +2089,7 @@ fn _landing_pad_requirement_findings(doc_id, root) {
     findings
 }
 
-fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
+fn _ramp_track_requirement_findings(child, child_path, child_name,
     ramp_source, ramp_length, ramp_thickness, ramp_center_y, track_width,
     ramp_clearance, wheel_width, track_tolerance, wheel_stations_z, half_track) {
     let findings = [];
@@ -2077,11 +2101,10 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
     let translation = child.attrs["xformOp:translate"];
     let collision = child.collision_geometry;
     let collision_bounds = child.collision_bounds;
-    let expected_z = if child_name == "RampTrackPort" { half_track } else { -half_track };
     let source_missing = ramp_source.ok != true || ramp_length == ()
         || ramp_thickness == () || ramp_center_y == () || track_width == ()
         || ramp_clearance == () || wheel_width == () || track_tolerance == ()
-        || wheel_stations_z == () || wheel_stations_z.len() != 4;
+        || wheel_stations_z == () || wheel_stations_z.len() != 4 || half_track == ();
     let geometry_missing = translation == () || translation.len() != 3
         || child.type_name != "Mesh" || collision == ()
         || collision.frame != "canonical_stage"
@@ -2108,7 +2131,8 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
             "dynamic contact track collider must use the authored convexHull approximation"));
         return findings;
     }
-    let expected_x = if ramp_index == 0 { ramp_length / 2.0 } else { -ramp_length / 2.0 };
+    let expected_z = if child_name == "RampTrackPort" { half_track } else { -half_track };
+    let expected_x = 0.0;
     let half_extents = collision_bounds.half_extents;
     let measured_length = 2.0 * half_extents[0];
     let measured_thickness = 2.0 * half_extents[1];
@@ -2126,24 +2150,27 @@ fn _ramp_track_requirement_findings(child, child_path, child_name, ramp_index,
     let model = sysml_requirements::model();
     let requirement_usage = model.requirement("GriffinRampRequirements::grr006");
     let checks = [
-        sysml_requirements::constraint_check(
+        sysml_requirements::required_constraint_check(
             "GR-006-tire-clearance-" + child_name, "lander", "grr006",
             "Verify_GriffinRampRequirements",
             clearance_constraint,
             sysml_requirements::required_constraint_input_observations(model,
                 requirement_usage, clearance_constraint, [
-                ["trackWidthM", _usd_value(measured_width)],
+                // GRC016 binds the design width in SysML; GRC017 below
+                // checks the cooked mesh against that same width and the
+                // source-owned geometry tolerance.
+                ["trackWidthM", _source_value(track_width, ramp_source)],
                 ["wheelWidthM", _source_value(wheel_width, ramp_source)],
-                ["wheelClearanceM", _source_value(ramp_clearance, ramp_source)]]), "derived", 0.0),
-        sysml_requirements::constraint_check(
+                ["wheelClearanceM", _source_value(ramp_clearance, ramp_source)]]), "typed", 0.0),
+        sysml_requirements::required_constraint_check(
             "GR-006-composed-geometry-" + child_name, "lander", "grr006",
             "Verify_GriffinRampRequirements",
             geometry_constraint,
             sysml_requirements::required_constraint_input_observations(model,
                 requirement_usage, geometry_constraint, [
-                ["maximumDimensionDeviationM", _usd_value(dimension_deviation)],
-                ["maximumPlacementDeviationM", _usd_value(placement_deviation)],
-                ["toleranceM", _source_value(track_tolerance, ramp_source)]]), "derived", 0.0)
+                ["maximumDimensionDeviationM", _usd_snapshot_value(dimension_deviation, child)],
+                ["maximumPlacementDeviationM", _usd_snapshot_value(placement_deviation, child)],
+                ["toleranceM", _source_value(track_tolerance, ramp_source)]]), "typed", 0.0)
     ];
     let evaluation = sysml_requirements::evaluate(ramp_source, checks);
     if evaluation.results == () || evaluation.results.len() != checks.len() {
@@ -2168,9 +2195,7 @@ fn ramp_command_check(angle_rad) {
     let result = _evaluate_source_constraint(source, "GRR-005-deployment-command",
         "grr005", "Verify_GriffinRampCommandEnvelope", requirement_usage,
         "GriffinRampRequirements::GRC005_DeploymentCommandWithinLimit",
-        [["commandRad", #{provider: "external",
-            state: if angle_rad == () { "unavailable" } else { "value" },
-            value: angle_rad}],
+        [["commandRad", _external_value(angle_rad)],
          ["limitRad", _source_value(limit, source)]]);
     result.angle_rad = angle_rad;
     result.limit_rad = limit;
@@ -2181,6 +2206,11 @@ fn ramp_command_check(angle_rad) {
 /// path, such as `/Griffin1` in the isolated Editor preview or
 /// `/GriffinRequirementsTest/Griffin1` in the Twin test scene.
 fn lint(doc_id, root) {
+    lint_with_audits(doc_id, root, part_report(doc_id, root), layout_report(doc_id, root))
+}
+
+// Reuse snapshot observations when the caller schedules bounded audit turns.
+fn lint_with_audits(doc_id, root, part_contract, layout_contract) {
     let findings = [];
     let root_record = _query(doc_id, root, [
         "lunco:payload_class_kg",
@@ -2199,9 +2229,7 @@ fn lint(doc_id, root) {
     // specialized checks below still cover topology relationships and exact
     // counts; the manifest covers presence, geometry, collision ownership,
     // and per-part parameters uniformly.
-    let part_contract = part_report(doc_id, root);
     for finding in part_contract.findings { findings.push(finding); }
-    let layout_contract = layout_report(doc_id, root);
     for finding in layout_contract.findings { findings.push(finding); }
 
     let attrs = root_record.attrs;
@@ -2210,7 +2238,7 @@ fn lint(doc_id, root) {
     let payload_capacity = sysml_requirements::number(requirement_source,
         griffin_spec::qualified_attribute_name("payloadCapacityKg"));
     let payload_report = sysml_requirements::evaluate_document(requirement_source,
-        doc_id, _payload_scene_checks(root, payload, payload_capacity));
+        doc_id, _payload_scene_checks(root, _usd_snapshot_value(payload, root_record), payload_capacity));
     for result in payload_report.results {
         if result.ok != true {
             findings.push(_finding("GR-009", root,
@@ -2220,16 +2248,11 @@ fn lint(doc_id, root) {
 
     let leg_names = griffin_spec::landing_leg_names();
     let visible_leg_count = 0;
-    if root_record.children != () {
-        for child in root_record.children {
-            // Spring joints carry the leg dynamics and are not visible leg
-            // bodies; count only visible direct Leg* body roots.
-            if child.contains("/Leg") && !child.contains("_Spring") {
-                let child_record = _query(doc_id, child, ["visibility"], (), false);
-                if _ok(child_record) && child_record.attrs["visibility"] != "invisible" {
-                    visible_leg_count += 1;
-                }
-            }
+    for name in leg_names {
+        let leg = _query_schemas(doc_id, root + "/" + name, ["visibility"], (), false);
+        if _ok(leg) && leg.type_name == "Xform" && _visible(leg)
+            && _has(leg.api_schemas, "PhysicsRigidBodyAPI") {
+            visible_leg_count += 1;
         }
     }
     if visible_leg_count != landing_leg_count() {
@@ -2264,27 +2287,35 @@ fn lint(doc_id, root) {
     for finding in _landing_pad_requirement_findings(doc_id, root) { findings.push(finding); }
 
     let ramp_source = _physical_ramp_geometry_source();
-    let ramp_length = sysml_requirements::number(ramp_source,
-        "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceLengthM");
-    let ramp_thickness = sysml_requirements::number(ramp_source,
+    // Engineering datums come from the revision-pinned typed model; the
+    // selected source projection supplies requirement provenance only.
+    let ramp_length = griffin_spec::_typed_model_number(
+        "GriffinRampRequirements::GriffinEgressRamp::rampSectionLengthM");
+    let ramp_thickness = griffin_spec::_typed_model_number(
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceThicknessM");
-    let ramp_center_y = sysml_requirements::number(ramp_source,
+    let ramp_center_y = griffin_spec::_typed_model_number(
         "GriffinRampRequirements::GriffinEgressRamp::rampSurfaceCenterYM");
-    let track_width = sysml_requirements::number(ramp_source,
+    let track_width = griffin_spec::_typed_model_number(
         "GriffinRampRequirements::GriffinEgressRamp::assemblyTrackWidthM");
-    let ramp_clearance = sysml_requirements::number(ramp_source,
+    let ramp_clearance = griffin_spec::_typed_model_number(
         "GriffinRampRequirements::GriffinEgressRamp::rampWheelClearanceM");
-    let wheel_width = sysml_requirements::number(ramp_source,
-        "FlipWheelRequirements::FlipDirectionalWheelAssembly::tireWidthM");
-    let track_tolerance = sysml_requirements::number(ramp_source,
+    // FlipDirectionalWheelAssembly::tireWidthM is a ref to this attribute.
+    let wheel_width = griffin_spec::_typed_model_number(
+        "FlipRequirements::FlipRover::wheelWidthM");
+    let track_tolerance = griffin_spec::_typed_model_number(
         "GriffinRampRequirements::GriffinEgressRamp::contactTrackGeometryToleranceM");
-    let wheel_stations_z = sysml_requirement_checks::source_number_list(ramp_source,
+    let wheel_stations_z = griffin_spec::_typed_model_number_list(
         "FlipRequirements::FlipRover::wheelStationZ");
-    let half_track = 0.0;
-    if wheel_stations_z != () {
+    let half_track = ();
+    if wheel_stations_z != () && wheel_stations_z.len() == 4 {
         for station in wheel_stations_z {
-            if station.abs() > half_track { half_track = station.abs(); }
+            if half_track == () || station.abs() > half_track { half_track = station.abs(); }
         }
+    }
+    if half_track == () || half_track <= 0.0 {
+        findings.push(_finding("GR-006", root,
+            "FLIP wheel stations must contain four finite values with a positive half-track"));
+        half_track = ();
     }
     let ramp_names = griffin_spec::ramp_names();
     let hinge_names = griffin_spec::ramp_hinge_names();
@@ -2309,8 +2340,13 @@ fn lint(doc_id, root) {
                         "egress ramp body is missing " + schema));
                 }
             }
-            let physical_children = ["RampTrackPort", "RampTrackStarboard",
-                "EdgeRail", "EdgeRailInner"];
+            let physical_children = ["RampTrackPort", "RampTrackStarboard"];
+            for guide in griffin_spec::ramp_guide_stations() { physical_children.push(guide.name); }
+            let sections = griffin_spec::ramp_section_paths(ramp_path);
+            if sections == () {
+                findings.push(_finding("GR-003", ramp_path,
+                    "articulated section identity collection is unavailable"));
+            }
             let side = if i == 0 { "port" } else { "starboard" };
             let transition_name = griffin_spec::physical_ramp_transition_body_name(side);
             if transition_name != () && transition_name != "" {
@@ -2323,27 +2359,31 @@ fn lint(doc_id, root) {
                         "physical deck transition contact child name is missing in SysML"));
                 }
             }
-            for child_name in physical_children {
-                let child_path = ramp_path + "/" + child_name;
-                let child = _query_geometry(doc_id, child_path,
-                    ["physics:collisionEnabled", "xformOp:translate", "xformOp:scale",
-                     "physics:approximation", "lunco:collider:geometrySource",
-                     "lunco:requirement"], (), true);
-                if !_ok(child) || child.attrs["physics:collisionEnabled"] != true {
-                    findings.push(_finding("GR-003", child_path,
-                        "ramp contact geometry must have collision enabled"));
-                }
-                if _ok(child) && (child.attrs["lunco:collider:geometrySource"] != ()
-                    || child.attrs["lunco:requirement"] != ()) {
-                    findings.push(_finding("GR-006", child_path,
-                        "legacy string collider provenance must be removed; SysML and typed geometry own traceability"));
-                }
-                if child_name == "RampTrackPort" || child_name == "RampTrackStarboard" {
-                    let track_findings = _ramp_track_requirement_findings(child,
-                        child_path, child_name, i, ramp_source, ramp_length,
-                        ramp_thickness, ramp_center_y, track_width, ramp_clearance,
-                        wheel_width, track_tolerance, wheel_stations_z, half_track);
-                    for finding in track_findings { findings.push(finding); }
+            if sections != () {
+                for section in sections {
+                    for child_name in physical_children {
+                        let child_path = section + "/" + child_name;
+                        let child = _query_geometry(doc_id, child_path,
+                            ["physics:collisionEnabled", "xformOp:translate", "xformOp:scale",
+                             "physics:approximation", "lunco:collider:geometrySource",
+                             "lunco:requirement"], (), true);
+                        if !_ok(child) || child.attrs["physics:collisionEnabled"] != true {
+                            findings.push(_finding("GR-003", child_path,
+                                "ramp contact geometry must have collision enabled"));
+                        }
+                        if _ok(child) && (child.attrs["lunco:collider:geometrySource"] != ()
+                            || child.attrs["lunco:requirement"] != ()) {
+                            findings.push(_finding("GR-006", child_path,
+                                "legacy string collider provenance must be removed; SysML and typed geometry own traceability"));
+                        }
+                        if child_name == "RampTrackPort" || child_name == "RampTrackStarboard" {
+                            let track_findings = _ramp_track_requirement_findings(child,
+                                child_path, child_name, ramp_source, ramp_length,
+                                ramp_thickness, ramp_center_y, track_width, ramp_clearance,
+                                wheel_width, track_tolerance, wheel_stations_z, half_track);
+                            for finding in track_findings { findings.push(finding); }
+                        }
+                    }
                 }
             }
             if transition_name != () && transition_name != "" {
@@ -2397,9 +2437,9 @@ fn lint(doc_id, root) {
                     findings.push(_finding("GR-012", contact_path,
                         "transition ContactSurface must be a collision-enabled Cube"));
                 }
-                let prefix = griffin_spec::physical_ramp_transition_joint_name_prefix();
-                let suffix = if i == 0 { "Port" } else { "Starboard" };
-                let joint_path = root + "/" + prefix + suffix;
+                let joint_name = griffin_spec::physical_ramp_transition_joint_name(
+                    if i == 0 { "port" } else { "starboard" });
+                let joint_path = root + "/" + joint_name;
                 let joint = _query(doc_id, joint_path,
                     ["physics:localPos0", "physics:localPos1", "physics:collisionEnabled"],
                     ["physics:body0", "physics:body1"], false);
@@ -2705,7 +2745,7 @@ fn payload_limit_live(doc_id, root, payload_kg) {
     let source = _payload_requirement_source();
     let capacity = sysml_requirements::number(source,
         griffin_spec::qualified_attribute_name("payloadCapacityKg"));
-    let checks = _payload_scene_checks(root, payload_kg, capacity);
+    let checks = _payload_scene_checks(root, _external_value(payload_kg), capacity);
     let result = sysml_requirements::evaluate_document(source, doc_id, checks);
     print("[griffin-lint] payload=" + payload_kg + "kg max="
         + max_payload_kg() + "kg result="

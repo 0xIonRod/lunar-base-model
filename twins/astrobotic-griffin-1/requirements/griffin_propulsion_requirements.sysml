@@ -54,6 +54,8 @@ package GriffinPropulsionRequirements {
         attribute maximumBurnAngularSpeedRadS : Real = .1;
         attribute extinguishedThrustThresholdN : Real = 100.0;
         attribute touchdownTimeoutS : Real = 150.0;
+        attribute pilotPitchTapDurationS : Real = .1;
+        attribute pilotAttitudeRecoveryDurationS : Real = 15.0;
     }
 
     part def GriffinPressureFedStudy {
@@ -604,6 +606,24 @@ package GriffinPropulsionRequirements {
     }
     requirement <'GPP-010'> gpp010 : GPP010_SustainedPilotThrust {
         subject control : GriffinEngineControlStudy;
+    }
+
+    requirement def GPP011_PilotAttitudeRecovery {
+        doc /* GPP-011 [runtime integration study] after qualified touchdown,
+         * hold semantic thrust, lift by minimumSustainedLiftM, and apply one
+         * forward pitch intent for pilotPitchTapDurationS. During the subsequent
+         * pilotAttitudeRecoveryDurationS under held thrust, upright Y shall
+         * exceed minimumBurnUprightY and angular speed shall stay below
+         * maximumBurnAngularSpeedRadS. Recover upright with the ramps physically
+         * locked in their authored transport pose. These are simulator study
+         * thresholds, not flight GNC qualification. */
+    }
+    requirement <'GPP-011'> gpp011 : GPP011_PilotAttitudeRecovery {
+        subject control : GriffinEngineControlStudy;
+    }
+    verification def Verify_GriffinPilotAttitude {
+        subject control : GriffinEngineControlStudy;
+        objective { verify gpp011; }
     }
 
 }

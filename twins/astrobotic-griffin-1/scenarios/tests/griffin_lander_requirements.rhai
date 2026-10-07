@@ -115,7 +115,9 @@ fn on_tick(me, ctx) {
         let visual_path = path + "/LandingLegVisual";
         checks.push(_children("GLR-002-" + name + "-parts", "glr002", visual_path,
             [visual_path + "/StrutOuter", visual_path + "/StrutInner",
-             visual_path + "/ShockPiston", visual_path + "/FootPad"]));
+             visual_path + "/FootPad"]));
+        // The shock piston is the physical `<leg>/ShockPiston` body; its
+        // visual copy is hidden and owned by griffin_landing_legs_requirements.
         if leg_stations.len() == leg_names.len() {
             checks.push(_position("GLR-008-" + name + "-x", "glr008", path, 0, leg_stations[index].x));
             checks.push(_position("GLR-008-" + name + "-y", "glr008", path, 1, leg_stations[index].y));
@@ -155,7 +157,9 @@ fn on_tick(me, ctx) {
         }
     }
     let solar_names = _enum_names(values, "solarArrayInstances");
-    let solar_stations = _position_values(values, "solarStations");
+    // solarStations are bus attachment datums; the installed panel centre
+    // rises by half the frame-height difference (griffin_solar_requirements).
+    let solar_stations = griffin_spec::component_solar_stations();
     for index in 0..solar_names.len() {
         let name = solar_names[index];
         let path = ROOT + "/" + name;

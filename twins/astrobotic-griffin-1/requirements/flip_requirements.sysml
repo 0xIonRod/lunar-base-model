@@ -8,13 +8,14 @@ package FlipRequirements {
     private import FlipCadRequirements::CadStudy;
 
     enum def FlipWheelStation { FL; RL; FR; RR; }
-    enum def FlipSteeringMode { ackermann; crab; }
+    // `differential` is the LunCoSim steering geometry token for skid steer.
+    enum def FlipSteeringMode { differential; }
 
     // CAD-study dimensions are owned by FlipCadRequirements::CadStudy and
     // converted to the SI runtime frame here. Rover-specific simulation policy
     // remains owned by this part definition.
     part def FlipRover {
-        doc /* CAD body, wheel, and baseplate dimensions are owned by FlipCadRequirements::CadStudy and converted to SI for the Twin frame (CAD X,Y,Z maps to USD Y,Z,X). The public skid-steer architecture is distinct from this Twin's Ackermann route-control approximation. Lower-frame thickness, equipment position, fixed panel mount, suspension rest length, mass, COM, and inertia remain replaceable simulation-study values. Rationale and confidence: griffin-size-evidence.md. */
+        doc /* CAD body, wheel, and baseplate dimensions are owned by FlipCadRequirements::CadStudy and converted to SI for the Twin frame (CAD X,Y,Z maps to USD Y,Z,X). The Twin models the public four-wheel skid-steer architecture: fixed-axis wheels with independent left/right drive. Lower-frame thickness, equipment position, fixed panel mount, suspension rest length, mass, COM, and inertia remain replaceable simulation-study values. Rationale and confidence: griffin-size-evidence.md. */
         attribute componentAsset : TwinAssetPath = "vehicles/flip.usda";
         attribute usdRootPath : UsdPrimPath = "/World/FLIP";
         attribute localFrame : String = "Y-up SI metres; X longitudinal, Z lateral; CAD (X,Y,Z) maps to USD (Y,Z,X)";
@@ -31,9 +32,7 @@ package FlipRequirements {
         attribute wheelRadiusM : Real = FlipCadRequirements::CadStudy::wheelBandRadiusMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute wheelWidthM : Real = FlipCadRequirements::CadStudy::wheelWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute wheelStations : FlipWheelStation[4] = ("FL", "RL", "FR", "RR");
-        // Ackermann is the current route-control approximation; it is not a
-        // claim that the public skid-steer hardware has Ackermann kinematics.
-        attribute missionSteeringMode : FlipSteeringMode = "ackermann";
+        attribute missionSteeringMode : FlipSteeringMode = "differential";
         attribute chassisWidthM : Real = FlipCadRequirements::CadStudy::bodyWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute chassisLengthM : Real = FlipCadRequirements::CadStudy::bodyLengthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute chassisHeightM : Real = .12;
@@ -121,7 +120,7 @@ package FlipRequirements {
         doc /* FGV-008 [geometry] each wheel shall use the single SysML-owned radius and width, and each active wheel station shall use the same station datums in simulation and presentation. */
     }
     requirement def FLIPV009_MissionSteeringMode {
-        doc /* FGV-009 [behavior] the authored Griffin surface route shall use the source-owned Twin steering approximation before issuing route torque. This simulation policy does not redefine FLIP's public skid-steer architecture; controller behavior remains a separate validation item. */
+        doc /* FGV-009 [behavior] the authored FLIP assembly shall use the source-owned differential steering geometry and fixed wheel axes before issuing route torque. Controller behavior remains a separate validation item. */
     }
     requirement def FLIPV010_PhysicalWheelSupportEnvelope {
         doc /* FGV-010 [simulation] physical wheel stations and the suspension extension shall be driven by the shared vehicle datums and pass the deployed ramp wheel-contact replay. */
@@ -153,4 +152,13 @@ package FlipRequirements {
             verify fvg010;
         }
     }
+    requirement def FLIPV011_OperatorRoute {
+        doc /* FGV-011 [operator study interface] Alt+left-click adds points to FLIP's linked operator route; the action control starts or stops it. FLIP shall visit all accepted points upright, and manual input shall take control. Operator route edits are runtime state and shall not be restored or saved by this Twin. */
+    }
+    requirement <'FGV-011'> fvg011 : FLIPV011_OperatorRoute { subject rover : FlipRover; }
+    verification def Verify_FLIPOperatorRoute {
+        subject rover : FlipRover;
+        objective { verify fvg011; }
+    }
+
 }

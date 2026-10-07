@@ -135,10 +135,22 @@ script = "scenarios/tests/griffin_engine_commands.rhai"
 verdict_channel = "GRIFFIN_ENGINE_COMMANDS"
 
 [[verification.cases]]
+name = "GriffinPropulsionRequirements::Verify_GriffinPilotAttitude"
+scene = "tests/griffin_pilot_attitude.usda"
+script = "scenarios/tests/griffin_pilot_attitude.rhai"
+verdict_channel = "GRIFFIN_PILOT_ATTITUDE"
+
+[[verification.cases]]
 name = "GriffinFunctionalRequirements::Verify_GriffinAdapterRelease"
 scene = "scenes/griffin_1_detach_stability_test.usda"
 script = "scenarios/tests/griffin_detach_stability.rhai"
 verdict_channel = "GRIFFIN_ADAPTER_RELEASE"
+
+[[verification.cases]]
+name = "FlipRequirements::Verify_FLIPOperatorRoute"
+scene = "tests/flip_route_follow.usda"
+script = "scenarios/tests/flip_route_follow.rhai"
+verdict_channel = "FLIP_ROUTE_FOLLOW"
 
 # Component ownership is explicit.  Each entry points to one normative SysML
 # source and one qualified verification case; the case supplies that
@@ -222,7 +234,7 @@ verification = "FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements"
 usd_path = "/World/FLIP"
 
 [settings]
-"usd.runtime_persistence" = true
+"usd.runtime_persistence" = false
 "numerics.comparison.length_abs_m" = 1.0e-6
 "numerics.comparison.scalar_abs" = 1.0e-9
 "numerics.comparison.angle_abs_rad" = 1.0e-9

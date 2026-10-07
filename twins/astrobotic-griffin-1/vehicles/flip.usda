@@ -8,8 +8,8 @@
 def Xform "FLIP" (
     documentation = "Astrolab FLIP four-wheel lunar rover study proxy with finite EPS and Modelica drivetrain."
     kind = "assembly"
-    prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "PhysxVehicleAckermannSteeringAPI", "LunCoCatalogAPI", "CollectionAPI:components"]
-    prepend references = [@lunco://components/avionics/obc.usda@</OBC>, @lunco://components/cameras/rover_front_camera.usda@</RoverFrontCamera>, @lunco://components/mobility/drive_laws/modelica_ackermann.usda@</DriveLaw>]
+    prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "PhysxVehicleTankDifferentialAPI", "LunCoCatalogAPI", "CollectionAPI:components"]
+    prepend references = [@lunco://components/avionics/obc.usda@</OBC>, @lunco://components/cameras/rover_front_camera.usda@</RoverFrontCamera>, @lunco://components/mobility/drive_laws/modelica_skid.usda@</DriveLaw>]
     prepend variantSets = "drivetrain"
     variants = { string "drivetrain" = "raycast" }
 )
@@ -26,12 +26,9 @@ def Xform "FLIP" (
     float3 physics:diagonalInertia = (240.0, 337.5, 145.5)
     float physxRigidBody:linearDamping = 0.5
     float physxRigidBody:angularDamping = 2.0
-    float physxVehicleAckermannSteering:maxSteerAngle = 0.44999998807907104
-    float physxVehicleAckermannSteering:strength = 0.0
-    uniform token lunco:steeringGeometry = "ackermann"
+    custom token lunco:steeringGeometry = "differential"
     float outputs:drive_left = 0.0
     float outputs:drive_right = 0.0
-    float outputs:steering = 0.0
     float outputs:brake = 0.0
     uniform token collection:components:expansionRule = "explicitOnly"
     rel collection:components:includes
@@ -68,7 +65,7 @@ def Xform "FLIP" (
     double inputs:target_mount_y.connect = </FLIP/SolarArray/Environment.outputs:sun_mount_y>
     custom double inputs:target_mount_z
     double inputs:target_mount_z.connect = </FLIP/SolarArray/Environment.outputs:sun_mount_z>
-    string lunco:ui:surfaceId = "vehicle-control-right"
+    string lunco:ui:surfaceId = "vessel-hud"
     string lunco:ui:visibilityMode = "possessed"
     variantSet "drivetrain" = {
         "raycast" {
@@ -177,8 +174,6 @@ def Xform "FLIP" (
             int physxVehicleWheelAttachment:index = 0
             float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_FL.outputs:torque>
-            float inputs:heading
-            float inputs:heading.connect = </FLIP.outputs:heading_fl>
             float lunco:suspension:restLength = 0.75
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
             uniform token purpose = "default"
@@ -211,8 +206,6 @@ def Xform "FLIP" (
             int physxVehicleWheelAttachment:index = 1
             float inputs:drive
             float inputs:drive.connect = </FLIP/Shaft_FR.outputs:torque>
-            float inputs:heading
-            float inputs:heading.connect = </FLIP.outputs:heading_fr>
             float lunco:suspension:restLength = 0.75
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
             uniform token purpose = "default"
