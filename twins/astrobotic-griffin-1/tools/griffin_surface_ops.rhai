@@ -766,11 +766,9 @@ fn surface_route() {
 fn engage_route_subject() {
     let rover = find_path("/Griffin1SurfaceOps/FLIP");
     if rover < 0 { return #{ ok: false, error: "FLIP entity is unavailable" }; }
-    // Use LunCoSim's current typed control contract.  The old
-    // `PossessVessel` name was never registered in the production command
-    // catalog, so the handoff looked like a rover-physics failure while the
-    // actual rejection happened before FLIP received route authority.
-    let result = cmd("AcquireControl", #{ target: rover, bind_camera: false });
+    // Deployment hands the operator's local input and camera to FLIP as well
+    // as claiming its control surface, so keyboard and HUD target one vessel.
+    let result = cmd("AcquireControl", #{ target: rover, bind_camera: true });
     if result == () || result.ok != true {
         return #{ ok: false, error: "FLIP rejected mission control" };
     }

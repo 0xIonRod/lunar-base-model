@@ -533,6 +533,9 @@ The controller's configured bindings command lander pitch, roll, yaw, thrust
 and release, or FLIP drive, skid-turn, brake and route action. The vehicle HUD
 shows the current input hints. Manual driving takes over from route guidance;
 the mission route remains a visible phase after adapter release.
+Deployment binds the local operator and camera to FLIP. Starting or stopping
+its operator route also retires automatic mission driving, so the mission
+cannot re-enable guidance after the HUD stop.
 
 The default scene includes the shared procedural starfield and physical Sun
 disk, driven by its existing celestial Sun. Native W/S, A/D and Space press and
@@ -546,6 +549,13 @@ python3 scripts/api/test_flip_manual_controls.py --api 4117 \
 Run the command from the LunCoSim checkout against your own ready session. Its
 assertions live in `scenarios/tests/flip_manual_controls.rhai`; the driver
 delivers native window events and releases every test key before returning.
+`scenarios/tests/griffin_operator_route_handoff.rhai` tests this handoff after a
+fresh scene reload while mission guidance is still active after detachment.
+Open the exact scene document and add a transient waypoint through the route
+editor. Attach the observer to `CameraTrack` with the waypoint's absolute
+`point_path` as a launch parameter, then request normal ramp unfolding and
+rover release after touchdown. It checks HUD start/stop, 120 ticks of disabled
+guidance, and native W press/release without another possession.
 
 The controls are a study interface, not a claim about the flight command
 dictionary. The generic simulator still owns possession, input routing,

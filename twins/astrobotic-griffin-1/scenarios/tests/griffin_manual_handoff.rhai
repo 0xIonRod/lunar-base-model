@@ -93,6 +93,19 @@ fn griffin_handoff_policy() {
     if before!=[1.0,1.0,0.25,-0.125,0.25] {throw("handoff preparation has not committed: "+before);}
     let state=#{route_engaged:true,route_interrupted:false,route_control_error:false,event_trace:[]};
     let checks=[];
+    let program=find_path("/Griffin1SurfaceOps/FlipRoute");
+    if program<0 {throw("handoff operator program unavailable");}
+    for event_name in ["route_started", "route_stopped"] {
+        let operator=#{route_engaged:true,route_interrupted:false,route_control_error:false,event_trace:[]};
+        operator.on_event(0,#{name:event_name,source:foreign,sim_tick:sim_tick(),value:true},#{});
+        checks.push(t_true(operator.route_engaged && !operator.route_interrupted,
+            "foreign program must not interrupt the mission on "+event_name));
+        operator.on_event(0,#{name:event_name,source:program,sim_tick:sim_tick(),value:true},#{});
+        checks.push(t_true(operator.route_interrupted && !operator.route_engaged,
+            "the exact operator program cancels the mission on "+event_name));
+        checks.push(t_true(griffin_handoff_values()==before,
+            "mission retirement preserves the operator program inputs on "+event_name));
+    }
     for item in [#{source:foreign,target:rover,edge:"pressed",label:"foreign source"},
         #{source:rover,target:foreign,edge:"pressed",label:"wrong target"},
         #{source:rover,target:rover,edge:"released",label:"release edge"}] {

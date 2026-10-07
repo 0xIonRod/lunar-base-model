@@ -78,6 +78,10 @@ fn on_start(me, ctx) {
         subscribe_from("lander_touchdown", lander_gid);
     }
     if rover_gid >= 0 {subscribe_from("intent.edge", rover_gid);}
+    let route_host = find_path("/Griffin1SurfaceOps/FlipRoute");
+    if route_host < 0 { throw("FLIP operator route host is unavailable"); }
+    subscribe_from("route_started", route_host);
+    subscribe_from("route_stopped", route_host);
     subscribe("griffin_ramp_unfold_requested");
     subscribe("griffin_rover_release_requested");
     for event_name in griffin_surface_ramp_ops::unfold_event_contract().ordered {
@@ -139,6 +143,17 @@ fn on_event(me, evt, ctx) {
     this.event_trace = griffin_surface_mission_report::trace_event(this, evt);
     let lander = find_path(LANDER);
     let rover = find_path(ROVER);
+
+    if this.route_engaged && (evt.name == "route_started" || evt.name == "route_stopped")
+        && evt.source == find_path("/Griffin1SurfaceOps/FlipRoute") {
+        // The operator program already owns its start/stop writes. Retire the
+        // mission branch without clearing the new program's guidance inputs.
+        this.route_interrupted = true;
+        this.route_engaged = false;
+        emit("griffin_surface_route_interrupted", #{rover: rover, program_event: evt.name});
+        print("[griffin] surface route yielded to operator program=" + evt.name);
+        return;
+    }
 
     if evt.name=="intent.edge" && evt.source==rover && this.route_engaged {
         let value=evt.value;
