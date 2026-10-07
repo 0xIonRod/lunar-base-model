@@ -465,6 +465,8 @@ The current stable boundary demonstrates:
    a rear-deck solar-panel proxy, motor/gearbox, finite-EPS, and motor-thermal
    Modelica contracts. Geometry, mass, and mobility values remain study
    assumptions until the FLIP ICD is available.
+   FLIP uses zero global linear damping in lunar vacuum; its tires own ground
+   resistance.
 7. The surface environment uses a typed `LunCoTerrainAPI`/DEM layer wired to
    the processed LROC NOBILE03 crop; the old flat `Ground` fixture is inactive.
 8. The Rhai task tree expresses descent event waits, the selected direct-deck or

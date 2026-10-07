@@ -608,8 +608,8 @@ package GriffinPropulsionRequirements {
         subject control : GriffinEngineControlStudy;
     }
 
-    requirement def GPP011_PilotAttitudeRecovery {
-        doc /* GPP-011 [runtime integration study] after qualified touchdown,
+    requirement def GPP013_PilotAttitudeRecovery {
+        doc /* GPP-013 [runtime integration study] after qualified touchdown,
          * hold semantic thrust, lift by minimumSustainedLiftM, and apply one
          * forward pitch intent for pilotPitchTapDurationS. During the subsequent
          * pilotAttitudeRecoveryDurationS under held thrust, upright Y shall
@@ -618,12 +618,12 @@ package GriffinPropulsionRequirements {
          * locked in their authored transport pose. These are simulator study
          * thresholds, not flight GNC qualification. */
     }
-    requirement <'GPP-011'> gpp011 : GPP011_PilotAttitudeRecovery {
+    requirement <'GPP-013'> gpp013 : GPP013_PilotAttitudeRecovery {
         subject control : GriffinEngineControlStudy;
     }
     verification def Verify_GriffinPilotAttitude {
         subject control : GriffinEngineControlStudy;
-        objective { verify gpp011; }
+        objective { verify gpp013; }
     }
 
 }

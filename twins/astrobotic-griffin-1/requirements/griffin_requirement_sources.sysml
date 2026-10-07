@@ -1294,6 +1294,11 @@ package GriffinRequirementSources {
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_engine_commands.rhai";
     }
 
+    part source_griffin_pilot_attitude : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_pilot_attitude.rhai";
+    }
+
     part source_griffin_rcs_commands : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_rcs_commands.rhai";
@@ -1342,6 +1347,11 @@ package GriffinRequirementSources {
     part evidence_gpp_012 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp012;
         ref sources = (source_griffin_rcs_commands, source_agile_a110, source_griffin_propulsion_study);
+    }
+
+    part evidence_gpp_013 : RequirementEvidence {
+        ref targetRequirement = GriffinPropulsionRequirements::gpp013;
+        ref sources = (source_griffin_pilot_attitude, source_griffin_propulsion_study);
     }
 
 }

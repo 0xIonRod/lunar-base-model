@@ -24,7 +24,7 @@ def Xform "FLIP" (
     float physics:mass = 450.0
     float3 physics:centerOfMass = (0.0, -0.05000000074505806, 0.0)
     float3 physics:diagonalInertia = (240.0, 337.5, 145.5)
-    float physxRigidBody:linearDamping = 0.5
+    float physxRigidBody:linearDamping = 0.0
     float physxRigidBody:angularDamping = 2.0
     custom token lunco:steeringGeometry = "differential"
     float outputs:drive_left = 0.0
