@@ -1970,10 +1970,8 @@ fn physical_top_deck_collider_observation(doc, root) {
       stage_generation: stage_generation}
 }
 
-// The simulation lander's legacy leg roots own dynamics and joints; their
-// obsolete visible cylinders/capsules are replaced by the requirement-owned
-// LandingLeg visual component plus one hidden cylinder contact proxy. Both
-// shapes use the same SysML foot-pad dimensions and leg-local datum.
+// Each leg body owns its suspension and source-derived pad contact proxy.
+// The visible pad and proxy share the SysML dimensions and leg-local datum.
 fn physical_landing_leg_pad_geometry() {
     let visual = "GriffinLandingLegRequirements::GriffinLandingLegAssembly::";
     let configuration = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
@@ -2067,8 +2065,7 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         }
         // This relation targeted the enclosing compound body, so it filtered
         // no distinct rigid body. Clear its target list through the typed USD
-        // relationship operation and remove its empty applied schema; the root
-        // owns all four leg colliders.
+        // relationship operation and remove its empty applied schema.
         ops.push(#{SetRelationship: #{edit_target: edit_target,
             path: leg_path, name: "physics:filteredPairs", targets: []}});
         ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: leg_path,
@@ -2147,8 +2144,6 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         let source_height = source_shape.attrs["height"];
         let source_axis = source_shape.attrs["axis"];
         let source_translation = source_shape.attrs["xformOp:translate"];
-        let source_rotation = source_shape.attrs["xformOp:rotateXYZ"];
-        let source_scale = source_shape.attrs["xformOp:scale"];
         if source_radius == () || source_height == () || source_axis != "Y"
             || source_translation == () || source_translation.len() != 3
             || source_shape.attrs["physics:collisionEnabled"] != false {
@@ -2161,76 +2156,11 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
             || source_translation[2].abs() > geometry.tolerance_m {
             return plan_error(source_path + ": composed visual pad no longer matches its SysML geometry datums");
         }
-        if source_rotation == () { source_rotation = [0.0, 0.0, 0.0]; }
-        if source_scale == () { source_scale = [1.0, 1.0, 1.0]; }
-
-        // The proxy is a sibling of the visual pad under the same referenced
-        // component frame. Its primitive, dimensions, and local transform are
-        // copied from composed geometry; a typed relationship preserves the
-        // source edge without encoding a prim path in a string attribute.
-        let collider_path = visual_path + "/FootPadCollider";
-        let collider = assembly_builder::composed_query(doc,
-            #{path: collider_path, children: false,
-              attrs: ["lunco:collider:geometrySource", "lunco:requirement"]});
-        if query_ok(collider) && collider.type_name != "Cylinder" {
-            return plan_error(collider_path + ": contact proxy must remain a UsdGeomCylinder");
-        }
-        let legacy_collider_path = leg_path + "/FootPadCollider";
-        if query_ok(assembly_builder::composed_query(doc,
-            #{path: legacy_collider_path, children: false})) {
-            ops.push(#{RemovePrim: #{edit_target: edit_target,
-                path: legacy_collider_path}});
-            removed_legacy.push(legacy_collider_path);
-        }
-        if !query_ok(collider) {
-            let shape = assembly_builder::cylinder_shape_plan_axis(edit_target,
-                visual_path, "FootPadCollider", source_radius, source_height,
-                source_translation, source_rotation, source_scale, source_axis, true);
-            if !shape.ok { return shape; }
-            for op in shape.ops { ops.push(op); }
-        } else {
-            for item in [
-                #{name: "radius", type_name: "double", value: source_radius.to_string()},
-                #{name: "height", type_name: "double", value: source_height.to_string()},
-                #{name: "axis", type_name: "token", value: "\"" + source_axis + "\""},
-                #{name: "extent", type_name: "float3[]", value: "[(-" + source_radius.to_string() + ", -" + (source_height / 2.0).to_string() + ", -" + source_radius.to_string() + "), (" + source_radius.to_string() + ", " + (source_height / 2.0).to_string() + ", " + source_radius.to_string() + ")]"},
-                #{name: "physics:collisionEnabled", type_name: "bool", value: "true"},
-                #{name: "purpose", type_name: "token", value: "\"proxy\""},
-                #{name: "visibility", type_name: "token", value: "\"invisible\""}
-            ] {
-                ops.push(#{SetAttribute: #{edit_target: edit_target, path: collider_path,
-                    name: item.name, type_name: item.type_name, value: item.value}});
-            }
-            ops.push(#{SetApiSchemas: #{edit_target: edit_target,
-                path: collider_path, schemas: ["PhysicsCollisionAPI"]}});
-            let collider_placement = assembly_builder::place_plan(edit_target,
-                collider_path, source_translation, source_rotation, source_scale);
-            if !collider_placement.ok { return collider_placement; }
-            for op in collider_placement.ops { ops.push(op); }
-            if collider.attrs["lunco:collider:geometrySource"] != () {
-                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
-                    path: collider_path, name: "lunco:collider:geometrySource"}});
-            }
-            if collider.attrs["lunco:requirement"] != () {
-                ops.push(#{RemoveAttribute: #{edit_target: edit_target,
-                    path: collider_path, name: "lunco:requirement"}});
-            }
-        }
-        for attribute in [
-            #{name: "purpose", type_name: "token", value: "\"proxy\""},
-            #{name: "visibility", type_name: "token", value: "\"invisible\""}
-        ] {
-            ops.push(#{SetAttribute: #{edit_target: edit_target,
-                path: collider_path, name: attribute.name,
-                type_name: attribute.type_name, value: attribute.value}});
-        }
-        ops.push(#{SetRelationship: #{edit_target: edit_target,
-            path: collider_path, name: "lunco:collider:geometrySource",
-            targets: [source_path]}});
+        let proxy=assembly_builder::collision_proxy_plan(doc,edit_target,
+            source_path,visual_path+"/FootPadCollider");
+        if !proxy.ok {return proxy;}
+        for op in proxy.ops {ops.push(op);}
     }
-    let linkage=axial_landing_gear_plan(doc,edit_target,root);
-    if !linkage.ok {return linkage;}
-    for op in linkage.ops {ops.push(op);}
     #{ok: true, kind: "griffin_physical_landing_leg_pads", root: root,
       radius_m: geometry.radius_m, height_m: geometry.height_m,
       center_y_m: geometry.center_y_m, tolerance_m: geometry.tolerance_m,
@@ -2766,18 +2696,41 @@ fn physical_landing_leg_pad_observation(doc, root) {
       tolerance_m: geometry.tolerance_m, details: details}
 }
 
+/// Structural proxies follow their moving leg or fixed bus mounting frame.
+fn physical_landing_leg_structure_plan(doc,edit_target,root) {
+    let ops=[];let paths=[];
+    for suffix in ["PX","NX","PZ","NZ"] {
+        let leg=root+"/Leg"+suffix;
+        let mount=leg+"_BusMount";
+        let sources=[leg+"/LandingLegVisual/StrutOuter",leg+"/LandingLegVisual/StrutInner",
+            leg+"/LandingLegVisual/FootPadPlate",leg+"/ShockPiston/Tube",
+            mount+"/BodyMountArm",mount+"/MountAxle",mount+"/MountClevisOuter",
+            mount+"/MountClevisInner",mount+"/ShockBarrel/Tube"];
+        for source in sources {
+            let plan=assembly_builder::collision_proxy_plan(doc,edit_target,source,source+"Collider");
+            if !plan.ok {return plan;}
+            for op in plan.ops {ops.push(op);}
+            paths.push(plan.path);
+        }
+    }
+    #{ok:true,ops:ops,collider_paths:paths}
+}
+
 /// Compose the source-derived deck and leg contact plans into one Editor edit.
 fn physical_collision_plan(doc, edit_target, root) {
     let deck = physical_top_deck_collider_plan(doc, edit_target, root);
     if deck.ok != true { return deck; }
     let legs = physical_landing_leg_pad_plan(doc, edit_target, root);
     if legs.ok != true { return legs; }
+    let structure=physical_landing_leg_structure_plan(doc,edit_target,root);
+    if !structure.ok {return structure;}
     let ops = [];
     for op in deck.ops { ops.push(op); }
     for op in legs.ops { ops.push(op); }
+    for op in structure.ops {ops.push(op);}
     #{ok: true, kind: "griffin_physical_collision_geometry", root: root,
       deck_op_count: deck.ops.len(), leg_op_count: legs.ops.len(),
-      deck_collider_count: 9, collider_count: 13, ops: ops}
+      deck_collider_count: 9, collider_count: 13+structure.collider_paths.len(), ops: ops}
 }
 
 fn apply_physical_colliders(doc, edit_target, root, parent_gen) {

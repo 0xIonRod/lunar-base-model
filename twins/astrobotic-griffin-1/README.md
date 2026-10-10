@@ -628,3 +628,20 @@ Neither the revised observer's full horizon nor deployed-ramp stability/egress
 is accepted. Next investigation must inspect the measured unfolding sweep and
 collision pairs; disabling collision or weakening settlement limits would not
 resolve the mechanism fault.
+
+Landing gear collision geometry is derived from its composed Cube/Cylinder
+members by `griffin_visual_builder::physical_collision_plan`. Moving braces,
+piston, pad, and plate belong to the leg rigid body; mounting hardware and the
+shock barrel belong to the lander body. Compose suspension/visual geometry
+changes before deriving collision proxies from that revision. The footpads
+retain nonlinear CCD against the sampled terrain collision mesh.
+
+Engine-off impact acceptance uses `tests/griffin_engine_off_impact.usda` and
+`GRIFFIN_ENGINE_OFF_IMPACT`; it observes the complete startup drop, footpad
+terrain clearance, engine extinction, and suspension hard-stop travel.
+
+`tests/griffin_rover_leg_collision.usda` drives the real FLIP into the PX gear
+using its authored rolling axis and normal avatar controls. The
+`GRIFFIN_ROVER_LEG_COLLISION` verdict checks every structural proxy against its
+composed source and requires powered motion, contact, and blocked passage.
+FLIP enables CCD so thin landing-gear members remain swept at driving speed.

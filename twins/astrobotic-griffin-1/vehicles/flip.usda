@@ -67,6 +67,7 @@ def Xform "FLIP" (
     double inputs:target_mount_z.connect = </FLIP/SolarArray/Environment.outputs:sun_mount_z>
     string lunco:ui:surfaceId = "vessel-hud"
     string lunco:ui:visibilityMode = "possessed"
+    bool physxRigidBody:enableCCD = true
     variantSet "drivetrain" = {
         "raycast" {
         }

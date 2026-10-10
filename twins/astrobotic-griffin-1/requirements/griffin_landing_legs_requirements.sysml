@@ -138,7 +138,7 @@ package GriffinLandingLegRequirements {
         doc /* GLL-001 [topology] every instance in the typed landing-leg identity collection is present and visible. */
     }
     requirement def GLL002_LegStructure {
-        doc /* GLL-002 [visual] every landing leg exposes a bus-mount arm, two diagonal skirt braces and one primary shock member, a mount clevis pair, an axle, and a load-spreading foot pad/plate. These render-only members make the load path inspectable without claiming flight-collider ownership. */
+        doc /* GLL-002 [visual] every landing leg exposes a bus-mount arm, two diagonal skirt braces and one primary shock member, a mount clevis pair, an axle, and a load-spreading foot pad/plate. The visible members provide geometry sources for hidden physical proxies; the moving foot, braces, and piston belong to the leg body, while the mounting hardware and barrel belong to the bus. */
     }
     requirement def GLL003_LegFrame {
         doc /* GLL-003 [layout] the four leg stations and pad envelopes extend beyond the source-owned octagonal body. The resulting footprint is derived from the typed stations and pad geometry; its evidence and configuration limits are recorded in griffin-size-evidence.md. */
@@ -206,7 +206,7 @@ package GriffinLandingLegRequirements {
         require GLLC008_PadColliderStationMatchesSource {
             in toleranceM = GriffinLandingLegAssembly::physicalLegPlacementToleranceM;
         }
-        doc /* GLL-008 [contact geometry] each dynamics leg root shall match the ordered COM-frame legStations and legStationRotationYDeg in GriffinVisualConfiguration. Its hidden Y-axis cylinder contact proxy shall be generated from the composed visible FootPad cylinder and link to it through a typed USD relationship. The effective Avian-cooked contact cylinder shall match the composed visible FootPad cylinder in radius, height, Y-axis orientation, and center within the authored tolerance after both geometries are compared in the canonical-stage metre frame. The visible component remains the geometry source; only the proxy owns contact, and legacy strut/capsule proxies shall not also collide. The visible load-spreading plate shall use the typed footPadPlateWidthM, footPadPlateHeightM, footPadPlateDepthM, and footPadPlateCenterYM datums.  The physical leg body shall use the source continuousCollisionDetection policy so thin pad contact is swept through time, rather than accepted from endpoint overlap alone. A runtime landing/impact test must separately establish terrain clearance; source geometry agreement is not that verdict. */
+        doc /* GLL-008 [contact geometry] each dynamics leg root shall match the ordered COM-frame legStations and legStationRotationYDeg in GriffinVisualConfiguration. Its hidden Y-axis cylinder contact proxy shall be generated from the composed visible FootPad cylinder and link to it through a typed USD relationship. The effective Avian-cooked contact cylinder shall match the composed visible FootPad cylinder in radius, height, Y-axis orientation, and center within the authored tolerance after both geometries are compared in the canonical-stage metre frame. The visible component remains the geometry source; only the proxies own contact. The braces, plate, moving piston, bus mount arm, axle, clevises, and fixed barrel shall have source-derived colliders so a detached rover cannot pass through landing gear. Obsolete coarse strut/capsule shapes remain disabled. The visible load-spreading plate shall use the typed footPadPlateWidthM, footPadPlateHeightM, footPadPlateDepthM, and footPadPlateCenterYM datums.  The physical leg body shall use the source continuousCollisionDetection policy so thin pad contact is swept through time, rather than accepted from endpoint overlap alone. A runtime landing/impact test must separately establish terrain clearance; source geometry agreement is not that verdict. */
     }
     constraint def GLLC009_BusAndAxleOverlap {
         in measuredBusOverlapM : Real;
@@ -288,5 +288,14 @@ package GriffinLandingLegRequirements {
             verify gll009;
             verify gll010;
         }
+    }
+    verification def Verify_GriffinEngineOffImpact {
+        subject legs : GriffinLandingLegAssembly;
+        objective { verify gll008; verify gll010; }
+    }
+
+    verification def Verify_GriffinRoverLegCollision {
+        subject legs : GriffinLandingLegAssembly;
+        objective { verify gll002; verify gll008; }
     }
 }
