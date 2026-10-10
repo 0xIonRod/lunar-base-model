@@ -279,9 +279,15 @@ fn landing_setup_preflight() {
 fn begin_descent(state) {
     let lander = find_path(LANDER);
     let status = griffin_surface_ops::landed_status();
-    // Recompilation must not re-arm guidance or move the operator's camera
-    // when this vehicle is already landed or under local manual control.
-    if (status.ok == true && status.landed) || owner_of(lander) == 0 {
+    if status.ok != true {
+        notify_kind("Landing state is unavailable; powered descent is inhibited.", "error");
+        emit("griffin_surface_ops_guidance_arm_failed");
+        return false;
+    }
+    // A landed mission stays disarmed. During flight, arming belongs to the
+    // validated mission; the airframe's piloted mux decides which commands
+    // reach propulsion, including when possession precedes this preflight.
+    if status.landed {
         griffin_controls::show_briefing();
         return true;
     }
@@ -302,7 +308,7 @@ fn begin_descent(state) {
         emit("griffin_surface_ops_guidance_arm_failed");
         return false;
     }
-    griffin_surface_ops::follow_lander();
+    if owner_of(lander) == () { griffin_surface_ops::follow_lander(); }
     griffin_controls::show_briefing();
     emit("griffin_powered_descent_started");
     notify_kind("Griffin-1 powered descent started.", "info");

@@ -517,6 +517,15 @@ the missing Rust capabilities.
 
 ## Interactive control contract
 
+Powered descent arms only after landing-state and assembly-mass preflight.
+Initial pilot possession does not suppress arming: the Modelica `piloted`
+mux keeps the pilot's throttle in authority until control is released.
+RECONNECT GNC then returns command authority to the armed guidance without
+overwriting pilot inputs. Startup arming preserves a possessed lander's camera;
+an already landed mission remains disarmed. The production
+`tests/griffin_gnc_toggle.usda` gate covers initial possession, zero-throttle
+authority, airborne ignition after reconnect, and subsequent HUD handoffs.
+
 The mission starts with an explicit persistent control brief. Click the
 vehicle in the viewport to possess it; the Command Deck and vehicle HUD remain
 the authority/status surface. The Twin-local `griffin_controls` library also
