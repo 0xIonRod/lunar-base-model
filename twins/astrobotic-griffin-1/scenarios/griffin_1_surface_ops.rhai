@@ -44,11 +44,6 @@ fn simulation_dependencies(me, ctx) {
         entity_reads.push(joint);
         entity_writes.push(joint);
     }
-    for binding in griffin_spec::ramp_flight_latch_bindings() {
-        let latch=find_path(LANDER+"/"+binding.latch);
-        entity_reads.push(latch);
-        entity_writes.push(latch);
-    }
     #{
         modelica_entities: modelica_entities,
         entity_reads: entity_reads,
@@ -57,11 +52,17 @@ fn simulation_dependencies(me, ctx) {
             "QueryUsdPrim", "QueryUsdPrims", "QueryPhysicsState", "PhysicsPerformance",
             "ReadPorts", "ReadPortsBatch", "ReadModelicaStepSamples",
             "ListOpenDocuments", "Raycast", "TerrainHeight"],
-        required_inputs: []
+        required_inputs: [#{owner: "sysml.twin-analysis", identity: twin_name()}]
     }
 }
 
 fn on_start(me, ctx) {
+    // Sourced identities are available after the required analysis is ready.
+    for binding in griffin_spec::ramp_flight_latch_bindings() {
+        let latch = find_path(LANDER + "/" + binding.latch);
+        track_entity_read(latch);
+        track_entity_write(latch);
+    }
     // This mission only reacts to these discrete control/phase edges. Opt into
     // the event filter so unrelated wheel/terrain collision chatter does not
     // enter the Rhai VM; the shared task/mission identity buffer remains

@@ -6189,7 +6189,7 @@ fn griffin_avionics_component_plan(doc,edit_target,root) {
 }
 
 fn griffin_payload_frame_component_plan(doc, edit_target, root) {
-    let model = sysml_model("twin://astrobotic-griffin-1");
+    let model = sysml_requirements::model();
     if !sysml_model_is(model) { return plan_error("Griffin model unavailable"); }
     _griffin_payload_frame_component_plan(doc, edit_target, root, model)
 }

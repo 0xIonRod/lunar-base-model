@@ -299,7 +299,7 @@ fn bus_checks(doc, source, bus_root) {
     }
 
     let root = bus_root;
-    let model = sysml_model("twin://astrobotic-griffin-1");
+    let model = sysml_requirements::model();
     // Measure the complete support chain in one composed frame. Separate
     // correct-looking parts must not pass while their mating faces float.
     let owners=["TopDeckOctagon","RoverPayloadDeck","UpperCentralBucket",

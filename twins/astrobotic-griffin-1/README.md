@@ -273,6 +273,20 @@ an unknown, duplicate, unindexed, or mismatched mapping before starting the
 simulation. Keep the requirements and verification declarations in SysML;
 the registry contains no thresholds or copied requirement values.
 
+Propulsion runtime entries include `GriffinFunctionalRequirements::Verify_GriffinGncHandoff`,
+`GriffinPropulsionRequirements::Verify_GriffinEngineOut`,
+`GriffinPropulsionRequirements::Verify_GriffinFuelExhaustion`,
+`GriffinPropulsionRequirements::Verify_GriffinOxidizerExhaustion`, and
+`GriffinPropulsionRequirements::Verify_GriffinRcsRuntime`. Each selects its
+production fixture and observer. The GNC case covers the startup/handoff slice;
+the system mission case still owns full surface-sequence acceptance.
+
+Mission and source-backed observers declare the active mount's
+`sysml.twin-analysis` readiness input through `twin_name()`. Dependency planning
+only discovers identities; source-selected latch and isolation access is
+registered at `on_start` after analysis is ready. Tools use the active Twin's
+revision-pinned SysML model, including after reopening the same Twin.
+
 The same tool runs against the open headful Editor document through
 `griffin_requirements::lint_live(doc_id, "/Griffin1")` for the aggregate gate or
 `griffin_requirements::part_report_live(doc_id, "/Griffin1")` to inspect each

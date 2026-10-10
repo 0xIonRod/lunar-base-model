@@ -626,4 +626,20 @@ package GriffinPropulsionRequirements {
         objective { verify gpp013; }
     }
 
+    verification def Verify_GriffinEngineOut {
+        subject propulsion : GriffinMainPropulsionAssembly;
+        objective { verify gpp003; }
+    }
+    verification def Verify_GriffinFuelExhaustion {
+        subject propulsion : GriffinMainPropulsionAssembly;
+        subject rcs : GriffinAttitudeEngineAssembly;
+        objective { verify gpp003; verify gpp011; }
+    }
+
+    verification def Verify_GriffinOxidizerExhaustion {
+        subject propulsion : GriffinMainPropulsionAssembly;
+        subject rcs : GriffinAttitudeEngineAssembly;
+        objective { verify gpp003; verify gpp011; }
+    }
+
 }

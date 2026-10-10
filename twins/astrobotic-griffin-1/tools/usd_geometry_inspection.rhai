@@ -2,7 +2,7 @@
 // Scene identity comes from a composed prim, never Editor tab focus.
 fn dependencies() {
     #{modelica_entities: [], entity_reads: [], entity_writes: [],
-      query_reads: ["AnalyzeSysml", "QueryUsdPrim", "QueryUsdPrims", "ReadActiveTwinContract"], required_inputs: []}
+      query_reads: ["AnalyzeSysml", "QueryUsdPrim", "QueryUsdPrims", "ReadActiveTwinContract"], required_inputs: [#{owner: "sysml.twin-analysis", identity: twin_name()}]}
 }
 
 fn document_owner(path) {

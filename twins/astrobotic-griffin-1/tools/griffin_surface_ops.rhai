@@ -523,7 +523,7 @@ fn landing_stability_dependencies() {
     #{modelica_entities: [lander, gnc, propulsion, altimeter],
       entity_reads: [lander, gnc, propulsion, altimeter], entity_writes: [],
       query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
-        "QueryUsdPrim", "QueryPhysicsState"], required_inputs: []}
+        "QueryUsdPrim", "QueryPhysicsState"], required_inputs: [#{owner: "sysml.twin-analysis", identity: twin_name()}]}
 }
 
 

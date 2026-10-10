@@ -109,4 +109,13 @@ package GriffinFunctionalRequirements {
         }
     }
 
+    verification def Verify_GriffinGncHandoff {
+        doc /* Startup and operator-guidance handoff slice of GR-004. The
+         * production observer checks arming under initial pilot possession,
+         * manual authority, reconnect ignition, and invalid HUD rejection.
+         * Full surface sequence acceptance remains in the system mission case. */
+        subject lander : Griffin1Lander;
+        objective { verify gr004; }
+    }
+
 }

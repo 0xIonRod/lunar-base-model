@@ -152,6 +152,36 @@ scene = "tests/flip_route_follow.usda"
 script = "scenarios/tests/flip_route_follow.rhai"
 verdict_channel = "FLIP_ROUTE_FOLLOW"
 
+[[verification.cases]]
+name = "GriffinFunctionalRequirements::Verify_GriffinGncHandoff"
+scene = "tests/griffin_gnc_toggle.usda"
+script = "scenarios/tests/griffin_gnc_toggle.rhai"
+verdict_channel = "GRIFFIN_GNC_TOGGLE"
+
+[[verification.cases]]
+name = "GriffinPropulsionRequirements::Verify_GriffinEngineOut"
+scene = "tests/griffin_engine_out.usda"
+script = "scenarios/tests/griffin_engine_out.rhai"
+verdict_channel = "GRIFFIN_ENGINE_OUT"
+
+[[verification.cases]]
+name = "GriffinPropulsionRequirements::Verify_GriffinFuelExhaustion"
+scene = "tests/griffin_fuel_exhaustion.usda"
+script = "scenarios/tests/griffin_fuel_exhaustion.rhai"
+verdict_channel = "GRIFFIN_FUEL_EXHAUSTION"
+
+[[verification.cases]]
+name = "GriffinPropulsionRequirements::Verify_GriffinRcsRuntime"
+scene = "tests/griffin_rcs_commands.usda"
+script = "scenarios/tests/griffin_rcs_commands.rhai"
+verdict_channel = "GRIFFIN_RCS_COMMANDS"
+
+[[verification.cases]]
+name = "GriffinPropulsionRequirements::Verify_GriffinOxidizerExhaustion"
+scene = "tests/griffin_oxidizer_exhaustion.usda"
+script = "scenarios/tests/griffin_fuel_exhaustion.rhai"
+verdict_channel = "GRIFFIN_FUEL_EXHAUSTION"
+
 # Component ownership is explicit.  Each entry points to one normative SysML
 # source and one qualified verification case; the case supplies that
 # component's Twin-local USD fixture and Rhai observer above.

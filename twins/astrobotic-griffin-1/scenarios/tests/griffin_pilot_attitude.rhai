@@ -6,38 +6,15 @@ fn simulation_dependencies(me, ctx) {
     deps.entity_reads.push(find_path("/Griffin1SurfaceOps/Lander/AttitudePropulsion"));
     deps.entity_reads.push(find_path("/Griffin1SurfaceOps/FLIP"));
     for path in _force_actuator_paths() {deps.entity_reads.push(find_path(path));}
-    for name in griffin_spec::ramp_root_joint_names() + griffin_spec::ramp_intermediate_joint_names() {
-        deps.entity_reads.push(find_path("/Griffin1SurfaceOps/Lander/" + name));
-    }
     deps.query_reads.push("ReadPortsBatch");
     deps.query_reads.push("QueryUsdPrims");
     deps.query_reads.push("QueryEntity");
     deps.entity_writes = [find_path("/Griffin1SurfaceOps/Lander"),
         find_path("/Griffin1SurfaceOps/Lander/GNC")];
-    if ctx["isolate_leg_joints"] == true {
-        for path in _leg_joint_paths() {
-            deps.entity_reads.push(find_path(path));
-            deps.entity_writes.push(find_path(path));
-        }
-        for name in griffin_spec::landing_leg_names() {
-            let body=find_path("/Griffin1SurfaceOps/Lander/"+name);
-            deps.entity_reads.push(body);deps.entity_writes.push(body);
-        }
-    }
     if ctx["isolate_payload_adapter"] == true {
         deps.entity_reads.push(find_path("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint"));
         deps.entity_writes.push(find_path("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint"));
         deps.entity_writes.push(find_path("/Griffin1SurfaceOps/FLIP"));
-    }
-    if ctx["isolate_hull"] == true {
-        for path in _hull_cut_paths() {
-            deps.entity_reads.push(find_path(path));
-            deps.entity_writes.push(find_path(path));
-        }
-        for path in _hull_source_body_paths() {
-            deps.entity_reads.push(find_path(path));
-            deps.entity_writes.push(find_path(path));
-        }
     }
     deps
 }
@@ -457,6 +434,30 @@ fn on_start(me, ctx) {
     if (isolate==true && adapter==true) || (hull==true && (isolate==true || adapter==true)) {
         throw("pilot isolation trial selects one attachment group");
     }
+    for name in griffin_spec::ramp_root_joint_names() + griffin_spec::ramp_intermediate_joint_names() {
+        track_entity_read(find_path("/Griffin1SurfaceOps/Lander/" + name));
+    }
+    if ctx["isolate_leg_joints"] == true {
+        for path in _leg_joint_paths() {
+            track_entity_read(find_path(path));
+            track_entity_write(find_path(path));
+        }
+        for name in griffin_spec::landing_leg_names() {
+            let body=find_path("/Griffin1SurfaceOps/Lander/"+name);
+            track_entity_read(body);track_entity_write(body);
+        }
+    }
+    if ctx["isolate_hull"] == true {
+        for path in _hull_cut_paths() {
+            track_entity_read(find_path(path));
+            track_entity_write(find_path(path));
+        }
+        for path in _hull_source_body_paths() {
+            track_entity_read(find_path(path));
+            track_entity_write(find_path(path));
+        }
+    }
+
     this.isolate_leg_joints=isolate==true;
     this.isolate_payload_adapter=adapter==true;
     this.isolate_hull=hull==true;

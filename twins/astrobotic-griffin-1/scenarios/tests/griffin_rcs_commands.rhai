@@ -4,7 +4,7 @@
 fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path("/World/Griffin1"),
         find_path("/World/Griffin1/AttitudeActuation"),find_path("/World/Griffin1/AttitudePropulsion")],
-      entity_reads:[],entity_writes:[],query_reads:["QueryUsdPrim","AnalyzeSysml"],required_inputs:[]}
+      entity_reads:[],entity_writes:[],query_reads:["QueryUsdPrim","AnalyzeSysml"],required_inputs:[#{owner: "sysml.twin-analysis", identity: twin_name()}]}
 }
 fn command_axis(target,row) {
     let values=[0.0,0.0,0.0];values[row.axis]=row.sign;

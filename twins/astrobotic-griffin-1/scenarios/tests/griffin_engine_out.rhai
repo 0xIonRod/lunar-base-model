@@ -15,7 +15,7 @@ const EXTINGUISHED_PLUME_FRACTION = 1.0e-9;
 
 fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path("/World/Griffin1"),find_path("/World/Griffin1/MainPropulsion")],
-      entity_reads:[],entity_writes:[],query_reads:[],required_inputs:[]}
+      entity_reads:[],entity_writes:[],query_reads:[],required_inputs:[#{owner: "sysml.twin-analysis", identity: twin_name()}]}
 }
 
 fn _threshold() {
