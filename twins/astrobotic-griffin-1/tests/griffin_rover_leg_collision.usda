@@ -8,8 +8,10 @@
 def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda@</Griffin1SurfaceOps>
     documentation = "Production FLIP drives into a landed Griffin leg; structural proxies block the rover."
+    prepend apiSchemas = "LunCoEpochAPI"
 )
 {
+    double lunco:time:epochJd = 2461395.5
     def "Scenario" (
         active = false
     )

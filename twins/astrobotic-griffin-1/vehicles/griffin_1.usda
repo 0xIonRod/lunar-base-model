@@ -2748,7 +2748,7 @@ def Xform "Griffin1" (
     }
     def Xform "LegPX" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
-        prepend apiSchemas = "PhysicsRigidBodyAPI"
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI"]
     )
     {
         custom double3 xformOp:translate = (1.9, 0.9, 1.9)
@@ -2797,11 +2797,11 @@ def Xform "Griffin1" (
         )
         {
             def Cylinder "FootPadCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, -1.32, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                uniform token[] xformOpOrder = ["xformOp:translate"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 double radius = 0.35
@@ -2811,7 +2811,7 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPX/LandingLegVisual/FootPad>
+                custom rel lunco:derived:source = </Griffin1/LegPX/LandingLegVisual/FootPad>
             }
             def "BodyMountArm"
             {
@@ -2834,7 +2834,7 @@ def Xform "Griffin1" (
                 token visibility = "invisible"
             }
             def Cylinder "StrutOuterCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (-0.551543289325507, -0.58, 0.311126983722081)
@@ -2847,10 +2847,10 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPX/LandingLegVisual/StrutOuter>
+                custom rel lunco:derived:source = </Griffin1/LegPX/LandingLegVisual/StrutOuter>
             }
             def Cylinder "StrutInnerCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (-0.551543289325507, -0.58, -0.311126983722081)
@@ -2863,10 +2863,10 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPX/LandingLegVisual/StrutInner>
+                custom rel lunco:derived:source = </Griffin1/LegPX/LandingLegVisual/StrutInner>
             }
             def Cube "FootPadPlateCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:scale = (0.42, 0.04, 0.36)
@@ -2876,7 +2876,7 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, -1.28, 0.0)
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPX/LandingLegVisual/FootPadPlate>
+                custom rel lunco:derived:source = </Griffin1/LegPX/LandingLegVisual/FootPadPlate>
             }
         }
         def Xform "ShockPiston"
@@ -2891,16 +2891,16 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                double radius = 0.041999999999999996
-                double height = 0.9271709320855664
                 uniform token axis = "Y"
-                float3[] extent = [(-0.041999999433755875, -0.4635854661464691, -0.041999999433755875), (0.041999999433755875, 0.4635854661464691, 0.041999999433755875)]
                 bool physics:collisionEnabled = false
                 token visibility = "inherited"
                 color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+                double radius = 0.041999999999999996
+                double height = 0.9271709320855664
+                uniform token purpose = "render"
             }
             def Cylinder "TubeCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
@@ -2913,13 +2913,13 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPX/ShockPiston/Tube>
+                custom rel lunco:derived:source = </Griffin1/LegPX/ShockPiston/Tube>
             }
         }
     }
     def Xform "LegNX" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
-        prepend apiSchemas = "PhysicsRigidBodyAPI"
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI"]
     )
     {
         custom double3 xformOp:translate = (-1.9, 0.9, -1.9)
@@ -2968,11 +2968,11 @@ def Xform "Griffin1" (
         )
         {
             def Cylinder "FootPadCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, -1.32, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                uniform token[] xformOpOrder = ["xformOp:translate"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 double radius = 0.35
@@ -2982,7 +2982,7 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNX/LandingLegVisual/FootPad>
+                custom rel lunco:derived:source = </Griffin1/LegNX/LandingLegVisual/FootPad>
             }
             def "BodyMountArm"
             {
@@ -3005,7 +3005,7 @@ def Xform "Griffin1" (
                 token visibility = "invisible"
             }
             def Cylinder "StrutOuterCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (-0.551543289325507, -0.58, 0.311126983722081)
@@ -3018,10 +3018,10 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNX/LandingLegVisual/StrutOuter>
+                custom rel lunco:derived:source = </Griffin1/LegNX/LandingLegVisual/StrutOuter>
             }
             def Cylinder "StrutInnerCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (-0.551543289325507, -0.58, -0.311126983722081)
@@ -3034,10 +3034,10 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNX/LandingLegVisual/StrutInner>
+                custom rel lunco:derived:source = </Griffin1/LegNX/LandingLegVisual/StrutInner>
             }
             def Cube "FootPadPlateCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:scale = (0.42, 0.04, 0.36)
@@ -3047,7 +3047,7 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, -1.28, 0.0)
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNX/LandingLegVisual/FootPadPlate>
+                custom rel lunco:derived:source = </Griffin1/LegNX/LandingLegVisual/FootPadPlate>
             }
         }
         def Xform "ShockPiston"
@@ -3062,16 +3062,16 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                double radius = 0.041999999999999996
-                double height = 0.9271709320855664
                 uniform token axis = "Y"
-                float3[] extent = [(-0.041999999433755875, -0.4635854661464691, -0.041999999433755875), (0.041999999433755875, 0.4635854661464691, 0.041999999433755875)]
                 bool physics:collisionEnabled = false
                 token visibility = "inherited"
                 color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+                double radius = 0.041999999999999996
+                double height = 0.9271709320855664
+                uniform token purpose = "render"
             }
             def Cylinder "TubeCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
@@ -3084,13 +3084,13 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNX/ShockPiston/Tube>
+                custom rel lunco:derived:source = </Griffin1/LegNX/ShockPiston/Tube>
             }
         }
     }
     def Xform "LegPZ" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
-        prepend apiSchemas = "PhysicsRigidBodyAPI"
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI"]
     )
     {
         custom double3 xformOp:translate = (-1.9, 0.9, 1.9)
@@ -3139,11 +3139,11 @@ def Xform "Griffin1" (
         )
         {
             def Cylinder "FootPadCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, -1.32, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                uniform token[] xformOpOrder = ["xformOp:translate"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 double radius = 0.35
@@ -3153,7 +3153,7 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPZ/LandingLegVisual/FootPad>
+                custom rel lunco:derived:source = </Griffin1/LegPZ/LandingLegVisual/FootPad>
             }
             def "BodyMountArm"
             {
@@ -3176,7 +3176,7 @@ def Xform "Griffin1" (
                 token visibility = "invisible"
             }
             def Cylinder "StrutOuterCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (-0.551543289325507, -0.58, 0.311126983722081)
@@ -3189,10 +3189,10 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPZ/LandingLegVisual/StrutOuter>
+                custom rel lunco:derived:source = </Griffin1/LegPZ/LandingLegVisual/StrutOuter>
             }
             def Cylinder "StrutInnerCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (-0.551543289325507, -0.58, -0.311126983722081)
@@ -3205,10 +3205,10 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPZ/LandingLegVisual/StrutInner>
+                custom rel lunco:derived:source = </Griffin1/LegPZ/LandingLegVisual/StrutInner>
             }
             def Cube "FootPadPlateCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:scale = (0.42, 0.04, 0.36)
@@ -3218,7 +3218,7 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, -1.28, 0.0)
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPZ/LandingLegVisual/FootPadPlate>
+                custom rel lunco:derived:source = </Griffin1/LegPZ/LandingLegVisual/FootPadPlate>
             }
         }
         def Xform "ShockPiston"
@@ -3233,16 +3233,16 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                double radius = 0.041999999999999996
-                double height = 0.9271709320855664
                 uniform token axis = "Y"
-                float3[] extent = [(-0.041999999433755875, -0.4635854661464691, -0.041999999433755875), (0.041999999433755875, 0.4635854661464691, 0.041999999433755875)]
                 bool physics:collisionEnabled = false
                 token visibility = "inherited"
                 color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+                double radius = 0.041999999999999996
+                double height = 0.9271709320855664
+                uniform token purpose = "render"
             }
             def Cylinder "TubeCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
@@ -3255,13 +3255,13 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPZ/ShockPiston/Tube>
+                custom rel lunco:derived:source = </Griffin1/LegPZ/ShockPiston/Tube>
             }
         }
     }
     def Xform "LegNZ" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
-        prepend apiSchemas = "PhysicsRigidBodyAPI"
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI"]
     )
     {
         custom double3 xformOp:translate = (1.9, 0.9, -1.9)
@@ -3310,11 +3310,11 @@ def Xform "Griffin1" (
         )
         {
             def Cylinder "FootPadCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, -1.32, 0.0)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                uniform token[] xformOpOrder = ["xformOp:translate"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
                 custom double3 xformOp:scale = (1.0, 1.0, 1.0)
                 double radius = 0.35
@@ -3324,7 +3324,7 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNZ/LandingLegVisual/FootPad>
+                custom rel lunco:derived:source = </Griffin1/LegNZ/LandingLegVisual/FootPad>
             }
             def "BodyMountArm"
             {
@@ -3347,7 +3347,7 @@ def Xform "Griffin1" (
                 token visibility = "invisible"
             }
             def Cylinder "StrutOuterCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (-0.551543289325507, -0.58, 0.311126983722081)
@@ -3360,10 +3360,10 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNZ/LandingLegVisual/StrutOuter>
+                custom rel lunco:derived:source = </Griffin1/LegNZ/LandingLegVisual/StrutOuter>
             }
             def Cylinder "StrutInnerCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (-0.551543289325507, -0.58, -0.311126983722081)
@@ -3376,10 +3376,10 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNZ/LandingLegVisual/StrutInner>
+                custom rel lunco:derived:source = </Griffin1/LegNZ/LandingLegVisual/StrutInner>
             }
             def Cube "FootPadPlateCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:scale = (0.42, 0.04, 0.36)
@@ -3389,7 +3389,7 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, -1.28, 0.0)
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNZ/LandingLegVisual/FootPadPlate>
+                custom rel lunco:derived:source = </Griffin1/LegNZ/LandingLegVisual/FootPadPlate>
             }
         }
         def Xform "ShockPiston"
@@ -3404,16 +3404,16 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                double radius = 0.041999999999999996
-                double height = 0.9271709320855664
                 uniform token axis = "Y"
-                float3[] extent = [(-0.041999999433755875, -0.4635854661464691, -0.041999999433755875), (0.041999999433755875, 0.4635854661464691, 0.041999999433755875)]
                 bool physics:collisionEnabled = false
                 token visibility = "inherited"
                 color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+                double radius = 0.041999999999999996
+                double height = 0.9271709320855664
+                uniform token purpose = "render"
             }
             def Cylinder "TubeCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, 0.4635854660427832, 0.0)
@@ -3426,7 +3426,7 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNZ/ShockPiston/Tube>
+                custom rel lunco:derived:source = </Griffin1/LegNZ/ShockPiston/Tube>
             }
         }
     }
@@ -7878,16 +7878,16 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                double radius = 0.06
-                double height = 1.027020109387089
                 uniform token axis = "Y"
-                float3[] extent = [(-0.05999999865889549, -0.5135100483894348, -0.05999999865889549), (0.05999999865889549, 0.5135100483894348, 0.05999999865889549)]
                 bool physics:collisionEnabled = false
                 token visibility = "inherited"
                 color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+                double radius = 0.06
+                double height = 1.027020109387089
+                uniform token purpose = "render"
             }
             def Cylinder "TubeCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
@@ -7900,11 +7900,11 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPX_BusMount/ShockBarrel/Tube>
+                custom rel lunco:derived:source = </Griffin1/LegPX_BusMount/ShockBarrel/Tube>
             }
         }
         def Cube "BodyMountArmCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.09999999999999964, 0.32000000000000006, 0.16)
@@ -7914,10 +7914,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-0.7486291501015241, 0.08000000000000002, 0.0)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegPX_BusMount/BodyMountArm>
+            custom rel lunco:derived:source = </Griffin1/LegPX_BusMount/BodyMountArm>
         }
         def Cylinder "MountAxleCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:translate = (-0.668629150101524, 0.0, 0.0)
@@ -7929,10 +7929,10 @@ def Xform "Griffin1" (
             bool physics:collisionEnabled = true
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegPX_BusMount/MountAxle>
+            custom rel lunco:derived:source = </Griffin1/LegPX_BusMount/MountAxle>
         }
         def Cube "MountClevisOuterCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -7942,10 +7942,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-1.103086578651014, 0.1, 0.622253967444162)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegPX_BusMount/MountClevisOuter>
+            custom rel lunco:derived:source = </Griffin1/LegPX_BusMount/MountClevisOuter>
         }
         def Cube "MountClevisInnerCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -7955,7 +7955,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-1.103086578651014, 0.1, -0.622253967444162)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegPX_BusMount/MountClevisInner>
+            custom rel lunco:derived:source = </Griffin1/LegPX_BusMount/MountClevisInner>
         }
     }
     def Xform "LegNX_BusMount" (
@@ -7997,16 +7997,16 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                double radius = 0.06
-                double height = 1.027020109387089
                 uniform token axis = "Y"
-                float3[] extent = [(-0.05999999865889549, -0.5135100483894348, -0.05999999865889549), (0.05999999865889549, 0.5135100483894348, 0.05999999865889549)]
                 bool physics:collisionEnabled = false
                 token visibility = "inherited"
                 color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+                double radius = 0.06
+                double height = 1.027020109387089
+                uniform token purpose = "render"
             }
             def Cylinder "TubeCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
@@ -8019,11 +8019,11 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNX_BusMount/ShockBarrel/Tube>
+                custom rel lunco:derived:source = </Griffin1/LegNX_BusMount/ShockBarrel/Tube>
             }
         }
         def Cube "BodyMountArmCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.09999999999999964, 0.32000000000000006, 0.16)
@@ -8033,10 +8033,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-0.7486291501015241, 0.08000000000000002, 0.0)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegNX_BusMount/BodyMountArm>
+            custom rel lunco:derived:source = </Griffin1/LegNX_BusMount/BodyMountArm>
         }
         def Cylinder "MountAxleCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:translate = (-0.668629150101524, 0.0, 0.0)
@@ -8048,10 +8048,10 @@ def Xform "Griffin1" (
             bool physics:collisionEnabled = true
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegNX_BusMount/MountAxle>
+            custom rel lunco:derived:source = </Griffin1/LegNX_BusMount/MountAxle>
         }
         def Cube "MountClevisOuterCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -8061,10 +8061,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-1.103086578651014, 0.1, 0.622253967444162)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegNX_BusMount/MountClevisOuter>
+            custom rel lunco:derived:source = </Griffin1/LegNX_BusMount/MountClevisOuter>
         }
         def Cube "MountClevisInnerCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -8074,7 +8074,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-1.103086578651014, 0.1, -0.622253967444162)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegNX_BusMount/MountClevisInner>
+            custom rel lunco:derived:source = </Griffin1/LegNX_BusMount/MountClevisInner>
         }
     }
     def Xform "LegPZ_BusMount" (
@@ -8116,16 +8116,16 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                double radius = 0.06
-                double height = 1.027020109387089
                 uniform token axis = "Y"
-                float3[] extent = [(-0.05999999865889549, -0.5135100483894348, -0.05999999865889549), (0.05999999865889549, 0.5135100483894348, 0.05999999865889549)]
                 bool physics:collisionEnabled = false
                 token visibility = "inherited"
                 color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+                double radius = 0.06
+                double height = 1.027020109387089
+                uniform token purpose = "render"
             }
             def Cylinder "TubeCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
@@ -8138,11 +8138,11 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegPZ_BusMount/ShockBarrel/Tube>
+                custom rel lunco:derived:source = </Griffin1/LegPZ_BusMount/ShockBarrel/Tube>
             }
         }
         def Cube "BodyMountArmCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.09999999999999964, 0.32000000000000006, 0.16)
@@ -8152,10 +8152,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-0.7486291501015241, 0.08000000000000002, 0.0)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegPZ_BusMount/BodyMountArm>
+            custom rel lunco:derived:source = </Griffin1/LegPZ_BusMount/BodyMountArm>
         }
         def Cylinder "MountAxleCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:translate = (-0.668629150101524, 0.0, 0.0)
@@ -8167,10 +8167,10 @@ def Xform "Griffin1" (
             bool physics:collisionEnabled = true
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegPZ_BusMount/MountAxle>
+            custom rel lunco:derived:source = </Griffin1/LegPZ_BusMount/MountAxle>
         }
         def Cube "MountClevisOuterCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -8180,10 +8180,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-1.103086578651014, 0.1, 0.622253967444162)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegPZ_BusMount/MountClevisOuter>
+            custom rel lunco:derived:source = </Griffin1/LegPZ_BusMount/MountClevisOuter>
         }
         def Cube "MountClevisInnerCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -8193,7 +8193,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-1.103086578651014, 0.1, -0.622253967444162)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegPZ_BusMount/MountClevisInner>
+            custom rel lunco:derived:source = </Griffin1/LegPZ_BusMount/MountClevisInner>
         }
     }
     def Xform "LegNZ_BusMount" (
@@ -8235,16 +8235,16 @@ def Xform "Griffin1" (
                 custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
-                double radius = 0.06
-                double height = 1.027020109387089
                 uniform token axis = "Y"
-                float3[] extent = [(-0.05999999865889549, -0.5135100483894348, -0.05999999865889549), (0.05999999865889549, 0.5135100483894348, 0.05999999865889549)]
                 bool physics:collisionEnabled = false
                 token visibility = "inherited"
                 color3f[] primvars:displayColor = [(0.6200000047683716, 0.6499999761581421, 0.6899999976158142)]
+                double radius = 0.06
+                double height = 1.027020109387089
+                uniform token purpose = "render"
             }
             def Cylinder "TubeCollider" (
-                prepend apiSchemas = "PhysicsCollisionAPI"
+                prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
             )
             {
                 custom double3 xformOp:translate = (0.0, -0.5135100546935445, 0.0)
@@ -8257,11 +8257,11 @@ def Xform "Griffin1" (
                 bool physics:collisionEnabled = true
                 uniform token purpose = "proxy"
                 token visibility = "invisible"
-                custom rel lunco:collider:geometrySource = </Griffin1/LegNZ_BusMount/ShockBarrel/Tube>
+                custom rel lunco:derived:source = </Griffin1/LegNZ_BusMount/ShockBarrel/Tube>
             }
         }
         def Cube "BodyMountArmCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.09999999999999964, 0.32000000000000006, 0.16)
@@ -8271,10 +8271,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-0.7486291501015241, 0.08000000000000002, 0.0)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegNZ_BusMount/BodyMountArm>
+            custom rel lunco:derived:source = </Griffin1/LegNZ_BusMount/BodyMountArm>
         }
         def Cylinder "MountAxleCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:translate = (-0.668629150101524, 0.0, 0.0)
@@ -8286,10 +8286,10 @@ def Xform "Griffin1" (
             bool physics:collisionEnabled = true
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegNZ_BusMount/MountAxle>
+            custom rel lunco:derived:source = </Griffin1/LegNZ_BusMount/MountAxle>
         }
         def Cube "MountClevisOuterCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -8299,10 +8299,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-1.103086578651014, 0.1, 0.622253967444162)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegNZ_BusMount/MountClevisOuter>
+            custom rel lunco:derived:source = </Griffin1/LegNZ_BusMount/MountClevisOuter>
         }
         def Cube "MountClevisInnerCollider" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
         )
         {
             custom double3 xformOp:scale = (0.16, 0.16, 0.12)
@@ -8312,7 +8312,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (-1.103086578651014, 0.1, -0.622253967444162)
             uniform token purpose = "proxy"
             token visibility = "invisible"
-            custom rel lunco:collider:geometrySource = </Griffin1/LegNZ_BusMount/MountClevisInner>
+            custom rel lunco:derived:source = </Griffin1/LegNZ_BusMount/MountClevisInner>
         }
     }
     def Cube "RampMountPortInnerRear" (

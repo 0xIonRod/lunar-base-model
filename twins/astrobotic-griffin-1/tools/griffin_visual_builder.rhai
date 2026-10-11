@@ -2059,7 +2059,7 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
     for index in 0..suffixes.len() {
         let leg_path = root + "/Leg" + suffixes[index];
         let leg = assembly_builder::composed_query(doc,
-            #{path: leg_path, children: false});
+            #{path: leg_path, children: false, schemas:true});
         if !query_ok(leg) || leg.type_name != "Xform" {
             return plan_error(leg_path + ": dynamics leg body is missing or is not an Xform");
         }
@@ -2068,8 +2068,12 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         // relationship operation and remove its empty applied schema.
         ops.push(#{SetRelationship: #{edit_target: edit_target,
             path: leg_path, name: "physics:filteredPairs", targets: []}});
-        ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: leg_path,
-            schemas: ["PhysicsRigidBodyAPI"]}});
+        let schemas=[];
+        for schema in leg.api_schemas {if schema!="PhysicsFilteredPairsAPI" {schemas.push(schema);}}
+        for schema in ["PhysicsRigidBodyAPI","PhysicsMassAPI","PhysxRigidBodyAPI"] {
+            if !schemas.contains(schema) {schemas.push(schema);}
+        }
+        ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: leg_path,schemas:schemas}});
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: leg_path,
             name: "physxRigidBody:enableCCD", type_name: "bool",
             value: geometry.continuous_collision_detection.to_string()}});
@@ -2313,8 +2317,8 @@ fn physical_landing_leg_pad_observation(doc, root) {
         attrs: ["radius", "height", "axis", "xformOp:translate",
             "xformOp:rotateXYZ", "xformOp:scale",
             "physics:collisionEnabled", "visibility", "purpose",
-            "lunco:collider:geometrySource", "lunco:requirement"],
-        rels: ["lunco:collider:geometrySource"], schemas: true,
+            "lunco:derived:source", "lunco:requirement"],
+        rels: ["lunco:derived:source"], schemas: true,
         geometry_bounds: true, collision_geometry: true};
     if doc != () { pad_request.doc_id = doc; }
     let pad_batch = query("QueryUsdPrims", pad_request);
@@ -2617,9 +2621,9 @@ fn physical_landing_leg_pad_observation(doc, root) {
         if !collider.api_schemas.contains("PhysicsCollisionAPI") {
             all_collision_enabled = false;
         }
-        let targets = collider.relationships["lunco:collider:geometrySource"];
+        let targets = collider.relationships["lunco:derived:source"];
         if targets == () || targets.len() != 1 || targets[0] != visual_path
-            || collider.attrs["lunco:collider:geometrySource"] != ()
+            || collider.attrs["lunco:derived:source"] != ()
             || collider.attrs["lunco:requirement"] != () {
             all_source_relationships = false;
         }
@@ -2716,30 +2720,24 @@ fn physical_landing_leg_structure_plan(doc,edit_target,root) {
     #{ok:true,ops:ops,collider_paths:paths}
 }
 
-/// Compose the source-derived deck and leg contact plans into one Editor edit.
-fn physical_collision_plan(doc, edit_target, root) {
-    let deck = physical_top_deck_collider_plan(doc, edit_target, root);
-    if deck.ok != true { return deck; }
+/// Regenerate the landing gear's source-derived contact geometry in one
+/// bounded authoring transaction. Deck geometry has its own component planner.
+fn landing_gear_collision_plan(doc, edit_target, root) {
     let legs = physical_landing_leg_pad_plan(doc, edit_target, root);
-    if legs.ok != true { return legs; }
+    if !legs.ok { return legs; }
     let structure=physical_landing_leg_structure_plan(doc,edit_target,root);
     if !structure.ok {return structure;}
-    let ops = [];
-    for op in deck.ops { ops.push(op); }
-    for op in legs.ops { ops.push(op); }
+    let ops=legs.ops;
     for op in structure.ops {ops.push(op);}
-    #{ok: true, kind: "griffin_physical_collision_geometry", root: root,
-      deck_op_count: deck.ops.len(), leg_op_count: legs.ops.len(),
-      deck_collider_count: 9, collider_count: 13+structure.collider_paths.len(), ops: ops}
+    #{ok:true,kind:"griffin_landing_gear_collision_geometry",root:root,
+      collider_count:4+structure.collider_paths.len(),ops:ops}
 }
 
-fn apply_physical_colliders(doc, edit_target, root, parent_gen) {
-    let plan = physical_collision_plan(doc, edit_target, root);
-    if plan.ok != true || plan.ops.len() == 0 { return plan; }
-    let command = assembly_edit::batch(doc,
-        "Derive Griffin physical colliders from source geometry", plan.ops, parent_gen);
-    #{ok: command.ok == true, kind: plan.kind, command: command,
-      root: root, collider_count: plan.collider_count}
+fn apply_landing_gear_colliders(doc, edit_target, root, parent_gen) {
+    let plan=landing_gear_collision_plan(doc,edit_target,root);
+    if !plan.ok {return plan;}
+    let command=assembly_edit::batch(doc,"Derive landing-gear colliders from composed source geometry",plan.ops,parent_gen);
+    #{ok:command.ok==true,command:command,root:root,collider_count:plan.collider_count}
 }
 
 fn _tank_support_annulus_geometry(center, inner_radius, outer_radius, thickness, segments) {
@@ -6422,14 +6420,6 @@ fn axial_landing_gear_plan(doc, edit_target, root) {
         let qtilt=quat_from_euler_xyz_deg(vec3(0.0,0.0,tilt));
         let qshock=qleg*qtilt;
         let c=stations[i]+qrot(qleg,foot);
-        // Delete superseded independent shock bodies and pins as one authored
-        // migration; subsequent runs converge on the same minimal mechanism.
-        for suffix in ["_BraceHinge","_ShockUpperPin","_ShockLowerPin","_ShockBarrel","_ShockPiston"] {
-            let old=leg+suffix;
-            if query_ok(assembly_builder::composed_query(doc,#{path:old,children:false})) {
-                ops.push(#{RemovePrim:#{edit_target:edit_target,path:old}});
-            }
-        }
         let mount=root+"/"+name+"_BusMount";
         if !query_ok(assembly_builder::composed_query(doc,#{path:mount,children:false})) {
             ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:name+"_BusMount",type_name:"Xform",

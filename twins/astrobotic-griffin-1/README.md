@@ -644,7 +644,7 @@ collision pairs; disabling collision or weakening settlement limits would not
 resolve the mechanism fault.
 
 Landing gear collision geometry is derived from its composed Cube/Cylinder
-members by `griffin_visual_builder::physical_collision_plan`. Moving braces,
+members by `griffin_visual_builder::landing_gear_collision_plan`. Moving braces,
 piston, pad, and plate belong to the leg rigid body; mounting hardware and the
 shock barrel belong to the lander body. Compose suspension/visual geometry
 changes before deriving collision proxies from that revision. The footpads
@@ -657,5 +657,24 @@ terrain clearance, engine extinction, and suspension hard-stop travel.
 `tests/griffin_rover_leg_collision.usda` drives the real FLIP into the PX gear
 using its authored rolling axis and normal avatar controls. The
 `GRIFFIN_ROVER_LEG_COLLISION` verdict checks every structural proxy against its
-composed source and requires powered motion, contact, and blocked passage.
+composed source and requires powered motion, contact, collision response, and
+bounded penetration.
 FLIP enables CCD so thin landing-gear members remain swept at driving speed.
+
+Landing-gear regeneration has two authored phases: apply
+`griffin_visual_builder::axial_landing_gear_plan` to update source geometry,
+body mass and joint frames from SysML; after that document generation composes,
+apply `landing_gear_collision_plan` to derive the 40 leg contact proxies.
+The deck is regenerated separately with `physical_top_deck_collider_plan`. Primitive proxies
+use `LunCoDerivedGeometryAPI` and `lunco:derived:source`. A stale proxy rejects
+physics admission; update source and regenerate before running the scene.
+
+Impact verification samples every physics tick, including footpad centers, and
+asserts native penetration, hard-stop travel and final four-leg support against
+the authored numerical tolerances. Rover verification reads admitted collider
+source paths on each intended body and exact rover-leg narrow-phase contacts,
+including the rover wheels, then bounds physical penetration and requires a
+real collision impulse from an identified admitted structural member during
+the drive. The rover gate verifies all 40 gear colliders on their actual native
+bodies, including fixed mounting hardware. Acceptance uses the actual finite
+collision envelopes throughout the driven route.
