@@ -68,6 +68,10 @@ def Xform "FLIP" (
     string lunco:ui:surfaceId = "vessel-hud"
     string lunco:ui:visibilityMode = "possessed"
     bool physxRigidBody:enableCCD = true
+    custom double inputs:irradiance
+    double inputs:irradiance.connect = </FLIP/SolarArray/Environment.outputs:sun_irradiance_w_m2>
+    custom double inputs:sun_visibility
+    double inputs:sun_visibility.connect = </FLIP/SolarArray/Environment.outputs:sun_visibility>
     variantSet "drivetrain" = {
         "raycast" {
         }
@@ -75,72 +79,48 @@ def Xform "FLIP" (
             prepend references = @lunco://components/mobility/physical_drivetrain.usda@</Drivetrain>
         ) {
             over "Suspension_FL" (
-                prepend apiSchemas = "PhysicsRigidBodyAPI"
+                prepend apiSchemas = ["PhysicsRigidBodyAPI"]
             )
             {
                 over "Wheel_FL" (
-                    prepend apiSchemas = "PhysicsFilteredPairsAPI"
+                    prepend apiSchemas = ["PhysicsFilteredPairsAPI"]
                 )
                 {
                     custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
                 }
             }
             over "Suspension_FR" (
-                prepend apiSchemas = "PhysicsRigidBodyAPI"
+                prepend apiSchemas = ["PhysicsRigidBodyAPI"]
             )
             {
                 over "Wheel_FR" (
-                    prepend apiSchemas = "PhysicsFilteredPairsAPI"
+                    prepend apiSchemas = ["PhysicsFilteredPairsAPI"]
                 )
                 {
                     custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
                 }
             }
             over "Suspension_RL" (
-                prepend apiSchemas = "PhysicsRigidBodyAPI"
+                prepend apiSchemas = ["PhysicsRigidBodyAPI"]
             )
             {
                 over "Wheel_RL" (
-                    prepend apiSchemas = "PhysicsFilteredPairsAPI"
+                    prepend apiSchemas = ["PhysicsFilteredPairsAPI"]
                 )
                 {
                     custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
                 }
             }
             over "Suspension_RR" (
-                prepend apiSchemas = "PhysicsRigidBodyAPI"
+                prepend apiSchemas = ["PhysicsRigidBodyAPI"]
             )
             {
                 over "Wheel_RR" (
-                    prepend apiSchemas = "PhysicsFilteredPairsAPI"
+                    prepend apiSchemas = ["PhysicsFilteredPairsAPI"]
                 )
                 {
                     custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
                 }
-            }
-            over "Suspension_FL/Wheel_FL" (
-                prepend apiSchemas = "PhysicsFilteredPairsAPI"
-            )
-            {
-                custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            }
-            over "Suspension_FR/Wheel_FR" (
-                prepend apiSchemas = "PhysicsFilteredPairsAPI"
-            )
-            {
-                custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            }
-            over "Suspension_RL/Wheel_RL" (
-                prepend apiSchemas = "PhysicsFilteredPairsAPI"
-            )
-            {
-                custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            }
-            over "Suspension_RR/Wheel_RR" (
-                prepend apiSchemas = "PhysicsFilteredPairsAPI"
-            )
-            {
-                custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
             }
         }
     }
@@ -476,7 +456,6 @@ def Xform "FLIP" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         float parameters:area = 0.699999988079071
         float parameters:efficiency = 0.3499999940395355
-        float inputs:irradiance = 1361.0
         custom token connectors:p
         token connectors:p.connect = </FLIP/Battery.connectors:p>
         custom double3 xformOp:rotateXYZ = (18.0, 0.0, 0.0)
@@ -493,6 +472,10 @@ def Xform "FLIP" (
         double inputs:target_mount_z.connect = </FLIP.inputs:target_mount_z>
         custom rel lunco:telemetry:target = </FLIP>
         token lunco:telemetry:port = "solar_power"
+        custom double inputs:irradiance
+        double inputs:irradiance.connect = </FLIP.inputs:irradiance>
+        custom double inputs:sun_visibility
+        double inputs:sun_visibility.connect = </FLIP.inputs:sun_visibility>
         def "PanelSurface" (
             active = false
         )
@@ -524,7 +507,7 @@ def Xform "FLIP" (
         float inputs:trigger.connect = </FLIP/Battery.outputs:drained>
     }
     def Scope "Thermal" (
-        prepend apiSchemas = "CollectionAPI:components"
+        prepend apiSchemas = ["CollectionAPI:components"]
         documentation = "FLIP motor thermal network: four motor losses into left/right masses and radiators."
         active = false
     )
