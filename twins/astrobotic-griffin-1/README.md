@@ -78,6 +78,7 @@ Sources:
 | terrain/nobile03/ | Ignored processed heightfield output, regenerated from the manifest and adapter |
 | tools/terrain/ | Polar-stereo download, reprojection, and provenance instructions |
 | scenarios/griffin_1_surface_ops.rhai | Single mission state owner, event routing, and phase sequencing |
+| scenarios/tests/griffin_mission_evidence.rhai | Production one-shot verdict gate for route-start evidence after guidance release, including absent and false phase evidence |
 | scenarios/tests/griffin_requirements.rhai | Twin-owned structural/parameter verdict and boundary checks |
 | scenarios/tests/griffin_lander_requirements.rhai | Rhai observer for the standalone lander-component contract |
 | scenarios/tests/griffin_bus_requirements.rhai | Component-owned Rhai gate for bus geometry, tank-support openings, and source-owned appearance |
@@ -183,6 +184,13 @@ asset, so FLIP, the payload adapter, route markers, terrain payload, and
 mission/tutorial scenario do not obscure the lander. Keep that scene for
 visual authoring; use `scenes/griffin_1_surface_ops.usda` for integration and
 runtime acceptance.
+
+The mission completion report reads the route task's `route_started` phase
+evidence. `route_engaged` records current guidance authority and is released
+when the route finishes. The one-shot
+`scenarios/tests/griffin_mission_evidence.rhai` gate runs through `RunRhai`
+after the Twin is mounted and checks completed, active, false and missing
+route-start evidence through the report's own structured check.
 
 Opening the Twin defaults to `scenes/griffin_flip_visual.usda`, the combined
 Griffin/FLIP review composition. The powered landing mission remains a separate

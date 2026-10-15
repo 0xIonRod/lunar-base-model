@@ -107,6 +107,17 @@ fn ramp_unfold_order_report(state) {
     #{ok: true, expected: required, observed: observed}
 }
 
+// Route entry is a historical phase fact; guidance authority can end after
+// completion while the successful route-start evidence remains valid.
+fn route_start_check(state) {
+    #{id: "GR-004-route-started", component: "rover",
+        requirement: "GriffinFunctionalRequirements::gr004",
+        verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
+        kind: "phase", path: global::ROVER, actual: state.route_started,
+        expected: true, ok: state.route_started == true,
+        error: "FLIP surface route did not start"}
+}
+
 fn finish_surface_ops(state) {
     let ramp_unfold_order = ramp_unfold_order_report(state);
     let ramp_middle_settled = state.ramp_middle_settle_evidence != ()
@@ -139,7 +150,7 @@ fn finish_surface_ops(state) {
         #{id: "GR-004-lander-settled", component: "landing", requirement: "GriffinFunctionalRequirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander", actual: state.lander_settled, expected: true, ok: state.lander_settled, error: settle_error},
         #{id: "GR-003-ramps-deployed", component: "egress_ramps", requirement: "GriffinFunctionalRequirements::gr003", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander/EgressRampPort", actual: state.ramps_deployed, expected: true, ok: state.ramps_deployed, error: "ramps were not deployed"},
         #{id: "GR-026-adapter-release", component: "payload_adapter", requirement: "GriffinFunctionalRequirements::gr026", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::DOCK, actual: state.rover_detached, expected: true, ok: state.rover_detached, error: "FLIP adapter was not released"},
-        #{id: "GR-004-route-engaged", component: "rover", requirement: "GriffinFunctionalRequirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::ROVER, actual: state.route_engaged, expected: true, ok: state.route_engaged, error: "FLIP route was not engaged"},
+        route_start_check(state),
         #{id: "GR-007-ramp-approach", component: "rover", requirement: "GriffinFunctionalRequirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/RoverRampApproach", actual: state.ramp_approach_reached, expected: true, ok: state.ramp_approach_reached, error: "ramp approach was not reached"},
         #{id: "GR-007-ramp-exit", component: "rover", requirement: "GriffinFunctionalRequirements::gr007", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/RoverRampExit", actual: state.ramp_exit_reached, expected: true, ok: state.ramp_exit_reached, error: "ramp exit was not reached"},
         #{id: "GR-004-waypoint-1", component: "rover", requirement: "GriffinFunctionalRequirements::gr004", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/RoverTarget1", actual: state.waypoint_1_reached, expected: true, ok: state.waypoint_1_reached, error: "first survey waypoint was not reached"},
