@@ -28,8 +28,8 @@ fn show_briefing() {
     let action = input_hint("action");
     let cancel = input_hint("cancel");
 
-    hint("CONTROL: click the lander or FLIP to possess; " + cancel + " releases control");
-    objectives_hud([
+    hint("griffin-controls", "CONTROL: click the lander or FLIP to possess; " + cancel + " releases control");
+    objectives_hud("griffin-controls", [
         #{ text: "LANDER  " + thrust + " thrust | " + forward + "/" + backward + " pitch | " + left + "/" + right + " roll", state: "active" },
         #{ text: "LANDER  " + yaw_left + "/" + yaw_right + " yaw | U open ramps | F detach rover", state: "pending" },
         #{ text: "FLIP    " + forward + "/" + backward + " drive | " + left + "/" + right + " steer | Space brake", state: "pending" },
@@ -55,7 +55,7 @@ fn set_surface_action_buttons() {
 
 /// `gnc` is the guidance state the GNC button offers to change.
 fn set_surface_action_buttons_for(gnc) {
-    let result = guided_hud_actions("griffin_surface_ops", "on_hud_action", [
+    let result = guided_hud_actions("griffin-controls", "griffin_surface_ops", "on_hud_action", [
         #{id: "unfold_ramps", label: "OPEN RAMPS  U", enabled: true},
         #{id: "release_rover", label: "DETACH ROVER  F", enabled: true},
         #{id: "toggle_gnc",
@@ -71,27 +71,27 @@ fn set_surface_action_buttons_for(gnc) {
 
 fn show_touchdown_actions() {
     show_briefing();
-    hint("TOUCHDOWN CONFIRMED: U or OPEN RAMPS to lower both ramps. F detaches FLIP immediately.");
+    hint("griffin-controls", "TOUCHDOWN CONFIRMED: U or OPEN RAMPS to lower both ramps. F detaches FLIP immediately.");
     set_surface_action_buttons();
 }
 
 fn show_ramp_unfolding_actions() {
-    hint("RAMP UNFOLDING: middle sections, toes, then deck hinges. F remains available.");
+    hint("griffin-controls", "RAMP UNFOLDING: middle sections, toes, then deck hinges. F remains available.");
     set_surface_action_buttons();
 }
 
 fn show_rover_release_actions() {
-    hint("RAMPS SETTLED: F or DETACH ROVER detaches FLIP from the top deck.");
+    hint("griffin-controls", "RAMPS SETTLED: F or DETACH ROVER detaches FLIP from the top deck.");
     set_surface_action_buttons();
 }
 
 fn show_rover_release_pending() {
-    hint("ROVER RELEASE REQUESTED: waiting for the physics joint to retire.");
+    hint("griffin-controls", "ROVER RELEASE REQUESTED: waiting for the physics joint to retire.");
     set_surface_action_buttons();
 }
 
 fn clear_surface_operation_actions() {
-    clear_guided_hud_actions()
+    clear_guided_hud_actions("griffin-controls")
 }
 
 fn show_rover_controls() {
@@ -103,7 +103,7 @@ fn show_rover_controls() {
     let cancel = input_hint("cancel");
     // The vessel HUD carries telemetry and the route program run/stop button;
     // this brief only names the manual skid-steer controls.
-    hint("FLIP CONTROL: " + forward + "/" + backward + " drive · " + left + "/" + right
+    hint("griffin-controls", "FLIP CONTROL: " + forward + "/" + backward + " drive · " + left + "/" + right
         + " skid turn · Space brake · " + action + " run/stop route · " + cancel + " release");
 }
 
@@ -165,7 +165,7 @@ fn control_lander() {
     if target == () { return; }
     let result = cmd("AcquireControl", #{ target: target, bind_camera: true });
     if result.ok {
-        hint("LANDER CONTROL: " + input_hint("thrust") + " thrust · W/S pitch · A/D roll · Q/E yaw · F detach rover");
+        hint("griffin-controls", "LANDER CONTROL: " + input_hint("thrust") + " thrust · W/S pitch · A/D roll · Q/E yaw · F detach rover");
         notify_kind("Griffin lander under manual control.", "success");
     } else {
         notify_kind("Lander control was rejected: " + result.error, "error");
@@ -190,7 +190,7 @@ fn toggle_gnc() {
     if connected {
         notify_kind("Griffin GNC disconnected: manual flight.", "warning");
     } else {
-        hint("GNC RECONNECTED: guidance commands the lander again.");
+        hint("griffin-controls", "GNC RECONNECTED: guidance commands the lander again.");
         notify_kind("Griffin GNC reconnected.", "success");
     }
     set_surface_action_buttons_for(!connected);
@@ -226,6 +226,6 @@ fn release_rover() {
 fn release_control() {
     let lander = release_lander();
     let rover = release_rover();
-    hint("FREE FLIGHT: click Griffin or FLIP to take control; " + input_hint("cancel") + " releases control");
+    hint("griffin-controls", "FREE FLIGHT: click Griffin or FLIP to take control; " + input_hint("cancel") + " releases control");
     #{ lander: lander, rover: rover }
 }

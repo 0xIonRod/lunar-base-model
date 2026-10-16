@@ -686,3 +686,10 @@ real collision impulse from an identified admitted structural member during
 the drive. The rover gate verifies all 40 gear colliders on their actual native
 bodies, including fixed mounting hardware. Acceptance uses the actual finite
 collision envelopes throughout the driven route.
+
+The mission hint, objectives, and mechanism buttons share the explicit
+`griffin-controls` scene HUD card. It uses the application's View-only default;
+Build and Editor hide the entire card and its input. Scenario and tool callbacks
+address that same identity. Replacing its actions retires the old callback lease,
+and scene reset or Twin close removes its card and bindings. Tutorial guidance
+uses independent script-owned cards and authored perspective scope.

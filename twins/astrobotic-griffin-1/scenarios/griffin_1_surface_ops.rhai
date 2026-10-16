@@ -328,11 +328,11 @@ fn update_landing_status(previously_landed, already_announced) {
             status.touchdown_announced = true;
         }
         if !status.landed && previously_landed {
-            hint("LANDING NOT CONFIRMED: U opens ramps; F detaches FLIP. Both remain available.");
+            hint("griffin-controls", "LANDING NOT CONFIRMED: U opens ramps; F detaches FLIP. Both remain available.");
         } else if status.landed && !previously_landed && already_announced {
             // Restore the live contact notice after suspension settling without
             // announcing touchdown again or resetting the egress action phase.
-            hint("FOUR-PAD CONTACT RESTORED: U opens ramps; F detaches FLIP.");
+            hint("griffin-controls", "FOUR-PAD CONTACT RESTORED: U opens ramps; F detaches FLIP.");
         }
     }
     status
@@ -344,10 +344,9 @@ fn on_stop(me, ctx) {
         if result==() || result.ok!=true {notify_kind("FLIP mission stop was rejected.","error");}
         this.route_engaged=false;
     }
-    // The guided overlay is app-wide, so retire this mission's controls when
-    // its scenario is stopped even if the Welcome tab stays open underneath.
-    hint("");
-    objectives_hud([]);
+    // Retire this mission's shared scene card when its scenario stops.
+    hint("griffin-controls", "");
+    objectives_hud("griffin-controls", []);
     griffin_controls::clear_surface_operation_actions();
 }
 
