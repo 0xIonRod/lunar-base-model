@@ -391,6 +391,13 @@ package GriffinRequirementSources {
         ref sources = (source_www_astrolab_space_flip_rover, source_venturi_space_rovers);
     }
 
+    part evidence_fvg_011 : RequirementEvidence {
+        ref targetRequirement = FlipRequirements::fvg011;
+        ref sources = (source_astrobotic_griffin_1_requirements_flip_requirements_sysml,
+            source_astrobotic_griffin_1_vehicles_flip_usda,
+            source_astrobotic_griffin_1_scenarios_griffin_1_surface_ops_rhai);
+    }
+
     part evidence_fsr_008 : RequirementEvidence {
         ref targetRequirement = FlipSuspensionRequirements::fsr008;
         ref sources = (source_astrobotic_griffin_1_requirements_flip_requirements_sysml, source_astrobotic_griffin_1_requirements_flip_suspension_requirements_sysml, source_astrobotic_griffin_1_vehicles_flip_usda, source_astrobotic_griffin_1_scenes_griffin_1_surface_ops_usda);
@@ -598,7 +605,8 @@ package GriffinRequirementSources {
 
     part evidence_gpp_003 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp003;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
+        ref sources = (source_www_astrobotic_com_griffin_lander,
+            source_griffin_engine_out, source_griffin_starvation, source_griffin_propulsion_study);
     }
 
     part evidence_gpp_004 : RequirementEvidence {
@@ -771,6 +779,13 @@ package GriffinRequirementSources {
         ref sources = (source_astrobotic_griffin_rendering_2021, source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml,
             source_astrobotic_griffin_1_components_lander_griffin_ramp_section_visual_usda,
             source_astrobotic_griffin_1_tools_griffin_visual_builder_rhai,
+            source_astrobotic_griffin_1_research_griffin_1_assumptions_md);
+    }
+
+    part evidence_grr_020 : RequirementEvidence {
+        ref targetRequirement = GriffinRampRequirements::grr020;
+        ref sources = (source_www_nasa_gov_astrobotics_griffin_1,
+            source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml,
             source_astrobotic_griffin_1_research_griffin_1_assumptions_md);
     }
 
@@ -1327,11 +1342,6 @@ package GriffinRequirementSources {
     part source_agile_a110 : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "https://static1.squarespace.com/static/634ee7b32099c80fdfcc8cac/t/6418ea80e1144560207215ca/1679505951405/AgileSpace_A110SpecDoc.pdf";
-    }
-
-    part evidence_gpp_003 : RequirementEvidence {
-        ref targetRequirement = GriffinPropulsionRequirements::gpp003;
-        ref sources = (source_griffin_engine_out, source_griffin_starvation, source_griffin_propulsion_study);
     }
 
     part evidence_gpp_010 : RequirementEvidence {
