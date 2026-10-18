@@ -18,24 +18,9 @@ fn resolve(path, label) {
 }
 
 fn show_briefing() {
-    let thrust = input_hint("thrust");
-    let forward = input_hint("forward");
-    let backward = input_hint("backward");
-    let left = input_hint("left");
-    let right = input_hint("right");
-    let yaw_left = input_hint("yaw_left");
-    let yaw_right = input_hint("yaw_right");
-    let action = input_hint("action");
     let cancel = input_hint("cancel");
-
-    hint("griffin-controls", "CONTROL: click the lander or FLIP to possess; " + cancel + " releases control");
-    objectives_hud("griffin-controls", [
-        #{ text: "LANDER  " + thrust + " thrust | " + forward + "/" + backward + " pitch | " + left + "/" + right + " roll", state: "active" },
-        #{ text: "LANDER  " + yaw_left + "/" + yaw_right + " yaw | U open ramps | F detach rover", state: "pending" },
-        #{ text: "FLIP    " + forward + "/" + backward + " drive | " + left + "/" + right + " steer | Space brake", state: "pending" },
-        #{ text: "FLIP    " + action + " toggles autopilot; manual input takes authority back", state: "pending" },
-        #{ text: "HANDOFF " + cancel + " releases the selected vehicle", state: "pending" }
-    ]);
+    hint("griffin-controls", "Click a vehicle to control. " + cancel + " releases.");
+    objectives_hud("griffin-controls", []);
     set_surface_action_buttons();
 }
 
