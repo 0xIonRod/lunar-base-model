@@ -101,14 +101,20 @@ LunCoSim.
 The FLIP route observer preserves the route editor's explicit `retryable`
 projection status after adding a point. It waits within its existing ten-second
 phase deadline; permanent errors fail immediately with the owner diagnostic.
-The route completes all three points and passes 19 assertions, including all four gearbox heat inputs at the thermal
+The route completes all three points and passes 25 assertions, including all four gearbox heat inputs at the thermal
 participant, nonnegative gear dissipation and a rising drivetrain-bank
 temperature.
 The shared `GearRatio` model applies efficiency in both power directions,
 exports dissipated heat and checks its torque rating. Four `HeatLoad` facets
 route gearbox losses into the enabled lumped motor/gear thermal banks. Their
-coefficients remain study assumptions. Native wheel/brake/tire losses stay
-under their native mechanical owners; their heat distribution is outside
-these thermal banks. The maintained shared mechanical regression has 41
-checks, including regeneration, bearing loss, stored heat and overload.
-Evidence: `/tmp/griffin-mechanical-losses-20261019/gates/route-thermal.log`.
+coefficients remain study assumptions. Native wheel/brake/tire forces stay
+under their native mechanical owners; their measured losses enter HeatLoad
+facets without adding a second mechanical force. Native bearing, brake and tire loss outputs feed the same thermal collection.
+A passive contact network conducts into wheel and averaged near-contact ground
+masses; actual support opens each ground conductor while airborne. Motor/gear,
+hub/brake, wheel and ground lumping and conductances are study assumptions.
+The route includes a real brake application and verifies all four bearing/tire
+paths, braking heat and wheel/ground thermal response. The maintained shared
+mechanical regression has 46 checks including contact energy conservation and
+airborne isolation; native mechanics has 13 and drivetrain parity has 20.
+Evidence: `/tmp/griffin-native-heat-20261019/route-final.log`.

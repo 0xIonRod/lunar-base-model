@@ -508,12 +508,12 @@ def Xform "FLIP" (
     }
     def Scope "Thermal" (
         prepend apiSchemas = ["CollectionAPI:components"]
-        documentation = "Lumped left/right drivetrain thermal banks receiving motor copper and gearbox mesh losses; coefficients are study assumptions."
+        documentation = "Lumped drivetrain/hub/brake and wheel thermal banks; contact heat enters a passive wheel/ground conduction network. Capacities and conductances are explicit study assumptions, not calibrated FLIP data."
         active = true
     )
     {
         uniform token collection:components:expansionRule = "explicitOnly"
-        rel collection:components:includes = [</FLIP/Thermal/MotorHeat_FL>, </FLIP/Thermal/MotorHeat_RL>, </FLIP/Thermal/MotorHeat_FR>, </FLIP/Thermal/MotorHeat_RR>, </FLIP/Thermal/MotorThermalLeft>, </FLIP/Thermal/MotorThermalRight>, </FLIP/Thermal/MotorRadiatorLeft>, </FLIP/Thermal/MotorRadiatorRight>, </FLIP/Thermal/ThermalBridge>, </FLIP/Thermal/GearHeat_FL>, </FLIP/Thermal/GearHeat_FR>, </FLIP/Thermal/GearHeat_RL>, </FLIP/Thermal/GearHeat_RR>]
+        rel collection:components:includes = [</FLIP/Thermal/ThermalBridge>, </FLIP/Thermal/MotorHeat_FL>, </FLIP/Thermal/MotorHeat_RL>, </FLIP/Thermal/MotorThermalLeft>, </FLIP/Thermal/MotorRadiatorLeft>, </FLIP/Thermal/MotorHeat_FR>, </FLIP/Thermal/MotorHeat_RR>, </FLIP/Thermal/MotorThermalRight>, </FLIP/Thermal/MotorRadiatorRight>, </FLIP/Thermal/GearHeat_FL>, </FLIP/Thermal/GearHeat_FR>, </FLIP/Thermal/GearHeat_RL>, </FLIP/Thermal/GearHeat_RR>, </FLIP/Thermal/TireThermalLeft>, </FLIP/Thermal/GroundThermalLeft>, </FLIP/Thermal/ContactToTireLeft>, </FLIP/Thermal/TireToHubLeft>, </FLIP/Thermal/TireRadiatorLeft>, </FLIP/Thermal/TireThermalRight>, </FLIP/Thermal/GroundThermalRight>, </FLIP/Thermal/ContactToTireRight>, </FLIP/Thermal/TireToHubRight>, </FLIP/Thermal/TireRadiatorRight>, </FLIP/Thermal/BearingHeat_FL>, </FLIP/Thermal/BrakeHeat_FL>, </FLIP/Thermal/TireHeat_FL>, </FLIP/Thermal/BearingHeat_FR>, </FLIP/Thermal/BrakeHeat_FR>, </FLIP/Thermal/TireHeat_FR>, </FLIP/Thermal/BearingHeat_RL>, </FLIP/Thermal/BrakeHeat_RL>, </FLIP/Thermal/TireHeat_RL>, </FLIP/Thermal/BearingHeat_RR>, </FLIP/Thermal/BrakeHeat_RR>, </FLIP/Thermal/TireHeat_RR>, </FLIP/Thermal/ContactToGround_FL>, </FLIP/Thermal/ContactToGround_FR>, </FLIP/Thermal/ContactToGround_RL>, </FLIP/Thermal/ContactToGround_RR>]
         float inputs:motor_heat_FL
         float inputs:motor_heat_FL.connect = </FLIP/Motor_FL.outputs:heat>
         float inputs:motor_heat_FR
@@ -534,6 +534,54 @@ def Xform "FLIP" (
         double inputs:gear_heat_RL.connect = </FLIP/Gearbox_RL.outputs:heat>
         custom double inputs:gear_heat_RR
         double inputs:gear_heat_RR.connect = </FLIP/Gearbox_RR.outputs:heat>
+        custom float outputs:tire_temp_left
+        float outputs:tire_temp_left.connect = </FLIP/Thermal/TireThermalLeft.outputs:temp_k>
+        custom float outputs:ground_temp_left
+        float outputs:ground_temp_left.connect = </FLIP/Thermal/GroundThermalLeft.outputs:temp_k>
+        custom float outputs:tire_temp_right
+        float outputs:tire_temp_right.connect = </FLIP/Thermal/TireThermalRight.outputs:temp_k>
+        custom float outputs:ground_temp_right
+        float outputs:ground_temp_right.connect = </FLIP/Thermal/GroundThermalRight.outputs:temp_k>
+        custom double inputs:bearing_heat_FL
+        double inputs:bearing_heat_FL.connect = </FLIP/Suspension_FL/Wheel_FL.outputs:bearing_heat>
+        custom double inputs:brake_heat_FL
+        double inputs:brake_heat_FL.connect = </FLIP/Suspension_FL/Wheel_FL.outputs:brake_heat>
+        custom double inputs:tire_heat_FL
+        double inputs:tire_heat_FL.connect = </FLIP/Suspension_FL/Wheel_FL.outputs:tire_heat>
+        custom double inputs:bearing_heat_FR
+        double inputs:bearing_heat_FR.connect = </FLIP/Suspension_FR/Wheel_FR.outputs:bearing_heat>
+        custom double inputs:brake_heat_FR
+        double inputs:brake_heat_FR.connect = </FLIP/Suspension_FR/Wheel_FR.outputs:brake_heat>
+        custom double inputs:tire_heat_FR
+        double inputs:tire_heat_FR.connect = </FLIP/Suspension_FR/Wheel_FR.outputs:tire_heat>
+        custom double inputs:bearing_heat_RL
+        double inputs:bearing_heat_RL.connect = </FLIP/Suspension_RL/Wheel_RL.outputs:bearing_heat>
+        custom double inputs:brake_heat_RL
+        double inputs:brake_heat_RL.connect = </FLIP/Suspension_RL/Wheel_RL.outputs:brake_heat>
+        custom double inputs:tire_heat_RL
+        double inputs:tire_heat_RL.connect = </FLIP/Suspension_RL/Wheel_RL.outputs:tire_heat>
+        custom double inputs:bearing_heat_RR
+        double inputs:bearing_heat_RR.connect = </FLIP/Suspension_RR/Wheel_RR.outputs:bearing_heat>
+        custom double inputs:brake_heat_RR
+        double inputs:brake_heat_RR.connect = </FLIP/Suspension_RR/Wheel_RR.outputs:brake_heat>
+        custom double inputs:tire_heat_RR
+        double inputs:tire_heat_RR.connect = </FLIP/Suspension_RR/Wheel_RR.outputs:tire_heat>
+        custom double inputs:contact_FL
+        double inputs:contact_FL.connect = </FLIP/Suspension_FL/Wheel_FL.outputs:contact>
+        custom double outputs:ground_heat_FL
+        double outputs:ground_heat_FL.connect = </FLIP/Thermal/ContactToGround_FL.outputs:heat_flow_w>
+        custom double inputs:contact_FR
+        double inputs:contact_FR.connect = </FLIP/Suspension_FR/Wheel_FR.outputs:contact>
+        custom double outputs:ground_heat_FR
+        double outputs:ground_heat_FR.connect = </FLIP/Thermal/ContactToGround_FR.outputs:heat_flow_w>
+        custom double inputs:contact_RL
+        double inputs:contact_RL.connect = </FLIP/Suspension_RL/Wheel_RL.outputs:contact>
+        custom double outputs:ground_heat_RL
+        double outputs:ground_heat_RL.connect = </FLIP/Thermal/ContactToGround_RL.outputs:heat_flow_w>
+        custom double inputs:contact_RR
+        double inputs:contact_RR.connect = </FLIP/Suspension_RR/Wheel_RR.outputs:contact>
+        custom double outputs:ground_heat_RR
+        double outputs:ground_heat_RR.connect = </FLIP/Thermal/ContactToGround_RR.outputs:heat_flow_w>
         def Xform "ThermalBridge" (
             prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
         )
@@ -638,6 +686,254 @@ def Xform "FLIP" (
             float inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_RR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+        }
+        def Xform "TireThermalLeft" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorThermalMass>
+        )
+        {
+            float inputs:c_th = 45000.0
+            float inputs:T_init = 250.0
+        }
+        def Xform "GroundThermalLeft" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorThermalMass>
+        )
+        {
+            float inputs:c_th = 60000.0
+            float inputs:T_init = 250.0
+        }
+        def Xform "ContactToTireLeft" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
+        )
+        {
+            float inputs:G = 10.0
+            custom double outputs:heat_flow_w = 0.0
+            custom token connectors:port_b
+            token connectors:port_b.connect = </FLIP/Thermal/TireThermalLeft.connectors:port>
+        }
+        def Xform "TireToHubLeft" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
+        )
+        {
+            float inputs:G = 1.0
+            custom double outputs:heat_flow_w = 0.0
+            custom token connectors:port_a
+            token connectors:port_a.connect = </FLIP/Thermal/TireThermalLeft.connectors:port>
+            custom token connectors:port_b
+            token connectors:port_b.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+        }
+        def Xform "TireRadiatorLeft" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorRadiator>
+        )
+        {
+            float inputs:area = 1.0
+            float inputs:emissivity = 0.8999999761581421
+            float inputs:T_sink = 250.0
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/TireThermalLeft.connectors:port>
+        }
+        def Xform "TireThermalRight" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorThermalMass>
+        )
+        {
+            float inputs:c_th = 45000.0
+            float inputs:T_init = 250.0
+        }
+        def Xform "GroundThermalRight" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorThermalMass>
+        )
+        {
+            float inputs:c_th = 60000.0
+            float inputs:T_init = 250.0
+        }
+        def Xform "ContactToTireRight" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
+        )
+        {
+            float inputs:G = 10.0
+            custom double outputs:heat_flow_w = 0.0
+            custom token connectors:port_b
+            token connectors:port_b.connect = </FLIP/Thermal/TireThermalRight.connectors:port>
+        }
+        def Xform "TireToHubRight" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
+        )
+        {
+            float inputs:G = 1.0
+            custom double outputs:heat_flow_w = 0.0
+            custom token connectors:port_a
+            token connectors:port_a.connect = </FLIP/Thermal/TireThermalRight.connectors:port>
+            custom token connectors:port_b
+            token connectors:port_b.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+        }
+        def Xform "TireRadiatorRight" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorRadiator>
+        )
+        {
+            float inputs:area = 1.0
+            float inputs:emissivity = 0.8999999761581421
+            float inputs:T_sink = 250.0
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/TireThermalRight.connectors:port>
+        }
+        def Xform "BearingHeat_FL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_FL>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+        }
+        def Xform "BrakeHeat_FL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_FL>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+        }
+        def Xform "TireHeat_FL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_FL>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/ContactToTireLeft.connectors:port_a>
+        }
+        def Xform "BearingHeat_FR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_FR>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+        }
+        def Xform "BrakeHeat_FR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_FR>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+        }
+        def Xform "TireHeat_FR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_FR>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/ContactToTireRight.connectors:port_a>
+        }
+        def Xform "BearingHeat_RL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_RL>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+        }
+        def Xform "BrakeHeat_RL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_RL>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+        }
+        def Xform "TireHeat_RL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_RL>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/ContactToTireLeft.connectors:port_a>
+        }
+        def Xform "BearingHeat_RR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_RR>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+        }
+        def Xform "BrakeHeat_RR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_RR>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+        }
+        def Xform "TireHeat_RR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_RR>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/ContactToTireRight.connectors:port_a>
+        }
+        def Xform "ContactToGround_FL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
+        )
+        {
+            float inputs:G = 0.05000000074505806
+            custom double outputs:heat_flow_w = 0.0
+            custom double inputs:conductance_scale
+            double inputs:conductance_scale.connect = </FLIP/Thermal.inputs:contact_FL>
+            custom token connectors:port_a
+            token connectors:port_a.connect = </FLIP/Thermal/ContactToTireLeft.connectors:port_a>
+            custom token connectors:port_b
+            token connectors:port_b.connect = </FLIP/Thermal/GroundThermalLeft.connectors:port>
+        }
+        def Xform "ContactToGround_FR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
+        )
+        {
+            float inputs:G = 0.05000000074505806
+            custom double outputs:heat_flow_w = 0.0
+            custom double inputs:conductance_scale
+            double inputs:conductance_scale.connect = </FLIP/Thermal.inputs:contact_FR>
+            custom token connectors:port_a
+            token connectors:port_a.connect = </FLIP/Thermal/ContactToTireRight.connectors:port_a>
+            custom token connectors:port_b
+            token connectors:port_b.connect = </FLIP/Thermal/GroundThermalRight.connectors:port>
+        }
+        def Xform "ContactToGround_RL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
+        )
+        {
+            float inputs:G = 0.05000000074505806
+            custom double outputs:heat_flow_w = 0.0
+            custom double inputs:conductance_scale
+            double inputs:conductance_scale.connect = </FLIP/Thermal.inputs:contact_RL>
+            custom token connectors:port_a
+            token connectors:port_a.connect = </FLIP/Thermal/ContactToTireLeft.connectors:port_a>
+            custom token connectors:port_b
+            token connectors:port_b.connect = </FLIP/Thermal/GroundThermalLeft.connectors:port>
+        }
+        def Xform "ContactToGround_RR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
+        )
+        {
+            float inputs:G = 0.05000000074505806
+            custom double outputs:heat_flow_w = 0.0
+            custom double inputs:conductance_scale
+            double inputs:conductance_scale.connect = </FLIP/Thermal.inputs:contact_RR>
+            custom token connectors:port_a
+            token connectors:port_a.connect = </FLIP/Thermal/ContactToTireRight.connectors:port_a>
+            custom token connectors:port_b
+            token connectors:port_b.connect = </FLIP/Thermal/GroundThermalRight.connectors:port>
         }
     }
     def Xform "Chassis" (

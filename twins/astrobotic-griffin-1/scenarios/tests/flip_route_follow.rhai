@@ -67,6 +67,13 @@ fn on_start(me, ctx) {
     this.initial_empty = false;
     this.minimum_upright_y = 1.0;
     this.gear_heat_seen = [false,false,false,false];
+    this.bearing_heat_seen = [false,false,false,false];
+    this.brake_heat_seen = [false,false,false,false];
+    this.tire_heat_seen = [false,false,false,false];
+    this.native_heat_passive = true;
+    this.tire_warming = false;
+    this.ground_heat_seen = false;
+    this.brake_command_ok = false;
     this.gear_heat_passive = true;
     this.thermal_rise_seen = false;
     this.add_results = [];
@@ -101,7 +108,22 @@ fn on_tick(me, ctx) {
             this.gear_heat_passive = this.gear_heat_passive && heat.is_finite() && heat >= -1.0e-6;
             this.gear_heat_seen[index] = this.gear_heat_seen[index] || heat > 1.0e-4;
         }
+        for loss in ["bearing","brake","tire"] {
+            let power=get(thermal,loss+"_heat_"+wheel_sides[index]);
+            if power!=() {
+                this.native_heat_passive=this.native_heat_passive && power.is_finite() && power>=-1.0e-6;
+                if power>1.0e-6 {
+                    if loss=="bearing" {this.bearing_heat_seen[index]=true;}
+                    if loss=="brake" {this.brake_heat_seen[index]=true;}
+                    if loss=="tire" {this.tire_heat_seen[index]=true;}
+                }
+            }
+        }
     }
+    let tire_temperature=get(thermal,"tire_temp_left");
+    this.tire_warming=this.tire_warming || (tire_temperature!=() && tire_temperature.is_finite() && tire_temperature>250.000001);
+    let ground_heat=get(thermal,"ground_heat_FL");
+    this.ground_heat_seen=this.ground_heat_seen || (ground_heat!=() && ground_heat.is_finite() && ground_heat>1.0e-8);
     let temperature = get(thermal,"motor_temp_left");
     this.thermal_rise_seen = this.thermal_rise_seen
         || (temperature != () && temperature.is_finite() && temperature > 250.00001);
@@ -251,8 +273,35 @@ fn on_tick(me, ctx) {
         this.manual_ok = this.manual_start_ok && this.manual_command.ok && released.ok
             && ready
             && is_controlled(this.flip);
+        // Build wheel momentum before applying the physical brake command.
+        this.brake_command_ok=cmd("SimulateIntent",#{target:this.flip,intent:"forward",held:true}).ok;
+        this.phase="brake_accelerate";this.elapsed=0.0;return;
+    }
+    if this.phase=="brake_accelerate" {
+        if this.elapsed<2.0 {return;}
+        this.brake_command_ok=this.brake_command_ok
+            && cmd("SimulateIntent",#{target:this.flip,intent:"forward",held:false}).ok
+            && cmd("SimulateIntent",#{target:this.flip,intent:"brake",held:true}).ok;
+        this.phase="braking";this.elapsed=0.0;return;
+    }
+    if this.phase=="braking" {
+        if this.elapsed<1.0 {return;}
+        this.brake_command_ok=this.brake_command_ok
+            && cmd("SimulateIntent",#{target:this.flip,intent:"brake",held:false}).ok;
     }
     let failures = [];
+    let all_bearings=true;let all_tires=true;let brake_seen=false;
+    for index in 0..4 {
+        all_bearings=all_bearings && this.bearing_heat_seen[index];
+        all_tires=all_tires && this.tire_heat_seen[index];
+        brake_seen=brake_seen || this.brake_heat_seen[index];
+    }
+    failures.push(t_true(all_bearings,"all four bearing losses reach the thermal participant"));
+    failures.push(t_true(all_tires,"all four tire contact losses reach the thermal participant"));
+    failures.push(t_true(this.brake_command_ok && brake_seen,"applied wheel braking produces heat through its native loss port"));
+    failures.push(t_true(this.native_heat_passive,"native physical losses remain finite and passive"));
+    failures.push(t_true(this.tire_warming,"tire friction warms the wheel thermal bank"));
+    failures.push(t_true(this.ground_heat_seen,"contact heat flows through the passive wheel-ground thermal network"));
     failures.push(t_true(this.gear_heat_seen[0] && this.gear_heat_seen[1]
         && this.gear_heat_seen[2] && this.gear_heat_seen[3],
         "all four gearbox heat paths reach the thermal participant while driving"));
