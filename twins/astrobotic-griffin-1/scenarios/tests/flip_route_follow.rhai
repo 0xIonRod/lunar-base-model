@@ -122,13 +122,17 @@ fn on_tick(me, ctx) {
         return;
     }
     if this.phase == "add" {
-        let count = _route_point_count(this.doc);
-        if count == () {
+        let snapshot = waypoint_editor::route_positions(this.doc, ROUTE);
+        if snapshot == () || snapshot.ok != true {
+            // Point edits commit before their document projection. Only the
+            // owner's explicit pending status may defer this phase.
+            if snapshot != () && snapshot.retryable == true && this.elapsed < 10.0 { return; }
             this.done = true;
-            report_verdict([t_true(false, "FlipRoute point query failed")],
+            report_verdict([t_true(false, "FlipRoute point query failed: " + snapshot.to_string())],
                 "FLIP ROUTE FOLLOW", "FLIP_ROUTE_FOLLOW");
             return;
         }
+        let count = snapshot.paths.len();
         if count < this.add_results.len() {
             if this.elapsed < 10.0 { return; }
         }
