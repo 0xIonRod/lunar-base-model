@@ -89,7 +89,7 @@ qualify landing dynamics, structural loads, propulsion, or FLIP egress.
 
 ## Modelica compilation review — 2026-10-19
 
-The normal surface-operations scene admits all nine Modelica participants,
+The normal surface-operations scene admits all ten Modelica participants,
 advances them beyond 0.1 s and reaches fault-free readiness with no pending
 holds using the reviewed shared library. The current production gates pass
 GNC 12, engine-out 20, RCS commands 19 and both depletion cases 11 each.
@@ -101,5 +101,14 @@ LunCoSim.
 The FLIP route observer preserves the route editor's explicit `retryable`
 projection status after adding a point. It waits within its existing ten-second
 phase deadline; permanent errors fail immediately with the owner diagnostic.
-The route completes all three points and passes all 16 existing assertions.
-Evidence: `/tmp/griffin-model-review-20261019/flip-route-fixed.log`.
+The route completes all three points and passes 19 assertions, including all four gearbox heat inputs at the thermal
+participant, nonnegative gear dissipation and a rising drivetrain-bank
+temperature.
+The shared `GearRatio` model applies efficiency in both power directions,
+exports dissipated heat and checks its torque rating. Four `HeatLoad` facets
+route gearbox losses into the enabled lumped motor/gear thermal banks. Their
+coefficients remain study assumptions. Native wheel/brake/tire losses stay
+under their native mechanical owners; their heat distribution is outside
+these thermal banks. The maintained shared mechanical regression has 41
+checks, including regeneration, bearing loss, stored heat and overload.
+Evidence: `/tmp/griffin-mechanical-losses-20261019/gates/route-thermal.log`.

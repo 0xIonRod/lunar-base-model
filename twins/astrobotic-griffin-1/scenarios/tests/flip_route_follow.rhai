@@ -17,7 +17,7 @@ const ROUTE_TIMEOUT_S = 150.0;
 const MINIMUM_UPRIGHT_Y = 0.906307787;
 fn simulation_dependencies(me, ctx) {
     let flip = find_path(FLIP_PATH);
-    #{ modelica_entities: [flip], entity_reads: [flip], entity_writes: [],
+    #{ modelica_entities: [flip, find_path(FLIP_PATH+"/Thermal")], entity_reads: [flip], entity_writes: [],
        query_reads: ["QueryUsdPrim", "QueryUsdPrims", "QueryPhysicsState", "ResolveUsdTarget",
                      "InspectSelection", "InspectUsdSelection", "TerrainHeight"],
        required_inputs: [] }
@@ -66,6 +66,9 @@ fn on_start(me, ctx) {
     this.negative_ok = false;
     this.initial_empty = false;
     this.minimum_upright_y = 1.0;
+    this.gear_heat_seen = [false,false,false,false];
+    this.gear_heat_passive = true;
+    this.thermal_rise_seen = false;
     this.add_results = [];
     let assembly = query("QueryUsdPrim", #{path: FLIP_PATH,
         attrs: ["lunco:steeringGeometry", "lunco:ui:surfaceId"]});
@@ -90,6 +93,18 @@ fn on_event(me, evt, ctx) {
 fn on_tick(me, ctx) {
     if this.done { return; }
     this.elapsed += dt();
+    let thermal = find_path(FLIP_PATH+"/Thermal");
+    let wheel_sides=["FL","FR","RL","RR"];
+    for index in 0..wheel_sides.len() {
+        let heat = get(thermal,"gear_heat_"+wheel_sides[index]);
+        if heat != () {
+            this.gear_heat_passive = this.gear_heat_passive && heat.is_finite() && heat >= -1.0e-6;
+            this.gear_heat_seen[index] = this.gear_heat_seen[index] || heat > 1.0e-4;
+        }
+    }
+    let temperature = get(thermal,"motor_temp_left");
+    this.thermal_rise_seen = this.thermal_rise_seen
+        || (temperature != () && temperature.is_finite() && temperature > 250.00001);
     if this.phase == "settle" {
         if this.elapsed < SETTLE_S { return; }
         let route = query("QueryUsdPrim", #{ path: ROUTE, attrs: [] });
@@ -238,6 +253,11 @@ fn on_tick(me, ctx) {
             && is_controlled(this.flip);
     }
     let failures = [];
+    failures.push(t_true(this.gear_heat_seen[0] && this.gear_heat_seen[1]
+        && this.gear_heat_seen[2] && this.gear_heat_seen[3],
+        "all four gearbox heat paths reach the thermal participant while driving"));
+    failures.push(t_true(this.gear_heat_passive,"gearbox heat never creates mechanical energy"));
+    failures.push(t_true(this.thermal_rise_seen,"drivetrain losses warm the authored thermal bank"));
     failures.push(t_true(this.initial_empty, "runtime waypoints were restored at test start"));
     failures.push(t_true(this.negative_ok, "ordinary click changed the route"));
     failures.push(t_true(this.hud_dispatch_ok && this.hud_start_ok && this.hud_stop_ok,

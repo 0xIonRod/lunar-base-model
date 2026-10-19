@@ -508,13 +508,12 @@ def Xform "FLIP" (
     }
     def Scope "Thermal" (
         prepend apiSchemas = ["CollectionAPI:components"]
-        documentation = "FLIP motor thermal network: four motor losses into left/right masses and radiators."
-        active = false
+        documentation = "Lumped left/right drivetrain thermal banks receiving motor copper and gearbox mesh losses; coefficients are study assumptions."
+        active = true
     )
     {
         uniform token collection:components:expansionRule = "explicitOnly"
-        rel collection:components:includes
-        prepend rel collection:components:includes = [</FLIP/Thermal/MotorHeat_FL>, </FLIP/Thermal/MotorHeat_RL>, </FLIP/Thermal/MotorHeat_FR>, </FLIP/Thermal/MotorHeat_RR>, </FLIP/Thermal/MotorThermalLeft>, </FLIP/Thermal/MotorThermalRight>, </FLIP/Thermal/MotorRadiatorLeft>, </FLIP/Thermal/MotorRadiatorRight>, </FLIP/Thermal/ThermalBridge>]
+        rel collection:components:includes = [</FLIP/Thermal/MotorHeat_FL>, </FLIP/Thermal/MotorHeat_RL>, </FLIP/Thermal/MotorHeat_FR>, </FLIP/Thermal/MotorHeat_RR>, </FLIP/Thermal/MotorThermalLeft>, </FLIP/Thermal/MotorThermalRight>, </FLIP/Thermal/MotorRadiatorLeft>, </FLIP/Thermal/MotorRadiatorRight>, </FLIP/Thermal/ThermalBridge>, </FLIP/Thermal/GearHeat_FL>, </FLIP/Thermal/GearHeat_FR>, </FLIP/Thermal/GearHeat_RL>, </FLIP/Thermal/GearHeat_RR>]
         float inputs:motor_heat_FL
         float inputs:motor_heat_FL.connect = </FLIP/Motor_FL.outputs:heat>
         float inputs:motor_heat_FR
@@ -527,6 +526,14 @@ def Xform "FLIP" (
         float outputs:motor_temp_left.connect = </FLIP/Thermal/MotorThermalLeft.outputs:temp_k>
         float outputs:motor_temp_right
         float outputs:motor_temp_right.connect = </FLIP/Thermal/MotorThermalRight.outputs:temp_k>
+        custom double inputs:gear_heat_FL
+        double inputs:gear_heat_FL.connect = </FLIP/Gearbox_FL.outputs:heat>
+        custom double inputs:gear_heat_FR
+        double inputs:gear_heat_FR.connect = </FLIP/Gearbox_FR.outputs:heat>
+        custom double inputs:gear_heat_RL
+        double inputs:gear_heat_RL.connect = </FLIP/Gearbox_RL.outputs:heat>
+        custom double inputs:gear_heat_RR
+        double inputs:gear_heat_RR.connect = </FLIP/Gearbox_RR.outputs:heat>
         def Xform "ThermalBridge" (
             prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>
         )
@@ -593,6 +600,42 @@ def Xform "FLIP" (
             prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorRadiator>
         )
         {
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+        }
+        def Xform "GearHeat_FL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_FL>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+        }
+        def Xform "GearHeat_FR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_FR>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+        }
+        def Xform "GearHeat_RL" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_RL>
+            custom token connectors:port
+            token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+        }
+        def Xform "GearHeat_RR" (
+            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+        )
+        {
+            float inputs:heat_w
+            float inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_RR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
         }
