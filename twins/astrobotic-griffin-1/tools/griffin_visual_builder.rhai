@@ -114,6 +114,10 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
     let enabled=griffin_spec::main_engine_port(name,"enabled");
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:main,name:"inputs:"+enabled,
         type_name:"float",value:"1.0"}});
+    for output in ["exit_mach","gamma_out","exit_lip_angle_rad"] {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:nozzle,name:"outputs:"+output,
+            type_name:"double",value:"0.0"}});
+    }
     for connection in [
         #{path:engine,name:"inputs:flow_fraction_command",source:main+".inputs:flow_fraction_command",kind:"float"},
         #{path:engine,name:"inputs:enabled",source:main+".inputs:"+enabled,kind:"float"},
@@ -122,16 +126,16 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
         #{path:engine,name:"inputs:effective_exhaust_velocity_mps",source:nozzle+".outputs:ideal_exhaust_velocity_mps",kind:"float"},
         #{path:engine,name:"connectors:fuel_in",source:main+"/FuelTank.connectors:outlet",kind:"token"},
         #{path:engine,name:"connectors:oxidizer_in",source:main+"/OxidizerTank.connectors:outlet",kind:"token"},
-        #{path:plume,name:"inputs:throttle",source:engine+".outputs:activity",kind:"double"},
         #{path:plume,name:"inputs:thrust_n",source:engine+".outputs:thrust_n",kind:"double"},
         #{path:plume,name:"inputs:maximum_thrust_n",source:engine+".outputs:maximum_thrust_n",kind:"double"},
         #{path:plume,name:"inputs:propellant_flow_kgs",source:engine+".outputs:propellant_flow",kind:"double"},
         #{path:plume,name:"inputs:exhaust_velocity_mps",source:engine+".outputs:exhaust_velocity_mps",kind:"double"},
-        #{path:plume,name:"inputs:design_exhaust_velocity_mps",source:engine+".outputs:design_exhaust_velocity_mps",kind:"double"},
-        #{path:plume,name:"inputs:chamber_pressure_pa",source:engine+".outputs:chamber_pressure_pa",kind:"double"},
         #{path:plume,name:"inputs:mixture_ratio",source:engine+".outputs:mixture_ratio",kind:"double"},
         #{path:plume,name:"inputs:nozzle_exit_radius_m",source:nozzle+".outputs:exit_radius_m",kind:"float"},
-        #{path:plume,name:"inputs:nozzle_exit_area_m2",source:nozzle+".outputs:exit_area",kind:"float"}] {
+        #{path:plume,name:"inputs:nozzle_exit_area_m2",source:nozzle+".outputs:exit_area",kind:"float"},
+        #{path:plume,name:"inputs:nozzle_exit_mach",source:nozzle+".outputs:exit_mach",kind:"double"},
+        #{path:plume,name:"inputs:gas_gamma",source:nozzle+".outputs:gamma_out",kind:"double"},
+        #{path:plume,name:"inputs:exit_lip_angle_rad",source:nozzle+".outputs:exit_lip_angle_rad",kind:"double"}] {
         ops.push(#{SetConnection:#{edit_target:edit_target,path:connection.path,name:connection.name,
             type_name:connection.kind,sources:[connection.source]}});
     }
@@ -147,19 +151,21 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
     for parameter in [#{name:"engine_count",value:"1.0"},
         #{name:"fuel_family",value:fuel_family.to_string()},
         #{name:"stoichiometric_mixture_ratio",value:stoichiometric.to_string()},
-        #{name:"nozzle_exit_pressure_pa",value:"0.0"},
-        #{name:"ambient_pressure_pa",value:"0.0"},
-        #{name:"pressure_threshold_pa",value:"100.0"}] {
+        #{name:"ambient_pressure_pa",value:"0.0"}] {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"inputs:"+parameter.name,
             type_name:"float",value:parameter.value}});
     }
-    let published=["length"];
-    for wire in engine_exhaust::wires() {
-        if !published.contains(wire.output) {published.push(wire.output);}
+    for item in [#{input:"gas_constant_j_kg_k",source:"gasConstantJkgK"},
+        #{input:"radiative_fraction",source:"mainRadiativeFraction"},
+        #{input:"luminous_efficacy_lm_w",source:"luminousEfficacyLmW"}] {
+        let value=_source_number(model,"GriffinPropulsionRequirements::GriffinPlumeStudy::"+item.source);
+        if value==() {return plan_error("plume optical assumption missing: "+item.source);}
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"inputs:"+item.input,
+            type_name:"double",value:value.to_string()}});
     }
-    for output in published {
+    for output in engine_exhaust::physical_outputs() {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"outputs:"+output,
-            type_name:"float",value:"0.0"}});
+            type_name:if engine_exhaust::render_outputs().contains(output) {"float"} else {"double"},value:"0.0"}});
     }
     for op in engine_exhaust::connection_ops(edit_target,visual,plume,#{}) {ops.push(op);}
 
@@ -6549,10 +6555,12 @@ fn griffin_rcs_feed_plan(doc, edit_target, root) {
     let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
     let isp=griffin_spec::_typed_model_number(own+"nominalSpecificImpulseS");
     let mixture=griffin_spec::_typed_model_number(own+"oxidizerToFuelRatio");
-    let pressure=griffin_spec::_typed_model_number(own+"chamberPressurePa");
+    let throat=griffin_spec::_typed_model_number(own+"throatRadiusM");
+    let length=griffin_spec::_typed_model_number(own+"bellHeightM");
+    let contour=griffin_spec::_typed_model_number(own+"bellContourExponent");
     let force=griffin_spec::_typed_model_number(own+"nominalForceN");
     if fuel==() || radius==() || radius<=0.0 || isp==() || mixture==()
-        || pressure==() || force==() {return plan_error("RCS feed source incomplete");}
+        || throat==() || length==() || contour==() || force==() {return plan_error("RCS feed source incomplete");}
     let ops=[];
     let aggregate=root+"/AttitudePropulsion/RcsFlowAggregator";
     ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:aggregate,name:"inputs:oxidizer_to_fuel_ratio"}});
@@ -6574,16 +6582,28 @@ fn griffin_rcs_feed_plan(doc, edit_target, root) {
                 name:"inputs:"+reactant.input,type_name:"float",
                 sources:[root+"/AttitudePropulsion.inputs:"+reactant.input]}});
         }
-        for output in ["color_r","color_g","color_b","envelope_radius_m",
-            "core_envelope_radius_m","envelope_length_m","envelope_center_y_m"] {
+        for output in engine_exhaust::physical_outputs() {
+            let name=if output=="intensity" {"light_intensity"}
+                else if output=="radius" {"light_radius"} else {output};
             ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
-                name:"outputs:"+output,type_name:"float",value:"0.0"}});
+                name:"outputs:"+name,
+                type_name:if engine_exhaust::render_outputs().contains(output) {"float"} else {"double"},value:"0.0"}});
+        }
+        for item in [#{input:"gas_gamma",source:"rcsGasGamma"},
+            #{input:"gas_constant_j_kg_k",source:"gasConstantJkgK"},
+            #{input:"radiative_fraction",source:"rcsRadiativeFraction"},
+            #{input:"luminous_efficacy_lm_w",source:"luminousEfficacyLmW"}] {
+            let value=griffin_spec::_typed_model_number("GriffinPropulsionRequirements::GriffinPlumeStudy::"+item.source);
+            if value==() {return plan_error("RCS optical assumption missing: "+item.source);}
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"inputs:"+item.input,
+                type_name:"double",value:value.to_string()}});
         }
         for parameter in [#{name:"fuel_family",value:fuel},
             #{name:"plume_width_m",value:radius},#{name:"geometry_capacity_m",value:0.0},
-            #{name:"plume_luminance",value:0.0},#{name:"f_nom_n",value:force},
-            #{name:"isp_sec",value:isp},#{name:"mixture_ratio",value:mixture},
-            #{name:"design_chamber_pressure_pa",value:pressure}] {
+            #{name:"nozzle_throat_radius_m",value:throat},
+            #{name:"nozzle_length_m",value:length},#{name:"nozzle_contour",value:contour},
+            #{name:"f_nom_n",value:force},
+            #{name:"isp_sec",value:isp},#{name:"mixture_ratio",value:mixture}] {
             ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:path,name:"inputs:"+parameter.name}});
             ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
                 name:"inputs:"+parameter.name,type_name:"double",value:parameter.value.to_string()}});
@@ -6682,7 +6702,7 @@ fn griffin_rcs_nozzle_station_plan(doc, edit_target, root, index) {
     if query_ok(core) {ops.push(#{RemovePrim:#{edit_target:edit_target,path:root+"/"+name+"Core"}});}
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:model,name:"inputs:f_nom_n",type_name:"float",value:force.to_string()}});
     for op in engine_exhaust::connection_ops(edit_target,path+"/Nozzle",model,
-        #{render_throttle:"activity",intensity:"light_intensity",radius:"light_radius"}) {ops.push(op);}
+        #{intensity:"light_intensity",radius:"light_radius"}) {ops.push(op);}
     #{ok:true,ops:ops,path:path,model:model}
 }
 

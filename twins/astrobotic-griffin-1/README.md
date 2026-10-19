@@ -14,6 +14,14 @@ mobility claim is made. The terrain source is real LROC data, but the selected
 regional center is a reproducible study anchor, not a confirmed touchdown
 coordinate.
 
+The current plume interface requires LunCoSim's conservative propulsion assets
+(engine commit `a446c2659`, also integrated into optimization as `0e927735d`).
+Deploy that shared Modelica library, shader and component set with this Twin.
+An older library reports unresolved `NozzleDesign.gamma_out` or
+`NozzleDesign.exit_lip_angle_rad`; rebuilding Rust alone cannot supply missing
+Modelica assets. Main and RCS plumes share the Modelica gas/energy model and
+shader field, with optical study assumptions in `GriffinPlumeStudy`.
+
 ## Current public mission baseline
 
 The latest primary-source baseline used for this package is:

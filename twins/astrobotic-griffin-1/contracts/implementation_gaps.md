@@ -261,8 +261,10 @@ realized feature, and evidence result.
 ### Main-engine plume runtime status
 
 Each `MainPropulsion/EngineNNPlume` declares the typed `PlumePhotometry`
-outputs its bell's flame pair and light consume: `render_throttle`,
-`visual_length_fraction`, `intensity`, and `radius`. The fuel-exhaustion
+outputs its bell's field, bounds, bounded transported phase and local light consume.
+The shared Modelica model closes mass, stagnation energy and pressure thrust;
+its optical coefficients in `GriffinPlumeStudy` remain uncalibrated. This is a
+forward ideal-gas streamtube, not CFD or a spectral plume prediction. The fuel-exhaustion
 fixture observes Engine01's plume going dark when a reactant depletes.
 
 ### Surface mission run status

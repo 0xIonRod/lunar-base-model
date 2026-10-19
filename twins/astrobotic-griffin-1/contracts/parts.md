@@ -52,7 +52,7 @@ independently through the runtime authoring tools.
 | `components/lander/griffin_landing_leg_visual.usda` | outer/inner strut, shock piston, foot pad | four repeated outboard strut assemblies; render-only |
 | `components/lander/griffin_tank_visual.usda` | MLI tank and three bands | horizontal gold tank study; render-only |
 | `components/lander/griffin_solar_panel_visual.usda` | frame, cells, dividers, hinge, paired brackets, paired support links | shared render-only component referenced by the three independently placed panel roots |
-| `components/lander/griffin_engine_bell_visual.usda` | bell, throat, fixed-capacity outer plume and hot core, and a per-nozzle point light | referenced by each of the seven engines; plume visibility, derived length, and light output are connected to the shared Modelica photometry result; all geometry is render-only |
+| `components/lander/griffin_engine_bell_visual.usda` | bell, throat, expanding-volume outer plume and hot core, and a per-nozzle point light | referenced by each of the seven engines; gas field, metric observation bounds, and light output are connected to the shared Modelica photometry result; all geometry is render-only |
 | `components/lander/griffin_ramp_visual.usda` | three visual ramp sections, each with paired wheel tracks, upper rail segments and joint pins, deck-to-rail posts, underside beams, hinge barrel, and per-track treads | standalone preview asset; the integrated vehicle renders its articulated physical sections and does not mount a static duplicate |
 | `components/lander/griffin_ramp_section_visual.usda` | reusable full section with geometry-derived track collision, upper edge rails, rail pivot pins, supports, treads, beams, and hinge barrel | shared source section referenced by visual and physical ramp assemblies |
 | `components/lander/griffin_ramp_toe_section_visual.usda` | final section with the deployment-angle-derived toe bevel | inherits shared geometry and collision from the section source |
@@ -82,20 +82,24 @@ and creates the matching torque for RCS to hold. Guidance converts demand with
 the nominal SysML cluster rating (`guidanceClusterThrustN`) and is not told
 about a failure.
 
-Each engine's plume is a direct presentation of its own simulation.
-`MainPropulsion/EngineNNPlume` (`PlumePhotometry`, `engine_count = 1`) consumes
-that engine's activity, thrust, flow, exhaust velocity and chamber pressure,
-plus nozzle area and radius from the shared `MainPropulsion/NozzleDesign`. The
-bell's flame pair and local light connect to its outputs, so a failed engine
-shows no plume while the others burn. At zero delivered thrust the model
-specifies zero plume and zero light. Rhai does not animate plume transforms or
-brightness.
+Each engine's plume presents its own delivered state.
+`MainPropulsion/EngineNNPlume` (`PlumePhotometry`, count 1) consumes that engine's
+thrust, flow and effective Isp velocity, plus nozzle radius, area, Mach, gamma
+and wall angle from `NozzleDesign`. A failed engine loses its own light and
+volume while the other six remain independent. Rhai authors connections;
+Modelica owns continuous state and equations; WGSL integrates the visual field.
 
-The shared combustion shader integrates gas emission inside each cone; the cone
-is only a rendering bound. Main nozzles use a warm outer flame and pale hot core;
-the twelve RCS nozzles use a fainter, compact combustion effect. Their separate
-material overrides live in the reusable nozzle assets. Both nozzle classes use
-an explicit 100 Pa visible-jet pressure floor in the existing photometry model.
-This is a visualization assumption for the vacuum study, not a measured exhaust
-boundary or a change to engine performance. The model still owns length, colour,
-activity and light output; a closed or starved nozzle stays dark.
+The shared Modelica streamtube publishes five stations for gas radius, density,
+temperature, speed and energy-bounded emissivity. Cylinder volumes accommodate
+vacuum expansion; they are render bounds, never force frames or colliders.
+The shader ray-marches each axial interval and adds convected structure using
+a bounded sine/cosine phase from the simulation clock. Core and outer layers
+partition one optical budget. Off and starved nozzles produce no hot emission.
+
+`GriffinPlumeStudy` records uncalibrated gas/optical assumptions: R = 300 J/(kg K),
+RCS gamma = 1.2, main/RCS radiative fractions 0.0002/0.00005, efficacy 200 lm/W.
+The default observation horizon is 20 exit radii, not a physical end to vacuum
+exhaust. The forward ideal-gas spreading closure, passive radiation and RGB
+palette do not predict shocks, backflow, rarefaction, species spectra or
+plume-surface interaction. Gas state is not a calibrated Griffin plume solution.
+The library's `docs/architecture/propulsion-plume.md` gives equations and limits.

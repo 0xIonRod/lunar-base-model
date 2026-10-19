@@ -337,6 +337,23 @@ package GriffinPropulsionRequirements {
         attribute memberTangentOffsetM : Real = .12;
     }
 
+    part GriffinPlumeStudy {
+        doc /* Reduced forward ideal-gas expansion with passive optically thin
+         * emission. Gas R, radiative fractions and luminous efficacy are study
+         * assumptions, not released Griffin calibration or spectral chemistry.
+         * The horizon is a rendering observation extent, not a physical end of
+         * vacuum exhaust. Equation reference: NASA Glenn isentropic nozzle flow,
+         * https://www.grc.nasa.gov/WWW/BGH/isentrop.html . The shared Modelica
+         * implementation publishes mass, energy and pressure-thrust residuals.
+         * Shock cells, rarefaction, backflow and surface interaction are outside
+         * this model. Nozzle geometry is owned by the assembly parts above. */
+        attribute rcsGasGamma : Real = 1.2;
+        attribute gasConstantJkgK : Real = 300.0;
+        attribute mainRadiativeFraction : Real = .0002;
+        attribute rcsRadiativeFraction : Real = .00005;
+        attribute luminousEfficacyLmW : Real = 200.0;
+    }
+
     requirement def GPP011_RcsFeedAvailability {
         doc /* GPP-011 [physics boundary] all twelve RCSJet instances receive fuel
          * and oxidizer availability from the owning live tank mass outputs.
@@ -457,7 +474,7 @@ package GriffinPropulsionRequirements {
         require GPPC008_EnginePlumeDataflow {
             in engineCount = GriffinLanderComponent::engineCount;
         }
-        doc /* GPP-008 [simulation presentation] each main-engine owner shall inherit its render-only outer plume from the LunCoSim rocket_engine_visual library component, without Twin-authored flame geometry or materials. The library helper connects physics to geometry envelope scale, shader colour and light colour. Nozzle radius and nominal thrust shall determine the envelope; fuel family and mixture richness shall determine a documented heuristic palette. Each nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow that engine's own photometry outputs driven by its live propulsion state and the modeled nozzle geometry, so a failed engine shows no plume while the others burn. Zero delivered thrust shall produce neither visible exhaust nor light. */
+        doc /* GPP-008 [simulation presentation] each main-engine owner shall inherit its render-only outer plume from the LunCoSim rocket_engine_visual library component, without Twin-authored flame geometry or materials. The library helper connects physics to geometry envelope scale, shader colour and light colour. Nozzle geometry and the shared ideal-gas streamtube shall determine an expanding field within a finite observation horizon; fuel family and mixture richness shall determine a documented heuristic palette. Each nozzle shall have a render-only outer plume and hot core with the corresponding plume materials, plus a local light. The shader inputs and light intensity/size shall follow that engine's own photometry outputs driven by its live propulsion state and the modeled nozzle geometry, so a failed engine shows no plume while the others burn. Zero delivered thrust shall produce neither visible exhaust nor light. */
     }
     constraint def GPPC009_TankHardwareSeparation {
         in measuredVerticalGapM : Real;

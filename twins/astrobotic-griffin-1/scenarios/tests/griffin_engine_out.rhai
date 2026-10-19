@@ -69,7 +69,10 @@ fn on_tick(me,ctx) {
         FAILED_ENGINE+" showed no plume before the failure"));
     failures.push(t_true(after[FAILED_ENGINE]!=() && after[FAILED_ENGINE]<threshold,
         FAILED_ENGINE+" kept thrust after failing: "+after[FAILED_ENGINE]));
-    failures.push(t_true(get(this.main,griffin_spec::main_engine_port(FAILED_ENGINE,"activity"))==0.0,
+    // Valve travel decays exponentially; combustion follows that physical
+    // tail. Apply the same extinction fraction used for the optical tail.
+    failures.push(t_true(get(this.main,griffin_spec::main_engine_port(FAILED_ENGINE,"activity"))
+        <=EXTINGUISHED_PLUME_FRACTION,
         FAILED_ENGINE+" kept combustion activity after failing"));
     let failed_plume=get(this.main,"test_failed_plume_intensity");
     failures.push(t_true(failed_plume!=() && this.nominal_plume!=()

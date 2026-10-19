@@ -53,7 +53,10 @@ def Xform "World" (
                 {
                     color3f inputs:core_color = (10.0, 9.0, 8.0)
                     color3f inputs:edge_color = (4.0, 1.7999999523162842, 0.6000000238418579)
-                    float inputs:density = 2.5
+                    custom float inputs:energy_fraction = 0.30000001192092896
+                    custom float inputs:radial_width = 1.0
+                    float inputs:steps = 64.0
+                    float inputs:flicker = 0.8500000238418579
                 }
             }
             over "FlameCore_Mat"
@@ -62,7 +65,10 @@ def Xform "World" (
                 {
                     color3f inputs:core_color = (14.0, 14.0, 16.0)
                     color3f inputs:edge_color = (4.0, 3.0, 3.5)
-                    float inputs:density = 4.0
+                    custom float inputs:energy_fraction = 0.699999988079071
+                    custom float inputs:radial_width = 0.44999998807907104
+                    float inputs:steps = 64.0
+                    float inputs:flicker = 0.6000000238418579
                 }
             }
         }

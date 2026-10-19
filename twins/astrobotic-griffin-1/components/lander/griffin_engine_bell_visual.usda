@@ -22,7 +22,10 @@ def Xform "EngineBell" (
                 {
                     color3f inputs:core_color = (12.0, 10.0, 7.0)
                     color3f inputs:edge_color = (8.0, 1.7999999523162842, 0.3499999940395355)
-                    float inputs:density = 4.0
+                    custom float inputs:energy_fraction = 0.30000001192092896
+                    custom float inputs:radial_width = 1.0
+                    float inputs:steps = 64.0
+                    float inputs:flicker = 0.8500000238418579
                 }
             }
             over "FlameCore_Mat"
@@ -31,7 +34,10 @@ def Xform "EngineBell" (
                 {
                     color3f inputs:core_color = (18.0, 15.0, 12.0)
                     color3f inputs:edge_color = (6.0, 2.0, 0.4000000059604645)
-                    float inputs:density = 7.0
+                    custom float inputs:energy_fraction = 0.699999988079071
+                    custom float inputs:radial_width = 0.44999998807907104
+                    float inputs:steps = 64.0
+                    float inputs:flicker = 0.6000000238418579
                 }
             }
         }
