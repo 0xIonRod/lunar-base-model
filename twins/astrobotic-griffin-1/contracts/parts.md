@@ -90,3 +90,12 @@ bell's flame pair and local light connect to its outputs, so a failed engine
 shows no plume while the others burn. At zero delivered thrust the model
 specifies zero plume and zero light. Rhai does not animate plume transforms or
 brightness.
+
+The shared combustion shader integrates gas emission inside each cone; the cone
+is only a rendering bound. Main nozzles use a warm outer flame and pale hot core;
+the twelve RCS nozzles use a fainter, compact combustion effect. Their separate
+material overrides live in the reusable nozzle assets. Both nozzle classes use
+an explicit 100 Pa visible-jet pressure floor in the existing photometry model.
+This is a visualization assumption for the vacuum study, not a measured exhaust
+boundary or a change to engine performance. The model still owns length, colour,
+activity and light output; a closed or starved nozzle stays dark.

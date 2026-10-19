@@ -502,7 +502,7 @@ def Xform "Griffin1" (
             float inputs:stoichiometric_mixture_ratio = 2.0
             float inputs:nozzle_exit_pressure_pa = 0.0
             float inputs:ambient_pressure_pa = 0.0
-            float inputs:pressure_threshold_pa = 1000.0
+            float inputs:pressure_threshold_pa = 100.0
             float outputs:length = 0.0
             float outputs:render_throttle = 0.0
             float outputs:visual_length_fraction = 0.0
@@ -605,7 +605,7 @@ def Xform "Griffin1" (
             float inputs:stoichiometric_mixture_ratio = 2.0
             float inputs:nozzle_exit_pressure_pa = 0.0
             float inputs:ambient_pressure_pa = 0.0
-            float inputs:pressure_threshold_pa = 1000.0
+            float inputs:pressure_threshold_pa = 100.0
             float outputs:length = 0.0
             float outputs:render_throttle = 0.0
             float outputs:visual_length_fraction = 0.0
@@ -708,7 +708,7 @@ def Xform "Griffin1" (
             float inputs:stoichiometric_mixture_ratio = 2.0
             float inputs:nozzle_exit_pressure_pa = 0.0
             float inputs:ambient_pressure_pa = 0.0
-            float inputs:pressure_threshold_pa = 1000.0
+            float inputs:pressure_threshold_pa = 100.0
             float outputs:length = 0.0
             float outputs:render_throttle = 0.0
             float outputs:visual_length_fraction = 0.0
@@ -811,7 +811,7 @@ def Xform "Griffin1" (
             float inputs:stoichiometric_mixture_ratio = 2.0
             float inputs:nozzle_exit_pressure_pa = 0.0
             float inputs:ambient_pressure_pa = 0.0
-            float inputs:pressure_threshold_pa = 1000.0
+            float inputs:pressure_threshold_pa = 100.0
             float outputs:length = 0.0
             float outputs:render_throttle = 0.0
             float outputs:visual_length_fraction = 0.0
@@ -914,7 +914,7 @@ def Xform "Griffin1" (
             float inputs:stoichiometric_mixture_ratio = 2.0
             float inputs:nozzle_exit_pressure_pa = 0.0
             float inputs:ambient_pressure_pa = 0.0
-            float inputs:pressure_threshold_pa = 1000.0
+            float inputs:pressure_threshold_pa = 100.0
             float outputs:length = 0.0
             float outputs:render_throttle = 0.0
             float outputs:visual_length_fraction = 0.0
@@ -1017,7 +1017,7 @@ def Xform "Griffin1" (
             float inputs:stoichiometric_mixture_ratio = 2.0
             float inputs:nozzle_exit_pressure_pa = 0.0
             float inputs:ambient_pressure_pa = 0.0
-            float inputs:pressure_threshold_pa = 1000.0
+            float inputs:pressure_threshold_pa = 100.0
             float outputs:length = 0.0
             float outputs:render_throttle = 0.0
             float outputs:visual_length_fraction = 0.0
@@ -1120,7 +1120,7 @@ def Xform "Griffin1" (
             float inputs:stoichiometric_mixture_ratio = 2.0
             float inputs:nozzle_exit_pressure_pa = 0.0
             float inputs:ambient_pressure_pa = 0.0
-            float inputs:pressure_threshold_pa = 1000.0
+            float inputs:pressure_threshold_pa = 100.0
             float outputs:length = 0.0
             float outputs:render_throttle = 0.0
             float outputs:visual_length_fraction = 0.0
@@ -1324,6 +1324,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsPitchPosBModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1365,6 +1366,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsPitchNegModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1406,6 +1408,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsPitchNegBModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1447,6 +1450,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsRollPosModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1488,6 +1492,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsRollPosBModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1529,6 +1534,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsRollNegModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1570,6 +1576,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsRollNegBModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1611,6 +1618,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsYawPosModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1653,6 +1661,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsYawPosBModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1694,6 +1703,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsYawNegModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1736,6 +1746,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsYawNegBModel" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1777,6 +1788,7 @@ def Xform "Griffin1" (
             double inputs:isp_sec = 309.98480831915157
             double inputs:mixture_ratio = 0.9
             double inputs:design_chamber_pressure_pa = 1516846.6044969598
+            custom float inputs:pressure_threshold_pa = 100.0
         }
         def Scope "RcsFlowAggregator" (
             prepend apiSchemas = ["LunCoProgramAPI"]

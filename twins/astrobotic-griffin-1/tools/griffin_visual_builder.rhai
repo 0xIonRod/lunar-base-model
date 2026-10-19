@@ -149,7 +149,7 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
         #{name:"stoichiometric_mixture_ratio",value:stoichiometric.to_string()},
         #{name:"nozzle_exit_pressure_pa",value:"0.0"},
         #{name:"ambient_pressure_pa",value:"0.0"},
-        #{name:"pressure_threshold_pa",value:"1000.0"}] {
+        #{name:"pressure_threshold_pa",value:"100.0"}] {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"inputs:"+parameter.name,
             type_name:"float",value:parameter.value}});
     }

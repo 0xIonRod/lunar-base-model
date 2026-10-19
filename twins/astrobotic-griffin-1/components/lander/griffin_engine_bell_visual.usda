@@ -14,6 +14,27 @@ def Xform "EngineBell" (
     {
         custom double3 xformOp:translate = (0.0, -0.26, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
+        over "Looks"
+        {
+            over "Flame_Mat"
+            {
+                over "Surface"
+                {
+                    color3f inputs:core_color = (12.0, 10.0, 7.0)
+                    color3f inputs:edge_color = (8.0, 1.7999999523162842, 0.3499999940395355)
+                    float inputs:density = 4.0
+                }
+            }
+            over "FlameCore_Mat"
+            {
+                over "Surface"
+                {
+                    color3f inputs:core_color = (18.0, 15.0, 12.0)
+                    color3f inputs:edge_color = (6.0, 2.0, 0.4000000059604645)
+                    float inputs:density = 7.0
+                }
+            }
+        }
     }
     def Mesh "Bell" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
