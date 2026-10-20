@@ -81,6 +81,12 @@ script = "scenarios/tests/griffin_tank_requirements.rhai"
 verdict_channel = "GRIFFIN_TANK_REQUIREMENTS"
 
 [[verification.cases]]
+name = "GriffinSolarRequirements::Verify_GriffinDescentSunPointing"
+scene = "tests/griffin_sun_pointing.usda"
+script = "scenarios/tests/griffin_sun_pointing.rhai"
+verdict_channel = "GRIFFIN_SUN_POINTING"
+
+[[verification.cases]]
 name = "GriffinSolarRequirements::Verify_GriffinSolarRequirements"
 scene = "tests/griffin_solar_requirements.usda"
 script = "scenarios/tests/griffin_solar_requirements.rhai"

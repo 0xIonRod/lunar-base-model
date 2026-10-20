@@ -1,5 +1,36 @@
 # Griffin verification boundary
 
+## Sun-facing autonomous descent
+
+The operator-requested GSA-011 study yaws the forward solar bank's +Z outward
+normal toward the mounted probe's measured Sun azimuth. The IMU quaternion
+keeps this heading reference separate from the thrust-vector tilt needed for
+landing. The 60 m final approach begins Sun-aligned with all attached rigid
+bodies at rest; guidance commands descent immediately. FLIP shares the initial
+yaw so its fixed adapter starts without a rotational constraint error.
+`heading_ready` qualifies azimuth error within 5 degrees and yaw rate within
+0.02 rad/s for the observer; heading qualification does not pause descent.
+First accepted pilot flight input releases the
+heading reference through the existing GNC authority gate. Native contact
+handoff retires automatic attitude requests.
+
+`GriffinSolarRequirements::GriffinDescentSunPointingStudy` owns the study
+limits: initial heading qualification within 2 s, tracking for at least 3 s,
+and an observer timeout of 180 s. These are simulation acceptance settings, not flight GNC
+tolerances. GSA-010 transit Sun pointing, thermal exceptions, full mission-window
+coverage and array electrical performance retain their separate scope.
+
+Run the mapped `GriffinSolarRequirements::Verify_GriffinDescentSunPointing`
+case on `tests/griffin_sun_pointing.usda`. Its typed SysML constraint consumes
+sampled acquisition time, tracking error, automatic authority and qualified
+landing handoff, with source-pinned limits and simulation intervals. Run
+`GriffinFunctionalRequirements::Verify_GriffinGncHandoff` for selection,
+first-input release and reconnect, and
+`GriffinSimulationAccuracyRequirements::Verify_GriffinLandingStability` for
+the post-touchdown stability interval. The shared simulator
+`scripts/api/test_attitude_heading.py --output <evidence-dir>` covers analytic
+heading signs, antipodal recovery, tilt, rate readiness and manual authority.
+
 ## Temperature-sensitive photovoltaics and bounded cooling — 2026-10-20
 
 Solar cell temperature now affects both available conversion power and the

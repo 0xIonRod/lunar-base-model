@@ -4,6 +4,7 @@ const TEST_KIND = "headless";
 
 fn simulation_dependencies(me, ctx) {
     let dependencies = griffin_surface_ops::landing_stability_dependencies();
+    dependencies.modelica_entities.push(find_path("/Griffin1SurfaceOps/Lander/AttitudeReference"));
     dependencies.entity_writes = [find_path("/Griffin1SurfaceOps/Lander"),
         find_path("/Griffin1SurfaceOps/Lander/GNC")];
     dependencies
@@ -29,8 +30,10 @@ fn is_guided(lander) { let value = get(lander, "piloted"); value != () && value 
 fn manual(me) { is_manual(this.lander) }
 fn guided(me) {
     let gnc=find_path("/Griffin1SurfaceOps/Lander/GNC");
+    let reference=find_path("/Griffin1SurfaceOps/Lander/AttitudeReference");
     is_guided(this.lander) && griffin_controls::gnc_connected() == true
         && get(gnc,"flight_authority_gate") > 0.5
+        && get(reference,"heading_enable") > 0.5
 }
 
 fn selected_with_guidance(me) {
@@ -42,6 +45,8 @@ fn selected_with_guidance(me) {
         "validated descent guidance arms despite initial pilot possession"));
     this.checks.push(t_true(is_guided(this.lander) && griffin_controls::gnc_connected() == true,
         "avatar selection leaves guidance active without flight input"));
+    this.checks.push(t_true(get(find_path("/Griffin1SurfaceOps/Lander/AttitudeReference"),"heading_enable")>0.5,
+        "avatar selection preserves autonomous solar heading"));
     this.checks.push(t_true(ignition_sample_valid(sample, this.thrust_threshold),
         "selected lander retains automatic powered descent"));
     if get(gnc, "engage") != 1.0 {
@@ -85,6 +90,8 @@ fn neutral_stays_manual(me) {
     print("GRIFFIN MANUAL GUIDANCE AUTHORITY " + authority);
     this.checks.push(t_true(authority.pilot_input==1.0 && authority.command_gate==0.0,
         "the guidance model receives the same manual authority and stops commanding flight"));
+    this.checks.push(t_true(get(find_path("/Griffin1SurfaceOps/Lander/AttitudeReference"),"heading_enable")==0.0,
+        "manual flight input releases solar heading hold"));
     true
 }
 
@@ -157,6 +164,8 @@ fn finish(me) {
     if this.done { return true; }
     this.done = true;
     this.checks.push(t_true(is_guided(this.lander), "guidance owns the lander again"));
+    this.checks.push(t_true(get(find_path("/Griffin1SurfaceOps/Lander/AttitudeReference"),"heading_enable")>0.5,
+        "GNC reconnect restores solar heading hold"));
     let unknown = griffin_surface_ops::on_hud_action("no_such_action");
     this.checks.push(t_true(unknown != () && unknown.ok == false,
         "an unknown HUD action is rejected"));

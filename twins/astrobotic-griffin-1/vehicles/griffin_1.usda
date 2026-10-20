@@ -2939,6 +2939,17 @@ def Xform "Griffin1" (
         float inputs:desired_tilt_x.connect = </Griffin1.outputs:desired_tilt_x>
         float inputs:desired_tilt_z
         float inputs:desired_tilt_z.connect = </Griffin1.outputs:desired_tilt_z>
+        custom double inputs:heading_enable = 0.0 (
+            documentation = "Autonomous solar-heading authority is connected by the mission. Default zero allows standalone vehicle and manual yaw operation."
+        )
+        custom double inputs:heading_target_body_x = 0.0
+        custom double inputs:heading_target_body_y = 0.0
+        custom double inputs:heading_target_body_z = 0.0
+        custom double outputs:heading_error_rad = 0.0
+        custom double outputs:heading_valid = 0.0
+        custom float inputs:heading_rate_body_y
+        float inputs:heading_rate_body_y.connect = </Griffin1/IMU.outputs:gyro_y>
+        custom double outputs:heading_ready = 0.0
     }
     def Xform "Nozzle"
     {

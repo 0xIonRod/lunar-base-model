@@ -60,11 +60,11 @@ def Xform "Griffin1SurfaceOps" (
     }
     def "Lander" (
         prepend references = [@twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>, @lunco://components/gnc/position_pid_guidance.usda@</PositionPIDGuidance>]
+        documentation = "Final-approach study starts at 60 m with all connected rigid bodies at rest, yawed 172.483 degrees toward the Sun at the authored site/epoch. Guidance immediately descends while tracking solar heading. The initial yaw is an epoch-specific study value, not a flight attitude plan."
     )
     {
         double3 xformOp:translate = (0.0, 60.0, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        double3 physics:velocity = (0.0, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateY"]
         float inputs:guidance_throttle
         float inputs:guidance_throttle.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:throttle_cmd>
         float inputs:guidance_pitch
@@ -77,6 +77,8 @@ def Xform "Griffin1SurfaceOps" (
         float inputs:landing_engine_cutoff.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:landing_engine_cutoff>
         float inputs:landing_handoff
         float inputs:landing_handoff.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:landing_handoff>
+        custom double xformOp:rotateY = 172.483
+        vector3f physics:velocity = (0.0, 0.0, 0.0)
         over "GNC"
         {
             float inputs:initial_pos_x = 0.0
@@ -144,12 +146,28 @@ def Xform "Griffin1SurfaceOps" (
             float inputs:max_thrust = 21796.28515625
             float inputs:piloted
             float inputs:piloted.connect = </Griffin1SurfaceOps/Lander.outputs:piloted>
+            custom double outputs:flight_authority_gate = 0.0
         }
         def "RampHingePort"
         {
         }
         def "RampHingeStarboard"
         {
+        }
+        over "AttitudeReference" (
+            documentation = "Forward solar-bank +Z faces Sun azimuth during automatic descent. IMU thrust tilt retains priority; first pilot flight input disables heading hold through the GNC authority gate."
+        )
+        {
+            custom double inputs:heading_enable
+            double inputs:heading_enable.connect = </Griffin1SurfaceOps/Lander/GNC.outputs:flight_authority_gate>
+            custom double inputs:heading_target_body_x
+            double inputs:heading_target_body_x.connect = </Griffin1SurfaceOps/Lander/Environment.outputs:sun_mount_x>
+            custom double inputs:heading_target_body_y
+            double inputs:heading_target_body_y.connect = </Griffin1SurfaceOps/Lander/Environment.outputs:sun_mount_y>
+            custom double inputs:heading_target_body_z
+            double inputs:heading_target_body_z.connect = </Griffin1SurfaceOps/Lander/Environment.outputs:sun_mount_z>
+            custom double parameters:heading_tolerance_rad = 0.08726646259971647
+            custom double parameters:heading_rate_tolerance_rad_s = 0.02
         }
     }
     def "FLIP" (
@@ -160,7 +178,7 @@ def Xform "Griffin1SurfaceOps" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         double3 physics:velocity = (0.0, 0.0, 0.0)
         custom token lunco:mission:deploymentState = "top_deck_attached_until_touchdown"
-        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 172.483, 0.0)
         custom rel programs = </Griffin1SurfaceOps/FlipRoute/Program>
     }
     def PhysicsFixedJoint "FLIPPayloadAdapterJoint"

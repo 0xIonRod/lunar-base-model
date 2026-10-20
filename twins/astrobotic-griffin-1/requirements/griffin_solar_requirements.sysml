@@ -2,6 +2,7 @@ package GriffinSolarRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
     private import ScalarValues::String;
+    private import ScalarValues::Boolean;
     private import VectorValues::CartesianThreeVectorValue;
     private import GriffinRequirementSources::TwinAssetPath;
     private import GriffinRequirementSources::UsdPrimPath;
@@ -108,6 +109,17 @@ package GriffinSolarRequirements {
          * not an angular hardware tolerance. USD orient uses (w,x,y,z). */
         attribute orientationTolerance : Real = 0.00001;
         attribute minimumMountOverlapM : Real = 0.01;
+    }
+
+    part def GriffinDescentSunPointingStudy {
+        doc /* Operator-requested simulation acceptance for solar heading during descent. These are study limits, not supplier flight-GNC tolerances. Thrust-vector tilt, manual authority and native contact handoff retain priority. */
+        attribute azimuthToleranceRad : Real = 0.08726646259971647;
+        attribute acquisitionTimeS : Real = 2.0;
+        // Final-approach yaw derived from the authored epoch/site Sun azimuth.
+        attribute initialYawDeg : Real = 172.483;
+        attribute yawRateToleranceRadS : Real = 0.02;
+        attribute minimumTrackingTimeS : Real = 3.0;
+        attribute testTimeoutS : Real = 180.0;
     }
 
     requirement def GSA001_ArrayCount {
@@ -227,6 +239,35 @@ package GriffinSolarRequirements {
         doc /* GSA-010 [operational, OPEN] during transit, Griffin attitude control shall keep solar-array incidence within a source-defined Sun-pointing envelope when mission, thermal, and vehicle constraints permit. Define the envelope, evaluation window, and permitted exceptions before claiming a pass. Verification evidence shall correlate time-aligned Sun direction, commanded and measured vehicle attitude, panel incidence, and electrical-power data. */
     }
 
+    constraint def GSAC011_DescentSolarHeading {
+        in telemetryFinite : Boolean;
+        in automaticAuthority : Boolean;
+        in acquisitionCompleted : Boolean;
+        in acquisitionTimeS : Real;
+        in maximumAcquisitionTimeS : Real;
+        in landingHandoff : Boolean;
+        in sampleCount : Real;
+        in initialHeadingErrorRad : Real;
+        in maximumTrackingErrorRad : Real;
+        in trackingTimeS : Real;
+        in azimuthToleranceRad : Real;
+        in minimumTrackingTimeS : Real;
+        telemetryFinite and automaticAuthority and acquisitionCompleted
+            and acquisitionTimeS >= 0.0 and acquisitionTimeS <= maximumAcquisitionTimeS
+            and landingHandoff and sampleCount > 0.0
+            and RealFunctions::abs(initialHeadingErrorRad) <= azimuthToleranceRad
+            and maximumTrackingErrorRad <= azimuthToleranceRad
+            and trackingTimeS >= minimumTrackingTimeS;
+    }
+    requirement def GSA011_DescentSunPointing {
+        require GSAC011_DescentSolarHeading {
+            in azimuthToleranceRad = GriffinDescentSunPointingStudy::azimuthToleranceRad;
+            in minimumTrackingTimeS = GriffinDescentSunPointingStudy::minimumTrackingTimeS;
+            in maximumAcquisitionTimeS = GriffinDescentSunPointingStudy::acquisitionTimeS;
+        }
+        doc /* GSA-011 [operator study] the final approach shall start Sun-aligned and descending without a heading-acquisition hover; during autonomous powered descent, Griffin shall yaw the forward solar-array outward normal toward the measured Sun azimuth within GriffinDescentSunPointingStudy limits. Required thrust tilt retains priority. First accepted pilot flight input releases solar heading control; settled native contact hands control to the landing gear. The verification shall observe live heading error, automatic authority and successful landing. */
+    }
+
     requirement <'GSA-001'> gsa001 : GSA001_ArrayCount { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-002'> gsa002 : GSA002_ArrayStructure { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-003'> gsa003 : GSA003_SunQuadrantLayout { subject arrays : GriffinSolarArrayAssembly; }
@@ -237,6 +278,12 @@ package GriffinSolarRequirements {
     requirement <'GSA-008'> gsa008 : GSA008_HingeAndStandoff { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-009'> gsa009 : GSA009_BusMountConnection { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-010'> gsa010 : GSA010_TransitSunPointing { subject lander : GriffinLanderComponent; }
+    requirement <'GSA-011'> gsa011 : GSA011_DescentSunPointing { subject lander : GriffinLanderComponent; }
+
+    verification def Verify_GriffinDescentSunPointing {
+        subject lander : GriffinLanderComponent;
+        objective { verify gsa011; }
+    }
 
     verification def Verify_GriffinSolarRequirements {
         subject arrays : GriffinSolarArrayAssembly;

@@ -465,6 +465,13 @@ electrical-power observations. Verification against the flight configuration
 requires the mission landing epoch/site and installation definition, plus
 transit attitude and EPS data.
 
+GSA-011 separately defines the operator-requested autonomous descent study.
+The final approach starts Sun-aligned at the authored site/epoch and tracks
+measured Sun azimuth continuously during descent, then yields to manual input
+and native contact handoff. Its 5 degree / 0.02 rad/s envelope and acquisition interval
+are source-owned study settings. This implemented descent behavior does not
+close the transit, thermal, installation-ICD or flight-performance gaps above.
+
 ### Configuration conflicts to resolve
 
 - Astrobotic's current product page specifies seven main engines. The earlier
