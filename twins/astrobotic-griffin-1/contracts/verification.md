@@ -31,6 +31,15 @@ the post-touchdown stability interval. The shared simulator
 `scripts/api/test_attitude_heading.py --output <evidence-dir>` covers analytic
 heading signs, antipodal recovery, tilt, rate readiness and manual authority.
 
+The 2026-10-20 merged production qualification passes all five mapped cases:
+Sun pointing, GNC handoff, landing stability, engine-out and full surface
+operations (each exits zero with a structured PASS). Both native-window and headless descent observers acquire
+heading in 0.05 s and measure a maximum azimuth error of 0.00592636 rad
+(0.340 degrees) over 23.5 s of tracking. The landing-stability run observes
+all four pads in contact in all 361 observations over 60.0167 s. The GNC
+selection/manual/reconnect case passes 22 checks. These observations apply to
+the authored site, epoch and initial approach, not the full flight envelope.
+
 ## Temperature-sensitive photovoltaics and bounded cooling — 2026-10-20
 
 Solar cell temperature now affects both available conversion power and the
