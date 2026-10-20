@@ -4085,7 +4085,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         return plan_error("refine_griffin_engine_skirt_plan requires a document, edit target, and absolute root");
     }
     let selected=[];
-    for name in ["perimeterRailName","railLengthM","railHeightM","railWidthM","shellDepthM","shellBottomInsetM","adapterPlateName","adapterPlateWidthM","adapterPlateDepthM","adapterPlateHeightM","componentLocalCenterYM","adapterPlateCenterYM"] {
+    for name in ["perimeterRailName","railLengthM","railHeightM","railWidthM","shellDepthM","shellBottomInsetM","adapterPlateName","adapterPlateWidthM","adapterPlateDepthM","adapterPlateHeightM","componentLocalCenterYM","adapterPlateCenterYM","thermalOpeningApothemM","thermalApronThicknessM"] {
         selected.push("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::"+name);
     }
     let source = sysml_requirements::source_with_attributes(selected);
@@ -4114,6 +4114,12 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         || shell_inset >= width / 2.0 || shell_inset >= depth / 2.0
         || adapter_width <= 0.0 || adapter_depth <= 0.0 || adapter_height <= 0.0 {
         return plan_error("engine-skirt SysML metric dimensions are missing or invalid: "+[width,depth,height,section,shell_depth,shell_inset,local_center_y,adapter_name,adapter_width,adapter_depth,adapter_height,adapter_center_y].to_string());
+    }
+    let opening = _skirt_number(source, "thermalOpeningApothemM");
+    let apron_thickness = _skirt_number(source, "thermalApronThicknessM");
+    if opening==() || apron_thickness==() || opening<=0.0
+        || opening>=width/2.0-shell_inset || apron_thickness<=0.0 {
+        return plan_error("thermal opening and apron thickness must fit the engine bay");
     }
     let profile=griffin_spec::visual_outer_body_profile_coordinates();
     let ring=griffin_geometry::octagonal_ring_geometry(profile,width/2.0,
@@ -4199,6 +4205,31 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         schemas:["PhysicsCollisionAPI","MaterialBindingAPI"]}});
     ops.push(#{SetRelationship:#{edit_target:edit_target,path:shell_path,
         name:"material:binding",targets:[blanket]}});
+    // The belly apron closes the surrounding bay while keeping one open
+    // central exhaust aperture. The liner screens adjacent hardware laterally.
+    let lower=local_center_y+height/2.0-shell_depth;
+    let apron=griffin_geometry::octagonal_ring_geometry(profile,width/2.0-shell_inset,
+        lower+apron_thickness/2.0,width/2.0-shell_inset-opening,apron_thickness);
+    if !apron.ok {return plan_error(apron.error);}
+    let liner_points=[];
+    for y in [lower+apron_thickness,local_center_y+height/2.0] {
+        for p in profile {liner_points.push([p.x*opening,y,p.y*opening]);}
+    }
+    for geometry in [#{name:"ThermalApron",points:apron.points,counts:apron.face_counts,indices:apron.face_indices},
+        #{name:"ThermalLiner",points:liner_points,counts:[4,4,4,4,4,4,4,4],
+          indices:[0,1,9,8,1,2,10,9,2,3,11,10,3,4,12,11,4,5,13,12,5,6,14,13,6,7,15,14,7,0,8,15]}] {
+        let path=root+"/"+geometry.name;
+        let exists=query_ok(_component_query(doc,path));
+        let mesh=assembly_builder::mesh_shape_plan(edit_target,root,geometry.name,
+            geometry.points,geometry.counts,geometry.indices,[0.20,0.22,0.25],false);
+        if !mesh.ok {return mesh;}
+        for op in mesh.ops {if exists && op.AddPrim!=() {continue;} ops.push(op);}
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"purpose",type_name:"token",value:"\"render\""}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"doubleSided",type_name:"bool",value:"true"}});
+        ops.push(#{SetPrimDocumentation:#{edit_target:edit_target,path:path,
+            documentation:"Engine-bay thermal protection reconstruction. Open exhaust path; estimated geometry and optical appearance. No heat-transfer or flight qualification claimed."}});
+        paths.push(path);
+    }
     let component_record = assembly_builder::composed_query(doc,
         #{path: root, attrs: ["lunco:visual:component",
             "lunco:visual:datum", "lunco:visual:skirt_metric_envelope"],

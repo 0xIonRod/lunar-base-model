@@ -83,3 +83,23 @@ root, index, group)` calls for `frame`, `backplane`, `substrate`, `materials`,
 Indices follow `solarArrayInstances` and `componentAssets`; no full-panel
 operation bypasses the script budget. Read back each compound generation before
 the next group, then save and inspect the complete panel in its own preview.
+
+## Compact cluster and thermal protection
+
+The seven engine stations now use a 0.64 m ring (one centre plus six outer
+engines), reducing the outer-engine centre span from 2.38 m to 1.28 m.
+The calculated 379.948 mm outer exit diameter leaves 260.052 mm minimum
+bell-to-bell clearance. Visible engines and force actuators share those prims.
+The full lower bay retains its octagonal MLI cover; an 8 mm visual apron closes
+the surrounding underside around a 1.02 m-apothem central opening. An inner
+liner separates the engines laterally from adjacent hardware. Both ends of
+the exhaust opening stay open. The apron and liner use a dark optical estimate;
+no temperature rating, emissivity, radiative heat flux or plume impingement
+claim is implied.
+
+[NASA/JPL PIA26708](https://science.nasa.gov/photojournal/voyager-technologies-griffin-1-completes-environmental-testing-at-nasa-jpl/)
+(13 October 2026) establishes the wrapped lower hardware bay; the photographs
+do not release an engine mounting drawing or shield dimensions. Cluster pitch,
+shield opening and stock thickness are operator-requested reconstruction
+parameters, replaceable by supplier data. This geometric representation does
+not close thermal qualification requirements.

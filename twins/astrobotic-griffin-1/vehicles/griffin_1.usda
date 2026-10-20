@@ -3123,7 +3123,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["LunCoForceActuatorAPI"]
             )
             {
-                custom double3 xformOp:translate = (1.19, 0.34, 0.0)
+                custom double3 xformOp:translate = (0.64, 0.34, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
                 double lunco:forceActuator:maxForce = 5394.8476527572275
@@ -3297,7 +3297,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["LunCoForceActuatorAPI"]
             )
             {
-                custom double3 xformOp:translate = (0.595, 0.34, 1.030570230503)
+                custom double3 xformOp:translate = (0.32, 0.34, 0.554256258422)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
                 double lunco:forceActuator:maxForce = 5394.8476527572275
@@ -3471,7 +3471,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["LunCoForceActuatorAPI"]
             )
             {
-                custom double3 xformOp:translate = (-0.595, 0.34, 1.030570230503)
+                custom double3 xformOp:translate = (-0.32, 0.34, 0.554256258422)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
                 double lunco:forceActuator:maxForce = 5394.8476527572275
@@ -3645,7 +3645,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["LunCoForceActuatorAPI"]
             )
             {
-                custom double3 xformOp:translate = (-1.19, 0.34, 0.0)
+                custom double3 xformOp:translate = (-0.64, 0.34, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
                 double lunco:forceActuator:maxForce = 5394.8476527572275
@@ -3826,7 +3826,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["LunCoForceActuatorAPI"]
             )
             {
-                custom double3 xformOp:translate = (-0.595, 0.34, -1.030570230503)
+                custom double3 xformOp:translate = (-0.32, 0.34, -0.554256258422)
                 custom token[] xformOpOrder = ["xformOp:translate"]
                 float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
                 double lunco:forceActuator:maxForce = 5394.8476527572275
@@ -4000,7 +4000,7 @@ def Xform "Griffin1" (
                 prepend apiSchemas = ["LunCoForceActuatorAPI"]
             )
             {
-                custom double3 xformOp:translate = (0.595, 0.34, -1.030570230503)
+                custom double3 xformOp:translate = (0.32, 0.34, -0.554256258422)
                 custom token[] xformOpOrder = ["xformOp:translate"]
                 float3 lunco:forceActuator:direction = (0.0, 1.0, 0.0)
                 double lunco:forceActuator:maxForce = 5394.8476527572275

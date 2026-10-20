@@ -436,28 +436,22 @@ package GriffinVisualConfigurationRequirements {
         /* Seven engines: current Astrobotic Griffin product page, accessed
          * 2026-10-03: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
          * The August 2021 PUG v5.02 p.26 five-engine configuration is historical.
-         * No current mounting drawing is available. One center plus a regular
-         * six-engine ring is an explicit symmetric packaging estimate, not
-         * supplier geometry. The 1.19 m ring leaves 0.51 m between 0.34 m bell
-         * exits, at least 0.11 m to the 3.44 m frame's inner rail edges, and
-         * collar clearance below the four estimated tank envelopes and their
-         * lower end hardware. Y=0.34 m puts the uppermost collar at 0.76 m,
-         * below the tank cradle bottoms at 0.784 m (24 mm separation).
-         * The adapter plate occupies Y=0.76..0.88 m. Its frame centers at
-         * Y=0.82 m, with rail tops at the lower service-skirt bottom Y=0.86 m.
-         * Thus the frame supports the upper engine interface rather than
-         * surrounding the bell exits. The lowest exit Y=0.08 m plus the
-         * 0.44 m touchdown root elevation leaves 0.52 m ground clearance.
-         * Shared aluminum tank-seat/adapter interfaces are structural joins;
-         * their geometry is a study proxy, not a released attachment ICD.
-         * This visual-only placement does not alter aggregate Modelica thrust
-         * or add force actuators. Current thrust/mass calibration remains open.
+         * No current mounting drawing is public. One center plus a regular
+         * six-engine ring is a compact packaging reconstruction. The 0.64 m
+         * ring and 0.380 m outer exit diameter leave 0.260 m minimum between
+         * bells. The cluster fits the separate 1.02 m-apothem thermal opening.
+         * The surrounding apron and liner represent radiant/plume protection;
+         * material properties and heat-rejection performance remain unqualified.
+         * Current hardware imagery establishes the wrapped lower bay, not
+         * these dimensions: NASA/JPL PIA26708, 2026-10-13.
+         * https://science.nasa.gov/photojournal/voyager-technologies-griffin-1-completes-environmental-testing-at-nasa-jpl/
+         * Engine prims own both the visible bell and physical force mount.
          */
         attribute engineStations : Position[7] =
-            ((0.0, 0.34, 0.0), (1.19, 0.34, 0.0),
-             (0.595, 0.34, 1.030570230503), (-0.595, 0.34, 1.030570230503),
-             (-1.19, 0.34, 0.0), (-0.595, 0.34, -1.030570230503),
-             (0.595, 0.34, -1.030570230503));
+            ((0.0, 0.34, 0.0), (0.64, 0.34, 0.0),
+             (0.32, 0.34, 0.554256258422), (-0.32, 0.34, 0.554256258422),
+             (-0.64, 0.34, 0.0), (-0.32, 0.34, -0.554256258422),
+             (0.32, 0.34, -0.554256258422));
     }
 
     requirement def GVC001_ConfigurationSelection {

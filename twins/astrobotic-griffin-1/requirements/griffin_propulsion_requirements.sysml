@@ -245,6 +245,11 @@ package GriffinPropulsionRequirements {
          * No coating or thermal-property claim follows from that RGB value.
          * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
          * https://www.nasa.gov/gallery/astrobotics-griffin-1/ */
+        // Compact central exhaust opening with a surrounding belly apron and
+        // internal radiant barrier. Reconstruction dimensions, not flight data.
+        attribute thermalOpeningApothemM : Real = 1.02;
+        attribute thermalApronThicknessM : Real = .008;
+        attribute minimumThermalOpeningBellClearanceM : Real = .10;
         attribute nozzleExitRecessM : Real = .02;
         attribute shellDepthM : Real = shellUpperYM + GriffinMainPropulsionAssembly::bellHeightM / 2.0 + nozzleExitRecessM;
         attribute shellBottomInsetM : Real = 0.06;
@@ -514,19 +519,25 @@ package GriffinPropulsionRequirements {
         in nozzleExitRecessM : Real;
         in requiredNozzleExitRecessM : Real;
         in adapterThroatSeparationM : Real;
+        in thermalOpeningClearanceM : Real;
+        in requiredThermalOpeningClearanceM : Real;
+        in exhaustOpeningClear : Boolean;
         in toleranceM : Real;
         minimumRadialClearanceM >= requiredRadialClearanceM
             and nozzleExitRecessM - requiredNozzleExitRecessM <= toleranceM
             and nozzleExitRecessM - requiredNozzleExitRecessM >= -toleranceM
-            and adapterThroatSeparationM >= -toleranceM;
+            and adapterThroatSeparationM >= -toleranceM
+            and thermalOpeningClearanceM >= requiredThermalOpeningClearanceM
+            and exhaustOpeningClear;
     }
     requirement def GES004_BellClearance {
         require GESC004_SkirtAndBellFit {
             in requiredRadialClearanceM = GriffinEngineSkirtComponent::minimumSkirtBellClearanceM;
+            in requiredThermalOpeningClearanceM = GriffinEngineSkirtComponent::minimumThermalOpeningBellClearanceM;
             in requiredNozzleExitRecessM = GriffinEngineSkirtComponent::nozzleExitRecessM;
             in toleranceM = GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GES-004 [clearance] the rails and lower shroud contour leave at least minimumSkirtBellClearanceM clearance to the full bell envelopes. Every open bell exit is recessed by nozzleExitRecessM above the open skirt lip, and the adapter plate lower face is at or above the upper throat ends. These conservative packaging checks must use composed geometry; a named shroud is not evidence of clearance. */
+        doc /* GES-004 [clearance] the rails and lower shroud contour leave at least minimumSkirtBellClearanceM clearance to the full bell envelopes. The thermal apron and internal liner shall leave a central exhaust opening with minimumThermalOpeningBellClearanceM radial clearance to all complete bell envelopes and no mesh cap across the exhaust paths. Every open bell exit is recessed by nozzleExitRecessM above the open skirt lip, and the adapter plate lower face is at or above the upper throat ends. These conservative packaging checks must use composed geometry; a named shroud is not evidence of clearance. */
     }
     requirement def GES005_SkirtOwnership {
         doc /* GES-005 [ownership] skirt geometry is render-only and cannot introduce thrust, collider, or physics authority. */

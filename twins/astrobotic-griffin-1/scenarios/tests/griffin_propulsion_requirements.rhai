@@ -161,6 +161,48 @@ fn station_ring_is_centered_hexagon(stations, tolerance) {
     counts[0] == 6 && counts[1] == 6 && counts[2] == 3
 }
 
+// Measure the actual aperture and reject caps across each exhaust centre.
+fn thermal_fit_observation(root, engine_records, bell_observations, tolerance) {
+    let batch=query("QueryUsdPrims",#{paths:[root+"/ThermalApron",root+"/ThermalLiner"],
+        attrs:["points","faceVertexCounts","faceVertexIndices"]});
+    let snapshot=_query_snapshot(batch);
+    if snapshot.ok!=true || batch.records.len()!=2 {return #{available:false,snapshot:snapshot};}
+    let liner=batch.records[1];
+    if liner.attrs.points==() || liner.attrs.points.len()<16 {return #{available:false,snapshot:snapshot};}
+    let lower=1.0e30;
+    for point in liner.attrs.points {lower=min(lower,point[1]);}
+    let contour=[];
+    for point in liner.attrs.points {
+        if abs(point[1]-lower)<=tolerance {contour.push(vec3_from(point));}
+    }
+    if contour.len()!=8 {return #{available:false,snapshot:snapshot};}
+    let clearance=1.0e30;let clear=true;
+    for i in 0..engine_records.len() {
+        let engine=vec3_from(engine_records[i].attrs["xformOp:translate"]);
+        let gap=griffin_geometry::convex_polygon_clearance_xz(engine,contour);
+        if gap==() || !bell_observations[i].available {return #{available:false,snapshot:snapshot};}
+        clearance=min(clearance,gap-bell_observations[i].radius);
+        for mesh in batch.records {
+            if mesh.attrs.points==() || mesh.attrs.faceVertexCounts==()
+                || mesh.attrs.faceVertexIndices==() {return #{available:false,snapshot:snapshot};}
+            let offset=0;
+            for count in mesh.attrs.faceVertexCounts {
+                let polygon=[];
+                for vertex in 0..count {
+                    if offset+vertex>=mesh.attrs.faceVertexIndices.len() {return #{available:false,snapshot:snapshot};}
+                    let index=mesh.attrs.faceVertexIndices[offset+vertex];
+                    if index<0 || index>=mesh.attrs.points.len() {return #{available:false,snapshot:snapshot};}
+                    polygon.push(vec3_from(mesh.attrs.points[index]));
+                }
+                offset+=count;
+                let inside=griffin_geometry::convex_polygon_clearance_xz(engine,polygon);
+                if inside!=() && inside>=-tolerance {clear=false;}
+            }
+        }
+    }
+    #{available:true,snapshot:snapshot,clearance:clearance,clear:clear}
+}
+
 // One composed snapshot of the skirt, plate, rail stock and throat ends.
 fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observations, tolerance, profile, body_dimensions, radius, center_y, width, height, shell_depth, shell_inset) {
     let paths=[skirt_root+"/EngineSkirtShell",skirt_root+"/EngineAdapterPlate",skirt_root];
@@ -370,7 +412,7 @@ fn on_tick(me, ctx) {
     for name in ["componentRootName", "perimeterRailName", "shellName",
         "adapterPlateName", "componentLocalCenterYM", "railLengthM",
         "railWidthM", "railHeightM", "shellDepthM", "adapterPlateWidthM",
-        "adapterPlateHeightM", "adapterPlateDepthM", "adapterPlateCenterYM", "minimumSkirtBellClearanceM", "nozzleExitRecessM", "shellBottomInsetM"] {
+        "adapterPlateHeightM", "adapterPlateDepthM", "adapterPlateCenterYM", "minimumSkirtBellClearanceM", "nozzleExitRecessM", "shellBottomInsetM", "minimumThermalOpeningBellClearanceM"] {
         selected_attributes.push(skirt(name));
     }
     selected_attributes.push(parent("engineCount"));
@@ -755,6 +797,10 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-width", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 0, skirt("railLengthM"), 2.0, geometry_tolerance));
         checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-depth-y", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 1, skirt("shellDepthM"), 2.0, geometry_tolerance));
         checks.push(sysml_requirement_checks::bounds_component("GES-007-shell-envelope-depth", "engine_skirt", "ges007", VERIFICATION, skirt_shell, 2, skirt("railLengthM"), 2.0, geometry_tolerance));
+        checks.push(sysml_requirement_checks::exists("GES-004-ThermalApron","engine_skirt","ges004",VERIFICATION,skirt_root+"/ThermalApron","Mesh"));
+        checks.push(sysml_requirement_checks::attribute_equals("GES-005-ThermalApron-collision","engine_skirt","ges005",VERIFICATION,skirt_root+"/ThermalApron","physics:collisionEnabled",false));
+        checks.push(sysml_requirement_checks::exists("GES-004-ThermalLiner","engine_skirt","ges004",VERIFICATION,skirt_root+"/ThermalLiner","Mesh"));
+        checks.push(sysml_requirement_checks::attribute_equals("GES-005-ThermalLiner-collision","engine_skirt","ges005",VERIFICATION,skirt_root+"/ThermalLiner","physics:collisionEnabled",false));
         let adapter_path = skirt_root + "/" + adapter_name;
         checks.push(component_position("GES-007-adapter-y", adapter_path, 1,
             sysml_requirements::number(source,skirt("adapterPlateCenterYM")),geometry_tolerance));
@@ -772,10 +818,15 @@ fn on_tick(me, ctx) {
             ["toleranceM",_source_literal(source_model,visual("geometryVerificationToleranceM"))]
         ]);
         checks.push(sysml_requirements::required_constraint_check("GES-006-octagonal-profile","engine_skirt","ges006",VERIFICATION,"GriffinPropulsionRequirements::GESC006_OctagonalProfile",profile_bindings,"typed",0.0));
+        let thermal=thermal_fit_observation(skirt_root,observed_engines.records,this.mesh_results,geometry_tolerance);
+        let thermal_available=thermal.available==true && _same_snapshot(thermal.snapshot,usd_snapshot);
         let fit_bindings=_required_constraint_bindings(source_model,"ges004","GESC004_SkirtAndBellFit",[
             ["minimumRadialClearanceM",_usd_observation(fit.snapshot,fit_available,fit.clearance,"skirt/rail contour unavailable")],
             ["nozzleExitRecessM",_usd_observation(fit.snapshot,fit_available,fit.recess,"bell exit recess unavailable")],
             ["adapterThroatSeparationM",_usd_observation(fit.snapshot,fit_available,fit.separation,"adapter/throat datums unavailable")],
+            ["thermalOpeningClearanceM",_usd_observation(thermal.snapshot,thermal_available,thermal.clearance,"thermal aperture unavailable")],
+            ["exhaustOpeningClear",_usd_observation(thermal.snapshot,thermal_available,thermal.clear,"thermal mesh topology unavailable")],
+            ["requiredThermalOpeningClearanceM",_source_literal(source_model,skirt("minimumThermalOpeningBellClearanceM"))],
             ["requiredRadialClearanceM",_source_literal(source_model,skirt("minimumSkirtBellClearanceM"))],
             ["requiredNozzleExitRecessM",_source_literal(source_model,skirt("nozzleExitRecessM"))],
             ["toleranceM",_source_literal(source_model,visual("geometryVerificationToleranceM"))]

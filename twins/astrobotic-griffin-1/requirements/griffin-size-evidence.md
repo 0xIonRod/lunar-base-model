@@ -1109,23 +1109,15 @@ configuration evidence, not the current count. The supplied hardware reference
 https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png helps with
 structure and finish but does not establish the current nozzle station drawing.
 
-The realized study layout is explicitly estimated: one center nozzle and six
-on a regular 1.19 m ring, all facing down. With the retained 0.34 m exit radius,
-neighboring exits have 0.51 m clearance. The 3.44 m skirt frame leaves at least
-0.11 m to its inner rail edges. Bell and collar centers are at lander-local
-Y=0.34 m, putting the highest collar point at Y=0.76 m. The lowest composed
-tank hardware point is Y=0.784 m, giving **24 mm vertical separation**. At the
-0.44 m touchdown-root datum, the lowest exit is 0.52 m above ground. These
-clearances are reconstruction allowances, not qualified thermal/flight margins.
-
-Skirt rails now share the adapter's component-local Y=0.48 m plane. Their
-assembly tops are at Y=0.86 m, the lower service-skirt bottom; the shallow
-open shroud surrounds the mounting interface rather than the bell exits.
-Tank seats and adapter contacts remain structural attachment proxies. No
-current supplier engine/tank attachment ICD is available. GPP-009 verifies a
-conservative gap from the complete named vessel, cradle/pad, lower fittings
-and brackets, using composed geometry bounds in one canonical snapshot. This
-is necessary because an engine-spacing check alone missed collar penetration.
+The realized study layout is explicitly estimated: one centre nozzle and six
+on a regular 0.64 m ring, all facing down. The current calculated outside exit
+diameter is 379.948 mm, giving 260.052 mm minimum gap. An open thermal liner
+at 1.02 m apothem surrounds the compact cluster and a separate underside apron
+covers the adjacent bay. The 3.44 m outer shroud retains the bus outline.
+No current supplier engine/tank attachment or thermal-protection ICD is public.
+The native geometry gate measures bell/tank separation and exhaust clearances
+from composed geometry; these are reconstruction allowances, not qualified
+thermal margins. See griffin-appearance-analysis.md for source and sizing limits.
 
 Engine06 and Engine07 reference the same reusable hollow bell/shared LunCoSim
 exhaust component as the existing nozzles. All seven use aggregate Modelica
