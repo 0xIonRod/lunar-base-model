@@ -90,6 +90,13 @@ The seven engine stations now use a 0.64 m ring (one centre plus six outer
 engines), reducing the outer-engine centre span from 2.38 m to 1.28 m.
 The calculated 379.948 mm outer exit diameter leaves 260.052 mm minimum
 bell-to-bell clearance. Visible engines and force actuators share those prims.
+The lower central adapter shell now has a 0.75 m maximum diameter and a
+0.64 m minimum bore, retaining its 25 mm wall. This leaves 75.026 mm
+between the outer bells and shell, and 130.026 mm around the centre bell,
+against the unchanged 60 mm study clearance. These are packaging estimates;
+the supplier structural dimensions remain unpublished. The production bus
+geometry case passes all 356 checks at source revision `13380128770256977815`.
+
 The full lower bay retains its octagonal MLI cover; an 8 mm visual apron closes
 the surrounding underside around a 1.02 m-apothem central opening. An inner
 liner separates the engines laterally from adjacent hardware. Both ends of

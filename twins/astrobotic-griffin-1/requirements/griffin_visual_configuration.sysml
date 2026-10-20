@@ -309,7 +309,7 @@ package GriffinVisualConfigurationRequirements {
         attribute tankSupportOpeningSegments : Integer = 16;
         attribute tankSupportPlanes : Real[3] = (0.37, 0.0, -0.37);
 
-        /* Central eight-sided upper and lower adapter shells stay inside the tank and engine envelopes. The former 3.08 m top span crossed the four tank columns and peripheral nozzles. The revised 0.54 m upper diameter, 1.28 m lower maximum diameter and 25 mm shell thickness are packaging estimates, not supplier CAD. Source: central adapter architecture in Astrobotic Payload User Guide (August 2021 v5.02), pp.25-26, https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf. Their diameters are limited by this study tank/engine stations and clearances; no public dimensions calibrate them. Upper and lower buckets bridge the central structure;
+        /* Central eight-sided upper and lower adapter shells stay inside the tank and engine envelopes. The former 3.08 m top span crossed the four tank columns and peripheral nozzles. The revised 0.54 m upper diameter, 0.75 m lower maximum diameter and 25 mm shell thickness are packaging estimates, not supplier CAD. Source: central adapter architecture in Astrobotic Payload User Guide (August 2021 v5.02), pp.25-26, https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf. Their diameters are limited by this study tank/engine stations and clearances; no public dimensions calibrate them. The compact 0.64 m peripheral engine station radius and derived 0.189974 m bell radius leave 0.075026 m outside the lower shell, exceeding the shared 0.06 m study clearance. The central engine also retains 0.130026 m inside its bore. Upper and lower buckets bridge the central structure;
          * neither shell crosses the four COPV columns. These are replaceable
          * presentation assumptions because the supplier structural ICD is
          * not public. */
@@ -321,10 +321,10 @@ package GriffinVisualConfigurationRequirements {
         attribute upperBucketOuterTopRadiusM : Real = .27;
         attribute upperBucketBottomCenterYM : Real = .45;
         attribute upperBucketTopCenterYM : Real = .62;
-        attribute lowerBucketInnerTopRadiusM : Real = .615;
-        attribute lowerBucketOuterTopRadiusM : Real = .64;
-        attribute lowerBucketInnerBottomRadiusM : Real = .555;
-        attribute lowerBucketOuterBottomRadiusM : Real = .58;
+        attribute lowerBucketInnerTopRadiusM : Real = .350;
+        attribute lowerBucketOuterTopRadiusM : Real = .375;
+        attribute lowerBucketInnerBottomRadiusM : Real = .320;
+        attribute lowerBucketOuterBottomRadiusM : Real = .345;
         attribute lowerBucketTopCenterYM : Real = -0.46;
         attribute lowerBucketBottomCenterYM : Real = -0.58;
         /* The former 160 mm square-stock payload frame dominated the upper
