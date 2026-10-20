@@ -502,11 +502,6 @@ package GriffinRequirementSources {
         ref sources = (source_www_astrobotic_com_griffin_lander);
     }
 
-    part evidence_gbc_002 : RequirementEvidence {
-        ref targetRequirement = GriffinBusRequirements::gbc002;
-        ref sources = (source_www_astrobotic_com_griffin_lander);
-    }
-
     part evidence_gbc_003 : RequirementEvidence {
         ref targetRequirement = GriffinBusRequirements::gbc003;
         ref sources = (source_www_astrobotic_com_griffin_lander);

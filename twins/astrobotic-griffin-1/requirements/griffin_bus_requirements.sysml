@@ -66,9 +66,6 @@ package GriffinBusRequirements {
     requirement def GBC001_BusIdentity {
         doc /* GBC-001 [topology] the bus is a named, visible octagonal open-frame visual component with an octagonal lower service skirt and upper deck. */
     }
-    requirement def GBC002_BusEnvelope {
-        doc /* GBC-002 [geometry] the bus envelope is checked against the lander SysML metric width, depth, and height values. */
-    }
     requirement def GBC003_BusPresentationOwnership {
         doc /* GBC-003 [visual ownership] the bus presentation component is render-only and does not replace the flight body or collider owner. */
     }
@@ -116,7 +113,6 @@ package GriffinBusRequirements {
     }
 
     requirement <'GBC-001'> gbc001 : GBC001_BusIdentity { subject bus : GriffinBusComponent; }
-    requirement <'GBC-002'> gbc002 : GBC002_BusEnvelope { subject bus : GriffinBusComponent; }
     requirement <'GBC-003'> gbc003 : GBC003_BusPresentationOwnership { subject bus : GriffinBusComponent; }
     requirement <'GBC-004'> gbc004 : GBC004_BusTraceability { subject bus : GriffinBusComponent; }
     requirement <'GBC-005'> gbc005 : GBC005_BusFrameGeometry { subject bus : GriffinBusComponent; }
@@ -132,7 +128,6 @@ package GriffinBusRequirements {
         subject bus : GriffinBusComponent;
         objective {
             verify gbc001;
-            verify gbc002;
             verify gbc003;
             verify gbc004;
             verify gbc005;

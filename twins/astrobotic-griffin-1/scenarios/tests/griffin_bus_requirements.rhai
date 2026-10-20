@@ -48,7 +48,7 @@ fn on_tick(me, ctx) {
         "GriffinTankRequirements::GriffinPropellantTankAssembly::bandRadiusByCenterM",
         "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::minimumTankFrameClearanceM"
     ], [
-        "GriffinBusRequirements::gbc001", "GriffinBusRequirements::gbc002",
+        "GriffinBusRequirements::gbc001",
         "GriffinBusRequirements::gbc003", "GriffinBusRequirements::gbc004",
         "GriffinBusRequirements::gbc005", "GriffinBusRequirements::gbc006",
         "GriffinBusRequirements::gbc007", "GriffinBusRequirements::gbc008",

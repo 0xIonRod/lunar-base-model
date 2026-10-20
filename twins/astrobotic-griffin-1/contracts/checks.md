@@ -24,6 +24,12 @@ aggregate verification.
 
 ## Independent component contracts
 
+The unallocated GBC-002 envelope statement is retired. GBC-005 already
+measures the composed perimeter-frame envelope against its typed dimensions;
+GBC-006 measures the deck and GBC-010 checks its separation from the skirt.
+These distinguish the core frame from the whole lander envelope. Their metric
+criteria and production checks remain intact. Other requirement IDs stay stable.
+
 Bus, landing-leg, propulsion, tank, solar-array, ramp, and FLIP component
 requirements remain separate source packages with their own mapped Editor
 fixtures and read-only observers. See the component rows in
@@ -41,3 +47,9 @@ separate preflight report and are not counted as requirement evidence.
 This index does not claim that a structural pass qualifies landing dynamics,
 ramp deployment, or FLIP egress. Those claims require their own current
 verification case and runtime evidence.
+
+The CAD FR-016 baseline is the preserved `freecad/flip_v3/audited_source.FCStd`
+from revision `86917ca`; the SysML statement now records its artifact hash.
+`compare_published.py` measures component and pose counts from the native
+comparison instead of printing assumed counts. External CAD evidence remains
+separate from the runnable Twin suite.
