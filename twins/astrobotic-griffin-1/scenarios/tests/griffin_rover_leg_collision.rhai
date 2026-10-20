@@ -1,6 +1,7 @@
 // Real FLIP contact with the landed Griffin's structural landing gear.
 // The fixture points the authored wheel rolling axis (+X with Z axles)
-// toward the PX leg; the avatar supplies its normal drive controller.
+// toward the landing gear; the avatar supplies its normal drive controller.
+// The Sun-oriented bus can present any named leg or its bus-owned mounting hardware.
 const TEST_KIND="headless";
 const ROOT="/Griffin1SurfaceOps";
 fn simulation_dependencies(me,ctx) {
@@ -80,24 +81,25 @@ fn on_tick(me,ctx) {
         this.checks.push(t_true(griffin_controls::release_rover_brake().ok,
             "the parking brake is released before the drive"));
         this.checks.push(t_true(cmd("SimulateIntent",#{target:this.rover,intent:"forward",held:true}).ok,
-            "FLIP drives forward toward the PX landing leg"));
+            "FLIP drives forward toward the landing gear"));
     }
     let pose=world_pos3(this.rover);let leg_pose=world_pos3(leg);
     this.maximum_speed=max(this.maximum_speed,vlen(velocity(this.rover)));
     this.maximum_demand=max(this.maximum_demand,get(this.rover,"drive_left"));
-    let contacts=contact_debug(leg,this.rover);
-    if contacts==() {throw("live rover-leg contact facts unavailable");}
-    if contacts.touching_pair_count>0 {this.hit=true;}
-    this.maximum_penetration=max(this.maximum_penetration,contacts.max_penetration);
-    let mounts=contact_debug(find_path(ROOT+"/Lander"),this.rover);
-    if mounts==() {throw("live rover-mount contact facts unavailable");}
-    this.maximum_penetration=max(this.maximum_penetration,mounts.max_penetration);
-    for sample in [contacts,mounts] {
-        if sample.parts==() {throw("native gear contact part identities unavailable");}
+    // Body identity alone cannot identify landing gear: barrels and brackets
+    // belong to the bus, while translating feet and pistons belong to a leg.
+    // Require a source-derived structural proxy in the native part records.
+    for suffix in ["", "/LegPX", "/LegNX", "/LegPZ", "/LegNZ"] {
+        let sample=contact_debug(find_path(ROOT+"/Lander"+suffix),this.rover);
+        if sample==() || sample.parts==() {throw("native landing-gear contact part identities unavailable");}
+        this.maximum_penetration=max(this.maximum_penetration,sample.max_penetration);
         for part in sample.parts {
             for proxy in this.proxy_owners {
-                if (part.source1==proxy.path || part.source2==proxy.path) && part.normal_impulse>this.maximum_contact_impulse {
-                    this.maximum_contact_impulse=part.normal_impulse;this.hit_source=proxy.path;
+                if part.source1==proxy.path || part.source2==proxy.path {
+                    if sample.touching_pair_count>0 {this.hit=true;}
+                    if part.normal_impulse>this.maximum_contact_impulse {
+                        this.maximum_contact_impulse=part.normal_impulse;this.hit_source=proxy.path;
+                    }
                 }
             }
         }
@@ -107,7 +109,7 @@ fn on_tick(me,ctx) {
     cmd("SimulateIntent",#{target:this.rover,intent:"forward",held:false});
     this.checks.push(t_true(this.maximum_speed>0.1 && this.maximum_demand>0.1 && vlen(pose-this.start_position)>0.25,
         "the rover physically advances under its normal drive controller"));
-    this.checks.push(t_true(this.hit,"the PX leg gains a physical contact with the rover"));
+    this.checks.push(t_true(this.hit,"a source-derived landing-gear collider gains a physical contact with the rover"));
     this.checks.push(t_true(this.maximum_penetration<=this.contact_tolerance,
         "the rover's actual collision envelope does not penetrate the leg beyond the authored tolerance"));
     this.checks.push(t_true(this.maximum_contact_impulse>0.0,
