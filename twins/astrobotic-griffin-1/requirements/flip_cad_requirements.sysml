@@ -127,7 +127,7 @@ package FlipCadRequirements {
     requirement <'FR-015'> fr015 : FR015 { subject redefines model = cadStudy; }
     requirement def FR016 {
         subject model : CadStudy;
-        doc /* Handoff shall identify its baseline CAD artifact and source revision, then account for each intentional change and retained physical component. The baseline artifact is currently unidentified, so no component count or preservation pass is claimed. Verification allocation: PreserveBaseline (OPEN). */
+        doc /* Handoff shall identify its baseline CAD artifact and source revision, then account for each intentional change and retained physical component. The preserved baseline is freecad/flip_v3/audited_source.FCStd from repository revision 86917ca, SHA-256 43d8c0f9d86f2ca087ed0ada744b0824abbeb10198cfceaf1cb3ac67c7e38600. Compare the delivered FLIP_rover_v3_corrected.FCStd against it across all source-owned sampled panel and wheel poses; report each changed or missing named physical component. The documented intentional change is the native clamp on out-of-range panel inputs. Verification allocation: PreserveBaseline. */
     }
     requirement <'FR-016'> fr016 : FR016 { subject redefines model = cadStudy; }
     verification def InspectCAD {

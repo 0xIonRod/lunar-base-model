@@ -41,8 +41,21 @@ The preserved audited_source.FCStd matches the hash in v3_audit_latest.json.
 Run compare_published.py with FreeCADCmd to repeat the 17-pose equivalence check.
 Run requirements_check.py with FreeCADCmd from this repository layout to measure
 the delivered CAD against the SysML numeric contract and test effective angle limits.
+The native checkers share `cad_contract.py` for scalar limits and panel/wheel
+sample sets. This reads the CAD-owned subset; it is not a general SysML parser.
+Audit reuse requires matching model, interface source, contract, checker, reader and FreeCAD
+version, so changed tolerances or tools trigger fresh geometry checks.
 Initial failed requirements checks are retained for traceability.
 
 Repository structure validation passes. The broader historical Griffin validator
 has pre-existing failures against unchanged runtime assets; see repository_validation.json.
 Formal SysML parser validation and runtime promotion remain open.
+
+## Additional native validation — 2026-10-20
+
+The installed FreeCAD 27.1.0 development revision 49185 passes 94 numeric
+contract checks, all 225 attachment checks over 224 physical component objects,
+11 panel and 6 wheel collision samples, and the 17-pose baseline comparison.
+This is an additional native check; authoring remains pinned to 1.1.1 above.
+Inputs, tool version, complete native reports and the study boundary are in
+[`validation/2026-10-20/manifest.json`](validation/2026-10-20/manifest.json).

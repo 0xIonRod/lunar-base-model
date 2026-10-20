@@ -3,8 +3,15 @@ import FreeCAD as App
 from pathlib import Path
 import json,datetime,traceback,time,hashlib
 W=Path(__file__).resolve().parent
+import sys
+sys.path.insert(0,str(W))
+from cad_contract import read_contract
+contract,contract_sha256,values,samples=read_contract()
+script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+reader_sha256=hashlib.sha256((W/'cad_contract.py').read_bytes()).hexdigest()
+interfaces_sha256=hashlib.sha256((W/'build_report.json').read_bytes()).hexdigest()
 prior=json.loads((W/'v3_audit_latest.json').read_text()) if (W/'v3_audit_latest.json').exists() else {}
-R={'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'gap_tolerance_mm':0.01,'penetration_tolerance_mm3':1.0}
+R={'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'gap_tolerance_mm':values['gapToleranceMm'],'penetration_tolerance_mm3':values['penetrationToleranceMm3'],'contract_sha256':contract_sha256,'audit_script_sha256':script_sha256,'contract_reader_sha256':reader_sha256,'interface_source_sha256':interfaces_sha256,'tool_version':App.Version()}
 out=W/('v3_audit_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S')+'.json')
 def log(phase):
  R['phase']=phase;out.write_text(json.dumps(R,indent=2));(W/'v3_audit_latest.json').write_text(json.dumps(R,indent=2));print(phase,flush=True)
@@ -23,7 +30,7 @@ try:
  R['expressions']={o.Name:list(o.ExpressionEngine) for o in d.Objects if o.ExpressionEngine}
  log('Geometry validity checked')
  ss={o.Name:world(o) for o in leaves}
- resume=prior.get('model_sha256')==R['model_sha256'] and prior.get('shape_count')==len(leaves) and 'static_intersections' in prior
+ resume=prior.get('model_sha256')==R['model_sha256'] and prior.get('shape_count')==len(leaves) and 'static_intersections' in prior and all(prior.get(key)==R[key] for key in ['contract_sha256','audit_script_sha256','contract_reader_sha256','interface_source_sha256','tool_version'])
  if resume:
   for key in ['interfaces','failed_interfaces','ungrounded_features','static_intersections']:R[key]=prior[key]
   R['reused_checks_from_utc']=prior['started_utc']
@@ -35,12 +42,12 @@ try:
    for i,solid in enumerate(ss[a].Solids):
     gap=solid.distToShape(ss[b])[0]
     v={'part':a,'solid':i,'mate':b,'gap_mm':gap};R['interfaces'].append(v)
-    if gap>0.01:bad.append(v)
+    if gap>values['gapToleranceMm']:bad.append(v)
   R['failed_interfaces']=bad
   # Graph uses intended, measured interfaces only; a contact chain is not structural qualification.
   edges={}
   for q in R['interfaces']:
-   if q['gap_mm']<=.01:
+   if q['gap_mm']<=values['gapToleranceMm']:
     a,b=q['part'],q['mate'];edges.setdefault(a,set()).add(b);edges.setdefault(b,set()).add(a)
   seen={'Baseplate'};todo=['Baseplate']
   while todo:
@@ -52,14 +59,14 @@ try:
    for b in names[i+1:]:
     if overlaps(ss[a],ss[b]):
      v=ss[a].common(ss[b]).Volume
-     if v>1:R['static_intersections'].append({'a':a,'b':b,'mm3':v})
+     if v>values['penetrationToleranceMm3']:R['static_intersections'].append({'a':a,'b':b,'mm3':v})
   log('All stowed leaf-pair penetrations checked')
  panel=d.getObject('SolarArrayPanelBody')
  moving=[o for o in leaves if panel in o.InListRecursive]
  fixed=[o for o in leaves if o not in moving]
  fixed_shapes={o.Name:world(o) for o in fixed}
  R['panel_samples']=prior.get('panel_samples',[]) if resume else []
- for angle in [0,5,10,20,30,40,50,60,70,82,90]:
+ for angle in samples['panelSamplesDeg']:
   if any(q['degrees']==angle for q in R['panel_samples']):continue
   d.Motion.SolarAngle=angle;d.recompute()
   hits=[]
@@ -69,14 +76,14 @@ try:
     sb=fixed_shapes[b.Name]
     if overlaps(sa,sb):
      v=sa.common(sb).Volume
-     if v>1:hits.append({'a':a.Name,'b':b.Name,'mm3':v})
+     if v>values['penetrationToleranceMm3']:hits.append({'a':a.Name,'b':b.Name,'mm3':v})
   # Point at panel front-centre: expected rotation about X in world Z-up frame.
-  q=panel.getGlobalPlacement().multVec(App.Vector(0,-1380,0))
+  q=panel.getGlobalPlacement().multVec(App.Vector(0,-values['panelFoldSpanMm'],0))
   R['panel_samples'].append({'degrees':angle,'front_point_mm':list(q),'penetrations':hits})
   log('Panel sample '+str(angle))
  d.Motion.SolarAngle=0;d.recompute()
  R['wheel_samples']=[]
- for angle in [0,15,45,90,180,270]:
+ for angle in samples['wheelSamplesDeg']:
   d.Motion.LeftWheelRoll=angle;d.Motion.RightWheelRoll=-angle;d.recompute()
   pose_shapes={o.Name:world(o) for o in leaves}
   hits=[]
@@ -90,7 +97,7 @@ try:
      sb=world(b)
      if overlaps(sa,sb):
       v=sa.common(sb).Volume
-      if v>1:hits.append({'a':a.Name,'b':b.Name,'mm3':v})
+      if v>values['penetrationToleranceMm3']:hits.append({'a':a.Name,'b':b.Name,'mm3':v})
   R['wheel_samples'].append({'degrees':angle,'penetrations':hits})
   log('Wheel sample '+str(angle))
  d.Motion.LeftWheelRoll=0;d.Motion.RightWheelRoll=0;d.recompute()

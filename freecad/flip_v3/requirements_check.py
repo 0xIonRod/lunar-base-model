@@ -5,16 +5,18 @@ import FreeCAD as App, Part
 from pathlib import Path
 import re,json,hashlib,datetime,traceback,math
 W=Path(__file__).resolve().parent
-contract=W.parents[1]/'twins/astrobotic-griffin-1/requirements/flip_cad_requirements.sysml'
-values={n:float(v) for n,v in re.findall(r'attribute\s+(\w+)\s*:\s*(?:Real|Integer)\s*=\s*(-?[\d.]+)',contract.read_text(encoding='utf-8'))}
+import sys
+sys.path.insert(0,str(W))
+from cad_contract import read_contract
+contract,contract_sha256,values,samples=read_contract()
 checks=[]
 def check(name,ok,actual=None):
  checks.append({'check':name,'passed':bool(ok),'actual':actual})
-def near(name,a,b):check(name,abs(a-b)<=.01,float(a))
+def near(name,a,b):check(name,abs(a-b)<=values['gapToleranceMm'],float(a))
 def world(o):
  s=o.Shape.copy();s.Placement=o.getGlobalPlacement();return s
 def placement(o):return list(o.getGlobalPlacement().Base)+list(o.getGlobalPlacement().Rotation.Q)
-report={'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'checks':checks,'contract':contract.name}
+report={'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'checks':checks,'contract':contract.name,'contract_sha256':contract_sha256,'tool_version':App.Version()}
 try:
  file=W/'FLIP_rover_v3_corrected.FCStd'
  report['model_sha256']=hashlib.sha256(file.read_bytes()).hexdigest()

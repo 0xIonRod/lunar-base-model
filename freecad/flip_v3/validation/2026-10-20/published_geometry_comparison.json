@@ -1,0 +1,40 @@
+{
+  "utc": "2026-10-20T19:28:05.332069+00:00",
+  "contract_sha256": "5f2bd2023e114d3fb571025545327cc34032e65983f72f1bb3edc72321e82442",
+  "tool_version": [
+    "27",
+    "1",
+    "0",
+    "49185 (Git)",
+    "git://github.com/FreeCAD/FreeCAD.git main",
+    "2026/10/12 06:56:12",
+    "main",
+    "44d332262e946287289fc2647f41c8e589e67a7b"
+  ],
+  "audited_source_sha256": "43d8c0f9d86f2ca087ed0ada744b0824abbeb10198cfceaf1cb3ac67c7e38600",
+  "published_sha256": "05fbfaa454d299f5ce3f9d555d2a8727b2134cf4b251b1a380a65d007f3c0054",
+  "poses": 17,
+  "physical_parts_per_pose": 224,
+  "physical_part_counts_by_pose": [
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224,
+    224
+  ],
+  "differences": [],
+  "intentional_change": "Native expression clamps out-of-range effective panel angles; all previously audited poses unchanged.",
+  "passed": true
+}

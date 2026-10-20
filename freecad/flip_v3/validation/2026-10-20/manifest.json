@@ -1,0 +1,31 @@
+{
+  "verified_utc": "2026-10-20T19:35:46.201527+00:00",
+  "tool_version": [
+    "27",
+    "1",
+    "0",
+    "49185 (Git)",
+    "git://github.com/FreeCAD/FreeCAD.git main",
+    "2026/10/12 06:56:12",
+    "main",
+    "44d332262e946287289fc2647f41c8e589e67a7b"
+  ],
+  "distribution": "FreeCAD snap revision 2834",
+  "scope": "Additional native validation of unchanged CAD with installed 27.1 development build; reproducible authoring remains pinned to FreeCAD 1.1.1. No flight mass, structural, thermal, continuous-clearance or runtime qualification.",
+  "execution": "Disposable copy; complete geometry checks, no cached audit checks reused. Tracked CAD and historical reports were not rewritten.",
+  "inputs": {
+    "twins/astrobotic-griffin-1/requirements/flip_cad_requirements.sysml": "5f2bd2023e114d3fb571025545327cc34032e65983f72f1bb3edc72321e82442",
+    "freecad/flip_v3/FLIP_rover_v3_corrected.FCStd": "05fbfaa454d299f5ce3f9d555d2a8727b2134cf4b251b1a380a65d007f3c0054",
+    "freecad/flip_v3/audited_source.FCStd": "43d8c0f9d86f2ca087ed0ada744b0824abbeb10198cfceaf1cb3ac67c7e38600",
+    "freecad/flip_v3/cad_contract.py": "dafc75da177498b6d0b287722fc080703fbd4d217e294ac58d321946f4ec01c8",
+    "freecad/flip_v3/requirements_check.py": "763837781952351327d5b265ea5c8a625931485c8a53cad4ee2e57ebad8a5e6c",
+    "freecad/flip_v3/compare_published.py": "414cfe9cfc7ee39d56049f2c204b6534d251e634512b80dfe719b18023c8a77e",
+    "freecad/flip_v3/audit.py": "d6f22bb6607b09c5a2f1cadd19e6f96c4edca1615d4e5c104ba5ef2e90498f2e",
+    "freecad/flip_v3/build_report.json": "6a34807635b581d00c5c3b48d0838c1f23b1ee3a367a6744b828e48537b464d1"
+  },
+  "outputs": {
+    "published_geometry_comparison.json": "5f3ddc0ba1488e2459a03575a452cb0a4e4d5c6fedd7c6c1829822cbd564350a",
+    "requirements_check.json": "41bb854f64f1d7830f83f1f0855e0f1f3b72f0e6dd4a0e2b12ebb2263f8f00bc",
+    "v3_audit_latest.json": "a6744bb3685e2cd2b54f8fcc37f0d3c9f494e98052b514f43890c33d1d89a7fe"
+  }
+}
