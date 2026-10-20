@@ -102,13 +102,6 @@ package GriffinFunctionalRequirements {
         }
     }
 
-    verification def Verify_GriffinPayloadCapacity {
-        subject lander : Griffin1Lander;
-        objective {
-            verify gr009;
-        }
-    }
-
     verification def Verify_GriffinGncHandoff {
         doc /* Startup and operator-guidance handoff slice of GR-004. The
          * production observer checks that initial avatar possession preserves

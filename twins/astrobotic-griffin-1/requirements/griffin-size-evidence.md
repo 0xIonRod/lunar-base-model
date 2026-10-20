@@ -1,4 +1,4 @@
-# Griffin and FLIP size basis — updated 2026-10-05
+# Griffin and FLIP size basis — updated 2026-10-20
 
 These are provisional reconstruction requirements, not an as-built mechanical
 ICD. A successful geometry check proves implementation of the assumptions; it
@@ -6,7 +6,7 @@ does not prove the assumptions describe flight hardware. Replace estimates when
 better configuration-specific evidence becomes available. Numerical precision in
 derived hinge coordinates is for interface closure, not measurement accuracy.
 
-## Current packaging study, 2026-10-05
+## Current packaging study, 2026-10-20
 
 The [NASA June 15 hardware gallery](https://www.nasa.gov/gallery/astrobotics-griffin-1/)
 and [PGH reference](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
@@ -18,16 +18,17 @@ SysML owns the estimates and builder relationships; the table below is current.
 The previous 3.28 m landed walking surface was rejected: it lifted the rover
 above tall arrays to accommodate an array wrongly placed across the exit.
 The panel bank now occupies the forward face and its two chamfers, leaving
-both +/-X ramp corridors open. A 180 mm forward offset reserves lateral
-clearance, with brackets retained on the original rails and longer links.
-This one-side layout follows the operator's requested reconstruction; the
-photographs do not establish these installation coordinates. The two narrow
-five-column faces are consequences of the retained bus plan, not measured
-flight cell counts. Equal-looking panel widths in perspective remain a reason
-to revisit the plan when calibrated CAD becomes available.
+both +/-X ramp corridors open. All three panels now have the photographed
+12-column by 24-row full-width field before contour cutouts. The central
+panel has a landing-leg opening; the mirrored side panels have stepped
+shoulders and equipment recesses. Each owns its frame, substrate and cell
+rows in a separate canonical component asset. Mount links and poses belong
+to the vehicle assembly. The 610 mm forward bank offset reserves lateral
+ramp clearance; all metric sizes and mounting datums remain estimates.
+See [appearance analysis](griffin-appearance-analysis.md) for source photos.
 
 The local walking surface is now Y2.12 (nominal landed height 2.56 m), below
-the Y2.714577 array tops. The 3.60 m bus accommodates the study rover's
+the Y2.8535 array tops. The 3.60 m bus accommodates the study rover's
 2.60 x 2.28 m wheel envelope without enlarging it. Retaining the span avoids
 turning a layout error into an unsupported overall rescale. Uncertainty remains
 3.2-4.0 m; the historical 4.5 m envelope belongs to another configuration.
@@ -43,12 +44,12 @@ A narrow rear avionics shelf replaces the obsolete central box. These members
 remain under the existing lander mass; their strength is not qualified.
 
 The seven main bells are contained by an open octagonal skirt. Its lower lip
-is Y0.06; nozzle exits are Y0.08, a chosen 20 mm recess. The 0.80 m shell depth
+is approximately Y0.073; nozzle exits are Y0.093, a chosen 20 mm recess. The approximately 0.774 m shell depth
 is derived from that recess, the nozzle envelope and adapter plane. Radial
 clearance is checked against the actual perimeter. The former square adapter
 plate projected beyond the shell corners; its retained 2.84 m envelope now
 follows the same octagonal profile, and its vertices are checked for containment. Shared bus foil gives the
-photographed silver blanket finish. Heat protection and plume interaction
+user-requested yellow-gold presentation finish. Heat protection and plume interaction
 are unmodelled. A110 RCS members retain their original force/fuel identities
 on four upper corner platforms; their station height is deck top + 0.20 m.
 Flight count, arrangement and mounting dimensions remain explicit estimates.

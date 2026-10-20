@@ -1879,7 +1879,7 @@ fn payload_load_check(payload_kg) {
     let capacity = sysml_requirements::number(source,
         griffin_spec::qualified_attribute_name("payloadCapacityKg"));
     let result = _evaluate_source_constraint(source, "GR-009-payload-capacity", "gr009",
-        "Verify_GriffinPayloadCapacity", requirement_usage,
+        "Griffin1Requirements::Verify_GriffinRequirements", requirement_usage,
         "GriffinFunctionalRequirements::GR009_PayloadWithinCapacity",
         [["payloadKg", _external_value(payload_kg)],
          ["capacityKg", _source_value(capacity, source)]]);
@@ -1900,11 +1900,11 @@ fn _payload_scene_checks(root, payload_observation, capacity_kg) {
          ["capacityKg", _source_value(capacity_kg, source)]]);
     [
         #{id: "GR-009-authored-capacity", component: "lander",
-          requirement: "gr009", verification: "Verify_GriffinPayloadCapacity",
+          requirement: "gr009", verification: "Griffin1Requirements::Verify_GriffinRequirements",
           kind: "attribute", path: root, attr: "lunco:payload_class_kg",
           expected_attr: capacity_attribute, tolerance: 0.0},
         sysml_requirements::required_constraint_check("GR-009-payload-load", "lander",
-            "gr009", "Verify_GriffinPayloadCapacity",
+            "gr009", "Griffin1Requirements::Verify_GriffinRequirements",
             constraint_name, observations, "typed", 0.0),
     ]
 }
@@ -1913,7 +1913,7 @@ fn _payload_requirement_source() {
     sysml_requirements::source_with_selection([
         griffin_spec::qualified_attribute_name("payloadCapacityKg")
     ], ["GriffinFunctionalRequirements::gr009"],
-        ["GriffinFunctionalRequirements::Verify_GriffinPayloadCapacity"])
+        ["Griffin1Requirements::Verify_GriffinRequirements"])
 }
 
 /// Runtime command acceptance uses the source-defined SysML constraint. USD
@@ -1922,7 +1922,7 @@ fn _ramp_requirement_source() {
     sysml_requirements::source_with_selection([
         "GriffinRampRequirements::GriffinEgressRamp::rampMaxDeploymentAngleRad"
     ], ["GriffinRampRequirements::grr005"],
-        ["GriffinRampRequirements::Verify_GriffinRampCommandEnvelope"])
+        ["GriffinRampRequirements::Verify_GriffinRampRequirements"])
 }
 
 fn _landing_leg_requirement_source() {
@@ -2193,7 +2193,7 @@ fn ramp_command_check(angle_rad) {
     let limit = sysml_requirements::number(source,
         "GriffinRampRequirements::GriffinEgressRamp::rampMaxDeploymentAngleRad");
     let result = _evaluate_source_constraint(source, "GRR-005-deployment-command",
-        "grr005", "Verify_GriffinRampCommandEnvelope", requirement_usage,
+        "grr005", "GriffinRampRequirements::Verify_GriffinRampRequirements", requirement_usage,
         "GriffinRampRequirements::GRC005_DeploymentCommandWithinLimit",
         [["commandRad", _external_value(angle_rad)],
          ["limitRad", _source_value(limit, source)]]);

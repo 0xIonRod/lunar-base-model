@@ -144,18 +144,4 @@ package GriffinSimulationAccuracyRequirements {
         }
     }
 
-    verification def Verify_GriffinLandingTargetDatum {
-        subject lander : Griffin1Lander;
-        objective {
-            verify gr037;
-        }
-    }
-
-    verification def Verify_GriffinLandingSurfaceDatum {
-        subject lander : Griffin1Lander;
-        objective {
-            verify gr038;
-        }
-    }
-
 }

@@ -258,7 +258,7 @@ fn _qualified_attribute(name) {
         "payloadAdapterCenterYM", "legStations",
         "legStationRotationYDeg", "solarStations", "solarMountRails",
         "solarStationRotationXDeg", "solarStationRotationZDeg",
-        "solarArrayEdgeClearanceM", "tankStations",
+        "tankStations",
         "tankStationRotationYDeg", "tankScale",
         "engineClusterMountYM", "engineBellDirection", "engineStations"
     ];
@@ -503,42 +503,22 @@ fn engine_skirt_component_adapter_name() {
     engine_skirt_identity("adapterPlateName")
 }
 fn solar_mount_rail_names() { _sysml_enum_names("solarMountRails") }
+fn solar_component_assets() {
+    _typed_model_value("GriffinSolarRequirements::GriffinSolarArrayAssembly::componentAssets")
+}
 fn solar_panel_frame_width_m() { solar_component_number("frameWidthM") }
 fn component_solar_array_widths_m() {
-    let count = solar_array_count();
-    let mounts = solar_mount_rail_names();
-    let rail_names = _sysml_enum_names("frameRails");
-    let rail_stations = _sysml_native_list("railStations");
-    let clearance = _sysml_attribute("solarArrayEdgeClearanceM");
-    if count <= 0 || mounts.len() != count * 2 || rail_names.len() != rail_stations.len()
-        || clearance == () || clearance < 0.0 {
-        return [];
-    }
-    let requested=_typed_model_value("GriffinSolarRequirements::GriffinSolarArrayAssembly::installedMaximumColumnCounts");
+    let count=solar_array_count();
+    let requested=_typed_model_value("GriffinSolarRequirements::GriffinSolarArrayAssembly::installedColumnCounts");
     let cells=solar_component_number("cellWidthM");
-    let nominal_columns=solar_component_number("gridColumnCount");
-    if !array_is(requested) || requested.len()!=count || cells==() || nominal_columns==() {return [];}
-    let widths = [];
-    for index in 0..count {
-        let endpoints = [];
-        for endpoint in 0..2 {
-            let target = mounts[index * 2 + endpoint];
-            let found = false;
-            for rail_index in 0..rail_names.len() {
-                if rail_names[rail_index] == target {
-                    endpoints.push(rail_stations[rail_index]);
-                    found = true;
-                    break;
-                }
-            }
-            if !found { return []; }
-        }
-        let dx = endpoints[1].x - endpoints[0].x;
-        let dz = endpoints[1].z - endpoints[0].z;
-        let module_width=requested[index]*cells/nominal_columns + solar_panel_frame_width_m()-cells;
-        let width = min(sqrt(dx * dx + dz * dz) - clearance, module_width);
-        if width <= 0.0 { return []; }
-        widths.push(width);
+    let columns=solar_component_number("gridColumnCount");
+    let frame=solar_panel_frame_width_m();
+    if !array_is(requested) || requested.len()!=count || cells==() || cells<=0.0
+        || columns==() || columns<=0.0 || frame==() || frame<=cells {return [];}
+    let widths=[];
+    for requested_columns in requested {
+        if requested_columns<2 {return [];}
+        widths.push(requested_columns*cells/columns+frame-cells);
     }
     widths
 }
@@ -551,14 +531,11 @@ fn solar_installed_cell_layout(index) {
     if index<0 || index>=widths.len() || frame==() || cells==() || columns==()
         || cells<=0.0 || frame<=cells || columns<2.0 {return ();}
     let pitch=cells/columns;
-    let requested=_typed_model_value("GriffinSolarRequirements::GriffinSolarArrayAssembly::installedMaximumColumnCounts");
+    let requested=_typed_model_value("GriffinSolarRequirements::GriffinSolarArrayAssembly::installedColumnCounts");
     let row_counts=_typed_model_value("GriffinSolarRequirements::GriffinSolarArrayAssembly::installedRowCounts");
     if !array_is(requested) || !array_is(row_counts) || requested.len()!=widths.len()
         || row_counts.len()!=widths.len() || row_counts[index]<2 || requested[index]<2 {return ();}
-    let available=widths[index]-(frame-cells);
-    let maximum=requested[index]*cells/columns + frame-cells;
-    let count=if widths[index]==maximum {requested[index].to_int()}
-        else {min(requested[index],(available/pitch).floor()).to_int()};
+    let count=requested[index].to_int();
     if count<2 {return ();}
     let scale=widths[index]/frame;
     let aspect=solar_component_number("cellPitchAspectRatio");
@@ -739,7 +716,8 @@ fn visual_component_transform_plan() {
         || !_visual_plan_lengths_match(leg_rot_y, 4) || leg_names.len() != 4;
     let solar_count = solar_array_count();
     let solar_widths = component_solar_array_widths_m();
-    let bad_solar = solar_count <= 0
+    let solar_assets=solar_component_assets();
+    let bad_solar = !array_is(solar_assets) || solar_assets.len()!=solar_count || solar_count <= 0
         || !_native_positions_match(solar_stations, solar_count)
         || !_visual_plan_lengths_match(solar_rot_x, solar_count)
         || !_visual_plan_lengths_match(solar_rot_z, solar_count)
@@ -780,8 +758,10 @@ fn visual_component_transform_plan() {
         let pose = transform(solar_stations[index],
             component_solar_orientation(index),
             scale);
-        plan.push(_visual_pose_record(solar_names[index], "lander",
-            "lander/griffin_solar_panel_visual.usda", pose, false));
+        let asset=solar_assets[index];
+        if !asset.starts_with("components/") {return [];}
+        asset.replace("components/", "");
+        plan.push(_visual_pose_record(solar_names[index], "lander", asset, pose, false));
     }
     plan.push(_visual_transform_record("EgressRampPort", "lander",
         "lander/griffin_ramp_visual.usda", ramp_x[0], ramp_y, ramp_z, 0.0, 0.0, 0.0,

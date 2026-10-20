@@ -200,7 +200,6 @@ fn on_tick(me, ctx) {
     let mount_rails = sysml_requirement_checks::source_enum_identifiers(source, visual("solarMountRails"));
     let bus_mount = sysml_requirements::native_value(source, visual("bodyMount"));
     let frame_width = sysml_requirements::number(source, own("frameWidthM"));
-    let edge_clearance = sysml_requirements::number(source, visual("solarArrayEdgeClearanceM"));
     let local_mount_rails = [];
     if names.len() == stations.len() && mount_rails.len() == names.len() * 2
         && rail_names.len() == rail_stations.len() && vec3_is_native(bus_mount)
@@ -280,23 +279,22 @@ fn on_tick(me, ctx) {
         let positive_rail = if local_mount_rails.len() == names.len() * 2 {
             local_mount_rails[index * 2 + 1]
         } else { () };
-        let expected_installed_width = if negative_rail != () && positive_rail != ()
-            && edge_clearance != () {
+        let expected_installed_width = if negative_rail != () && positive_rail != () {
             griffin_spec::component_solar_array_widths_m()[index]
         } else { () };
         let placement_constraint = sysml_requirements::required_constraint_ir(model,
-            gsa005, "GriffinSolarRequirements::GSAC005_RailSpanFit");
+            gsa005, "GriffinSolarRequirements::GSAC005_InstalledModuleSize");
         let placement_observations = sysml_requirements::scalar_constraint_observations(
             placement_constraint, [
             ["expectedInstalledFrameWidthM", derived_measurement(expected_installed_width,
-                "typed bus rail pair or array edge clearance is unavailable", model)],
+                "source module width or bus attachment pair is unavailable", model)],
             ["measuredInstalledFrameWidthM", usd_geometry_inspection::measurement(installed_width, composed[path + "/Frame"], "composed frame points or instance scale unavailable")],
         ]);
         placement_observations.push(source_observation(model,
             visual("geometryVerificationToleranceM")));
-        checks.push(sysml_requirements::required_constraints_check("GSA-005-" + name + "-rail-span-fit",
+        checks.push(sysml_requirements::required_constraints_check("GSA-005-" + name + "-module-size",
             "solar_array", "gsa005", VERIFICATION,
-            "GriffinSolarRequirements::GSAC005_RailSpanFit", placement_observations, "typed", 0.0));
+            "GriffinSolarRequirements::GSAC005_InstalledModuleSize", placement_observations, "typed", 0.0));
 
         let panel_envelope_constraint = sysml_requirements::required_constraint_ir(model,
             gsa006, "GriffinSolarRequirements::GSAC006_PanelMeshEnvelope");

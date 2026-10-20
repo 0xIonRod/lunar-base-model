@@ -18,17 +18,18 @@ package GriffinSolarRequirements {
         doc /* One Griffin-1 solar-array assembly, including its panel, collection surface, and structural attachment interface. */
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_solar_panel_visual.usda";
+        attribute componentAssets : TwinAssetPath[3] = ("components/lander/griffin_solar_panel_visual.usda", "components/lander/griffin_solar_panel_starboard_visual.usda", "components/lander/griffin_solar_panel_port_visual.usda");
         attribute childNames : GriffinSolarVisualMember[8] = ("Frame", "Cells", "ArrayBackplane", "MountBracketNegativeX", "MountBracketPositiveX", "HingeBar", "MountLinkNegativeX", "MountLinkPositiveX");
         /* Current appearance reference: Astrobotic's integrated flight vehicle,
          * photographed 2026-06-15. https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/
          * https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1419-edit-2/
          * Three tall panel faces replace the older belt/ESA combination. A
-         * 13-column by 24-row nominal field and approximately 2:1 rectangular
+         * 12-column by 24-row nominal field and approximately 2:1 rectangular
          * cell pitch reconstruct the visible grid; counts are approximate,
          * especially at stepped edges. Supplier cell dimensions are unavailable.
          * The existing 1.866 m rail-fitted broad frame is retained as the only
-         * metric packaging datum. Its 30 mm border yields 138.923 mm horizontal
-         * pitch and 69.462 mm vertical pitch, hence 1.727 m frame height.
+         * metric packaging datum. Its 30 mm border yields 150.5 mm horizontal
+         * pitch and 75.25 mm vertical pitch, hence 1.866 m frame height.
          * Absolute size, stock and mounting remain study estimates. */
         attribute frameWidthM : Real = 1.866;
         /* Panel/support stock is an explicit visual estimate from the 2021
@@ -38,7 +39,7 @@ package GriffinSolarRequirements {
          * Use 30 mm frame stock, 12 mm backplane, 2 mm visual cell surface,
          * 100 x 80 x 120 mm brackets and 50 mm hinge diameter.
          * These are appearance envelopes, not laminate/hinge design dimensions.
-         * The 460 mm link stock covers the retained 220 mm normal standoff plus the 180 mm forward bank offset; 10 mm
+         * The 900 mm link stock covers the retained 220 mm normal standoff plus the 610 mm forward bank offset; 10 mm
          * overlap is a visual seating tolerance, not a structural engagement spec.
          * Current cell geometry and silhouette use the June 2026 source below;
          * these retained attachment stocks are still packaging estimates. */
@@ -77,37 +78,30 @@ package GriffinSolarRequirements {
         attribute hingeBarLengthM : Real = frameWidthM;
         attribute hingeBarCenterYM : Real = -0.18;
         attribute hingeBarCenterZM : Real = 0.00;
-        attribute mountLinkHeightM : Real = .46;
+        attribute mountLinkHeightM : Real = .90;
         attribute mountLinkDepthM : Real = 0.04;
         attribute mountLinkCenterYM : Real = -0.11;
         attribute mountLinkCenterZM : Real = 0.00;
-        attribute gridColumnCount : Integer = 13;
+        attribute gridColumnCount : Integer = 12;
         attribute gridRowCount : Integer = 24;
-        /* Ordered entries follow solarArrayInstances. All three faces are tall;
-         * both chamfers carry fewer columns at the same pitch. Source solarStations
-         * stay bus attachment datums; the installed centre rises by half the
-         * difference between frame height and installationDatumHeightM. The
-         * 705 mm datum retains the previously fitted bus lower edge and the
-         * original sockets; it is not a second panel-height requirement.
-         * Clean-room stands, protective covers and elevated footpads are ground
-         * test equipment/poses and must not become lunar landing geometry.
-         * Real imagery supersedes the 2021/ESA renderings for this appearance
-         * pass. Remaining unknowns: exact stepped contours, laminate, fasteners,
-         * support ICD, cell supplier/count and electrical/thermal qualification. */
-        attribute installedMaximumColumnCounts : Integer[3] = (13, 5, 5);
+        /* June 15, 2026 photographs show twelve cell columns and twenty-four
+         * rows on the full panel faces. Count the near-face cells rather than
+         * treating perspective foreshortening as a narrower module. The forward
+         * face clears the cardinal landing leg; the side faces have mirrored
+         * stepped shoulders and an inboard equipment recess. Coordinates below
+         * trace visible cell boundaries, not a released supplier drawing.
+         * Source: NASA/Astrobotic 1348, 1419 and 1442 clean-room photographs.
+         * Metric pitch, exact laminate and mounting ICD remain study estimates. */
+        attribute installedColumnCounts : Integer[3] = (12, 12, 12);
         attribute installedRowCounts : Integer[3] = (24, 24, 24);
-
-        /* Outline vertices use cell-pitch coordinates (x column, y unused,
-         * z row counted downward). They describe only the silhouette; they
-         * are not measured flight dimensions. Front broad face: upper-left
-         * steps and right equipment recess. Chamfer face: bottom leg opening.
-         * Port chamfer: retained lower corner opening scaled to five columns. Face assignment
-         * adapts the photographed panel silhouettes to the operator-selected forward-side bank.
-         * Broad/front contour is read from the two June 15 photos; unseen
-         * edge details and both five-column chamfers are packaging estimates, not photographed cell counts. */
-        attribute frontCellContour : CellContourPoint[12] = ((3,0,0), (13,0,0), (13,0,11), (11,0,11), (11,0,19), (13,0,19), (13,0,24), (0,0,24), (0,0,15), (2,0,15), (2,0,12), (3,0,12));
-        attribute chamferCellContour : CellContourPoint[8] = ((0,0,0), (5,0,0), (5,0,24), (4,0,24), (4,0,18), (1,0,18), (1,0,24), (0,0,24));
-        attribute sideCellContour : CellContourPoint[6] = ((0,0,0), (5,0,0), (5,0,24), (2,0,24), (2,0,18), (0,0,18));
+        /* X is the cell column; Z counts rows downward. The forward panel's
+         * stepped leg opening and right equipment recess follow photo 1348.
+         * The two side profiles follow the stepped panel in 1419 and its
+         * opposite-side counterpart visible in 1348; unseen fine edge details
+         * are explicitly estimated. */
+        attribute frontCellContour : CellContourPoint[16] = ((0,0,0), (12,0,0), (12,0,16), (11,0,16), (11,0,22), (12,0,22), (12,0,24), (8,0,24), (8,0,18), (7,0,18), (7,0,16), (5,0,16), (5,0,19), (4,0,19), (4,0,24), (0,0,24));
+        attribute chamferCellContour : CellContourPoint[12] = ((9,0,0), (0,0,0), (0,0,11), (2,0,11), (2,0,19), (0,0,19), (0,0,24), (12,0,24), (12,0,15), (10,0,15), (10,0,12), (9,0,12));
+        attribute sideCellContour : CellContourPoint[12] = ((3,0,0), (12,0,0), (12,0,11), (10,0,11), (10,0,19), (12,0,19), (12,0,24), (0,0,24), (0,0,15), (2,0,15), (2,0,12), (3,0,12));
 
         attribute cellFaceNormal : Direction = (0.0, 1.0, 0.0);
         /* Quaternion component tolerance covers authored serialization precision,
@@ -128,7 +122,7 @@ package GriffinSolarRequirements {
     requirement def GSA004_ArrayTraceability {
         doc /* GSA-004 [evidence] array identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and deployment status is explicit. */
     }
-    constraint def GSAC005_RailSpanFit {
+    constraint def GSAC005_InstalledModuleSize {
         in expectedInstalledFrameWidthM : Real;
         in measuredInstalledFrameWidthM : Real;
         in toleranceM : Real;
@@ -137,10 +131,10 @@ package GriffinSolarRequirements {
                 - expectedInstalledFrameWidthM) <= toleranceM;
     }
     requirement def GSA005_ArrayPlacement {
-        require GSAC005_RailSpanFit {
+        require GSAC005_InstalledModuleSize {
             in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
         }
-        doc /* GSA-005 [installation interface] installed width is the lesser of the typed bus-rail span minus solarArrayEdgeClearanceM and the selected module column count times metric cell pitch plus the nominal frame border. Installed row count sets frame height; centre Y derives from the belt-centre datum plus half the height difference from installationDatumHeightM, preserving the lower-edge alignment. Stations and orientations remain source-owned reconstruction datums. Compact brackets seat at the unchanged bus rails; slanted links derive from the rail-to-panel-edge endpoints to preserve the load path. No supplier installation ICD is available. */
+        doc /* GSA-005 [installation interface] installed width is the source column count times metric cell pitch plus the frame border. The bus attachment span controls the support links; it shall not truncate a photographed cell field. Installed row count sets frame height; centre Y derives from the belt-centre datum plus half the height difference from installationDatumHeightM, preserving the lower-edge alignment. Stations and orientations remain source-owned reconstruction datums. Compact brackets seat at the unchanged bus rails; slanted links derive from the rail-to-panel-edge endpoints to preserve the load path. No supplier installation ICD is available. */
     }
     constraint def GSAC006_PanelMeshEnvelope {
         in measuredFrameWidthM : Real;

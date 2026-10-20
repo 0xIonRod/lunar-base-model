@@ -25,7 +25,7 @@ package GriffinPropulsionRequirements {
          * Passive valve/injector loss and choked chamber pressure are solved
          * together by LunCo.Propulsion.PressureFedValve and
          * PressureFedCombustionChamber. They add no artificial pump work.
-         * 13 kg/s bounds 7.24479843*sqrt(3 MPa/1 MPa) even at zero chamber pressure;
+         * 13 kg/s bounds 7.50323630*sqrt(3 MPa/1 MPa) even at zero chamber pressure;
          * it is an actuator admission envelope, not predicted current flow.
          * Control closure source: lunco://models/Lander.mo. Its gyro damping
          * deadband is capped at half the settled-touchdown rate tolerance so
@@ -74,16 +74,18 @@ package GriffinPropulsionRequirements {
          * the inherited 2.5 MPa minimum supply for 1 MPa feed/injector loss.
          * c-star 1550 m/s, combustion efficiency .96 and gamma 1.2 are
          * reduced gas assumptions, not an equilibrium chemistry solution.
-         * Preserve the .334 m exit bore visual estimate. Solve each throat
-         * radius from F=Cf(epsilon)*Pc*pi*r^2, with the supersonic isentropic
-         * area-Mach relation and exit pressure ratio from NASA Glenn:
-         * https://www.grc.nasa.gov/WWW/BGH/isentrop.html.
-         * Bisection gives r=.018077777339853586 m, Cf=2.0218701400894896,
-         * aggregate bore area .007186840039031625 m2 and reacting flow
-         * 7.24479842644317 kg/s at Pc=1.5 MPa. These derived literals must
-         * be checked against the native BellNozzle model, not inferred from
-         * screenshots. O/F 2.6 remains an inherited integration assumption;
-         * excess-gas chemistry and current flight mixture remain unknown.
+         * Provisional sizing revision 2026-10-20: assume expansion 100:1,
+         * rather than preserving an independently selected exit diameter.
+         * tools/size_main_nozzle.py reproduces F=Cf*Pc*At and the supersonic
+         * area-Mach relation from https://www.grc.nasa.gov/WWW/BGH/isentrop.html.
+         * It gives throat radius .01839738900670362 m, Cf=1.9522298164444065
+         * and seven-engine throat area .007443210401827927 m2. At 1.5 MPa,
+         * reacting flow is 7.503236292165249 kg/s. The current flight expansion
+         * and chamber pressure are unavailable: these are design-study inputs,
+         * not measurements or a supplier drawing. Runtime BellNozzle observes
+         * the actual bore/height and is the independent physics check.
+         * O/F 2.6 remains an inherited integration assumption; excess-gas
+         * chemistry and current flight mixture remain unknown.
          * Throttle requests a fraction of this nominal flow, split at O/F.
          * Each valve compensates travel using current pressure head, physical
          * saturation and the inherited .08 s response. This is a study
@@ -103,10 +105,10 @@ package GriffinPropulsionRequirements {
         attribute referencePressureDropPa : Real = nominalTankPressurePa - referenceChamberPressurePa;
         attribute characteristicVelocityMps : Real = 1550.0;
         attribute combustionEfficiency : Real = GriffinEngineControlStudy::combustionEfficiency;
-        attribute totalThroatBoreAreaM2 : Real = .007186840039031625;
-        attribute throatBoreRadiusM : Real = .018077777339853586;
+        attribute totalThroatBoreAreaM2 : Real = .007443210401827927;
+        attribute throatBoreRadiusM : Real = .01839738900670362;
         attribute gasGamma : Real = 1.2;
-        attribute nozzleThrustCoefficient : Real = 2.0218701400894896;
+        attribute nozzleThrustCoefficient : Real = 1.9522298164444065;
         attribute estimatedMainEngineUnitThrustN : Real = 3113.7551306823498;
         attribute controllerFlowCapabilityKgs : Real = referenceTotalFlowKgs;
         attribute fuelCommandFlowKgs : Real = controllerFlowCapabilityKgs / (1.0 + oxidizerToFuelRatio);
@@ -137,8 +139,15 @@ package GriffinPropulsionRequirements {
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_engine_bell_visual.usda";
         attribute childNames : GriffinEngineVisualMember[2] =
             ("Bell", "Throat");
-        attribute bellRadiusM : Real = 0.34;
-        attribute bellHeightM : Real = 0.52;
+        // Provisional 100:1 study: exit bore is ten throat radii. This
+        // ratio, pressure and historical unit thrust determine the diameter;
+        // no current flight nozzle dimensions have been released.
+        attribute exitToThroatRadiusRatio : Real = 10.0;
+        attribute bellLengthFraction : Real = .8;
+        attribute bellRadiusM : Real = GriffinPressureFedStudy::throatBoreRadiusM * exitToThroatRadiusRatio + bellVisualWallThicknessM;
+        // 80% of a 15-degree cone; cot(15 deg)=3.7320508075688776.
+        // This is a packaging envelope, not a qualified Rao contour.
+        attribute bellHeightM : Real = bellLengthFraction * (exitBoreRadiusM - GriffinPressureFedStudy::throatBoreRadiusM) * 3.7320508075688776;
         // Exterior radius includes the source-owned render wall. Modelica uses
         // the bore radius, so gas area and visible bore share one dimension.
         attribute throatRadiusM : Real = GriffinPressureFedStudy::throatBoreRadiusM + GriffinMainPropulsionAssembly::bellVisualWallThicknessM;
@@ -226,14 +235,14 @@ package GriffinPropulsionRequirements {
          * nozzle envelopes stay inside the octagonal perimeter; their open
          * exits sit 20 mm above the skirt lip, visible from below. The shell
          * depth derives from the bell exit and this recess, rather than hiding
-         * a nozzle with a second proxy. This supersedes the former 120 mm
-         * shallow fairing/30% exposed-bell study. The PGH hardware photo and
+         * a nozzle with a second proxy. The PGH hardware photo and
          * June 2026 NASA gallery establish a wrapped lower bay but do not
          * publish a skirt contour or recess measurement. The 20 mm recess,
          * 60 mm taper and 80 mm rail are explicit packaging estimates; no
          * thermal shield qualification or exhaust-flow simulation is implied.
          * The shroud references the bus ExteriorPanels foil material; its
-         * silver blanket finish follows photographs, not coating data.
+         * yellow-gold presentation finish follows the user-selected bus palette.
+         * No coating or thermal-property claim follows from that RGB value.
          * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
          * https://www.nasa.gov/gallery/astrobotics-griffin-1/ */
         attribute nozzleExitRecessM : Real = .02;

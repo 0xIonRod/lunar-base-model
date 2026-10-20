@@ -145,7 +145,7 @@ package GriffinVisualConfigurationRequirements {
         attribute bodySideFaceAspectRatioTolerance : Real = 0.35;
         attribute bodySkinThicknessM : Real = 0.025;
         attribute bodySkinEdgeMarginM : Real = 0.04;
-        attribute bodySkinDisplayColor : Real[3] = (0.65, 0.66, 0.64);
+        attribute bodySkinDisplayColor : Real[3] = (.83, .62, .18);
         /* Thin gold edge tape is visible in the PGH hardware photo:
          * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .
          * Estimate 10 mm width and 1 mm presentation offset, because the image
@@ -165,22 +165,17 @@ package GriffinVisualConfigurationRequirements {
         attribute silverDisplayColor : Real[3] = (.55, .58, .62);
         attribute silverMetallic : Real = .75;
         attribute silverRoughness : Real = .42;
-        /* Silver exterior blanket appearance, 2026-10-03. Crumpled silver
-         * surfaces and narrow gold edge tape are visible in the hardware photo:
-         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .
-         * Reuse LunCoSim's mli_foil shader with bodySkinDisplayColor as the
-         * bright color. Valley RGB (.58,.59,.57), contrast .65 and sheen .10
-         * retain broad silver reflections in the shared foil shader. The low
-         * sheen avoids nearly black grazing faces in inspection lighting. Density 26
-         * per metre gives centimetre-scale shading detail on the 0.72 m belt;
-         * axial scale 1 keeps the object-space pattern isotropic. These are
-         * artistic estimates from an uncalibrated photograph, not measured
-         * reflectance, thermal properties, blanket construction or wrinkles
-         * in the actual mesh. Shader inputs narrow only at the GPU boundary. */
-        attribute busFoilValleyColor : Real[3] = (.58, .59, .57);
-        attribute busFoilCrinkleDensity : Real = 26.0;
-        attribute busFoilFacetContrast : Real = .65;
-        attribute busFoilSheen : Real = .10;
+        /* Yellow-gold bus MLI presentation selected by the user, 2026-10-20.
+         * The shared object-space foil shader models broad folds and reflective
+         * highlights. These linear RGB and fold controls are display estimates,
+         * not measured optical/thermal properties or an as-built blanket stack.
+         * Hardware photographs include pale blankets with gold seam tape;
+         * this requested gold finish must not be described as flight metrology.
+         * Shader inputs narrow only at the explicit GPU boundary. */
+        attribute busFoilValleyColor : Real[3] = (.45, .30, .08);
+        attribute busFoilCrinkleDensity : Real = 12.0;
+        attribute busFoilFacetContrast : Real = .40;
+        attribute busFoilSheen : Real = .75;
         attribute busFoilAxialPatternScale : Real = 1.0;
         attribute bodyGroundClearanceM : Real = 0.20;
         attribute lowerSkirtDimensions : Dimensions = (3.40, 0.24, 3.40);
@@ -397,14 +392,14 @@ package GriffinVisualConfigurationRequirements {
          * flight installation. June 2026 photographs show tall faceted arrays:
          * https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1419-edit-2/ .
          * Rail-derived X datums and 220 mm normal stand-off are retained, with
-         * an additional 180 mm +Z offset of the bank. The extra offset is a
-         * packaging estimate: it reserves >50 mm Z separation between the full
+         * an additional 610 mm +Z offset of the full-width panel bank. This
+         * packaging estimate reserves >50 mm Z separation between the full
          * panel frames and the 2.592 m-wide ramp corridors at every fold angle.
          * Brackets remain at the original rails; links derive their new span.
-         * Absolute bus span and unequal face widths are unresolved photo-scale
+         * Absolute bus span and panel dimensions remain photo-scale
          * assumptions; no current as-built CAD is publicly available here. */
         attribute solarStations : Position[3] =
-            ((0.0, 1.34, 2.12), (1.519563492, 1.34, 1.699563492), (-1.519563492, 1.34, 1.699563492));
+            ((0.0, 1.34, 2.55), (1.519563492, 1.34, 2.129563492), (-1.519563492, 1.34, 2.129563492));
         attribute solarMountRails : GriffinFrameRailNode[6] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard", "FrameRailFrontStarboard", "FrameRailStarboardFront", "FrameRailPortFront", "FrameRailFrontPort");
         /* X is panel tilt; negative signed Z values below name the clockwise
@@ -413,7 +408,6 @@ package GriffinVisualConfigurationRequirements {
          * panels upright and their normal on the intended octagonal face. */
         attribute solarStationRotationXDeg : Real[3] = (90.0, 90.0, 90.0);
         attribute solarStationRotationZDeg : Real[3] = (0.0, -45.0, 45.0);
-        attribute solarArrayEdgeClearanceM : Real = 0.15;
 
         /* Four tank stations and 0.60 instance scale are packaging estimates.
          * The 1.39 m center exposes approximately 0.23 m of spherical dome above

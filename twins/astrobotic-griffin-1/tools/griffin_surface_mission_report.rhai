@@ -166,18 +166,16 @@ fn finish_surface_ops(state) {
     ];
     let failures = [];
     for check in checks { if check.ok != true { failures.push(check); } }
+    // Measured observations travel in the streamed checks above; keep the
+    // summary free of duplicate geometry and compiler snapshots.
     report_structured_verdict(#{ok: failures.len() == 0,
         verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
         requirement_count: checks.len(), pass_count: checks.len() - failures.len(),
         failure_count: failures.len(), non_pass_count: failures.len(),
         source_revision: source.source_revision,
-        source_files: source.source_files, results: checks, failures: failures,
+        source_files: source.source_files, check_count: checks.len(),
+        result_chunks: [checks], failures: failures,
         metrics: #{event_trace: state.event_trace, clocks: clock_snapshot(),
-            route_preflight: state.route_preflight,
-            landing_setup: state.landing_setup_evidence,
-            guidance_assembly_mass: state.guidance_assembly_mass_evidence,
-            ramp_deployment: ramp_deployment_evidence,
-            egress_terrain: egress_terrain,
             final_state: #{lander_settled: state.lander_settled,
                 ramps_deployed: state.ramps_deployed,
                 rover_detached: state.rover_detached,

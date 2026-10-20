@@ -148,8 +148,10 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
             name:"outputs:"+griffin_spec::main_engine_port(name,output),type_name:"double",
             sources:[engine+".outputs:"+output]}});
     }
-    for parameter in [#{name:"engine_count",value:"1.0"},
-        #{name:"fuel_family",value:fuel_family.to_string()},
+    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:plume,name:"inputs:engine_count"}});
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"parameters:engine_count",
+        type_name:"int",value:"1"}});
+    for parameter in [#{name:"fuel_family",value:fuel_family.to_string()},
         #{name:"stoichiometric_mixture_ratio",value:stoichiometric.to_string()},
         #{name:"ambient_pressure_pa",value:"0.0"}] {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"inputs:"+parameter.name,
@@ -190,11 +192,14 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
     ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:telemetry,schemas:["LunCoTelemetryAPI"]}});
     for field in [#{name:"lunco:telemetry",type_name:"bool",value:"true"},
         #{name:"ui:displayName",type_name:"string",value:"\""+name.to_upper()+" THRUST\""},
-        #{name:"lunco:telemetry:port",type_name:"token",value:"\""+griffin_spec::main_engine_port(name,"thrust_n")+"\""},
-        #{name:"lunco:telemetry:name",type_name:"token",value:"\"lander."+griffin_spec::main_engine_port(name,"thrust")+"\""},
-        #{name:"lunco:telemetry:unit",type_name:"token",value:"\"N\""},
+        #{name:"lunco:telemetry:port",type_name:"string",value:"\""+griffin_spec::main_engine_port(name,"thrust_n")+"\""},
+        #{name:"lunco:telemetry:name",type_name:"string",value:"\"lander."+griffin_spec::main_engine_port(name,"thrust")+"\""},
+        #{name:"lunco:telemetry:unit",type_name:"string",value:"\"N\""},
         #{name:"lunco:telemetry:description",type_name:"string",
             value:"\"Delivered thrust of main engine "+name+" from its PressureFedEngine model.\""}] {
+        if ["lunco:telemetry:port","lunco:telemetry:name","lunco:telemetry:unit"].contains(field.name) {
+            ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:telemetry,name:field.name}});
+        }
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:telemetry,name:field.name,
             type_name:field.type_name,value:field.value}});
     }
@@ -256,6 +261,8 @@ fn griffin_main_engine_feed_plan(doc, edit_target, root) {
     ops.push(#{SetRelationship:#{edit_target:edit_target,path:main,name:"collection:components:includes",targets:members}});
     for item in [#{name:"throat_radius",source:own+"throatBoreRadiusM"},
         #{name:"exit_radius",source:nozzle_source+"exitBoreRadiusM"},
+        #{name:"length",source:nozzle_source+"bellHeightM"},
+        #{name:"contour",source:nozzle_source+"bellContourExponent"},
         #{name:"p_chamber",source:own+"referenceChamberPressurePa"},
         #{name:"gamma",source:own+"gasGamma"},
         #{name:"characteristic_velocity_mps",source:own+"characteristicVelocityMps"}] {
@@ -348,10 +355,6 @@ fn griffin_body_collision_component_plan(doc, edit_target, root) {
 }
 
 fn _solar_station_ops(doc, edit_target, root, index) {
-    _solar_station_ops(doc,edit_target,root,index,"all")
-}
-
-fn _solar_station_ops(doc, edit_target, root, index, group) {
     let names = griffin_spec::solar_array_names();
     let positions = griffin_spec::component_solar_stations();
     let widths = griffin_spec::component_solar_array_widths_m();
@@ -367,20 +370,18 @@ fn _solar_station_ops(doc, edit_target, root, index, group) {
             value: "("+q.w.to_string()+", "+q.x.to_string()+", "+q.y.to_string()+", "+q.z.to_string()+")"}},
         #{SetAttribute: #{edit_target: edit_target, path: path, name: "xformOpOrder", type_name: "token[]",
             value: "[\"xformOp:translate\", \"xformOp:orient\", \"xformOp:scale\"]"}}];
-    let geometry=_solar_panel_geometry_ops(doc,edit_target,path,index,group);
+    let geometry=_solar_panel_geometry_ops(doc,edit_target,path,index,"mounts");
     if !geometry.ok {return geometry;}
     for op in geometry.ops {ops.push(op);}
     #{ok: true, ops: ops}
 }
 
-fn griffin_solar_station_plan(doc, edit_target, root, index) {
-    griffin_solar_station_plan(doc,edit_target,root,index,"all")
-}
+fn solar_edit_groups() { ["frame","backplane","substrate","materials","cleanup","mounts"] }
 
-// Bound live edits to one named panel task without duplicating geometry policy.
-fn griffin_solar_station_plan(doc, edit_target, root, index, group) {
-    if !["all","surface","cleanup","mounts"].contains(group) {return plan_error("unknown solar edit group");}
-    let plan = _solar_station_ops(doc, edit_target, root, index, group);
+// The assembly owns only the instance pose and its bus attachment links.
+// Each referenced panel component owns its photographed outline and cell field.
+fn griffin_solar_station_plan(doc, edit_target, root, index) {
+    let plan = _solar_station_ops(doc, edit_target, root, index);
     if !plan.ok { return plan; }
     let path = root + "/" + griffin_spec::solar_array_names()[index];
     let current = assembly_builder::composed_query(doc,
@@ -398,17 +399,21 @@ fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
     if layout==() {return plan_error("installed solar field cannot fit the source module");}
     let cw=layout.local_cell_width_m;let sx=layout.scale_x;
     let color=sysml_requirements::model().value("GriffinSolarRequirements::GriffinSolarArrayAssembly::substrateDisplayColor");
-    if group=="all" || group=="surface" {
+    if group=="frame" {
         let frame_color=sysml_requirements::model().value("GriffinSolarRequirements::GriffinSolarArrayAssembly::frameDisplayColor");
         let frame=_component_mesh_visual_ops(doc,edit_target,path,"Frame",
             griffin_geometry::solar_contour_frame_geometry(layout,_solar_number("frameWidthM"),_solar_number("frameThicknessM")),frame_color);
         if !frame.ok {return frame;}for op in frame.ops {plan.ops.push(op);}
-        for surface in [#{name:"ArrayBackplane",width:_solar_number("cellWidthM"),thickness:_solar_number("arrayBackplaneThicknessM"),y:_solar_number("arrayBackplaneCenterYM")},
-            #{name:"Cells",width:cw,thickness:_solar_number("cellThicknessM"),y:_solar_number("cellOffsetYM")}] {
+    }
+    for surface in [#{group:"backplane",name:"ArrayBackplane",width:_solar_number("cellWidthM"),thickness:_solar_number("arrayBackplaneThicknessM"),y:_solar_number("arrayBackplaneCenterYM")},
+            #{group:"substrate",name:"Cells",width:cw,thickness:_solar_number("cellThicknessM"),y:_solar_number("cellOffsetYM")}] {
+        if group==surface.group {
             let part=_component_mesh_visual_ops(doc,edit_target,path,surface.name,
                 griffin_geometry::solar_contour_geometry(layout,surface.width,surface.y,surface.thickness),color);
             if !part.ok {return part;}for op in part.ops {plan.ops.push(op);}
         }
+    }
+    if group=="materials" {
         plan.ops.push(#{SetTranslate:#{edit_target:edit_target,path:path+"/HingeBar",
             value:[0.0,_solar_number("hingeBarCenterYM"),_solar_number("hingeBarCenterZM")+layout.datum_offset_m]}});
         for material in [#{name:"Substrate",target:"Cells",prefix:"substrate"},#{name:"PanelFrame",target:"Frame",prefix:"frame"}] {
@@ -425,7 +430,7 @@ fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
             plan.ops.push(#{SetAttribute:#{edit_target:edit_target,path:path+"/Looks/SolarCells/Surface",name:"inputs:"+parameter.name,type_name:parameter.kind,value:parameter.value}});
         }
     }
-    if group=="all" || group=="cleanup" {
+    if group=="cleanup" {
         let current=assembly_builder::composed_query(doc,#{path:path,children:true,attrs:[]});
         if !query_ok(current) {return plan_error("solar cleanup cannot inspect component");}
         for child in current.children {
@@ -435,8 +440,8 @@ fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
             }
         }
     }
-    if group=="all" || group=="mounts" {
-        // Bus rail datums stay fixed as the face width is capped. Pin each compact
+    if group=="mounts" {
+        // Bus rail datums stay fixed independently of module width. Pin each compact
         // bracket at its rail and derive a slanted link to the panel edge.
         let q=griffin_spec::component_solar_orientation(index);
         let station=griffin_spec::component_solar_stations()[index];
@@ -464,12 +469,6 @@ fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
             if !link.ok {return link;}for op in link.ops {plan.ops.push(op);}
         }
     }
-    if group=="all" {
-        for row in 0..layout.rows {
-            let part=griffin_solar_cell_row_plan(doc,edit_target,path,index,row);
-            if !part.ok {return part;}for op in part.ops {plan.ops.push(op);}
-        }
-    }
     plan
 }
 
@@ -491,9 +490,9 @@ fn griffin_solar_cell_row_plan(doc,edit_target,path,index,row) {
     part
 }
 
-fn griffin_solar_component_group_plan(doc,edit_target,root,group) {
-    if !["all","surface","cleanup","mounts"].contains(group) {return plan_error("unknown solar edit group");}
-    _solar_panel_geometry_ops(doc,edit_target,root,0,group)
+fn griffin_solar_component_group_plan(doc,edit_target,root,index,group) {
+    if !solar_edit_groups().contains(group) {return plan_error("unknown solar edit group");}
+    _solar_panel_geometry_ops(doc,edit_target,root,index,group)
 }
 
 fn griffin_bus_cladding_plan(doc, edit_target, root) {
@@ -3626,22 +3625,6 @@ fn _component_mesh_visual_ops(doc, edit_target, parent, name, geometry, color) {
     #{ok: true, path: path, ops: ops}
 }
 
-// Refine the reusable solar-array component in its own document.  The
-// outward-facing root rotation is owned by GriffinLanderComponent; this
-// operation owns only the panel's local frame, cell rows, substrate,
-// and bracket geometry.
-fn refine_griffin_solar_panel_component_plan(doc,edit_target,root) {
-    griffin_solar_component_group_plan(doc,edit_target,root,"all")
-}
-
-fn apply_refined_griffin_solar_panel(doc, edit_target, root, parent_gen) {
-    let plan = refine_griffin_solar_panel_component_plan(doc, edit_target, root);
-    if !plan.ok || plan.no_op { return plan; }
-    let command = assembly_edit::batch(doc, "Refine Griffin solar-panel component", plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, command: command,
-      root: root, paths: plan.paths}
-}
-
 // Refine the reusable propellant-tank visual in its own document.  USD
 // geometry dimensions stay double all the way to the schema boundary.  The
 // only lower-precision value authored here is the required renderer extent.
@@ -5874,10 +5857,11 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     }
     let ops = [];
     let migrated = [];
-    let solar_asset = component_asset("lander/griffin_solar_panel_visual.usda");
+    let solar_assets = griffin_spec::solar_component_assets();
+    if !array_is(solar_assets) || solar_assets.len()!=solar_names.len() {return plan_error("solar component identities are unavailable");}
     for index in 0..solar_names.len() {
         let result = _migrate_griffin_component_reference(doc, edit_target,
-            root, solar_names[index], solar_asset, "/SolarPanel",
+            root, solar_names[index], "twin://"+twin_name()+"/"+solar_assets[index], "/SolarPanel",
             vec3_array(solar_stations[index]),
             [solar_rot_x[index], 0.0, solar_rot_z[index]],
             [solar_widths[index] / solar_frame_width, 1.0, 1.0],

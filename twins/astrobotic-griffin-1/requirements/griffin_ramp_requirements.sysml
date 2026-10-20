@@ -963,10 +963,4 @@ package GriffinRampRequirements {
         verify grr010;
     }
 
-    verification def Verify_GriffinRampCommandEnvelope {
-        subject ramp : GriffinEgressRamp;
-        objective {
-            verify grr005;
-        }
-    }
 }
