@@ -1,10 +1,12 @@
-// Production startup and HUD GNC handoff. Initial pilot possession must not
-// suppress mission arming; the airframe's piloted mux keeps engines under the
-// pilot until RECONNECT GNC releases control. Observe actual thrust afterward.
+// Production selection, first-input manual takeover and explicit GNC reconnect.
+// Observe the live authority mux and delivered main-engine thrust.
 const TEST_KIND = "headless";
 
 fn simulation_dependencies(me, ctx) {
-    griffin_surface_ops::landing_stability_dependencies()
+    let dependencies = griffin_surface_ops::landing_stability_dependencies();
+    dependencies.entity_writes = [find_path("/Griffin1SurfaceOps/Lander"),
+        find_path("/Griffin1SurfaceOps/Lander/GNC")];
+    dependencies
 }
 
 fn on_start(me, ctx) {
@@ -25,23 +27,64 @@ fn on_start(me, ctx) {
 fn is_manual(lander) { let value = get(lander, "piloted"); value != () && value >= 0.5 }
 fn is_guided(lander) { let value = get(lander, "piloted"); value != () && value < 0.5 }
 fn manual(me) { is_manual(this.lander) }
-fn guided(me) { is_guided(this.lander) }
+fn guided(me) {
+    let gnc=find_path("/Griffin1SurfaceOps/Lander/GNC");
+    is_guided(this.lander) && griffin_controls::gnc_connected() == true
+        && get(gnc,"flight_authority_gate") > 0.5
+}
 
-fn armed_under_pilot(me) {
+fn selected_with_guidance(me) {
     let gnc = find_path("/Griffin1SurfaceOps/Lander/GNC");
     let sample = griffin_surface_ops::landing_stability_sample();
-    print("GRIFFIN INITIAL PILOT " + #{sample:sample, piloted:get(this.lander,"piloted"),
+    print("GRIFFIN SELECTED WITH GUIDANCE " + #{sample:sample, piloted:get(this.lander,"piloted"),
         guidance_engage:get(gnc,"engage")});
     this.checks.push(t_true(get(gnc, "engage") == 1.0,
         "validated descent guidance arms despite initial pilot possession"));
-    this.checks.push(t_true(is_manual(this.lander) && sample.ok == true
-        && sample.engine_thrust_n == 0.0,
-        "arming preserves the pilot's zero-throttle authority"));
+    this.checks.push(t_true(is_guided(this.lander) && griffin_controls::gnc_connected() == true,
+        "avatar selection leaves guidance active without flight input"));
+    this.checks.push(t_true(ignition_sample_valid(sample, this.thrust_threshold),
+        "selected lander retains automatic powered descent"));
     if get(gnc, "engage") != 1.0 {
         this.done = true;
         report_verdict(this.checks, "Griffin GNC toggle", "GRIFFIN_GNC_TOGGLE");
         return false;
     }
+    true
+}
+
+fn press_flight_input(me) {
+    let result = cmd("SimulateIntent", #{target:this.lander, intent:"forward", held:true});
+    this.checks.push(t_true(result != () && result.ok == true, "flight input is accepted"));
+    true
+}
+
+fn release_flight_input(me) {
+    this.checks.push(t_true(is_manual(this.lander) && griffin_controls::gnc_connected() == false,
+        "first flight input transfers the lander to manual authority"));
+    let result = cmd("SimulateIntent", #{target:this.lander, intent:"forward", held:false});
+    this.checks.push(t_true(result != () && result.ok == true, "flight input releases"));
+    true
+}
+
+fn input_value(target, name) {
+    for port in read_ports(target,[name]).ports {
+        if port.direction == "in" {return port.value;}
+    }
+    ()
+}
+
+fn neutral_stays_manual(me) {
+    this.checks.push(t_true(is_manual(this.lander) && griffin_controls::gnc_connected() == false,
+        "releasing the flight key keeps manual mode until GNC reconnect"));
+    let pitch = input_value(this.lander,"pitch");
+    this.checks.push(t_true(pitch == 0.0,
+        "released input is neutral rather than a stale pitch command"));
+    let gnc=find_path("/Griffin1SurfaceOps/Lander/GNC");
+    let authority=#{pilot_input:input_value(gnc,"piloted"),
+        command_gate:get(gnc,"flight_authority_gate"),manual:get(this.lander,"piloted")};
+    print("GRIFFIN MANUAL GUIDANCE AUTHORITY " + authority);
+    this.checks.push(t_true(authority.pilot_input==1.0 && authority.command_gate==0.0,
+        "the guidance model receives the same manual authority and stops commanding flight"));
     true
 }
 
@@ -81,7 +124,7 @@ fn verify_automatic_startup() {
     ], "Griffin automatic ignition", "GRIFFIN_AUTOMATIC_IGNITION")
 }
 
-// The HUD action result must report the new GNC state it established.
+// The HUD acknowledges its requested state; the task observes its application.
 fn pressed(expected_connected) {
     let result = griffin_surface_ops::on_hud_action("toggle_gnc");
     result != () && result.ok == true && result.gnc_connected == expected_connected
@@ -95,11 +138,15 @@ fn disconnect(me) {
 }
 
 fn disconnected(me) {
-    this.checks.push(t_true(is_manual(this.lander), "the lander's piloted authority is engaged"));
+    let gnc = find_path("/Griffin1SurfaceOps/Lander/GNC");
+    this.checks.push(t_true(get(gnc,"engage") == 0.0,
+        "explicit DISCONNECT GNC disables guidance without a fabricated stick input"));
     this.checks.push(t_true(griffin_controls::gnc_connected() == false,
         "the HUD reports GNC disconnected"));
     true
 }
+
+fn guidance_disconnected(me) { griffin_controls::gnc_connected() == false }
 
 fn reconnect(me) {
     this.checks.push(t_true(pressed(true), "RECONNECT GNC is accepted"));
@@ -128,17 +175,23 @@ fn timeout(me) {
 fn task(me, ctx) {
     par_race([
         seq([
-            wait_until(Fn("manual")),
+            wait_until(Fn("guided")),
             wait(0.5),
             wait_until(Fn("observation_ready")),
-            once(Fn("armed_under_pilot")),
+            wait_until(Fn("ignited")),
+            once(Fn("selected_with_guidance")),
             check(|m| !this.done),
+            once(Fn("press_flight_input")),
+            wait_until(Fn("manual")),
+            once(Fn("release_flight_input")),
+            wait(0.3),
+            once(Fn("neutral_stays_manual")),
             once(Fn("reconnect")),
             wait_until(Fn("guided")),
             wait_until(Fn("ignited")),
             once(Fn("ignition_confirmed")),
             once(Fn("disconnect")),
-            wait_until(Fn("manual")),
+            wait_until(Fn("guidance_disconnected")),
             once(Fn("disconnected")),
             once(Fn("reconnect")),
             wait_until(Fn("guided")),

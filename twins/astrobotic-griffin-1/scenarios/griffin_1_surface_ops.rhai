@@ -31,7 +31,7 @@ fn simulation_dependencies(me, ctx) {
     let entity_reads = [lander, gnc, propulsion, altimeter_model, imu,
         attitude_reference, attitude_propulsion, attitude_actuation, rover,
         lander_environment, altimeter];
-    let entity_writes = [rover];
+    let entity_writes = [rover, gnc];
     for side in ["Port", "Starboard"] {
         entity_reads.push(find_path(LANDER+"/EgressRamp"+side));
     }
@@ -85,6 +85,7 @@ fn on_start(me, ctx) {
     subscribe_from("route_stopped", route_host);
     subscribe("griffin_ramp_unfold_requested");
     subscribe("griffin_rover_release_requested");
+    subscribe("griffin_gnc_engagement_requested");
     for event_name in griffin_surface_ramp_ops::unfold_event_contract().ordered {
         subscribe(event_name);
     }
@@ -145,6 +146,21 @@ fn on_event(me, evt, ctx) {
     let lander = find_path(LANDER);
     let rover = find_path(ROVER);
 
+    if evt.name == "griffin_gnc_engagement_requested" {
+        let request = evt.value;
+        if request == () || (request.enabled != true && request.enabled != false) {
+            throw("Griffin GNC request requires an explicit enabled state");
+        }
+        let result = cmd("SetPorts", #{target: find_path(LANDER + "/GNC"),
+            writes: [["engage", if request.enabled {1.0} else {0.0}]]});
+        if result == () || result.ok != true {
+            notify_kind("Griffin guidance engagement was rejected.", "error");
+            throw("Griffin guidance engagement was rejected");
+        }
+        griffin_controls::guidance_engagement_applied(request.enabled);
+        return;
+    }
+
     if this.route_engaged && (evt.name == "route_started" || evt.name == "route_stopped")
         && evt.source == find_path("/Griffin1SurfaceOps/FlipRoute") {
         // The operator program already owns its start/stop writes. Retire the
@@ -182,6 +198,7 @@ fn on_event(me, evt, ctx) {
     // manual actions. F on FLIP retains its vehicle-specific control meaning.
     if evt.name == "intent.edge" && evt.source == lander {
         let value = evt.value;
+        griffin_controls::set_surface_action_buttons();
         if value != () && value["intent"] == "action" &&
            (value["edge"] == "pressed" || value["edge"] == "pulse") {
             let result=griffin_surface_ops::request_rover_release();

@@ -92,9 +92,10 @@ loading; it does not prove physics or mission completion.
 
 ## Step 6: open the default visual Twin or run the landing mission
 
-Opening the Twin shows `scenes/griffin_flip_visual.usda`. To run the powered
-landing mission and its Griffin-specific control HUD, explicitly select the
-surface-operations scene below.
+Opening the Twin uses `scenes/griffin_1_surface_ops.usda`, as declared in
+`twin.toml`. For a static shape/material review, select
+`scenes/griffin_flip_visual.usda`. The surface-operations scene runs the powered
+landing mission and its Griffin-specific control HUD.
 
 Run:
 
@@ -108,13 +109,15 @@ Check:
 - the four-wheel FLIP study proxy is visible on the lander top deck during
   descent;
 - the isogrid deck, clean top deck, three adjacent vertical solar arrays on the
-  forward, beveled forward-starboard, and starboard faces, two
+  forward face and both forward chamfers, two
   collision-safe ramps, and the ordered route markers are present;
 - the runtime has no unresolved twin:// asset error.
 
 The persistent control brief is part of the interactive acceptance check:
 
 - click the Griffin lander to possess it and verify the lander control card;
+- confirm GNC remains engaged until the first flight-control input; releasing
+  that input retains manual mode, and RECONNECT GNC restores guidance;
 - use `W/S` pitch, `A/D` roll, `Q/E` yaw, `Space` thrust, and `G` release;
 - after rover release, click FLIP to possess it and verify the rover HUD;
 - use the configured drive/turn/brake controls; Alt+left-click adds operator route points and the action control starts or stops the route;

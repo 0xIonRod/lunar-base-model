@@ -27,9 +27,10 @@ package GriffinLanderRequirements {
         // and current propellant loading remain unpublished study inputs.
         // https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
         attribute engineCount : Integer = 7;
-        /* Four arrays is a study configuration, not a released hardware count.
-         * The fourth restores a belt panel on the opposite broad face requested
-         * by the operator on 2026-10-02. See solar layout rationale. */
+        /* Three arrays follow the public Griffin-1 solar configuration.
+         * The forward face and two forward chamfer stations are the selected
+         * study layout; exact installation geometry remains unpublished.
+         * GriffinSolarRequirements owns the image references and estimates. */
         attribute solarArrayCount : Integer = 3;
         // The open-frame mesh is a render study made from bounded member
         // sections. Its composed envelope may differ slightly from the
@@ -61,7 +62,7 @@ package GriffinLanderRequirements {
         doc /* GLR-007 [evidence] component counts, status, and public references shall come from this SysML package; repeated instance identities shall use the typed enumerations in GriffinVisualConfigurationRequirements and be checked by a Twin Rhai observer. */
     }
     requirement def GLR008_StationPlacement {
-        doc /* GLR-008 [layout] every replaceable lander component root uses the native Position and Direction values in GriffinVisualConfigurationRequirements; no verifier or builder owns a second placement table. The two Z-side legs rotate 90 degrees because the reusable leg asset's canted struts are authored in local X/Y. */
+        doc /* GLR-008 [layout] every replaceable lander component root uses the native Position and Direction values in GriffinVisualConfigurationRequirements; no verifier or builder owns a second placement table. Each landing leg's local +X axis shall point radially outward at its corner, using the source-owned legStationRotationYDeg list. */
     }
     requirement def GLR009_ComponentIdentity {
         doc /* GLR-009 [configuration] the Griffin visual assembly shall use the stage-root part /Griffin1 and expose the composed bus and subsystem parts. */

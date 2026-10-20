@@ -8,7 +8,7 @@
 def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda@</Griffin1SurfaceOps>
     documentation = "Production FLIP drives into a landed Griffin leg; structural proxies block the rover."
-    prepend apiSchemas = "LunCoEpochAPI"
+    prepend apiSchemas = ["LunCoEpochAPI"]
 )
 {
     double lunco:time:epochJd = 2461395.5
@@ -24,17 +24,17 @@ def Xform "Griffin1SurfaceOps" (
     }
     def "Lander"
     {
-        double3 xformOp:translate = (0.0, 0.65, 0.0)
+        double3 xformOp:translate = (0.0, 1.1, 0.0)
     }
     def "FLIP"
     {
-        double3 xformOp:translate = (4.5, 0.5, 4.5)
+        double3 xformOp:translate = (4.5, 1.47, 4.5)
         double3 xformOp:rotateXYZ = (0.0, 135.0, 0.0)
     }
     def Scope "RoverLegCollision"
     {
         def Scope "Observer" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"

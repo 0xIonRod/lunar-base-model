@@ -88,6 +88,8 @@ fn run_visual_review(batch_index) {
         griffin_spec::qualified_attribute_name("missionSteeringMode"),
         griffin_spec::qualified_attribute_name("visualReviewGriffinStation"),
         griffin_spec::qualified_attribute_name("visualReviewFlipStation"),
+        griffin_spec::qualified_attribute_name("visualReviewLegDisplacementM"),
+        griffin_spec::qualified_attribute_name("visualReviewLegVelocityMps"),
         griffin_spec::qualified_attribute_name("deckDimensions"),
         griffin_spec::qualified_attribute_name("visualReviewPadHalfExtentM"),
         griffin_spec::qualified_attribute_name("visualReviewGroundWidthM"),
@@ -104,6 +106,18 @@ fn run_visual_review(batch_index) {
     ], ["GriffinVisualRequirements::Verify_GriffinVisualRequirements"]);
     let root = "/GriffinFlipVisual";
     let checks = [];
+    for quantity in [#{port:"displacement",datum:"visualReviewLegDisplacementM"},
+                     #{port:"velocity",datum:"visualReviewLegVelocityMps"}] {
+        for leg in ["px", "nx", "pz", "nz"] {
+            checks.push(#{id:"GV-004-static-leg-"+quantity.port+"-"+leg,
+                component:"lander",requirement:"gv004",
+                verification:"Verify_GriffinVisualRequirements",
+                kind:"attribute",path:root+"/Griffin1",
+                attr:"inputs:leg_"+quantity.port+"_"+leg,
+                expected_attr:griffin_spec::qualified_attribute_name(quantity.datum),
+                tolerance:0.000001});
+        }
+    }
     checks.push(visual_exists_check("GV-001-camera", "camera", "gv001", "exists", root + "/VisualCamera"));
     let leg_names = _sysml_list(source, "landingLegInstances");
     for name in leg_names {

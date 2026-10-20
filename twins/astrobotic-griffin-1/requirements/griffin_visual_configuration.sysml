@@ -100,6 +100,11 @@ package GriffinVisualConfigurationRequirements {
         // pose and all physics is disabled. Live terrain contact belongs to
         // griffin_1_surface_ops, which is the Twin default. See size evidence.
         attribute visualReviewGriffinStation : Position = (0.0, 0.44, 0.0);
+        // Fixed-pose review fixture only: disabled joints have no runtime
+        // telemetry. The flight model receives this explicit unloaded rest
+        // coordinate (m) and stationary rate (m/s), without live joint wires.
+        attribute visualReviewLegDisplacementM : Real = 0.0;
+        attribute visualReviewLegVelocityMps : Real = 0.0;
         // FLIP is mounted on the payload adapter. Its wheel bottoms (station
         // -0.05 m minus 0.45 m tire radius) meet the adapter top at 2.12 m.
         // This station is the one review-scene placement source.

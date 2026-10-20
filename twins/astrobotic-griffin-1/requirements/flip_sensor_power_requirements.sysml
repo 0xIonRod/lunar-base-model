@@ -1,9 +1,10 @@
 // Legacy runtime visual-study contract; not the corrected FreeCAD v3 geometry.
 // See flip_cad_requirements.sysml for current CAD behavior and dimensions.
-// Runtime promotion remains OPEN; these builder-consumed values are unchanged.
+// Runtime sensor and array geometry remain explicit study estimates.
 package FlipSensorPowerRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::String;
+    private import GriffinVisualConfigurationRequirements::Direction;
     private import GriffinRequirementSources::TwinAssetPath;
     private import GriffinRequirementSources::UsdPrimPath;
 
@@ -31,9 +32,12 @@ package FlipSensorPowerRequirements {
         attribute mastPostHeightM : Real = 0.70;
         attribute mastPostCenterYM : Real = 0.35;
         attribute mastPostCenterZM : Real = 0.0;
-        attribute sensorHeadWidthM : Real = 0.80;
-        attribute sensorHeadHeightM : Real = 0.32;
-        attribute sensorHeadDepthM : Real = 0.48;
+        // Full metre envelopes of the current size=1 study Cube. The former
+        // values doubled its actual geometry by retaining size=2 semantics.
+        // This is authored study geometry, not supplier metrology.
+        attribute sensorHeadWidthM : Real = 0.40;
+        attribute sensorHeadHeightM : Real = 0.16;
+        attribute sensorHeadDepthM : Real = 0.24;
         attribute sensorHeadCenterYM : Real = 0.78;
         attribute sensorHeadCenterZM : Real = 0.0;
         attribute antennaRadiusM : Real = 0.025;
@@ -54,8 +58,34 @@ package FlipSensorPowerRequirements {
         // Astrolab publishes these nameplate ratings; the physical models
         // realize them through the generic LunCoSim storage/source parameters.
         attribute batteryEnergyKWh : Real = 6.22;
+        // The public post says nearly 270 W. Use 270 W as the rounded model
+        // ceiling, not as a supplier tolerance or guaranteed bus delivery.
         attribute solarArrayPeakPowerW : Real = 270.0;
+        attribute solarReferenceTemperatureK : Real = 298.15;
+        // Generic standard-silicon sensitivity from PVWatts, not a FLIP cell
+        // measurement. Replace with the installed cell supplier's coefficient.
+        attribute solarPowerTemperatureCoefficientPerK : Real = -0.0037;
+        // Ideal opaque absorber until a measured optical surface is available.
+        attribute solarAbsorptivity : Real = 1.0;
         attribute visualOwnership : String = "mast and panel are render-only; rover sensor and electrical models own behavior";
+    }
+
+    part def FlipSolarVerificationInputs {
+        doc /* Synthetic illumination for the native electrical verification; these are test stimuli, not lunar-site or supplier measurements. The front and back directions are expressed in the installed panel's local frame. */
+        attribute brightIrradianceWm2 : Real = 2000.0;
+        attribute dimIrradianceWm2 : Real = 100.0;
+        attribute visibleSunFraction : Real = 1.0;
+        attribute occludedSunFraction : Real = 0.0;
+        attribute frontDirection : Direction = (0.0, 0.0, 1.0);
+        attribute backDirection : Direction = (0.0, 0.0, -1.0);
+        attribute frontCosine : Real = 1.0;
+        attribute backCosine : Real = 0.0;
+        attribute observationDwellS : Real = 0.5;
+        attribute observationTimeoutS : Real = 30.0;
+        attribute temperatureProbeDeltaK : Real = 50.0;
+        attribute counterexampleAreaOffsetM2 : Real = 0.01;
+        attribute counterexampleEfficiencyOffset : Real = 0.01;
+        attribute counterexamplePowerOffsetW : Real = 1.0;
     }
 
     requirement def FSP001_MastStructure {
@@ -76,11 +106,124 @@ package FlipSensorPowerRequirements {
     requirement def FSP006_SolarPanelGeometry {
         doc /* FSP-006 [geometry] the rover panel shall expose an active cell face sized by solarCellWidthM and solarCellDepthM. Its collection area is derived from those typed dimensions and shall fit on the source-owned backsheet and fold hinge. */
     }
+    constraint def FSPC007_BatteryNameplateEnergy {
+        in capacityAh : Real;
+        in nominalVoltageV : Real;
+        in requiredEnergyKWh : Real;
+        in requiredVoltageV : Real;
+        in capacityToleranceAh : Real;
+        in voltageToleranceV : Real;
+        capacityAh > 0.0 and nominalVoltageV > 0.0
+            and requiredEnergyKWh > 0.0 and requiredVoltageV > 0.0
+            and capacityToleranceAh >= 0.0 and voltageToleranceV >= 0.0
+            and capacityAh >= requiredEnergyKWh * 1000.0 / requiredVoltageV - capacityToleranceAh
+            and capacityAh <= requiredEnergyKWh * 1000.0 / requiredVoltageV + capacityToleranceAh
+            and nominalVoltageV >= requiredVoltageV - voltageToleranceV
+            and nominalVoltageV <= requiredVoltageV + voltageToleranceV;
+    }
     requirement def FSP007_BatteryEnergyCapacity {
-        doc /* FSP-007 [power] the FLIP electrical-storage model shall realize the published battery energy capacity held in this package's source attribute. */
+        doc /* FSP-007 [power] the electrical-storage model's authored ampere-hour capacity shall equal the source nameplate energy converted from kWh to Wh and divided by the source nominal voltage, within batteryCapacityToleranceAh. Its nominal voltage shall match the source within batteryVoltageToleranceV. Verification reads both values from the same composed USD snapshot. */
+        // Numerical configuration allowances retained from the existing gate.
+        attribute batteryCapacityToleranceAh : Real = 0.02;
+        attribute batteryVoltageToleranceV : Real = 0.002;
+        require FSPC007_BatteryNameplateEnergy {
+            in requiredEnergyKWh = FlipSensorPowerAssembly::batteryEnergyKWh;
+            in requiredVoltageV = FlipRequirements::FlipRover::batteryNominalVoltageV;
+            in capacityToleranceAh = batteryCapacityToleranceAh;
+            in voltageToleranceV = batteryVoltageToleranceV;
+        }
+    }
+    constraint def FSPC008_SolarConfiguration {
+        in areaM2 : Real;
+        in efficiency : Real;
+        in peakPowerW : Real;
+        in cellWidthM : Real;
+        in cellDepthM : Real;
+        in requiredEfficiency : Real;
+        in requiredPeakPowerW : Real;
+        in areaToleranceM2 : Real;
+        in efficiencyTolerance : Real;
+        in powerToleranceW : Real;
+        areaM2 > 0.0 and cellWidthM > 0.0 and cellDepthM > 0.0
+            and efficiency > 0.0 and efficiency <= 1.0
+            and requiredEfficiency > 0.0 and requiredEfficiency <= 1.0
+            and requiredPeakPowerW > 0.0
+            and areaToleranceM2 >= 0.0 and efficiencyTolerance >= 0.0 and powerToleranceW >= 0.0
+            and areaM2 >= cellWidthM * cellDepthM - areaToleranceM2
+            and areaM2 <= cellWidthM * cellDepthM + areaToleranceM2
+            and efficiency >= requiredEfficiency - efficiencyTolerance
+            and efficiency <= requiredEfficiency + efficiencyTolerance
+            and peakPowerW >= requiredPeakPowerW - powerToleranceW
+            and peakPowerW <= requiredPeakPowerW + powerToleranceW;
+    }
+    constraint def FSPC008_SolarAvailablePower {
+        in availablePowerW : Real;
+        in deliveredPowerW : Real;
+        in irradianceWm2 : Real;
+        in sunVisibility : Real;
+        in incidenceCosine : Real;
+        in cellTemperatureK : Real;
+        in temperatureFactor : Real;
+        in referenceTemperatureK : Real;
+        in powerTemperatureCoefficientPerK : Real;
+        in solarAbsorptivity : Real;
+        in temperatureFactorTolerance : Real;
+        in cellWidthM : Real;
+        in cellDepthM : Real;
+        in requiredEfficiency : Real;
+        in requiredPeakPowerW : Real;
+        in powerToleranceW : Real;
+        irradianceWm2 >= 0.0 and sunVisibility >= 0.0 and sunVisibility <= 1.0
+            and incidenceCosine >= 0.0 and incidenceCosine <= 1.0
+            and cellWidthM > 0.0 and cellDepthM > 0.0
+            and requiredEfficiency > 0.0 and requiredEfficiency <= 1.0
+            and requiredPeakPowerW > 0.0 and powerToleranceW >= 0.0
+            and cellTemperatureK > 0.0 and referenceTemperatureK > 0.0
+            and solarAbsorptivity >= requiredEfficiency and solarAbsorptivity <= 1.0
+            and temperatureFactor >= 0.0 and temperatureFactorTolerance >= 0.0
+            and temperatureFactor >= (if 1.0 + powerTemperatureCoefficientPerK * (cellTemperatureK-referenceTemperatureK) > 0.0
+                ? 1.0 + powerTemperatureCoefficientPerK * (cellTemperatureK-referenceTemperatureK) else 0.0) - temperatureFactorTolerance
+            and temperatureFactor <= (if 1.0 + powerTemperatureCoefficientPerK * (cellTemperatureK-referenceTemperatureK) > 0.0
+                ? 1.0 + powerTemperatureCoefficientPerK * (cellTemperatureK-referenceTemperatureK) else 0.0) + temperatureFactorTolerance
+            and availablePowerW >= (if cellWidthM * cellDepthM * (if requiredEfficiency * temperatureFactor < solarAbsorptivity ? requiredEfficiency * temperatureFactor else solarAbsorptivity) * irradianceWm2 * sunVisibility * incidenceCosine < requiredPeakPowerW * temperatureFactor
+                ? cellWidthM * cellDepthM * (if requiredEfficiency * temperatureFactor < solarAbsorptivity ? requiredEfficiency * temperatureFactor else solarAbsorptivity) * irradianceWm2 * sunVisibility * incidenceCosine
+                else requiredPeakPowerW * temperatureFactor) - powerToleranceW
+            and availablePowerW <= (if cellWidthM * cellDepthM * (if requiredEfficiency * temperatureFactor < solarAbsorptivity ? requiredEfficiency * temperatureFactor else solarAbsorptivity) * irradianceWm2 * sunVisibility * incidenceCosine < requiredPeakPowerW * temperatureFactor
+                ? cellWidthM * cellDepthM * (if requiredEfficiency * temperatureFactor < solarAbsorptivity ? requiredEfficiency * temperatureFactor else solarAbsorptivity) * irradianceWm2 * sunVisibility * incidenceCosine
+                else requiredPeakPowerW * temperatureFactor) + powerToleranceW
+            and deliveredPowerW >= -powerToleranceW
+            and deliveredPowerW <= availablePowerW + powerToleranceW
+            and deliveredPowerW <= requiredPeakPowerW * temperatureFactor + powerToleranceW
+            and (availablePowerW <= powerToleranceW or deliveredPowerW > 0.0);
     }
     requirement def FSP008_SolarArrayPeakPower {
-        doc /* FSP-008 [power] derive the modeled solar collection area from the typed cell dimensions, apply solarArrayEfficiency, and limit electrical output to solarArrayPeakPowerW. Panel telemetry shall target the FLIP system solar_power output, which is wired from SolarArray.outputs:power_out, rather than treating an internally composed Modelica network node as an independent runtime port surface. Source: vehicles/flip.usda output connection, lunco://components/power/solar_panel.usda and the generic telemetry target contract in crates/lunco-usd-sim-cosim/src/lib.rs. This changes measurement ownership, not the electrical equation or hardware power rating. */
+        doc /* FSP-008 [power] derive collection area from the typed cell dimensions and apply the source temperature coefficient relative to solarReferenceTemperatureK. Both conversion efficiency and the rounded reference-temperature nameplate shall change with cell temperature; conversion cannot exceed absorbed radiant power. Delivered power shall be nonnegative and shall not exceed available power. The native gate shall exercise reference-temperature bright/dim/occluded/back-facing probes and hot/cold bright probes. The cell temperature may be prescribed or connected to a thermal network; absorbed radiation minus electrical delivery is the heat input for that network. A cooling sink has finite heat-rejection capacity and cannot remove heat below its minimum sink temperature. The generic coefficient and ideal absorptivity are explicit study assumptions, not FLIP supplier properties. Sources: Astrolab nameplate post, PVWatts standard-module temperature coefficient and the user's 2026-10-20 electrothermal requirement. */
+        // Configuration/numeric allowances retained from the existing gate;
+        // they do not express the precision of the public nameplate claim.
+        attribute areaToleranceM2 : Real = 0.002;
+        attribute efficiencyTolerance : Real = 0.002;
+        attribute powerToleranceW : Real = 0.01;
+        attribute temperatureFactorTolerance : Real = 1.0e-9;
+        require FSPC008_SolarConfiguration {
+            in cellWidthM = FlipSensorPowerAssembly::solarCellWidthM;
+            in cellDepthM = FlipSensorPowerAssembly::solarCellDepthM;
+            in requiredEfficiency = FlipSensorPowerAssembly::solarArrayEfficiency;
+            in requiredPeakPowerW = FlipSensorPowerAssembly::solarArrayPeakPowerW;
+            in areaToleranceM2 = FlipSensorPowerRequirements::FSP008_SolarArrayPeakPower::areaToleranceM2;
+            in efficiencyTolerance = FlipSensorPowerRequirements::FSP008_SolarArrayPeakPower::efficiencyTolerance;
+            in powerToleranceW = FlipSensorPowerRequirements::FSP008_SolarArrayPeakPower::powerToleranceW;
+        }
+        require FSPC008_SolarAvailablePower {
+            in referenceTemperatureK = FlipSensorPowerAssembly::solarReferenceTemperatureK;
+            in powerTemperatureCoefficientPerK = FlipSensorPowerAssembly::solarPowerTemperatureCoefficientPerK;
+            in solarAbsorptivity = FlipSensorPowerAssembly::solarAbsorptivity;
+            in temperatureFactorTolerance = FlipSensorPowerRequirements::FSP008_SolarArrayPeakPower::temperatureFactorTolerance;
+            in cellWidthM = FlipSensorPowerAssembly::solarCellWidthM;
+            in cellDepthM = FlipSensorPowerAssembly::solarCellDepthM;
+            in requiredEfficiency = FlipSensorPowerAssembly::solarArrayEfficiency;
+            in requiredPeakPowerW = FlipSensorPowerAssembly::solarArrayPeakPowerW;
+            in powerToleranceW = FlipSensorPowerRequirements::FSP008_SolarArrayPeakPower::powerToleranceW;
+        }
     }
 
     requirement <'FSP-001'> fsp001 : FSP001_MastStructure { subject sensorPower : FlipSensorPowerAssembly; }

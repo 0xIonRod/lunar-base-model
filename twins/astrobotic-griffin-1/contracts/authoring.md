@@ -1,7 +1,8 @@
 # Typed Editor authoring procedure
 
-1. Launch the production `luncosim` binary from the main checkout in headful
-   mode and open the derived Griffin Editor scene.
+1. Launch the production `luncosim` binary from the selected compatible checkout
+   or installation in headful mode and open the derived Griffin Editor scene.
+   Use the matching shared assets; the current review uses `tutorials`.
 2. Use `ListOpenDocuments` and the exact numeric `doc_id`; do not use a title as
    an identifier and do not close/reload the open document during an edit loop.
 3. Focus the USD preview and confirm `InspectUsdViewport` reports projection

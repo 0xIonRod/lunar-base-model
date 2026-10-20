@@ -24,18 +24,32 @@ fn show_briefing() {
     set_surface_action_buttons();
 }
 
-/// Whether the lander's guidance (GNC) currently commands it: true while no
-/// pilot holds the lander's `piloted` authority, () when it cannot be read.
+/// Guidance commands the lander while engaged and no accepted operator input
+/// holds manual authority. Selecting the vehicle alone preserves guidance.
 fn gnc_connected() {
     let lander = find_path(lander_path());
     if lander == () || lander < 0 { return (); }
     let piloted = get(lander, "piloted");
-    if piloted == () { return (); }
-    piloted < 0.5
+    let gnc = find_path(lander_path() + "/GNC");
+    if gnc == () || gnc < 0 { return (); }
+    let engage = get(gnc, "engage");
+    if piloted == () || engage == () { return (); }
+    piloted < 0.5 && engage >= 0.5
 }
 
 fn set_surface_action_buttons() {
     set_surface_action_buttons_for(gnc_connected())
+}
+
+fn guidance_engagement_applied(enabled) {
+    if enabled {
+        hint("griffin-controls", "GNC RECONNECTED: guidance commands the lander again.");
+        notify_kind("Griffin GNC reconnected.", "success");
+    } else {
+        hint("griffin-controls", "GNC DISCONNECTED: flight input takes manual control. RECONNECT GNC restores guidance.");
+        notify_kind("Griffin GNC disconnected.", "warning");
+    }
+    set_surface_action_buttons();
 }
 
 /// `gnc` is the guidance state the GNC button offers to change.
@@ -150,36 +164,38 @@ fn control_lander() {
     if target == () { return; }
     let result = cmd("AcquireControl", #{ target: target, bind_camera: true });
     if result.ok {
-        hint("griffin-controls", "LANDER CONTROL: " + input_hint("thrust") + " thrust · W/S pitch · A/D roll · Q/E yaw · F detach rover");
-        notify_kind("Griffin lander under manual control.", "success");
+        hint("griffin-controls", "LANDER CONTROL: GNC stays on until flight input. " + input_hint("thrust") + " thrust · W/S pitch · A/D roll · Q/E yaw · F detach rover");
+        notify_kind("Griffin selected. Flight input takes manual control.", "success");
     } else {
         notify_kind("Lander control was rejected: " + result.error, "error");
     }
     result
 }
 
-/// Disconnect GNC by taking manual possession of the lander (its `piloted`
-/// authority makes the flight law ignore guidance commands), or reconnect it
-/// by releasing that possession. Uses the existing control commands only.
+/// Explicitly disconnect guidance or release manual possession and re-engage
+/// it. Ordinary selection leaves guidance active until the first flight input.
 fn toggle_gnc() {
     let connected = gnc_connected();
     if connected == () {
         notify_kind("Griffin GNC state is not readable from the active scene.", "error");
-        return #{ok: false, error: "lander piloted authority is unavailable"};
+        return #{ok: false, error: "lander guidance authority is unavailable"};
     }
     let result = if connected { control_lander() } else { release_lander() };
     if result == () || result.ok != true {
         let detail = if result == () || result.error == () { "control command rejected" } else { result.error };
         return #{ok: false, error: detail};
     }
+    // The mission owns fixed-tick guidance writes. HUD and console callbacks
+    // submit the same event as simulation callers, with no fabricated producer.
+    emit("griffin_gnc_engagement_requested", #{enabled: !connected});
     if connected {
-        notify_kind("Griffin GNC disconnected: manual flight.", "warning");
+        notify_kind("Griffin GNC disconnect requested.", "warning");
     } else {
-        hint("griffin-controls", "GNC RECONNECTED: guidance commands the lander again.");
-        notify_kind("Griffin GNC reconnected.", "success");
+        hint("griffin-controls", "GNC RECONNECT REQUESTED: waiting for guidance engagement.");
+        notify_kind("Griffin GNC reconnect requested.", "info");
     }
     set_surface_action_buttons_for(!connected);
-    #{ok: true, gnc_connected: !connected}
+    #{ok: true, queued: true, gnc_connected: !connected}
 }
 
 fn control_rover() {

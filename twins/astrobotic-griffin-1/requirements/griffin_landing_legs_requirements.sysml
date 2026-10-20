@@ -116,6 +116,15 @@ package GriffinLandingLegRequirements {
         attribute padColliderToleranceM : Real = 0.001;
         // Runtime numerical allowance for the contact solver, separate from geometry fidelity.
         attribute runtimeContactToleranceM : Real = 0.01;
+        // Collision-bench initial poses, not vehicle dimensions. Native DEM
+        // footprint sampling on 2026-10-20 measured maxima 0.409260 m at the
+        // four pads and 0.711725 m over FLIP's conservative rotated footprint.
+        // Add the respective 0.44/0.50 m unloaded bottom offsets and 0.25 m
+        // spawn clearance, then round heights upward to a centimetre. Gravity
+        // settles both vehicles before the collision approach; no runtime
+        // teleport or change to contact tolerance is permitted.
+        attribute collisionBenchLanderStart : Position = (0.0, 1.10, 0.0);
+        attribute collisionBenchRoverStart : Position = (4.5, 1.47, 4.5);
         attribute bodyMountOverlapM : Real = 0.05;
         // Numerical allowance for composed floating-point bound arithmetic;
         // it does not change the physical minimum-overlap datum.

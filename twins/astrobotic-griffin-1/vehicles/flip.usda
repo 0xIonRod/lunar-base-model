@@ -72,6 +72,21 @@ def Xform "FLIP" (
     double inputs:irradiance.connect = </FLIP/SolarArray/Environment.outputs:sun_irradiance_w_m2>
     custom double inputs:sun_visibility
     double inputs:sun_visibility.connect = </FLIP/SolarArray/Environment.outputs:sun_visibility>
+    custom double inputs:solar_cell_temperature_k = 298.15 (
+        documentation = "Prescribed cell temperature in K at the reference condition until a panel thermal network drives this boundary. This is not motor/chassis temperature or a flight-calibrated lunar cell temperature."
+    )
+    custom double outputs:solar_temperature_k
+    double outputs:solar_temperature_k.connect = </FLIP/SolarArray.outputs:temperature_k>
+    custom double outputs:solar_temperature_factor
+    double outputs:solar_temperature_factor.connect = </FLIP/SolarArray.outputs:temperature_factor>
+    custom double outputs:solar_heat_w
+    double outputs:solar_heat_w.connect = </FLIP/SolarArray.outputs:heat_w>
+    custom double outputs:solar_incident_power_w
+    double outputs:solar_incident_power_w.connect = </FLIP/SolarArray.outputs:incident_power_w>
+    custom double outputs:solar_reflected_power_w
+    double outputs:solar_reflected_power_w.connect = </FLIP/SolarArray.outputs:reflected_power_w>
+    custom double outputs:solar_temperature_adjusted_peak_power_w
+    double outputs:solar_temperature_adjusted_peak_power_w.connect = </FLIP/SolarArray.outputs:temperature_adjusted_peak_power_w>
     variantSet "drivetrain" = {
         "raycast" {
         }
@@ -476,6 +491,8 @@ def Xform "FLIP" (
         double inputs:irradiance.connect = </FLIP.inputs:irradiance>
         custom double inputs:sun_visibility
         double inputs:sun_visibility.connect = </FLIP.inputs:sun_visibility>
+        custom double inputs:cell_temperature_k
+        double inputs:cell_temperature_k.connect = </FLIP.inputs:solar_cell_temperature_k>
         def "PanelSurface" (
             active = false
         )

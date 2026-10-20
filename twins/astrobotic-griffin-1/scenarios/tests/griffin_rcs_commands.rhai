@@ -8,8 +8,8 @@ fn simulation_dependencies(me,ctx) {
 }
 fn command_axis(target,row) {
     let values=[0.0,0.0,0.0];values[row.axis]=row.sign;
-    cmd("SetPorts",#{target:target,writes:[["pitch",values[0]],
-        ["yaw",values[1]],["roll",values[2]],["external_throttle",0.0]]});
+    cmd("SetPorts",#{target:target,writes:[["guidance_pitch",values[0]],
+        ["guidance_yaw",values[1]],["guidance_roll",values[2]],["guidance_throttle",0.0]]});
 }
 fn on_start(me,ctx) {
     this.griffin=find_path("/World/Griffin1");
@@ -41,8 +41,8 @@ fn on_start(me,ctx) {
         this.stations.push(#{position:position,direction:direction,port:jet.thrust_port,
             nominal:f64_from(record.attrs["lunco:forceActuator:maxForce"])});
     }
-    let control=cmd("AcquireControl",#{target:this.griffin,bind_camera:false});
-    this.failures.push(t_true(control.ok,"attitude control acquisition rejected"));
+    this.failures.push(t_true(get(this.griffin,"piloted")==0.0,
+        "allocator fixture must retain guidance authority without operator input"));
     let demand=command_axis(this.griffin,this.cases[this.index]);
     this.failures.push(t_true(demand.ok,"initial attitude command rejected"));
     this.elapsed=0.0;
@@ -85,6 +85,6 @@ fn on_tick(me,ctx) {
         this.failures.push(t_true(demand.ok,"attitude command rejected"));
         this.elapsed=0.0;return;
     }
-    cmd("SetPorts",#{target:this.griffin,writes:[["pitch",0.0],["yaw",0.0],["roll",0.0]]});
+    cmd("SetPorts",#{target:this.griffin,writes:[["guidance_pitch",0.0],["guidance_yaw",0.0],["guidance_roll",0.0]]});
     this.done=true;report_verdict(this.failures,"GRIFFIN RCS COMMANDS","GRIFFIN_RCS_COMMANDS");
 }

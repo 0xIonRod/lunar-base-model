@@ -1183,6 +1183,16 @@ nearly black grazing faces under Editor inspection lighting. They do not
 establish measured optical or thermal properties, actual blanket construction
 or mesh wrinkles. The original flat-material controls were removed.
 
+On 2026-10-20 the shared shader gained filtered analytic fold normals using
+LunCoSim's existing noise/PBR helpers. Those normals produce lighting-dependent
+silver and gold highlights rather than object-axis colour shading. No mesh,
+mass, collision geometry or thermal quantity changes. The
+[Astrobotic June 15, 2026 hardware photograph](https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/)
+was rechecked as a qualitative appearance reference. These controls remain
+artistic estimates. The fresh mounted visual gate passes 134 checks; inspected
+before/after views and a contention-affected High/PBR timing baseline are under
+`/tmp/griffin-visual-20261020/final/`, with scope in `contracts/verification.md`.
+
 A reversed end quad in the shared prism topology affected eight bus facets,
 four standalone ramp track meshes and twelve integrated ramp track meshes.
 The existing closure observation now requires two opposite directed uses of

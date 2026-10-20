@@ -14,9 +14,8 @@ fn on_start(me,ctx) {
     this.rcs=find_path("/World/Griffin1/AttitudePropulsion");
     this.allocator=find_path("/World/Griffin1/AttitudeActuation");
     this.elapsed=0.0;this.empty_since=();this.burn_seen=false;this.rcs_burn_seen=false;this.done=false;
-    let control=cmd("AcquireControl",#{target:this.griffin,bind_camera:false});
-    let command=cmd("SetPorts",#{target:this.griffin,writes:[["external_throttle",1.0],["yaw",1.0]]});
-    this.command_ok=control.ok && command.ok;
+    let command=cmd("SetPorts",#{target:this.griffin,writes:[["guidance_throttle",1.0],["guidance_yaw",1.0]]});
+    this.command_ok=get(this.griffin,"piloted")==0.0 && command.ok;
 }
 fn on_tick(me,ctx) {
     if this.done {return;}this.elapsed+=dt();

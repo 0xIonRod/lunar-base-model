@@ -5,12 +5,14 @@
     upAxis = "Y"
 )
 
-def Xform "World"
+def Xform "World" (
+    prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
+)
 {
     def Scope "Scenario"
     {
         def Scope "Mission" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"

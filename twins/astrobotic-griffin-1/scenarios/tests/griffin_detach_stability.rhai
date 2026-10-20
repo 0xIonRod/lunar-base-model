@@ -12,9 +12,16 @@ const ROOT = "/GriffinRoverDeliveryTest";
 const LANDER = ROOT + "/Lander";
 const DOCK = ROOT + "/PayloadDock";
 
+fn simulation_dependencies(me,ctx) {
+    #{modelica_entities:[find_path(LANDER),find_path(ROOT+"/Rover")],
+      entity_reads:[find_path(LANDER),find_path(DOCK)],entity_writes:[find_path(DOCK)],
+      query_reads:["PhysicsPerformance","AnalyzeSysml","ReadActiveTwinContract"],
+      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+}
+
 fn on_start(me, ctx) {
-    this.lander = find(LANDER);
-    this.dock = find(DOCK);
+    this.lander = find_path(LANDER);
+    this.dock = find_path(DOCK);
     this.start_tick = sim_tick();
     this.last_sample_tick = this.start_tick - 1;
     this.touchdown = false;
@@ -26,6 +33,7 @@ fn on_start(me, ctx) {
     this.pre = ();
     this.post = ();
     this.post_samples = 0;
+    this.release_tick = ();
     this.max_step_ms = 0.0;
     this.min_step_ms = 1.0e300;
     if this.lander < 0 {
@@ -50,7 +58,7 @@ fn on_event(me, evt, ctx) {
         return;
     }
     this.touchdown = true;
-    this.dock = find(DOCK);
+    this.dock = find_path(DOCK);
     if this.dock < 0 {
         this.failed = true;
         this.failure = "touchdown arrived after the authored dock disappeared";
@@ -68,50 +76,52 @@ fn on_event(me, evt, ctx) {
     print("[griffin-detach-stability] detach accepted; waiting for topology retirement");
 }
 
-fn emit_verdict(me) {
-    if me.finished { return; }
-    me.finished = true;
+fn emit_release_verdict() {
+    if this.finished { return; }
     let source = sysml_requirements::source();
-    let post = me.post;
-    let pre = me.pre;
+    let post = this.post;
+    let pre = this.pre;
     let has_post = post != ();
+    // ECS joint counts are bounded by native entity capacity; convert the
+    // unsigned API counters explicitly before signed integer arithmetic.
     let topology_ok = has_post
         && post.detach_requests == 0
         && post.pending_joints == 0
         && post.joints == post.joint_graph_edges
         && pre != ()
-        && post.joints + 1 == pre.joints
+        && post.joints.to_int() + 1 == pre.joints.to_int()
         && post.entities <= pre.entities;
     let topology_observation = if has_post {
         topology_ok
     } else {
         #{provider: "physics_topology", state: "unavailable",
-          detail: if me.failure == "" {
+          detail: if this.failure == "" {
               "No post-release physics topology sample was produced"
-          } else { me.failure }}
+          } else { this.failure }}
     };
     let checks = [sysml_requirements::constraint_check(
         "GR-026-release-evidence", "payload_adapter",
         "GriffinFunctionalRequirements::gr026",
         "GriffinFunctionalRequirements::Verify_GriffinAdapterRelease",
         "GriffinFunctionalRequirements::GR026_ReleaseEvidenceComplete",
-        #{touchdownObserved: me.touchdown,
-          detachAccepted: me.detach_requested,
+        #{touchdownObserved: this.touchdown,
+          detachAccepted: this.detach_requested,
           releaseTopologyValid: topology_observation},
-        "physics_and_command_observation", 0.0)];
+        "derived", 0.0)];
     let report = sysml_requirements::evaluate(source, checks);
     report.metrics = #{
         clocks: clock_snapshot(),
         pre_release: pre,
         post_release: post,
-        post_samples: me.post_samples,
-        min_step_time_ms: me.min_step_ms,
-        max_step_time_ms: me.max_step_ms,
+        post_samples: this.post_samples,
+        min_step_time_ms: this.min_step_ms,
+        max_step_time_ms: this.max_step_ms,
         topology_invariants: topology_ok
     };
     report_structured_verdict(report, "GRIFFIN ADAPTER RELEASE", "GRIFFIN_ADAPTER_RELEASE");
+    this.finished = true;
     print("[griffin-detach-stability] verdict=" + (if report.ok { "PASS" } else { "FAIL" })
-        + " post_samples=" + me.post_samples + " max_step_ms=" + me.max_step_ms);
+        + " post_samples=" + this.post_samples + " max_step_ms=" + this.max_step_ms);
 }
 
 fn on_tick(me, ctx) {
@@ -136,12 +146,12 @@ fn on_tick(me, ctx) {
             }
         }
     }
-    if !this.detached && this.detach_requested && find(DOCK) < 0 {
+    if !this.detached && this.detach_requested && find_path(DOCK) < 0 {
         this.detached = true;
         print("[griffin-detach-stability] solver retirement observed");
     }
     if this.failed {
-        emit_verdict(this);
+        this.emit_release_verdict();
         return;
     }
     // Keep a post-release observation window long enough to catch a retained
@@ -152,6 +162,6 @@ fn on_tick(me, ctx) {
         release_tick = this.release_tick;
     }
     if this.detached && sim_tick() - release_tick >= 1800 {
-        emit_verdict(this);
+        this.emit_release_verdict();
     }
 }

@@ -4106,8 +4106,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         selected.push("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::"+name);
     }
     let source = sysml_requirements::source_with_attributes(selected);
-    let name=sysml_requirements::text(source,
-        "GriffinPropulsionRequirements::GriffinEngineSkirtComponent::perimeterRailName");
+    let name=griffin_spec::engine_skirt_identity("perimeterRailName");
     if name==() || name=="" {return plan_error("engine-skirt requires a continuous rail identity");}
     // The component owns its typed rail envelope. Avoid duplicated lander
     // geometry fields and source-path indirection.
@@ -4117,8 +4116,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     let section = _skirt_number(source, "railWidthM");
     let shell_depth = _skirt_number(source, "shellDepthM");
     let shell_inset = _skirt_number(source, "shellBottomInsetM");
-    let adapter_name = sysml_requirements::text(source,
-        "GriffinPropulsionRequirements::GriffinEngineSkirtComponent::adapterPlateName");
+    let adapter_name = griffin_spec::engine_skirt_identity("adapterPlateName");
     let adapter_width = _skirt_number(source, "adapterPlateWidthM");
     let adapter_depth = _skirt_number(source, "adapterPlateDepthM");
     let adapter_height = _skirt_number(source, "adapterPlateHeightM");

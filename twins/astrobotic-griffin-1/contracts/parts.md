@@ -13,7 +13,7 @@ graph still needs canonical identity migration and generated realization links.
 
 | Part | Required topology | Required geometry / physics | Known study requirement |
 |---|---|---|---|
-| `Griffin1` | component-owned octagonal bus, payload adapter, seven-engine propulsion, four-leg landing system, three Griffin-1 solar arrays, optional two ramps | Xform root with capacity, collision, status, and provenance metadata | Three panel instances occupy adjacent forward, bevel, and starboard faces; their stations and support dimensions are visual-study values. Four visual tank assemblies are also a Twin study assumption |
+| `Griffin1` | component-owned octagonal bus, payload adapter, seven-engine propulsion, four-leg landing system, three Griffin-1 solar arrays, optional two ramps | Xform root with capacity, collision, status, and provenance metadata | Three panel instances occupy the forward face and both forward chamfers; their stations and support dimensions are visual-study values. Four visual tank assemblies are also a Twin study assumption |
 | `GriffinBusComponent` | open octagonal frame, octagonal payload deck, lower service skirt, avionics, and a separate octagonal central tank-support perimeter | referenced component owns render geometry; the descent lander owns flight collision and mass | `GriffinVisualConfiguration` owns dimensions, stations, and appearance; the support perimeter has eight sides |
 | `GriffinBody` | `BodyCollisionProxy` and four side collision proxies | Hidden flight-body colliders; visible structure comes from `Bus` | Flight collider geometry remains a simulator study envelope |
 | `TopDeckBeamCollider0..7` | Eight hidden convex beams following the eight source-owned octagon edges | Enabled perimeter colliders; no hull closes the tank-support opening | Editor readback checks beam count, profile-derived dimensions, and collider state; dimensions remain a simulator study envelope |
@@ -22,7 +22,7 @@ graph still needs canonical identity migration and generated realization links.
 | `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider; the surface scene owns one fixed FLIP payload joint | The graph names the adapter and release-joint paths and requires both touchdown/settling and a ready egress path before release; mechanical interface dimensions and release-load ICD remain TBD |
 | `MainPropulsion` | Shared fuel and oxidizer tanks, seven `PressureFedEngine` members with one `PlumePhotometry` each, representative nozzle design | Each engine is the thrust and propellant authority for its own valves and chamber; `engineNN_enabled` models an engine-out | Nozzle contour, engine-out guidance response, and supplier propulsion data remain TBD |
 | `Nozzle` | `MainEngineCluster/Engine01..07`, each with a bell, throat, outer plume, hot core, local plume light and force actuator | Seven non-colliding bells; each applies its own engine's thrust at its station and shows its own plume | Seven main engines are public; bell contour and spacing remain study geometry |
-| `SolarPanelForward`, `SolarPanelFrontStarboard`, `SolarPanelStarboard` | Each root references `components/lander/griffin_solar_panel_visual.usda`, with `Cells`, `Frame`, dividers, hinge, brackets, and links | Three independently oriented panels use paired bus rails; each installed width derives from its rail span and shared edge clearance | The lower clearance cutout, as-built outline, installation datums, mechanism limits, and electrical behavior require the controlled panel and interface definitions |
+| `SolarPanelForward`, `SolarPanelFrontStarboard`, `SolarPanelFrontPort` | Each root references `components/lander/griffin_solar_panel_visual.usda`, with `Cells`, `Frame`, dividers, hinge, brackets, and links | Three independently oriented panels use paired bus rails; each installed width derives from its rail span and shared edge clearance | The lower clearance cutout, as-built outline, installation datums, mechanism limits, and electrical behavior require the controlled panel and interface definitions |
 | `LegPX/NX/PZ/NZ` | `Strut` and matching `PadPX/NX/PZ/NZ` | Positive mass body, visible strut, enabled pad collider | Four functional legs; dimensions and damping TBD |
 | `EgressRampPort/Starboard` | Three rigid ramp sections from the upper deck; each section has two source-aligned wheel tracks, an open centre, and two upper edge-rail segments | Positive-mass rigid sections; both geometry-derived track colliders enabled | Track stations follow FLIP wheel datums; dimensions and ramp kinematics remain study values |
 | `RampHingePort/Starboard` | Upper-deck hinge connects the lander body to the first ramp section | `PhysicsRevoluteJoint`, Z axis, angular drive; port limits −50°..+60°, starboard −60°..+50° | One source-owned 45° stow magnitude produces joint targets +45° port / −45° starboard. Both bodies use +45° Z; the starboard body also has the mirrored Y=180° mount, giving it a +135° lander-frame heading. Terrain deployment targets are −27.83° / +27.83°. |
@@ -31,14 +31,15 @@ graph still needs canonical identity migration and generated realization links.
 ## Canonical frame
 
 The study frame is metres, Y-up, with the lander body datum at the Griffin root.
-The three solar-array instances occupy the forward, bevel, and starboard faces
-in the Sun quadrant shown in Griffin-1 integration imagery. Their authored
+The three solar-array instances occupy the forward face and both forward
+chamfers. Integration imagery informs appearance; this station assignment is
+the selected study layout. Their authored
 stations, dimensions, and support geometry are visual-study values, not a
 released flight installation. The optional egress ramps
 occupy opposite signed X sides. FLIP's nominal public path is direct top-deck
-egress; the ramp path is an alternate study branch. The four leg attachment
-points occupy the four cardinal X/Z directions and their pads are below and
-farther outboard than the body attachment points.
+egress; the ramp path is an alternate study branch. The four leg attachments occupy the signed X/Z corners, with each local +X
+axis rotated radially outward. Pads are below and farther outboard than their
+upper attachments; PX/NX/PZ/NZ remain stable instance IDs, not axial stations.
 
 ## Presentation component contracts
 

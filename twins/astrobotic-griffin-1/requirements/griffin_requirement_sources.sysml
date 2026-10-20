@@ -21,6 +21,54 @@ package GriffinRequirementSources {
      * Each source link resolves to one typed SourceLocator value. Requirement
      * identifiers are the standard SysML short names on those usages.
      */
+    part source_project_authoring_policy : EvidenceSource {
+        doc /* Project authoring and review policy; not spacecraft engineering data. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/authoring.md";
+    }
+
+    part source_project_part_contracts : EvidenceSource {
+        doc /* Project part ownership, units and collision policy; study geometry remains explicitly provisional. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/parts.md";
+    }
+
+    part source_project_verification_boundary : EvidenceSource {
+        doc /* Project acceptance and evidence policy, including planned and unavailable observations; not flight qualification. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/verification.md";
+    }
+
+    part source_project_check_catalog : EvidenceSource {
+        doc /* Project screening cases and active/planned verification coverage. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/checks.md";
+    }
+
+    part source_project_landing_repeatability : EvidenceSource {
+        doc /* Executable fixed-clock repeatability policy; simulator consistency rather than flight accuracy. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/tools/check_landing_determinism.sh";
+    }
+
+    part source_project_review_scene : EvidenceSource {
+        doc /* Authored SI/Y-up static review camera and composition; visual-study context. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenes/griffin_flip_visual.usda";
+    }
+
+    part source_project_solar_contract : EvidenceSource {
+        doc /* Project source-owned solar clearance and configuration assumptions; flight installation data remain unresolved. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_solar_requirements.sysml";
+    }
+
+    part source_pvwatts_temperature_coefficient : EvidenceSource {
+        doc /* Accessed 2026-10-20. Reference cell temperature 25 C and standard crystalline-silicon power coefficient -0.37 percent per C. This supplies the generic study default, not FLIP cell technology or calibration. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://samrepo.nlr.gov/help/pvwatts_system_design.html";
+    }
+
     part source_astrobotic_griffin_propulsion_pug_2022 : EvidenceSource {
         doc /* August 2021 v5.02, printed p.26. URL dated January 2022 is the hosting/upload path, not the guide edition. Five main engines, twelve ACS engines in groups of three, two fuel and two oxidizer tanks; detailed dimensions remain estimates. */
         attribute role : EvidenceSourceRole = "Reference";
@@ -83,6 +131,7 @@ package GriffinRequirementSources {
     }
 
     part source_astrobotic_griffin_1_requirements_griffin_simulation_accuracy_requiremen : EvidenceSource {
+        doc /* Project simulation acceptance contract. GR-036 settling limits are engineering screening choices; their linked geometry and attitude datums supply the derivation. */
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml";
     }
@@ -212,6 +261,7 @@ package GriffinRequirementSources {
     }
 
     part source_linkedin_astrolab_flip_power_post : EvidenceSource {
+        doc /* Astrolab primary post, rechecked 2026-10-20: 6.22 kWh storage and a deployable array rated nearly 270 W. The Twin's 270 W ceiling is a rounded study setting; the post supplies neither an electrical I-V curve nor MPPT/converter parameters. */
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "https://www.linkedin.com/posts/astrolabspace_our-flip-rover-is-equipped-with-a-622-kwh-activity-7508563602279309312-W5Le";
     }
@@ -353,7 +403,7 @@ package GriffinRequirementSources {
 
     part evidence_fsp_008 : RequirementEvidence {
         ref targetRequirement = FlipSensorPowerRequirements::fsp008;
-        ref sources = (source_linkedin_astrolab_flip_power_post);
+        ref sources = (source_linkedin_astrolab_flip_power_post, source_project_verification_boundary, source_pvwatts_temperature_coefficient);
     }
 
     part evidence_fsr_001 : RequirementEvidence {
@@ -806,6 +856,7 @@ package GriffinRequirementSources {
 
     part evidence_gr_004 : RequirementEvidence {
         ref targetRequirement = GriffinFunctionalRequirements::gr004;
+        ref sources = (source_astrobotic_griffin_1_scenarios_griffin_1_surface_ops_rhai, source_project_verification_boundary);
     }
 
     part evidence_gr_005 : RequirementEvidence {
@@ -820,10 +871,12 @@ package GriffinRequirementSources {
 
     part evidence_gr_007 : RequirementEvidence {
         ref targetRequirement = GriffinFunctionalRequirements::gr007;
+        ref sources = (source_astrobotic_griffin_1_scenarios_griffin_1_surface_ops_rhai, source_project_check_catalog);
     }
 
     part evidence_gr_008 : RequirementEvidence {
         ref targetRequirement = GriffinSimulationAccuracyRequirements::gr008;
+        ref sources = (source_project_check_catalog, source_astrobotic_griffin_1_research_griffin_1_assumptions_md);
     }
 
     part evidence_gr_009 : RequirementEvidence {
@@ -843,14 +896,17 @@ package GriffinRequirementSources {
 
     part evidence_gr_012 : RequirementEvidence {
         ref targetRequirement = GriffinMechanicalRequirements::gr012;
+        ref sources = (source_project_part_contracts, source_project_verification_boundary);
     }
 
     part evidence_gr_013 : RequirementEvidence {
         ref targetRequirement = GriffinAssuranceRequirements::gr013;
+        ref sources = (source_project_authoring_policy, source_project_verification_boundary);
     }
 
     part evidence_gr_014 : RequirementEvidence {
         ref targetRequirement = GriffinAssuranceRequirements::gr014;
+        ref sources = (source_project_authoring_policy);
     }
 
     part evidence_gr_015 : RequirementEvidence {
@@ -865,6 +921,7 @@ package GriffinRequirementSources {
 
     part evidence_gr_017 : RequirementEvidence {
         ref targetRequirement = GriffinMechanicalRequirements::gr017;
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml);
     }
 
     part evidence_gr_018 : RequirementEvidence {
@@ -879,50 +936,62 @@ package GriffinRequirementSources {
 
     part evidence_gr_020 : RequirementEvidence {
         ref targetRequirement = GriffinVisualRequirements::gr020;
+        ref sources = (source_project_part_contracts, source_project_authoring_policy);
     }
 
     part evidence_gr_021 : RequirementEvidence {
         ref targetRequirement = GriffinSimulationAccuracyRequirements::gr021;
+        ref sources = (source_project_part_contracts, source_project_verification_boundary);
     }
 
     part evidence_gr_022 : RequirementEvidence {
         ref targetRequirement = GriffinSimulationAccuracyRequirements::gr022;
+        ref sources = (source_astrobotic_griffin_1_research_griffin_1_assumptions_md, source_project_verification_boundary);
     }
 
     part evidence_gr_023 : RequirementEvidence {
         ref targetRequirement = GriffinSimulationAccuracyRequirements::gr023;
+        ref sources = (source_project_verification_boundary, source_project_check_catalog);
     }
 
     part evidence_gr_024 : RequirementEvidence {
         ref targetRequirement = GriffinMechanicalRequirements::gr024;
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_ramp_requirements_sysml, source_project_part_contracts);
     }
 
     part evidence_gr_025 : RequirementEvidence {
         ref targetRequirement = GriffinMechanicalRequirements::gr025;
+        ref sources = (source_project_solar_contract, source_astrobotic_griffin_1_research_griffin_1_assumptions_md);
     }
 
     part evidence_gr_026 : RequirementEvidence {
         ref targetRequirement = GriffinFunctionalRequirements::gr026;
+        ref sources = (source_astrobotic_griffin_1_scenarios_griffin_1_surface_ops_rhai, source_project_verification_boundary);
     }
 
     part evidence_gr_027 : RequirementEvidence {
         ref targetRequirement = GriffinSimulationAccuracyRequirements::gr027;
+        ref sources = (source_astrobotic_griffin_1_tests_griffin_propulsion_requirements_rhai, source_project_part_contracts);
     }
 
     part evidence_gr_028 : RequirementEvidence {
         ref targetRequirement = GriffinFunctionalRequirements::gr028;
+        ref sources = (source_project_part_contracts, source_project_verification_boundary);
     }
 
     part evidence_gr_029 : RequirementEvidence {
         ref targetRequirement = GriffinAssuranceRequirements::gr029;
+        ref sources = (source_project_part_contracts, source_project_authoring_policy);
     }
 
     part evidence_gr_030 : RequirementEvidence {
         ref targetRequirement = GriffinAssuranceRequirements::gr030;
+        ref sources = (source_project_verification_boundary, source_project_authoring_policy);
     }
 
     part evidence_gr_031 : RequirementEvidence {
         ref targetRequirement = GriffinSimulationAccuracyRequirements::gr031;
+        ref sources = (source_project_landing_repeatability, source_project_verification_boundary);
     }
 
     part evidence_gr_032 : RequirementEvidence {
@@ -952,6 +1021,7 @@ package GriffinRequirementSources {
 
     part evidence_gv_001 : RequirementEvidence {
         ref targetRequirement = GriffinVisualRequirements::gv001;
+        ref sources = (source_project_review_scene, source_project_authoring_policy);
     }
 
     part evidence_gv_002 : RequirementEvidence {
@@ -966,10 +1036,12 @@ package GriffinRequirementSources {
 
     part evidence_gv_004 : RequirementEvidence {
         ref targetRequirement = GriffinVisualRequirements::gv004;
+        ref sources = (source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml, source_project_part_contracts);
     }
 
     part evidence_gv_005 : RequirementEvidence {
         ref targetRequirement = GriffinVisualRequirements::gv005;
+        ref sources = (source_project_part_contracts, source_project_review_scene);
     }
 
     part evidence_gv_006 : RequirementEvidence {
@@ -979,6 +1051,7 @@ package GriffinRequirementSources {
 
     part evidence_gv_007 : RequirementEvidence {
         ref targetRequirement = GriffinVisualRequirements::gv007;
+        ref sources = (source_project_verification_boundary, source_project_authoring_policy);
     }
 
     part evidence_gsa_001 : RequirementEvidence {
@@ -1180,18 +1253,22 @@ package GriffinRequirementSources {
 
     part evidence_mb_001 : RequirementEvidence {
         ref targetRequirement = MoonBaseProjectRequirements::mb001;
+        ref sources = (source_project_authoring_policy, source_project_part_contracts);
     }
 
     part evidence_mb_002 : RequirementEvidence {
         ref targetRequirement = MoonBaseProjectRequirements::mb002;
+        ref sources = (source_project_part_contracts, source_project_review_scene);
     }
 
     part evidence_mb_003 : RequirementEvidence {
         ref targetRequirement = MoonBaseProjectRequirements::mb003;
+        ref sources = (source_project_landing_repeatability, source_project_verification_boundary);
     }
 
     part evidence_mb_004 : RequirementEvidence {
         ref targetRequirement = MoonBaseProjectRequirements::mb004;
+        ref sources = (source_project_verification_boundary, source_project_authoring_policy);
     }
 
     part evidence_gr_037 : RequirementEvidence {

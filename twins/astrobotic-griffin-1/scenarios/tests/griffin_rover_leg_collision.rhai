@@ -5,7 +5,7 @@ const TEST_KIND="headless";
 const ROOT="/Griffin1SurfaceOps";
 fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path(ROOT+"/Lander"),find_path(ROOT+"/FLIP")],
-      entity_reads:[find_path(ROOT+"/Lander"),find_path(ROOT+"/FLIP"),find_path(ROOT+"/Lander/LegPX"),find_path(ROOT+"/Lander/LegNX"),find_path(ROOT+"/Lander/LegPZ"),find_path(ROOT+"/Lander/LegNZ")],entity_writes:[],query_reads:["QueryUsdPrim","QueryPhysicsState","TerrainHeight","Raycast"],required_inputs:[]}
+      entity_reads:[find_path(ROOT+"/Lander"),find_path(ROOT+"/FLIP"),find_path(ROOT+"/Lander/LegPX"),find_path(ROOT+"/Lander/LegNX"),find_path(ROOT+"/Lander/LegPZ"),find_path(ROOT+"/Lander/LegNZ")],entity_writes:[],query_reads:["QueryUsdPrim","QueryPhysicsState","TerrainHeight","Raycast"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
 }
 fn on_start(me,ctx) {
     this.rover=find_path(ROOT+"/FLIP");this.start_tick=sim_tick();
@@ -14,6 +14,18 @@ fn on_start(me,ctx) {
     if this.contact_tolerance==() || this.contact_tolerance<=0.0 {throw("runtime contact tolerance unavailable");}
     this.proxy_owners=[];
     this.maximum_contact_impulse=0.0;this.hit_source="";this.maximum_speed=0.0;this.maximum_demand=0.0;
+    for fixture in [#{path:ROOT+"/Lander",datum:"collisionBenchLanderStart"},
+                    #{path:ROOT+"/FLIP",datum:"collisionBenchRoverStart"}] {
+        let expected=assembly_builder::vector3(sysml_requirements::model().value(
+            "GriffinLandingLegRequirements::GriffinLandingLegAssembly::"+fixture.datum),fixture.datum);
+        let observed=query("QueryUsdPrim",#{path:fixture.path,attrs:["xformOp:translate"]});
+        if !assembly_builder::query_ok(observed) || expected.ok!=true {
+            throw("collision-bench authored start pose unavailable: "+fixture.path);
+        }
+        let actual=assembly_builder::vector3(observed.attrs["xformOp:translate"],fixture.path);
+        this.checks.push(t_true(actual.ok==true && actual.value==expected.value,
+            fixture.path+": authored start pose matches the terrain-clearance study datum"));
+    }
     this.checks.push(t_true(cmd("AcquireControl",#{source:find_path(ROOT+"/Avatar"),target:this.rover,bind_camera:false}).ok,
         "FLIP manual control is acquired"));
     for suffix in ["PX","NX","PZ","NZ"] {
@@ -54,6 +66,8 @@ fn on_tick(me,ctx) {
     if elapsed<180 {return;}
     if !this.started {
         this.started=true;
+        this.checks.push(t_true(get(find_path(ROOT+"/Lander"),"all_legs_contact")>=0.5,
+            "all four lander pads settle before the rover approach"));
         for proxy in this.proxy_owners {
             let body=query("QueryPhysicsState",#{id:find_path(proxy.owner)});
             this.checks.push(t_true(body.physics_state_ready==true && body.collider_present==true

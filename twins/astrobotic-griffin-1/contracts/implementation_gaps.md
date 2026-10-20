@@ -1,5 +1,65 @@
 # Griffin implementation and standards gap review
 
+## Current acceptance boundary — 2026-10-20
+
+Use [verification.md](verification.md) for the current artifact, source revisions
+and bounded production results. The records below are historical checkpoints;
+their earlier failures and passes do not describe every later source revision.
+
+The current solar-temperature cohort passes the rendered 16-gate mission,
+45 electrothermal checks and 38 mapped sensor/power checks. The prior battery
+cohort passed the strict 94-sample restart comparison and the tighter 361-sample
+landing screen; those results have not been rerun for the new solar interface. Selecting
+Griffin preserves GNC; first flight input establishes manual authority until
+GNC reconnects or the session releases vehicle possession. Releasing the flight
+key leaves manual authority active. The mounted SysML parameter view preserves
+resolved values, integer precision, collection shape and declared units.
+
+The open acceptance issues are sustained real-time throughput across the full
+mission and FPS headroom, awake contact precision, battery/solar hardware and thermal calibration,
+and 164 requirements without formal criteria. The 60-second landing screen permits
+bounded settling/deployment movement and does not establish static equilibrium.
+Native SysML validation has zero errors; the complete source-evidence checker
+passes 214 targets. Flight-hardware equivalence remains limited by the
+documented public-data gaps and dimensional estimates.
+
+FSP-008 now has two executable source constraints and a native six-probe
+illumination/temperature sequence. All 38 measured sensor/power checks and 26 independent
+criterion diagnostics pass; the mapped production test gives FSP-008 VERIFIED
+in the SysML view at source `4119846244799939613`. The model distinguishes the
+rounded 270 W reference-temperature rating, temperature-adjusted availability
+and bus delivery. The public post does not
+provide the pack voltage, I-V curve or converter data. The former half-energy
+battery law is now reproduced and repaired: 38 production energy/charge/boundary
+checks, four empty-actuator checks and the rendered 16-gate mission pass. The
+normalized plateau/reserve law accounts for the complete nominal energy and
+explicit full-charge shunt heat. It remains a study model; pack OCV/BMS data
+and coupling its new heat output into FLIP thermal behavior remain open.
+Solar cell temperature is currently prescribed at 298.15 K through a connectable
+input. A bounded cooling-sink component and coupled thermal feedback pass the
+synthetic production bench. The coefficient is a generic PVWatts study default;
+actual cell properties, panel heat capacity and cooling hardware remain unsourced.
+
+The slider differential and gravity change-provenance repairs pass 28 joint,
+31 CCD, 16 environment and five site-placement checks, plus native rollback.
+With the repaired storage law, the rendered mission, 94-sample restart
+comparison and both 361-sample landing screens pass. Maximum landing
+displacement is 0.172714955811522 m in both new headless restarts. An earlier
+90-second rendered rest observation found all 14 dynamic bodies sleeping from
+30 seconds onward with unchanged root pose through 90 seconds; that separate
+sleep observation belongs to its recorded earlier source baseline.
+
+An earlier complete rendered mission delivers 0.936803× real time at 46.9325
+frames/s, High / standard PBR at 1280 × 720, under uncontrolled host load.
+Sustained real-time acceptance remains open. The newer completed-mission
+97.5206/110.6446 FPS A/B observations now qualify separate 25-second windows
+on retained binaries; they do not qualify sustained full-mission real time.
+See verification.md for source, artifact and instrumentation limits. The older
+32.90 frames/s window is retained with its original scope in verification.md.
+The awake sprung-platform diagnostic still fails its proposed 1 mm criterion;
+normal native sleep admission does not qualify the awake solver or
+flight-hardware equivalence.
+
 ## Nested payload bay and one-side arrays — 2026-10-05
 
 Supersedes the raised-deck checkpoint below. The operator identified the wrong
@@ -242,7 +302,7 @@ Normative references: [OMG SysML v2.0 Language Specification](https://www.omg.or
 
 | Area | Current state | Gap / consequence |
 |---|---|---|
-| Requirement meaning | Five Griffin domain packages plus separate subsystem packages; some definitions provide only an informal `doc` statement | The audit's 154 informational findings mean “no formal SysML `require` membership”; they do not say that no Rhai procedure exists or that it ran. The current review resolves verification links for all 183 definitions, but the CLI does not check procedure execution or evidence freshness. Use a formal predicate for finite, measurable acceptance; use a bounded verification procedure/rubric and revision-linked evidence for visual, temporal, process, and documentary acceptance. Do not invent scalar predicates for those cases |
+| Requirement meaning | Griffin domain and subsystem packages include both formal constraints and informal acceptance statements | The current warning count and executed gates are maintained in `verification.md`; historical counts below describe their dated source revisions. A missing formal SysML `require` membership does not establish whether a Rhai procedure exists or ran. Use a formal predicate for finite, measurable acceptance and a bounded, revision-linked procedure for visual, temporal, process and documentary acceptance. Do not invent scalar predicates for those cases |
 | Formal constraint ownership | Requirement membership roles are projected as standard `require`/`assume`; the generic IR selects constraints by snapshot-scoped handles, aggregates required memberships, and checks verification coverage through resolved `verify` links. It retains each usage's resolved formal-parameter handle and typed bound expression. Griffin's shared adapter resolves scalar source-feature bindings against those handles and evaluates the bound constraints | Griffin now exercises usage-bound constraints across solar, ramp, landing-leg, and deck geometry requirements; source literals and composed USD measurements enter as typed feature-path observations. Other verification paths still use name-keyed parameter maps. Defaults, output binding, and full specialization/redefinition traversal remain |
 | Verification | Requirement `verify` references are inside `objective` blocks; Rust projects source-linked `require` membership, and `GR-036` owns landing-stability limits. The surface-operations preflight is authored to evaluate `GR-037` target datum and `GR-038` landing-pad/terrain continuity constraints from one SysML revision and one composed USD snapshot | Many text-only requirements still have no executable constraint. Passing `GR-037`/`GR-038` proves setup geometry only; touchdown, all-leg contact, suspension behavior, and post-touchdown stability remain unverified under `GR-036`. `GR-031` remains a separate process gate |
 | Traceability | Twin manifest selects source packages, USD fixtures, scripts, and cases; Rust projects snapshot-scoped element handles, resolved references, typed relationship endpoints, and verification-to-requirement handle links. The GR-005 evidence catalog resolves its typed requirement and source references to typed locators and roles | Coverage evaluation compares resolved handles and GR-005 source provenance is exercised in the runtime verifier. Provider observations still do not share one end-to-end identity across source revision, realization, composed-stage generation, physics sampling, and resulting evidence. Status/check catalogs remain authored execution metadata; derive the requirement matrix from requirement, verification, realization, and evidence links |
@@ -751,8 +811,9 @@ become Griffin's permanent source semantics.
    analysis resolves its imports and the root `missionVehicle` usage with no
    parser diagnostics. Canonical identity/station arrays and legacy scalar
    count aliases still need migration to one owner, and the graph is not yet
-   bound to composed USD/provider observations. `ValidateSysml` still reports
-   16 pre-existing missing-subject lint errors in `flip_cad_requirements.sysml`.
+   bound to every composed USD/provider observation. The earlier
+   missing-subject lint errors have been resolved; current mounted validation
+   and its remaining warnings are recorded in `verification.md`.
 4. **Partially complete:** the typed graph contains a `ref part hostedRover`,
    adapter path, surface-scene release-joint path, and separate required
    touchdown/settle and egress-path-ready conditions.

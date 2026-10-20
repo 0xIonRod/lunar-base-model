@@ -54,7 +54,7 @@ for match in re.finditer(r"\bpart\s+(source_[A-Za-z0-9_]+)\s*:\s*EvidenceSource\
     locators = re.findall(r"attribute\s+locator\s*:\s*SourceLocator\s*=\s*\"([^\"]+)\"\s*;", body)
     require(len(role_values) == 1 and role_values[0] in roles,
             f"{name} must have exactly one valid typed role")
-    require(len(locators) == 1 and ";" not in locators[0],
+    require(len(locators) == 1 and locators[0].strip() and ";" not in locators[0],
             f"{name} must have exactly one atomic SourceLocator")
     source_parts[name] = locators[0]
 require(source_parts, "catalog contains no EvidenceSource instances")
@@ -91,7 +91,7 @@ for match in re.finditer(r"\bpart\s+(evidence_[A-Za-z0-9_]+)\s*:\s*RequirementEv
             f"requirement {target} has multiple evidence records")
     evidence_targets[target] = evidence_name
     source_lists = re.findall(r"\bref\s+sources\s*=\s*\(([^)]*)\)\s*;", body)
-    require(len(source_lists) <= 1, f"{evidence_name} has multiple source collections")
+    require(len(source_lists) == 1, f"{evidence_name} must have one populated source collection")
     if source_lists:
         names = [name.strip() for name in source_lists[0].split(",") if name.strip()]
         require(names, f"{evidence_name} has an empty source collection")

@@ -21,6 +21,8 @@ package FlipRequirements {
         attribute localFrame : String = "Y-up SI metres; X longitudinal, Z lateral; CAD (X,Y,Z) maps to USD (Y,Z,X)";
         attribute flipMassStudyKg : Real = FlipCadRequirements::CadStudy::legacyRuntimeMassKg;
         attribute massPropertiesStatus : String = "study proxy; supplier mass properties and wheel loads TBD";
+        // Study bus nominal voltage. The public 6.22 kWh / nearly 270 W post
+        // does not publish a pack voltage or cell discharge curve.
         attribute batteryNominalVoltageV : Real = 28.0;
         attribute centerOfMassM : Real[3] = (0.0, -0.05, 0.0);
         attribute diagonalInertiaKgM2 : Real[3] = (240.0, 337.5, 145.5);

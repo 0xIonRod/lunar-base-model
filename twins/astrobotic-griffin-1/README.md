@@ -40,7 +40,7 @@ The latest primary-source baseline used for this package is:
   and a surface Sun path contained in one mission quadrant. The June 2026
   integration image shows upright panels across adjacent lander faces in one
   sector. The Twin composes three referenced panel assemblies on the forward,
-  beveled forward-starboard, and starboard faces. Their study stations, widths,
+  beveled forward-starboard, and beveled forward-port faces. Their study stations, widths,
   support geometry, and surface appearance do not replace released installation
   dimensions, deployment limits, or electrical performance data.
 - Astrobotic's June 2026 update says the integrated lander is moving through
@@ -294,7 +294,9 @@ Propulsion runtime entries include `GriffinFunctionalRequirements::Verify_Griffi
 `GriffinPropulsionRequirements::Verify_GriffinFuelExhaustion`,
 `GriffinPropulsionRequirements::Verify_GriffinOxidizerExhaustion`, and
 `GriffinPropulsionRequirements::Verify_GriffinRcsRuntime`. Each selects its
-production fixture and observer. The GNC case covers the startup/handoff slice;
+production fixture and observer. The GNC case covers selection without interrupting
+powered automatic descent, first-input manual takeover, neutral manual hold and
+explicit GNC disconnect/reconnect. The case covers the startup/handoff slice;
 the system mission case still owns full surface-sequence acceptance.
 
 Mission and source-backed observers declare the active mount's

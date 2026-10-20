@@ -420,16 +420,16 @@ fn on_tick(me, ctx) {
     let geometry_tolerance = sysml_requirements::number(source, visual("geometryVerificationToleranceM"));
     let required_clearance = sysml_requirements::number(source, own("minimumBellClearanceM"));
     let skirt_outer_radius = sysml_requirements::number(source, own("clusterOuterRadiusM"));
-    let skirt_root = root + "/" + sysml_requirements::text(source, skirt("componentRootName"));
-    let rail_name=sysml_requirements::text(source,skirt("perimeterRailName"));
-    let skirt_shell = skirt_root + "/" + sysml_requirements::text(source, skirt("shellName"));
+    let skirt_root = root + "/" + griffin_spec::engine_skirt_identity("componentRootName");
+    let rail_name=griffin_spec::engine_skirt_identity("perimeterRailName");
+    let skirt_shell = skirt_root + "/" + griffin_spec::engine_skirt_identity("shellName");
     let skirt_width = sysml_requirements::number(source, skirt("railLengthM"));
     let skirt_depth = skirt_width;
     let skirt_height = sysml_requirements::number(source, skirt("railHeightM"));
     let skirt_section = sysml_requirements::number(source, skirt("railWidthM"));
     let skirt_shell_depth = sysml_requirements::number(source, skirt("shellDepthM"));
     let skirt_assembly_y = sysml_requirements::number(source, visual("engineClusterMountYM"));
-    let adapter_name = sysml_requirements::text(source, skirt("adapterPlateName"));
+    let adapter_name = griffin_spec::engine_skirt_identity("adapterPlateName");
     let adapter_width = sysml_requirements::number(source, skirt("adapterPlateWidthM"));
     let adapter_depth = sysml_requirements::number(source, skirt("adapterPlateDepthM"));
     let adapter_height = sysml_requirements::number(source, skirt("adapterPlateHeightM"));
@@ -439,7 +439,7 @@ fn on_tick(me, ctx) {
     checks.push(sysml_requirement_checks::source_list_count("GPP-005-stations", "engine", "gpp005", VERIFICATION, visual("engineStations"), parent("engineCount")));
     for name in names {
         checks.push(attribute("GPP-001-" + name + "-photometry-engine-count", "gpp001",
-            (propulsion_path + "/" + name) + "Plume", "inputs:engine_count", 1.0, 0.0));
+            (propulsion_path + "/" + name) + "Plume", "parameters:engine_count", 1, 0.0));
     }
     checks.push(attribute("GPP-006-nozzle-design-exit-radius", "gpp006",
         nozzle_design_path, "inputs:exit_radius",
@@ -608,14 +608,17 @@ fn on_tick(me, ctx) {
         let engine = (propulsion_path + "/" + names[index]) + ".outputs:";
         let record = record_at(observed_photometry, photometry_paths[index]);
         photometry_consumes_engine_state = record != ()
-            && has_single_connection(record, "inputs:throttle", engine + "activity")
             && has_single_connection(record, "inputs:thrust_n", engine + "thrust_n")
             && has_single_connection(record, "inputs:maximum_thrust_n", engine + "maximum_thrust_n")
             && has_single_connection(record, "inputs:propellant_flow_kgs", engine + "propellant_flow")
             && has_single_connection(record, "inputs:exhaust_velocity_mps", engine + "exhaust_velocity_mps")
-            && has_single_connection(record, "inputs:design_exhaust_velocity_mps",
-                engine + "design_exhaust_velocity_mps")
-            && has_single_connection(record, "inputs:chamber_pressure_pa", engine + "chamber_pressure_pa")
+            && has_single_connection(record, "inputs:mixture_ratio", engine + "mixture_ratio")
+            && has_single_connection(record, "inputs:gas_gamma",
+                nozzle_design_path + ".outputs:gamma_out")
+            && has_single_connection(record, "inputs:nozzle_exit_mach",
+                nozzle_design_path + ".outputs:exit_mach")
+            && has_single_connection(record, "inputs:exit_lip_angle_rad",
+                nozzle_design_path + ".outputs:exit_lip_angle_rad")
             && has_single_connection(record, "inputs:nozzle_exit_radius_m",
                 nozzle_design_path + ".outputs:exit_radius_m")
             && has_single_connection(record, "inputs:nozzle_exit_area_m2",

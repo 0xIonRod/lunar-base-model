@@ -35,7 +35,7 @@ package GriffinVisualRequirements {
     }
 
     requirement def GRV003_GriffinSolarAssemblies {
-        doc /* GV-003 [visual] the review shall show the solar configuration defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout as upright frame/cell assemblies across the three original adjacent lander sides and the opposite broad-face study station, each with a visible structural support path and the approved panel outline and clearances. */
+        doc /* GV-003 [visual] the review shall show the solar configuration defined by GriffinSolarRequirements::GSA001_ArrayCount and GSA003_SunQuadrantLayout as upright frame/cell assemblies on the forward face and both forward chamfers, each with a visible structural support path and the source-owned panel outline and clearances. Exact flight installation dimensions remain unpublished; this study layout preserves both rover egress corridors. */
     }
 
     requirement def GRV004_ScaleDatums {

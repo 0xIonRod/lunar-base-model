@@ -233,6 +233,7 @@ fn _qualified_attribute(name) {
         "appearanceVerificationTolerance", "doubleSidedFacesMust",
         "renderOnlyCollisionEnabled", "renderPurpose",
         "visualReviewGriffinStation", "visualReviewFlipStation",
+        "visualReviewLegDisplacementM", "visualReviewLegVelocityMps",
         "bodyDimensions", "bodyMount", "bodyGroundClearanceM",
         "lowerSkirtDimensions", "lowerSkirtCenter", "deckDimensions", "deckCenter",
         "avionicsDeckDimensions", "avionicsDeckCenter", "avionicsPodDimensions", "outerBodyProfileCoordinates",
@@ -372,9 +373,8 @@ fn _dimensions_component(name, axis) {
 // One canonical payload datum lives on Griffin1Lander.  Requirement GR-009
 // consumes that datum instead of declaring a second 625 kg literal.
 fn max_payload_kg() { _sysml_attribute("payloadCapacityKg") }
-// Ramp limits are owned by the dedicated ramp requirement package. Keep this
-// compatibility accessor for lander mission helpers without duplicating the
-// numeric datum in the Griffin package.
+// Mission helpers read the dedicated ramp requirement package's limit without
+// duplicating its numeric datum in the Griffin package.
 fn max_ramp_command_rad() { _sysml_attribute("rampMaxDeploymentAngleRad") }
 fn main_engine_count() { _sysml_integer("mainEngineCount") }
 fn propellant_tank_count() { _sysml_integer("propellantTankCount") }
@@ -391,9 +391,6 @@ fn landing_minimum_upright_axis_y() { _sysml_attribute("landingMinimumUprightAxi
 fn landing_max_ground_speed_mps() { _sysml_attribute("landingMaxGroundSpeedMps") }
 fn landing_max_angular_speed_rad_per_sec() { _sysml_attribute("landingMaxAngularSpeedRadPerSec") }
 fn landing_max_horizontal_drift_m() { _sysml_attribute("landingMaxHorizontalDriftM") }
-fn landing_divergence_tolerance_m() { _sysml_attribute("landingDivergenceToleranceM") }
-fn landing_divergence_tolerance_upright() { _sysml_attribute("landingDivergenceToleranceUpright") }
-fn landing_divergence_tolerance_speed_mps() { _sysml_attribute("landingDivergenceToleranceSpeedMps") }
 fn landing_replay_tolerance_m() { _sysml_attribute("landingReplayToleranceM") }
 fn landing_replay_tolerance_upright() { _sysml_attribute("landingReplayToleranceUpright") }
 fn landing_replay_tolerance_speed_mps() { _sysml_attribute("landingReplayToleranceSpeedMps") }
@@ -485,19 +482,25 @@ fn solar_component_child_names() {
 fn main_engine_component_child_names() {
     _typed_model_text_list("GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::childNames")
 }
+// USD child names are the boundary where these closed typed identities become text.
+fn engine_skirt_identity(name) {
+    let value = _typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::" + name);
+    if !sysml_enum_is(value) { throw("engine-skirt identity must be a SysML enumeration: " + name); }
+    value.literal
+}
 fn engine_skirt_component_root_name() {
-    _typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::componentRootName")
+    engine_skirt_identity("componentRootName")
 }
 fn engine_skirt_component_member_names() {
-    let name=_typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::perimeterRailName");
+    let name=engine_skirt_identity("perimeterRailName");
     if name==() || name=="" {return [];}
     [name]
 }
 fn engine_skirt_component_shell_name() {
-    _typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::shellName")
+    engine_skirt_identity("shellName")
 }
 fn engine_skirt_component_adapter_name() {
-    _typed_model_value("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::adapterPlateName")
+    engine_skirt_identity("adapterPlateName")
 }
 fn solar_mount_rail_names() { _sysml_enum_names("solarMountRails") }
 fn solar_panel_frame_width_m() { solar_component_number("frameWidthM") }

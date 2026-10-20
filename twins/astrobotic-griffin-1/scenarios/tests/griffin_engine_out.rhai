@@ -35,9 +35,10 @@ fn on_start(me,ctx) {
     this.griffin=find_path("/World/Griffin1");
     this.main=find_path("/World/Griffin1/MainPropulsion");
     this.elapsed=0.0;this.phase="nominal";this.done=false;
-    let control=cmd("AcquireControl",#{target:this.griffin,bind_camera:false});
-    let command=cmd("SetPorts",#{target:this.griffin,writes:[["external_throttle",1.0]]});
-    this.command_ok=control.ok && command.ok;
+    // This static propulsion bench is an authored command producer. Program
+    // holds command guidance; selection alone does not take manual authority.
+    let command=cmd("SetPorts",#{target:this.griffin,writes:[["guidance_throttle",1.0]]});
+    this.command_ok=command.ok;
 }
 
 fn on_tick(me,ctx) {

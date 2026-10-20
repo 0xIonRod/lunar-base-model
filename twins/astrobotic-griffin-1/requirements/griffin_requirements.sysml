@@ -24,21 +24,12 @@ package Griffin1Requirements {
         attribute hostedRover : HostedRoverDesignation = "AstrolabFLIP";
         attribute cargoMassLowerBoundKg : Real = 499.0;
         attribute cargoMassLowerBoundIsExclusive : Boolean = true;
-        // Body-reference touchdown height for the powered-descent study.
-        // Four 4 kN/m gear springs under the 4,950 kg study mass at lunar
-        // gravity give about 0.50 m nominal travel; the unloaded pad-bottom
-        // datum is 0.06 m above this reference. This is not flight data.
+        // Unloaded body-reference datum from the composed pad-bottom geometry:
+        // body Y=.44 places the nominal pad bottoms on the support plane.
+        // Loaded suspension response is verified separately under GR-036.
         attribute landingVehicleReferenceTouchdownY : Real = 0.44;
-        // Landing-stability limits are owned by GR036 in the simulation
-        // accuracy package; this integration context does not mirror them.
-        attribute landingDivergenceToleranceM : Real = 0.50;
-        attribute landingDivergenceToleranceUpright : Real = 0.02;
-        attribute landingDivergenceToleranceSpeedMps : Real = 0.50;
-        // Replay tolerances are distinct from engineering acceptance bounds.
-        // With the deterministic single-thread profile, two fresh processes
-        // must reproduce the same state to numerical round-off; the broader
-        // divergence limits above describe acceptable physical envelopes, not
-        // permission to hide an admission-order bug.
+        // GR-036 alone owns the physical acceptance envelope. These separate
+        // replay tolerances compare repeated simulator states to round-off.
         attribute landingReplayToleranceM : Real = 1.0e-6;
         attribute landingReplayToleranceUpright : Real = 1.0e-7;
         attribute landingReplayToleranceSpeedMps : Real = 1.0e-6;

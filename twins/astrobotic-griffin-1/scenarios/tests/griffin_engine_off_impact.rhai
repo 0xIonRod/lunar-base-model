@@ -17,13 +17,24 @@ fn on_start(me,ctx) {
     this.maximum_penetration=0.0;this.travel_error_tick=0;this.minimum_clearance_tick=0;
     this.maximum_travel_error=0.0;this.maximum_thrust=0.0;this.samples=0;
     let control=griffin_controls::control_lander();
-    this.checks.push(t_true(control.ok==true,"pilot owns zero-throttle engine-off drop"));
+    // Selection preserves GNC. Take the stick through the production flight
+    // input path, then release pitch once manual authority is observed. The
+    // throttle remains untouched at zero for the entire free fall.
+    let input=cmd("SimulateIntent",#{target:this.lander,intent:"forward",held:true});
+    this.manual_input_released=false;
+    this.checks.push(t_true(control.ok==true && input.ok==true,
+        "pilot begins a zero-throttle drop through the flight input path"));
     let invalid=assembly_builder::collision_proxy_plan((),"@root@","/missing","/missing");
     this.checks.push(t_true(invalid.ok==false && invalid.ops.len()==0,
         "invalid collider source is rejected before any document edit"));
 }
 fn on_tick(me,ctx) {
     if this.done {return;}
+    if !this.manual_input_released && get(this.lander,"piloted")>=0.5 {
+        let released=cmd("SimulateIntent",#{target:this.lander,intent:"forward",held:false});
+        if released.ok!=true {throw("engine-off drop could not release its pitch input");}
+        this.manual_input_released=true;
+    }
     let sample=griffin_surface_ops::landing_stability_sample();
     if !sample.ok {throw(sample.error);}
     this.maximum_thrust=max(this.maximum_thrust,sample.engine_thrust_n);
@@ -65,7 +76,7 @@ fn on_tick(me,ctx) {
     this.samples+=1;
     if sim_tick()-this.start_tick<1800 {return;}
     this.done=true;
-    this.checks.push(t_true(this.samples>=1800 && this.maximum_thrust==0.0,
+    this.checks.push(t_true(this.manual_input_released && this.samples>=1800 && this.maximum_thrust==0.0,
         "the complete drop runs with extinguished engines"));
     this.checks.push(t_true(this.minimum_clearance>=-this.contact_tolerance,
         "footpad rims and centers stay above terrain within the authored solver tolerance"));

@@ -30,18 +30,16 @@ fn _live_mass_properties(lander, main) {
         let selected=[];
         let names=if index==0 {native_names} else {model_names};
         let direction=if index==0 {"inout"} else {"out"};
-        let source=if index==0 {"Avian rigid body"} else {"Modelica co-simulation component"};
         for axis in 0..7 {
             let matches=[];
             for candidate in row.ports {
-                if candidate.name==names[axis] && candidate.direction==direction
-                    && candidate.metadata!=() && candidate.metadata.source==source {
+                if candidate.name==names[axis] && candidate.direction==direction {
                     matches.push(candidate);
                 }
             }
             if matches.len()!=1 {
                 throw("native mass property requires exactly one authoritative owner: "+
-                    #{name:names[axis],direction:direction,source:source,matches:matches});
+                    #{name:names[axis],direction:direction,target:row.api_id,matches:matches});
             }
             let port=matches[0];
             if port.value==() || !port.value.is_finite()

@@ -9,7 +9,7 @@ def Xform "GriffinFlipVisual" (
     prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
     kind = "assembly"
     documentation = "Griffin-1 and Astrolab FLIP visual review composition; SI metres."
-    prepend apiSchemas = "LunCoEpochAPI"
+    prepend apiSchemas = ["LunCoEpochAPI"]
 )
 {
     custom string lunco:visual:status = "review-ready proxy geometry, not flight CAD"
@@ -70,6 +70,38 @@ def Xform "GriffinFlipVisual" (
         bool physics:rigidBodyEnabled = false
         custom double3 xformOp:translate = (0.0, 0.44, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
+        float inputs:leg_displacement_px = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_px.connect = None
+        float inputs:leg_displacement_nx = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_nx.connect = None
+        float inputs:leg_displacement_pz = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_pz.connect = None
+        float inputs:leg_displacement_nz = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_nz.connect = None
+        float inputs:leg_velocity_px = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_px.connect = None
+        float inputs:leg_velocity_nx = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_nx.connect = None
+        float inputs:leg_velocity_pz = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_pz.connect = None
+        float inputs:leg_velocity_nz = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_nz.connect = None
         over "LegPX"
         {
             custom double3 xformOp:translate = (1.9, 0.9, 1.9)
@@ -226,7 +258,7 @@ def Xform "GriffinFlipVisual" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Scope "CameraTrack" (
-        prepend apiSchemas = "LunCoCameraTrackAPI"
+        prepend apiSchemas = ["LunCoCameraTrackAPI"]
     )
     {
         token lunco:activeCamera
@@ -237,7 +269,7 @@ def Xform "GriffinFlipVisual" (
     def Scope "Scenario"
     {
         def Scope "Mission" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"

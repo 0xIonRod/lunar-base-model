@@ -39,7 +39,7 @@ def Xform "Griffin1SurfaceOps" (
     {
     }
     def Camera "Avatar" (
-        prepend apiSchemas = "LunCoAvatarAPI"
+        prepend apiSchemas = ["LunCoAvatarAPI"]
         prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
     )
     {
@@ -50,7 +50,7 @@ def Xform "Griffin1SurfaceOps" (
         custom double3 xformOp:rotateXYZ = (-31.65, 45.0, 0.0)
     }
     def Scope "CameraTrack" (
-        prepend apiSchemas = "LunCoCameraTrackAPI"
+        prepend apiSchemas = ["LunCoCameraTrackAPI"]
     )
     {
         token lunco:activeCamera
@@ -142,6 +142,8 @@ def Xform "Griffin1SurfaceOps" (
             double inputs:mass_properties_valid
             double inputs:mass_properties_valid.connect = </Griffin1SurfaceOps/Lander.outputs:dynamic_joint_island_mass_valid>
             float inputs:max_thrust = 21796.28515625
+            float inputs:piloted
+            float inputs:piloted.connect = </Griffin1SurfaceOps/Lander.outputs:piloted>
         }
         def "RampHingePort"
         {
@@ -295,7 +297,7 @@ def Xform "Griffin1SurfaceOps" (
     {
         custom string lunco:scenario = "griffin-1-surface-ops"
         def Scope "Mission" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"
@@ -307,7 +309,7 @@ def Xform "Griffin1SurfaceOps" (
     )
     {
         def Scope "Program" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"

@@ -11,6 +11,8 @@ package GriffinPropulsionRequirements {
 
     attribute def Direction :> CartesianThreeVectorValue;
     enum def GriffinEngineVisualMember { Bell; Throat; }
+    enum def GriffinEngineSkirtRoot { EngineSkirt; }
+    enum def GriffinEngineSkirtMember { PerimeterRail; EngineSkirtShell; EngineAdapterPlate; }
 
     part def GriffinEngineControlStudy {
         doc /* Integration study, not current flight performance. Current
@@ -199,8 +201,8 @@ package GriffinPropulsionRequirements {
     // datum for the Editor.
     part def GriffinEngineSkirtComponent {
         attribute usdRootPath : String = "/World/Griffin1/Nozzle/MainEngineCluster";
-        attribute componentRootName : String = "EngineSkirt";
-        attribute perimeterRailName : String = "PerimeterRail";
+        attribute componentRootName : GriffinEngineSkirtRoot = "EngineSkirt";
+        attribute perimeterRailName : GriffinEngineSkirtMember = "PerimeterRail";
         // Continuous mitered octagon, sharing the normalized outerBodyProfileCoordinates
         // of GriffinVisualConfiguration. The 3.44 m across-flats envelope is
         // inset 80 mm from the estimated 3.60 m bus on each cardinal side.
@@ -212,8 +214,8 @@ package GriffinPropulsionRequirements {
         attribute railLengthM : Real = 3.44;
         attribute railWidthM : Real = 0.08;
         attribute railHeightM : Real = 0.08;
-        attribute shellName : String = "EngineSkirtShell";
-        attribute adapterPlateName : String = "EngineAdapterPlate";
+        attribute shellName : GriffinEngineSkirtMember = "EngineSkirtShell";
+        attribute adapterPlateName : GriffinEngineSkirtMember = "EngineAdapterPlate";
         // Uncalibrated adapter span retained; corners follow the shared octagon
         // to avoid protruding through the skirt. PGH/NASA photos show the
         // wrapped bay, not a supplier plate drawing.

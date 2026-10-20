@@ -82,13 +82,19 @@ package GriffinSimulationAccuracyRequirements {
     }
 
     requirement def GR036_LandingStability {
-        doc /* GR-036 [simulation accuracy] beginning with detected touchdown, observe the source-owned post-touchdown horizon at the source-owned fixed-tick cadence. At every available observation all four landing legs shall remain in contact and telemetry shall be finite; upright attitude, horizontal speed, angular speed and drift shall remain within the typed bounds below. These are replaceable Twin screening limits, not supplier performance specifications or mission-level landing-stability acceptance. Missing physics samples are inconclusive. */
+        doc /* GR-036 [simulation accuracy] beginning with detected touchdown, observe the source-owned post-touchdown horizon at the source-owned fixed-tick cadence. At every available observation all four landing legs shall remain in contact and telemetry shall be finite; upright attitude, horizontal speed, angular speed and drift shall remain within the typed bounds below. The 60-second observation includes suspension settling and the authored post-touchdown mechanisms. Missing physics samples are inconclusive. */
         attribute landingStabilityHorizonS : Real = 60.0;
         attribute landingStabilitySampleEveryNTicks : Integer = 10;
-        attribute landingMinimumUprightAxisY : Real = 0.9393727128473789;
-        attribute landingMaxGroundSpeedMps : Real = 5.0;
-        attribute landingMaxAngularSpeedRadPerSec : Real = 2.0;
-        attribute landingMaxHorizontalDriftM : Real = 50.0;
+        // Project screening choices: retain the existing 10-degree study
+        // attitude envelope, cap settling transients at 5 cm/s and 0.01 rad/s,
+        // and keep total body-reference motion within one physical pad radius.
+        // These acceptance choices are independent of observed run extrema;
+        // they screen gross movement during settling and deployment. They do
+        // not certify no-slip static equilibrium or supplier landing capability.
+        attribute landingMinimumUprightAxisY : Real = GriffinPropulsionRequirements::GriffinEngineControlStudy::minimumBurnUprightY;
+        attribute landingMaxGroundSpeedMps : Real = 0.05;
+        attribute landingMaxAngularSpeedRadPerSec : Real = 0.01;
+        attribute landingMaxHorizontalDriftM : Real = GriffinLandingLegRequirements::GriffinLandingLegAssembly::footPadRadiusM;
         require GR036_LandingStabilityWithinBounds {
             in minimumUprightAxisYLimit = landingMinimumUprightAxisY;
             in maximumGroundSpeedLimitMps = landingMaxGroundSpeedMps;

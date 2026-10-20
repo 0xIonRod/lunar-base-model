@@ -20,7 +20,7 @@ package FlipSuspensionRequirements {
     // explicitly labelled Twin visual-study values until an ICD is released.
     part def FlipSuspensionComponent {
         doc /* Public FLIP and Venturi sources establish the four-wheel mobility and independent suspension architecture. Exact dimensions below are explicitly labeled Twin visual-study values; the detached assembly keeps each wheel mechanism reusable and independently verifiable. Typed requirement evidence owns the source links. */
-        attribute usdRootPath : UsdPrimPath = "/FlipSuspension";
+        attribute usdRootPath : UsdPrimPath = "/World/FlipSuspension";
         attribute componentAsset : TwinAssetPath = "components/rover/flip_suspension_visual.usda";
         attribute geometryStatus : String = "metric visual study proxy; production suspension ICD not public";
         attribute localFrame : String = "Y-up, right-handed, SI metres; origin at wheel hub; canonical arm points +X";

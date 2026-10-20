@@ -255,7 +255,7 @@ usd_path = "/World/FLIP"
 name = "flip.suspension"
 requirements = "requirements/flip_suspension_requirements.sysml"
 verification = "FlipSuspensionRequirements::Verify_FLIPSuspensionRequirements"
-usd_path = "/FlipSuspension"
+usd_path = "/World/FlipSuspension"
 
 [[components]]
 name = "flip.sensor_power"

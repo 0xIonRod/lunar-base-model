@@ -61,7 +61,7 @@ package GriffinMechanicalRequirements {
     }
 
     requirement def GR019_LegPlacement {
-        doc /* GR-019 [layout] mount four legs on signed horizontal body axes with mirrored pads and a documented local frame. Rationale: signed stations expose the four-leg support pattern and make symmetry errors observable in the composed stage. */
+        doc /* GR-019 [layout] mount four legs at the ordered signed X/Z corner stations in GriffinVisualConfiguration, with mirrored pads and each local outward axis rotated to its corner radial direction. PX/NX/PZ/NZ are stable instance identities, not signed-axis placement instructions. Rationale: source-owned corner stations expose the four-leg support pattern and make symmetry errors observable in the composed stage. */
     }
 
     requirement def GR024_HingeFrames {
