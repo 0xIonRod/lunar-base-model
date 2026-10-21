@@ -42,7 +42,9 @@ comes from the rendered cell fields; physical sunlight and panel temperature
 feed electrical conversion. See the [solar power and cooling contract](contracts/griffin-power-thermal.md)
 for the selected reference-cell data and explicit study assumptions. Deploy
 shared controller commit `668ab5d0d` or newer: the solved avionics supply gates
-flight commands. Gold MLI and engine shields describe appearance and packaging;
+flight commands. The GEP-004 vehicle gate observes battery depletion, command
+suppression and physical main-engine/RCS shutdown under sustained demand.
+Gold MLI and engine shields describe appearance and packaging;
 their geometry does not establish thermal protection performance.
 
 ## Current public mission baseline

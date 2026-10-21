@@ -1,0 +1,37 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+    documentation = "Production Griffin power-loss acceptance: 0.1 Ah/10% SOC test battery and prescribed eclipse. Equations and vehicle actuators are inherited unchanged; this is a stress fixture, not a flight battery rating."
+)
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda@</Griffin1SurfaceOps>
+)
+{
+    def Scope "ControlPowerLoss" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_control_power_loss.rhai@
+    }
+    over "Lander"
+    {
+        over "ElectricalPower"
+        {
+            custom double inputs:SolarPanelForward_irradiance = 0.0
+            double inputs:SolarPanelForward_irradiance.connect = None
+            custom double inputs:SolarPanelFrontStarboard_irradiance = 0.0
+            double inputs:SolarPanelFrontStarboard_irradiance.connect = None
+            custom double inputs:SolarPanelFrontPort_irradiance = 0.0
+            double inputs:SolarPanelFrontPort_irradiance.connect = None
+            over "Battery"
+            {
+                custom double parameters:capacity = 0.1
+                custom double parameters:soc_init = 0.1
+            }
+        }
+    }
+}

@@ -1478,6 +1478,11 @@ package GriffinRequirementSources {
         ref targetRequirement = GriffinPowerThermalRequirements::gep003;
         ref sources = (source_griffin_power_thermal_contract, source_griffin_power_thermal_study, source_griffin_power_pug_2021);
     }
+    part evidence_gep_004 : RequirementEvidence {
+        ref targetRequirement = GriffinPowerThermalRequirements::gep004;
+        ref sources = (source_griffin_power_thermal_contract, source_griffin_power_thermal_study);
+    }
+
 
     part evidence_gpp_013 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp013;

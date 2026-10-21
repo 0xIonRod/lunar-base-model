@@ -123,21 +123,46 @@ package GriffinPowerThermalRequirements {
         electricalNodeBalanceClosed and batteryEnergyBalanceClosed
             and loadPowerObserved and flightPowerGateWired;
     }
+    constraint def GEP004_LowSupplyCommandsOff {
+        in poweredCommandsObserved : Boolean;
+        in lowSupplyObserved : Boolean;
+        in commandsSuppressed : Boolean;
+        in loadDisconnected : Boolean;
+        in actuatorsSettled : Boolean;
+        poweredCommandsObserved and lowSupplyObserved and commandsSuppressed
+            and loadDisconnected and actuatorsSettled;
+    }
     requirement def GEP003_StorageAndControlSupply {
         doc /* GEP-003: the three arrays, finite battery and regulated avionics
          * load shall share one solved electrical node. Power and battery
          * storage/loss balance shall close. Flight command availability shall
-         * be connected to the solved avionics powered signal; a low supply
-         * shall suppress thrust and attitude requests without replacing the
-         * engine's downstream valve or propellant dynamics.
+         * be connected to the solved avionics powered signal.
          */
         require GEP003_PowerSupplyClosed;
     }
+    requirement def GEP004_LowSupplyProtection {
+        doc /* GEP-004: under a sustained command, loss of solved avionics
+         * power shall suppress all thrust and attitude requests within three
+         * completed fixed intervals. The unpowered computer shall draw zero
+         * power. Engines shall settle through their own valve/chamber dynamics.
+         * Qualify a powered interval followed by battery depletion under a
+         * prescribed eclipse; reduced test inventory is not a flight rating.
+         */
+        require GEP004_LowSupplyCommandsOff;
+    }
+    requirement <'GEP-004'> gep004 : GEP004_LowSupplyProtection { subject power : GriffinPowerThermalStudy; }
     requirement <'GEP-001'> gep001 : GEP001_SolarConversion { subject power : GriffinPowerThermalStudy; }
     requirement <'GEP-002'> gep002 : GEP002_PanelCooling { subject power : GriffinPowerThermalStudy; }
     requirement <'GEP-003'> gep003 : GEP003_StorageAndControlSupply { subject power : GriffinPowerThermalStudy; }
     verification def Verify_GriffinPowerThermal {
         subject power : GriffinPowerThermalStudy;
         objective { verify gep001; verify gep002; verify gep003; }
+    }
+    verification def Verify_GriffinControlPowerLoss {
+        doc /* Production vehicle under a prescribed eclipse with a reduced
+         * test battery inventory. Sustained thrust/yaw requests must lose
+         * authority when the solved avionics supply enters UVLO. */
+        subject power : GriffinPowerThermalStudy;
+        objective { verify gep004; }
     }
 }

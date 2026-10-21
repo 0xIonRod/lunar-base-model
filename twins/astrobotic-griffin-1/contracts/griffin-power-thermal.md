@@ -51,5 +51,57 @@ checks passed. Eight affected Griffin control, Sun-pointing, landing, engine-out
 and propellant-exhaustion/impact cases also passed. These runs qualify the
 declared reduced study; they do not establish flight calibration or FPS.
 The shared controller separately passes 108 powered/interrupted/recovery checks.
-Production low-battery and disconnected-network negative cases remain to be
-qualified. The coolant boundary remains ideal and unlimited in total energy.
+The coolant boundary remains ideal and unlimited in total energy.
+
+`GEP-004` independently qualifies low-supply protection on the production
+vehicle. Its fixture inherits the landing scene, changes only battery capacity
+to 0.1 Ah and initial SOC to 0.1, and prescribes zero irradiance at the three
+electrical-network boundaries. Those accelerated-depletion inputs are test
+conditions, not revised flight or nominal study ratings. A sustained 0.35
+thrust request and 0.2 yaw request remain present throughout the eight-second
+run. The gate observes a powered interval, solved avionics UVLO, zero computer
+draw, suppression of throttle and all three attitude requests within three
+fixed intervals, and subsequent main-engine and RCS extinction. The current
+run passes with 299 powered and 181 unpowered samples; cutoff occurs at tick
+300. Peak main-engine thrust is 7,628.58 N and peak summed RCS thrust is
+231.969 N; final values are below 0.001 N. The rapid voltage transition of this
+tiny test inventory does not calibrate a real battery OCV or BMS curve.
+
+Run the two positive cases through the normal Twin verification registry:
+
+```sh
+luncosim test --scene tests/griffin_power_thermal.usda --verification GriffinPowerThermalRequirements::Verify_GriffinPowerThermal
+luncosim test --scene tests/griffin_control_power_loss.usda --verification GriffinPowerThermalRequirements::Verify_GriffinControlPowerLoss
+```
+
+For fault qualification, `tools/check_power_failure_rejection.py` forks the
+positive document through the existing document API and cuts exactly one
+connection per disposable layer: forward-panel temperature feedback, its heat
+source-to-mass connector, or its electrical connection to the battery node.
+It leaves the positive source and model equations unchanged. Use an owned
+windowed authoring session with this Twin open and a separate free test port:
+
+```sh
+python3 tools/check_power_failure_rejection.py --engine /path/to/lunco-sim --author-port 4291 --test-port 4292
+```
+
+Generated layers use the ignored `tests/_power_failure_*.usda` prefix so the
+existing Twin scene index can admit them. Exact typed mutations, source hashes
+and production reports are retained under `.cache/power-failure-qualification/`.
+A timeout, source-load failure or test-selection error cannot satisfy this
+fault gate. A malformed input can be rejected before simulation starts; that
+case requires the exact electrical-network `CosimStatus.modelica_error` and
+held admission. Other cuts must produce a failing typed requirement verdict.
+The script is an external API/CLI coordinator; the existing Rhai observer and Modelica
+admission owner supply the rejection evidence.
+
+Qualification on 21 October 2026 confirms all three cuts: the temperature input
+is rejected as neither a scalar value nor a connection; the disconnected PV
+connector is rejected as outside the generated acausal network; and the heat
+source disconnection completes the observation horizon with a failing GEP-002
+verdict. The unmodified network passes GEP-001–003 with the strengthened exact
+electrical/thermal node checks. Together with the separate GEP-004 pass, these
+close the power-loss and broken-wiring acceptance gaps. Raw evidence is in the
+engine checkout's `.cache/codex-evidence/griffin-power-loss-20261021/` and this
+Twin's `.cache/power-failure-qualification/`. This checkpoint adds verification;
+it does not change nominal physical parameters or qualify FPS.

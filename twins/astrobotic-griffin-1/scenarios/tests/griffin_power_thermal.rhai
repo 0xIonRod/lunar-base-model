@@ -11,8 +11,13 @@ fn simulation_dependencies(me,ctx) {
       required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
 }
 fn wired(record,name,source) {
-    record!=() && record.connections!=() && record.connections[name]!=()
-        && record.connections[name].len()==1 && record.connections[name][0]==source
+    node(record,name,[source])
+}
+fn node(record,name,sources) {
+    if record==() || record.connections==() || record.connections[name]==()
+        || record.connections[name].len()!=sources.len() {return false;}
+    for source in sources {if !record.connections[name].contains(source) {return false;}}
+    true
 }
 fn row_area(path) {
     let r=query("QueryUsdPrim",#{path:path,attrs:["points","faceVertexCounts","faceVertexIndices"]});
@@ -51,6 +56,11 @@ fn on_start(me,ctx) {
     let net=ROOT+"/ElectricalPower";
     let root=query("QueryUsdPrim",#{path:ROOT,attrs:[],connections:true});
     this.gate=wired(root,"inputs:control_powered",net+".outputs:avionics_powered");
+    let boundary=query("QueryUsdPrim",#{path:net,attrs:[],connections:true});
+    let pins=[net+"/AvionicsLoad.connectors:p"];
+    for name in this.names {pins.push(net+"/"+name+".connectors:p");}
+    this.electrical=node(query("QueryUsdPrim",#{path:net+"/Battery",attrs:[],connections:true}),
+        "connectors:p",pins);
     for i in 0..this.names.len() {
         let name=this.names[i];let pv=net+"/"+name;
         let panel=query("QueryUsdPrim",#{path:ROOT+"/"+name,attrs:["xformOp:scale"]});
@@ -61,11 +71,14 @@ fn on_start(me,ctx) {
         let record=query("QueryUsdPrim",#{path:pv,attrs:["parameters:area"],connections:true});
         this.pv_area.push(record.attrs["parameters:area"]);
         this.feedback=this.feedback && wired(record,"inputs:cell_temperature_k",pv+"Mass.outputs:temp_k");
+        this.thermal=this.thermal && node(query("QueryUsdPrim",#{path:pv+"Mass",attrs:[],connections:true}),
+            "connectors:port",[pv+"Heat.connectors:port",pv+"Cooler.connectors:port"])
+            && wired(query("QueryUsdPrim",#{path:pv+"Heat",attrs:[],connections:true}),
+                "inputs:heat_w",pv+".outputs:heat_w");
         for pair in [["irradiance","sun_irradiance_w_m2"],["sun_visibility","sun_visibility"],
             ["target_mount_x","sun_mount_x"],["target_mount_y","sun_mount_y"],["target_mount_z","sun_mount_z"]] {
             this.sun=this.sun && wired(record,"inputs:"+pair[0],net+".inputs:"+name+"_"+pair[0]);
         }
-        let boundary=query("QueryUsdPrim",#{path:net,attrs:[],connections:true});
         this.sun=this.sun && wired(boundary,"inputs:"+name+"_irradiance",ROOT+"/"+name+"/PowerEnvironment.outputs:sun_irradiance_w_m2")
             && wired(boundary,"inputs:"+name+"_sun_visibility",ROOT+"/"+name+"/PowerEnvironment.outputs:sun_visibility");
     }

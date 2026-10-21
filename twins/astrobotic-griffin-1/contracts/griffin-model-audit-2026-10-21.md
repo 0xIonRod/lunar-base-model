@@ -51,9 +51,11 @@ tank loads during depletion and also checks native solver propagation.
   electrical balance and the cooling cap. AZUR cell properties are a declared
   study reference, not an identified Griffin supplier. Battery inventory,
   heat capacity and cooler ratings remain project assumptions. A production
-  low-battery vehicle case and disconnected-network negative cases remain open;
-  the shared controller's separate power interruption/recovery gate passes
-  108 checks. See [the subsystem contract](griffin-power-thermal.md).
+  low-battery vehicle case now passes GEP-004: persistent thrust/yaw demands
+  lose authority at solved avionics UVLO, and both main engines and RCS settle
+  through their own actuator dynamics. The shared controller's separate power
+  interruption/recovery gate passes 108 checks. Disconnected-network
+  qualification is recorded in [the subsystem contract](griffin-power-thermal.md).
 - **Heat protection:** the apron, engine liner, skirt and MLI have explicit
   geometry/material assignments. Radiative exchange, plume heating, shield
   temperature, coolant capacity and protection of neighboring equipment are
@@ -72,9 +74,11 @@ tank loads during depletion and also checks native solver propagation.
   allowables. Some geometry, including body collision proxies, is simplified.
 
 Keep these study assumptions explicit until configuration-specific supplier
-data or measurements support replacement. Reconstructing the lower bus against
-the selected hardware remains an appearance task; replacing its source
-rationale alone does not change the executable geometry.
+data or measurements support replacement. The lower-bus checkpoint removes
+the unsupported continuous polygonal blanket belt and exposes the separately
+modeled tanks and support structure. Its scoped inventory, interfaces and
+visual inspection are recorded in [the June bus contract](griffin-june-bus.md);
+this does not establish hidden hardware dimensions or exact open-bay collisions.
 
 ## Production validation
 

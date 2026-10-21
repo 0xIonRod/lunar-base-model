@@ -44,5 +44,6 @@ luna2_twin/.cache/terrain/luna2/luna2_sinus_lunicus_preview.png
 # bytes, or bake stamps; keep the manifest, provenance, and USD wiring
 # reviewable instead.
 twins/**/.cache/
+twins/**/tests/_power_failure_*.usda
 twins/**/terrain/*/materials/
 twins/**/terrain/*/.bakekey
