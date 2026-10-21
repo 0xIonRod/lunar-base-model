@@ -22,6 +22,25 @@ An older library reports unresolved `NozzleDesign.gamma_out` or
 Modelica assets. Main and RCS plumes share the Modelica gas/energy model and
 shader field, with optical study assumptions in `GriffinPlumeStudy`.
 
+## Griffin model correctness
+
+See [the 2026-10-21 Griffin audit](contracts/griffin-model-audit-2026-10-21.md)
+for the reference comparison, production checks and remaining fidelity gaps.
+The seven-engine/four-leg configuration is source-backed; current metric
+dimensions, mass properties and propulsion ratings remain reconstruction or
+integration-study inputs.
+
+The four tank stations now determine the propellant-group centroids and live
+diagonal inertia. Deploy shared Modelica commit `8a1604463` or newer with this
+Twin: `LunCo.Propulsion.PropellantStatus` includes the mass-normalized tank-group
+inertia parameters. The initial study COM is (0, 0.695, 0) m; dry mass and the
+equal-fill reactant pairing remain explicit estimates.
+
+The three Griffin solar assemblies currently provide visible geometry and
+Sun-heading targets. They do not yet form a connected lander electrical-power
+or thermal network. Gold MLI and engine shields describe appearance and
+packaging; their geometry does not establish thermal protection performance.
+
 ## Current public mission baseline
 
 The latest primary-source baseline used for this package is:
@@ -29,9 +48,10 @@ The latest primary-source baseline used for this package is:
 - NASA describes Griffin-1 / Moon Base II as a 2026 mission to the lunar
   South-Pole region, carrying more than 499 kg of cargo including
   Astrolab's FLIP rover to Nobile Crater.
-- NASA's August 2026 update says Griffin-1 is undergoing environmental testing
-  at NASA's Jet Propulsion Laboratory, has completed mass-properties testing,
-  and is planned for a late-2026 launch.
+- NASA's [13 October 2026 JPL report](https://science.nasa.gov/photojournal/voyager-technologies-griffin-1-completes-environmental-testing-at-nasa-jpl/)
+  says Griffin-1 completed nearly three months of environmental testing in late
+  September and returned to Pittsburgh for final assembly. A late-2026 launch
+  remains a plan, not an authored simulation timestamp.
 - Astrobotic's current manifest lists the destination as Nobile Region 2026,
   while NASA describes launch as planned later this year. Neither publishes a
   surface landing timestamp. The scene's JD 2461395.5 TDB is therefore a

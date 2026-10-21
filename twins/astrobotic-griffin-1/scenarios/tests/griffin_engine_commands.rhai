@@ -15,7 +15,7 @@ fn _live_mass_properties(lander, main) {
     let model_names=["vehicle_mass_kg","vehicle_com_x_m","vehicle_com_y_m","vehicle_com_z_m",
         "vehicle_inertia_xx_kg_m2","vehicle_inertia_yy_kg_m2","vehicle_inertia_zz_kg_m2"];
     let batch=query("ReadPortsBatch",#{targets:[#{api_id:lander,port_names:native_names},
-        #{api_id:main,port_names:model_names}]});
+        #{api_id:main,port_names:model_names+["fuel_mass_kg","oxidizer_mass_kg"]}]});
     if batch==() || batch.sim_tick==() || batch.sim_tick.to_int()!=sim_tick()
         || batch.entities==() || batch.entities.len()!=2 {
         throw("native mass property snapshot unavailable: "+batch);
@@ -50,7 +50,64 @@ fn _live_mass_properties(lander, main) {
         }
         values.push(selected);
     }
-    #{sim_tick:batch.sim_tick.to_int(),native:values[0],model:values[1]}
+    let species=[];
+    // The composed MainPropulsion network republishes both tank inventories.
+    for name in ["fuel_mass_kg","oxidizer_mass_kg"] {
+        let ports=[];
+        for p in batch.entities[1].ports {
+            if p.name==name && p.direction=="out" {ports.push(p);}
+        }
+        if ports.len()!=1 || ports[0].value==() || !ports[0].value.is_finite() {
+            throw("live tank mass unavailable: "+name);
+        }
+        species.push(max(0.0,ports[0].value));
+    }
+    #{sim_tick:batch.sim_tick.to_int(),native:values[0],model:values[1],species:species}
+}
+
+// Independent four-point sum: do not reuse the builder's group centroid or
+// intrinsic-inertia reduction, which could reproduce the same authoring bug.
+fn _mass_study_loads() {
+    let model=sysml_requirements::model();
+    let own="GriffinPropulsionRequirements::GriffinPropellantMassStudy::";
+    let names=griffin_spec::propellant_tank_names();
+    let stations=griffin_spec::component_tank_stations();
+    let loads=[];let dry=[];let inertia=[];
+    for axis in ["X","Y","Z"] {dry.push(f64_from(model.value(own+"dryCom"+axis+"M")));}
+    for axis in ["Xx","Yy","Zz"] {inertia.push(f64_from(model.value(own+"dryInertia"+axis+"KgM2")));}
+    let identities=[];
+    for g in 0..2 {
+        let members=model.value(own+["fuelTankInstances","oxidizerTankInstances"][g]);
+        if !array_is(members) || members.len()!=2 {throw("mass study requires two tanks per species");}
+        for member in members {
+            let index=names.index_of(member.literal);
+            if index<0 || identities.contains(member.literal) {throw("invalid tank mass assignment");}
+            identities.push(member.literal);let p=stations[index];
+            loads.push(#{group:g,position:[p.x,p.y,p.z]});
+        }
+    }
+    #{dry_mass:f64_from(model.value(own+"dryMassKg")),dry_com:dry,dry_inertia:inertia,loads:loads}
+}
+
+fn _tank_layout_matches(sample, study) {
+    let total=study.dry_mass+sample.species[0]+sample.species[1];let com=[];
+    for i in 0..3 {
+        let moment=study.dry_mass*study.dry_com[i];
+        for load in study.loads {moment+=sample.species[load.group]*load.position[i]/2.0;}
+        com.push(moment/total);
+    }
+    let expected=[total,com[0],com[1],com[2]];
+    for i in 0..3 {
+        let value=study.dry_inertia[i];
+        for j in 0..3 {
+            if i==j {continue;}
+            value+=study.dry_mass*(study.dry_com[j]-com[j])**2;
+            for load in study.loads {value+=sample.species[load.group]*(load.position[j]-com[j])**2/2.0;}
+        }
+        expected.push(value);
+    }
+    for i in 0..7 {if abs(sample.model[i]-expected[i])>1.0e-6 {return false;}}
+    true
 }
 
 fn _propagation_matches(current, previous) {
@@ -120,6 +177,8 @@ fn on_start(me, ctx) {
         /griffin_spec::_typed_model_number(own+"engineThroatBoreAreaM2");
     this.pressure_closure_ok=true;
     this.mass_propagation_ok=true;
+    this.mass_layout_ok=true;
+    this.mass_study=_mass_study_loads();
     this.previous_mass_properties=();
 }
 
@@ -134,6 +193,7 @@ fn on_tick(me, ctx) {
         throw("engine command physical observation unavailable: "+sample);
     }
     let properties=_live_mass_properties(this.lander,this.main);
+    this.mass_layout_ok=this.mass_layout_ok && _tank_layout_matches(properties,this.mass_study);
     if this.phase!="landing" && this.previous_mass_properties!=() {
         this.mass_propagation_ok=this.mass_propagation_ok
             && _propagation_matches(properties,this.previous_mass_properties);
@@ -199,9 +259,8 @@ fn on_tick(me, ctx) {
     this.done = true;
     let final_pressure=_peak_engine_pressure(this.main);
     let inertia_decreased=true;
-    // The tanks lie along body Y: consuming their mass reduces X/Z inertia.
-    // The Y component remains governed by the same model propagation check.
-    for axis in [4,6] {
+    // All four tanks have a radial station offset: every diagonal decreases.
+    for axis in [4,5,6] {
         inertia_decreased=inertia_decreased && this.native_after.native[axis]<this.native_before.native[axis];
     }
     print("GRIFFIN_ENGINE_NATIVE_MASS_PROPERTIES "+#{before:this.native_before,
@@ -214,8 +273,9 @@ fn on_tick(me, ctx) {
             "held thrust ended without sustained climb: vertical speed=" + this.end_vertical_speed),
         t_true(this.fuel_after < this.fuel_before, "burn did not consume propellant"),
         t_true(this.native_after.native[0]<this.native_before.native[0],"native solver mass did not decrease with propellant"),
-        t_true(inertia_decreased,"native solver X/Z inertia did not decrease with propellant"),
+        t_true(inertia_decreased,"native solver diagonal inertia did not decrease with propellant"),
         t_true(this.mass_propagation_ok,"native solver mass, COM or inertia differs from consecutive PropellantStatus samples"),
+        t_true(this.mass_layout_ok,"live mass properties disagree with the four source-owned tank stations"),
         t_true(this.peak_angular_speed <= _trial_number("maximumBurnAngularSpeedRadS"),
             "straight-up burn spun too fast: " + this.peak_angular_speed),
         t_true(this.minimum_upright_y >= _trial_number("minimumBurnUprightY"),

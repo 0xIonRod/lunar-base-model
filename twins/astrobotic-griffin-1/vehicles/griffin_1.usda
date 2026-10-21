@@ -23,9 +23,6 @@ def Xform "Griffin1" (
     custom string lunco:egress = "FLIP payload adapter with port and starboard hinged ramps"
     uniform bool lunco:spawnable = true
     bool physics:rigidBodyEnabled = true
-    float physics:mass = 4000.0
-    float3 physics:diagonalInertia = (5905.0, 6250.0, 5905.0)
-    float3 physics:centerOfMass = (0.0, 0.0, 0.0)
     float physxRigidBody:linearDamping = 0.0
     uniform token info:implementationSource = "sourceAsset"
     uniform asset info:sourceAsset = @lunco://models/Lander.mo@
@@ -132,6 +129,9 @@ def Xform "Griffin1" (
     double inputs:controller_inertia_zz.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_zz_kg_m2>
     custom double inputs:inertia_zz
     double inputs:inertia_zz.connect = </Griffin1/MainPropulsion.outputs:vehicle_inertia_zz_kg_m2>
+    float physics:mass = 4000.0
+    point3f physics:centerOfMass = (0.0, 0.6949999928474426, 0.0)
+    float3 physics:diagonalInertia = (7279.60009765625, 7695.0, 7279.60009765625)
     def Scope "PhysicsMaterials"
     {
         def Material "LandingPadSlide" (
@@ -400,15 +400,8 @@ def Xform "Griffin1" (
             uniform bool lunco:program:realtimeSafe = true
             float inputs:low_fuel_mass_kg = 200.0
             float inputs:depleted_mass_kg = 1.0
-            float inputs:initial_propellant_mass_kg = 2000.0
             float inputs:minimum_mass_kg = 0.0000009999999974752427
             float inputs:event_transition_width_kg = 0.009999999776482582
-            float inputs:dry_mass_kg = 2000.0
-            float inputs:dry_inertia_xx_kg_m2 = 4625.0
-            float inputs:dry_inertia_yy_kg_m2 = 6250.0
-            float inputs:dry_inertia_zz_kg_m2 = 4625.0
-            float inputs:fuel_position_y_m = 0.800000011920929
-            float inputs:oxidizer_position_y_m = -0.800000011920929
             float outputs:propellant_mass_kg
             float outputs:propellant_used_kg
             float outputs:propellant_fraction
@@ -428,6 +421,26 @@ def Xform "Griffin1" (
             double outputs:vehicle_inertia_yy_kg_m2.connect = None
             custom double outputs:vehicle_inertia_zz_kg_m2
             double outputs:vehicle_inertia_zz_kg_m2.connect = None
+            custom double inputs:dry_mass_kg = 2000.0
+            custom double inputs:initial_propellant_mass_kg = 2000.0
+            custom double inputs:dry_com_x_m = 0.0
+            custom double inputs:dry_inertia_xx_kg_m2 = 4625.0
+            custom double inputs:fuel_position_x_m = 0.0
+            custom double inputs:fuel_specific_inertia_xx_m2 = 0.0
+            custom double inputs:oxidizer_position_x_m = 0.0
+            custom double inputs:oxidizer_specific_inertia_xx_m2 = 0.7224999999999999
+            custom double inputs:dry_com_y_m = 0.0
+            custom double inputs:dry_inertia_yy_kg_m2 = 6250.0
+            custom double inputs:fuel_position_y_m = 1.39
+            custom double inputs:fuel_specific_inertia_yy_m2 = 0.7224999999999999
+            custom double inputs:oxidizer_position_y_m = 1.39
+            custom double inputs:oxidizer_specific_inertia_yy_m2 = 0.7224999999999999
+            custom double inputs:dry_com_z_m = 0.0
+            custom double inputs:dry_inertia_zz_kg_m2 = 4625.0
+            custom double inputs:fuel_position_z_m = 0.0
+            custom double inputs:fuel_specific_inertia_zz_m2 = 0.7224999999999999
+            custom double inputs:oxidizer_position_z_m = 0.0
+            custom double inputs:oxidizer_specific_inertia_zz_m2 = 0.0
         }
         def Scope "Engine01" (
             prepend apiSchemas = ["LunCoProgramAPI"]

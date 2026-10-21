@@ -208,6 +208,106 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
     #{ok:true,kind:"griffin_main_engine",engine:name,ops:ops,no_op:false}
 }
 
+// Equal live mass at each station of an explicitly assigned tank pair.
+// Reject layouts requiring products of inertia; the current body port owns
+// a diagonal tensor and cannot represent an arbitrary asymmetric grouping.
+fn _propellant_group(model, attribute, names, stations) {
+    let members=model.value(attribute);
+    if !array_is(members) || members.len()!=2 {return plan_error("two typed tank identities required: "+attribute);}
+    let points=[];
+    for member in members {
+        if !sysml_enum_is(member) {return plan_error("invalid tank identity");}
+        let index=names.index_of(member.literal);
+        if index<0 {return plan_error("unknown tank identity: "+member.literal);}
+        points.push(stations[index]);
+    }
+    if members[0].literal==members[1].literal {return plan_error("tank pair must contain distinct stations");}
+    let a=points[0]; let b=points[1];
+    if abs(a.x+b.x)>1.0e-8 || abs(a.z+b.z)>1.0e-8
+        || abs(a.y-b.y)>1.0e-8 || abs(a.x*a.z)>1.0e-8 {
+        return plan_error("mass study requires opposed axis-aligned horizontal pairs");
+    }
+    let c=[(a.x+b.x)/2.0,(a.y+b.y)/2.0,(a.z+b.z)/2.0];
+    let spread=[0.0,0.0,0.0];
+    for p in points {
+        let x=p.x-c[0];let y=p.y-c[1];let z=p.z-c[2];
+        spread[0]+=(y*y+z*z)/2.0;
+        spread[1]+=(x*x+z*z)/2.0;
+        spread[2]+=(x*x+y*y)/2.0;
+    }
+    #{ok:true,centroid:c,specific_inertia:spread}
+}
+
+fn griffin_propellant_mass_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    if !sysml_model_is(model) {return plan_error("propellant mass source unavailable");}
+    let own="GriffinPropulsionRequirements::GriffinPropellantMassStudy::";
+    let names=griffin_spec::propellant_tank_names();
+    let stations=griffin_spec::component_tank_stations();
+    if names.len()!=4 || stations.len()!=4 {return plan_error("four typed tank stations required");}
+    let fuel=_propellant_group(model,own+"fuelTankInstances",names,stations);
+    let oxidizer=_propellant_group(model,own+"oxidizerTankInstances",names,stations);
+    if !fuel.ok {return fuel;} if !oxidizer.ok {return oxidizer;}
+    let used=[];
+    for attr in ["fuelTankInstances","oxidizerTankInstances"] {
+        for member in model.value(own+attr) {
+            if used.contains(member.literal) {return plan_error("tank belongs to both reactant groups");}
+            used.push(member.literal);
+        }
+    }
+    let dry=_source_number(model,own+"dryMassKg");
+    let dc=[];let di=[];
+    for axis in ["X","Y","Z"] {dc.push(_source_number(model,own+"dryCom"+axis+"M"));}
+    for axis in ["Xx","Yy","Zz"] {di.push(_source_number(model,own+"dryInertia"+axis+"KgM2"));}
+    if dry==() || dry<=0.0 {return plan_error("positive dry mass required");}
+    for i in 0..3 {if dc[i]==() || di[i]==() || di[i]<=0.0 {return plan_error("dry tensor source unavailable");}}
+    if abs(dc[0])>1.0e-8 || abs(dc[2])>1.0e-8 {
+        return plan_error("diagonal mass study requires the dry centroid on the tank-pair symmetry axis");
+    }
+    let pressure="GriffinPropulsionRequirements::GriffinPressureFedStudy::";
+    let fm=_source_number(model,pressure+"initialFuelMassKg");
+    let om=_source_number(model,pressure+"initialOxidizerMassKg");
+    if fm==() || om==() || fm<0.0 || om<0.0 {return plan_error("initial species masses unavailable");}
+    let mass=dry+fm+om; let com=[]; let inertia=[];
+    for i in 0..3 {com.push((dry*dc[i]+fm*fuel.centroid[i]+om*oxidizer.centroid[i])/mass);}
+    for i in 0..3 {
+        let j=(i+1)%3;let k=(i+2)%3;
+        let value=di[i];
+        for g in [#{m:dry,c:dc,s:[0.0,0.0,0.0]},
+            #{m:fm,c:fuel.centroid,s:fuel.specific_inertia},
+            #{m:om,c:oxidizer.centroid,s:oxidizer.specific_inertia}] {
+            value+=g.m*(g.s[i]+(g.c[j]-com[j])**2+(g.c[k]-com[k])**2);
+        }
+        inertia.push(value);
+    }
+    let status=root+"/MainPropulsion/PropellantStatus";let params=[];
+    params.push(#{name:"dry_mass_kg",value:dry});
+    params.push(#{name:"initial_propellant_mass_kg",value:fm+om});
+    let axes=["x","y","z"];
+    for i in 0..3 {
+        let axis=axes[i];
+        params.push(#{name:"dry_com_"+axis+"_m",value:dc[i]});
+        params.push(#{name:"dry_inertia_"+axis+axis+"_kg_m2",value:di[i]});
+        for g in [#{name:"fuel",value:fuel},#{name:"oxidizer",value:oxidizer}] {
+            params.push(#{name:g.name+"_position_"+axis+"_m",value:g.value.centroid[i]});
+            params.push(#{name:g.name+"_specific_inertia_"+axis+axis+"_m2",value:g.value.specific_inertia[i]});
+        }
+    }
+    let ops=[];
+    for p in params {
+        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:status,name:"inputs:"+p.name}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:status,name:"inputs:"+p.name,type_name:"double",value:p.value.to_string()}});
+    }
+    for p in [#{name:"physics:mass",type_name:"float",value:mass.to_string()},
+        #{name:"physics:centerOfMass",type_name:"point3f",value:"("+com[0]+", "+com[1]+", "+com[2]+")"},
+        #{name:"physics:diagonalInertia",type_name:"float3",value:"("+inertia[0]+", "+inertia[1]+", "+inertia[2]+")"}] {
+        // Recreate each schema declaration atomically with its typed value.
+        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:root,name:p.name}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:root,name:p.name,type_name:p.type_name,value:p.value}});
+    }
+    #{ok:true,kind:"griffin_propellant_mass",ops:ops,mass:mass,com:com,inertia:inertia,no_op:false}
+}
+
 // Admit every engine into the MainPropulsion network: shared throttle, tank
 // outlets, nozzle design, and the explicit member collection.
 fn griffin_main_engine_feed_plan(doc, edit_target, root) {
@@ -223,6 +323,9 @@ fn griffin_main_engine_feed_plan(doc, edit_target, root) {
     let main=root+"/MainPropulsion";
     let nozzle=main+"/NozzleDesign";
     let ops=[];
+    let mass_plan=griffin_propellant_mass_plan(doc,edit_target,root);
+    if !mass_plan.ok {return mass_plan;}
+    for op in mass_plan.ops {ops.push(op);}
     // Lander.mo publishes the shared throttle; runtime Modelica is the writer.
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:root,name:"outputs:throttle",
         type_name:"float",value:"0.0"}});

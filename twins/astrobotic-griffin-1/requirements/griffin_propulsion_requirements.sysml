@@ -8,6 +8,7 @@ package GriffinPropulsionRequirements {
     private import GriffinRequirementSources::UsdPrimPath;
     private import GriffinLanderRequirements::GriffinLanderComponent;
     private import GriffinVisualConfigurationRequirements::GriffinVisualConfiguration;
+    private import GriffinVisualConfigurationRequirements::GriffinTankInstanceName;
 
     attribute def Direction :> CartesianThreeVectorValue;
     enum def GriffinEngineVisualMember { Bell; Throat; }
@@ -132,6 +133,30 @@ package GriffinPropulsionRequirements {
         attribute initialFuelMassKg : Real = 1000.0;
         attribute initialOxidizerMassKg : Real = 1000.0;
         attribute pressureObservationTolerancePa : Real = 100.0;
+    }
+
+    part def GriffinPropellantMassStudy {
+        doc /* Rigid, equally filled tank-pair study, 2026-10-21. The four
+         * tank stations come from GriffinVisualConfiguration::tankStations.
+         * Fuel in the X pair and oxidizer in the Z pair is an explicit study
+         * assignment; public sources do not identify the flight pairing.
+         * Each species is split equally between its two stations. The builder
+         * derives centroids and mass-normalized diagonal inertia from these
+         * stations; they drain with the corresponding live species mass.
+         * Dry mass, dry centroid and dry inertia below retain inherited study
+         * estimates, not supplier measurements. Tank-load points exclude
+         * liquid shape, slosh and tank internal geometry. Opposed horizontal
+         * pairs keep products of inertia zero in this Y-up vehicle frame.
+         */
+        attribute fuelTankInstances : GriffinTankInstanceName[2] = ("TankPX", "TankNX");
+        attribute oxidizerTankInstances : GriffinTankInstanceName[2] = ("TankPZ", "TankNZ");
+        attribute dryMassKg : Real = 2000.0;
+        attribute dryComXM : Real = 0.0;
+        attribute dryComYM : Real = 0.0;
+        attribute dryComZM : Real = 0.0;
+        attribute dryInertiaXxKgM2 : Real = 4625.0;
+        attribute dryInertiaYyKgM2 : Real = 6250.0;
+        attribute dryInertiaZzKgM2 : Real = 4625.0;
     }
 
     part def GriffinMainPropulsionAssembly {
@@ -630,7 +655,13 @@ package GriffinPropulsionRequirements {
          * upright Y shall exceed minimumBurnUprightY and angular speed shall
          * remain below maximumBurnAngularSpeedRadS. Releasing the input shall
          * reduce delivered chamber thrust below extinguishedThrustThresholdN
-         * after releaseDurationS. Fuel must decrease during the burn. The
+         * after releaseDurationS. Fuel must decrease during the burn. Live
+         * mass, centroid and diagonal inertia shall match the independent
+         * four-tank point-load sum defined by GriffinPropellantMassStudy and
+         * GriffinVisualConfiguration::tankStations. Native solver properties
+         * shall follow these outputs within the admitted tick exchange.
+         * All three inertia diagonals shall decrease with consumed propellant.
+         * This validates the declared mass study, not flight mass properties. The
          * force actuator input envelope shall accept the modeled feed range
          * derived in GriffinEngineControlStudy. Cold/released chamber pressure
          * shall remain below GriffinPressureFedStudy::pressureObservationTolerancePa;
