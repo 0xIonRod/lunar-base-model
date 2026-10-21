@@ -640,15 +640,6 @@ fn visual_tank_support_plane_center_y_m() {
 fn visual_tank_opening_inner_radius_m() { _sysml_attribute("tankSupportOpeningInnerRadiusM") }
 fn visual_tank_opening_outer_radius_m() { _sysml_attribute("tankSupportOpeningOuterRadiusM") }
 fn visual_tank_opening_segments() { _sysml_integer("tankSupportOpeningSegments") }
-fn legacy_bus_prim_names() {
-    ["BoxyAirframe", "LowerServiceSkirtBox", "IsogridDeck", "WhiteEquipmentBox",
-     "TopDeck", "LowerServiceSkirt", "TopDeckHex", "LowerServiceSkirtHex",
-     "HexPanelFrontRight", "HexPanelRightRear", "HexPanelRearRight",
-     "HexPanelRearLeft", "HexPanelLeftFront", "HexPanelFrontLeft",
-     "FrameRailFront", "FrameRailRear"]
-}
-
-
 // Structured, native geometry plan consumed by the visual builder.  The
 // source attributes remain SysML-owned. Typed Position collections are used
 // directly here; no XYZ CSV or parallel coordinate arrays cross this seam.

@@ -9,11 +9,13 @@ derived hinge coordinates is for interface closure, not measurement accuracy.
 ## Selected configuration, 2026-10-21
 
 The user selected June 2026 integration hardware as the shape and solar-panel
-baseline. The gold finish remains a separate presentation preference. The
-older ESA-based body-height ratio is an unqualified retained study input,
-not evidence of the selected hardware's shape. The remaining lower-bus
-reconstruction must replace that rationale and verify its component and
-assembly interfaces before changing the executable geometry.
+baseline. The gold finish remains a separate presentation preference. The bus
+presentation exposes its structural bays and separately owned wrapped tanks,
+as observed below the photovoltaic faces in those photographs. The internal
+3.60 m span and 0.72 m frame height remain unqualified packaging estimates;
+the older ESA image supplies no accepted exterior-face aspect ratio.
+See [the lower-bus contract](../contracts/griffin-june-bus.md) for ownership,
+source limits and the component/assembly gates.
 
 ## Panel-bank correction checkpoint, 2026-10-21
 
@@ -145,7 +147,7 @@ uncontended performance remain separate acceptance obligations.
 | Quantity | Previous active model | New study value | Basis and uncertainty |
 |---|---:|---:|---|
 | Griffin body plan span | 5.40 m | 3.60 m | Estimate: 80% of the historical 4.5 m overall envelope reserves 0.45 m per side for leg/foot extension. Plausible range 3.2–4.0 m; low confidence. |
-| Body belt and frame-member height | 2.00 m; first pass 1.40 m | 0.72 m | User-selected ESA face ratio ≈3:1; broad octagon face = 0.585786 × 3.60 = 2.109 m; 2.109 / 3 = 0.703 m, rounded to 0.72 m. Approximate range 0.60–0.84 m; low-confidence presentation estimate. The earlier 1.40 m entry was stale and did not match the authored geometry. |
+| Internal frame-member height | Unqualified packaging study | 0.72 m | Retained internal support envelope, approximately 0.60–0.84 m with low confidence. The June photographs do not calibrate this dimension. It is not an exterior blanket-belt height. |
 | Payload surface above nominal terrain | 5.72 m; earlier study 2.52 m | 2.56 m | .44 m touchdown datum + 2.12 m walking top. The rejected 3.28 m deck compensated for an exit-side panel. New height keeps the rover in the bay and crossmembers about 14 mm above tank caps. No calibrated photo or flight drawing establishes it. |
 | Axis-aligned footpad envelope in X/Z | 7.24 m | 4.50 m | Stations at X/Z=+/-1.90 m plus 0.35 m pad radii give 4.50 m projected width. Opposed diagonal pad edges span about 6.074 m (2 × sqrt(2) × 1.90 + 0.70); 4.50 m is not that diagonal diameter. This is an estimated square-plan fit to the historical envelope, not a current footprint measurement. |
 | Payload adapter | 4.40 × 3.20 m | 3.20 × 3.20 m | Estimated octagonal footprint fitting inside the bus and covering the reconstructed FLIP wheels after clipping the corners. 80 mm stock is an explicit silhouette estimate; center Y2.08 gives the Y2.12 contact top below the tall arrays. |
@@ -193,12 +195,10 @@ control, or successful rover egress. The differential steering simulation policy
 also remains a separate mismatch with the public skid-steer configuration;
 correcting its controller requires its own behavior validation.
 
-The eight neutral exterior facets reproduce the shallow body belt in the
-user-selected ESA concept image. Their 25 mm thickness, 40 mm frame-edge margin,
-flat faces and display color are presentation estimates. They add no collision
-or material/structural claim. The body collision proxy uses five boxes inscribed
-in the octagon; it omits the diagonal triangular wedges and follows the same
-body dimensions and mount rather than retaining the old oversized collider.
+The open bus presentation leaves the separately owned tank blankets visible.
+The body collision proxy uses five boxes inscribed in the internal octagonal
+envelope. It omits diagonal triangular wedges and fills some frame openings;
+it is a coarse structural proxy, not exact contact geometry for the exposed bays.
 
 First-pass checks: the fresh production test passes all 164 ramp stow checks,
 all six ramp touchdown-geometry checks, and all 161 landing-leg checks. The bus
@@ -833,7 +833,7 @@ The Rhai sources compiled and the provenance gate passed (207 requirements,
 | [Pittsburgh Technology Council hardware photograph](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png) | One primary member and two separated diagonal braces converge at each foot; upper attachments belong to the bus/frame. | Hardware revision, calibrated dimensions, internal shock construction, hinge axes, travel and spring properties. Perspective cannot establish these values. |
 | [Astrobotic Griffin lander description](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/) | Four shock-absorbing legs; manufacturer context for the lander. | A released linkage diagram, landing-gear stiffness or exact attachment coordinates. |
 | [Astrobotic product image](https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png) | The user counted 14 cell columns and 5 rows on the broad panel; supports a shallow rectangular panel and slender folded ramps. | Cell pitch in metres and the layout on narrower faces. This older concept rendering is not current flight-panel metrology. |
-| [ESA Griffin artist impression, 23 September 2022](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander) | The user-marked broad bus face is approximately 3:1 in width/height; appearance reference for ramps and exposed tank domes. | Absolute dimensions, hidden mechanisms and structural stock sizes. Perspective and artistic rendering limit precision. |
+| [ESA Griffin artist impression, 23 September 2022](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander) | Historical concept appearance for ramps and exposed tank domes; not the selected June hardware body-shape reference. | Absolute dimensions, hidden mechanisms and structural stock sizes. Perspective and artistic rendering limit precision. |
 
 The previous vertical prismatic joint translated the whole leg, including its
 upper brackets. That violates the reconstructed fixed attachment load path.
@@ -1071,50 +1071,6 @@ washed out. The shadowed side becomes dark; this is a static shape inspection,
 not acceptance of mission exposure, terrain appearance or flight physics.
 The visual requirement's stale five-engine description was corrected to seven,
 matching the existing current-product requirement and vehicle.
-
-## Exterior finish and review cleanup — 2026-10-03
-
-The bus ExteriorPanels UsdPreviewSurface now uses the source-owned metallic
-0.55 and roughness 0.45, replacing 0 and 0.65. This is an appearance estimate
-informed by the broad soft reflections on the pale exterior in the
-[PGH hardware photograph](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png),
-not measured optical properties. The existing material is reused; no texture,
-extra geometry, collider or mass was added. `griffin_bus_finish_plan` reads the
-SysML values and uses the existing material-network planner after the cladding
-is composed. Saved owner and dependent-stage reads confirm these values.
-
-Twenty obsolete review-only shock-body and pin/brace-hinge overrides were
-removed after the axial mechanism revision. A fresh-process static geometry
-check passes all 126 checks, source revision 13849370287358511557, in
-`terrain/target/griffin-current-visual-fresh.log`. This is structural evidence,
-not rendered acceptance. The older process still returned the previous shock
-paths after clearing/loading and stayed in physical-admission hold, while the
-fresh process resolved the new piston Tube. That difference remains a core
-dependency/reload defect to investigate; do not hide it by weakening checks.
-
-## Blanket perimeter detail — 2026-10-03
-
-Eight render-only tape meshes follow the existing panel face perimeters.
-The [PGH hardware photo](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
-shows thin gold edge tape. Width 10 mm, a 1 mm surface offset to avoid coincident
-render faces, and linear color (0.55, 0.36, 0.05) are explicit appearance estimates.
-Each mesh has four quads forming a ring with an open center, derived directly
-from its composed ExteriorFacet outer vertices; no independent bus pose, rigid
-body or collision geometry is added. GBC-009 owns the detail and its uncertainty.
-
-A directly launched scene initially had an inactive window camera. Opening the
-Twin enabled the window camera; this explains the blank cold screenshot and is
-separate from the warm-process stale dependency/admission defect. The current
-full assembly, before edge tape, was inspected in
-`terrain/target/assembly-editor/griffin-current-finish-twin.png`.
-
-All eight composed tape meshes were observed spawned, single-sided, render-only
-and non-colliding with eight points/four quads each. Evidence:
-`terrain/target/assembly-editor/griffin-blanket-composed.json` and the inspected
-`griffin-blanket-framed-current.png`. The component source refresh changed the
-camera orientation before it was framed again through SetCameraLookAt; preserving
-the camera across such refreshes remains unresolved. The geometry observation
-and subsequent frame are not a camera-refresh PASS.
 
 ## Exposed-frame finish — 2026-10-03
 

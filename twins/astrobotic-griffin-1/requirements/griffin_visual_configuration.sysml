@@ -38,6 +38,25 @@ package GriffinVisualConfigurationRequirements {
         FrameRailStarboardFront;
         FrameRailStarboardRear;
     }
+    enum def GriffinBusStructureNode {
+        PerimeterFrame;
+        AvionicsDeck;
+        AvionicsPod;
+        TopDeckOctagon;
+        LowerServiceSkirtOctagon;
+        TankSupportPlate;
+        UpperCentralBucket;
+        LowerCentralBucket;
+        RoverPayloadDeck;
+        Looks;
+        MediumGainAntenna;
+        PayloadSupportPort;
+        PayloadSupportStarboard;
+        PayloadSupportForward;
+        PayloadSupportRear;
+        PayloadCrossmemberAcrossX;
+        PayloadCrossmemberAcrossZ;
+    }
     enum def GriffinTankInstanceName {
         TankPX;
         TankNX;
@@ -119,42 +138,16 @@ package GriffinVisualConfigurationRequirements {
          * supplies a relative peripheral-array silhouette, not a calibrated bus
          * span or deck height. Retain the 2.56 +/-0.5 m landed payload datum:
          * vehicle touchdown .44 m + adapter centre 2.08 m + half-stock .04 m.
-         * Body belt height .72 +/- .12 m and internal support dimensions remain
-         * packaging estimates. The rejected 3.28 m deck was an interference
-         * workaround and must not be cited as a photo-derived dimension. */
+         * Internal frame height .72 +/- .12 m and support dimensions remain
+         * packaging estimates, not calibrated photograph measurements. */
         attribute bodyDimensions : Dimensions = (3.60, 0.72, 3.60);
         attribute bodyMount : Position = (0.0, 1.34, 0.0);
-        /* Exterior blanket/panel presentation follows the faceted wrapped
-         * structure visible in the June 2026 Astrobotic hardware photo above.
-         * Eight flat facets approximate the envelope; actual blanket folds,
-         * fasteners and cutouts are unknown. Thickness 25 mm and 40 mm edge
-         * margins are presentation estimates, not structural material sizing.
-         * Light neutral panel color is an image-informed linear display-color estimate.
-         * This cladding is render-only; the frame remains a separate part. */
-        /* ESA artist impression, 23 September 2022:
-         * https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander
-         * The user's marked flat face is about 3:1 width/height, not the
-         * full vehicle span. Flat face width = 0.5857864376 * 3.60 = 2.109 m;
-         * /3 gives 0.703 m, rounded to 0.72 m for this study. Perspective
-         * supports only an approximate ratio (2.65-3.35), not metrology.
-         * Keep the body top at vehicle Y=1.70 and payload top Y=2.12;
-         * the shallower belt therefore moves upward rather than moving ramps.
-         * This older artist impression is a user-selected silhouette basis;
-         * it is not a claim of June 2026 as-built panel geometry. */
-        attribute bodySideFaceAspectRatio : Real = 3.0;
-        attribute bodySideFaceAspectRatioTolerance : Real = 0.35;
-        attribute bodySkinThicknessM : Real = 0.025;
-        attribute bodySkinEdgeMarginM : Real = 0.04;
+        /* June 2026 hardware exposes tank blankets and structural members
+         * below the separate solar bank. The internal octagonal support
+         * envelope above is a packaging study, not an exterior blanket belt.
+         * Blanket color belongs to the shared engine-bay material template;
+         * gold is the user's display preference, not measured flight optics. */
         attribute bodySkinDisplayColor : Real[3] = (.83, .62, .18);
-        /* Thin gold edge tape is visible in the PGH hardware photo:
-         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .
-         * Estimate 10 mm width and 1 mm presentation offset, because the image
-         * has no calibrated scale. Strips follow the composed exterior facet
-         * perimeter; they do not assign a blanket stack or thermal properties.
-         * Linear RGB is a replaceable appearance estimate. */
-        attribute blanketEdgeTapeWidthM : Real = .010;
-        attribute blanketEdgeTapeOffsetM : Real = .001;
-        attribute blanketEdgeTapeDisplayColor : Real[3] = (.55, .36, .05);
         /* Standard UsdPreviewSurface presentation parameters. ESA/Astrobotic
          * reference renderings show pale exterior panels
          * and silver ramp/leg members. These linear RGB colors, metallic and
@@ -272,6 +265,8 @@ package GriffinVisualConfigurationRequirements {
         /* Eight upper and eight lower beams close the octagonal outer frame. */
         attribute frameRingCenterY : Real[2] = (0.28, -0.28);
         attribute frameRingSectionM : Real = 0.16;
+        attribute busStructureInstances : GriffinBusStructureNode[17] =
+            ("PerimeterFrame", "AvionicsDeck", "AvionicsPod", "TopDeckOctagon", "LowerServiceSkirtOctagon", "TankSupportPlate", "UpperCentralBucket", "LowerCentralBucket", "RoverPayloadDeck", "Looks", "MediumGainAntenna", "PayloadSupportPort", "PayloadSupportStarboard", "PayloadSupportForward", "PayloadSupportRear", "PayloadCrossmemberAcrossX", "PayloadCrossmemberAcrossZ");
         attribute frameRails : GriffinFrameRailNode[8] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard",
              "FrameRailStarboardFront", "FrameRailStarboardRear",
@@ -369,7 +364,7 @@ package GriffinVisualConfigurationRequirements {
         /* Correct the upper leg mount to the lower body edge, per the user's
          * Astrobotic rendering: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
          * and https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2r1xQLuK9FVl67Bpt2FkrW5JXaLk0HFu78gfflGo-r32Rt636APG830o&s=10.
-         * Sleeve center Y=.90 = body center 1.34 - belt height .72/2
+         * Sleeve center Y=.90 = body center 1.34 - frame height .72/2
          * - sleeve radius .08. Thus sleeve top meets body bottom .98.
          * This is a reference-informed packaging estimate, not measured CAD.
          * Shift the shared physics/visual root down .30 m and compensate the

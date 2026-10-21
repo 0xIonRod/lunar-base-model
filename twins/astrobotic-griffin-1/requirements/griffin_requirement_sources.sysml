@@ -534,7 +534,7 @@ package GriffinRequirementSources {
 
     part evidence_gbc_009 : RequirementEvidence {
         ref targetRequirement = GriffinBusRequirements::gbc009;
-        ref sources = (source_astrobotic_griffin_1_lander_griffin_bus_visual_usda, source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
+        ref sources = (source_astrobotic_griffin_1_integration_photo_2026_06_15, source_astrobotic_griffin_1_lander_griffin_bus_visual_usda, source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
     }
 
     part evidence_glr_001 : RequirementEvidence {

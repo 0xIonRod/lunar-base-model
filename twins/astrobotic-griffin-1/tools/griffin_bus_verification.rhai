@@ -278,6 +278,40 @@ fn outward_quad_face_count(points, counts, indices, beam_count) {
 }
 
 
+// The source inventory and existing frame/deck geometry checks together
+// describe open structural bays without accepting an extra enclosing skin.
+fn open_bay_checks(doc, source, root) {
+    let model=sysml_requirements::model();
+    let names=_model_names(model,"busStructureInstances");
+    for name in _model_names(model,"frameRails") {names.push(name);}
+    let paths=[];for name in names {paths.push(root+"/"+name);}
+    let record=assembly_builder::composed_query(doc,#{path:root,children:true,
+        rels:["lunco:mount:sockets"]});
+    // Assemblies own explicit non-rendering socket frames in addition to the
+    // component inventory. Only declared, empty mount frames qualify.
+    let inventory_available=_query_ok(record) && record.children!=();
+    if inventory_available && record.relationships["lunco:mount:sockets"]!=() {
+        for path in record.relationships["lunco:mount:sockets"] {
+            let socket=assembly_builder::composed_query(doc,#{path:path,schemas:true,children:true});
+            if !record.children.contains(path) || paths.contains(path)
+                || !_query_ok(socket) || socket.type_name!="Xform"
+                || !socket.api_schemas.contains("LunCoMountSocketAPI")
+                || socket.children==() || socket.children.len()!=0 {
+                inventory_available=false;
+            } else {paths.push(path);}
+        }
+    }
+    let observed=if inventory_available {record.children.len()} else {()};
+    let checks=[sysml_requirement_checks::children("GBC-009-open-frame-members","bus","gbc009",
+        "Verify_GriffinBusOpenBays",root,paths),
+     _count_constraint("GBC-009-complete-structural-inventory","gbc009",observed,paths.len())];
+    for index in 0..checks.len() {
+        checks[index].doc_id=doc;
+        checks[index].verification="Verify_GriffinBusOpenBays";
+    }
+    checks
+}
+
 fn bus_checks(doc, source, bus_root) {
     let checks = [];
     // Bucket vertices are already in the bus component frame; extra instance
@@ -645,90 +679,11 @@ fn bus_checks(doc, source, bus_root) {
     checks.push(_tolerance_constraint("GBC-012-source-owned-colors", "gbc012",
         source_color_error, appearance_tolerance));
 
-    let legacy_names = griffin_spec::legacy_bus_prim_names();
-    for legacy_name in legacy_names {
-        checks.push(sysml_requirement_checks::not_exists("GBC-009-legacy-" + legacy_name,
-            "bus", "gbc009", verification_name(), root + "/" + legacy_name));
+    for check in open_bay_checks(doc,source,root) {
+        check.verification=verification_name();checks.push(check);
     }
 
-    // Flight exterior is distinct from the internal open frame. Inspect the
-    // actual mesh, so a name or source parameter cannot stand in for a skin.
-    let skin_thickness = sysml_requirements::number(source, visual("bodySkinThicknessM"));
-    let skin_margin = sysml_requirements::number(source, visual("bodySkinEdgeMarginM"));
-    let skin_color = sysml_requirements::native_value(source, visual("bodySkinDisplayColor"));
-    for index in 1..9 {
-        let label = "ExteriorFacet" + index.to_string();
-        let path = root + "/" + label;
-        let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
-        checks.push(sysml_requirement_checks::exists("GBC-009-" + label,
-            "bus", "gbc009", verification_name(), path, "Mesh"));
-        let points = if _query_ok(prim) { prim.attrs.points } else { [] };
-        let counts = if _query_ok(prim) { prim.attrs.faceVertexCounts } else { [] };
-        let indices = if _query_ok(prim) { prim.attrs.faceVertexIndices } else { [] };
-        checks.push(_count_constraint("GBC-009-points-" + label, "gbc009", points.len(), 8));
-        checks.push(_count_constraint("GBC-009-quads-" + label, "gbc009", _quad_face_count(counts), 6));
-        checks.push(_count_constraint("GBC-009-indices-" + label, "gbc009", indices.len(), 24));
-        // Every edge has two oppositely directed uses. Incidence alone would
-        // accept a reversed face and its incorrect single-sided lighting.
-        let edges = #{}; let directions=#{}; let valid = true; let offset = 0;
-        for count in counts {
-            if count != 4 || offset + count > indices.len() { valid = false; break; }
-            for edge in 0..count {
-                let a = indices[offset + edge];
-                let b = indices[offset + (edge + 1) % count];
-                if a < 0 || b < 0 || a >= points.len() || b >= points.len() || a == b {
-                    valid = false; continue;
-                }
-                let key = if a < b { a.to_string() + ":" + b.to_string() }
-                    else { b.to_string() + ":" + a.to_string() };
-                edges[key] = if edges[key] == () { 1 } else { edges[key] + 1 };
-                let direction=if a<b {1} else {-1};
-                directions[key]=if directions[key]==() {direction} else {directions[key]+direction};
-            }
-            offset += count;
-        }
-        for incidence in edges.values() { if incidence != 2 { valid = false; } }
-        for balance in directions.values() {if balance!=0 {valid=false;}}
-        checks.push(_count_constraint("GBC-009-closed-" + label, "gbc009",
-            if valid && edges.len() == 12 && offset == indices.len() { 1 } else { 0 }, 1));
-        let extent = _mesh_extent(points);
-        let error = ();
-        if extent != () && skin_thickness != () && skin_margin != () {
-            error = (extent[1] - (body_dimensions.y - 2.0 * skin_margin)).abs();
-            error = _max_number(error, _max_number(0.0, extent[0] - body_dimensions.x - 2.0 * skin_thickness));
-            error = _max_number(error, _max_number(0.0, extent[2] - body_dimensions.z - 2.0 * skin_thickness));
-        }
-        checks.push(_tolerance_constraint("GBC-009-envelope-" + label, "gbc009", error, geometry_tolerance));
-        // Only the four broad axial faces correspond to the user's marked
-        // face. Applying that ratio to the clipped corners would distort the
-        // octagon. Measure actual mesh edges instead of dividing source sizes.
-        if index % 2 == 1 {
-            let ratio_error = ();
-            if points.len() == 8 {
-                let dx = points[3][0] - points[0][0];
-                let dz = points[3][2] - points[0][2];
-                let height = (points[1][1] - points[0][1]).abs();
-                if height > 0.0 {
-                    let ratio = sqrt(dx * dx + dz * dz) / height;
-                    ratio_error = (ratio - sysml_requirements::number(source,
-                        visual("bodySideFaceAspectRatio"))).abs();
-                }
-            }
-            checks.push(_tolerance_constraint("GBC-009-face-ratio-" + label, "gbc009",
-                ratio_error, sysml_requirements::number(source, visual("bodySideFaceAspectRatioTolerance"))));
-        }
-        checks.push(_tolerance_constraint("GBC-009-color-" + label, "gbc009",
-            _display_color_error(prim, skin_color), appearance_tolerance));
-        for attr in ["physics:collisionEnabled", "purpose", "doubleSided"] {
-            let expected = if attr == "purpose" { "renderPurpose" }
-                else if attr == "doubleSided" { "doubleSidedFacesMustBe" }
-                else { "renderOnlyCollisionEnabled" };
-            checks.push(_visual_attribute_check("GBC-009-" + label + "-" + attr,
-                "gbc009", path, attr, expected, model));
-        }
-    }
-
-    // One material owns all blanket faces; evaluate the source-owned shader
+    // Shared engine-bay blanket material; evaluate the source-owned shader
     // controls together rather than adding a requirement for every input.
     let material=root+"/Looks/ExteriorPanels";let shader=material+"/Surface";
     let surface=assembly_builder::composed_query(doc,#{path:shader,children:false});
@@ -755,14 +710,6 @@ fn bus_checks(doc, source, bus_root) {
     }
     checks.push(_tolerance_constraint("GBC-012-blanket-shader-inputs", "gbc012",
         finish_error, appearance_tolerance));
-    let binding_error=0.0;
-    for index in 1..9 {
-        let facet=assembly_builder::composed_query(doc,#{path:root+"/ExteriorFacet"+index.to_string(),
-            attrs:[],rels:["material:binding"]});
-        if !_query_ok(facet) || facet.relationships["material:binding"]!=[material] {binding_error=1.0;}
-    }
-    checks.push(_tolerance_constraint("GBC-012-blanket-shared-binding", "gbc012",
-        binding_error, appearance_tolerance));
     checks
 }
 

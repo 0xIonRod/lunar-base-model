@@ -29,7 +29,8 @@ panels before this particular assembly can rely on it. Named mating frames
 must exist first. JSON by itself does not provide those missing interfaces.
 
 For now, keep panel width derived from paired bus rails by the existing recipe.
-Keep belt height derived from the wide-face aspect ratio in the source model.
+Keep the internal frame dimensions as explicit packaging assumptions; the June
+hardware photographs do not establish an exterior-face aspect ratio.
 Do not add expressions, a general constraint graph, or a CAD solver until an
 actual assembly requires them. `mechanical_relations` already checks residuals
 such as distances and parallelism; it does not solve poses.

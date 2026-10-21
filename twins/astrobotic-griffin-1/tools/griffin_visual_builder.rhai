@@ -598,66 +598,11 @@ fn griffin_solar_component_group_plan(doc,edit_target,root,index,group) {
     _solar_panel_geometry_ops(doc,edit_target,root,index,group)
 }
 
-fn griffin_bus_cladding_plan(doc, edit_target, root) {
-    let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("Griffin cladding source unavailable");}
-    let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
-    let dims=model.value(prefix+"bodyDimensions");
-    let profile=model.value(prefix+"outerBodyProfileCoordinates");
-    let thickness=f64_from(model.value(prefix+"bodySkinThicknessM"));
-    let margin=f64_from(model.value(prefix+"bodySkinEdgeMarginM"));
-    let color=model.value(prefix+"bodySkinDisplayColor");
-    if !vec3_is_native(dims) || !array_is(profile) || profile.len()!=8
-        || thickness==() || thickness<=0.0 || margin==() || margin<0.0
-        || dims.y<=2.0*margin || !array_is(color) || color.len()!=3 {
-        return plan_error("Griffin cladding source dimensions or color incomplete");
-    }
-    let ops=[];
-    for i in 0..profile.len() {
-        let a=profile[i]; let b=profile[(i+1)%profile.len()];
-        let ax=a.x*dims.x/2.0;let az=-a.y*dims.z/2.0;
-        let bx=b.x*dims.x/2.0;let bz=-b.y*dims.z/2.0;
-        let dx=bx-ax;let dz=bz-az;let length=sqrt(dx*dx+dz*dz);
-        if length<=2.0*margin {return plan_error("cladding edge margin consumes a facet");}
-        let tx=dx/length;let tz=dz/length;
-        let nx=-tz;let nz=tx;
-        if nx*(ax+bx)+nz*(az+bz)<0.0 {nx=-nx;nz=-nz;}
-        let x0=ax+tx*margin;let z0=az+tz*margin;
-        let x1=bx-tx*margin;let z1=bz-tz*margin;
-        let low=-dims.y/2.0+margin;let high=dims.y/2.0-margin;
-        let points=[[x0,low,z0],[x0,high,z0],[x1,high,z1],[x1,low,z1],
-            [x0+nx*thickness,low,z0+nz*thickness],
-            [x0+nx*thickness,high,z0+nz*thickness],
-            [x1+nx*thickness,high,z1+nz*thickness],
-            [x1+nx*thickness,low,z1+nz*thickness]];
-        let name="ExteriorFacet"+(i+1).to_string();let path=root+"/"+name;
-        let current=assembly_builder::composed_query(doc,#{path:path,children:false});
-        let topology=_ramp_section_track_topology();
-        if query_ok(current) {
-            if current.type_name!="Mesh" {return plan_error(path+": exterior facet must be Mesh");}
-            let p=assembly_builder::mesh_geometry_update_plan(edit_target,path,points,topology.face_counts,topology.face_indices);
-            if !p.ok {return p;} for op in p.ops {ops.push(op);}
-        } else {
-            let p=assembly_builder::mesh_shape_plan(edit_target,root,name,points,topology.face_counts,topology.face_indices,color,false);
-            if !p.ok {return p;} for op in p.ops {ops.push(op);}
-        }
-        for a in [#{name:"purpose",type_name:"token",value:"\"render\""},
-            #{name:"physics:collisionEnabled",type_name:"bool",value:"false"},
-            #{name:"doubleSided",type_name:"bool",value:model.value(prefix+"doubleSidedFacesMustBe").to_string()},
-            #{name:"primvars:displayColor",type_name:"color3f[]",value:_color_literal(color)}] {
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:a.name,type_name:a.type_name,value:a.value}});
-        }
-    }
-    #{ok:true,ops:ops}
-}
-
-// Apply after cladding is composed; the material planner verifies each target.
+// Shared blanket material template, consumed by the engine-bay component.
 fn griffin_bus_finish_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
     if !sysml_model_is(model) {return plan_error("Griffin appearance source unavailable");}
     let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
-    let profile=model.value(prefix+"outerBodyProfileCoordinates");
-    if !array_is(profile) || profile.len()!=8 {return plan_error("Griffin bus profile unavailable");}
     let material=root+"/Looks/ExteriorPanels";let shader=material+"/Surface";
     let surface=assembly_builder::composed_query(doc,#{path:shader,attrs:[]});
     if !query_ok(surface) || surface.type_name!="Shader" {
@@ -692,15 +637,6 @@ fn griffin_bus_finish_plan(doc, edit_target, root) {
         #{name:"info:wgsl:sourceAsset",kind:"asset",value:"@lunco://shaders/mli_foil.wgsl@"}] {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:shader,name:attr.name,type_name:attr.kind,value:attr.value}});
     }
-    for i in 0..profile.len() {
-        let path=root+"/ExteriorFacet"+(i+1).to_string();
-        let prim=assembly_builder::composed_query(doc,#{path:path,schemas:true,attrs:[]});
-        if !query_ok(prim) || prim.type_name!="Mesh" {return plan_error("Bus blanket facet missing: "+path);}
-        let schemas=prim.api_schemas;
-        if !schemas.contains("MaterialBindingAPI") {schemas.push("MaterialBindingAPI");}
-        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:schemas}});
-        ops.push(#{SetRelationship:#{edit_target:edit_target,path:path,name:"material:binding",targets:[material]}});
-    }
     #{ok:true,ops:ops}
 }
 
@@ -726,60 +662,6 @@ fn griffin_bus_frame_finish_plan(doc, edit_target, root) {
     for path in paths {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
             name:"primvars:displayColor",type_name:"color3f[]",value:_color_literal(color)}});
-    }
-    #{ok:true,ops:ops}
-}
-
-// Blanket tape follows the already composed panel perimeter; no second bus pose.
-fn griffin_bus_blanket_seams_plan(doc, edit_target, root) {
-    let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("Griffin blanket appearance source unavailable");}
-    let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
-    let width=f64_from(model.value(prefix+"blanketEdgeTapeWidthM"));
-    let offset=f64_from(model.value(prefix+"blanketEdgeTapeOffsetM"));
-    let color=model.value(prefix+"blanketEdgeTapeDisplayColor");
-    let profile=model.value(prefix+"outerBodyProfileCoordinates");
-    if width==() || width<=0.0 || offset==() || offset<=0.0
-        || !array_is(color) || color.len()!=3 || !array_is(profile) || profile.len()!=8 {
-        return plan_error("Griffin blanket seam parameters incomplete");
-    }
-    let ops=[];
-    for i in 0..profile.len() {
-        let facet=root+"/ExteriorFacet"+(i+1).to_string();
-        let record=assembly_builder::composed_query(doc,#{path:facet,attrs:["points"]});
-        if !query_ok(record) || !record.attrs.contains("points") || record.attrs.points.len()!=8 {
-            return plan_error("Blanket seam requires the composed eight-point facet: "+facet);
-        }
-        let p=record.attrs.points;
-        let a=vec3(p[4][0],p[4][1],p[4][2]);let b=vec3(p[7][0],p[7][1],p[7][2]);
-        let c=vec3(p[6][0],p[6][1],p[6][2]);let d=vec3(p[5][0],p[5][1],p[5][2]);
-        let edge=b-a;let up=d-a;
-        if vlen(edge)<=2.0*width || vlen(up)<=2.0*width {
-            return plan_error("Blanket tape consumes its panel face: "+facet);
-        }
-        let normal=vnorm(vcross(edge,up))*offset;
-        let along=vnorm(edge)*width;let vertical=vnorm(up)*width;
-        let points=[];
-        for v in [a,b,c,d,a+along+vertical,b-along+vertical,c-along-vertical,d+along-vertical] {
-            points.push(vec3_array(v+normal));
-        }
-        let name="BlanketEdgeTape"+(i+1).to_string();let path=root+"/"+name;
-        let counts=[4,4,4,4];let indices=[0,1,5,4,1,2,6,5,2,3,7,6,3,0,4,7];
-        let existing=assembly_builder::composed_query(doc,#{path:path});
-        let plan=if query_ok(existing) {
-            if existing.type_name!="Mesh" {return plan_error("Blanket tape target must be Mesh: "+path);}
-            assembly_builder::mesh_geometry_update_plan(edit_target,path,points,counts,indices)
-        } else {
-            assembly_builder::mesh_shape_plan(edit_target,root,name,points,counts,indices,color,false)
-        };
-        if !plan.ok {return plan;} for op in plan.ops {ops.push(op);}
-        for field in [#{name:"purpose",kind:"token",value:"\"render\""},
-            #{name:"physics:collisionEnabled",kind:"bool",value:"false"},
-            #{name:"doubleSided",kind:"bool",value:"false"},
-            #{name:"primvars:displayColor",kind:"color3f[]",value:_color_literal(color)}] {
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:field.name,
-                type_name:field.kind,value:field.value}});
-        }
     }
     #{ok:true,ops:ops}
 }
@@ -6472,23 +6354,20 @@ fn griffin_high_gain_plan(doc, edit_target, root) {
     #{ok:true,ops:ops,path:path,mount:position}
 }
 
-// Bus-owned two-part medium-gain study. All placements follow existing skin
-// datums; this parked visual adds no separate actuator or physics body.
+// Bus-owned two-part medium-gain study. Placements follow the frame envelope;
+// this parked visual adds no separate actuator or physics body.
 fn griffin_medium_gain_plan(doc, edit_target, root) {
     let m=sysml_requirements::model();
     if !sysml_model_is(m) {return plan_error("medium-gain source unavailable");}
     let o="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let body=m.value(o+"bodyDimensions");let panel=m.value(o+"mediumGainPanelDimensions");
     let bracket=m.value(o+"mediumGainBracketDimensions");
-    let margin=f64_from(m.value(o+"bodySkinEdgeMarginM"));
-    let skin=f64_from(m.value(o+"bodySkinThicknessM"));
     let fraction=f64_from(m.value(o+"mediumGainMountWidthFraction"));
     if !absolute_root(root) || !vec3_is_native(body) || !vec3_is_native(panel)
         || !vec3_is_native(bracket) || !vec3_is_finite(body) || !vec3_is_finite(panel)
-        || !vec3_is_finite(bracket) || margin==() || skin==() || skin<=0.0 || fraction==()
-        || !griffin_geometry::scalar_is_finite(skin)
-        || !griffin_geometry::scalar_is_finite(margin) || !griffin_geometry::scalar_is_finite(fraction)
-        || margin<0.0 || fraction<0.0 || fraction>=0.5
+        || !vec3_is_finite(bracket) || fraction==()
+        || !griffin_geometry::scalar_is_finite(fraction)
+        || fraction<0.0 || fraction>=0.5
         || panel.x<=0.0 || panel.y<=0.0 || panel.z<=0.0
         || bracket.x<=0.0 || bracket.y<=0.0 || bracket.z<=0.0 {
         return plan_error("medium-gain source dimensions incomplete");
@@ -6498,7 +6377,7 @@ fn griffin_medium_gain_plan(doc, edit_target, root) {
     if !existing.ok {
         ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:"MediumGainAntenna",type_name:"Xform",reference:(),reference_prim_path:""}});
     } else if existing.type_name!="Xform" {return plan_error("medium-gain assembly must be Xform");}
-    let origin=vec3(body.x*fraction,body.y/2.0-margin-panel.y/2.0,-body.z/2.0-skin);
+    let origin=vec3(body.x*fraction,body.y/2.0-panel.y/2.0,-body.z/2.0);
     ops.push(#{SetTranslate:#{edit_target:edit_target,path:parent,value:origin}});
     for item in [#{name:"Bracket",size:bracket,center:vec3(0.0,0.0,-bracket.z/2.0),color:m.value(o+"silverDisplayColor")},
         #{name:"Radome",size:panel,center:vec3(0.0,0.0,-bracket.z-panel.z/2.0),color:m.value(o+"mediumGainRadomeDisplayColor")}] {
