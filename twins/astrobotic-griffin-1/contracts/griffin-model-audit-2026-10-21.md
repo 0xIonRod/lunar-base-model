@@ -160,7 +160,7 @@ The accompanying SysML audit found 107 Griffin usages without formal `require`
 criteria. GBC-001, GBC-003 and GBC-004 now declare finite acceptance predicates;
 their updated production bus gate passes 254 checks at source revision
 `8817007894596470783`. Validation has zero errors and no remaining bus
-formal-acceptance warnings. There are still 104 such Griffin warnings in the
+formal-acceptance warnings. At that checkpoint there were 104 such Griffin warnings in the
 other packages (160 total warnings including the separately scoped FLIP/CAD
 model). The older 29-case reports remain evidence for their recorded revision;
 they are not relabeled as runs of this revised requirement set.
@@ -172,3 +172,12 @@ the containing vehicle must retain its body and mass schemas. The provenance
 criterion resolves each selected requirement's source-scoped evidence link and
 requires a nonempty typed source catalog entry. Neither criterion accepts a
 `verify` relationship as proof of physical or source correctness.
+
+The subsequent [solar geometry audit](griffin-solar-geometry.md) declares
+acceptance for the remaining five static solar requirements, replaces the
+unsupported approved-mechanism claim, and moves the open transit placeholder
+out of the active geometry objective into the documented backlog. The updated
+gate passes 170 checks for all ten declared requirements. A deliberately
+misoriented support link fails only the new endpoint criterion, demonstrating
+a gap in the former size/centre/overlap checks. Current validation has zero
+errors and 98 remaining Griffin formal-acceptance warnings (154 total warnings).

@@ -1,7 +1,6 @@
 package GriffinSolarRequirements {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
-    private import ScalarValues::String;
     private import ScalarValues::Boolean;
     private import VectorValues::CartesianThreeVectorValue;
     private import GriffinRequirementSources::TwinAssetPath;
@@ -122,17 +121,79 @@ package GriffinSolarRequirements {
         attribute testTimeoutS : Real = 180.0;
     }
 
+    constraint def GSAC001_InstalledArrayPopulation {
+        in requiredArrayCount : Real;
+        in declaredArrayCount : Real;
+        in distinctArrayCount : Real;
+        in activeVisibleArrayCount : Real;
+        requiredArrayCount > 0.0 and declaredArrayCount == requiredArrayCount
+            and distinctArrayCount == requiredArrayCount
+            and activeVisibleArrayCount == requiredArrayCount;
+    }
     requirement def GSA001_ArrayCount {
         doc /* GSA-001 [mission configuration] the Griffin-1 configuration and composed lander shall contain one uniquely identified installed array assembly for each value of the canonical GriffinLanderRequirements::GriffinLanderComponent::solarArrayCount. */
+        require GSAC001_InstalledArrayPopulation;
+    }
+    constraint def GSAC002_VisibleMemberInventory {
+        in requiredMemberCount : Real;
+        in activeVisibleMemberCount : Real;
+        requiredMemberCount > 0.0 and activeVisibleMemberCount == requiredMemberCount;
     }
     requirement def GSA002_ArrayStructure {
-        doc /* GSA-002 [visual] each array exposes a frame and cell surface with owned geometry. */
+        doc /* GSA-002 [component structure] every installed array shall contain the source-enumerated frame, cell surface, backplane, brackets, hinge and support links plus every row mesh declared by its installed cell layout. All required members shall be active and have visibility other than invisible. GSA-006/007 independently accept mesh geometry and cell pitch. */
+        require GSAC002_VisibleMemberInventory;
+    }
+    constraint def GSAC003_ForwardFaceFrame {
+        in centerX : Real;
+        in centerZ : Real;
+        in normalX : Real;
+        in normalY : Real;
+        in normalZ : Real;
+        in positionToleranceM : Real;
+        in normalTolerance : Real;
+        centerZ > 0.0 and normalZ > 0.0 and positionToleranceM >= 0.0 and normalTolerance >= 0.0
+            and RealFunctions::abs(centerX) <= positionToleranceM
+            and RealFunctions::abs(normalX) <= normalTolerance
+            and RealFunctions::abs(normalY) <= normalTolerance;
+    }
+    constraint def GSAC003_ChamferFaceFrame {
+        in centerX : Real;
+        in centerZ : Real;
+        in normalX : Real;
+        in normalY : Real;
+        in normalZ : Real;
+        in lateralSign : Real;
+        in normalTolerance : Real;
+        (lateralSign == 1.0 or lateralSign == -1.0)
+            and lateralSign * centerX > 0.0 and centerZ > 0.0
+            and lateralSign * normalX > 0.0 and normalZ > 0.0
+            and normalTolerance >= 0.0
+            and RealFunctions::abs(normalY) <= normalTolerance;
+    }
+    constraint def GSAC003_NoOppositeArray {
+        in oppositeArrayAbsent : Boolean;
+        oppositeArrayAbsent == true;
     }
     requirement def GSA003_SunQuadrantLayout {
-        doc /* GSA-003 [study layout] three tall arrays occupy the forward face and the two forward chamfers. Both +/-X ramp/rover corridors remain open; the rover walking plane is below the panel tops. This operator-selected one-side layout corrects the former +X exit obstruction. The June 2026 hardware photographs inform array appearance, not an exact flight mounting ICD or a verified site-Sun coverage envelope. */
+        doc /* GSA-003 [installed facet layout] the three array collecting normals shall face vehicle +Z, +X/+Z, and -X/+Z respectively, with all normal Y components zero within the dimensionless appearanceVerificationTolerance. Their centres shall lie on the corresponding forward face and signed forward chamfers; the forward centre X shall be zero within geometryVerificationToleranceM. The rear-array installation shall be absent. Verification uses composed poses in the vehicle frame. Sources and reconstruction limits are recorded in the provenance catalog; this criterion makes no mission-wide Sun coverage claim. */
+        require GSAC003_ForwardFaceFrame {
+            in positionToleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
+            in normalTolerance = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::appearanceVerificationTolerance;
+        }
+        require GSAC003_ChamferFaceFrame {
+            in normalTolerance = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::appearanceVerificationTolerance;
+        }
+        require GSAC003_NoOppositeArray;
+    }
+    constraint def GSAC004_ResolvedArraySources {
+        in declaredRequirementCount : Real;
+        in requirementsWithResolvedSources : Real;
+        declaredRequirementCount > 0.0
+            and requirementsWithResolvedSources == declaredRequirementCount;
     }
     requirement def GSA004_ArrayTraceability {
-        doc /* GSA-004 [evidence] array identities resolve from GriffinVisualConfigurationRequirements, their cardinality agrees with the typed lander count, and deployment status is explicit. */
+        doc /* GSA-004 [source traceability] every array requirement selected by Verify_GriffinSolarRequirements shall resolve one unambiguous provenance owner and at least one source with a nonempty typed locator and enumeration role. Array identity and cardinality are accepted under GSA-001; installation poses are accepted under GSA-005. */
+        require GSAC004_ResolvedArraySources;
     }
     constraint def GSAC005_InstalledModuleSize {
         in expectedInstalledFrameWidthM : Real;
@@ -216,8 +277,27 @@ package GriffinSolarRequirements {
         }
         doc /* GSA-007 [geometry] installed cells form row meshes of clipped rectangular cells, with horizontal pitch cellWidthM/gridColumnCount and vertical pitch divided by cellPitchAspectRatio. Narrow faces keep that pitch and reduce column count rather than squeezing cells. Source pitch-coordinate contours omit cells outside the silhouette, leaving equipment and leg clearances open. Counts and the 2:1 pitch ratio are estimates from the June 2026 Astrobotic photos linked above. Gaps, corner clips and appearance parameters are study values; no supplier panel drawing or electrical-performance claim is implied. */
     }
+    constraint def GSAC008_HingeEnvelope {
+        in axisMatches : Boolean;
+        in maximumDimensionOrStationErrorM : Real;
+        in toleranceM : Real;
+        axisMatches and toleranceM >= 0.0 and maximumDimensionOrStationErrorM >= 0.0
+            and maximumDimensionOrStationErrorM <= toleranceM;
+    }
+    constraint def GSAC008_SupportLinkEndpoints {
+        in maximumEndpointErrorSquaredM2 : Real;
+        in toleranceM : Real;
+        toleranceM >= 0.0 and maximumEndpointErrorSquaredM2 >= 0.0
+            and maximumEndpointErrorSquaredM2 <= toleranceM * toleranceM;
+    }
     requirement def GSA008_HingeAndStandoff {
-        doc /* GSA-008 [mechanical interface] panel pivots, restraints, support links, deployment envelope, and structural load path shall conform to the approved Griffin-1 mechanism and structural interface definition. */
+        doc /* GSA-008 [reconstructed support geometry] each installed hinge cylinder shall use the source-defined X axis, radius, length and local station. Both support links shall place their axial endpoints at the source-derived rail-to-frame stations including minimumMountOverlapM seating at both ends. The maximum hinge dimension/station error and endpoint distance shall not exceed geometryVerificationToleranceM. This accepts the fixed presentation geometry; deployment kinematics and structural qualification require a separate mechanism definition. */
+        require GSAC008_HingeEnvelope {
+            in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
+        require GSAC008_SupportLinkEndpoints {
+            in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
     }
     constraint def GSAC009_MountPathOverlap {
         in busToBracketOverlapM : Real;
@@ -234,11 +314,6 @@ package GriffinSolarRequirements {
         }
         doc /* GSA-009 [visual integration] each array shall show connected support geometry from the panel frame to the lander mounting rails, including the bracket, link, and frame interfaces. */
     }
-    requirement def GSA010_TransitSunPointing {
-        attribute acceptanceStatus : String = "OPEN: approved incidence bounds, evaluation window, and exception authority are not source-defined";
-        doc /* GSA-010 [operational, OPEN] during transit, Griffin attitude control shall keep solar-array incidence within a source-defined Sun-pointing envelope when mission, thermal, and vehicle constraints permit. Define the envelope, evaluation window, and permitted exceptions before claiming a pass. Verification evidence shall correlate time-aligned Sun direction, commanded and measured vehicle attitude, panel incidence, and electrical-power data. */
-    }
-
     constraint def GSAC011_DescentSolarHeading {
         in telemetryFinite : Boolean;
         in automaticAuthority : Boolean;
@@ -290,7 +365,6 @@ package GriffinSolarRequirements {
     requirement <'GSA-007'> gsa007 : GSA007_CellGridAndMount { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-008'> gsa008 : GSA008_HingeAndStandoff { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-009'> gsa009 : GSA009_BusMountConnection { subject arrays : GriffinSolarArrayAssembly; }
-    requirement <'GSA-010'> gsa010 : GSA010_TransitSunPointing { subject lander : GriffinLanderComponent; }
     requirement <'GSA-011'> gsa011 : GSA011_DescentSunPointing { subject lander : GriffinLanderComponent; }
     requirement <'GSA-012'> gsa012 : GSA012_ConnectedArrayFacets { subject arrays : GriffinSolarArrayAssembly; }
 
@@ -313,7 +387,6 @@ package GriffinSolarRequirements {
             verify gsa008;
             verify gsa009;
             verify gsa012;
-            verify gsa010;
         }
     }
 }

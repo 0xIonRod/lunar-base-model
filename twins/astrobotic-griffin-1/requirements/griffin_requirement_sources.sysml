@@ -1103,12 +1103,6 @@ package GriffinRequirementSources {
             source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
     }
 
-    part evidence_gsa_010 : RequirementEvidence {
-        ref targetRequirement = GriffinSolarRequirements::gsa010;
-        ref sources = (source_linkedin_astrobotic_griffin_solar_setup,
-            source_www_astrobotic_com_griffin_lander);
-    }
-
     part evidence_gsa_011 : RequirementEvidence {
         doc /* Operator-requested descent study and its executable acceptance boundary, authored 2026-10-20. These sources define simulation behavior, not flight supplier limits. */
         ref targetRequirement = GriffinSolarRequirements::gsa011;

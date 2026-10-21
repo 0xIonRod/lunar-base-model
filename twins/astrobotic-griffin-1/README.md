@@ -155,6 +155,7 @@ Sources:
 | requirements/griffin_propulsion_requirements.sysml | Propulsion-owned SysML v2 requirements and verification case |
 | requirements/griffin_tank_requirements.sysml | Tank-owned SysML v2 requirements and verification case |
 | requirements/griffin_solar_requirements.sysml | Griffin-array-owned SysML v2 requirements and verification case |
+| contracts/griffin-solar-geometry.md | Solar geometry acceptance, source-data boundaries and rotated-link rejection evidence |
 | requirements/griffin_requirement_sources.sysml | Typed, requirement-ID-keyed source and rationale catalog for every mounted requirement definition |
 | tools/verify_requirement_sources.sh | Read-only authoring/CI gate for catalog coverage and complete typed evidence records |
 | tests/check_power_failure_rejection.py | External process/API driver for four deliberately broken power/thermal connections |

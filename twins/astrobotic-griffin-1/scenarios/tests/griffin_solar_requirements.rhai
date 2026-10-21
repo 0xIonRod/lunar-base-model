@@ -1,7 +1,7 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
-// Standalone Griffin solar-array component verification. Mission placement
-// remains inconclusive until the controlled installation datums are available.
+// Reconstructed Griffin solar-array geometry. Flight installation and transit
+// qualification remain separate from this composed-geometry gate.
 
 const PACKAGE = "GriffinSolarRequirements";
 const VERIFICATION = "Verify_GriffinSolarRequirements";
@@ -150,6 +150,79 @@ fn derived_measurement(value, detail, model) {
     #{provider: "derived", state: "value", value: value,
         provider_generation: model.source_revision, source_revision: model.source_revision,
         document_id: (), document_generation: ()}
+}
+
+fn required_check(model, id, requirement, constraint, values, source_attributes) {
+    let name = PACKAGE + "::" + constraint;
+    let ir = sysml_requirements::required_constraint_ir(model,
+        model.requirement(PACKAGE + "::" + requirement), name);
+    let observations = sysml_requirements::scalar_constraint_observations(ir, values);
+    for attribute in source_attributes { observations.push(source_observation(model, attribute)); }
+    sysml_requirements::required_constraint_check(id, "solar_array", requirement,
+        VERIFICATION, name, observations, "typed", 0.0)
+}
+
+fn array_pose(record) {
+    if record == () || record.active != true || record.attrs == ()
+        || record.attrs["xformOpOrder"] != ["xformOp:translate", "xformOp:orient", "xformOp:scale"] { return (); }
+    let t = record.attrs["xformOp:translate"];
+    let q = record.attrs["xformOp:orient"];
+    let s = record.attrs["xformOp:scale"];
+    if !array_is(t) || t.len() != 3 || !array_is(q) || q.len() != 4
+        || !array_is(s) || s.len() != 3 || s[0] <= 0.0 || s[1] <= 0.0 || s[2] <= 0.0 { return (); }
+    #{center: vec3_from(t), normal: qrot(quat(q[1], q[2], q[3], q[0]), vec3(0.0, 1.0, 0.0))}
+}
+
+fn visible_members(paths) {
+    let batch = query("QueryUsdPrims", #{paths: paths, attrs: ["visibility"]});
+    if batch == () || batch.records == () || batch.records.len() != paths.len()
+        || !usd_geometry_inspection::same_snapshot(batch.records) { return (); }
+    let count = 0;
+    for record in batch.records {
+        if record.active == true && record.attrs["visibility"] != "invisible" { count += 1; }
+    }
+    usd_geometry_inspection::measurement(count, batch.records[0], "array member inventory unavailable")
+}
+
+fn source_catalog_counts(source) {
+    let verification = ();
+    for record in source.verification_records {
+        if record.element.qualified_name == PACKAGE + "::" + VERIFICATION { verification = record.element.handle; }
+    }
+    let coverage = sysml_requirement_coverage(source.verification_records);
+    let declared = 0;
+    let resolved = 0;
+    for requirement in source.requirement_records {
+        if !coverage.covers(verification, requirement.element.handle) { continue; }
+        declared += 1;
+        let provenance = sysml_requirements::provenance(source, requirement.element.handle);
+        if provenance.ok == true && provenance.evidence.sources.len() > 0 { resolved += 1; }
+    }
+    #{declaredRequirementCount: declared, requirementsWithResolvedSources: resolved}
+}
+
+fn squared_distance(left, right) {
+    let d = left - right;
+    d.x*d.x + d.y*d.y + d.z*d.z
+}
+
+fn support_endpoint_error(record, rail, scale_x, frame_width, sign, overlap) {
+    if record == () || rail == () || record.type_name != "Cube" || record.attrs == ()
+        || record.attrs["size"] != 1.0
+        || record.attrs["xformOpOrder"] != ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"] { return (); }
+    let t = record.attrs["xformOp:translate"];
+    let r = record.attrs["xformOp:rotateXYZ"];
+    let s = record.attrs["xformOp:scale"];
+    if !array_is(t) || t.len()!=3 || !array_is(r) || r.len()!=3 || !array_is(s) || s.len()!=3 { return (); }
+    let lower = vec3(rail.x / scale_x, rail.y, rail.z);
+    let upper = vec3(sign * frame_width / 2.0, 0.0, rail.z);
+    let delta = upper - lower;
+    let length = sqrt(delta.x*delta.x + delta.y*delta.y + delta.z*delta.z);
+    if length <= 0.0 { return (); }
+    let seating = delta * (overlap / length);
+    let pose = transform(vec3_from(t), quat_from_euler_xyz_deg(vec3_from(r)), vec3_from(s));
+    max(squared_distance(transform_apply_point(pose,vec3(0.0,-0.5,0.0)), lower-seating),
+        squared_distance(transform_apply_point(pose,vec3(0.0,0.5,0.0)), upper+seating))
 }
 
 fn panel_local_rail(rail, bus_mount, station, rotation_z_deg) {
@@ -302,15 +375,57 @@ fn on_tick(me, ctx) {
         mesh_paths.push(path + "/Frame");
         mesh_paths.push(path + "/Cells");
         mesh_paths.push(path + "/ArrayBackplane");
+        mesh_paths.push(path + "/HingeBar");
+        mesh_paths.push(path + "/MountLinkNegativeX");
+        mesh_paths.push(path + "/MountLinkPositiveX");
     }
     let mesh_batch = if mesh_paths.len() > 0 {
-        query("QueryUsdPrims", #{paths: mesh_paths, attrs: ["points", "xformOp:scale","xformOp:translate","xformOp:orient","xformOpOrder","visibility"]})
+        query("QueryUsdPrims", #{paths: mesh_paths, attrs: ["points", "xformOp:scale","xformOp:translate","xformOp:orient","xformOp:rotateXYZ","xformOpOrder","visibility","size","axis","radius","height"]})
     } else { () };
     let composed = #{};
     if mesh_batch != () && usd_geometry_inspection::same_snapshot(mesh_batch.records) {
         for record in mesh_batch.records { composed[record.path] = record; }
     }
     let checks = [];
+    let distinct_names = [];
+    let active_arrays = 0;
+    for name in names {
+        if !distinct_names.contains(name) { distinct_names.push(name); }
+        let record = composed[root + "/" + name];
+        if record != () && record.active == true && record.type_name == "Xform"
+            && record.attrs["visibility"] != "invisible" { active_arrays += 1; }
+    }
+    checks.push(sysml_requirements::constraint_check("GSA-001-installed-array-population",
+        "solar_array", "gsa001", VERIFICATION, PACKAGE+"::GSAC001_InstalledArrayPopulation",
+        #{requiredArrayCount:model.value(count), declaredArrayCount:names.len(),
+          distinctArrayCount:distinct_names.len(),activeVisibleArrayCount:active_arrays}, "derived",0.0));
+    for facet in [#{name:"SolarPanelForward",sign:0.0},
+                  #{name:"SolarPanelFrontStarboard",sign:1.0},
+                  #{name:"SolarPanelFrontPort",sign:-1.0}] {
+        let record = composed[root+"/"+facet.name];
+        let pose = array_pose(record);
+        let values = [];
+        for field in ["centerX","centerZ","normalX","normalY","normalZ"] {
+            let value = if pose == () { () } else if field == "centerX" { pose.center.x }
+                else if field == "centerZ" { pose.center.z } else if field == "normalX" { pose.normal.x }
+                else if field == "normalY" { pose.normal.y } else { pose.normal.z };
+            values.push([field,usd_geometry_inspection::measurement(value,record,"composed facet pose unavailable")]);
+        }
+        let source_attributes = [visual("appearanceVerificationTolerance")];
+        let constraint = "GSAC003_ForwardFaceFrame";
+        if facet.sign == 0.0 { source_attributes.push(visual("geometryVerificationToleranceM")); }
+        else {
+            constraint = "GSAC003_ChamferFaceFrame";
+            values.push(["lateralSign",derived_measurement(facet.sign,"signed source facet role",model)]);
+        }
+        checks.push(required_check(model,"GSA-003-"+facet.name+"-facet-frame","gsa003",constraint,values,source_attributes));
+    }
+    let opposite = query("QueryUsdPrim",#{path:root+"/SolarPanelRear"});
+    checks.push(sysml_requirements::constraint_check("GSA-003-opposite-array-absent","solar_array","gsa003",
+        VERIFICATION,PACKAGE+"::GSAC003_NoOppositeArray",
+        #{oppositeArrayAbsent:opposite==() || opposite.ok==false || opposite.path==()},"derived",0.0));
+    checks.push(sysml_requirements::constraint_check("GSA-004-resolved-source-catalog","solar_array","gsa004",
+        VERIFICATION,PACKAGE+"::GSAC004_ResolvedArraySources",source_catalog_counts(source),"derived",0.0));
     for seam in [#{side: "SolarPanelFrontStarboard", positive_x: true},
                  #{side: "SolarPanelFrontPort", positive_x: false}] {
         let constraint = sysml_requirements::required_constraint_ir(model,
@@ -338,6 +453,10 @@ fn on_tick(me, ctx) {
         for member in griffin_spec::solar_installed_visible_members(index,members) {required_children.push(path+"/"+member);}
         checks.push(sysml_requirement_checks::children("GSA-002-" + name, "solar_array", "gsa002", VERIFICATION, path,
             required_children));
+        checks.push(required_check(model,"GSA-002-"+name+"-visible-members","gsa002",
+            "GSAC002_VisibleMemberInventory",[
+                ["requiredMemberCount",derived_measurement(required_children.len(),"source member population",model)],
+                ["activeVisibleMemberCount",visible_members(required_children)]],[]));
         if stations.len() == names.len() {
             checks.push(position("GSA-005-" + name + "-x", path, 0, stations[index].x, geometry_tolerance));
             checks.push(position("GSA-005-" + name + "-y", path, 1, stations[index].y, geometry_tolerance));
@@ -466,6 +585,25 @@ fn on_tick(me, ctx) {
             path: path + "/HingeBar", attr: "xformOp:translate", index: 2,
             expected:sysml_requirements::number(source,own("hingeBarCenterZM"))
                 +layout.datum_offset_m, tolerance: geometry_tolerance});
+        let hinge = composed[path+"/HingeBar"];
+        let hinge_error = ();
+        if hinge != () && hinge.attrs != () && hinge.attrs["radius"] != ()
+            && hinge.attrs["height"] != () && array_is(hinge.attrs["xformOp:translate"]) {
+            let station = hinge.attrs["xformOp:translate"];
+            if station.len()==3 {
+                hinge_error=max(abs(hinge.attrs["radius"]-model.value(own("hingeBarRadiusM"))),
+                    abs(hinge.attrs["height"]-model.value(own("hingeBarLengthM"))));
+                for datum in [#{axis:0,value:0.0},#{axis:1,value:model.value(own("hingeBarCenterYM"))},
+                    #{axis:2,value:model.value(own("hingeBarCenterZM"))+layout.datum_offset_m}] {
+                    hinge_error=max(hinge_error,abs(station[datum.axis]-datum.value));
+                }
+            }
+        }
+        checks.push(required_check(model,"GSA-008-"+name+"-hinge-envelope","gsa008","GSAC008_HingeEnvelope",[
+            ["axisMatches",usd_geometry_inspection::measurement(hinge!=() && hinge.type_name=="Cylinder"
+                && hinge.attrs["axis"]=="X",hinge,"composed hinge axis unavailable")],
+            ["maximumDimensionOrStationErrorM",usd_geometry_inspection::measurement(hinge_error,hinge,"composed hinge envelope unavailable")]
+        ],[visual("geometryVerificationToleranceM")]));
         for side in ["NegativeX", "PositiveX"] {
             let link_path = path + "/MountLink" + side;
             checks.push(sysml_requirement_checks::exists("GSA-008-" + name + "-" + side + "-link",
@@ -473,6 +611,11 @@ fn on_tick(me, ctx) {
             if negative_rail!=() && positive_rail!=() {
                 let rail=if side=="NegativeX" {negative_rail} else {positive_rail};
                 let sign=if side=="NegativeX" {-1.0} else {1.0};
+                let link = composed[link_path];
+                checks.push(required_check(model,"GSA-008-"+name+side+"-link-endpoints","gsa008",
+                    "GSAC008_SupportLinkEndpoints",[["maximumEndpointErrorSquaredM2",
+                        usd_geometry_inspection::measurement(support_endpoint_error(link,rail,layout.scale_x,frame_width,sign,mount_overlap),
+                            link,"composed support link endpoint unavailable")]], [visual("geometryVerificationToleranceM")]));
                 let panel_x=sign*frame_width/2.0;let rail_x=rail.x/layout.scale_x;
                 let dx=panel_x-rail_x;let dy=-rail.y;
                 let height=sqrt(dx*dx+dy*dy)+2.0*mount_overlap;
@@ -549,10 +692,5 @@ fn on_tick(me, ctx) {
             "gsa009", VERIFICATION, "GriffinSolarRequirements::GSAC009_MountPathOverlap",
             mount_observations, "typed", 0.0));
     }
-    // This is requirement/verification-link coverage only. It does not verify
-    // the panel quadrant; that needs mission solar ephemeris and approved
-    // installation frames, neither of which is in the current Twin sources.
-    checks.push(sysml_requirement_checks::coverage("GSA-003-verification-link-coverage", "solar_array", "gsa003", VERIFICATION));
-    checks.push(sysml_requirement_checks::coverage("GSA-004-traceability", "solar_array", "gsa004", VERIFICATION));
     this.pending_checks = checks;
 }

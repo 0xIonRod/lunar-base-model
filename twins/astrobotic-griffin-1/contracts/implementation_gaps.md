@@ -458,10 +458,16 @@ that anchor. Astrobotic's [manifest](https://www.astrobotic.com/lunar-delivery/m
 lists Nobile Region 2026 and NASA's [Moon Base update](https://www.nasa.gov/news-release/nasa-provides-update-on-moon-base-rovers-landers-missions/)
 describes a launch planned later in 2026, but neither publishes the surface
 landing timestamp; the authored epoch is not flight timeline data. The current
-solar observer checks array geometry and visible support overlap, but does not
-evaluate GSA-003 across the actual mission-window Sun envelope and approved
-installation frames. GSA-010 also needs time-aligned transit attitude and
-electrical-power observations. Verification against the flight configuration
+solar observer checks reconstructed array geometry, signed outward facet
+normals, support-link endpoints and visible support overlap. GSA-003 accepts
+that installed geometry, not a mission-window Sun envelope. The former GSA-010
+transit placeholder is retained here as unbaselined work, outside the active
+geometry verification objective. A transit requirement needs approved incidence
+bounds, an evaluation window, exception authority, and time-aligned Sun,
+commanded/measured attitude, panel incidence and electrical-power observations.
+Its source leads remain the catalog's Astrobotic solar-setup reference and
+current Griffin product description. No transit case is qualified by the
+descent or static geometry verdicts. Verification against the flight configuration
 requires the mission landing epoch/site and installation definition, plus
 transit attitude and EPS data.
 

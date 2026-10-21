@@ -17,8 +17,11 @@ handoff retires automatic attitude requests.
 `GriffinSolarRequirements::GriffinDescentSunPointingStudy` owns the study
 limits: initial heading qualification within 2 s, tracking for at least 3 s,
 and an observer timeout of 180 s. These are simulation acceptance settings, not flight GNC
-tolerances. GSA-010 transit Sun pointing, thermal exceptions, full mission-window
-coverage and array electrical performance retain their separate scope.
+tolerances. Transit Sun pointing, thermal exceptions and full mission-window
+coverage remain unbaselined work in `implementation_gaps.md`. The former open
+GSA-010 placeholder is removed from the geometry verification objective; it had
+no acceptance envelope or transit observer. Array electrical performance is
+accepted separately by the bounded power/thermal study.
 
 Run the mapped `GriffinSolarRequirements::Verify_GriffinDescentSunPointing`
 case on `tests/griffin_sun_pointing.usda`. Its typed SysML constraint consumes
