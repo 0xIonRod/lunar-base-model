@@ -471,8 +471,8 @@ fn solar_component_number(name) {
         "gridColumnCount", "gridRowCount",
         "mountBracketWidthM", "mountBracketThicknessM", "mountBracketDepthM",
         "hingeBarRadiusM", "hingeBarLengthM", "hingeBarCenterYM",
-        "hingeBarCenterZM", "mountLinkHeightM", "mountLinkDepthM",
-        "mountLinkCenterYM", "mountLinkCenterZM", "minimumMountOverlapM", "orientationTolerance"];
+        "hingeBarCenterZM", "mountLinkDepthM",
+        "minimumMountOverlapM", "orientationTolerance"];
     if !fields.contains(name) { return (); }
     _typed_model_number("GriffinSolarRequirements::GriffinSolarArrayAssembly::" + name)
 }

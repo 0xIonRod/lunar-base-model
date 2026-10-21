@@ -1095,6 +1095,14 @@ package GriffinRequirementSources {
             source_griffin_solar_panel_visual_asset);
     }
 
+    part evidence_gsa_012 : RequirementEvidence {
+        doc /* Accessed 2026-10-21. June 2026 hardware photographs inform adjacent array facets. Exact seam closure, widths, bearings and clearance are derived study geometry, not flight metrology. */
+        ref targetRequirement = GriffinSolarRequirements::gsa012;
+        ref sources = (source_astrobotic_griffin_1_integration_photo_2026_06_15,
+            source_project_solar_contract,
+            source_astrobotic_griffin_1_requirements_griffin_visual_configuration_sysml);
+    }
+
     part evidence_gsa_010 : RequirementEvidence {
         ref targetRequirement = GriffinSolarRequirements::gsa010;
         ref sources = (source_linkedin_astrobotic_griffin_solar_setup,

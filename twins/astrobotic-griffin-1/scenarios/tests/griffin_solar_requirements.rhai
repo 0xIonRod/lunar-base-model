@@ -87,6 +87,53 @@ fn composed_attribute(records, path, name) {
     record.attrs[name]
 }
 
+// Compare frame corners in their common assembly frame. This remains valid
+// when the lander's mission placement rotates or translates its parent.
+fn array_upper_corner(records, path, positive_x) {
+    let record = records[path];
+    let frame = records[path + "/Frame"];
+    if record == () || frame == () || record.attrs == () || frame.attrs == ()
+        || record.attrs["xformOpOrder"] != ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        || frame.attrs["xformOpOrder"] != ["xformOp:translate"] { return (); }
+    let t = record.attrs["xformOp:translate"];
+    let q = record.attrs["xformOp:orient"];
+    let s = record.attrs["xformOp:scale"];
+    let ft = frame.attrs["xformOp:translate"];
+    let bounds = mesh_geometry(records, path + "/Frame");
+    if !array_is(t) || t.len() != 3 || !array_is(q) || q.len() != 4
+        || !array_is(s) || s.len() != 3 || !array_is(ft) || ft.len() != 3
+        || bounds == () { return (); }
+    let outer_x = if positive_x { bounds.maximum[0] } else { bounds.minimum[0] };
+    let upper_z = (); let lower_y = (); let upper_y = ();
+    // The beam ends leave the bounding-box corner empty. Measure the upper
+    // endpoint of the actual outer edge, centered across its stock thickness.
+    for point in frame.attrs["points"] {
+        if point[0] != outer_x { continue; }
+        if upper_z == () || point[2] < upper_z {
+            upper_z = point[2]; lower_y = point[1]; upper_y = point[1];
+        } else if point[2] == upper_z {
+            lower_y = min(lower_y, point[1]); upper_y = max(upper_y, point[1]);
+        }
+    }
+    if upper_z == () || upper_y <= lower_y { return (); }
+    let corner = vec3(outer_x, (lower_y + upper_y) / 2.0, upper_z) + vec3_from(ft);
+    transform_apply_point(transform(vec3_from(t), quat(q[1], q[2], q[3], q[0]), vec3_from(s)), corner)
+}
+
+fn array_seam_measurement(records, root, side, forward_positive_x) {
+    let forward = root + "/SolarPanelForward";
+    let wing = root + "/" + side;
+    let a = array_upper_corner(records, forward, forward_positive_x);
+    let b = array_upper_corner(records, wing, !forward_positive_x);
+    let value = ();
+    if a != () && b != () && usd_geometry_inspection::same_snapshot([
+        records[forward], records[forward + "/Frame"], records[wing], records[wing + "/Frame"]]) {
+        let gap = a - b;
+        value = gap.x * gap.x + gap.y * gap.y + gap.z * gap.z;
+    }
+    usd_geometry_inspection::measurement(value, records[forward], "array seam pose or frame geometry unavailable")
+}
+
 fn source_observation(model, name) {
     let attribute = model.attribute(name);
     if attribute == () {
@@ -156,6 +203,7 @@ fn on_start(me, ctx) {
     this.started = elapsed_seconds();
     this.done = false;
     this.grid=[];this.grid_panel=0;this.grid_row=0;this.grid_source_revision=();
+    this.pending_checks=();this.next_check=0;this.aggregate=();this.batch_channels=[];
 }
 
 fn on_tick(me, ctx) {
@@ -163,6 +211,28 @@ fn on_tick(me, ctx) {
     let model = sysml_requirements::model();
     if this.grid_source_revision==() {this.grid_source_revision=model.source_revision;}
     if this.grid_source_revision!=model.source_revision {throw("Solar source changed during cell observations");}
+    if this.pending_checks != () {
+        let source = sysml_requirements::source();
+        let batch = [];
+        let end = min(this.next_check + 16, this.pending_checks.len());
+        for index in this.next_check..end { batch.push(this.pending_checks[index]); }
+        let channel = "GRIFFIN_SOLAR_REQUIREMENTS_BATCH_" + this.next_check.to_string();
+        let part = sysml_requirement_checks::finish(source, batch,
+            "GRIFFIN SOLAR REQUIREMENTS batch " + this.next_check.to_string(), channel,
+            model.value(own("usdRootPath")), PACKAGE, VERIFICATION);
+        this.aggregate = griffin_requirements::accumulate_check_batch(this.aggregate, part);
+        this.batch_channels.push(channel);
+        this.next_check = end;
+        if end == this.pending_checks.len() {
+            let result = this.aggregate;
+            result.evidence_channels = this.batch_channels;
+            result.metrics = #{root: model.value(own("usdRootPath")), component_package: PACKAGE,
+                verification: result.verification, separate_component_document: true};
+            this.done = true;
+            report_structured_verdict(result, "GRIFFIN SOLAR REQUIREMENTS", "GRIFFIN_SOLAR_REQUIREMENTS");
+        }
+        return;
+    }
     let array_names=griffin_spec::solar_array_names();
     if this.grid_panel<array_names.len() {
         let index=this.grid_panel;let layout=griffin_spec::solar_installed_cell_layout(index);
@@ -234,13 +304,24 @@ fn on_tick(me, ctx) {
         mesh_paths.push(path + "/ArrayBackplane");
     }
     let mesh_batch = if mesh_paths.len() > 0 {
-        query("QueryUsdPrims", #{paths: mesh_paths, attrs: ["points", "xformOp:scale","xformOp:translate","visibility"]})
+        query("QueryUsdPrims", #{paths: mesh_paths, attrs: ["points", "xformOp:scale","xformOp:translate","xformOp:orient","xformOpOrder","visibility"]})
     } else { () };
     let composed = #{};
     if mesh_batch != () && usd_geometry_inspection::same_snapshot(mesh_batch.records) {
         for record in mesh_batch.records { composed[record.path] = record; }
     }
     let checks = [];
+    for seam in [#{side: "SolarPanelFrontStarboard", positive_x: true},
+                 #{side: "SolarPanelFrontPort", positive_x: false}] {
+        let constraint = sysml_requirements::required_constraint_ir(model,
+            model.requirement(PACKAGE + "::gsa012"), PACKAGE + "::GSAC012_ArrayFacetClosure");
+        let observations = sysml_requirements::scalar_constraint_observations(constraint, [
+            ["measuredEdgeGapSquaredM2", array_seam_measurement(composed, root, seam.side, seam.positive_x)]
+        ]);
+        observations.push(source_observation(model, visual("geometryVerificationToleranceM")));
+        checks.push(sysml_requirements::required_constraints_check("GSA-012-" + seam.side + "-seam",
+            "solar_array", "gsa012", VERIFICATION, PACKAGE + "::GSAC012_ArrayFacetClosure", observations, "typed", 0.0));
+    }
     checks.push(sysml_requirement_checks::source_list_count("GSA-001-count", "lander_solar", "gsa001", VERIFICATION, visual("solarArrayInstances"), count));
     checks.push(sysml_requirement_checks::source_list_count("GSA-005-stations", "solar_array", "gsa005", VERIFICATION, visual("solarStations"), count));
     checks.push(sysml_requirement_checks::source_list_count("GSA-005-rotation-x", "solar_array", "gsa005", VERIFICATION, visual("solarStationRotationXDeg"), count));
@@ -394,7 +475,7 @@ fn on_tick(me, ctx) {
                 let sign=if side=="NegativeX" {-1.0} else {1.0};
                 let panel_x=sign*frame_width/2.0;let rail_x=rail.x/layout.scale_x;
                 let dx=panel_x-rail_x;let dy=-rail.y;
-                let height=sqrt(dx*dx+dy*dy)+sysml_requirements::number(source,own("mountLinkHeightM"))-dy;
+                let height=sqrt(dx*dx+dy*dy)+2.0*mount_overlap;
                 let dims=[sysml_requirements::number(source,own("mountBracketWidthM"))/layout.scale_x,height,sysml_requirements::number(source,own("mountLinkDepthM"))];
                 for axis in 0..3 {
                     checks.push(#{id:"GSA-008-"+name+side+"-link-stock-"+axis.to_string(),component:"solar_array",requirement:"gsa008",verification:VERIFICATION,
@@ -473,6 +554,5 @@ fn on_tick(me, ctx) {
     // installation frames, neither of which is in the current Twin sources.
     checks.push(sysml_requirement_checks::coverage("GSA-003-verification-link-coverage", "solar_array", "gsa003", VERIFICATION));
     checks.push(sysml_requirement_checks::coverage("GSA-004-traceability", "solar_array", "gsa004", VERIFICATION));
-    sysml_requirement_checks::finish(source, checks, "GRIFFIN SOLAR REQUIREMENTS", "GRIFFIN_SOLAR_REQUIREMENTS", root, PACKAGE, VERIFICATION);
-    this.done = true;
+    this.pending_checks = checks;
 }

@@ -460,9 +460,9 @@ fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
             if !bracket.ok {return bracket;}for op in bracket.ops {plan.ops.push(op);}
             let dy=-local.y;let dx=panel_x-rail_x;
             if dy<=0.0 {return plan_error("solar frame must sit above its rear bracket in local Y");}
-            let extra=_solar_number("mountLinkHeightM")-dy;
-            if extra<0.0 {return plan_error("solar link stock cannot cover bracket standoff");}
-            let length=sqrt(dx*dx+dy*dy)+extra;
+            let overlap=_solar_number("minimumMountOverlapM");
+            if overlap<=0.0 {return plan_error("solar link seating overlap must be positive");}
+            let length=sqrt(dx*dx+dy*dy)+2.0*overlap;
             let angle=-atan(dx/dy)*180.0/acos(-1.0);
             let link=_component_cube_visual_ops(doc,edit_target,path,"MountLink"+side,[(panel_x+rail_x)/2.0,local.y/2.0,local.z],
                 [0.0,0.0,angle],[_solar_number("mountBracketWidthM")/sx,length,_solar_number("mountLinkDepthM")],[0.10,0.13,0.18]);

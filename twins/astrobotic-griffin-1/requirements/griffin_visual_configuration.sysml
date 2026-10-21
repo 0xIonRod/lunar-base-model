@@ -385,21 +385,32 @@ package GriffinVisualConfigurationRequirements {
          * Primary upper anchors meet chamfer midpoints; legs splay outward. */
         attribute legStationRotationYDeg : Real[4] = (-45.0, 135.0, -135.0, 45.0);
 
-        /* One forward-side array bank, leaving both +/-X egress corridors open.
-         * Forward and both forward chamfers replace the former forward-to-+X
-         * quadrant, which put a tall panel through the ramp/rover exit. This is
-         * the operator-selected one-side reconstruction, not a measured current
-         * flight installation. June 2026 photographs show tall faceted arrays:
+        /* Connected forward array facets, informed by the June 2026 hardware:
          * https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1419-edit-2/ .
-         * Rail-derived X datums and 220 mm normal stand-off are retained, with
-         * an additional 610 mm +Z offset of the full-width panel bank. This
-         * packaging estimate reserves >50 mm Z separation between the full
-         * panel frames and the 2.592 m-wide ramp corridors at every fold angle.
-         * Brackets remain at the original rails; links derive their new span.
-         * Absolute bus span and panel dimensions remain photo-scale
-         * assumptions; no current as-built CAD is publicly available here. */
+         * Shared corners derive from panel width and facet bearing. The rear
+         * edge clears the outside hinge-pin ends by the existing study margin,
+         * including panel half-thickness and the geometry uncertainty budget.
+         * Brackets meet the named bus rails; their links derive the span.
+         * Width, bearing and clearance remain study geometry, not flight CAD. */
+        attribute solarBankFacetAngleDeg : Real = 45.0;
+        // Unit tangent components of the fixed 45-degree chamfer: 1/sqrt(2).
+        attribute solarBankDiagonalFactor : Real = 0.7071067811865476;
+        attribute solarBankPanelWidthM : Real = GriffinSolarRequirements::GriffinSolarArrayAssembly::frameWidthM;
+        attribute solarBankFrontZM : Real =
+            GriffinRampRequirements::GriffinEgressRamp::rampRailOffsetZM
+            + GriffinRampRequirements::GriffinEgressRamp::rampRailJointPinLengthM / 2.0
+            + GriffinRampRequirements::GriffinEgressRamp::physicalRampPanelClearanceM
+            + GriffinSolarRequirements::GriffinSolarArrayAssembly::frameThicknessM / 2.0 * solarBankDiagonalFactor
+            + geometryVerificationToleranceM
+            + solarBankPanelWidthM * solarBankDiagonalFactor;
+        attribute solarBankSideXM : Real = solarBankPanelWidthM / 2.0
+            * (1.0 + solarBankDiagonalFactor);
+        attribute solarBankSideZM : Real = solarBankFrontZM
+            - solarBankPanelWidthM / 2.0 * solarBankDiagonalFactor;
         attribute solarStations : Position[3] =
-            ((0.0, 1.34, 2.55), (1.519563492, 1.34, 2.129563492), (-1.519563492, 1.34, 2.129563492));
+            ((0.0, 1.34, solarBankFrontZM),
+             (solarBankSideXM, 1.34, solarBankSideZM),
+             (-solarBankSideXM, 1.34, solarBankSideZM));
         attribute solarMountRails : GriffinFrameRailNode[6] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard", "FrameRailFrontStarboard", "FrameRailStarboardFront", "FrameRailPortFront", "FrameRailFrontPort");
         /* X is panel tilt; negative signed Z values below name the clockwise
@@ -407,7 +418,7 @@ package GriffinVisualConfigurationRequirements {
          * quaternion composes Y(-bearing) after local X(tilt), keeping all
          * panels upright and their normal on the intended octagonal face. */
         attribute solarStationRotationXDeg : Real[3] = (90.0, 90.0, 90.0);
-        attribute solarStationRotationZDeg : Real[3] = (0.0, -45.0, 45.0);
+        attribute solarStationRotationZDeg : Real[3] = (0.0, -solarBankFacetAngleDeg, solarBankFacetAngleDeg);
 
         /* Four tank stations and 0.60 instance scale are packaging estimates.
          * The 1.39 m center exposes approximately 0.23 m of spherical dome above

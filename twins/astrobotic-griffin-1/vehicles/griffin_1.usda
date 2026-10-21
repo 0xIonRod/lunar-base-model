@@ -8711,13 +8711,13 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (0.0, 1.9205, 2.55)
+        custom double3 xformOp:translate = (0.0, 1.9205, 2.705067855411896)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-        quatd xformOp:orient = (0.7071067690849304, 0.7071067690849304, 0.0, 0.0)
+        quatd xformOp:orient = (0.7071067811865476, 0.7071067811865475, 0.0, 0.0)
         over "MountBracketNegativeX"
         {
-            custom double3 xformOp:translate = (-1.008, -0.83, 0.5804999999999998)
+            custom double3 xformOp:translate = (-1.008, -0.9850678554118961, 0.5804999999999998)
             custom double3 xformOp:scale = (0.1, 0.08, 0.12)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
@@ -8726,9 +8726,9 @@ def Xform "Griffin1" (
         }
         over "MountLinkNegativeX"
         {
-            custom double3 xformOp:translate = (-0.9705, -0.415, 0.5804999999999998)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -5.1633068143735406)
-            custom double3 xformOp:scale = (0.1, 0.9033816652650813, 0.04)
+            custom double3 xformOp:translate = (-0.9705, -0.49253392770594806, 0.5804999999999998)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -4.353922280281284)
+            custom double3 xformOp:scale = (0.1, 1.0079188629466451, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -8736,7 +8736,7 @@ def Xform "Griffin1" (
         }
         over "MountBracketPositiveX"
         {
-            custom double3 xformOp:translate = (1.008, -0.83, 0.5804999999999998)
+            custom double3 xformOp:translate = (1.008, -0.9850678554118961, 0.5804999999999998)
             custom double3 xformOp:scale = (0.1, 0.08, 0.12)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
@@ -8745,9 +8745,9 @@ def Xform "Griffin1" (
         }
         over "MountLinkPositiveX"
         {
-            custom double3 xformOp:translate = (0.9705, -0.415, 0.5804999999999998)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 5.1633068143735406)
-            custom double3 xformOp:scale = (0.1, 0.9033816652650813, 0.04)
+            custom double3 xformOp:translate = (0.9705, -0.49253392770594806, 0.5804999999999998)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 4.353922280281284)
+            custom double3 xformOp:scale = (0.1, 1.0079188629466451, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -8758,10 +8758,10 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_starboard_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (1.519563492, 1.9205, 2.129563492)
+        custom double3 xformOp:translate = (1.592730626847049, 1.9205, 2.045337228564847)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-        quatd xformOp:orient = (0.6532815098762512, 0.6532815098762512, 0.27059805393218994, -0.27059805393218994)
+        quatd xformOp:orient = (0.6532814824381883, 0.6532814824381882, 0.2705980500730985, -0.27059805007309845)
         def Cube "MountBracketNegativeX" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
@@ -8770,7 +8770,7 @@ def Xform "Griffin1" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (-0.07212489168102793, -0.6513351367203125, 0.5804999999999999)
+            custom double3 xformOp:translate = (-0.18341883092036793, -0.6435151519016501, 0.5804999999999999)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
         }
@@ -8778,12 +8778,12 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
-            custom double3 xformOp:scale = (0.1, 1.3281755915495228, 0.04)
+            custom double3 xformOp:scale = (0.1, 1.007918862946645, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (-0.502562445840514, -0.32566756836015626, 0.5804999999999999)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 52.888976415402645)
+            custom double3 xformOp:translate = (-0.558209415460184, -0.32175757595082505, 0.5804999999999999)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 49.35392228028129)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         }
@@ -8795,7 +8795,7 @@ def Xform "Griffin1" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.9347951647286157, -0.6513351367203124, 0.5804999999999999)
+            custom double3 xformOp:translate = (0.8235012254892757, -0.6435151519016502, 0.5804999999999999)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
         }
@@ -8803,12 +8803,12 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
-            custom double3 xformOp:scale = (0.1, 0.9000024738495601, 0.04)
+            custom double3 xformOp:scale = (0.1, 0.6727646837462596, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.9338975823643079, -0.3256675683601562, 0.5804999999999999)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.15791425372959444)
+            custom double3 xformOp:translate = (0.8782506127446379, -0.3217575759508251, 0.5804999999999999)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -9.656802294534133)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         }
@@ -11681,10 +11681,10 @@ def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_port_visual.usda@</SolarPanel>
     )
     {
-        custom double3 xformOp:translate = (-1.519563492, 1.9205, 2.129563492)
+        custom double3 xformOp:translate = (-1.592730626847049, 1.9205, 2.045337228564847)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
         custom double3 xformOp:scale = (1.0, 1.0, 1.0)
-        quatd xformOp:orient = (0.6532815098762512, 0.6532815098762512, -0.27059805393218994, 0.27059805393218994)
+        quatd xformOp:orient = (0.6532814824381883, 0.6532814824381882, -0.2705980500730985, 0.27059805007309845)
         def Cube "MountBracketNegativeX" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
@@ -11693,7 +11693,7 @@ def Xform "Griffin1" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (-0.9347951647286157, -0.6513351367203124, 0.5804999999999999)
+            custom double3 xformOp:translate = (-0.8235012254892757, -0.6435151519016502, 0.5804999999999999)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
         }
@@ -11701,12 +11701,12 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
-            custom double3 xformOp:scale = (0.1, 0.9000024738495601, 0.04)
+            custom double3 xformOp:scale = (0.1, 0.6727646837462596, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (-0.9338975823643079, -0.3256675683601562, 0.5804999999999999)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -0.15791425372959444)
+            custom double3 xformOp:translate = (-0.8782506127446379, -0.3217575759508251, 0.5804999999999999)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 9.656802294534133)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         }
@@ -11718,7 +11718,7 @@ def Xform "Griffin1" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.07212489168102793, -0.6513351367203125, 0.5804999999999999)
+            custom double3 xformOp:translate = (0.18341883092036793, -0.6435151519016501, 0.5804999999999999)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
         }
@@ -11726,12 +11726,12 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
-            custom double3 xformOp:scale = (0.1, 1.3281755915495228, 0.04)
+            custom double3 xformOp:scale = (0.1, 1.007918862946645, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.502562445840514, -0.32566756836015626, 0.5804999999999999)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -52.888976415402645)
+            custom double3 xformOp:translate = (0.558209415460184, -0.32175757595082505, 0.5804999999999999)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -49.35392228028129)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         }

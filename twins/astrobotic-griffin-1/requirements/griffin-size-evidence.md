@@ -1,10 +1,59 @@
-# Griffin and FLIP size basis — updated 2026-10-20
+# Griffin and FLIP size basis — updated 2026-10-21
 
 These are provisional reconstruction requirements, not an as-built mechanical
 ICD. A successful geometry check proves implementation of the assumptions; it
 does not prove the assumptions describe flight hardware. Replace estimates when
 better configuration-specific evidence becomes available. Numerical precision in
 derived hinge coordinates is for interface closure, not measurement accuracy.
+
+## Panel-bank correction checkpoint, 2026-10-21
+
+The June 2026 hardware photographs show adjacent faceted array frames. The
+assembly derives their stations from a shared seam and clearance contract.
+The composed geometry check verifies both matching frame corners; ramp
+clearance alone cannot establish the connected silhouette.
+
+This checkpoint covers the three array instance poses and their attachment
+links. The detached panel files continue to own their contours, cells, stock
+and material assignments. Their existing 1.866 m width is a study assumption;
+this change does not claim a flight dimension. The coordinate frame remains
+right-handed Y-up/SI metres, with source-owned panel bearings and lower-edge
+height. Existing mass, rigid-body, joint, continuous Modelica and gold-finish
+contracts are outside this component change.
+
+The reconstruction joins the front frame edges to the corresponding
+side-frame edges using the source widths and fixed 45-degree bearings. The
+dimensionless diagonal factor is the mathematical constant 1/sqrt(2), not a
+photographic measurement. Its shared forward datum derives from the side-frame
+rearward reach, its projected half-thickness,
+the ramp's outside hinge-pin ends, the existing `physicalRampPanelClearanceM`
+study margin and `geometryVerificationToleranceM` uncertainty budget. The
+hinge pins extend beyond the thinner rail stock. This is an explicit interface
+constraint; it does not infer an unpublished mounting ICD. Attachment links
+must still terminate at the existing named bus rail interfaces.
+
+Acceptance requires typed composed edge closure, intact references and
+attachment endpoints, the existing isolated panel geometry checks, and the
+full ramp articulation/clearance gate. A deliberately separated runtime-only
+placement must fail the closure requirement. Inspect the mounted bank in the
+headful Editor before saving. Installed link lengths derive from their two
+attachment endpoints plus twice the source seating overlap, rather than a
+nominal stock length. The lower bus profile remains a separate visual
+checkpoint because its selected proportions use an older ESA illustration.
+
+Production verification on 2026-10-21 passed 154 solar checks, 1,281 deployed
+ramp checks and 272 folded-ramp checks. The measured minimum folded-ramp gap
+is approximately 52 mm against the unchanged 50 mm requirement. A temporary
+100 mm runtime displacement failed the seam constraint; undo restored the
+pose and transform order exactly. The seam observer reads the actual upper
+outer-edge endpoints from Mesh points, centered across the frame stock; it
+does not use an empty bounding-box corner. The connected bank was inspected
+in the headful source Editor and saved through the document owner.
+
+This source revision requires the structured-vector constant projection and
+canonical USD editing fixes included in LunCoSim commit `3d9ad023e`. The source
+geometry gates do not qualify flight dimensions, platform performance, or the
+separate lower-bus silhouette.
 
 ## Current packaging study, 2026-10-20
 
@@ -23,8 +72,9 @@ both +/-X ramp corridors open. All three panels now have the photographed
 panel has a landing-leg opening; the mirrored side panels have stepped
 shoulders and equipment recesses. Each owns its frame, substrate and cell
 rows in a separate canonical component asset. Mount links and poses belong
-to the vehicle assembly. The 610 mm forward bank offset reserves lateral
-ramp clearance; all metric sizes and mounting datums remain estimates.
+to the vehicle assembly. The shared forward datum derives from the full
+side-frame envelope and the ramp hinge-pin span plus clearance and uncertainty;
+all metric sizes and mounting datums remain estimates.
 See [appearance analysis](griffin-appearance-analysis.md) for source photos.
 
 The local walking surface is now Y2.12 (nominal landed height 2.56 m), below

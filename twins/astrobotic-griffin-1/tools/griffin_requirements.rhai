@@ -8,6 +8,57 @@ import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_c
 // the headful Editor and in a Twin-owned scene test.
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 
+// Retain bounded verdict summaries between authored verification batches.
+fn _merge_batch_verdict(current, next) {
+    if current == "error" || next == "error" { return "error"; }
+    if current == "fail" || next == "fail" { return "fail"; }
+    if current == "inconclusive" || next == "inconclusive" { return "inconclusive"; }
+    if current == "unverified" || next == "unverified" { return "unverified"; }
+    if current == "" { return next; }
+    "pass"
+}
+fn accumulate_check_batch(aggregate, part) {
+    if aggregate == () {
+        aggregate = #{ok: true, verdict: "", results: [], result_chunks: [],
+            failures: [], non_pass_results: [], requirement_count: 0,
+            requirement_names: [], requirement_summary: #{}, check_count: 0,
+            pass_count: 0, failure_count: 0, inconclusive_count: 0,
+            error_count: 0, unverified_count: 0, non_pass_count: 0,
+            streamed: true};
+    }
+    aggregate.verdict = _merge_batch_verdict(aggregate.verdict, part.verdict);
+    for field in ["check_count", "pass_count", "failure_count",
+        "inconclusive_count", "error_count", "unverified_count", "non_pass_count"] {
+        aggregate[field] += part[field];
+    }
+    for failure in part.failures {
+        if aggregate.failures.len() < 64 { aggregate.failures.push(failure); }
+    }
+    for failure in part.non_pass_results {
+        if aggregate.non_pass_results.len() < 64 {
+            aggregate.non_pass_results.push(failure);
+        }
+    }
+    for requirement in part.requirement_names {
+        if aggregate.requirement_summary[requirement] == () {
+            aggregate.requirement_summary[requirement] = #{checks: 0,
+                passes: 0, failures: 0, inconclusive: 0, errors: 0,
+                unverified: 0};
+            aggregate.requirement_names.push(requirement);
+        }
+        let from = part.requirement_summary[requirement];
+        for field in ["checks", "passes", "failures", "inconclusive", "errors", "unverified"] {
+            aggregate.requirement_summary[requirement][field] += from[field];
+        }
+    }
+    aggregate.requirement_count = aggregate.requirement_names.len();
+    aggregate.verification = part.verification;
+    aggregate.source_revision = part.source_revision;
+    aggregate.source_files = part.source_files;
+    aggregate.ok = aggregate.verdict == "pass";
+    aggregate
+}
+
 // Run this report explicitly from the Griffin requirements tool when doing a
 // source review. It is not part of normal Twin startup or scene admission.
 // The policy is a review choice, while the audit implementation and finding

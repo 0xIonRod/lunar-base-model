@@ -148,55 +148,6 @@ fn _section_path(ramp, index) {
     ramp + "/MiddleSection/ToeSection"
 }
 fn _side_suffix(side) { if side == "port" { "Port" } else { "Starboard" } }
-fn _merge_batch_verdict(current, next) {
-    if current == "error" || next == "error" { return "error"; }
-    if current == "fail" || next == "fail" { return "fail"; }
-    if current == "inconclusive" || next == "inconclusive" { return "inconclusive"; }
-    if current == "unverified" || next == "unverified" { return "unverified"; }
-    if current == "" { return next; }
-    "pass"
-}
-fn _accumulate_batch(aggregate, part) {
-    if aggregate == () {
-        aggregate = #{ok: true, verdict: "", results: [], result_chunks: [],
-            failures: [], non_pass_results: [], requirement_count: 0,
-            requirement_names: [], requirement_summary: #{}, check_count: 0,
-            pass_count: 0, failure_count: 0, inconclusive_count: 0,
-            error_count: 0, unverified_count: 0, non_pass_count: 0,
-            streamed: true};
-    }
-    aggregate.verdict = _merge_batch_verdict(aggregate.verdict, part.verdict);
-    for field in ["check_count", "pass_count", "failure_count",
-        "inconclusive_count", "error_count", "unverified_count", "non_pass_count"] {
-        aggregate[field] += part[field];
-    }
-    for failure in part.failures {
-        if aggregate.failures.len() < 64 { aggregate.failures.push(failure); }
-    }
-    for failure in part.non_pass_results {
-        if aggregate.non_pass_results.len() < 64 {
-            aggregate.non_pass_results.push(failure);
-        }
-    }
-    for requirement in part.requirement_names {
-        if aggregate.requirement_summary[requirement] == () {
-            aggregate.requirement_summary[requirement] = #{checks: 0,
-                passes: 0, failures: 0, inconclusive: 0, errors: 0,
-                unverified: 0};
-            aggregate.requirement_names.push(requirement);
-        }
-        let from = part.requirement_summary[requirement];
-        for field in ["checks", "passes", "failures", "inconclusive", "errors", "unverified"] {
-            aggregate.requirement_summary[requirement][field] += from[field];
-        }
-    }
-    aggregate.requirement_count = aggregate.requirement_names.len();
-    aggregate.verification = part.verification;
-    aggregate.source_revision = part.source_revision;
-    aggregate.source_files = part.source_files;
-    aggregate.ok = aggregate.verdict == "pass";
-    aggregate
-}
 
 fn on_tick(me, ctx) {
     if this.done || elapsed_seconds() - this.started < 0.1 { return; }
@@ -841,7 +792,7 @@ fn on_tick(me, ctx) {
     let stream_channel = "GRIFFIN_RAMP_REQUIREMENTS_PART_" + batch.to_string();
     let part = sysml_requirements::evaluate_stream(source, checks,
         stream_channel, "GRIFFIN RAMP REQUIREMENTS PART " + batch.to_string());
-    this.aggregate = _accumulate_batch(this.aggregate, part);
+    this.aggregate = griffin_requirements::accumulate_check_batch(this.aggregate, part);
     this.batch += 1;
     if this.batch == 6 {
         let result = this.aggregate;

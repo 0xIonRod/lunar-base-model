@@ -40,7 +40,8 @@ package GriffinSolarRequirements {
          * Use 30 mm frame stock, 12 mm backplane, 2 mm visual cell surface,
          * 100 x 80 x 120 mm brackets and 50 mm hinge diameter.
          * These are appearance envelopes, not laminate/hinge design dimensions.
-         * The 900 mm link stock covers the retained 220 mm normal standoff plus the 610 mm forward bank offset; 10 mm
+         * Installed link lengths derive from their named bus-rail and
+         * panel-frame endpoints plus seating overlap at both ends. The 10 mm
          * overlap is a visual seating tolerance, not a structural engagement spec.
          * Current cell geometry and silhouette use the June 2026 source below;
          * these retained attachment stocks are still packaging estimates. */
@@ -79,10 +80,7 @@ package GriffinSolarRequirements {
         attribute hingeBarLengthM : Real = frameWidthM;
         attribute hingeBarCenterYM : Real = -0.18;
         attribute hingeBarCenterZM : Real = 0.00;
-        attribute mountLinkHeightM : Real = .90;
         attribute mountLinkDepthM : Real = 0.04;
-        attribute mountLinkCenterYM : Real = -0.11;
-        attribute mountLinkCenterZM : Real = 0.00;
         attribute gridColumnCount : Integer = 12;
         attribute gridRowCount : Integer = 24;
         /* June 15, 2026 photographs show twelve cell columns and twenty-four
@@ -268,6 +266,19 @@ package GriffinSolarRequirements {
         doc /* GSA-011 [operator study] the final approach shall start Sun-aligned and descending without a heading-acquisition hover; during autonomous powered descent, Griffin shall yaw the forward solar-array outward normal toward the measured Sun azimuth within GriffinDescentSunPointingStudy limits. Required thrust tilt retains priority. First accepted pilot flight input releases solar heading control; settled native contact hands control to the landing gear. The verification shall observe live heading error, automatic authority and successful landing. */
     }
 
+    constraint def GSAC012_ArrayFacetClosure {
+        in measuredEdgeGapSquaredM2 : Real;
+        in toleranceM : Real;
+        toleranceM >= 0.0 and measuredEdgeGapSquaredM2 >= 0.0
+            and measuredEdgeGapSquaredM2 <= toleranceM * toleranceM;
+    }
+    requirement def GSA012_ConnectedArrayFacets {
+        require GSAC012_ArrayFacetClosure {
+            in toleranceM = GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
+        doc /* GSA-012 [derived installation geometry] the upper inboard frame corners of the side arrays shall meet the matching forward-array corners in the common Griffin assembly frame. Read composed Mesh points and instance poses from one document/stage generation. Missing or unsupported pose data are unavailable evidence. The June 2026 hardware photographs inform connected facets; the nominal width, bearings and metre-valued closure tolerance remain explicit reconstruction assumptions, not a flight mounting ICD. */
+    }
+
     requirement <'GSA-001'> gsa001 : GSA001_ArrayCount { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-002'> gsa002 : GSA002_ArrayStructure { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-003'> gsa003 : GSA003_SunQuadrantLayout { subject arrays : GriffinSolarArrayAssembly; }
@@ -279,6 +290,7 @@ package GriffinSolarRequirements {
     requirement <'GSA-009'> gsa009 : GSA009_BusMountConnection { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-010'> gsa010 : GSA010_TransitSunPointing { subject lander : GriffinLanderComponent; }
     requirement <'GSA-011'> gsa011 : GSA011_DescentSunPointing { subject lander : GriffinLanderComponent; }
+    requirement <'GSA-012'> gsa012 : GSA012_ConnectedArrayFacets { subject arrays : GriffinSolarArrayAssembly; }
 
     verification def Verify_GriffinDescentSunPointing {
         subject lander : GriffinLanderComponent;
@@ -298,6 +310,7 @@ package GriffinSolarRequirements {
             verify gsa007;
             verify gsa008;
             verify gsa009;
+            verify gsa012;
             verify gsa010;
         }
     }
