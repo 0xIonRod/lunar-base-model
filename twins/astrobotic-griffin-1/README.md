@@ -47,6 +47,12 @@ suppression and physical main-engine/RCS shutdown under sustained demand.
 Gold MLI and engine shields describe appearance and packaging;
 their geometry does not establish thermal protection performance.
 
+The [powered verification context](contracts/griffin-verification-context.md)
+records the shared environment required by standalone component fixtures and
+their current passing gates. Sustained panel thermal behavior remains outside
+the short power-study qualification; see the long-run observation in the power
+contract.
+
 ## Current public mission baseline
 
 The latest primary-source baseline used for this package is:

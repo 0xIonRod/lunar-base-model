@@ -105,3 +105,19 @@ close the power-loss and broken-wiring acceptance gaps. Raw evidence is in the
 engine checkout's `.cache/codex-evidence/griffin-power-loss-20261021/` and this
 Twin's `.cache/power-failure-qualification/`. This checkpoint adds verification;
 it does not change nominal physical parameters or qualify FPS.
+
+The extended native observation identifies a remaining operating-range gap:
+the three panel temperatures reached approximately 522.4, 435.2 and 422.3 K.
+All exceed the selected cell coefficient's 413.15 K upper applicability limit.
+The short GEP gates do not qualify sustained operation. The current network
+has no radiative heat exchange; the selected 200 W per-panel coolant limit
+does not balance the continuing solar heat input. This is a model limitation,
+not evidence of Griffin flight hardware overheating. The simulation was paused
+and the clock/temperature receipt retained as `long-run-panel-state.json` in
+the committed-baseline evidence directory. Close this gap with a documented
+heat-rejection boundary and longer-horizon verification; increasing a study
+cooler rating without a source would not establish realistic thermal behavior.
+The shared `LunCo.Thermal.Radiator` already owns the Stefan–Boltzmann law.
+The selected AZUR datasheet gives absorptivity and the 28–140°C coefficient
+range, but does not supply infrared emissivity; that property and the radiative
+view/environment assumptions still need explicit provenance.

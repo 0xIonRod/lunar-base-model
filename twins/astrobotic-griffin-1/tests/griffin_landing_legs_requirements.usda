@@ -5,7 +5,9 @@
     metersPerUnit = 1.0
 )
 
-def Xform "World"
+def Xform "World" (
+    prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
+)
 {
     def Xform "Griffin1" (
         references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
@@ -15,7 +17,7 @@ def Xform "World"
     def Scope "Scenario"
     {
         def Scope "Mission" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"

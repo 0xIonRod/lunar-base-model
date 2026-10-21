@@ -2,29 +2,24 @@
 (
     defaultPrim = "GriffinRequirementsTest"
     upAxis = "Y"
-    metersPerUnit = 1
+    metersPerUnit = 1.0
 )
 
-# A minimal composed fixture for the Griffin wrapper contract. It is separate
-# from the surface mission so a structural failure cannot be hidden by terrain,
-# FLIP, guidance, or the descent/release lifecycle.
 def Xform "GriffinRequirementsTest" (
     kind = "assembly"
     documentation = "Twin-owned Griffin-1 requirements and limiter fixture."
+    prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
 )
 {
     uniform bool lunco:spawnable = false
-
     def Xform "Griffin1" (
         prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
     )
     {
     }
-
     def Scope "Scenario"
     {
         custom string lunco:scenario = "griffin-requirements"
-
         def Scope "Mission" (
             prepend apiSchemas = ["LunCoProgramAPI"]
         )

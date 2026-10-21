@@ -124,6 +124,10 @@ regression in committed main. The headless power results do not qualify this
 pending implementation's interactive path. Its readiness and timing
 receipt is retained in the engine checkout at
 `.cache/codex-evidence/griffin-power-loss-20261021/native-joint-drive-failure.json`.
-Joint-drive repair and native landing requalification remain open. The owned
-4291 session is left in Editor with its live scene cleared and the latest
-vehicle document open; that preview does not claim a successful landing.
+Qualification of that pending coupled-drive implementation remains open.
+The clean committed `b9f29853b` baseline separately passes the full windowed
+landing-stability horizon on binary `fa7c94a1…`, with ready admission and zero
+runtime diagnostics or broken connections. Nine repaired standalone fixture
+gates also pass 1,913 checks; see [the verification-context contract](griffin-verification-context.md).
+The current owned 4291 session uses that clean baseline and is paused after
+the recorded landing and extended thermal observation.
