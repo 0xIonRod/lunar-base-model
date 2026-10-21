@@ -141,3 +141,34 @@ with the bounded generated-source query and headless constant-input solve
 extensions. It passes GEP-001–005; its exact binary/source receipts and study
 boundaries are recorded in the power contract. This does not qualify the
 concurrent coupled-drive implementation or establish an uncontended FPS result.
+
+## Complete registry checkpoint and formal-acceptance audit
+
+At Twin commit `35c38d42be9ad1db3eff94855d5c2511b36b3315`, all 29 registered
+Griffin verification cases passed: 25 serial registry runs plus the three
+power/thermal cases and the corrected open-bay case. All retained reports use
+SysML source revision `12310693418688040198` at start and completion. The
+executable SHA-256 is
+`39f60840b5ea0412f5eb3aabc0769d1ceb57e671050ad563f3674ec62962834c`;
+its shared assets are from engine `7f957dd2b`. The coordinator checked executable
+identity and unchanged Twin source hashes throughout the 25-case run. Evidence
+is in engine `.cache/codex-evidence/griffin-radiation-20261021/registry/cohort.json`
+and `previous-qualified-registry-cases.json`. This is an executable-case
+checkpoint, not proof that every requirement is complete.
+
+The accompanying SysML audit found 107 Griffin usages without formal `require`
+criteria. GBC-001, GBC-003 and GBC-004 now declare finite acceptance predicates;
+their updated production bus gate passes 254 checks at source revision
+`8817007894596470783`. Validation has zero errors and no remaining bus
+formal-acceptance warnings. There are still 104 such Griffin warnings in the
+other packages (160 total warnings including the separately scoped FLIP/CAD
+model). The older 29-case reports remain evidence for their recorded revision;
+they are not relabeled as runs of this revised requirement set.
+
+The ownership repair replaces a verification-link-only check with an inspection
+of every composed bus descendant: disabled presentation collision schemas are
+allowed, additional body/mass owners and enabled collisions are rejected, and
+the containing vehicle must retain its body and mass schemas. The provenance
+criterion resolves each selected requirement's source-scoped evidence link and
+requires a nonempty typed source catalog entry. Neither criterion accepts a
+`verify` relationship as proof of physical or source correctness.

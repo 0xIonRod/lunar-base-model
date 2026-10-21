@@ -58,3 +58,23 @@ and explicitly mounts the open-bay observer, which emits `GRIFFIN_BUS_OPEN_BAYS`
 The registry-driven case passes both checks with the requested source revision
 at run start and end. The general bus fixture remains mapped to its own bus
 requirements observer and verdict channel.
+
+The subsequent formal-acceptance audit replaces the bus identity, physics
+ownership and provenance-link-only checks with three source-declared
+constraints (GBC-001, GBC-003, GBC-004). The updated gate passes 254 checks.
+`tests/check_bus_failure_rejection.py` then authors disposable USD forks through
+the live document API. The production observer rejects all three injected
+faults: collision enabled on a nested tank collar, an extra mass owner on that
+collar, and an invisible top deck. Each produces exit 1 and the exact expected
+typed failing constraint; fixture-admission errors and timeouts do not count.
+All three runs use source revision `8817007894596470783` and binary SHA-256
+`39f60840b5ea0412f5eb3aabc0769d1ceb57e671050ad563f3674ec62962834c`.
+The full receipts and typed failures are retained under
+`.cache/bus-failure-qualification/results.json`; disposable layers are removed.
+
+From the Twin root, with an owned windowed authoring session and a free test
+port:
+
+```sh
+python3 tests/check_bus_failure_rejection.py --engine /path/to/lunco-sim --author-port 4291 --test-port 4294
+```

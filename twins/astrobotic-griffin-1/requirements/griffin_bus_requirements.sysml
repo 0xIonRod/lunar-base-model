@@ -1,5 +1,6 @@
 package GriffinBusRequirements {
     private import ScalarValues::Real;
+    private import ScalarValues::Boolean;
     /* The bus is a real SysML composition, not a String list of child names.
      * Metric design values are owned by GriffinVisualConfiguration. */
     part def GriffinBusFrameStructure;
@@ -63,14 +64,39 @@ package GriffinBusRequirements {
         quadFaceCount == faceCount;
     }
 
+    constraint def GBC001_VisibleComponentIdentity {
+        in busRootPresent : Boolean;
+        in perimeterFramePresent : Boolean;
+        in topDeckPresent : Boolean;
+        in lowerSkirtPresent : Boolean;
+        busRootPresent and perimeterFramePresent and topDeckPresent and lowerSkirtPresent;
+    }
+    constraint def GBC003_IndependentPhysicsOwnership {
+        in completeSubtreeObserved : Boolean;
+        in additionalRigidOrMassOwners : Real;
+        in enabledCollisionShapes : Real;
+        in flightBodyOwnsPhysics : Boolean;
+        completeSubtreeObserved and additionalRigidOrMassOwners == 0.0
+            and enabledCollisionShapes == 0.0 and flightBodyOwnsPhysics;
+    }
+    constraint def GBC004_ResolvedProvenance {
+        in declaredRequirementCount : Real;
+        in requirementsWithResolvedSources : Real;
+        declaredRequirementCount > 0.0
+            and requirementsWithResolvedSources == declaredRequirementCount;
+    }
+
     requirement def GBC001_BusIdentity {
-        doc /* GBC-001 [topology] the bus is a named, visible octagonal open-frame visual component with an octagonal lower service skirt and upper deck. */
+        doc /* GBC-001 [component identity] the composed bus shall contain an active, visible Xform root and active, visible PerimeterFrame, TopDeckOctagon and LowerServiceSkirtOctagon meshes. The octagonal and open-bay geometry is accepted separately under GBC-008 and GBC-009. */
+        require GBC001_VisibleComponentIdentity;
     }
     requirement def GBC003_BusPresentationOwnership {
-        doc /* GBC-003 [visual ownership] the bus presentation component is render-only and does not replace the flight body or collider owner. */
+        doc /* GBC-003 [physics ownership] the complete composed bus subtree shall contain no additional rigid-body or mass owners and no enabled collision shapes. The containing vehicle shall retain its PhysicsRigidBodyAPI and PhysicsMassAPI. A CollisionAPI on a presentation mesh is permitted only with collisionEnabled explicitly false. Verification inspects every descendant, including nested support meshes. */
+        require GBC003_IndependentPhysicsOwnership;
     }
     requirement def GBC004_BusTraceability {
-        doc /* GBC-004 [evidence] each bus assumption and its rationale/source shall resolve from the separate SysML provenance catalog, while geometry is verified from typed requirements and composed mesh data. */
+        doc /* GBC-004 [source traceability] each bus requirement selected by Verify_GriffinBusRequirements shall resolve one unambiguous provenance-catalog evidence owner and at least one source with a nonempty typed locator and enumeration role. Verification uses source-scoped element handles; a verify relationship alone is insufficient. */
+        require GBC004_ResolvedProvenance;
     }
     requirement def GBC005_BusFrameGeometry {
         doc /* GBC-005 [geometry] the internal eight-sided frame shall comprise eight upper and eight lower perimeter beams plus eight named corner posts. Plan span, frame height, and member stock shall resolve from GriffinVisualConfiguration and remain replaceable presentation estimates documented in griffin-size-evidence.md; the older NASA whole-lander envelope is not a current core measurement. */

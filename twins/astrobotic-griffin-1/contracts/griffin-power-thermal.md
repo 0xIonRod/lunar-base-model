@@ -117,7 +117,7 @@ luncosim test --scene tests/griffin_control_power_loss.usda --verification Griff
 luncosim test --scene tests/griffin_sustained_thermal.usda --verification GriffinPowerThermalRequirements::Verify_GriffinSustainedThermal
 ```
 
-For fault qualification, `tools/check_power_failure_rejection.py` forks the
+For fault qualification, `tests/check_power_failure_rejection.py` forks the
 positive document through the existing document API and cuts exactly one
 connection per disposable layer: forward-panel temperature feedback, its heat
 source-to-mass connector, its sky-radiation connector, or its electrical
@@ -126,7 +126,7 @@ It leaves the positive source and model equations unchanged. Use an owned
 windowed authoring session with this Twin open and a separate free test port:
 
 ```sh
-python3 tools/check_power_failure_rejection.py --engine /path/to/lunco-sim --author-port 4291 --test-port 4292
+python3 tests/check_power_failure_rejection.py --engine /path/to/lunco-sim --author-port 4291 --test-port 4292
 ```
 
 Generated layers use the ignored `tests/_power_failure_*.usda` prefix so the

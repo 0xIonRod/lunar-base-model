@@ -157,6 +157,8 @@ Sources:
 | requirements/griffin_solar_requirements.sysml | Griffin-array-owned SysML v2 requirements and verification case |
 | requirements/griffin_requirement_sources.sysml | Typed, requirement-ID-keyed source and rationale catalog for every mounted requirement definition |
 | tools/verify_requirement_sources.sh | Read-only authoring/CI gate for catalog coverage and complete typed evidence records |
+| tests/check_power_failure_rejection.py | External process/API driver for four deliberately broken power/thermal connections |
+| tests/check_bus_failure_rejection.py | External process/API driver proving bus collision, mass-ownership and visibility fault rejection |
 | requirements/flip_requirements.sysml | Rover-owned FLIP SysML v2 values and visual verification case |
 | requirements/flip_chassis_requirements.sysml | Chassis-owned SysML v2 requirements and verification case |
 | requirements/flip_wheel_requirements.sysml | Wheel-owned SysML v2 requirements and verification case |

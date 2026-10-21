@@ -157,6 +157,65 @@ fn _tolerance_constraint(id, requirement, error, tolerance) {
         #{absoluteError: error, allowedTolerance: tolerance}, "derived")
 }
 
+fn _visible_component(record, expected_type) {
+    _query_ok(record) && record.active == true && record.type_name == expected_type
+        && record.attrs["visibility"] != "invisible"
+}
+
+// Inspect the actual composed subtree, including nested meshes and declared
+// mount frames. Disabled CollisionAPI is legal; another body/mass owner is not.
+fn _physics_ownership(doc, root) {
+    let frontier = [root];
+    let complete = true;
+    let rigid_or_mass_owners = 0;
+    let enabled_collisions = 0;
+    let records = [];
+    while frontier.len() > 0 {
+        let batch = query("QueryUsdPrims", #{doc_id: doc, paths: frontier,
+            schemas: true, children: true, attrs: ["physics:collisionEnabled"]});
+        if batch == () || batch.records == () || batch.records.len() != frontier.len() {
+            complete = false;
+            break;
+        }
+        frontier = [];
+        for prim in batch.records {
+            if !_query_ok(prim) || prim.active != true
+                || prim.api_schemas == () || prim.children == () {
+                complete = false;
+                continue;
+            }
+            records.push(prim);
+            if prim.api_schemas.contains("PhysicsRigidBodyAPI")
+                || prim.api_schemas.contains("PhysicsMassAPI") { rigid_or_mass_owners += 1; }
+            if prim.api_schemas.contains("PhysicsCollisionAPI")
+                && prim.attrs["physics:collisionEnabled"] != false { enabled_collisions += 1; }
+            for child in prim.children { frontier.push(child); }
+        }
+    }
+    if !root.ends_with("/Bus") { throw("Bus ownership requires the vehicle's explicit /Bus component path"); }
+    let vehicle_path = root.sub_string(0, root.len() - 4);
+    let flight = assembly_builder::composed_query(doc,
+        #{path: vehicle_path, schemas: true, children: false});
+    let flight_owns = _query_ok(flight) && flight.active == true
+        && flight.api_schemas != ()
+        && flight.api_schemas.contains("PhysicsRigidBodyAPI")
+        && flight.api_schemas.contains("PhysicsMassAPI");
+    records.push(flight);
+    #{completeSubtreeObserved: complete && usd_geometry_inspection::same_snapshot(records),
+      additionalRigidOrMassOwners: rigid_or_mass_owners,
+      enabledCollisionShapes: enabled_collisions, flightBodyOwnsPhysics: flight_owns}
+}
+
+fn _bus_provenance(source) {
+    let resolved = 0;
+    for requirement in source.requirement_records {
+        let provenance = sysml_requirements::provenance(source, requirement.element.handle);
+        if provenance.ok == true && provenance.evidence.sources.len() > 0 { resolved += 1; }
+    }
+    #{declaredRequirementCount: source.requirement_records.len(),
+      requirementsWithResolvedSources: resolved}
+}
+
 fn _quad_face_count(counts) {
     let result = 0;
     for count in counts { if count == 4 { result += 1; } }
@@ -433,16 +492,20 @@ fn bus_checks(doc, source, bus_root) {
     let frame_prim = assembly_builder::composed_query(doc, #{path: root + "/PerimeterFrame", children: false});
     let deck_prim = assembly_builder::composed_query(doc, #{path: root + "/TopDeckOctagon", children: false});
     let skirt_prim = assembly_builder::composed_query(doc, #{path: root + "/LowerServiceSkirtOctagon", children: false});
-    checks.push(sysml_requirement_checks::exists("GBC-001-root", "bus", "gbc001",
-        verification_name(), root, "Xform"));
-    checks.push(sysml_requirement_checks::exists("GBC-001-frame", "bus", "gbc001",
-        verification_name(), root + "/PerimeterFrame", "Mesh"));
-    checks.push(sysml_requirement_checks::exists("GBC-001-deck", "bus", "gbc001",
-        verification_name(), root + "/TopDeckOctagon", "Mesh"));
-    checks.push(sysml_requirement_checks::exists("GBC-001-skirt", "bus", "gbc001",
-        verification_name(), root + "/LowerServiceSkirtOctagon", "Mesh"));
-    checks.push(sysml_requirement_checks::coverage("GBC-003-ownership", "bus", "gbc003", verification_name()));
-    checks.push(sysml_requirement_checks::coverage("GBC-004-traceability", "bus", "gbc004", verification_name()));
+    checks.push(_constraint("GBC-001-visible-component-identity", "gbc001",
+        "GBC001_VisibleComponentIdentity", #{
+            busRootPresent: usd_geometry_inspection::measurement(
+                _visible_component(root_prim, "Xform"), root_prim, "composed bus root"),
+            perimeterFramePresent: usd_geometry_inspection::measurement(
+                _visible_component(frame_prim, "Mesh"), frame_prim, "composed perimeter frame"),
+            topDeckPresent: usd_geometry_inspection::measurement(
+                _visible_component(deck_prim, "Mesh"), deck_prim, "composed top deck"),
+            lowerSkirtPresent: usd_geometry_inspection::measurement(
+                _visible_component(skirt_prim, "Mesh"), skirt_prim, "composed lower skirt")}, "typed"));
+    checks.push(_constraint("GBC-003-physics-ownership", "gbc003",
+        "GBC003_IndependentPhysicsOwnership", _physics_ownership(doc, root), "derived"));
+    checks.push(_constraint("GBC-004-resolved-source-catalog", "gbc004",
+        "GBC004_ResolvedProvenance", _bus_provenance(source), "derived"));
 
     let frame = assembly_builder::composed_query(doc,
         #{path: root + "/PerimeterFrame", children: false});
