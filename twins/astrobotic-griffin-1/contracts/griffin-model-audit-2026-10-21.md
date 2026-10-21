@@ -111,3 +111,16 @@ A separate High-quality native Sun-facing landing passed with zero runtime
 diagnostics and broken connections; its inspected screenshot is 1024 × 1024.
 The concurrent qualification workloads do not establish clean FPS acceptance.
 Owned API sessions on 4291, 4292 and 4293 were closed and their ports released.
+
+The later power-loss checkpoint passes GEP-001–004 and three controlled
+broken-wiring checks; see `griffin-power-thermal.md`. A fresh windowed landing
+startup on binary SHA-256
+`f7ec38952301f01d37a55074137bddc13732c480fa117375d3977879d99a639c`
+then faulted on its first physics tick with `physics-joint-drive-invalid`:
+`constrained actuator response is not finite and nonnegative`. The headless
+power results do not qualify that interactive path. Its readiness and timing
+receipt is retained in the engine checkout at
+`.cache/codex-evidence/griffin-power-loss-20261021/native-joint-drive-failure.json`.
+Joint-drive repair and native landing requalification remain open. The owned
+4291 session is left in Editor with its live scene cleared and the latest
+vehicle document open; that preview does not claim a successful landing.
