@@ -33,5 +33,7 @@ Evidence is in the clean engine worktree's
 `.cache/codex-evidence/griffin-committed-20261021/`: the before/after system
 fixture logs and probe reads, typed authoring receipts, `fixture-cohort.json`,
 `fixture-results.json`, `native-qualification.json` and `landed-1024.png`.
-These functional results are not FPS acceptance. The longer native run also
-exposes the thermal operating-range gap recorded in the power contract.
+These functional results are not FPS acceptance. The separate radiative-network
+checkpoint adds GEP-005 one-hour held-input subsystem evidence and updates
+GEP-001–004; the power contract records its exact binary and thermal boundaries.
+The standalone geometry cohort above was run before that radiative addition.

@@ -1489,4 +1489,21 @@ package GriffinRequirementSources {
         ref sources = (source_griffin_pilot_attitude, source_griffin_propulsion_study);
     }
 
+    part source_image_solar_thermal_reference : EvidenceSource {
+        doc /* IMAGE FRB final presentation p.99, 21-Apr-2006. Dual-junction
+         * solar-cell emissivity .87 is selected only as an infrared surrogate;
+         * no Griffin/AZUR supplier equivalence is claimed. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://image.gsfc.nasa.gov/publication/document/IMAGE_FRB_Presentation_4-21-06.pdf";
+    }
+    part source_nist_stefan_boltzmann : EvidenceSource {
+        doc /* NIST CODATA Stefan-Boltzmann constant, SI 2019 definition. The
+         * study uses the displayed 5.670374419e-8 W m^-2 K^-4 precision. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://physics.nist.gov/cuu/pdf/all_2018.pdf";
+    }
+    part evidence_gep_005 : RequirementEvidence {
+        ref targetRequirement = GriffinPowerThermalRequirements::gep005;
+        ref sources = (source_griffin_power_thermal_contract, source_griffin_power_thermal_study, source_image_solar_thermal_reference, source_nist_stefan_boltzmann);
+    }
 }

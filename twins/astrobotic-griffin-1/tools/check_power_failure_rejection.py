@@ -45,7 +45,7 @@ def main():
     parser.add_argument("--author-port", type=int, required=True)
     parser.add_argument("--test-port", type=int, required=True)
     parser.add_argument("--case", action="append", choices=["temperature_feedback",
-        "thermal_connection", "electrical_connection"], help="Run only named faults; default: all three")
+        "thermal_connection", "radiation_connection", "electrical_connection"], help="Run only named faults; default: all four")
     args = parser.parse_args()
     engine = args.engine.resolve()
     twin = Path(__file__).resolve().parents[1]
@@ -86,7 +86,11 @@ def main():
         "temperature_feedback": dict(path=panel, name="inputs:cell_temperature_k",
                                      type_name="double", sources=[]),
         "thermal_connection": dict(path=panel + "Mass", name="connectors:port",
-                                   type_name="token", sources=[panel + "Cooler.connectors:port"]),
+            type_name="token", sources=[panel + "Cooler.connectors:port",
+                panel + "SkyRadiation.connectors:port", panel + "GroundRadiation.connectors:port"]),
+        "radiation_connection": dict(path=panel + "Mass", name="connectors:port",
+            type_name="token", sources=[panel + "Heat.connectors:port",
+                panel + "Cooler.connectors:port", panel + "GroundRadiation.connectors:port"]),
         "electrical_connection": dict(path=net + "/Battery", name="connectors:p",
             type_name="token", sources=[net + "/AvionicsLoad.connectors:p",
                 net + "/SolarPanelFrontStarboard.connectors:p",

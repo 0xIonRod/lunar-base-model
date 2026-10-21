@@ -15,6 +15,12 @@ paths = ["requirements"]
 
 [verification]
 [[verification.cases]]
+name = "GriffinPowerThermalRequirements::Verify_GriffinSustainedThermal"
+scene = "tests/griffin_sustained_thermal.usda"
+script = "scenarios/tests/griffin_sustained_thermal.rhai"
+verdict_channel = "GRIFFIN_SUSTAINED_THERMAL"
+
+[[verification.cases]]
 name = "GriffinPowerThermalRequirements::Verify_GriffinPowerThermal"
 scene = "tests/griffin_power_thermal.usda"
 script = "scenarios/tests/griffin_power_thermal.rhai"

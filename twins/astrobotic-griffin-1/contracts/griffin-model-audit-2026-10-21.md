@@ -45,7 +45,8 @@ tank loads during depletion and also checks native solver propagation.
 ## Fidelity gaps
 
 - **Electrical and thermal calibration:** the three photovoltaic faces now
-  feed a solved battery/avionics bus and individual thermal masses/coolers.
+  feed a solved battery/avionics bus and individual thermal masses/coolers,
+  with signed infrared exchange against prescribed sky/ground baths.
   The 45-second production gate passes all three GEP requirements, measuring
   geometry-derived area, temperature-dependent generation, radiant/thermal/
   electrical balance and the cooling cap. AZUR cell properties are a declared
@@ -56,6 +57,12 @@ tank loads during depletion and also checks native solver propagation.
   through their own actuator dynamics. The shared controller's separate power
   interruption/recovery gate passes 108 checks. Disconnected-network
   qualification is recorded in [the subsystem contract](griffin-power-thermal.md).
+  GEP-005 also passes a one-hour held-input subsystem experiment: all samples
+  remain in the selected cell coefficient range and reach the study settling
+  bound. Infrared emissivity is a sourced IMAGE-array surrogate; the bath
+  temperatures and view factors are declared boundary approximations, not
+  measured Griffin/Nobile properties. A dynamic mission thermal environment
+  and flight laminate calibration remain unqualified.
 - **Heat protection:** the apron, engine liner, skirt and MLI have explicit
   geometry/material assignments. Radiative exchange, plume heating, shield
   temperature, coolant capacity and protection of neighboring equipment are
@@ -129,5 +136,8 @@ The clean committed `b9f29853b` baseline separately passes the full windowed
 landing-stability horizon on binary `fa7c94a1…`, with ready admission and zero
 runtime diagnostics or broken connections. Nine repaired standalone fixture
 gates also pass 1,913 checks; see [the verification-context contract](griffin-verification-context.md).
-The current owned 4291 session uses that clean baseline and is paused after
-the recorded landing and extended thermal observation.
+The later radiative-network checkpoint uses that committed physics baseline
+with the bounded generated-source query and headless constant-input solve
+extensions. It passes GEP-001–005; its exact binary/source receipts and study
+boundaries are recorded in the power contract. This does not qualify the
+concurrent coupled-drive implementation or establish an uncontended FPS result.

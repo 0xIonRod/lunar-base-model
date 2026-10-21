@@ -72,7 +72,8 @@ fn on_start(me,ctx) {
         this.pv_area.push(record.attrs["parameters:area"]);
         this.feedback=this.feedback && wired(record,"inputs:cell_temperature_k",pv+"Mass.outputs:temp_k");
         this.thermal=this.thermal && node(query("QueryUsdPrim",#{path:pv+"Mass",attrs:[],connections:true}),
-            "connectors:port",[pv+"Heat.connectors:port",pv+"Cooler.connectors:port"])
+            "connectors:port",[pv+"Heat.connectors:port",pv+"Cooler.connectors:port",
+                pv+"SkyRadiation.connectors:port",pv+"GroundRadiation.connectors:port"])
             && wired(query("QueryUsdPrim",#{path:pv+"Heat",attrs:[],connections:true}),
                 "inputs:heat_w",pv+".outputs:heat_w");
         for pair in [["irradiance","sun_irradiance_w_m2"],["sun_visibility","sun_visibility"],
@@ -82,6 +83,7 @@ fn on_start(me,ctx) {
         this.sun=this.sun && wired(boundary,"inputs:"+name+"_irradiance",ROOT+"/"+name+"/PowerEnvironment.outputs:sun_irradiance_w_m2")
             && wired(boundary,"inputs:"+name+"_sun_visibility",ROOT+"/"+name+"/PowerEnvironment.outputs:sun_visibility");
     }
+    this.thermal_topology=this.thermal;
     print("[griffin-power-thermal] observing production network for "+this.config.duration+" s");
 }
 fn port(entity,name) {
@@ -138,8 +140,15 @@ fn on_tick(me,ctx) {
                 this.pv_area[i]*c.efficiency*c.reference_irradiance*expected))<=c.power_tolerance
             && temperature>=c.reference_temperature-c.temperature_tolerance && temperature<=c.maximum_temperature;
         this.radiant=this.radiant && residual<=c.power_tolerance;
-        this.thermal=this.thermal && abs(flow-(heat-cooling))<=c.power_tolerance
-            && abs(temperature-mass_temperature)<=c.temperature_tolerance;
+        // A known broken thermal node already disproves closure. Its removed
+        // member outputs are unavailable, so observe the remaining independent
+        // criteria without manufacturing a radiation value.
+        if this.thermal_topology {
+            let radiation=port(e,prefix+"SkyRadiation_heat_rejection_w")
+                +port(e,prefix+"GroundRadiation_heat_rejection_w");
+            this.thermal=this.thermal && abs(flow-(heat-cooling-radiation))<=c.power_tolerance
+                && abs(temperature-mass_temperature)<=c.temperature_tolerance;
+        }
         this.cooling=this.cooling && cooling>=-c.power_tolerance && cooling<=c.maximum_cooling+c.power_tolerance
             && (temperature>c.minimum_temperature+c.temperature_tolerance || abs(cooling)<=c.power_tolerance);
         this.generated[i]=this.generated[i] || power>c.power_tolerance;
@@ -173,7 +182,8 @@ fn on_tick(me,ctx) {
     let source=sysml_requirements::source_with_selection([],
         [PACKAGE+"gep001",PACKAGE+"gep002",PACKAGE+"gep003"],[PACKAGE+VERIFY]);
     let report=sysml_requirements::evaluate(source,checks);
-    report.metrics=#{samples:this.samples,area_m2:this.areas,initial_temperature_k:this.initial,
+    report.metrics=#{samples:this.samples,thermal_topology_closed:this.thermal_topology,
+        area_m2:this.areas,initial_temperature_k:this.initial,
         final_temperature_k:this.final,maximum_power_residual_w:this.max_power_residual,
         maximum_temperature_factor_residual:this.max_temperature_residual};
     print("GRIFFIN_POWER_THERMAL_METRICS "+to_json(report.metrics));

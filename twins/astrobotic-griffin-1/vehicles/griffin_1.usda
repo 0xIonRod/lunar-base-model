@@ -11952,7 +11952,7 @@ def Xform "Griffin1" (
         double outputs:SolarPanelFrontPort_cooler_heat_rejection_w.connect = </Griffin1/ElectricalPower/SolarPanelFrontPortCooler.outputs:heat_rejection_w>
         custom double outputs:SolarPanelFrontPort_cooler_temperature_k
         double outputs:SolarPanelFrontPort_cooler_temperature_k.connect = </Griffin1/ElectricalPower/SolarPanelFrontPortCooler.outputs:temperature_k>
-        rel collection:components:includes = [</Griffin1/ElectricalPower/Battery>, </Griffin1/ElectricalPower/AvionicsLoad>, </Griffin1/ElectricalPower/SolarPanelForward>, </Griffin1/ElectricalPower/SolarPanelForwardMass>, </Griffin1/ElectricalPower/SolarPanelForwardHeat>, </Griffin1/ElectricalPower/SolarPanelForwardCooler>, </Griffin1/ElectricalPower/SolarPanelFrontStarboard>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardMass>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardHeat>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardCooler>, </Griffin1/ElectricalPower/SolarPanelFrontPort>, </Griffin1/ElectricalPower/SolarPanelFrontPortMass>, </Griffin1/ElectricalPower/SolarPanelFrontPortHeat>, </Griffin1/ElectricalPower/SolarPanelFrontPortCooler>]
+        rel collection:components:includes = [</Griffin1/ElectricalPower/Battery>, </Griffin1/ElectricalPower/AvionicsLoad>, </Griffin1/ElectricalPower/SolarPanelForward>, </Griffin1/ElectricalPower/SolarPanelForwardMass>, </Griffin1/ElectricalPower/SolarPanelForwardHeat>, </Griffin1/ElectricalPower/SolarPanelForwardCooler>, </Griffin1/ElectricalPower/SolarPanelFrontStarboard>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardMass>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardHeat>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardCooler>, </Griffin1/ElectricalPower/SolarPanelFrontPort>, </Griffin1/ElectricalPower/SolarPanelFrontPortMass>, </Griffin1/ElectricalPower/SolarPanelFrontPortHeat>, </Griffin1/ElectricalPower/SolarPanelFrontPortCooler>, </Griffin1/ElectricalPower/SolarPanelForwardSkyRadiation>, </Griffin1/ElectricalPower/SolarPanelForwardGroundRadiation>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardSkyRadiation>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardGroundRadiation>, </Griffin1/ElectricalPower/SolarPanelFrontPortSkyRadiation>, </Griffin1/ElectricalPower/SolarPanelFrontPortGroundRadiation>]
         custom double inputs:SolarPanelForward_irradiance
         double inputs:SolarPanelForward_irradiance.connect = </Griffin1/SolarPanelForward/PowerEnvironment.outputs:sun_irradiance_w_m2>
         custom double inputs:SolarPanelForward_sun_visibility
@@ -11983,6 +11983,30 @@ def Xform "Griffin1" (
         double inputs:SolarPanelFrontPort_target_mount_y.connect = </Griffin1/SolarPanelFrontPort/PowerEnvironment.outputs:sun_mount_y>
         custom double inputs:SolarPanelFrontPort_target_mount_z
         double inputs:SolarPanelFrontPort_target_mount_z.connect = </Griffin1/SolarPanelFrontPort/PowerEnvironment.outputs:sun_mount_z>
+        custom double outputs:SolarPanelForward_SkyRadiation_heat_rejection_w
+        double outputs:SolarPanelForward_SkyRadiation_heat_rejection_w.connect = </Griffin1/ElectricalPower/SolarPanelForwardSkyRadiation.outputs:heat_rejection_w>
+        custom double outputs:SolarPanelForward_SkyRadiation_temperature_k
+        double outputs:SolarPanelForward_SkyRadiation_temperature_k.connect = </Griffin1/ElectricalPower/SolarPanelForwardSkyRadiation.outputs:temperature_k>
+        custom double outputs:SolarPanelForward_GroundRadiation_heat_rejection_w
+        double outputs:SolarPanelForward_GroundRadiation_heat_rejection_w.connect = </Griffin1/ElectricalPower/SolarPanelForwardGroundRadiation.outputs:heat_rejection_w>
+        custom double outputs:SolarPanelForward_GroundRadiation_temperature_k
+        double outputs:SolarPanelForward_GroundRadiation_temperature_k.connect = </Griffin1/ElectricalPower/SolarPanelForwardGroundRadiation.outputs:temperature_k>
+        custom double outputs:SolarPanelFrontStarboard_SkyRadiation_heat_rejection_w
+        double outputs:SolarPanelFrontStarboard_SkyRadiation_heat_rejection_w.connect = </Griffin1/ElectricalPower/SolarPanelFrontStarboardSkyRadiation.outputs:heat_rejection_w>
+        custom double outputs:SolarPanelFrontStarboard_SkyRadiation_temperature_k
+        double outputs:SolarPanelFrontStarboard_SkyRadiation_temperature_k.connect = </Griffin1/ElectricalPower/SolarPanelFrontStarboardSkyRadiation.outputs:temperature_k>
+        custom double outputs:SolarPanelFrontStarboard_GroundRadiation_heat_rejection_w
+        double outputs:SolarPanelFrontStarboard_GroundRadiation_heat_rejection_w.connect = </Griffin1/ElectricalPower/SolarPanelFrontStarboardGroundRadiation.outputs:heat_rejection_w>
+        custom double outputs:SolarPanelFrontStarboard_GroundRadiation_temperature_k
+        double outputs:SolarPanelFrontStarboard_GroundRadiation_temperature_k.connect = </Griffin1/ElectricalPower/SolarPanelFrontStarboardGroundRadiation.outputs:temperature_k>
+        custom double outputs:SolarPanelFrontPort_SkyRadiation_heat_rejection_w
+        double outputs:SolarPanelFrontPort_SkyRadiation_heat_rejection_w.connect = </Griffin1/ElectricalPower/SolarPanelFrontPortSkyRadiation.outputs:heat_rejection_w>
+        custom double outputs:SolarPanelFrontPort_SkyRadiation_temperature_k
+        double outputs:SolarPanelFrontPort_SkyRadiation_temperature_k.connect = </Griffin1/ElectricalPower/SolarPanelFrontPortSkyRadiation.outputs:temperature_k>
+        custom double outputs:SolarPanelFrontPort_GroundRadiation_heat_rejection_w
+        double outputs:SolarPanelFrontPort_GroundRadiation_heat_rejection_w.connect = </Griffin1/ElectricalPower/SolarPanelFrontPortGroundRadiation.outputs:heat_rejection_w>
+        custom double outputs:SolarPanelFrontPort_GroundRadiation_temperature_k
+        double outputs:SolarPanelFrontPort_GroundRadiation_temperature_k.connect = </Griffin1/ElectricalPower/SolarPanelFrontPortGroundRadiation.outputs:temperature_k>
         def Scope "Battery" (
             prepend apiSchemas = ["LunCoProgramAPI"]
         )
@@ -12070,7 +12094,7 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/ThermalMass.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom token connectors:port = ""
-            token connectors:port.connect = [</Griffin1/ElectricalPower/SolarPanelForwardHeat.connectors:port>, </Griffin1/ElectricalPower/SolarPanelForwardCooler.connectors:port>]
+            token connectors:port.connect = [</Griffin1/ElectricalPower/SolarPanelForwardHeat.connectors:port>, </Griffin1/ElectricalPower/SolarPanelForwardCooler.connectors:port>, </Griffin1/ElectricalPower/SolarPanelForwardSkyRadiation.connectors:port>, </Griffin1/ElectricalPower/SolarPanelForwardGroundRadiation.connectors:port>]
             custom double parameters:c_th = 6000.0
             custom double parameters:T_init = 301.15
             custom double outputs:temp_k = 0.0
@@ -12150,7 +12174,7 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/ThermalMass.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom token connectors:port = ""
-            token connectors:port.connect = [</Griffin1/ElectricalPower/SolarPanelFrontStarboardHeat.connectors:port>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardCooler.connectors:port>]
+            token connectors:port.connect = [</Griffin1/ElectricalPower/SolarPanelFrontStarboardHeat.connectors:port>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardCooler.connectors:port>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardSkyRadiation.connectors:port>, </Griffin1/ElectricalPower/SolarPanelFrontStarboardGroundRadiation.connectors:port>]
             custom double parameters:c_th = 6000.0
             custom double parameters:T_init = 301.15
             custom double outputs:temp_k = 0.0
@@ -12230,7 +12254,7 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/ThermalMass.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom token connectors:port = ""
-            token connectors:port.connect = [</Griffin1/ElectricalPower/SolarPanelFrontPortHeat.connectors:port>, </Griffin1/ElectricalPower/SolarPanelFrontPortCooler.connectors:port>]
+            token connectors:port.connect = [</Griffin1/ElectricalPower/SolarPanelFrontPortHeat.connectors:port>, </Griffin1/ElectricalPower/SolarPanelFrontPortCooler.connectors:port>, </Griffin1/ElectricalPower/SolarPanelFrontPortSkyRadiation.connectors:port>, </Griffin1/ElectricalPower/SolarPanelFrontPortGroundRadiation.connectors:port>]
             custom double parameters:c_th = 6000.0
             custom double parameters:T_init = 301.15
             custom double outputs:temp_k = 0.0
@@ -12261,6 +12285,96 @@ def Xform "Griffin1" (
             custom double parameters:conductance_w_per_k = 40.0
             custom double outputs:heat_rejection_w = 0.0
             custom double outputs:temperature_k = 0.0
+        }
+        def Scope "SolarPanelForwardSkyRadiation" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/Radiator.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom token connectors:port = ""
+            custom double parameters:area = 1.2907303124999996
+            custom double parameters:emissivity = 0.87
+            custom double parameters:T_sink = 3.0
+            custom double outputs:heat_rejection_w = 0.0
+            custom double outputs:temperature_k = 0.0
+            custom double parameters:sigma = 0.00000005670374419
+        }
+        def Scope "SolarPanelForwardGroundRadiation" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/Radiator.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom token connectors:port = ""
+            custom double parameters:area = 1.2907303124999996
+            custom double parameters:emissivity = 0.87
+            custom double parameters:T_sink = 250.0
+            custom double outputs:heat_rejection_w = 0.0
+            custom double outputs:temperature_k = 0.0
+            custom double parameters:sigma = 0.00000005670374419
+        }
+        def Scope "SolarPanelFrontStarboardSkyRadiation" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/Radiator.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom token connectors:port = ""
+            custom double parameters:area = 1.1641881249999997
+            custom double parameters:emissivity = 0.87
+            custom double parameters:T_sink = 3.0
+            custom double outputs:heat_rejection_w = 0.0
+            custom double outputs:temperature_k = 0.0
+            custom double parameters:sigma = 0.00000005670374419
+        }
+        def Scope "SolarPanelFrontStarboardGroundRadiation" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/Radiator.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom token connectors:port = ""
+            custom double parameters:area = 1.1641881249999997
+            custom double parameters:emissivity = 0.87
+            custom double parameters:T_sink = 250.0
+            custom double outputs:heat_rejection_w = 0.0
+            custom double outputs:temperature_k = 0.0
+            custom double parameters:sigma = 0.00000005670374419
+        }
+        def Scope "SolarPanelFrontPortSkyRadiation" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/Radiator.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom token connectors:port = ""
+            custom double parameters:area = 1.1641881249999997
+            custom double parameters:emissivity = 0.87
+            custom double parameters:T_sink = 3.0
+            custom double outputs:heat_rejection_w = 0.0
+            custom double outputs:temperature_k = 0.0
+            custom double parameters:sigma = 0.00000005670374419
+        }
+        def Scope "SolarPanelFrontPortGroundRadiation" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/Radiator.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom token connectors:port = ""
+            custom double parameters:area = 1.1641881249999997
+            custom double parameters:emissivity = 0.87
+            custom double parameters:T_sink = 250.0
+            custom double outputs:heat_rejection_w = 0.0
+            custom double outputs:temperature_k = 0.0
+            custom double parameters:sigma = 0.00000005670374419
         }
     }
 }

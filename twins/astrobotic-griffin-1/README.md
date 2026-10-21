@@ -37,10 +37,13 @@ inertia parameters. The initial study COM is (0, 0.695, 0) m; dry mass and the
 equal-fill reactant pairing remain explicit estimates.
 
 The three Griffin arrays now supply a shared battery and avionics bus, with
-individual panel thermal masses and capacity-limited coolers. Collecting area
+individual panel thermal masses, capacity-limited coolers and signed sky/ground
+radiative exchange. Collecting area
 comes from the rendered cell fields; physical sunlight and panel temperature
 feed electrical conversion. See the [solar power and cooling contract](contracts/griffin-power-thermal.md)
-for the selected reference-cell data and explicit study assumptions. Deploy
+for the selected reference-cell data and explicit study assumptions. Simulator
+commit `7f957dd2b` or newer supplies signed radiative exchange and the headless
+held-input experiment API used by GEP-005. Deploy
 shared controller commit `668ab5d0d` or newer: the solved avionics supply gates
 flight commands. The GEP-004 vehicle gate observes battery depletion, command
 suppression and physical main-engine/RCS shutdown under sustained demand.
@@ -49,9 +52,11 @@ their geometry does not establish thermal protection performance.
 
 The [powered verification context](contracts/griffin-verification-context.md)
 records the shared environment required by standalone component fixtures and
-their current passing gates. Sustained panel thermal behavior remains outside
-the short power-study qualification; see the long-run observation in the power
-contract.
+their current passing gates. GEP-005 qualifies one hour of the generated
+electrical/thermal subsystem under held physical Sun inputs, with all panels
+inside the reference-cell coefficient range. The power contract records the
+surrogate emissivity and prescribed external thermal environments; this does
+not qualify a one-hour flight/terrain replay or measured flight temperatures.
 
 ## Current public mission baseline
 

@@ -29,6 +29,11 @@ fn configuration() {
         throw("typed photovoltaic material selection unavailable");
     }
     let material=selection.declared_type.resolved_type.qualified_name+"::";
+    let infrared=model.attribute(study()+"radiativeMaterial");
+    if infrared==() || infrared.declared_type==() || infrared.declared_type.resolved_type==() {
+        throw("typed infrared surface reference unavailable");
+    }
+    let infrared_material=infrared.declared_type.resolved_type.qualified_name+"::";
     let voltage=[2,1,-3,-1,0,0,0];let current=[0,0,0,1,0,0,0];
     let temperature=[0,0,0,0,1,0,0];let power=[2,1,-3,0,0,0,0];
     let vm=si(model,material+"maximumPowerVoltage",voltage);
@@ -57,6 +62,14 @@ fn configuration() {
         maximum_cooling:si(model,study()+"maximumPanelCooling",power),
         minimum_temperature:si(model,study()+"minimumCoolantTemperature",temperature),
         conductance:si(model,study()+"coolingConductance",[2,1,-3,0,-1,0,0]),
+        infrared_emissivity:number(model,infrared_material+"infraredEmissivity"),
+        radiation_constant:si(model,study()+"stefanBoltzmannConstant",[0,1,-3,0,-4,0,0]),
+        sky_view_factor:number(model,study()+"skyViewFactor"),
+        ground_view_factor:number(model,study()+"groundViewFactor"),
+        sky_temperature:si(model,study()+"skyRadiationTemperature",temperature),
+        ground_temperature:si(model,study()+"groundRadiationTemperature",temperature),
+        sustained_duration:si(model,study()+"sustainedObservationDuration",[0,0,1,0,0,0,0]),
+        settling_rate:si(model,study()+"maximumSettledTemperatureRate",[0,0,-1,0,1,0,0]),
         duration:si(model,study()+"observationDuration",[0,0,1,0,0,0,0]),
         power_tolerance:si(model,study()+"powerResidualTolerance",power),
         temperature_tolerance:number(model,study()+"temperatureLawTolerance")};
@@ -71,6 +84,12 @@ fn configuration() {
         || config.absorptivity>1.0 || config.power_temperature_coefficient>=0.0
         || config.heat_capacity<=0.0 || config.maximum_cooling<0.0 || config.conductance<=0.0 {
         throw("invalid selected photovoltaic/thermal study parameters");
+    }
+    if config.infrared_emissivity<=0.0 || config.infrared_emissivity>1.0
+        || config.sky_view_factor<0.0 || config.ground_view_factor<0.0
+        || abs(config.sky_view_factor+config.ground_view_factor-1.0)>1.0e-12
+        || config.sky_temperature<0.0 || config.ground_temperature<0.0 {
+        throw("invalid radiative study boundary");
     }
     config
 }
@@ -215,12 +234,25 @@ fn network_part_plan(doc, edit, root, part) {
                 ops.push(_scalar(edit,cooler,"parameters:"+p.name,p.value));
             }
             ops+=_outputs(edit,cooler,["heat_rejection_w","temperature_k"]);
+            for boundary in [#{suffix:"SkyRadiation",factor:c.sky_view_factor,temperature:c.sky_temperature},
+                #{suffix:"GroundRadiation",factor:c.ground_view_factor,temperature:c.ground_temperature}] {
+                let radiator=pv+boundary.suffix;
+                ops+=_program(edit,net,name+boundary.suffix,"Thermal/Radiator");
+                ops.push(_value(edit,radiator,"connectors:port","token","\"\""));
+                for p in [#{name:"area",value:g.area*boundary.factor},#{name:"sigma",value:c.radiation_constant},
+                    #{name:"emissivity",value:c.infrared_emissivity},#{name:"T_sink",value:boundary.temperature}] {
+                    ops.push(_scalar(edit,radiator,"parameters:"+p.name,p.value));
+                }
+                ops+=_outputs(edit,radiator,["heat_rejection_w","temperature_k"]);
+                ops+=_exports(edit,net,radiator,name+"_"+boundary.suffix+"_",["heat_rejection_w","temperature_k"]);
+            }
             ops.push(_wire(edit,pv,"inputs:cell_temperature_k","double",[mass+".outputs:temp_k"]));
-            ops.push(_wire(edit,mass,"connectors:port","token",[heat+".connectors:port",cooler+".connectors:port"]));
+            ops.push(_wire(edit,mass,"connectors:port","token",[heat+".connectors:port",cooler+".connectors:port",
+                pv+"SkyRadiation.connectors:port",pv+"GroundRadiation.connectors:port"]));
             ops+=_exports(edit,net,pv,name+"_",["power_out","available_power_w","incident_power_w","absorbed_power_w","reflected_power_w","heat_w","temperature_k","temperature_factor","cos_incidence"]);
             ops+=_exports(edit,net,mass,name+"_mass_",["temp_k","heat_flow_w"]);
             ops+=_exports(edit,net,cooler,name+"_cooler_",["heat_rejection_w","temperature_k"]);
-            for member in [pv,mass,heat,cooler] {members.push(member);}
+            for member in [pv,mass,heat,cooler,pv+"SkyRadiation",pv+"GroundRadiation"] {members.push(member);}
             pins.push(pv+".connectors:p");panels.push(#{name:name,area:g.area,cell_count:g.cell_count});
         }
         if part==3 {
@@ -232,7 +264,7 @@ fn network_part_plan(doc, edit, root, part) {
         ops.push(_scalar(edit,load,"outputs:powered",0.0));
         for name in names {
             let pv=net+"/"+name;
-            for suffix in ["","Mass","Heat","Cooler"] {
+            for suffix in ["","Mass","Heat","Cooler","SkyRadiation","GroundRadiation"] {
                 members.push(pv+suffix);
                 ops.push(_add(edit,net,name+suffix,"Scope"));
             }
