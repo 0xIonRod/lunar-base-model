@@ -91,7 +91,13 @@ failure, fuel exhaustion, oxidizer exhaustion and engine-off impact. The
 latest result per case is recorded in `suite/acceptance-summary.json`; rejected
 observer-development trials remain in the raw evidence.
 
-Equation owner: shared Modelica commit `8a1604463`. Vehicle qualification used
-the `3d9ad023e` production host plus those Modelica sources. Integration with
-newer main physics is being qualified separately; this evidence does not
-implicitly qualify another binary.
+Equation owner: shared Modelica commit `8a1604463`. The same eight vehicle gates
+and 441 authored equation checks also pass after integration with newer main
+physics at `a4f4faca24432102dd9c4852217623db95e30424`. The integrated binary is
+SHA-256 `33c4f93de00781b54a0544c5ff13e58437c5412c91e841b823596c07a536a4a6`.
+Evidence is under `.cache/codex-evidence/griffin-mass-integration-20261021/`.
+The 60-second settling window retained all four contacts at 361/361 samples.
+A separate High-quality native Sun-facing landing passed with zero runtime
+diagnostics and broken connections; its inspected screenshot is 1024 × 1024.
+The concurrent qualification workloads do not establish clean FPS acceptance.
+Owned API sessions on 4291, 4292 and 4293 were closed and their ports released.
