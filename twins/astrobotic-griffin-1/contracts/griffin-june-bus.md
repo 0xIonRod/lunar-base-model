@@ -51,3 +51,10 @@ source and lunar gravity required by the connected solar-power network. Without
 that environment, initial solar observations are unavailable and the fixture
 cannot certify its coupled initialization. The integrated bus gate passes all
 257 checks with zero pending readiness tickets and a ready co-simulation topology.
+
+The mapped `Verify_GriffinBusOpenBays` case uses
+`tests/griffin_bus_open_bays.usda`. It preserves that same vehicle and environment
+and explicitly mounts the open-bay observer, which emits `GRIFFIN_BUS_OPEN_BAYS`.
+The registry-driven case passes both checks with the requested source revision
+at run start and end. The general bus fixture remains mapped to its own bus
+requirements observer and verdict channel.

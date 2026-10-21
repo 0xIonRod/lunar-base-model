@@ -34,7 +34,7 @@ verdict_channel = "GRIFFIN_CONTROL_POWER_LOSS"
 
 [[verification.cases]]
 name = "GriffinBusRequirements::Verify_GriffinBusOpenBays"
-scene = "tests/griffin_bus_requirements.usda"
+scene = "tests/griffin_bus_open_bays.usda"
 script = "scenarios/tests/griffin_bus_open_bays.rhai"
 verdict_channel = "GRIFFIN_BUS_OPEN_BAYS"
 
