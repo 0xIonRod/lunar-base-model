@@ -115,10 +115,13 @@ Owned API sessions on 4291, 4292 and 4293 were closed and their ports released.
 The later power-loss checkpoint passes GEP-001–004 and three controlled
 broken-wiring checks; see `griffin-power-thermal.md`. A fresh windowed landing
 startup on binary SHA-256
-`f7ec38952301f01d37a55074137bddc13732c480fa117375d3977879d99a639c`
+`4fce1d2aa43c86316b83ed67a8939d521f9374c7f79ee65d024a580567c37a9d`
 then faulted on its first physics tick with `physics-joint-drive-invalid`:
-`constrained actuator response is not finite and nonnegative`. The headless
-power results do not qualify that interactive path. Its readiness and timing
+`constrained actuator response is not finite and nonnegative`. That executable
+includes the uncommitted coupled-actuator-response implementation. It differs
+from the preceding `f7ec3895…` power-test executable and is not evidence of a
+regression in committed main. The headless power results do not qualify this
+pending implementation's interactive path. Its readiness and timing
 receipt is retained in the engine checkout at
 `.cache/codex-evidence/griffin-power-loss-20261021/native-joint-drive-failure.json`.
 Joint-drive repair and native landing requalification remain open. The owned
