@@ -1,4 +1,9 @@
-# Griffin appearance review — 2026-10-20
+# Griffin appearance review — 2026-10-21
+
+The selected shape and solar-array configuration is the June 15, 2026
+integration hardware. Older ESA illustrations do not govern its silhouette.
+The retained lower-bus envelope still needs reconstruction against that
+hardware baseline; the panel-bank checkpoint alone does not close this work.
 
 The requested bus finish is yellow-gold MLI. Its canonical owner is
 `components/lander/griffin_bus_visual.usda`, with the palette and fold controls
@@ -28,15 +33,24 @@ shows three broad, differently cut panel faces. The reconstruction uses a
 12-column by 24-row field before cutouts. The cardinal panel clears the landing
 leg; the two mirrored side panels have stepped shoulders and equipment recesses.
 The frame, backplane, substrate and individual cell rows follow the same contour.
-The old rail-span width cap narrowed the corner panels incorrectly.
 
 All three physical panels have separate canonical component assets, selected by
 `GriffinSolarArrayAssembly::componentAssets`. Vehicle overrides own only the
 mount poses and rail links. The retained 1.866 m frame width gives 150.5 mm
 horizontal and 75.25 mm vertical pitch, with 30 mm frame stock. These SI values
-are packaging estimates, not calibrated measurements. A 610 mm forward bank
-placement and 900 mm mount-link stock reserve the ramp corridors; the native
-solar geometry gate observes the actual composed frames, links and cell rows.
+are packaging estimates, not calibrated measurements. The shared bank datum
+derives from panel width, 45-degree facets, frame thickness, ramp hinge-pin
+span and the source-owned clearance and uncertainty budgets. Link lengths
+derive from their attachment endpoints and seating overlap. The native solar
+geometry gate observes the composed frame edges, links and cell rows; the
+ramp gates independently observe clearance throughout articulation.
+
+The [1419](https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1419-edit-2/)
+and [1442](https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1442-edit-2/)
+hardware views also show exposed panel backs beside the array bank and wrapped
+hardware underneath. They provide additional silhouette checks, but do not
+establish a hidden rear array, an engine mounting drawing or calibrated body
+dimensions. Do not extrapolate the visible three-face bank around every side.
 
 ## Main engine and skirt sizing
 

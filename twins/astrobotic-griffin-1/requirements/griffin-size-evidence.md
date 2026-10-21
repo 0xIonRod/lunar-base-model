@@ -6,6 +6,15 @@ does not prove the assumptions describe flight hardware. Replace estimates when
 better configuration-specific evidence becomes available. Numerical precision in
 derived hinge coordinates is for interface closure, not measurement accuracy.
 
+## Selected configuration, 2026-10-21
+
+The user selected June 2026 integration hardware as the shape and solar-panel
+baseline. The gold finish remains a separate presentation preference. The
+older ESA-based body-height ratio is an unqualified retained study input,
+not evidence of the selected hardware's shape. The remaining lower-bus
+reconstruction must replace that rationale and verify its component and
+assembly interfaces before changing the executable geometry.
+
 ## Panel-bank correction checkpoint, 2026-10-21
 
 The June 2026 hardware photographs show adjacent faceted array frames. The
