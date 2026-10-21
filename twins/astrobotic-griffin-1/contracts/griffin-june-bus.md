@@ -44,3 +44,10 @@ passes, rejects a journaled extra Cube, and passes after undo. The component
 preview and complete assembled vehicle were inspected in Editor Perspective.
 This qualifies the lower-bus presentation and its assembly interfaces; it does
 not qualify hidden hardware dimensions, ramp poses or performance targets.
+
+The complete powered-vehicle verification fixture references the shared
+`environments/lunar_surface_base.usda` preamble. It supplies the physical Sun
+source and lunar gravity required by the connected solar-power network. Without
+that environment, initial solar observations are unavailable and the fixture
+cannot certify its coupled initialization. The integrated bus gate passes all
+257 checks with zero pending readiness tickets and a ready co-simulation topology.
