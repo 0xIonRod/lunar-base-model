@@ -71,6 +71,8 @@ package GriffinSolarRequirements {
         attribute cellThicknessM : Real = 0.002;
         attribute cellDepthM : Real = cellWidthM * gridRowCount / gridColumnCount / cellPitchAspectRatio;
         attribute cellOffsetYM : Real = 0.007;
+        // The installed forward array lies on vehicle +Z; local +Y is its outward collecting face.
+        attribute illuminatedFaceNormal : Direction = (0.0, 1.0, 0.0);
         attribute arrayBackplaneThicknessM : Real = 0.012;
         attribute arrayBackplaneCenterYM : Real = 0;
         attribute mountBracketWidthM : Real = 0.1;

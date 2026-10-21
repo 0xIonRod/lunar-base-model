@@ -36,10 +36,14 @@ Twin: `LunCo.Propulsion.PropellantStatus` includes the mass-normalized tank-grou
 inertia parameters. The initial study COM is (0, 0.695, 0) m; dry mass and the
 equal-fill reactant pairing remain explicit estimates.
 
-The three Griffin solar assemblies currently provide visible geometry and
-Sun-heading targets. They do not yet form a connected lander electrical-power
-or thermal network. Gold MLI and engine shields describe appearance and
-packaging; their geometry does not establish thermal protection performance.
+The three Griffin arrays now supply a shared battery and avionics bus, with
+individual panel thermal masses and capacity-limited coolers. Collecting area
+comes from the rendered cell fields; physical sunlight and panel temperature
+feed electrical conversion. See the [solar power and cooling contract](contracts/griffin-power-thermal.md)
+for the selected reference-cell data and explicit study assumptions. Deploy
+shared controller commit `668ab5d0d` or newer: the solved avionics supply gates
+flight commands. Gold MLI and engine shields describe appearance and packaging;
+their geometry does not establish thermal protection performance.
 
 ## Current public mission baseline
 

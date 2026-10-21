@@ -44,10 +44,16 @@ tank loads during depletion and also checks native solver propagation.
 
 ## Fidelity gaps
 
-- **Lander electrical and thermal behavior:** Griffin's panel meshes and solar
-  heading reference have no connected photovoltaic, lander battery/load or
-  panel thermal network. A Sun-facing attitude pass proves heading and landing,
-  not generated watts or thermal balance.
+- **Electrical and thermal calibration:** the three photovoltaic faces now
+  feed a solved battery/avionics bus and individual thermal masses/coolers.
+  The 45-second production gate passes all three GEP requirements, measuring
+  geometry-derived area, temperature-dependent generation, radiant/thermal/
+  electrical balance and the cooling cap. AZUR cell properties are a declared
+  study reference, not an identified Griffin supplier. Battery inventory,
+  heat capacity and cooler ratings remain project assumptions. A production
+  low-battery vehicle case and disconnected-network negative cases remain open;
+  the shared controller's separate power interruption/recovery gate passes
+  108 checks. See [the subsystem contract](griffin-power-thermal.md).
 - **Heat protection:** the apron, engine liner, skirt and MLI have explicit
   geometry/material assignments. Radiative exchange, plume heating, shield
   temperature, coolant capacity and protection of neighboring equipment are

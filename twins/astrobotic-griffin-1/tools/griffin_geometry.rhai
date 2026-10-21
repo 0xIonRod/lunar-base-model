@@ -203,6 +203,30 @@ fn convex_polygon_clearance_xz(point, polygon) {
 }
 
 
+// Scan each orthogonal contour once per row. This also supplies the physical
+// collecting-area builder without repeating a polygon walk for every cell.
+fn solar_cell_row_columns(layout, row) {
+    if layout==() || row<0 || row>=layout.rows {throw("solar row outside source field");}
+    let z=row+0.5;let crosses=[];let previous=layout.contour[layout.contour.len()-1];
+    for point in layout.contour {
+        if (point.z>z)!=(previous.z>z) {
+            crosses.push(point.x+(previous.x-point.x)*(z-point.z)/(previous.z-point.z));
+        }
+        previous=point;
+    }
+    crosses.sort();
+    if crosses.len()%2!=0 {throw("solar source contour has unpaired row crossings");}
+    let columns=[];
+    for column in 0..layout.columns {
+        for interval in 0..(crosses.len()/2) {
+            if column+0.5>=crosses[interval*2] && column+0.5<crosses[interval*2+1] {
+                columns.push(column);break;
+            }
+        }
+    }
+    columns
+}
+
 // One row of thin, corner-clipped solar cells. Native extrusion owns topology;
 // a row is one render mesh, rather than one entity/draw per cell.
 fn solar_cell_row_geometry(layout, row, center_y, thickness, gap, corner) {
@@ -219,9 +243,8 @@ fn solar_cell_row_geometry(layout, row, center_y, thickness, gap, corner) {
         vec2(-half_x/sx,half_z-corner),vec2(-half_x/sx,-half_z+corner)];
     let cell=extrude_profile(profile,thickness,profile_plane_xz());let pieces=[];
     let z=-layout.cell_depth_m/2.0+(row+0.5)*layout.pitch_z_m;
-    for column in 0..layout.columns {
+    for column in solar_cell_row_columns(layout,row) {
         let x=-layout.local_cell_width_m/2.0+(column+0.5)*layout.pitch_m/sx;
-        if !solar_contour_contains(layout.contour,column+0.5,row+0.5) {continue;}
         let points=[];
         for point in cell.points {points.push([point.x+x,point.y+center_y,point.z+z]);}
         pieces.push(#{ok:true,points:points,face_counts:cell.face_vertex_counts,face_indices:cell.face_vertex_indices});

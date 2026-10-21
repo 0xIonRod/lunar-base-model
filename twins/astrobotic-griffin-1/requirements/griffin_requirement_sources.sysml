@@ -1445,6 +1445,40 @@ package GriffinRequirementSources {
         ref sources = (source_griffin_rcs_commands, source_agile_a110, source_griffin_propulsion_study);
     }
 
+    part source_griffin_power_thermal_contract : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/griffin-power-thermal.md";
+    }
+    part source_griffin_power_thermal_study : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_power_thermal.sysml";
+    }
+    part source_azur_3g30a_study_reference : EvidenceSource {
+        doc /* DB 00010893-01, 11-Apr-2025, p.2. BOL CIC performance and
+         * temperature slopes, 100 micrometre AR coverglass absorption bound.
+         * Accessed 2026-10-21. Study surrogate, not Griffin supplier identity. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.azurspace.com/media/uploads/file_links/file/bdb_00010893-01-00_3g30-advanced_6x12_LrDRZvU.pdf";
+    }
+    part source_griffin_power_pug_2021 : EvidenceSource {
+        doc /* August 2021 guide p.28: triple-junction cells, lithium-ion storage
+         * and 28 V rail for that design. Current ratings remain study inputs. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf";
+    }
+    part evidence_gep_001 : RequirementEvidence {
+        ref targetRequirement = GriffinPowerThermalRequirements::gep001;
+        ref sources = (source_griffin_power_thermal_contract, source_griffin_power_thermal_study, source_azur_3g30a_study_reference);
+    }
+    part evidence_gep_002 : RequirementEvidence {
+        ref targetRequirement = GriffinPowerThermalRequirements::gep002;
+        ref sources = (source_griffin_power_thermal_contract, source_griffin_power_thermal_study, source_azur_3g30a_study_reference);
+    }
+    part evidence_gep_003 : RequirementEvidence {
+        ref targetRequirement = GriffinPowerThermalRequirements::gep003;
+        ref sources = (source_griffin_power_thermal_contract, source_griffin_power_thermal_study, source_griffin_power_pug_2021);
+    }
+
     part evidence_gpp_013 : RequirementEvidence {
         ref targetRequirement = GriffinPropulsionRequirements::gpp013;
         ref sources = (source_griffin_pilot_attitude, source_griffin_propulsion_study);
