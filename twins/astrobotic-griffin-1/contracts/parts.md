@@ -69,6 +69,15 @@ wheel and drivetrain model with the chassis, wheel, suspension, mast, and solar
 visual components. SysML owns wheel identities, station datums, and dimensions;
 the references keep repeated geometry in one component source.
 
+FCC-006 binds two reusable standard USD materials to the five chassis shapes:
+`PaleEnclosure` is the equipment box's dielectric display finish;
+`ExposedMetal` uses the shared silver palette on the lower frame, bumper,
+deck and service panel. Astrolab's [FLIP reference page](https://www.astrolab.space/flip-rover/)
+informs the pale/silver distinction. Colors, metallic and roughness controls
+are display estimates; these bindings do not assign a structural alloy,
+coating stack or measured optical property. The component's geometry and
+collision representations are unchanged. See the [finish review](griffin-chassis-finish-2026-10-22.md).
+
 FLIP's battery uses the shared electrical-storage component, including its
 existing 50 kg study mass and 6.22 kWh nameplate allocation. FSP-009 owns an
 internal packaging study: a 1.684 × 0.20 × 1.36 m case centered at rover-local

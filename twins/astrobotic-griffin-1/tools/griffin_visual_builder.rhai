@@ -6341,6 +6341,45 @@ fn griffin_surface_material_plan(doc, edit_target, root, name, paths, color, met
     #{ok:true,ops:ops}
 }
 
+// FLIP owns its component finishes; the renderer consumes standard USD
+// materials. Geometry, collision, mass and thermal parameters remain separate.
+fn flip_chassis_finish_plan(doc, edit_target, root) {
+    let model=sysml_requirements::model();
+    let own="FlipChassisRequirements::FlipChassisComponent::";
+    let source=sysml_requirements::source_with_attributes([own+"usdPath",own+"childNames",own+"appearanceRoles"]);
+    let owner=sysml_requirements::attribute(source,own+"usdPath").record.owner_handle;
+    let silver=sysml_requirements::vector_from_reference(source,owner,"metalDisplayColor");
+    if !silver.ok {return plan_error(silver.error);}
+    let ops=[];
+    let looks_planned=false;
+    let members=sysml_requirement_checks::source_enum_identifiers(source,own+"childNames");
+    let roles=sysml_requirement_checks::source_enum_identifiers(source,own+"appearanceRoles");
+    if members.is_empty() || members.len()!=roles.len() {return plan_error("FLIP appearance role/member counts disagree");}
+    for role in roles {if role!="Metal" && role!="Enclosure" {return plan_error("Unknown FLIP finish role: "+role);}}
+    for prefix in ["metal","enclosure"] {
+        let material_name=model.value(own+prefix+"MaterialName");
+        if !sysml_enum_is(material_name) {return plan_error("FLIP material identity is unavailable");}
+        let selected=[];
+        for index in 0..members.len() {if roles[index].to_lower()==prefix {selected.push(members[index]);}}
+        let profile=#{name:material_name.literal,prefix:prefix,members:selected};
+        let color=if profile.prefix=="metal" {silver.value} else {model.value(own+profile.prefix+"DisplayColor")};
+        let metallic=_source_number(model,own+profile.prefix+"Metallic");
+        let roughness=_source_number(model,own+profile.prefix+"Roughness");
+        if color==() || metallic==() || roughness==() {return plan_error("FLIP finish source unavailable");}
+        let paths=[];for member in profile.members {paths.push(root+"/"+member);}
+        let plan=griffin_surface_material_plan(doc,edit_target,root,profile.name,paths,color,metallic,roughness);
+        if !plan.ok {return plan;}
+        for op in plan.ops {
+            if op.AddPrim!=() && op.AddPrim.parent_path==root && op.AddPrim.name=="Looks" {
+                if looks_planned {continue;}
+                looks_planned=true;
+            }
+            ops.push(op);
+        }
+    }
+    #{ok:true,doc_id:doc,source_revision:model.source_revision,ops:ops}
+}
+
 // The walking contact Mesh also owns the visible plate and folded back.
 fn griffin_ramp_walking_surface_plan(doc, edit_target, section_path) {
     let model=sysml_requirements::model();

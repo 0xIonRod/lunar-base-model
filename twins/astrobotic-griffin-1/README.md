@@ -43,6 +43,12 @@ The [interface and internal battery review](contracts/griffin-interface-validati
 records the subsequent correction of the protruding battery case, explicit
 visual collision roles, and clean mounted USD preflight. It preserves the
 wider bus, inward ramps and leg/panel alignment from the packaging checkpoint.
+The [FLIP chassis finish review](contracts/griffin-chassis-finish-2026-10-22.md)
+adds source-owned pale and silver PBR finishes, a 42-check component gate,
+and a bounded rendering diagnostic. Wheel and panel fidelity remain open.
+That review also records the integrated optimization IMU repair: the original
+267-check acceleration gate passes at its unchanged norm limit. Loaded landing,
+ramp deployment and clean full-mission performance remain open.
 The seven-engine/four-leg configuration is source-backed; current metric
 dimensions, mass properties and propulsion ratings remain reconstruction or
 integration-study inputs.

@@ -11,7 +11,7 @@ def Xform "FlipChassis" (
 {
     custom string lunco:visual:component = "flip_chassis"
     def Cube "LowerFrame" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         double size = 2.0
@@ -21,9 +21,10 @@ def Xform "FlipChassis" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         bool physics:collisionEnabled = true
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        custom rel material:binding = </FlipChassis/Looks/ExposedMetal>
     }
     def Cube "WhiteEquipmentBox" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         double size = 2.0
@@ -33,9 +34,10 @@ def Xform "FlipChassis" (
         color3f[] primvars:displayColor = [(0.8299999833106995, 0.8399999737739563, 0.8399999737739563)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = true
+        custom rel material:binding = </FlipChassis/Looks/PaleEnclosure>
     }
     def Cube "FrontBumper" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         double size = 2.0
@@ -45,9 +47,10 @@ def Xform "FlipChassis" (
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = true
+        custom rel material:binding = </FlipChassis/Looks/ExposedMetal>
     }
     def Cube "PayloadDeck" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         double size = 2.0
@@ -57,8 +60,11 @@ def Xform "FlipChassis" (
         color3f[] primvars:displayColor = [(0.3400000035762787, 0.36000001430511475, 0.3799999952316284)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = true
+        custom rel material:binding = </FlipChassis/Looks/ExposedMetal>
     }
-    def Cube "ServicePanel"
+    def Cube "ServicePanel" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
     {
         double size = 2.0
         custom double3 xformOp:translate = (0.0, 0.258, -0.7425)
@@ -67,5 +73,35 @@ def Xform "FlipChassis" (
         color3f[] primvars:displayColor = [(0.36000001430511475, 0.38999998569488525, 0.41999998688697815)]
         uniform token purpose = "render"
         custom bool physics:collisionEnabled = false
+        custom rel material:binding = </FlipChassis/Looks/ExposedMetal>
+    }
+    def Scope "Looks"
+    {
+        def Material "ExposedMetal"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FlipChassis/Looks/ExposedMetal/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                custom token outputs:surface = ""
+                custom color3f inputs:diffuseColor = (0.550000011920929, 0.5799999833106995, 0.6200000047683716)
+                custom float inputs:metallic = 0.75
+                custom float inputs:roughness = 0.41999998688697815
+            }
+        }
+        def Material "PaleEnclosure"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FlipChassis/Looks/PaleEnclosure/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                custom token outputs:surface = ""
+                custom color3f inputs:diffuseColor = (0.8299999833106995, 0.8399999737739563, 0.8399999737739563)
+                custom float inputs:metallic = 0.0
+                custom float inputs:roughness = 0.5
+            }
+        }
     }
 }

@@ -57,10 +57,13 @@ typed provenance catalog covers 220 requirement targets with 220 evidence
 records and 69 source elements. Requirement declarations and provenance links
 do not substitute for execution evidence.
 
-Physics ownership remains with optimization. The unchanged acceleration gate
+At this checkpoint, physics ownership remained with optimization. The unchanged acceleration gate
 fails 47 of 267 checks, all on rotation-norm invariance, on both the untouched
 control and current build; its `1e-9` acceptance was retained. That control, loaded-support drift,
 impact and pilot observations are in optimization's physics handoff. Loaded
 touchdown, ramp deployment, full-mission acceptance and 60 FPS at High quality
 with real-time physics remain open. No solver dependency, timestep, substep,
 friction, mass parameter, spring cap or existing physics limit was changed.
+The later [chassis finish and IMU integration review](griffin-chassis-finish-2026-10-22.md)
+records optimization's precision repair and its successful USD qualification;
+the receipt above retains this checkpoint's original binary and findings.

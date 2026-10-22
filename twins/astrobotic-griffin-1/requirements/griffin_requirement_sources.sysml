@@ -366,6 +366,12 @@ package GriffinRequirementSources {
         ref sources = (source_www_astrolab_space_flip, source_astrobotic_griffin_1_vehicles_flip_usda, source_astrobotic_griffin_1_requirements_flip_suspension_requirements_sysml, source_astrobotic_griffin_1_scenarios_griffin_1_surface_ops_rhai);
     }
 
+    part evidence_fcc_006 : RequirementEvidence {
+        doc /* FLIP appearance reference and explicitly estimated display palette. */
+        ref targetRequirement = FlipChassisRequirements::fcc006;
+        ref sources = (source_www_astrolab_space_flip, source_project_part_contracts);
+    }
+
     part evidence_fsp_001 : RequirementEvidence {
         ref targetRequirement = FlipSensorPowerRequirements::fsp001;
         ref sources = (source_www_astrolab_space_flip);
