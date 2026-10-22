@@ -1,0 +1,1399 @@
+{
+  "status": "authored_geometry_interference_confirmed",
+  "model_commit": "4dc4d17eead452cc9fc5597b783d6d5ddd9983e4",
+  "engine_commit": "65264b712c72494ee3ac03e6ced52a7870a452f7",
+  "binary_sha256": "9b28c4be8f9e77e8bd1fe8e5ee6f21db4e83afbe2d3d9153cf0c10c64d1579eb",
+  "document": {
+    "doc_id": 119562041633649,
+    "path": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/vehicles/griffin_1.usda"
+  },
+  "document_generation": 0,
+  "stage_generation": 0,
+  "frame": "canonical_stage_metres",
+  "kernel": "lunco_geometry_core::bounds::bounds_relation via assembly_audit::oriented_box_clearance",
+  "source_sha256": {
+    "vehicles/griffin_1.usda": "a7cfd8a587f8e401643b0056f6a5bb3cb1d9d71dedccff9a09060fd596b74f73",
+    "requirements/griffin_ramp_requirements.sysml": "61568189cf9e8e657b9b43890748ead0e5defbbb9c560347745aa667b1018591",
+    "requirements/griffin_visual_configuration.sysml": "3ce3b5266fd9725e9d6c32d6347ef38f8ba958324195eb17b67638b2e8694c1f",
+    "components/lander/griffin_ramp_section_visual.usda": "a7116d879f0835f0fa7d4feb95673ba109257398513e1f536e61d2ce1f1659d4"
+  },
+  "observations": [
+    {
+      "a": "/Griffin1/EgressRampPort/MiddleSection/RampTrackPort",
+      "b": "/Griffin1/TransitionPlatePort/ContactSurface",
+      "signed_sat_axis_margin_m": -0.2207053495583775,
+      "maximum_corner_fit_residual_m": 2.8702283660919647e-08
+    },
+    {
+      "a": "/Griffin1/EgressRampPort/MiddleSection/RampTrackPort",
+      "b": "/Griffin1/TransitionPlateStarboard/ContactSurface",
+      "signed_sat_axis_margin_m": 2.4857439671289607,
+      "maximum_corner_fit_residual_m": 2.8702283660919647e-08
+    },
+    {
+      "a": "/Griffin1/EgressRampPort/MiddleSection/RampTrackStarboard",
+      "b": "/Griffin1/TransitionPlatePort/ContactSurface",
+      "signed_sat_axis_margin_m": -0.2207053495583775,
+      "maximum_corner_fit_residual_m": 2.8702283660919647e-08
+    },
+    {
+      "a": "/Griffin1/EgressRampPort/MiddleSection/RampTrackStarboard",
+      "b": "/Griffin1/TransitionPlateStarboard/ContactSurface",
+      "signed_sat_axis_margin_m": 2.4857439671289607,
+      "maximum_corner_fit_residual_m": 2.8702283660919647e-08
+    },
+    {
+      "a": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackPort",
+      "b": "/Griffin1/TransitionPlatePort/ContactSurface",
+      "signed_sat_axis_margin_m": 2.4857439671289607,
+      "maximum_corner_fit_residual_m": 2.8702284549098067e-08
+    },
+    {
+      "a": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackPort",
+      "b": "/Griffin1/TransitionPlateStarboard/ContactSurface",
+      "signed_sat_axis_margin_m": -0.22070534955837784,
+      "maximum_corner_fit_residual_m": 2.8702284549098067e-08
+    },
+    {
+      "a": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackStarboard",
+      "b": "/Griffin1/TransitionPlatePort/ContactSurface",
+      "signed_sat_axis_margin_m": 2.4857439671289607,
+      "maximum_corner_fit_residual_m": 2.8702284549098067e-08
+    },
+    {
+      "a": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackStarboard",
+      "b": "/Griffin1/TransitionPlateStarboard/ContactSurface",
+      "signed_sat_axis_margin_m": -0.22070534955837784,
+      "maximum_corner_fit_residual_m": 2.8702284549098067e-08
+    }
+  ],
+  "colliders": [
+    {
+      "record": {
+        "path": "/Griffin1/EgressRampPort/MiddleSection/RampTrackPort",
+        "type_name": "Mesh",
+        "attrs": {
+          "size": null,
+          "xformOp:translate": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "xformOp:rotateXYZ": null,
+          "xformOp:scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "physics:collisionEnabled": true
+        },
+        "spawned": false,
+        "active": true,
+        "doc_id": 119562041633649,
+        "generation": 0,
+        "world_position": [
+          1.1111625429932248,
+          3.4648471697904952,
+          1.0
+        ],
+        "position_frame": "canonical_stage",
+        "document_generation": 0,
+        "stage_generation": 0,
+        "collision_bounds": {
+          "min": [
+            1.0981721622298923,
+            1.8992946644574882,
+            0.7100000083446503
+          ],
+          "max": [
+            2.0236949580680132,
+            3.472347169628186,
+            1.2899999916553497
+          ],
+          "center": [
+            1.560933560148953,
+            2.685820917042837,
+            1.0
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534973
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact",
+          "rest_depth": -1.8992946644574882
+        },
+        "collision_geometry": {
+          "shape": "convex_hull",
+          "vertices": [
+            [
+              1.0981721622298923,
+              3.4573471699528047,
+              0.7100000083446503
+            ],
+            [
+              1.1241529237565573,
+              3.472347169628186,
+              0.7100000083446503
+            ],
+            [
+              2.0236949580680132,
+              1.9142946641328697,
+              0.7100000083446503
+            ],
+            [
+              1.9977141965413485,
+              1.8992946644574882,
+              0.7100000083446503
+            ],
+            [
+              1.0981721622298923,
+              3.4573471699528047,
+              1.2899999916553497
+            ],
+            [
+              1.1241529237565573,
+              3.472347169628186,
+              1.2899999916553497
+            ],
+            [
+              2.0236949580680132,
+              1.9142946641328697,
+              1.2899999916553497
+            ],
+            [
+              1.9977141965413485,
+              1.8992946644574882,
+              1.2899999916553497
+            ]
+          ],
+          "triangles": null,
+          "type_name": "Mesh",
+          "approximation": "convexHull",
+          "frame": "canonical_stage"
+        },
+        "geometry_bounds": {
+          "min": [
+            1.0981721622298923,
+            1.8992946644574882,
+            0.7100000083446503
+          ],
+          "max": [
+            2.0236949580680132,
+            3.472347169628186,
+            1.2899999916553497
+          ],
+          "center": [
+            1.560933560148953,
+            2.685820917042837,
+            1.0
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534973
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        }
+      },
+      "topology_part": {
+        "path": "/Griffin1/EgressRampPort/MiddleSection/RampTrackPort",
+        "type_name": "Mesh",
+        "purpose": "default",
+        "visual": true,
+        "collider": true,
+        "collision_enabled": true,
+        "body_owner": "/Griffin1/EgressRampPort/MiddleSection",
+        "bounds": {
+          "min": [
+            1.0981721622298923,
+            1.8992946644574882,
+            0.7100000083446503
+          ],
+          "max": [
+            2.0236949580680132,
+            3.472347169628186,
+            1.2899999916553497
+          ],
+          "center": [
+            1.560933560148953,
+            2.685820917042837,
+            1.0
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534973
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        },
+        "transform": {
+          "local_frame": "canonical_stage_parent",
+          "local": {
+            "translation": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "rotation": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "world_frame": "canonical_stage",
+          "world": {
+            "translation": [
+              1.111162543296814,
+              3.4648470878601074,
+              1.0
+            ],
+            "rotation": [
+              0.8660253882408142,
+              0.0,
+              0.0,
+              -0.5
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "materials": {
+          "render": "/Griffin1/EgressRampPort/MiddleSection/Looks/RampWalkingPlate",
+          "physics": "/Griffin1/PhysicsMaterials/LandingPadSlide",
+          "shader": "/Griffin1/EgressRampPort/MiddleSection/Looks/RampWalkingPlate/Surface"
+        },
+        "source": {
+          "layer": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+          "path": "/Griffin1/EgressRampPort/MiddleSection/RampTrackPort",
+          "stack_depth": 2
+        }
+      }
+    },
+    {
+      "record": {
+        "path": "/Griffin1/EgressRampPort/MiddleSection/RampTrackStarboard",
+        "type_name": "Mesh",
+        "attrs": {
+          "size": null,
+          "xformOp:translate": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "xformOp:rotateXYZ": null,
+          "xformOp:scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "physics:collisionEnabled": true
+        },
+        "spawned": false,
+        "active": true,
+        "doc_id": 119562041633649,
+        "generation": 0,
+        "world_position": [
+          1.1111625429932248,
+          3.4648471697904952,
+          -1.0
+        ],
+        "position_frame": "canonical_stage",
+        "document_generation": 0,
+        "stage_generation": 0,
+        "collision_bounds": {
+          "min": [
+            1.0981721622298923,
+            1.8992946644574882,
+            -1.2899999916553497
+          ],
+          "max": [
+            2.0236949580680132,
+            3.472347169628186,
+            -0.7100000083446503
+          ],
+          "center": [
+            1.560933560148953,
+            2.685820917042837,
+            -1.0
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534973
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact",
+          "rest_depth": -1.8992946644574882
+        },
+        "collision_geometry": {
+          "shape": "convex_hull",
+          "vertices": [
+            [
+              1.0981721622298923,
+              3.4573471699528047,
+              -1.2899999916553497
+            ],
+            [
+              1.1241529237565573,
+              3.472347169628186,
+              -1.2899999916553497
+            ],
+            [
+              2.0236949580680132,
+              1.9142946641328697,
+              -1.2899999916553497
+            ],
+            [
+              1.9977141965413485,
+              1.8992946644574882,
+              -1.2899999916553497
+            ],
+            [
+              1.0981721622298923,
+              3.4573471699528047,
+              -0.7100000083446503
+            ],
+            [
+              1.1241529237565573,
+              3.472347169628186,
+              -0.7100000083446503
+            ],
+            [
+              2.0236949580680132,
+              1.9142946641328697,
+              -0.7100000083446503
+            ],
+            [
+              1.9977141965413485,
+              1.8992946644574882,
+              -0.7100000083446503
+            ]
+          ],
+          "triangles": null,
+          "type_name": "Mesh",
+          "approximation": "convexHull",
+          "frame": "canonical_stage"
+        },
+        "geometry_bounds": {
+          "min": [
+            1.0981721622298923,
+            1.8992946644574882,
+            -1.2899999916553497
+          ],
+          "max": [
+            2.0236949580680132,
+            3.472347169628186,
+            -0.7100000083446503
+          ],
+          "center": [
+            1.560933560148953,
+            2.685820917042837,
+            -1.0
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534973
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        }
+      },
+      "topology_part": {
+        "path": "/Griffin1/EgressRampPort/MiddleSection/RampTrackStarboard",
+        "type_name": "Mesh",
+        "purpose": "default",
+        "visual": true,
+        "collider": true,
+        "collision_enabled": true,
+        "body_owner": "/Griffin1/EgressRampPort/MiddleSection",
+        "bounds": {
+          "min": [
+            1.0981721622298923,
+            1.8992946644574882,
+            -1.2899999916553497
+          ],
+          "max": [
+            2.0236949580680132,
+            3.472347169628186,
+            -0.7100000083446503
+          ],
+          "center": [
+            1.560933560148953,
+            2.685820917042837,
+            -1.0
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534973
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        },
+        "transform": {
+          "local_frame": "canonical_stage_parent",
+          "local": {
+            "translation": [
+              0.0,
+              0.0,
+              -1.0
+            ],
+            "rotation": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "world_frame": "canonical_stage",
+          "world": {
+            "translation": [
+              1.111162543296814,
+              3.4648470878601074,
+              -1.0
+            ],
+            "rotation": [
+              0.8660253882408142,
+              0.0,
+              0.0,
+              -0.5
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "materials": {
+          "render": "/Griffin1/EgressRampPort/MiddleSection/Looks/RampWalkingPlate",
+          "physics": "/Griffin1/PhysicsMaterials/LandingPadSlide",
+          "shader": "/Griffin1/EgressRampPort/MiddleSection/Looks/RampWalkingPlate/Surface"
+        },
+        "source": {
+          "layer": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+          "path": "/Griffin1/EgressRampPort/MiddleSection/RampTrackStarboard",
+          "stack_depth": 2
+        }
+      }
+    },
+    {
+      "record": {
+        "path": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackPort",
+        "type_name": "Mesh",
+        "attrs": {
+          "size": null,
+          "xformOp:translate": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "xformOp:rotateXYZ": null,
+          "xformOp:scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "physics:collisionEnabled": true
+        },
+        "spawned": false,
+        "active": true,
+        "doc_id": 119562041633649,
+        "generation": 0,
+        "world_position": [
+          -1.1111625429932248,
+          3.4648471697904952,
+          -1.0000000000000002
+        ],
+        "position_frame": "canonical_stage",
+        "document_generation": 0,
+        "stage_generation": 0,
+        "collision_bounds": {
+          "min": [
+            -2.0236949580680132,
+            1.8992946644574882,
+            -1.28999999165535
+          ],
+          "max": [
+            -1.0981721622298923,
+            3.472347169628186,
+            -0.7100000083446503
+          ],
+          "center": [
+            -1.560933560148953,
+            2.685820917042837,
+            -1.0
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534984
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact",
+          "rest_depth": -1.8992946644574882
+        },
+        "collision_geometry": {
+          "shape": "convex_hull",
+          "vertices": [
+            [
+              -1.0981721622298923,
+              3.4573471699528047,
+              -0.7100000083446505
+            ],
+            [
+              -1.1241529237565573,
+              3.472347169628186,
+              -0.7100000083446505
+            ],
+            [
+              -2.0236949580680132,
+              1.9142946641328697,
+              -0.7100000083446503
+            ],
+            [
+              -1.9977141965413487,
+              1.8992946644574882,
+              -0.7100000083446503
+            ],
+            [
+              -1.0981721622298923,
+              3.4573471699528047,
+              -1.28999999165535
+            ],
+            [
+              -1.1241529237565573,
+              3.472347169628186,
+              -1.28999999165535
+            ],
+            [
+              -2.0236949580680132,
+              1.9142946641328697,
+              -1.2899999916553497
+            ],
+            [
+              -1.9977141965413487,
+              1.8992946644574882,
+              -1.2899999916553497
+            ]
+          ],
+          "triangles": null,
+          "type_name": "Mesh",
+          "approximation": "convexHull",
+          "frame": "canonical_stage"
+        },
+        "geometry_bounds": {
+          "min": [
+            -2.0236949580680132,
+            1.8992946644574882,
+            -1.28999999165535
+          ],
+          "max": [
+            -1.0981721622298923,
+            3.472347169628186,
+            -0.7100000083446503
+          ],
+          "center": [
+            -1.560933560148953,
+            2.685820917042837,
+            -1.0
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534984
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        }
+      },
+      "topology_part": {
+        "path": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackPort",
+        "type_name": "Mesh",
+        "purpose": "default",
+        "visual": true,
+        "collider": true,
+        "collision_enabled": true,
+        "body_owner": "/Griffin1/EgressRampStarboard/MiddleSection",
+        "bounds": {
+          "min": [
+            -2.0236949580680132,
+            1.8992946644574882,
+            -1.28999999165535
+          ],
+          "max": [
+            -1.0981721622298923,
+            3.472347169628186,
+            -0.7100000083446503
+          ],
+          "center": [
+            -1.560933560148953,
+            2.685820917042837,
+            -1.0
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534984
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        },
+        "transform": {
+          "local_frame": "canonical_stage_parent",
+          "local": {
+            "translation": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "rotation": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "world_frame": "canonical_stage",
+          "world": {
+            "translation": [
+              -1.111162543296814,
+              3.4648470878601074,
+              -1.0
+            ],
+            "rotation": [
+              -5.302876236065149e-17,
+              -0.5,
+              0.8660253882408142,
+              -3.0616171314629196e-17
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "materials": {
+          "render": "/Griffin1/EgressRampStarboard/MiddleSection/Looks/RampWalkingPlate",
+          "physics": "/Griffin1/PhysicsMaterials/LandingPadSlide",
+          "shader": "/Griffin1/EgressRampStarboard/MiddleSection/Looks/RampWalkingPlate/Surface"
+        },
+        "source": {
+          "layer": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+          "path": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackPort",
+          "stack_depth": 2
+        }
+      }
+    },
+    {
+      "record": {
+        "path": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackStarboard",
+        "type_name": "Mesh",
+        "attrs": {
+          "size": null,
+          "xformOp:translate": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "xformOp:rotateXYZ": null,
+          "xformOp:scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "physics:collisionEnabled": true
+        },
+        "spawned": false,
+        "active": true,
+        "doc_id": 119562041633649,
+        "generation": 0,
+        "world_position": [
+          -1.1111625429932248,
+          3.4648471697904952,
+          0.9999999999999998
+        ],
+        "position_frame": "canonical_stage",
+        "document_generation": 0,
+        "stage_generation": 0,
+        "collision_bounds": {
+          "min": [
+            -2.0236949580680132,
+            1.8992946644574882,
+            0.71000000834465
+          ],
+          "max": [
+            -1.0981721622298923,
+            3.472347169628186,
+            1.2899999916553497
+          ],
+          "center": [
+            -1.560933560148953,
+            2.685820917042837,
+            0.9999999999999999
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534984
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact",
+          "rest_depth": -1.8992946644574882
+        },
+        "collision_geometry": {
+          "shape": "convex_hull",
+          "vertices": [
+            [
+              -1.0981721622298923,
+              3.4573471699528047,
+              1.2899999916553495
+            ],
+            [
+              -1.1241529237565573,
+              3.472347169628186,
+              1.2899999916553495
+            ],
+            [
+              -2.0236949580680132,
+              1.9142946641328697,
+              1.2899999916553497
+            ],
+            [
+              -1.9977141965413487,
+              1.8992946644574882,
+              1.2899999916553497
+            ],
+            [
+              -1.0981721622298923,
+              3.4573471699528047,
+              0.71000000834465
+            ],
+            [
+              -1.1241529237565573,
+              3.472347169628186,
+              0.71000000834465
+            ],
+            [
+              -2.0236949580680132,
+              1.9142946641328697,
+              0.7100000083446503
+            ],
+            [
+              -1.9977141965413487,
+              1.8992946644574882,
+              0.7100000083446503
+            ]
+          ],
+          "triangles": null,
+          "type_name": "Mesh",
+          "approximation": "convexHull",
+          "frame": "canonical_stage"
+        },
+        "geometry_bounds": {
+          "min": [
+            -2.0236949580680132,
+            1.8992946644574882,
+            0.71000000834465
+          ],
+          "max": [
+            -1.0981721622298923,
+            3.472347169628186,
+            1.2899999916553497
+          ],
+          "center": [
+            -1.560933560148953,
+            2.685820917042837,
+            0.9999999999999999
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534984
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        }
+      },
+      "topology_part": {
+        "path": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackStarboard",
+        "type_name": "Mesh",
+        "purpose": "default",
+        "visual": true,
+        "collider": true,
+        "collision_enabled": true,
+        "body_owner": "/Griffin1/EgressRampStarboard/MiddleSection",
+        "bounds": {
+          "min": [
+            -2.0236949580680132,
+            1.8992946644574882,
+            0.71000000834465
+          ],
+          "max": [
+            -1.0981721622298923,
+            3.472347169628186,
+            1.2899999916553497
+          ],
+          "center": [
+            -1.560933560148953,
+            2.685820917042837,
+            0.9999999999999999
+          ],
+          "half_extents": [
+            0.46276139791906046,
+            0.7865262525853488,
+            0.28999999165534984
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        },
+        "transform": {
+          "local_frame": "canonical_stage_parent",
+          "local": {
+            "translation": [
+              0.0,
+              0.0,
+              -1.0
+            ],
+            "rotation": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "world_frame": "canonical_stage",
+          "world": {
+            "translation": [
+              -1.111162543296814,
+              3.4648470878601074,
+              1.0
+            ],
+            "rotation": [
+              -5.302876236065149e-17,
+              -0.5,
+              0.8660253882408142,
+              -3.0616171314629196e-17
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "materials": {
+          "render": "/Griffin1/EgressRampStarboard/MiddleSection/Looks/RampWalkingPlate",
+          "physics": "/Griffin1/PhysicsMaterials/LandingPadSlide",
+          "shader": "/Griffin1/EgressRampStarboard/MiddleSection/Looks/RampWalkingPlate/Surface"
+        },
+        "source": {
+          "layer": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+          "path": "/Griffin1/EgressRampStarboard/MiddleSection/RampTrackStarboard",
+          "stack_depth": 2
+        }
+      }
+    },
+    {
+      "record": {
+        "path": "/Griffin1/TransitionPlatePort/ContactSurface",
+        "type_name": "Cube",
+        "attrs": {
+          "size": 1.0,
+          "xformOp:translate": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "xformOp:rotateXYZ": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "xformOp:scale": [
+            1.35,
+            0.03,
+            2.5919999999999996
+          ],
+          "physics:collisionEnabled": true
+        },
+        "spawned": false,
+        "active": true,
+        "doc_id": 119562041633649,
+        "generation": 0,
+        "world_position": [
+          1.675,
+          2.105,
+          0.0
+        ],
+        "position_frame": "canonical_stage",
+        "document_generation": 0,
+        "stage_generation": 0,
+        "collision_bounds": {
+          "min": [
+            1.0,
+            2.09,
+            -1.2959999999999998
+          ],
+          "max": [
+            2.35,
+            2.12,
+            1.2959999999999998
+          ],
+          "center": [
+            1.675,
+            2.105,
+            0.0
+          ],
+          "half_extents": [
+            0.675,
+            0.015000000000000124,
+            1.2959999999999998
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact",
+          "rest_depth": -2.09
+        },
+        "collision_geometry": {
+          "shape": "convex_hull",
+          "vertices": [
+            [
+              0.9999999880790711,
+              2.090000000335276,
+              -1.2960000038146973
+            ],
+            [
+              2.3500000119209288,
+              2.090000000335276,
+              -1.2960000038146973
+            ],
+            [
+              0.9999999880790711,
+              2.119999999664724,
+              -1.2960000038146973
+            ],
+            [
+              2.3500000119209288,
+              2.119999999664724,
+              -1.2960000038146973
+            ],
+            [
+              0.9999999880790711,
+              2.090000000335276,
+              1.2960000038146973
+            ],
+            [
+              2.3500000119209288,
+              2.090000000335276,
+              1.2960000038146973
+            ],
+            [
+              0.9999999880790711,
+              2.119999999664724,
+              1.2960000038146973
+            ],
+            [
+              2.3500000119209288,
+              2.119999999664724,
+              1.2960000038146973
+            ]
+          ],
+          "triangles": null,
+          "type_name": "Cube",
+          "approximation": null,
+          "frame": "canonical_stage"
+        },
+        "geometry_bounds": {
+          "min": [
+            1.0,
+            2.09,
+            -1.2959999999999998
+          ],
+          "max": [
+            2.35,
+            2.12,
+            1.2959999999999998
+          ],
+          "center": [
+            1.675,
+            2.105,
+            0.0
+          ],
+          "half_extents": [
+            0.675,
+            0.015000000000000124,
+            1.2959999999999998
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        }
+      },
+      "topology_part": {
+        "path": "/Griffin1/TransitionPlatePort/ContactSurface",
+        "type_name": "Cube",
+        "purpose": "proxy",
+        "visual": false,
+        "collider": true,
+        "collision_enabled": true,
+        "body_owner": "/Griffin1/TransitionPlatePort",
+        "bounds": {
+          "min": [
+            1.0,
+            2.09,
+            -1.2959999999999998
+          ],
+          "max": [
+            2.35,
+            2.12,
+            1.2959999999999998
+          ],
+          "center": [
+            1.675,
+            2.105,
+            0.0
+          ],
+          "half_extents": [
+            0.675,
+            0.015000000000000124,
+            1.2959999999999998
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        },
+        "transform": {
+          "local_frame": "canonical_stage_parent",
+          "local": {
+            "translation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.350000023841858,
+              0.029999999329447746,
+              2.5920000076293945
+            ]
+          },
+          "world_frame": "canonical_stage",
+          "world": {
+            "translation": [
+              1.6749999523162842,
+              2.1050000190734863,
+              0.0
+            ],
+            "rotation": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.350000023841858,
+              0.029999999329447746,
+              2.5920000076293945
+            ]
+          }
+        },
+        "materials": {
+          "render": null,
+          "physics": "/Griffin1/PhysicsMaterials/LandingPadSlide",
+          "shader": null
+        },
+        "source": {
+          "layer": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+          "path": "/Griffin1/TransitionPlatePort/ContactSurface",
+          "stack_depth": 1
+        }
+      }
+    },
+    {
+      "record": {
+        "path": "/Griffin1/TransitionPlateStarboard/ContactSurface",
+        "type_name": "Cube",
+        "attrs": {
+          "size": 1.0,
+          "xformOp:translate": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "xformOp:rotateXYZ": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "xformOp:scale": [
+            1.35,
+            0.03,
+            2.5919999999999996
+          ],
+          "physics:collisionEnabled": true
+        },
+        "spawned": false,
+        "active": true,
+        "doc_id": 119562041633649,
+        "generation": 0,
+        "world_position": [
+          -1.675,
+          2.105,
+          0.0
+        ],
+        "position_frame": "canonical_stage",
+        "document_generation": 0,
+        "stage_generation": 0,
+        "collision_bounds": {
+          "min": [
+            -2.35,
+            2.09,
+            -1.2959999999999998
+          ],
+          "max": [
+            -1.0,
+            2.12,
+            1.2959999999999998
+          ],
+          "center": [
+            -1.675,
+            2.105,
+            0.0
+          ],
+          "half_extents": [
+            0.675,
+            0.015000000000000124,
+            1.2959999999999998
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact",
+          "rest_depth": -2.09
+        },
+        "collision_geometry": {
+          "shape": "convex_hull",
+          "vertices": [
+            [
+              -2.3500000119209288,
+              2.090000000335276,
+              -1.2960000038146973
+            ],
+            [
+              -0.9999999880790711,
+              2.090000000335276,
+              -1.2960000038146973
+            ],
+            [
+              -2.3500000119209288,
+              2.119999999664724,
+              -1.2960000038146973
+            ],
+            [
+              -0.9999999880790711,
+              2.119999999664724,
+              -1.2960000038146973
+            ],
+            [
+              -2.3500000119209288,
+              2.090000000335276,
+              1.2960000038146973
+            ],
+            [
+              -0.9999999880790711,
+              2.090000000335276,
+              1.2960000038146973
+            ],
+            [
+              -2.3500000119209288,
+              2.119999999664724,
+              1.2960000038146973
+            ],
+            [
+              -0.9999999880790711,
+              2.119999999664724,
+              1.2960000038146973
+            ]
+          ],
+          "triangles": null,
+          "type_name": "Cube",
+          "approximation": null,
+          "frame": "canonical_stage"
+        },
+        "geometry_bounds": {
+          "min": [
+            -2.35,
+            2.09,
+            -1.2959999999999998
+          ],
+          "max": [
+            -1.0,
+            2.12,
+            1.2959999999999998
+          ],
+          "center": [
+            -1.675,
+            2.105,
+            0.0
+          ],
+          "half_extents": [
+            0.675,
+            0.015000000000000124,
+            1.2959999999999998
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        }
+      },
+      "topology_part": {
+        "path": "/Griffin1/TransitionPlateStarboard/ContactSurface",
+        "type_name": "Cube",
+        "purpose": "proxy",
+        "visual": false,
+        "collider": true,
+        "collision_enabled": true,
+        "body_owner": "/Griffin1/TransitionPlateStarboard",
+        "bounds": {
+          "min": [
+            -2.35,
+            2.09,
+            -1.2959999999999998
+          ],
+          "max": [
+            -1.0,
+            2.12,
+            1.2959999999999998
+          ],
+          "center": [
+            -1.675,
+            2.105,
+            0.0
+          ],
+          "half_extents": [
+            0.675,
+            0.015000000000000124,
+            1.2959999999999998
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        },
+        "transform": {
+          "local_frame": "canonical_stage_parent",
+          "local": {
+            "translation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.350000023841858,
+              0.029999999329447746,
+              2.5920000076293945
+            ]
+          },
+          "world_frame": "canonical_stage",
+          "world": {
+            "translation": [
+              -1.6749999523162842,
+              2.1050000190734863,
+              0.0
+            ],
+            "rotation": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.350000023841858,
+              0.029999999329447746,
+              2.5920000076293945
+            ]
+          }
+        },
+        "materials": {
+          "render": null,
+          "physics": "/Griffin1/PhysicsMaterials/LandingPadSlide",
+          "shader": null
+        },
+        "source": {
+          "layer": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+          "path": "/Griffin1/TransitionPlateStarboard/ContactSurface",
+          "stack_depth": 1
+        }
+      }
+    }
+  ],
+  "draft_scope": "Port-side conservative section boxes, 181 samples per motion phase. Not detailed geometry, continuous sweep, starboard, rover, terrain, physical or performance qualification.",
+  "draft_proposal": {
+    "section_lengths_m": [
+      2.149084054,
+      1.449084054,
+      1.799084054
+    ],
+    "toe_fold_axis_y_m": -0.12,
+    "physical_middle_unfold_deg": [
+      180,
+      0
+    ],
+    "physical_toe_unfold_deg": [
+      -180,
+      0
+    ],
+    "root_angle_deg": 120
+  },
+  "draft_sample_minima": {
+    "unequal-length outward-toe draft / middle_to_plate": {
+      "margin_m": 0.2280479665759071,
+      "phase": "middle",
+      "step": 17
+    },
+    "unequal-length outward-toe draft / root_to_toe": {
+      "margin_m": 0.0282819202711016,
+      "phase": "middle",
+      "step": 173
+    },
+    "unequal-length outward-toe draft / toe_to_plate": {
+      "margin_m": 0.12423199125095831,
+      "phase": "middle",
+      "step": 6
+    }
+  }
+}

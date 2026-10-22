@@ -5,6 +5,13 @@ records the latest saved geometry and focused verification. Earlier results
 below belong to their recorded revisions. Loaded-support physics, complete
 mission acceptance and the 60 FPS real-time target remain open.
 
+The [folded-ramp inspection](griffin-ramp-interference-2026-10-22.md) confirms
+source interference between all four middle tracks and their corresponding
+fixed transitions. Passing angle, panel or leg checks cannot accept this
+mechanism. Its provisional unequal-length, opposite-toe-sweep study has only
+sampled port-side box coverage; detailed geometry, complete deployment
+clearance and native loaded egress remain unqualified.
+
 ## Sun-facing autonomous descent
 
 The operator-requested GSA-011 study yaws the forward solar bank's +Z outward

@@ -1,140 +1,78 @@
 # Griffin ramp model contract
 
-Visual component: `components/lander/griffin_ramp_visual.usda`
-Requirements and visual dimensions: `requirements/griffin_ramp_requirements.sysml`
+The integrated ramp mechanism has a confirmed folded-stack interference.
+[The current inspection and candidate design](../griffin-ramp-interference-2026-10-22.md)
+record its exact scope. Existing source-conformance checks do not qualify
+collision-free stow, deployment or rover egress.
 
-The standalone visual ramp asset remains available for component previews. The
-integrated vehicle uses the six articulated physical hinge joints and their
-render geometry; its mount sockets do not instantiate a second static ramp.
-Section identities, dimensions, support members, appearance, wheel clearance,
-hinge limits, and drive values are owned by the SysML source and checked by the
-shared SysML/USD requirements evaluator.
+## Ownership and current datums
 
-## Ownership
+`requirements/griffin_ramp_requirements.sysml` owns reconstruction dimensions,
+material choices, hinge frames, travel, masses and verification objectives.
+`tools/griffin_spec.rhai` reads those typed facts; `griffin_visual_builder.rhai`
+materializes geometry through the native document journal. The vehicle owns
+references, installation poses, standard bodies, joints, latches and wiring.
 
-- `GriffinRampRequirements::GriffinEgressRamp` owns the standalone visual
-  dimensions, physical child and hinge identities, and port/starboard
-  deployment datums.
-- `GRC005_DeploymentCommandWithinLimit` owns the symmetric command acceptance
-  boundary in radians.
-- `GRC003_WidthClearsFlipWheelEnvelope` checks the FLIP lateral wheel stations,
-  half wheel width, and authored clearance against the outside rail envelope.
-- `GRC016_ContactTrackClearsTire` checks each separate contact-track width
-  against the source wheel width and two side clearances.
-- The physical ramp bodies, six hinge joints, and deck transition belong to
-  the physical Griffin model. The two root deck hinges and four section hinges
-  each expose their source-owned angular drive values. The render component does not provide
-  a collider, mass, inertia, or another physical body.
-- FLIP remains a referenced rover component; the ramp requirement reads FLIP's
-  wheel datums through its SysML source.
-- The physical top deck uses eight hidden convex perimeter-beam colliders and
-  a separate payload-deck collider. GRR-012 reads exact composed collider
-  vertices for the adapter, transition, and ramp track together from one USD
-  snapshot for each side. It measures minimum cross-section overlap across the
-  adapter's complete lateral span, transition length, top-face step, and hinge
-  seam. The clipped octagonal adapter makes AABB intersection too coarse to
-  prove overlap. SysML owns the transition length and minimum actual overlap.
-  The result is static interface evidence; rover traversal still needs
-  runtime wheel-contact evidence.
-- GRR-006 checks the composed physical track's convex collision bounds and toe
-  mesh vertices against SysML geometry. A shared mechanical relation derives
-  the toe bevel from track thickness and deployment angle; it is not another
-  Twin-owned length literal.
-- GRR-010 checks both toe edges against the authored terrain height. Source
-  geometry places the physical track centre at Y=5.19 m, aligns its top to the
-  adapter at Y=5.28 m, and uses a 12.228605 m top face at 27.833532 degrees
-  from the 0.44 m vehicle-reference touchdown datum. These are replaceable
-  study values. The focused GRR-010 check passed at source revision
-  `13950898190506578966`; both toe edges compute at terrain Y=0 within numeric
-  precision. Runtime deployment and rover traversal remain unverified.
-- GRR-011 owns the existing ramp-body mass and diagonal inertia in SysML and
-  checks the composed body matches those values. They remain labeled Twin
-  study proxies; center of mass and supplier mass properties are still open
-  under GR-021.
-- The ramp contact geometry uses two FLIP-aligned tracks, not a solid plate
-  across the open centre. The same source wheel stations and track width drive
-  render geometry and physical colliders.
+Each side has three articulated sections, each 1.799084054 m long, totaling
+5.397252162 m. Two collision-enabled tracks follow the FLIP wheel stations;
+the center remains open. Walking stock is 0.03 m thick. Four open truss guides
+follow each section. Their upper chord center is 0.18 m above the track datum,
+with 0.04 m stock; root guides rise from the track entrance toward that datum.
+The guides, tread bars and underside beams are structural appearance proxies,
+not qualified load-bearing hardware.
 
-## Physical flight stow and rail clearance
+Both roots lean thirty degrees inward from vertical. The port body has
+Z=+120 degrees; starboard has Y=180, Z=-120 degrees. Root travel is -50..+125
+and -125..+50 degrees respectively. Both intermediate physical folds are
+180 degrees. Their current child frames are offset -90 degrees, so their
+native stow, halfway and level targets are +90, 0 and -90 degrees. The middle
+axis is Y=+0.20 m and the toe axis Y=-0.015 m in their respective body frames.
+The saved source pose intersects the transition plates; the common unfolding
+sense also needs mechanism review.
 
-`GRR-017` owns the image-based flight-stow pose: the roots use mirrored +45/-45
-degree Z rotations, and the starboard root also uses a 180 degree Y mount. Under the
-simulator's fixed-axis `rotateXYZ` convention, their
-lander-frame headings are +45 and +135 degrees. The 180 degree Y mount makes both
-folded bundles mirror across the lander's X=0 centerline, with 6.4 m between
-their root stations. Both intermediate hinges turn 180 degrees to fold
-each three-section ramp into its transport bundle. Their full +/-180 degree
-travel remains available for commanded deployment and inspection. These angles
-are replaceable study estimates from the user-provided Griffin reference, not
-released supplier geometry. The root hinges retain source-owned asymmetric
-travel: port runs from -50 to +60 degrees and starboard from -60 to +50
-degrees; the terrain targets remain -27.83 degrees port and +27.83 degrees
-starboard.
-`GRR-018` keeps the rail bottoms on the upper track face: the authored rail
-bottom and track top are both Y=0.09 m in section-local coordinates. The
-focused composed-USD check measures all 12 rail bounds and 40 landing-leg
-geometry bounds in the canonical stage frame.
+Each fixed transition is a separate 15 kg rigid body, constrained to the bus.
+Its 1.35 m contact plate has a top at local Y=2.12 m and outboard edge at
+|X|=2.35 m. GRR-012 measures exact convex footprints across the full lateral
+span of the clipped payload adapter; an aggregate AABB cannot establish that
+interface. The nominal landed bus reference is Y=0.44 m. Nominal deployment
+angles come from the shared total span and landing/walking datums; runtime
+terrain fitting uses the measured hinge frames and retained DEM. These are
+study assumptions until supplier geometry is available.
 
-NASA describes Griffin's ramps as folding ramps and Astrobotic documents the
-optional egress-ramp interface, but public material does not publish the
-flight-stowed mechanism geometry or supplier ICD. The reference image controls
-this study pose; the mirrored +45/-45 degree local Z rotations, starboard
-180 degree Y mount, and asymmetric travel remain explicit replaceable
-assumptions, not a claim of released flight-hardware geometry.
+Each section has source-owned mass and diagonal inertia. Visual stock does
+not create extra physical bodies or mass. The deck uses separate convex
+perimeter beams and a payload adapter, preserving the tank openings. Only the
+matching root/transition seam is explicitly contact-filtered; middle and toe
+contacts with fixed plates remain active.
 
-Press **U** or choose **OPEN RAMPS** to unfold, and **F** or **DETACH ROVER**
-to release FLIP. Both manual actions remain available during flight and landing.
-The autonomous mission waits for touchdown. Intermediate hinges move through
-measured halfway poses before leveling; the root hinges then lower. Automatic
-release requires the source-owned sampled hinge settlement dwell. A flight
-opening is a mechanism pose, not terrain-contact or egress acceptance.
+## Commands and verification
 
-Six physical fixed latches carry the stowed bundles independently of their
-parallel hinge motors. The mission records the admitted native drive laws and
-sets their effort caps to zero while latched. Each release-command event
-restores only that pair's original torque caps, after the latch release has
-entered the native lifecycle. Targets, gains, frames and physical constraints
-remain under their existing owners. Missing or changed saved laws stop the
-action visibly. Profiles live in the mission instance and retire with it.
-Both manual and automatic unfolding use this same sequence.
+The mission owns sequencing and measured settlement; Modelica owns continuous
+motion profiles. Six fixed flight latches carry the stowed sections while
+parallel hinge motors supply no effort. Release restores each selected pair's
+admitted native motor law. Middle latches release first, then toe latches,
+then roots after section settlement. Missing or changed laws fail visibly.
+The observed interference means this authored sequence is not accepted.
 
-The 2026-10-02 wheel-path correction shortens each central hinge shaft from
-2.592 m to 1.408 m, the derived gap inside the two inner rails. Four rail-local
-coaxial pins retain the visible bearings. This avoids a transverse shaft above
-the tire corridors while preserving the folding axes. The split-shaft layout
-is a low-confidence reconstruction from the paired open trusses in the
-[Astrobotic reference](https://www.astrobotic.com/wp-content/uploads/2021/02/g1.png)
-and the operator's obstruction report; public supplier hinge drawings are
-unavailable. GRR-015 owns this clearance requirement. The USD section assets
-and integrated vehicle use the same derived shaft length.
+Manual **U / OPEN RAMPS** and **F / DETACH ROVER** remain separate operator
+commands. Automatic egress requires landed state, terrain-fitted targets and
+the source-owned hinge settlement dwell. Opening during flight is a mechanism
+pose, not terrain contact or traversable egress.
 
-Before this change, the owned live scene measured all three deployed port
-section normals upward (Y > 0.890) and aligned, and recorded FLIP ramp exit.
-That excludes an inverted section in that run, but does not establish general
-clearance or traversal acceptance for the revised geometry.
+The production Rhai observers are `griffin_ramp_requirements.rhai`,
+`griffin_ramp_flight_stow.rhai` and `griffin_ramp_touchdown_geometry.rhai` under
+`scenarios/tests/`. They read typed USD facts and bind SysML constraints.
+Their source-conformance, panel and leg checks have bounded coverage. Full
+folded-bundle clearance, deployment-path clearance, runtime landing and loaded
+rover traversal require their own passing evidence after a mechanism repair.
 
-## Evidence
+The standalone `components/lander/griffin_ramp_visual.usda` remains a compact
+presentation asset. Integrated geometry comes from the reusable section and
+toe components referenced by `vehicles/griffin_1.usda`. A miniature preview
+cannot establish the physical mechanism envelope.
 
-`scenarios/tests/griffin_ramp_requirements.rhai` observes the composed ramp
-instances in the Griffin vehicle document. It supplies typed USD facts and FLIP
-wheel measurements to generic source constraints; it does not author a second
-ramp limit or reinterpret a boolean Rhai predicate as requirement evidence.
-
-### Bus attachment reconstruction (2026-10-02)
-
-Each root hinge now has two visible inner-track pedestals, with short deck shoes
-that overlap the bus perimeter. Their height comes from the difference between
-the bus deck top and native root hinge; their lateral stations reuse the inner
-rail offsets. Member width reuses the estimated pivot lug width. The builder
-materializes these relationships rather than introducing independent positions.
-These are render-only members of the bus, with no extra body, mass or collider.
-
-The operator's screenshot exposed the missing visual load path. The
-[ESA artist rendering](https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander)
-supports bus-mounted ramps but does not resolve bracket construction. The
-[Astrobotic hardware photo](https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png)
-is useful for bus and leg structure; it does not establish these ramp brackets.
-Pedestal shape and stock therefore remain low-confidence study estimates under
-GRR-015. They sit inside the wheel tracks, outside the tire corridors, and leave
-the walking surfaces clear. A rendered review and actual rover traversal are
-separate acceptance steps.
+[Astrobotic](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
+confirms the adapter/ramp concept. Public imagery guides the inward silhouette
+and open trusses, but supplies no flight hinge positions, section dimensions,
+mass properties or released deployment ICD. All numerical reconstruction
+choices must retain that provenance boundary.
