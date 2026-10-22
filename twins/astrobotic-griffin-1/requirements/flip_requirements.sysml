@@ -11,11 +11,31 @@ package FlipRequirements {
     // `differential` is the LunCoSim steering geometry token for skid steer.
     enum def FlipSteeringMode { differential; }
 
-    // CAD-study dimensions are owned by FlipCadRequirements::CadStudy and
-    // converted to the SI runtime frame here. Rover-specific simulation policy
-    // remains owned by this part definition.
+    part def FlipPackagingStudy {
+        doc /* Twin reconstruction, 2026-10-22; the preserved FreeCAD variant
+         * and its source contract are unchanged. Venturi publishes 930 mm
+         * diameter for its FLEX wheel, and Astrolab says FLIP uses the same
+         * full-size tires:
+         * https://www.venturi.com/wp-content/uploads/2023/06/PR_19_06_2023.pdf
+         * https://www.astrolab.space/flip-rover/ .
+         * The 1.30 m wheelbase and 1.80 m chassis reconstruct the compact
+         * proportions in Astrolab's official drive-out rendering:
+         * https://www.astrolab.space/wp-content/uploads/2025/06/07-FLIPv2-DriveOut.4K1-2-2048x1152.jpg .
+         * They imply a 2.23 m longitudinal wheel envelope, consistent with
+         * Astrolab's qualitative 'more than 7 feet' statement:
+         * https://www.linkedin.com/company/astrolabspace .
+         * Wheelbase, body and inner deck sizes remain image-based estimates,
+         * not released flight dimensions. This does not qualify dynamics. */
+        attribute wheelDiameterM : Real = 0.930;
+        attribute wheelbaseM : Real = 1.300;
+        attribute chassisLengthM : Real = 1.800;
+        attribute equipmentDepthM : Real = 1.784;
+    }
+
+    // Baseline CAD conversion and the selected Twin packaging variant resolve
+    // here. Rover-specific simulation policy remains owned by this definition.
     part def FlipRover {
-        doc /* CAD body, wheel, and baseplate dimensions are owned by FlipCadRequirements::CadStudy and converted to SI for the Twin frame (CAD X,Y,Z maps to USD Y,Z,X). The Twin models the public four-wheel skid-steer architecture: fixed-axis wheels with independent left/right drive. Lower-frame thickness, equipment position, fixed panel mount, suspension rest length, mass, COM, and inertia remain replaceable simulation-study values. Rationale and confidence: griffin-size-evidence.md. */
+        doc /* Width, height and retained baseline datums come from FlipCadRequirements::CadStudy and convert to SI (CAD X,Y,Z maps to USD Y,Z,X). FlipPackagingStudy owns the current Twin tire diameter and compact longitudinal reconstruction, separately from the preserved FreeCAD variant. The Twin models the public four-wheel skid-steer architecture: fixed-axis wheels with independent left/right drive. Lower-frame thickness, equipment position, fixed panel mount, suspension rest length, mass, COM, and inertia remain replaceable simulation-study values. Rationale and confidence: griffin-size-evidence.md. */
         attribute componentAsset : TwinAssetPath = "vehicles/flip.usda";
         attribute usdRootPath : UsdPrimPath = "/World/FLIP";
         attribute localFrame : String = "Y-up SI metres; X longitudinal, Z lateral; CAD (X,Y,Z) maps to USD (Y,Z,X)";
@@ -31,20 +51,20 @@ package FlipRequirements {
         attribute solarArrayMode : String = "collapsible public concept; fixed panel is current visual proxy";
         attribute mobilityStatus : String = "mobility, power, thermal, and wheel parameters are study proxies";
         attribute exactVehicleIcdStatus : String = "TBD";
-        attribute wheelRadiusM : Real = FlipCadRequirements::CadStudy::wheelBandRadiusMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute wheelRadiusM : Real = FlipPackagingStudy::wheelDiameterM / 2.0;
         attribute wheelWidthM : Real = FlipCadRequirements::CadStudy::wheelWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute wheelStations : FlipWheelStation[4] = ("FL", "RL", "FR", "RR");
         attribute missionSteeringMode : FlipSteeringMode = "differential";
         attribute chassisWidthM : Real = FlipCadRequirements::CadStudy::bodyWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
-        attribute chassisLengthM : Real = FlipCadRequirements::CadStudy::bodyLengthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute chassisLengthM : Real = FlipPackagingStudy::chassisLengthM;
         attribute chassisHeightM : Real = .12;
         attribute equipmentBoxWidthM : Real = FlipCadRequirements::CadStudy::baseplateWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute equipmentBoxHeightM : Real = FlipCadRequirements::CadStudy::bodyHeightMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
-        attribute equipmentBoxDepthM : Real = FlipCadRequirements::CadStudy::baseplateLengthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute equipmentBoxDepthM : Real = FlipPackagingStudy::equipmentDepthM;
         attribute equipmentBoxCenterYM : Real = chassisHeightM / 2.0 + equipmentBoxHeightM / 2.0;
         attribute payloadDeckWidthM : Real = FlipCadRequirements::CadStudy::baseplateWidthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
         attribute payloadDeckThicknessM : Real = .04;
-        attribute payloadDeckDepthM : Real = FlipCadRequirements::CadStudy::baseplateLengthMm / FlipCadRequirements::CadStudy::millimetresPerMetre;
+        attribute payloadDeckDepthM : Real = FlipPackagingStudy::equipmentDepthM;
         attribute payloadDeckCenterYM : Real = equipmentBoxCenterYM + equipmentBoxHeightM / 2.0 + payloadDeckThicknessM / 2.0;
         attribute sensorMastHeightM : Real = 0.70;
         // One station definition drives the simulation, Editor projection,
@@ -56,10 +76,10 @@ package FlipRequirements {
         // assumption: GR-004-route-stall at tick 12762, throttle zero.
         attribute forwardYawOffsetRad : Real = -1.5707963267948966;
         attribute wheelStationX : Real[4] = (
-            FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
-            -FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
-            FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),
-            -FlipCadRequirements::CadStudy::wheelbaseMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre));
+            FlipPackagingStudy::wheelbaseM / 2.0,
+            -FlipPackagingStudy::wheelbaseM / 2.0,
+            FlipPackagingStudy::wheelbaseM / 2.0,
+            -FlipPackagingStudy::wheelbaseM / 2.0);
         attribute wheelStationY : Real[4] = (-.05, -.05, -.05, -.05);
         attribute wheelStationZ : Real[4] = (
             -FlipCadRequirements::CadStudy::trackMm / (2.0 * FlipCadRequirements::CadStudy::millimetresPerMetre),

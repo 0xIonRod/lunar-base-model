@@ -13,9 +13,12 @@ The bus component owns its structural presentation, payload supports and
 shared blanket material template in `components/lander/griffin_bus_visual.usda`.
 The assembly separately references four tank components, the engine-bay
 blanket and the three photovoltaic faces. The bus uses SI metres and Y-up,
-with its existing local origin and assembly mount. Its 3.60 m span and 0.72 m
+with its existing local origin and assembly mount. Its revised 4.50 m span and 0.72 m
 internal-frame height remain unqualified packaging estimates. They do not
-represent measured flight dimensions or an exterior blanket envelope.
+represent measured flight dimensions or an exterior blanket envelope. The
+[22 October packaging correction](griffin-integrated-packaging-review.md)
+supersedes the earlier 3.60 m span and regenerates the wider deck collision
+beams and frame attachments, while retaining the inner tank module.
 
 GBC-009 requires the complete source-enumerated structural inventory, together
 with the independent frame/deck/support geometry requirements. The component
@@ -33,7 +36,7 @@ The component checkpoint compares its complete child inventory and previews
 the composed vehicle. A temporary extra child must fail that same inventory
 gate; undo must restore it. The complete bus gate also checks payload support
 interfaces, material inputs, frame/deck geometry and tank-opening clearance.
-This presentation change does not alter mass, collision, hinge limits or any
+The original 21 October presentation pass did not alter mass, collision, hinge limits or any
 Modelica equation. The existing structural collision envelope is a coarse
 proxy and does not provide exact open-bay contact behavior.
 

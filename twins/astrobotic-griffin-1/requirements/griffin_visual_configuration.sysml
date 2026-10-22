@@ -125,22 +125,27 @@ package GriffinVisualConfigurationRequirements {
         attribute visualReviewLegDisplacementM : Real = 0.0;
         attribute visualReviewLegVelocityMps : Real = 0.0;
         // FLIP is mounted on the payload adapter. Its wheel bottoms (station
-        // -0.05 m minus 0.45 m tire radius) meet the adapter top at 2.12 m.
+        // -0.05 m minus 0.465 m tire radius) meet the adapter top at 2.12 m.
         // This station is the one review-scene placement source.
-        attribute visualReviewFlipStation : Position = (0.0, 3.06, 0.0);
+        attribute visualReviewFlipStation : Position = (0.0, 3.075, 0.0);
 
         /* SIZE ESTIMATE, 2026-09-30; rationale and uncertainties are in
          * requirements/griffin-size-evidence.md. NASA MSS 2024, slide 8
          * (https://ntrs.nasa.gov/citations/20240004236) labels the older
          * VIPER-configured vehicle envelope 4.5 m by 2.0 m, not its bus.
-         * Estimate the bus at 80% of that lateral envelope (3.6 +/-0.4 m).
+         * The former 80% reduction to 3.6 m crowded FLIP and left the diagonal
+         * array faces roughly 0.55 m outside the frame. The 2026-10-22 visual
+         * reconstruction uses a 4.5 m bus span and correspondingly outboard
+         * ramp bearings. This is a packaging estimate selected with the
+         * operator, not a reinterpretation of the historical overall label as
+         * a measured current bus dimension.
          * Current hardware photo https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/
          * supplies a relative peripheral-array silhouette, not a calibrated bus
          * span or deck height. Retain the 2.56 +/-0.5 m landed payload datum:
          * vehicle touchdown .44 m + adapter centre 2.08 m + half-stock .04 m.
          * Internal frame height .72 +/- .12 m and support dimensions remain
          * packaging estimates, not calibrated photograph measurements. */
-        attribute bodyDimensions : Dimensions = (3.60, 0.72, 3.60);
+        attribute bodyDimensions : Dimensions = (4.50, 0.72, 4.50);
         attribute bodyMount : Position = (0.0, 1.34, 0.0);
         /* June 2026 hardware exposes tank blankets and structural members
          * below the separate solar bank. The internal octagonal support
@@ -171,18 +176,18 @@ package GriffinVisualConfigurationRequirements {
         attribute busFoilSheen : Real = .75;
         attribute busFoilAxialPatternScale : Real = 1.0;
         attribute bodyGroundClearanceM : Real = 0.20;
-        attribute lowerSkirtDimensions : Dimensions = (3.40, 0.24, 3.40);
+        attribute lowerSkirtDimensions : Dimensions = (4.30, 0.24, 4.30);
         attribute lowerSkirtCenter : Position = (0.0, -0.36, 0.0);
         /* Apply the same estimated 80 mm stock to the upper perimeter deck
          * ring. Raise its center 40 mm to retain the original top surface:
          * bus-local .41 + .08/2 = .45 m. This reduces the opaque band below
          * that surface without altering its physical support elevation. */
-        attribute deckDimensions : Dimensions = (3.50, 0.08, 3.50);
+        attribute deckDimensions : Dimensions = (4.40, 0.08, 4.40);
         attribute deckCenter : Position = (0.0, 0.41, 0.0);
         /* Griffin high-gain dish: PUG August 2021 v5.02 p.30 labels a dish
          * at the bus edge. Reuse the parked shared antenna mechanism. Its
          * default 0.58 m reflector radius times the estimated 0.60 head scale
-         * yields 0.696 m diameter, roughly one fifth of this 3.60 m bus.
+         * yields 0.696 m diameter. Its size is retained in the wider bus study.
          * 180 mm mast and 70 degree parked tilt are packaging estimates;
          * they are not supplier CAD or Earth-pointing acceptance. The mount
          * derives from the top deck elevation and midline of its perimeter
@@ -217,7 +222,7 @@ package GriffinVisualConfigurationRequirements {
          * hardware, https://www.nasa.gov/gallery/astrobotics-griffin-1/ . */
         attribute avionicsPodDimensions : Dimensions = (.72, .36, .12);
         attribute avionicsDeckDimensions : Dimensions = (.80, .05, .16);
-        attribute avionicsDeckCenter : Position = (0.0, -.205, -1.58);
+        attribute avionicsDeckCenter : Position = (0.0, -.205, -2.03);
 
         /* Linear scene-referred display colors are visual design parameters;
          * Rhai consumes these values but does not define a second palette. */
@@ -285,10 +290,10 @@ package GriffinVisualConfigurationRequirements {
         attribute rampHingeInstances : GriffinRampHingeInstanceName[2] =
             ("RampHingePort", "RampHingeStarboard");
         attribute railStations : Position[8] =
-            ((-1.008, 0.0, 1.720), (1.008, 0.0, 1.720),
-             (1.720, 0.0, 1.008), (1.720, 0.0, -1.008),
-             (1.008, 0.0, -1.720), (-1.008, 0.0, -1.720),
-             (-1.720, 0.0, -1.008), (-1.720, 0.0, 1.008));
+            ((-1.27115656965, 0.0, 2.170), (1.27115656965, 0.0, 2.170),
+             (2.170, 0.0, 1.27115656965), (2.170, 0.0, -1.27115656965),
+             (1.27115656965, 0.0, -2.170), (-1.27115656965, 0.0, -2.170),
+             (-2.170, 0.0, -1.27115656965), (-2.170, 0.0, 1.27115656965));
         attribute railDimensions : Dimensions = (0.16, 0.72, 0.16);
 
         /* Separate central tank-support assembly. The four bore centres are
@@ -369,16 +374,23 @@ package GriffinVisualConfigurationRequirements {
          * This is a reference-informed packaging estimate, not measured CAD.
          * Shift the shared physics/visual root down .30 m and compensate the
          * local foot datums to preserve the previous terrain contact. */
+        /* June 2026 hardware places the front shock behind the lower opening
+         * in a broad solar face, not at the seam between array facets.
+         * Correct the former 45-degree indexing error relative to the bus,
+         * array and egress axes. Preserve the existing estimated radial foot
+         * reach (1.90*sqrt(2)); its absolute size is not calibrated flight CAD.
+         * Source: https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1348-edit/ */
+        attribute legStationRadiusM : Real = 2.68700576850888;
         attribute legStations : Position[4] =
-            ((1.90, .90, 1.90), (-1.90, .90, -1.90),
-             (-1.90, .90, 1.90), (1.90, .90, -1.90));
+            ((0.0, .90, legStationRadiusM), (0.0, .90, -legStationRadiusM),
+             (-legStationRadiusM, .90, 0.0), (legStationRadiusM, .90, 0.0));
         /* Each local +X axis points radially outward. This gives the shared
-         * leg mount interface one canonical orientation at every chamfered corner.
+         * leg mount interface one canonical orientation at every broad face.
          * The legacy PX/NX/PZ/NZ instance names are retained as stable IDs,
-         * rather than treated as placement directions. Feet at (+/-1.90,
-         * +/-1.90) preserve the estimated 4.50 m X/Z envelope including pads.
-         * Primary upper anchors meet chamfer midpoints; legs splay outward. */
-        attribute legStationRotationYDeg : Real[4] = (-45.0, 135.0, -135.0, 45.0);
+         * rather than treated as placement directions. Rotation preserves the
+         * radial support reach; it does not establish an overall flight width.
+         * Primary upper anchors meet broad-face midpoints; legs splay outward. */
+        attribute legStationRotationYDeg : Real[4] = (-90.0, 90.0, -180.0, 0.0);
 
         /* Connected forward array facets, informed by the June 2026 hardware:
          * https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1419-edit-2/ .
@@ -391,13 +403,10 @@ package GriffinVisualConfigurationRequirements {
         // Unit tangent components of the fixed 45-degree chamfer: 1/sqrt(2).
         attribute solarBankDiagonalFactor : Real = 0.7071067811865476;
         attribute solarBankPanelWidthM : Real = GriffinSolarRequirements::GriffinSolarArrayAssembly::frameWidthM;
-        attribute solarBankFrontZM : Real =
-            GriffinRampRequirements::GriffinEgressRamp::rampRailOffsetZM
-            + GriffinRampRequirements::GriffinEgressRamp::rampRailJointPinLengthM / 2.0
-            + GriffinRampRequirements::GriffinEgressRamp::physicalRampPanelClearanceM
-            + GriffinSolarRequirements::GriffinSolarArrayAssembly::frameThicknessM / 2.0 * solarBankDiagonalFactor
-            + geometryVerificationToleranceM
-            + solarBankPanelWidthM * solarBankDiagonalFactor;
+        // Reconstructed bank offset clears both the wider bus diagonal frame
+        // and the ramp channels. Verify composed envelopes independently;
+        // this is not a supplier installation dimension.
+        attribute solarBankFrontZM : Real = 2.87;
         attribute solarBankSideXM : Real = solarBankPanelWidthM / 2.0
             * (1.0 + solarBankDiagonalFactor);
         attribute solarBankSideZM : Real = solarBankFrontZM

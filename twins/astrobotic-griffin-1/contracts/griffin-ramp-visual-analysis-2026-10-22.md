@@ -1,5 +1,10 @@
 # Griffin ramp visual analysis — 22 October 2026
 
+This records the earlier checkpoint. The subsequent
+[integrated packaging correction](griffin-integrated-packaging-review.md)
+supersedes its outward ramp pose and dimensional assumptions; the results
+below retain their original source and acceptance scope.
+
 Status: current ramp appearance rejected in user review. The current requirement
 checks establish agreement with authored study geometry, not photographic
 fidelity. No ramp geometry or body scaling has been changed in this analysis.

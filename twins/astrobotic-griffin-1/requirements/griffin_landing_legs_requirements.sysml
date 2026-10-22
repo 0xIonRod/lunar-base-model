@@ -26,7 +26,7 @@ package GriffinLandingLegRequirements {
     }
 
     part def GriffinLandingLegAssembly {
-        doc /* Public Griffin material confirms four shock-absorbing legs. The legs are a repeated load-bearing subassembly with an independent visual/collision contract and a mount datum at each bus corner; source links are owned by the typed requirement-evidence catalog. */
+        doc /* Public Griffin material confirms four shock-absorbing legs. The legs are a repeated load-bearing subassembly with an independent visual/collision contract and a mount datum at each broad bus face; source links are owned by the typed requirement-evidence catalog. */
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_landing_leg_visual.usda";
         attribute bodyChildNames : GriffinLandingLegBodyChild[2] =
@@ -37,20 +37,19 @@ package GriffinLandingLegRequirements {
              "BodyMountArm");
         // Three-member topology follows the user-provided PGH Tech hardware
         // photograph. The source has perspective and no calibrated scale.
-        // Local +X points outward along a chamfer normal, Y up, Z tangential.
-        // Body edge radius = 1.80*(1+.5857864376269049)/sqrt(2) = 2.0183766 m.
-        // Foot/root radius = 1.90*sqrt(2) = 2.6870058 m. Their difference is
-        // the primary local upper X datum. Both are reconstruction estimates.
-        // Brace tops lie at skirt-frame world X/Z=(1.56,.68) and (.68,1.56)
-        // for the +X/+Z corner. Rotate them into this shared leg frame:
-        // upper X=(1.56+.68)/sqrt(2)-foot radius; tangential Z=+/- .88/sqrt(2).
+        // Local +X points outward along a broad-face normal, Y up, Z tangential.
+        // The June 2026 face opening establishes angular indexing only.
+        // Broad bus face radius = bodyDimensions.x/2 = 2.25 m; retain the
+        // estimated foot/root radius 2.6870058 m and tangential brace spacing.
+        // All upper anchors seat at the same broad face, independently of the
+        // solar laminate. Absolute dimensions remain reconstruction estimates.
         // Y=.10 = skirt mount 1.00 - root .90. The .68 m tangential rail
         // station remains a packaging estimate. Endpoint poses derive once
         // from these datums; no independent cylinder length/angle guesses.
         attribute loadMembers : GriffinLandingLegChild[3] =
             ("ShockPiston", "StrutOuter", "StrutInner");
         attribute memberUpperAnchors : Position[3] =
-            ((-0.668629150101524, 0.0, 0.0), (-1.103086578651014, .10, 0.622253967444162), (-1.103086578651014, .10, -0.622253967444162));
+            ((-0.43700576850888, 0.0, 0.0), (-0.43700576850888, .10, 0.622253967444162), (-0.43700576850888, .10, -0.622253967444162));
         attribute memberLowerAnchor : Position = (0.0, -1.26, 0.0);
         // Diameter estimates: 0.12 m main shock and 0.07 m braces. These
         // approximate the slender primary/secondary silhouette, not a flight
@@ -65,7 +64,7 @@ package GriffinLandingLegRequirements {
         // Remove the legacy -0.43 m whole-leg rest translation by baking that
         // offset only into the foot/hub nominal datums. Upper anchors stay at
         // their bus/skirt stations. At body Y=.44 the pad bottom remains Y=0;
-        // the 4.50 m X/Z footprint is unchanged. No ground mesh is moved.
+        // radial support reach is retained. No ground mesh is moved.
         attribute footPadCenterYM : Real = -1.32;
         // Axial suspension study values. The target is zero at the nominal
         // seated axial pose; nominal foot height follows the touchdown datum.
@@ -86,7 +85,8 @@ package GriffinLandingLegRequirements {
          * a compliant appearance proxy: their foot attachment follows the
          * piston and their upper endpoints translate during compression.
          * No rigid flight-brace closure under load is claimed.
-         * Source datums: primary length 1.4264168 m, vertical span 1.26 m,
+         * Historical 2026-10-03 sizing datums, preceding the 2026-10-22
+         * broad-face packaging correction: primary length 1.4264168 m, vertical span 1.26 m,
          * cos(inclination)=0.883332. Reconstruction assembly mass 5510 kg,
          * lunar g=1.62 m/s2 give quarter vertical load 2231.55 N and axial
          * load 2526.3 N. k=85000 N/m gives about 0.0297 m compression,
@@ -95,7 +95,9 @@ package GriffinLandingLegRequirements {
          * 2*sqrt(k*mEff) is about 19117 Ns/m, rounded to 19000 Ns/m.
          * The 12000 N cap is 4.75 times nominal axial load; impact capacity
          * must be measured separately. Masses and damping are estimates,
-         * and must be revised when the propellant/mass budget changes.
+         * and require renewed dynamics qualification after the mount change.
+         * This appearance correction retains them rather than retuning them
+         * to conceal the optimization-owned loaded-support solver error.
          * Appearance: https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
          * Four shock-absorbing legs: https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/
          * Supplier linkage and shock data remain unknown. */
@@ -165,7 +167,7 @@ package GriffinLandingLegRequirements {
         doc /* GLL-004 [evidence] leg identities come from GriffinVisualConfigurationRequirements and their collection cardinality agrees with the typed lander count. */
     }
     requirement def GLL005_LegPlacement {
-        doc /* GLL-005 [layout] visual and physical landing-leg roots match the same ordered native Position stations and outward-facing rotations owned by GriffinVisualConfiguration. Each root sits outward of a different chamfered bus corner; the primary upper anchor meets that chamfer midpoint below the internal frame; there is no second physical station table. */
+        doc /* GLL-005 [layout] visual and physical landing-leg roots match the same ordered native Position stations and outward-facing rotations owned by GriffinVisualConfiguration. Each root sits outward of a different broad bus face; the primary upper anchor meets that face midpoint below the internal frame. The front leg aligns with the solar face's lower opening as in the June 2026 hardware photographs; there is no second physical station table. */
     }
     constraint def GLLC006_MemberClosure {
         in measuredUpperEndpointErrorM : Real;

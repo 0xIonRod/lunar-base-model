@@ -230,9 +230,9 @@ fn typed_symmetry_check(source) {
         relations.push(mechanical_relations::symmetric_pairs_about_plane(
             [tank_stations[2]], [tank_stations[3]], body_mount, axis_forward, tolerance));
         relations.push(mechanical_relations::symmetric_pairs_about_plane(
-            [leg_stations[0],leg_stations[1]], [leg_stations[2],leg_stations[3]], body_mount, axis_port, tolerance));
+            [leg_stations[2]], [leg_stations[3]], body_mount, axis_port, tolerance));
         relations.push(mechanical_relations::symmetric_pairs_about_plane(
-            [leg_stations[0],leg_stations[2]], [leg_stations[3],leg_stations[1]], body_mount, axis_forward, tolerance));
+            [leg_stations[0]], [leg_stations[1]], body_mount, axis_forward, tolerance));
         for relation in relations {
             if relation == () || relation.status != "passed" { ok = false; }
         }
@@ -240,7 +240,7 @@ fn typed_symmetry_check(source) {
     sysml_requirement_checks::preflight("GVC-T-symmetry", ok,
         "ordered component stations must be mirrored across their authored symmetry planes",
         #{relations: relations, tolerance_m: tolerance},
-        #{tank_pairs: 2, leg_pairs: 4, tolerance_m: tolerance})
+        #{tank_pairs: 2, leg_pairs: 2, tolerance_m: tolerance})
 }
 
 fn on_start(me, ctx) {

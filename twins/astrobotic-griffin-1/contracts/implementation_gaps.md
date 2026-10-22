@@ -1,5 +1,10 @@
 # Griffin implementation and standards gap review
 
+The [22 October packaging checkpoint](griffin-integrated-packaging-review.md)
+records the latest saved geometry and focused verification. Earlier results
+below belong to their recorded revisions. Loaded-support physics, complete
+mission acceptance and the 60 FPS real-time target remain open.
+
 ## Current acceptance boundary — 2026-10-20
 
 Use [verification.md](verification.md) for the current artifact, source revisions

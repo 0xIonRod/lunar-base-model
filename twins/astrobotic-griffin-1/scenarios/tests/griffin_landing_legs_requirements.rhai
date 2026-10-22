@@ -191,13 +191,10 @@ fn on_tick(me, ctx) {
             expected:expected_mount_y,tolerance:f64_from(model.value(own("memberEndpointToleranceM")))});
 
         // Compare the mount to the actual octagon datum independently of the
-        // tube's own upper-anchor table. Cardinal or oversized mounts fail.
-        let profile=model.value(visual("outerBodyProfileCoordinates"));
-        let cx=(profile[1].x+profile[2].x)*body.x/4.0;
-        let cz=-(profile[1].y+profile[2].y)*body.z/4.0;
+        // tube's own upper-anchor table. The solar opening indexes this face.
         let station_radius=sqrt(stations[index].x*stations[index].x+stations[index].z*stations[index].z);
-        let expected_mount_x=sqrt(cx*cx+cz*cz)-station_radius;
-        checks.push(#{id:"GLL-009-"+name+"-chamfer-mount",component:"landing_leg",
+        let expected_mount_x=body.x/2.0-station_radius;
+        checks.push(#{id:"GLL-009-"+name+"-broad-face-mount",component:"landing_leg",
             requirement:"gll009",verification:VERIFICATION,kind:"attribute_component",
             path:mount_path+"/MountAxle",attr:"xformOp:translate",index:0,
             expected:expected_mount_x,tolerance:f64_from(model.value(own("memberEndpointToleranceM")))});

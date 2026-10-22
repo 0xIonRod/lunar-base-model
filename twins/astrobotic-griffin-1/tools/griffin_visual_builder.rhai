@@ -719,7 +719,11 @@ fn flip_vehicle_size_plan(doc, edit_target, root) {
     let zs=griffin_spec::rover_wheel_station_z();
     if names.len()!=4 || xs.len()!=4 || ys.len()!=4 || zs.len()!=4 {return plan_error("FLIP station source incomplete");}
     let width=griffin_spec::_sysml_attribute("wheelWidthM");
+    let radius=griffin_spec::rover_wheel_radius_m();
     let rest=griffin_spec::_sysml_attribute("suspensionRestLengthM");
+    if width==() || radius==() || rest==() || width<=0.0 || radius<=0.0 || rest<=0.0 {
+        return plan_error("FLIP wheel dimensions are incomplete");
+    }
     let ops=[];
     for i in 0..names.len() {
         let carrier=root+"/Suspension_"+names[i];
@@ -728,6 +732,8 @@ fn flip_vehicle_size_plan(doc, edit_target, root) {
         if !record.ok || record.type_name!="Cylinder" {return plan_error(wheel+": wheel Cylinder missing");}
         ops.push(#{SetTranslate:#{edit_target:edit_target,path:carrier,value:[xs[i],ys[i],zs[i]]}});
         for a in [#{name:"axis",type_name:"token",value:"\"Z\""},
+            #{name:"radius",type_name:"double",value:radius.to_string()},
+            #{name:"physxVehicleWheel:radius",type_name:"float",value:radius.to_string()},
             #{name:"height",type_name:"double",value:width.to_string()},
             #{name:"physxVehicleWheel:width",type_name:"float",value:width.to_string()},
             #{name:"lunco:suspension:restLength",type_name:"float",value:rest.to_string()}] {
@@ -2819,6 +2825,32 @@ fn tank_support_opening_plan(doc, edit_target, root, tank_index, plane_index) {
         section, segments, griffin_spec::visual_tank_collar_display_color())
 }
 
+// The inner tank-support module retains its calibrated study clearances when
+// the outer bus changes width. Bridge each homologous corner to the outer
+// frame instead of scaling the tank bores or leaving the module floating.
+fn griffin_tank_frame_links_plan(doc, edit_target, root, plane_index) {
+    let profile=griffin_spec::visual_outer_body_profile_coordinates();
+    let stations=griffin_spec::visual_rail_station_positions();
+    let radius=griffin_spec::visual_tank_support_perimeter_radius_m();
+    let section=griffin_spec::visual_tank_support_perimeter_section_m();
+    let planes=griffin_spec::visual_tank_support_planes_m();
+    if profile.len()!=8 || stations.len()!=8 || planes.len()!=3 || plane_index<0 || plane_index>=3
+        || radius<=0.0 || section<=0.0 {return plan_error("tank-to-frame link datums incomplete");}
+    let ops=[];let color=griffin_spec::visual_tank_support_display_color();
+    for i in 0..8 {
+        let a=vec3(profile[i].x*radius,planes[plane_index],-profile[i].y*radius);
+        let b=vec3(stations[i].x,planes[plane_index],stations[i].z);
+        let delta=b-a;let length=vlen(delta);let center=(a+b)*0.5;
+        if length<=section || delta.x==0.0 {return plan_error("tank-to-frame link has no radial span");}
+        let angle=-atan(delta.z/delta.x)*180.0/acos(-1.0);
+        let p=_component_cube_visual_ops(doc,edit_target,root+"/TankSupportPlate",
+            "FrameLink"+plane_index+"_"+i,vec3_array(center),[0.0,angle,0.0],
+            [length+section,section,section],color);
+        if !p.ok {return p;}for op in p.ops {ops.push(op);}
+    }
+    #{ok:true,ops:ops}
+}
+
 fn _octagonal_open_frame_mesh_plan(doc, edit_target, root, name, stations, ring_y, section, color) {
     let path = root + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
@@ -3296,6 +3328,34 @@ fn flip_payload_interface_observation(doc, root) {
       wheel_footprint_fits: footprint_fits, tolerance_m: tolerance}
 }
 
+// Seat the source-sized tires on the source-owned adapter, including the
+// fixed dock's rover-side datum. This keeps radius changes out of scene literals.
+fn hosted_flip_interface_plan(doc, edit_target, lander, rover, joint) {
+    let l=assembly_builder::composed_query(doc,#{path:lander,attrs:["xformOp:translate"]});
+    let r=assembly_builder::composed_query(doc,#{path:rover,attrs:["xformOp:translate"]});
+    let dimensions=sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::payloadAdapterDimensions");
+    let y=griffin_spec::_sysml_attribute("payloadAdapterCenterYM");
+    let ys=griffin_spec::rover_wheel_station_y();let radius=griffin_spec::rover_wheel_radius_m();
+    if !query_ok(l) || !query_ok(r) || !vec3_is_native(dimensions) || y==() || ys.len()!=4 || radius==() {
+        return plan_error("hosted FLIP interface datums unavailable");
+    }
+    let lt=l.attrs["xformOp:translate"];let rt=r.attrs["xformOp:translate"];
+    if !array_is(lt) || !array_is(rt) || lt.len()!=3 || rt.len()!=3 || lt[0]!=rt[0] || lt[2]!=rt[2] {
+        return plan_error("hosted FLIP roots must share their horizontal station");
+    }
+    let lowest=ys[0];for v in ys {lowest=min(lowest,v);}
+    let deck=y+dimensions.y/2.0;let bottom=lowest-radius;
+    let ops=[#{SetTranslate:#{edit_target:edit_target,path:rover,value:[rt[0],lt[1]+deck-bottom,rt[2]]}}];
+    if joint!="" {
+        let j=_component_query(doc,joint);
+        if !j.ok || j.type_name!="PhysicsFixedJoint" {return plan_error("hosted FLIP dock unavailable");}
+        for a in [#{name:"physics:localPos0",v:[0.0,deck,0.0]},#{name:"physics:localPos1",v:[0.0,bottom,0.0]}] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:joint,name:a.name,type_name:"point3f",value:assembly_edit::tuple3_literal(a.v)}});
+        }
+    }
+    #{ok:true,ops:ops}
+}
+
 // Update the eight assembly-owned corner posts in-place. These posts are not
 // part of the replaceable bus asset: they are visual-review detail geometry
 // authored in the vehicle document, so their metric contract must be applied
@@ -3486,11 +3546,9 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
     let radial=(stations[0].x*stations[0].x+stations[0].z*stations[0].z).sqrt();
     let profile=model.value(visual+"outerBodyProfileCoordinates");
     if !array_is(profile) || profile.len()!=8 {return plan_error("octagonal leg mount profile missing");}
-    // Midpoint of the +X/+Z chamfer. The reusable bracket seats at this
+    // Midpoint of the +X broad face. The reusable bracket seats at this
     // outer-frame datum rather than extending out to the foot/root radius.
-    let corner_x=(profile[1].x+profile[2].x)*body.x/4.0;
-    let corner_z=-(profile[1].y+profile[2].y)*body.z/4.0;
-    let bus_edge=sqrt(corner_x*corner_x+corner_z*corner_z)-section/2.0-overlap;
+    let bus_edge=body.x/2.0-section/2.0-overlap;
     let arm_end=radial+upper[0].x-clevis_width/2.0+overlap;
     if arm_end<=bus_edge {return plan_error("leg mount cannot reach outer frame");}
     let ops=[];
@@ -5219,6 +5277,48 @@ fn griffin_ramp_mount_plan(doc, edit_target, lander_root, side) {
 // Reconcile the physical ramp as a top-deck hinge plus three rigid sections.
 // Geometry is materialized by the same source-driven section builder used by
 // the visual assembly; this plan adds section masses, placement, and joints.
+// Reconcile a transport-angle change without rebuilding the section meshes.
+// Both the hinge drive and its fixed flight latch must describe the body pose.
+fn griffin_ramp_transport_plan(doc, edit_target, lander_root, side) {
+    if side!="port" && side!="starboard" {return plan_error("unknown ramp side");}
+    let i=if side=="port" {0}else{1};
+    let angle=griffin_spec::physical_ramp_port_root_stowed_angle_rad();
+    let limit=if i==0 {griffin_spec::physical_ramp_port_root_stow_limit_rad()}
+        else {griffin_spec::physical_ramp_starboard_root_stow_limit_rad()};
+    let deploy=_ramp_number("rampMaxDeploymentAngleRad");
+    let pi=acos(-1.0);
+    if angle==() || limit==() || deploy==() || angle<=0.0 || angle>limit || limit>=pi {
+        return plan_error("ramp transport pose is outside its source travel");
+    }
+    let body=lander_root+"/"+griffin_spec::ramp_names()[i];
+    let binding=griffin_spec::ramp_flight_latch_bindings()[i];
+    let hinge=lander_root+"/"+binding.hinge;let latch=lander_root+"/"+binding.latch;
+    for p in [#{path:body,kind:"Xform"},#{path:hinge,kind:"PhysicsRevoluteJoint"},#{path:latch,kind:"PhysicsFixedJoint"}] {
+        let r=_component_query(doc,p.path);
+        if !r.ok || r.type_name!=p.kind {return plan_error("ramp transport owner missing: "+p.path);}
+    }
+    let degrees=angle*180.0/pi;let sign=if i==0 {1.0}else{-1.0};
+    let rotation=vec3(0.0,if i==0 {0.0}else{180.0},sign*degrees);
+    let inverse=quat_inverse(quat_from_euler_xyz_deg(rotation));
+    let station=[_ramp_number(if i==0 {"physicalRampPortMountX"}else{"physicalRampStarboardMountX"}),
+        _ramp_number("physicalRampMountY"),_ramp_number("physicalRampMountZ")];
+    let ops=[#{SetRotate:#{edit_target:edit_target,path:body,value:vec3_array(rotation)}},
+        #{SetTranslate:#{edit_target:edit_target,path:body,value:station}}];
+    for j in [hinge,latch] {
+        for a in [#{name:"physics:localPos0",v:station},#{name:"physics:localPos1",v:[0.0,0.0,0.0]}] {
+            ops.push(#{SetAttribute:#{edit_target:edit_target,path:j,name:a.name,type_name:"point3f",value:assembly_edit::tuple3_literal(a.v)}});
+        }
+    }
+    for a in [#{name:"physics:lowerLimit",v:if i==0 {-deploy*180.0/pi}else{-limit*180.0/pi}},
+        #{name:"physics:upperLimit",v:if i==0 {limit*180.0/pi}else{deploy*180.0/pi}},
+        #{name:"drive:angular:physics:targetPosition",v:sign*degrees}] {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:hinge,name:a.name,type_name:"float",value:a.v.to_string()}});
+    }
+    ops.push(#{SetAttribute:#{edit_target:edit_target,path:latch,name:"physics:localRot1",type_name:"quatf",
+        value:assembly_edit::quat4_literal([inverse.w,inverse.x,inverse.y,inverse.z])}});
+    #{ok:true,ops:ops}
+}
+
 fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, side) {
     if doc == () || edit_target == () || !absolute_root(lander_root) {
         return plan_error("physical articulated-ramp planning requires a document, edit target, and absolute lander root");
@@ -6409,7 +6509,9 @@ fn axial_landing_gear_plan(doc, edit_target, root) {
             ops.push(#{SetAttribute:#{edit_target:edit_target,path:path+"/Tube",name:"primvars:displayColor",type_name:"color3f[]",value:"[(0.62,0.65,0.69)]"}});
         }
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:leg,name:"physics:mass",type_name:"float",value:foot_mass.to_string()}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:leg,name:"physics:centerOfMass",type_name:"float3",value:assembly_edit::tuple3_literal(vec3_array(foot))}});
+        // Migrate the legacy float3 opinion to the schema's point3f type.
+        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:leg,name:"physics:centerOfMass"}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:leg,name:"physics:centerOfMass",type_name:"point3f",value:assembly_edit::tuple3_literal(vec3_array(foot))}});
         let spring=leg+"_Spring";
         let flip=quat(1.0,0.0,0.0,0.0);
         let f0=qshock*flip;let f1=qtilt*flip;

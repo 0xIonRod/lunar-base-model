@@ -26,14 +26,19 @@ shader field, with optical study assumptions in `GriffinPlumeStudy`.
 
 See [the 2026-10-21 Griffin audit](contracts/griffin-model-audit-2026-10-21.md)
 for the reference comparison, production checks and remaining fidelity gaps.
-The [22 October checkpoint](contracts/griffin-model-audit-2026-10-22.md)
+The [earlier 22 October checkpoint](contracts/griffin-model-audit-2026-10-22.md)
 records the original 35-case registry cohort (31 passes), subsequent focused
-checks, and the current open physics, ramp-appearance and performance findings.
+checks, and the physics, ramp-appearance and performance findings at that revision.
 The current native ramp drive-control interface is available in
 [LunCoSim USD commit d389c12f1](https://github.com/LunCoSim/lunco-sim/commit/d389c12f1).
 The [ramp visual analysis](contracts/griffin-ramp-visual-analysis-2026-10-22.md)
-records the outward-stow mismatch against the supplied reference and the
-required inward-package reconstruction. Ramp appearance remains unaccepted.
+records the original outward-stow mismatch against the supplied reference.
+The later [integrated packaging correction](contracts/griffin-integrated-packaging-review.md)
+widens the bus to an estimated 4.50 m, reconstructs a compact FLIP, folds the
+ramps 30° inward from vertical and aligns the legs with the solar openings.
+Its screenshot and native static-clearance receipts document this bounded
+visual checkpoint; loaded deployment, flight dynamics and 60 FPS real-time
+acceptance remain open.
 The seven-engine/four-leg configuration is source-backed; current metric
 dimensions, mass properties and propulsion ratings remain reconstruction or
 integration-study inputs.

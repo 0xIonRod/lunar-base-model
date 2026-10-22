@@ -1,5 +1,10 @@
 # Griffin qualification checkpoint — 22 October 2026
 
+This records the earlier checkpoint. The subsequent
+[integrated packaging correction](griffin-integrated-packaging-review.md)
+supersedes its outward ramp pose and dimensional assumptions; the results
+below retain their original source and acceptance scope.
+
 The goal remains open. This checkpoint strengthens skirt verification and
 establishes a current full-registry baseline; it does not certify the whole
 model as accurate, visually accepted, fast or fully passing.

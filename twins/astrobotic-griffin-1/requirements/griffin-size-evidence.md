@@ -1,4 +1,15 @@
-# Griffin and FLIP size basis — updated 2026-10-21
+# Griffin and FLIP size basis — updated 2026-10-22
+
+The current packaging reconstruction is recorded in
+[the integrated review](../contracts/griffin-integrated-packaging-review.md).
+It supersedes the older 1.70 m FLIP wheelbase, 2.116 m chassis length, 0.90 m
+tire diameter, corner-indexed landing gear and outward 45° ramp stow below.
+The selected values are 1.30 m, 1.80 m, 0.93 m, broad-face landing gear and
+120° inward stow respectively. The selected bus reconstruction is now 4.50 m,
+with a 4.40 m perimeter deck; the older 3.60 m bus estimate is superseded.
+Only wheel diameter has a published numerical vendor basis; the other revised dimensions and angles are explicit
+reconstruction estimates. Historical entries below retain their dates and
+must not be read as current flight metrology or fresh acceptance.
 
 These are provisional reconstruction requirements, not an as-built mechanical
 ICD. A successful geometry check proves implementation of the assumptions; it

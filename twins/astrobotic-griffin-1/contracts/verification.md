@@ -1,5 +1,10 @@
 # Griffin verification boundary
 
+The [22 October packaging checkpoint](griffin-integrated-packaging-review.md)
+records the latest saved geometry and focused verification. Earlier results
+below belong to their recorded revisions. Loaded-support physics, complete
+mission acceptance and the 60 FPS real-time target remain open.
+
 ## Sun-facing autonomous descent
 
 The operator-requested GSA-011 study yaws the forward solar bank's +Z outward

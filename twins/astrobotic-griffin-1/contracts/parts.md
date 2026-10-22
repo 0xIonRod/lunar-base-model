@@ -37,8 +37,9 @@ the selected study layout. Their authored
 stations, dimensions, and support geometry are visual-study values, not a
 released flight installation. The optional egress ramps
 occupy opposite signed X sides. FLIP's nominal public path is direct top-deck
-egress; the ramp path is an alternate study branch. The four leg attachments occupy the signed X/Z corners, with each local +X
-axis rotated radially outward. Pads are below and farther outboard than their
+egress; the ramp path is an alternate study branch. The four leg attachments occupy the broad signed X/Z faces, with each local +X
+axis rotated radially outward. The front leg aligns with the lower solar-panel
+opening; see the [packaging correction](griffin-integrated-packaging-review.md). Pads are below and farther outboard than their
 upper attachments; PX/NX/PZ/NZ remain stable instance IDs, not axial stations.
 
 ## Presentation component contracts

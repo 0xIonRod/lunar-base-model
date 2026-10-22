@@ -11,11 +11,11 @@ def Xform "FlipChassis" (
 {
     custom string lunco:visual:component = "flip_chassis"
     def Cube "LowerFrame" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI"]
     )
     {
         double size = 2.0
-        custom double3 xformOp:scale = (1.058, 0.06, 0.738)
+        custom double3 xformOp:scale = (0.9, 0.06, 0.738)
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20000000298023224)]
         uniform token purpose = "render"
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
@@ -23,23 +23,23 @@ def Xform "FlipChassis" (
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
     }
     def Cube "WhiteEquipmentBox" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI"]
     )
     {
         double size = 2.0
         custom double3 xformOp:translate = (0.0, 0.258, 0.0)
-        custom double3 xformOp:scale = (1.05, 0.198, 0.73)
+        custom double3 xformOp:scale = (0.892, 0.198, 0.73)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.8299999833106995, 0.8399999737739563, 0.8399999737739563)]
         uniform token purpose = "render"
         bool physics:collisionEnabled = true
     }
     def Cube "FrontBumper" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI"]
     )
     {
         double size = 2.0
-        custom double3 xformOp:translate = (1.05, 0.06, 0.0)
+        custom double3 xformOp:translate = (0.892, 0.06, 0.0)
         custom double3 xformOp:scale = (0.06, 0.06, 0.6)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.14000000059604645)]
@@ -47,12 +47,12 @@ def Xform "FlipChassis" (
         bool physics:collisionEnabled = true
     }
     def Cube "PayloadDeck" (
-        prepend apiSchemas = "PhysicsCollisionAPI"
+        prepend apiSchemas = ["PhysicsCollisionAPI"]
     )
     {
         double size = 2.0
-        custom double3 xformOp:translate = (0.0, 0.476, 0.0)
-        custom double3 xformOp:scale = (1.05, 0.02, 0.73)
+        custom double3 xformOp:translate = (0.0, 0.47600000000000003, 0.0)
+        custom double3 xformOp:scale = (0.892, 0.02, 0.73)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.3400000035762787, 0.36000001430511475, 0.3799999952316284)]
         uniform token purpose = "render"
