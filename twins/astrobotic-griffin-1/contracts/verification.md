@@ -15,7 +15,10 @@ clearance and native loaded egress remain unqualified.
 The [detached root-section checkpoint](griffin-ramp-root-section-2026-10-23.md)
 qualifies its 2.149084054 m component geometry independently. Its 119-check
 gate includes native metric bounds; a 0.8 X-scale negative fixture fails that
-constraint. The installed ramp source gate passes 1,257 checks after its
+constraint. The [middle/fitting continuation](griffin-ramp-middle-section-2026-10-23.md)
+passes 119 checks for each saved root/middle component, including connected
+fitting envelopes and explicit structural PBR bindings; both shortened
+fixtures each fail exactly one constraint. The installed ramp source gate passes 1,257 checks after its
 observer recovers dimensions in the native cooking frame; flight stow passes
 272. These source checks do not close the installed interference above.
 

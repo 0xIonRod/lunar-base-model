@@ -7,7 +7,8 @@ collision-free stow, deployment or rover egress.
 
 A [separate longer-root component](../griffin-ramp-root-section-2026-10-23.md)
 is saved and tested at 2.149084054 m. It is an unmounted reconstruction
-prototype. The equal-length installed mechanism described below is unchanged.
+prototype. The [shorter middle and connected fittings](../griffin-ramp-middle-section-2026-10-23.md)
+are also saved and component-tested. The equal-length installed mechanism described below is unchanged.
 
 ## Ownership and current datums
 

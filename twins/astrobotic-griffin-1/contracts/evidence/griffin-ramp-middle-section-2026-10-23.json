@@ -1,0 +1,300 @@
+{
+  "binary_sha256": "5b24ec52f8893910cf764334a75279a20522bfdd8d30d0bbfdb827b5ed28c73d",
+  "engine_commit": "0cb4d37137554af3227a316100c903f44a1c3a4c",
+  "cases": [
+    {
+      "name": "root",
+      "scene": "tests/griffin_ramp_root_section.usda",
+      "channel": "GRIFFIN_RAMP_ROOT_SECTION",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "elapsed_s": 6.733,
+      "checks": 119,
+      "passes": 119,
+      "failures": 0,
+      "log_sha256": "d6012d1281649ec2dc95c3ec14163c2fe0a521a05e65411e74ad3f00feee0949"
+    },
+    {
+      "name": "middle",
+      "scene": "tests/griffin_ramp_middle_section.usda",
+      "channel": "GRIFFIN_RAMP_MIDDLE_SECTION",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "elapsed_s": 7.032,
+      "checks": 119,
+      "passes": 119,
+      "failures": 0,
+      "log_sha256": "366f867934cd5d4f4272edb3c98f47dc331f48335bfb77c4c90b92bbd274c9d7"
+    },
+    {
+      "name": "root-negative",
+      "scene": "tests/fixtures/griffin_ramp_root_section_short.usda",
+      "channel": "GRIFFIN_RAMP_ROOT_SECTION",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "elapsed_s": 6.08,
+      "checks": 119,
+      "passes": 118,
+      "failures": 1,
+      "log_sha256": "111bb476e1837c5379b5852b9f9584c7826634421744cd40e2e5e9d1707ba3a4"
+    },
+    {
+      "name": "middle-negative",
+      "scene": "tests/fixtures/griffin_ramp_middle_section_short.usda",
+      "channel": "GRIFFIN_RAMP_MIDDLE_SECTION",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "elapsed_s": 6.078,
+      "checks": 119,
+      "passes": 118,
+      "failures": 1,
+      "log_sha256": "cbb994066bcc193a9bb951bb2542b33fbae4f2cba03615c29370203d2dc5443a"
+    }
+  ],
+  "status": "root_and_middle_detached_components_qualified_installation_open",
+  "source_revision": 1657279327391262603,
+  "source_sha256": {
+    "components/lander/griffin_ramp_root_section_visual.usda": "ecde238ca2c7b12dddaf2e776d0e58188a0566662ce7fbe89d852080b7f40491",
+    "components/lander/griffin_ramp_middle_section_visual.usda": "06f85b0967effbd5e8c421b6daaeeb60f2746f6ef4adf4a586c33ada3308d16d",
+    "requirements/griffin_ramp_root_section_requirements.sysml": "76927a055f5ed7d2503f08aaeeedb065fe83b4e40f574a05b9e5594a7a3f9700",
+    "requirements/griffin_ramp_middle_section_requirements.sysml": "205a8987df2c1a7fd4c258071623515c87ab1f14d029eba1deee0288d294b63d",
+    "requirements/griffin_requirement_sources.sysml": "b3784619e7ab09ff02a9011de810ffb22068b453d8d5fa8cdbe228536c6a7b4b",
+    "tools/griffin_ramp_section_component.rhai": "3ae4a660059ad1f6cd1b47e8499ca657e095be72117905a63d2c83d171c7a219",
+    "tools/griffin_ramp_section_checks.rhai": "c8c24e7ac49970da18dd028d13e0289a06b00e0c822ee885853a87370c8c6855",
+    "tools/griffin_ramp_root_section.rhai": "c287f410f9aa400dbf6f07de33ab2510dc529f0140e0efccd1a90153b53f5e4e",
+    "tools/griffin_ramp_root_section_checks.rhai": "ce96b89b2ae653611193cf6d5dfb64f7d41de4eb92b79c35c0b27da23b49557f",
+    "tools/griffin_ramp_middle_section.rhai": "9f12a9f720bace75252590044b4e61939d45eca0c5f77ba6600d6078f2ee30ca",
+    "tools/griffin_ramp_middle_section_checks.rhai": "7ebf3b163fc9a2ecfcd43f96d005dc95748308724c2da0d0b9d4b68edca3e236",
+    "scenarios/tests/griffin_ramp_middle_section.rhai": "cd16d93635bd44968163da34b487bd732596875dca3836dbf9491fcef869f5aa",
+    "tests/griffin_ramp_middle_section.usda": "39cfa152856babdf408ee249dd3a498343b3f0df83f1b48a7448eaeec813d224",
+    "tests/fixtures/griffin_ramp_middle_section_short.usda": "ae1d26fe52b2abdd7ffee58ef885809d6d506c7b4b6a01cb86d8b11000956f1d",
+    "twin.toml": "1ca57b7f212512675b38a176641859016f332f8b698d67d1adf1c4cfc5fe4cd0",
+    "vehicles/griffin_1.usda": "a7cfd8a587f8e401643b0056f6a5bb3cb1d9d71dedccff9a09060fd596b74f73",
+    "components/lander/griffin_ramp_section_visual.usda": "a7116d879f0835f0fa7d4feb95673ba109257398513e1f536e61d2ce1f1659d4"
+  },
+  "sysml": {
+    "errors": 0,
+    "warnings": 153,
+    "new_component_warnings": 0
+  },
+  "provenance": {
+    "requirements": 223,
+    "records": 223,
+    "sources": 72
+  },
+  "boundaries": {
+    "mounted_in_vehicle": false,
+    "full_folding_clearance": false,
+    "loaded_egress": false,
+    "fps_acceptance": false
+  },
+  "preflight": [
+    {
+      "operation_id": 1,
+      "state": "ready",
+      "report": {
+        "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda",
+        "kind": "usd",
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "findings": [],
+        "info": {
+          "wheel_prims": [],
+          "control_bindings": []
+        }
+      },
+      "source_revisions": [
+        {
+          "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda",
+          "cid": "bafkreihm3yryziwhwew53lzoo5wq4wayricwmzrm4756rhmfecalp5aese"
+        }
+      ]
+    },
+    {
+      "operation_id": 2,
+      "state": "ready",
+      "report": {
+        "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda",
+        "kind": "usd",
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "findings": [],
+        "info": {
+          "wheel_prims": [],
+          "control_bindings": []
+        }
+      },
+      "source_revisions": [
+        {
+          "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda",
+          "cid": "bafkreiag7bnqsz7p7pk6rrbbw3nk523a6j2g63xuvx2klbwdhlndgcgrnu"
+        }
+      ]
+    },
+    {
+      "operation_id": 3,
+      "state": "ready",
+      "report": {
+        "path": "twin://astrobotic-griffin-1/tests/griffin_ramp_root_section.usda",
+        "kind": "usd",
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "findings": [],
+        "info": {
+          "wheel_prims": [],
+          "control_bindings": []
+        }
+      },
+      "source_revisions": [
+        {
+          "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda",
+          "cid": "bafkreihm3yryziwhwew53lzoo5wq4wayricwmzrm4756rhmfecalp5aese"
+        },
+        {
+          "path": "twin://astrobotic-griffin-1/tests/griffin_ramp_root_section.usda",
+          "cid": "bafkreibap5efqnl5zvkshl6uh7arpfxsalhxlgyta7a6wfeehrk2sxpqha"
+        }
+      ]
+    },
+    {
+      "operation_id": 4,
+      "state": "ready",
+      "report": {
+        "path": "twin://astrobotic-griffin-1/tests/griffin_ramp_middle_section.usda",
+        "kind": "usd",
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "findings": [],
+        "info": {
+          "wheel_prims": [],
+          "control_bindings": []
+        }
+      },
+      "source_revisions": [
+        {
+          "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda",
+          "cid": "bafkreiag7bnqsz7p7pk6rrbbw3nk523a6j2g63xuvx2klbwdhlndgcgrnu"
+        },
+        {
+          "path": "twin://astrobotic-griffin-1/tests/griffin_ramp_middle_section.usda",
+          "cid": "bafkreibzz6qvfbllvppubdxcjhotusmdioz7bx4d6g2iu5ci5lxmqe6seq"
+        }
+      ]
+    }
+  ],
+  "editor": {
+    "middle": {
+      "doc_id": 119577894507484,
+      "view": 5,
+      "target": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda",
+      "generation": 1346
+    },
+    "root": {
+      "doc_id": 119577747235212,
+      "view": 2,
+      "target": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda",
+      "generation": 305
+    },
+    "middle_gate": [
+      {
+        "check_count": 24,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      },
+      {
+        "check_count": 24,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      },
+      {
+        "check_count": 24,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      },
+      {
+        "check_count": 24,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      },
+      {
+        "check_count": 23,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      }
+    ],
+    "root_gate": [
+      {
+        "check_count": 24,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      },
+      {
+        "check_count": 24,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      },
+      {
+        "check_count": 24,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      },
+      {
+        "check_count": 24,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      },
+      {
+        "check_count": 23,
+        "error_count": 0,
+        "failure_count": 0,
+        "non_pass_count": 0,
+        "ok": true,
+        "source_revision": 1657279327391262603
+      }
+    ]
+  },
+  "baseline": {
+    "middle_missing_fittings": {
+      "stdout": "[#{\"component\": \"ramp_middle_section\", \"constraint\": \"GriffinRampMiddleSectionRequirements::GMSC001_PositiveSpan\", \"constraint_fingerprint\": 2369717044480470256, \"constraint_source\": SourceRef, \"diagnostics\": [#{\"code\": \"SYSML-IR-023\", \"message\": \"Connected hinge stock is unavailable\", \"severity\": \"warning\", \"source\": SourceRef}], \"error\": \"SysML constraint verdict: inconclusive\", \"expression_results\": [()], \"id\": \"GMS-001-native-metric-span\", \"kind\": \"required_constraint\", \"observations\": [#{\"path\": [SysmlFeatureHandle], \"provider\": \"source_literal\", \"provider_generation\": 1657279327391262603, \"source_revision\": 1657279327391262603, \"state\": \"value\", \"value\": 1.449084054}, #{\"doc_id\": 119577894507484, \"document_generation\": 757, \"path\": [SysmlFeatureHandle], \"provider\": \"usd\", \"stage_generation\": 1, \"state\": \"value\", \"value\": 1.668930060816365e-8}, #{\"path\": [SysmlFeatureHandle], \"provider\": \"source_literal\", \"provider_generation\": 1657279327391262603, \"source_revision\": 1657279327391262603, \"state\": \"value\", \"value\": 0.002}, #{\"detail\": \"Connected hinge stock is unavailable\", \"path\": [SysmlFeatureHandle], \"provider\": \"usd\", \"state\": \"unavailable\"}], \"ok\": false, \"required_constraint_definition\": \"GriffinRampMiddleSectionRequirements::GMSC001_PositiveSpan\", \"required_constraint_results\": [], \"required_constraint_usage\": \"GriffinRampMiddleSectionRequirements::GMS001_MiddleSectionGeometry::?\", \"requirement\": \"GriffinRampMiddleSectionRequirements::gms001\", \"source_revision\": 1657279327391262603, \"tolerance\": 0.0, \"verdict\": \"inconclusive\", \"verification\": \"GriffinRampMiddleSectionRequirements::Verify_GriffinRampMiddleSection\"}]\n"
+    },
+    "middle_missing_pin_material": {
+      "check_count": 24,
+      "error_count": 0,
+      "failure_count": 1,
+      "non_pass_count": 1,
+      "ok": false,
+      "source_revision": 1657279327391262603
+    }
+  }
+}

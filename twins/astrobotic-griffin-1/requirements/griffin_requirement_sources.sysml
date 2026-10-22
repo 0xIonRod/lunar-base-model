@@ -1529,4 +1529,13 @@ package GriffinRequirementSources {
         ref targetRequirement = GriffinPowerThermalRequirements::gep005;
         ref sources = (source_griffin_power_thermal_contract, source_griffin_power_thermal_study, source_image_solar_thermal_reference, source_nist_stefan_boltzmann);
     }
+    part source_griffin_ramp_middle_component : EvidenceSource {
+        doc /* Detached shorter-middle reconstruction, not supplier CAD or an installed mechanism. */
+        attribute role : EvidenceSourceRole = "VisualAsset";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda";
+    }
+    part evidence_griffin_ramp_middle_component : RequirementEvidence {
+        ref targetRequirement = GriffinRampMiddleSectionRequirements::gms001;
+        ref sources = (source_griffin_ramp_middle_component, source_griffin_root_section_study, source_www_astrobotic_com_griffin_lander);
+    }
 }

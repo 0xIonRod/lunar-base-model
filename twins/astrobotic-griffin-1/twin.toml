@@ -15,6 +15,12 @@ paths = ["requirements"]
 
 [verification]
 [[verification.cases]]
+name = "GriffinRampMiddleSectionRequirements::Verify_GriffinRampMiddleSection"
+scene = "tests/griffin_ramp_middle_section.usda"
+script = "scenarios/tests/griffin_ramp_middle_section.rhai"
+verdict_channel = "GRIFFIN_RAMP_MIDDLE_SECTION"
+
+[[verification.cases]]
 name = "GriffinRampRootSectionRequirements::Verify_GriffinRampRootSection"
 scene = "tests/griffin_ramp_root_section.usda"
 script = "scenarios/tests/griffin_ramp_root_section.rhai"
@@ -304,6 +310,12 @@ name = "griffin.ramp_root_section"
 requirements = "requirements/griffin_ramp_root_section_requirements.sysml"
 verification = "GriffinRampRootSectionRequirements::Verify_GriffinRampRootSection"
 usd_path = "/World/RampRootSection"
+
+[[components]]
+name = "griffin.ramp_middle_section"
+requirements = "requirements/griffin_ramp_middle_section_requirements.sysml"
+verification = "GriffinRampMiddleSectionRequirements::Verify_GriffinRampMiddleSection"
+usd_path = "/World/RampMiddleSection"
 
 [settings]
 "usd.runtime_persistence" = false

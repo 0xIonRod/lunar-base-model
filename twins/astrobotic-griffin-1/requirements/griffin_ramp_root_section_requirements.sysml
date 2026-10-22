@@ -1,5 +1,6 @@
 package GriffinRampRootSectionRequirements {
     private import ScalarValues::Real;
+    private import ScalarValues::Boolean;
     private import GriffinRequirementSources::TwinAssetPath;
     private import GriffinRequirementSources::UsdPrimPath;
 
@@ -19,11 +20,13 @@ package GriffinRampRootSectionRequirements {
         attribute usdPath : UsdPrimPath = "/World/RampRootSection";
         attribute lengthM : Real = 2.149084054;
         attribute geometryToleranceM : Real = 0.002;
-        attribute deckFrameName : RootFrameIdentity = "DeckHinge";
-        attribute foldFrameName : RootFrameIdentity = "MiddleFold";
-        attribute deckAxisYM : Real = GriffinRampRequirements::GriffinEgressRamp::rampSectionHingeBarrelCenterYM;
-        attribute foldAxisYM : Real = GriffinRampRequirements::GriffinEgressRamp::rampRailCenterYM
+        attribute entryFrameName : RootFrameIdentity = "DeckHinge";
+        attribute exitFrameName : RootFrameIdentity = "MiddleFold";
+        attribute entryAxisYM : Real = GriffinRampRequirements::GriffinEgressRamp::rampSectionHingeBarrelCenterYM;
+        attribute exitAxisYM : Real = GriffinRampRequirements::GriffinEgressRamp::rampRailCenterYM
             + GriffinRampRequirements::GriffinEgressRamp::rampRailHeightM / 2.0;
+        attribute plateAttachmentRunM : Real = 1.5 * GriffinRampRequirements::GriffinEgressRamp::rampPivotLugWidthM;
+        attribute forkWebSizeM : Real = GriffinRampRequirements::GriffinEgressRamp::rampPivotLugWidthM / 2.0;
         ref part sourceRamp : GriffinRampRequirements::GriffinEgressRamp;
     }
 
@@ -31,7 +34,8 @@ package GriffinRampRootSectionRequirements {
         in sourceLengthM : Real;
         in measuredDimensionErrorM : Real;
         in toleranceM : Real;
-        sourceLengthM > 0.0 and toleranceM >= 0.0
+        in connectedFittings : Boolean;
+        sourceLengthM > 0.0 and connectedFittings and toleranceM >= 0.0
             and measuredDimensionErrorM >= 0.0
             and measuredDimensionErrorM <= toleranceM;
     }
@@ -42,6 +46,10 @@ package GriffinRampRootSectionRequirements {
          * two underside beams and four treads per track shall follow that span.
          * Named deck and middle-fold Xform datums shall lie on the source
          * hinge axes at X=0 and X=lengthM respectively.
+         * Each entry tongue and paired exit fork cheeks shall connect the
+         * hinge axis to the same guide stock; a lower-axis plate shall bridge
+         * to the lower chord. Pins remain coaxial, and all fittings retain
+         * shared structural material and render-only collision roles.
          * Geometry belongs to this component; the vehicle owns its rigid body,
          * mass/inertia, hinge and installed pose. Native composed geometry and
          * standard attributes supply evidence. Missing or wrong units, types,

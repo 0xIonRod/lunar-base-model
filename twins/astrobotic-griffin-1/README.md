@@ -54,7 +54,10 @@ confirms that the saved middle tracks intersect their fixed transitions.
 Its unequal-length, opposite-toe-sweep candidate is a design study awaiting
 complete clearance/runtime verification. The first [detached root section](contracts/griffin-ramp-root-section-2026-10-23.md)
 is now authored and component-tested at 2.149084054 m. It is not mounted in
-the vehicle; the installed mechanism still has the recorded interference.
+the vehicle; the installed mechanism still has the recorded interference. The
+[shorter middle and connected hinge fittings](contracts/griffin-ramp-middle-section-2026-10-23.md)
+now pass their separate component gates. The new toe and complete folded
+mechanism remain open.
 The seven-engine/four-leg configuration is source-backed; current metric
 dimensions, mass properties and propulsion ratings remain reconstruction or
 integration-study inputs.

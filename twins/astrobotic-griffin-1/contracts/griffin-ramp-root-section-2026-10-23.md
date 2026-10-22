@@ -1,5 +1,9 @@
 # Detached Griffin ramp root section
 
+The [subsequent middle/fitting checkpoint](griffin-ramp-middle-section-2026-10-23.md)
+extends this first root reconstruction with connected tongue/fork hardware
+and the shorter middle component. Its receipt pins the current source cohort.
+
 The longer root is saved as `components/lander/griffin_ramp_root_section_visual.usda`.
 It has a source-owned length of **2.149084054 m**, two dark walking tracks,
 four silver open truss guides, two underside beams and four treads per track.
