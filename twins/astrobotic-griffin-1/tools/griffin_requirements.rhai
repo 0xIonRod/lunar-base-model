@@ -908,7 +908,27 @@ fn landing_gear_spring_pose_report(doc_id, lander_path, source, verification) {
 // One composed target, one pinned source revision and the retained DEM datum.
 // The surface measurement is telemetry, not a fictitious authored collider.
 fn landing_setup_geometry_check(doc_id, target_path, lander_path) {
-    let source=sysml_requirements::source();
+    let assembly = "GriffinLandingLegRequirements::GriffinLandingLegAssembly::";
+    let configuration = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let attributes = [
+        griffin_spec::qualified_attribute_name("landingVehicleReferenceTouchdownY"),
+        griffin_spec::qualified_attribute_name("siteSurfaceY"),
+        configuration + "landingLegInstances",
+        configuration + "legStations"
+    ];
+    for field in ["footPadCenterYM", "footPadHeightM", "springLowerLimitM",
+        "springUpperLimitM", "springStiffnessNPerM", "springDampingNsPerM",
+        "springMaxForceN", "springTargetVelocityMps", "springPoseToleranceM",
+        "physicalLegPlacementToleranceM"] {
+        attributes.push(assembly + field);
+    }
+    let source = sysml_requirements::source_with_selection(attributes, [
+        "GriffinSimulationAccuracyRequirements::gr037",
+        "GriffinSimulationAccuracyRequirements::gr038",
+        "GriffinLandingLegRequirements::gll009",
+        "GriffinLandingLegRequirements::gll010"
+    ], ["Griffin1Requirements::Verify_GriffinSurfaceOperations",
+        "GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements"]);
     if source==() || source.ok!=true {return #{ok:false,error:"landing SysML source unavailable"};}
     let reference=griffin_spec::_sysml_attribute("landingVehicleReferenceTouchdownY");
     let ground=griffin_spec::_sysml_attribute("landingTerrainDatumY");
