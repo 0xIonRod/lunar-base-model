@@ -20,7 +20,7 @@ Attach it with `RunScenarioAsset` after the scene's participants are admitted.
 Its verdict channel is `GRIFFIN_LANDING_PREFLIGHT`.
 
 The regular optimization production binary with Tracy, SHA-256
-`ed2ebf7a2eba3b5a1f11132f88c572ec74d0e3bb4ba2077417b9565c081e6b365`,
+`ed2ebf7a2eba3b5a1f11132f88c572ec74d0e3bb4ba2077417b9565c0816b365`,
 passes all four checks in the windowed host, PID 68464/API 4836. The normal
 mission also reports its geometry/spring and dynamic assembly-mass preflights
 passing before descent. The screenshot was inspected; API Exit releases the
