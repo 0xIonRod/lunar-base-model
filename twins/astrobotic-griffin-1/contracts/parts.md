@@ -50,6 +50,7 @@ independently through the runtime authoring tools.
 | Component asset | Stable child geometry | Policy |
 |---|---|---|
 | `components/lander/griffin_bus_visual.usda` | octagonal open perimeter frame, white equipment box, thermal panel, logo marks, top deck | octagonal Griffin silhouette with open tank-support centre; render-only |
+| `components/lander/griffin_landing_leg_physics.usda` | shared lumped rigid-body properties only | no child geometry; the integrated leg owns exactly its source-enumerated visual assembly and moving piston |
 | `components/lander/griffin_landing_leg_visual.usda` | outer/inner strut, shock piston, foot pad | four repeated outboard strut assemblies; render-only |
 | `components/lander/griffin_tank_visual.usda` | MLI tank and three bands | horizontal gold tank study; render-only |
 | `components/lander/griffin_solar_panel_visual.usda` | frame, cells, dividers, hinge, paired brackets, paired support links | shared render-only component referenced by the three independently placed panel roots |
@@ -88,7 +89,7 @@ Each engine's plume presents its own delivered state.
 thrust, flow and effective Isp velocity, plus nozzle radius, area, Mach, gamma
 and wall angle from `NozzleDesign`. A failed engine loses its own light and
 volume while the other six remain independent. Rhai authors connections;
-Modelica owns continuous state and equations; WGSL integrates the visual field.
+Modelica owns continuous state and equations; WESL integrates the visual field.
 
 The shared Modelica streamtube publishes five stations for gas radius, density,
 temperature, speed and energy-bounded emissivity. Cylinder volumes accommodate

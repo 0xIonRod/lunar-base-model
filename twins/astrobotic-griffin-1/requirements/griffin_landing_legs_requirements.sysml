@@ -20,10 +20,17 @@ package GriffinLandingLegRequirements {
         BodyMountArm;
     }
 
+    enum def GriffinLandingLegBodyChild {
+        LandingLegVisual;
+        ShockPiston;
+    }
+
     part def GriffinLandingLegAssembly {
         doc /* Public Griffin material confirms four shock-absorbing legs. The legs are a repeated load-bearing subassembly with an independent visual/collision contract and a mount datum at each bus corner; source links are owned by the typed requirement-evidence catalog. */
         attribute usdRootPath : UsdPrimPath = "/World/Griffin1";
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_landing_leg_visual.usda";
+        attribute bodyChildNames : GriffinLandingLegBodyChild[2] =
+            ("LandingLegVisual", "ShockPiston");
         attribute childNames : GriffinLandingLegChild[9] =
             ("StrutOuter", "StrutInner", "ShockPiston", "FootPad",
              "MountClevisOuter", "MountClevisInner", "FootPadPlate", "MountAxle",
@@ -196,10 +203,10 @@ package GriffinLandingLegRequirements {
         in collisionMatchesVisual : Boolean;
         in geometrySourceLinked : Boolean;
         in selfCollisionFilterClear : Boolean;
-        in legacyCollisionDisabled : Boolean;
+        in bodyInventoryMatches : Boolean;
         collisionEnabled and proxyHidden and visualCollisionDisabled
             and collisionMatchesVisual and geometrySourceLinked
-            and selfCollisionFilterClear and legacyCollisionDisabled;
+            and selfCollisionFilterClear and bodyInventoryMatches;
     }
 
     constraint def GLLC008_PadColliderStationMatchesSource {
@@ -217,7 +224,7 @@ package GriffinLandingLegRequirements {
         require GLLC008_PadColliderStationMatchesSource {
             in toleranceM = GriffinLandingLegAssembly::physicalLegPlacementToleranceM;
         }
-        doc /* GLL-008 [contact geometry] each dynamics leg root shall match the ordered COM-frame legStations and legStationRotationYDeg in GriffinVisualConfiguration. Its hidden Y-axis cylinder contact proxy shall be generated from the composed visible FootPad cylinder and link to it through LunCoDerivedGeometryAPI and lunco:derived:source. Source drift shall reject collider admission until regeneration. The effective Avian-cooked contact cylinder shall match the composed visible FootPad cylinder in radius, height, Y-axis orientation, and center within the authored tolerance after both geometries are compared in the canonical-stage metre frame. The visible component remains the geometry source; only the proxies own contact. The braces, plate, moving piston, bus mount arm, axle, clevises, and fixed barrel shall have source-derived colliders so a detached rover cannot pass through landing gear. Obsolete coarse strut/capsule shapes remain disabled. The visible load-spreading plate shall use the typed footPadPlateWidthM, footPadPlateHeightM, footPadPlateDepthM, and footPadPlateCenterYM datums.  The physical leg body shall use the source continuousCollisionDetection policy so thin pad contact is swept through time, rather than accepted from endpoint overlap alone. A runtime landing/impact test must separately establish terrain clearance; source geometry agreement is not that verdict. */
+        doc /* GLL-008 [contact geometry] each dynamics leg root shall match the ordered COM-frame legStations and legStationRotationYDeg in GriffinVisualConfiguration. Its hidden Y-axis cylinder contact proxy shall be generated from the composed visible FootPad cylinder and link to it through LunCoDerivedGeometryAPI and lunco:derived:source. Source drift shall reject collider admission until regeneration. The effective Avian-cooked contact cylinder shall match the composed visible FootPad cylinder in radius, height, Y-axis orientation, and center within the authored tolerance after both geometries are compared in the canonical-stage metre frame. The visible component remains the geometry source; only the proxies own contact. The braces, plate, moving piston, bus mount arm, axle, clevises, and fixed barrel shall have source-derived colliders so a detached rover cannot pass through landing gear. Each integrated moving leg body shall contain exactly the source-enumerated bodyChildNames children. The shared physics component shall carry body properties only; rendered parts and contact proxies belong to the named visual and piston children. The visible load-spreading plate shall use the typed footPadPlateWidthM, footPadPlateHeightM, footPadPlateDepthM, and footPadPlateCenterYM datums.  The physical leg body shall use the source continuousCollisionDetection policy so thin pad contact is swept through time, rather than accepted from endpoint overlap alone. A runtime landing/impact test must separately establish terrain clearance; source geometry agreement is not that verdict. */
     }
     constraint def GLLC009_BusAndAxleOverlap {
         in measuredBusOverlapM : Real;

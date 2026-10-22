@@ -165,6 +165,9 @@ fn on_tick(me, ctx) {
             requirement:"gll009",verification:VERIFICATION,kind:"attribute",
             path:pin,attr:"axis",expected:usd_axis(sysml_requirements::native_value(source,own("mountAxleAxis")))});
     }
+    let pad_report = griffin_requirements::landing_pad_constraint_report((), root);
+    if pad_report.ok != true { throw(pad_report.error); }
+    for check in pad_report.checks { checks.push(check); }
     let spring_pose = griffin_requirements::landing_gear_spring_pose_report(
         (), root, source, VERIFICATION);
     for check in spring_pose.checks { checks.push(check); }

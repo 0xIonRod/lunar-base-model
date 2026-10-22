@@ -46,5 +46,6 @@ luna2_twin/.cache/terrain/luna2/luna2_sinus_lunicus_preview.png
 twins/**/.cache/
 twins/**/tests/_power_failure_*.usda
 twins/**/tests/_bus_failure_*.usda
+twins/**/tests/_skirt_failure_*.usda
 twins/**/terrain/*/materials/
 twins/**/terrain/*/.bakekey

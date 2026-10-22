@@ -283,7 +283,7 @@ package GriffinRequirementSources {
 
     part source_lunco_terrain_layered_shader : EvidenceSource {
         attribute role : EvidenceSourceRole = "ShaderAsset";
-        attribute locator : SourceLocator = "lunco://shaders/terrain_layered.wgsl";
+        attribute locator : SourceLocator = "lunco://shaders/terrain_layered.wesl";
     }
 
     part source_griffin_solar_panel_visual_asset : EvidenceSource {

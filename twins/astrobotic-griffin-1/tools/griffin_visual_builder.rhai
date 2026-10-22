@@ -634,7 +634,7 @@ fn griffin_bus_finish_plan(doc, edit_target, root) {
         ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:shader,name:name}});
     }
     for attr in [#{name:"info:implementationSource",kind:"token",value:"\"sourceAsset\""},
-        #{name:"info:wgsl:sourceAsset",kind:"asset",value:"@lunco://shaders/mli_foil.wgsl@"}] {
+        #{name:"info:wesl:sourceAsset",kind:"asset",value:"@lunco://shaders/mli_foil.wesl@"}] {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:shader,name:attr.name,type_name:attr.kind,value:attr.value}});
     }
     #{ok:true,ops:ops}
@@ -1967,7 +1967,7 @@ fn physical_landing_leg_pad_geometry() {
     let configuration = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let source = sysml_requirements::source_with_selection([
         visual + "footPadRadiusM", visual + "footPadHeightM",
-        visual + "footPadCenterYM",
+        visual + "footPadCenterYM", visual + "bodyChildNames",
         visual + "springLowerLimitM", visual + "springUpperLimitM",
         visual + "springStiffnessNPerM", visual + "springDampingNsPerM",
         visual + "springMaxForceN", visual + "springTargetVelocityMps",
@@ -1986,6 +1986,7 @@ fn physical_landing_leg_pad_geometry() {
     if source.ok != true {
         return plan_error("SysML landing-leg geometry source is unavailable");
     }
+    let body_children = sysml_requirement_checks::source_enum_identifiers(source, visual + "bodyChildNames");
     let radius = sysml_requirements::number(source, visual + "footPadRadiusM");
     let height = sysml_requirements::number(source, visual + "footPadHeightM");
     let center_y = sysml_requirements::number(source, visual + "footPadCenterYM");
@@ -2011,7 +2012,7 @@ fn physical_landing_leg_pad_geometry() {
         visual + "physicalLegRotationToleranceDeg");
     let tolerance = sysml_requirements::number(source,
         visual + "padColliderToleranceM");
-    let geometry_missing = radius == () || height == () || center_y == ()
+    let geometry_missing = body_children.len() == 0 || radius == () || height == () || center_y == ()
         || tolerance == () || touchdown_y == () || surface_y == ();
     let spring_missing = lower_limit == () || upper_limit == () || stiffness == ()
         || damping == () || max_force == () || target_velocity == ()
@@ -2026,6 +2027,7 @@ fn physical_landing_leg_pad_geometry() {
         return plan_error("SysML landing-leg geometry, spring, or touchdown datums are incomplete or invalid");
     }
     #{ok: true, radius_m: radius, height_m: height, center_y_m: center_y,
+      body_children: body_children,
       stations: stations, rotations_y_deg: rotations,
       spring_lower_limit_m: lower_limit, spring_upper_limit_m: upper_limit,
       spring_stiffness_n_per_m: stiffness, spring_damping_ns_per_m: damping,
@@ -2044,7 +2046,6 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
     if geometry.ok != true { return geometry; }
     let suffixes = ["PX", "NX", "PZ", "NZ"];
     let ops = [];
-    let removed_legacy = [];
     let spring_targets = [];
     for index in 0..suffixes.len() {
         let leg_path = root + "/Leg" + suffixes[index];
@@ -2095,30 +2096,6 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
             return plan_error(joint_path + ": physical suspension joint is missing");
         }
 
-        // Remove the assembly-local legacy presentation and pad capsule; the
-        // referenced physical leg body, mass, joint, and outputs remain.
-        for name in ["Strut", "Pad" + suffixes[index]] {
-            let legacy_path = leg_path + "/" + name;
-            if query_ok(assembly_builder::composed_query(doc,
-                #{path: legacy_path, children: false})) {
-                ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_path}});
-                removed_legacy.push(legacy_path);
-            }
-        }
-        // Disable and hide the old source component's coarse render/collision
-        // primitives. The shared, requirement-driven visual reference below
-        // owns presentation; the new FootPadCollider owns terrain contact.
-        for name in ["TopMount", "OuterStrut", "ShockHousing", "Piston", "FootHub", "FootPad"] {
-            let old_path = leg_path + "/" + name;
-            if query_ok(assembly_builder::composed_query(doc,
-                #{path: old_path, children: false})) {
-                ops.push(#{SetAttribute: #{edit_target: edit_target, path: old_path,
-                    name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
-                ops.push(#{SetAttribute: #{edit_target: edit_target, path: old_path,
-                    name: "visibility", type_name: "token", value: "\"invisible\""}});
-            }
-        }
-
         let visual_path = leg_path + "/LandingLegVisual";
         let visual_prim = assembly_builder::composed_query(doc,
             #{path: visual_path, children: false});
@@ -2160,7 +2137,6 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
       center_y_m: geometry.center_y_m, tolerance_m: geometry.tolerance_m,
       spring_target_positions_m: spring_targets,
       spring_limits_m: [geometry.spring_lower_limit_m, geometry.spring_upper_limit_m],
-      removed_legacy_paths: removed_legacy,
       collider_paths: [root + "/LegPX/LandingLegVisual/FootPadCollider",
         root + "/LegNX/LandingLegVisual/FootPadCollider",
         root + "/LegPZ/LandingLegVisual/FootPadCollider",
@@ -2272,7 +2248,7 @@ fn physical_landing_leg_pad_observation(doc, root) {
     let all_collision_enabled = true;
     let all_proxy_hidden = true;
     let all_visual_disabled = true;
-    let all_legacy_disabled = true;
+    let all_body_inventory_matches = true;
     let all_source_relationships = true;
     let all_self_collision_filters_clear = true;
     let all_geometry_available = true;
@@ -2620,33 +2596,13 @@ fn physical_landing_leg_pad_observation(doc, root) {
         if visual.attrs["physics:collisionEnabled"] != false {
             all_visual_disabled = false;
         }
-        for legacy_name in ["OuterStrut", "FootPad"] {
-            let legacy_path = leg_path + "/" + legacy_name;
-            // Inactive prims have no composed contact geometry. Inspect only
-            // children admitted by this same composed leg snapshot.
-            if !leg_pose.children.contains(legacy_path) { continue; }
-            let legacy = assembly_builder::composed_query(doc,
-                #{path: legacy_path, children: false,
-                  attrs: ["physics:collisionEnabled", "visibility"]});
-            if !query_ok(legacy) || legacy.attrs == ()
-                || legacy.attrs["physics:collisionEnabled"] != false
-                || legacy.attrs["visibility"] != "invisible" {
-                all_legacy_disabled = false;
-            } else if !physical_landing_pad_snapshot_matches(legacy, snapshot_doc,
-                    document_generation, stage_generation) {
-                return #{ok: false, state: "stale",
-                    detail: leg_path + ": legacy collider measurements came from a different composed USD snapshot"};
-            }
+        let expected_children=[];
+        for name in geometry.body_children {expected_children.push(leg_path+"/"+name);}
+        if leg_pose.children.len()!=expected_children.len() {
+            all_body_inventory_matches=false;
         }
-        let legacy_proxy = assembly_builder::composed_query(doc,
-            #{path: leg_path + "/FootPadCollider", children: false});
-        if query_ok(legacy_proxy) {
-            if !physical_landing_pad_snapshot_matches(legacy_proxy, snapshot_doc,
-                    document_generation, stage_generation) {
-                return #{ok: false, state: "stale",
-                    detail: leg_path + ": legacy collider query came from a different composed USD snapshot"};
-            }
-            all_legacy_disabled = false;
+        for path in expected_children {
+            if !leg_pose.children.contains(path) {all_body_inventory_matches=false;}
         }
         details.push(#{leg: leg_path, proxy: collider_path, visual: visual_path,
             collision_enabled: collider.attrs["physics:collisionEnabled"],
@@ -2683,7 +2639,7 @@ fn physical_landing_leg_pad_observation(doc, root) {
       source_relationships_valid: all_source_relationships,
       self_collision_filter_clear: all_self_collision_filters_clear,
       visual_collision_disabled: all_visual_disabled,
-      legacy_collision_disabled: all_legacy_disabled,
+      body_inventory_matches: all_body_inventory_matches,
       collision_matches_visual: all_geometry_available && all_axes_match
         && all_geometry_semantics_match && all_cooked_geometry_comparable
         && all_cooked_axis_matches && geometry_deviation <= geometry.tolerance_m,
@@ -2970,7 +2926,7 @@ fn _central_bucket_mesh_plan(doc, edit_target, root, name, profile, segments, co
     ops.push(#{SetRotate: #{edit_target: edit_target, path: path, value: [0.0, 0.0, 0.0]}});
     ops.push(#{SetScale: #{edit_target: edit_target, path: path, value: [1.0, 1.0, 1.0]}});
     ops.push(#{RevolveProfileMesh: #{edit_target: edit_target, path: path,
-        profile: profile, angular_segments: segments.to_int(), normal_crease_angle_deg: 0.0, display_color: color,
+        profile: profile, axis: [0.0, 1.0, 0.0], angular_segments: segments.to_int(), normal_crease_angle_deg: 0.0, display_color: color,
         collision_enabled: false}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
         name: "purpose", type_name: "token", value: "\"render\""}});
@@ -4061,7 +4017,7 @@ fn apply_refined_griffin_tank(doc, edit_target, root, parent_gen) {
 }
 
 // Refine only the engine-skirt frame.  This is intentionally a separate
-// Editor task: the four rails remain assembly-owned geometry, while the
+// Editor task: the continuous perimeter rail remains assembly-owned, while the
 // engine bell references stay untouched and continue to own the visual bell
 // profile.  All dimensions and the adapter datum come from the lander SysML
 // source, so this helper contains no second placement table.
@@ -4070,7 +4026,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         return plan_error("refine_griffin_engine_skirt_plan requires a document, edit target, and absolute root");
     }
     let selected=[];
-    for name in ["perimeterRailName","railLengthM","railHeightM","railWidthM","shellDepthM","shellBottomInsetM","adapterPlateName","adapterPlateWidthM","adapterPlateDepthM","adapterPlateHeightM","componentLocalCenterYM","adapterPlateCenterYM","thermalOpeningApothemM","thermalApronThicknessM"] {
+    for name in ["perimeterRailName","railLengthM","railHeightM","railWidthM","shellDepthM","shellBottomInsetM","adapterPlateName","adapterPlateWidthM","adapterPlateDepthM","adapterPlateHeightM","componentLocalCenterYM","adapterPlateCenterYM","thermalOpeningApothemM","thermalApronThicknessM","shellWallAllowanceM"] {
         selected.push("GriffinPropulsionRequirements::GriffinEngineSkirtComponent::"+name);
     }
     let source = sysml_requirements::source_with_attributes(selected);
@@ -4102,8 +4058,9 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     }
     let opening = _skirt_number(source, "thermalOpeningApothemM");
     let apron_thickness = _skirt_number(source, "thermalApronThicknessM");
-    if opening==() || apron_thickness==() || opening<=0.0
-        || opening>=width/2.0-shell_inset || apron_thickness<=0.0 {
+    let wall_allowance = _skirt_number(source, "shellWallAllowanceM");
+    if opening==() || apron_thickness==() || wall_allowance==() || opening<=0.0
+        || opening>=width/2.0-shell_inset-wall_allowance || apron_thickness<=0.0 || wall_allowance<=0.0 {
         return plan_error("thermal opening and apron thickness must fit the engine bay");
     }
     let profile=griffin_spec::visual_outer_body_profile_coordinates();
@@ -4142,10 +4099,8 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         name:"purpose",type_name:"token",value:"\"render\""}});
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:adapter_path,
         name:"physics:collisionEnabled",type_name:"bool",value:"false"}});
-    // Add the visible beveled octagonal shroud as its own replaceable visual part.
-    // It is open at both ends so the bells remain readable, and it is
-    // double-sided because a study-level thin shell must not disappear when
-    // the Editor camera moves underneath the lander.
+    // The exhaust remains open. Outer/inner walls and real lip faces replace
+    // the former zero-thickness sheet and double-sided rendering workaround.
     let shell_path = root + "/EngineSkirtShell";
     let shell = _component_query(doc, shell_path);
     if query_ok(shell) && shell.type_name != "Mesh" {
@@ -4154,23 +4109,17 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     {
         let y_top = local_center_y + height / 2.0;
         let y_bottom = y_top - shell_depth;
-        let points=[];
-        // The fairing shares the bus outline; bottom inset is taper only,
-        // not an unrelated 60 mm corner clip.
-        for radius in [width/2.0,width/2.0-shell_inset] {
-            let y=if points.len()==0 {y_top} else {y_bottom};
-            for point in profile {points.push([point.x*radius,y,point.y*radius]);}
-        }
+        let geometry=griffin_geometry::tapered_octagonal_sleeve_geometry(profile,
+            width/2.0,width/2.0-shell_inset,y_top,y_bottom,wall_allowance);
+        if !geometry.ok {return plan_error(geometry.error);}
         let mesh = assembly_builder::mesh_shape_plan(edit_target, root,
-            "EngineSkirtShell", points, [4, 4, 4, 4, 4, 4, 4, 4],
-            [0, 1, 9, 8, 1, 2, 10, 9, 2, 3, 11, 10, 3, 4, 12, 11,
-             4, 5, 13, 12, 5, 6, 14, 13, 6, 7, 15, 14, 7, 0, 8, 15],
+            "EngineSkirtShell", geometry.points,geometry.face_counts,geometry.face_indices,
             [0.07, 0.09, 0.12], false);
         if !mesh.ok { return mesh; }
         for op in mesh.ops { if query_ok(shell) && op.AddPrim != () {continue;} ops.push(op); }
     }
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
-        name: "doubleSided", type_name: "bool", value: "true"}});
+        name: "doubleSided", type_name: "bool", value: "false"}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
         name: "purpose", type_name: "token", value: "\"render\""}});
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
@@ -4193,16 +4142,17 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     // The belly apron closes the surrounding bay while keeping one open
     // central exhaust aperture. The liner screens adjacent hardware laterally.
     let lower=local_center_y+height/2.0-shell_depth;
-    let apron=griffin_geometry::octagonal_ring_geometry(profile,width/2.0-shell_inset,
-        lower+apron_thickness/2.0,width/2.0-shell_inset-opening,apron_thickness);
+    let apron_outer=width/2.0-shell_inset-wall_allowance;
+    let apron=griffin_geometry::octagonal_ring_geometry(profile,apron_outer,
+        lower+apron_thickness/2.0,apron_outer-opening,apron_thickness);
     if !apron.ok {return plan_error(apron.error);}
-    let liner_points=[];
-    for y in [lower+apron_thickness,local_center_y+height/2.0] {
-        for p in profile {liner_points.push([p.x*opening,y,p.y*opening]);}
-    }
+    // Add liner stock outside the aperture, preserving its exhaust clearance.
+    let liner=griffin_geometry::tapered_octagonal_sleeve_geometry(profile,
+        opening+wall_allowance,opening+wall_allowance,
+        local_center_y+height/2.0,lower+apron_thickness,wall_allowance);
+    if !liner.ok {return plan_error(liner.error);}
     for geometry in [#{name:"ThermalApron",points:apron.points,counts:apron.face_counts,indices:apron.face_indices},
-        #{name:"ThermalLiner",points:liner_points,counts:[4,4,4,4,4,4,4,4],
-          indices:[0,1,9,8,1,2,10,9,2,3,11,10,3,4,12,11,4,5,13,12,5,6,14,13,6,7,15,14,7,0,8,15]}] {
+        #{name:"ThermalLiner",points:liner.points,counts:liner.face_counts,indices:liner.face_indices}] {
         let path=root+"/"+geometry.name;
         let exists=query_ok(_component_query(doc,path));
         let mesh=assembly_builder::mesh_shape_plan(edit_target,root,geometry.name,
@@ -4210,11 +4160,22 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         if !mesh.ok {return mesh;}
         for op in mesh.ops {if exists && op.AddPrim!=() {continue;} ops.push(op);}
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"purpose",type_name:"token",value:"\"render\""}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"doubleSided",type_name:"bool",value:"true"}});
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"doubleSided",type_name:"bool",value:"false"}});
         ops.push(#{SetPrimDocumentation:#{edit_target:edit_target,path:path,
             documentation:"Engine-bay thermal protection reconstruction. Open exhaust path; estimated geometry and optical appearance. No heat-transfer or flight qualification claimed."}});
         paths.push(path);
     }
+    ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:root+"/ThermalApron",
+        schemas:["PhysicsCollisionAPI","MaterialBindingAPI"]}});
+    ops.push(#{SetRelationship:#{edit_target:edit_target,path:root+"/ThermalApron",
+        name:"material:binding",targets:[blanket]}});
+    let model=sysml_requirements::model();
+    let visual="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
+    let liner_finish=griffin_surface_material_plan(doc,edit_target,root,"BayLinerMetal",
+        [root+"/ThermalLiner"],model.value(visual+"silverDisplayColor"),
+        model.value(visual+"silverMetallic"),model.value(visual+"silverRoughness"));
+    if !liner_finish.ok {return liner_finish;}
+    for op in liner_finish.ops {ops.push(op);}
     let component_record = assembly_builder::composed_query(doc,
         #{path: root, attrs: ["lunco:visual:component",
             "lunco:visual:datum", "lunco:visual:skirt_metric_envelope"],
@@ -4283,11 +4244,11 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
     let ops = [
         #{RemovePrim:#{edit_target:edit_target,path:root+"/Bell"}},
         #{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Bell",type_name:"Mesh",reference:(),reference_prim_path:""}},
-        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Bell",profile:profile,angular_segments:segments,normal_crease_angle_deg:crease,display_color:model.value(own+"bellDisplayColor"),collision_enabled:false}},
+        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Bell",profile:profile,axis:[0.0,1.0,0.0],angular_segments:segments,normal_crease_angle_deg:crease,display_color:model.value(own+"bellDisplayColor"),collision_enabled:false}},
         #{SetAttribute:#{edit_target:edit_target,path:root+"/Bell",name:"purpose",type_name:"token",value:"\"render\""}},
         #{RemovePrim:#{edit_target:edit_target,path:root+"/Throat"}},
         #{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Throat",type_name:"Mesh",reference:(),reference_prim_path:""}},
-        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Throat",profile:neck_profile,angular_segments:segments,normal_crease_angle_deg:crease,
+        #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Throat",profile:neck_profile,axis:[0.0,1.0,0.0],angular_segments:segments,normal_crease_angle_deg:crease,
             display_color:sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::silverDisplayColor"),collision_enabled:false}},
         #{SetAttribute:#{edit_target:edit_target,path:root+"/Throat",name:"purpose",type_name:"token",value:"\"render\""}}
     ];
@@ -6504,7 +6465,7 @@ fn griffin_rcs_bell_component_plan(doc, edit_target, root) {
         let path=root+"/"+member.name;
         ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:member.name,type_name:"Mesh",reference:(),reference_prim_path:()}});
         ops.push(#{RevolveProfileMesh:#{edit_target:edit_target,path:path,
-            profile:member.profile,angular_segments:segments,
+            profile:member.profile,axis:[0.0,1.0,0.0],angular_segments:segments,
             normal_crease_angle_deg:60.0,display_color:color,collision_enabled:false}});
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"purpose",type_name:"token",value:"\"render\""}});
         ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:["MaterialBindingAPI"]}});

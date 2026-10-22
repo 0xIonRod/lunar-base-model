@@ -138,6 +138,84 @@ fn tank_support_perimeter_geometry(profile, radius, center_y, section) {
     perimeter_beam_geometry(stations, levels, section)
 }
 
+// Closed material volume around an open exhaust path. The allowance is a
+// radial profile inset, not a measured blanket laminate or structural gauge.
+// Rings: outer top/bottom, inner top/bottom. Both lips have real edge faces.
+fn tapered_octagonal_sleeve_geometry(profile, top_radius, bottom_radius, top_y, bottom_y, allowance) {
+    if !array_is(profile) || profile.len()!=8 || !scalar_is_finite(top_radius)
+        || !scalar_is_finite(bottom_radius) || !scalar_is_finite(top_y)
+        || !scalar_is_finite(bottom_y) || !scalar_is_finite(allowance)
+        || allowance<=0.0 || min(top_radius,bottom_radius)<=allowance || top_y<=bottom_y {
+        return #{ok:false,error:"octagonal sleeve requires positive finite wall allowance and open inner radii"};
+    }
+    let area=0.0;
+    for i in 0..8 {
+        let p=profile[i];let q=profile[(i+1)%8];
+        if !vec2_is_native(p) || !vec2_is_finite(p) || !vec2_is_native(q) || !vec2_is_finite(q) {
+            return #{ok:false,error:"octagonal sleeve profile must use finite Vec2 vertices"};
+        }
+        area+=p.x*q.y-q.x*p.y;
+    }
+    if area<=0.0 {return #{ok:false,error:"octagonal sleeve requires a counterclockwise nondegenerate profile"};}
+    let points=[];let counts=[];let indices=[];
+    for ring in [#{r:top_radius,y:top_y},#{r:bottom_radius,y:bottom_y},
+                 #{r:top_radius-allowance,y:top_y},#{r:bottom_radius-allowance,y:bottom_y}] {
+        for p in profile {points.push([p.x*ring.r,ring.y,p.y*ring.r]);}
+    }
+    for i in 0..8 {
+        let j=(i+1)%8;
+        for face in [[i,j,8+j,8+i],[16+i,24+i,24+j,16+j],
+                     [i,16+i,16+j,j],[8+i,8+j,24+j,24+i]] {
+            counts.push(4);for vertex in face {indices.push(vertex);}
+        }
+    }
+    #{ok:true,points:points,face_counts:counts,face_indices:indices}
+}
+
+// Independent incidence/winding/volume measurements of the observed mesh.
+// No construction profile or expected vertex list is used here.
+fn closed_mesh_metrics(points, counts, indices) {
+    if !array_is(points) || !array_is(counts) || !array_is(indices)
+        || points.len()==0 || counts.len()==0 {return #{available:false};}
+    for point in points {
+        if !array_is(point) || point.len()!=3 {return #{available:false};}
+        for value in point {if !scalar_is_finite(value) {return #{available:false};}}
+    }
+    let edges=#{};let offset=0;let volume=0.0;
+    for count in counts {
+        if count<3 || offset+count>indices.len() {return #{available:false};}
+        let face=[];
+        for i in 0..count {
+            let index=indices[offset+i];
+            if index<0 || index>=points.len() {return #{available:false};}
+            face.push(index);
+        }
+        for i in 0..count {
+            let a=face[i];let b=face[(i+1)%count];
+            if a==b {return #{available:false};}
+            let key=min(a,b).to_string()+"/"+max(a,b).to_string();
+            if edges[key]==() {edges[key]=#{count:0,balance:0};}
+            edges[key].count+=1;edges[key].balance+=if a<b {1} else {-1};
+        }
+        let a=points[face[0]];
+        for i in 1..(count-1) {
+            let b=points[face[i]];let c=points[face[i+1]];
+            volume+=(a[0]*(b[1]*c[2]-b[2]*c[1])
+                +a[1]*(b[2]*c[0]-b[0]*c[2])+a[2]*(b[0]*c[1]-b[1]*c[0]))/6.0;
+        }
+        offset+=count;
+    }
+    if offset!=indices.len() {return #{available:false};}
+    let boundary=0;let nonmanifold=0;let winding=0;
+    for key in edges.keys() {
+        let edge=edges[key];
+        if edge.count==1 {boundary+=1;}
+        if edge.count>2 {nonmanifold+=1;}
+        if edge.count==2 && edge.balance!=0 {winding+=1;}
+    }
+    #{available:true,boundary:boundary,nonmanifold:nonmanifold,winding:winding,volume:volume}
+}
+
 // A continuous mitered ring for the source's regular clipped-square profile.
 // Scaling the inner profile reduces every edge's apothem by the stock width;
 // it avoids square beam ends projecting beyond the bus chamfers.

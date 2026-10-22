@@ -17,7 +17,7 @@ def Xform "GriffinFlipVisual" (
     custom string lunco:visual:camera = "VisualCamera"
     custom token lunco:visual:terrain_mode = "standard_layered"
     custom asset lunco:visual:terrain_asset = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@
-    custom asset lunco:visual:terrain_shader = @lunco://shaders/terrain_layered.wgsl@
+    custom asset lunco:visual:terrain_shader = @lunco://shaders/terrain_layered.wesl@
     double lunco:anchor:lat = -84.72672255
     double lunco:anchor:lon = 29.14428685
     double lunco:anchor:height = 0.0

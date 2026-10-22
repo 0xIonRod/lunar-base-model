@@ -16,7 +16,7 @@ def Xform "SouthPoleSurrogate" (
     def Scope "PhysicsMaterials"
     {
         def Material "RegolithSurrogate" (
-            prepend apiSchemas = "PhysicsMaterialAPI"
+            prepend apiSchemas = ["PhysicsMaterialAPI"]
         )
         {
             float physics:dynamicFriction = 0.6499999761581421
@@ -34,10 +34,10 @@ def Xform "SouthPoleSurrogate" (
             def Shader "Shader"
             {
                 uniform token info:implementationSource = "sourceAsset"
-                uniform asset info:wgsl:sourceAsset = @lunco://shaders/terrain_layered.wgsl@
                 color3f inputs:albedo = (0.12999999523162842, 0.12999999523162842, 0.12999999523162842)
                 token outputs:surface
-                asset info:wgsl:vertexAsset = @lunco://shaders/terrain_geomorph.wgsl@
+                uniform asset info:wesl:sourceAsset = @lunco://shaders/terrain_layered.wesl@
+                asset info:wesl:vertexAsset = @lunco://shaders/terrain_geomorph.wesl@
             }
         }
     }
@@ -58,7 +58,7 @@ def Xform "SouthPoleSurrogate" (
         custom asset lunco:terrain:processedAsset = @terrain/nobile03@
         rel material:binding = </SouthPoleSurrogate/Looks/RegolithSurface>
         def Xform "dem" (
-            prepend apiSchemas = "LunCoTerrainLayerAPI"
+            prepend apiSchemas = ["LunCoTerrainLayerAPI"]
         )
         {
             uniform token lunco:layer = "dem"

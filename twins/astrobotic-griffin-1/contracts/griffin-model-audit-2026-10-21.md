@@ -64,7 +64,10 @@ tank loads during depletion and also checks native solver propagation.
   measured Griffin/Nobile properties. A dynamic mission thermal environment
   and flight laminate calibration remain unqualified.
 - **Heat protection:** the apron, engine liner, skirt and MLI have explicit
-  geometry/material assignments. Radiative exchange, plume heating, shield
+  geometry/material assignments. The [engine-skirt contract](griffin-engine-skirt.md)
+  records finite visual wall stock, open exhaust geometry and the distinction
+  between reconstruction allowance and flight blanket gauge.
+  Radiative exchange, plume heating, shield
   temperature, coolant capacity and protection of neighboring equipment are
   not solved by those display materials.
 - **Mass and propulsion calibration:** the 4,000 kg initial root-body mass,

@@ -513,7 +513,7 @@ def Xform "GriffinBus" (
                 float inputs:sheen = 0.75
                 float inputs:v_scale = 1.0
                 uniform token info:implementationSource = "sourceAsset"
-                asset info:wgsl:sourceAsset = @lunco://shaders/mli_foil.wgsl@
+                asset info:wesl:sourceAsset = @lunco://shaders/mli_foil.wesl@
             }
         }
         def Material "TankFrame"

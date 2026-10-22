@@ -23,8 +23,7 @@ shared SysML/USD requirements evaluator.
   against the source wheel width and two side clearances.
 - The physical ramp bodies, six hinge joints, and deck transition belong to
   the physical Griffin model. The two root deck hinges and four section hinges
-  each expose the same source-owned angular drive values; the root joints had
-  limits but no drive before this repair. The render component does not provide
+  each expose their source-owned angular drive values. The render component does not provide
   a collider, mass, inertia, or another physical body.
 - FLIP remains a referenced rover component; the ramp requirement reads FLIP's
   wheel datums through its SysML source.
@@ -58,8 +57,8 @@ shared SysML/USD requirements evaluator.
 
 ## Physical flight stow and rail clearance
 
-`GRR-017` owns the image-based flight-stow pose: both roots use a +45 degree
-Z rotation, and the starboard root also uses a 180 degree Y mount. Under the
+`GRR-017` owns the image-based flight-stow pose: the roots use mirrored +45/-45
+degree Z rotations, and the starboard root also uses a 180 degree Y mount. Under the
 simulator's fixed-axis `rotateXYZ` convention, their
 lander-frame headings are +45 and +135 degrees. The 180 degree Y mount makes both
 folded bundles mirror across the lander's X=0 centerline, with 6.4 m between
@@ -89,6 +88,15 @@ The autonomous mission waits for touchdown. Intermediate hinges move through
 measured halfway poses before leveling; the root hinges then lower. Automatic
 release requires the source-owned sampled hinge settlement dwell. A flight
 opening is a mechanism pose, not terrain-contact or egress acceptance.
+
+Six physical fixed latches carry the stowed bundles independently of their
+parallel hinge motors. The mission records the admitted native drive laws and
+sets their effort caps to zero while latched. Each release-command event
+restores only that pair's original torque caps, after the latch release has
+entered the native lifecycle. Targets, gains, frames and physical constraints
+remain under their existing owners. Missing or changed saved laws stop the
+action visibly. Profiles live in the mission instance and retire with it.
+Both manual and automatic unfolding use this same sequence.
 
 The 2026-10-02 wheel-path correction shortens each central hinge shaft from
 2.592 m to 1.408 m, the derived gap inside the two inner rails. Four rail-local

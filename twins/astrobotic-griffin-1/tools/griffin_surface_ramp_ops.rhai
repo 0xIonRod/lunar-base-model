@@ -70,6 +70,77 @@ fn _release_flight_latches(hinge_names) {
     #{ok:true,plan:plan,commands:commands}
 }
 
+// The mission owns these profiles for one admitted scene. A mechanical flight
+// latch holds the stowed coordinate; its parallel motor supplies no effort.
+fn hold_flight_latch_motors(root) {
+    let drives=[];
+    for binding in griffin_spec::ramp_flight_latch_bindings() {
+        let id=find_path(root+"/"+binding.hinge);
+        let law=joint_drive(id);
+        if law==() || law.angular!=true || law.enabled!=true || law.model!="force"
+            || !law.max_effort.is_finite() || law.max_effort<=0.0 {
+            return #{ok:false,error:"flight latch requires an enabled finite-effort hinge motor",
+                hinge:binding.hinge,drive:law};
+        }
+        drives.push(#{name:binding.hinge,id:id,law:law});
+    }
+    if drives.len()!=6 {return #{ok:false,error:"six source-paired flight latch motors required"};}
+    let sections=griffin_spec::ramp_intermediate_joint_names();
+    for names in [griffin_spec::ramp_root_joint_names(),
+        [sections[0],sections[2]],[sections[1],sections[3]]] {
+        let plan=flight_latch_release_plan(root,names);
+        if plan.ok!=true {return plan;}
+    }
+    for drive in drives {
+        if !set_joint_drive(drive.id,drive.law.stiffness,drive.law.damping,0.0) {
+            throw("flight latch motor effort suppression rejected: "+drive.name);
+        }
+    }
+    #{ok:true,drives:drives}
+}
+
+// Validate the entire pair before restoring either native motor. Targets are
+// already owned by the phase command and must survive this effort change.
+fn released_motor_plan(profiles,names) {
+    if profiles==() || names==() || names.len()!=2 || names[0]==names[1] {
+        return #{ok:false,error:"released motor plan requires two distinct hinge identities"};
+    }
+    let drives=[];
+    for name in names {
+        let matches=[];
+        for profile in profiles {if profile.name==name {matches.push(profile);}}
+        if matches.len()!=1 {return #{ok:false,error:"released hinge has no unique saved motor law",hinge:name};}
+        let drive=matches[0];
+        let live=joint_drive(drive.id);
+        if live==() || live.angular!=true || live.stiffness!=drive.law.stiffness
+            || live.damping!=drive.law.damping
+            || (live.max_effort!=0.0 && live.max_effort!=drive.law.max_effort) {
+            return #{ok:false,error:"released hinge motor law changed after flight latch admission",hinge:name};
+        }
+        drives.push(drive);
+    }
+    #{ok:true,drives:drives}
+}
+
+fn restore_released_motors(profiles,event_name) {
+    let events=unfold_event_contract();
+    let names=[];
+    if event_name==events.middle_commanded || event_name==events.toes_commanded {
+        let sections=griffin_spec::ramp_intermediate_joint_names();
+        let offset=if event_name==events.middle_commanded {0} else {1};
+        names=[sections[offset],sections[offset+2]];
+    } else if event_name==events.roots_commanded {names=griffin_spec::ramp_root_joint_names();}
+    else {return #{ok:true,restored:[]};}
+    let plan=released_motor_plan(profiles,names);
+    if plan.ok!=true {return plan;}
+    for drive in plan.drives {
+        if !set_joint_drive(drive.id,drive.law.stiffness,drive.law.damping,drive.law.max_effort) {
+            throw("released flight latch motor restoration rejected: "+drive.name);
+        }
+    }
+    #{ok:true,restored:names}
+}
+
 fn unfold_event_contract() {
     let middle_commanded = "griffin_ramp_middle_sections_unfold_commanded";
     let middle_settled = "griffin_ramp_middle_sections_unfold_settled";

@@ -753,7 +753,7 @@ fn bus_checks(doc, source, bus_root) {
     let finish_error=1.0;
     if _query_ok(surface) && surface.type_name=="Shader"
         && surface.attrs["info:implementationSource"]=="sourceAsset"
-        && surface.attrs["info:wgsl:sourceAsset"]=="lunco://shaders/mli_foil.wgsl"
+        && surface.attrs["info:wesl:sourceAsset"]=="lunco://shaders/mli_foil.wesl"
         && surface.attrs["info:id"]==() {
         finish_error=0.0;
         for input in griffin_spec::bus_foil_shader_inputs() {

@@ -63,6 +63,9 @@ fn on_start(me, ctx) {
         track_entity_read(latch);
         track_entity_write(latch);
     }
+    let held=griffin_surface_ramp_ops::hold_flight_latch_motors(LANDER);
+    if held.ok!=true {throw("flight latch motor admission failed: "+held);}
+    this.ramp_latched_drive_profiles=held.drives;
     // This mission only reacts to these discrete control/phase edges. Opt into
     // the event filter so unrelated wheel/terrain collision chatter does not
     // enter the Rhai VM; the shared task/mission identity buffer remains
@@ -142,6 +145,9 @@ fn on_start(me, ctx) {
 }
 
 fn on_event(me, evt, ctx) {
+    let motors=griffin_surface_ramp_ops::restore_released_motors(
+        this.ramp_latched_drive_profiles,evt.name);
+    if motors.ok!=true {throw("released flight latch motor restoration failed: "+motors);}
     this.event_trace = griffin_surface_mission_report::trace_event(this, evt);
     let lander = find_path(LANDER);
     let rover = find_path(ROVER);

@@ -2011,13 +2011,11 @@ fn _physical_ramp_geometry_source() {
        ["GriffinRampRequirements::Verify_GriffinRampRequirements"])
 }
 
-fn _landing_pad_requirement_findings(doc_id, root) {
-    let findings = [];
+fn landing_pad_constraint_report(doc_id, root) {
     let source = _landing_leg_requirement_source();
     if source.ok != true {
-        findings.push(_finding("GLL-008", root,
-            "typed landing-leg requirement source is unavailable"));
-        return findings;
+        return #{ok: false, checks: [],
+            error: "typed landing-leg requirement source is unavailable"};
     }
     let assembly = "GriffinLandingLegRequirements::GriffinLandingLegAssembly::";
     let tolerance = sysml_requirements::number(source, assembly + "padColliderToleranceM");
@@ -2029,30 +2027,27 @@ fn _landing_pad_requirement_findings(doc_id, root) {
         assembly + "bodyMountOverlapMeasurementToleranceM");
     if tolerance == () || station_tolerance == () || mount_overlap == ()
         || mount_measurement_tolerance == () {
-        findings.push(_finding("GLL-008", root,
-            "typed pad, mount, or station tolerances are unavailable"));
-        return findings;
+        return #{ok: false, checks: [],
+            error: "typed pad, mount, or station tolerances are unavailable"};
     }
     let observation = griffin_visual_builder::physical_landing_leg_pad_observation(
         doc_id, root);
     if observation.ok != true {
-        findings.push(_finding("GLL-008", root,
-            if observation.detail == () {
-                "composed landing-pad measurements are unavailable"
-            } else { observation.detail }));
-        return findings;
+        return #{ok: false, checks: [], error: if observation.detail == () {
+            "composed landing-pad measurements are unavailable"
+        } else { observation.detail }};
     }
     if !observation.collision_enabled || !observation.proxy_hidden
         || !observation.visual_collision_disabled || !observation.collision_matches_visual
         || !observation.source_relationships_valid || !observation.self_collision_filter_clear
-        || !observation.legacy_collision_disabled {
+        || !observation.body_inventory_matches {
         print("[griffin-requirements] pad contact facts: " + #{
             collision: observation.collision_enabled, proxy: observation.proxy_hidden,
             visual_disabled: observation.visual_collision_disabled,
             geometry_matches: observation.collision_matches_visual,
             source_linked: observation.source_relationships_valid,
             filters_clear: observation.self_collision_filter_clear,
-            legacy_disabled: observation.legacy_collision_disabled,
+            body_inventory_matches: observation.body_inventory_matches,
             geometry_deviation_m: observation.geometry_deviation_m,
             tolerance_m: observation.tolerance_m});
     }
@@ -2101,8 +2096,8 @@ fn _landing_pad_requirement_findings(doc_id, root) {
                     _usd_snapshot_value(observation.source_relationships_valid, observation)],
                 ["selfCollisionFilterClear",
                     _usd_snapshot_value(observation.self_collision_filter_clear, observation)],
-                ["legacyCollisionDisabled",
-                    _usd_snapshot_value(observation.legacy_collision_disabled, observation)]]),
+                ["bodyInventoryMatches",
+                    _usd_snapshot_value(observation.body_inventory_matches, observation)]]),
             "typed", 0.0),
         sysml_requirements::required_constraint_check("GLL-008-physical-stations", "landing_leg",
             "gll008", "Verify_GriffinLandingLegRequirements",
@@ -2126,8 +2121,18 @@ fn _landing_pad_requirement_findings(doc_id, root) {
                 ["physicalJointStationMatches", _usd_snapshot_value(observation.physical_joints_match, observation)]]),
             "typed", 0.0)
     ];
-    let evaluation = sysml_requirements::evaluate(source, checks);
-    if evaluation.results == () || evaluation.results.len() != checks.len() {
+    #{ok: true, source: source, checks: checks, observation: observation}
+}
+
+fn _landing_pad_requirement_findings(doc_id, root) {
+    let findings = [];
+    let report = landing_pad_constraint_report(doc_id, root);
+    if report.ok != true {
+        findings.push(_finding("GLL-008", root, report.error));
+        return findings;
+    }
+    let evaluation = sysml_requirements::evaluate(report.source, report.checks);
+    if evaluation.results == () || evaluation.results.len() != report.checks.len() {
         findings.push(_finding("GLL-008", root,
             _evaluation_failure(evaluation,
                 "SysML landing-pad constraints produced no results")));

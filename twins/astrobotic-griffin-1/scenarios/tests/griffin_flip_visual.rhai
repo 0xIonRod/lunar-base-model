@@ -392,7 +392,7 @@ fn run_visual_review(batch_index) {
         verification: "Verify_GriffinVisualRequirements",
         kind: "attribute_equals",
         path: root + "/Environment/Looks/RegolithSurface/Shader",
-        attr: "info:wgsl:sourceAsset",
+        attr: "info:wesl:sourceAsset",
         expected: griffin_spec::visual_terrain_shader_asset() });
     checks.push(#{ id: "GV-006-terrain-mode", component: "context",
         requirement: "gv006",

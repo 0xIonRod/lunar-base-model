@@ -1,6 +1,7 @@
 import "twin://astrobotic-griffin-1/tools/griffin_geometry.rhai" as griffin_geometry;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
+import "twin://astrobotic-griffin-1/tools/griffin_skirt_verification.rhai" as griffin_skirt_verification;
 // Standalone Griffin main-propulsion visual verification.  Thrust and
 // collision remain owned by the flight model; this observer checks only the
 // replaceable bell/throat presentation components.
@@ -168,14 +169,10 @@ fn thermal_fit_observation(root, engine_records, bell_observations, tolerance) {
     let snapshot=_query_snapshot(batch);
     if snapshot.ok!=true || batch.records.len()!=2 {return #{available:false,snapshot:snapshot};}
     let liner=batch.records[1];
-    if liner.attrs.points==() || liner.attrs.points.len()<16 {return #{available:false,snapshot:snapshot};}
-    let lower=1.0e30;
-    for point in liner.attrs.points {lower=min(lower,point[1]);}
+    if liner.attrs.points==() || liner.attrs.points.len()!=32 {return #{available:false,snapshot:snapshot};}
     let contour=[];
-    for point in liner.attrs.points {
-        if abs(point[1]-lower)<=tolerance {contour.push(vec3_from(point));}
-    }
-    if contour.len()!=8 {return #{available:false,snapshot:snapshot};}
+    // The inner lower ring owns the exhaust aperture; wall stock is outside it.
+    for i in 24..32 {contour.push(vec3_from(liner.attrs.points[i]));}
     let clearance=1.0e30;let clear=true;
     for i in 0..engine_records.len() {
         let engine=vec3_from(engine_records[i].attrs["xformOp:translate"]);
@@ -204,7 +201,7 @@ fn thermal_fit_observation(root, engine_records, bell_observations, tolerance) {
 }
 
 // One composed snapshot of the skirt, plate, rail stock and throat ends.
-fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observations, tolerance, profile, body_dimensions, radius, center_y, width, height, shell_depth, shell_inset) {
+fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observations, tolerance, profile, body_dimensions, radius, center_y, width, height, shell_depth, shell_inset, wall_allowance) {
     let paths=[skirt_root+"/EngineSkirtShell",skirt_root+"/EngineAdapterPlate",skirt_root];
     paths.push(skirt_root+"/"+rail_name);
     for record in engine_records {paths.push(record.path+"/Throat");}
@@ -212,14 +209,13 @@ fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observation
     let snapshot=_query_snapshot(batch);
     if snapshot.ok!=true || batch.records.len()!=paths.len() {return #{available:false,snapshot:snapshot};}
     let shell=batch.records[0];let plate=batch.records[1];let mount=batch.records[2];
-    if shell.attrs.points==() || shell.attrs.points.len()!=16
+    if shell.attrs.points==() || shell.attrs.points.len()!=32
         || plate.attrs["xformOp:translate"]==() || plate.attrs.points==() || plate.attrs.points.len()!=16
         || mount.attrs["xformOp:translate"]==() {return #{available:false,snapshot:snapshot};}
     let lower=1.0e30;
     for p in shell.attrs.points {if p[1]<lower {lower=p[1];}}
     let contour=[];
-    for p in shell.attrs.points {if (p[1]-lower).abs()<=tolerance {contour.push(vec3_from(p));}}
-    if contour.len()!=8 {return #{available:false,snapshot:snapshot};}
+    for i in 24..32 {contour.push(vec3_from(shell.attrs.points[i]));}
     let mount_y=mount.attrs["xformOp:translate"][1];
     let plate_min=1.0e30;
     for p in plate.attrs.points {if p[1]<plate_min {plate_min=p[1];}}
@@ -261,10 +257,11 @@ fn skirt_fit_observation(skirt_root, rail_name, engine_records, bell_observation
         if -gap>overhang {overhang=-gap;}
         if i>=8 && i<16 {inner_contour.push(vec3_from(actual));}
     }
-    for i in 0..16 {
-        let r=if i<8 {radius} else {radius-shell_inset};
-        let y=if i<8 {center_y+height/2.0} else {center_y+height/2.0-shell_depth};
-        let p=profile[i%8];let target=[p.x*r,y,p.y*r];let actual=shell.attrs.points[i];
+    let expected_shell=griffin_geometry::tapered_octagonal_sleeve_geometry(profile,
+        radius,radius-shell_inset,center_y+height/2.0,center_y+height/2.0-shell_depth,wall_allowance);
+    if !expected_shell.ok {return #{available:false,snapshot:snapshot};}
+    for i in 0..32 {
+        let target=expected_shell.points[i];let actual=shell.attrs.points[i];
         for axis in 0..3 {let delta=(actual[axis]-target[axis]).abs();if delta>shell_error {shell_error=delta;}}
         let gap=griffin_geometry::convex_polygon_clearance_xz(vec3_from(actual),body_contour);
         if gap==() {return #{available:false,snapshot:snapshot};}
@@ -351,6 +348,8 @@ fn on_start(me, ctx) {
     this.mesh_count = ();
     this.mesh_snapshot = ();
     this.mesh_source_revision = ();
+    this.wall_check = ();
+    this.thermal_fit = ();
 }
 
 fn on_tick(me, ctx) {
@@ -404,6 +403,31 @@ fn on_tick(me, ctx) {
         this.mesh_results.push(griffin_geometry::open_bell_mesh(record.attrs.points,counts.attrs.faceVertexCounts,indices.attrs.faceVertexIndices));
         return;
     }
+    // Finite wall topology and exhaust-face traversal each have a bounded turn.
+    // The same immutable source/stage fence applies to these and the nozzles.
+    if this.wall_check==() || this.thermal_fit==() {
+        let source=sysml_requirements::source_with_attributes([own("usdRootPath"),
+            visual("geometryVerificationToleranceM"),visual("mainEngineInstances")]);
+        if source.source_revision!=this.mesh_source_revision {throw("Source changed before skirt measurement");}
+        let root=sysml_requirements::text(source,own("usdRootPath"));
+        let skirt_root=root+"/"+griffin_spec::engine_skirt_identity("componentRootName");
+        let record=query("QueryUsdPrim",#{path:root,attrs:[]});
+        if !_same_snapshot(this.mesh_snapshot,#{ok:record.doc_id!=(),doc_id:record.doc_id,
+            document_generation:record.document_generation,stage_generation:record.stage_generation}) {
+            throw("USD changed before skirt measurement");
+        }
+        if this.wall_check==() {
+            this.wall_check=griffin_skirt_verification::wall_check((),skirt_root,VERIFICATION);
+        } else {
+            let names=sysml_requirement_checks::source_enum_identifiers(source,visual("mainEngineInstances"));
+            let paths=[];for name in names {paths.push(root+"/"+name);}
+            let engines=query("QueryUsdPrims",#{paths:paths,attrs:["xformOp:translate"]});
+            if !_same_snapshot(_query_snapshot(engines),this.mesh_snapshot) {throw("Engine snapshot changed before thermal aperture measurement");}
+            this.thermal_fit=thermal_fit_observation(skirt_root,engines.records,this.mesh_results,
+                sysml_requirements::number(source,visual("geometryVerificationToleranceM")));
+        }
+        return;
+    }
     let selected_attributes = [];
     for name in ["usdRootPath", "bellRadiusM", "exitBoreRadiusM", "bellHeightM", "throatRadiusM",
         "throatHeightM", "throatCenterYM", "minimumBellClearanceM", "minimumTankHardwareClearanceM", "clusterOuterRadiusM", "bellVisualWallThicknessM", "bellContourExponent"] {
@@ -411,7 +435,7 @@ fn on_tick(me, ctx) {
     }
     for name in ["componentRootName", "perimeterRailName", "shellName",
         "adapterPlateName", "componentLocalCenterYM", "railLengthM",
-        "railWidthM", "railHeightM", "shellDepthM", "adapterPlateWidthM",
+        "railWidthM", "railHeightM", "shellDepthM", "shellWallAllowanceM", "adapterPlateWidthM",
         "adapterPlateHeightM", "adapterPlateDepthM", "adapterPlateCenterYM", "minimumSkirtBellClearanceM", "nozzleExitRecessM", "shellBottomInsetM", "minimumThermalOpeningBellClearanceM"] {
         selected_attributes.push(skirt(name));
     }
@@ -808,7 +832,8 @@ fn on_tick(me, ctx) {
             sysml_requirements::native_value(source,visual("outerBodyProfileCoordinates")),
             sysml_requirements::native_value(source,visual("bodyDimensions")),skirt_width/2.0,
             sysml_requirements::number(source,skirt("componentLocalCenterYM")),skirt_section,skirt_height,
-            skirt_shell_depth,sysml_requirements::number(source,skirt("shellBottomInsetM")));
+            skirt_shell_depth,sysml_requirements::number(source,skirt("shellBottomInsetM")),
+            sysml_requirements::number(source,skirt("shellWallAllowanceM")));
         let fit_available=fit.available==true && _same_snapshot(fit.snapshot,usd_snapshot);
         let profile_bindings=_required_constraint_bindings(source_model,"ges006","GESC006_OctagonalProfile",[
             ["topologyMismatches",_usd_observation(fit.snapshot,fit_available,fit.topology,"rail topology unavailable")],
@@ -818,7 +843,7 @@ fn on_tick(me, ctx) {
             ["toleranceM",_source_literal(source_model,visual("geometryVerificationToleranceM"))]
         ]);
         checks.push(sysml_requirements::required_constraint_check("GES-006-octagonal-profile","engine_skirt","ges006",VERIFICATION,"GriffinPropulsionRequirements::GESC006_OctagonalProfile",profile_bindings,"typed",0.0));
-        let thermal=thermal_fit_observation(skirt_root,observed_engines.records,this.mesh_results,geometry_tolerance);
+        let thermal=this.thermal_fit;
         let thermal_available=thermal.available==true && _same_snapshot(thermal.snapshot,usd_snapshot);
         let fit_bindings=_required_constraint_bindings(source_model,"ges004","GESC004_SkirtAndBellFit",[
             ["minimumRadialClearanceM",_usd_observation(fit.snapshot,fit_available,fit.clearance,"skirt/rail contour unavailable")],
@@ -842,7 +867,7 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirement_checks::attribute_equals("GES-005-shell-purpose", "engine_skirt", "ges005", VERIFICATION, skirt_shell, "purpose", "render"));
         checks.push(sysml_requirement_checks::attribute_equals("GES-005-shell-collision", "engine_skirt", "ges005", VERIFICATION, skirt_shell, "physics:collisionEnabled", false));
         checks.push(sysml_requirement_checks::coverage("GES-004-clearance", "engine_skirt", "ges004", VERIFICATION));
-        checks.push(sysml_requirement_checks::coverage("GES-002-envelope", "engine_skirt", "ges002", VERIFICATION));
+        checks.push(this.wall_check);
     } else {
         checks.push(sysml_requirement_checks::coverage("GES-001-source", "engine_skirt", "ges001", VERIFICATION));
     }

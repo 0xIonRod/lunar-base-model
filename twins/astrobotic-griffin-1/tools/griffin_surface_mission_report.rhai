@@ -21,6 +21,25 @@ fn trace_event(state, evt) {
     state.event_trace
 }
 
+// The scene-test transport retains bounded typed events. Settlement reports
+// duplicate every unsettled observation in `pending`; retain each fact once.
+fn settle_snapshot(report) {
+    if report == () { return #{available: false}; }
+    let snapshot = #{available: true};
+    for field in ["ok", "settled", "sim_tick", "error", "tolerance_rad", "observations"] {
+        if report[field] != () { snapshot[field] = report[field]; }
+    }
+    snapshot
+}
+
+fn recent_motion_samples(trace) {
+    if trace == () { return []; }
+    let samples = [];
+    let first = max(0, trace.len() - 2);
+    for index in first..trace.len() { samples.push(trace[index]); }
+    samples
+}
+
 fn fail_phase(state, phase) {
     if state.phase_failure_reported == true { return true; }
     print("[griffin] phase failure: " + phase);
@@ -42,14 +61,19 @@ fn fail_phase(state, phase) {
     };
     let ramp_runtime = griffin_surface_ops::physical_ramp_runtime_pose_evidence();
     let ramp_joints = griffin_surface_ops::physical_ramp_joint_evidence();
-    // Keep full evidence typed in the verdict below. Converting the nested
-    // control/geometry snapshots and motion trace into one debug string can
-    // exceed Rhai's string limit and prevent the failure verdict itself.
+    // Preserve the facts needed to diagnose this phase, rather than repeat
+    // complete geometry/provider snapshots and the whole historical trace.
+    // Each failed result is streamed independently from the summary below.
     let source = sysml_requirements::source();
     let failure = #{id: "GR-004-phase-" + phase, component: "mission",
         requirement: "GriffinFunctionalRequirements::gr004",
         verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
-        kind: "phase", path: global::MISSION_ROOT, actual: phase,
+        kind: "phase", path: global::MISSION_ROOT,
+        actual: #{phase: phase, sim_tick: sim_tick(),
+            hinges: ramp_joints, bodies: ramp_runtime,
+            settlement: settle_snapshot(state.ramp_section_settle_evidence),
+            expected_angles: state.ramp_sections_expected,
+            recent_motion: recent_motion_samples(state.ramp_motion_trace)},
         expected: "completed", ok: false, error: "mission phase or preflight failed"};
     let mass_evidence = state.guidance_assembly_mass_evidence;
     let mass_ok = mass_evidence != () && mass_evidence.ok == true;
@@ -64,22 +88,12 @@ fn fail_phase(state, phase) {
     if !mass_ok { failures.push(mass_check); }
     report_structured_verdict(#{ok: false, verification:
         "Griffin1Requirements::Verify_GriffinSurfaceOperations",
-        requirement_count: results.len(), source_revision: source.source_revision,
-        source_files: source.source_files, results: results, failures: failures,
+        requirement_count: results.len(), check_count: results.len(),
+        pass_count: results.len() - failures.len(), failure_count: failures.len(),
+        non_pass_count: failures.len(), source_revision: source.source_revision,
+        source_files: source.source_files, result_chunks: [results], failures: failures,
         metrics: #{phase: phase, event_trace: state.event_trace,
-            clocks: clock_snapshot(), landing_setup: state.landing_setup_evidence,
-            guidance_assembly_mass: mass_evidence,
-            landing_gates: landing, landing_diagnostics: gates,
-            physical_ramps: ramp_runtime, physical_ramp_joints: ramp_joints,
-            ramp_section_settle: state.ramp_section_settle_evidence,
-            ramp_sections_expected: state.ramp_sections_expected,
-            ramp_unfold_waypoints: state.ramp_unfold_waypoint_evidence,
-            ramp_middle_settle: state.ramp_middle_settle_evidence,
-            ramp_toe_settle: state.ramp_toe_settle_evidence,
-            ramp_root_settle: state.ramp_deployment_settle_evidence,
-            ramp_terrain_plan: state.ramp_terrain_plan,
-            ramp_motion_trace: state.ramp_motion_trace,
-            route_command_updates: state.route_command_updates}},
+            clocks: clock_snapshot(), landing_gates: landing}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
     emit("griffin_phase_timeout");
     true

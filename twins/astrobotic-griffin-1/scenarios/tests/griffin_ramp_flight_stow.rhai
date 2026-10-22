@@ -586,7 +586,15 @@ fn on_tick(me, ctx) {
         [latch_bindings[0].hinge,"unregistered_ramp_hinge"]);
     let duplicate=ramp_ops::flight_latch_release_plan(ROOT,
         [latch_bindings[0].hinge,latch_bindings[0].hinge]);
+    let missing_motors=ramp_ops::released_motor_plan([],
+        [latch_bindings[0].hinge,latch_bindings[1].hinge]);
+    let duplicate_motors=ramp_ops::released_motor_plan([],
+        [latch_bindings[0].hinge,latch_bindings[0].hinge]);
     let policy_checks=[
+        sysml_requirement_checks::preflight("flight-latch-missing-motor-law",missing_motors.ok==false,
+            "missing saved motor laws must reject before restoration",missing_motors,false),
+        sysml_requirement_checks::preflight("flight-latch-duplicate-motor",duplicate_motors.ok==false,
+            "duplicate released motor identities must reject before restoration",duplicate_motors,false),
         sysml_requirement_checks::preflight("flight-latch-unknown-hinge",unknown.ok==false,
             "unknown hinge release plan must be rejected",unknown,false),
         sysml_requirement_checks::preflight("flight-latch-duplicate-hinge",duplicate.ok==false,

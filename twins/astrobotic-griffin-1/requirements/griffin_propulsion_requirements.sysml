@@ -274,6 +274,10 @@ package GriffinPropulsionRequirements {
         // internal radiant barrier. Reconstruction dimensions, not flight data.
         attribute thermalOpeningApothemM : Real = 1.02;
         attribute thermalApronThicknessM : Real = .008;
+        // Finite visual edge volume uses the existing apron allowance.
+        // This radial inset is a reconstruction envelope, not flight MLI
+        // laminate thickness or a structural/thermal material property.
+        attribute shellWallAllowanceM : Real = thermalApronThicknessM;
         attribute minimumThermalOpeningBellClearanceM : Real = .10;
         attribute nozzleExitRecessM : Real = .02;
         attribute shellDepthM : Real = shellUpperYM + GriffinMainPropulsionAssembly::bellHeightM / 2.0 + nozzleExitRecessM;
@@ -533,7 +537,31 @@ package GriffinPropulsionRequirements {
         doc /* GES-001 [topology] one named continuous mitered octagonal skirt rail forms a closed frame around the seven-engine cluster. */
     }
     requirement def GES002_SkirtEnvelope {
-        doc /* GES-002 [geometry] the rail envelope, rail section, open-ended shell, and adapter plate shall use their typed dimensions and station datums in GriffinEngineSkirtComponent. */
+        doc /* GES-002 [geometry] the rail envelope, rail section, open-ended shell, and adapter plate shall use their typed dimensions and station datums in GriffinEngineSkirtComponent. The outer blanket, inner exhaust liner and belly apron shall be closed material volumes with consistently outward-wound faces and single-sided rendering. Shell and liner use shellWallAllowanceM as a radial profile inset, including real upper/lower edge faces; the liner stock lies outside the declared exhaust aperture. This allowance is a visual reconstruction envelope, not a flight blanket gauge or thermal-property assignment. */
+        require GESC002_FiniteWallGeometry {
+            in requiredWallAllowanceM = GriffinEngineSkirtComponent::shellWallAllowanceM;
+            in toleranceM = GriffinVisualConfiguration::geometryVerificationToleranceM;
+        }
+    }
+    constraint def GESC002_FiniteWallGeometry {
+        in boundaryEdgeCount : Integer;
+        in nonManifoldEdgeCount : Integer;
+        in inconsistentEdgeWindingCount : Integer;
+        in singleSidedSurfaceCount : Integer;
+        in expectedSurfaceCount : Integer;
+        in minimumSignedVolumeM3 : Real;
+        in minimumWallAllowanceM : Real;
+        in maximumWallAllowanceM : Real;
+        in requiredWallAllowanceM : Real;
+        in toleranceM : Real;
+        boundaryEdgeCount == 0 and nonManifoldEdgeCount == 0
+            and inconsistentEdgeWindingCount == 0
+            and singleSidedSurfaceCount == expectedSurfaceCount and expectedSurfaceCount > 0
+            and minimumSignedVolumeM3 > 0.0 and requiredWallAllowanceM > 0.0
+            and toleranceM >= 0.0 and minimumWallAllowanceM > 0.0
+            and maximumWallAllowanceM >= minimumWallAllowanceM
+            and RealFunctions::abs(minimumWallAllowanceM-requiredWallAllowanceM) <= toleranceM
+            and RealFunctions::abs(maximumWallAllowanceM-requiredWallAllowanceM) <= toleranceM;
     }
     requirement def GES003_SkirtDatum {
         doc /* GES-003 [placement] the skirt is centered on the engine adapter datum immediately below the bus. */

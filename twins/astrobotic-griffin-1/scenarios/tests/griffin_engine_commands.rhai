@@ -117,10 +117,19 @@ fn _propagation_matches(current, previous) {
     for axis in 0..7 {
         let lower=min(previous.model[axis],current.model[axis]);
         let upper=max(previous.model[axis],current.model[axis]);
-        // Avian stores an inverse inertia tensor. Its reciprocal reader can
-        // differ by roundoff; this bound is two binary64 machine epsilons.
-        let roundoff=4.440892098500626e-16*max(1.0,max(lower.abs(),upper.abs()));
-        if current.native[axis]<lower-roundoff || current.native[axis]>upper+roundoff {return false;}
+        // Native mass/COM use binary32; diagonal inertia additionally passes
+        // through a binary32 reciprocal before its f64 port read. Match the
+        // owner's two-f32-epsilon envelope in lunco-cosim/src/avian.rs, not
+        // binary64 roundoff. The independent Modelica/tank oracle above stays
+        // at its original f64 tolerance; only this native conversion is bounded.
+        let roundoff=2.0*0.00000011920928955078125*max(lower.abs(),upper.abs());
+        if current.native[axis]<lower-roundoff || current.native[axis]>upper+roundoff {
+            emit("GRIFFIN_ENGINE_COMMANDS_MASS_EVIDENCE",#{axis:axis,
+                previous_tick:previous.sim_tick,sim_tick:current.sim_tick,
+                previous_model:previous.model,current_model:current.model,
+                native:current.native,representation_error_bound:roundoff});
+            return false;
+        }
     }
     true
 }

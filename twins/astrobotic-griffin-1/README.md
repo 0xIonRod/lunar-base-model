@@ -26,6 +26,14 @@ shader field, with optical study assumptions in `GriffinPlumeStudy`.
 
 See [the 2026-10-21 Griffin audit](contracts/griffin-model-audit-2026-10-21.md)
 for the reference comparison, production checks and remaining fidelity gaps.
+The [22 October checkpoint](contracts/griffin-model-audit-2026-10-22.md)
+records the original 35-case registry cohort (31 passes), subsequent focused
+checks, and the current open physics, ramp-appearance and performance findings.
+The current native ramp drive-control interface is available in
+[LunCoSim USD commit d389c12f1](https://github.com/LunCoSim/lunco-sim/commit/d389c12f1).
+The [ramp visual analysis](contracts/griffin-ramp-visual-analysis-2026-10-22.md)
+records the outward-stow mismatch against the supplied reference and the
+required inward-package reconstruction. Ramp appearance remains unaccepted.
 The seven-engine/four-leg configuration is source-backed; current metric
 dimensions, mass properties and propulsion ratings remain reconstruction or
 integration-study inputs.
@@ -49,6 +57,13 @@ flight commands. The GEP-004 vehicle gate observes battery depletion, command
 suppression and physical main-engine/RCS shutdown under sustained demand.
 Gold MLI and engine shields describe appearance and packaging;
 their geometry does not establish thermal protection performance.
+
+The [interactive performance contract](contracts/griffin-performance.md)
+records the user-selected 60 FPS / 1280 × 720 / High-quality target with
+real-time physics. This target remains open; component conformance is separate
+from mission and performance acceptance. The [skirt contract](contracts/griffin-engine-skirt.md)
+records the 22 October thickness-verification repair and its positive and
+deliberately malformed production cases.
 
 The [powered verification context](contracts/griffin-verification-context.md)
 records the shared environment required by standalone component fixtures and
@@ -212,7 +227,7 @@ heightfield is also ignored because it is reproducible; only the manifest,
 adapter, provenance, and USD wiring are reviewable source.
 
 From the LunCoSim repository root, follow
-[`tools/terrain/README.md`](tools/terrain/README.md). The current reproducible
+[`tools/terrain/README.md`](../../tools/terrain/README.md). The current reproducible
 study crop is a 512 m × 512 m local ENU window at 4 m node spacing (129 × 129
 nodes), centered at latitude `-84.72672255` and east longitude `29.14428685`.
 The source is polar stereographic, so the checked-in Python adapter converts it
