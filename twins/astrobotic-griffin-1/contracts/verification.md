@@ -12,6 +12,13 @@ mechanism. Its provisional unequal-length, opposite-toe-sweep study has only
 sampled port-side box coverage; detailed geometry, complete deployment
 clearance and native loaded egress remain unqualified.
 
+The [detached root-section checkpoint](griffin-ramp-root-section-2026-10-23.md)
+qualifies its 2.149084054 m component geometry independently. Its 119-check
+gate includes native metric bounds; a 0.8 X-scale negative fixture fails that
+constraint. The installed ramp source gate passes 1,257 checks after its
+observer recovers dimensions in the native cooking frame; flight stow passes
+272. These source checks do not close the installed interference above.
+
 ## Sun-facing autonomous descent
 
 The operator-requested GSA-011 study yaws the forward solar bank's +Z outward

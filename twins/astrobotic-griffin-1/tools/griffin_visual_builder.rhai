@@ -4688,8 +4688,8 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     let tread_names = griffin_spec::ramp_tread_names();
     let tread_width = griffin_spec::ramp_tread_width_m();
     let tread_height = griffin_spec::ramp_tread_height_m();
-    let tread_first_x = griffin_spec::ramp_tread_first_center_x_m();
-    let tread_pitch = griffin_spec::ramp_tread_pitch_m();
+    let tread_pitch = section_length / tread_count;
+    let tread_first_x = tread_pitch / 2.0;
     let beam_width = griffin_spec::ramp_under_beam_width_m();
     let beam_height = griffin_spec::ramp_under_beam_height_m();
     let beam_y = griffin_spec::ramp_under_beam_center_y_m();
@@ -4699,7 +4699,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     let post_depth = griffin_spec::ramp_side_post_depth_m();
     let post_embed = griffin_spec::ramp_side_post_embedded_depth_m();
     let post_first_x = griffin_spec::ramp_side_post_first_center_x_m();
-    let post_pitch = griffin_spec::ramp_side_post_pitch_m();
+    let post_pitch = section_length / (post_count - 1.0);
     let truss_chord_height = griffin_spec::ramp_side_truss_chord_height_m();
     let truss_lower_chord_y = griffin_spec::ramp_side_truss_lower_chord_center_y_m();
     let truss_brace_thickness = griffin_spec::ramp_side_truss_brace_thickness_m();
@@ -4721,7 +4721,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         || tread_first_x == () || tread_pitch == ();
     let invalid_beams = beam_width == () || beam_height == ()
         || beam_y == () || beam_z == ();
-    let invalid_post_count = post_count <= 0 || post_width == () || post_depth == ();
+    let invalid_post_count = post_count <= 1 || post_width == () || post_depth == ();
     let invalid_post_fit = post_embed == () || post_first_x == () || post_pitch == ();
     let invalid_hinge = hinge_radius == () || hinge_length == ()
         || hinge_y == () || deployment_angle == ();
@@ -4734,7 +4734,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         return plan_error(section_path + ": ramp section geometry source values are incomplete");
     }
     let tolerance = _sysml_number(source, "rampSectionGeometryToleranceM");
-    if tolerance == () || (section_count * section_length - total_length).abs() > tolerance
+    if tolerance == () || section_length > total_length + tolerance
         || tread_count * section_count != griffin_spec::_sysml_integer("assemblyTreadCount") {
         return plan_error(section_path + ": ramp section length or tread count does not match the SysML assembly");
     }
@@ -4867,8 +4867,8 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
 
         // A single rounded strip remains the guard collider. Reuse the
         // lug profile with a quarter-turn; no overlapping visual proxy.
-        let entry_y=griffin_spec::ramp_guide_center_y_m(section_index,0.0);
-        let exit_y=griffin_spec::ramp_guide_center_y_m(section_index,section_length);
+        let entry_y=griffin_spec::ramp_guide_center_y_m(section_index,0.0,section_length);
+        let exit_y=griffin_spec::ramp_guide_center_y_m(section_index,section_length,section_length);
         let rise=exit_y-entry_y;
         let guide_length=(section_length*section_length+rise*rise).sqrt();
         let guide_angle=(rise/section_length).atan()*180.0/3.141592653589793;
@@ -4905,7 +4905,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             let post_path = section_path + "/SidePost" + post_side.name
                 + (index + 1).to_string();
             let post_x=post_first_x+post_pitch*index;
-            let top_y=griffin_spec::ramp_guide_center_y_m(section_index,post_x)+rail_height/2.0;
+            let top_y=griffin_spec::ramp_guide_center_y_m(section_index,post_x,section_length)+rail_height/2.0;
             let placement = _component_cube_visual_ops(doc,edit_target,section_path,
                 "SidePost"+post_side.name+(index+1).to_string(),
                 [post_x,(top_y+post_bottom_y)/2.0,post_side.z],
@@ -4926,8 +4926,8 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             let x0 = bay_pitch * brace_index;
             let x1 = bay_pitch * (brace_index + 1);
             let start_low = brace_index % 2 == 0;
-            let y0 = if start_low { truss_lower_chord_y } else { griffin_spec::ramp_guide_center_y_m(section_index,x0) };
-            let y1 = if start_low { griffin_spec::ramp_guide_center_y_m(section_index,x1) } else { truss_lower_chord_y };
+            let y0 = if start_low { truss_lower_chord_y } else { griffin_spec::ramp_guide_center_y_m(section_index,x0,section_length) };
+            let y1 = if start_low { griffin_spec::ramp_guide_center_y_m(section_index,x1,section_length) } else { truss_lower_chord_y };
             let dx = x1 - x0;
             let dy = y1 - y0;
             let brace_length = (dx * dx + dy * dy).sqrt();
@@ -4996,10 +4996,14 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path, side) {
         "rampStarboardDeploymentAngleRad"
     });
     let tolerance = _ramp_number("rampSectionGeometryToleranceM");
+    let total_length = _ramp_number("rampSurfaceLengthM");
     if section_count != 3 || section_length == () || section_length <= 0.0
         || section_names.len() != section_count || tolerance == () || tolerance <= 0.0
-        || angle == () {
+        || total_length == () || angle == () {
         return plan_error("articulated ramp section datums are incomplete");
+    }
+    if (section_count*section_length-total_length).abs()>tolerance {
+        return plan_error("visual ramp section lengths do not close the assembly span");
     }
     let ops = [];
     for index in 0..section_count {

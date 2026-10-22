@@ -70,8 +70,12 @@ package GriffinRampRequirements {
     constraint def GRC017_ComposedContactTrackMatchesSource {
         in maximumDimensionDeviationM : Real;
         in maximumPlacementDeviationM : Real;
+        in localFrameContractSatisfied : Boolean;
         in toleranceM : Real;
         toleranceM >= 0.0
+            and localFrameContractSatisfied
+            and maximumDimensionDeviationM >= 0.0
+            and maximumPlacementDeviationM >= 0.0
             and maximumDimensionDeviationM <= toleranceM
             and maximumPlacementDeviationM <= toleranceM;
     }
@@ -759,7 +763,7 @@ package GriffinRampRequirements {
     }
 
     requirement def GRR006_RampGeometry {
-        doc /* GRR-006 [geometry/physics] each composed physical ramp shall provide two visible continuous convex-mesh contact tracks whose top-face length and thickness match the SysML study values. Their lateral centres shall equal the source FLIP wheel stations, and their width shall equal the source wheel width plus twice the wheel clearance. The outer toe face shall be mitered from the track thickness and deployed angle so its upper and lower edges meet the terrain plane together. The centre remains open between tracks; rails and support load paths remain separately inspectable. */
+        doc /* GRR-006 [geometry/physics] each composed physical ramp shall provide two visible continuous convex-mesh contact tracks whose top-face length and thickness match the SysML study values. Their lateral centres shall equal the source FLIP wheel stations, and their width shall equal the source wheel width plus twice the wheel clearance. Dimension observations shall invert the native rigid cooking pose on the canonical-stage cooked vertices, preserving cooked scale; a rotated stage AABB is not a section-local dimension. Local track transforms shall retain unit scale and the declared translation/scale order. The outer toe face shall be mitered from the track thickness and deployed angle so its upper and lower edges meet the terrain plane together. The centre remains open between tracks; rails and support load paths remain separately inspectable. */
         require GRC016_ContactTrackClearsTire {
             in trackWidthM = GriffinEgressRamp::assemblyTrackWidthM;
             in wheelWidthM = FlipRover::wheelWidthM;

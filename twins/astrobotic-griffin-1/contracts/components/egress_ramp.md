@@ -5,6 +5,10 @@ The integrated ramp mechanism has a confirmed folded-stack interference.
 record its exact scope. Existing source-conformance checks do not qualify
 collision-free stow, deployment or rover egress.
 
+A [separate longer-root component](../griffin-ramp-root-section-2026-10-23.md)
+is saved and tested at 2.149084054 m. It is an unmounted reconstruction
+prototype. The equal-length installed mechanism described below is unchanged.
+
 ## Ownership and current datums
 
 `requirements/griffin_ramp_requirements.sysml` owns reconstruction dimensions,

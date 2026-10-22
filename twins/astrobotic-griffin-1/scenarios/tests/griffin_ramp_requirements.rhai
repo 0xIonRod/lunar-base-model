@@ -81,6 +81,45 @@ fn _measurement_value(observation, field, label) {
       document_generation: observation.document_generation,
       stage_generation: observation.stage_generation}
 }
+
+// Hull vertices are canonical-stage metres. The native rigid cooking pose
+// removes only placement/orientation; cooked scale stays in the dimensions.
+fn _contact_track_observation(path,dimensions,placement) {
+    let doc=usd_geometry_inspection::document_owner(path);
+    let record=query("QueryUsdPrim",#{doc_id:doc,path:path,collision_geometry:true,
+        attrs:["xformOp:translate","xformOp:scale","xformOpOrder"]});
+    if record==() || record.error!=() || record.collision_geometry==() {
+        return #{ok:false,message:"composed cooked contact track is unavailable"};
+    }
+    let shape=record.collision_geometry;let pose=shape.local_to_stage;
+    if shape.shape!="convex_hull" || shape.frame!="canonical_stage"
+        || shape.vertices==() || shape.vertices.len()!=8 || pose==()
+        || pose.translation_m==() || pose.rotation_wxyz==() {
+        return #{ok:false,message:"contact hull requires its native rigid cooking frame"};
+    }
+    let origin=vec3_from(pose.translation_m);let r=pose.rotation_wxyz;
+    let inverse=quat_inverse(quat_from([r[1],r[2],r[3],r[0]]));
+    let lo=vec3_array(qrot(inverse,vec3_from(shape.vertices[0])-origin));let hi=lo;
+    for vertex in shape.vertices {
+        let p=vec3_array(qrot(inverse,vec3_from(vertex)-origin));
+        for axis in 0..3 {lo[axis]=min(lo[axis],p[axis]);hi[axis]=max(hi[axis],p[axis]);}
+    }
+    let dimension_error=0.0;let placement_error=0.0;
+    let actual=record.attrs["xformOp:translate"];let scale=record.attrs["xformOp:scale"];
+    if actual==() || actual.len()!=3 || scale==() || scale.len()!=3 {
+        return #{ok:false,message:"contact track local placement is unavailable"};
+    }
+    let local_contract=record.attrs["xformOpOrder"]==["xformOp:translate","xformOp:scale"];
+    for axis in 0..3 {
+        dimension_error=max(dimension_error,abs(hi[axis]-lo[axis]-dimensions[axis]));
+        placement_error=max(placement_error,abs(actual[axis]-placement[axis]));
+        local_contract=local_contract && scale[axis]==1.0;
+    }
+    #{ok:true,maximumDimensionDeviationM:dimension_error,
+        maximumPlacementDeviationM:placement_error,localFrameContractSatisfied:local_contract,
+        doc_id:record.doc_id,document_generation:record.document_generation,
+        stage_generation:record.stage_generation}
+}
 // One aggregate observation per intermediate hinge: the plates are measured
 // in their owning body frames against the composed native joint datums.
 fn _pivot_fittings(source, joint_path, parent, child) {
@@ -437,16 +476,16 @@ fn on_tick(me, ctx) {
                     component: "ramp_track", requirement: "grr006", verification: VERIFICATION,
                     kind: "attribute_equals", path: track_path,
                     attr: "physics:approximation", expected: "convexHull"});
-                for dim in [
-                    #{name: "length", index: 0, attr: "rampSectionLengthM"},
-                    #{name: "thickness", index: 1, attr: "rampSurfaceThicknessM"},
-                    #{name: "width", index: 2, attr: "assemblyTrackWidthM"},
-                ] {
-                    checks.push(sysml_requirement_checks::collision_bounds_component(
-                        "GRR-006-" + side + "-" + index.to_string() + "-" + track.name + "-" + dim.name,
-                        "ramp_track", "grr006", VERIFICATION, track_path, dim.index,
-                        _source_attr(dim.attr), 2.0, 0.002));
-                }
+                let observation=_contact_track_observation(track_path,
+                    [section_length,_source_number(source,"rampSurfaceThicknessM"),
+                        _source_number(source,"assemblyTrackWidthM")],
+                    [0.0,_source_number(source,"rampSurfaceCenterYM"),track.center_z]);
+                checks.push(_constraint(source,"GRR-006-"+side+"-"+index.to_string()+"-"+track.name+"-cooked-frame",
+                    "grr006","GRC017_ComposedContactTrackMatchesSource",#{
+                        maximumDimensionDeviationM:_measurement_value(observation,"maximumDimensionDeviationM","cooked local dimensions"),
+                        maximumPlacementDeviationM:_measurement_value(observation,"maximumPlacementDeviationM","local track placement"),
+                        localFrameContractSatisfied:_measurement_value(observation,"localFrameContractSatisfied","local transform contract"),
+                        toleranceM:_source_number(source,"contactTrackGeometryToleranceM")}));
                 checks.push(_attribute_component("GRR-006-" + side + "-" + index.to_string() + "-" + track.name + "-z",
                     "grr006", track_path, "xformOp:translate", 2, track.center_z));
                 checks.push(_attribute_component("GRR-006-" + side + "-" + index.to_string() + "-" + track.name + "-y",
@@ -473,8 +512,8 @@ fn on_tick(me, ctx) {
 
             for rail in griffin_spec::ramp_guide_stations() {
                 let rail_path = section + "/" + rail.name;
-                let entry_y = griffin_spec::ramp_guide_center_y_m(index, 0.0);
-                let exit_y = griffin_spec::ramp_guide_center_y_m(index, section_length);
+                let entry_y = griffin_spec::ramp_guide_center_y_m(index, 0.0,section_length);
+                let exit_y = griffin_spec::ramp_guide_center_y_m(index, section_length,section_length);
                 let rise = exit_y - entry_y;
                 let guide_length = (section_length * section_length + rise * rise).sqrt();
                 checks.push(sysml_requirement_checks::exists(
@@ -570,7 +609,7 @@ fn on_tick(me, ctx) {
                         + (post_index + 1).to_string();
                     let post_x=_source_number(source,"assemblySidePostFirstCenterXM")
                         +_source_number(source,"assemblySidePostPitchM")*post_index;
-                    let rail_top_y=griffin_spec::ramp_guide_center_y_m(index,post_x)
+                    let rail_top_y=griffin_spec::ramp_guide_center_y_m(index,post_x,section_length)
                         +_source_number(source,"rampRailHeightM")/2.0;
                     let post_height=rail_top_y-post_bottom_y;
                     let post_center_y=(rail_top_y+post_bottom_y)/2.0;

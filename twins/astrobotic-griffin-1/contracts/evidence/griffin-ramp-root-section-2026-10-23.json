@@ -1,0 +1,175 @@
+{
+  "status": "detached_component_qualified_installation_open",
+  "source_revision": 4297951802997717750,
+  "length_m": 2.149084054,
+  "geometry_tolerance_m": 0.002,
+  "source_sha256": {
+    "components/lander/griffin_ramp_root_section_visual.usda": "d1ca46d5ec95b3745c19465d948c6b72b9fc89edeafec9b310acfd3bfda69b18",
+    "tests/griffin_ramp_root_section.usda": "207f4858357dcd5523afd43fc11796f202cf759b1307c1eb14843c55a95df038",
+    "tests/fixtures/griffin_ramp_root_section_short.usda": "9a9e602fa1a406d9a0713ade34cf22247dc14099a749e83c71d1abbc4544a9fe",
+    "requirements/griffin_ramp_root_section_requirements.sysml": "8c73d8fe67f24bb85f482b967d11a6a6492dce6780ddddc3ce8d0af962887359",
+    "requirements/griffin_ramp_requirements.sysml": "de205c76dbc4ab41b610f4c6e61951978b37aecc1f247c08b42eec694cd33cd9",
+    "requirements/griffin_requirement_sources.sysml": "c373062070afe24d3a27f0f02a6442fe987baecab0193e3f9dd76fbf7e94d988",
+    "tools/griffin_ramp_root_section.rhai": "4b4d6b75c881bce213aa564b9d7c8bfab4fc416a0dbcaa936e560afdf66cd976",
+    "tools/griffin_ramp_root_section_checks.rhai": "ac19592d1373826ffcf74f340ab29f61d359f06cc99eaab36aecbb5db807134c",
+    "tools/griffin_spec.rhai": "166314eb69fa3933d3e9833a07b22429c6c032bf7867abc4781fc5fccb9e0b1f",
+    "tools/griffin_visual_builder.rhai": "5f4a7f43c45bac35a8efa716eb73b4f82f144a928c51ef5a09b797ce5af8941a",
+    "scenarios/tests/griffin_ramp_requirements.rhai": "8f6d475fadfa74ca45d498fc8832c1c583ce62162b4a3990653d0e34271bfc67",
+    "scenarios/tests/griffin_ramp_root_section.rhai": "c5ba4b9aed222ed3bf305b0a30f46547f6425e90b9478a235ee1b4715e283bee",
+    "scenarios/tests/griffin_ramp_flight_stow.rhai": "22c27a51d0c163c0e68cec786a720bbfe5fd155ed5a2aba599acad7ca138ba6b",
+    "twin.toml": "e9177655d7f382515a4c8ffb9f6d10d20c5f3cdb396d48cbf8a336a3ce911c07",
+    "vehicles/griffin_1.usda": "a7cfd8a587f8e401643b0056f6a5bb3cb1d9d71dedccff9a09060fd596b74f73",
+    "components/lander/griffin_ramp_section_visual.usda": "a7116d879f0835f0fa7d4feb95673ba109257398513e1f536e61d2ce1f1659d4"
+  },
+  "component_readback": {
+    "doc_id": 119574114331324,
+    "view": 1,
+    "preview": 119574114331324,
+    "target": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda"
+  },
+  "sysml": {
+    "errors": 0,
+    "warnings": 153,
+    "new_root_warnings": 0
+  },
+  "provenance": {
+    "requirements": 222,
+    "records": 222,
+    "sources": 71
+  },
+  "preflight": [
+    {
+      "operation_id": 3,
+      "state": "ready",
+      "report": {
+        "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda",
+        "kind": "usd",
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "findings": [],
+        "info": {
+          "wheel_prims": [],
+          "control_bindings": []
+        }
+      },
+      "source_revisions": [
+        {
+          "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda",
+          "cid": "bafkreigrzjdnl3evwn2fygkglwkiy23sxh6it3pk73e3gefm7u573ju3da"
+        }
+      ]
+    },
+    {
+      "operation_id": 4,
+      "state": "ready",
+      "report": {
+        "path": "twin://astrobotic-griffin-1/tests/griffin_ramp_root_section.usda",
+        "kind": "usd",
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "findings": [],
+        "info": {
+          "wheel_prims": [],
+          "control_bindings": []
+        }
+      },
+      "source_revisions": [
+        {
+          "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda",
+          "cid": "bafkreigrzjdnl3evwn2fygkglwkiy23sxh6it3pk73e3gefm7u573ju3da"
+        },
+        {
+          "path": "twin://astrobotic-griffin-1/tests/griffin_ramp_root_section.usda",
+          "cid": "bafkreibap5efqnl5zvkshl6uh7arpfxsalhxlgyta7a6wfeehrk2sxpqha"
+        }
+      ]
+    }
+  ],
+  "integrated_production": {
+    "engine_commit": "0cb4d37137554af3227a316100c903f44a1c3a4c",
+    "binary_sha256": "5b24ec52f8893910cf764334a75279a20522bfdd8d30d0bbfdb827b5ed28c73d",
+    "cases": [
+      {
+        "name": "cooked-frame",
+        "scene": "assets/scenes/tests/assembly_collision_clearance_builder.usda",
+        "channel": "ASSEMBLY_COLLISION_CLEARANCE_BUILDER",
+        "expected_exit": 0,
+        "actual_exit": 0,
+        "elapsed_s": 2.275,
+        "log": ".cache/codex-evidence/griffin-root-section-20261022/integrated-cooked-frame.log",
+        "check_count": 21,
+        "verdict": "pass",
+        "log_sha256": "e41468134249379905871aaac7a2d1baf742b7d41650a1f0be01f87e70bb5389"
+      },
+      {
+        "name": "loaded-slider",
+        "scene": "assets/scenes/tests/loaded_slider_slope.usda",
+        "channel": "LOADED_SLIDER_SLOPE",
+        "expected_exit": 0,
+        "actual_exit": 0,
+        "elapsed_s": 2.473,
+        "log": ".cache/codex-evidence/griffin-root-section-20261022/integrated-loaded-slider.log",
+        "check_count": 7,
+        "verdict": "pass",
+        "log_sha256": "f7dbd3712e25460057191febc0366a92c5627e76147c3288fae7721a2fe9a759"
+      },
+      {
+        "name": "root",
+        "scene": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_ramp_root_section.usda",
+        "channel": "GRIFFIN_RAMP_ROOT_SECTION",
+        "expected_exit": 0,
+        "actual_exit": 0,
+        "elapsed_s": 4.777,
+        "log": ".cache/codex-evidence/griffin-root-section-20261022/integrated-root.log",
+        "check_count": 119,
+        "verdict": "pass",
+        "log_sha256": "88b90c843368c17d2409af77f3570f6ea7718e7f7098312787032267777940e1"
+      },
+      {
+        "name": "ramp",
+        "scene": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_ramp_requirements.usda",
+        "channel": "GRIFFIN_RAMP_REQUIREMENTS",
+        "expected_exit": 0,
+        "actual_exit": 0,
+        "elapsed_s": 30.228,
+        "log": ".cache/codex-evidence/griffin-root-section-20261022/integrated-ramp.log",
+        "check_count": 1257,
+        "verdict": "pass",
+        "log_sha256": "f228365ee4194ea38e42b0b82e102944c8482a619021fd7889ad4475e0f51bc4"
+      },
+      {
+        "name": "flight-stow",
+        "scene": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_ramp_flight_stow.usda",
+        "channel": "GRIFFIN_RAMP_FLIGHT_STOW",
+        "expected_exit": 0,
+        "actual_exit": 0,
+        "elapsed_s": 21.711,
+        "log": ".cache/codex-evidence/griffin-root-section-20261022/integrated-flight-stow.log",
+        "check_count": 272,
+        "verdict": "pass",
+        "log_sha256": "9894d17647d4647229e750f03dfaabb779852121d54e9d90e6a599e331f45ff9"
+      },
+      {
+        "name": "short-negative",
+        "scene": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/fixtures/griffin_ramp_root_section_short.usda",
+        "channel": "GRIFFIN_RAMP_ROOT_SECTION",
+        "expected_exit": 1,
+        "actual_exit": 1,
+        "elapsed_s": 5.783,
+        "log": ".cache/codex-evidence/griffin-root-section-20261022/integrated-short-negative.log",
+        "check_count": 119,
+        "verdict": "expected_failure",
+        "log_sha256": "b2d4d5979749f1cb08d4b7e93516b951b0e8244497ac84c9f2c01e569663c4d9"
+      }
+    ]
+  },
+  "negative_failure": "GRS-001-native-metric-span only; X scale 0.8",
+  "boundary": {
+    "mounted_in_vehicle": false,
+    "full_mechanism_clearance": false,
+    "loaded_deployment": false,
+    "fps_acceptance": false
+  }
+}

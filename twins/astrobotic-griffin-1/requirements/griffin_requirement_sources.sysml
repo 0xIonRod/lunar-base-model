@@ -839,6 +839,23 @@ package GriffinRequirementSources {
             source_astrobotic_griffin_1_research_griffin_1_assumptions_md);
     }
 
+    part source_griffin_root_section_study : EvidenceSource {
+        doc /* Native interference finding and provisional unequal-fold study;
+         * a Twin reconstruction basis, not supplier metrology. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/griffin-ramp-interference-2026-10-22.md";
+    }
+    part source_griffin_root_section_component : EvidenceSource {
+        attribute role : EvidenceSourceRole = "VisualAsset";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda";
+    }
+    part evidence_grs_001 : RequirementEvidence {
+        ref targetRequirement = GriffinRampRootSectionRequirements::grs001;
+        ref sources = (source_griffin_root_section_study,
+            source_griffin_root_section_component,
+            source_www_astrobotic_com_griffin_lander);
+    }
+
     part evidence_grr_020 : RequirementEvidence {
         ref targetRequirement = GriffinRampRequirements::grr020;
         ref sources = (source_www_nasa_gov_astrobotics_griffin_1,

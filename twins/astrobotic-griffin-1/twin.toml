@@ -15,6 +15,12 @@ paths = ["requirements"]
 
 [verification]
 [[verification.cases]]
+name = "GriffinRampRootSectionRequirements::Verify_GriffinRampRootSection"
+scene = "tests/griffin_ramp_root_section.usda"
+script = "scenarios/tests/griffin_ramp_root_section.rhai"
+verdict_channel = "GRIFFIN_RAMP_ROOT_SECTION"
+
+[[verification.cases]]
 name = "GriffinPowerThermalRequirements::Verify_GriffinSustainedThermal"
 scene = "tests/griffin_sustained_thermal.usda"
 script = "scenarios/tests/griffin_sustained_thermal.rhai"
@@ -292,6 +298,12 @@ name = "flip.sensor_power"
 requirements = "requirements/flip_sensor_power_requirements.sysml"
 verification = "FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements"
 usd_path = "/World/FLIP"
+
+[[components]]
+name = "griffin.ramp_root_section"
+requirements = "requirements/griffin_ramp_root_section_requirements.sysml"
+verification = "GriffinRampRootSectionRequirements::Verify_GriffinRampRootSection"
+usd_path = "/World/RampRootSection"
 
 [settings]
 "usd.runtime_persistence" = false

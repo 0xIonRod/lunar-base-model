@@ -918,8 +918,6 @@ fn ramp_tread_count() { _sysml_integer("assemblyTreadCount") }
 fn ramp_tread_width_m() { _sysml_attribute("assemblyTreadWidthM") }
 fn ramp_tread_height_m() { _sysml_attribute("assemblyTreadHeightM") }
 fn ramp_contact_track_width_m() { _sysml_attribute("assemblyTrackWidthM") }
-fn ramp_tread_first_center_x_m() { _sysml_attribute("assemblyTreadFirstCenterXM") }
-fn ramp_tread_pitch_m() { _sysml_attribute("assemblyTreadPitchM") }
 fn ramp_under_beam_width_m() { _sysml_attribute("assemblyUnderBeamWidthM") }
 fn ramp_under_beam_height_m() { _sysml_attribute("assemblyUnderBeamHeightM") }
 fn ramp_under_beam_center_y_m() { _sysml_attribute("assemblyUnderBeamCenterYM") }
@@ -967,13 +965,13 @@ fn ramp_guide_stations() {
 }
 // The root guide rises from track level, clearing the horizontal-deck
 // breakover. Middle/toe guides retain the full-height fold datum.
-fn ramp_guide_center_y_m(section_index, x_m) {
+fn ramp_guide_center_y_m(section_index, x_m, section_length_m) {
     let full=_sysml_attribute("rampRailCenterYM");
     if section_index!=0 {return full;}
     let entry=_sysml_attribute("rampSurfaceCenterYM")
         +_sysml_attribute("rampSurfaceThicknessM")/2.0
         +_sysml_attribute("rampRailHeightM")/2.0;
-    entry+(full-entry)*x_m/ramp_section_length_m()
+    entry+(full-entry)*x_m/section_length_m
 }
 fn ramp_transition_joint_names() { _sysml_enum_names("transitionJoints") }
 fn ramp_tread_count_per_section() { _sysml_integer("assemblyTreadCountPerSection") }
@@ -982,7 +980,6 @@ fn ramp_side_post_width_m() { _sysml_attribute("assemblySidePostWidthM") }
 fn ramp_side_post_depth_m() { _sysml_attribute("assemblySidePostDepthM") }
 fn ramp_side_post_embedded_depth_m() { _sysml_attribute("assemblySidePostEmbeddedDepthM") }
 fn ramp_side_post_first_center_x_m() { _sysml_attribute("assemblySidePostFirstCenterXM") }
-fn ramp_side_post_pitch_m() { _sysml_attribute("assemblySidePostPitchM") }
 fn ramp_side_truss_chord_height_m() { _sysml_attribute("assemblySideTrussChordHeightM") }
 fn ramp_side_truss_lower_chord_center_y_m() { _sysml_attribute("assemblySideTrussLowerChordCenterYM") }
 fn ramp_side_truss_brace_thickness_m() { _sysml_attribute("assemblySideTrussBraceThicknessM") }

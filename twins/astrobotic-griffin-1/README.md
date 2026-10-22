@@ -52,7 +52,9 @@ ramp deployment and clean full-mission performance remain open.
 The [folded-ramp inspection](contracts/griffin-ramp-interference-2026-10-22.md)
 confirms that the saved middle tracks intersect their fixed transitions.
 Its unequal-length, opposite-toe-sweep candidate is a design study awaiting
-component authoring and complete clearance/runtime verification.
+complete clearance/runtime verification. The first [detached root section](contracts/griffin-ramp-root-section-2026-10-23.md)
+is now authored and component-tested at 2.149084054 m. It is not mounted in
+the vehicle; the installed mechanism still has the recorded interference.
 The seven-engine/four-leg configuration is source-backed; current metric
 dimensions, mass properties and propulsion ratings remain reconstruction or
 integration-study inputs.
