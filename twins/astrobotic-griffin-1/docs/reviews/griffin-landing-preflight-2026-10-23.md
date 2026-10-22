@@ -28,6 +28,6 @@ process and port. Evidence resides in the optimization checkout under
 `.cache/codex-evidence/performance-20261023/griffin-preflight-gate/`.
 
 This qualifies preflight, not touchdown, ramp deployment, the complete mission
-or performance targets. Generic task-callback errors still require a terminal
-failure boundary instead of implicit retry; that engine issue is separate from
-the bounded landing input repaired here.
+or performance targets. Task-callback termination and diagnostic event delivery
+belong to the application's scripting owner; the Twin selects its reaction to
+`TASK_FAILED` through scenario policy.
