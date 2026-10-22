@@ -1,0 +1,1877 @@
+{
+  "date": "2026-10-22",
+  "qualification": "focused interface and internal packaging checkpoint",
+  "engine_main_fast_forward": "a45cbca69f22427fb7a7d5f7652940c306efdb28",
+  "engine_interface_commit": "eb4ae00eb758677b493b44d846ad78a7ecab179e",
+  "engine_review_head": "6efe51ff8ca041ee466873cee42d02d3fc006c2e",
+  "binary_sha256": "7ac15fa0d9c5aafd0140be663b09b5e12ec1ec55fa2602106be065bdb712a6a3",
+  "source_revision": "3062506949441219699",
+  "execution_sources": {
+    ".cache/power-failure-qualification/electrical_connection.usda": "4ce544d19818dfecbff89ce3c94aff8df50dcc62a0ec7b088f1e778995fd1ceb",
+    ".cache/power-failure-qualification/temperature_feedback.usda": "99c40efca94092cf00542c032afa0427a5cfddb9674e8c079f03b6a4e7e6da4c",
+    ".cache/power-failure-qualification/thermal_connection.usda": "476bb775c52e93a873f86c719fc536b2f90de0320c2dc28e174511e1de7cea56",
+    ".lunco/runtime/components/lander/griffin_tank_visual.usda": "8b1aee27df2102bbd106df53a3af97444a63f4a00f96440b631a75d5599b8a3d",
+    ".lunco/runtime/scenes/griffin_1_rover_delivery_test.usda": "cad7b96d002f55d1e82a27035d079ce978a820d6b1fe17a42eb0a42d49926da5",
+    ".lunco/runtime/scenes/griffin_1_surface_ops.usda": "68a24e0d0d211a621f5eccd476fab0d481372f91b692789e1279d6a9ea43a846",
+    ".lunco/runtime/vehicles/griffin_1_visual.usda": "542205afb14d7e409ea0acb9e2a4998927d5453e72cc1c874f33e875e4d8938e",
+    "Assets.toml": "9e75e631e26968a8efd70f52216fe0ef9ca2cf52662fb42f502c9767f27f8ce7",
+    "components/lander/griffin_body_collision.usda": "2cfadd1c657057d03913b9bc6a59b5cd037155bbc2af2ea74c6c0a7bca246113",
+    "components/lander/griffin_bus_visual.usda": "6e89100a660011f064e671a608efb484a4c324ef3cff1e730df69bf8aee8ae2f",
+    "components/lander/griffin_engine_bell_visual.usda": "97d0dd98fe16075a7174ef23b428316710c2097433e09dbe10b964beccda7c38",
+    "components/lander/griffin_engine_skirt_visual.usda": "f8b320dec47faa67fd3f469de02cb22db546a5361f1ad82159cab62bf29dadb7",
+    "components/lander/griffin_landing_leg_physics.usda": "2f7380414b306aaab7a626b002df536e93531c0ea89d83b54d0ee28f77f65231",
+    "components/lander/griffin_landing_leg_visual.usda": "aaa5e8b2df863d33b5f132fc0eb0cafa5e742e4942cc00b03b44ccd9a66ec744",
+    "components/lander/griffin_ramp_section_visual.usda": "a7116d879f0835f0fa7d4feb95673ba109257398513e1f536e61d2ce1f1659d4",
+    "components/lander/griffin_ramp_toe_section_visual.usda": "5f80cd0bc7c0f6ad18e3c30728df8a61e926a3e220e6be745a49680738d3aa7d",
+    "components/lander/griffin_ramp_visual.usda": "f1f63bc93a1f25f4a55554037144e2bae91ee594094a7f53bd0f4c70591a86af",
+    "components/lander/griffin_rcs_bell_visual.usda": "ae9d8d40ef8b19a32dfa94af60e5fcd7fc744ec2974831ec073c04b8940ad741",
+    "components/lander/griffin_solar_panel_port_visual.usda": "afb4be547780927ebfb2acc3259f94a211f1fcbf5bd8e7ae224a8f45982a5c8f",
+    "components/lander/griffin_solar_panel_starboard_visual.usda": "645094d68768e6ee0b53360b61faf69a9fbf06a7f125785d66b4d1130a0c24c0",
+    "components/lander/griffin_solar_panel_visual.usda": "599da3ec5c091fc6d4a8a5b1e5b22aef987cd8ea29e42ba58ab73efe58946702",
+    "components/lander/griffin_tank_visual.usda": "f9325904d635e138214591a3e065e4486ea98e109d216b6325493dd287b15464",
+    "components/rover/flip_chassis_visual.usda": "7351a7f6da19c5bf80192944fee356d381b6ba30804c7d1dd8c9c4543351a738",
+    "components/rover/flip_sensor_mast_visual.usda": "3b551f21f10eb11317c59baaab303d81d8b132a506f7bc92abcc5c324d237fb0",
+    "components/rover/flip_solar_panel_visual.usda": "bcbf55c847df57fbe89064b2d20b4f37734aaa478881e69ede3db8d0bb2cc15c",
+    "components/rover/flip_suspension_visual.usda": "0b1d60c1479f31c8404cb107be4a897f27c6a836c9a0bd6b43fdc5b6e690e9a5",
+    "environments/lunar_surface_base.usda": "b978a8000490c37cba159b32c6f400ff315af28b37d1756a5a15d7107f4b307f",
+    "environments/south_pole_surrogate.usda": "f130ccfc03f7d9fa76715ef68cef07fbf8c3198163bd4fcfb10378e5996cd396",
+    "requirements/flip_cad_requirements.sysml": "5f2bd2023e114d3fb571025545327cc34032e65983f72f1bb3edc72321e82442",
+    "requirements/flip_chassis_requirements.sysml": "24b480271b157fdd96e98687c3ba406210beabb562a2e29e87ff575e4634ded4",
+    "requirements/flip_requirements.sysml": "8a7d9f799758190f44d1ee902d1a3175cb4489521a0831b2e7b8a24c5224042a",
+    "requirements/flip_sensor_power_requirements.sysml": "48bd15d1ed24f72f472bf5296360d8b443a7630426b61df0d17e52960f859db6",
+    "requirements/flip_suspension_requirements.sysml": "1d42f8926c44d40e675eb27e724429f69ec139667ff5d965e2b4f534e51ceb39",
+    "requirements/flip_wheel_requirements.sysml": "ac465151485fae1bcf191972c44c9c0d44d4f511a5d54e6480136b89e32c8942",
+    "requirements/griffin_assurance_requirements.sysml": "88929d2a66092f2497a5fe7066142ce9efc76560693f8773fafeea918582c0bd",
+    "requirements/griffin_bus_requirements.sysml": "43336fd453f9ad6970ca26d02b8965652c87a382b441d6a4e169d3d8db06eaed",
+    "requirements/griffin_functional_requirements.sysml": "5acaa760d89b0befd9f07ea9237d832107ef14739e1780b45bc39060273d43b7",
+    "requirements/griffin_lander_requirements.sysml": "76edcea83b91109aef8f2cbcfee54b1e1f13a9946490dc0831454178e1534aa1",
+    "requirements/griffin_landing_legs_requirements.sysml": "a40a562a0a0bdc039f602974971064d7431484b6d2c102b1d41d76eab044cb3a",
+    "requirements/griffin_mechanical_requirements.sysml": "0933bdfcf01ee3dddeefbacf02ccff7ea022f5b78a6eaf9ba5094e637908b7ae",
+    "requirements/griffin_power_thermal.sysml": "736e91dc33d26fdad9ab3acffee90eff02ed3b1d4d63a108b19f335bc4d66928",
+    "requirements/griffin_propulsion_requirements.sysml": "9edabf09a4ad7cfaeaf2a2904568dde16b3c25eb84bc2380c5e6cd7ddf7eb99d",
+    "requirements/griffin_ramp_requirements.sysml": "61568189cf9e8e657b9b43890748ead0e5defbbb9c560347745aa667b1018591",
+    "requirements/griffin_requirement_sources.sysml": "9bd0ce08f510d3eb909108d8ba89c50799346e74cdf56e3f32317f50acf0837c",
+    "requirements/griffin_requirements.sysml": "7a6a29cd396ead35e77bc55d9026d004a428b1ccfe567bda8c39626c12da9be9",
+    "requirements/griffin_simulation_accuracy_requirements.sysml": "aa42cc72241ff99e34a1086c6023933c201f34bf4952478d61cc191c6e170919",
+    "requirements/griffin_solar_requirements.sysml": "fbafafc474ebca25c14095128a26db8ae8ee45bce1b1e43f0841bfc042cbcaba",
+    "requirements/griffin_tank_requirements.sysml": "1a3af3232ebb41d13fc3ea29029489ab86d839f9f6e354cc83c1dafcb183f332",
+    "requirements/griffin_vehicle_assembly.sysml": "4503dc5da478b69856ca894b458d82302aaf78016d294f5b4d671354afff4c3b",
+    "requirements/griffin_visual_configuration.sysml": "3ce3b5266fd9725e9d6c32d6347ef38f8ba958324195eb17b67638b2e8694c1f",
+    "requirements/griffin_visual_requirements.sysml": "d85e10a373cf7852af39a026f7f490087c739c227b104e56ad26796d5a133709",
+    "requirements/moonbase_project_requirements.sysml": "e4c6e6f7839702cf3b5864bab0d109f42b5965c4e70b13fb07f49a4bdc9c595a",
+    "scenarios/griffin_1_delivery_release.rhai": "6524d24ed8ba40283075937e3a3328896a7664cd69249af0e5d1947dfb7eb5b7",
+    "scenarios/griffin_1_surface_ops.rhai": "23549a3b23d9c07aa606733208e44a5c116666e47f40dec681f2efa9e9f3f9e2",
+    "scenarios/tests/flip_chassis_requirements.rhai": "ad593e7f6088b0a50d7c70ec46caa9ae0178367a8598c3fefdc12cf87a926d16",
+    "scenarios/tests/flip_manual_controls.rhai": "1038aab87b5c65a82fd2f2943564d59989f4b0cb9acdd0d427095b85e0b9767c",
+    "scenarios/tests/flip_requirements.rhai": "e57bf469f6001840dc2632e4d2ec2499861e20a5299e036276985b834d4da993",
+    "scenarios/tests/flip_route_follow.rhai": "9ee21fa9dbd2835ea696b9890701dc5a900a1f174de6bff147f08cea689a3ce9",
+    "scenarios/tests/flip_sensor_power_requirements.rhai": "30c928316bd38786ccb45b87c35ea66f38737ce71a22f4580ec4be0d4a322892",
+    "scenarios/tests/flip_suspension_requirements.rhai": "7c54c745a3a870a88a69b40b2d7cb81d8bf6fc405d1ab9b5e789a51921def35e",
+    "scenarios/tests/flip_wheel_requirements.rhai": "3f19dad0cc9799dc047d6d2396dbbf32195785297ea90172988d5ffadf7fdae0",
+    "scenarios/tests/griffin_bus_open_bays.rhai": "0ee0cd1a96cc2f40fc50b72fd17e8253db1fd87879915d341f0277feeee97caf",
+    "scenarios/tests/griffin_bus_requirements.rhai": "bbf0a3af98147cfc109f933dd0096ff93013f088ad4e8677791183fd01091abc",
+    "scenarios/tests/griffin_control_power_loss.rhai": "0a23b80327dbc92cf46b5e15545fa91df6e5d5494f2004284ca45b34d2308afa",
+    "scenarios/tests/griffin_detach_stability.rhai": "9c6d96ec4c082e4e13fa7382c5ff932b95779ee95cac460f470fea2d07069c75",
+    "scenarios/tests/griffin_engine_commands.rhai": "5598bcc55577a8d58b695927cd49a6c4999c724683eea5ab4b61891803855cd9",
+    "scenarios/tests/griffin_engine_off_impact.rhai": "436714f839d9955e584beb1d27bf35d55fa62b9c3beb96e9a687a8d3173ec703",
+    "scenarios/tests/griffin_engine_out.rhai": "0b7ecb76a372e4c2cfad7ed006ea93fca0377cc89adfa4834f156c44a017fede",
+    "scenarios/tests/griffin_flip_visual.rhai": "6751810300097979acf6b4129fae427dc0821fdd0df3ed16aa79627f71bc4657",
+    "scenarios/tests/griffin_fuel_exhaustion.rhai": "9b4d207e069dce768f057f06d79c9585a4de23ab471115fcadb03606a9543808",
+    "scenarios/tests/griffin_gnc_toggle.rhai": "1f16980ab9f1d2d9c047fe32ac68fa040a3ae39a28544efcfd942edc462e6c98",
+    "scenarios/tests/griffin_lander_requirements.rhai": "03849dcdbb11451276fac2e669269b078fe4660f0655b921e41ec1078f8d6142",
+    "scenarios/tests/griffin_landing_legs_requirements.rhai": "34876ccf5c29777b440a3fd364dcf5f6244c9b8216079f640e8f295c0f0ca52c",
+    "scenarios/tests/griffin_manual_handoff.rhai": "52ff9a63433439e50bf36a55a938150533805db529e1ba515afbc1f122aa3ccf",
+    "scenarios/tests/griffin_mission_evidence.rhai": "9bdcb2b8682388fd4279126165480fae56b9679e1f6204de80fcc61252b6a672",
+    "scenarios/tests/griffin_operator_route_handoff.rhai": "9c64a406bc8eae5e20928d63a6bd4cb02a2a168bafb33b97f11980a67bfaa8c1",
+    "scenarios/tests/griffin_pilot_attitude.rhai": "36eb681f95f9bfaf348fd92cb822bb982d042d16ae406dda9646af463e8766d8",
+    "scenarios/tests/griffin_power_thermal.rhai": "5f2e9c0bab0e40374aefa03cff6f1fc0fcb8d69e3ea61e017897aefde55a31b4",
+    "scenarios/tests/griffin_propulsion_requirements.rhai": "2bfad66a920ce46da1c261b6c3ac3c9534f8ad2b3901d7ae65e6755502da69c1",
+    "scenarios/tests/griffin_ramp_flight_stow.rhai": "f662508fe1f87ba6198e4ad7a43483728947bd1eb35dea45ed4a3b980df6bf3d",
+    "scenarios/tests/griffin_ramp_requirements.rhai": "d14f47318613b519cf9123865c4994243b1b1a13ba5094e07bfb1c7ed8d5decc",
+    "scenarios/tests/griffin_ramp_touchdown_geometry.rhai": "f034120437bd94b0f09c9ae8a6d00c78a426258a069ab440292223f77b8a4733",
+    "scenarios/tests/griffin_rcs_commands.rhai": "b2f4c4d22c30438bcbd816f8d8cf435f014d7a1c609244bb642f857bbed255cb",
+    "scenarios/tests/griffin_requirements.rhai": "b2eb7406a551479c7e5ac03fbd5b7e4200fca82ac9a6c2162ab9b0d4ff5e2910",
+    "scenarios/tests/griffin_rover_leg_collision.rhai": "04cd0633c4ddb5ddd71f504d115629a939c7ff9d2fc65e2619d210a98ce57e4f",
+    "scenarios/tests/griffin_scene_restart.rhai": "248f589810e5a3f544dd4d8f96623e76ede39458a840f0bb3f0ae58af3720f57",
+    "scenarios/tests/griffin_solar_requirements.rhai": "72965811f28ae39372fab4ac23d2092e12931881ed1c2bd197c86135e11e5ab6",
+    "scenarios/tests/griffin_sun_pointing.rhai": "aceea3cb3afc538d3cefa760318f0e005da312c7df02be2e81a349eb5b8a2aa4",
+    "scenarios/tests/griffin_surface_ops_contract.rhai": "2c31fa14e73a568409680875df70a19a4edfe37a83672b91ab7e84df57ee4caf",
+    "scenarios/tests/griffin_sustained_thermal.rhai": "7f6180cbba81aa905ad712ff234baba11abbfc1b29a83b69f3eaaa1c83cf243b",
+    "scenarios/tests/griffin_tank_requirements.rhai": "12e89f693b494fb58ce36dd0d9ab455ce40044bc542667786d1e4612d0c8ee78",
+    "scenarios/tests/griffin_visual_configuration_types.rhai": "957b51a5bf4fe2a7a4e4a3ff530213040ab72b7a5e99d7e5c0ee863bc516b3e8",
+    "scenarios/tests/rumoca_startup.rhai": "f66f724f8b1c3b7cd054526fe9bed4c4d380012d52116d9b4e46dd82fc916649",
+    "scenes/flip_isolated_collision_test.usda": "c7361990fc504729b18f9ab6234b5abd0f3518c866d597bcf88a2fa73a4089a1",
+    "scenes/griffin_1_detach_stability_test.usda": "1a946b98fa87a0de93d9440b63ed52543ffe54336c2c510e32ba5a076ee9f327",
+    "scenes/griffin_1_editor.usda": "a042bbb94a1da3701e158c5baeadd1a9efd2358779c3f8688f09075f98d28eab",
+    "scenes/griffin_1_leg_drop_test.usda": "d0fd4d0778ad3e645cdc07dbbb2e1dbd274aae4ffeeded894ae42f18e6a1635d",
+    "scenes/griffin_1_rover_delivery_test.usda": "d7bec94576dff1b92be7f1bbae4446b5b70d735bc8b8ee468fab4e93986873de",
+    "scenes/griffin_1_surface_ops.usda": "3bca9098dba11cef45bbe43573e7a8939abefd09e81cfbb3318152a3345f0e7a",
+    "scenes/griffin_flip_no_joint_test.usda": "d3ac3377366be8dc1e4931f5e50f58f6abca474d72d8b288c59d0b6b1b64a6c7",
+    "scenes/griffin_flip_visual.usda": "5c134dfecae8471cb97d6f56b446937e0f44c50594cce27c974c8e4935b8bc0c",
+    "tests/_power_failure_electrical_connection.usda": "4ce544d19818dfecbff89ce3c94aff8df50dcc62a0ec7b088f1e778995fd1ceb",
+    "tests/_power_failure_radiation_connection.usda": "b184e0607bbffb0f8d793f7ebae77e787825fa7eccd5ea7add8b634b1a827ef4",
+    "tests/_power_failure_temperature_feedback.usda": "99c40efca94092cf00542c032afa0427a5cfddb9674e8c079f03b6a4e7e6da4c",
+    "tests/_power_failure_thermal_connection.usda": "f5bd7f1b7144131b76f0425967c9082993f05f448611c7bab8e4d1edf76791ec",
+    "tests/flip_chassis_requirements.usda": "65e1a388e512ae5502656905e11edb7c0f45b9436884658a30c4af6fd791bfe6",
+    "tests/flip_requirements.usda": "dab615d9fd87f829a543f45f367d7fad1762b9b199181d7c56a4fea39d7f9f71",
+    "tests/flip_route_follow.usda": "16f77429b90a0487421da1a247c2df210bcd6e5ff56484809ec57c03ba669f8f",
+    "tests/flip_sensor_power_requirements.usda": "af17cd12157e0c86c24184a32191b1ca27c2d9bce531f36656e1b927c083d4d8",
+    "tests/flip_suspension_requirements.usda": "9d534c2ed0bee235ab9da7048663e495ff2bb076dfb2329691dbc26d37fda8ae",
+    "tests/flip_wheel_requirements.usda": "e48ded1b25a51f22b29ee70f600b4d7d702018489192215f670e806c80a3a668",
+    "tests/griffin_bus_open_bays.usda": "5eff4b853ef57e9e2bd8e1f2f4ca7fa2e75f3a96432299a52c7f89f2344997aa",
+    "tests/griffin_bus_requirements.usda": "002fe29c559759a7079c80d3fcda62d41cc4f5ec8ba5845e62ecf0beb2c9448a",
+    "tests/griffin_control_power_loss.usda": "08ff7a77a2af5e174414c5242e3412387962ca7dc50b927facc54ad1009893f6",
+    "tests/griffin_engine_commands.usda": "657c15a236015a7f649a57bbddcbb496565710a4ff3765ee8bc0e06dc7a6530e",
+    "tests/griffin_engine_off_impact.usda": "17629cdb2eb0c01780f3bcab5ac91b9a8c445e8f3c6cb6fc4726a4ba8b581ebc",
+    "tests/griffin_engine_out.usda": "654504ac8706d4b728e9799af96eae80e35471c7d2a152af1315c44715ebe228",
+    "tests/griffin_flip_visual.usda": "baffbecb5631d47d67f99fe297b4195ee69043fe29d42e63dfabafdad568ba67",
+    "tests/griffin_fuel_exhaustion.usda": "2a835f49b236489da45c221060e569bb70f0b660797029decfa981fe8ad4f18b",
+    "tests/griffin_gnc_toggle.usda": "5d54889f802b19ec25b25ff461c5f637f5f6624d7d22a80b20aecacb32c6b2b8",
+    "tests/griffin_lander_requirements.usda": "b27020c4f3b9ad0cd0eddf06f25a9eafba1972e4f99f7427b05ae6d9a47642d4",
+    "tests/griffin_landing_legs_requirements.usda": "3aaf40287d6c5cdad765b3aaecdf930035eea480c9ceed89fd02fe66344ea3be",
+    "tests/griffin_oxidizer_exhaustion.usda": "889327c112fe775abd29147018b4af5889a6cd57a76c89b7499dcca426a7a6aa",
+    "tests/griffin_pilot_attitude.usda": "5864cc77c9f3e963fc627fb43d6c291773ce80dc5ae9564abf4e6860d9025076",
+    "tests/griffin_power_thermal.usda": "133e15aaac4bc569110f330cc70c2d9cc921eba98be8b75caca0b0bde172600a",
+    "tests/griffin_propulsion_requirements.usda": "f91566d37cc59be44c8f56f6281f91657596f78c7dad34b8ec771eeeb5aceff4",
+    "tests/griffin_ramp_flight_stow.usda": "d9cf69ec2027d28404106c1e3a11d7caae43bddfd81db0f8a2dd0f9d7e75afa9",
+    "tests/griffin_ramp_requirements.usda": "dc55234b8ecab43bb235155a6dc5ce9472c4a4ebca05afbdd6908b7cad3f068f",
+    "tests/griffin_ramp_touchdown_geometry.usda": "01c104145dc2018110cf6e11129d223e41f82d76b432681c568d99e3e2e5adda",
+    "tests/griffin_rcs_commands.usda": "9c7e687f14d479e760e2d5b9e313ca250f779d2dad892db21eef8d932de590f4",
+    "tests/griffin_requirements.usda": "31d9dcb1fcaafba570ed89267b6c27aad780a0462939ccb5cba12998be6212fc",
+    "tests/griffin_rover_leg_collision.usda": "f4f8cba622eef7af676dc4b554d694b17c182fc9d32f324461721cf1fc3bda10",
+    "tests/griffin_solar_requirements.usda": "f84ee309284b84c581b699914c08c7eb4b95fcc8ed8ae2758dc0d772d46daa89",
+    "tests/griffin_sun_pointing.usda": "ff0cd529353b649873804d0dc59a1b4c66d083d2a1ad466476e40ca245c0ab61",
+    "tests/griffin_surface_ops_contract.usda": "56a268cb97e07e215b05aedfc08c8a3f35f63c78d69b4c60681d77f8fcc2a6aa",
+    "tests/griffin_sustained_thermal.usda": "373cedf2b6c6a300ad44241df81c040d919a9b5542e37da58f6b65859884f26c",
+    "tests/griffin_tank_requirements.usda": "8a4e5b749a203d673da956ab6e6eb3aebc265466f3ac3b9427016b782e21056c",
+    "tests/griffin_visual_configuration_types.usda": "06a364ec30eb96c2a0b83d32964851f9f4302c7b4ef92e3def20c9e410890cc0",
+    "tools/flip_battery_packaging.rhai": "b123f5bbe6ed8633304390921d02d28d95e8b4ec5b7458251e034a715620ebbe",
+    "tools/flip_wheel_checks.rhai": "8f4bec4c7fa0f3dd96b4d77d2e03b058491d3a19c3fb58a4e71b5f20b1df2e3c",
+    "tools/griffin_bus_verification.rhai": "bad32ec9f68546ee691233ec538623c253577eb9b128321fd5a0b178b881aa3e",
+    "tools/griffin_controls.rhai": "19d4752d7f1b6ca1e9f50900e883c4ef5e40316e86227f9237b2040a491acfbc",
+    "tools/griffin_geometry.rhai": "736daf6e0226936a90bdc01eef5383248be55a6ffb73356e672c99a23062ccbe",
+    "tools/griffin_power_builder.rhai": "45d92a8821eafeacec2937aac440493ad113f3d04093896144a1b6db24ccad2d",
+    "tools/griffin_requirements.rhai": "587d2109bb03b84f9627ed75f2ab7dcdeaca1204cd5a60b5a9728f56cb0403dd",
+    "tools/griffin_skirt_verification.rhai": "1a4e36ad6fc341f9c047662f1872dc5dd50b86a9b4571118ef3e228e29f984d9",
+    "tools/griffin_spec.rhai": "6929519dbe4817e6496aed70dceed0dbb314a847c313ad3240ec174d914cbdbf",
+    "tools/griffin_surface_mission_report.rhai": "30dacc3a24fbac8b7a98e0082a3c960a065db392a1c5a0cd1306f80438fa75e0",
+    "tools/griffin_surface_ops.rhai": "0dfbb17e1b26fa3036676310d14a221bdb490d6aa2a52d22a0ef89873dc1292a",
+    "tools/griffin_surface_ramp_ops.rhai": "b1886181d403384ffe9c3581863975e8d5b7f191486a9efdcf1c1c7191cb035f",
+    "tools/griffin_visual_builder.rhai": "a30f68404c6ce5370ce95251eae8bc529a5c6651c41d1e024400cc4479b0701e",
+    "tools/usd_geometry_inspection.rhai": "ccb498ad59767c348a2fd0db56dfd817380820d7fd038f9181255514239bae69",
+    "twin.toml": "7f42e039eab7dc8ae65e6123413299bc0efcbf1dd802a26ba62f9b85feeaab88",
+    "vehicles/flip.usda": "6e6ecba9c1889c55ca67fe3874d71c84b63f1b4e674cc43d25aa51852ee3c12c",
+    "vehicles/griffin_1.usda": "a7cfd8a587f8e401643b0056f6a5bb3cb1d9d71dedccff9a09060fd596b74f73"
+  },
+  "focused_cases": [
+    {
+      "name": "GriffinVisualRequirements::Verify_GriffinVisualRequirements",
+      "passed": true,
+      "exit": 0,
+      "source_revision_at_start": "3062506949441219699",
+      "source_revision_at_end": "3062506949441219699",
+      "verdict": "pass",
+      "verdict_channel": "GRIFFIN_FLIP_VISUAL",
+      "non_pass_checks": [],
+      "runner_diagnostic": null,
+      "elapsed_wall_s": 64.32774693900137,
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022/griffin_flip_visual-final-cohort.log"
+    },
+    {
+      "name": "GriffinSolarRequirements::Verify_GriffinSolarRequirements",
+      "passed": true,
+      "exit": 0,
+      "source_revision_at_start": "3062506949441219699",
+      "source_revision_at_end": "3062506949441219699",
+      "verdict": "pass",
+      "verdict_channel": "GRIFFIN_SOLAR_REQUIREMENTS",
+      "non_pass_checks": [],
+      "runner_diagnostic": null,
+      "elapsed_wall_s": 119.39244161000533,
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022/griffin_solar_requirements-final-cohort.log"
+    },
+    {
+      "name": "FlipChassisRequirements::Verify_FLIPChassisRequirements",
+      "passed": true,
+      "exit": 0,
+      "source_revision_at_start": "3062506949441219699",
+      "source_revision_at_end": "3062506949441219699",
+      "verdict": "pass",
+      "verdict_channel": "FLIP_CHASSIS_REQUIREMENTS",
+      "non_pass_checks": [],
+      "runner_diagnostic": null,
+      "elapsed_wall_s": 21.952922217999003,
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022/flip_chassis_requirements-final-cohort.log"
+    },
+    {
+      "name": "FlipSensorPowerRequirements::Verify_FLIPSensorPowerRequirements",
+      "passed": true,
+      "exit": 0,
+      "source_revision_at_start": "3062506949441219699",
+      "source_revision_at_end": "3062506949441219699",
+      "verdict": "pass",
+      "verdict_channel": "FLIP_SENSOR_POWER_REQUIREMENTS",
+      "non_pass_checks": [],
+      "runner_diagnostic": null,
+      "elapsed_wall_s": 17.085530918993754,
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022/flip_sensor_power_requirements-final-cohort.log"
+    }
+  ],
+  "mounted_preflight": {
+    "reports": {
+      "vehicles/griffin_1.usda": {
+        "operation_id": 7,
+        "state": "ready",
+        "report": {
+          "path": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+          "kind": "usd",
+          "ok": true,
+          "errors": [],
+          "warnings": [],
+          "findings": [],
+          "info": {
+            "wheel_prims": [],
+            "control_bindings": [
+              {
+                "prim": "/Griffin1/Controls/forward",
+                "intent": "forward",
+                "port": "pitch",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1/Controls/backward",
+                "intent": "backward",
+                "port": "pitch",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1/Controls/left",
+                "intent": "left",
+                "port": "roll",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1/Controls/right",
+                "intent": "right",
+                "port": "roll",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1/Controls/yaw_left",
+                "intent": "yaw_left",
+                "port": "yaw",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1/Controls/yaw_right",
+                "intent": "yaw_right",
+                "port": "yaw",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1/Controls/thrust",
+                "intent": "thrust",
+                "port": "external_throttle",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1/Controls/release",
+                "intent": "release",
+                "port": "release",
+                "ok": true
+              }
+            ]
+          }
+        },
+        "source_revisions": [
+          {
+            "path": "lunco://components/avionics/obc_lander.usda",
+            "cid": "bafkreicgd2vyg26f6c5lytq4re4vgbn3zvb5ct3ardlqq6zenkvu4lo7xm"
+          },
+          {
+            "path": "lunco://components/comms/antenna.usda",
+            "cid": "bafkreihmd26jlduexe5jhbnvcohmlo27o57j5abttww4lqiorb5oreln6i"
+          },
+          {
+            "path": "lunco://components/comms/link_beam.usda",
+            "cid": "bafkreigvgmp6iadqzgchus7ovq6porp3w232bhahug57ltpg3bxvuti6ze"
+          },
+          {
+            "path": "lunco://components/environment/probe.usda",
+            "cid": "bafkreiby477qna4qhu7hcfplkai75tm7sjw66wjsglo5kiz73ptoypdm5i"
+          },
+          {
+            "path": "lunco://components/propulsion/rocket_engine_visual.usda",
+            "cid": "bafkreibflbauy2b5g743uqmegb7bbwsv7bq2tiiankztgtf2h33js4blxi"
+          },
+          {
+            "path": "lunco://vessels/control_profiles.usda",
+            "cid": "bafkreieqt3ivo6p6uhcjxk4df6as6svvooig3kkwnhdnoibgpxtmgsrowu"
+          },
+          {
+            "path": "lunco://vessels/sensors/altimeter.usda",
+            "cid": "bafkreigmx22hyo44anc5ry6kfqcxgchchbvm44ff7cbscqfaphai7x4iua"
+          },
+          {
+            "path": "lunco://vessels/sensors/imu.usda",
+            "cid": "bafkreifb7tvmpz7klw7wbdsmccwf2kaxhcy6d7sckcryw5e7zs67x6naq4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_body_collision.usda",
+            "cid": "bafkreibm7loryzlqk7idse5zxrvftnonanyvlo6cv4xkotdmbj54ujdbcm"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda",
+            "cid": "bafkreidoreiauzqachygjztruyeo7neeutbsj3z474phgdpwtp4k52fof4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda",
+            "cid": "bafkreiex2dozr7qwa5nhc5hpeo2cqmlhcdbas5bt4co34efzms7mzwt4ha"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda",
+            "cid": "bafkreihywmqn5rd7vjt72p2gtxqczmrnwvdkknq7dlmccwokwyv7fhnnw4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda",
+            "cid": "bafkreibpooaecszqnkvlpjrgwabn6u3osnjrydvitwb3ktio4khxp5ssge"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda",
+            "cid": "bafkreifkuxulfx4ghuz3l4js7qhlbsx2lz2c4skczqalao2eztm2m3whiq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda",
+            "cid": "bafkreifhcfwyphyigxypu7kp5okwoo5bbesxhgcrhypvg3tb2lhb6fsz2q"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda",
+            "cid": "bafkreic7qdgqxr6a62wrry6da4un7ctb5etkhyra427hiwsjnadtru5kpu"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda",
+            "cid": "bafkreifotwgub34ldgrs36uuv5qol7gx7r2e5quxjay6ybz4as4jicwxie"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_port_visual.usda",
+            "cid": "bafkreifpws7fi54asj7l7mvmymsz7ffcchy7zp233dt24iskr5czqks4r4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_starboard_visual.usda",
+            "cid": "bafkreidekcknnb3i43xawuzwbnq7v5u2t67qnj7rev4f2zvu2ejqudbeya"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda",
+            "cid": "bafkreicztwr6yxajd7dnjkffwhs3ekxptb6nr2rj4qv2lcvxh37frfdhai"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda",
+            "cid": "bafkreihzgjmqjvrv4e4ccrmrupqglzcin2uy4ee5efvwgjkjhxjipmkumq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+            "cid": "bafkreifhz7mklb7y4qawioyak33kloz4whm5ohpnzt7zucigb7kznn2pom"
+          }
+        ]
+      },
+      "vehicles/flip.usda": {
+        "operation_id": 8,
+        "state": "ready",
+        "report": {
+          "path": "twin://astrobotic-griffin-1/vehicles/flip.usda",
+          "kind": "usd",
+          "ok": true,
+          "errors": [],
+          "warnings": [],
+          "findings": [],
+          "info": {
+            "wheel_prims": [
+              {
+                "prim": "/FLIP/Suspension_FL/Wheel_FL",
+                "ok": true
+              },
+              {
+                "prim": "/FLIP/Suspension_FR/Wheel_FR",
+                "ok": true
+              },
+              {
+                "prim": "/FLIP/Suspension_RL/Wheel_RL",
+                "ok": true
+              },
+              {
+                "prim": "/FLIP/Suspension_RR/Wheel_RR",
+                "ok": true
+              }
+            ],
+            "control_bindings": [
+              {
+                "prim": "/FLIP/Controls/forward",
+                "intent": "forward",
+                "port": "throttle",
+                "ok": true
+              },
+              {
+                "prim": "/FLIP/Controls/backward",
+                "intent": "backward",
+                "port": "throttle",
+                "ok": true
+              },
+              {
+                "prim": "/FLIP/Controls/left",
+                "intent": "left",
+                "port": "steer",
+                "ok": true
+              },
+              {
+                "prim": "/FLIP/Controls/right",
+                "intent": "right",
+                "port": "steer",
+                "ok": true
+              },
+              {
+                "prim": "/FLIP/Controls/brake",
+                "intent": "brake",
+                "port": "brake",
+                "ok": true
+              }
+            ]
+          }
+        },
+        "source_revisions": [
+          {
+            "path": "lunco://components/avionics/obc.usda",
+            "cid": "bafkreiarrchom3bkd2vqkae5m5gzwh4gzz7y43hpnpwkfvvagccvvsvxa4"
+          },
+          {
+            "path": "lunco://components/cameras/rover_front_camera.usda",
+            "cid": "bafkreicd5t7do5ufg45owipmqtswffkbl5ffxxn7j6txik3oiiz6anmt2m"
+          },
+          {
+            "path": "lunco://components/environment/probe.usda",
+            "cid": "bafkreiby477qna4qhu7hcfplkai75tm7sjw66wjsglo5kiz73ptoypdm5i"
+          },
+          {
+            "path": "lunco://components/mobility/avian_shaft.usda",
+            "cid": "bafkreib42jfo6qhlpi4z5ysipmuihriikjwpiggzrphheumocihgcv655q"
+          },
+          {
+            "path": "lunco://components/mobility/drive_laws/modelica_skid.usda",
+            "cid": "bafkreidgzdadgmt63dxcnwwfxzb7p4vsrkpetghug45whnitiatjvrwexu"
+          },
+          {
+            "path": "lunco://components/mobility/gearbox.usda",
+            "cid": "bafkreidl2jgqncfkqpvagdhgbsbcrapzwpetv4rnc2zea4bjoojmdh2bey"
+          },
+          {
+            "path": "lunco://components/mobility/motor.usda",
+            "cid": "bafkreia5ezydy4tvabs4mshe523upzfixhwge5nc33bbw7wevjtvmefsva"
+          },
+          {
+            "path": "lunco://components/mobility/physical_drivetrain.usda",
+            "cid": "bafkreibjwwkernnj2wb7dhsdsvdwufoww2ib3uomk55d3wbyo3v76tdgmu"
+          },
+          {
+            "path": "lunco://components/mobility/suspensions/physical_carrier.usda",
+            "cid": "bafkreigdsrpi2jtb5jiyumu4zite3f2awoxpmhhgexxxgvc7x6t2tt6vzy"
+          },
+          {
+            "path": "lunco://components/mobility/suspensions/standard.usda",
+            "cid": "bafkreiaolgpildhuc2izf45wzcigzx75jogxukif577bfimv7kjouxs3b4"
+          },
+          {
+            "path": "lunco://components/mobility/tires/bald.usda",
+            "cid": "bafkreiczx7qnro66lx4erow47sj4ewvt376wpujpdomejo2j2dqfxo42ai"
+          },
+          {
+            "path": "lunco://components/mobility/tires/cleated.usda",
+            "cid": "bafkreifwzsec5q45fu3zcec63ln53usqy2jtgb6pvytg5pcz2mvphza4um"
+          },
+          {
+            "path": "lunco://components/mobility/tires/hard.usda",
+            "cid": "bafkreih3inrwqdjpokfujzikqxy4c7a2gm4d4zxxgesfof7gck5ilqc7ki"
+          },
+          {
+            "path": "lunco://components/mobility/tires/regolith.usda",
+            "cid": "bafkreice25ecsywfau4x5zh4xoi7zmrw2ebkijx5ejoveztzq4dskc5pbu"
+          },
+          {
+            "path": "lunco://components/mobility/tires/worn.usda",
+            "cid": "bafkreibs27mu22gww6qn5vr3eccarn67cyxit5vep4t6ysvuzda7ugt7aa"
+          },
+          {
+            "path": "lunco://components/mobility/torque.usda",
+            "cid": "bafkreidwslidhfu53bgqu54zmg4eonls3kifxrc4eueloub4hpcs5qajje"
+          },
+          {
+            "path": "lunco://components/mobility/wheel.usda",
+            "cid": "bafkreidb45oozm5jdo524d75sjhexa3pdnbm5g6fsovcknvcczhmknygce"
+          },
+          {
+            "path": "lunco://components/power/battery.usda",
+            "cid": "bafkreieger5jelk2sizmiscsfamvnio2jctuaebazcu57aifqtzigjrbmy"
+          },
+          {
+            "path": "lunco://components/power/solar_panel.usda",
+            "cid": "bafkreidk7egpmqmct24nx7e5ei2cusr2rylemdbc76v74tg7g5lh4jakba"
+          },
+          {
+            "path": "lunco://components/thermal/motor_thermal.usda",
+            "cid": "bafkreibw4y2wubruhf7mvucjvq4b3iysknqtxog4pfsajfgm3sy3dvlihe"
+          },
+          {
+            "path": "lunco://vessels/control_profiles.usda",
+            "cid": "bafkreieqt3ivo6p6uhcjxk4df6as6svvooig3kkwnhdnoibgpxtmgsrowu"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_chassis_visual.usda",
+            "cid": "bafkreidtkgt7nwqzyw7yagjjit7ogvwtqg3lumeajr6r3wgjyrkdgunhha"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_sensor_mast_visual.usda",
+            "cid": "bafkreib3kupsd4iowejrprm3vkvtapmb3cytfjig666jfk6mlqze2i37wa"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_solar_panel_visual.usda",
+            "cid": "bafkreif4x5k4qr67k756redewljawtzxonfkur4iqhtj5xr5xdilwlgblq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda",
+            "cid": "bafkreialdvqmcr47gheeatfra67evcl7e7dkqnwjuc6wwq75yw3onehjuu"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/vehicles/flip.usda",
+            "cid": "bafkreidon3f2tqmitrk4uz76hb2noheewy7rwtthjtcd2jnkkgcs5y6bfq"
+          }
+        ]
+      },
+      "scenes/griffin_flip_visual.usda": {
+        "operation_id": 9,
+        "state": "ready",
+        "report": {
+          "path": "twin://astrobotic-griffin-1/scenes/griffin_flip_visual.usda",
+          "kind": "usd",
+          "ok": true,
+          "errors": [],
+          "warnings": [],
+          "findings": [],
+          "info": {
+            "wheel_prims": [
+              {
+                "prim": "/GriffinFlipVisual/FLIP/Suspension_FL/Wheel_FL",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/FLIP/Suspension_FR/Wheel_FR",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/FLIP/Suspension_RL/Wheel_RL",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/FLIP/Suspension_RR/Wheel_RR",
+                "ok": true
+              }
+            ],
+            "control_bindings": [
+              {
+                "prim": "/GriffinFlipVisual/Griffin1/Controls/forward",
+                "intent": "forward",
+                "port": "pitch",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/Griffin1/Controls/backward",
+                "intent": "backward",
+                "port": "pitch",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/Griffin1/Controls/left",
+                "intent": "left",
+                "port": "roll",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/Griffin1/Controls/right",
+                "intent": "right",
+                "port": "roll",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/Griffin1/Controls/yaw_left",
+                "intent": "yaw_left",
+                "port": "yaw",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/Griffin1/Controls/yaw_right",
+                "intent": "yaw_right",
+                "port": "yaw",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/Griffin1/Controls/thrust",
+                "intent": "thrust",
+                "port": "external_throttle",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/Griffin1/Controls/release",
+                "intent": "release",
+                "port": "release",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/FLIP/Controls/forward",
+                "intent": "forward",
+                "port": "throttle",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/FLIP/Controls/backward",
+                "intent": "backward",
+                "port": "throttle",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/FLIP/Controls/left",
+                "intent": "left",
+                "port": "steer",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/FLIP/Controls/right",
+                "intent": "right",
+                "port": "steer",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/FLIP/Controls/brake",
+                "intent": "brake",
+                "port": "brake",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/VisualCamera/Controls/forward",
+                "intent": "forward",
+                "port": "forward",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/VisualCamera/Controls/backward",
+                "intent": "backward",
+                "port": "forward",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/VisualCamera/Controls/left",
+                "intent": "left",
+                "port": "side",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/VisualCamera/Controls/right",
+                "intent": "right",
+                "port": "side",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/VisualCamera/Controls/yaw_left",
+                "intent": "yaw_left",
+                "port": "up",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/VisualCamera/Controls/yaw_right",
+                "intent": "yaw_right",
+                "port": "up",
+                "ok": true
+              },
+              {
+                "prim": "/GriffinFlipVisual/VisualCamera/Controls/speed_boost",
+                "intent": "speed_boost",
+                "port": "speed_boost",
+                "ok": true
+              }
+            ]
+          }
+        },
+        "source_revisions": [
+          {
+            "path": "lunco://celestial/solar_system.usda",
+            "cid": "bafkreigp7jcfxldjhapmyyihot5baceryyvamhagfmnsjnhv5q7tinbowe"
+          },
+          {
+            "path": "lunco://components/avionics/obc.usda",
+            "cid": "bafkreiarrchom3bkd2vqkae5m5gzwh4gzz7y43hpnpwkfvvagccvvsvxa4"
+          },
+          {
+            "path": "lunco://components/avionics/obc_lander.usda",
+            "cid": "bafkreicgd2vyg26f6c5lytq4re4vgbn3zvb5ct3ardlqq6zenkvu4lo7xm"
+          },
+          {
+            "path": "lunco://components/cameras/lunar_surface_camera.usda",
+            "cid": "bafkreiaanjfxdgr6wmmajifitm6mrcz2fq7hyywmus33rh5ajaitshtes4"
+          },
+          {
+            "path": "lunco://components/cameras/rover_front_camera.usda",
+            "cid": "bafkreicd5t7do5ufg45owipmqtswffkbl5ffxxn7j6txik3oiiz6anmt2m"
+          },
+          {
+            "path": "lunco://components/comms/antenna.usda",
+            "cid": "bafkreihmd26jlduexe5jhbnvcohmlo27o57j5abttww4lqiorb5oreln6i"
+          },
+          {
+            "path": "lunco://components/comms/link_beam.usda",
+            "cid": "bafkreigvgmp6iadqzgchus7ovq6porp3w232bhahug57ltpg3bxvuti6ze"
+          },
+          {
+            "path": "lunco://components/environment/probe.usda",
+            "cid": "bafkreiby477qna4qhu7hcfplkai75tm7sjw66wjsglo5kiz73ptoypdm5i"
+          },
+          {
+            "path": "lunco://components/mobility/avian_shaft.usda",
+            "cid": "bafkreib42jfo6qhlpi4z5ysipmuihriikjwpiggzrphheumocihgcv655q"
+          },
+          {
+            "path": "lunco://components/mobility/drive_laws/modelica_skid.usda",
+            "cid": "bafkreidgzdadgmt63dxcnwwfxzb7p4vsrkpetghug45whnitiatjvrwexu"
+          },
+          {
+            "path": "lunco://components/mobility/gearbox.usda",
+            "cid": "bafkreidl2jgqncfkqpvagdhgbsbcrapzwpetv4rnc2zea4bjoojmdh2bey"
+          },
+          {
+            "path": "lunco://components/mobility/motor.usda",
+            "cid": "bafkreia5ezydy4tvabs4mshe523upzfixhwge5nc33bbw7wevjtvmefsva"
+          },
+          {
+            "path": "lunco://components/mobility/physical_drivetrain.usda",
+            "cid": "bafkreibjwwkernnj2wb7dhsdsvdwufoww2ib3uomk55d3wbyo3v76tdgmu"
+          },
+          {
+            "path": "lunco://components/mobility/suspensions/physical_carrier.usda",
+            "cid": "bafkreigdsrpi2jtb5jiyumu4zite3f2awoxpmhhgexxxgvc7x6t2tt6vzy"
+          },
+          {
+            "path": "lunco://components/mobility/suspensions/standard.usda",
+            "cid": "bafkreiaolgpildhuc2izf45wzcigzx75jogxukif577bfimv7kjouxs3b4"
+          },
+          {
+            "path": "lunco://components/mobility/tires/bald.usda",
+            "cid": "bafkreiczx7qnro66lx4erow47sj4ewvt376wpujpdomejo2j2dqfxo42ai"
+          },
+          {
+            "path": "lunco://components/mobility/tires/cleated.usda",
+            "cid": "bafkreifwzsec5q45fu3zcec63ln53usqy2jtgb6pvytg5pcz2mvphza4um"
+          },
+          {
+            "path": "lunco://components/mobility/tires/hard.usda",
+            "cid": "bafkreih3inrwqdjpokfujzikqxy4c7a2gm4d4zxxgesfof7gck5ilqc7ki"
+          },
+          {
+            "path": "lunco://components/mobility/tires/regolith.usda",
+            "cid": "bafkreice25ecsywfau4x5zh4xoi7zmrw2ebkijx5ejoveztzq4dskc5pbu"
+          },
+          {
+            "path": "lunco://components/mobility/tires/worn.usda",
+            "cid": "bafkreibs27mu22gww6qn5vr3eccarn67cyxit5vep4t6ysvuzda7ugt7aa"
+          },
+          {
+            "path": "lunco://components/mobility/torque.usda",
+            "cid": "bafkreidwslidhfu53bgqu54zmg4eonls3kifxrc4eueloub4hpcs5qajje"
+          },
+          {
+            "path": "lunco://components/mobility/wheel.usda",
+            "cid": "bafkreidb45oozm5jdo524d75sjhexa3pdnbm5g6fsovcknvcczhmknygce"
+          },
+          {
+            "path": "lunco://components/power/battery.usda",
+            "cid": "bafkreieger5jelk2sizmiscsfamvnio2jctuaebazcu57aifqtzigjrbmy"
+          },
+          {
+            "path": "lunco://components/power/solar_panel.usda",
+            "cid": "bafkreidk7egpmqmct24nx7e5ei2cusr2rylemdbc76v74tg7g5lh4jakba"
+          },
+          {
+            "path": "lunco://components/propulsion/rocket_engine_visual.usda",
+            "cid": "bafkreibflbauy2b5g743uqmegb7bbwsv7bq2tiiankztgtf2h33js4blxi"
+          },
+          {
+            "path": "lunco://components/thermal/motor_thermal.usda",
+            "cid": "bafkreibw4y2wubruhf7mvucjvq4b3iysknqtxog4pfsajfgm3sy3dvlihe"
+          },
+          {
+            "path": "lunco://lighting/earthshine.usda",
+            "cid": "bafkreid6zczgg5252quxca6pvyvczyd7nazucao5jxerm4gnbnyr2lnzoi"
+          },
+          {
+            "path": "lunco://lighting/sun.usda",
+            "cid": "bafkreie7ng266apj6uddxgbxuwofetckcqqsn2eeaijqfxkeuide6vld4u"
+          },
+          {
+            "path": "lunco://vessels/control_profiles.usda",
+            "cid": "bafkreieqt3ivo6p6uhcjxk4df6as6svvooig3kkwnhdnoibgpxtmgsrowu"
+          },
+          {
+            "path": "lunco://vessels/sensors/altimeter.usda",
+            "cid": "bafkreigmx22hyo44anc5ry6kfqcxgchchbvm44ff7cbscqfaphai7x4iua"
+          },
+          {
+            "path": "lunco://vessels/sensors/imu.usda",
+            "cid": "bafkreifb7tvmpz7klw7wbdsmccwf2kaxhcy6d7sckcryw5e7zs67x6naq4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_body_collision.usda",
+            "cid": "bafkreibm7loryzlqk7idse5zxrvftnonanyvlo6cv4xkotdmbj54ujdbcm"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda",
+            "cid": "bafkreidoreiauzqachygjztruyeo7neeutbsj3z474phgdpwtp4k52fof4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda",
+            "cid": "bafkreiex2dozr7qwa5nhc5hpeo2cqmlhcdbas5bt4co34efzms7mzwt4ha"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda",
+            "cid": "bafkreihywmqn5rd7vjt72p2gtxqczmrnwvdkknq7dlmccwokwyv7fhnnw4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda",
+            "cid": "bafkreibpooaecszqnkvlpjrgwabn6u3osnjrydvitwb3ktio4khxp5ssge"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda",
+            "cid": "bafkreifkuxulfx4ghuz3l4js7qhlbsx2lz2c4skczqalao2eztm2m3whiq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda",
+            "cid": "bafkreifhcfwyphyigxypu7kp5okwoo5bbesxhgcrhypvg3tb2lhb6fsz2q"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda",
+            "cid": "bafkreic7qdgqxr6a62wrry6da4un7ctb5etkhyra427hiwsjnadtru5kpu"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda",
+            "cid": "bafkreifotwgub34ldgrs36uuv5qol7gx7r2e5quxjay6ybz4as4jicwxie"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_port_visual.usda",
+            "cid": "bafkreifpws7fi54asj7l7mvmymsz7ffcchy7zp233dt24iskr5czqks4r4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_starboard_visual.usda",
+            "cid": "bafkreidekcknnb3i43xawuzwbnq7v5u2t67qnj7rev4f2zvu2ejqudbeya"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda",
+            "cid": "bafkreicztwr6yxajd7dnjkffwhs3ekxptb6nr2rj4qv2lcvxh37frfdhai"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda",
+            "cid": "bafkreihzgjmqjvrv4e4ccrmrupqglzcin2uy4ee5efvwgjkjhxjipmkumq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_chassis_visual.usda",
+            "cid": "bafkreidtkgt7nwqzyw7yagjjit7ogvwtqg3lumeajr6r3wgjyrkdgunhha"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_sensor_mast_visual.usda",
+            "cid": "bafkreib3kupsd4iowejrprm3vkvtapmb3cytfjig666jfk6mlqze2i37wa"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_solar_panel_visual.usda",
+            "cid": "bafkreif4x5k4qr67k756redewljawtzxonfkur4iqhtj5xr5xdilwlgblq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda",
+            "cid": "bafkreialdvqmcr47gheeatfra67evcl7e7dkqnwjuc6wwq75yw3onehjuu"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/environments/lunar_surface_base.usda",
+            "cid": "bafkreifzpcuaabeqyn6lufm3gldpiah7gfnpfczx2f2wuwqv24ih6szqp4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda",
+            "cid": "bafkreihrgdgpya7x3h5hm4k662go6b737dbrtaldxvh47midpdszs3gtsy"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/scenes/griffin_flip_visual.usda",
+            "cid": "bafkreic4cng75sxii4ols7lpk22ene36b5cmkbmuztrhzf2mrzetlof4bq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/vehicles/flip.usda",
+            "cid": "bafkreidon3f2tqmitrk4uz76hb2noheewy7rwtthjtcd2jnkkgcs5y6bfq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+            "cid": "bafkreifhz7mklb7y4qawioyak33kloz4whm5ohpnzt7zucigb7kznn2pom"
+          }
+        ]
+      },
+      "scenes/griffin_1_surface_ops.usda": {
+        "operation_id": 11,
+        "state": "ready",
+        "report": {
+          "path": "twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda",
+          "kind": "usd",
+          "ok": true,
+          "errors": [],
+          "warnings": [],
+          "findings": [],
+          "info": {
+            "wheel_prims": [
+              {
+                "prim": "/Griffin1SurfaceOps/FLIP/Suspension_FL/Wheel_FL",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/FLIP/Suspension_FR/Wheel_FR",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/FLIP/Suspension_RL/Wheel_RL",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/FLIP/Suspension_RR/Wheel_RR",
+                "ok": true
+              }
+            ],
+            "control_bindings": [
+              {
+                "prim": "/Griffin1SurfaceOps/Avatar/Controls/forward",
+                "intent": "forward",
+                "port": "forward",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Avatar/Controls/backward",
+                "intent": "backward",
+                "port": "forward",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Avatar/Controls/left",
+                "intent": "left",
+                "port": "side",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Avatar/Controls/right",
+                "intent": "right",
+                "port": "side",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Avatar/Controls/yaw_left",
+                "intent": "yaw_left",
+                "port": "up",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Avatar/Controls/yaw_right",
+                "intent": "yaw_right",
+                "port": "up",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Avatar/Controls/speed_boost",
+                "intent": "speed_boost",
+                "port": "speed_boost",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Lander/Controls/forward",
+                "intent": "forward",
+                "port": "pitch",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Lander/Controls/backward",
+                "intent": "backward",
+                "port": "pitch",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Lander/Controls/left",
+                "intent": "left",
+                "port": "roll",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Lander/Controls/right",
+                "intent": "right",
+                "port": "roll",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Lander/Controls/yaw_left",
+                "intent": "yaw_left",
+                "port": "yaw",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Lander/Controls/yaw_right",
+                "intent": "yaw_right",
+                "port": "yaw",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Lander/Controls/thrust",
+                "intent": "thrust",
+                "port": "external_throttle",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/Lander/Controls/release",
+                "intent": "release",
+                "port": "release",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/FLIP/Controls/forward",
+                "intent": "forward",
+                "port": "throttle",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/FLIP/Controls/backward",
+                "intent": "backward",
+                "port": "throttle",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/FLIP/Controls/left",
+                "intent": "left",
+                "port": "steer",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/FLIP/Controls/right",
+                "intent": "right",
+                "port": "steer",
+                "ok": true
+              },
+              {
+                "prim": "/Griffin1SurfaceOps/FLIP/Controls/brake",
+                "intent": "brake",
+                "port": "brake",
+                "ok": true
+              }
+            ]
+          }
+        },
+        "source_revisions": [
+          {
+            "path": "lunco://celestial/solar_system.usda",
+            "cid": "bafkreigp7jcfxldjhapmyyihot5baceryyvamhagfmnsjnhv5q7tinbowe"
+          },
+          {
+            "path": "lunco://components/avionics/obc.usda",
+            "cid": "bafkreiarrchom3bkd2vqkae5m5gzwh4gzz7y43hpnpwkfvvagccvvsvxa4"
+          },
+          {
+            "path": "lunco://components/avionics/obc_lander.usda",
+            "cid": "bafkreicgd2vyg26f6c5lytq4re4vgbn3zvb5ct3ardlqq6zenkvu4lo7xm"
+          },
+          {
+            "path": "lunco://components/cameras/lunar_surface_camera.usda",
+            "cid": "bafkreiaanjfxdgr6wmmajifitm6mrcz2fq7hyywmus33rh5ajaitshtes4"
+          },
+          {
+            "path": "lunco://components/cameras/rover_front_camera.usda",
+            "cid": "bafkreicd5t7do5ufg45owipmqtswffkbl5ffxxn7j6txik3oiiz6anmt2m"
+          },
+          {
+            "path": "lunco://components/comms/antenna.usda",
+            "cid": "bafkreihmd26jlduexe5jhbnvcohmlo27o57j5abttww4lqiorb5oreln6i"
+          },
+          {
+            "path": "lunco://components/comms/link_beam.usda",
+            "cid": "bafkreigvgmp6iadqzgchus7ovq6porp3w232bhahug57ltpg3bxvuti6ze"
+          },
+          {
+            "path": "lunco://components/environment/probe.usda",
+            "cid": "bafkreiby477qna4qhu7hcfplkai75tm7sjw66wjsglo5kiz73ptoypdm5i"
+          },
+          {
+            "path": "lunco://components/environment/starfield_sky.usda",
+            "cid": "bafkreic2ebzba36w5wacm64j3a4uoz5dq43v2i4iz3i2siulvpsohx4huu"
+          },
+          {
+            "path": "lunco://components/gnc/landing_target.usda",
+            "cid": "bafkreia7cahl7yjykln7f4tekctqkwypusdfzphvwvd4zgcw5nk5qq3cky"
+          },
+          {
+            "path": "lunco://components/gnc/position_pid_guidance.usda",
+            "cid": "bafkreia4yhvqiarycr27pqgoxxhle73cp6d2cwoeh4kjz6plm7herirgj4"
+          },
+          {
+            "path": "lunco://components/mobility/avian_shaft.usda",
+            "cid": "bafkreib42jfo6qhlpi4z5ysipmuihriikjwpiggzrphheumocihgcv655q"
+          },
+          {
+            "path": "lunco://components/mobility/drive_laws/modelica_skid.usda",
+            "cid": "bafkreidgzdadgmt63dxcnwwfxzb7p4vsrkpetghug45whnitiatjvrwexu"
+          },
+          {
+            "path": "lunco://components/mobility/gearbox.usda",
+            "cid": "bafkreidl2jgqncfkqpvagdhgbsbcrapzwpetv4rnc2zea4bjoojmdh2bey"
+          },
+          {
+            "path": "lunco://components/mobility/motor.usda",
+            "cid": "bafkreia5ezydy4tvabs4mshe523upzfixhwge5nc33bbw7wevjtvmefsva"
+          },
+          {
+            "path": "lunco://components/mobility/physical_drivetrain.usda",
+            "cid": "bafkreibjwwkernnj2wb7dhsdsvdwufoww2ib3uomk55d3wbyo3v76tdgmu"
+          },
+          {
+            "path": "lunco://components/mobility/suspensions/physical_carrier.usda",
+            "cid": "bafkreigdsrpi2jtb5jiyumu4zite3f2awoxpmhhgexxxgvc7x6t2tt6vzy"
+          },
+          {
+            "path": "lunco://components/mobility/suspensions/standard.usda",
+            "cid": "bafkreiaolgpildhuc2izf45wzcigzx75jogxukif577bfimv7kjouxs3b4"
+          },
+          {
+            "path": "lunco://components/mobility/tires/bald.usda",
+            "cid": "bafkreiczx7qnro66lx4erow47sj4ewvt376wpujpdomejo2j2dqfxo42ai"
+          },
+          {
+            "path": "lunco://components/mobility/tires/cleated.usda",
+            "cid": "bafkreifwzsec5q45fu3zcec63ln53usqy2jtgb6pvytg5pcz2mvphza4um"
+          },
+          {
+            "path": "lunco://components/mobility/tires/hard.usda",
+            "cid": "bafkreih3inrwqdjpokfujzikqxy4c7a2gm4d4zxxgesfof7gck5ilqc7ki"
+          },
+          {
+            "path": "lunco://components/mobility/tires/regolith.usda",
+            "cid": "bafkreice25ecsywfau4x5zh4xoi7zmrw2ebkijx5ejoveztzq4dskc5pbu"
+          },
+          {
+            "path": "lunco://components/mobility/tires/worn.usda",
+            "cid": "bafkreibs27mu22gww6qn5vr3eccarn67cyxit5vep4t6ysvuzda7ugt7aa"
+          },
+          {
+            "path": "lunco://components/mobility/torque.usda",
+            "cid": "bafkreidwslidhfu53bgqu54zmg4eonls3kifxrc4eueloub4hpcs5qajje"
+          },
+          {
+            "path": "lunco://components/mobility/wheel.usda",
+            "cid": "bafkreidb45oozm5jdo524d75sjhexa3pdnbm5g6fsovcknvcczhmknygce"
+          },
+          {
+            "path": "lunco://components/power/battery.usda",
+            "cid": "bafkreieger5jelk2sizmiscsfamvnio2jctuaebazcu57aifqtzigjrbmy"
+          },
+          {
+            "path": "lunco://components/power/solar_panel.usda",
+            "cid": "bafkreidk7egpmqmct24nx7e5ei2cusr2rylemdbc76v74tg7g5lh4jakba"
+          },
+          {
+            "path": "lunco://components/propulsion/rocket_engine_visual.usda",
+            "cid": "bafkreibflbauy2b5g743uqmegb7bbwsv7bq2tiiankztgtf2h33js4blxi"
+          },
+          {
+            "path": "lunco://components/thermal/motor_thermal.usda",
+            "cid": "bafkreibw4y2wubruhf7mvucjvq4b3iysknqtxog4pfsajfgm3sy3dvlihe"
+          },
+          {
+            "path": "lunco://lighting/earthshine.usda",
+            "cid": "bafkreid6zczgg5252quxca6pvyvczyd7nazucao5jxerm4gnbnyr2lnzoi"
+          },
+          {
+            "path": "lunco://lighting/sun.usda",
+            "cid": "bafkreie7ng266apj6uddxgbxuwofetckcqqsn2eeaijqfxkeuide6vld4u"
+          },
+          {
+            "path": "lunco://markers/route_point.usda",
+            "cid": "bafkreibtfi3z6drz4cbmbat3ov4irrm7gjqmjnoryo76wxsjxdyat2cppu"
+          },
+          {
+            "path": "lunco://vessels/control_profiles.usda",
+            "cid": "bafkreieqt3ivo6p6uhcjxk4df6as6svvooig3kkwnhdnoibgpxtmgsrowu"
+          },
+          {
+            "path": "lunco://vessels/markers/landing_location.usda",
+            "cid": "bafkreiewmwyyy3jtyglmogp3qfcoi2pg74bhaamxrkt4t6m5x7agw4wbs4"
+          },
+          {
+            "path": "lunco://vessels/sensors/altimeter.usda",
+            "cid": "bafkreigmx22hyo44anc5ry6kfqcxgchchbvm44ff7cbscqfaphai7x4iua"
+          },
+          {
+            "path": "lunco://vessels/sensors/imu.usda",
+            "cid": "bafkreifb7tvmpz7klw7wbdsmccwf2kaxhcy6d7sckcryw5e7zs67x6naq4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_body_collision.usda",
+            "cid": "bafkreibm7loryzlqk7idse5zxrvftnonanyvlo6cv4xkotdmbj54ujdbcm"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_bus_visual.usda",
+            "cid": "bafkreidoreiauzqachygjztruyeo7neeutbsj3z474phgdpwtp4k52fof4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda",
+            "cid": "bafkreiex2dozr7qwa5nhc5hpeo2cqmlhcdbas5bt4co34efzms7mzwt4ha"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda",
+            "cid": "bafkreihywmqn5rd7vjt72p2gtxqczmrnwvdkknq7dlmccwokwyv7fhnnw4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda",
+            "cid": "bafkreibpooaecszqnkvlpjrgwabn6u3osnjrydvitwb3ktio4khxp5ssge"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda",
+            "cid": "bafkreifkuxulfx4ghuz3l4js7qhlbsx2lz2c4skczqalao2eztm2m3whiq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda",
+            "cid": "bafkreifhcfwyphyigxypu7kp5okwoo5bbesxhgcrhypvg3tb2lhb6fsz2q"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda",
+            "cid": "bafkreic7qdgqxr6a62wrry6da4un7ctb5etkhyra427hiwsjnadtru5kpu"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda",
+            "cid": "bafkreifotwgub34ldgrs36uuv5qol7gx7r2e5quxjay6ybz4as4jicwxie"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_port_visual.usda",
+            "cid": "bafkreifpws7fi54asj7l7mvmymsz7ffcchy7zp233dt24iskr5czqks4r4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_starboard_visual.usda",
+            "cid": "bafkreidekcknnb3i43xawuzwbnq7v5u2t67qnj7rev4f2zvu2ejqudbeya"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda",
+            "cid": "bafkreicztwr6yxajd7dnjkffwhs3ekxptb6nr2rj4qv2lcvxh37frfdhai"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/lander/griffin_tank_visual.usda",
+            "cid": "bafkreihzgjmqjvrv4e4ccrmrupqglzcin2uy4ee5efvwgjkjhxjipmkumq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_chassis_visual.usda",
+            "cid": "bafkreidtkgt7nwqzyw7yagjjit7ogvwtqg3lumeajr6r3wgjyrkdgunhha"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_sensor_mast_visual.usda",
+            "cid": "bafkreib3kupsd4iowejrprm3vkvtapmb3cytfjig666jfk6mlqze2i37wa"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_solar_panel_visual.usda",
+            "cid": "bafkreif4x5k4qr67k756redewljawtzxonfkur4iqhtj5xr5xdilwlgblq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda",
+            "cid": "bafkreialdvqmcr47gheeatfra67evcl7e7dkqnwjuc6wwq75yw3onehjuu"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/environments/lunar_surface_base.usda",
+            "cid": "bafkreifzpcuaabeqyn6lufm3gldpiah7gfnpfczx2f2wuwqv24ih6szqp4"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda",
+            "cid": "bafkreihrgdgpya7x3h5hm4k662go6b737dbrtaldxvh47midpdszs3gtsy"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda",
+            "cid": "bafkreib3zkijrw5bdtxulo7egvz6pkettk7p2cpidt53gmmbkkrtixyopi"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/vehicles/flip.usda",
+            "cid": "bafkreidon3f2tqmitrk4uz76hb2noheewy7rwtthjtcd2jnkkgcs5y6bfq"
+          },
+          {
+            "path": "twin://astrobotic-griffin-1/vehicles/griffin_1.usda",
+            "cid": "bafkreifhz7mklb7y4qawioyak33kloz4whm5ohpnzt7zucigb7kznn2pom"
+          }
+        ]
+      }
+    },
+    "pending": null,
+    "lost_operation": {
+      "operation_id": 10,
+      "path": "scenes/griffin_1_surface_ops.usda",
+      "reason": "Client timeout; subsequent poll confirmed unknown, consumed, or retired; terminal receipt unavailable"
+    }
+  },
+  "sysml": {
+    "ok": true,
+    "source_revision": "3062506949441219699",
+    "errors": [],
+    "warning_count": 153,
+    "warnings": [
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr001 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:3232 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr002 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:3636 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr003 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:3938 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr004 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:4393 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr005 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:4666 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr006 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:5032 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr007 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:5296 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr008 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:5599 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr009 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:5902 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr010 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:6274 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr011 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:6576 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr012 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:6915 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr013 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:7301 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr014 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:7593 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr015 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:7958 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipCadRequirements::fr016 @ twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml:8742 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipChassisRequirements::fcc001 @ twin://astrobotic-griffin-1/requirements/flip_chassis_requirements.sysml:3630 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipChassisRequirements::fcc002 @ twin://astrobotic-griffin-1/requirements/flip_chassis_requirements.sysml:3734 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipChassisRequirements::fcc003 @ twin://astrobotic-griffin-1/requirements/flip_chassis_requirements.sysml:3838 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipChassisRequirements::fcc004 @ twin://astrobotic-griffin-1/requirements/flip_chassis_requirements.sysml:3943 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipChassisRequirements::fcc005 @ twin://astrobotic-griffin-1/requirements/flip_chassis_requirements.sysml:4051 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg001 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11145 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg002 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11240 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg003 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11333 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg004 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11424 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg005 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11516 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg006 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11606 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg007 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11699 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg008 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11794 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg009 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11885 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg010 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:11982 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipRequirements::fvg011 @ twin://astrobotic-griffin-1/requirements/flip_requirements.sysml:12860 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSensorPowerRequirements::fsp001 @ twin://astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml:18565 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSensorPowerRequirements::fsp002 @ twin://astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml:18674 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSensorPowerRequirements::fsp003 @ twin://astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml:18784 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSensorPowerRequirements::fsp004 @ twin://astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml:18889 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSensorPowerRequirements::fsp005 @ twin://astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml:19008 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSensorPowerRequirements::fsp006 @ twin://astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml:19116 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSuspensionRequirements::fsr001 @ twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml:5688 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSuspensionRequirements::fsr002 @ twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml:5801 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSuspensionRequirements::fsr003 @ twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml:5906 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSuspensionRequirements::fsr004 @ twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml:6009 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSuspensionRequirements::fsr005 @ twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml:6114 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSuspensionRequirements::fsr006 @ twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml:6228 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipSuspensionRequirements::fsr007 @ twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml:6337 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipWheelRequirements::fww001 @ twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml:3164 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipWheelRequirements::fww002 @ twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml:3270 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipWheelRequirements::fww003 @ twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml:3379 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipWheelRequirements::fww004 @ twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml:3495 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipWheelRequirements::fww005 @ twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml:3608 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipWheelRequirements::fww006 @ twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml:3718 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] FlipWheelRequirements::fww007 @ twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml:3830 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinAssuranceRequirements::gr005 @ twin://astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml:2210 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinAssuranceRequirements::gr013 @ twin://astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml:2304 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinAssuranceRequirements::gr014 @ twin://astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml:2402 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinAssuranceRequirements::gr029 @ twin://astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml:2495 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinAssuranceRequirements::gr030 @ twin://astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml:2626 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinFunctionalRequirements::gr001 @ twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml:9597 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinFunctionalRequirements::gr002 @ twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml:9694 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinFunctionalRequirements::gr003 @ twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml:9787 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinFunctionalRequirements::gr004 @ twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml:9881 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinFunctionalRequirements::gr006 @ twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml:10013 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinFunctionalRequirements::gr007 @ twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml:10145 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinFunctionalRequirements::gr028 @ twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml:10465 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinFunctionalRequirements::gr034 @ twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml:10601 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinFunctionalRequirements::gr035 @ twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml:10703 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr001 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:5613 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr002 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:5714 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr003 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:5815 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr004 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:5920 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr005 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:6023 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr006 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:6124 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr007 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:6228 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr008 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:6330 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr009 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:6436 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr010 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:6543 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLanderRequirements::glr011 @ twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml:6655 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLandingLegRequirements::gll001 @ twin://astrobotic-griffin-1/requirements/griffin_landing_legs_requirements.sysml:21330 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLandingLegRequirements::gll002 @ twin://astrobotic-griffin-1/requirements/griffin_landing_legs_requirements.sysml:21429 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLandingLegRequirements::gll003 @ twin://astrobotic-griffin-1/requirements/griffin_landing_legs_requirements.sysml:21532 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLandingLegRequirements::gll004 @ twin://astrobotic-griffin-1/requirements/griffin_landing_legs_requirements.sysml:21631 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinLandingLegRequirements::gll005 @ twin://astrobotic-griffin-1/requirements/griffin_landing_legs_requirements.sysml:21737 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinMechanicalRequirements::gr010 @ twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml:5554 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinMechanicalRequirements::gr011 @ twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml:5647 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinMechanicalRequirements::gr012 @ twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml:5736 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinMechanicalRequirements::gr017 @ twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml:5830 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinMechanicalRequirements::gr019 @ twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml:6011 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinMechanicalRequirements::gr024 @ twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml:6102 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinMechanicalRequirements::gr025 @ twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml:6192 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::gpp001 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:44181 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::gpp002 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:44293 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::gpp003 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:44406 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::gpp004 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:44522 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::gpp005 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:44645 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::gpp011 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:45240 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::gpp012 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:45365 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::ges001 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:46040 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::ges003 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:46254 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::ges005 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:46465 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::ges007 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:46679 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::gpp010 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:49524 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinPropulsionRequirements::gpp013 @ twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml:50312 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinRampRequirements::grr001 @ twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml:68065 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinRampRequirements::grr002 @ twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml:68160 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinRampRequirements::grr004 @ twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml:68347 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinRampRequirements::grr007 @ twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml:68633 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinRampRequirements::grr008 @ twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml:68728 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinRampRequirements::grr009 @ twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml:68823 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinRampRequirements::grr014 @ twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml:69029 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinSimulationAccuracyRequirements::gr008 @ twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml:13573 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinSimulationAccuracyRequirements::gr021 @ twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml:13670 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinSimulationAccuracyRequirements::gr022 @ twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml:13763 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinSimulationAccuracyRequirements::gr023 @ twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml:13856 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinSimulationAccuracyRequirements::gr027 @ twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml:13952 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinSimulationAccuracyRequirements::gr031 @ twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml:14050 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinTankRequirements::gpt001 @ twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml:12404 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinTankRequirements::gpt002 @ twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml:12509 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinTankRequirements::gpt003 @ twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml:12618 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinTankRequirements::gpt004 @ twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml:12724 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinTankRequirements::gpt007 @ twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml:13056 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinTankRequirements::gpt008 @ twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml:13171 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinTankRequirements::gpt011 @ twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml:13498 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc001 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:37285 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc002 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:37408 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc003 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:37523 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc004 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:37641 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc005 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:37762 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc006 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:37874 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc007 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:37988 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc008 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:38102 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc009 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:38222 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc010 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:38332 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc011 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:38453 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc012 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:38566 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc013 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:38677 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc014 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:38796 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualConfigurationRequirements::gvc015 @ twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml:38914 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gr015 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:8581 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gr016 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:8674 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gr020 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:8764 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gr032 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:8859 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gr033 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:8953 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gv001 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:9047 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gv002 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:9144 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gv003 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:9242 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gv004 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:9344 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gv005 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:9473 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gv006 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:9606 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] GriffinVisualRequirements::gv007 @ twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml:9698 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] MoonBaseProjectRequirements::mb001 @ twin://astrobotic-griffin-1/requirements/moonbase_project_requirements.sysml:1669 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] MoonBaseProjectRequirements::mb002 @ twin://astrobotic-griffin-1/requirements/moonbase_project_requirements.sysml:1775 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] MoonBaseProjectRequirements::mb003 @ twin://astrobotic-griffin-1/requirements/moonbase_project_requirements.sysml:1877 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case",
+      "[sysml/sysml-requirement-usage-missing-formal-acceptance] MoonBaseProjectRequirements::mb004 @ twin://astrobotic-griffin-1/requirements/moonbase_project_requirements.sysml:1988 \u2014 requirement usage has no inherited or owned require constraint; add a formal acceptance predicate, or define the finite qualitative rubric in its verification case"
+    ]
+  },
+  "provenance": {
+    "requirement_targets": 220,
+    "evidence_records": 220,
+    "source_elements": 69
+  },
+  "battery_native_apply": {
+    "status": "applied",
+    "doc_id": 119546362397782,
+    "target_layer": "@root@",
+    "target_layers": [
+      "@root@"
+    ],
+    "paths": [
+      "/FLIP/Battery",
+      "/FLIP/Battery",
+      "/FLIP/Battery"
+    ],
+    "generation": 151,
+    "change_set_id": 7,
+    "journal_cursor": {
+      "author": "local",
+      "lamport": 236
+    },
+    "diagnostics": []
+  },
+  "battery_native_readback": {
+    "records": [
+      {
+        "path": "/FLIP/Battery",
+        "type_name": "Xform",
+        "attrs": {
+          "xformOp:translate": [
+            0.0,
+            0.258,
+            0.0
+          ],
+          "xformOp:scale": [
+            1.684,
+            0.2,
+            1.3599999999999999
+          ],
+          "xformOpOrder": [
+            "xformOp:translate",
+            "xformOp:scale"
+          ],
+          "size": null,
+          "physics:mass": 50.0
+        },
+        "spawned": false,
+        "active": true,
+        "doc_id": 119546362397782,
+        "generation": 151,
+        "world_position": [
+          0.0,
+          0.258,
+          0.0
+        ],
+        "position_frame": "canonical_stage",
+        "document_generation": 151,
+        "stage_generation": 4,
+        "collision_bounds": {
+          "min": [
+            -0.842,
+            0.158,
+            -0.6799999999999999
+          ],
+          "max": [
+            0.842,
+            0.358,
+            0.6799999999999999
+          ],
+          "center": [
+            0.0,
+            0.258,
+            0.0
+          ],
+          "half_extents": [
+            0.842,
+            0.09999999999999999,
+            0.6799999999999999
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact",
+          "rest_depth": -0.158
+        },
+        "collision_geometry": null,
+        "geometry_bounds": null
+      },
+      {
+        "path": "/FLIP/Battery/Body",
+        "type_name": "Cube",
+        "attrs": {
+          "xformOp:translate": null,
+          "xformOp:scale": null,
+          "xformOpOrder": null,
+          "size": 1.0,
+          "physics:mass": null
+        },
+        "spawned": false,
+        "active": true,
+        "doc_id": 119546362397782,
+        "generation": 151,
+        "world_position": [
+          0.0,
+          0.258,
+          0.0
+        ],
+        "position_frame": "canonical_stage",
+        "document_generation": 151,
+        "stage_generation": 4,
+        "collision_bounds": {
+          "min": [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          "max": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "half_extents": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact",
+          "rest_depth": 0.5
+        },
+        "collision_geometry": {
+          "shape": "convex_hull",
+          "vertices": [
+            [
+              -0.8420000076293945,
+              0.1579999985098839,
+              -0.6800000071525574
+            ],
+            [
+              0.8420000076293945,
+              0.1579999985098839,
+              -0.6800000071525574
+            ],
+            [
+              -0.8420000076293945,
+              0.3580000014901161,
+              -0.6800000071525574
+            ],
+            [
+              0.8420000076293945,
+              0.3580000014901161,
+              -0.6800000071525574
+            ],
+            [
+              -0.8420000076293945,
+              0.1579999985098839,
+              0.6800000071525574
+            ],
+            [
+              0.8420000076293945,
+              0.1579999985098839,
+              0.6800000071525574
+            ],
+            [
+              -0.8420000076293945,
+              0.3580000014901161,
+              0.6800000071525574
+            ],
+            [
+              0.8420000076293945,
+              0.3580000014901161,
+              0.6800000071525574
+            ]
+          ],
+          "triangles": null,
+          "type_name": "Cube",
+          "approximation": null,
+          "frame": "canonical_stage"
+        },
+        "geometry_bounds": {
+          "min": [
+            -0.842,
+            0.158,
+            -0.6799999999999999
+          ],
+          "max": [
+            0.842,
+            0.358,
+            0.6799999999999999
+          ],
+          "center": [
+            0.0,
+            0.258,
+            0.0
+          ],
+          "half_extents": [
+            0.842,
+            0.09999999999999999,
+            0.6799999999999999
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        }
+      },
+      {
+        "path": "/FLIP/Chassis/WhiteEquipmentBox",
+        "type_name": "Cube",
+        "attrs": {
+          "xformOp:translate": [
+            0.0,
+            0.258,
+            0.0
+          ],
+          "xformOp:scale": [
+            0.892,
+            0.198,
+            0.73
+          ],
+          "xformOpOrder": [
+            "xformOp:translate",
+            "xformOp:scale"
+          ],
+          "size": 2.0,
+          "physics:mass": null
+        },
+        "spawned": false,
+        "active": true,
+        "doc_id": 119546362397782,
+        "generation": 151,
+        "world_position": [
+          0.0,
+          0.258,
+          0.0
+        ],
+        "position_frame": "canonical_stage",
+        "document_generation": 151,
+        "stage_generation": 4,
+        "collision_bounds": {
+          "min": [
+            -0.892,
+            0.06,
+            -0.73
+          ],
+          "max": [
+            0.892,
+            0.456,
+            0.73
+          ],
+          "center": [
+            0.0,
+            0.258,
+            0.0
+          ],
+          "half_extents": [
+            0.892,
+            0.198,
+            0.73
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact",
+          "rest_depth": -0.06
+        },
+        "collision_geometry": {
+          "shape": "convex_hull",
+          "vertices": [
+            [
+              -0.8920000195503235,
+              0.06000000107288361,
+              -0.7300000190734863
+            ],
+            [
+              0.8920000195503235,
+              0.06000000107288361,
+              -0.7300000190734863
+            ],
+            [
+              -0.8920000195503235,
+              0.4559999989271164,
+              -0.7300000190734863
+            ],
+            [
+              0.8920000195503235,
+              0.4559999989271164,
+              -0.7300000190734863
+            ],
+            [
+              -0.8920000195503235,
+              0.06000000107288361,
+              0.7300000190734863
+            ],
+            [
+              0.8920000195503235,
+              0.06000000107288361,
+              0.7300000190734863
+            ],
+            [
+              -0.8920000195503235,
+              0.4559999989271164,
+              0.7300000190734863
+            ],
+            [
+              0.8920000195503235,
+              0.4559999989271164,
+              0.7300000190734863
+            ]
+          ],
+          "triangles": null,
+          "type_name": "Cube",
+          "approximation": null,
+          "frame": "canonical_stage"
+        },
+        "geometry_bounds": {
+          "min": [
+            -0.892,
+            0.06,
+            -0.73
+          ],
+          "max": [
+            0.892,
+            0.456,
+            0.73
+          ],
+          "center": [
+            0.0,
+            0.258,
+            0.0
+          ],
+          "half_extents": [
+            0.892,
+            0.198,
+            0.73
+          ],
+          "frame": "canonical_stage",
+          "fidelity": "exact"
+        }
+      }
+    ],
+    "count": 3
+  },
+  "battery_packaging": {
+    "status": "internal allocation study, not supplier dimensions",
+    "dimensions_xyz_m": [
+      1.684,
+      0.2,
+      1.36
+    ],
+    "center_xyz_m": [
+      0,
+      0.258,
+      0
+    ],
+    "horizontal_margin_m": 0.05,
+    "vertical_margin_m": 0.098,
+    "mass_parameter_kg": 50,
+    "energy_nameplate_kwh": 6.22
+  },
+  "engine_gates": [
+    {
+      "scene": "celestial_solar_source_lint",
+      "channel": "DIRECTION_TARGET_CONTRACT",
+      "exit": 0,
+      "elapsed_s": 3.627517885004636,
+      "log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022/post-ff-gates/celestial_solar_source_lint-gate.log"
+    },
+    {
+      "scene": "physics_initialization_policy",
+      "channel": "PHYSICS_INITIALIZATION_POLICY",
+      "exit": 0,
+      "elapsed_s": 4.37888264299545,
+      "log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022/post-ff-gates/physics_initialization_policy-gate.log"
+    },
+    {
+      "scene": "scene_transition_generation",
+      "channel": "SCENE_TRANSITION_GENERATION",
+      "exit": 0,
+      "elapsed_s": 3.8771945309999865,
+      "log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022/post-ff-gates/scene_transition_generation-gate.log"
+    },
+    {
+      "scene": "body_acceleration",
+      "channel": "BODY_ACCELERATION",
+      "exit": 1,
+      "elapsed_s": 3.0249476070021046,
+      "log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022/post-ff-gates/body_acceleration-gate.log"
+    },
+    {
+      "scene": "sensor",
+      "channel": "SENSORS",
+      "exit": 0,
+      "elapsed_s": 4.781089586991584,
+      "log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022/post-ff-gates/sensor-gate.log"
+    }
+  ],
+  "known_limits": [
+    "153 SysML lint warnings remain; this is not a clean requirements audit",
+    "Body acceleration: 47 of 267 existing checks fail rotation-norm invariance at unchanged 1e-9; untouched control reproduces",
+    "Child collision_bounds query labels an untransformed unit Cube canonical_stage; parent aggregate and cooked vertices are separate observations",
+    "No current loaded landing, impact, ramp deployment, full mission, or 60 FPS real-time-physics acceptance"
+  ],
+  "local_evidence_root": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-validation-20261022"
+}

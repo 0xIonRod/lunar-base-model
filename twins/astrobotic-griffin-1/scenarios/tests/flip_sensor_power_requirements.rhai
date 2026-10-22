@@ -34,6 +34,7 @@ fn on_start(me, ctx) {
 }
 
 fn geometry_checks(source) {
+    let source_model = sysml_requirements::model();
     let mast = sysml_requirements::text(source, own("mastPath"));
     let solar = sysml_requirements::text(source, own("solarPath"));
     let solar_visual = solar + "/SolarArrayVisual";
@@ -49,12 +50,22 @@ fn geometry_checks(source) {
     let checks = [];
     checks.push(sysml_requirement_checks::exists("FSP-001-mast", "sensor_mast", "fsp001", VERIFICATION, mast, "Xform"));
     let mast_paths = [];
-    for member in mast_members { mast_paths.push(mast + "/" + member); }
+    for member in mast_members {
+        let path=mast + "/" + member;
+        mast_paths.push(path);
+        checks.push(sysml_requirement_checks::attribute_equals("FSP-001-render-only-"+member,
+            "sensor_mast", "fsp001", VERIFICATION, path, "physics:collisionEnabled", false));
+    }
     checks.push(sysml_requirement_checks::children("FSP-001-mast-parts", "sensor_mast", "fsp001", VERIFICATION, mast, mast_paths));
     checks.push(sysml_requirement_checks::exists("FSP-002-solar", "solar_array", "fsp002", VERIFICATION, solar, "Xform"));
     checks.push(sysml_requirement_checks::exists("FSP-002-solar-visual", "solar_array", "fsp002", VERIFICATION, solar_visual, "Xform"));
     let solar_paths = [];
-    for member in solar_members { solar_paths.push(solar_visual + "/" + member); }
+    for member in solar_members {
+        let path=solar_visual + "/" + member;
+        solar_paths.push(path);
+        checks.push(sysml_requirement_checks::attribute_equals("FSP-002-render-only-"+member,
+            "solar_array", "fsp002", VERIFICATION, path, "physics:collisionEnabled", false));
+    }
     checks.push(sysml_requirement_checks::children("FSP-002-solar-parts", "solar_array", "fsp002", VERIFICATION, solar_visual, solar_paths));
     checks.push(#{id: "FSP-003-mast-height", component: "sensor_mast",
         requirement: "fsp003", verification: VERIFICATION,
@@ -123,12 +134,61 @@ fn geometry_checks(source) {
         source_owner: source_owner, reference_feature: "solarStatus"});
     checks.push(sysml_requirement_checks::coverage("FSP-004-traceability", "sensor_power", "fsp004", VERIFICATION));
     let battery = "" + sysml_requirements::text(source, own("batteryPath"));
+    let battery_tolerance = required_number(source,
+        PACKAGE+"::FSP009_BatteryPackaging::geometryProjectionToleranceM");
+    checks.push(sysml_requirement_checks::attribute_equals("FSP-009-transform-order",
+        "battery", "fsp009", VERIFICATION, battery, "xformOpOrder",
+        ["xformOp:translate", "xformOp:scale"]));
+    checks.push(sysml_requirement_checks::attribute_equals("FSP-009-unit-case",
+        "battery", "fsp009", VERIFICATION, battery+"/Body", "size", 1.0));
+    checks.push(sysml_requirement_checks::attribute_equals("FSP-009-physical-case",
+        "battery", "fsp009", VERIFICATION, battery+"/Body", "physics:collisionEnabled", true));
+    for field in [
+        ["length", "xformOp:scale", 0, "batteryLengthM"],
+        ["height", "xformOp:scale", 1, "batteryHeightM"],
+        ["width", "xformOp:scale", 2, "batteryWidthM"],
+        ["center-x", "xformOp:translate", 0, "batteryCenterXM"],
+        ["center-y", "xformOp:translate", 1, "batteryCenterYM"],
+        ["center-z", "xformOp:translate", 2, "batteryCenterZM"]
+    ] {
+        checks.push(#{id: "FSP-009-"+field[0], component: "battery", requirement: "fsp009",
+            verification: VERIFICATION, kind: "attribute_component", path: battery,
+            attr: field[1], index: field[2], expected: f64_from(source_model.value(own(field[3]))), tolerance: battery_tolerance});
+    }
+    for field in [[0,"batteryLengthM"], [1,"batteryHeightM"], [2,"batteryWidthM"]] {
+        for representation in ["geometry", "collision"] {
+            checks.push(#{id: "FSP-009-"+representation+"-extent-"+field[0], component:"battery",
+                requirement:"fsp009", verification:VERIFICATION, kind:"bounds_component",
+                path:if representation == "collision" { battery } else { battery+"/Body" },
+                index:field[0], representation:representation, multiplier:2.0,
+                expected:f64_from(source_model.value(own(field[1]))), tolerance:battery_tolerance});
+        }
+    }
+    let allocation_inputs = [];
+    for field in [
+        ["packLengthM", own("batteryLengthM")],
+        ["packHeightM", own("batteryHeightM")],
+        ["packWidthM", own("batteryWidthM")],
+        ["enclosureLengthM", "FlipRequirements::FlipRover::equipmentBoxDepthM"],
+        ["enclosureHeightM", "FlipRequirements::FlipRover::equipmentBoxHeightM"],
+        ["enclosureWidthM", "FlipRequirements::FlipRover::equipmentBoxWidthM"],
+        ["marginM", own("batteryEnclosureMarginM")]
+    ] {
+        allocation_inputs.push([field[0], source_model.source_literal_observation(
+            source_model.attribute(field[1]))]);
+    }
+    let allocation_constraint = PACKAGE+"::FSPC009_BatteryAllocation";
+    let allocation_observations = sysml_requirements::required_constraint_input_observations(
+        source_model, source_model.requirement(PACKAGE+"::fsp009"),
+        allocation_constraint, allocation_inputs);
+    checks.push(sysml_requirements::required_constraints_check(
+        "FSP-009-enclosure-allocation", "battery", "fsp009", VERIFICATION,
+        allocation_constraint, allocation_observations, "typed", 0.0));
     let battery_record = query("QueryUsdPrim", #{path: battery,
         attrs: ["inputs:capacity", "inputs:voltage_nom"]});
     let battery_attrs = if battery_record != () { battery_record.attrs } else { () };
     let capacity = if battery_attrs != () { battery_attrs["inputs:capacity"] } else { () };
     let nominal_voltage = if battery_attrs != () { battery_attrs["inputs:voltage_nom"] } else { () };
-    let source_model = sysml_requirements::model();
     let battery_inputs = [
         ["capacityAh", usd_geometry_inspection::measurement(capacity, battery_record,
             "Battery ampere-hour capacity is unavailable")],
@@ -161,6 +221,7 @@ fn _solar_probe(name) { PACKAGE + "::FlipSolarVerificationInputs::" + name }
 fn sensor_power_source() {
     let attributes = [];
     for name in ["mastPath", "solarPath", "batteryPath", "mastChildNames", "solarChildNames",
+        "batteryLengthM", "batteryHeightM", "batteryWidthM", "batteryCenterXM", "batteryCenterYM", "batteryCenterZM",
         "mastPostRadiusM", "mastPostHeightM", "mastPostCenterYM", "mastPostCenterZM",
         "sensorHeadWidthM", "sensorHeadHeightM", "sensorHeadDepthM",
         "antennaRadiusM", "antennaHeightM", "solarBacksheetWidthM",
@@ -174,13 +235,14 @@ fn sensor_power_source() {
     for name in ["areaToleranceM2", "efficiencyTolerance", "powerToleranceW", "temperatureFactorTolerance"] {
         attributes.push(_solar_limit(name));
     }
+    attributes.push(PACKAGE+"::FSP009_BatteryPackaging::geometryProjectionToleranceM");
     for name in ["brightIrradianceWm2", "dimIrradianceWm2", "visibleSunFraction",
         "occludedSunFraction", "frontDirection", "backDirection", "frontCosine",
         "backCosine", "observationDwellS", "observationTimeoutS",
         "counterexampleAreaOffsetM2", "counterexampleEfficiencyOffset",
         "counterexamplePowerOffsetW", "temperatureProbeDeltaK"] { attributes.push(_solar_probe(name)); }
     let requirements = [];
-    for name in ["fsp001", "fsp002", "fsp003", "fsp004", "fsp005", "fsp006", "fsp007", "fsp008"] {
+    for name in ["fsp001", "fsp002", "fsp003", "fsp004", "fsp005", "fsp006", "fsp007", "fsp008", "fsp009"] {
         requirements.push(PACKAGE + "::" + name);
     }
     sysml_requirements::source_with_selection(attributes, requirements,

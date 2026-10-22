@@ -66,5 +66,6 @@ def Xform "FlipChassis" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.36000001430511475, 0.38999998569488525, 0.41999998688697815)]
         uniform token purpose = "render"
+        custom bool physics:collisionEnabled = false
     }
 }

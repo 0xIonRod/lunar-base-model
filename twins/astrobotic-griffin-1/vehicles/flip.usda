@@ -55,10 +55,6 @@ def Xform "FLIP" (
     float outputs:battery_soc.connect = </FLIP/Battery.outputs:soc_out>
     float outputs:battery_drained
     float outputs:battery_drained.connect = </FLIP/Battery.outputs:drained>
-    float outputs:solar_power
-    float outputs:solar_power.connect = </FLIP/SolarArray.outputs:power_out>
-    float outputs:solar_available_power
-    float outputs:solar_available_power.connect = </FLIP/SolarArray.outputs:available_power_w>
     custom double inputs:target_mount_x
     double inputs:target_mount_x.connect = </FLIP/SolarArray/Environment.outputs:sun_mount_x>
     custom double inputs:target_mount_y
@@ -87,6 +83,10 @@ def Xform "FLIP" (
     double outputs:solar_reflected_power_w.connect = </FLIP/SolarArray.outputs:reflected_power_w>
     custom double outputs:solar_temperature_adjusted_peak_power_w
     double outputs:solar_temperature_adjusted_peak_power_w.connect = </FLIP/SolarArray.outputs:temperature_adjusted_peak_power_w>
+    custom double outputs:solar_available_power
+    double outputs:solar_available_power.connect = </FLIP/SolarArray.outputs:available_power_w>
+    custom double outputs:solar_power
+    double outputs:solar_power.connect = </FLIP/SolarArray.outputs:power_out>
     variantSet "drivetrain" = {
         "raycast" {
         }
@@ -455,12 +455,13 @@ def Xform "FLIP" (
         prepend references = @lunco://components/power/battery.usda@</Battery>
     )
     {
-        double3 xformOp:translate = (0.0, 0.28, 0.2)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 xformOp:translate = (0.0, 0.258, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         float inputs:voltage_nom = 28.0
         float inputs:capacity = 222.14285278320313
         float inputs:R_internal = 0.009999999776482582
         float inputs:soc_init = 0.8500000238418579
+        double3 xformOp:scale = (1.684, 0.2, 1.3599999999999999)
     }
     def Xform "SolarArray" (
         prepend references = @lunco://components/power/solar_panel.usda@</SolarPanel>
@@ -669,40 +670,52 @@ def Xform "FLIP" (
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
         }
         def Xform "GearHeat_FL" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_FL>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_FL>
         }
         def Xform "GearHeat_FR" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_FR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_FR>
         }
         def Xform "GearHeat_RL" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_RL>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_RL>
         }
         def Xform "GearHeat_RR" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_RR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:gear_heat_RR>
         }
         def Xform "TireThermalLeft" (
             prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorThermalMass>
@@ -793,112 +806,148 @@ def Xform "FLIP" (
             token connectors:port.connect = </FLIP/Thermal/TireThermalRight.connectors:port>
         }
         def Xform "BearingHeat_FL" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_FL>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_FL>
         }
         def Xform "BrakeHeat_FL" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_FL>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_FL>
         }
         def Xform "TireHeat_FL" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_FL>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/ContactToTireLeft.connectors:port_a>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_FL>
         }
         def Xform "BearingHeat_FR" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_FR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_FR>
         }
         def Xform "BrakeHeat_FR" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_FR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_FR>
         }
         def Xform "TireHeat_FR" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_FR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/ContactToTireRight.connectors:port_a>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_FR>
         }
         def Xform "BearingHeat_RL" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_RL>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_RL>
         }
         def Xform "BrakeHeat_RL" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_RL>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalLeft.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_RL>
         }
         def Xform "TireHeat_RL" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_RL>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/ContactToTireLeft.connectors:port_a>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_RL>
         }
         def Xform "BearingHeat_RR" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_RR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:bearing_heat_RR>
         }
         def Xform "BrakeHeat_RR" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_RR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/MotorThermalRight.connectors:port>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:brake_heat_RR>
         }
         def Xform "TireHeat_RR" (
-            prepend references = @lunco://components/thermal/motor_thermal.usda@</MotorHeatLoad>
+            references = None
+            prepend apiSchemas = ["LunCoProgramAPI", "LunCoTelemetryAPI"]
         )
         {
-            float inputs:heat_w
-            float inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_RR>
             custom token connectors:port
             token connectors:port.connect = </FLIP/Thermal/ContactToTireRight.connectors:port_a>
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            custom double inputs:heat_w = 0.0
+            double inputs:heat_w.connect = </FLIP/Thermal.inputs:tire_heat_RR>
         }
         def Xform "ContactToGround_FL" (
             prepend references = @lunco://components/thermal/motor_thermal.usda@</ThermalConductor>

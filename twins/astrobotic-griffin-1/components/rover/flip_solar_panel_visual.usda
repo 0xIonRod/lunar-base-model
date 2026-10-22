@@ -20,23 +20,26 @@ def Xform "FlipSolarPanel" (
         uniform token purpose = "render"
         custom token[] xformOpOrder = ["xformOp:scale", "xformOp:translate"]
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        custom bool physics:collisionEnabled = false
     }
     def Cube "BlueCells"
     {
         double size = 1.0
         custom double3 xformOp:translate = (0.0, 0.0325, 0.0)
-        custom double3 xformOp:scale = (1.0, 0.015, 0.70)
+        custom double3 xformOp:scale = (1.0, 0.015, 0.7)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.03999999910593033, 0.11999999731779099, 0.30000001192092896)]
         uniform token purpose = "render"
+        custom bool physics:collisionEnabled = false
     }
     def Cube "FoldHinge"
     {
         double size = 1.0
-        double3 xformOp:translate = (0.0, 0.0, -0.40)
-        double3 xformOp:scale = (1.10, 0.06, 0.06)
+        double3 xformOp:translate = (0.0, 0.0, -0.4)
+        double3 xformOp:scale = (1.1, 0.06, 0.06)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.18000000715255737, 0.20000000298023224, 0.2199999988079071)]
         uniform token purpose = "render"
+        custom bool physics:collisionEnabled = false
     }
 }

@@ -84,9 +84,11 @@ per-file CLI attempt cannot resolve this Twin's cross-file SysML names or
 `twin://` USD references without its mounted namespace; those diagnostics are
 retained with the local logs and are not claimed as passing validation.
 
-Mounted vehicle USD validation also reports nine solar direction-port and IMU
-gravity connection findings in unchanged wiring. These remain open; this
-checkpoint does not claim clean whole-model lint.
+At this geometry checkpoint, mounted vehicle USD validation reported nine
+solar direction-port and IMU gravity connection findings. The subsequent
+[interface and battery review](griffin-interface-validation-2026-10-22.md)
+records their repair and current preflight results; the receipt below retains
+the original source revision and its validation boundary.
 
 The [production receipt](evidence/griffin-packaging-2026-10-22.json) records
 154 source hashes and **16 passing selected cases**: nine assembly/geometry

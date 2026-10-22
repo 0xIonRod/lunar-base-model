@@ -406,6 +406,12 @@ package GriffinRequirementSources {
         ref sources = (source_linkedin_astrolab_flip_power_post, source_project_verification_boundary, source_pvwatts_temperature_coefficient);
     }
 
+    part evidence_fsp_009 : RequirementEvidence {
+        doc /* Internal packaging study allocation; not supplier pack metrology. */
+        ref targetRequirement = FlipSensorPowerRequirements::fsp009;
+        ref sources = (source_project_part_contracts, source_astrobotic_griffin_1_vehicles_flip_usda);
+    }
+
     part evidence_fsr_001 : RequirementEvidence {
         ref targetRequirement = FlipSuspensionRequirements::fsr001;
         ref sources = (source_www_astrolab_space_flip_rover, source_venturi_space_rovers);

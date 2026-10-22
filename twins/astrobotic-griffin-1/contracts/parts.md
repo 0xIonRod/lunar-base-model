@@ -25,7 +25,7 @@ graph still needs canonical identity migration and generated realization links.
 | `SolarPanelForward`, `SolarPanelFrontStarboard`, `SolarPanelFrontPort` | Each root references `components/lander/griffin_solar_panel_visual.usda`, with `Cells`, `Frame`, dividers, hinge, brackets, and links | Three independently oriented panels use paired bus rails; each installed width derives from its rail span and shared edge clearance | The lower clearance cutout, as-built outline, installation datums, mechanism limits, and electrical behavior require the controlled panel and interface definitions |
 | `LegPX/NX/PZ/NZ` | `Strut` and matching `PadPX/NX/PZ/NZ` | Positive mass body, visible strut, enabled pad collider | Four functional legs; dimensions and damping TBD |
 | `EgressRampPort/Starboard` | Three rigid ramp sections from the upper deck; each section has two source-aligned wheel tracks, an open centre, and two upper edge-rail segments | Positive-mass rigid sections; both geometry-derived track colliders enabled | Track stations follow FLIP wheel datums; dimensions and ramp kinematics remain study values |
-| `RampHingePort/Starboard` | Upper-deck hinge connects the lander body to the first ramp section | `PhysicsRevoluteJoint`, Z axis, angular drive; port limits −50°..+60°, starboard −60°..+50° | One source-owned 45° stow magnitude produces joint targets +45° port / −45° starboard. Both bodies use +45° Z; the starboard body also has the mirrored Y=180° mount, giving it a +135° lander-frame heading. Terrain deployment targets are −27.83° / +27.83°. |
+| `RampHingePort/Starboard` | Upper-deck hinge connects the lander body to the first ramp section | `PhysicsRevoluteJoint`, Z axis, angular drive; port limits −50°..+125°, starboard −125°..+50° | One source-owned 120° stow magnitude produces joint targets +120° port / −120° starboard, leaning 30° inward from vertical. The starboard mount also mirrors about Y. Terrain deployment targets are −27.83° / +27.83°. |
 | `RampSectionHingePort/Starboard01/12` | Two serial inter-section pivots per ramp; track surfaces, rail segments, and hinge fittings remain aligned at each joint | Native driven `PhysicsRevoluteJoint` between adjacent rigid section bodies, ±180° limits | Both intermediate hinges target 180° for transport stow and 0° for rover traversal |
 
 ## Canonical frame
@@ -59,7 +59,7 @@ independently through the runtime authoring tools.
 | `components/lander/griffin_ramp_visual.usda` | three visual ramp sections, each with paired wheel tracks, upper rail segments and joint pins, deck-to-rail posts, underside beams, hinge barrel, and per-track treads | standalone preview asset; the integrated vehicle renders its articulated physical sections and does not mount a static duplicate |
 | `components/lander/griffin_ramp_section_visual.usda` | reusable full section with geometry-derived track collision, upper edge rails, rail pivot pins, supports, treads, beams, and hinge barrel | shared source section referenced by visual and physical ramp assemblies |
 | `components/lander/griffin_ramp_toe_section_visual.usda` | final section with the deployment-angle-derived toe bevel | inherits shared geometry and collision from the section source |
-| `components/rover/flip_chassis_visual.usda` | lower frame, equipment box, bumper, payload deck, service panel | referenced by the canonical FLIP vehicle; the same shapes provide visible chassis geometry and wheel-filtered rigid-body collision |
+| `components/rover/flip_chassis_visual.usda` | lower frame, equipment box, bumper, payload deck, service panel | four structural shapes provide visible chassis geometry and wheel-filtered rigid-body collision; the decorative service panel explicitly disables collision |
 | Shared `lunco://components/mobility/wheel.usda` and selected tire | wheel cylinder, tire material and dynamics | one geometry source per station; the simulator transfers its mesh to a physics-driven runtime render child |
 | `components/rover/flip_sensor_mast_visual.usda` | mast post, sensor head, antenna | front sensor silhouette; render-only |
 | `components/rover/flip_solar_panel_visual.usda` | white backsheet, blue cells, fold hinge | rear collapsible-array proxy; render-only |
@@ -68,6 +68,15 @@ independently through the runtime authoring tools.
 wheel and drivetrain model with the chassis, wheel, suspension, mast, and solar
 visual components. SysML owns wheel identities, station datums, and dimensions;
 the references keep repeated geometry in one component source.
+
+FLIP's battery uses the shared electrical-storage component, including its
+existing 50 kg study mass and 6.22 kWh nameplate allocation. FSP-009 owns an
+internal packaging study: a 1.684 × 0.20 × 1.36 m case centered at rover-local
+(0, 0.258, 0) m, leaving 50 mm horizontal margins and 98 mm vertical margins
+inside the equipment box. These are derived enclosure allocations, not
+released Astrolab battery dimensions. The visible case and collision shape
+share the explicit translate/scale order. The sensor/power fixture declares
+SI metres and Y-up so its composed bounds can verify the allocation directly.
 
 Each Griffin main engine is modelled separately. `MainPropulsion/EngineNN` is
 one `LunCo.Propulsion.PressureFedEngine` (its own fuel/oxidizer valves and

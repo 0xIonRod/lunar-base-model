@@ -39,6 +39,10 @@ ramps 30° inward from vertical and aligns the legs with the solar openings.
 Its screenshot and native static-clearance receipts document this bounded
 visual checkpoint; loaded deployment, flight dynamics and 60 FPS real-time
 acceptance remain open.
+The [interface and internal battery review](contracts/griffin-interface-validation-2026-10-22.md)
+records the subsequent correction of the protruding battery case, explicit
+visual collision roles, and clean mounted USD preflight. It preserves the
+wider bus, inward ramps and leg/panel alignment from the packaging checkpoint.
 The seven-engine/four-leg configuration is source-backed; current metric
 dimensions, mass properties and propulsion ratings remain reconstruction or
 integration-study inputs.

@@ -19,6 +19,7 @@ def Xform "FlipSensorMast" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
         color3f[] primvars:displayColor = [(0.18000000715255737, 0.20000000298023224, 0.2199999988079071)]
         uniform token purpose = "render"
+        custom bool physics:collisionEnabled = false
     }
     def Cube "SensorHead"
     {
@@ -28,6 +29,7 @@ def Xform "FlipSensorMast" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
         color3f[] primvars:displayColor = [(0.11999999731779099, 0.14000000059604645, 0.17000000178813934)]
         uniform token purpose = "render"
+        custom bool physics:collisionEnabled = false
     }
     def Cylinder "SensorAntenna"
     {
@@ -38,5 +40,6 @@ def Xform "FlipSensorMast" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
         color3f[] primvars:displayColor = [(0.6499999761581421, 0.6700000166893005, 0.699999988079071)]
         uniform token purpose = "render"
+        custom bool physics:collisionEnabled = false
     }
 }

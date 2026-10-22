@@ -43,6 +43,8 @@ fn on_tick(me, ctx) {
         checks.push(sysml_requirement_checks::attribute_equals("FCC-003-collision-" + path,
             "chassis", "fcc003", VERIFICATION, path, "physics:collisionEnabled", true));
     }
+    checks.push(sysml_requirement_checks::attribute_equals("FCC-003-service-cover-render-only",
+        "chassis", "fcc003", VERIFICATION, root + "/ServicePanel", "physics:collisionEnabled", false));
     for field in [
         #{id: "FCC-005-box-width", path: root + "/WhiteEquipmentBox", index: 2, attr: "equipmentBoxWidthM"},
         #{id: "FCC-005-box-height", path: root + "/WhiteEquipmentBox", index: 1, attr: "equipmentBoxHeightM"},

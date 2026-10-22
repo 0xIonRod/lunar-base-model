@@ -1,5 +1,9 @@
 # Griffin contract architecture
 
+The [interface and internal battery checkpoint](griffin-interface-validation-2026-10-22.md)
+records current mounted preflight and focused verification after the
+[integrated packaging correction](griffin-integrated-packaging-review.md).
+
 This folder is the reviewable design-contract layer for the Griffin Twin. It
 does not contain USD source and it is not a second runtime loader. The
 executable contract surface remains in `../tools/`, because the current Twin

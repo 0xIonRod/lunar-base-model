@@ -20,6 +20,15 @@ package FlipSensorPowerRequirements {
         attribute mastPath : UsdPrimPath = "/World/FLIP/SensorMast";
         attribute solarPath : UsdPrimPath = "/World/FLIP/SolarArray";
         attribute batteryPath : UsdPrimPath = "/World/FLIP/Battery";
+        // Internal packaging allocation, not a released Astrolab pack drawing.
+        // X is longitudinal, Y is up, Z is lateral in the rover frame.
+        attribute batteryEnclosureMarginM : Real = 0.05;
+        attribute batteryLengthM : Real = FlipRequirements::FlipRover::equipmentBoxDepthM - 2.0 * batteryEnclosureMarginM;
+        attribute batteryHeightM : Real = 0.20;
+        attribute batteryWidthM : Real = FlipRequirements::FlipRover::equipmentBoxWidthM - 2.0 * batteryEnclosureMarginM;
+        attribute batteryCenterXM : Real = 0.0;
+        attribute batteryCenterYM : Real = FlipRequirements::FlipRover::equipmentBoxCenterYM;
+        attribute batteryCenterZM : Real = 0.0;
         ref attribute mastHeight : FlipRequirements::FlipRover::sensorMastHeightM;
         ref attribute solarMount : FlipRequirements::FlipRover::solarArrayMount;
         ref attribute solarTilt : FlipRequirements::FlipRover::solarArrayTiltDeg;
@@ -89,10 +98,10 @@ package FlipSensorPowerRequirements {
     }
 
     requirement def FSP001_MastStructure {
-        doc /* FSP-001 [visual] FLIP exposes an inspectable sensor mast with post, sensor head, and antenna. */
+        doc /* FSP-001 [visual] FLIP exposes an inspectable sensor mast with post, sensor head, and antenna. These presentation members explicitly disable collision; the rover body and physical wheel assemblies own collision behavior. */
     }
     requirement def FSP002_SolarStructure {
-        doc /* FSP-002 [visual] FLIP exposes a separately owned collapsible-array proxy with backsheet, cells, and fold hinge. */
+        doc /* FSP-002 [visual] FLIP exposes a separately owned collapsible-array proxy with backsheet, cells, and fold hinge. These presentation members explicitly disable collision; this proxy does not qualify a physical deployment mechanism. */
     }
     requirement def FSP003_MastDatum {
         doc /* FSP-003 [geometry] the mast height and mount are checked against the rover SysML metre datum. */
@@ -226,6 +235,35 @@ package FlipSensorPowerRequirements {
         }
     }
 
+    constraint def FSPC009_BatteryAllocation {
+        in packLengthM : Real;
+        in packHeightM : Real;
+        in packWidthM : Real;
+        in enclosureLengthM : Real;
+        in enclosureHeightM : Real;
+        in enclosureWidthM : Real;
+        in marginM : Real;
+        packLengthM > 0.0 and packHeightM > 0.0 and packWidthM > 0.0
+            and marginM > 0.0
+            and packLengthM + 2.0 * marginM <= enclosureLengthM
+            and packWidthM + 2.0 * marginM <= enclosureWidthM
+            and packHeightM + 2.0 * marginM <= enclosureHeightM;
+    }
+    requirement def FSP009_BatteryPackaging {
+        doc /* FSP-009 [geometry] the visible battery case and its collision shape shall share the source-owned internal packaging allocation inside the equipment enclosure. The unit Cube shall use the declared SI dimensions and center through an explicit translate/scale transform order. This allocation preserves the electrical nameplate and existing study mass; it does not establish cell layout, supplier dimensions, or qualified mass properties. */
+        // Serialization/projection agreement, not manufacturing accuracy.
+        attribute geometryProjectionToleranceM : Real = 1.0e-9;
+        require FSPC009_BatteryAllocation {
+            in packLengthM = FlipSensorPowerAssembly::batteryLengthM;
+            in packHeightM = FlipSensorPowerAssembly::batteryHeightM;
+            in packWidthM = FlipSensorPowerAssembly::batteryWidthM;
+            in enclosureLengthM = FlipRequirements::FlipRover::equipmentBoxDepthM;
+            in enclosureHeightM = FlipRequirements::FlipRover::equipmentBoxHeightM;
+            in enclosureWidthM = FlipRequirements::FlipRover::equipmentBoxWidthM;
+            in marginM = FlipSensorPowerAssembly::batteryEnclosureMarginM;
+        }
+    }
+
     requirement <'FSP-001'> fsp001 : FSP001_MastStructure { subject sensorPower : FlipSensorPowerAssembly; }
     requirement <'FSP-002'> fsp002 : FSP002_SolarStructure { subject sensorPower : FlipSensorPowerAssembly; }
     requirement <'FSP-003'> fsp003 : FSP003_MastDatum { subject sensorPower : FlipSensorPowerAssembly; }
@@ -234,6 +272,7 @@ package FlipSensorPowerRequirements {
     requirement <'FSP-006'> fsp006 : FSP006_SolarPanelGeometry { subject sensorPower : FlipSensorPowerAssembly; }
     requirement <'FSP-007'> fsp007 : FSP007_BatteryEnergyCapacity { subject sensorPower : FlipSensorPowerAssembly; }
     requirement <'FSP-008'> fsp008 : FSP008_SolarArrayPeakPower { subject sensorPower : FlipSensorPowerAssembly; }
+    requirement <'FSP-009'> fsp009 : FSP009_BatteryPackaging { subject sensorPower : FlipSensorPowerAssembly; }
 
     verification def Verify_FLIPSensorPowerRequirements {
         subject sensorPower : FlipSensorPowerAssembly;
@@ -246,6 +285,7 @@ package FlipSensorPowerRequirements {
             verify fsp006;
             verify fsp007;
             verify fsp008;
+            verify fsp009;
         }
     }
 }

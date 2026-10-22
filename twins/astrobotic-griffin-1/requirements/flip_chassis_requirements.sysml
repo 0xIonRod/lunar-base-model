@@ -41,7 +41,7 @@ package FlipChassisRequirements {
         doc /* FCC-002 [geometry] lower-frame width, height, and length resolve to the owning FlipRequirements values. */
     }
     requirement def FCC003_ChassisOwnership {
-        doc /* FCC-003 [physics boundary] the FLIP rigid body uses the referenced chassis geometry for collision; its wheel suspension and contacts remain on the four physical wheel assemblies. */
+        doc /* FCC-003 [physics boundary] the FLIP rigid body uses the lower frame, equipment box, bumper and payload deck for collision; the decorative service panel explicitly disables collision. Wheel suspension and contacts remain on the four physical wheel assemblies. */
     }
     requirement def FCC004_ChassisTraceability {
         doc /* FCC-004 [evidence] the chassis path and metric source names resolve from this package. */
