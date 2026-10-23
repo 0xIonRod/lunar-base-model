@@ -10,6 +10,7 @@ env/
 logs/
 **/logs/
 target/
+twins/**/results/
 
 # Generated news state and rolling briefing outputs
 news/.artemis_news_state.json
