@@ -23,7 +23,13 @@ package GriffinRampRootSectionRequirements {
         attribute geometryToleranceM : Real = 0.002;
         attribute entryFrameName : RootFrameIdentity = "DeckHinge";
         attribute exitFrameName : RootFrameIdentity = "MiddleFold";
-        attribute entryAxisYM : Real = GriffinRampRequirements::GriffinEgressRamp::rampSectionHingeBarrelCenterYM;
+        // Raised-axis reconstruction: one existing lug width above the track
+        // centre. The nominal entrance face is vertical and its lower edge is
+        // mitered from source thickness/angle; underside beams start at that
+        // same run. The assembly solves the bearing position from the deck
+        // corner and this datum, rather than moving the deck or rover.
+        attribute deploymentAngleRad : Real = GriffinRampRequirements::GriffinEgressRamp::physicalRampPortDeploymentAngleRad;
+        attribute entryAxisYM : Real = GriffinRampRequirements::GriffinEgressRamp::rampPivotLugWidthM;
         attribute exitAxisYM : Real = GriffinRampRequirements::GriffinEgressRamp::rampRailCenterYM
             + GriffinRampRequirements::GriffinEgressRamp::rampRailHeightM / 2.0;
         attribute plateAttachmentRunM : Real = 1.5 * GriffinRampRequirements::GriffinEgressRamp::rampPivotLugWidthM;
@@ -41,10 +47,16 @@ package GriffinRampRootSectionRequirements {
             and measuredDimensionErrorM <= toleranceM;
     }
     requirement def GRS001_RootSectionGeometry {
-        doc /* GRS-001 the detached root section shall contain two rectangular
+        doc /* GRS-001 the detached root section shall contain two entrance-mitered
          * collision-enabled walking tracks of length lengthM, source track
          * width/thickness and FLIP wheel stations. Four rising guide trusses,
          * two underside beams and four treads per track shall follow that span.
+         * The entrance lower corners shall be relieved so the entrance face
+         * is vertical at deploymentAngleRad. Beams shall start at the same
+         * native thickness/angle-derived run. DeckHinge is raised by the
+         * source entryAxisYM; connected tongues and coaxial pins shall follow
+         * it. The assembly separately qualifies running clearance and wheel
+         * crossing from the fixed deck to this nominal walking face.
          * Named deck and middle-fold Xform datums shall lie on the source
          * hinge axes at X=0 and X=lengthM respectively.
          * Each entry tongue and paired exit fork cheeks shall connect the

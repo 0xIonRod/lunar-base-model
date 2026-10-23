@@ -146,7 +146,7 @@ def Xform "GriffinFlipVisual" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                custom double3 xformOp:scale = (1.42, 0.03, 0.5800000000000001)
+                custom double3 xformOp:scale = (1.42, 0.03, 0.5760000000000001)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 double size = 1.0
                 bool physics:collisionEnabled = true
@@ -159,7 +159,7 @@ def Xform "GriffinFlipVisual" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                custom double3 xformOp:scale = (1.42, 0.03, 0.5800000000000001)
+                custom double3 xformOp:scale = (1.42, 0.03, 0.5760000000000001)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 double size = 1.0
                 bool physics:collisionEnabled = true
@@ -197,7 +197,7 @@ def Xform "GriffinFlipVisual" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                custom double3 xformOp:scale = (1.42, 0.03, 0.5800000000000001)
+                custom double3 xformOp:scale = (1.42, 0.03, 0.5760000000000001)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 double size = 1.0
                 bool physics:collisionEnabled = true
@@ -210,7 +210,7 @@ def Xform "GriffinFlipVisual" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
             )
             {
-                custom double3 xformOp:scale = (1.42, 0.03, 0.5800000000000001)
+                custom double3 xformOp:scale = (1.42, 0.03, 0.5760000000000001)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                 double size = 1.0
                 bool physics:collisionEnabled = true
@@ -322,14 +322,14 @@ def Xform "GriffinFlipVisual" (
         }
         def Xform "CandidateRampPort"
         {
-            custom double3 xformOp:translate = (2.427114731507, 2.106794675483, 0.0)
+            custom double3 xformOp:translate = (2.4433441945204004, 2.1596159735495077, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 119.99999999999999)
             def Xform "DeckSection" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda@</RampSection>
             )
             {
-                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                custom double3 xformOp:translate = (0.0, -0.06, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
             }
@@ -337,7 +337,7 @@ def Xform "GriffinFlipVisual" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda@</RampSection>
             )
             {
-                custom double3 xformOp:translate = (2.1490840539179583, 0.39999999999999997, 0.0)
+                custom double3 xformOp:translate = (2.1490840539179583, 0.33999999999999997, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, -179.9999999764969)
                 def Xform "ToeSection" (
@@ -354,8 +354,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (2.427114731507, 1.9608973377415, -0.707)
-            custom double3 xformOp:scale = (0.06, 0.3417946754829999, 0.06)
+            custom double3 xformOp:translate = (2.4433441945204004, 1.9873079867747538, -0.707)
+            custom double3 xformOp:scale = (0.06, 0.3946159735495076, 0.06)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -366,8 +366,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (2.2985573657535, 1.76, -0.707)
-            custom double3 xformOp:scale = (0.3171147315069995, 0.06, 0.06)
+            custom double3 xformOp:translate = (2.3066720972602006, 1.76, -0.707)
+            custom double3 xformOp:scale = (0.33334419452040004, 0.06, 0.06)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -378,8 +378,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (2.427114731507, 1.9608973377415, 0.707)
-            custom double3 xformOp:scale = (0.06, 0.3417946754829999, 0.06)
+            custom double3 xformOp:translate = (2.4433441945204004, 1.9873079867747538, 0.707)
+            custom double3 xformOp:scale = (0.06, 0.3946159735495076, 0.06)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -390,8 +390,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (2.2985573657535, 1.76, 0.707)
-            custom double3 xformOp:scale = (0.3171147315069995, 0.06, 0.06)
+            custom double3 xformOp:translate = (2.3066720972602006, 1.76, 0.707)
+            custom double3 xformOp:scale = (0.33334419452040004, 0.06, 0.06)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -400,14 +400,14 @@ def Xform "GriffinFlipVisual" (
         }
         def Xform "CandidateRampStarboard"
         {
-            custom double3 xformOp:translate = (-2.427114731507, 2.106794675483, 0.0)
+            custom double3 xformOp:translate = (-2.4433441945204004, 2.1596159735495077, -0.0000000000000000000000000000000001925929944387236)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (180.0, 0.000000000000007016709298534876, 60.00000000000002)
             def Xform "DeckSection" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda@</RampSection>
             )
             {
-                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                custom double3 xformOp:translate = (0.0, -0.06, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
             }
@@ -415,7 +415,7 @@ def Xform "GriffinFlipVisual" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda@</RampSection>
             )
             {
-                custom double3 xformOp:translate = (2.1490840539179583, 0.39999999999999997, 0.0)
+                custom double3 xformOp:translate = (2.1490840539179583, 0.33999999999999997, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                 custom double3 xformOp:rotateXYZ = (0.0, 0.0, -179.9999999764969)
                 def Xform "ToeSection" (
@@ -432,8 +432,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (-2.427114731507, 1.9608973377415, -0.707)
-            custom double3 xformOp:scale = (0.06, 0.3417946754829999, 0.06)
+            custom double3 xformOp:translate = (-2.4433441945204004, 1.9873079867747538, -0.707)
+            custom double3 xformOp:scale = (0.06, 0.3946159735495076, 0.06)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -444,8 +444,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (-2.2985573657535, 1.76, -0.707)
-            custom double3 xformOp:scale = (0.3171147315069995, 0.06, 0.06)
+            custom double3 xformOp:translate = (-2.3066720972602006, 1.76, -0.707)
+            custom double3 xformOp:scale = (0.33334419452040004, 0.06, 0.06)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -456,8 +456,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (-2.427114731507, 1.9608973377415, 0.707)
-            custom double3 xformOp:scale = (0.06, 0.3417946754829999, 0.06)
+            custom double3 xformOp:translate = (-2.4433441945204004, 1.9873079867747538, 0.707)
+            custom double3 xformOp:scale = (0.06, 0.3946159735495076, 0.06)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -468,8 +468,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (-2.2985573657535, 1.76, 0.707)
-            custom double3 xformOp:scale = (0.3171147315069995, 0.06, 0.06)
+            custom double3 xformOp:translate = (-2.3066720972602006, 1.76, 0.707)
+            custom double3 xformOp:scale = (0.33334419452040004, 0.06, 0.06)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false

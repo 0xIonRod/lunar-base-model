@@ -26,25 +26,46 @@ fn child_pose(model,docs,parent,child,angle){
     let rotate=#{translation:[0.0,0.0,0.0],rotation:quat_array(quat_from_euler_xyz_deg(vec3(0.0,0.0,angle*180.0/acos(-1.0))))};
     frames::mount_transform_compose(frames::mount_transform_compose(a.value,rotate),frames::mount_transform_inverse(b.value))
 }
+// Solve the raised bearing from the nominal walking corner. Source datums
+// stay in SysML; native rigid-frame math owns their geometric composition.
+fn bank_placements(model,docs,index){
+    if index!=0 && index!=1{throw("Unknown bank side");}
+    let own=owner();let ramp="GriffinRampRequirements::GriffinEgressRamp::";
+    let entry=frames::mount_local_transform(docs.root,"/RampSection/"+
+        section::frame_name(model,component_owner("root"),"entryFrameName"));
+    if !entry.ok{throw("Source root entry datum is unavailable");}
+    let angle=model.value(ramp+"physicalRampPortDeploymentAngleRad");let sign=if index==0{1.0}else{-1.0};
+    let nominal=quat_from_euler_xyz_deg(vec3(0.0,if index==0{0.0}else{180.0},sign*angle*180.0/acos(-1.0)));
+    let top=model.value(ramp+"rampSurfaceCenterYM")+spec::ramp_surface_thickness_m()/2.0;
+    let target=vec3(sign*(model.value(own+"transitionOutboardX")+model.value(own+"hingeRunningClearanceM")),
+        model.value(ramp+"physicalRampDeckTransitionCenterY")+spec::ramp_surface_thickness_m()/2.0,
+        model.value(own+"mountZ"));
+    let position=target-qrot(nominal,vec3(0.0,top,0.0)-vec3_from(entry.value.translation));
+    let deck=frames::mount_transform_inverse(entry.value);
+    let folded=model.value(ramp+"physicalRampSectionStowedRelativeAngleRad");
+    let stow=model.value(ramp+"physicalRampRootStowedAngleRad");
+    let stow_rotation=quat_array(quat_from_euler_xyz_deg(vec3(0.0,if index==0{0.0}else{180.0},sign*stow*180.0/acos(-1.0))));
+    #{position:vec3_array(position),rotation:stow_rotation,deck:deck,
+        middle:frames::mount_transform_compose(deck,child_pose(model,docs,"root","middle",folded)),
+        toe:child_pose(model,docs,"middle","toe",-folded)}
+}
 fn bank_plan(doc,edit_target,docs,index){
     if index!=0 && index!=1{throw("Packaging bank index must select port or starboard");}
     let model=requirements::model();let own=owner();let lander=model.value(own+"landerPath");
     let names=bank_names(model);let name=names[index];let root=lander+"/"+name;
     let actual=lander+"/"+spec::ramp_names()[index];let old=frames::mount_local_transform(doc,actual);
     if !old.ok{throw("Installed bank frame is unavailable");}
-    let position=[model.value(own+if index==0{"portMountX"}else{"starboardMountX"}),model.value(own+"mountY"),model.value(own+"mountZ")];
-    let middle=child_pose(model,docs,"root","middle",model.value("GriffinRampRequirements::GriffinEgressRamp::physicalRampSectionStowedRelativeAngleRad"));
-    let toe=child_pose(model,docs,"middle","toe",-model.value("GriffinRampRequirements::GriffinEgressRamp::physicalRampSectionStowedRelativeAngleRad"));
+    let placement=bank_placements(model,docs,index);let position=placement.position;
     let contract=query("ReadActiveTwinContract");if contract.open!=true{throw("Active Twin contract is unavailable");}
     let ops=[];
     let found=query("QueryUsdPrim",#{doc_id:doc,path:root});if found.type_name!=(){throw("Packaging bank already exists; revise its explicit placement instead");}
     ops.push(#{SetActive:#{edit_target:edit_target,path:actual,active:false}});
     ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:lander,name:name,type_name:"Xform",reference:(),reference_prim_path:""}});
-    let pose=frames::place_plan(edit_target,root,position,frames::mount_xyz_deg_from_quat(old.value.rotation),());
+    let pose=frames::place_plan(edit_target,root,position,frames::mount_xyz_deg_from_quat(placement.rotation),());
     if !pose.ok{return pose;}for op in pose.ops{ops.push(op);}
-    for member in [#{label:"root",parent:root,name:"DeckSection",pose:frames::mount_transform_identity()},
-        #{label:"middle",parent:root,name:"MiddleSection",pose:middle},
-        #{label:"toe",parent:root+"/MiddleSection",name:"ToeSection",pose:toe}]{
+    for member in [#{label:"root",parent:root,name:"DeckSection",pose:placement.deck},
+        #{label:"middle",parent:root,name:"MiddleSection",pose:placement.middle},
+        #{label:"toe",parent:root+"/MiddleSection",name:"ToeSection",pose:placement.toe}]{
         let asset=model.value(component_owner(member.label)+"::componentAsset");
         ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:member.parent,name:member.name,type_name:"Xform",
             reference:"twin://"+contract.name+"/"+asset,reference_prim_path:"/RampSection"}});
@@ -57,6 +78,25 @@ fn bank_plan(doc,edit_target,docs,index){
     if !mount.ok{return mount;}for op in mount.ops{ops.push(op);}
     #{ok:true,ops:ops,root:root,doc_id:doc,generation:query("QueryUsdPrim",#{doc_id:doc,path:lander}).document_generation,
         source_revision:model.source_revision,kind:"griffin_candidate_ramp_bank"}
+}
+
+fn interface_plan(doc,edit_target,docs,index){
+    let model=requirements::model();let lander=model.value(owner()+"landerPath");
+    let root=lander+"/"+bank_names(model)[index];let placement=bank_placements(model,docs,index);let ops=[];
+    for member in [#{path:root,pose:#{translation:placement.position,rotation:placement.rotation}},
+        #{path:root+"/DeckSection",pose:placement.deck},#{path:root+"/MiddleSection",pose:placement.middle},
+        #{path:root+"/MiddleSection/ToeSection",pose:placement.toe}]{
+        let present=query("QueryUsdPrim",#{doc_id:doc,path:member.path});
+        if present.type_name!="Xform"{throw("Existing bank component is unavailable: "+member.path);}
+        let plan=frames::place_plan(edit_target,member.path,member.pose.translation,
+            if member.pose.rotation==(){()}else{frames::mount_xyz_deg_from_quat(member.pose.rotation)},());
+        if !plan.ok{return plan;}for op in plan.ops{ops.push(op);}
+    }
+    let support=visual::_griffin_ramp_mount_at_plan(doc,edit_target,lander,if index==0{"port"}else{"starboard"},
+        placement.position,root+"/DeckSection/Looks/RampStructure");
+    if !support.ok{return support;}for op in support.ops{ops.push(op);}
+    #{ok:true,ops:ops,doc_id:doc,generation:query("QueryUsdPrim",#{doc_id:doc,path:root}).document_generation,
+        source_revision:model.source_revision,position:placement.position,kind:"griffin_raised_root_interface"}
 }
 
 // Finish only the static study fixture. The production vehicle keeps its own
@@ -81,7 +121,7 @@ fn fixture_plan(doc,edit_target){
     ops.push(#{SetRelationship:#{edit_target:edit_target,path:bus,name:"lunco:mount:sockets",targets:retained}});
     let length=model.value(own+"transitionLengthM");let edge=model.value(own+"transitionOutboardX");
     let y=model.value(ramp+"physicalRampDeckTransitionCenterY");let z=model.value(ramp+"physicalRampMountZ");
-    let width=spec::ramp_contact_track_width_m();let thickness=spec::ramp_surface_thickness_m();
+    let width=model.value(own+"transitionTrackWidthM");let thickness=spec::ramp_surface_thickness_m();
     if length<=0.0 || width<=0.0 || thickness<=0.0 || edge<=length{throw("Transition source dimensions are invalid");}
     for index in 0..2{
         let side=if index==0{"port"}else{"starboard"};let sign=if index==0{1.0}else{-1.0};

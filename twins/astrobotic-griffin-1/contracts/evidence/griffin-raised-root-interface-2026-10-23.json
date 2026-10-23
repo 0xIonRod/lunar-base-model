@@ -1,0 +1,392 @@
+{
+  "scope": "Saved Editor geometry study; production vehicle and loaded operation unaccepted",
+  "engine": {
+    "built_commit": "0cb4d37137554af3227a316100c903f44a1c3a4c",
+    "checkout_at_validation": "53de87e6eb6bbea6db5a629578ee3afe020f34c0",
+    "binary_sha256": "5b24ec52f8893910cf764334a75279a20522bfdd8d30d0bbfdb827b5ed28c73d",
+    "owned_api_port": 4391
+  },
+  "source_revision": 10230336678615105864,
+  "source_sha256": {
+    "components/lander/griffin_ramp_root_section_visual.usda": "61611c7cc5f8d53dcdd45bb164d21f24bdcaa09f7605d8229b9536743fcfa448",
+    "requirements/griffin_ramp_root_section_requirements.sysml": "f8338ebf98a10a290919a697d264a3c9c83aa8669350a388f69c2e968a13d222",
+    "requirements/griffin_vehicle_assembly.sysml": "d7362c03c1d98476d8161fc4f9d7f98b308683747ef5c63097a86633be61e18e",
+    "tests/griffin_ramp_packaging.usda": "843499024c356c8b052e54a332c20128eaaa0d1ef28830f8bec853464e6de08e",
+    "tools/griffin_ramp_packaging.rhai": "d5ff5aada0a4530c2bc502a9f083f692f1adf260eaf0b3f76421580d787c8fb0",
+    "tools/griffin_ramp_packaging_checks.rhai": "ec95bdc4680e247892e419c8514a577dc87bf21be59ef988e59550f254b12c6d",
+    "tools/griffin_ramp_section_checks.rhai": "18a2ade652dbe70474f8261fac9326d7618aeaeac200e513c08bb141cccc3351",
+    "tools/griffin_ramp_section_component.rhai": "1a49943fcb62c9554bbcc971537775d0ed15b54107ac04376a1ee5017c009ed4",
+    "vehicles/flip.usda": "c51fea3981af2d4aeaa0c7cc0699a32dc8f0eabc77da7de1d06f9f50a818bdd8",
+    "scenarios/tests/griffin_ramp_interface_study.rhai": "650074b9c01a2496f28bab2f712daf6d94bfd881033972aa71d3ba291b7660cb"
+  },
+  "study_script": {
+    "doc_id": 119594617591962,
+    "generation": 4,
+    "source_sha256": "650074b9c01a2496f28bab2f712daf6d94bfd881033972aa71d3ba291b7660cb",
+    "matches_file": true
+  },
+  "root_production": {
+    "engine_commit": "0cb4d37137554af3227a316100c903f44a1c3a4c",
+    "binary_sha256": "5b24ec52f8893910cf764334a75279a20522bfdd8d30d0bbfdb827b5ed28c73d",
+    "source_revision": 750804711896307413,
+    "cases": [
+      {
+        "name": "root",
+        "scene": "tests/griffin_ramp_root_section.usda",
+        "expected_exit": 0,
+        "actual_exit": 0,
+        "elapsed_s": 4.975385071000346,
+        "log_sha256": "a45e0c82f7adc22cd78ddacda45e9b60c4728b96c0837006aae5d33bf68555ae"
+      },
+      {
+        "name": "root-negative",
+        "scene": "tests/fixtures/griffin_ramp_root_section_short.usda",
+        "expected_exit": 1,
+        "actual_exit": 1,
+        "elapsed_s": 5.4766938609991485,
+        "log_sha256": "2298ce58499a2646c2cfd25736ef541237546c8c34802038d89f7b15d582f941"
+      }
+    ]
+  },
+  "root_production_scope_note": "Root component, root requirement and shared observer/planner inputs unchanged after this production run; later assembly-only bridge width changed the global SysML revision. Positive 127 pass; shortened-instance negative 126 pass and one expected failure.",
+  "sweep": {
+    "verdict": "pass",
+    "observations": 22176,
+    "payload_observations": 11088,
+    "bridge_observations": 11088,
+    "banks": [
+      0,
+      1
+    ],
+    "sections": [
+      "root",
+      "middle",
+      "toe"
+    ],
+    "phase_intervals": [
+      300,
+      180,
+      180,
+      1184
+    ],
+    "minimum_payload_certified_gap_m": 0.05011680483727207,
+    "required_payload_gap_m": 0.05,
+    "minimum_bridge_certified_gap_m": 2.2325991242406855e-06,
+    "bridge_minimum_interpretation": "Conservative interval lower bound after motion allowance, not a measured micrometre hardware clearance.",
+    "doc_id": 119596318330781,
+    "document_generation": 66,
+    "stage_generation": 3,
+    "source_revision": 10230336678615105864,
+    "evidence": "Aggregate terminal telemetry and source loop counters; no claim of persisted per-observation result rows.",
+    "log": "griffin-raised-root-interface-2026-10-23.log",
+    "log_sha256": "8b61cb10c4f6db65095c2069db6d22bbb2ddd368be1b3719383a85bfc3a9f448",
+    "references": [
+      {
+        "bank": 0,
+        "bank_axis_residual_m": 0.0,
+        "doc_id": 119596318330781,
+        "document_generation": 66,
+        "maximum_placement_residual_m": 0.0,
+        "part_count": 97,
+        "section": "root",
+        "source_revision": 10230336678615105864,
+        "stage_generation": 3
+      },
+      {
+        "bank": 0,
+        "bank_axis_residual_m": 0.0,
+        "doc_id": 119596318330781,
+        "document_generation": 66,
+        "maximum_placement_residual_m": 3.554447978966673e-16,
+        "part_count": 97,
+        "section": "middle",
+        "source_revision": 10230336678615105864,
+        "stage_generation": 3
+      },
+      {
+        "bank": 0,
+        "bank_axis_residual_m": 0.0,
+        "doc_id": 119596318330781,
+        "document_generation": 66,
+        "maximum_placement_residual_m": 4.236704743275018e-16,
+        "part_count": 85,
+        "section": "toe",
+        "source_revision": 10230336678615105864,
+        "stage_generation": 3
+      },
+      {
+        "bank": 1,
+        "bank_axis_residual_m": 8.881784197001252e-16,
+        "doc_id": 119596318330781,
+        "document_generation": 66,
+        "maximum_placement_residual_m": 0.0,
+        "part_count": 97,
+        "section": "root",
+        "source_revision": 10230336678615105864,
+        "stage_generation": 3
+      },
+      {
+        "bank": 1,
+        "bank_axis_residual_m": 5.438959822042073e-16,
+        "doc_id": 119596318330781,
+        "document_generation": 66,
+        "maximum_placement_residual_m": 3.554447978966673e-16,
+        "part_count": 97,
+        "section": "middle",
+        "source_revision": 10230336678615105864,
+        "stage_generation": 3
+      },
+      {
+        "bank": 1,
+        "bank_axis_residual_m": 4.965068306494546e-16,
+        "doc_id": 119596318330781,
+        "document_generation": 66,
+        "maximum_placement_residual_m": 4.236704743275018e-16,
+        "part_count": 85,
+        "section": "toe",
+        "source_revision": 10230336678615105864,
+        "stage_generation": 3
+      }
+    ],
+    "member_comparisons": 558
+  },
+  "nominal_seams": [
+    {
+      "bank": "Port",
+      "corners": [
+        [
+          2.422000000549541,
+          2.5259228367831223,
+          0.7100000083446504
+        ],
+        [
+          2.421999999840973,
+          2.5599999997048384,
+          0.7100000083446504
+        ],
+        [
+          2.422000000549541,
+          2.5259228367831223,
+          1.2899999916553495
+        ],
+        [
+          2.421999999840973,
+          2.5599999997048384,
+          1.2899999916553495
+        ]
+      ],
+      "doc_id": 119596318330781,
+      "document_generation": 66,
+      "front_face_x_spread_m": 7.08567871043897e-10,
+      "geometry_tolerance_m": 0.002,
+      "maximum_gap_m": 0.002000000549541081,
+      "minimum_gap_m": 0.00199999984097321,
+      "passes": true,
+      "requested_gap_m": 0.002,
+      "source_revision": 10230336678615105864,
+      "stage_generation": 3,
+      "target": "/GriffinFlipVisual/Griffin1/TransitionPlatePort/RampTrackPort",
+      "top_height_error_m": 2.9516167288079487e-10,
+      "track": "RampTrackPort"
+    },
+    {
+      "bank": "Port",
+      "corners": [
+        [
+          2.422000000549541,
+          2.5259228367831223,
+          -1.2899999916553495
+        ],
+        [
+          2.421999999840973,
+          2.5599999997048384,
+          -1.2899999916553495
+        ],
+        [
+          2.422000000549541,
+          2.5259228367831223,
+          -0.7100000083446504
+        ],
+        [
+          2.421999999840973,
+          2.5599999997048384,
+          -0.7100000083446504
+        ]
+      ],
+      "doc_id": 119596318330781,
+      "document_generation": 66,
+      "front_face_x_spread_m": 7.08567871043897e-10,
+      "geometry_tolerance_m": 0.002,
+      "maximum_gap_m": 0.002000000549541081,
+      "minimum_gap_m": 0.00199999984097321,
+      "passes": true,
+      "requested_gap_m": 0.002,
+      "source_revision": 10230336678615105864,
+      "stage_generation": 3,
+      "target": "/GriffinFlipVisual/Griffin1/TransitionPlatePort/RampTrackStarboard",
+      "top_height_error_m": 2.9516167288079487e-10,
+      "track": "RampTrackStarboard"
+    },
+    {
+      "bank": "Starboard",
+      "corners": [
+        [
+          -2.422000000549541,
+          2.5259228367831223,
+          -0.7100000083446504
+        ],
+        [
+          -2.421999999840973,
+          2.559999999704838,
+          -0.7100000083446504
+        ],
+        [
+          -2.4220000005495406,
+          2.5259228367831223,
+          -1.2899999916553495
+        ],
+        [
+          -2.421999999840973,
+          2.559999999704838,
+          -1.2899999916553495
+        ]
+      ],
+      "doc_id": 119596318330781,
+      "document_generation": 66,
+      "front_face_x_spread_m": 7.08567871043897e-10,
+      "geometry_tolerance_m": 0.002,
+      "maximum_gap_m": 0.002000000549541081,
+      "minimum_gap_m": 0.00199999984097321,
+      "passes": true,
+      "requested_gap_m": 0.002,
+      "source_revision": 10230336678615105864,
+      "stage_generation": 3,
+      "target": "/GriffinFlipVisual/Griffin1/TransitionPlateStarboard/RampTrackStarboard",
+      "top_height_error_m": 2.951621169700047e-10,
+      "track": "RampTrackPort"
+    },
+    {
+      "bank": "Starboard",
+      "corners": [
+        [
+          -2.422000000549541,
+          2.525922836783123,
+          1.2899999916553495
+        ],
+        [
+          -2.421999999840973,
+          2.559999999704839,
+          1.2899999916553495
+        ],
+        [
+          -2.422000000549541,
+          2.525922836783123,
+          0.7100000083446504
+        ],
+        [
+          -2.421999999840973,
+          2.5599999997048384,
+          0.7100000083446504
+        ]
+      ],
+      "doc_id": 119596318330781,
+      "document_generation": 66,
+      "front_face_x_spread_m": 7.08567871043897e-10,
+      "geometry_tolerance_m": 0.002,
+      "maximum_gap_m": 0.002000000549541081,
+      "minimum_gap_m": 0.00199999984097321,
+      "passes": true,
+      "requested_gap_m": 0.002,
+      "source_revision": 10230336678615105864,
+      "stage_generation": 3,
+      "target": "/GriffinFlipVisual/Griffin1/TransitionPlateStarboard/RampTrackPort",
+      "top_height_error_m": 2.9516167288079487e-10,
+      "track": "RampTrackStarboard"
+    }
+  ],
+  "camera": {
+    "path": "/FLIP/NavigationCameraMount/FrontCamera",
+    "type_name": "Camera",
+    "attrs": {
+      "clippingRange": [
+        0.10000000149011612,
+        100000.0
+      ],
+      "focalLength": 24.0,
+      "lunco:cameraLookAt": [
+        0.0,
+        0.75,
+        -12.0
+      ],
+      "lunco:cameraPose": "mounted",
+      "lunco:cameraRole": "viewport",
+      "xformOpOrder": [
+        "xformOp:translate"
+      ],
+      "xformOp:translate": [
+        0.0,
+        0.85,
+        -1.35
+      ]
+    },
+    "spawned": false,
+    "active": true,
+    "doc_id": 119595570397519,
+    "generation": 6,
+    "world_position": [
+      1.35,
+      0.85,
+      -2.997602166487923e-16
+    ],
+    "position_frame": "canonical_stage",
+    "document_generation": 6,
+    "stage_generation": 1,
+    "api_schemas": [
+      "LunCoCameraAPI"
+    ]
+  },
+  "preflights": {
+    "griffin_ramp_root_section_visual": {
+      "path": "twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda",
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "eedc17a3ebaf2704ee056a142485365e85f3250d3bf1e9a4f35962dfb96510a0"
+    },
+    "griffin_ramp_packaging": {
+      "path": "twin://astrobotic-griffin-1/tests/griffin_ramp_packaging.usda",
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "40ad72d5d9811437ae88185722e659a59d3333ee2a3e001efcee3c72718445cc"
+    },
+    "flip": {
+      "path": "twin://astrobotic-griffin-1/vehicles/flip.usda",
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "2b4e60dc402829f1079d705ac8559cbdf59ebb6ef61d22fd68b59ebb8f63a17e"
+    },
+    "griffin_ramp_interface_study": {
+      "path": "twin://astrobotic-griffin-1/scenarios/tests/griffin_ramp_interface_study.rhai",
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "7bdbcd1af736d24cfa04b1bc038d6d5bc634a90a81bfa519148ca13924247d07"
+    }
+  },
+  "sysml": {
+    "ok": true,
+    "errors": 0,
+    "existing_warnings": 153,
+    "source_revision": 10230336678615105864,
+    "receipt_sha256": "6a511edb2ac679145eaa5348f68275c6f518ceb3576433fb5e904ac652a617b4"
+  },
+  "remaining": [
+    "Other-bank, lander, panel, leg, ground and mating clearance",
+    "Production vehicle mechanism/joint/latch/mass/mission-phase promotion",
+    "Native loaded deployment and traversal",
+    "60 FPS at 1280x720 High and real-time physics"
+  ],
+  "production_vehicle_modified": false
+}

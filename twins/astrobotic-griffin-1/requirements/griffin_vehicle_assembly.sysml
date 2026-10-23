@@ -65,17 +65,23 @@ package GriffinVehicleAssemblyRequirements {
         attribute landerPath : UsdPrimPath = "/GriffinFlipVisual/Griffin1";
         attribute roverPath : UsdPrimPath = "/GriffinFlipVisual/FLIP";
         attribute banks : RampPackagingBankIdentity[2] = ("CandidateRampPort", "CandidateRampStarboard");
-        attribute portMountX : Real = 2.427114731507;
-        attribute starboardMountX : Real = -GriffinRampPackagingStudy::portMountX;
-        attribute mountY : Real = GriffinEgressRamp::physicalRampMountY;
         attribute mountZ : Real = GriffinEgressRamp::physicalRampMountZ;
         attribute transitionLengthM : Real = 1.42;
         attribute transitionOutboardX : Real = 2.42;
+        // Positive running clearance at the nominal mitered entrance. The
+        // native rigid-frame relation solves the raised bearing from the
+        // fixed deck top, this corner offset and the root's entry datum.
+        attribute hingeRunningClearanceM : Real = GriffinEgressRamp::physicalRampDeckTransitionInterfaceToleranceM;
+        attribute transitionTrackWidthM : Real = GriffinEgressRamp::assemblyTrackWidthM
+            - 2.0 * GriffinRampPackagingStudy::hingeRunningClearanceM;
+        attribute bridgeTireSideClearanceM : Real = (GriffinRampPackagingStudy::transitionTrackWidthM
+            - FlipRover::wheelWidthM) / 2.0;
         attribute rootClearanceAngleRad : Real = -GriffinEgressRamp::physicalRampSectionJointFrameOffsetRad;
         attribute payloadClearanceM : Real = 0.05;
         attribute nonAdjacentClearanceM : Real = 0.02;
         attribute rootClearanceStepRad : Real = GriffinRampPackagingStudy::rootClearanceAngleRad / 900.0;
         attribute sectionStepRad : Real = GriffinRampPackagingStudy::rootClearanceAngleRad / 90.0;
+        attribute rootLoweringStepRad : Real = GriffinRampPackagingStudy::rootClearanceStepRad;
         ref part root : GriffinRampRootSectionRequirements::RampRootSection;
         ref part middle : GriffinRampMiddleSectionRequirements::RampMiddleSection;
         ref part toe : GriffinRampToeSectionRequirements::RampToeSection;

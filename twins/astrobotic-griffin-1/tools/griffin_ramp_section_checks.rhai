@@ -1,5 +1,6 @@
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 import "griffin_spec" as spec;
+import "griffin_ramp_section_component" as component;
 import "lunco://scripting/tools/mechanical_relations" as mechanical;
 import "usd_geometry_inspection" as inspection;
 import "lunco://scripting/tools/sysml_requirement_checks" as checks;
@@ -21,7 +22,7 @@ fn observe(doc,root,profile){
     for name in ["lengthM","geometryToleranceM","entryFrameName","exitFrameName","entryAxisYM","exitAxisYM","plateAttachmentRunM","forkWebSizeM","hasExitHinge"]{
         names.push((profile.owner+"::")+name);
     }
-    if profile.section_index==2{names.push(profile.owner+"::deploymentAngleRad");}
+    if profile.section_index==0 || profile.section_index==2{names.push(profile.owner+"::deploymentAngleRad");}
     let source=sysml_requirements::source_with_selection(names,
         [profile.package_name+"::"+profile.requirement],[profile.package_name+"::"+profile.verification]);
     let length=sysml_requirements::number(source,(profile.owner+"::")+"lengthM");
@@ -35,6 +36,9 @@ fn observe(doc,root,profile){
             sysml_requirements::number(source,profile.owner+"::deploymentAngleRad"))
     }else{0.0};
     if bevel==() || !bevel.is_finite() || bevel<0.0 || bevel>=length{throw("Toe miter source is invalid");}
+    let inlet=if profile.section_index==0{component::entry_bevel(thickness,
+        sysml_requirements::number(source,profile.owner+"::deploymentAngleRad"))}else{0.0};
+    if inlet==() || !inlet.is_finite() || inlet<0.0 || inlet>=length{throw("Entrance miter source is invalid");}
     let paths=[root+"/RampTrackPort",root+"/RampTrackStarboard"];
     let guides=spec::ramp_guide_stations();
     for guide in guides {paths.push(root+"/"+guide.name);}
@@ -71,14 +75,19 @@ fn observe(doc,root,profile){
         list.push(attribute(profile,id+"-hull",path,"physics:approximation","convexHull"));
         for vertex in [2,3,6,7]{list.push(checks::array_component(id+"-tip-"+vertex.to_string(),
             profile.component,profile.requirement,profile.verification,path,"points",[vertex,0],length-if vertex==3 || vertex==7 {bevel}else{0.0},tolerance));}
+        if profile.section_index==0{
+            for vertex in [0,1,4,5]{list.push(checks::array_component(id+"-entrance-"+vertex.to_string(),
+                profile.component,profile.requirement,profile.verification,path,"points",[vertex,0],
+                if vertex==0 || vertex==4{inlet}else{0.0},tolerance));}
+        }
         list.push(coordinate(profile,id+"-station",path,"xformOp:translate",2,
             if i==0 {abs(spec::rover_wheel_station_z()[0])} else {-abs(spec::rover_wheel_station_z()[0])},tolerance));
         list.push(coordinate(profile,id+"-plane",path,"xformOp:translate",1,0.0,tolerance));
     }
     for side in ["Port","Starboard"]{
         let beam=root+"/UnderBeam"+side;
-        list.push(coordinate(profile,profile.short_name+"-beam-span-"+side,beam,"xformOp:scale",0,length,tolerance));
-        list.push(coordinate(profile,profile.short_name+"-beam-center-"+side,beam,"xformOp:translate",0,length/2.0,tolerance));
+        list.push(coordinate(profile,profile.short_name+"-beam-span-"+side,beam,"xformOp:scale",0,length-inlet,tolerance));
+        list.push(coordinate(profile,profile.short_name+"-beam-center-"+side,beam,"xformOp:translate",0,(length+inlet)/2.0,tolerance));
         for i in 0..spec::ramp_tread_count_per_section(){
             let tread=root+"/Tread"+side+(i+1).to_string();
             list.push(coordinate(profile,profile.short_name+"-tread-"+side+i.to_string(),tread,"xformOp:translate",0,

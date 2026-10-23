@@ -2,6 +2,12 @@ import "griffin_visual_builder" as visual;
 import "griffin_spec" as spec;
 import "lunco://scripting/tools/assembly_builder" as assembly;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
+import "lunco://scripting/tools/mechanical_relations" as mechanical;
+
+fn entry_bevel(thickness,angle){
+    if !angle.is_finite() || abs(angle)>=acos(-1.0)/2.0{throw("Entrance miter requires a nominal angle below vertical");}
+    mechanical::planar_horizontal_face_bevel_run(thickness,acos(-1.0)/2.0-abs(angle))
+}
 
 fn frame_name(model,owner,feature) {
     let value=model.value(owner+"::"+feature);
@@ -30,11 +36,40 @@ fn plan(doc, edit_target, root, group, owner, identity, section_index, deploymen
         }
         let datums=datums_plan(doc,edit_target,root,owner);
         if !datums.ok{return datums;}for op in datums.ops{result.ops.push(op);}
+        if section_index==0{
+            let inlet=entrance_plan(doc,edit_target,root,owner);
+            if !inlet.ok{return inlet;}for op in inlet.ops{result.ops.push(op);}
+        }
     }
     result.source_revision=model.source_revision;
     result.doc_id=doc;
     result.generation=part.document_generation;
     result
+}
+
+// Miter the entrance at the nominal deployed angle. The lower track corners
+// and beam start share one run, so no rectangular heel remains under the deck.
+fn entrance_plan(doc,edit_target,root,owner){
+    let model=sysml_requirements::model();let length=model.value(owner+"::lengthM");
+    let thickness=spec::ramp_surface_thickness_m();let width=spec::ramp_contact_track_width_m();
+    let bevel=entry_bevel(thickness,model.value(owner+"::deploymentAngleRad"));
+    if bevel==() || !bevel.is_finite() || bevel<0.0 || bevel>=length{throw("Entrance bevel is unavailable");}
+    let points=visual::_ramp_section_track_points(length,thickness,width,0.0);
+    for i in [0,4]{points[i][0]=bevel;}
+    let topology=visual::_ramp_section_track_topology();let ops=[];
+    for name in ["RampTrackPort","RampTrackStarboard"]{
+        let geometry=assembly::mesh_geometry_update_plan(edit_target,root+"/"+name,points,topology.face_counts,topology.face_indices);
+        if !geometry.ok{return geometry;}for op in geometry.ops{ops.push(op);}
+    }
+    for beam in [#{name:"UnderBeamPort",z:spec::ramp_under_beam_center_offset_z_m()},
+        #{name:"UnderBeamStarboard",z:-spec::ramp_under_beam_center_offset_z_m()}]{
+        let pose=assembly::place_plan(edit_target,root+"/"+beam.name,
+            [(length+bevel)/2.0,spec::ramp_under_beam_center_y_m(),beam.z],(),
+            [length-bevel,spec::ramp_under_beam_height_m(),spec::ramp_under_beam_width_m()]);
+        if !pose.ok{return pose;}for op in pose.ops{ops.push(op);}
+    }
+    #{ok:true,ops:ops,doc_id:doc,generation:query("QueryUsdPrim",#{doc_id:doc,path:root}).document_generation,
+        source_revision:model.source_revision,entry_bevel_m:bevel,kind:"griffin_root_entrance"}
 }
 
 

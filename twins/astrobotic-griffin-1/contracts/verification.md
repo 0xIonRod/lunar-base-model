@@ -1,7 +1,7 @@
 # Griffin verification boundary
 
 The [22 October packaging checkpoint](griffin-integrated-packaging-review.md)
-records the latest saved geometry and focused verification. Earlier results
+records the installed vehicle geometry and focused verification. Earlier results
 below belong to their recorded revisions. Loaded-support physics, complete
 mission acceptance and the 60 FPS real-time target remain open.
 
@@ -31,6 +31,16 @@ plus native comparison of all 558 installed reference members. GVA-001 remains
 unmapped and unaccepted as a full integration case. The production vehicle's
 old mechanism, other obstacle clearances, loaded deployment and 60 FPS remain
 open; a static study cannot replace those checks.
+
+The later [raised root interface](griffin-raised-root-interface-2026-10-23.md)
+supersedes that candidate's fixed-bridge obstruction. The revised root passes
+127 production checks and its shortened-instance negative fails as required.
+Both banks pass 22,176 payload/bridge observations with between-sample motion
+allowance; minimum payload separation is 50.1168 mm, all four nominal seams
+measure 2 mm, and all 558 source-member comparisons pass. Root, fixture,
+FLIP and study preflights have zero errors/warnings. SysML validation retains
+153 existing warnings. The installed vehicle, complete obstacle clearance,
+loaded deployment/traversal and 60 FPS remain unaccepted.
 
 ## Sun-facing autonomous descent
 

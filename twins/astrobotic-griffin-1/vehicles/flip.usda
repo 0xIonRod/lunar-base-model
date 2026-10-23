@@ -9,7 +9,7 @@ def Xform "FLIP" (
     documentation = "Astrolab FLIP four-wheel lunar rover study proxy with finite EPS and Modelica drivetrain."
     kind = "assembly"
     prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "PhysxVehicleTankDifferentialAPI", "LunCoCatalogAPI", "CollectionAPI:components"]
-    prepend references = [@lunco://components/avionics/obc.usda@</OBC>, @lunco://components/cameras/rover_front_camera.usda@</RoverFrontCamera>, @lunco://components/mobility/drive_laws/modelica_skid.usda@</DriveLaw>]
+    prepend references = [@lunco://components/avionics/obc.usda@</OBC>, @lunco://components/mobility/drive_laws/modelica_skid.usda@</DriveLaw>]
     prepend variantSets = "drivetrain"
     variants = { string "drivetrain" = "raycast" }
 )
@@ -1010,5 +1010,16 @@ def Xform "FLIP" (
     def "Drivetrain"
     {
         double parameters:forward_yaw_offset = -1.5707963267948966
+    }
+    def Xform "NavigationCameraMount"
+    {
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+        def Camera "FrontCamera" (
+            prepend references = @lunco://components/cameras/rover_front_camera.usda@</FrontCamera>
+        )
+        {
+        }
     }
 }

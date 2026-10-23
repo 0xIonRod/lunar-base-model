@@ -1,5 +1,9 @@
 # Griffin ramp packaging and deployment study
 
+The later [raised root interface](griffin-raised-root-interface-2026-10-23.md)
+supersedes this candidate bridge obstruction and records the current saved
+fixture. Results below apply to their stated earlier revisions.
+
 This is a reconstruction geometry study. The new section assets are detached;
 `vehicles/griffin_1.usda` still contains its old equal-length mechanism and
 confirmed transition interference. No loaded or flight qualification is claimed.
@@ -128,7 +132,7 @@ mass properties and the root-upright mission phase still need promotion into
 its earlier mechanism and known transition interference. No new landing,
 egress or FPS acceptance is claimed by this static checkpoint.
 
-## Fixed-structure follow-up: hinge seam still obstructed
+## Earlier fixed-structure follow-up: hinge seam obstruction
 
 The next stowed-pose survey tests each section on both banks against 476 fixed
 lander members: 2,856 section/target comparisons. It leaves two visible antenna
