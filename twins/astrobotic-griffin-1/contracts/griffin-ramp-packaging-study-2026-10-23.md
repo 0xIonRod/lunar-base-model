@@ -127,3 +127,35 @@ mass properties and the root-upright mission phase still need promotion into
 `vehicles/griffin_1.usda` and its loaded production gates. That vehicle retains
 its earlier mechanism and known transition interference. No new landing,
 egress or FPS acceptance is claimed by this static checkpoint.
+
+## Fixed-structure follow-up: hinge seam still obstructed
+
+The next stowed-pose survey tests each section on both banks against 476 fixed
+lander members: 2,856 section/target comparisons. It leaves two visible antenna
+NURBS pieces explicitly unmeasured because their native `geometry_bounds` are
+unavailable. It is therefore not complete lander-clearance evidence.
+
+Eight target comparisons have overlapping member envelopes: four at the root
+bearing supports, and four at the fixed bridge plates. Bearing-support overlap
+needs its own mating/shaft-housing interpretation. The plate obstruction is
+confirmed more strongly: each root walking mesh has exactly the eight corners
+of a rectangular solid and six quad faces. Native f64 rigid-frame SAT against
+its matching fixed Cube gives a signed axis margin of approximately
+**-0.0154411236970564 m** on all four tracks. Starboard correspondence is
+mirrored in Z. This establishes an intersection of the authored solids; the
+signed SAT margin is not a runtime contact-penetration measurement.
+
+A temporary, unsaved pin-pocket experiment did not close this interface: it
+cleared a different part of the plate while leaving the root walking heel
+inside the central strip. Both native journal groups were undone and the
+document restored to its saved source. The recipe and fixture remain exactly
+as committed in `9c875e7`; no pocket variant or collision exclusion is retained.
+
+The root's rotating heel, fixed walking edge, bearing axis and eventual wheel
+crossing must be designed together before promotion. The existing source
+transition interface/overlap acceptance must be reviewed against that coherent
+geometry. Raising a force limit, disabling contact or accepting only the pin
+clearance would leave the real obstruction in place. The payload-only path
+study above remains valid, but does not accept this failed bridge interface.
+[The follow-up receipt](evidence/griffin-ramp-bridge-interference-2026-10-23.json)
+pins the exact solid observations and incomplete survey scope.

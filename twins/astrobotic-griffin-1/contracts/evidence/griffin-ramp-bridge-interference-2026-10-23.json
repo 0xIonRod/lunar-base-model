@@ -1,0 +1,532 @@
+{
+  "status": "bridge_interface_interference_confirmed_full_lander_clearance_open",
+  "source_revision": 18059387422882714778,
+  "model_geometry_commit": "9c875e71d7aae5cfaf66659e03c29f634f06d3f1",
+  "engine_commit": "0cb4d37137554af3227a316100c903f44a1c3a4c",
+  "binary_sha256": "5b24ec52f8893910cf764334a75279a20522bfdd8d30d0bbfdb827b5ed28c73d",
+  "survey": {
+    "fixed_members_measured": 476,
+    "section_target_comparisons": 2856,
+    "overlapping_target_comparisons": [
+      {
+        "bank": 0,
+        "section": 0,
+        "gap": -0.020205776568688827,
+        "member": "/RampSection/OuterRailJointPin",
+        "target": "/GriffinFlipVisual/Griffin1/TransitionPlatePort/RampTrackPort"
+      },
+      {
+        "bank": 0,
+        "section": 0,
+        "gap": -0.020205776568688827,
+        "member": "/RampSection/InnerRailJointPin",
+        "target": "/GriffinFlipVisual/Griffin1/TransitionPlatePort/RampTrackStarboard"
+      },
+      {
+        "bank": 0,
+        "section": 0,
+        "gap": -0.05232050807568868,
+        "member": "/RampSection/CenterRailStarboardJointPin",
+        "target": "/GriffinFlipVisual/Griffin1/RampMountPortInnerRear"
+      },
+      {
+        "bank": 0,
+        "section": 0,
+        "gap": -0.05232050807568868,
+        "member": "/RampSection/CenterRailPortJointPin",
+        "target": "/GriffinFlipVisual/Griffin1/RampMountPortInnerFront"
+      },
+      {
+        "bank": 1,
+        "section": 0,
+        "gap": -0.020205776568688827,
+        "member": "/RampSection/InnerRailJointPin",
+        "target": "/GriffinFlipVisual/Griffin1/TransitionPlateStarboard/RampTrackPort"
+      },
+      {
+        "bank": 1,
+        "section": 0,
+        "gap": -0.020205776568688827,
+        "member": "/RampSection/OuterRailJointPin",
+        "target": "/GriffinFlipVisual/Griffin1/TransitionPlateStarboard/RampTrackStarboard"
+      },
+      {
+        "bank": 1,
+        "section": 0,
+        "gap": -0.05232050807568868,
+        "member": "/RampSection/CenterRailPortJointPin",
+        "target": "/GriffinFlipVisual/Griffin1/RampMountStarboardInnerRear"
+      },
+      {
+        "bank": 1,
+        "section": 0,
+        "gap": -0.05232050807568868,
+        "member": "/RampSection/CenterRailStarboardJointPin",
+        "target": "/GriffinFlipVisual/Griffin1/RampMountStarboardInnerFront"
+      }
+    ],
+    "unavailable_members": [
+      {
+        "path": "/GriffinFlipVisual/Griffin1/HighGainDish/YawHead/DishGimbal/DishHead/Reflector",
+        "type_name": "NurbsPatch",
+        "reason": "native geometry_bounds unavailable"
+      },
+      {
+        "path": "/GriffinFlipVisual/Griffin1/HighGainDish/YawHead/DishGimbal/DishHead/FeedArm",
+        "type_name": "NurbsCurves",
+        "reason": "native geometry_bounds unavailable"
+      }
+    ],
+    "full_survey_sha256": "ec38cb926f9a50e6502895493143b4bdceb2a743069f99673c7975a2ebeccd70",
+    "exclusions": "Candidate/retired ramp banks and Exhaust plume geometry; mating bearings are observed, not automatically accepted."
+  },
+  "exact_box_observations": [
+    {
+      "bank": "Port",
+      "doc_id": 119590155011470,
+      "document_generation": 185,
+      "margin_m": -0.015441123697056414,
+      "separated": false,
+      "source_bounds": {
+        "center": [
+          1.0745420455932617,
+          0.0,
+          1.0
+        ],
+        "fidelity": "exact",
+        "frame": "canonical_stage",
+        "half_extents": [
+          1.0745420455932617,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        "max": [
+          2.1490840911865234,
+          0.014999999664723873,
+          1.2899999916553497
+        ],
+        "min": [
+          0.0,
+          -0.014999999664723873,
+          0.7100000083446503
+        ]
+      },
+      "source_face_counts": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "source_points": [
+        [
+          0.0,
+          -0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          0.0,
+          0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          -0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          0.0,
+          -0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          0.0,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          -0.014999999664723873,
+          0.28999999165534973
+        ]
+      ],
+      "stage_generation": 4,
+      "target": "/GriffinFlipVisual/Griffin1/TransitionPlatePort/RampTrackPort",
+      "target_bounds": {
+        "center": [
+          1.71,
+          2.545,
+          1.0
+        ],
+        "fidelity": "exact",
+        "frame": "canonical_stage",
+        "half_extents": [
+          0.71,
+          0.015000000000000124,
+          0.29000000000000004
+        ],
+        "max": [
+          2.42,
+          2.56,
+          1.29
+        ],
+        "min": [
+          1.0,
+          2.53,
+          0.71
+        ]
+      },
+      "track": "RampTrackPort"
+    },
+    {
+      "bank": "Port",
+      "doc_id": 119590155011470,
+      "document_generation": 185,
+      "margin_m": -0.015441123697056414,
+      "separated": false,
+      "source_bounds": {
+        "center": [
+          1.0745420455932617,
+          0.0,
+          -1.0
+        ],
+        "fidelity": "exact",
+        "frame": "canonical_stage",
+        "half_extents": [
+          1.0745420455932617,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        "max": [
+          2.1490840911865234,
+          0.014999999664723873,
+          -0.7100000083446503
+        ],
+        "min": [
+          0.0,
+          -0.014999999664723873,
+          -1.2899999916553497
+        ]
+      },
+      "source_face_counts": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "source_points": [
+        [
+          0.0,
+          -0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          0.0,
+          0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          -0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          0.0,
+          -0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          0.0,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          -0.014999999664723873,
+          0.28999999165534973
+        ]
+      ],
+      "stage_generation": 4,
+      "target": "/GriffinFlipVisual/Griffin1/TransitionPlatePort/RampTrackStarboard",
+      "target_bounds": {
+        "center": [
+          1.71,
+          2.545,
+          -1.0
+        ],
+        "fidelity": "exact",
+        "frame": "canonical_stage",
+        "half_extents": [
+          0.71,
+          0.015000000000000124,
+          0.29000000000000004
+        ],
+        "max": [
+          2.42,
+          2.56,
+          -0.71
+        ],
+        "min": [
+          1.0,
+          2.53,
+          -1.29
+        ]
+      },
+      "track": "RampTrackStarboard"
+    },
+    {
+      "bank": "Starboard",
+      "doc_id": 119590155011470,
+      "document_generation": 185,
+      "margin_m": -0.015441123697056636,
+      "separated": false,
+      "source_bounds": {
+        "center": [
+          1.0745420455932617,
+          0.0,
+          1.0
+        ],
+        "fidelity": "exact",
+        "frame": "canonical_stage",
+        "half_extents": [
+          1.0745420455932617,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        "max": [
+          2.1490840911865234,
+          0.014999999664723873,
+          1.2899999916553497
+        ],
+        "min": [
+          0.0,
+          -0.014999999664723873,
+          0.7100000083446503
+        ]
+      },
+      "source_face_counts": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "source_points": [
+        [
+          0.0,
+          -0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          0.0,
+          0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          -0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          0.0,
+          -0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          0.0,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          -0.014999999664723873,
+          0.28999999165534973
+        ]
+      ],
+      "stage_generation": 4,
+      "target": "/GriffinFlipVisual/Griffin1/TransitionPlateStarboard/RampTrackStarboard",
+      "target_bounds": {
+        "center": [
+          -1.71,
+          2.545,
+          -1.0
+        ],
+        "fidelity": "exact",
+        "frame": "canonical_stage",
+        "half_extents": [
+          0.71,
+          0.015000000000000124,
+          0.29000000000000004
+        ],
+        "max": [
+          -1.0,
+          2.56,
+          -0.71
+        ],
+        "min": [
+          -2.42,
+          2.53,
+          -1.29
+        ]
+      },
+      "track": "RampTrackPort"
+    },
+    {
+      "bank": "Starboard",
+      "doc_id": 119590155011470,
+      "document_generation": 185,
+      "margin_m": -0.015441123697056192,
+      "separated": false,
+      "source_bounds": {
+        "center": [
+          1.0745420455932617,
+          0.0,
+          -1.0
+        ],
+        "fidelity": "exact",
+        "frame": "canonical_stage",
+        "half_extents": [
+          1.0745420455932617,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        "max": [
+          2.1490840911865234,
+          0.014999999664723873,
+          -0.7100000083446503
+        ],
+        "min": [
+          0.0,
+          -0.014999999664723873,
+          -1.2899999916553497
+        ]
+      },
+      "source_face_counts": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "source_points": [
+        [
+          0.0,
+          -0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          0.0,
+          0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          -0.014999999664723873,
+          -0.28999999165534973
+        ],
+        [
+          0.0,
+          -0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          0.0,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          0.014999999664723873,
+          0.28999999165534973
+        ],
+        [
+          2.1490840911865234,
+          -0.014999999664723873,
+          0.28999999165534973
+        ]
+      ],
+      "stage_generation": 4,
+      "target": "/GriffinFlipVisual/Griffin1/TransitionPlateStarboard/RampTrackPort",
+      "target_bounds": {
+        "center": [
+          -1.71,
+          2.545,
+          1.0
+        ],
+        "fidelity": "exact",
+        "frame": "canonical_stage",
+        "half_extents": [
+          0.71,
+          0.015000000000000124,
+          0.29000000000000004
+        ],
+        "max": [
+          -1.0,
+          2.56,
+          1.29
+        ],
+        "min": [
+          -2.42,
+          2.53,
+          0.71
+        ]
+      },
+      "track": "RampTrackStarboard"
+    }
+  ],
+  "interpretation": "All four root track solids intersect their matching fixed bridge. Signed SAT margins are geometry separation margins, not runtime contact penetrations. Bearing-housing envelopes require separate mating assessment.",
+  "experiment": {
+    "pin_pockets_accepted": false,
+    "saved": false,
+    "native_undo_groups": 2,
+    "saved_source_restored": true,
+    "recipe_restored": true
+  },
+  "next_owner": "USD reconstruction: coherent heel, fixed bridge edge, bearing-axis and wheel-crossing geometry before installed promotion. Optimization retains native physics ownership.",
+  "source_sha256": {
+    "tests/griffin_ramp_packaging.usda": "1a0222dba7e023cdb5c4e9188e7c9eb74fbc95ea5805d7fc36accb1c8d819b55",
+    "components/lander/griffin_ramp_root_section_visual.usda": "ecde238ca2c7b12dddaf2e776d0e58188a0566662ce7fbe89d852080b7f40491",
+    "tools/griffin_ramp_packaging.rhai": "29a68852d51380bfcf3821ee561267a145707473db42613c745409e6a414360d",
+    "tools/griffin_ramp_packaging_checks.rhai": "2b8150844bfcc7f6153b1f18aa1c3c72f0eae6ebe84a2623f544a50f2701752c"
+  }
+}
