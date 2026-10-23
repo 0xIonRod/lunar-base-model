@@ -1562,6 +1562,31 @@ package GriffinRequirementSources {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/griffin-root-bearing-2026-10-23.md";
     }
+    part source_venturi_wheel_2023 : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://venturi.space/en/article/world-premiere-venturi-hyper-deformable-lunar-wheel/";
+    }
+    part source_venturi_wheel_media_2023 : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.venturi.com/wp-content/uploads/2023/06/Media_Kit_Venturi_Wheel.pdf";
+    }
+    part source_flip_airless_wheel_study : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/flip-airless-wheel-2026-10-23.md";
+    }
+    part evidence_faw_001 : RequirementEvidence {
+        ref targetRequirement = FlipAirlessWheelRequirements::faw001;
+        ref sources = (source_venturi_wheel_2023, source_venturi_wheel_media_2023,
+            source_www_astrolab_space_flip_rover, source_flip_airless_wheel_study);
+    }
+    part evidence_faw_002 : RequirementEvidence {
+        ref targetRequirement = FlipAirlessWheelRequirements::faw002;
+        ref sources = (source_venturi_wheel_media_2023, source_flip_airless_wheel_study);
+    }
+    part evidence_faw_003 : RequirementEvidence {
+        ref targetRequirement = FlipAirlessWheelRequirements::faw003;
+        ref sources = (source_project_authoring_policy, source_flip_airless_wheel_study);
+    }
     part root_bearing_evidence : RequirementEvidence {
         ref targetRequirement = GriffinRampRootBearingRequirements::grb001;
         ref sources = (source_root_bearing_reconstruction);

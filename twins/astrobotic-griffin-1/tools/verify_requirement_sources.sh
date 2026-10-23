@@ -47,7 +47,7 @@ for legacy in ("requirementId", "qualifiedRequirement", "sourceReference", "rati
             f"legacy duplicate evidence field remains: {legacy}")
 
 source_parts = {}
-for match in re.finditer(r"\bpart\s+(source_[A-Za-z0-9_]+)\s*:\s*EvidenceSource\s*\{([^{}]*)\}", catalog):
+for match in re.finditer(r"\bpart\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*EvidenceSource\s*\{([^{}]*)\}", catalog):
     name, body = match.groups()
     require(name not in source_parts, f"duplicate source element: {name}")
     role_values = re.findall(r"attribute\s+role\s*:\s*EvidenceSourceRole\s*=\s*\"([^\"]+)\"\s*;", body)
@@ -79,7 +79,7 @@ require(requirement_targets, "no standard SysML requirement short names found")
 
 evidence_targets = {}
 evidence_count = 0
-for match in re.finditer(r"\bpart\s+(evidence_[A-Za-z0-9_]+)\s*:\s*RequirementEvidence\s*\{([^{}]*)\}", catalog):
+for match in re.finditer(r"\bpart\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*RequirementEvidence\s*\{([^{}]*)\}", catalog):
     evidence_name, body = match.groups()
     evidence_count += 1
     targets = re.findall(r"\bref\s+targetRequirement\s*=\s*([A-Za-z_][A-Za-z0-9_:]*)\s*;", body)

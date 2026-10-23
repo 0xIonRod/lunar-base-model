@@ -15,6 +15,12 @@ paths = ["requirements"]
 
 [verification]
 [[verification.cases]]
+name = "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel"
+scene = "tests/flip_airless_wheel.usda"
+script = "scenarios/tests/flip_airless_wheel.rhai"
+verdict_channel = "FLIP_AIRLESS_WHEEL"
+
+[[verification.cases]]
 name = "GriffinRampRootBearingRequirements::Verify_GriffinRampRootBearing"
 scene = "tests/griffin_ramp_root_bearing.usda"
 script = "scenarios/tests/griffin_ramp_root_bearing.rhai"
@@ -334,6 +340,12 @@ name = "griffin.ramp_toe_section"
 requirements = "requirements/griffin_ramp_toe_section_requirements.sysml"
 verification = "GriffinRampToeSectionRequirements::Verify_GriffinRampToeSection"
 usd_path = "/World/RampToeSection"
+
+[[components]]
+name = "flip.airless_wheel_visual"
+requirements = "requirements/flip_airless_wheel_requirements.sysml"
+verification = "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel"
+usd_path = "/World/AirlessWheel"
 
 [[components]]
 name = "griffin.ramp_root_bearing"

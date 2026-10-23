@@ -58,6 +58,12 @@ track obstruction is rejected. The two unmeasured antenna members and all
 moving-to-moving interfaces remain open; this does not accept GVA-001 or loaded
 deployment.
 
+The detached [FLIP airless wheel](flip-airless-wheel-2026-10-23.md) passes 62
+production checks for its source envelope, closed mesh architecture, four
+material networks and render budget. The oversized fixture and wrong-material
+negative each fail one check. This does not qualify installed roll, contact
+deformation or whole-scene FPS; the production rover still uses its prior visual.
+
 ## Sun-facing autonomous descent
 
 The operator-requested GSA-011 study yaws the forward solar bank's +Z outward

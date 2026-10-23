@@ -74,6 +74,10 @@ observations, with explicit between-sample allowance and obstruction rejection.
 The dish, feed arm and moving-to-moving interfaces remain outside that result.
 The production vehicle still contains the earlier mechanism. Full obstacle
 clearance, native loaded deployment and clean 60 FPS remain open.
+The detached [airless wheel component](contracts/flip-airless-wheel-2026-10-23.md)
+now reconstructs Venturi's cable/spring wheel architecture and passes 62
+production checks. It is not yet installed on the rover; the existing physical
+wheel, contact model and active cylinder/shader appearance remain unchanged.
 The seven-engine/four-leg configuration is source-backed; current metric
 dimensions, mass properties and propulsion ratings remain reconstruction or
 integration-study inputs.

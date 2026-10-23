@@ -1,0 +1,2145 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "scope": "Detached render-only FLIP airless wheel component; installed wheel/roll, deformation, ramp paths and full-scene FPS unaccepted",
+  "runtime": {
+    "binary_revision": "0cb4d37137554af3227a316100c903f44a1c3a4c",
+    "binary_sha256": "5b24ec52f8893910cf764334a75279a20522bfdd8d30d0bbfdb827b5ed28c73d",
+    "usd_checkout_revision": "f934f92054a228017671a977cb2eb265f2f94657",
+    "editor_pid": 53186,
+    "editor_api_port": 4391,
+    "editor_authority": "astrobotic-griffin-1--mount-11",
+    "test_ports_released": [
+      4394,
+      4395
+    ]
+  },
+  "production": [
+    {
+      "label": "positive",
+      "scene": "flip_airless_wheel.usda",
+      "port": 4394,
+      "expected_exit": 0,
+      "command": [
+        "/home/rod/Documents/luncosim-workspace/usd/target/debug/luncosim",
+        "test",
+        "--scene",
+        "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/flip_airless_wheel.usda",
+        "--verification",
+        "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel",
+        "--verdict-channel",
+        "FLIP_AIRLESS_WHEEL",
+        "--max-ticks",
+        "1200",
+        "--tick-hz",
+        "60",
+        "--threads",
+        "1",
+        "--jitter",
+        "0",
+        "--api",
+        "4394"
+      ],
+      "pid": 815075,
+      "exit_code": 0,
+      "wall_seconds": 11.207734622999851,
+      "summary": {
+        "channel": "FLIP_AIRLESS_WHEEL",
+        "error_count": 0,
+        "failure_count": 0,
+        "inconclusive_count": 0,
+        "non_pass_count": 0,
+        "pass_count": 62,
+        "requirement_count": 3,
+        "requirement_names": [
+          "FlipAirlessWheelRequirements::faw002",
+          "FlipAirlessWheelRequirements::faw001",
+          "FlipAirlessWheelRequirements::faw003"
+        ],
+        "requirement_summary": {
+          "FlipAirlessWheelRequirements::faw001": {
+            "checks": 5,
+            "errors": 0,
+            "failures": 0,
+            "inconclusive": 0,
+            "passes": 5,
+            "unverified": 0
+          },
+          "FlipAirlessWheelRequirements::faw002": {
+            "checks": 56,
+            "errors": 0,
+            "failures": 0,
+            "inconclusive": 0,
+            "passes": 56,
+            "unverified": 0
+          },
+          "FlipAirlessWheelRequirements::faw003": {
+            "checks": 1,
+            "errors": 0,
+            "failures": 0,
+            "inconclusive": 0,
+            "passes": 1,
+            "unverified": 0
+          }
+        },
+        "result_count": 62,
+        "schema_version": 3,
+        "source_revision": 5722064762575710188,
+        "title": "FLIP AIRLESS WHEEL",
+        "unverified_count": 0,
+        "verdict": "pass",
+        "verification": "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel"
+      },
+      "checks": [
+        {
+          "id": "FAW-002-binding-Hub",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Rim",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Web0",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Web1",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Fasteners",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Carrier",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Blades0",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Blades1",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Cables0",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Cables1",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Cables2",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Cables3",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs0",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs1",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs2",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs3",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs4",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs5",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs6",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs7",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs8",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs9",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs10",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs11",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-material",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-surface-model",
+          "kind": "attribute_equals",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-color-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-color-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-color-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-Metallic",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-Roughness",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-002-Metal-normalized",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-material",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-surface-model",
+          "kind": "attribute_equals",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-color-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-color-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-color-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-Metallic",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-Roughness",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-002-Cable-normalized",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-material",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-surface-model",
+          "kind": "attribute_equals",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-color-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-color-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-color-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-Metallic",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-Roughness",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-002-Blade-normalized",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-material",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-surface-model",
+          "kind": "attribute_equals",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-color-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-color-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-color-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-Metallic",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-Roughness",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-002-Carrier-normalized",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-001-geometry",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-003-cost",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw003",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-001-axis",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-001-axis-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-001-axis-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-001-axis-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "pass"
+        }
+      ],
+      "measurements": {
+        "blades": 96,
+        "cables": 192,
+        "envelope_excess_m": 1.528796333971627e-08,
+        "geometry_valid": true,
+        "maximum_cable_seat_error_m": 1.666000468656264e-08,
+        "maximum_cable_tread_excess_m": -0.00079996878377947,
+        "maximum_radius_error_m": 1.528796333971627e-08,
+        "meshes": 24,
+        "springs": 96,
+        "triangles": 23328,
+        "width_error_m": 1.19209286886246e-09
+      },
+      "runner_report": {
+        "schema_version": 2,
+        "verification": "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel",
+        "process_exit_code": 0,
+        "process_status": "verdict_produced",
+        "expected_source_revision": null,
+        "source_revision_at_start": 5722064762575710188,
+        "source_revision_at_end": 5722064762575710188,
+        "verdict": "pass",
+        "verdict_channel": "FLIP_AIRLESS_WHEEL",
+        "evidence": [
+          {
+            "name": "FLIP_AIRLESS_WHEEL_EVIDENCE_STREAM_SUMMARY",
+            "sim_tick": 520,
+            "data": {
+              "Map": {
+                "channel": {
+                  "String": "FLIP_AIRLESS_WHEEL"
+                },
+                "error_count": {
+                  "I64": 0
+                },
+                "failure_count": {
+                  "I64": 0
+                },
+                "inconclusive_count": {
+                  "I64": 0
+                },
+                "non_pass_count": {
+                  "I64": 0
+                },
+                "pass_count": {
+                  "I64": 62
+                },
+                "requirement_count": {
+                  "I64": 3
+                },
+                "requirement_names": {
+                  "Array": [
+                    {
+                      "String": "FlipAirlessWheelRequirements::faw002"
+                    },
+                    {
+                      "String": "FlipAirlessWheelRequirements::faw001"
+                    },
+                    {
+                      "String": "FlipAirlessWheelRequirements::faw003"
+                    }
+                  ]
+                },
+                "requirement_summary": {
+                  "Map": {
+                    "FlipAirlessWheelRequirements::faw001": {
+                      "Map": {
+                        "checks": {
+                          "I64": 5
+                        },
+                        "errors": {
+                          "I64": 0
+                        },
+                        "failures": {
+                          "I64": 0
+                        },
+                        "inconclusive": {
+                          "I64": 0
+                        },
+                        "passes": {
+                          "I64": 5
+                        },
+                        "unverified": {
+                          "I64": 0
+                        }
+                      }
+                    },
+                    "FlipAirlessWheelRequirements::faw002": {
+                      "Map": {
+                        "checks": {
+                          "I64": 56
+                        },
+                        "errors": {
+                          "I64": 0
+                        },
+                        "failures": {
+                          "I64": 0
+                        },
+                        "inconclusive": {
+                          "I64": 0
+                        },
+                        "passes": {
+                          "I64": 56
+                        },
+                        "unverified": {
+                          "I64": 0
+                        }
+                      }
+                    },
+                    "FlipAirlessWheelRequirements::faw003": {
+                      "Map": {
+                        "checks": {
+                          "I64": 1
+                        },
+                        "errors": {
+                          "I64": 0
+                        },
+                        "failures": {
+                          "I64": 0
+                        },
+                        "inconclusive": {
+                          "I64": 0
+                        },
+                        "passes": {
+                          "I64": 1
+                        },
+                        "unverified": {
+                          "I64": 0
+                        }
+                      }
+                    }
+                  }
+                },
+                "result_count": {
+                  "I64": 62
+                },
+                "schema_version": {
+                  "I64": 3
+                },
+                "source_revision": {
+                  "U64": 5722064762575710188
+                },
+                "title": {
+                  "String": "FLIP AIRLESS WHEEL"
+                },
+                "unverified_count": {
+                  "I64": 0
+                },
+                "verdict": {
+                  "String": "pass"
+                },
+                "verification": {
+                  "String": "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel"
+                }
+              }
+            }
+          },
+          {
+            "name": "FLIP_AIRLESS_WHEEL_EVIDENCE",
+            "sim_tick": 520,
+            "data": {
+              "Map": {
+                "channel": {
+                  "String": "FLIP_AIRLESS_WHEEL"
+                },
+                "check_count": {
+                  "I64": 62
+                },
+                "error_count": {
+                  "I64": 0
+                },
+                "evidence_chunked": {
+                  "Bool": true
+                },
+                "evidence_result_events": {
+                  "I64": 62
+                },
+                "failure_count": {
+                  "I64": 0
+                },
+                "failures": {
+                  "Array": []
+                },
+                "inconclusive_count": {
+                  "I64": 0
+                },
+                "metrics": {
+                  "Map": {
+                    "clock": {
+                      "Map": {
+                        "admitted_sim_elapsed_s": {
+                          "F64": 8.666666666666666
+                        },
+                        "barrier_active_participants": {
+                          "I64": 0
+                        },
+                        "barrier_held": {
+                          "Bool": false
+                        },
+                        "barrier_shared_clock_participants": {
+                          "I64": 0
+                        },
+                        "barrier_worst_lag_s": {
+                          "F64": 0.0
+                        },
+                        "celestial_delta_s": {
+                          "F64": 0.016666666666667496
+                        },
+                        "celestial_epoch_jd": {
+                          "F64": 2461336.708081437
+                        },
+                        "celestial_parent": {
+                          "String": "world_time"
+                        },
+                        "celestial_rate": {
+                          "F64": 1.0
+                        },
+                        "celestial_time_available": {
+                          "Bool": true
+                        },
+                        "clock_contract_error": {
+                          "String": ""
+                        },
+                        "clock_contract_ok": {
+                          "Bool": true
+                        },
+                        "deterministic_master": {
+                          "String": "sim_tick"
+                        },
+                        "domains": {
+                          "Array": [
+                            {
+                              "Map": {
+                                "dt_s": {
+                                  "F64": 0.01666666699999908
+                                },
+                                "name": {
+                                  "String": "real"
+                                },
+                                "t_s": {
+                                  "F64": 10.250000205
+                                }
+                              }
+                            },
+                            {
+                              "Map": {
+                                "dt_s": {
+                                  "F64": 0.016666666666667496
+                                },
+                                "name": {
+                                  "String": "sim"
+                                },
+                                "t_s": {
+                                  "F64": 8.65
+                                }
+                              }
+                            },
+                            {
+                              "Map": {
+                                "dt_s": {
+                                  "F64": 0.01666666699999908
+                                },
+                                "name": {
+                                  "String": "interaction"
+                                },
+                                "t_s": {
+                                  "F64": 10.250000205
+                                }
+                              }
+                            },
+                            {
+                              "Map": {
+                                "dt_s": {
+                                  "F64": 0.016666666666667496
+                                },
+                                "name": {
+                                  "String": "celestial"
+                                },
+                                "t_s": {
+                                  "F64": 8.65
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "epoch_jd": {
+                          "F64": 2461336.708081437
+                        },
+                        "fixed_delta_s": {
+                          "F64": 0.016666667
+                        },
+                        "fixed_dt_s": {
+                          "F64": 0.016666667
+                        },
+                        "fixed_elapsed_s": {
+                          "F64": 8.66666684
+                        },
+                        "manual_simulation_hold": {
+                          "Bool": false
+                        },
+                        "mission_epoch0_jd": {
+                          "F64": 2461336.707981321
+                        },
+                        "mission_tick0": {
+                          "I64": 0
+                        },
+                        "physics_compute_threads": {
+                          "I64": 1
+                        },
+                        "physics_dt_s": {
+                          "F64": 0.016666667
+                        },
+                        "physics_elapsed_s": {
+                          "F64": 8.650000173
+                        },
+                        "physics_hold_reasons": {
+                          "Array": []
+                        },
+                        "physics_holds_available": {
+                          "Bool": true
+                        },
+                        "physics_paused": {
+                          "Bool": false
+                        },
+                        "physics_profile_error": {
+                          "String": ""
+                        },
+                        "physics_profile_known": {
+                          "Bool": true
+                        },
+                        "physics_substep_dt_s": {
+                          "F64": 0.002083333
+                        },
+                        "presentation_epoch_jd": {
+                          "F64": 2461336.708081244
+                        },
+                        "presentation_interpolation": {
+                          "F64": 0.0
+                        },
+                        "presentation_sim_s": {
+                          "F64": 8.633333333333333
+                        },
+                        "presentation_time_available": {
+                          "Bool": true
+                        },
+                        "queued_simulation_steps": {
+                          "U64": 0
+                        },
+                        "sim_tick": {
+                          "I64": 520
+                        },
+                        "simulation_cycle_active": {
+                          "Bool": true
+                        },
+                        "simulation_dt_s": {
+                          "F64": 0.016666666666666666
+                        },
+                        "simulation_is_running": {
+                          "Bool": true
+                        },
+                        "simulation_progress": {
+                          "Map": {
+                            "blockers": {
+                              "Array": []
+                            },
+                            "held": {
+                              "Bool": false
+                            }
+                          }
+                        },
+                        "transport_playing": {
+                          "Bool": true
+                        },
+                        "transport_rate": {
+                          "F64": 1.0
+                        },
+                        "virtual_dt_s": {
+                          "F64": 0.016666667
+                        },
+                        "virtual_elapsed_s": {
+                          "F64": 8.66666684
+                        },
+                        "virtual_paused": {
+                          "Bool": false
+                        },
+                        "virtual_rate": {
+                          "F64": 1.0
+                        },
+                        "wall_dt_s": {
+                          "F64": 0.016666667
+                        },
+                        "wall_elapsed_s": {
+                          "F64": 10.250000205
+                        },
+                        "wall_time_deterministic": {
+                          "Bool": false
+                        },
+                        "world_met_s": {
+                          "F64": 8.650003373622894
+                        },
+                        "world_sim_s": {
+                          "F64": 8.65
+                        }
+                      }
+                    },
+                    "component_package": {
+                      "String": "FlipAirlessWheelRequirements"
+                    },
+                    "root": {
+                      "String": "/World/AirlessWheel"
+                    },
+                    "separate_component_document": {
+                      "Bool": true
+                    },
+                    "verification": {
+                      "String": "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel"
+                    }
+                  }
+                },
+                "non_pass_count": {
+                  "I64": 0
+                },
+                "non_pass_results": {
+                  "Array": []
+                },
+                "ok": {
+                  "Bool": true
+                },
+                "pass_count": {
+                  "I64": 62
+                },
+                "requirement_count": {
+                  "I64": 3
+                },
+                "requirement_names": {
+                  "Array": [
+                    {
+                      "String": "FlipAirlessWheelRequirements::faw002"
+                    },
+                    {
+                      "String": "FlipAirlessWheelRequirements::faw001"
+                    },
+                    {
+                      "String": "FlipAirlessWheelRequirements::faw003"
+                    }
+                  ]
+                },
+                "requirement_summary": {
+                  "Map": {
+                    "FlipAirlessWheelRequirements::faw001": {
+                      "Map": {
+                        "checks": {
+                          "I64": 5
+                        },
+                        "errors": {
+                          "I64": 0
+                        },
+                        "failures": {
+                          "I64": 0
+                        },
+                        "inconclusive": {
+                          "I64": 0
+                        },
+                        "passes": {
+                          "I64": 5
+                        },
+                        "unverified": {
+                          "I64": 0
+                        }
+                      }
+                    },
+                    "FlipAirlessWheelRequirements::faw002": {
+                      "Map": {
+                        "checks": {
+                          "I64": 56
+                        },
+                        "errors": {
+                          "I64": 0
+                        },
+                        "failures": {
+                          "I64": 0
+                        },
+                        "inconclusive": {
+                          "I64": 0
+                        },
+                        "passes": {
+                          "I64": 56
+                        },
+                        "unverified": {
+                          "I64": 0
+                        }
+                      }
+                    },
+                    "FlipAirlessWheelRequirements::faw003": {
+                      "Map": {
+                        "checks": {
+                          "I64": 1
+                        },
+                        "errors": {
+                          "I64": 0
+                        },
+                        "failures": {
+                          "I64": 0
+                        },
+                        "inconclusive": {
+                          "I64": 0
+                        },
+                        "passes": {
+                          "I64": 1
+                        },
+                        "unverified": {
+                          "I64": 0
+                        }
+                      }
+                    }
+                  }
+                },
+                "result_count": {
+                  "I64": 62
+                },
+                "results": {
+                  "Array": []
+                },
+                "schema_version": {
+                  "I64": 3
+                },
+                "source_files": {
+                  "Array": [
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/flip_airless_wheel_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/flip_chassis_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/flip_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_bus_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_landing_legs_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_power_thermal.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_ramp_middle_section_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_ramp_root_bearing_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_ramp_root_section_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_ramp_toe_section_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_requirement_sources.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_solar_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_vehicle_assembly.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml"
+                    },
+                    {
+                      "String": "twin://astrobotic-griffin-1/requirements/moonbase_project_requirements.sysml"
+                    }
+                  ]
+                },
+                "source_revision": {
+                  "U64": 5722064762575710188
+                },
+                "title": {
+                  "String": "FLIP AIRLESS WHEEL"
+                },
+                "unverified_count": {
+                  "I64": 0
+                },
+                "verdict": {
+                  "String": "pass"
+                },
+                "verification": {
+                  "String": "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel"
+                }
+              }
+            }
+          }
+        ],
+        "non_pass_checks": [],
+        "runner_diagnostic": null,
+        "details_truncated": false
+      }
+    },
+    {
+      "label": "negative",
+      "scene": "flip_airless_wheel_oversize.usda",
+      "port": 4395,
+      "expected_exit": 1,
+      "command": [
+        "/home/rod/Documents/luncosim-workspace/usd/target/debug/luncosim",
+        "test",
+        "--scene",
+        "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/flip_airless_wheel_oversize.usda",
+        "--verdict-channel",
+        "FLIP_AIRLESS_WHEEL",
+        "--max-ticks",
+        "1200",
+        "--tick-hz",
+        "60",
+        "--threads",
+        "1",
+        "--jitter",
+        "0",
+        "--api",
+        "4395"
+      ],
+      "pid": 815076,
+      "exit_code": 1,
+      "wall_seconds": 11.207420876999095,
+      "summary": {
+        "channel": "FLIP_AIRLESS_WHEEL",
+        "error_count": 0,
+        "failure_count": 1,
+        "inconclusive_count": 0,
+        "non_pass_count": 1,
+        "pass_count": 61,
+        "requirement_count": 3,
+        "requirement_names": [
+          "FlipAirlessWheelRequirements::faw002",
+          "FlipAirlessWheelRequirements::faw001",
+          "FlipAirlessWheelRequirements::faw003"
+        ],
+        "requirement_summary": {
+          "FlipAirlessWheelRequirements::faw001": {
+            "checks": 5,
+            "errors": 0,
+            "failures": 1,
+            "inconclusive": 0,
+            "passes": 4,
+            "unverified": 0
+          },
+          "FlipAirlessWheelRequirements::faw002": {
+            "checks": 56,
+            "errors": 0,
+            "failures": 0,
+            "inconclusive": 0,
+            "passes": 56,
+            "unverified": 0
+          },
+          "FlipAirlessWheelRequirements::faw003": {
+            "checks": 1,
+            "errors": 0,
+            "failures": 0,
+            "inconclusive": 0,
+            "passes": 1,
+            "unverified": 0
+          }
+        },
+        "result_count": 62,
+        "schema_version": 3,
+        "source_revision": 5722064762575710188,
+        "title": "FLIP AIRLESS WHEEL",
+        "unverified_count": 0,
+        "verdict": "fail",
+        "verification": "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel"
+      },
+      "checks": [
+        {
+          "id": "FAW-002-binding-Hub",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Rim",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Web0",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Web1",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Fasteners",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Carrier",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Blades0",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Blades1",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Cables0",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Cables1",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Cables2",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Cables3",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs0",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs1",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs2",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs3",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs4",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs5",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs6",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs7",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs8",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs9",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs10",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-binding-Springs11",
+          "kind": "relationship",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-material",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-surface-model",
+          "kind": "attribute_equals",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-color-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-color-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-color-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-Metallic",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Metal-Roughness",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-002-Metal-normalized",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-material",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-surface-model",
+          "kind": "attribute_equals",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-color-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-color-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-color-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-Metallic",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Cable-Roughness",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-002-Cable-normalized",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-material",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-surface-model",
+          "kind": "attribute_equals",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-color-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-color-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-color-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-Metallic",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Blade-Roughness",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-002-Blade-normalized",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-material",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-surface-model",
+          "kind": "attribute_equals",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-color-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-color-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-color-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-Metallic",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-002-Carrier-Roughness",
+          "kind": "attribute",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "",
+          "id": "FAW-002-Carrier-normalized",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw002",
+          "verdict": "pass"
+        },
+        {
+          "error": "SysML constraint verdict: fail",
+          "id": "FAW-001-geometry",
+          "kind": "required_constraint",
+          "ok": false,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "fail"
+        },
+        {
+          "error": "",
+          "id": "FAW-003-cost",
+          "kind": "required_constraint",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw003",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-001-axis",
+          "kind": "exists",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-001-axis-0",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-001-axis-1",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "pass"
+        },
+        {
+          "id": "FAW-001-axis-2",
+          "kind": "attribute_component",
+          "ok": true,
+          "requirement": "FlipAirlessWheelRequirements::faw001",
+          "verdict": "pass"
+        }
+      ],
+      "measurements": {
+        "blades": 96,
+        "cables": 192,
+        "envelope_excess_m": 0.0489999985694885,
+        "geometry_valid": false,
+        "maximum_cable_seat_error_m": 1.666000468656264e-08,
+        "maximum_cable_tread_excess_m": -0.00079996878377947,
+        "maximum_radius_error_m": 0.0489999985694885,
+        "meshes": 24,
+        "springs": 96,
+        "triangles": 23328,
+        "width_error_m": 1.19209286886246e-09
+      },
+      "runner_report": null
+    }
+  ],
+  "editor": {
+    "envelope_negative": {
+      "start": {
+        "document_id": 119625128472682,
+        "generation": 0
+      },
+      "terminal": "FAIL",
+      "log_file": "editor-negative-envelope.log",
+      "apply": {
+        "status": "applied",
+        "doc_id": 119617907615981,
+        "target_layer": "@root@",
+        "target_layers": [
+          "@root@"
+        ],
+        "paths": [
+          "/AirlessWheel/Carrier"
+        ],
+        "generation": 351,
+        "change_set_id": 51,
+        "journal_cursor": {
+          "author": "local",
+          "lamport": 470
+        },
+        "diagnostics": []
+      },
+      "vertex": 96,
+      "offset_m": 0.05
+    },
+    "material_negative": {
+      "start": {
+        "document_id": 119625150613501,
+        "generation": 0
+      },
+      "terminal": "FAIL",
+      "log_file": "editor-negative-material.log",
+      "apply": {
+        "status": "applied",
+        "doc_id": 119617907615981,
+        "target_layer": "@root@",
+        "target_layers": [
+          "@root@"
+        ],
+        "paths": [
+          "/AirlessWheel/Blades0"
+        ],
+        "generation": 353,
+        "change_set_id": 53,
+        "journal_cursor": {
+          "author": "local",
+          "lamport": 472
+        },
+        "diagnostics": []
+      }
+    },
+    "connection_negative": {
+      "start": {
+        "document_id": 119625170036972,
+        "generation": 0
+      },
+      "terminal": "FAIL",
+      "log_file": "editor-negative-seat.log",
+      "apply": {
+        "status": "applied",
+        "doc_id": 119617907615981,
+        "target_layer": "@root@",
+        "target_layers": [
+          "@root@"
+        ],
+        "paths": [
+          "/AirlessWheel/Cables0"
+        ],
+        "generation": 355,
+        "change_set_id": 55,
+        "journal_cursor": {
+          "author": "local",
+          "lamport": 474
+        },
+        "diagnostics": []
+      },
+      "offset_m": 0.007,
+      "scope": "Complete first 8-segment cable shifted; source envelope and topology retained"
+    },
+    "positive": {
+      "start": {
+        "document_id": 119625190728035,
+        "generation": 0
+      },
+      "terminal": "PASS",
+      "log_file": "editor-final-positive.log"
+    },
+    "document": {
+      "doc_id": 119617907615981,
+      "generation": 356,
+      "origin": {
+        "File": {
+          "path": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/components/rover/flip_airless_wheel_visual.usda",
+          "writable": true
+        }
+      },
+      "dirty": false,
+      "layers": {
+        "root": {
+          "id": "@root@",
+          "persistent": true,
+          "revision": 356,
+          "spec_count": 278
+        },
+        "runtime": {
+          "id": "@runtime@",
+          "persistent": "twin_policy",
+          "revision": 0,
+          "spec_count": 1
+        },
+        "view": {
+          "id": "@view@",
+          "persistent": false,
+          "revision": 0,
+          "spec_count": 1
+        }
+      },
+      "composition": {
+        "dependencies": [],
+        "owner": "lunco-usd-compose"
+      },
+      "metadata": {
+        "defaultPrim": {
+          "authored": {
+            "root": {
+              "present": true,
+              "value": "AirlessWheel",
+              "source": "@root@"
+            },
+            "runtime": {
+              "present": false,
+              "value": null,
+              "source": "@runtime@"
+            },
+            "view": {
+              "present": false,
+              "value": null,
+              "source": "@view@"
+            }
+          },
+          "composed": {
+            "present": true,
+            "value": "AirlessWheel",
+            "source": "document_composition"
+          }
+        }
+      },
+      "journal": {
+        "entries": 361,
+        "cursor": {
+          "author": "local",
+          "lamport": 476
+        }
+      },
+      "diagnostics": []
+    }
+  },
+  "pre_fix_inner_seat_observation": {
+    "doc_id": 119617907615981,
+    "document_generation": 336,
+    "connections": 192,
+    "minimum_seat_error_m": 0.006999991355946419,
+    "maximum_seat_error_m": 0.007000011412942164,
+    "scope": "Actual native-profile start poles versus four-vertex terminal spring-cap centroids; current 8-segment cable and 16-step spring topology"
+  },
+  "sysml": {
+    "source_revision": 12526225763798473850,
+    "source_files": 29,
+    "errors": 0,
+    "existing_warnings": 153
+  },
+  "preflights": [
+    {
+      "operation_id": 18,
+      "state": "ready",
+      "report": {
+        "path": "twin://astrobotic-griffin-1--mount-11/components/rover/flip_airless_wheel_visual.usda",
+        "kind": "usd",
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "findings": [],
+        "info": {
+          "wheel_prims": [],
+          "control_bindings": []
+        }
+      },
+      "source_revisions": [
+        {
+          "path": "twin://astrobotic-griffin-1--mount-11/components/rover/flip_airless_wheel_visual.usda",
+          "cid": "bafkreigtvi524qiutr7upte6p7hulmmnzpii53vc5gjs3nqgahlxjjpkly"
+        }
+      ]
+    },
+    {
+      "operation_id": 19,
+      "state": "ready",
+      "report": {
+        "path": "twin://astrobotic-griffin-1--mount-11/tests/flip_airless_wheel.usda",
+        "kind": "usd",
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "findings": [],
+        "info": {
+          "wheel_prims": [],
+          "control_bindings": []
+        }
+      },
+      "source_revisions": [
+        {
+          "path": "twin://astrobotic-griffin-1--mount-11/components/rover/flip_airless_wheel_visual.usda",
+          "cid": "bafkreigtvi524qiutr7upte6p7hulmmnzpii53vc5gjs3nqgahlxjjpkly"
+        },
+        {
+          "path": "twin://astrobotic-griffin-1--mount-11/tests/flip_airless_wheel.usda",
+          "cid": "bafkreidcrd7c5iu7l3eitdbvgffmu7ggvemgczscp7wjrosxtuhcgya6uu"
+        }
+      ]
+    }
+  ],
+  "provenance_audit": {
+    "requirement_targets": 229,
+    "evidence_records": 229,
+    "source_elements": 78,
+    "source_roles": 3,
+    "command": "bash twins/astrobotic-griffin-1/tools/verify_requirement_sources.sh"
+  },
+  "geometry_ownership": "Native f64 Rhai geometry kernel and source-owned patterns; ApplyUsdOps and SaveDocument own USD authoring; point3f[] is the explicit schema precision boundary",
+  "sources": [
+    "https://venturi.space/en/article/world-premiere-venturi-hyper-deformable-lunar-wheel/",
+    "https://www.venturi.com/wp-content/uploads/2023/06/Media_Kit_Venturi_Wheel.pdf",
+    "https://www.astrolab.space/flip-rover/"
+  ],
+  "limitations": [
+    "Metric dimensions other than the published diameter are reconstruction estimates",
+    "Stainless tread material family is published; grade/condition, cable/rim alloys and elastic composition are unreleased",
+    "Rigid visual architecture does not simulate tire deformation",
+    "Production rover still uses its existing analytic cylinder and shader appearance",
+    "No FPS or loaded physics acceptance in this component-only test"
+  ],
+  "source_hashes": {
+    "twins/astrobotic-griffin-1/.lunco/runtime/scenes/griffin_1_rover_delivery_test.usda": "cad7b96d002f55d1e82a27035d079ce978a820d6b1fe17a42eb0a42d49926da5",
+    "twins/astrobotic-griffin-1/Assets.toml": "9e75e631e26968a8efd70f52216fe0ef9ca2cf52662fb42f502c9767f27f8ce7",
+    "twins/astrobotic-griffin-1/components/lander/griffin_body_collision.usda": "2cfadd1c657057d03913b9bc6a59b5cd037155bbc2af2ea74c6c0a7bca246113",
+    "twins/astrobotic-griffin-1/components/lander/griffin_bus_visual.usda": "6e89100a660011f064e671a608efb484a4c324ef3cff1e730df69bf8aee8ae2f",
+    "twins/astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda": "97d0dd98fe16075a7174ef23b428316710c2097433e09dbe10b964beccda7c38",
+    "twins/astrobotic-griffin-1/components/lander/griffin_engine_skirt_visual.usda": "f8b320dec47faa67fd3f469de02cb22db546a5361f1ad82159cab62bf29dadb7",
+    "twins/astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda": "2f7380414b306aaab7a626b002df536e93531c0ea89d83b54d0ee28f77f65231",
+    "twins/astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda": "aaa5e8b2df863d33b5f132fc0eb0cafa5e742e4942cc00b03b44ccd9a66ec744",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda": "82158f349b54e805f9be960f34831e0f9a480d02a0d456bbe08fe35492cde8cf",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_root_bearing_visual.usda": "c23ed9fd3a534a8f30dff3fc75f11067e1d23ffd7fbd828aec806c37279c2ee4",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda": "55c8cd6469874b6c18220e0722d1e097ef4872275d016f0499efe2d89627b96c",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda": "a7116d879f0835f0fa7d4feb95673ba109257398513e1f536e61d2ce1f1659d4",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda": "5f80cd0bc7c0f6ad18e3c30728df8a61e926a3e220e6be745a49680738d3aa7d",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_toe_visual.usda": "9c4634f2b75d3e166cd2d9dcce59bf529c0bc09786b1c2bd3b51bc816efb49cf",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_visual.usda": "f1f63bc93a1f25f4a55554037144e2bae91ee594094a7f53bd0f4c70591a86af",
+    "twins/astrobotic-griffin-1/components/lander/griffin_rcs_bell_visual.usda": "ae9d8d40ef8b19a32dfa94af60e5fcd7fc744ec2974831ec073c04b8940ad741",
+    "twins/astrobotic-griffin-1/components/lander/griffin_solar_panel_port_visual.usda": "afb4be547780927ebfb2acc3259f94a211f1fcbf5bd8e7ae224a8f45982a5c8f",
+    "twins/astrobotic-griffin-1/components/lander/griffin_solar_panel_starboard_visual.usda": "645094d68768e6ee0b53360b61faf69a9fbf06a7f125785d66b4d1130a0c24c0",
+    "twins/astrobotic-griffin-1/components/lander/griffin_solar_panel_visual.usda": "599da3ec5c091fc6d4a8a5b1e5b22aef987cd8ea29e42ba58ab73efe58946702",
+    "twins/astrobotic-griffin-1/components/lander/griffin_tank_visual.usda": "f9325904d635e138214591a3e065e4486ea98e109d216b6325493dd287b15464",
+    "twins/astrobotic-griffin-1/components/rover/flip_airless_wheel_visual.usda": "d3aa3bae41149c7f47cc9e7fcf45b18dcbd08eeea2e9932db60601d774a5ea5e",
+    "twins/astrobotic-griffin-1/components/rover/flip_chassis_visual.usda": "2fdcf40e9de408002ee953bc76fccd4c93a7480d0f3fc6059b5cec1b02f6e739",
+    "twins/astrobotic-griffin-1/components/rover/flip_sensor_mast_visual.usda": "3b551f21f10eb11317c59baaab303d81d8b132a506f7bc92abcc5c324d237fb0",
+    "twins/astrobotic-griffin-1/components/rover/flip_solar_panel_visual.usda": "bcbf55c847df57fbe89064b2d20b4f37734aaa478881e69ede3db8d0bb2cc15c",
+    "twins/astrobotic-griffin-1/components/rover/flip_suspension_visual.usda": "0b1d60c1479f31c8404cb107be4a897f27c6a836c9a0bd6b43fdc5b6e690e9a5",
+    "twins/astrobotic-griffin-1/environments/lunar_surface_base.usda": "b978a8000490c37cba159b32c6f400ff315af28b37d1756a5a15d7107f4b307f",
+    "twins/astrobotic-griffin-1/environments/south_pole_surrogate.usda": "f130ccfc03f7d9fa76715ef68cef07fbf8c3198163bd4fcfb10378e5996cd396",
+    "twins/astrobotic-griffin-1/requirements/flip_airless_wheel_requirements.sysml": "5b3dae1f87d6280ac34d8f242a953a9afc9185d88ffdf52dc246f77b35a268b7",
+    "twins/astrobotic-griffin-1/requirements/flip_cad_requirements.sysml": "5f2bd2023e114d3fb571025545327cc34032e65983f72f1bb3edc72321e82442",
+    "twins/astrobotic-griffin-1/requirements/flip_chassis_requirements.sysml": "f20f454ee4bb3141e423e30f43c1454593de32730c26abeef5212e1e876bfa58",
+    "twins/astrobotic-griffin-1/requirements/flip_requirements.sysml": "8a7d9f799758190f44d1ee902d1a3175cb4489521a0831b2e7b8a24c5224042a",
+    "twins/astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml": "48bd15d1ed24f72f472bf5296360d8b443a7630426b61df0d17e52960f859db6",
+    "twins/astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml": "1d42f8926c44d40e675eb27e724429f69ec139667ff5d965e2b4f534e51ceb39",
+    "twins/astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml": "ac465151485fae1bcf191972c44c9c0d44d4f511a5d54e6480136b89e32c8942",
+    "twins/astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml": "88929d2a66092f2497a5fe7066142ce9efc76560693f8773fafeea918582c0bd",
+    "twins/astrobotic-griffin-1/requirements/griffin_bus_requirements.sysml": "43336fd453f9ad6970ca26d02b8965652c87a382b441d6a4e169d3d8db06eaed",
+    "twins/astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml": "5acaa760d89b0befd9f07ea9237d832107ef14739e1780b45bc39060273d43b7",
+    "twins/astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml": "76edcea83b91109aef8f2cbcfee54b1e1f13a9946490dc0831454178e1534aa1",
+    "twins/astrobotic-griffin-1/requirements/griffin_landing_legs_requirements.sysml": "a40a562a0a0bdc039f602974971064d7431484b6d2c102b1d41d76eab044cb3a",
+    "twins/astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml": "0933bdfcf01ee3dddeefbacf02ccff7ea022f5b78a6eaf9ba5094e637908b7ae",
+    "twins/astrobotic-griffin-1/requirements/griffin_power_thermal.sysml": "736e91dc33d26fdad9ab3acffee90eff02ed3b1d4d63a108b19f335bc4d66928",
+    "twins/astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml": "9edabf09a4ad7cfaeaf2a2904568dde16b3c25eb84bc2380c5e6cd7ddf7eb99d",
+    "twins/astrobotic-griffin-1/requirements/griffin_ramp_middle_section_requirements.sysml": "6d036743d9db3abe6051340f1b1ff67e6d954834fe37f56a122f591da818696c",
+    "twins/astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml": "de205c76dbc4ab41b610f4c6e61951978b37aecc1f247c08b42eec694cd33cd9",
+    "twins/astrobotic-griffin-1/requirements/griffin_ramp_root_bearing_requirements.sysml": "cd39eaf26d2647ce4965f484483e8984199a5cf2559f35d55340a3c6ff807ba4",
+    "twins/astrobotic-griffin-1/requirements/griffin_ramp_root_section_requirements.sysml": "c7b8ec039a452cb2559ad9ac778f66d436d1db9a63203b1ae8b8630f35e878ba",
+    "twins/astrobotic-griffin-1/requirements/griffin_ramp_toe_section_requirements.sysml": "0c6dacacf2f8f00f2b872bbcbe38c3e9527b78f8d639d7b7b909058837c76939",
+    "twins/astrobotic-griffin-1/requirements/griffin_requirement_sources.sysml": "97ddd421c32013a09bef3c9977513d9725ea8238f02105e7e459aa9a7c61efa3",
+    "twins/astrobotic-griffin-1/requirements/griffin_requirements.sysml": "7a6a29cd396ead35e77bc55d9026d004a428b1ccfe567bda8c39626c12da9be9",
+    "twins/astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml": "aa42cc72241ff99e34a1086c6023933c201f34bf4952478d61cc191c6e170919",
+    "twins/astrobotic-griffin-1/requirements/griffin_solar_requirements.sysml": "fbafafc474ebca25c14095128a26db8ae8ee45bce1b1e43f0841bfc042cbcaba",
+    "twins/astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml": "1a3af3232ebb41d13fc3ea29029489ab86d839f9f6e354cc83c1dafcb183f332",
+    "twins/astrobotic-griffin-1/requirements/griffin_vehicle_assembly.sysml": "d7362c03c1d98476d8161fc4f9d7f98b308683747ef5c63097a86633be61e18e",
+    "twins/astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml": "3ce3b5266fd9725e9d6c32d6347ef38f8ba958324195eb17b67638b2e8694c1f",
+    "twins/astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml": "d85e10a373cf7852af39a026f7f490087c739c227b104e56ad26796d5a133709",
+    "twins/astrobotic-griffin-1/requirements/moonbase_project_requirements.sysml": "e4c6e6f7839702cf3b5864bab0d109f42b5965c4e70b13fb07f49a4bdc9c595a",
+    "twins/astrobotic-griffin-1/scenarios/griffin_1_delivery_release.rhai": "6524d24ed8ba40283075937e3a3328896a7664cd69249af0e5d1947dfb7eb5b7",
+    "twins/astrobotic-griffin-1/scenarios/griffin_1_surface_ops.rhai": "23549a3b23d9c07aa606733208e44a5c116666e47f40dec681f2efa9e9f3f9e2",
+    "twins/astrobotic-griffin-1/scenarios/tests/flip_airless_wheel.rhai": "bfc735324bf83504537b03ec7ceb883a2fe3440d594053ab33271b1b4a17f739",
+    "twins/astrobotic-griffin-1/scenarios/tests/flip_chassis_requirements.rhai": "2ba2bbb056fbfe95d4940c86c2aee6a85869e0398288e64397a16e30f4a9789f",
+    "twins/astrobotic-griffin-1/scenarios/tests/flip_manual_controls.rhai": "1038aab87b5c65a82fd2f2943564d59989f4b0cb9acdd0d427095b85e0b9767c",
+    "twins/astrobotic-griffin-1/scenarios/tests/flip_requirements.rhai": "e57bf469f6001840dc2632e4d2ec2499861e20a5299e036276985b834d4da993",
+    "twins/astrobotic-griffin-1/scenarios/tests/flip_route_follow.rhai": "9ee21fa9dbd2835ea696b9890701dc5a900a1f174de6bff147f08cea689a3ce9",
+    "twins/astrobotic-griffin-1/scenarios/tests/flip_sensor_power_requirements.rhai": "30c928316bd38786ccb45b87c35ea66f38737ce71a22f4580ec4be0d4a322892",
+    "twins/astrobotic-griffin-1/scenarios/tests/flip_suspension_requirements.rhai": "7c54c745a3a870a88a69b40b2d7cb81d8bf6fc405d1ab9b5e789a51921def35e",
+    "twins/astrobotic-griffin-1/scenarios/tests/flip_wheel_requirements.rhai": "3f19dad0cc9799dc047d6d2396dbbf32195785297ea90172988d5ffadf7fdae0",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_bus_open_bays.rhai": "0ee0cd1a96cc2f40fc50b72fd17e8253db1fd87879915d341f0277feeee97caf",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_bus_requirements.rhai": "bbf0a3af98147cfc109f933dd0096ff93013f088ad4e8677791183fd01091abc",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_control_power_loss.rhai": "0a23b80327dbc92cf46b5e15545fa91df6e5d5494f2004284ca45b34d2308afa",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_detach_stability.rhai": "9c6d96ec4c082e4e13fa7382c5ff932b95779ee95cac460f470fea2d07069c75",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_engine_commands.rhai": "5598bcc55577a8d58b695927cd49a6c4999c724683eea5ab4b61891803855cd9",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_engine_off_impact.rhai": "436714f839d9955e584beb1d27bf35d55fa62b9c3beb96e9a687a8d3173ec703",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_engine_out.rhai": "0b7ecb76a372e4c2cfad7ed006ea93fca0377cc89adfa4834f156c44a017fede",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_flip_visual.rhai": "6751810300097979acf6b4129fae427dc0821fdd0df3ed16aa79627f71bc4657",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_fuel_exhaustion.rhai": "9b4d207e069dce768f057f06d79c9585a4de23ab471115fcadb03606a9543808",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_gnc_toggle.rhai": "1f16980ab9f1d2d9c047fe32ac68fa040a3ae39a28544efcfd942edc462e6c98",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_lander_requirements.rhai": "03849dcdbb11451276fac2e669269b078fe4660f0655b921e41ec1078f8d6142",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_landing_legs_requirements.rhai": "34876ccf5c29777b440a3fd364dcf5f6244c9b8216079f640e8f295c0f0ca52c",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_landing_preflight.rhai": "1bdac5a788da3620994167c7bb4079689005abb08c23b9dd4b3fe6c0b7800941",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_manual_handoff.rhai": "52ff9a63433439e50bf36a55a938150533805db529e1ba515afbc1f122aa3ccf",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_mission_evidence.rhai": "9bdcb2b8682388fd4279126165480fae56b9679e1f6204de80fcc61252b6a672",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_operator_route_handoff.rhai": "9c64a406bc8eae5e20928d63a6bd4cb02a2a168bafb33b97f11980a67bfaa8c1",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_pilot_attitude.rhai": "36eb681f95f9bfaf348fd92cb822bb982d042d16ae406dda9646af463e8766d8",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_power_thermal.rhai": "5f2e9c0bab0e40374aefa03cff6f1fc0fcb8d69e3ea61e017897aefde55a31b4",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_propulsion_requirements.rhai": "2bfad66a920ce46da1c261b6c3ac3c9534f8ad2b3901d7ae65e6755502da69c1",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_flight_stow.rhai": "22c27a51d0c163c0e68cec786a720bbfe5fd155ed5a2aba599acad7ca138ba6b",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_interface_study.rhai": "650074b9c01a2496f28bab2f712daf6d94bfd881033972aa71d3ba291b7660cb",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_middle_section.rhai": "cd16d93635bd44968163da34b487bd732596875dca3836dbf9491fcef869f5aa",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_requirements.rhai": "8f6d475fadfa74ca45d498fc8832c1c583ce62162b4a3990653d0e34271bfc67",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_root_bearing.rhai": "be3e0bcc246053e880c08479599731ed19cd987e35583954b7fbbaa5011e7fde",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_root_section.rhai": "c5ba4b9aed222ed3bf305b0a30f46547f6425e90b9478a235ee1b4715e283bee",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_structure_study.rhai": "42324acae76e1ec3e476897d2085d0918735e034ecf2f35b8c289c4626ae7b98",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_toe_section.rhai": "00bfa26b563d9597c1969eec2a5619b7721f3a73b1bcb6d8deb74d62841cee79",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_touchdown_geometry.rhai": "f034120437bd94b0f09c9ae8a6d00c78a426258a069ab440292223f77b8a4733",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_rcs_commands.rhai": "b2f4c4d22c30438bcbd816f8d8cf435f014d7a1c609244bb642f857bbed255cb",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_requirements.rhai": "b2eb7406a551479c7e5ac03fbd5b7e4200fca82ac9a6c2162ab9b0d4ff5e2910",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_rover_leg_collision.rhai": "04cd0633c4ddb5ddd71f504d115629a939c7ff9d2fc65e2619d210a98ce57e4f",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_scene_restart.rhai": "248f589810e5a3f544dd4d8f96623e76ede39458a840f0bb3f0ae58af3720f57",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_solar_requirements.rhai": "72965811f28ae39372fab4ac23d2092e12931881ed1c2bd197c86135e11e5ab6",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_sun_pointing.rhai": "aceea3cb3afc538d3cefa760318f0e005da312c7df02be2e81a349eb5b8a2aa4",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_surface_ops_contract.rhai": "2c31fa14e73a568409680875df70a19a4edfe37a83672b91ab7e84df57ee4caf",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_sustained_thermal.rhai": "7f6180cbba81aa905ad712ff234baba11abbfc1b29a83b69f3eaaa1c83cf243b",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_tank_requirements.rhai": "12e89f693b494fb58ce36dd0d9ab455ce40044bc542667786d1e4612d0c8ee78",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_visual_configuration_types.rhai": "957b51a5bf4fe2a7a4e4a3ff530213040ab72b7a5e99d7e5c0ee863bc516b3e8",
+    "twins/astrobotic-griffin-1/scenarios/tests/rumoca_startup.rhai": "f66f724f8b1c3b7cd054526fe9bed4c4d380012d52116d9b4e46dd82fc916649",
+    "twins/astrobotic-griffin-1/scenes/flip_isolated_collision_test.usda": "c7361990fc504729b18f9ab6234b5abd0f3518c866d597bcf88a2fa73a4089a1",
+    "twins/astrobotic-griffin-1/scenes/griffin_1_detach_stability_test.usda": "1a946b98fa87a0de93d9440b63ed52543ffe54336c2c510e32ba5a076ee9f327",
+    "twins/astrobotic-griffin-1/scenes/griffin_1_editor.usda": "a042bbb94a1da3701e158c5baeadd1a9efd2358779c3f8688f09075f98d28eab",
+    "twins/astrobotic-griffin-1/scenes/griffin_1_leg_drop_test.usda": "d0fd4d0778ad3e645cdc07dbbb2e1dbd274aae4ffeeded894ae42f18e6a1635d",
+    "twins/astrobotic-griffin-1/scenes/griffin_1_rover_delivery_test.usda": "d7bec94576dff1b92be7f1bbae4446b5b70d735bc8b8ee468fab4e93986873de",
+    "twins/astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda": "3bca9098dba11cef45bbe43573e7a8939abefd09e81cfbb3318152a3345f0e7a",
+    "twins/astrobotic-griffin-1/scenes/griffin_flip_no_joint_test.usda": "d3ac3377366be8dc1e4931f5e50f58f6abca474d72d8b288c59d0b6b1b64a6c7",
+    "twins/astrobotic-griffin-1/scenes/griffin_flip_visual.usda": "5c134dfecae8471cb97d6f56b446937e0f44c50594cce27c974c8e4935b8bc0c",
+    "twins/astrobotic-griffin-1/tests/fixtures/griffin_ramp_middle_section_short.usda": "ae1d26fe52b2abdd7ffee58ef885809d6d506c7b4b6a01cb86d8b11000956f1d",
+    "twins/astrobotic-griffin-1/tests/fixtures/griffin_ramp_root_bearing_short.usda": "b06664d877c6d806065c51a4fe658895844df9102b66a796b5b541d79bae8f66",
+    "twins/astrobotic-griffin-1/tests/fixtures/griffin_ramp_root_section_short.usda": "9a9e602fa1a406d9a0713ade34cf22247dc14099a749e83c71d1abbc4544a9fe",
+    "twins/astrobotic-griffin-1/tests/fixtures/griffin_ramp_toe_section_short.usda": "7b92642a37ce7f4a5aeaa4967d4afc03b85f256cf4e552f79484e336e0197f60",
+    "twins/astrobotic-griffin-1/tests/flip_airless_wheel.usda": "6288fe2ea29f5ec8898c35314aca7cc6a9186166427fec98ba579d0e23601ea5",
+    "twins/astrobotic-griffin-1/tests/flip_airless_wheel_oversize.usda": "d246f3ff2266b586c200ac8d6ab3136fcd045f4dd3dc95c3e9a4ddc01806658e",
+    "twins/astrobotic-griffin-1/tests/flip_chassis_requirements.usda": "526342ab17b08c3a6b4a43e7d6791cd89aa8901d3df972c71bba343014f43370",
+    "twins/astrobotic-griffin-1/tests/flip_requirements.usda": "dab615d9fd87f829a543f45f367d7fad1762b9b199181d7c56a4fea39d7f9f71",
+    "twins/astrobotic-griffin-1/tests/flip_route_follow.usda": "16f77429b90a0487421da1a247c2df210bcd6e5ff56484809ec57c03ba669f8f",
+    "twins/astrobotic-griffin-1/tests/flip_sensor_power_requirements.usda": "af17cd12157e0c86c24184a32191b1ca27c2d9bce531f36656e1b927c083d4d8",
+    "twins/astrobotic-griffin-1/tests/flip_suspension_requirements.usda": "9d534c2ed0bee235ab9da7048663e495ff2bb076dfb2329691dbc26d37fda8ae",
+    "twins/astrobotic-griffin-1/tests/flip_wheel_requirements.usda": "e48ded1b25a51f22b29ee70f600b4d7d702018489192215f670e806c80a3a668",
+    "twins/astrobotic-griffin-1/tests/griffin_bus_open_bays.usda": "5eff4b853ef57e9e2bd8e1f2f4ca7fa2e75f3a96432299a52c7f89f2344997aa",
+    "twins/astrobotic-griffin-1/tests/griffin_bus_requirements.usda": "002fe29c559759a7079c80d3fcda62d41cc4f5ec8ba5845e62ecf0beb2c9448a",
+    "twins/astrobotic-griffin-1/tests/griffin_control_power_loss.usda": "08ff7a77a2af5e174414c5242e3412387962ca7dc50b927facc54ad1009893f6",
+    "twins/astrobotic-griffin-1/tests/griffin_engine_commands.usda": "657c15a236015a7f649a57bbddcbb496565710a4ff3765ee8bc0e06dc7a6530e",
+    "twins/astrobotic-griffin-1/tests/griffin_engine_off_impact.usda": "17629cdb2eb0c01780f3bcab5ac91b9a8c445e8f3c6cb6fc4726a4ba8b581ebc",
+    "twins/astrobotic-griffin-1/tests/griffin_engine_out.usda": "654504ac8706d4b728e9799af96eae80e35471c7d2a152af1315c44715ebe228",
+    "twins/astrobotic-griffin-1/tests/griffin_flip_visual.usda": "baffbecb5631d47d67f99fe297b4195ee69043fe29d42e63dfabafdad568ba67",
+    "twins/astrobotic-griffin-1/tests/griffin_fuel_exhaustion.usda": "2a835f49b236489da45c221060e569bb70f0b660797029decfa981fe8ad4f18b",
+    "twins/astrobotic-griffin-1/tests/griffin_gnc_toggle.usda": "5d54889f802b19ec25b25ff461c5f637f5f6624d7d22a80b20aecacb32c6b2b8",
+    "twins/astrobotic-griffin-1/tests/griffin_lander_requirements.usda": "b27020c4f3b9ad0cd0eddf06f25a9eafba1972e4f99f7427b05ae6d9a47642d4",
+    "twins/astrobotic-griffin-1/tests/griffin_landing_legs_requirements.usda": "3aaf40287d6c5cdad765b3aaecdf930035eea480c9ceed89fd02fe66344ea3be",
+    "twins/astrobotic-griffin-1/tests/griffin_oxidizer_exhaustion.usda": "889327c112fe775abd29147018b4af5889a6cd57a76c89b7499dcca426a7a6aa",
+    "twins/astrobotic-griffin-1/tests/griffin_pilot_attitude.usda": "5864cc77c9f3e963fc627fb43d6c291773ce80dc5ae9564abf4e6860d9025076",
+    "twins/astrobotic-griffin-1/tests/griffin_power_thermal.usda": "133e15aaac4bc569110f330cc70c2d9cc921eba98be8b75caca0b0bde172600a",
+    "twins/astrobotic-griffin-1/tests/griffin_propulsion_requirements.usda": "f91566d37cc59be44c8f56f6281f91657596f78c7dad34b8ec771eeeb5aceff4",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_flight_stow.usda": "d9cf69ec2027d28404106c1e3a11d7caae43bddfd81db0f8a2dd0f9d7e75afa9",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_middle_section.usda": "39cfa152856babdf408ee249dd3a498343b3f0df83f1b48a7448eaeec813d224",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_packaging.usda": "6022e609c35114f7523a9665f88efa434cab669444c7e7d3294d85d762462c71",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_requirements.usda": "dc55234b8ecab43bb235155a6dc5ce9472c4a4ebca05afbdd6908b7cad3f068f",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_root_bearing.usda": "6591b834aae0bdb620522d68f4df8a2c9d2ac191789cdc7fb8a64a9a2de3c717",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_root_section.usda": "207f4858357dcd5523afd43fc11796f202cf759b1307c1eb14843c55a95df038",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_toe_section.usda": "a5be9442fc40ffb28b230fbf067c64376322aaba81338d527030b0b0c48d7945",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_touchdown_geometry.usda": "01c104145dc2018110cf6e11129d223e41f82d76b432681c568d99e3e2e5adda",
+    "twins/astrobotic-griffin-1/tests/griffin_rcs_commands.usda": "9c7e687f14d479e760e2d5b9e313ca250f779d2dad892db21eef8d932de590f4",
+    "twins/astrobotic-griffin-1/tests/griffin_requirements.usda": "31d9dcb1fcaafba570ed89267b6c27aad780a0462939ccb5cba12998be6212fc",
+    "twins/astrobotic-griffin-1/tests/griffin_rover_leg_collision.usda": "f4f8cba622eef7af676dc4b554d694b17c182fc9d32f324461721cf1fc3bda10",
+    "twins/astrobotic-griffin-1/tests/griffin_solar_requirements.usda": "f84ee309284b84c581b699914c08c7eb4b95fcc8ed8ae2758dc0d772d46daa89",
+    "twins/astrobotic-griffin-1/tests/griffin_sun_pointing.usda": "ff0cd529353b649873804d0dc59a1b4c66d083d2a1ad466476e40ca245c0ab61",
+    "twins/astrobotic-griffin-1/tests/griffin_surface_ops_contract.usda": "56a268cb97e07e215b05aedfc08c8a3f35f63c78d69b4c60681d77f8fcc2a6aa",
+    "twins/astrobotic-griffin-1/tests/griffin_sustained_thermal.usda": "373cedf2b6c6a300ad44241df81c040d919a9b5542e37da58f6b65859884f26c",
+    "twins/astrobotic-griffin-1/tests/griffin_tank_requirements.usda": "8a4e5b749a203d673da956ab6e6eb3aebc265466f3ac3b9427016b782e21056c",
+    "twins/astrobotic-griffin-1/tests/griffin_visual_configuration_types.usda": "06a364ec30eb96c2a0b83d32964851f9f4302c7b4ef92e3def20c9e410890cc0",
+    "twins/astrobotic-griffin-1/tools/check_landing_determinism.sh": "40c1cc5e571aefa9b5bff838b80a87ae3217a25a1cc7ea08983d196f8e05ee1c",
+    "twins/astrobotic-griffin-1/tools/flip_airless_wheel.rhai": "f30b9a214366dd5c710e081d494a9bcb4536a534b6e37372114bf2921a4e6bdd",
+    "twins/astrobotic-griffin-1/tools/flip_airless_wheel_checks.rhai": "c6698d36548212b59a9eb0180472786fcf5c32e1e484bdeee3b66269e9384bb4",
+    "twins/astrobotic-griffin-1/tools/flip_battery_packaging.rhai": "b123f5bbe6ed8633304390921d02d28d95e8b4ec5b7458251e034a715620ebbe",
+    "twins/astrobotic-griffin-1/tools/flip_wheel_checks.rhai": "8f4bec4c7fa0f3dd96b4d77d2e03b058491d3a19c3fb58a4e71b5f20b1df2e3c",
+    "twins/astrobotic-griffin-1/tools/griffin_bus_verification.rhai": "bad32ec9f68546ee691233ec538623c253577eb9b128321fd5a0b178b881aa3e",
+    "twins/astrobotic-griffin-1/tools/griffin_controls.rhai": "19d4752d7f1b6ca1e9f50900e883c4ef5e40316e86227f9237b2040a491acfbc",
+    "twins/astrobotic-griffin-1/tools/griffin_geometry.rhai": "736daf6e0226936a90bdc01eef5383248be55a6ffb73356e672c99a23062ccbe",
+    "twins/astrobotic-griffin-1/tools/griffin_power_builder.rhai": "45d92a8821eafeacec2937aac440493ad113f3d04093896144a1b6db24ccad2d",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_middle_section.rhai": "9f12a9f720bace75252590044b4e61939d45eca0c5f77ba6600d6078f2ee30ca",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_middle_section_checks.rhai": "7ebf3b163fc9a2ecfcd43f96d005dc95748308724c2da0d0b9d4b68edca3e236",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_packaging.rhai": "eea4d4b9c269a42a9558b995635599ec82c3aa3ffbc06da3cb5077de10d51ad4",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_packaging_checks.rhai": "c21d773db76461fb8a35eac445584c45c484a1feb3d54bd0c3d0b84a15a5958f",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_root_bearing.rhai": "cf6c94a3a5f8d137f94d65cab46808f9f6e6893403bff5b40e3301baf90b866a",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_root_bearing_checks.rhai": "0fad2eb1fd9c6ee723d0d7a625525ad883e9c94e2f06bdcb6b629ef1446ca703",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_root_bearing_fit.rhai": "c04caa5c01334cfd71cdf53d730e5f7cfc976635bfab80a35567f3d5e19c103b",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_root_section.rhai": "c287f410f9aa400dbf6f07de33ab2510dc529f0140e0efccd1a90153b53f5e4e",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_root_section_checks.rhai": "ce96b89b2ae653611193cf6d5dfb64f7d41de4eb92b79c35c0b27da23b49557f",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_section_checks.rhai": "a441e48510c9eb2fa1817258f203afcf219ba99b3645df4c8944bc8a99bf9f28",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_section_component.rhai": "404dc10587daca90cea8317c482596be8e779e099ad68cc7aba831adbe5a55f9",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_toe_section.rhai": "82c358ac8abde8a66c56c35d84d2c39becfdc089431e53447ea712a4882a8670",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_toe_section_checks.rhai": "05b9907e291d65201891b02dfd1a29e3e736a7236c1d8c58cd6cef7c77f194fc",
+    "twins/astrobotic-griffin-1/tools/griffin_requirements.rhai": "9d227c380340b18a813876f22b5e9b7b2d62ff757a121624967616d85a584e40",
+    "twins/astrobotic-griffin-1/tools/griffin_skirt_verification.rhai": "1a4e36ad6fc341f9c047662f1872dc5dd50b86a9b4571118ef3e228e29f984d9",
+    "twins/astrobotic-griffin-1/tools/griffin_spec.rhai": "166314eb69fa3933d3e9833a07b22429c6c032bf7867abc4781fc5fccb9e0b1f",
+    "twins/astrobotic-griffin-1/tools/griffin_surface_mission_report.rhai": "30dacc3a24fbac8b7a98e0082a3c960a065db392a1c5a0cd1306f80438fa75e0",
+    "twins/astrobotic-griffin-1/tools/griffin_surface_ops.rhai": "0dfbb17e1b26fa3036676310d14a221bdb490d6aa2a52d22a0ef89873dc1292a",
+    "twins/astrobotic-griffin-1/tools/griffin_surface_ramp_ops.rhai": "b1886181d403384ffe9c3581863975e8d5b7f191486a9efdcf1c1c7191cb035f",
+    "twins/astrobotic-griffin-1/tools/griffin_visual_builder.rhai": "1f4bf54364b9bb841f241572b20a117b309e36115dce8c0d9537170c85e8dea6",
+    "twins/astrobotic-griffin-1/tools/usd_geometry_inspection.rhai": "ccb498ad59767c348a2fd0db56dfd817380820d7fd038f9181255514239bae69",
+    "twins/astrobotic-griffin-1/tools/verify_requirement_sources.sh": "17b1449995228e48961d085f92edfb3416124f4a8761c101f5cb3655b3e28194",
+    "twins/astrobotic-griffin-1/twin.toml": "822bc65d00c7fbd2013d51e9fe6bde046e02b86f328c44db3c0262ff67a1a483",
+    "twins/astrobotic-griffin-1/vehicles/flip.usda": "c51fea3981af2d4aeaa0c7cc0699a32dc8f0eabc77da7de1d06f9f50a818bdd8",
+    "twins/astrobotic-griffin-1/vehicles/griffin_1.usda": "a7cfd8a587f8e401643b0056f6a5bb3cb1d9d71dedccff9a09060fd596b74f73"
+  }
+}
