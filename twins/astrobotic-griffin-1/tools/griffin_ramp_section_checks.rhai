@@ -1,5 +1,6 @@
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 import "griffin_spec" as spec;
+import "lunco://scripting/tools/mechanical_relations" as mechanical;
 import "usd_geometry_inspection" as inspection;
 import "lunco://scripting/tools/sysml_requirement_checks" as checks;
 
@@ -17,9 +18,10 @@ fn observe(doc,root,profile){
     // static collider need not have an active dynamic-body frame.
     let selected_doc=if doc==() {inspection::document_owner(root)} else {doc};
     let names=[];
-    for name in ["lengthM","geometryToleranceM","entryFrameName","exitFrameName","entryAxisYM","exitAxisYM","plateAttachmentRunM","forkWebSizeM"]{
+    for name in ["lengthM","geometryToleranceM","entryFrameName","exitFrameName","entryAxisYM","exitAxisYM","plateAttachmentRunM","forkWebSizeM","hasExitHinge"]{
         names.push((profile.owner+"::")+name);
     }
+    if profile.section_index==2{names.push(profile.owner+"::deploymentAngleRad");}
     let source=sysml_requirements::source_with_selection(names,
         [profile.package_name+"::"+profile.requirement],[profile.package_name+"::"+profile.verification]);
     let length=sysml_requirements::number(source,(profile.owner+"::")+"lengthM");
@@ -28,6 +30,11 @@ fn observe(doc,root,profile){
     let list=[];
     let width=spec::ramp_contact_track_width_m();
     let thickness=spec::ramp_surface_thickness_m();
+    let bevel=if profile.section_index==2 {
+        mechanical::planar_horizontal_face_bevel_run(thickness,
+            sysml_requirements::number(source,profile.owner+"::deploymentAngleRad"))
+    }else{0.0};
+    if bevel==() || !bevel.is_finite() || bevel<0.0 || bevel>=length{throw("Toe miter source is invalid");}
     let paths=[root+"/RampTrackPort",root+"/RampTrackStarboard"];
     let guides=spec::ramp_guide_stations();
     for guide in guides {paths.push(root+"/"+guide.name);}
@@ -63,7 +70,7 @@ fn observe(doc,root,profile){
         list.push(attribute(profile,id+"-contact",path,"physics:collisionEnabled",true));
         list.push(attribute(profile,id+"-hull",path,"physics:approximation","convexHull"));
         for vertex in [2,3,6,7]{list.push(checks::array_component(id+"-tip-"+vertex.to_string(),
-            profile.component,profile.requirement,profile.verification,path,"points",[vertex,0],length,tolerance));}
+            profile.component,profile.requirement,profile.verification,path,"points",[vertex,0],length-if vertex==3 || vertex==7 {bevel}else{0.0},tolerance));}
         list.push(coordinate(profile,id+"-station",path,"xformOp:translate",2,
             if i==0 {abs(spec::rover_wheel_station_z()[0])} else {-abs(spec::rover_wheel_station_z()[0])},tolerance));
         list.push(coordinate(profile,id+"-plane",path,"xformOp:translate",1,0.0,tolerance));
@@ -110,6 +117,16 @@ fn observe(doc,root,profile){
             sysml_requirements::number(source,(profile.owner+"::")+datum.y),tolerance));
         list.push(coordinate(profile,profile.short_name+"-frame-z-"+name,path,"xformOp:translate",2,0.0,tolerance));
     }
+    let has_exit=sysml_requirements::native_value(source,profile.owner+"::hasExitHinge");
+    if has_exit!=true && has_exit!=false{throw("Section exit-hinge topology must be Boolean");}
+    if !has_exit{
+        for guide in guides{
+            for suffix in ["DistalNegativeLug","DistalPositiveLug","ForkWeb"]{
+                list.push(checks::not_exists(profile.short_name+"-free-toe-"+guide.pin+suffix,
+                    profile.component,profile.requirement,profile.verification,root+"/"+guide.pin+suffix));
+            }
+        }
+    }
     for index in 0..list.len(){list[index].doc_id=selected_doc;}
     #{source:source,checks:list,path:root,package_name:profile.package_name,verification:profile.verification}
 }
@@ -134,6 +151,8 @@ fn inspect(doc,root,profile,batch){
 fn fittings_connected(doc,root,profile,source,length,tolerance,owner){
     if owner==(){return ();}
     let prefix=profile.owner+"::";
+    let has_exit=sysml_requirements::native_value(source,prefix+"hasExitHinge");
+    if has_exit!=true && has_exit!=false{return ();}
     let entry=sysml_requirements::number(source,prefix+"entryAxisYM");
     let exit=sysml_requirements::number(source,prefix+"exitAxisYM");
     let run=sysml_requirements::number(source,prefix+"plateAttachmentRunM");
@@ -148,18 +167,22 @@ fn fittings_connected(doc,root,profile,source,length,tolerance,owner){
     let exit_support=if exit<0.0 {lower}else{spec::ramp_guide_center_y_m(profile.section_index,length-run,length)};
     for guide in spec::ramp_guide_stations(){
         let expected=[#{name:guide.pin+"Lug",a:[0.0,entry],b:[run,entry_support],z:guide.z,stock:tongue}];
+        if has_exit{
         for side in [#{name:"Negative",sign:-1.0},#{name:"Positive",sign:1.0}]{
             expected.push(#{name:guide.pin+"Distal"+side.name+"Lug",a:[length,exit],b:[length-run,exit_support],
                 z:guide.z+side.sign*(tongue+cheek)/2.0,stock:cheek});
+        }
         }
         for part in expected{
             let lo=[min(part.a[0],part.b[0])-width/2.0,min(part.a[1],part.b[1])-width/2.0,part.z-part.stock/2.0];
             let hi=[max(part.a[0],part.b[0])+width/2.0,max(part.a[1],part.b[1])+width/2.0,part.z+part.stock/2.0];
             parts.push(#{path:root+"/"+part.name,kind:"Mesh",lo:lo,hi:hi});
         }
+        if has_exit{
         parts.push(#{path:root+"/"+guide.pin+"ForkWeb",kind:"Cube",
             lo:[length-run-web/2.0,exit_support-web/2.0,guide.z-(tongue+2.0*cheek)/2.0],
             hi:[length-run+web/2.0,exit_support+web/2.0,guide.z+(tongue+2.0*cheek)/2.0]});
+        }
     }
     let pin_radius=spec::ramp_rail_joint_pin_radius_m();let pin_length=spec::ramp_rail_joint_pin_length_m();
     for guide in spec::ramp_guide_stations(){

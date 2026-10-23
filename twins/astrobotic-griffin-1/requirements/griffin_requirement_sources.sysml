@@ -1538,4 +1538,24 @@ package GriffinRequirementSources {
         ref targetRequirement = GriffinRampMiddleSectionRequirements::gms001;
         ref sources = (source_griffin_ramp_middle_component, source_griffin_root_section_study, source_www_astrobotic_com_griffin_lander);
     }
+    part source_griffin_ramp_toe_component : EvidenceSource {
+        doc /* Detached lower-axis toe reconstruction; not supplier CAD or an installed mechanism. */
+        attribute role : EvidenceSourceRole = "VisualAsset";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_visual.usda";
+    }
+    part evidence_griffin_ramp_toe_component : RequirementEvidence {
+        ref targetRequirement = GriffinRampToeSectionRequirements::gts001;
+        ref sources = (source_griffin_ramp_toe_component, source_griffin_root_section_study, source_www_astrobotic_com_griffin_lander);
+    }
+    part source_griffin_ramp_packaging_study : EvidenceSource {
+        doc /* Native reconstruction study and its explicit coverage boundaries; not flight CAD. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/griffin-ramp-packaging-study-2026-10-23.md";
+    }
+    part evidence_griffin_ramp_payload_packaging : RequirementEvidence {
+        ref targetRequirement = GriffinVehicleAssemblyRequirements::gva001;
+        ref sources = (source_griffin_ramp_packaging_study, source_griffin_root_section_component,
+            source_griffin_ramp_middle_component, source_griffin_ramp_toe_component,
+            source_www_astrobotic_com_griffin_lander);
+    }
 }

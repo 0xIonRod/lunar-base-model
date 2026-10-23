@@ -1,0 +1,215 @@
+{
+  "engine_commit": "0cb4d37137554af3227a316100c903f44a1c3a4c",
+  "checkout_commit": "2a4ec5db046ac3b38400392817e54ef645070512",
+  "binary_sha256": "5b24ec52f8893910cf764334a75279a20522bfdd8d30d0bbfdb827b5ed28c73d",
+  "cases": [
+    {
+      "name": "root",
+      "scene": "tests/griffin_ramp_root_section.usda",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "elapsed_s": 4.473138939999444,
+      "checks": 119,
+      "passes": 119,
+      "failures": 0,
+      "log_sha256": "b49aa132f3781a5edf02eb54438394996a01a65077c8299cebdeabd4c7712980"
+    },
+    {
+      "name": "middle",
+      "scene": "tests/griffin_ramp_middle_section.usda",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "elapsed_s": 4.571543607000422,
+      "checks": 119,
+      "passes": 119,
+      "failures": 0,
+      "log_sha256": "ec20df4e2bdcb8739395fac0227ff7a8ae1e380aa03299c3e08dcc6469206851"
+    },
+    {
+      "name": "toe",
+      "scene": "tests/griffin_ramp_toe_section.usda",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "elapsed_s": 4.923956882999846,
+      "checks": 131,
+      "passes": 131,
+      "failures": 0,
+      "log_sha256": "5af2e8977431088c381a86de376f0df4b608e5cc87fd7413e36a47d271e98e98"
+    },
+    {
+      "name": "toe-negative",
+      "scene": "tests/fixtures/griffin_ramp_toe_section_short.usda",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "elapsed_s": 4.423886143000345,
+      "checks": 131,
+      "passes": 130,
+      "failures": 1,
+      "log_sha256": "dd1691e2957bf0dfd3cb54c7a925a97fd0ea949879985d21468a30ae83d4d3ca"
+    }
+  ],
+  "status": "detached_components_qualified_payload_path_study_passed_installed_mechanism_open",
+  "source_revision": 18059387422882714778,
+  "payload_path_study": {
+    "observation_count": 4698,
+    "minimum_certified_gap_m": 0.05031921791611015,
+    "required_gap_m": 0.05,
+    "failures": 0,
+    "phases": [
+      "root-clear",
+      "middle",
+      "toe",
+      "root-lower"
+    ],
+    "intervals": [
+      300,
+      180,
+      180,
+      119
+    ],
+    "native_bounds": true,
+    "between_sample_motion_bound": true,
+    "reference_comparison": [
+      {
+        "bank": 0,
+        "doc_id": 119590155011470,
+        "document_generation": 0,
+        "maximum_placement_residual_m": 0.0,
+        "part_count": 97,
+        "section": "root",
+        "source_revision": 18059387422882714778,
+        "stage_generation": 0
+      },
+      {
+        "bank": 0,
+        "doc_id": 119590155011470,
+        "document_generation": 0,
+        "maximum_placement_residual_m": 4.002966042486721e-16,
+        "part_count": 97,
+        "section": "middle",
+        "source_revision": 18059387422882714778,
+        "stage_generation": 0
+      },
+      {
+        "bank": 0,
+        "doc_id": 119590155011470,
+        "document_generation": 0,
+        "maximum_placement_residual_m": 4.236704743275018e-16,
+        "part_count": 85,
+        "section": "toe",
+        "source_revision": 18059387422882714778,
+        "stage_generation": 0
+      },
+      {
+        "bank": 1,
+        "doc_id": 119590155011470,
+        "document_generation": 0,
+        "maximum_placement_residual_m": 0.0,
+        "part_count": 97,
+        "section": "root",
+        "source_revision": 18059387422882714778,
+        "stage_generation": 0
+      },
+      {
+        "bank": 1,
+        "doc_id": 119590155011470,
+        "document_generation": 0,
+        "maximum_placement_residual_m": 4.002966042486721e-16,
+        "part_count": 97,
+        "section": "middle",
+        "source_revision": 18059387422882714778,
+        "stage_generation": 0
+      },
+      {
+        "bank": 1,
+        "doc_id": 119590155011470,
+        "document_generation": 0,
+        "maximum_placement_residual_m": 4.236704743275018e-16,
+        "part_count": 85,
+        "section": "toe",
+        "source_revision": 18059387422882714778,
+        "stage_generation": 0
+      }
+    ],
+    "full_scan_sha256": "eadb721e6c979d5051bafbdfa37ab1b590cc4bc5c2a6c6ddc67dfa2165021806",
+    "reference_comparison_sha256": "7d0e4a8d7e9905199de8602f8462acbf003b03d15e95fabf518dfab6446eb438",
+    "scope": "Conservative payload-envelope clearance only. Source-based kinematic study, not loaded joint motion or full GVA-001 acceptance.",
+    "refreshed_input_correlation": {
+      "bank_transforms_identical": true,
+      "payload_geometry_and_attributes_identical": 44,
+      "sha256": "0e0f78285e1a9725b5ac3de3d87b8835fa541d84bec026c0ea9cb52b26e7de7d"
+    }
+  },
+  "preflight": [
+    {
+      "asset": "components/lander/griffin_ramp_middle_section_visual.usda",
+      "ok": true,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "asset": "components/lander/griffin_ramp_toe_visual.usda",
+      "ok": true,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "asset": "tests/griffin_ramp_toe_section.usda",
+      "ok": true,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "asset": "tests/fixtures/griffin_ramp_toe_section_short.usda",
+      "ok": true,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "asset": "tests/griffin_ramp_packaging.usda",
+      "ok": true,
+      "errors": 0,
+      "warnings": 0
+    }
+  ],
+  "sysml": {
+    "errors": 0,
+    "warnings": 153,
+    "new_component_warnings": 0
+  },
+  "provenance": {
+    "requirements": 225,
+    "records": 225,
+    "sources": 74
+  },
+  "boundaries": {
+    "production_vehicle_modified": false,
+    "full_GVA001_verdict": false,
+    "other_bank_lander_ground_and_mating_clearance": false,
+    "loaded_deployment_or_egress": false,
+    "fps_acceptance": false
+  },
+  "source_sha256": {
+    "components/lander/griffin_ramp_root_section_visual.usda": "ecde238ca2c7b12dddaf2e776d0e58188a0566662ce7fbe89d852080b7f40491",
+    "components/lander/griffin_ramp_middle_section_visual.usda": "82158f349b54e805f9be960f34831e0f9a480d02a0d456bbe08fe35492cde8cf",
+    "components/lander/griffin_ramp_toe_visual.usda": "9c4634f2b75d3e166cd2d9dcce59bf529c0bc09786b1c2bd3b51bc816efb49cf",
+    "requirements/griffin_ramp_root_section_requirements.sysml": "621ca552cd2cc86fa65d5305d84f94c6645b6639031cbec7ed1885f95daea48e",
+    "requirements/griffin_ramp_middle_section_requirements.sysml": "6d036743d9db3abe6051340f1b1ff67e6d954834fe37f56a122f591da818696c",
+    "requirements/griffin_ramp_toe_section_requirements.sysml": "0c6dacacf2f8f00f2b872bbcbe38c3e9527b78f8d639d7b7b909058837c76939",
+    "requirements/griffin_vehicle_assembly.sysml": "595ae3807aba0dbf40d4b626e9498e69c4463da8172331b6cf251ba269fb40bc",
+    "requirements/griffin_requirement_sources.sysml": "a2f78ab94ba5a7e817fea3d17c42d4c9390ff593562e7b6730b5abe32758584c",
+    "tools/griffin_ramp_section_component.rhai": "e803e49b0bcbfd51edae8ddf81fbbda3d16c935c4de7555a8d068fa653d20d3f",
+    "tools/griffin_ramp_section_checks.rhai": "3141cb99753486a8c52a28b0670482c4c33bc7c890d167b0156776ca5f58f197",
+    "tools/griffin_ramp_packaging.rhai": "29a68852d51380bfcf3821ee561267a145707473db42613c745409e6a414360d",
+    "tools/griffin_ramp_packaging_checks.rhai": "2b8150844bfcc7f6153b1f18aa1c3c72f0eae6ebe84a2623f544a50f2701752c",
+    "tools/griffin_ramp_toe_section.rhai": "82c358ac8abde8a66c56c35d84d2c39becfdc089431e53447ea712a4882a8670",
+    "tools/griffin_ramp_toe_section_checks.rhai": "05b9907e291d65201891b02dfd1a29e3e736a7236c1d8c58cd6cef7c77f194fc",
+    "tools/griffin_visual_builder.rhai": "1f4bf54364b9bb841f241572b20a117b309e36115dce8c0d9537170c85e8dea6",
+    "scenarios/tests/griffin_ramp_toe_section.rhai": "00bfa26b563d9597c1969eec2a5619b7721f3a73b1bcb6d8deb74d62841cee79",
+    "tests/griffin_ramp_toe_section.usda": "a5be9442fc40ffb28b230fbf067c64376322aaba81338d527030b0b0c48d7945",
+    "tests/fixtures/griffin_ramp_toe_section_short.usda": "7b92642a37ce7f4a5aeaa4967d4afc03b85f256cf4e552f79484e336e0197f60",
+    "tests/griffin_ramp_packaging.usda": "1a0222dba7e023cdb5c4e9188e7c9eb74fbc95ea5805d7fc36accb1c8d819b55",
+    "twin.toml": "5098ddf59c53adacd15766335c25005734a935206b609d6700ad86d0cfab96eb",
+    "vehicles/griffin_1.usda": "a7cfd8a587f8e401643b0056f6a5bb3cb1d9d71dedccff9a09060fd596b74f73"
+  }
+}

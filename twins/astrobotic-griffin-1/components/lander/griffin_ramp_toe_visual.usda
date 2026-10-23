@@ -1,0 +1,1282 @@
+#usda 1.0
+(
+    defaultPrim = "RampSection"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "RampSection" (
+    kind = "component"
+)
+{
+    custom token lunco:component:role = "Griffin articulated egress ramp section"
+    custom token lunco:ramp:section:identity = "ToeSection"
+    def Mesh "RampTrackPort" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.7990840673446655, 0.014999999664723873, -0.28999999165534973), (1.7434024810791016, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.7990840673446655, 0.014999999664723873, 0.28999999165534973), (1.7434024810791016, -0.014999999664723873, 0.28999999165534973)]
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 2, 6, 7, 1, 5, 6, 2, 0, 3, 7, 4]
+        uniform token subdivisionScheme = "none"
+        custom double3 xformOp:translate = (0.0, 0.0, 1.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+        uniform token purpose = "default"
+        uniform token physics:approximation = "convexHull"
+        bool physics:collisionEnabled = true
+        token visibility = "inherited"
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampWalkingPlate>
+    }
+    def Mesh "RampTrackStarboard" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        point3f[] points = [(0.0, -0.014999999664723873, -0.28999999165534973), (0.0, 0.014999999664723873, -0.28999999165534973), (1.7990840673446655, 0.014999999664723873, -0.28999999165534973), (1.7434024810791016, -0.014999999664723873, -0.28999999165534973), (0.0, -0.014999999664723873, 0.28999999165534973), (0.0, 0.014999999664723873, 0.28999999165534973), (1.7990840673446655, 0.014999999664723873, 0.28999999165534973), (1.7434024810791016, -0.014999999664723873, 0.28999999165534973)]
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 4, 7, 6, 5, 0, 4, 5, 1, 3, 2, 6, 7, 1, 5, 6, 2, 0, 3, 7, 4]
+        uniform token subdivisionScheme = "none"
+        custom double3 xformOp:translate = (0.0, 0.0, -1.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+        uniform token purpose = "default"
+        uniform token physics:approximation = "convexHull"
+        bool physics:collisionEnabled = true
+        token visibility = "inherited"
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampWalkingPlate>
+    }
+    def Cube "UnderBeamPort" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.8995420265, -0.0375, 1.2)
+        custom double3 xformOp:scale = (1.799084053, 0.045, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "UnderBeamStarboard" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.8995420265, -0.0375, -1.2)
+        custom double3 xformOp:scale = (1.799084053, 0.045, 0.06)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SidePostPort1" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.0, 0.09999999999999999, 1.293)
+        custom double3 xformOp:scale = (0.012, 0.19999999999999998, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SidePostPort2" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (1.799084053, 0.09999999999999999, 1.293)
+        custom double3 xformOp:scale = (0.012, 0.19999999999999998, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SidePostStarboard1" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.0, 0.09999999999999999, -1.293)
+        custom double3 xformOp:scale = (0.012, 0.19999999999999998, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SidePostStarboard2" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (1.799084053, 0.09999999999999999, -1.293)
+        custom double3 xformOp:scale = (0.012, 0.19999999999999998, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "TreadPort1" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.224885506625, 0.02, 1.0)
+        custom double3 xformOp:scale = (0.06, 0.01, 0.5800000000000001)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23000000417232513, 0.2800000011920929)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadPort2" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.6746565198750001, 0.02, 1.0)
+        custom double3 xformOp:scale = (0.06, 0.01, 0.5800000000000001)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23000000417232513, 0.2800000011920929)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadPort3" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (1.124427533125, 0.02, 1.0)
+        custom double3 xformOp:scale = (0.06, 0.01, 0.5800000000000001)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23000000417232513, 0.2800000011920929)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadPort4" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (1.5741985463750001, 0.02, 1.0)
+        custom double3 xformOp:scale = (0.06, 0.01, 0.5800000000000001)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23000000417232513, 0.2800000011920929)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadStarboard1" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.224885506625, 0.02, -1.0)
+        custom double3 xformOp:scale = (0.06, 0.01, 0.5800000000000001)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23000000417232513, 0.2800000011920929)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadStarboard2" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (0.6746565198750001, 0.02, -1.0)
+        custom double3 xformOp:scale = (0.06, 0.01, 0.5800000000000001)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23000000417232513, 0.2800000011920929)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadStarboard3" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (1.124427533125, 0.02, -1.0)
+        custom double3 xformOp:scale = (0.06, 0.01, 0.5800000000000001)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23000000417232513, 0.2800000011920929)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cube "TreadStarboard4" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double size = 1.0
+        custom double3 xformOp:translate = (1.5741985463750001, 0.02, -1.0)
+        custom double3 xformOp:scale = (0.06, 0.01, 0.5800000000000001)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.20000000298023224, 0.23000000417232513, 0.2800000011920929)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+    }
+    def Cylinder "HingeBarrel" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        double radius = 0.025
+        double height = 1.408
+        uniform token axis = "Z"
+        custom double3 xformOp:translate = (0.0, -0.08, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.2199999988079071, 0.25999999046325684, 0.3100000023841858)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cylinder "OuterRailJointPin" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double radius = 0.02
+        double height = 0.06
+        uniform token axis = "Z"
+        custom double3 xformOp:translate = (0.0, -0.08, 1.293)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cylinder "InnerRailJointPin" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double radius = 0.02
+        double height = 0.06
+        uniform token axis = "Z"
+        custom double3 xformOp:translate = (0.0, -0.08, -1.293)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussLowerChordPort" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.8995420265, 0.025, 1.293)
+        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        custom double3 xformOp:scale = (1.799084053, 0.02, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort1" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.07496183554166667, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort2" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.224885506625, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort3" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.37480917770833333, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779243)
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort4" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.5247328487916667, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussLowerChordStarboard" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.8995420265, 0.025, -1.293)
+        double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+        custom double3 xformOp:scale = (1.799084053, 0.02, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard1" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.07496183554166667, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard2" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.224885506625, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard3" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.37480917770833333, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779243)
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard4" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.5247328487916667, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        uniform token purpose = "render"
+        bool physics:collisionEnabled = false
+        double size = 1.0
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Mesh "CenterRailPort" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+        active = true
+    )
+    {
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (0.8995420265, 0.18, 0.707)
+        uniform token purpose = "default"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+        point3f[] points = [(0.019999999552965164, 0.8795420527458191, -0.003000000026077032), (0.019318517297506332, 0.8847184181213379, -0.003000000026077032), (0.017320508137345314, 0.8895420432090759, -0.003000000026077032), (0.01414213515818119, 0.8936841487884521, -0.003000000026077032), (0.009999999776482582, 0.8968625068664551, -0.003000000026077032), (0.00517638074234128, 0.898860514163971, -0.003000000026077032), (0.000000000000000001224646790546622, 0.8995420336723328, -0.003000000026077032), (-0.00517638074234128, 0.898860514163971, -0.003000000026077032), (-0.009999999776482582, 0.8968625068664551, -0.003000000026077032), (-0.01414213515818119, 0.8936841487884521, -0.003000000026077032), (-0.017320508137345314, 0.8895420432090759, -0.003000000026077032), (-0.019318517297506332, 0.8847184181213379, -0.003000000026077032), (-0.019999999552965164, 0.8795420527458191, -0.003000000026077032), (-0.019999999552965164, -0.8795420527458191, -0.003000000026077032), (-0.019318517297506332, -0.8847184181213379, -0.003000000026077032), (-0.017320508137345314, -0.8895420432090759, -0.003000000026077032), (-0.01414213515818119, -0.8936841487884521, -0.003000000026077032), (-0.009999999776482582, -0.8968625068664551, -0.003000000026077032), (-0.00517638074234128, -0.898860514163971, -0.003000000026077032), (-0.000000000000000003673940475037442, -0.8995420336723328, -0.003000000026077032), (0.00517638074234128, -0.898860514163971, -0.003000000026077032), (0.009999999776482582, -0.8968625068664551, -0.003000000026077032), (0.01414213515818119, -0.8936841487884521, -0.003000000026077032), (0.017320508137345314, -0.8895420432090759, -0.003000000026077032), (0.019318517297506332, -0.8847184181213379, -0.003000000026077032), (0.019999999552965164, -0.8795420527458191, -0.003000000026077032), (0.019999999552965164, 0.8795420527458191, 0.003000000026077032), (0.019318517297506332, 0.8847184181213379, 0.003000000026077032), (0.017320508137345314, 0.8895420432090759, 0.003000000026077032), (0.01414213515818119, 0.8936841487884521, 0.003000000026077032), (0.009999999776482582, 0.8968625068664551, 0.003000000026077032), (0.00517638074234128, 0.898860514163971, 0.003000000026077032), (0.000000000000000001224646790546622, 0.8995420336723328, 0.003000000026077032), (-0.00517638074234128, 0.898860514163971, 0.003000000026077032), (-0.009999999776482582, 0.8968625068664551, 0.003000000026077032), (-0.01414213515818119, 0.8936841487884521, 0.003000000026077032), (-0.017320508137345314, 0.8895420432090759, 0.003000000026077032), (-0.019318517297506332, 0.8847184181213379, 0.003000000026077032), (-0.019999999552965164, 0.8795420527458191, 0.003000000026077032), (-0.019999999552965164, -0.8795420527458191, 0.003000000026077032), (-0.019318517297506332, -0.8847184181213379, 0.003000000026077032), (-0.017320508137345314, -0.8895420432090759, 0.003000000026077032), (-0.01414213515818119, -0.8936841487884521, 0.003000000026077032), (-0.009999999776482582, -0.8968625068664551, 0.003000000026077032), (-0.00517638074234128, -0.898860514163971, 0.003000000026077032), (-0.000000000000000003673940475037442, -0.8995420336723328, 0.003000000026077032), (0.00517638074234128, -0.898860514163971, 0.003000000026077032), (0.009999999776482582, -0.8968625068664551, 0.003000000026077032), (0.01414213515818119, -0.8936841487884521, 0.003000000026077032), (0.017320508137345314, -0.8895420432090759, 0.003000000026077032), (0.019318517297506332, -0.8847184181213379, 0.003000000026077032), (0.019999999552965164, -0.8795420527458191, 0.003000000026077032)]
+        int[] faceVertexCounts = [26, 26, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 1, 27, 26, 1, 2, 28, 27, 2, 3, 29, 28, 3, 4, 30, 29, 4, 5, 31, 30, 5, 6, 32, 31, 6, 7, 33, 32, 7, 8, 34, 33, 8, 9, 35, 34, 9, 10, 36, 35, 10, 11, 37, 36, 11, 12, 38, 37, 12, 13, 39, 38, 13, 14, 40, 39, 14, 15, 41, 40, 15, 16, 42, 41, 16, 17, 43, 42, 17, 18, 44, 43, 18, 19, 45, 44, 19, 20, 46, 45, 20, 21, 47, 46, 21, 22, 48, 47, 22, 23, 49, 48, 23, 24, 50, 49, 24, 25, 51, 50, 25, 0, 26, 51]
+        uniform token subdivisionScheme = "none"
+        uniform bool doubleSided = false
+        float3[] extent = [(-0.019999999552965164, -0.899541974067688, -0.003000000026077032), (0.019999999552965164, 0.899541974067688, 0.003000000026077032)]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -90.0)
+        uniform token physics:approximation = "convexHull"
+    }
+    def Mesh "CenterRailStarboard" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+        active = true
+    )
+    {
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = true
+        custom double3 xformOp:translate = (0.8995420265, 0.18, -0.707)
+        uniform token purpose = "default"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+        point3f[] points = [(0.019999999552965164, 0.8795420527458191, -0.003000000026077032), (0.019318517297506332, 0.8847184181213379, -0.003000000026077032), (0.017320508137345314, 0.8895420432090759, -0.003000000026077032), (0.01414213515818119, 0.8936841487884521, -0.003000000026077032), (0.009999999776482582, 0.8968625068664551, -0.003000000026077032), (0.00517638074234128, 0.898860514163971, -0.003000000026077032), (0.000000000000000001224646790546622, 0.8995420336723328, -0.003000000026077032), (-0.00517638074234128, 0.898860514163971, -0.003000000026077032), (-0.009999999776482582, 0.8968625068664551, -0.003000000026077032), (-0.01414213515818119, 0.8936841487884521, -0.003000000026077032), (-0.017320508137345314, 0.8895420432090759, -0.003000000026077032), (-0.019318517297506332, 0.8847184181213379, -0.003000000026077032), (-0.019999999552965164, 0.8795420527458191, -0.003000000026077032), (-0.019999999552965164, -0.8795420527458191, -0.003000000026077032), (-0.019318517297506332, -0.8847184181213379, -0.003000000026077032), (-0.017320508137345314, -0.8895420432090759, -0.003000000026077032), (-0.01414213515818119, -0.8936841487884521, -0.003000000026077032), (-0.009999999776482582, -0.8968625068664551, -0.003000000026077032), (-0.00517638074234128, -0.898860514163971, -0.003000000026077032), (-0.000000000000000003673940475037442, -0.8995420336723328, -0.003000000026077032), (0.00517638074234128, -0.898860514163971, -0.003000000026077032), (0.009999999776482582, -0.8968625068664551, -0.003000000026077032), (0.01414213515818119, -0.8936841487884521, -0.003000000026077032), (0.017320508137345314, -0.8895420432090759, -0.003000000026077032), (0.019318517297506332, -0.8847184181213379, -0.003000000026077032), (0.019999999552965164, -0.8795420527458191, -0.003000000026077032), (0.019999999552965164, 0.8795420527458191, 0.003000000026077032), (0.019318517297506332, 0.8847184181213379, 0.003000000026077032), (0.017320508137345314, 0.8895420432090759, 0.003000000026077032), (0.01414213515818119, 0.8936841487884521, 0.003000000026077032), (0.009999999776482582, 0.8968625068664551, 0.003000000026077032), (0.00517638074234128, 0.898860514163971, 0.003000000026077032), (0.000000000000000001224646790546622, 0.8995420336723328, 0.003000000026077032), (-0.00517638074234128, 0.898860514163971, 0.003000000026077032), (-0.009999999776482582, 0.8968625068664551, 0.003000000026077032), (-0.01414213515818119, 0.8936841487884521, 0.003000000026077032), (-0.017320508137345314, 0.8895420432090759, 0.003000000026077032), (-0.019318517297506332, 0.8847184181213379, 0.003000000026077032), (-0.019999999552965164, 0.8795420527458191, 0.003000000026077032), (-0.019999999552965164, -0.8795420527458191, 0.003000000026077032), (-0.019318517297506332, -0.8847184181213379, 0.003000000026077032), (-0.017320508137345314, -0.8895420432090759, 0.003000000026077032), (-0.01414213515818119, -0.8936841487884521, 0.003000000026077032), (-0.009999999776482582, -0.8968625068664551, 0.003000000026077032), (-0.00517638074234128, -0.898860514163971, 0.003000000026077032), (-0.000000000000000003673940475037442, -0.8995420336723328, 0.003000000026077032), (0.00517638074234128, -0.898860514163971, 0.003000000026077032), (0.009999999776482582, -0.8968625068664551, 0.003000000026077032), (0.01414213515818119, -0.8936841487884521, 0.003000000026077032), (0.017320508137345314, -0.8895420432090759, 0.003000000026077032), (0.019318517297506332, -0.8847184181213379, 0.003000000026077032), (0.019999999552965164, -0.8795420527458191, 0.003000000026077032)]
+        int[] faceVertexCounts = [26, 26, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 1, 27, 26, 1, 2, 28, 27, 2, 3, 29, 28, 3, 4, 30, 29, 4, 5, 31, 30, 5, 6, 32, 31, 6, 7, 33, 32, 7, 8, 34, 33, 8, 9, 35, 34, 9, 10, 36, 35, 10, 11, 37, 36, 11, 12, 38, 37, 12, 13, 39, 38, 13, 14, 40, 39, 14, 15, 41, 40, 15, 16, 42, 41, 16, 17, 43, 42, 17, 18, 44, 43, 18, 19, 45, 44, 19, 20, 46, 45, 20, 21, 47, 46, 21, 22, 48, 47, 22, 23, 49, 48, 23, 24, 50, 49, 24, 25, 51, 50, 25, 0, 26, 51]
+        uniform token subdivisionScheme = "none"
+        uniform bool doubleSided = false
+        float3[] extent = [(-0.019999999552965164, -0.899541974067688, -0.003000000026077032), (0.019999999552965164, 0.899541974067688, 0.003000000026077032)]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -90.0)
+        uniform token physics:approximation = "convexHull"
+    }
+    def Cube "SidePostPortCenter1" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.012, 0.19999999999999998, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.09999999999999999, 0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SidePostPortCenter2" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.012, 0.19999999999999998, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.799084053, 0.09999999999999999, 0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussLowerChordPortCenter" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (1.799084053, 0.02, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.8995420265, 0.025, 0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter1" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.07496183554166667, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter2" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.224885506625, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter3" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.37480917770833333, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779243)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter4" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.5247328487916667, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SidePostStarboardCenter1" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.012, 0.19999999999999998, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.09999999999999999, -0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SidePostStarboardCenter2" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.012, 0.19999999999999998, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.799084053, 0.09999999999999999, -0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussLowerChordStarboardCenter" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (1.799084053, 0.02, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.8995420265, 0.025, -0.707)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter1" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.07496183554166667, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter2" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.224885506625, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter3" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275868, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.37480917770833333, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779243)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter4" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.5247328487916667, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort5" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.6746565198750001, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort6" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275863, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.8245801909583335, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.953764447792445)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort7" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.9745038620416667, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort8" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.124427533125, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort9" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.2743512042083336, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort10" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.4242748752916667, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort11" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.5741985463750003, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePort12" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275854, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.7241222174583335, 0.1025, 1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.953764447792466)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard5" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.6746565198750001, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard6" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275863, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.8245801909583335, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.953764447792445)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard7" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.9745038620416667, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard8" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.124427533125, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard9" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.2743512042083336, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard10" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.4242748752916667, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard11" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.5741985463750003, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboard12" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275854, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.7241222174583335, 0.1025, -1.293)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.953764447792466)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter5" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.6746565198750001, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter6" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275863, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.8245801909583335, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.953764447792445)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter7" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.9745038620416667, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter8" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.124427533125, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter9" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.2743512042083336, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter10" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.4242748752916667, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter11" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.5741985463750003, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBracePortCenter12" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275854, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.7241222174583335, 0.1025, 0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.953764447792466)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter5" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.6746565198750001, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter6" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275863, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.8245801909583335, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.953764447792445)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter7" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (0.9745038620416667, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter8" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.124427533125, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter9" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.2743512042083336, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter10" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.4242748752916667, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter11" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.2156434723127587, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.5741985463750003, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 45.95376444779242)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cube "SideTrussBraceStarboardCenter12" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        custom double3 xformOp:scale = (0.21564347231275854, 0.012, 0.006)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        double size = 1.0
+        bool physics:collisionEnabled = false
+        custom double3 xformOp:translate = (1.7241222174583335, 0.1025, -0.707)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -45.953764447792466)
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cylinder "CenterRailPortJointPin" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double radius = 0.02
+        double height = 0.06
+        uniform token axis = "Z"
+        bool physics:collisionEnabled = false
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom double3 xformOp:translate = (0.0, -0.08, 0.707)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Cylinder "CenterRailStarboardJointPin" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+    )
+    {
+        double radius = 0.02
+        double height = 0.06
+        uniform token axis = "Z"
+        bool physics:collisionEnabled = false
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        custom double3 xformOp:translate = (0.0, -0.08, -0.707)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Scope "Looks"
+    {
+        def Material "RampStructure"
+        {
+            custom token outputs:surface
+            token outputs:surface.connect = </RampSection/Looks/RampStructure/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                token outputs:surface = ""
+                color3f inputs:diffuseColor = (0.550000011920929, 0.5799999833106995, 0.6200000047683716)
+                float inputs:metallic = 0.75
+                float inputs:roughness = 0.41999998688697815
+            }
+        }
+        def Material "RampWalkingPlate"
+        {
+            custom token outputs:surface
+            token outputs:surface.connect = </RampSection/Looks/RampWalkingPlate/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                token outputs:surface = ""
+                color3f inputs:diffuseColor = (0.02500000037252903, 0.02800000086426735, 0.032999999821186066)
+                float inputs:metallic = 0.10000000149011612
+                float inputs:roughness = 0.6800000071525574
+            }
+        }
+    }
+    def Mesh "OuterRailJointPinLug" (
+        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        active = true
+    )
+    {
+        point3f[] points = [(0.029999999329447746, 0.06914658099412918, -0.004999999888241291), (0.02897777408361435, 0.07691115140914917, -0.004999999888241291), (0.025980761274695396, 0.08414658159017563, -0.004999999888241291), (0.02121320366859436, 0.09035978466272354, -0.004999999888241291), (0.014999999664723873, 0.09512734413146973, -0.004999999888241291), (0.007764571346342564, 0.09812435507774353, -0.004999999888241291), (0.000000000000000001836970237518721, 0.09914658218622208, -0.004999999888241291), (-0.007764571346342564, 0.09812435507774353, -0.004999999888241291), (-0.014999999664723873, 0.09512734413146973, -0.004999999888241291), (-0.02121320366859436, 0.09035978466272354, -0.004999999888241291), (-0.025980761274695396, 0.08414658159017563, -0.004999999888241291), (-0.02897777408361435, 0.07691115140914917, -0.004999999888241291), (-0.029999999329447746, 0.06914658099412918, -0.004999999888241291), (-0.029999999329447746, -0.06914658099412918, -0.004999999888241291), (-0.02897777408361435, -0.07691115140914917, -0.004999999888241291), (-0.025980761274695396, -0.08414658159017563, -0.004999999888241291), (-0.02121320366859436, -0.09035978466272354, -0.004999999888241291), (-0.014999999664723873, -0.09512734413146973, -0.004999999888241291), (-0.007764571346342564, -0.09812435507774353, -0.004999999888241291), (-0.00000000000000000551091050576101, -0.09914658218622208, -0.004999999888241291), (0.007764571346342564, -0.09812435507774353, -0.004999999888241291), (0.014999999664723873, -0.09512734413146973, -0.004999999888241291), (0.02121320366859436, -0.09035978466272354, -0.004999999888241291), (0.025980761274695396, -0.08414658159017563, -0.004999999888241291), (0.02897777408361435, -0.07691115140914917, -0.004999999888241291), (0.029999999329447746, -0.06914658099412918, -0.004999999888241291), (0.029999999329447746, 0.06914658099412918, 0.004999999888241291), (0.02897777408361435, 0.07691115140914917, 0.004999999888241291), (0.025980761274695396, 0.08414658159017563, 0.004999999888241291), (0.02121320366859436, 0.09035978466272354, 0.004999999888241291), (0.014999999664723873, 0.09512734413146973, 0.004999999888241291), (0.007764571346342564, 0.09812435507774353, 0.004999999888241291), (0.000000000000000001836970237518721, 0.09914658218622208, 0.004999999888241291), (-0.007764571346342564, 0.09812435507774353, 0.004999999888241291), (-0.014999999664723873, 0.09512734413146973, 0.004999999888241291), (-0.02121320366859436, 0.09035978466272354, 0.004999999888241291), (-0.025980761274695396, 0.08414658159017563, 0.004999999888241291), (-0.02897777408361435, 0.07691115140914917, 0.004999999888241291), (-0.029999999329447746, 0.06914658099412918, 0.004999999888241291), (-0.029999999329447746, -0.06914658099412918, 0.004999999888241291), (-0.02897777408361435, -0.07691115140914917, 0.004999999888241291), (-0.025980761274695396, -0.08414658159017563, 0.004999999888241291), (-0.02121320366859436, -0.09035978466272354, 0.004999999888241291), (-0.014999999664723873, -0.09512734413146973, 0.004999999888241291), (-0.007764571346342564, -0.09812435507774353, 0.004999999888241291), (-0.00000000000000000551091050576101, -0.09914658218622208, 0.004999999888241291), (0.007764571346342564, -0.09812435507774353, 0.004999999888241291), (0.014999999664723873, -0.09512734413146973, 0.004999999888241291), (0.02121320366859436, -0.09035978466272354, 0.004999999888241291), (0.025980761274695396, -0.08414658159017563, 0.004999999888241291), (0.02897777408361435, -0.07691115140914917, 0.004999999888241291), (0.029999999329447746, -0.06914658099412918, 0.004999999888241291)]
+        int[] faceVertexCounts = [26, 26, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 1, 27, 26, 1, 2, 28, 27, 2, 3, 29, 28, 3, 4, 30, 29, 4, 5, 31, 30, 5, 6, 32, 31, 6, 7, 33, 32, 7, 8, 34, 33, 8, 9, 35, 34, 9, 10, 36, 35, 10, 11, 37, 36, 11, 12, 38, 37, 12, 13, 39, 38, 13, 14, 40, 39, 14, 15, 41, 40, 15, 16, 42, 41, 16, 17, 43, 42, 17, 18, 44, 43, 18, 19, 45, 44, 19, 20, 46, 45, 20, 21, 47, 46, 21, 22, 48, 47, 22, 23, 49, 48, 23, 24, 50, 49, 24, 25, 51, 50, 25, 0, 26, 51]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        bool physics:collisionEnabled = false
+        uniform bool doubleSided = false
+        custom double3 xformOp:translate = (0.045, -0.0275, 1.293)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+        float3[] extent = [(-0.029999999329447746, -0.0991469994187355, -0.004999999888241291), (0.029999999329447746, 0.0991469994187355, 0.004999999888241291)]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.601294645004465)
+    }
+    def Mesh "InnerRailJointPinLug" (
+        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        active = true
+    )
+    {
+        point3f[] points = [(0.029999999329447746, 0.06914658099412918, -0.004999999888241291), (0.02897777408361435, 0.07691115140914917, -0.004999999888241291), (0.025980761274695396, 0.08414658159017563, -0.004999999888241291), (0.02121320366859436, 0.09035978466272354, -0.004999999888241291), (0.014999999664723873, 0.09512734413146973, -0.004999999888241291), (0.007764571346342564, 0.09812435507774353, -0.004999999888241291), (0.000000000000000001836970237518721, 0.09914658218622208, -0.004999999888241291), (-0.007764571346342564, 0.09812435507774353, -0.004999999888241291), (-0.014999999664723873, 0.09512734413146973, -0.004999999888241291), (-0.02121320366859436, 0.09035978466272354, -0.004999999888241291), (-0.025980761274695396, 0.08414658159017563, -0.004999999888241291), (-0.02897777408361435, 0.07691115140914917, -0.004999999888241291), (-0.029999999329447746, 0.06914658099412918, -0.004999999888241291), (-0.029999999329447746, -0.06914658099412918, -0.004999999888241291), (-0.02897777408361435, -0.07691115140914917, -0.004999999888241291), (-0.025980761274695396, -0.08414658159017563, -0.004999999888241291), (-0.02121320366859436, -0.09035978466272354, -0.004999999888241291), (-0.014999999664723873, -0.09512734413146973, -0.004999999888241291), (-0.007764571346342564, -0.09812435507774353, -0.004999999888241291), (-0.00000000000000000551091050576101, -0.09914658218622208, -0.004999999888241291), (0.007764571346342564, -0.09812435507774353, -0.004999999888241291), (0.014999999664723873, -0.09512734413146973, -0.004999999888241291), (0.02121320366859436, -0.09035978466272354, -0.004999999888241291), (0.025980761274695396, -0.08414658159017563, -0.004999999888241291), (0.02897777408361435, -0.07691115140914917, -0.004999999888241291), (0.029999999329447746, -0.06914658099412918, -0.004999999888241291), (0.029999999329447746, 0.06914658099412918, 0.004999999888241291), (0.02897777408361435, 0.07691115140914917, 0.004999999888241291), (0.025980761274695396, 0.08414658159017563, 0.004999999888241291), (0.02121320366859436, 0.09035978466272354, 0.004999999888241291), (0.014999999664723873, 0.09512734413146973, 0.004999999888241291), (0.007764571346342564, 0.09812435507774353, 0.004999999888241291), (0.000000000000000001836970237518721, 0.09914658218622208, 0.004999999888241291), (-0.007764571346342564, 0.09812435507774353, 0.004999999888241291), (-0.014999999664723873, 0.09512734413146973, 0.004999999888241291), (-0.02121320366859436, 0.09035978466272354, 0.004999999888241291), (-0.025980761274695396, 0.08414658159017563, 0.004999999888241291), (-0.02897777408361435, 0.07691115140914917, 0.004999999888241291), (-0.029999999329447746, 0.06914658099412918, 0.004999999888241291), (-0.029999999329447746, -0.06914658099412918, 0.004999999888241291), (-0.02897777408361435, -0.07691115140914917, 0.004999999888241291), (-0.025980761274695396, -0.08414658159017563, 0.004999999888241291), (-0.02121320366859436, -0.09035978466272354, 0.004999999888241291), (-0.014999999664723873, -0.09512734413146973, 0.004999999888241291), (-0.007764571346342564, -0.09812435507774353, 0.004999999888241291), (-0.00000000000000000551091050576101, -0.09914658218622208, 0.004999999888241291), (0.007764571346342564, -0.09812435507774353, 0.004999999888241291), (0.014999999664723873, -0.09512734413146973, 0.004999999888241291), (0.02121320366859436, -0.09035978466272354, 0.004999999888241291), (0.025980761274695396, -0.08414658159017563, 0.004999999888241291), (0.02897777408361435, -0.07691115140914917, 0.004999999888241291), (0.029999999329447746, -0.06914658099412918, 0.004999999888241291)]
+        int[] faceVertexCounts = [26, 26, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 1, 27, 26, 1, 2, 28, 27, 2, 3, 29, 28, 3, 4, 30, 29, 4, 5, 31, 30, 5, 6, 32, 31, 6, 7, 33, 32, 7, 8, 34, 33, 8, 9, 35, 34, 9, 10, 36, 35, 10, 11, 37, 36, 11, 12, 38, 37, 12, 13, 39, 38, 13, 14, 40, 39, 14, 15, 41, 40, 15, 16, 42, 41, 16, 17, 43, 42, 17, 18, 44, 43, 18, 19, 45, 44, 19, 20, 46, 45, 20, 21, 47, 46, 21, 22, 48, 47, 22, 23, 49, 48, 23, 24, 50, 49, 24, 25, 51, 50, 25, 0, 26, 51]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        bool physics:collisionEnabled = false
+        uniform bool doubleSided = false
+        custom double3 xformOp:translate = (0.045, -0.0275, -1.293)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+        float3[] extent = [(-0.029999999329447746, -0.0991469994187355, -0.004999999888241291), (0.029999999329447746, 0.0991469994187355, 0.004999999888241291)]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.601294645004465)
+    }
+    def Mesh "CenterRailPortJointPinLug" (
+        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        active = true
+    )
+    {
+        point3f[] points = [(0.029999999329447746, 0.06914658099412918, -0.004999999888241291), (0.02897777408361435, 0.07691115140914917, -0.004999999888241291), (0.025980761274695396, 0.08414658159017563, -0.004999999888241291), (0.02121320366859436, 0.09035978466272354, -0.004999999888241291), (0.014999999664723873, 0.09512734413146973, -0.004999999888241291), (0.007764571346342564, 0.09812435507774353, -0.004999999888241291), (0.000000000000000001836970237518721, 0.09914658218622208, -0.004999999888241291), (-0.007764571346342564, 0.09812435507774353, -0.004999999888241291), (-0.014999999664723873, 0.09512734413146973, -0.004999999888241291), (-0.02121320366859436, 0.09035978466272354, -0.004999999888241291), (-0.025980761274695396, 0.08414658159017563, -0.004999999888241291), (-0.02897777408361435, 0.07691115140914917, -0.004999999888241291), (-0.029999999329447746, 0.06914658099412918, -0.004999999888241291), (-0.029999999329447746, -0.06914658099412918, -0.004999999888241291), (-0.02897777408361435, -0.07691115140914917, -0.004999999888241291), (-0.025980761274695396, -0.08414658159017563, -0.004999999888241291), (-0.02121320366859436, -0.09035978466272354, -0.004999999888241291), (-0.014999999664723873, -0.09512734413146973, -0.004999999888241291), (-0.007764571346342564, -0.09812435507774353, -0.004999999888241291), (-0.00000000000000000551091050576101, -0.09914658218622208, -0.004999999888241291), (0.007764571346342564, -0.09812435507774353, -0.004999999888241291), (0.014999999664723873, -0.09512734413146973, -0.004999999888241291), (0.02121320366859436, -0.09035978466272354, -0.004999999888241291), (0.025980761274695396, -0.08414658159017563, -0.004999999888241291), (0.02897777408361435, -0.07691115140914917, -0.004999999888241291), (0.029999999329447746, -0.06914658099412918, -0.004999999888241291), (0.029999999329447746, 0.06914658099412918, 0.004999999888241291), (0.02897777408361435, 0.07691115140914917, 0.004999999888241291), (0.025980761274695396, 0.08414658159017563, 0.004999999888241291), (0.02121320366859436, 0.09035978466272354, 0.004999999888241291), (0.014999999664723873, 0.09512734413146973, 0.004999999888241291), (0.007764571346342564, 0.09812435507774353, 0.004999999888241291), (0.000000000000000001836970237518721, 0.09914658218622208, 0.004999999888241291), (-0.007764571346342564, 0.09812435507774353, 0.004999999888241291), (-0.014999999664723873, 0.09512734413146973, 0.004999999888241291), (-0.02121320366859436, 0.09035978466272354, 0.004999999888241291), (-0.025980761274695396, 0.08414658159017563, 0.004999999888241291), (-0.02897777408361435, 0.07691115140914917, 0.004999999888241291), (-0.029999999329447746, 0.06914658099412918, 0.004999999888241291), (-0.029999999329447746, -0.06914658099412918, 0.004999999888241291), (-0.02897777408361435, -0.07691115140914917, 0.004999999888241291), (-0.025980761274695396, -0.08414658159017563, 0.004999999888241291), (-0.02121320366859436, -0.09035978466272354, 0.004999999888241291), (-0.014999999664723873, -0.09512734413146973, 0.004999999888241291), (-0.007764571346342564, -0.09812435507774353, 0.004999999888241291), (-0.00000000000000000551091050576101, -0.09914658218622208, 0.004999999888241291), (0.007764571346342564, -0.09812435507774353, 0.004999999888241291), (0.014999999664723873, -0.09512734413146973, 0.004999999888241291), (0.02121320366859436, -0.09035978466272354, 0.004999999888241291), (0.025980761274695396, -0.08414658159017563, 0.004999999888241291), (0.02897777408361435, -0.07691115140914917, 0.004999999888241291), (0.029999999329447746, -0.06914658099412918, 0.004999999888241291)]
+        int[] faceVertexCounts = [26, 26, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 1, 27, 26, 1, 2, 28, 27, 2, 3, 29, 28, 3, 4, 30, 29, 4, 5, 31, 30, 5, 6, 32, 31, 6, 7, 33, 32, 7, 8, 34, 33, 8, 9, 35, 34, 9, 10, 36, 35, 10, 11, 37, 36, 11, 12, 38, 37, 12, 13, 39, 38, 13, 14, 40, 39, 14, 15, 41, 40, 15, 16, 42, 41, 16, 17, 43, 42, 17, 18, 44, 43, 18, 19, 45, 44, 19, 20, 46, 45, 20, 21, 47, 46, 21, 22, 48, 47, 22, 23, 49, 48, 23, 24, 50, 49, 24, 25, 51, 50, 25, 0, 26, 51]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        bool physics:collisionEnabled = false
+        uniform bool doubleSided = false
+        custom double3 xformOp:translate = (0.045, -0.0275, 0.707)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+        float3[] extent = [(-0.029999999329447746, -0.0991469994187355, -0.004999999888241291), (0.029999999329447746, 0.0991469994187355, 0.004999999888241291)]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.601294645004465)
+    }
+    def Mesh "CenterRailStarboardJointPinLug" (
+        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        active = true
+    )
+    {
+        point3f[] points = [(0.029999999329447746, 0.06914658099412918, -0.004999999888241291), (0.02897777408361435, 0.07691115140914917, -0.004999999888241291), (0.025980761274695396, 0.08414658159017563, -0.004999999888241291), (0.02121320366859436, 0.09035978466272354, -0.004999999888241291), (0.014999999664723873, 0.09512734413146973, -0.004999999888241291), (0.007764571346342564, 0.09812435507774353, -0.004999999888241291), (0.000000000000000001836970237518721, 0.09914658218622208, -0.004999999888241291), (-0.007764571346342564, 0.09812435507774353, -0.004999999888241291), (-0.014999999664723873, 0.09512734413146973, -0.004999999888241291), (-0.02121320366859436, 0.09035978466272354, -0.004999999888241291), (-0.025980761274695396, 0.08414658159017563, -0.004999999888241291), (-0.02897777408361435, 0.07691115140914917, -0.004999999888241291), (-0.029999999329447746, 0.06914658099412918, -0.004999999888241291), (-0.029999999329447746, -0.06914658099412918, -0.004999999888241291), (-0.02897777408361435, -0.07691115140914917, -0.004999999888241291), (-0.025980761274695396, -0.08414658159017563, -0.004999999888241291), (-0.02121320366859436, -0.09035978466272354, -0.004999999888241291), (-0.014999999664723873, -0.09512734413146973, -0.004999999888241291), (-0.007764571346342564, -0.09812435507774353, -0.004999999888241291), (-0.00000000000000000551091050576101, -0.09914658218622208, -0.004999999888241291), (0.007764571346342564, -0.09812435507774353, -0.004999999888241291), (0.014999999664723873, -0.09512734413146973, -0.004999999888241291), (0.02121320366859436, -0.09035978466272354, -0.004999999888241291), (0.025980761274695396, -0.08414658159017563, -0.004999999888241291), (0.02897777408361435, -0.07691115140914917, -0.004999999888241291), (0.029999999329447746, -0.06914658099412918, -0.004999999888241291), (0.029999999329447746, 0.06914658099412918, 0.004999999888241291), (0.02897777408361435, 0.07691115140914917, 0.004999999888241291), (0.025980761274695396, 0.08414658159017563, 0.004999999888241291), (0.02121320366859436, 0.09035978466272354, 0.004999999888241291), (0.014999999664723873, 0.09512734413146973, 0.004999999888241291), (0.007764571346342564, 0.09812435507774353, 0.004999999888241291), (0.000000000000000001836970237518721, 0.09914658218622208, 0.004999999888241291), (-0.007764571346342564, 0.09812435507774353, 0.004999999888241291), (-0.014999999664723873, 0.09512734413146973, 0.004999999888241291), (-0.02121320366859436, 0.09035978466272354, 0.004999999888241291), (-0.025980761274695396, 0.08414658159017563, 0.004999999888241291), (-0.02897777408361435, 0.07691115140914917, 0.004999999888241291), (-0.029999999329447746, 0.06914658099412918, 0.004999999888241291), (-0.029999999329447746, -0.06914658099412918, 0.004999999888241291), (-0.02897777408361435, -0.07691115140914917, 0.004999999888241291), (-0.025980761274695396, -0.08414658159017563, 0.004999999888241291), (-0.02121320366859436, -0.09035978466272354, 0.004999999888241291), (-0.014999999664723873, -0.09512734413146973, 0.004999999888241291), (-0.007764571346342564, -0.09812435507774353, 0.004999999888241291), (-0.00000000000000000551091050576101, -0.09914658218622208, 0.004999999888241291), (0.007764571346342564, -0.09812435507774353, 0.004999999888241291), (0.014999999664723873, -0.09512734413146973, 0.004999999888241291), (0.02121320366859436, -0.09035978466272354, 0.004999999888241291), (0.025980761274695396, -0.08414658159017563, 0.004999999888241291), (0.02897777408361435, -0.07691115140914917, 0.004999999888241291), (0.029999999329447746, -0.06914658099412918, 0.004999999888241291)]
+        int[] faceVertexCounts = [26, 26, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 1, 27, 26, 1, 2, 28, 27, 2, 3, 29, 28, 3, 4, 30, 29, 4, 5, 31, 30, 5, 6, 32, 31, 6, 7, 33, 32, 7, 8, 34, 33, 8, 9, 35, 34, 9, 10, 36, 35, 10, 11, 37, 36, 11, 12, 38, 37, 12, 13, 39, 38, 13, 14, 40, 39, 14, 15, 41, 40, 15, 16, 42, 41, 16, 17, 43, 42, 17, 18, 44, 43, 18, 19, 45, 44, 19, 20, 46, 45, 20, 21, 47, 46, 21, 22, 48, 47, 22, 23, 49, 48, 23, 24, 50, 49, 24, 25, 51, 50, 25, 0, 26, 51]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "render"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        bool physics:collisionEnabled = false
+        uniform bool doubleSided = false
+        custom double3 xformOp:translate = (0.045, -0.0275, -0.707)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+        float3[] extent = [(-0.029999999329447746, -0.0991469994187355, -0.004999999888241291), (0.029999999329447746, 0.0991469994187355, 0.004999999888241291)]
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -40.601294645004465)
+    }
+    def Mesh "OuterRail" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+        active = true
+    )
+    {
+        point3f[] points = [(0.019999999552965164, 0.8795420527458191, -0.003000000026077032), (0.019318517297506332, 0.8847184181213379, -0.003000000026077032), (0.017320508137345314, 0.8895420432090759, -0.003000000026077032), (0.01414213515818119, 0.8936841487884521, -0.003000000026077032), (0.009999999776482582, 0.8968625068664551, -0.003000000026077032), (0.00517638074234128, 0.898860514163971, -0.003000000026077032), (0.000000000000000001224646790546622, 0.8995420336723328, -0.003000000026077032), (-0.00517638074234128, 0.898860514163971, -0.003000000026077032), (-0.009999999776482582, 0.8968625068664551, -0.003000000026077032), (-0.01414213515818119, 0.8936841487884521, -0.003000000026077032), (-0.017320508137345314, 0.8895420432090759, -0.003000000026077032), (-0.019318517297506332, 0.8847184181213379, -0.003000000026077032), (-0.019999999552965164, 0.8795420527458191, -0.003000000026077032), (-0.019999999552965164, -0.8795420527458191, -0.003000000026077032), (-0.019318517297506332, -0.8847184181213379, -0.003000000026077032), (-0.017320508137345314, -0.8895420432090759, -0.003000000026077032), (-0.01414213515818119, -0.8936841487884521, -0.003000000026077032), (-0.009999999776482582, -0.8968625068664551, -0.003000000026077032), (-0.00517638074234128, -0.898860514163971, -0.003000000026077032), (-0.000000000000000003673940475037442, -0.8995420336723328, -0.003000000026077032), (0.00517638074234128, -0.898860514163971, -0.003000000026077032), (0.009999999776482582, -0.8968625068664551, -0.003000000026077032), (0.01414213515818119, -0.8936841487884521, -0.003000000026077032), (0.017320508137345314, -0.8895420432090759, -0.003000000026077032), (0.019318517297506332, -0.8847184181213379, -0.003000000026077032), (0.019999999552965164, -0.8795420527458191, -0.003000000026077032), (0.019999999552965164, 0.8795420527458191, 0.003000000026077032), (0.019318517297506332, 0.8847184181213379, 0.003000000026077032), (0.017320508137345314, 0.8895420432090759, 0.003000000026077032), (0.01414213515818119, 0.8936841487884521, 0.003000000026077032), (0.009999999776482582, 0.8968625068664551, 0.003000000026077032), (0.00517638074234128, 0.898860514163971, 0.003000000026077032), (0.000000000000000001224646790546622, 0.8995420336723328, 0.003000000026077032), (-0.00517638074234128, 0.898860514163971, 0.003000000026077032), (-0.009999999776482582, 0.8968625068664551, 0.003000000026077032), (-0.01414213515818119, 0.8936841487884521, 0.003000000026077032), (-0.017320508137345314, 0.8895420432090759, 0.003000000026077032), (-0.019318517297506332, 0.8847184181213379, 0.003000000026077032), (-0.019999999552965164, 0.8795420527458191, 0.003000000026077032), (-0.019999999552965164, -0.8795420527458191, 0.003000000026077032), (-0.019318517297506332, -0.8847184181213379, 0.003000000026077032), (-0.017320508137345314, -0.8895420432090759, 0.003000000026077032), (-0.01414213515818119, -0.8936841487884521, 0.003000000026077032), (-0.009999999776482582, -0.8968625068664551, 0.003000000026077032), (-0.00517638074234128, -0.898860514163971, 0.003000000026077032), (-0.000000000000000003673940475037442, -0.8995420336723328, 0.003000000026077032), (0.00517638074234128, -0.898860514163971, 0.003000000026077032), (0.009999999776482582, -0.8968625068664551, 0.003000000026077032), (0.01414213515818119, -0.8936841487884521, 0.003000000026077032), (0.017320508137345314, -0.8895420432090759, 0.003000000026077032), (0.019318517297506332, -0.8847184181213379, 0.003000000026077032), (0.019999999552965164, -0.8795420527458191, 0.003000000026077032)]
+        int[] faceVertexCounts = [26, 26, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 1, 27, 26, 1, 2, 28, 27, 2, 3, 29, 28, 3, 4, 30, 29, 4, 5, 31, 30, 5, 6, 32, 31, 6, 7, 33, 32, 7, 8, 34, 33, 8, 9, 35, 34, 9, 10, 36, 35, 10, 11, 37, 36, 11, 12, 38, 37, 12, 13, 39, 38, 13, 14, 40, 39, 14, 15, 41, 40, 15, 16, 42, 41, 16, 17, 43, 42, 17, 18, 44, 43, 18, 19, 45, 44, 19, 20, 46, 45, 20, 21, 47, 46, 21, 22, 48, 47, 22, 23, 49, 48, 23, 24, 50, 49, 24, 25, 51, 50, 25, 0, 26, 51]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "default"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        bool physics:collisionEnabled = true
+        uniform bool doubleSided = false
+        custom double3 xformOp:translate = (0.8995420265, 0.18, 1.293)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        float3[] extent = [(-0.019999999552965164, -0.899541974067688, -0.003000000026077032), (0.019999999552965164, 0.899541974067688, 0.003000000026077032)]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -90.0)
+        uniform token physics:approximation = "convexHull"
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Mesh "InnerRail" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI", "MaterialBindingAPI"]
+        active = true
+    )
+    {
+        point3f[] points = [(0.019999999552965164, 0.8795420527458191, -0.003000000026077032), (0.019318517297506332, 0.8847184181213379, -0.003000000026077032), (0.017320508137345314, 0.8895420432090759, -0.003000000026077032), (0.01414213515818119, 0.8936841487884521, -0.003000000026077032), (0.009999999776482582, 0.8968625068664551, -0.003000000026077032), (0.00517638074234128, 0.898860514163971, -0.003000000026077032), (0.000000000000000001224646790546622, 0.8995420336723328, -0.003000000026077032), (-0.00517638074234128, 0.898860514163971, -0.003000000026077032), (-0.009999999776482582, 0.8968625068664551, -0.003000000026077032), (-0.01414213515818119, 0.8936841487884521, -0.003000000026077032), (-0.017320508137345314, 0.8895420432090759, -0.003000000026077032), (-0.019318517297506332, 0.8847184181213379, -0.003000000026077032), (-0.019999999552965164, 0.8795420527458191, -0.003000000026077032), (-0.019999999552965164, -0.8795420527458191, -0.003000000026077032), (-0.019318517297506332, -0.8847184181213379, -0.003000000026077032), (-0.017320508137345314, -0.8895420432090759, -0.003000000026077032), (-0.01414213515818119, -0.8936841487884521, -0.003000000026077032), (-0.009999999776482582, -0.8968625068664551, -0.003000000026077032), (-0.00517638074234128, -0.898860514163971, -0.003000000026077032), (-0.000000000000000003673940475037442, -0.8995420336723328, -0.003000000026077032), (0.00517638074234128, -0.898860514163971, -0.003000000026077032), (0.009999999776482582, -0.8968625068664551, -0.003000000026077032), (0.01414213515818119, -0.8936841487884521, -0.003000000026077032), (0.017320508137345314, -0.8895420432090759, -0.003000000026077032), (0.019318517297506332, -0.8847184181213379, -0.003000000026077032), (0.019999999552965164, -0.8795420527458191, -0.003000000026077032), (0.019999999552965164, 0.8795420527458191, 0.003000000026077032), (0.019318517297506332, 0.8847184181213379, 0.003000000026077032), (0.017320508137345314, 0.8895420432090759, 0.003000000026077032), (0.01414213515818119, 0.8936841487884521, 0.003000000026077032), (0.009999999776482582, 0.8968625068664551, 0.003000000026077032), (0.00517638074234128, 0.898860514163971, 0.003000000026077032), (0.000000000000000001224646790546622, 0.8995420336723328, 0.003000000026077032), (-0.00517638074234128, 0.898860514163971, 0.003000000026077032), (-0.009999999776482582, 0.8968625068664551, 0.003000000026077032), (-0.01414213515818119, 0.8936841487884521, 0.003000000026077032), (-0.017320508137345314, 0.8895420432090759, 0.003000000026077032), (-0.019318517297506332, 0.8847184181213379, 0.003000000026077032), (-0.019999999552965164, 0.8795420527458191, 0.003000000026077032), (-0.019999999552965164, -0.8795420527458191, 0.003000000026077032), (-0.019318517297506332, -0.8847184181213379, 0.003000000026077032), (-0.017320508137345314, -0.8895420432090759, 0.003000000026077032), (-0.01414213515818119, -0.8936841487884521, 0.003000000026077032), (-0.009999999776482582, -0.8968625068664551, 0.003000000026077032), (-0.00517638074234128, -0.898860514163971, 0.003000000026077032), (-0.000000000000000003673940475037442, -0.8995420336723328, 0.003000000026077032), (0.00517638074234128, -0.898860514163971, 0.003000000026077032), (0.009999999776482582, -0.8968625068664551, 0.003000000026077032), (0.01414213515818119, -0.8936841487884521, 0.003000000026077032), (0.017320508137345314, -0.8895420432090759, 0.003000000026077032), (0.019318517297506332, -0.8847184181213379, 0.003000000026077032), (0.019999999552965164, -0.8795420527458191, 0.003000000026077032)]
+        int[] faceVertexCounts = [26, 26, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 1, 27, 26, 1, 2, 28, 27, 2, 3, 29, 28, 3, 4, 30, 29, 4, 5, 31, 30, 5, 6, 32, 31, 6, 7, 33, 32, 7, 8, 34, 33, 8, 9, 35, 34, 9, 10, 36, 35, 10, 11, 37, 36, 11, 12, 38, 37, 12, 13, 39, 38, 13, 14, 40, 39, 14, 15, 41, 40, 15, 16, 42, 41, 16, 17, 43, 42, 17, 18, 44, 43, 18, 19, 45, 44, 19, 20, 46, 45, 20, 21, 47, 46, 21, 22, 48, 47, 22, 23, 49, 48, 23, 24, 50, 49, 24, 25, 51, 50, 25, 0, 26, 51]
+        uniform token subdivisionScheme = "none"
+        uniform token purpose = "default"
+        color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        bool physics:collisionEnabled = true
+        uniform bool doubleSided = false
+        custom double3 xformOp:translate = (0.8995420265, 0.18, -1.293)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        float3[] extent = [(-0.019999999552965164, -0.899541974067688, -0.003000000026077032), (0.019999999552965164, 0.899541974067688, 0.003000000026077032)]
+        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 0.0, -90.0)
+        uniform token physics:approximation = "convexHull"
+        custom rel material:binding = </RampSection/Looks/RampStructure>
+    }
+    def Xform "MiddleFold"
+    {
+        custom double3 xformOp:translate = (0.0, -0.08, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Xform "GroundToe"
+    {
+        custom double3 xformOp:translate = (1.799084053, 0.015, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+}

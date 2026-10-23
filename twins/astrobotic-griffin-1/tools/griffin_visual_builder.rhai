@@ -5247,9 +5247,19 @@ fn griffin_ramp_toe_miter_plan(doc,edit_target,root) {
 
 fn griffin_ramp_mount_plan(doc, edit_target, lander_root, side) {
     if side != "port" && side != "starboard" { return plan_error("unknown ramp side"); }
-    let x = _ramp_number(if side == "port" { "physicalRampPortMountX" } else { "physicalRampStarboardMountX" });
-    let y = _ramp_number("physicalRampMountY");
-    let z = _ramp_number("physicalRampMountZ");
+    let suffix=if side=="port"{"Port"}else{"Starboard"};
+    _griffin_ramp_mount_at_plan(doc,edit_target,lander_root,side,
+        [_ramp_number(if side=="port"{"physicalRampPortMountX"}else{"physicalRampStarboardMountX"}),
+            _ramp_number("physicalRampMountY"),_ramp_number("physicalRampMountZ")],
+        lander_root+"/EgressRamp"+suffix+"/DeckSection/Looks/RampStructure")
+}
+
+// The installed bank and a detached integration study use the same shoe and
+// pedestal geometry, with an explicit mount and standard material target.
+fn _griffin_ramp_mount_at_plan(doc,edit_target,lander_root,side,position,material){
+    if side!="port" && side!="starboard"{return plan_error("unknown ramp side");}
+    if position==() || position.len()!=3 || material==(){return plan_error("ramp bearing interface is incomplete");}
+    let x=position[0];let y=position[1];let z=position[2];
     let inner = _ramp_number("rampCenterRailOffsetZM");
     let stock = _ramp_number("rampPivotLugWidthM");
     let bearing = _ramp_number("rampSectionHingeBarrelRadiusM");
@@ -5274,6 +5284,12 @@ fn griffin_ramp_mount_plan(doc, edit_target, lander_root, side) {
             [(x-inboard).abs()+stock,stock,stock],color);
         if !foot.ok { return foot; }
         for op in foot.ops { ops.push(op); }
+        for member in [name,name+"DeckShoe"]{
+            ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:lander_root+"/"+member,
+                schemas:["PhysicsCollisionAPI","MaterialBindingAPI"]}});
+            ops.push(#{SetRelationship:#{edit_target:edit_target,path:lander_root+"/"+member,
+                name:"material:binding",targets:[material]}});
+        }
     }
     #{ok:true,ops:ops}
 }

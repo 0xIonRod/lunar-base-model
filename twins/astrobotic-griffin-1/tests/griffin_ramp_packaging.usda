@@ -1,0 +1,570 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinFlipVisual"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "GriffinFlipVisual" (
+    prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
+    kind = "assembly"
+    documentation = "Griffin-1 and Astrolab FLIP visual review composition; SI metres."
+    prepend apiSchemas = ["LunCoEpochAPI"]
+)
+{
+    custom string lunco:visual:status = "review-ready proxy geometry, not flight CAD"
+    custom string lunco:visual:ownership = "Twin USD owns topology/material placement; Rhai owns visual acceptance"
+    custom string lunco:visual:camera = "VisualCamera"
+    custom token lunco:visual:terrain_mode = "standard_layered"
+    custom asset lunco:visual:terrain_asset = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@
+    custom asset lunco:visual:terrain_shader = @lunco://shaders/terrain_layered.wesl@
+    double lunco:anchor:lat = -84.72672255
+    double lunco:anchor:lon = 29.14428685
+    double lunco:anchor:height = 0.0
+    int lunco:anchor:body = 301
+    double lunco:time:epochJd = 2461395.5
+    def Xform "Ground"
+    {
+        def Cylinder "LandingPad"
+        {
+            float radius = 6.0
+            float height = 0.1599999964237213
+            uniform token axis = "Y"
+            double3 xformOp:translate = (0.0, 0.08, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.25999999046325684, 0.27000001072883606, 0.28999999165534973)]
+            bool physics:collisionEnabled = false
+            uniform token purpose = "guide"
+            token visibility = "invisible"
+        }
+        def Cylinder "PadRing"
+        {
+            float radius = 5.400000095367432
+            float height = 0.1899999976158142
+            uniform token axis = "Y"
+            double3 xformOp:translate = (0.0, 0.18, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.6499999761581421, 0.47999998927116394, 0.18000000715255737)]
+            bool physics:collisionEnabled = false
+            uniform token purpose = "guide"
+            token visibility = "invisible"
+        }
+        def Plane "FlatReviewSurface" (
+            prepend apiSchemas = ["LunCoTerrainAPI", "PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            double width = 36.0
+            double length = 36.0
+            uniform token axis = "Y"
+            uniform token lunco:terrain:surfaceRole = "flat-site"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.12999999523162842, 0.11999999731779099, 0.10999999940395355)]
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def Xform "Griffin1" (
+        references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
+    )
+    {
+        bool physics:rigidBodyEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.44, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        float inputs:leg_displacement_px = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_px.connect = None
+        float inputs:leg_displacement_nx = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_nx.connect = None
+        float inputs:leg_displacement_pz = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_pz.connect = None
+        float inputs:leg_displacement_nz = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_nz.connect = None
+        float inputs:leg_velocity_px = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_px.connect = None
+        float inputs:leg_velocity_nx = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_nx.connect = None
+        float inputs:leg_velocity_pz = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_pz.connect = None
+        float inputs:leg_velocity_nz = 0.0 (
+            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_nz.connect = None
+        over "LegPX"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        over "LegNX"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        over "LegPZ"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        over "LegNZ"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "EgressRampPort" (
+            active = false
+        )
+        {
+            bool physics:rigidBodyEnabled = false
+            def "MiddleSection"
+            {
+                bool physics:rigidBodyEnabled = false
+                def "ToeSection"
+                {
+                    bool physics:rigidBodyEnabled = false
+                }
+            }
+        }
+        def "TransitionPlatePort"
+        {
+            bool physics:rigidBodyEnabled = false
+            custom double3 xformOp:translate = (1.71, 2.105, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            def "ContactSurface" (
+                active = false
+            )
+            {
+            }
+            def Cube "RampTrackPort" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (1.42, 0.03, 0.5800000000000001)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = true
+                custom double3 xformOp:translate = (0.0, 0.0, 1.0)
+                uniform token purpose = "default"
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampPort/DeckSection/Looks/RampWalkingPlate>
+            }
+            def Cube "RampTrackStarboard" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (1.42, 0.03, 0.5800000000000001)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = true
+                custom double3 xformOp:translate = (0.0, 0.0, -1.0)
+                uniform token purpose = "default"
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampPort/DeckSection/Looks/RampWalkingPlate>
+            }
+        }
+        def "EgressRampStarboard" (
+            active = false
+        )
+        {
+            bool physics:rigidBodyEnabled = false
+            def "MiddleSection"
+            {
+                bool physics:rigidBodyEnabled = false
+                def "ToeSection"
+                {
+                    bool physics:rigidBodyEnabled = false
+                }
+            }
+        }
+        def "TransitionPlateStarboard"
+        {
+            bool physics:rigidBodyEnabled = false
+            custom double3 xformOp:translate = (-1.71, 2.105, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            def "ContactSurface" (
+                active = false
+            )
+            {
+            }
+            def Cube "RampTrackPort" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (1.42, 0.03, 0.5800000000000001)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = true
+                custom double3 xformOp:translate = (0.0, 0.0, 1.0)
+                uniform token purpose = "default"
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampStarboard/DeckSection/Looks/RampWalkingPlate>
+            }
+            def Cube "RampTrackStarboard" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (1.42, 0.03, 0.5800000000000001)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = true
+                custom double3 xformOp:translate = (0.0, 0.0, -1.0)
+                uniform token purpose = "default"
+                color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
+                custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampStarboard/DeckSection/Looks/RampWalkingPlate>
+            }
+        }
+        def "LegPX_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNX_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegPZ_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNZ_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampHingePort" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampHingeStarboard" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingePort01" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingePort12" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingeStarboard01" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingeStarboard12" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampTransitionJointPort" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampTransitionJointStarboard" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchPortRoot" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchStarboardRoot" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchPortMiddle" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchPortToe" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchStarboardMiddle" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchStarboardToe" (
+            active = false
+        )
+        {
+            bool physics:jointEnabled = false
+        }
+        def Xform "CandidateRampPort"
+        {
+            custom double3 xformOp:translate = (2.427114731507, 2.106794675483, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 119.99999999999999)
+            def Xform "DeckSection" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda@</RampSection>
+            )
+            {
+                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            }
+            def Xform "MiddleSection" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda@</RampSection>
+            )
+            {
+                custom double3 xformOp:translate = (2.1490840539179583, 0.39999999999999997, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -179.9999999764969)
+                def Xform "ToeSection" (
+                    prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_visual.usda@</RampSection>
+                )
+                {
+                    custom double3 xformOp:translate = (1.4490840539671834, -0.16, 0.0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 179.9999999764969)
+                }
+            }
+        }
+        over "RampMountPortInnerRear" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (2.427114731507, 1.9608973377415, -0.707)
+            custom double3 xformOp:scale = (0.06, 0.3417946754829999, 0.06)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampPort/DeckSection/Looks/RampStructure>
+        }
+        over "RampMountPortInnerRearDeckShoe" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (2.2985573657535, 1.76, -0.707)
+            custom double3 xformOp:scale = (0.3171147315069995, 0.06, 0.06)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampPort/DeckSection/Looks/RampStructure>
+        }
+        over "RampMountPortInnerFront" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (2.427114731507, 1.9608973377415, 0.707)
+            custom double3 xformOp:scale = (0.06, 0.3417946754829999, 0.06)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampPort/DeckSection/Looks/RampStructure>
+        }
+        over "RampMountPortInnerFrontDeckShoe" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (2.2985573657535, 1.76, 0.707)
+            custom double3 xformOp:scale = (0.3171147315069995, 0.06, 0.06)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampPort/DeckSection/Looks/RampStructure>
+        }
+        def Xform "CandidateRampStarboard"
+        {
+            custom double3 xformOp:translate = (-2.427114731507, 2.106794675483, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (180.0, 0.000000000000007016709298534876, 60.00000000000002)
+            def Xform "DeckSection" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda@</RampSection>
+            )
+            {
+                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            }
+            def Xform "MiddleSection" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda@</RampSection>
+            )
+            {
+                custom double3 xformOp:translate = (2.1490840539179583, 0.39999999999999997, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, -179.9999999764969)
+                def Xform "ToeSection" (
+                    prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_ramp_toe_visual.usda@</RampSection>
+                )
+                {
+                    custom double3 xformOp:translate = (1.4490840539671834, -0.16, 0.0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 179.9999999764969)
+                }
+            }
+        }
+        over "RampMountStarboardInnerRear" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (-2.427114731507, 1.9608973377415, -0.707)
+            custom double3 xformOp:scale = (0.06, 0.3417946754829999, 0.06)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampStarboard/DeckSection/Looks/RampStructure>
+        }
+        over "RampMountStarboardInnerRearDeckShoe" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (-2.2985573657535, 1.76, -0.707)
+            custom double3 xformOp:scale = (0.3171147315069995, 0.06, 0.06)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampStarboard/DeckSection/Looks/RampStructure>
+        }
+        over "RampMountStarboardInnerFront" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (-2.427114731507, 1.9608973377415, 0.707)
+            custom double3 xformOp:scale = (0.06, 0.3417946754829999, 0.06)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampStarboard/DeckSection/Looks/RampStructure>
+        }
+        over "RampMountStarboardInnerFrontDeckShoe" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (-2.2985573657535, 1.76, 0.707)
+            custom double3 xformOp:scale = (0.3171147315069995, 0.06, 0.06)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            uniform token purpose = "render"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+            custom rel material:binding = </GriffinFlipVisual/Griffin1/CandidateRampStarboard/DeckSection/Looks/RampStructure>
+        }
+        over "Bus"
+        {
+            custom rel lunco:mount:sockets = None
+            def "RampSocketPort" (
+                active = false
+            )
+            {
+            }
+            def "RampSocketStarboard" (
+                active = false
+            )
+            {
+            }
+        }
+    }
+    def Xform "FLIP" (
+        references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
+    )
+    {
+        bool physics:rigidBodyEnabled = false
+        custom double3 xformOp:translate = (0.0, 3.075, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def DomeLight "ReviewFill"
+    {
+        float inputs:intensity = 300.0
+        float inputs:exposure = 0.0
+        color3f inputs:color = (1.0, 1.0, 1.0)
+    }
+    over "Sun"
+    {
+        float inputs:intensity = 120000.0
+    }
+    def Camera "VisualCamera" (
+        prepend apiSchemas = ["LunCoCameraAPI", "LunCoAvatarAPI"]
+        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+    )
+    {
+        uniform bool lunco:avatar = true
+        uniform token lunco:cameraMode = "freeflight"
+        double3 lunco:cameraLookAt = (0.0, 2.3, 0.0)
+        custom double3 xformOp:translate = (0.0, 4.5, -17.0)
+        float focalLength = 40.0
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def Scope "CameraTrack" (
+        prepend apiSchemas = ["LunCoCameraTrackAPI"]
+    )
+    {
+        token lunco:activeCamera
+        token lunco:activeCamera.timeSamples = {
+            0.0: "VisualCamera",
+        }
+    }
+    def Scope "Scenario"
+    {
+        def Scope "Mission" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+            active = false
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_flip_visual.rhai@
+        }
+    }
+    def Xform "Environment" (
+        references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@
+    )
+    {
+        over "VisualBerms"
+        {
+            def "BermEast"
+            {
+                token visibility = "invisible"
+            }
+            def "BermWest"
+            {
+                token visibility = "invisible"
+            }
+        }
+        def "Terrain" (
+            active = false
+        )
+        {
+        }
+    }
+    def Xform "SolarSystem" (
+        prepend references = @lunco://celestial/solar_system.usda@</SolarSystem>
+    )
+    {
+    }
+}

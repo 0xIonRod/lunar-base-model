@@ -19,6 +19,7 @@ package GriffinRampRootSectionRequirements {
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_ramp_root_section_visual.usda";
         attribute usdPath : UsdPrimPath = "/World/RampRootSection";
         attribute lengthM : Real = 2.149084054;
+        attribute hasExitHinge : Boolean = true;
         attribute geometryToleranceM : Real = 0.002;
         attribute entryFrameName : RootFrameIdentity = "DeckHinge";
         attribute exitFrameName : RootFrameIdentity = "MiddleFold";

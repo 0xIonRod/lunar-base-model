@@ -22,6 +22,16 @@ fixtures each fail exactly one constraint. The installed ramp source gate passes
 observer recovers dimensions in the native cooking frame; flight stow passes
 272. These source checks do not close the installed interference above.
 
+The [toe and revised interface checkpoint](griffin-ramp-toe-section-2026-10-23.md)
+supersedes the earlier 120 mm lower fold candidate with an 80 mm offset.
+Root/middle/toe component gates pass 119/119/131 checks. The saved
+[two-bank packaging study](griffin-ramp-packaging-study-2026-10-23.md) has a
+50.319 mm conservative payload-path gap after between-sample motion allowance,
+plus native comparison of all 558 installed reference members. GVA-001 remains
+unmapped and unaccepted as a full integration case. The production vehicle's
+old mechanism, other obstacle clearances, loaded deployment and 60 FPS remain
+open; a static study cannot replace those checks.
+
 ## Sun-facing autonomous descent
 
 The operator-requested GSA-011 study yaws the forward solar bank's +Z outward

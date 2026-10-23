@@ -19,11 +19,17 @@ package GriffinRampMiddleSectionRequirements {
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_ramp_middle_section_visual.usda";
         attribute usdPath : UsdPrimPath = "/World/RampMiddleSection";
         attribute lengthM : Real = 1.449084054;
+        attribute hasExitHinge : Boolean = true;
         attribute geometryToleranceM : Real = 0.002;
         attribute entryFrameName : MiddleFrameIdentity = "RootFold";
         attribute exitFrameName : MiddleFrameIdentity = "ToeFold";
         attribute entryAxisYM : Real = GriffinRampRootSectionRequirements::RampRootSection::exitAxisYM;
-        attribute exitAxisYM : Real = -0.12;
+        /* 2026-10-23 native packaging study: a 120 mm lower offset places
+         * toe guides through FLIP's equipment/deck boxes. An 80 mm offset
+         * retains 40 mm root/toe stock separation in sampled detailed bounds.
+         * The assembly also requires outboard hinge stand-off and root-first
+         * unfolding; the component gate alone cannot accept the mechanism. */
+        attribute exitAxisYM : Real = -0.08;
         attribute plateAttachmentRunM : Real = GriffinRampRootSectionRequirements::RampRootSection::plateAttachmentRunM;
         attribute forkWebSizeM : Real = GriffinRampRootSectionRequirements::RampRootSection::forkWebSizeM;
         ref part sourceRamp : GriffinRampRequirements::GriffinEgressRamp;

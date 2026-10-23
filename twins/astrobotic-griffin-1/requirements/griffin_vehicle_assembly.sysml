@@ -1,5 +1,6 @@
 package GriffinVehicleAssemblyRequirements {
     private import ScalarValues::Boolean;
+    private import ScalarValues::Real;
     private import GriffinRequirementSources::TwinAssetPath;
     private import GriffinRequirementSources::UsdPrimPath;
     private import GriffinBusRequirements::GriffinBusComponent;
@@ -47,6 +48,72 @@ package GriffinVehicleAssemblyRequirements {
         part optionalEgressRamps : GriffinEgressRamp[0..2];
         part payloadInterface : GriffinPayloadAdapterInterface;
         part engineSkirt : GriffinEngineSkirtComponent;
+    }
+
+    enum def RampPackagingBankIdentity { CandidateRampPort; CandidateRampStarboard; }
+
+    // A detached integration fixture for the unequal-section reconstruction.
+    // These target mount values are not yet installed in vehicles/griffin_1.
+    part def GriffinRampPackagingStudy {
+        doc /* SI metres/radians. Native 2026-10-23 interference and path study:
+         * contracts/griffin-ramp-packaging-study-2026-10-23.md. Optional ramps
+         * and adapter are source-backed; dimensions and phase choices are
+         * reconstruction assumptions. This fixture qualifies static geometry,
+         * not loaded deployment or flight hardware. */
+        attribute fixtureAsset : TwinAssetPath = "tests/griffin_ramp_packaging.usda";
+        attribute usdRootPath : UsdPrimPath = "/GriffinFlipVisual";
+        attribute landerPath : UsdPrimPath = "/GriffinFlipVisual/Griffin1";
+        attribute roverPath : UsdPrimPath = "/GriffinFlipVisual/FLIP";
+        attribute banks : RampPackagingBankIdentity[2] = ("CandidateRampPort", "CandidateRampStarboard");
+        attribute portMountX : Real = 2.427114731507;
+        attribute starboardMountX : Real = -GriffinRampPackagingStudy::portMountX;
+        attribute mountY : Real = GriffinEgressRamp::physicalRampMountY;
+        attribute mountZ : Real = GriffinEgressRamp::physicalRampMountZ;
+        attribute transitionLengthM : Real = 1.42;
+        attribute transitionOutboardX : Real = 2.42;
+        attribute rootClearanceAngleRad : Real = -GriffinEgressRamp::physicalRampSectionJointFrameOffsetRad;
+        attribute payloadClearanceM : Real = 0.05;
+        attribute nonAdjacentClearanceM : Real = 0.02;
+        attribute rootClearanceStepRad : Real = GriffinRampPackagingStudy::rootClearanceAngleRad / 900.0;
+        attribute sectionStepRad : Real = GriffinRampPackagingStudy::rootClearanceAngleRad / 90.0;
+        ref part root : GriffinRampRootSectionRequirements::RampRootSection;
+        ref part middle : GriffinRampMiddleSectionRequirements::RampMiddleSection;
+        ref part toe : GriffinRampToeSectionRequirements::RampToeSection;
+        ref part rover : FlipRover;
+    }
+
+    constraint def GVAC001_RampPayloadClearance {
+        in observedMinimumGapM : Real;
+        in requiredGapM : Real;
+        in completeCoverage : Boolean;
+        completeCoverage and requiredGapM > 0.0
+            and observedMinimumGapM >= requiredGapM;
+    }
+    requirement def GVA001_RampPayloadPackaging {
+        doc /* GVA-001 both candidate ramp banks shall use the source component
+         * references and named attachment frames. Their complete visual and
+         * physical geometry shall retain payloadClearanceM from the source
+         * FLIP assembly in transport and throughout the selected deployment
+         * path. Root moves upright first with other folds latched; then middle
+         * unfolds, then the toe in its opposite sense; the extended root then
+         * lowers to the source nominal/terrain target. Native f64 bounds are
+         * conservative envelopes; sampled gaps require a between-sample motion
+         * bound before completeCoverage can be true. Source, document and stage
+         * generations must match the measured assembly. A section-only pass,
+         * broad-phase overlap or saved counterexample cannot accept this case.
+         * Other-bank, lander, ground and mating-interface checks are separate
+         * required integration work; loaded dynamics remain GRR-017/landing
+         * and surface-operations responsibilities. */
+        require GVAC001_RampPayloadClearance {
+            in requiredGapM = GriffinRampPackagingStudy::payloadClearanceM;
+        }
+    }
+    requirement <'GVA-001'> gva001 : GVA001_RampPayloadPackaging {
+        subject installation : GriffinRampPackagingStudy;
+    }
+    verification def Verify_GriffinRampPayloadPackaging {
+        subject installation : GriffinRampPackagingStudy;
+        verify gva001;
     }
 
 }
