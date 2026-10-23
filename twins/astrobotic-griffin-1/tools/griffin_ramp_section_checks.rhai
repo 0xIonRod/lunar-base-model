@@ -23,6 +23,7 @@ fn observe(doc,root,profile){
         names.push((profile.owner+"::")+name);
     }
     if profile.section_index==0 || profile.section_index==2{names.push(profile.owner+"::deploymentAngleRad");}
+    if profile.section_index==0{names.push(profile.owner+"::entryShaftRadiusM");}
     let source=sysml_requirements::source_with_selection(names,
         [profile.package_name+"::"+profile.requirement],[profile.package_name+"::"+profile.verification]);
     let length=sysml_requirements::number(source,(profile.owner+"::")+"lengthM");
@@ -68,6 +69,8 @@ fn observe(doc,root,profile){
             source_revision:source.source_revision,provider_generation:source.source_revision}};
     list.push(sysml_requirements::required_constraint_check(profile.short_name+"-native-metric-span",
         profile.component,profile.requirement,profile.verification,profile.package_name+"::"+profile.constraint,bindings,"typed",0.0));
+    if profile.section_index==0{list.push(checks::attribute_check("GRS-001-entry-shaft-radius",profile.component,profile.requirement,profile.verification,
+        root+"/HingeBarrel","radius",profile.owner+"::entryShaftRadiusM",0.0));}
     for i in 0..2{
         let path=paths[i];let id=profile.short_name+"-track-"+i.to_string();
         let exists=check(profile,id,"exists",path);exists.expected_type="Mesh";list.push(exists);
@@ -199,7 +202,7 @@ fn fittings_connected(doc,root,profile,source,length,tolerance,owner){
             lo:[-pin_radius,entry-pin_radius,guide.z-pin_length/2.0],
             hi:[pin_radius,entry+pin_radius,guide.z+pin_length/2.0]});
     }
-    let shaft_radius=spec::ramp_section_hinge_barrel_radius_m();
+    let shaft_radius=if profile.section_index==0{sysml_requirements::number(source,prefix+"entryShaftRadiusM")}else{spec::ramp_section_hinge_barrel_radius_m()};
     let shaft_length=spec::ramp_section_hinge_barrel_length_m();
     parts.push(#{path:root+"/HingeBarrel",kind:"Cylinder",
         lo:[-shaft_radius,entry-shaft_radius,-shaft_length/2.0],

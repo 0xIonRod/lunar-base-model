@@ -1,0 +1,313 @@
+{
+  "scope": "Saved static reconstruction geometry, conditional root mating certificate and production component gates; loaded vehicle unaccepted",
+  "binary_sha256": "5b24ec52f8893910cf764334a75279a20522bfdd8d30d0bbfdb827b5ed28c73d",
+  "recorded_binary_build": "0cb4d37137554af3227a316100c903f44a1c3a4c",
+  "engine_checkout_at_validation": "9eeec03b486116022d8c3ef58ea3917adea058bc",
+  "source_sha256": {
+    "components/lander/griffin_ramp_root_bearing_visual.usda": "c23ed9fd3a534a8f30dff3fc75f11067e1d23ffd7fbd828aec806c37279c2ee4",
+    "components/lander/griffin_ramp_root_section_visual.usda": "55c8cd6469874b6c18220e0722d1e097ef4872275d016f0499efe2d89627b96c",
+    "requirements/griffin_ramp_root_bearing_requirements.sysml": "cd39eaf26d2647ce4965f484483e8984199a5cf2559f35d55340a3c6ff807ba4",
+    "requirements/griffin_ramp_root_section_requirements.sysml": "c7b8ec039a452cb2559ad9ac778f66d436d1db9a63203b1ae8b8630f35e878ba",
+    "requirements/griffin_requirement_sources.sysml": "9876b230685f1ff2646f62a755a61606213218368fa5a1b731a4f2736df299e3",
+    "tests/griffin_ramp_packaging.usda": "6022e609c35114f7523a9665f88efa434cab669444c7e7d3294d85d762462c71",
+    "tests/griffin_ramp_root_bearing.usda": "6591b834aae0bdb620522d68f4df8a2c9d2ac191789cdc7fb8a64a9a2de3c717",
+    "tests/fixtures/griffin_ramp_root_bearing_short.usda": "b06664d877c6d806065c51a4fe658895844df9102b66a796b5b541d79bae8f66",
+    "scenarios/tests/griffin_ramp_root_bearing.rhai": "be3e0bcc246053e880c08479599731ed19cd987e35583954b7fbbaa5011e7fde",
+    "tools/griffin_ramp_root_bearing.rhai": "cf6c94a3a5f8d137f94d65cab46808f9f6e6893403bff5b40e3301baf90b866a",
+    "tools/griffin_ramp_root_bearing_checks.rhai": "0fad2eb1fd9c6ee723d0d7a625525ad883e9c94e2f06bdcb6b629ef1446ca703",
+    "tools/griffin_ramp_root_bearing_fit.rhai": "db051d0161cf235e30cf20d18c46879ab695e888255b97a77a52b535bb888bbd",
+    "tools/griffin_ramp_packaging.rhai": "eea4d4b9c269a42a9558b995635599ec82c3aa3ffbc06da3cb5077de10d51ad4",
+    "tools/griffin_ramp_section_component.rhai": "404dc10587daca90cea8317c482596be8e779e099ad68cc7aba831adbe5a55f9",
+    "tools/griffin_ramp_section_checks.rhai": "a441e48510c9eb2fa1817258f203afcf219ba99b3645df4c8944bc8a99bf9f28",
+    "twin.toml": "d8d4d8c4cd89ef5a5b4b9255fe1abe947e2f8aff631c9c1a55625405e20d72f9"
+  },
+  "production_cases": [
+    {
+      "verdict": "pass",
+      "check_count": 6,
+      "pass_count": 6,
+      "failure_count": 0,
+      "error_count": 0,
+      "source_revision": 15531712779564678673,
+      "verification": "GriffinRampRootBearingRequirements::Verify_GriffinRampRootBearing",
+      "name": "bearing",
+      "exit_code": 0,
+      "log_sha256": "2ae265f369b467a58bd9e1535271a73a0410963f48c67dfb3fd74acecf942924",
+      "measurements": {
+        "inner_faces": 48,
+        "maximum_dimension_error_m": 1.341104505225843e-09,
+        "minimum_clearance_m": 0.0004561075281409206,
+        "roles": true,
+        "topology": true
+      }
+    },
+    {
+      "verdict": "fail",
+      "check_count": 6,
+      "pass_count": 5,
+      "failure_count": 1,
+      "error_count": 0,
+      "source_revision": 15531712779564678673,
+      "verification": "GriffinRampRootBearingRequirements::Verify_GriffinRampRootBearing",
+      "name": "bearing-negative",
+      "exit_code": 1,
+      "log_sha256": "c5832db2e2bcaf06d877d1b02704a13f633f66189575411864e5dcc1eee497bd",
+      "measurements": {
+        "inner_faces": 48,
+        "maximum_dimension_error_m": 0.0006000013276934585,
+        "minimum_clearance_m": 0.0004561075281409206,
+        "roles": true,
+        "topology": true
+      }
+    },
+    {
+      "verdict": "pass",
+      "check_count": 128,
+      "pass_count": 128,
+      "failure_count": 0,
+      "error_count": 0,
+      "source_revision": 15531712779564678673,
+      "verification": "GriffinRampRootSectionRequirements::Verify_GriffinRampRootSection",
+      "name": "root",
+      "exit_code": 0,
+      "log_sha256": "a098f3069f8d7bb0e6e7c0ad47cf44d8a642527f905c56f650d439891c7a97d8"
+    },
+    {
+      "verdict": "fail",
+      "check_count": 128,
+      "pass_count": 127,
+      "failure_count": 1,
+      "error_count": 0,
+      "source_revision": 15531712779564678673,
+      "verification": "GriffinRampRootSectionRequirements::Verify_GriffinRampRootSection",
+      "name": "root-negative",
+      "exit_code": 1,
+      "log_sha256": "1265d47d0d8e59fa3f2bd1ddad75e43bb0f92630967037ac03f27a9128c2ee1f"
+    }
+  ],
+  "root_mating": [
+    {
+      "axis_alignment_error_m": 0.0,
+      "bank": 0,
+      "coaxial_error_m": 0.0,
+      "comparisons": 194,
+      "doc_id": 119606540566024,
+      "document_generation": 47,
+      "minimum_certified_gap_m": 0.00039800000000000105,
+      "passes": true,
+      "pin_contains_housing": true,
+      "scope": "Entire root versus this housing and stem for any root angle; qualified source bore geometry required; other sections and loaded physics unaccepted",
+      "source_geometry_matches": true,
+      "source_revision": 4630426454283312065,
+      "stage_generation": 5,
+      "station": 0,
+      "stem_connected": true,
+      "uncertain": []
+    },
+    {
+      "axis_alignment_error_m": 0.0,
+      "bank": 0,
+      "coaxial_error_m": 0.0,
+      "comparisons": 194,
+      "doc_id": 119606540566024,
+      "document_generation": 47,
+      "minimum_certified_gap_m": 0.00039800000000000105,
+      "passes": true,
+      "pin_contains_housing": true,
+      "scope": "Entire root versus this housing and stem for any root angle; qualified source bore geometry required; other sections and loaded physics unaccepted",
+      "source_geometry_matches": true,
+      "source_revision": 4630426454283312065,
+      "stage_generation": 5,
+      "station": 1,
+      "stem_connected": true,
+      "uncertain": []
+    },
+    {
+      "axis_alignment_error_m": 5.195736337412959e-18,
+      "bank": 1,
+      "coaxial_error_m": 0.0,
+      "comparisons": 194,
+      "doc_id": 119606540566024,
+      "document_generation": 47,
+      "minimum_certified_gap_m": 0.0003979999999999976,
+      "passes": true,
+      "pin_contains_housing": true,
+      "scope": "Entire root versus this housing and stem for any root angle; qualified source bore geometry required; other sections and loaded physics unaccepted",
+      "source_geometry_matches": true,
+      "source_revision": 4630426454283312065,
+      "stage_generation": 5,
+      "station": 0,
+      "stem_connected": true,
+      "uncertain": []
+    },
+    {
+      "axis_alignment_error_m": 5.195736337412959e-18,
+      "bank": 1,
+      "coaxial_error_m": 0.0,
+      "comparisons": 194,
+      "doc_id": 119606540566024,
+      "document_generation": 47,
+      "minimum_certified_gap_m": 0.0003979999999999976,
+      "passes": true,
+      "pin_contains_housing": true,
+      "scope": "Entire root versus this housing and stem for any root angle; qualified source bore geometry required; other sections and loaded physics unaccepted",
+      "source_geometry_matches": true,
+      "source_revision": 4630426454283312065,
+      "stage_generation": 5,
+      "station": 1,
+      "stem_connected": true,
+      "uncertain": []
+    }
+  ],
+  "misalignment_rejection": {
+    "axis_alignment_error_m": 0.0,
+    "bank": 0,
+    "coaxial_error_m": 0.0009999999999997838,
+    "comparisons": 194,
+    "doc_id": 119606540566024,
+    "document_generation": 46,
+    "minimum_certified_gap_m": -0.0006019999999997813,
+    "passes": false,
+    "pin_contains_housing": true,
+    "scope": "Entire root versus this housing and stem for any root angle; qualified source bore geometry required; other sections and loaded physics unaccepted",
+    "source_geometry_matches": true,
+    "source_revision": 4630426454283312065,
+    "stage_generation": 4,
+    "station": 0,
+    "stem_connected": true,
+    "uncertain": [
+      {
+        "gap_m": -0.0006019999999997813,
+        "part": "/RampSection/HingeBarrel",
+        "target": "housing"
+      },
+      {
+        "gap_m": -0.0006019999999997813,
+        "part": "/RampSection/CenterRailStarboardJointPin",
+        "target": "housing"
+      }
+    ]
+  },
+  "new_housing_payload_clearance": [
+    {
+      "doc_id": 119606540566024,
+      "document_generation": 47,
+      "minimum_payload_gap_m": 1.298344195190953,
+      "passes": true,
+      "path": "/GriffinFlipVisual/Griffin1/RampMountPortInnerRearBearing/Housing",
+      "source_revision": 4630426454283312065,
+      "stage_generation": 5,
+      "witness": "/GriffinFlipVisual/FLIP/Suspension_FL/Wheel_FL"
+    },
+    {
+      "doc_id": 119606540566024,
+      "document_generation": 47,
+      "minimum_payload_gap_m": 1.298344195190953,
+      "passes": true,
+      "path": "/GriffinFlipVisual/Griffin1/RampMountPortInnerFrontBearing/Housing",
+      "source_revision": 4630426454283312065,
+      "stage_generation": 5,
+      "witness": "/GriffinFlipVisual/FLIP/Suspension_FR/Wheel_FR"
+    },
+    {
+      "doc_id": 119606540566024,
+      "document_generation": 47,
+      "minimum_payload_gap_m": 1.298344195190953,
+      "passes": true,
+      "path": "/GriffinFlipVisual/Griffin1/RampMountStarboardInnerRearBearing/Housing",
+      "source_revision": 4630426454283312065,
+      "stage_generation": 5,
+      "witness": "/GriffinFlipVisual/FLIP/Suspension_RL/Wheel_RL"
+    },
+    {
+      "doc_id": 119606540566024,
+      "document_generation": 47,
+      "minimum_payload_gap_m": 1.298344195190953,
+      "passes": true,
+      "path": "/GriffinFlipVisual/Griffin1/RampMountStarboardInnerFrontBearing/Housing",
+      "source_revision": 4630426454283312065,
+      "stage_generation": 5,
+      "witness": "/GriffinFlipVisual/FLIP/Suspension_RR/Wheel_RR"
+    }
+  ],
+  "preflights": {
+    "griffin_ramp_root_bearing_visual": {
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "79a1d302ee96d1b119a96ccefdc0941548047044cd4b4a575fe204c185c7f268"
+    },
+    "griffin_ramp_root_section_visual": {
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "7d300154cf7e7a432d866757549d8c9dfd51fbcdf7876e02f4ca3a18c41c28f9"
+    },
+    "griffin_ramp_root_bearing": {
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "6a126f3dc5c377ca4451cf0bbe0a3c1b8ab588d184a79de2f68f1f6f7c215d09"
+    },
+    "griffin_ramp_root_bearing_short": {
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "62732a1d33ebd5ce24bcae236031527391109ee79a9970dda9532be5e52b8342"
+    },
+    "griffin_ramp_packaging": {
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "288cc09d5c50246425f992e052ba99735ee6a369c4b31aab0f25cc6fb719ff3c"
+    },
+    "observer_script": {
+      "ok": true,
+      "errors": 0,
+      "warnings": 0,
+      "receipt_sha256": "3c2ff5585d9f3801f7f4213833addeaa69d53a05b3e56ba665d74f8f7abae25a"
+    }
+  },
+  "sysml": {
+    "ok": true,
+    "errors": 0,
+    "existing_warnings": 153,
+    "source_revision": 15531712779564678673
+  },
+  "authoring": {
+    "fixture": {
+      "doc_id": 119606540566024,
+      "docs": {
+        "root": 119606518657015,
+        "middle": 119606518657019,
+        "toe": 119606518657018
+      },
+      "view": 47,
+      "generation": 47,
+      "bearing_doc": 119606518657017
+    },
+    "writer": "Native ApplyUsdOps and SaveDocument; no direct USD edits",
+    "warm_refresh_boundary": "Creating the new asset initially left a stale uncomposed reference. Twin reindex and canonical reopen resolved it before acceptance. No warm-refresh qualification is claimed."
+  },
+  "assembled_runtime": {
+    "exit_code": 101,
+    "verdict": "panic before any authored runtime verdict",
+    "panic": "Neither body 1274v0 nor 1275v0 is in an island",
+    "owner_file": "Avian 9097ce9/src/dynamics/solver/islands/mod.rs:881",
+    "body_usd_identity": "unresolved",
+    "log_tail_sha256": "de79c0692d108e3449703c07b5f0f4762b83e6fc95dbbb4a132a02e8e31b6e20",
+    "reported_to": "optimization/docs/reviews/griffin-physics-handoff-2026-10-22.md",
+    "scope": "Static review fixture with authored disabled bodies; not loaded egress acceptance"
+  },
+  "unaccepted": [
+    "Complete middle/toe and surrounding structure sweep",
+    "Antenna NURBS and ground interfaces",
+    "Production vehicle geometry/joint/latch/mass/phase promotion",
+    "Loaded deployment/traversal and complete mission",
+    "60 FPS at 1280x720 High with real-time physics"
+  ],
+  "visual_artifacts_sha256": {
+    "griffin-root-bearing-2026-10-23.png": "f802eadafc5be8f870933c95d932d5a472e150ac46502f82a6c0889bca3bbac7",
+    "griffin-root-bearing-2026-10-23-overview.png": "20d65d469713f045766ee810414216df88b6aacd93358030824dceeabb778d9c"
+  }
+}

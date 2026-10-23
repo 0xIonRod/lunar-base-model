@@ -29,6 +29,7 @@ package GriffinRampRootSectionRequirements {
         // same run. The assembly solves the bearing position from the deck
         // corner and this datum, rather than moving the deck or rover.
         attribute deploymentAngleRad : Real = GriffinRampRequirements::GriffinEgressRamp::physicalRampPortDeploymentAngleRad;
+        attribute entryShaftRadiusM : Real = GriffinRampRequirements::GriffinEgressRamp::rampRailJointPinRadiusM;
         attribute entryAxisYM : Real = GriffinRampRequirements::GriffinEgressRamp::rampPivotLugWidthM;
         attribute exitAxisYM : Real = GriffinRampRequirements::GriffinEgressRamp::rampRailCenterYM
             + GriffinRampRequirements::GriffinEgressRamp::rampRailHeightM / 2.0;
@@ -62,7 +63,9 @@ package GriffinRampRootSectionRequirements {
          * Each entry tongue and paired exit fork cheeks shall connect the
          * hinge axis to the same guide stock; a lower-axis plate shall bridge
          * to the lower chord. Pins remain coaxial, and all fittings retain
-         * shared structural material and render-only collision roles.
+         * shared structural material and render-only collision roles. The root entry
+         * shaft shall use entryShaftRadiusM, matching its coaxial pins so the
+         * shaft can pass through the assembly bearing bore.
          * Geometry belongs to this component; the vehicle owns its rigid body,
          * mass/inertia, hinge and installed pose. Native composed geometry and
          * standard attributes supply evidence. Missing or wrong units, types,

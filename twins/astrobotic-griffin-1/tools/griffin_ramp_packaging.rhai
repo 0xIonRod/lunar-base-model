@@ -76,6 +76,7 @@ fn bank_plan(doc,edit_target,docs,index){
     let side=if index==0{"port"}else{"starboard"};
     let mount=visual::_griffin_ramp_mount_at_plan(doc,edit_target,lander,side,position,root+"/DeckSection/Looks/RampStructure");
     if !mount.ok{return mount;}for op in mount.ops{ops.push(op);}
+    for station in 0..2{let bearing=bearing_station_plan(doc,edit_target,docs,index,station);if !bearing.ok{return bearing;}for op in bearing.ops{ops.push(op);}}
     #{ok:true,ops:ops,root:root,doc_id:doc,generation:query("QueryUsdPrim",#{doc_id:doc,path:lander}).document_generation,
         source_revision:model.source_revision,kind:"griffin_candidate_ramp_bank"}
 }
@@ -95,6 +96,7 @@ fn interface_plan(doc,edit_target,docs,index){
     let support=visual::_griffin_ramp_mount_at_plan(doc,edit_target,lander,if index==0{"port"}else{"starboard"},
         placement.position,root+"/DeckSection/Looks/RampStructure");
     if !support.ok{return support;}for op in support.ops{ops.push(op);}
+    for station in 0..2{let bearing=bearing_station_plan(doc,edit_target,docs,index,station);if !bearing.ok{return bearing;}for op in bearing.ops{ops.push(op);}}
     #{ok:true,ops:ops,doc_id:doc,generation:query("QueryUsdPrim",#{doc_id:doc,path:root}).document_generation,
         source_revision:model.source_revision,position:placement.position,kind:"griffin_raised_root_interface"}
 }
@@ -149,4 +151,36 @@ fn fixture_plan(doc,edit_target){
     ops.push(#{SetActive:#{edit_target:edit_target,path:scene+"/Scenario/Mission",active:false}});
     #{ok:true,ops:ops,doc_id:doc,generation:query("QueryUsdPrim",#{doc_id:doc,path:scene}).document_generation,
         source_revision:model.source_revision,kind:"griffin_static_packaging_interfaces"}
+}
+
+// One inboard housing and stem per inner rail, clear of the rotating tongue
+// and walking track. The pin and centre shaft rotate inside its open bore.
+fn bearing_station_plan(doc,edit_target,docs,bank,station){
+    if (bank!=0 && bank!=1) || (station!=0 && station!=1){throw("Select one root bearing station");}
+    let model=requirements::model();let own="GriffinRampRootBearingRequirements::RampRootBearing::";
+    let ramp="GriffinRampRequirements::GriffinEgressRamp::";let lander=model.value(owner()+"landerPath");
+    let placement=bank_placements(model,docs,bank);let point=vec3_from(placement.position);
+    let width=model.value(ramp+"rampPivotLugWidthM");let depth=model.value(own+"axialLengthM");
+    let inside=model.value(own+"innerRadiusM");let outside=model.value(own+"outerRadiusM");
+    let offset=model.value(own+"inboardOffsetM");let sign=if station==0{-1.0}else{1.0};
+    let z=point.z+sign*(model.value(ramp+"rampCenterRailOffsetZM")-offset);
+    let bottom=spec::component_bus_mount_y()+spec::visual_deck_center_y_m()+spec::visual_deck_thickness_m()/2.0;
+    let top=point.y-(inside+outside)/2.0;if top<=bottom || depth<=0.0{throw("Bearing stem has no positive stock");}
+    let name="RampMount"+if bank==0{"Port"}else{"Starboard"}+if station==0{"InnerRear"}else{"InnerFront"};
+    let material=lander+"/"+bank_names(model)[bank]+"/DeckSection/Looks/RampStructure";
+    let stem=visual::_component_cube_visual_ops(doc,edit_target,lander,name,[point.x,(bottom+top)/2.0,z],(),[width,top-bottom,depth],spec::visual_deck_display_color());
+    if !stem.ok{return stem;}let ops=stem.ops;
+    ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:lander+"/"+name,schemas:["PhysicsCollisionAPI","MaterialBindingAPI"]}});
+    ops.push(#{SetRelationship:#{edit_target:edit_target,path:lander+"/"+name,name:"material:binding",targets:[material]}});
+    let path=lander+"/"+name+"Bearing";let present=query("QueryUsdPrim",#{doc_id:doc,path:path});
+    if present.type_name==(){ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:lander,name:name+"Bearing",type_name:"Xform",reference:(),reference_prim_path:""}});}
+    else if present.type_name!="Xform"{throw("Bearing instance has the wrong standard type");}
+    // This fixture lives one level below the Twin root; author a portable
+    // USD-relative reference, independent of the live mount authority.
+    if model.value(owner()+"fixtureAsset").split("/").len()!=2{throw("Packaging fixture reference base changed");}
+    ops.push(#{SetReferenceArcs:#{edit_target:edit_target,path:path,list_op:"Explicit",references:[#{asset_path:"../"+model.value(own+"componentAsset"),prim_path:"/RootBearing"}]}});
+    let pose=frames::place_plan(edit_target,path,[point.x,point.y,z],[0.0,0.0,0.0],[1.0,1.0,1.0]);
+    if !pose.ok{return pose;}for op in pose.ops{ops.push(op);}
+    #{ok:true,ops:ops,doc_id:doc,generation:query("QueryUsdPrim",#{doc_id:doc,path:lander}).document_generation,source_revision:model.source_revision,
+        housing:path,stem:lander+"/"+name,position:[point.x,point.y,z],kind:"griffin_root_bearing_station"}
 }

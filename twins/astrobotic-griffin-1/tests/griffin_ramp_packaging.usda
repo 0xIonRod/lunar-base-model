@@ -354,8 +354,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (2.4433441945204004, 1.9873079867747538, -0.707)
-            custom double3 xformOp:scale = (0.06, 0.3946159735495076, 0.06)
+            custom double3 xformOp:translate = (2.4433441945204004, 1.9621829867747538, -0.6892499999999999)
+            custom double3 xformOp:scale = (0.06, 0.3443659735495075, 0.024499999999999997)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -378,8 +378,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (2.4433441945204004, 1.9873079867747538, 0.707)
-            custom double3 xformOp:scale = (0.06, 0.3946159735495076, 0.06)
+            custom double3 xformOp:translate = (2.4433441945204004, 1.9621829867747538, 0.6892499999999999)
+            custom double3 xformOp:scale = (0.06, 0.3443659735495075, 0.024499999999999997)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -432,8 +432,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (-2.4433441945204004, 1.9873079867747538, -0.707)
-            custom double3 xformOp:scale = (0.06, 0.3946159735495076, 0.06)
+            custom double3 xformOp:translate = (-2.4433441945204004, 1.9621829867747538, -0.6892499999999999)
+            custom double3 xformOp:scale = (0.06, 0.3443659735495075, 0.024499999999999997)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -456,8 +456,8 @@ def Xform "GriffinFlipVisual" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
         )
         {
-            custom double3 xformOp:translate = (-2.4433441945204004, 1.9873079867747538, 0.707)
-            custom double3 xformOp:scale = (0.06, 0.3946159735495076, 0.06)
+            custom double3 xformOp:translate = (-2.4433441945204004, 1.9621829867747538, 0.6892499999999999)
+            custom double3 xformOp:scale = (0.06, 0.3443659735495075, 0.024499999999999997)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -489,6 +489,42 @@ def Xform "GriffinFlipVisual" (
             )
             {
             }
+        }
+        def Xform "RampMountPortInnerRearBearing" (
+            references = @../components/lander/griffin_ramp_root_bearing_visual.usda@</RootBearing>
+        )
+        {
+            custom double3 xformOp:translate = (2.4433441945204004, 2.1596159735495077, -0.6892499999999999)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        }
+        def Xform "RampMountPortInnerFrontBearing" (
+            references = @../components/lander/griffin_ramp_root_bearing_visual.usda@</RootBearing>
+        )
+        {
+            custom double3 xformOp:translate = (2.4433441945204004, 2.1596159735495077, 0.6892499999999999)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        }
+        def Xform "RampMountStarboardInnerRearBearing" (
+            references = @../components/lander/griffin_ramp_root_bearing_visual.usda@</RootBearing>
+        )
+        {
+            custom double3 xformOp:translate = (-2.4433441945204004, 2.1596159735495077, -0.6892499999999999)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+        }
+        def Xform "RampMountStarboardInnerFrontBearing" (
+            references = @../components/lander/griffin_ramp_root_bearing_visual.usda@</RootBearing>
+        )
+        {
+            custom double3 xformOp:translate = (-2.4433441945204004, 2.1596159735495077, 0.6892499999999999)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            custom double3 xformOp:scale = (1.0, 1.0, 1.0)
         }
     }
     def Xform "FLIP" (

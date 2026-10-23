@@ -42,6 +42,15 @@ FLIP and study preflights have zero errors/warnings. SysML validation retains
 153 existing warnings. The installed vehicle, complete obstacle clearance,
 loaded deployment/traversal and 60 FPS remain unaccepted.
 
+The [root bearing checkpoint](griffin-root-bearing-2026-10-23.md) installs
+four inboard housings and connected stems in the review fixture. Housing/root
+production gates pass 6/128 checks, and both shortened-instance negatives fail
+exactly one constraint. A conditional native geometry certificate passes 776
+root/housing/stem comparisons over any root angle; a 1 mm misalignment is
+rejected. This does not qualify middle/toe or loaded integration. The separate
+assembled runtime attempt panics at the native island owner and is reported
+locally to optimization. Asset preflight passes; runtime acceptance remains open.
+
 ## Sun-facing autonomous descent
 
 The operator-requested GSA-011 study yaws the forward solar bank's +Z outward

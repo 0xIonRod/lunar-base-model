@@ -1558,4 +1558,12 @@ package GriffinRequirementSources {
             source_griffin_ramp_middle_component, source_griffin_ramp_toe_component,
             source_www_astrobotic_com_griffin_lander);
     }
+    part source_root_bearing_reconstruction : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/griffin-root-bearing-2026-10-23.md";
+    }
+    part root_bearing_evidence : RequirementEvidence {
+        ref targetRequirement = GriffinRampRootBearingRequirements::grb001;
+        ref sources = (source_root_bearing_reconstruction);
+    }
 }

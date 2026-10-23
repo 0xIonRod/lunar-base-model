@@ -15,6 +15,12 @@ paths = ["requirements"]
 
 [verification]
 [[verification.cases]]
+name = "GriffinRampRootBearingRequirements::Verify_GriffinRampRootBearing"
+scene = "tests/griffin_ramp_root_bearing.usda"
+script = "scenarios/tests/griffin_ramp_root_bearing.rhai"
+verdict_channel = "GRIFFIN_ROOT_BEARING"
+
+[[verification.cases]]
 name = "GriffinRampToeSectionRequirements::Verify_GriffinRampToeSection"
 scene = "tests/griffin_ramp_toe_section.usda"
 script = "scenarios/tests/griffin_ramp_toe_section.rhai"
@@ -328,6 +334,12 @@ name = "griffin.ramp_toe_section"
 requirements = "requirements/griffin_ramp_toe_section_requirements.sysml"
 verification = "GriffinRampToeSectionRequirements::Verify_GriffinRampToeSection"
 usd_path = "/World/RampToeSection"
+
+[[components]]
+name = "griffin.ramp_root_bearing"
+requirements = "requirements/griffin_ramp_root_bearing_requirements.sysml"
+verification = "GriffinRampRootBearingRequirements::Verify_GriffinRampRootBearing"
+usd_path = "/World/RampRootBearing"
 
 [settings]
 "usd.runtime_persistence" = false

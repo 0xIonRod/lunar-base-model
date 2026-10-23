@@ -147,6 +147,7 @@ fn fittings_plan(doc,edit_target,root,owner,section_index,guide_index){
     ops.push(#{SetRelationship:#{edit_target:edit_target,path:root+"/"+guide.pin,
         name:"material:binding",targets:[root+"/Looks/RampStructure"]}});
     if guide_index==0{
+        if section_index==0{ops.push(#{SetAttribute:#{edit_target:edit_target,path:root+"/HingeBarrel",name:"radius",type_name:"double",value:model.value(own+"entryShaftRadiusM").to_string()}});}
         ops.push(#{SetTranslate:#{edit_target:edit_target,path:root+"/HingeBarrel",value:[0.0,entry,0.0]}});
     }
     if has_exit {

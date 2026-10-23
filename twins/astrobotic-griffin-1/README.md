@@ -63,8 +63,11 @@ assembles all three unequal sections and visible fixed bridges. The
 now passes 22,176 payload/bridge observations through the full sampled path,
 including between-sample motion allowance. The nominal walking seam measures
 2 mm; minimum certified payload separation is 50.1168 mm. The revised root
-passes 127 production checks. Open `tests/griffin_ramp_packaging.usda` for
+passes 128 production checks. Open `tests/griffin_ramp_packaging.usda` for
 this saved static review.
+The later [root bearing checkpoint](contracts/griffin-root-bearing-2026-10-23.md)
+installs four bored inboard housings and connected stems, with 776 conservative
+root mating comparisons and a passing standalone housing gate.
 The production vehicle still contains the earlier mechanism. Full obstacle
 clearance, native loaded deployment and clean 60 FPS remain open.
 The seven-engine/four-leg configuration is source-backed; current metric

@@ -134,3 +134,9 @@ Both follow-ups set the angular interval to zero and qualify only the stowed
 pose. They do not accept a moving opposite bank or the full structure sweep.
 Their terminal observations are appended to the receipt's log; both temporary
 study runs have stopped. The app remains available on the owned port 4391.
+
+
+The later [root bearing checkpoint](griffin-root-bearing-2026-10-23.md)
+replaces the four solid pedestal tops with inboard bored housings and narrower
+connected stems. It qualifies those root mating interfaces separately; the
+snapshots and sweep figures above remain evidence for their pinned revision.
