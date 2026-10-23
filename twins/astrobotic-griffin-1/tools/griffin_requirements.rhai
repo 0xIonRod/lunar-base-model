@@ -102,9 +102,8 @@ fn _sysml_list(report, name) {
     items
 }
 
-// `compact=true` projects records to a flat qualified_name.  Keep this helper
-// tolerant of the full ValidateSysml shape as well, so the Twin policy can be
-// inspected with either projection without a second parser path.
+// Native source records and selected fact maps expose the same qualified
+// identity. Keep the lookup source-backed for both report readers.
 fn _qualified(record) {
     if record == () { return ""; }
     if record.qualified_name != () { return record.qualified_name; }
@@ -164,10 +163,10 @@ fn sysml_contract_report(verification_name) {
     if name == "" {
         return _sysml_contract_failure((), "active Twin root is unavailable");
     }
-    // source() pages the manifest-declared requirement and verification
-    // identities through AnalyzeSysml and adds the active typed Twin contract.
-    // Scalar literals remain lazy; this avoids transporting full source and
-    // AST tables through Rhai on every runtime report.
+    // source() reads every manifest-declared requirement and verification in
+    // bounded native pages and adds the active typed Twin contract. Metadata
+    // and scalar literals remain lazy, so the complete audit retains source
+    // identities without flattening the whole source into one Rhai value.
     let report = sysml_requirements::source();
     if report == () {
         return _sysml_contract_failure((), "typed SysML source projection is unavailable");

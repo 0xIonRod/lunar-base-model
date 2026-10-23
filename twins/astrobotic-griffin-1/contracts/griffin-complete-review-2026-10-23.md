@@ -78,13 +78,21 @@ recorded in optimization's local
 `.cache/griffin-handoffs/20261023-egress-joint-graph.md`. No solver, dependency,
 friction, substep, mass or acceptance limit was changed by this review.
 
-The full `Verify_GriffinRequirements` audit encounters `Length of string too
-large` in the shared full-Twin SysML projection before producing a verdict.
-A bounded twelve-step reproduction retains that error and produces no authored
-verdict. The selected-source component
-cases run successfully. The complete-registry audit remains blocked and its
-query-budget reproduction is recorded in the USD worktree; it is not counted
-as passing.
+The full `Verify_GriffinRequirements` audit now completes every phase and
+produces a structured FAIL. Shared engine commit `27790624c` reads native
+SysML records eight at a time, preserving all 458 requirements and 53
+verification cases across 58 pages. Its three adapter tests and seven live
+pagination assertions pass; Rhai limits are unchanged. The source contract
+reports `sysml_ok=true`, 29 source files and no missing source facts.
+
+The remaining composite findings concern the ramp observer: it expects paired
+tracks within each bank instead of the four independently articulated track
+bodies, compares the starboard Euler representation directly, omits a required
+local-frame constraint input and expects the retired single transition plate.
+These findings remain visible; the geometry audit is not counted as passing.
+The [paging repair receipt](../handover/griffin-source-pagination-2026-10-23.json)
+records the completed failed audit and the fresh 122-check lander PASS using
+the regular USD build. The earlier receipt below retains its original scope.
 
 ## Validation record
 

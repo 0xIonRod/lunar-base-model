@@ -1,6 +1,12 @@
+The [source paging repair receipt](../handover/griffin-source-pagination-2026-10-23.json)
+records complete reads of all 458 requirements and 53 verification cases with
+unchanged Rhai limits. The full composite audit now produces a structured FAIL
+for ramp-observer findings; its SysML source phase passes. The fresh lander
+component run passes 122 checks.
+
 The [complete hardware and payload-release review](griffin-complete-review-2026-10-23.md)
 records twelve passing selected cases, an explicit production egress observation,
-and the remaining native topology, impact and full-audit blockers. Its receipt
+and the remaining native topology, impact and composite-audit findings. Its receipt
 keeps source revisions and failed cases visible.
 
 # Griffin verification boundary
