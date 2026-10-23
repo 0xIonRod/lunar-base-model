@@ -79,7 +79,7 @@
     "source_revision": 10230336678615105864,
     "evidence": "Aggregate terminal telemetry and source loop counters; no claim of persisted per-observation result rows.",
     "log": "griffin-raised-root-interface-2026-10-23.log",
-    "log_sha256": "8b61cb10c4f6db65095c2069db6d22bbb2ddd368be1b3719383a85bfc3a9f448",
+    "log_sha256": "6593113a346b0a3f3f74a606a03fbacb1781159ca1d35a1d03a0991d97da46a0",
     "references": [
       {
         "bank": 0,
@@ -388,5 +388,80 @@
     "Native loaded deployment and traversal",
     "60 FPS at 1280x720 High and real-time physics"
   ],
-  "production_vehicle_modified": false
+  "production_vehicle_modified": false,
+  "stow_followup": {
+    "checkout": "9eeec03b486116022d8c3ef58ea3917adea058bc",
+    "fixed_structure": {
+      "doc_id": 119596318330781,
+      "document_generation": 66,
+      "minimum_m": -0.05232050807568911,
+      "observations": 2856,
+      "scope": "476 measured fixed members at stow only; NURBS and sweep unaccepted",
+      "source_revision": 10230336678615105864,
+      "stage_generation": 3,
+      "uncertain": [
+        {
+          "bank": 0,
+          "gap_m": -0.052320508075688665,
+          "section": 0,
+          "target": "/GriffinFlipVisual/Griffin1/RampMountPortInnerRear",
+          "witness": {
+            "payload": "/GriffinFlipVisual/Griffin1/RampMountPortInnerRear",
+            "ramp": "/RampSection/CenterRailStarboardJointPin"
+          }
+        },
+        {
+          "bank": 0,
+          "gap_m": -0.052320508075688665,
+          "section": 0,
+          "target": "/GriffinFlipVisual/Griffin1/RampMountPortInnerFront",
+          "witness": {
+            "payload": "/GriffinFlipVisual/Griffin1/RampMountPortInnerFront",
+            "ramp": "/RampSection/CenterRailPortJointPin"
+          }
+        },
+        {
+          "bank": 1,
+          "gap_m": -0.05232050807568911,
+          "section": 0,
+          "target": "/GriffinFlipVisual/Griffin1/RampMountStarboardInnerRear",
+          "witness": {
+            "payload": "/GriffinFlipVisual/Griffin1/RampMountStarboardInnerRear",
+            "ramp": "/RampSection/CenterRailPortJointPin"
+          }
+        },
+        {
+          "bank": 1,
+          "gap_m": -0.052320508075688665,
+          "section": 0,
+          "target": "/GriffinFlipVisual/Griffin1/RampMountStarboardInnerFront",
+          "witness": {
+            "payload": "/GriffinFlipVisual/Griffin1/RampMountStarboardInnerFront",
+            "ramp": "/RampSection/CenterRailStarboardJointPin"
+          }
+        }
+      ]
+    },
+    "fixed_structure_unmeasured": [
+      "/GriffinFlipVisual/Griffin1/HighGainDish/YawHead/DishGimbal/DishHead/Reflector",
+      "/GriffinFlipVisual/Griffin1/HighGainDish/YawHead/DishGimbal/DishHead/FeedArm"
+    ],
+    "opposite_bank": {
+      "doc_id": 119596318330781,
+      "document_generation": 66,
+      "minimum_m": 1.1691687718870183,
+      "observations": 1674,
+      "scope": "Opposite bank measured members at stow only; moving-bank sweep unaccepted",
+      "source_revision": 10230336678615105864,
+      "stage_generation": 3,
+      "uncertain": []
+    },
+    "target_members_per_bank": 279,
+    "scope_note": "These are stowed-pose envelopes only, with phase delta zero. Four bearing/pin overlaps require mating qualification. Neither survey qualifies the complete deployment sweep.",
+    "observer_source_sha256": {
+      "fixed": "3dda04be994927268b28f378257da4e4809bf5187c2820b7d26ae5ec59e70f6c",
+      "opposite_bank": "d9f290ced7f7330658e11fa487145f73d60ef0146714735d4b4f5b067223a1a5"
+    },
+    "study_actor_stopped": true
+  }
 }

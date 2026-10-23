@@ -28,7 +28,7 @@ frame; starboard is mirrored by the same source-frame relation.
 
 Each bank root is the bearing frame. DeckSection carries the inverse of its
 entry datum, and the middle placement composes that offset with the named fold
-frames. The deck remains 1.42 m long, the bus and rover stay unchanged, the
+frames. The fixed bridge remains 1.42 m long, the bus and rover stay unchanged, the
 120-degree inward stow is retained, and the nominal walking top remains at the
 deck elevation. Fixed bridge plates are 0.576 m wide, leaving the same source
 2 mm running clearance beside the moving entrance posts; rotating tracks stay
@@ -115,3 +115,22 @@ shows the repaired shared viewport camera in the rover assembly.
 This supersedes the candidate bridge obstruction in the previous study. It
 leaves the production vehicle, complete GVA-001 acceptance, loaded egress and
 performance acceptance open.
+
+
+## Surrounding structure and opposite-bank follow-up
+
+At the same saved source/generation, the stowed survey covers 476 measured
+fixed lander members against all three sections on both banks: 2,856
+comparisons. Four overlapping envelopes remain, all at root bearing/pin
+connections. Those mating interfaces require a fit check; an envelope overlap
+alone is not a physical penetration measurement. There are no remaining
+uncertain fixed-bridge envelopes. The antenna reflector and feed-arm NURBS
+remain outside this measured coverage.
+
+A separate stowed survey compares all three sections with all 279 measured
+members of the opposite bank in both directions: 1,674 comparisons, with no
+uncertain envelope pairs and minimum conservative separation of 1.16917 m.
+Both follow-ups set the angular interval to zero and qualify only the stowed
+pose. They do not accept a moving opposite bank or the full structure sweep.
+Their terminal observations are appended to the receipt's log; both temporary
+study runs have stopped. The app remains available on the owned port 4391.
