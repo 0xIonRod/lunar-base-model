@@ -51,6 +51,13 @@ rejected. This does not qualify middle/toe or loaded integration. The separate
 assembled runtime attempt panics at the native island owner and is reported
 locally to optimization. Asset preflight passes; runtime acceptance remains open.
 
+The [fixed-structure sweep](griffin-ramp-fixed-structures-2026-10-23.md) covers
+11,088 section/pose observations against 480 measured targets, including
+between-sample motion and the separate root mating prerequisites. A deliberate
+track obstruction is rejected. The two unmeasured antenna members and all
+moving-to-moving interfaces remain open; this does not accept GVA-001 or loaded
+deployment.
+
 ## Sun-facing autonomous descent
 
 The operator-requested GSA-011 study yaws the forward solar bank's +Z outward

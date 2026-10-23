@@ -78,7 +78,7 @@ fn inspect(doc,root_doc,bearing_doc,bank,station){
         }
     }
     #{passes:pass,bank:bank,station:station,comparisons:count,minimum_certified_gap_m:minimum,uncertain:uncertain,
-        coaxial_error_m:coaxial_error,axis_alignment_error_m:axis_error,source_geometry_matches:geometry_matches,stem_connected:connected,pin_contains_housing:pin_contains,
+        target_paths:[house+"/Housing",stem_path],coaxial_error_m:coaxial_error,axis_alignment_error_m:axis_error,source_geometry_matches:geometry_matches,stem_connected:connected,pin_contains_housing:pin_contains,
         doc_id:doc,document_generation:ring.document_generation,stage_generation:ring.stage_generation,source_revision:model.source_revision,
         scope:"Entire root versus this housing and stem for any root angle; qualified source bore geometry required; other sections and loaded physics unaccepted"}
 }

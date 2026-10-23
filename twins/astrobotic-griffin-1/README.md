@@ -68,6 +68,10 @@ this saved static review.
 The later [root bearing checkpoint](contracts/griffin-root-bearing-2026-10-23.md)
 installs four bored inboard housings and connected stems, with 776 conservative
 root mating comparisons and a passing standalone housing gate.
+The [fixed-structure sweep](contracts/griffin-ramp-fixed-structures-2026-10-23.md)
+extends the path study to 480 measured fixed-pose targets across 11,088
+observations, with explicit between-sample allowance and obstruction rejection.
+The dish, feed arm and moving-to-moving interfaces remain outside that result.
 The production vehicle still contains the earlier mechanism. Full obstacle
 clearance, native loaded deployment and clean 60 FPS remain open.
 The seven-engine/four-leg configuration is source-backed; current metric

@@ -185,6 +185,7 @@ fn verify_installation(state,bank,section_index){
     for corner in corners(state.sections[section_index].envelope){
         residual=max(residual,vlen(transform_apply_point(native_pose(expected),corner)-transform_apply_point(native_pose(actual.value),corner)));
     }
+    if residual>model.value(packaging::component_owner(label)+"::geometryToleranceM"){throw("Installed section frame differs from its source-owned placement: "+member);}
     assert_current(state);
     #{bank:bank,section:label,part_count:source_paths.len(),maximum_placement_residual_m:residual,bank_axis_residual_m:axis_residual,
         doc_id:state.doc,document_generation:state.fence.document_generation,stage_generation:state.fence.stage_generation,

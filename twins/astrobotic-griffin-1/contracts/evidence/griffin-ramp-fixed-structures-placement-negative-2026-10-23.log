@@ -1,0 +1,2 @@
+2026-10-23T03:44:46.736839Z  INFO rhai_user_scenario_hook{hook="on_start" entity=7077v3 gid=119613533979178}: lunco_scripting_rhai_world::world_bridge: [rhai] GRIFFIN_STRUCTURE_STUDY_STARTED actor=119613533979178 mode=probe
+2026-10-23T03:44:47.029391Z  INFO rhai_user_scenario_hook{hook="on_tick" entity=7077v3 gid=119613533979178}: lunco_scripting_rhai_world::world_bridge: [rhai] GRIFFIN_STRUCTURE_STUDY_ERROR Installed section frame differs from its source-owned placement: /GriffinFlipVisual/Griffin1/CandidateRampPort/DeckSection
