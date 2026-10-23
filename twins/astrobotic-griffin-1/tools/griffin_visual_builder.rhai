@@ -6571,45 +6571,5 @@ fn griffin_rcs_command_envelope_plan(doc,edit_target,root) {
 
 // One upper-corner mount group, preserving each nozzle/feed/force identity.
 fn griffin_rcs_pod_mount_plan(doc,edit_target,root,sx,sz) {
-    if (sx!=1.0 && sx!=-1.0) || (sz!=1.0 && sz!=-1.0) {return plan_error("RCS corner signs invalid");}
-    let ops=[];let frame=();let count=0;
-    for jet in griffin_spec::rcs_port_mapping() {
-        let name=jet.model_name.sub_string(0,jet.model_name.len()-5);
-        let path=root+"/"+name;
-        let record=assembly_builder::composed_query(doc,#{path:path,
-            attrs:["xformOp:translate"],schemas:true});
-        if !query_ok(record) || !record.api_schemas.contains("LunCoForceActuatorAPI") {
-            return plan_error("RCS force owner missing: "+path);
-        }
-        let point=vec3_from(record.attrs["xformOp:translate"]);
-        if point.x*sx<=0.0 || point.z*sz<=0.0 {continue;}
-        frame=_griffin_rcs_mount_frame(record,jet);if !frame.ok {return frame;}
-        ops.push(#{SetTranslate:#{edit_target:edit_target,path:path,value:frame.position}});
-        count+=1;
-    }
-    if count!=3 {return plan_error("RCS pod requires three existing physical members");}
-    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
-    let plate=griffin_spec::_typed_model_number(own+"podMountPlateThicknessM");
-    let overlap=griffin_spec::_typed_model_number(own+"podMountPlateOverlapM");
-    let offset=griffin_spec::_typed_model_number(own+"memberTangentOffsetM");
-    let radius=griffin_spec::_typed_model_number(own+"exitRadiusM");
-    let dims=griffin_spec::_sysml_model_value("payloadAdapterDimensions");
-    let profile=griffin_spec::visual_outer_body_profile_coordinates();
-    if plate==() || overlap==() || offset==() || radius==() || !vec3_is_native(dims) {
-        return plan_error("RCS support plate source unavailable");
-    }
-    let chamfer=(1.0+profile[0].x.abs())/2.0;
-    let inner=vec3(sx*dims.x/2.0*chamfer,0.0,sz*dims.z/2.0*chamfer);
-    let outer=vec3(sx*frame.arm_x,0.0,sz*frame.arm_z);
-    let delta=outer-inner;let mid=(outer+inner)*0.5;
-    let top=griffin_spec::visual_payload_adapter_center_y_m()+dims.y/2.0;
-    let angle=(-delta.z/delta.x).atan()*180.0/3.141592653589793;
-    let name="RcsPodMount"+if sx>0.0 {"PX"} else {"NX"}+if sz>0.0 {"PZ"} else {"NZ"};
-    let plan=_component_cube_visual_ops(doc,edit_target,root,name,
-        [mid.x,top+plate/2.0,mid.z],[0.0,angle,0.0],
-        [vlen(delta)+2.0*overlap,plate,2.0*offset+2.0*radius+overlap],
-        griffin_spec::_sysml_model_value("silverDisplayColor"));
-    if !plan.ok {return plan;}
-    for op in plan.ops {ops.push(op);}
-    #{ok:true,ops:ops,member_count:count}
+    plan_error("Use griffin_rcs_mounts::pod_plan; the flat shelf cannot seat inverted and horizontal A110 chambers")
 }

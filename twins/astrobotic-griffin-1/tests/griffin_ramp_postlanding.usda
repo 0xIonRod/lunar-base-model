@@ -23,7 +23,7 @@ def Xform "Griffin1SurfaceOps" (
     custom string lunco:mission:site = "Nobile regional study anchor backed by LROC NAC DTM NOBILE03; exact touchdown coordinate unresolved"
     custom string lunco:mission:scope = "surface operations only"
     custom string lunco:mission:evidence = "LROC NOBILE03 regional relief is source-backed; Griffin vehicle values and exact touchdown site remain assumptions"
-    custom string lunco:mission:deployment = "top-deck adapter during descent; middle then toe hinges unfold after touchdown; root targets derive from landed hinge frames and retained DEM toe clearance within source travel; all six hinges satisfy angle/rate/dwell before FLIP release"
+    custom string lunco:mission:deployment = "\"Top-deck payload during descent; four independent three-span wheel tracks clear their roots, unfold middle and toe sections, then fit four root targets to retained terrain. All twelve hinges satisfy measured angle, rate and dwell gates before payload release.\""
     custom string lunco:anchor:status = "MOON_ME ENU frame at NOBILE03 regional center; local height zero is the normalized terrain datum"
     custom string lunco:lighting:contract = "all Griffin and FLIP geometry uses LunarSurface/Sun polar direction and the authored mission epoch"
     custom string lunco:route:status = "ramp entry marker moved outside descent column; center lane remains clear of four solid legs"
@@ -198,9 +198,9 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (2.0, 0.0, 0.0)
+        custom double3 xformOp:translate = (2.0, 0.2049314542207867, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        bool lunco:billboard = false
+        bool lunco:billboard = true
         string lunco:billboard:text = "Ramp entry"
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0
@@ -220,9 +220,9 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (8.5, 0.0, 0.0)
+        custom double3 xformOp:translate = (8.5, -0.0062310658970091, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        bool lunco:billboard = false
+        bool lunco:billboard = true
         string lunco:billboard:text = "Ramp exit"
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0
@@ -242,9 +242,9 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (13.0, 0.0, 0.0)
+        custom double3 xformOp:translate = (13.0, -0.14148472641245463, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        bool lunco:billboard = false
+        bool lunco:billboard = true
         string lunco:billboard:text = "Survey 1"
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0
@@ -264,9 +264,9 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (22.0, 0.0, -4.0)
+        custom double3 xformOp:translate = (22.0, -1.067371954023838, -4.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        bool lunco:billboard = false
+        bool lunco:billboard = true
         string lunco:billboard:text = "Survey 2"
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0
@@ -286,9 +286,9 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://markers/route_point.usda@</RoutePoint>
     )
     {
-        custom double3 xformOp:translate = (31.0, 0.0, -10.0)
+        custom double3 xformOp:translate = (31.0, -2.166758555790875, -10.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        bool lunco:billboard = false
+        bool lunco:billboard = true
         string lunco:billboard:text = "Base"
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0

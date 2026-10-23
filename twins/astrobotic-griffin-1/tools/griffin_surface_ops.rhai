@@ -965,8 +965,9 @@ fn rover_route_settle_ready(rover) {
 // in every sample made the failure evidence exceed Rhai's string limit.
 fn physical_ramp_runtime_pose_evidence() {
     let records = [];
-    for side in ["Port", "Starboard"] {
-        let root_path = "/Griffin1SurfaceOps/Lander/EgressRamp" + side;
+    for track in griffin_spec::ramp_track_bindings() {
+        let side=track.side+"/"+track.track.to_string();
+        let root_path = "/Griffin1SurfaceOps/Lander/" + track.body;
         for body in [
             #{name: "root", path: root_path},
             #{name: "middle", path: root_path + "/MiddleSection"},
@@ -1069,14 +1070,14 @@ fn _ramp_hinge_state(name, path, id, ports) {
         angle_ports: ports}
 }
 
-/// Read live limits and angles for all six ramp hinges at one simulation tick.
+/// Read live limits and angles for all twelve ramp hinges at one simulation tick.
 /// `ReadPortsBatch` keeps mechanism evidence coherent across both ramps.
 fn physical_ramp_hinge_report() {
     let names = [];
     for name in griffin_spec::ramp_root_joint_names() { names.push(name); }
     for name in griffin_spec::ramp_intermediate_joint_names() { names.push(name); }
-    if names.len() != 6 {
-        return #{ok: false, error: "SysML must name both root and all four intermediate ramp hinges", hinge_names: names};
+    if names.len() != 12 {
+        return #{ok: false, error: "SysML must name all four root and eight intermediate track hinges", hinge_names: names};
     }
     let paths = [];
     let ids = [];
@@ -1406,31 +1407,52 @@ fn landed_surface_route_frame() {
     #{origin:position-forward*mount,forward:forward,
       lateral:vec3(-forward.z,0.0,forward.x)}
 }
+// Horizontal route datums belong to the frozen egress frame. Their Y
+// coordinate must be resolved at the transformed location on the retained DEM.
+// Reusing a reference-scene height after yawing the route buries its markers.
 fn surface_route_target(target, frame) {
     let point=frame.origin+frame.forward*target.x+frame.lateral*target.z;
-    vec3(point.x,target.y,point.z)
+    let height=terrain_height(point.x,point.z);
+    if height==() || !height.is_finite(){throw("Griffin route has no retained terrain at transformed target");}
+    vec3(point.x,height,point.z)
 }
-
-// Display the same frozen datums used by navigation. @view@ edits are
-// disposable presentation: saves and reloads retain the authored route table.
-fn present_surface_route(frame) {
+fn surface_route_entry_height(point) {
+    let lander=find_path("/Griffin1SurfaceOps/Lander");
+    let position=world_pos3(lander);let rotation=world_rotation_quat(lander);
+    if position==() || rotation==(){throw("Route entry requires the measured lander frame");}
+    let height=griffin_spec::visual_payload_adapter_center_y_m()+griffin_spec::visual_payload_adapter_thickness_m()/2.0;
+    let origin=position+qrot(rotation,vec3(0.0,height,0.0));
+    let normal=qrot(rotation,vec3(0.0,1.0,0.0));
+    if abs(normal.y)<0.001{throw("Payload-deck plane cannot support a route entry annotation");}
+    origin.y-(normal.x*(point.x-origin.x)+normal.z*(point.z-origin.z))/normal.y
+}
+// This is the one production presentation plan, also inspected by the gate.
+// The entry belongs to the payload walking plane; other gates follow terrain.
+// @view@ edits never overwrite the authored reference-scene route datums.
+fn surface_route_presentation_plan(frame) {
     let names=griffin_spec::surface_route_marker_names();
-    let x=griffin_spec::surface_route_marker_x();
-    let y=griffin_spec::surface_route_marker_y();
-    let z=griffin_spec::surface_route_marker_z();
+    let x=griffin_spec::surface_route_marker_x();let z=griffin_spec::surface_route_marker_z();
+    let clearance=griffin_spec::_sysml_attribute("surfaceRouteMarkerClearanceM");
+    if clearance==() || !clearance.is_finite() || clearance<=0.0{throw("Route annotation clearance is invalid");}
     let record=query("QueryUsdPrim",#{path:"/Griffin1SurfaceOps/"+names[0],attrs:[]});
-    if record==() || record.doc_id==() {throw("route presentation document unavailable");}
-    let ops=[];
-    for i in 0..names.len() {
+    if record==() || record.doc_id==(){throw("Route presentation document unavailable");}
+    let ops=[];let points=[];
+    for i in 0..names.len(){
         let path="/Griffin1SurfaceOps/"+names[i];
-        let point=surface_route_target(vec3(x[i],y[i],z[i]),frame);
+        let point=surface_route_target(vec3(x[i],0.0,z[i]),frame);let terrain=point.y;
+        if i==0{point=vec3(point.x,max(terrain,surface_route_entry_height(point)),point.z);}
+        point=vec3(point.x,point.y+clearance,point.z);
         ops.push(#{SetTranslate:#{edit_target:"@view@",path:path,value:vec3_array(point)}});
-        ops.push(#{SetAttribute:#{edit_target:"@view@",path:path,
-            name:"lunco:billboard",type_name:"bool",value:"true"}});
+        ops.push(#{SetAttribute:#{edit_target:"@view@",path:path,name:"lunco:billboard",type_name:"bool",value:"true"}});
+        points.push(#{path:path,position_m:vec3_array(point),terrain_y_m:terrain,
+            clearance_m:point.y-terrain,surface:if i==0{"payload_deck"}else{"terrain"}});
     }
-    cmd("ApplyUsdTransientOps",#{doc_id:record.doc_id,
-        parent_gen:usd_document_generation(record.doc_id),
-        label:"Present landed Griffin route",ops:ops})
+    #{ok:true,doc_id:record.doc_id,parent_gen:usd_document_generation(record.doc_id),ops:ops,points:points}
+}
+fn present_surface_route(frame) {
+    let plan=surface_route_presentation_plan(frame);
+    cmd("ApplyUsdTransientOps",#{doc_id:plan.doc_id,parent_gen:plan.parent_gen,
+        label:"Present terrain-fitted Griffin route",ops:plan.ops})
 }
 
 fn _surface_route_leg_task(rover, leg, stall_timeout) {

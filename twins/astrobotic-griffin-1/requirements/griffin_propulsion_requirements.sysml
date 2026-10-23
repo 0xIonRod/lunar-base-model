@@ -380,6 +380,12 @@ package GriffinPropulsionRequirements {
         attribute podMountPlateOverlapM : Real = .04;
         attribute mountStandoffM : Real = .06;
         attribute memberTangentOffsetM : Real = .12;
+        // Render-only saddle reconstruction. Clamps seat on the A110 chamber,
+        // with an open bore and native station/orientation. Stock/overlap are
+        // explicit visual fit assumptions, not pressure or structural sizing.
+        attribute clampRadialStockM : Real = .003;
+        attribute clampAxialLengthM : Real = .016;
+        attribute clampSeatingOverlapM : Real = .0001;
     }
 
     part GriffinPlumeStudy {

@@ -1,3 +1,4 @@
+import "twin://astrobotic-griffin-1/tools/griffin_rcs_mounts.rhai" as mounts;
 // Observe the production geometry-derived allocator and Newton-valued jet outputs.
 // The fixture disables rigid-body motion so each signed demand can be inspected
 // in the same authored body frame; no substitute propulsion equations are used.
@@ -18,6 +19,8 @@ fn on_start(me,ctx) {
         #{name:"yaw_pos",axis:1,sign:1.0},#{name:"yaw_neg",axis:1,sign:-1.0},
         #{name:"roll_pos",axis:2,sign:1.0},#{name:"roll_neg",axis:2,sign:-1.0}];
     this.index=0;this.done=false;this.failures=[];this.stations=[];
+    let native=query("QueryUsdPrim",#{path:"/World/Griffin1",attrs:[]});
+    this.geometry_doc=native.doc_id;this.clamp_index=0;
     this.settling=griffin_spec::_typed_model_number(
         "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::commandSettlingS");
     this.tolerance=griffin_spec::_typed_model_number(
@@ -48,7 +51,14 @@ fn on_start(me,ctx) {
     this.elapsed=0.0;
 }
 fn on_tick(me,ctx) {
-    if this.done {return;}this.elapsed+=dt();if this.elapsed<this.settling {return;}
+    if this.done {return;}
+    // One native hardware observation per tick keeps the observer bounded.
+    if this.clamp_index<12{
+        let geometry=mounts::installed_clamp(this.geometry_doc,"/World/Griffin1",this.clamp_index);
+        let ring=geometry.measurements[0];this.failures.push(t_true(ring.passes,"A110 clamp, inboard support and chamber bore: "+ring.path));
+        this.clamp_index+=1;return;
+    }
+    this.elapsed+=dt();if this.elapsed<this.settling {return;}
     let moment=vec3(0.0,0.0,0.0);let net=moment;let force_capacity=0.0;
     let delivered=0.0;
     for station in this.stations {

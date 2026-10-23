@@ -1,4 +1,6 @@
-# Griffin and FLIP size basis — updated 2026-10-22
+# Griffin and FLIP size basis — updated 2026-10-23
+
+The [23 October scale audit](../contracts/griffin-fidelity-review-2026-10-23.md) separates the 4.50 m exterior bus, retained 3.60 m inner tank module, foot span and payload walking plane. It makes no further uniform scale change and distinguishes prototype egress evidence from a current flight ICD.
 
 The current packaging reconstruction is recorded in
 [the integrated review](../contracts/griffin-integrated-packaging-review.md).

@@ -134,7 +134,7 @@ fn _qualified_attribute(name) {
     let ramp = [
         "rampCount", "rampSurfaceLengthM", "rampSurfaceWidthM",
         "sectionAsset", "sectionInstances", "rootJointInstances", "intermediateJointInstances",
-        "rootFlightLatchInstances", "intermediateFlightLatchInstances",
+        "rootFlightLatchInstances", "intermediateFlightLatchInstances", "physicalRootInstances",
         "treadInstances", "railJointPinInstances", "transitionBody", "transitionContact", "transitionJoints",
         "rampSectionCount", "rampSectionLengthM", "rampSectionGeometryToleranceM",
         "rampWheelClearanceM", "rampSurfaceThicknessM", "rampRailHeightM",
@@ -942,11 +942,11 @@ fn ramp_intermediate_joint_names() { _sysml_enum_names("intermediateJointInstanc
 fn ramp_flight_latch_bindings() {
     let bindings = [];
     for pair in [
-        #{hinges:ramp_root_joint_names(), latches:_sysml_enum_names("rootFlightLatchInstances"), count:2},
-        #{hinges:ramp_intermediate_joint_names(), latches:_sysml_enum_names("intermediateFlightLatchInstances"), count:4}
+        #{hinges:ramp_root_joint_names(), latches:_sysml_enum_names("rootFlightLatchInstances"), count:4},
+        #{hinges:ramp_intermediate_joint_names(), latches:_sysml_enum_names("intermediateFlightLatchInstances"), count:8}
     ] {
         if pair.hinges.len()!=pair.count || pair.latches.len()!=pair.count {
-            throw("ramp flight latches require all six sourced hinge/latch identity pairs");
+            throw("ramp flight latches require all twelve sourced hinge/latch identity pairs");
         }
         for index in 0..pair.count {
             bindings.push(#{hinge:pair.hinges[index], latch:pair.latches[index]});
@@ -1019,4 +1019,13 @@ fn lander_camera_focus_height_m() {
     let dimensions=_sysml_model_value("payloadAdapterDimensions");
     if dimensions==() {throw("payload adapter dimensions unavailable");}
     visual_payload_adapter_center_y_m() + dimensions.y / 2.0
+}
+
+fn ramp_physical_root_names(){_sysml_enum_names("physicalRootInstances")}
+fn ramp_track_bindings(){
+    let bodies=ramp_physical_root_names();let roots=ramp_root_joint_names();let sections=ramp_intermediate_joint_names();
+    if bodies.len()!=4 || roots.len()!=4 || sections.len()!=8{throw("Four independent three-span tracks required");}
+    let result=[];let station=abs(rover_wheel_station_z()[0]);
+    for i in 0..4{result.push(#{index:i,bank:if i<2{0}else{1},track:i%2,side:if i<2{"Port"}else{"Starboard"},
+        station:if i%2==0{station}else{-station},body:bodies[i],root:roots[i],middle:sections[i*2],toe:sections[i*2+1]});}result
 }

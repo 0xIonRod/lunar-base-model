@@ -1,0 +1,497 @@
+#usda 1.0
+(
+    defaultPrim = "RampSection"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "RampSection" (
+    prepend references = @griffin_ramp_middle_section_visual.usda@</RampSection>
+)
+{
+    over "RampTrackPort"
+    {
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    def "RampTrackStarboard" (
+        active = false
+    )
+    {
+    }
+    over "UnderBeamPort"
+    {
+        custom double3 xformOp:translate = (0.724542027, -0.0375, 0.19999999999999996)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    def "UnderBeamStarboard" (
+        active = false
+    )
+    {
+    }
+    over "SidePostPort1"
+    {
+        custom double3 xformOp:translate = (0.0, 0.09999999999999999, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    over "SidePostPort2"
+    {
+        custom double3 xformOp:translate = (1.449084054, 0.09999999999999999, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    def "SidePostStarboard1" (
+        active = false
+    )
+    {
+    }
+    def "SidePostStarboard2" (
+        active = false
+    )
+    {
+    }
+    over "TreadPort1"
+    {
+        custom double3 xformOp:translate = (0.18113550675, 0.02, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    over "TreadPort2"
+    {
+        custom double3 xformOp:translate = (0.54340652025, 0.02, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    over "TreadPort3"
+    {
+        custom double3 xformOp:translate = (0.90567753375, 0.02, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    over "TreadPort4"
+    {
+        custom double3 xformOp:translate = (1.26794854725, 0.02, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    def "TreadStarboard1" (
+        active = false
+    )
+    {
+    }
+    def "TreadStarboard2" (
+        active = false
+    )
+    {
+    }
+    def "TreadStarboard3" (
+        active = false
+    )
+    {
+    }
+    def "TreadStarboard4" (
+        active = false
+    )
+    {
+    }
+    def "HingeBarrel" (
+        active = false
+    )
+    {
+    }
+    over "OuterRailJointPin"
+    {
+        custom double3 xformOp:translate = (0.0, 0.19999999999999998, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    def "InnerRailJointPin" (
+        active = false
+    )
+    {
+    }
+    over "SideTrussLowerChordPort"
+    {
+        custom double3 xformOp:translate = (0.724542027, 0.025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    over "SideTrussBracePort1"
+    {
+        custom double3 xformOp:translate = (0.06037850225, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort2"
+    {
+        custom double3 xformOp:translate = (0.18113550675, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort3"
+    {
+        custom double3 xformOp:translate = (0.30189251125, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort4"
+    {
+        custom double3 xformOp:translate = (0.42264951575, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    def "SideTrussLowerChordStarboard" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard1" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard2" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard3" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard4" (
+        active = false
+    )
+    {
+    }
+    over "CenterRailPort"
+    {
+        custom double3 xformOp:translate = (0.724542027, 0.18, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    def "CenterRailStarboard" (
+        active = false
+    )
+    {
+    }
+    over "SidePostPortCenter1"
+    {
+        custom double3 xformOp:translate = (0.0, 0.09999999999999999, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    over "SidePostPortCenter2"
+    {
+        custom double3 xformOp:translate = (1.449084054, 0.09999999999999999, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    over "SideTrussLowerChordPortCenter"
+    {
+        custom double3 xformOp:translate = (0.724542027, 0.025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter1"
+    {
+        custom double3 xformOp:translate = (0.06037850225, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter2"
+    {
+        custom double3 xformOp:translate = (0.18113550675, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter3"
+    {
+        custom double3 xformOp:translate = (0.30189251125, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter4"
+    {
+        custom double3 xformOp:translate = (0.42264951575, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    def "SidePostStarboardCenter1" (
+        active = false
+    )
+    {
+    }
+    def "SidePostStarboardCenter2" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussLowerChordStarboardCenter" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter1" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter2" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter3" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter4" (
+        active = false
+    )
+    {
+    }
+    over "SideTrussBracePort5"
+    {
+        custom double3 xformOp:translate = (0.54340652025, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort6"
+    {
+        custom double3 xformOp:translate = (0.66416352475, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort7"
+    {
+        custom double3 xformOp:translate = (0.78492052925, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort8"
+    {
+        custom double3 xformOp:translate = (0.90567753375, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort9"
+    {
+        custom double3 xformOp:translate = (1.02643453825, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort10"
+    {
+        custom double3 xformOp:translate = (1.14719154275, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort11"
+    {
+        custom double3 xformOp:translate = (1.26794854725, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePort12"
+    {
+        custom double3 xformOp:translate = (1.38870555175, 0.1025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    def "SideTrussBraceStarboard5" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard6" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard7" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard8" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard9" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard10" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard11" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboard12" (
+        active = false
+    )
+    {
+    }
+    over "SideTrussBracePortCenter5"
+    {
+        custom double3 xformOp:translate = (0.54340652025, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter6"
+    {
+        custom double3 xformOp:translate = (0.66416352475, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter7"
+    {
+        custom double3 xformOp:translate = (0.78492052925, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter8"
+    {
+        custom double3 xformOp:translate = (0.90567753375, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter9"
+    {
+        custom double3 xformOp:translate = (1.02643453825, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter10"
+    {
+        custom double3 xformOp:translate = (1.14719154275, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter11"
+    {
+        custom double3 xformOp:translate = (1.26794854725, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "SideTrussBracePortCenter12"
+    {
+        custom double3 xformOp:translate = (1.38870555175, 0.1025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    def "SideTrussBraceStarboardCenter5" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter6" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter7" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter8" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter9" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter10" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter11" (
+        active = false
+    )
+    {
+    }
+    def "SideTrussBraceStarboardCenter12" (
+        active = false
+    )
+    {
+    }
+    over "CenterRailPortJointPin"
+    {
+        custom double3 xformOp:translate = (0.0, 0.19999999999999998, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    def "CenterRailStarboardJointPin" (
+        active = false
+    )
+    {
+    }
+    over "OuterRailJointPinLug"
+    {
+        custom double3 xformOp:translate = (0.045, 0.19, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    def "InnerRailJointPinLug" (
+        active = false
+    )
+    {
+    }
+    over "CenterRailPortJointPinLug"
+    {
+        custom double3 xformOp:translate = (0.045, 0.19, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    def "CenterRailStarboardJointPinLug" (
+        active = false
+    )
+    {
+    }
+    over "OuterRail"
+    {
+        custom double3 xformOp:translate = (0.724542027, 0.18, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    def "InnerRail" (
+        active = false
+    )
+    {
+    }
+    over "OuterRailJointPinDistalNegativeLug"
+    {
+        custom double3 xformOp:translate = (1.4040840540000001, -0.0275, 0.2849999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "OuterRailJointPinDistalPositiveLug"
+    {
+        custom double3 xformOp:translate = (1.4040840540000001, -0.0275, 0.30099999999999993)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "OuterRailJointPinForkWeb"
+    {
+        custom double3 xformOp:translate = (1.359084054, 0.025, 0.2929999999999999)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    def "InnerRailJointPinDistalNegativeLug" (
+        active = false
+    )
+    {
+    }
+    def "InnerRailJointPinDistalPositiveLug" (
+        active = false
+    )
+    {
+    }
+    def "InnerRailJointPinForkWeb" (
+        active = false
+    )
+    {
+    }
+    over "CenterRailPortJointPinDistalNegativeLug"
+    {
+        custom double3 xformOp:translate = (1.4040840540000001, -0.0275, -0.30100000000000005)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "CenterRailPortJointPinDistalPositiveLug"
+    {
+        custom double3 xformOp:translate = (1.4040840540000001, -0.0275, -0.28500000000000003)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+    over "CenterRailPortJointPinForkWeb"
+    {
+        custom double3 xformOp:translate = (1.359084054, 0.025, -0.29300000000000004)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+    def "CenterRailStarboardJointPinDistalNegativeLug" (
+        active = false
+    )
+    {
+    }
+    def "CenterRailStarboardJointPinDistalPositiveLug" (
+        active = false
+    )
+    {
+    }
+    def "CenterRailStarboardJointPinForkWeb" (
+        active = false
+    )
+    {
+    }
+}

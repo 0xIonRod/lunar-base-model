@@ -15,22 +15,35 @@ package GriffinRampRequirements {
 
     enum def GriffinRampIntermediateJointIdentity {
         RampSectionHingePort01;
+        RampSectionHingePort01TrackStarboard;
         RampSectionHingePort12;
+        RampSectionHingePort12TrackStarboard;
         RampSectionHingeStarboard01;
+        RampSectionHingeStarboard01TrackStarboard;
         RampSectionHingeStarboard12;
+        RampSectionHingeStarboard12TrackStarboard;
     }
     enum def GriffinRampRootJointIdentity {
         RampHingePort;
+        RampHingePortTrackStarboard;
         RampHingeStarboard;
+        RampHingeStarboardTrackStarboard;
     }
     enum def GriffinRampFlightLatchIdentity {
         RampFlightLatchPortRoot;
+        RampFlightLatchPortRootTrackStarboard;
         RampFlightLatchStarboardRoot;
+        RampFlightLatchStarboardRootTrackStarboard;
         RampFlightLatchPortMiddle;
+        RampFlightLatchPortMiddleTrackStarboard;
         RampFlightLatchPortToe;
+        RampFlightLatchPortToeTrackStarboard;
         RampFlightLatchStarboardMiddle;
+        RampFlightLatchStarboardMiddleTrackStarboard;
         RampFlightLatchStarboardToe;
+        RampFlightLatchStarboardToeTrackStarboard;
     }
+    enum def GriffinRampPhysicalRootIdentity { EgressRampPort; EgressRampPortTrackStarboard; EgressRampStarboard; EgressRampStarboardTrackStarboard; }
     enum def GriffinRampHingeAxis { Z; }
     enum def GriffinRampTreadIdentity { Tread01; Tread02; Tread03; Tread04; }
     enum def GriffinRampRailJointPinIdentity {
@@ -295,19 +308,25 @@ package GriffinRampRequirements {
         attribute sectionAsset : TwinAssetPath = "components/lander/griffin_ramp_section_visual.usda";
         attribute sectionInstances : GriffinRampSectionIdentity[3] =
             ("DeckSection", "MiddleSection", "ToeSection");
-        attribute rootJointInstances : GriffinRampRootJointIdentity[2] =
-            ("RampHingePort", "RampHingeStarboard");
-        attribute intermediateJointInstances : GriffinRampIntermediateJointIdentity[4] =
-            ("RampSectionHingePort01", "RampSectionHingePort12",
-             "RampSectionHingeStarboard01", "RampSectionHingeStarboard12");
-        // These latch lists pair one-to-one, in order, with the root and
-        // intermediate joint identity lists above. Each fixed latch shares
-        // its paired revolute joint's body endpoints and stowed anchor point.
-        attribute rootFlightLatchInstances : GriffinRampFlightLatchIdentity[2] =
-            ("RampFlightLatchPortRoot", "RampFlightLatchStarboardRoot");
-        attribute intermediateFlightLatchInstances : GriffinRampFlightLatchIdentity[4] =
-            ("RampFlightLatchPortMiddle", "RampFlightLatchPortToe",
-             "RampFlightLatchStarboardMiddle", "RampFlightLatchStarboardToe");
+        // Four independent wheel tracks, three articulated spans per track.
+        // Public NASA egress tests include unequal slopes; exact flight hinge
+        // and actuator details remain reconstruction assumptions.
+        attribute portTrackAssets : TwinAssetPath[3] = ("components/lander/griffin_ramp_root_track_port.usda", "components/lander/griffin_ramp_middle_track_port.usda", "components/lander/griffin_ramp_toe_track_port.usda");
+        attribute starboardTrackAssets : TwinAssetPath[3] = ("components/lander/griffin_ramp_root_track_starboard.usda", "components/lander/griffin_ramp_middle_track_starboard.usda", "components/lander/griffin_ramp_toe_track_starboard.usda");
+        attribute physicalTrackCountPerBank : Integer = 2;
+        attribute physicalTrackEnvelopeWidthM : Real = GriffinEgressRamp::assemblyTrackWidthM + 2.0 * GriffinEgressRamp::rampRailWidthM;
+        attribute physicalRootInstances : GriffinRampPhysicalRootIdentity[4] =
+            ("EgressRampPort", "EgressRampPortTrackStarboard", "EgressRampStarboard", "EgressRampStarboardTrackStarboard");
+        attribute rootJointInstances : GriffinRampRootJointIdentity[4] =
+            ("RampHingePort", "RampHingePortTrackStarboard", "RampHingeStarboard", "RampHingeStarboardTrackStarboard");
+        attribute intermediateJointInstances : GriffinRampIntermediateJointIdentity[8] =
+            ("RampSectionHingePort01", "RampSectionHingePort12", "RampSectionHingePort01TrackStarboard", "RampSectionHingePort12TrackStarboard",
+             "RampSectionHingeStarboard01", "RampSectionHingeStarboard12", "RampSectionHingeStarboard01TrackStarboard", "RampSectionHingeStarboard12TrackStarboard");
+        attribute rootFlightLatchInstances : GriffinRampFlightLatchIdentity[4] =
+            ("RampFlightLatchPortRoot", "RampFlightLatchPortRootTrackStarboard", "RampFlightLatchStarboardRoot", "RampFlightLatchStarboardRootTrackStarboard");
+        attribute intermediateFlightLatchInstances : GriffinRampFlightLatchIdentity[8] =
+            ("RampFlightLatchPortMiddle", "RampFlightLatchPortToe", "RampFlightLatchPortMiddleTrackStarboard", "RampFlightLatchPortToeTrackStarboard",
+             "RampFlightLatchStarboardMiddle", "RampFlightLatchStarboardToe", "RampFlightLatchStarboardMiddleTrackStarboard", "RampFlightLatchStarboardToeTrackStarboard");
         attribute treadInstances : GriffinRampTreadIdentity[4] =
             ("Tread01", "Tread02", "Tread03", "Tread04");
         attribute railJointPinInstances : GriffinRampRailJointPinIdentity[4] =
@@ -652,7 +671,7 @@ package GriffinRampRequirements {
         // These are replaceable study datums until the supplier mechanical ICD.
         // Nominal angles above describe the static flat-plane geometry only.
         // GRR-017 runtime targets shall instead use the measured landed root
-        // hinge frames and retained NOBILE03 DEM under all eight toe corners,
+        // hinge frames and retained NOBILE03 DEM under all sixteen toe corners, four per independent track,
         // without an artificial pad or apron overriding that native terrain.
         // Choose the shallowest terrain-contact solution inside the existing
         // joint travel with minimum predicted clearance = half the contact
@@ -673,6 +692,7 @@ package GriffinRampRequirements {
         // Griffin supplier data or an accepted mass-properties solution.
         attribute physicalRampMassKg : Real = 95.0;
         attribute physicalRampSectionMassKg : Real = 31.666666667;
+        attribute physicalTrackSectionMassKg : Real = GriffinEgressRamp::physicalRampSectionMassKg / GriffinEgressRamp::physicalTrackCountPerBank;
         // Legacy equal-span visual-template proxy only. Installed sections
         // use their component-owned lengths; GRC020 binds native inertia and
         // each actual span independently. These are reconstruction estimates.
@@ -719,7 +739,7 @@ package GriffinRampRequirements {
          * Source: handover/griffin-measured-unfold-waypoint-2026-10-01.md.
          * Retain the existing 0.035 rad observation tolerance; require
          * abs(relative hinge speed)<=0.02 rad/s at intermediate waypoints
-         * and final targets. Before payload release, all six hinges must
+         * and final targets. Before payload release, all twelve hinges must
          * satisfy angle and speed over a 1 s sampled dwell (probed every
          * six admitted 60 Hz ticks). Reset dwell on any failed sample.
          * Speed and dwell are unqualified study choices: at this rate a
@@ -812,7 +832,7 @@ package GriffinRampRequirements {
         doc /* Every rigid ramp section shall have two longitudinal underside beams and the source-owned edge support posts. Each section body shall own positive mass and diagonal inertia that partition the ramp mass and match its section envelope. */
     }
     requirement def GRR015_RampHingeGussetGeometry {
-        doc /* GRR-015 root bearings shall have a visible load path to the bus perimeter deck. Two inner-track pedestals per ramp derive their upper elevation from physicalRampMountY plus the bearing radius and their lower elevation from bodyMount.y plus deckCenter.y plus half deckDimensions.y. Short deck shoes overlap the bus edge and reach the native root hinge X station. Square member width reuses rampPivotLugWidthM; stations reuse rampCenterRailOffsetZM, outside tire corridors. These are render-only members of the existing bus rigid body, with no extra mass or contact owner. Bracket shape and stock are low-confidence reconstruction estimates prompted by the operator's floating-ramp image on 2026-10-02. ESA's artist rendering shows bus-mounted ramps but supplies no bracket ICD: https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander . The Astrobotic hardware photo documents the bus/leg structure, not a deployed ramp bracket: https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .  The deck hinge and both intermediate section hinges shall be visible at the ramp assembly joints. Every intermediate joint shall use a Z-axis revolute connection at the adjacent section endpoints, and its hinge fittings shall remain outside the tire corridors. The central shaft shall end at the inner rail edges; local coaxial bearings shall join each track guard without a full-width bar above the wheel paths. Each intermediate parent shall carry paired circular fork cheeks around a compact child tongue, with centres at the existing native joint anchors. Their thickness and spacing derive from the source plate stock. The fittings shall remain render-only and shall not span the tire paths. This split-shaft reconstruction retains the folding axes needed for stowage; it is an explicit image-based study estimate, not supplier geometry. */
+        doc /* GRR-015 root bearings shall have a visible load path to the bus perimeter deck. Two inner-track pedestals per ramp derive their upper elevation from physicalRampMountY plus the bearing radius and their lower elevation from bodyMount.y plus deckCenter.y plus half deckDimensions.y. Short deck shoes overlap the bus edge and reach the native root hinge X station. Square member width reuses rampPivotLugWidthM; stations reuse rampCenterRailOffsetZM, outside tire corridors. These are render-only members of the existing bus rigid body, with no extra mass or contact owner. Bracket shape and stock are low-confidence reconstruction estimates prompted by the operator's floating-ramp image on 2026-10-02. ESA's artist rendering shows bus-mounted ramps but supplies no bracket ICD: https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander . The Astrobotic hardware photo documents the bus/leg structure, not a deployed ramp bracket: https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png .  The deck hinge and both intermediate section hinges shall be visible at the ramp assembly joints. Every intermediate joint shall use a Z-axis revolute connection at the adjacent section endpoints, and its hinge fittings shall remain outside the tire corridors. The bus-owned common root shaft ends at the inner guide interfaces. Installed independent intermediate tracks omit the cross-track shaft; local coaxial fittings join each track guard outside the wheel paths. Each intermediate parent shall carry paired circular fork cheeks around a compact child tongue, with centres at the existing native joint anchors. Their thickness and spacing derive from the source plate stock. The fittings shall remain render-only and shall not span the tire paths. This split-shaft reconstruction retains the folding axes needed for stowage; it is an explicit image-based study estimate, not supplier geometry. */
         require GRC029_PivotFittingsMatchJoint {
             in toleranceM = GriffinEgressRamp::rampSectionGeometryToleranceM;
         }
@@ -826,7 +846,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR016_ArticulatedRampSections {
-        doc /* Each upper-deck-mounted ramp shall contain three unequal rigid sections (root, middle and toe, each owned by its reusable component contract), a revolute deck hinge, and two native revolute joints between consecutive sections. All six physical ramp joints shall expose the source-owned angular drive and limits so their typed angle ports can command motion inside the authored range. Section lengths shall sum to the full contact-track length. Intermediate joints shall hold zero relative angle during rover traversal so the sections, contact tracks, and upper rails form one continuous deployed path. */
+        doc /* Each upper-deck-mounted exit shall contain two independent wheel tracks. Each track shall contain three unequal rigid sections (root, middle and toe, each owned by its reusable component contract), a revolute deck hinge, and two native revolute joints between consecutive sections. All twelve physical track joints shall expose the source-owned angular drive and limits so their typed angle ports can command motion inside the authored range. Section lengths shall sum to the full contact-track length. Intermediate joints shall hold zero relative angle during rover traversal so the sections, contact tracks, and upper rails form one continuous deployed path. */
         require GRC018_SectionedRampMatchesEnvelope {
             in totalLengthM = GriffinEgressRamp::rampSurfaceLengthM;
             in rootLengthM = GriffinRampRootSectionRequirements::RampRootSection::lengthM;
@@ -837,7 +857,7 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR017_FlightStowAndPostTouchdownUnfold {
-        doc /* Six native PhysicsFixedJoint flight latches shall hold the authored stow poses. Their paired motors supply zero effort until the corresponding validated release event restores the admitted dimensional law and torque cap. The port root leans inward at +120 degrees about Z; the starboard has the mirrored rigid orientation, independent of Euler representation. Each bank references the independent root/middle/toe components and their named entry/exit datums. The middle folds +180 degrees with a -90 degree child joint-frame offset; the toe folds -180 degrees with a +90 degree offset. A measured halfway waypoint selects each opening sweep, away from an antipodal motor command. The raised root entry and lower toe fold axes belong to their component contracts. On an OPEN RAMPS command, release the root latches and move both still-folded banks outward to the 90 degree clearance pose; measure settlement before releasing the middle latches. Unfold and settle the middles while the toes remain latched, then release and unfold the toes in the opposite direction. Only after section settlement may the roots lower to terrain-fitted targets derived from measured landed hinge frames and all eight toe corners. Missing terrain or targets outside travel shall reject automatic deployment. An airborne manual command uses the nominal source-owned mechanism pose without claiming terrain contact. Manual F detachment remains independent. Each quarter-turn follows the source-owned six-second quintic profile on the simulation clock. Each waypoint meets the existing native angle/speed tolerances; final all-six settlement requires the existing sampled dwell, resetting on any failed sample. Events are ordered by their emission simulation tick; a command and the preceding phase's settled event may share a tick, while each command must precede its own settlement. Runtime receive order within one tick is not a chronology guarantee. Nonadjacent ramp stock shall clear throughout the complete ordered sweep; no nonadjacent contact exclusions are permitted. The two-track fixed transitions preserve their tire corridors and omit unused full-width stock that obstructed the original fold. These dimensions, clearances, mass proxies and mechanism choices are explicit reconstruction assumptions, not a supplier ICD or qualified hardware design. Image basis: Astrobotic 2021 Griffin-1 product image and operator observations, 2026-10-23. See contracts/griffin-ramp-deployment-2026-10-23.md for native geometry and post-landing evidence. */
+        doc /* Twelve native PhysicsFixedJoint flight latches shall hold the authored stow poses. Their paired motors supply zero effort until the corresponding validated release event restores the admitted dimensional law and torque cap. The port root leans inward at +120 degrees about Z; the starboard has the mirrored rigid orientation, independent of Euler representation. Each bank references the independent root/middle/toe components and their named entry/exit datums. The middle folds +180 degrees with a -90 degree child joint-frame offset; the toe folds -180 degrees with a +90 degree offset. A measured halfway waypoint selects each opening sweep, away from an antipodal motor command. The raised root entry and lower toe fold axes belong to their component contracts. On an OPEN RAMPS command, release the root latches and move both still-folded banks outward to the 90 degree clearance pose; measure settlement before releasing the middle latches. Unfold and settle the middles while the toes remain latched, then release and unfold the toes in the opposite direction. Only after section settlement may the roots lower to terrain-fitted targets derived from measured landed hinge frames and all sixteen toe corners, four per independent track. Missing terrain or targets outside travel shall reject automatic deployment. An airborne manual command uses the nominal source-owned mechanism pose without claiming terrain contact. Manual F detachment remains independent. Each quarter-turn follows the source-owned six-second quintic profile on the simulation clock. Each waypoint meets the existing native angle/speed tolerances; final all-twelve settlement requires the existing sampled dwell, resetting on any failed sample. Events are ordered by their emission simulation tick; a command and the preceding phase's settled event may share a tick, while each command must precede its own settlement. Runtime receive order within one tick is not a chronology guarantee. Nonadjacent ramp stock shall clear throughout the complete ordered sweep; no nonadjacent contact exclusions are permitted. The two-track fixed transitions preserve their tire corridors and omit unused full-width stock that obstructed the original fold. These dimensions, clearances, mass proxies and mechanism choices are explicit reconstruction assumptions, not a supplier ICD or qualified hardware design. Image basis: Astrobotic 2021 Griffin-1 product image and operator observations, 2026-10-23. See contracts/griffin-ramp-deployment-2026-10-23.md for native geometry and post-landing evidence. */
         require GRC022_RampFlightStowAnglesWithinTravel {
             in rootStowAngleRad = GriffinEgressRamp::physicalRampRootStowedAngleRad;
             in sectionStowRelativeAngleRad = GriffinEgressRamp::physicalRampSectionStowedRelativeAngleRad;

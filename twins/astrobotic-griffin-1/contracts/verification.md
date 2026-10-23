@@ -1,5 +1,7 @@
 # Griffin verification boundary
 
+The current [size, independent-track, RCS and waypoint review](griffin-fidelity-review-2026-10-23.md) passes 199 production checks: 54 integration, 40 stow, 16 toe geometry, 43 descent/deployment/waypoint, 31 RCS and 15 panel-contact checks. Four three-span wheel tracks fit terrain independently. Windowed manual opening also reaches all twelve hinge goals. This supersedes the installed equal-span and paired-track coupling checkpoints below; their results retain their original revision scope. Complete loaded rover traversal, flight dimensions and clean 60 FPS real-time acceptance remain open.
+
 The [solar collision repair](griffin-solar-collision-2026-10-23.md) adds
 59 frame/backplane stock colliders without filling the panel openings.
 Its native contact case passes 15 checks and the existing geometry case passes
@@ -150,7 +152,7 @@ not FLIP thermal design values.
 
 FSP-008 now executes the temperature-aware power predicate. The mapped native
 gate passes 38 measured checks and 26 criterion diagnostics at source
-`4119846244799939613`. Formal observation details use the existing streamed
+`4119946244799939613`. Formal observation details use the existing streamed
 evidence path; the scene report has no truncated details or oversized-event
 rejection. The inspected native SysML panel shows PASS evidence and a passed
 mapped test. Source validation reports zero errors and 164 missing-formal-criterion
@@ -316,7 +318,7 @@ zero runtime errors and no broken connections.
 
 The strict two-restart gate passes all 94 comparisons over two 90-second runs.
 Both GR-036 screens pass with 361 four-pad samples over 60 seconds, maximum
-horizontal displacement 0.1652981011986565 m, maximum ground speed
+horizontal displacement 0.1652981011996565 m, maximum ground speed
 0.006837443526173641 m/s, maximum angular speed 0.0047787336240988215 rad/s
 and minimum upright Y 0.9959669685720404. These metrics agree between restarts;
 they do not assert equality with the earlier artifact's corrected physics.

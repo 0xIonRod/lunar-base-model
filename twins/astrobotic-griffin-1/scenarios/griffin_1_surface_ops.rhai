@@ -20,20 +20,27 @@ fn simulation_dependencies(me, ctx) {
     let rover = find_path(ROVER);
     let lander_environment = find_path(LANDER + "/Environment");
     let altimeter = find_path(LANDER + "/Altimeter");
-    let ramp_joints = [
-        find_path(LANDER + "/RampHingePort"),
-        find_path(LANDER + "/RampHingeStarboard"),
-        find_path(LANDER + "/RampSectionHingePort01"),
-        find_path(LANDER + "/RampSectionHingePort12"),
-        find_path(LANDER + "/RampSectionHingeStarboard01"),
-        find_path(LANDER + "/RampSectionHingeStarboard12"),
+    // Bootstrap identities are literal until the required SysML analysis is ready.
+    let ramp_joints=[
+        find_path(LANDER+"/RampHingePort"),
+        find_path(LANDER+"/RampHingePortTrackStarboard"),
+        find_path(LANDER+"/RampHingeStarboard"),
+        find_path(LANDER+"/RampHingeStarboardTrackStarboard"),
+        find_path(LANDER+"/RampSectionHingePort01"),
+        find_path(LANDER+"/RampSectionHingePort12"),
+        find_path(LANDER+"/RampSectionHingePort01TrackStarboard"),
+        find_path(LANDER+"/RampSectionHingePort12TrackStarboard"),
+        find_path(LANDER+"/RampSectionHingeStarboard01"),
+        find_path(LANDER+"/RampSectionHingeStarboard12"),
+        find_path(LANDER+"/RampSectionHingeStarboard01TrackStarboard"),
+        find_path(LANDER+"/RampSectionHingeStarboard12TrackStarboard"),
     ];
     let entity_reads = [lander, gnc, propulsion, altimeter_model, imu,
         attitude_reference, attitude_propulsion, attitude_actuation, rover,
         lander_environment, altimeter];
     let entity_writes = [rover, gnc];
-    for side in ["Port", "Starboard"] {
-        entity_reads.push(find_path(LANDER+"/EgressRamp"+side));
+    for name in ["EgressRampPort","EgressRampPortTrackStarboard","EgressRampStarboard","EgressRampStarboardTrackStarboard"] {
+        entity_reads.push(find_path(LANDER+"/"+name));
     }
     for station in ["FL", "FR", "RL", "RR"] {
         entity_reads.push(find_path(ROVER+"/Suspension_"+station+"/Wheel_"+station));

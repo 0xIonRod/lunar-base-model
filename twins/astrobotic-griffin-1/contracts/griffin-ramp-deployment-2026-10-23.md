@@ -1,5 +1,7 @@
 # Griffin ramp deployment repair — 23 October 2026
 
+This records the earlier paired-track repair. The later [independent-track iteration](griffin-fidelity-review-2026-10-23.md) retains its ordered clearance/middle/toe/root sequence, separates the four wheel tracks and supersedes the installed counts and drive shares below.
+
 The former equal-span mechanism reproduced a middle-hinge jam near 102.7°.
 Its fixed transition stock also intersected the planned fold. The installed
 vehicle now references the independently qualified unequal root, middle and

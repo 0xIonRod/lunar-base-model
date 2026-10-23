@@ -86,7 +86,13 @@ package Griffin1Requirements {
         attribute surfaceRouteMarkerNames : GriffinSurfaceRouteMarkerName[5] =
             ("RoverRampApproach", "RoverRampExit", "RoverTarget1", "RoverTarget2", "BaseSite");
         attribute surfaceRouteMarkerX : Real[5] = (2.00, 8.50, 13.00, 22.00, 31.00);
-        attribute surfaceRouteMarkerY : Real[5] = (0.00, 0.00, 0.00, 0.00, 0.00);
+        // Reference-scene elevations sampled from retained NOBILE03 through
+        // TerrainHeight, 2026-10-23, plus the annotation clearance below.
+        // After landing, horizontal route datums rotate with the frozen exit
+        // frame and their terrain elevations are sampled again. These are
+        // presentation anchors, not a flat physical support plane.
+        attribute surfaceRouteMarkerY : Real[5] = (0.2049314542207867, -0.0062310658970091, -0.14148472641245462, -1.067371954023838, -2.166758555790875);
+        attribute surfaceRouteMarkerClearanceM : Real = 0.05;
         attribute surfaceRouteMarkerZ : Real[5] = (0.00, 0.00, 0.00, -4.00, -10.00);
         // Estimated normalized throttle limits, not flight speeds. Slow down
         // on the survey/base turn; retain tight egress arrival tolerances.

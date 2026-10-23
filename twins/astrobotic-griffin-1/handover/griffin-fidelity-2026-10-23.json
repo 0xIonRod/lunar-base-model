@@ -1,0 +1,315 @@
+{
+  "date": "2026-10-23",
+  "scope": "Griffin independent ramps, terrain annotations, RCS supports and dimensional audit",
+  "binary": {
+    "build": "3ebc93a7-dirty",
+    "sha256": "6fb5f3596919d4ba9d675d71b4b4163d3a37b4129d9dfa5281b5cc12cbb3d248"
+  },
+  "profile": {
+    "tick_hz": 60,
+    "compute_threads": 1,
+    "jitter": 0,
+    "substeps": "unchanged production defaults"
+  },
+  "cases": [
+    {
+      "scene": "tests/griffin_ramp_requirements.usda",
+      "channel": "GRIFFIN_RAMP_REQUIREMENTS",
+      "checks": 54,
+      "verdict": "pass",
+      "source_revision": "17535423134904019531"
+    },
+    {
+      "scene": "tests/griffin_ramp_flight_stow.usda",
+      "channel": "GRIFFIN_RAMP_FLIGHT_STOW",
+      "checks": 40,
+      "verdict": "pass",
+      "source_revision": "17535423134904019531"
+    },
+    {
+      "scene": "tests/griffin_ramp_touchdown_geometry.usda",
+      "channel": "GRIFFIN_RAMP_TOUCHDOWN_GEOMETRY",
+      "checks": 16,
+      "verdict": "pass",
+      "source_revision": "17535423134904019531"
+    },
+    {
+      "scene": "tests/griffin_ramp_postlanding.usda",
+      "channel": "GRIFFIN_RAMP_POSTLANDING",
+      "checks": 43,
+      "verdict": "pass",
+      "source_revision": "17535423134904019531"
+    },
+    {
+      "scene": "tests/griffin_rcs_commands.usda",
+      "channel": "GRIFFIN_RCS_COMMANDS",
+      "checks": 31,
+      "verdict": "pass",
+      "source_revision": null
+    },
+    {
+      "scene": "tests/griffin_solar_collision.usda",
+      "channel": "GRIFFIN_SOLAR_COLLISION",
+      "checks": 15,
+      "verdict": "pass",
+      "source_revision": null
+    }
+  ],
+  "total_checks": 199,
+  "windowed_manual_deployment": {
+    "count": 12,
+    "ok": true,
+    "rows": [
+      {
+        "command_rad": -0.49322569370269775,
+        "measured_rad": -0.4961388283132151,
+        "name": "RampHingePort",
+        "passes": true,
+        "rate_rad_s": 0.00013616527800637058
+      },
+      {
+        "command_rad": -0.4952846169471741,
+        "measured_rad": -0.49826141497588816,
+        "name": "RampHingePortTrackStarboard",
+        "passes": true,
+        "rate_rad_s": 0.00010257128048796297
+      },
+      {
+        "command_rad": 0.4874100685119629,
+        "measured_rad": 0.4904108806440176,
+        "name": "RampHingeStarboard",
+        "passes": true,
+        "rate_rad_s": 0.0002028137576888592
+      },
+      {
+        "command_rad": 0.49737218022346497,
+        "measured_rad": 0.5003454716370034,
+        "name": "RampHingeStarboardTrackStarboard",
+        "passes": true,
+        "rate_rad_s": 0.00015353276772211383
+      },
+      {
+        "command_rad": -1.5707963705062866,
+        "measured_rad": -1.5701939191756196,
+        "name": "RampSectionHingePort01",
+        "passes": true,
+        "rate_rad_s": -0.00034696406847390575
+      },
+      {
+        "command_rad": 1.5707963705062866,
+        "measured_rad": 1.571665787126042,
+        "name": "RampSectionHingePort12",
+        "passes": true,
+        "rate_rad_s": 0.00029263363080272065
+      },
+      {
+        "command_rad": -1.5707963705062866,
+        "measured_rad": -1.570221325241417,
+        "name": "RampSectionHingePort01TrackStarboard",
+        "passes": true,
+        "rate_rad_s": -0.0003643927204014551
+      },
+      {
+        "command_rad": 1.5707963705062866,
+        "measured_rad": 1.5717041306332853,
+        "name": "RampSectionHingePort12TrackStarboard",
+        "passes": true,
+        "rate_rad_s": 0.0003361952422481034
+      },
+      {
+        "command_rad": -1.5707963705062866,
+        "measured_rad": -1.570205192575237,
+        "name": "RampSectionHingeStarboard01",
+        "passes": true,
+        "rate_rad_s": 0.0003241916784347054
+      },
+      {
+        "command_rad": 1.5707963705062866,
+        "measured_rad": 1.5716882946027395,
+        "name": "RampSectionHingeStarboard12",
+        "passes": true,
+        "rate_rad_s": -0.0003212952363240832
+      },
+      {
+        "command_rad": -1.5707963705062866,
+        "measured_rad": -1.5701976807783655,
+        "name": "RampSectionHingeStarboard01TrackStarboard",
+        "passes": true,
+        "rate_rad_s": 0.000207629973669052
+      },
+      {
+        "command_rad": 1.5707963705062866,
+        "measured_rad": 1.5716808500115786,
+        "name": "RampSectionHingeStarboard12TrackStarboard",
+        "passes": true,
+        "rate_rad_s": -0.0002210943665790678
+      }
+    ]
+  },
+  "rcs_native_stock_observations": [
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 0.0,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountNXPZ/RcsPitchPosClamp",
+      "saddle_axis_clearance_m": 0.011400001696686965,
+      "spine_inset_m": 0.1263986468649508
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 0.0,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountNXNZ/RcsPitchPosBClamp",
+      "saddle_axis_clearance_m": 0.011400001696686965,
+      "spine_inset_m": 0.1263986468649508
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 0.0,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountPXPZ/RcsPitchNegClamp",
+      "saddle_axis_clearance_m": 0.011400001696686965,
+      "spine_inset_m": 0.1263986468649508
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 0.0,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountPXNZ/RcsPitchNegBClamp",
+      "saddle_axis_clearance_m": 0.011400001696686965,
+      "spine_inset_m": 0.1263986468649508
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 0.0,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountPXNZ/RcsRollPosClamp",
+      "saddle_axis_clearance_m": 0.011400001696686965,
+      "spine_inset_m": 0.1263986468649508
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 0.0,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountNXNZ/RcsRollPosBClamp",
+      "saddle_axis_clearance_m": 0.011400001696686965,
+      "spine_inset_m": 0.1263986468649508
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 0.0,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountNXPZ/RcsRollNegClamp",
+      "saddle_axis_clearance_m": 0.011400001696686965,
+      "spine_inset_m": 0.1263986468649508
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 0.0,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountPXPZ/RcsRollNegBClamp",
+      "saddle_axis_clearance_m": 0.011400001696686965,
+      "spine_inset_m": 0.1263986468649508
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 2.220446049250313e-16,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountPXNZ/RcsYawPosClamp",
+      "saddle_axis_clearance_m": 0.01139997156626782,
+      "spine_inset_m": 0.12096000414071292
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 2.220446049250313e-16,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountNXNZ/RcsYawPosBClamp",
+      "saddle_axis_clearance_m": 0.01139997156626782,
+      "spine_inset_m": 0.12096000414071292
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 2.220446049250313e-16,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountNXPZ/RcsYawNegClamp",
+      "saddle_axis_clearance_m": 0.01139997156626782,
+      "spine_inset_m": 0.12096000414071292
+    },
+    {
+      "axial_length_m": 0.01600000075995922,
+      "axis_residual": 2.220446049250313e-16,
+      "center_residual_m": 0.0,
+      "inner_radius_m": 0.008399999561547595,
+      "outer_radius_m": 0.011500000392851345,
+      "passes": true,
+      "path": "/Griffin1/RcsPodMountPXPZ/RcsYawNegBClamp",
+      "saddle_axis_clearance_m": 0.01139997156626782,
+      "spine_inset_m": 0.12096000414071292
+    }
+  ],
+  "rcs_bore_negative_failures": 8,
+  "all_12_actuator_frames_directions_ratings_preserved": true,
+  "source_sha256": {
+    "components/lander/griffin_ramp_middle_track_port.usda": "c7de07f02076ce2ca6e14a36de2b7ee7457b0f9e8e5ed494e19fa7c0b5bad5f6",
+    "components/lander/griffin_ramp_middle_track_starboard.usda": "9803f1911e6bc0f1c795896b52c3e86b06bb1d727f2a5b4bee13a60fbd167e61",
+    "components/lander/griffin_ramp_root_track_port.usda": "44fd1bcc4741af570c52593c9c0427c62ad096de21d369c43b4821c453b8ebb3",
+    "components/lander/griffin_ramp_root_track_starboard.usda": "55b529075ebd48c05bf8a2d22961808453561fd7ff51fa89bc51bed7202170c1",
+    "components/lander/griffin_ramp_toe_track_port.usda": "8ecd387b846d7a25cafb6a19c317fe38c858bb3d388c16b268b9e6753d1b322d",
+    "components/lander/griffin_ramp_toe_track_starboard.usda": "acdf7ab8bfc00bf44536ac642240d8eeb2ea7232a9ed9799634f72c2f382ebe5",
+    "requirements/griffin_propulsion_requirements.sysml": "3afaefece2c9cb60ac9930b960721e1b161382458acc8be931aad8d3644c22b4",
+    "requirements/griffin_ramp_requirements.sysml": "faa6ae7d0240a0f814bdfd2987aed12b5db6831015635b09fce3b9616443a971",
+    "requirements/griffin_requirements.sysml": "8b8d01e1995bbbedda729c29ec2db82d43680d7ba9b6987e6de6a6330cb9ca8f",
+    "scenarios/griffin_1_surface_ops.rhai": "584f43b3d2d6c229587aec81e2a3c541378707afe508ff3cf6f5a6d951d79c31",
+    "scenarios/tests/griffin_ramp_postlanding.rhai": "5a4c29e14ca0306e3825925895dab418f8bd85902f409c3a6a423418bd3fd3c0",
+    "scenarios/tests/griffin_rcs_commands.rhai": "240b9751d3d07f0ebf18ecda56e0e145419f98dc29790bf466e7ad1e34464ba7",
+    "scenes/griffin_1_surface_ops.usda": "275c68e27c01909d000fc2e439703f0865a77a13fb87e442cc175eaa1a78b68e",
+    "tests/griffin_ramp_postlanding.usda": "d7d1ad259b08a77ff5c916ae811a4a05b4e37445e0848d10eaa1891fc2bd5656",
+    "tools/griffin_ramp_installed_checks.rhai": "31426883af5455e6ecfd237ec04818d356ec8df99d01593be6baaf1b5efde2bb",
+    "tools/griffin_ramp_mechanism.rhai": "f5689ece6a9047dfbf62763e43634b986f7fdb53d88003b09f2d573cfe05f3e0",
+    "tools/griffin_ramp_tracks.rhai": "de2ece381fbf4afb902615a42da91c596e5f5dddc85052de3ea161956f32b209",
+    "tools/griffin_rcs_mounts.rhai": "d7d25b8511e6cf2324a62399869c38cd9cf72f420519912b727a5fedf95d870a",
+    "tools/griffin_spec.rhai": "d6767659dd4e5de0b248093d1a9f5830552be38a6024affe58c3e94e81461406",
+    "tools/griffin_surface_ops.rhai": "6e4ab18f7325b98495bb357c890b5302ca9181e7ab236d34106b92e4a7889926",
+    "tools/griffin_surface_ramp_ops.rhai": "27c371fef59d951233a1c42a86ffd618c50b8492da53d1d0953091b897caa6aa",
+    "tools/griffin_visual_builder.rhai": "a909501da0df60ddba1420019bb1d094c751e045891d2236c216ec6c9b569cca",
+    "vehicles/griffin_1.usda": "72672271d52254155ade42de3696c21e97bf93be7f332bede2f46c33cd863fec"
+  },
+  "open_acceptance": [
+    "Flight dimensional qualification",
+    "Complete loaded rover traversal",
+    "Clean 60 FPS real-time acceptance"
+  ]
+}

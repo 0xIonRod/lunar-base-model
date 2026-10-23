@@ -43,85 +43,10 @@ fn section_mass_ops(model,path,label,deck){
             mass*(length*length+width*width)/12.0,mass*(length*length+thickness*thickness)/12.0]),
         vector(path,"physics:principalAxes","quatf",[1.0,0.0,0.0,0.0])]
 }
-// One bank is the authoring unit. Its body paths survive, while obsolete local
-// geometry overrides are retired rather than shadowing the new components.
-fn bank_plan(doc,root,docs,index){
-    let model=requirements::model();let paths=installed_paths(root,index);let bank=paths[0];
-    let found=query("QueryUsdPrim",#{doc_id:doc,path:bank,attrs:[]});
-    if found.type_name!="Xform"{throw("Existing ramp body required");}
-    let placement=packaging::bank_placements(model,docs,index);let ops=[];
-    ops.push(#{RemovePrim:#{edit_target:"@root@",path:bank}});
-    ops.push(add(root,spec::ramp_names()[index],()));
-    for op in pose_ops(bank,#{translation:placement.position,rotation:placement.rotation}){ops.push(op);}
-    let contract=query("ReadActiveTwinContract");if contract.open!=true{throw("Active Twin required");}
-    for section in [#{label:"root",parent:bank,name:"DeckSection",path:bank+"/DeckSection",pose:placement.deck},
-        #{label:"middle",parent:bank,name:"MiddleSection",path:paths[1],pose:placement.middle},
-        #{label:"toe",parent:paths[1],name:"ToeSection",path:paths[2],pose:placement.toe}]{
-        ops.push(add(section.parent,section.name,"twin://"+contract.name+"/"+model.value(packaging::component_owner(section.label)+"::componentAsset")));
-        for op in pose_ops(section.path,section.pose){ops.push(op);}
-        let body=if section.label=="root"{bank}else{section.path};
-        let schemas=["PhysicsRigidBodyAPI","PhysxRigidBodyAPI","PhysicsMassAPI"];
-        if section.label=="root"{schemas.push("PhysicsFilteredPairsAPI");}
-        ops.push(#{SetApiSchemas:#{edit_target:"@root@",path:body,schemas:schemas}});
-        for op in section_mass_ops(model,body,section.label,placement.deck){ops.push(op);}
-    }
-    let side=if index==0{"port"}else{"starboard"};
-    ops.push(#{SetRelationship:#{edit_target:"@root@",path:bank,name:"physics:filteredPairs",targets:[root+"/"+spec::physical_ramp_transition_body_name(side)]}});
-    let r="GriffinRampRequirements::GriffinEgressRamp::";
-    ops.push(scalar(bank,"lunco:operational_width_m","double",model.value(r+"rampSurfaceWidthM")));
-    ops.push(scalar(bank,"lunco:wheel_clearance_m","double",model.value(r+"rampWheelClearanceM")));
-    ops.push(scalar(bank,"lunco:deployment_angle_rad","float",0.0));
-    // Explicit mount frame coincides with the solved root bearing axis.
-    ops.push(add(bank,"MountFrame",()));
-    for op in pose_ops(bank+"/MountFrame",#{translation:[0.0,0.0,0.0],rotation:quat_array(quat_identity())}){ops.push(op);}
-    ops.push(#{SetRelationship:#{edit_target:"@root@",path:bank,name:"lunco:mount:frame",targets:[bank+"/MountFrame"]}});
-    ops.push(#{SetAttribute:#{edit_target:"@root@",path:bank,name:"lunco:mount:plug",type_name:"token",value:"\"egress_ramp\""}});
-    let bus=frames::mount_local_transform(doc,root+"/Bus");if !bus.ok{throw("Bus mount required");}
-    let socket=frames::mount_transform_compose(frames::mount_transform_inverse(bus.value),#{translation:placement.position,rotation:placement.rotation});
-    for op in pose_ops(root+"/Bus/RampSocket"+if index==0{"Port"}else{"Starboard"},socket){ops.push(op);}
-    #{ok:true,ops:ops,doc_id:doc,generation:found.document_generation,source_revision:model.source_revision,kind:"griffin_unequal_ramp_bank",root:bank}
-}
-
-// Each joint and its parallel flight latch are a single interface task.
-fn joint_plan(doc,root,docs,bank,index){
-    if index<0 || index>2{throw("Select root, middle or toe hinge");}
-    let model=requirements::model();let paths=installed_paths(root,bank);
-    let placement=packaging::bank_placements(model,docs,bank);
-    let names=spec::ramp_intermediate_joint_names();
-    let name=if index==0{spec::ramp_root_joint_names()[bank]}else{names[bank*2+index-1]};
-    let joint=root+"/"+name;let current=query("QueryUsdPrim",#{doc_id:doc,path:joint,attrs:[]});
-    if current.type_name!="PhysicsRevoluteJoint"{throw("Existing native hinge required");}
-    let body0=if index==0{root}else{paths[index-1]};let body1=paths[index];
-    let parent=();let child=();let physical=();let offset=();let stow=();
-    if index==0{parent=placement.position;child=[0.0,0.0,0.0];physical=placement.rotation;
-        stow=if bank==0{spec::physical_ramp_port_root_stowed_angle_rad()}else{-spec::physical_ramp_starboard_root_stowed_angle_rad()};}
-    else{
-        let labels=["root","middle","toe"];
-        let a=datum(model,docs,labels[index-1],"exitFrameName");let b=datum(model,docs,labels[index],"entryFrameName");
-        parent=a.translation;child=b.translation;
-        if index==1{parent=vec3_array(vec3_from(parent)+vec3_from(placement.deck.translation));}
-        physical=if index==1{placement.middle.rotation}else{placement.toe.rotation};
-        let sign=if index==1{1.0}else{-1.0};
-        offset=spec::physical_ramp_section_joint_frame_offset_rad(if index==1{"middle"}else{"toe"});
-        stow=sign*spec::physical_ramp_section_stowed_relative_angle_rad()+offset;
-    }
-    let ops=[];
-    for rel in [#{name:"physics:body0",targets:[body0]},#{name:"physics:body1",targets:[body1]}]{ops.push(#{SetRelationship:#{edit_target:"@root@",path:joint,name:rel.name,targets:rel.targets}});}
-    ops.push(vector(joint,"physics:localPos0","point3f",parent));ops.push(vector(joint,"physics:localPos1","point3f",child));
-    if index>0{
-        ops.push(vector(joint,"physics:localRot0","quatf",[1.0,0.0,0.0,0.0]));
-        ops.push(vector(joint,"physics:localRot1","quatf",usd_quat(quat_from_euler_xyz_deg(vec3(0.0,0.0,offset*180.0/acos(-1.0))))));
-    }
-    ops.push(scalar(joint,"drive:angular:physics:targetPosition","float",stow*180.0/acos(-1.0)));
-    let binding=();for b in spec::ramp_flight_latch_bindings(){if b.hinge==name{binding=b;}}
-    if binding==(){throw("Hinge has no source flight latch pairing");}
-    let latch=root+"/"+binding.latch;let fixed=query("QueryUsdPrim",#{doc_id:doc,path:latch,attrs:[]});
-    if fixed.type_name!="PhysicsFixedJoint"{throw("Existing native flight latch required");}
-    ops.push(vector(latch,"physics:localPos0","point3f",parent));ops.push(vector(latch,"physics:localPos1","point3f",child));
-    ops.push(vector(latch,"physics:localRot0","quatf",[1.0,0.0,0.0,0.0]));
-    ops.push(vector(latch,"physics:localRot1","quatf",usd_quat(quat_inverse(quat_from(physical)))));
-    #{ok:true,ops:ops,doc_id:doc,generation:current.document_generation,source_revision:model.source_revision,kind:"griffin_unequal_ramp_interface",joint:joint,latch:latch}
-}
+// Paired rigid-bank authoring is retired. Preserve explicit diagnostics for
+// old authoring callers; the production owner is griffin_ramp_tracks.
+fn bank_plan(doc,root,docs,index){throw("Use griffin_ramp_tracks::body_plan for independent tracks");}
+fn joint_plan(doc,root,docs,bank,index){throw("Use griffin_ramp_tracks::interface_plan for independent tracks");}
 
 fn transition_plan(doc,root,bank){
     let model=requirements::model();let r="GriffinRampRequirements::GriffinEgressRamp::";let own=packaging::owner();

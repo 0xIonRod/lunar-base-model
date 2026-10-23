@@ -8,8 +8,8 @@ import "lunco://scripting/tools/sysml_requirements" as requirements;
 // Validate the complete pair before retiring either solver latch. USD owns
 // the fixed attachment; SysML owns its hinge pairing; Rhai owns release order.
 fn flight_latch_release_plan(root, hinge_names) {
-    if root==() || root=="" || hinge_names==() || hinge_names.len()!=2 {
-        return #{ok:false,error:"flight latch release requires a root and two hinge identities"};
+    if root==() || root=="" || hinge_names==() || hinge_names.len()!=4 {
+        return #{ok:false,error:"flight latch release requires a root and four hinge identities"};
     }
     let bindings=griffin_spec::ramp_flight_latch_bindings();
     let selected=[];
@@ -85,10 +85,10 @@ fn hold_flight_latch_motors(root) {
         }
         drives.push(#{name:binding.hinge,id:id,law:law});
     }
-    if drives.len()!=6 {return #{ok:false,error:"six source-paired flight latch motors required"};}
+    if drives.len()!=12 {return #{ok:false,error:"twelve source-paired flight latch motors required"};}
     let sections=griffin_spec::ramp_intermediate_joint_names();
     for names in [griffin_spec::ramp_root_joint_names(),
-        [sections[0],sections[2]],[sections[1],sections[3]]] {
+        [sections[0],sections[2],sections[4],sections[6]],[sections[1],sections[3],sections[5],sections[7]]] {
         let plan=flight_latch_release_plan(root,names);
         if plan.ok!=true {return plan;}
     }
@@ -103,8 +103,8 @@ fn hold_flight_latch_motors(root) {
 // Validate the entire pair before restoring either native motor. Targets are
 // already owned by the phase command and must survive this effort change.
 fn released_motor_plan(profiles,names) {
-    if profiles==() || names==() || names.len()!=2 || names[0]==names[1] {
-        return #{ok:false,error:"released motor plan requires two distinct hinge identities"};
+    if profiles==() || names==() || names.len()!=4 || names[0]==names[1] {
+        return #{ok:false,error:"released motor plan requires four distinct hinge identities"};
     }
     let drives=[];
     for name in names {
@@ -129,7 +129,7 @@ fn restore_released_motors(profiles,event_name) {
     if event_name==events.middle_commanded || event_name==events.toes_commanded {
         let sections=griffin_spec::ramp_intermediate_joint_names();
         let offset=if event_name==events.middle_commanded {0} else {1};
-        names=[sections[offset],sections[offset+2]];
+        names=[sections[offset],sections[offset+2],sections[offset+4],sections[offset+6]];
     } else if event_name==events.root_clear_commanded {names=griffin_spec::ramp_root_joint_names();}
     else {return #{ok:true,restored:[]};}
     let plan=released_motor_plan(profiles,names);
@@ -185,13 +185,13 @@ fn event_order_report(trace){
 fn root_clearance_targets() {
     let model=requirements::model();let angle=model.value("GriffinVehicleAssemblyRequirements::GriffinRampPackagingStudy::rootClearanceAngleRad");
     let names=griffin_spec::ramp_root_joint_names();
-    if names.len()!=2 || angle<=0.0 || !angle.is_finite(){throw("Source root-clearance targets unavailable");}
-    [#{name:names[0],target_rad:angle},#{name:names[1],target_rad:-angle}]
+    if names.len()!=4 || angle<=0.0 || !angle.is_finite(){throw("Source root-clearance targets unavailable");}
+    let result=[];for track in griffin_spec::ramp_track_bindings(){result.push(#{name:track.root,target_rad:if track.bank==0{angle}else{-angle}});}result
 }
 
 fn _begin_root_motion(expected,event_name) {
     let snapshot=griffin_surface_ops::physical_ramp_joint_evidence();
-    if snapshot.ok!=true || expected.len()!=2{return #{ok:false,error:"Both measured root coordinates are required"};}
+    if snapshot.ok!=true || expected.len()!=4{return #{ok:false,error:"All four measured root coordinates are required"};}
     let starts=[];let travel=0.0;
     for target in expected{
         let measured=();for hinge in snapshot.hinges{if hinge.name==target.name{measured=hinge.measured_angle_rad;}}
@@ -230,13 +230,13 @@ fn root_motion_progress(motion) {
 // frame offset alone cannot disambiguate the motor's shortest-path error.
 fn _command_section_unfold(stage, target, publish_start) {
     let names=griffin_spec::ramp_intermediate_joint_names();
-    if names.len()!=4 || target==()
+    if names.len()!=8 || target==()
         || (stage!="middle" && stage!="toe") {
         return #{ok:false,error:"ramp section unfold source or stage is invalid"};
     }
     let expected=[];
     let writes=[];
-    for index in 0..4 {
+    for index in 0..names.len() {
         let moving=if stage=="middle" {index%2==0} else {index%2==1};
         let held=if stage=="middle" {griffin_spec::physical_ramp_section_stowed_joint_angle_rad("toe")}
             else {griffin_spec::physical_ramp_section_deployment_joint_angle_rad("middle")};
@@ -268,11 +268,12 @@ fn _begin_section_motion(stage, start, target, publish_start) {
     let release=();
     if publish_start {
         let names=griffin_spec::ramp_intermediate_joint_names();
-        if names.len()!=4 || (stage!="middle" && stage!="toe") {
+        if names.len()!=8 || (stage!="middle" && stage!="toe") {
             return #{ok:false,error:"ramp section release identities unavailable"};
         }
         let offset=if stage=="middle" {0} else {1};
-        release=_release_flight_latches([names[offset],names[offset+2]]);
+        let selected=[];for i in 0..names.len(){if i%2==offset{selected.push(names[i]);}}
+        release=_release_flight_latches(selected);
         if release.ok!=true {return release;}
     }
     let result=_command_section_unfold(stage,start,publish_start);
@@ -396,22 +397,16 @@ fn landed_root_deployment_plan() {
     for name in ["GriffinRampRootSectionRequirements::RampRootSection", "GriffinRampMiddleSectionRequirements::RampMiddleSection", "GriffinRampToeSectionRequirements::RampToeSection"]{length+=model.value(name+"::lengthM");}
     let track_y=model.value("GriffinRampRequirements::GriffinEgressRamp::rampSurfaceCenterYM")-model.value("GriffinRampRootSectionRequirements::RampRootSection::entryAxisYM");
     let nominal=abs(griffin_spec::physical_ramp_port_deployment_angle_rad());
-    if snapshot.ok!=true || joints.len()!=2 || limit==() || tolerance==()
+    if snapshot.ok!=true || joints.len()!=4 || limit==() || tolerance==()
         || thickness==() || width==() || length==() || nominal==() {
         return #{ok:false,error:"landed ramp planning inputs unavailable"};
     }
-    let stations=[];
-    for z in griffin_spec::rover_wheel_station_z() {
-        for edge in [z-width/2.0,z+width/2.0] {
-            if !stations.contains(edge) {stations.push(edge);}
-        }
-    }
-    if stations.len()!=4 {return #{ok:false,error:"FLIP requires four lateral track edges"};}
     let expected=[];
     let evidence=[];
-    for index in 0..2 {
-        let side=if index==0 {"Port"} else {"Starboard"};
-        let id=find_path("/Griffin1SurfaceOps/Lander/EgressRamp"+side);
+    for track in griffin_spec::ramp_track_bindings() {
+        let index=track.index;let side=track.side+"/"+track.track.to_string();
+        let stations=[track.station-width/2.0,track.station+width/2.0];
+        let id=find_path("/Griffin1SurfaceOps/Lander/"+track.body);
         let position=world_pos3(id);
         let rotation=world_rotation_quat(id);
         let measured=();
@@ -421,7 +416,7 @@ fn landed_root_deployment_plan() {
         if position==() || rotation==() || measured==() {
             return #{ok:false,error:"landed root frame unavailable"};
         }
-        let sign=if index==0 {1.0} else {-1.0};
+        let sign=if track.bank==0 {1.0} else {-1.0};
         let frame=#{position:position,rotation:rotation,measured:measured,
             sign:sign,length:length,track_y:track_y,half_thickness:thickness/2.0,
             bevel:mechanical_relations::planar_horizontal_face_bevel_run(thickness,nominal),
@@ -447,7 +442,7 @@ fn landed_root_deployment_plan() {
         let planned=_toe_clearance(shallow,frame);
         expected.push(#{name:joints[index],target_rad:shallow});
         evidence.push(#{side:side,source_tick:snapshot.sim_tick,target_rad:shallow,
-            nominal_target_rad:if index==0 {-nominal} else {nominal},
+            nominal_target_rad:if track.bank==0 {-nominal} else {nominal},
             planned_clearance:planned});
     }
     #{ok:true,expected_angles:expected,evidence:evidence}
@@ -463,24 +458,22 @@ fn root_deployment_plan() {
     let joints = griffin_spec::ramp_root_joint_names();
     let port = griffin_spec::physical_ramp_port_deployment_angle_rad();
     let starboard = griffin_spec::physical_ramp_starboard_deployment_angle_rad();
-    if joints.len() != 2 || port == () || starboard == () {
+    if joints.len() != 4 || port == () || starboard == () {
         return #{ok: false, error: "airborne deployment pose unavailable in SysML"};
     }
-    #{ok: true, mode: "airborne_pose", expected_angles: [
-        #{name: joints[0], target_rad: port},
-        #{name: joints[1], target_rad: starboard}
-    ]}
+    let targets=[];for track in griffin_spec::ramp_track_bindings(){targets.push(#{name:track.root,target_rad:if track.bank==0{port}else{starboard}});}
+    #{ok:true,mode:"airborne_pose",expected_angles:targets}
 }
 
 fn deploy_roots(expected) {
     // Lower the roots only after all intermediate sections reach their
     // source-defined level deployment targets.
     let joints = griffin_spec::ramp_root_joint_names();
-    if joints.len() != 2 {
-        return #{ok: false, error: "SysML must name both top-deck ramp hinges"};
+    if joints.len() != 4 {
+        return #{ok: false, error: "SysML must name all four track hinges"};
     }
     let port_angle = expected[0].target_rad;
-    let starboard_angle = expected[1].target_rad;
+    let starboard_angle = expected[2].target_rad;
     if port_angle == () || starboard_angle == () {
         return #{ok: false, error: "physical ramp deployment angles are missing from SysML"};
     }
