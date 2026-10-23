@@ -1707,15 +1707,3 @@ fn surface_route_task(rover) {
     let legs = surface_route().children;
     _surface_route_task_range(rover, 2, legs.len())
 }
-
-/// Release the adapter and arm the complete route as one mission boundary.
-/// Returns the typed command acknowledgment so callers can report a failure
-/// instead of claiming that the rover moved when the command was rejected.
-fn release_and_engage() {
-    let release = cmd("DetachJoint", #{
-        target: find_path("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint"),
-        intent: "Interactive"
-    });
-    if release.ok == false { return release; }
-    engage_route_subject()
-}

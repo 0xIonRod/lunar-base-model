@@ -56,6 +56,8 @@ package GriffinVisualConfigurationRequirements {
         PayloadSupportRear;
         PayloadCrossmemberAcrossX;
         PayloadCrossmemberAcrossZ;
+        RampSharedShaftPort;
+        RampSharedShaftStarboard;
     }
     enum def GriffinTankInstanceName {
         TankPX;
@@ -270,8 +272,11 @@ package GriffinVisualConfigurationRequirements {
         /* Eight upper and eight lower beams close the octagonal outer frame. */
         attribute frameRingCenterY : Real[2] = (0.28, -0.28);
         attribute frameRingSectionM : Real = 0.16;
-        attribute busStructureInstances : GriffinBusStructureNode[17] =
-            ("PerimeterFrame", "AvionicsDeck", "AvionicsPod", "TopDeckOctagon", "LowerServiceSkirtOctagon", "TankSupportPlate", "UpperCentralBucket", "LowerCentralBucket", "RoverPayloadDeck", "Looks", "MediumGainAntenna", "PayloadSupportPort", "PayloadSupportStarboard", "PayloadSupportForward", "PayloadSupportRear", "PayloadCrossmemberAcrossX", "PayloadCrossmemberAcrossZ");
+        // Vehicle-owned fixed shafts remain with the bus while the four
+        // wheel tracks rotate independently. Keep them in its exact installed
+        // inventory; they are not extra moving cross-track couplings.
+        attribute busStructureInstances : GriffinBusStructureNode[19] =
+            ("PerimeterFrame", "AvionicsDeck", "AvionicsPod", "TopDeckOctagon", "LowerServiceSkirtOctagon", "TankSupportPlate", "UpperCentralBucket", "LowerCentralBucket", "RoverPayloadDeck", "Looks", "MediumGainAntenna", "PayloadSupportPort", "PayloadSupportStarboard", "PayloadSupportForward", "PayloadSupportRear", "PayloadCrossmemberAcrossX", "PayloadCrossmemberAcrossZ", "RampSharedShaftPort", "RampSharedShaftStarboard");
         attribute frameRails : GriffinFrameRailNode[8] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard",
              "FrameRailStarboardFront", "FrameRailStarboardRear",

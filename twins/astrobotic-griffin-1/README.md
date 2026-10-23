@@ -640,14 +640,12 @@ The isolated Rhai joint regression asserts this topology invariant.
 The mission scenarios also declare exact event subscriptions, so high-rate
 collision pulses are not repeatedly entered into their Rhai `on_event` hooks.
 
-The headful Griffin-only Editor check exposed a second runtime boundary: the
-current USD projector admits child `PhysicsCollisionAPI` geometry as loose
-physics bodies instead of aggregating it into the lander's rigid body. The
-wrapper therefore keeps collision schemas on every solid deck, panel, ramp,
-rail, strut, pad, and hinge; the source contract is correct, but the live
-viewport cannot be called physically accepted until compound-child admission
-is fixed. See `research/griffin_1_vehicle_spec.md` for the acceptance gate and
-the missing Rust capabilities.
+The former compound-child contact limitation is superseded by the saved native
+landing, articulated-ramp and solar-stock contact results. The current
+[reconstruction basis](../../research/griffin_1_vehicle_spec.md) separates public
+hardware evidence from study parameters and historical configurations. The
+[complete review](contracts/griffin-complete-review-2026-10-23.md) records current
+release, geometry and subsystem verification boundaries.
 
 ## Interactive control contract
 

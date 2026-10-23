@@ -113,4 +113,12 @@ package GriffinFunctionalRequirements {
         objective { verify gr004; }
     }
 
+    verification def Verify_GriffinProductionPayloadRelease {
+        doc /* Production composition: qualified deployment, exactly-once
+         * adapter retirement/control handover, independent rover travel
+         * beyond the deck and measured wheel support at the ramp exit. */
+        subject lander : Griffin1Lander;
+        objective { verify gr026; verify gr007; }
+    }
+
 }

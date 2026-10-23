@@ -85,7 +85,13 @@ fn show_rover_release_actions() {
 }
 
 fn show_rover_release_pending() {
-    hint("griffin-controls", "ROVER RELEASE REQUESTED: waiting for the physics joint to retire.");
+    let paused=clock_snapshot().transport_playing==false;
+    let detached=find_path("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint")<0;
+    let message=if paused {
+        if detached {"ADAPTER DETACHED: resume simulation to finish rover handover."}
+        else {"DETACH ACCEPTED: resume simulation to confirm release and hand over rover control."}
+    } else {"PAYLOAD RELEASE: confirming detachment and waiting for egress readiness."};
+    hint("griffin-controls",message);
     set_surface_action_buttons();
 }
 

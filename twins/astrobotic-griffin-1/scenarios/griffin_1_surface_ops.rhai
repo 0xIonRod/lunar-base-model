@@ -246,7 +246,10 @@ fn on_event(me, evt, ctx) {
     }
 
     if evt.name == "griffin_rover_release_requested" {
-        if this.release_requested { return; }
+        if this.release_requested {
+            if !this.rover_detached {griffin_controls::show_rover_release_pending();}
+            return;
+        }
         if release_rover(this, false) {
             this.release_requested = true;
             griffin_controls::show_rover_release_pending();
@@ -424,7 +427,7 @@ fn release_rover(state, already_requested) {
         target: joint,
         intent: "Interactive"
     });
-    if release.ok == false {
+    if release==() || release.ok!=true {
         notify_kind("FLIP adapter release was rejected.", "error");
         return false;
     }

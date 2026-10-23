@@ -1,3 +1,8 @@
+The [complete hardware and payload-release review](griffin-complete-review-2026-10-23.md)
+records twelve passing selected cases, an explicit production egress observation,
+and the remaining native topology, impact and full-audit blockers. Its receipt
+keeps source revisions and failed cases visible.
+
 # Griffin verification boundary
 
 The [landed ramp contact gate](griffin-ramp-contact-2026-10-23.md) adds actual

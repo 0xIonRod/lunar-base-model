@@ -1,146 +1,98 @@
-# Griffin-1 lander and FLIP rover study specification
+# Griffin-1 reconstruction basis — reviewed 23 October 2026
 
-This is the acceptance contract for the Twin model. It separates public
-mission facts from geometry values that are simulator study assumptions. A
-public reference is not treated as an as-built CAD drawing.
+This Twin reconstructs the June 2026 integration configuration. Its numerical
+study datums live in the typed SysML owners below; this document explains their
+meaning. Public photographs establish arrangement and silhouette, not a flight
+mechanical ICD. The current native checks and source hashes are recorded in the
+[complete review](../twins/astrobotic-griffin-1/contracts/griffin-complete-review-2026-10-23.md).
 
-## Reference basis
+## Public evidence and configuration boundaries
 
-- Griffin is modelled as a medium-class lunar lander for a south-polar mission.
-  Astrobotic's current Griffin page describes an aluminum frame, an isogrid
-  payload deck, four landing legs, optional payload/rover ramps, and solar
-  power intended to point toward the Sun. See the primary references:
-  `https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/` and
-  `https://www.astrobotic.com/media-kit/images/`.
-- The public Griffin payload class used here is 625 kg. Astrobotic's current
-  product material describes seven main engines and four attitude-control
-  thruster clusters; the twelve actuator identities in this Twin are a control
-  topology, not a claim about final Griffin flight hardware.
-- FLIP is the Astrolab FLEX Lunar Innovation Platform announced for Griffin-1.
-  Public material is not sufficient to claim exact FLIP CAD dimensions, so the
-  Twin labels its four-wheel all-wheel-steer geometry as a study proxy.
-- The landing site is a Nobile regional anchor backed by LROC NOBILE03. The
-  exact Griffin touchdown coordinate remains unresolved; local terrain is
-  therefore an ENU study frame, not a claim about the flight trajectory.
+- [Astrobotic's June 2026 unveiling](https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/)
+  and [NASA's June hardware gallery](https://www.nasa.gov/gallery/astrobotics-griffin-1/)
+  establish the selected integrated silhouette. The tall, stepped photovoltaic
+  faces, leg openings, open lower equipment bays and compact central engine bay
+  take precedence over older promotional concepts.
+- [Astrobotic's Griffin product page](https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/)
+  identifies seven main engines and a 625 kg payload capacity. The
+  [2021 payload guide](https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf)
+  describes five main engines, four propellant tanks, twelve attitude engines,
+  pressure-fed hypergolic propulsion, a 28 V electrical bus and side-mounted
+  panels for polar missions. Its five-engine topology is historical.
+- [NASA's October 2026 test report](https://www.jpl.nasa.gov/news/nasa-jpl-testing-readies-voyager-technologies-lander-for-moon-mission/)
+  gives a 1,265 kg environmental-test spacecraft mass. This is not an identified
+  fueled flight mass or a released component mass budget. The
+  [associated photojournal](https://science.nasa.gov/photojournal/voyager-technologies-griffin-1-completes-environmental-testing-at-nasa-jpl/)
+  identifies the striped upper box as a payload simulator. Test fixtures,
+  protective blankets, missing arrays and payload simulators must not become
+  flight geometry without configuration evidence.
+- [Agile's A110 specification](https://static1.squarespace.com/static/634ee7b32099c80fdfcc8cac/t/6418ea80e1144560207215ca/1679505951405/AgileSpace_A110SpecDoc.pdf)
+  supports the retained 111.2 N nominal attitude-thruster rating and 60.96 mm
+  exit diameter. Cluster brackets and mounting coordinates remain reconstructed.
+- [Astrolab's FLIP page](https://www.astrolab.space/flip-rover/) and
+  [Venturi's wheel publication](https://www.venturi.com/wp-content/uploads/2023/06/PR_19_06_2023.pdf)
+  support full-size FLEX tires and the selected 930 mm wheel scale. Rover
+  wheelbase, track, chassis dimensions and suspension details remain a study
+  reconstruction. They do not justify resizing the lander from a visual guess.
 
-## Authored geometry contract
+References were checked on 23 October 2026. Product-family capacity, a historical
+prototype, an environmental-test configuration and the hosted rover are distinct
+measurement boundaries.
 
-The following are simulator acceptance bounds, not public as-built dimensions.
+## Current authored configuration
 
-### Lander
+| Area | Current reconstruction | Authoritative SysML owner |
+| --- | --- | --- |
+| Bus and deck | 4.50 m exterior bus; 4.40 m perimeter deck; 3.60 m inner tank frame; open structural bays | `GriffinVisualConfigurationRequirements`, `GriffinBusRequirements` |
+| Landing gear | Four broad-face stations; three-member appearance; bus-to-foot axial suspension proxy | `GriffinLandingLegRequirements` |
+| Propellant packaging | Four separately wrapped spherical tank assemblies; 1.008 m installed body diameter | `GriffinTankRequirements` |
+| Main propulsion | Seven actual force owners; one centre and six outer stations on a 0.64 m ring; pressure-fed valve/chamber network | `GriffinPropulsionRequirements` |
+| Attitude propulsion | Twelve force owners in four corner clusters; open-bore rings and connected support stock | `GriffinPropulsionRequirements` |
+| Solar layout | Three adjacent stepped faces; photo-derived cell contours and leg/equipment openings; source-linked stock colliders | `GriffinSolarRequirements` |
+| Ramp mechanism | Two exits, each with two independent three-span wheel tracks; twelve hinges and twelve flight latches | `GriffinRampRequirements` and root/middle/toe component owners |
+| Ramp stow/deployment | Inward 120-degree study stow; root clearance, middle unfold, opposite toe unfold, then terrain-fitted root lowering | `GriffinRampRequirements` |
+| Ramp contact path | 5.397 m total span; actual toe clearance and deck-entry continuity join the angle/rate/dwell readiness gate | `GriffinRampRequirements` |
+| Hosted payload | One fixed adapter until solver-owned release; separate live rover body after retirement | `GriffinFunctionalRequirements` |
+| Electrical and thermal | 28 V bus; battery/solar power network; temperature-dependent photovoltaic and reduced thermal models | `GriffinPowerThermalRequirements` |
+| Guidance and sensors | Modelica descent/control with IMU, altimeter and environment connections; measured landing/handoff gates | `GriffinSimulationAccuracyRequirements` |
+| Terrain and route | NOBILE03 regional DEM study; route frozen to the landed egress frame; annotations resampled at actual terrain coordinates | `Griffin1Requirements::PublicMissionContext` |
 
-- The visible primary body is a boxy, rectilinear airframe: 5.4 m maximum
-  width, 3.2 m body height, and 5.4 m maximum depth. A cylindrical source
-  placeholder must not remain visible in the Griffin wrapper.
-- The top is a clean, solid payload deck with one adapter interface for FLIP.
-  No lander high-gain antenna, loose mast, or decorative part may occupy the
-  adapter clearance volume.
-- Four direct landing-leg struts terminate at four direct solid pads. Struts
-  and pads have collision enabled and are outside the rover's centre lane;
-  obsolete reference-leg visuals are hidden so they cannot create a second,
-  disconnected gear set. Each pad must meet the lower end of its strut in the
-  nominal pose; a visually nearby but geometrically separate pad fails this
-  contract. The accepted study pose uses a radial rake: strut centers at
-  `(+-2.475, -3.125, +-2.475)`, half-span `1.725 m`, and pad centers at
-  `(+-2.65, -4.85, +-2.65)`.
-- Three adjacent solar arrays span the forward, beveled forward-starboard, and
-  starboard lander faces in the mission Sun quadrant. Each array is a framed,
-  cell-bearing assembly with a structural path to its paired bus rails. The
-  installed panel outline includes the required local clearance cutouts; use
-  controlled panel geometry when available and keep photo-derived study
-  geometry replaceable.
-- Two solid egress ramps have collision surfaces and two visible edge rails on
-  the outside/accessible side of each ramp. Each root has a solid hinge-support
-  block tied into the deck. The accepted stable pose is an authored
-  deployed/integrated ramp from the payload deck to the terrain. A
-  future articulated fold must preserve this same swept-volume contract; the
-  unstable independent rigid-body hinge variant is not part of the accepted
-  runtime.
-- The ramp swept volume, solar panels, legs, pads, and adapter are disjoint at
-  the nominal deployed pose. FLIP cannot be mounted through a ramp or panel.
+All dimensions in this table except the separately sourced tire scale are study
+estimates. The old 5.4 m box, diagonal-leg stations, 45-degree outward stow,
+equal-span coupled ramps and 0.90 m tires are superseded configurations.
+The selected gold MLI finish is an operator presentation preference; it does not
+identify flight blanket material or its thermal properties.
 
-### FLIP rover
+The inherited propulsion study uses a 2,000 kg dry-mass input and 1,000 kg per
+reactant, with an assumed 2.6 oxidizer/fuel flow ratio. These are not measured
+flight inventories. Equal initial reactant masses do not imply equal usable
+burn time; oxidizer depletion leaves fuel. Finite helium inventory, regulator
+redundancy, slosh, detailed injector physics, discrete flight valve pulsing and
+a supplier mass/inertia budget remain unqualified. The new JPL test mass is
+recorded as evidence, without substituting it for a different mass boundary.
 
-- FLIP is a separate reusable assembly with a rigid chassis, a payload deck,
-  a clearly identified forward sensor mast, four wheel assemblies, and four
-  suspension carriers.
-- Each wheel is a solid cylinder with authored radius 0.45 m and width 0.28 m
-  in this study. Each has a wheel attachment index, drive connection, steer
-  connection, collision geometry, and suspension clearance.
-- The drivetrain exposes two explicit stopped-vehicle steering modes:
-  Ackermann and crab. Crab steers all four wheels to the same heading and is
-  allowed only while stopped or below the configured crawl threshold. Changing
-  modes must not add a second input path or leave stale per-wheel steering.
-- The rover body, wheels, legs/ramp, and terrain collider are solid. A wheel
-  ray, wheel axle, or rover chassis must not pass through a lander leg or ramp.
-- FLIP keeps its electrical solar component for power-network semantics, while
-  its visible rear-deck backsheet and cells are authored as explicit solid
-  geometry so the visual and collision contracts are inspectable.
+## Acceptance and operator behavior
 
-The current runtime realization deliberately selects the rover's `raycast`
-drivetrain variant and disables the optional `Thermal` network. This preserves
-the solid four-wheel geometry and the single steering interface while the
-runtime gaps below are resolved; the authored physical-joint and thermal
-variants remain useful engineering targets, but are not accepted as a working
-mission configuration until they pass the same runtime tests.
+USD owns geometry, materials, collision stock and joint topology. SysML owns
+configuration and tolerances. Modelica owns continuous subsystem equations.
+Rhai observes and sequences the existing native mechanisms. USD changes use
+native document operations and saved-document readback, as required by
+[the authoring procedure](../twins/astrobotic-griffin-1/contracts/authoring.md).
 
-## Runtime and presentation contract
+U / OPEN RAMPS and lander F / DETACH ROVER remain manual operator commands.
+A detach acknowledgement means the request was accepted. Solver retirement is
+observed separately; automatic control transfer also waits for landing and
+ramp readiness. A paused simulation must explain that handover resumes with
+simulation time instead of displaying a permanently pending physics claim.
+The production release check requires an absent adapter, consistent native
+joint graph, exactly-once release/control events, independent travel beyond
+the deck, and measured wheel support at the ramp exit. It never moves FLIP
+through a pose override.
 
-- View shows a single mounted Twin; Editor shows the exact reusable assembly
-  document. Editing `vehicles/griffin_1.usda` must leave the Griffin-only USD
-  preview visible rather than previewing the complete surface-operations scene.
-- The USD document has both an editable text tab and a paired 3D preview for
-  the same document/edit target. Opening a USD file must not route it through
-  Modelica source parsing or cause a scene reload.
-- Possession identifies either Lander or FLIP unambiguously. Lander controls
-  use thrust/pitch/roll/yaw/release; FLIP controls use drive/steer/brake and
-  report the active steering mode.
-- The polar scene uses the same authored lunar light for lander, rover, and
-  terrain. Terrain processing records the source coordinate, projection,
-  vertical datum, and generated output while downloaded/generated bytes stay
-  ignored by Git.
-
-## Evidence required for acceptance
-
-1. Run the Twin-owned Rhai requirement gate from `twin.toml` and keep its
-   structured verdict/evidence with the authored changes. Static source checks
-   are not an acceptance substitute for a composed-stage Rhai observation.
-2. In the headful Editor, capture a Griffin-only preview showing the clean top,
-   side panels, four-leg envelope, and rail-equipped ramps.
-3. In View, inspect both vessel records, possess the lander, release it, then
-   possess FLIP and demonstrate Ackermann -> stopped crab -> drive -> brake.
-4. Inspect the saved USD document and confirm `dirty=false`, the expected
-   references/relationships, collision fields, and no duplicate scene reload.
-
-## Known boundaries
-
-Exact Astrobotic manufacturing drawings, final Griffin touchdown coordinates,
-and final FLIP wheel/suspension data are not public in this checkout. Those
-facts must be replaced when authoritative CAD or mission data becomes
-available; the validator should then be tightened rather than silently
-changing the assumptions.
-
-Current Rust/runtime gaps that prevent claiming the full acceptance sequence:
-
-- the live USD projector currently promotes `PhysicsCollisionAPI` geometry
-  below a rigid body as independent physics bodies instead of aggregating the
-  authored compound. The source intentionally keeps collision schemas on the
-  deck, panels, ramps, rails, struts, pads, and hinges; until the projector
-  owns compound-child admission, a live Griffin preview can visibly separate
-  those parts even though the USD source is connected;
-- the physical FLIP wheel-joint variant can escape the bounded physics world;
-- the current ramp fold/joint path needs a stable compound-body articulation;
-- the optional FLIP thermal graph currently needs algebraic-solver support that
-  the active RK45 backend does not provide;
-- the generic `SetPorts` API is a one-tick command, while a safe stop on a
-  slope needs a held intent; the Twin helper now uses the existing persistent
-  `SimulateIntent` path for this case;
-- a native replicated vehicle-mode intent is missing, so crab/Ackermann mode is
-  currently a typed Twin-local command rather than a first-class input action;
-- replacement landing-contact proxies cannot yet bind to the source lander's
-  name-bound leg channels without reintroducing the unstable source bodies;
-- USD composition needs a shared presentation-only marker and stronger
-  domain-qualified document handles so Editor previews cannot be confused with
-  live scene entities;
-- the Editor needs schema-aware transform/color setters that preserve USD
-  xform order and array value types.
+The earlier claims that compound-child contact was unavailable and articulated
+ramps were categorically unsupported are superseded by the native landing,
+deployment and panel-contact records. Test results qualify their recorded
+source revision and scenario, rather than every conceivable flight condition.
+Supplier flight dimensions, impact/load qualification, a calibrated propulsion
+inventory, mission thermal validation and clean 60 FPS real-time acceptance
+remain separate evidence requirements.

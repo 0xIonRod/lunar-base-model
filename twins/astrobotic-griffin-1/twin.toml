@@ -395,3 +395,9 @@ name = "GriffinRampRequirements::Verify_GriffinRampDeckContactRejection"
 scene = "tests/griffin_ramp_deck_gap.usda"
 script = "scenarios/tests/griffin_ramp_contact_rejection.rhai"
 verdict_channel = "GRIFFIN_RAMP_CONTACT_REJECTION"
+
+[[verification.cases]]
+name = "GriffinFunctionalRequirements::Verify_GriffinProductionPayloadRelease"
+scene = "tests/griffin_payload_release.usda"
+script = "scenarios/tests/griffin_payload_release.rhai"
+verdict_channel = "GRIFFIN_PAYLOAD_RELEASE"

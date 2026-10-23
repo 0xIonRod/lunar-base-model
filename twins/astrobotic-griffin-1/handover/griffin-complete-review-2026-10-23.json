@@ -1,0 +1,307 @@
+{
+  "date": "2026-10-23",
+  "scope": "Griffin complete hardware/source review and production payload separation",
+  "base_commit": "fe5be36b45f1618a248d57ea042e2aef4f2f6615",
+  "binary": {
+    "path": "/home/rod/.cache/griffin-review-20261023/regular-review-5c327b4e652c",
+    "source_path": "/home/rod/Documents/luncosim-workspace/tutorials/target/debug/luncosim",
+    "sha256": "5c327b4e652cf156b10beae88a2b85a8fba1b624707a155271f4a841b38142b0",
+    "provenance": "Hardlink of the normally built tutorials executable; no build or feature changes",
+    "build": "3813c918-dirty"
+  },
+  "profile": {
+    "cwd": "/home/rod/Documents/luncosim-workspace/tutorials",
+    "asset_root": "/home/rod/Documents/luncosim-workspace/tutorials/assets",
+    "tick_hz": 60,
+    "compute_threads": 1,
+    "jitter": 0,
+    "seed": "6840157149251759617",
+    "substeps": "unchanged production defaults"
+  },
+  "cases": [
+    {
+      "case": "griffin_payload_release",
+      "verification": "GriffinFunctionalRequirements::Verify_GriffinProductionPayloadRelease",
+      "scene": "tests/griffin_payload_release.usda",
+      "log_sha256": "1a6973fdffda850bb89f4f1ad89a5f060c4d067d4910205b5f0a54e250fa683d",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_payload_release-pinned.log",
+      "verdict": "fail",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": "The scenario reported FAIL on channel GRIFFIN_PAYLOAD_RELEASE.",
+      "checks": 10,
+      "failure_details": [
+        "Physics topology retained pending or inconsistent edges"
+      ],
+      "metrics": {
+        "detach_requests": 0,
+        "exit_tick": 4039,
+        "graph_edges": 22,
+        "joint_count": 18,
+        "lander_position_m": [
+          0.0037668353104386085,
+          0.6038142391144286,
+          -0.039469210242952094
+        ],
+        "pending_joints": 0,
+        "release_count": 1,
+        "release_tick": 3539,
+        "route_count": 1,
+        "rover_position_m": [
+          -8.148968782278391,
+          0.6840378790921005,
+          -1.1455689074180322
+        ],
+        "start_position_m": [
+          0.057563001039117156,
+          3.225317385172273,
+          -0.26328060711218715
+        ],
+        "support_contacts": 4,
+        "travel_m": 8.253823147818048
+      }
+    },
+    {
+      "case": "griffin_lander_requirements",
+      "verification": "GriffinLanderRequirements::Verify_GriffinLanderRequirements",
+      "scene": "tests/griffin_lander_requirements.usda",
+      "log_sha256": "46ebcf571a3aa27908dc7594ed7977dcc8273fdd0fdbeecdb2ba36178f10010c",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_lander_requirements-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 122,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_bus_requirements",
+      "verification": "GriffinBusRequirements::Verify_GriffinBusRequirements",
+      "scene": "tests/griffin_bus_requirements.usda",
+      "log_sha256": "f10820b06ce1709e33ef8236c7abd1c7ff1e288003542f20de77b042836e7a58",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_bus_requirements-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 254,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_tank_requirements",
+      "verification": "GriffinTankRequirements::Verify_GriffinTankRequirements",
+      "scene": "tests/griffin_tank_requirements.usda",
+      "log_sha256": "197e754f7921fe3b004b2ca73a5756d52f68a3fa9e033803eb12e3204fbea5a3",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_tank_requirements-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 536,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_landing_legs_requirements",
+      "verification": "GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements",
+      "scene": "tests/griffin_landing_legs_requirements.usda",
+      "log_sha256": "8f61b63f2d35efcd533dfe558f8aa2b1f2f61aac1f5b2f2d0e8470d113eed615",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_landing_legs_requirements-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 189,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_solar_requirements",
+      "verification": "GriffinSolarRequirements::Verify_GriffinSolarRequirements",
+      "scene": "tests/griffin_solar_requirements.usda",
+      "log_sha256": "58c827cc17b410f809fa1b503e190b37b544c30387e60a2ca6a010f4cfcaf36d",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_solar_requirements-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 170,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_propulsion_requirements",
+      "verification": "GriffinPropulsionRequirements::Verify_GriffinPropulsionRequirements",
+      "scene": "tests/griffin_propulsion_requirements.usda",
+      "log_sha256": "c59eeefd937ab86e97fdaefb7b13287e08f56af4a644ce27c951821187c45527",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_propulsion_requirements-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 104,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_flip_visual",
+      "verification": "GriffinVisualRequirements::Verify_GriffinVisualRequirements",
+      "scene": "tests/griffin_flip_visual.usda",
+      "log_sha256": "b9363709ab226671f2874a2469fc0a35c3ef8ee0e0145066bbddeedecbe12789",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_flip_visual-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 190,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_bus_open_bays",
+      "verification": "GriffinBusRequirements::Verify_GriffinBusOpenBays",
+      "scene": "tests/griffin_bus_open_bays.usda",
+      "log_sha256": "239df312394320dec7b09f4018e084a56447927b7a3bce298576847ddd266426",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_bus_open_bays-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 2,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_visual_configuration_types",
+      "verification": "GriffinVisualConfigurationRequirements::Verify_GriffinVisualConfiguration",
+      "scene": "tests/griffin_visual_configuration_types.usda",
+      "log_sha256": "4e2830aa09da5862b8ae98ede3ff51007d391edd32f16d38fc863143a91cc0c6",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_visual_configuration_types-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 22,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_rcs_commands",
+      "verification": "GriffinPropulsionRequirements::Verify_GriffinRcsRuntime",
+      "scene": "tests/griffin_rcs_commands.usda",
+      "log_sha256": "902f16f73165c3bfb3ae44b3f9824fec0f778a2eeef8de0588fb66cfb45cfb79",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_rcs_commands-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 31,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_power_thermal",
+      "verification": "GriffinPowerThermalRequirements::Verify_GriffinPowerThermal",
+      "scene": "tests/griffin_power_thermal.usda",
+      "log_sha256": "de3f078cca8e50e4b82447be53c99c6b6cdf4dea9a50d88e7418b408070c7337",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_power_thermal-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 3,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_sustained_thermal",
+      "verification": "GriffinPowerThermalRequirements::Verify_GriffinSustainedThermal",
+      "scene": "tests/griffin_sustained_thermal.usda",
+      "log_sha256": "2989598740e076786713f7fb1530cf00d76dca4f8259c249be43a59832269d21",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_sustained_thermal-pinned.log",
+      "verdict": "pass",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": null,
+      "checks": 1,
+      "failure_details": []
+    },
+    {
+      "case": "griffin_engine_off_impact",
+      "verification": "GriffinLandingLegRequirements::Verify_GriffinEngineOffImpact",
+      "scene": "tests/griffin_engine_off_impact.usda",
+      "log_sha256": "edafacf1be7190044c9649c79f75dd45413323eda3bfa0753a411aca46c5979b",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_engine_off_impact-pinned.log",
+      "verdict": "fail",
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "runner_diagnostic": "The scenario reported FAIL on channel GRIFFIN_ENGINE_OFF_IMPACT.",
+      "checks": 9,
+      "failure_details": [
+        "footpad rims and centers stay above terrain within the authored solver tolerance",
+        "native narrow-phase penetration stays within the authored solver tolerance",
+        "suspension respects its authored hard-stop travel within 1 mm tolerance"
+      ]
+    },
+    {
+      "case": "griffin_requirements",
+      "verification": "Griffin1Requirements::Verify_GriffinRequirements",
+      "scene": "tests/griffin_requirements.usda",
+      "log_sha256": "2ac907d991fee9e3cbad81a08b80cd5d5991382eb6019491a3880156cf18c918",
+      "local_log": "/home/rod/Documents/luncosim-workspace/usd/.cache/codex-evidence/griffin-complete-review-20261023/griffin_requirements-pinned.log",
+      "verdict": "blocked",
+      "checks": null,
+      "source_revision": "1199670399273768624",
+      "source_revision_at_end": "1199670399273768624",
+      "max_ticks": 12,
+      "diagnostic": "Full-Twin SysML query exceeds the Rhai string budget; bounded 12-step run produces no authored verdict"
+    }
+  ],
+  "summary": {
+    "passed_cases": 12,
+    "failed_cases": 2,
+    "blocked_cases": 1,
+    "passing_case_checks": 1624
+  },
+  "sysml_validation": {
+    "ok": true,
+    "errors": 0,
+    "warnings": 153,
+    "source_revision": "1199670399273768624"
+  },
+  "source_sha256": {
+    "research/griffin_1_vehicle_spec.md": "7539a9175bf374082e20030cf0ee4e3ee17242386558152c57d9f00945b4dd89",
+    "twins/astrobotic-griffin-1/README.md": "bc42e4873798626539c3761fdfe42e52240d928bbd8a53f7d3a8636dfc118942",
+    "twins/astrobotic-griffin-1/contracts/griffin-complete-review-2026-10-23.md": "710a4cc856047d70710f3ece883ca5bbf00b02be76281ee254b98ea31dc35467",
+    "twins/astrobotic-griffin-1/contracts/verification.md": "2dcb7678579042bf4191bd4fbc1fa134534299f63eb03413647f8374cb4f592f",
+    "twins/astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml": "ae404ead9c0476b1b4315638d2f0875594d03620e6163b350f93741cdf17bad3",
+    "twins/astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml": "e9c8b80aed4b3aaf82bd830ef6bb6b75a45503e0dd6fc45cef057aee20f3ad91",
+    "twins/astrobotic-griffin-1/scenarios/griffin_1_surface_ops.rhai": "96fd8e2f6a1bafbbd139b1cf8fe1be403ecdcf59458e222352ce4c8cbbdaad8f",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_payload_release.rhai": "80b3a80eda1435475b4c0cac643cfb634adcd1c3dbc6e0e087d2167b5c45a51c",
+    "twins/astrobotic-griffin-1/tests/griffin_payload_release.usda": "d912a032ac79121803fbb08a3ccd1e03aad2794fc6588adee64736365ed6c46c",
+    "twins/astrobotic-griffin-1/tools/griffin_controls.rhai": "6a9a7d7037ca4a2fd3871a9e1e0f8d2836a40d847b6d174c064a83ddd7be7e09",
+    "twins/astrobotic-griffin-1/tools/griffin_surface_ops.rhai": "e82aa1a40b97f6cf06a7a559fb21ba84774a795d5ad1da8051d0aea1659257a7",
+    "twins/astrobotic-griffin-1/twin.toml": "fbddbea1b4644574356e6ae7a9786ec4fbdf5809bf867134d32cc2f8aececfb0"
+  },
+  "source_images": [
+    {
+      "file": "griffin-complete-review-stow-2026-10-23.png",
+      "sha256": "b3622e901ad857969a5a53a60649f25251e591f74330384fc3c769ea980a2e3a",
+      "size_px": [
+        2560,
+        1568
+      ]
+    },
+    {
+      "file": "griffin-complete-review-underside-2026-10-23.png",
+      "sha256": "1e2c6aa0049afe3b15f68a786b8e8c0804fed72ba29cb14018bc38a447844703",
+      "size_px": [
+        2560,
+        1568
+      ]
+    }
+  ],
+  "paused_release": {
+    "stdout": "#{\"joint\": -1, \"paused\": true}\n"
+  },
+  "source_reference_gallery": "https://www.nasa.gov/gallery/astrobotics-griffin-1/",
+  "vendor_drawing": "https://static1.squarespace.com/static/634ee7b32099c80fdfcc8cac/t/6418ea80e1144560207215ca/1679505951405/AgileSpace_A110SpecDoc.pdf",
+  "boundaries": [
+    "All final cases use one pinned normal binary; each retains its recorded source revision",
+    "Release and physical egress observed; strict graph agreement remains failing",
+    "Engine-off impact contact/travel limits remain failing",
+    "Complete-registry audit blocked by shared query transport budget",
+    "No flight-dimensional, propellant-inventory, structural-strength or 60 FPS qualification"
+  ]
+}
