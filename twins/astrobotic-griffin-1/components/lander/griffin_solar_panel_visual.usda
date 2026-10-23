@@ -572,4 +572,259 @@ def Xform "SolarPanel" (
         custom token[] xformOpOrder = ["xformOp:translate"]
         custom rel material:binding = </SolarPanel/Looks/SolarCells>
     }
+    def Scope "PanelCollision"
+    {
+        uniform token purpose = "proxy"
+        token visibility = "invisible"
+        def Cube "Frame0" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.0, 0.0, -0.9180000126361847)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (1.8359999656677246, 0.029999999329447746, 0.030000030994415283)
+        }
+        def Cube "Frame1" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.9180000126361847, 0.0, -0.3084999918937683)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.030000030994415283, 0.029999999329447746, 1.218999981880188)
+        }
+        def Cube "Frame2" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.8352499902248383, 0.0, 0.3010000139474869)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.1654999852180481, 0.029999999329447746, 0.030000001192092896)
+        }
+        def Cube "Frame3" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.7524999976158142, 0.0, 0.52674999833107)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.029999971389770508, 0.029999999329447746, 0.4514999985694885)
+        }
+        def Cube "Frame4" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.8352499902248383, 0.0, 0.7524999976158142)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.1654999852180481, 0.029999999329447746, 0.029999971389770508)
+        }
+        def Cube "Frame5" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.9180000126361847, 0.0, 0.8352499902248383)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.030000030994415283, 0.029999999329447746, 0.1654999852180481)
+        }
+        def Cube "Frame6" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.609499990940094, 0.0, 0.9180000126361847)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.6169999837875366, 0.029999999329447746, 0.030000030994415283)
+        }
+        def Cube "Frame7" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.3010000139474869, 0.0, 0.6847499907016754)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.030000001192092896, 0.029999999329447746, 0.4664999842643738)
+        }
+        def Cube "Frame8" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.22574999928474426, 0.0, 0.4515000134706497)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.15049999952316284, 0.029999999329447746, 0.030000001192092896)
+        }
+        def Cube "Frame9" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.15049999952316284, 0.0, 0.3762499988079071)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.030000001192092896, 0.029999999329447746, 0.15049999952316284)
+        }
+        def Cube "Frame10" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.0, 0.0, 0.3010000139474869)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.3009999990463257, 0.029999999329447746, 0.030000001192092896)
+        }
+        def Cube "Frame11" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.15049999952316284, 0.0, 0.413875013589859)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.030000001192092896, 0.029999999329447746, 0.22575002908706665)
+        }
+        def Cube "Frame12" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.22574999928474426, 0.0, 0.52674999833107)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.15049999952316284, 0.029999999329447746, 0.030000030994415283)
+        }
+        def Cube "Frame13" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.3010000139474869, 0.0, 0.7223750054836273)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.030000001192092896, 0.029999999329447746, 0.39124995470046997)
+        }
+        def Cube "Frame14" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.609499990940094, 0.0, 0.9180000126361847)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.6169999837875366, 0.029999999329447746, 0.030000030994415283)
+        }
+        def Cube "Frame15" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.9180000126361847, 0.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.030000030994415283, 0.029999999329447746, 1.8359999656677246)
+        }
+        def Cube "ArrayBackplane0" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.0, 0.0, -0.3009999990463257)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (1.805999994277954, 0.012000000104308128, 1.2039999961853027)
+        }
+        def Cube "ArrayBackplane1" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.52674999833107, 0.0, 0.3762499988079071)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.7524999976158142, 0.012000000104308128, 0.15049999952316284)
+        }
+        def Cube "ArrayBackplane2" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.4514999985694885, 0.0, 0.3762499988079071)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.6019999980926514, 0.012000000104308128, 0.15049999952316284)
+        }
+        def Cube "ArrayBackplane3" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.52674999833107, 0.0, 0.48912501335144043)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.7524999976158142, 0.012000000104308128, 0.07525002956390381)
+        }
+        def Cube "ArrayBackplane4" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.52674999833107, 0.0, 0.48912501335144043)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.4514999985694885, 0.012000000104308128, 0.07525002956390381)
+        }
+        def Cube "ArrayBackplane5" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.6019999980926514, 0.0, 0.6396250128746033)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.6019999980926514, 0.012000000104308128, 0.22574996948242188)
+        }
+        def Cube "ArrayBackplane6" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.52674999833107, 0.0, 0.6396250128746033)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.4514999985694885, 0.012000000104308128, 0.22574996948242188)
+        }
+        def Cube "ArrayBackplane7" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.6019999980926514, 0.0, 0.8277499973773956)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.6019999980926514, 0.012000000104308128, 0.15049999952316284)
+        }
+        def Cube "ArrayBackplane8" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (0.6019999980926514, 0.0, 0.8277499973773956)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            custom double3 xformOp:scale = (0.6019999980926514, 0.012000000104308128, 0.15049999952316284)
+        }
+    }
 }

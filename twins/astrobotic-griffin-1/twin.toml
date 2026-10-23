@@ -15,6 +15,12 @@ paths = ["requirements"]
 
 [verification]
 [[verification.cases]]
+name = "GriffinSolarRequirements::Verify_GriffinSolarCollision"
+scene = "tests/griffin_solar_collision.usda"
+script = "scenarios/tests/griffin_solar_collision.rhai"
+verdict_channel = "GRIFFIN_SOLAR_COLLISION"
+
+[[verification.cases]]
 name = "FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel"
 scene = "tests/flip_airless_wheel.usda"
 script = "scenarios/tests/flip_airless_wheel.rhai"

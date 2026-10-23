@@ -1,0 +1,72 @@
+{
+  "scope": "Griffin panel frame/backplane obstruction; compound-carrier contact witness; no structural or flight qualification",
+  "binary_revision": "eca1a3a9-dirty",
+  "binary_sha256": "b031e56d91f1ca0a8ca3232a0c0c824c51f27e2c1c9ea222aa09e1b5918ed134",
+  "binary_origin": "compatible tutorials-built normal production artifact, launched from USD; not a clean latest-main binary claim",
+  "usd_checkout": "6702004019ae2223875e23e49bc8537e88dc7eab",
+  "colliders_by_component": {
+    "forward": 25,
+    "starboard": 17,
+    "port": 17
+  },
+  "contact_positive": {
+    "checks": 15,
+    "verification": "GriffinSolarRequirements::Verify_GriffinSolarCollision",
+    "process_exit_code": 0,
+    "process_status": "verdict_produced",
+    "source_revision_at_start": 11012129784604985908,
+    "source_revision_at_end": 11012129784604985908,
+    "verdict": "pass",
+    "verdict_channel": "GRIFFIN_SOLAR_COLLISION"
+  },
+  "existing_geometry": {
+    "checks": 170,
+    "verification": "GriffinSolarRequirements::Verify_GriffinSolarRequirements",
+    "process_exit_code": 0,
+    "process_status": "verdict_produced",
+    "source_revision_at_start": 11012129784604985908,
+    "source_revision_at_end": 11012129784604985908,
+    "verdict": "pass",
+    "verdict_channel": "GRIFFIN_SOLAR_REQUIREMENTS"
+  },
+  "negative": {
+    "process_exit_code": 1,
+    "checks": 15,
+    "failed_checks": 2,
+    "changed_attribute": "/World/Panel0/PanelCollision/ArrayBackplane0.physics:collisionEnabled=false",
+    "minimum_signed_center_gaps_m": [
+      -0.44166652765125036,
+      -0.44166652765125036
+    ]
+  },
+  "source_geometry_matching": {
+    "method": "connected closed eight-corner stock components; native cooked corner matching",
+    "tolerance_m": 2e-06,
+    "same_snapshot_required": true
+  },
+  "authored_usd_boundary": [
+    "ApplyUsdOps",
+    "SaveDocument",
+    "SaveAsDocument",
+    "ForkDocument"
+  ],
+  "runtime_settings": {
+    "tick_hz": 60,
+    "physics_substeps": 8,
+    "threads": 1,
+    "jitter": 0,
+    "maximum_ticks": 300
+  },
+  "physics_handoff": "optimization/docs/reviews/griffin-physics-handoff-2026-10-22.md; static disabled-collider witness remains unaccepted",
+  "source_hashes": {
+    "components/lander/griffin_solar_panel_visual.usda": "7ce4803339947729bfabca569432bc8d614eb0d0c0969481a73ba8431f0b91af",
+    "components/lander/griffin_solar_panel_starboard_visual.usda": "ad2778c075e1bcc2c7075770d50909f27d13c19e5a95317d5d610c4d782797e9",
+    "components/lander/griffin_solar_panel_port_visual.usda": "e0fdad8e9bc278d68eb7dac69eced713f90e952cc2762c3a8e7e8a9dfb915a61",
+    "requirements/griffin_solar_requirements.sysml": "805c48e5599d4af606758f232e59a9a1413b73d6feb50a37f2cac1ab8bbfba69",
+    "tools/griffin_solar_collision.rhai": "4811d54d1546d4743b0ab109cd267ab39fd5c4b194986423ece3b00824754eb2",
+    "scenarios/tests/griffin_solar_collision.rhai": "726e77d0a1b27e88168d0b8b8fe8999ba6061920859ade7c9f85299bdf5b36a7",
+    "scenarios/tests/griffin_solar_requirements.rhai": "ca757e408cb692b48edf883acd191bc68fcae5337ef25e646393d7ee25a8a161",
+    "tests/griffin_solar_collision.usda": "edb15a3cf01d991006fe0bc191d70487e2b8948fa318429ca041f871100746d9",
+    "tests/griffin_solar_collision_disabled.usda": "40e8d199310a1ea17853013e92f78f33e13e0a1db8892a5331d493535432bab0"
+  }
+}

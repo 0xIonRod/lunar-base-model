@@ -108,6 +108,22 @@ package GriffinSolarRequirements {
          * not an angular hardware tolerance. USD orient uses (w,x,y,z). */
         attribute orientationTolerance : Real = 0.00001;
         attribute minimumMountOverlapM : Real = 0.01;
+        // Matching allowance for point3f source stock and the cooked geometry
+        // observation. This is not a physical gap or a panel design tolerance.
+        attribute collisionMatchToleranceM : Real = 0.000002;
+    }
+
+    // Deterministic contact witness, not flight or structural panel loading.
+    part def GriffinSolarCollisionStudy {
+        attribute probeRadiusM : Real = 0.02;
+        attribute probeMassKg : Real = 1.0;
+        attribute initialNormalOffsetM : Real = 0.3;
+        attribute initialSpeedMPerS : Real = 0.5;
+        attribute observationS : Real = 1.5;
+        attribute minimumProbeTravelM : Real = 0.1;
+        attribute laneSpacingM : Real = 3.0;
+        // Cell-grid coordinates inside the leg opening / side recesses.
+        attribute openingWitnesses : CellContourPoint[3] = ((6,0,21), (1,0,15), (11,0,15));
     }
 
     part def GriffinDescentSunPointingStudy {
@@ -246,6 +262,12 @@ package GriffinSolarRequirements {
             and RealFunctions::abs(measuredBackplaneCenterYM - arrayBackplaneCenterYM) <= geometryToleranceM;
     }
     requirement def GSA006_PanelEnvelope {
+        doc /* The frame and backplane shall also carry a hidden PanelCollision
+         * shell made of separate closed stock colliders. It shall match the
+         * composed visual stock within collisionMatchToleranceM, preserving
+         * the leg and equipment openings. Colliders inherit the lander body;
+         * no extra rigid body or duplicate mass is introduced. A rover shall
+         * contact the panel surface rather than pass through it. */
         require GSAC006_PanelMeshEnvelope {
             in frameWidthM = GriffinSolarArrayAssembly::frameWidthM;
             in frameThicknessM = GriffinSolarArrayAssembly::frameThicknessM;
@@ -365,6 +387,11 @@ package GriffinSolarRequirements {
     requirement <'GSA-007'> gsa007 : GSA007_CellGridAndMount { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-008'> gsa008 : GSA008_HingeAndStandoff { subject arrays : GriffinSolarArrayAssembly; }
     requirement <'GSA-009'> gsa009 : GSA009_BusMountConnection { subject arrays : GriffinSolarArrayAssembly; }
+
+    verification def Verify_GriffinSolarCollision {
+        subject arrays : GriffinSolarArrayAssembly;
+        verify gsa006;
+    }
     requirement <'GSA-011'> gsa011 : GSA011_DescentSunPointing { subject lander : GriffinLanderComponent; }
     requirement <'GSA-012'> gsa012 : GSA012_ConnectedArrayFacets { subject arrays : GriffinSolarArrayAssembly; }
 

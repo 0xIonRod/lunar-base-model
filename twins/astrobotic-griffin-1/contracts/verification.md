@@ -1,5 +1,11 @@
 # Griffin verification boundary
 
+The [solar collision repair](griffin-solar-collision-2026-10-23.md) adds
+59 frame/backplane stock colliders without filling the panel openings.
+Its native contact case passes 15 checks and the existing geometry case passes
+170 checks; the disabled-surface negative fails the two expected checks.
+Full landed rover interaction and ramp deployment remain separate gates.
+
 The [22 October packaging checkpoint](griffin-integrated-packaging-review.md)
 records the installed vehicle geometry and focused verification. Earlier results
 below belong to their recorded revisions. Loaded-support physics, complete

@@ -1,0 +1,157 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+    def PhysicsScene "PhysicsScene"
+    {
+        vector3f physics:gravityDirection = (0.0, -1.0, 0.0)
+        float physics:gravityMagnitude = 0.0
+    }
+    def Scope "Scenario"
+    {
+        def Scope "Mission" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @../scenarios/tests/griffin_solar_collision.rhai@
+        }
+    }
+    def Xform "Panel0" (
+        references = @../components/lander/griffin_solar_panel_visual.usda@
+        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        bool physics:kinematicEnabled = true
+        def Sphere "ProbeTop" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            double radius = 0.02
+            float physics:mass = 1.0
+            bool physics:collisionEnabled = true
+            vector3f physics:velocity = (0.0, -0.5, 0.0)
+            custom double3 xformOp:translate = (0.4514999985694885, 0.3, -0.3009999990463257)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Sphere "ProbeBottom" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            double radius = 0.02
+            float physics:mass = 1.0
+            bool physics:collisionEnabled = true
+            vector3f physics:velocity = (0.0, 0.5, 0.0)
+            custom double3 xformOp:translate = (-0.4514999985694885, -0.3, -0.3009999990463257)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Sphere "OpeningProbe" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            double radius = 0.02
+            float physics:mass = 1.0
+            bool physics:collisionEnabled = true
+            vector3f physics:velocity = (0.0, -0.5, 0.0)
+            custom double3 xformOp:translate = (0.0, 0.3, 0.6772499999999999)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+    def Xform "Panel1" (
+        references = @../components/lander/griffin_solar_panel_starboard_visual.usda@
+        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (3.0, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        bool physics:kinematicEnabled = true
+        def Sphere "ProbeTop" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            double radius = 0.02
+            float physics:mass = 1.0
+            bool physics:collisionEnabled = true
+            vector3f physics:velocity = (0.0, -0.5, 0.0)
+            custom double3 xformOp:translate = (0.11287499964237213, 0.3, -0.48912499845027924)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Sphere "ProbeBottom" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            double radius = 0.02
+            float physics:mass = 1.0
+            bool physics:collisionEnabled = true
+            vector3f physics:velocity = (0.0, 0.5, 0.0)
+            custom double3 xformOp:translate = (-0.5643749982118607, -0.3, -0.48912499845027924)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Sphere "OpeningProbe" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            double radius = 0.02
+            float physics:mass = 1.0
+            bool physics:collisionEnabled = true
+            vector3f physics:velocity = (0.0, -0.5, 0.0)
+            custom double3 xformOp:translate = (-0.7525000000000001, 0.3, 0.2257499999999999)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+    def Xform "Panel2" (
+        references = @../components/lander/griffin_solar_panel_port_visual.usda@
+        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (6.0, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        bool physics:kinematicEnabled = true
+        def Sphere "ProbeTop" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            double radius = 0.02
+            float physics:mass = 1.0
+            bool physics:collisionEnabled = true
+            vector3f physics:velocity = (0.0, -0.5, 0.0)
+            custom double3 xformOp:translate = (0.5643749982118607, 0.3, -0.48912499845027924)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Sphere "ProbeBottom" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            double radius = 0.02
+            float physics:mass = 1.0
+            bool physics:collisionEnabled = true
+            vector3f physics:velocity = (0.0, 0.5, 0.0)
+            custom double3 xformOp:translate = (-0.11287499964237213, -0.3, -0.48912499845027924)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Sphere "OpeningProbe" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
+        )
+        {
+            double radius = 0.02
+            float physics:mass = 1.0
+            bool physics:collisionEnabled = true
+            vector3f physics:velocity = (0.0, -0.5, 0.0)
+            custom double3 xformOp:translate = (0.7525, 0.3, 0.2257499999999999)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+    def DistantLight "TestLight"
+    {
+        float inputs:intensity = 1000.0
+        custom double3 xformOp:rotateXYZ = (-45.0, 25.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
+    }
+}

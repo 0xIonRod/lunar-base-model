@@ -12,6 +12,28 @@ fn simulation_dependencies(me, ctx) { usd_geometry_inspection::dependencies() }
 fn own(name) { PACKAGE + "::GriffinSolarArrayAssembly::" + name }
 fn visual(name) { "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::" + name }
 
+// Keep this observer's report proportional to the solar contract. Pulling the
+// complete Twin catalogue into every batch exceeds the interpreter value bound.
+fn selected_source() {
+    let attributes=[];
+    for name in ["arrayBackplaneCenterYM","arrayBackplaneThicknessM","cellGapM",
+        "cellOffsetYM","cellThicknessM","cellWidthM","childNames","frameThicknessM",
+        "frameWidthM","hingeBarCenterYM","hingeBarCenterZM","hingeBarLengthM",
+        "hingeBarRadiusM","minimumMountOverlapM","mountBracketDepthM",
+        "mountBracketThicknessM","mountBracketWidthM","mountLinkDepthM","usdRootPath"] {
+        attributes.push(own(name));
+    }
+    for name in ["appearanceVerificationTolerance","bodyMount","frameRails",
+        "geometryVerificationToleranceM","railStations","solarArrayInstances",
+        "solarMountRails","solarStationRotationXDeg","solarStationRotationZDeg","solarStations"] {
+        attributes.push(visual(name));
+    }
+    attributes.push("GriffinLanderRequirements::GriffinLanderComponent::solarArrayCount");
+    let selected=[];for name in ["gsa001","gsa002","gsa003","gsa004","gsa005",
+        "gsa006","gsa007","gsa008","gsa009","gsa012"]{selected.push(PACKAGE+"::"+name);}
+    sysml_requirements::source_with_selection(attributes,selected,[PACKAGE+"::"+VERIFICATION])
+}
+
 fn position(id, path, index, expected, tolerance) {
     #{id: id, component: "solar_array", requirement: "gsa005",
       verification: VERIFICATION, kind: "attribute_component", path: path,
@@ -285,7 +307,7 @@ fn on_tick(me, ctx) {
     if this.grid_source_revision==() {this.grid_source_revision=model.source_revision;}
     if this.grid_source_revision!=model.source_revision {throw("Solar source changed during cell observations");}
     if this.pending_checks != () {
-        let source = sysml_requirements::source();
+        let source = selected_source();
         let batch = [];
         let end = min(this.next_check + 16, this.pending_checks.len());
         for index in this.next_check..end { batch.push(this.pending_checks[index]); }
@@ -326,7 +348,7 @@ fn on_tick(me, ctx) {
         if this.grid_row>=layout.rows {this.grid_row=0;this.grid_panel+=1;}
         return;
     }
-    let source = sysml_requirements::source();
+    let source = selected_source();
     let gsa005 = model.requirement(PACKAGE + "::gsa005");
     let gsa006 = model.requirement(PACKAGE + "::gsa006");
     let gsa009 = model.requirement(PACKAGE + "::gsa009");
@@ -645,7 +667,7 @@ fn on_tick(me, ctx) {
                 paths.push(root + "/" + name + "/Frame");
             }
         }
-        let batch = query("QueryUsdPrims", #{paths: paths, geometry_bounds: true});
+        let batch = query("QueryUsdPrims", #{paths: paths, attrs: [], geometry_bounds: true});
         let bounds = #{};
         if batch.records != () {
             for record in batch.records { bounds[record.path] = record.geometry_bounds; }
