@@ -1,0 +1,3978 @@
+{
+  "scope": "Griffin installed ramp interference repair and measured post-landing opening; no rover traversal, structural hardware or FPS qualification",
+  "baseline_commit": "4f34f1b",
+  "binary_revision": "eca1a3a9-dirty",
+  "binary_sha256": "b031e56d91f1ca0a8ca3232a0c0c824c51f27e2c1c9ea222aa09e1b5918ed134",
+  "binary_origin": "Compatible tutorials-built normal production executable launched from USD; not a clean latest-main build claim",
+  "physics": {
+    "tick_hz": 60,
+    "substeps": 8,
+    "cli_compute_threads": 1,
+    "jitter": 0,
+    "changes_to_solver_gains_substeps_quality_or_dependency_pins": false
+  },
+  "baseline": {
+    "middle_jam_angle_deg": 102.7,
+    "fixed_transition_signed_sat_margin_m": -0.220705
+  },
+  "gates": [
+    {
+      "case": "griffin_ramp_requirements",
+      "exit_code": 0,
+      "log_sha256": "a75cd54c79c74d0efb88b4d6f0a74975a4dfb14fdf7eb0a6e0f3fd2ee10dc43f",
+      "evidence": {
+        "name": "GRIFFIN_RAMP_REQUIREMENTS_EVIDENCE",
+        "sim_tick": 32,
+        "data": {
+          "channel": "GRIFFIN_RAMP_REQUIREMENTS",
+          "check_count": 30,
+          "error_count": 0,
+          "evidence_chunked": false,
+          "evidence_result_events": 0,
+          "failure_count": 0,
+          "failures": [],
+          "inconclusive_count": 0,
+          "metrics": {
+            "doc_id": 119697307983085,
+            "measurements": [
+              {
+                "bank": 0,
+                "bank_axis_residual_m": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 0.0,
+                "part_count": 97,
+                "section": "root",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 0,
+                "bank_axis_residual_m": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 3.554447978966673e-16,
+                "part_count": 97,
+                "section": "middle",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 0,
+                "bank_axis_residual_m": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 4.236704743275018e-16,
+                "part_count": 85,
+                "section": "toe",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 1,
+                "bank_axis_residual_m": 8.881784197001252e-16,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 0.0,
+                "part_count": 97,
+                "section": "root",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 1,
+                "bank_axis_residual_m": 5.438959822042073e-16,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 3.554447978966673e-16,
+                "part_count": 97,
+                "section": "middle",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 1,
+                "bank_axis_residual_m": 4.965068306494546e-16,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 4.236704743275018e-16,
+                "part_count": 85,
+                "section": "toe",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "centre_residual_m": 1.8641565019244128e-08,
+                "constraint_ok": true,
+                "constraint_verdict": "pass",
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "inertia_kg_m2": [
+                  17.73165512084961,
+                  29.917152404785156,
+                  12.190247535705566
+                ],
+                "mass_kg": 31.66666603088379,
+                "mass_residual_kg": 6.36116212149318e-07,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/EgressRampPort",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "centre_residual_m": 5.248596224305402e-09,
+                "constraint_ok": true,
+                "constraint_verdict": "pass",
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "inertia_kg_m2": [
+                  17.73165512084961,
+                  23.270536422729492,
+                  5.543631553649902
+                ],
+                "mass_kg": 31.66666603088379,
+                "mass_residual_kg": 6.36116212149318e-07,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/EgressRampPort/MiddleSection",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "centre_residual_m": 7.172332727733988e-09,
+                "constraint_ok": true,
+                "constraint_verdict": "pass",
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "inertia_kg_m2": [
+                  17.73165512084961,
+                  26.270580291748047,
+                  8.543675422668457
+                ],
+                "mass_kg": 31.66666603088379,
+                "mass_residual_kg": 6.36116212149318e-07,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/EgressRampPort/MiddleSection/ToeSection",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "centre_residual_m": 1.8641565019244128e-08,
+                "constraint_ok": true,
+                "constraint_verdict": "pass",
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "inertia_kg_m2": [
+                  17.73165512084961,
+                  29.917152404785156,
+                  12.190247535705566
+                ],
+                "mass_kg": 31.66666603088379,
+                "mass_residual_kg": 6.36116212149318e-07,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/EgressRampStarboard",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "centre_residual_m": 5.248596224305402e-09,
+                "constraint_ok": true,
+                "constraint_verdict": "pass",
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "inertia_kg_m2": [
+                  17.73165512084961,
+                  23.270536422729492,
+                  5.543631553649902
+                ],
+                "mass_kg": 31.66666603088379,
+                "mass_residual_kg": 6.36116212149318e-07,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/EgressRampStarboard/MiddleSection",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "centre_residual_m": 7.172332727733988e-09,
+                "constraint_ok": true,
+                "constraint_verdict": "pass",
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "inertia_kg_m2": [
+                  17.73165512084961,
+                  26.270580291748047,
+                  8.543675422668457
+                ],
+                "mass_kg": 31.66666603088379,
+                "mass_residual_kg": 6.36116212149318e-07,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/EgressRampStarboard/MiddleSection/ToeSection",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 8.081079372192901e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampHingePort",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 8.081079372192901e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 1.5543624609648532e-08,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchPortRoot",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 8.081079372192901e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampHingeStarboard",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 8.081079372192901e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 1.5543624609648532e-08,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchStarboardRoot",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 3.735809532749401e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort01",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 3.735809532749401e-08,
+                "axis_residual": 1.1102230246251565e-16,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 5.551115123125783e-16,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchPortMiddle",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 1.1089672100110257e-08,
+                "axis_residual": 4.440892098500626e-16,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort12",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 1.1089672100110257e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 2.220446049250313e-16,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchPortToe",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 3.7358094940731374e-08,
+                "axis_residual": 2.220446049250313e-16,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard01",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 3.7358094940731374e-08,
+                "axis_residual": 2.220446049250313e-16,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 5.551115123125783e-16,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchStarboardMiddle",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 1.1089672186265644e-08,
+                "axis_residual": 2.220446049250313e-16,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard12",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 1.1089672186265644e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 2.220446049250313e-16,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchStarboardToe",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 4.2649612037320904e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampTransitionJointPort",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 4.2649612037320904e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampTransitionJointStarboard",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "dimensions_m": [
+                  1.42,
+                  0.03,
+                  0.5760000000000001
+                ],
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/TransitionPlatePort/RampTrackPort",
+                "stage_generation": 0,
+                "station_m": 1.0
+              },
+              {
+                "dimensions_m": [
+                  1.42,
+                  0.03,
+                  0.5760000000000001
+                ],
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/TransitionPlatePort/RampTrackStarboard",
+                "stage_generation": 0,
+                "station_m": -1.0
+              },
+              {
+                "dimensions_m": [
+                  1.42,
+                  0.03,
+                  0.5760000000000001
+                ],
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/TransitionPlateStarboard/RampTrackPort",
+                "stage_generation": 0,
+                "station_m": 1.0
+              },
+              {
+                "dimensions_m": [
+                  1.42,
+                  0.03,
+                  0.5760000000000001
+                ],
+                "doc_id": 119697307983085,
+                "document_generation": 0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/TransitionPlateStarboard/RampTrackStarboard",
+                "stage_generation": 0,
+                "station_m": -1.0
+              }
+            ],
+            "mode": "requirements",
+            "scope": "Read-only authored integration; standalone component geometry and dynamic deployment have independent cases",
+            "source_vehicle": "vehicles/griffin_1.usda"
+          },
+          "non_pass_count": 0,
+          "non_pass_results": [],
+          "ok": true,
+          "pass_count": 30,
+          "requirement_count": 0,
+          "requirement_names": [],
+          "requirement_summary": {},
+          "result_count": 0,
+          "results": [],
+          "schema_version": 3,
+          "source_files": [],
+          "source_revision": 13163315460900051146,
+          "title": "GRIFFIN RAMP REQUIREMENTS",
+          "unverified_count": 0,
+          "verdict": "pass",
+          "verification": ""
+        }
+      }
+    },
+    {
+      "case": "griffin_ramp_flight_stow",
+      "exit_code": 0,
+      "log_sha256": "24bb08170fe14d454e91c3c4b59285c35b9b9c5264d475bbf51819afcb003b14",
+      "evidence": {
+        "name": "GRIFFIN_RAMP_FLIGHT_STOW_EVIDENCE",
+        "sim_tick": 24,
+        "data": {
+          "channel": "GRIFFIN_RAMP_FLIGHT_STOW",
+          "check_count": 22,
+          "error_count": 0,
+          "evidence_chunked": false,
+          "evidence_result_events": 0,
+          "failure_count": 0,
+          "failures": [],
+          "inconclusive_count": 0,
+          "metrics": {
+            "doc_id": 119697363073917,
+            "measurements": [
+              {
+                "bank": 0,
+                "bank_axis_residual_m": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 0.0,
+                "part_count": 97,
+                "section": "root",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 0,
+                "bank_axis_residual_m": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 3.554447978966673e-16,
+                "part_count": 97,
+                "section": "middle",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 0,
+                "bank_axis_residual_m": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 4.236704743275018e-16,
+                "part_count": 85,
+                "section": "toe",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 1,
+                "bank_axis_residual_m": 8.881784197001252e-16,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 0.0,
+                "part_count": 97,
+                "section": "root",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 1,
+                "bank_axis_residual_m": 5.438959822042073e-16,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 3.554447978966673e-16,
+                "part_count": 97,
+                "section": "middle",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "bank": 1,
+                "bank_axis_residual_m": 4.965068306494546e-16,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 4.236704743275018e-16,
+                "part_count": 85,
+                "section": "toe",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 8.081079372192901e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampHingePort",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 8.081079372192901e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 1.5543624609648532e-08,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchPortRoot",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 8.081079372192901e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampHingeStarboard",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 8.081079372192901e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 1.5543624609648532e-08,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchStarboardRoot",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 3.735809532749401e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort01",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 3.735809532749401e-08,
+                "axis_residual": 1.1102230246251565e-16,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 5.551115123125783e-16,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchPortMiddle",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 1.1089672100110257e-08,
+                "axis_residual": 4.440892098500626e-16,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort12",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 1.1089672100110257e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 2.220446049250313e-16,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchPortToe",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 3.7358094940731374e-08,
+                "axis_residual": 2.220446049250313e-16,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard01",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 3.7358094940731374e-08,
+                "axis_residual": 2.220446049250313e-16,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 5.551115123125783e-16,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchStarboardMiddle",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 1.1089672186265644e-08,
+                "axis_residual": 2.220446049250313e-16,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard12",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 1.1089672186265644e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 2.220446049250313e-16,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampFlightLatchStarboardToe",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 4.2649612037320904e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampTransitionJointPort",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "anchor_residual_m": 4.2649612037320904e-08,
+                "axis_residual": 0.0,
+                "doc_id": 119697363073917,
+                "document_generation": 0,
+                "fixed_rest_residual": 0.0,
+                "passes": true,
+                "path": "/Griffin1SurfaceOps/Lander/RampTransitionJointStarboard",
+                "source_revision": 13163315460900051146,
+                "stage_generation": 0
+              },
+              {
+                "doc_id": 119697363073917,
+                "measured_forward_axes": [
+                  [
+                    -0.4999999999999998,
+                    0.8660254037844388,
+                    0.0
+                  ],
+                  [
+                    0.4999999999999998,
+                    0.8660254037844388,
+                    -1.2246467991473532e-16
+                  ]
+                ],
+                "passes": true
+              },
+              {
+                "doc_id": 119697363073917,
+                "measured_members": 52,
+                "passes": true,
+                "vertical_clearance_m": 1.0287694117163326
+              }
+            ],
+            "mode": "stow",
+            "scope": "Read-only authored integration; standalone component geometry and dynamic deployment have independent cases",
+            "source_vehicle": "vehicles/griffin_1.usda"
+          },
+          "non_pass_count": 0,
+          "non_pass_results": [],
+          "ok": true,
+          "pass_count": 22,
+          "requirement_count": 0,
+          "requirement_names": [],
+          "requirement_summary": {},
+          "result_count": 0,
+          "results": [],
+          "schema_version": 3,
+          "source_files": [],
+          "source_revision": 13163315460900051146,
+          "title": "GRIFFIN RAMP FLIGHT STOW",
+          "unverified_count": 0,
+          "verdict": "pass",
+          "verification": ""
+        }
+      }
+    },
+    {
+      "case": "griffin_ramp_touchdown_geometry",
+      "exit_code": 0,
+      "log_sha256": "ac8c69f14bb524292fd8e53cca2f113b1fd3fae65651e0f7bfe9835b5ba03044",
+      "evidence": {
+        "name": "GRIFFIN_RAMP_TOUCHDOWN_GEOMETRY_EVIDENCE",
+        "sim_tick": 12,
+        "data": {
+          "channel": "GRIFFIN_RAMP_TOUCHDOWN_GEOMETRY",
+          "check_count": 10,
+          "error_count": 0,
+          "evidence_chunked": false,
+          "evidence_result_events": 0,
+          "failure_count": 0,
+          "failures": [],
+          "inconclusive_count": 0,
+          "metrics": {
+            "doc_id": 119697427506947,
+            "measurements": [
+              {
+                "bank": 0,
+                "bank_axis_residual_m": 0.0,
+                "doc_id": 119697427506947,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 0.0,
+                "part_count": 97,
+                "section": "root",
+                "source_revision": 7666434479994125776,
+                "stage_generation": 0
+              },
+              {
+                "bank": 0,
+                "bank_axis_residual_m": 0.0,
+                "doc_id": 119697427506947,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 3.554447978966673e-16,
+                "part_count": 97,
+                "section": "middle",
+                "source_revision": 7666434479994125776,
+                "stage_generation": 0
+              },
+              {
+                "bank": 0,
+                "bank_axis_residual_m": 0.0,
+                "doc_id": 119697427506947,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 4.236704743275018e-16,
+                "part_count": 85,
+                "section": "toe",
+                "source_revision": 7666434479994125776,
+                "stage_generation": 0
+              },
+              {
+                "bank": 1,
+                "bank_axis_residual_m": 8.881784197001252e-16,
+                "doc_id": 119697427506947,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 0.0,
+                "part_count": 97,
+                "section": "root",
+                "source_revision": 7666434479994125776,
+                "stage_generation": 0
+              },
+              {
+                "bank": 1,
+                "bank_axis_residual_m": 5.438959822042073e-16,
+                "doc_id": 119697427506947,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 3.554447978966673e-16,
+                "part_count": 97,
+                "section": "middle",
+                "source_revision": 7666434479994125776,
+                "stage_generation": 0
+              },
+              {
+                "bank": 1,
+                "bank_axis_residual_m": 4.965068306494546e-16,
+                "doc_id": 119697427506947,
+                "document_generation": 0,
+                "maximum_placement_residual_m": 4.236704743275018e-16,
+                "part_count": 85,
+                "section": "toe",
+                "source_revision": 7666434479994125776,
+                "stage_generation": 0
+              },
+              {
+                "bank": 0,
+                "doc_id": 119697427506947,
+                "maximum_toe_y_m": -7.099898835516427e-09,
+                "minimum_toe_y_m": -1.979909830529536e-08,
+                "native_corners": 4,
+                "passes": true,
+                "path": "/RampSection/RampTrackPort",
+                "source_revision": 7666434479994125776,
+                "terrain_y_m": 0.0,
+                "toe_doc_id": 119697470830363
+              },
+              {
+                "bank": 0,
+                "doc_id": 119697427506947,
+                "maximum_toe_y_m": -7.099898835516427e-09,
+                "minimum_toe_y_m": -1.979909830529536e-08,
+                "native_corners": 4,
+                "passes": true,
+                "path": "/RampSection/RampTrackStarboard",
+                "source_revision": 7666434479994125776,
+                "terrain_y_m": 0.0,
+                "toe_doc_id": 119697470830363
+              },
+              {
+                "bank": 1,
+                "doc_id": 119697427506947,
+                "maximum_toe_y_m": -7.099898391427217e-09,
+                "minimum_toe_y_m": -1.979909786120615e-08,
+                "native_corners": 4,
+                "passes": true,
+                "path": "/RampSection/RampTrackPort",
+                "source_revision": 7666434479994125776,
+                "terrain_y_m": 0.0,
+                "toe_doc_id": 119697470830363
+              },
+              {
+                "bank": 1,
+                "doc_id": 119697427506947,
+                "maximum_toe_y_m": -7.099898391427217e-09,
+                "minimum_toe_y_m": -1.979909786120615e-08,
+                "native_corners": 4,
+                "passes": true,
+                "path": "/RampSection/RampTrackStarboard",
+                "source_revision": 7666434479994125776,
+                "terrain_y_m": 0.0,
+                "toe_doc_id": 119697470830363
+              }
+            ],
+            "mode": "touchdown",
+            "scope": "Read-only authored integration; standalone component geometry and dynamic deployment have independent cases",
+            "source_vehicle": "vehicles/griffin_1.usda"
+          },
+          "non_pass_count": 0,
+          "non_pass_results": [],
+          "ok": true,
+          "pass_count": 10,
+          "requirement_count": 0,
+          "requirement_names": [],
+          "requirement_summary": {},
+          "result_count": 0,
+          "results": [],
+          "schema_version": 3,
+          "source_files": [],
+          "source_revision": 7666434479994125776,
+          "title": "GRIFFIN RAMP TOUCHDOWN GEOMETRY",
+          "unverified_count": 0,
+          "verdict": "pass",
+          "verification": ""
+        }
+      }
+    },
+    {
+      "case": "griffin_ramp_postlanding",
+      "exit_code": 0,
+      "log_sha256": "00d1058540f55bc26694a4e8764f79386d8d66a08aa0a95bce0dcf6b68cd7bd2",
+      "evidence": {
+        "name": "GRIFFIN_RAMP_POSTLANDING_EVIDENCE",
+        "sim_tick": 3538,
+        "data": {
+          "channel": "GRIFFIN_RAMP_POSTLANDING",
+          "check_count": 20,
+          "error_count": 0,
+          "evidence_chunked": false,
+          "evidence_result_events": 0,
+          "failure_count": 0,
+          "failures": [],
+          "inconclusive_count": 0,
+          "metrics": {
+            "chronology": {
+              "expected": [
+                "griffin_ramp_root_clearance_commanded",
+                "griffin_ramp_root_clearance_settled",
+                "griffin_ramp_middle_sections_unfold_commanded",
+                "griffin_ramp_middle_sections_unfold_settled",
+                "griffin_ramp_toes_unfold_commanded",
+                "griffin_ramp_toes_unfold_settled",
+                "griffin_ramps_deploy_commanded",
+                "griffin_ramp_deployment_settled"
+              ],
+              "observed": [
+                {
+                  "event_index": 0,
+                  "name": "griffin_ramp_root_clearance_commanded",
+                  "sim_tick": 1431
+                },
+                {
+                  "event_index": 2,
+                  "name": "griffin_ramp_root_clearance_settled",
+                  "sim_tick": 1563
+                },
+                {
+                  "event_index": 1,
+                  "name": "griffin_ramp_middle_sections_unfold_commanded",
+                  "sim_tick": 1563
+                },
+                {
+                  "event_index": 3,
+                  "name": "griffin_ramp_middle_sections_unfold_settled",
+                  "sim_tick": 2283
+                },
+                {
+                  "event_index": 4,
+                  "name": "griffin_ramp_toes_unfold_commanded",
+                  "sim_tick": 2283
+                },
+                {
+                  "event_index": 5,
+                  "name": "griffin_ramp_toes_unfold_settled",
+                  "sim_tick": 3003
+                },
+                {
+                  "event_index": 6,
+                  "name": "griffin_ramps_deploy_commanded",
+                  "sim_tick": 3003
+                },
+                {
+                  "event_index": 7,
+                  "name": "griffin_ramp_deployment_settled",
+                  "sim_tick": 3537
+                }
+              ],
+              "ok": true
+            },
+            "events": [
+              {
+                "name": "griffin_ramp_root_clearance_commanded",
+                "sim_tick": 1431
+              },
+              {
+                "name": "griffin_ramp_middle_sections_unfold_commanded",
+                "sim_tick": 1563
+              },
+              {
+                "name": "griffin_ramp_root_clearance_settled",
+                "sim_tick": 1563
+              },
+              {
+                "name": "griffin_ramp_middle_sections_unfold_settled",
+                "sim_tick": 2283
+              },
+              {
+                "name": "griffin_ramp_toes_unfold_commanded",
+                "sim_tick": 2283
+              },
+              {
+                "name": "griffin_ramp_toes_unfold_settled",
+                "sim_tick": 3003
+              },
+              {
+                "name": "griffin_ramps_deploy_commanded",
+                "sim_tick": 3003
+              },
+              {
+                "name": "griffin_ramp_deployment_settled",
+                "sim_tick": 3537
+              }
+            ],
+            "measured_hinge_snapshots": {
+              "griffin_ramp_deployment_settled": {
+                "hinges": [
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 2.181661605834961,
+                            "min": -0.8726646304130554
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -0.4963194725680687
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 2.181661605834961,
+                            "min": -0.8726646304130554
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -0.4935706853866577
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 1.2338933733136245e-05
+                      }
+                    ],
+                    "drive_target_rad": -0.4935706853866577,
+                    "entity": 5089866426073956,
+                    "maximum_angle_rad": 2.181661605834961,
+                    "measured_angle_rad": -0.4963194725680687,
+                    "measured_angular_speed_rad_per_s": 1.2338933733136245e-05,
+                    "minimum_angle_rad": -0.8726646304130554,
+                    "name": "RampHingePort",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampHingePort"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 0.8726646304130554,
+                            "min": -2.181661605834961
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 0.4901975201560762
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 0.8726646304130554,
+                            "min": -2.181661605834961
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 0.4870316684246063
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 7.724653330712681e-05
+                      }
+                    ],
+                    "drive_target_rad": 0.4870316684246063,
+                    "entity": 4656591705134170,
+                    "maximum_angle_rad": 0.8726646304130554,
+                    "measured_angle_rad": 0.4901975201560762,
+                    "measured_angular_speed_rad_per_s": 7.724653330712681e-05,
+                    "minimum_angle_rad": -2.181661605834961,
+                    "name": "RampHingeStarboard",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampHingeStarboard"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5701048584902397
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": -0.00020694570135445527
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 5247236653393347,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.5701048584902397,
+                    "measured_angular_speed_rad_per_s": -0.00020694570135445527,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingePort01",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort01"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 1.5716857541280778
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 9.880580265750113e-05
+                      }
+                    ],
+                    "drive_target_rad": 1.5707963705062866,
+                    "entity": 6235697607260755,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": 1.5716857541280778,
+                    "measured_angular_speed_rad_per_s": 9.880580265750113e-05,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingePort12",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort12"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5703209269822394
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 0.00026516089282004176
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 7486192608422637,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.5703209269822394,
+                    "measured_angular_speed_rad_per_s": 0.00026516089282004176,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingeStarboard01",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard01"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 1.571673051479884
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": -0.000269671055894097
+                      }
+                    ],
+                    "drive_target_rad": 1.5707963705062866,
+                    "entity": 6497731655470205,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": 1.571673051479884,
+                    "measured_angular_speed_rad_per_s": -0.000269671055894097,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingeStarboard12",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard12"
+                  }
+                ],
+                "ok": true,
+                "sim_tick": 3538
+              },
+              "griffin_ramp_middle_sections_unfold_settled": {
+                "hinges": [
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 2.181661605834961,
+                            "min": -0.8726646304130554
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 1.5699274588408632
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 2.181661605834961,
+                            "min": -0.8726646304130554
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 0.00033170684893540486
+                      }
+                    ],
+                    "drive_target_rad": 1.5707963705062866,
+                    "entity": 5089866426073956,
+                    "maximum_angle_rad": 2.181661605834961,
+                    "measured_angle_rad": 1.5699274588408632,
+                    "measured_angular_speed_rad_per_s": 0.00033170684893540486,
+                    "minimum_angle_rad": -0.8726646304130554,
+                    "name": "RampHingePort",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampHingePort"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 0.8726646304130554,
+                            "min": -2.181661605834961
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5697681008172144
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 0.8726646304130554,
+                            "min": -2.181661605834961
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": -0.00025346834650450783
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 4656591705134170,
+                    "maximum_angle_rad": 0.8726646304130554,
+                    "measured_angle_rad": -1.5697681008172144,
+                    "measured_angular_speed_rad_per_s": -0.00025346834650450783,
+                    "minimum_angle_rad": -2.181661605834961,
+                    "name": "RampHingeStarboard",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampHingeStarboard"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.571325239562867
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": -0.0012610919279819424
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 5247236653393347,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.571325239562867,
+                    "measured_angular_speed_rad_per_s": -0.0012610919279819424,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingePort01",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort01"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5707909671417621
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 2.0330810394487047e-06
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 6235697607260755,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.5707909671417621,
+                    "measured_angular_speed_rad_per_s": 2.0330810394487047e-06,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingePort12",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort12"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5713219995021177
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": -0.0015150688654187448
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 7486192608422637,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.5713219995021177,
+                    "measured_angular_speed_rad_per_s": -0.0015150688654187448,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingeStarboard01",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard01"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5708042993096234
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 1.0610132599357993e-06
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 6497731655470205,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.5708042993096234,
+                    "measured_angular_speed_rad_per_s": 1.0610132599357993e-06,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingeStarboard12",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard12"
+                  }
+                ],
+                "ok": true,
+                "sim_tick": 2284
+              },
+              "griffin_ramp_root_clearance_settled": {
+                "hinges": [
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 2.181661605834961,
+                            "min": -0.8726646304130554
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 1.5728471737421408
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 2.181661605834961,
+                            "min": -0.8726646304130554
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": -0.009925266492240042
+                      }
+                    ],
+                    "drive_target_rad": 1.5707963705062866,
+                    "entity": 5089866426073956,
+                    "maximum_angle_rad": 2.181661605834961,
+                    "measured_angle_rad": 1.5728471737421408,
+                    "measured_angular_speed_rad_per_s": -0.009925266492240042,
+                    "minimum_angle_rad": -0.8726646304130554,
+                    "name": "RampHingePort",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampHingePort"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 0.8726646304130554,
+                            "min": -2.181661605834961
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5727600724239368
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 0.8726646304130554,
+                            "min": -2.181661605834961
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 0.010059652614821337
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 4656591705134170,
+                    "maximum_angle_rad": 0.8726646304130554,
+                    "measured_angle_rad": -1.5727600724239368,
+                    "measured_angular_speed_rad_per_s": 0.010059652614821337,
+                    "minimum_angle_rad": -2.181661605834961,
+                    "name": "RampHingeStarboard",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampHingeStarboard"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 1.5707999895343394
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 8.67496115806194e-06
+                      }
+                    ],
+                    "drive_target_rad": 1.5707963705062866,
+                    "entity": 5247236653393347,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": 1.5707999895343394,
+                    "measured_angular_speed_rad_per_s": 8.67496115806194e-06,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingePort01",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort01"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5708078522941156
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 4.904990820805723e-08
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 6235697607260755,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.5708078522941156,
+                    "measured_angular_speed_rad_per_s": 4.904990820805723e-08,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingePort12",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort12"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 1.570799425656481
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 1.0359688676163985e-05
+                      }
+                    ],
+                    "drive_target_rad": 1.5707963705062866,
+                    "entity": 7486192608422637,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": 1.570799425656481,
+                    "measured_angular_speed_rad_per_s": 1.0359688676163985e-05,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingeStarboard01",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard01"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5708057705234197
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 2.838572157504998e-07
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 6497731655470205,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.5708057705234197,
+                    "measured_angular_speed_rad_per_s": 2.838572157504998e-07,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingeStarboard12",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard12"
+                  }
+                ],
+                "ok": true,
+                "sim_tick": 1564
+              },
+              "griffin_ramp_toes_unfold_settled": {
+                "hinges": [
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 2.181661605834961,
+                            "min": -0.8726646304130554
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 1.5710969592641637
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 2.181661605834961,
+                            "min": -0.8726646304130554
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 1.5710821151733398
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 0.00028988728845715124
+                      }
+                    ],
+                    "drive_target_rad": 1.5710821151733398,
+                    "entity": 5089866426073956,
+                    "maximum_angle_rad": 2.181661605834961,
+                    "measured_angle_rad": 1.5710969592641637,
+                    "measured_angular_speed_rad_per_s": 0.00028988728845715124,
+                    "minimum_angle_rad": -0.8726646304130554,
+                    "name": "RampHingePort",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampHingePort"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 0.8726646304130554,
+                            "min": -2.181661605834961
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5708686899340212
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 0.8726646304130554,
+                            "min": -2.181661605834961
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5708585977554321
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 0.0002665654546500458
+                      }
+                    ],
+                    "drive_target_rad": -1.5708585977554321,
+                    "entity": 4656591705134170,
+                    "maximum_angle_rad": 0.8726646304130554,
+                    "measured_angle_rad": -1.5708686899340212,
+                    "measured_angular_speed_rad_per_s": 0.0002665654546500458,
+                    "minimum_angle_rad": -2.181661605834961,
+                    "name": "RampHingeStarboard",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampHingeStarboard"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.57104728837658
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": -0.00163724892794456
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 5247236653393347,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.57104728837658,
+                    "measured_angular_speed_rad_per_s": -0.00163724892794456,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingePort01",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort01"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 1.570915373631916
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 0.0003786921477518305
+                      }
+                    ],
+                    "drive_target_rad": 1.5707963705062866,
+                    "entity": 6235697607260755,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": 1.570915373631916,
+                    "measured_angular_speed_rad_per_s": 0.0003786921477518305,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingePort12",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingePort12"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": -1.5710511546280792
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": -1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": -0.0011851178658962385
+                      }
+                    ],
+                    "drive_target_rad": -1.5707963705062866,
+                    "entity": 7486192608422637,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": -1.5710511546280792,
+                    "measured_angular_speed_rad_per_s": -0.0011851178658962385,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingeStarboard01",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard01"
+                  },
+                  {
+                    "angle_ports": [
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": false
+                        },
+                        "name": "angle",
+                        "value": 1.5708830032216026
+                      },
+                      {
+                        "direction": "in",
+                        "metadata": {
+                          "authority": "control owner",
+                          "frame": true,
+                          "range": {
+                            "max": 3.1415927410125732,
+                            "min": -3.1415927410125732
+                          },
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad"
+                            },
+                            "id": "rad"
+                          },
+                          "writable": true
+                        },
+                        "name": "angle",
+                        "value": 1.5707963705062866
+                      },
+                      {
+                        "direction": "out",
+                        "metadata": {
+                          "authority": "physics solver",
+                          "frame": true,
+                          "range": true,
+                          "source": "Avian revolute joint",
+                          "type": "scalar",
+                          "unit": {
+                            "definition": {
+                              "angle_power": 1,
+                              "dimension_si": [
+                                0,
+                                0,
+                                -1,
+                                0,
+                                0,
+                                0,
+                                0
+                              ],
+                              "offset_to_si": 0.0,
+                              "relative_quantity": false,
+                              "scale_exactness": "exact",
+                              "scale_to_si": 1.0,
+                              "symbol": "rad/s"
+                            },
+                            "id": "rad/s"
+                          },
+                          "writable": false
+                        },
+                        "name": "angular_velocity",
+                        "value": 0.0011317868206388896
+                      }
+                    ],
+                    "drive_target_rad": 1.5707963705062866,
+                    "entity": 6497731655470205,
+                    "maximum_angle_rad": 3.1415927410125732,
+                    "measured_angle_rad": 1.5708830032216026,
+                    "measured_angular_speed_rad_per_s": 0.0011317868206388896,
+                    "minimum_angle_rad": -3.1415927410125732,
+                    "name": "RampSectionHingeStarboard12",
+                    "ok": true,
+                    "path": "/Griffin1SurfaceOps/Lander/RampSectionHingeStarboard12"
+                  }
+                ],
+                "ok": true,
+                "sim_tick": 3004
+              }
+            },
+            "opening_landing": {
+              "landed": true,
+              "ok": true
+            },
+            "scope": "Production descent and measured root-clear/middle/opposite-toe/root-lowering sequence; no pose overrides"
+          },
+          "non_pass_count": 0,
+          "non_pass_results": [],
+          "ok": true,
+          "pass_count": 20,
+          "requirement_count": 0,
+          "requirement_names": [],
+          "requirement_summary": {},
+          "result_count": 0,
+          "results": [],
+          "schema_version": 3,
+          "source_files": [],
+          "source_revision": 7666434479994125776,
+          "title": "GRIFFIN POST-LANDING RAMP DEPLOYMENT",
+          "unverified_count": 0,
+          "verdict": "pass",
+          "verification": ""
+        }
+      }
+    }
+  ],
+  "moving_candidate": {
+    "checks": 737,
+    "cross_bank_minimum_continuous_gap_m": 1.1651687718870176,
+    "own_bank_root_toe_minimum_interval_certified_gap_m": 0.020385279312426945,
+    "required_nonadjacent_gap_m": 0.02,
+    "candidate_vehicle_sha256": "fbc0b856335321c1504acb7bf50c4cf12f8df34d6c3abe12c364124663e950ac",
+    "executed_observer_sha256": "f38e58e9c1db00ab54f6fa582a7eebb5703b1ab1027fdae2f857bedf6a3e2648",
+    "executed_log_sha256": "2452abfc9a7294247a9c53f669530085bb7988a41db35b6e2cb037e2d4d16a54",
+    "scope": "Earlier geometry-equivalent candidate. Numeric packaging and component geometry retained in installed banks; installed source equivalence and joint checks are separate final gates.",
+    "negative_witness": {
+      "same_stock_self_overlap_gap_m": -0.029999999329447746,
+      "rejected": true,
+      "executed_observer_sha256": "4a5f1306e6354bdd4ee67ba136b96880e6cef19f3fe6f139b1c1b3291446beb0"
+    }
+  },
+  "headful": {
+    "api_port": 4391,
+    "quality": "High",
+    "physics_compute_threads": 8,
+    "readiness": "ready, no world hold or fault",
+    "settled_hinges": [
+      {
+        "name": "RampHingePort",
+        "measured_angle_rad": -0.4972763124945097,
+        "measured_angular_speed_rad_per_s": -0.00010888248453535363,
+        "drive_target_rad": -0.4944225549697876
+      },
+      {
+        "name": "RampHingeStarboard",
+        "measured_angle_rad": 0.4893657926246508,
+        "measured_angular_speed_rad_per_s": -4.893473941135926e-05,
+        "drive_target_rad": 0.48634520173072815
+      },
+      {
+        "name": "RampSectionHingePort01",
+        "measured_angle_rad": -1.5701809006046308,
+        "measured_angular_speed_rad_per_s": 0.00016530811915421468,
+        "drive_target_rad": -1.5707963705062866
+      },
+      {
+        "name": "RampSectionHingePort12",
+        "measured_angle_rad": 1.5716796165619158,
+        "measured_angular_speed_rad_per_s": -0.00023171854851527612,
+        "drive_target_rad": 1.5707963705062866
+      },
+      {
+        "name": "RampSectionHingeStarboard01",
+        "measured_angle_rad": -1.5702114943689223,
+        "measured_angular_speed_rad_per_s": -0.0002320847152264314,
+        "drive_target_rad": -1.5707963705062866
+      },
+      {
+        "name": "RampSectionHingeStarboard12",
+        "measured_angle_rad": 1.5716895522846404,
+        "measured_angular_speed_rad_per_s": 0.00020641288237679682,
+        "drive_target_rad": 1.5707963705062866
+      }
+    ],
+    "mode": "MaxSpeed during observation, restored to Realtime and paused after deployment",
+    "screenshot": "griffin-ramp-deployed-2026-10-23.png"
+  },
+  "provenance": "229 targets, 229 evidence records, 78 sources, 3 roles; catalog gate passed",
+  "limits": [
+    "No rover traversal or mounted rover-to-panel drive acceptance in this iteration",
+    "No 60 FPS qualification; another GUI was running",
+    "Candidate geometric envelope certificates are distinct from the final physical landing result",
+    "Geometry, section masses and inertias remain reconstruction estimates",
+    "A final-run attempt ended via SIGTERM without a verdict; the subsequent four final case logs all exited 0"
+  ],
+  "source_sha256": {
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_middle_section_visual.usda": "82158f349b54e805f9be960f34831e0f9a480d02a0d456bbe08fe35492cde8cf",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_root_bearing_visual.usda": "c23ed9fd3a534a8f30dff3fc75f11067e1d23ffd7fbd828aec806c37279c2ee4",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_root_section_visual.usda": "55c8cd6469874b6c18220e0722d1e097ef4872275d016f0499efe2d89627b96c",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_section_visual.usda": "a7116d879f0835f0fa7d4feb95673ba109257398513e1f536e61d2ce1f1659d4",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_toe_section_visual.usda": "5f80cd0bc7c0f6ad18e3c30728df8a61e926a3e220e6be745a49680738d3aa7d",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_toe_visual.usda": "9c4634f2b75d3e166cd2d9dcce59bf529c0bc09786b1c2bd3b51bc816efb49cf",
+    "twins/astrobotic-griffin-1/components/lander/griffin_ramp_visual.usda": "f1f63bc93a1f25f4a55554037144e2bae91ee594094a7f53bd0f4c70591a86af",
+    "twins/astrobotic-griffin-1/requirements/griffin_ramp_middle_section_requirements.sysml": "aaacee69ff8b78a40d1ab2dfdd24ab9017b61c8137a4291d4d1e074514e55fe4",
+    "twins/astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml": "f0a1cf77bc376d9200c141c7fe1ddf2c63447d6ff9ae2f4a5bed9ffd24f3c68e",
+    "twins/astrobotic-griffin-1/requirements/griffin_ramp_root_section_requirements.sysml": "84808cb614c1e815f232e35b56ab5b6230c40075c783e44e75a5ee3e4afc566e",
+    "twins/astrobotic-griffin-1/requirements/griffin_ramp_toe_section_requirements.sysml": "4136551ff81720899455fcb2c85a38f50e16c2e15b3351ee28a2dc6ec2647ff1",
+    "twins/astrobotic-griffin-1/requirements/griffin_vehicle_assembly.sysml": "081e201e34ade34a7aaeeae4fafef3d5d3f17171761dadc7da50d4abdeac4bc1",
+    "twins/astrobotic-griffin-1/scenarios/griffin_1_surface_ops.rhai": "e8ead33ccd7cfcfa31cecef23e4dafbc1547412b574b7970c62720922c36d215",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_flight_stow.rhai": "66daae0e93d51359b8ab5e8463a5a3a95fabff72f5fb603ec2de4a73fe709d08",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_moving_study.rhai": "53b226d45669a7984914960da7a7c837e3eb072e1ce9ddf40921b77b2a36ff01",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_postlanding.rhai": "e40b7fa58d97f4a503feb08772efced2a2d726e4faf5973be341202b064994ef",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_requirements.rhai": "7e773769616efe7e5667d794201bade0f88893f3153a4ae60c307da65b7dab4a",
+    "twins/astrobotic-griffin-1/scenarios/tests/griffin_ramp_touchdown_geometry.rhai": "7d0113e647b6c8c700ed06d9c4c08455e57128a45d27b2713505155e68fcc08a",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_flight_stow.usda": "8cd77e18bc484b10b367e6dc4c53e5e01e044a69a609b5ec2b9d9591ba260f8d",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_postlanding.usda": "864c512118aea88e75051c13442caf33ce53bf84aad78bcb773f7aa9e0b4a463",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_requirements.usda": "c9542fbd52f9d57418cfe0edb79a3fdc53ca695729e47866dfb9c45a0609979b",
+    "twins/astrobotic-griffin-1/tests/griffin_ramp_touchdown_geometry.usda": "119c8df924cd94109796f461da34171c7d865364b466d91fcc17b10cd42bcd26",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_installed_checks.rhai": "c7167768c4f20d57a095b46f8b01b5365a7ccf8cc9a0cff03d4ea8d356f90276",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_mechanism.rhai": "8b6ac64d4f3302c41063befbd92ff02bb6f4f4f217500f540799b92dcdd1f509",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_mechanism_checks.rhai": "ade26c1c24156852d8a0d6f771f5612ded8e721a2462468be62407d6dd9eeb9f",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_packaging.rhai": "3245bee9e837e14cef696ce1000406a9f63eb5eee7b17d9e960dd5fbc63562a1",
+    "twins/astrobotic-griffin-1/tools/griffin_ramp_packaging_checks.rhai": "6b34957f834b7b43eb29faf9ed9279f2265ff12c789d07b632180a45ba9416a3",
+    "twins/astrobotic-griffin-1/tools/griffin_spec.rhai": "afbfb3c5d32557618179fde148d27d36468e03b99b4d1af698661c5c2dcaeff6",
+    "twins/astrobotic-griffin-1/tools/griffin_surface_mission_report.rhai": "203c1dfa7d14fc09570f896763e1af0bbd6180f5b219c3d97aa3108e6fb9cacf",
+    "twins/astrobotic-griffin-1/tools/griffin_surface_ramp_ops.rhai": "722383c6b82073920cbc9ba388504442cd96ffec4c70394b276f9522b0d2cf7c",
+    "twins/astrobotic-griffin-1/tools/griffin_visual_builder.rhai": "a5e15aff71c675ae09e375155c2bb08a2edc6e3e9222a48d761649dc080cc9ff",
+    "twins/astrobotic-griffin-1/twin.toml": "1fb4e34c1cf7c86a48b5d08abcd4cc7c62cfea5e84922875606c76df8e0128fc",
+    "twins/astrobotic-griffin-1/vehicles/griffin_1.usda": "fbc0b856335321c1504acb7bf50c4cf12f8df34d6c3abe12c364124663e950ac"
+  }
+}

@@ -12,8 +12,8 @@ package GriffinRampRootSectionRequirements {
          * collider receipt. Astrobotic confirms a payload adapter and optional
          * egress ramps, not their dimensions. The longer root lifts the folded
          * middle/toe stack away from the fixed deck transitions while retaining
-         * the inward silhouette. This component is not mounted or qualified as
-         * a working mechanism until the dependent sections and hinges pass.
+         * the inward silhouette. Its geometry is independently qualified. The installed mechanism has
+         * a separate post-landing acceptance case.
          * Dimensions are SI metres, Y-up, +X from the deck hinge to the first
          * fold. No supplier CAD, stiffness or structural strength is claimed. */
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_ramp_root_section_visual.usda";

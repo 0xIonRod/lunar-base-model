@@ -836,20 +836,24 @@ fn physical_ramp_section_stowed_relative_angle_rad() {
 fn physical_ramp_section_deployment_relative_angle_rad() {
     _sysml_attribute("physicalRampSectionDeploymentRelativeAngleRad")
 }
-fn physical_ramp_section_joint_frame_offset_rad() {
-    _sysml_attribute("physicalRampSectionJointFrameOffsetRad")
+fn physical_ramp_section_sweep_sign(stage) {
+    if stage=="middle" {1.0} else if stage=="toe" {-1.0}
+    else {throw("Ramp fold stage must select middle or toe");}
 }
-fn physical_ramp_section_joint_coordinate_angle(relative_angle_rad) {
-    let offset = physical_ramp_section_joint_frame_offset_rad();
+fn physical_ramp_section_joint_frame_offset_rad(stage) {
+    physical_ramp_section_sweep_sign(stage)*_sysml_attribute("physicalRampSectionJointFrameOffsetRad")
+}
+fn physical_ramp_section_joint_coordinate_angle(stage, relative_angle_rad) {
+    let offset = physical_ramp_section_joint_frame_offset_rad(stage);
     if relative_angle_rad == () || offset == ()
         || !relative_angle_rad.is_finite() || !offset.is_finite() {
         return ();
     }
     relative_angle_rad + offset
 }
-fn physical_ramp_section_stowed_joint_angle_rad() {
-    physical_ramp_section_joint_coordinate_angle(
-        physical_ramp_section_stowed_relative_angle_rad())
+fn physical_ramp_section_stowed_joint_angle_rad(stage) {
+    physical_ramp_section_joint_coordinate_angle(stage,
+        physical_ramp_section_sweep_sign(stage)*physical_ramp_section_stowed_relative_angle_rad())
 }
 fn physical_ramp_hinge_settle_angle_tolerance_rad() {
     _sysml_attribute("physicalRampHingeSettleAngleToleranceRad")
@@ -863,13 +867,13 @@ fn physical_ramp_traversal_settle_dwell_s() {
 fn physical_ramp_unfold_quarter_turn_duration_s() {
     _sysml_attribute("physicalRampUnfoldQuarterTurnDurationS")
 }
-fn physical_ramp_section_unfold_waypoint_joint_angle_rad() {
-    physical_ramp_section_joint_coordinate_angle(
-        _sysml_attribute("physicalRampSectionUnfoldWaypointRelativeAngleRad"))
+fn physical_ramp_section_unfold_waypoint_joint_angle_rad(stage) {
+    physical_ramp_section_joint_coordinate_angle(stage,
+        physical_ramp_section_sweep_sign(stage)*_sysml_attribute("physicalRampSectionUnfoldWaypointRelativeAngleRad"))
 }
-fn physical_ramp_section_deployment_joint_angle_rad() {
-    physical_ramp_section_joint_coordinate_angle(
-        physical_ramp_section_deployment_relative_angle_rad())
+fn physical_ramp_section_deployment_joint_angle_rad(stage) {
+    physical_ramp_section_joint_coordinate_angle(stage,
+        physical_ramp_section_sweep_sign(stage)*physical_ramp_section_deployment_relative_angle_rad())
 }
 fn suspension_strut_scale() { _sysml_number_list("suspensionStrutScale") }
 fn suspension_strut_offset() { _sysml_number_list("suspensionStrutOffset") }

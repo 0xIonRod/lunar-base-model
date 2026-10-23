@@ -82,14 +82,16 @@ package GriffinRampRequirements {
 
     constraint def GRC018_SectionedRampMatchesEnvelope {
         in totalLengthM : Real;
-        in sectionLengthM : Real;
+        in rootLengthM : Real;
+        in middleLengthM : Real;
+        in toeLengthM : Real;
         in sectionCount : Integer;
         in measuredLengthDeviationM : Real;
         in toleranceM : Real;
-        sectionCount > 1 and sectionLengthM > 0.0
-            and measuredLengthDeviationM <= toleranceM
-            and sectionLengthM * sectionCount >= totalLengthM - toleranceM
-            and sectionLengthM * sectionCount <= totalLengthM + toleranceM;
+        sectionCount == 3 and rootLengthM > 0.0 and middleLengthM > 0.0 and toeLengthM > 0.0
+            and measuredLengthDeviationM >= 0.0 and measuredLengthDeviationM <= toleranceM
+            and rootLengthM + middleLengthM + toeLengthM >= totalLengthM - toleranceM
+            and rootLengthM + middleLengthM + toeLengthM <= totalLengthM + toleranceM;
     }
 
     constraint def GRC019_RampSectionMassPartition {
@@ -608,9 +610,9 @@ package GriffinRampRequirements {
         // envelope against all three installed panel-frame envelopes.
         attribute physicalRampPanelClearanceM : Real = .05;
         attribute physicalRampDeckTransitionRequiredOverlapM : Real = 0.05;
-        attribute physicalRampDeckTransitionLengthM : Real = 1.35;
+        attribute physicalRampDeckTransitionLengthM : Real = 1.42;
         attribute physicalRampDeckTransitionInterfaceToleranceM : Real = 0.002;
-        attribute physicalRampDeckTransitionOutboardX : Real = 2.35;
+        attribute physicalRampDeckTransitionOutboardX : Real = 2.42;
         attribute physicalRampDeckTransitionCenterY : Real = 2.105;
         // The transition is a separate rigid-body child, fixed to the Griffin
         // deck frame.  Its mass is an explicit simulator assumption because
@@ -619,13 +621,25 @@ package GriffinRampRequirements {
         // length, source contact thickness, and current outside rail width. It remains a study
         // estimate until the transition mass properties are measured.
         attribute physicalRampDeckTransitionMassKg : Real = 15.0;
+        attribute physicalRampDeckTransitionTrackWidthM : Real = GriffinEgressRamp::assemblyTrackWidthM
+            - 2.0 * GriffinEgressRamp::physicalRampDeckTransitionInterfaceToleranceM;
+        attribute physicalRampDeckTransitionTrackStationM : Real = CadStudy::trackMm / (2.0 * CadStudy::millimetresPerMetre);
+        // Two equal-mass rectangular tracks, including their transverse
+        // parallel-axis terms; no full-width plate occupies the open centre.
         attribute physicalRampDeckTransitionInertiaKgM2 : Real[3] = (
-            GriffinEgressRamp::physicalRampDeckTransitionMassKg * (GriffinEgressRamp::rampSurfaceWidthM * GriffinEgressRamp::rampSurfaceWidthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0,
-            GriffinEgressRamp::physicalRampDeckTransitionMassKg * (GriffinEgressRamp::physicalRampDeckTransitionLengthM * GriffinEgressRamp::physicalRampDeckTransitionLengthM + GriffinEgressRamp::rampSurfaceWidthM * GriffinEgressRamp::rampSurfaceWidthM) / 12.0,
+            GriffinEgressRamp::physicalRampDeckTransitionMassKg * ((GriffinEgressRamp::physicalRampDeckTransitionTrackWidthM * GriffinEgressRamp::physicalRampDeckTransitionTrackWidthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0 + GriffinEgressRamp::physicalRampDeckTransitionTrackStationM * GriffinEgressRamp::physicalRampDeckTransitionTrackStationM),
+            GriffinEgressRamp::physicalRampDeckTransitionMassKg * ((GriffinEgressRamp::physicalRampDeckTransitionLengthM * GriffinEgressRamp::physicalRampDeckTransitionLengthM + GriffinEgressRamp::physicalRampDeckTransitionTrackWidthM * GriffinEgressRamp::physicalRampDeckTransitionTrackWidthM) / 12.0 + GriffinEgressRamp::physicalRampDeckTransitionTrackStationM * GriffinEgressRamp::physicalRampDeckTransitionTrackStationM),
             GriffinEgressRamp::physicalRampDeckTransitionMassKg * (GriffinEgressRamp::physicalRampDeckTransitionLengthM * GriffinEgressRamp::physicalRampDeckTransitionLengthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0);
-        attribute physicalRampPortMountX : Real = 2.357114731507;
-        attribute physicalRampStarboardMountX : Real = -2.357114731507;
-        attribute physicalRampMountY : Real = 2.106794675483;
+        // Raised root bearing solved from the nominal transition seam and
+        // the reusable root component's named entry axis. Native relation:
+        // X=outboard+gap+sin(slope)*(trackTop-entryY);
+        // Y=transitionTop-cos(slope)*(trackTop-entryY).
+        // Explicit coordinates are retained because source initializers do
+        // not evaluate trigonometric calls. The installation observer solves
+        // the rigid frame relation independently from named source datums.
+        attribute physicalRampPortMountX : Real = 2.4433441945204004;
+        attribute physicalRampStarboardMountX : Real = -GriffinEgressRamp::physicalRampPortMountX;
+        attribute physicalRampMountY : Real = 2.1596159735495077;
         attribute physicalRampMountZ : Real = 0.0;
         // At deployment, the ramp hinge position offsets the track half
         // thickness so the upper root edge meets the 2.12 m adapter top. At
@@ -659,6 +673,9 @@ package GriffinRampRequirements {
         // Griffin supplier data or an accepted mass-properties solution.
         attribute physicalRampMassKg : Real = 95.0;
         attribute physicalRampSectionMassKg : Real = 31.666666667;
+        // Legacy equal-span visual-template proxy only. Installed sections
+        // use their component-owned lengths; GRC020 binds native inertia and
+        // each actual span independently. These are reconstruction estimates.
         attribute physicalRampSectionInertiaXKgM2 : Real = GriffinEgressRamp::physicalRampSectionMassKg *
             (GriffinEgressRamp::rampSurfaceWidthM * GriffinEgressRamp::rampSurfaceWidthM + GriffinEgressRamp::rampSurfaceThicknessM * GriffinEgressRamp::rampSurfaceThicknessM) / 12.0;
         attribute physicalRampSectionInertiaYKgM2 : Real = GriffinEgressRamp::physicalRampSectionMassKg *
@@ -801,7 +818,7 @@ package GriffinRampRequirements {
         }
         require GRC028_RailAndPivotSlenderness {
             in chordHeightM = GriffinEgressRamp::rampRailHeightM;
-            in sectionLengthM = GriffinEgressRamp::rampSectionLengthM;
+            // sectionLengthM is supplied from the observed component owner.
             in hingeRadiusM = GriffinEgressRamp::rampSectionHingeBarrelRadiusM;
             in pinRadiusM = GriffinEgressRamp::rampRailJointPinRadiusM;
             in maxChordFraction = GriffinEgressRamp::maxRailHeightToSectionLength;
@@ -809,17 +826,18 @@ package GriffinRampRequirements {
         }
     }
     requirement def GRR016_ArticulatedRampSections {
-        doc /* Each upper-deck-mounted ramp shall contain three equal rigid sections, a revolute deck hinge, and two native revolute joints between consecutive sections. All six physical ramp joints shall expose the source-owned angular drive and limits so their typed angle ports can command motion inside the authored range. Section lengths shall sum to the full contact-track length. Intermediate joints shall hold zero relative angle during rover traversal so the sections, contact tracks, and upper rails form one continuous deployed path. */
+        doc /* Each upper-deck-mounted ramp shall contain three unequal rigid sections (root, middle and toe, each owned by its reusable component contract), a revolute deck hinge, and two native revolute joints between consecutive sections. All six physical ramp joints shall expose the source-owned angular drive and limits so their typed angle ports can command motion inside the authored range. Section lengths shall sum to the full contact-track length. Intermediate joints shall hold zero relative angle during rover traversal so the sections, contact tracks, and upper rails form one continuous deployed path. */
         require GRC018_SectionedRampMatchesEnvelope {
             in totalLengthM = GriffinEgressRamp::rampSurfaceLengthM;
-            in sectionLengthM = GriffinEgressRamp::rampSectionLengthM;
+            in rootLengthM = GriffinRampRootSectionRequirements::RampRootSection::lengthM;
+            in middleLengthM = GriffinRampMiddleSectionRequirements::RampMiddleSection::lengthM;
+            in toeLengthM = GriffinRampToeSectionRequirements::RampToeSection::lengthM;
             in sectionCount = GriffinEgressRamp::rampSectionCount;
-            in measuredLengthDeviationM = 0.0;
             in toleranceM = GriffinEgressRamp::rampSectionGeometryToleranceM;
         }
     }
     requirement def GRR017_FlightStowAndPostTouchdownUnfold {
-        doc /* Six standard PhysicsFixedJoint flight latches shall hold the authored stowed relative poses independently of hinge motor authority. While a flight latch is installed, its paired motor shall supply zero effort. The mission shall retain the admitted native dimensional motor law and restore its original torque cap on the corresponding release-command event, preserving the commanded coordinate and rate. All selected identities and saved laws shall be validated before either motor in a released pair is restored. Missing, duplicate or changed motor laws shall fail visibly. These profiles belong to the admitted mission instance and shall not survive scene retirement. Each latch shall name the same body endpoints and coincident stowed anchors as its source-paired revolute joint. The unfold policy shall validate the complete selected latch pair before releasing it through the native interactive joint lifecycle: middle-section latches first, toe latches next, and root latches only after both sections settle. Latches on the other pairs shall remain installed until their own motion phase starts. Reload shall restore every authored latch. An unknown hinge or missing/mismatched latch shall fail visibly before release. The descent stow pose shall place the two root ramp axes as mirror images across the lander X=0 centerline: the port body uses a +120 degree Z rotation; the starboard body uses a -120 degree Z rotation and is mounted at 180 degrees about Y. Their axes lean thirty degrees inward from vertical, clearing the compact FLIP reconstruction. One shared 120 degree stow magnitude defines both body poses; the starboard revolute target is -120 degrees because its joint frame reverses the hinge axis. The port root joint spans -50 to +125 degrees and the starboard joint spans -125 to +50 degrees, retaining the authored outward/down deployment targets. Both intermediate hinges fold 180 degrees in the physical section geometry. Their child-side joint frames are offset by -90 degrees, so the transport pose is represented at +90 degrees and the level deployment pose at -90 degrees in the joint coordinate. This keeps both commanded poses inside the +/-180 degree travel. A measured halfway relative pose then selects the intended sweep: a frame offset alone cannot resolve the motor error at an antipodal half-turn. The first hinge axis is offset to the top rail chord and the second by half the walking-surface thickness, so the three sections stack as a compact bundle instead of occupying one plane. At the level physical relative angle, these frame offsets keep the deployed walking surfaces aligned. The image-based angles and fold offsets are replaceable study estimates informed by the 2021 Griffin-1 product image; the image supplies qualitative silhouette only, not released supplier geometry or an ICD. The lowest composed rail point shall remain above the highest composed landing-leg geometry by the measurement tolerance, and each rail shall remain attached to the upper side of its walking section. An operator U / OPEN RAMPS command in any flight or landing phase shall drive the middle hinges through their measured halfway pose to level while the toes remain stowed, then drive the toes through the same halfway pose to level; only then shall the deck hinges enter the deployment envelope using terrain-contact targets derived from the measured landed hinge frames and all eight toe corners when Modelica reports a physical landing. During flight, use the existing source-owned nominal deployment angles as an explicit mechanism pose, without claiming terrain contact or traversable egress. Source: operator instruction, 2026-10-01; rationale: an airborne surface can lie beyond the mechanism travel and shall not prevent manual opening. The static nominal deployment angles are flat-plane study datums, not unconditional commands for a tilted lander on the retained DEM. Missing terrain shall prevent automatic terrain-fitted deployment and egress acceptance; targets outside joint travel shall always be rejected. Manual F detachment is independent of deployment and settlement. Each quarter-turn command shall follow the source-owned physicalRampUnfoldQuarterTurnDurationS quintic profile on the admitted simulation clock, with zero endpoint speed and acceleration, to reduce abrupt reaction loads on the landing gear. Every waypoint and final section target shall meet the source angle and speed tolerances. Before automatic rover release and egress acceptance, all six hinges shall meet these limits for the source sampled dwell; any failing sample resets the dwell. */
+        doc /* Six native PhysicsFixedJoint flight latches shall hold the authored stow poses. Their paired motors supply zero effort until the corresponding validated release event restores the admitted dimensional law and torque cap. The port root leans inward at +120 degrees about Z; the starboard has the mirrored rigid orientation, independent of Euler representation. Each bank references the independent root/middle/toe components and their named entry/exit datums. The middle folds +180 degrees with a -90 degree child joint-frame offset; the toe folds -180 degrees with a +90 degree offset. A measured halfway waypoint selects each opening sweep, away from an antipodal motor command. The raised root entry and lower toe fold axes belong to their component contracts. On an OPEN RAMPS command, release the root latches and move both still-folded banks outward to the 90 degree clearance pose; measure settlement before releasing the middle latches. Unfold and settle the middles while the toes remain latched, then release and unfold the toes in the opposite direction. Only after section settlement may the roots lower to terrain-fitted targets derived from measured landed hinge frames and all eight toe corners. Missing terrain or targets outside travel shall reject automatic deployment. An airborne manual command uses the nominal source-owned mechanism pose without claiming terrain contact. Manual F detachment remains independent. Each quarter-turn follows the source-owned six-second quintic profile on the simulation clock. Each waypoint meets the existing native angle/speed tolerances; final all-six settlement requires the existing sampled dwell, resetting on any failed sample. Events are ordered by their emission simulation tick; a command and the preceding phase's settled event may share a tick, while each command must precede its own settlement. Runtime receive order within one tick is not a chronology guarantee. Nonadjacent ramp stock shall clear throughout the complete ordered sweep; no nonadjacent contact exclusions are permitted. The two-track fixed transitions preserve their tire corridors and omit unused full-width stock that obstructed the original fold. These dimensions, clearances, mass proxies and mechanism choices are explicit reconstruction assumptions, not a supplier ICD or qualified hardware design. Image basis: Astrobotic 2021 Griffin-1 product image and operator observations, 2026-10-23. See contracts/griffin-ramp-deployment-2026-10-23.md for native geometry and post-landing evidence. */
         require GRC022_RampFlightStowAnglesWithinTravel {
             in rootStowAngleRad = GriffinEgressRamp::physicalRampRootStowedAngleRad;
             in sectionStowRelativeAngleRad = GriffinEgressRamp::physicalRampSectionStowedRelativeAngleRad;
@@ -871,9 +889,6 @@ package GriffinRampRequirements {
         doc /* Each section shall carry positive mass and diagonal inertia. Port and starboard ramps shall remain within the deck-hinge travel limit and use zero relative angle targets at the intermediate hinges during FLIP traversal. */
         require GRC011_RampMassPropertiesArePositive {
             in massKg = GriffinEgressRamp::physicalRampSectionMassKg;
-            in inertiaXKgM2 = GriffinEgressRamp::physicalRampSectionInertiaXKgM2;
-            in inertiaYKgM2 = GriffinEgressRamp::physicalRampSectionInertiaYKgM2;
-            in inertiaZKgM2 = GriffinEgressRamp::physicalRampSectionInertiaZKgM2;
         }
         require GRC019_RampSectionMassPartition {
             in totalMassKg = GriffinEgressRamp::physicalRampMassKg;
@@ -881,12 +896,10 @@ package GriffinRampRequirements {
             in sectionCount = GriffinEgressRamp::rampSectionCount;
             in toleranceKg = GriffinEgressRamp::physicalRampSectionMassPartitionToleranceKg;
         }
+        // The observer supplies each native diagonal inertia and the actual
+        // component-owned sectionLengthM; no shared-span default is admissible.
         require GRC020_RampSectionInertiaMatchesEnvelope {
-            in measuredXKgM2 = GriffinEgressRamp::physicalRampSectionInertiaXKgM2;
-            in measuredYKgM2 = GriffinEgressRamp::physicalRampSectionInertiaYKgM2;
-            in measuredZKgM2 = GriffinEgressRamp::physicalRampSectionInertiaZKgM2;
             in sectionMassKg = GriffinEgressRamp::physicalRampSectionMassKg;
-            in sectionLengthM = GriffinEgressRamp::rampSectionLengthM;
             in outsideWidthM = GriffinEgressRamp::rampSurfaceWidthM;
             in thicknessM = GriffinEgressRamp::rampSurfaceThicknessM;
             in toleranceKgM2 = GriffinEgressRamp::physicalRampSectionMassPropertiesToleranceKgM2;
@@ -894,7 +907,7 @@ package GriffinRampRequirements {
         require GRC005_DeploymentCommandWithinLimit;
     }
     requirement def GRR012_PhysicalDeckTransition {
-        doc /* GRR-012 [physical interface] each physical ramp shall have a separate deck-frame TransitionPlate and collision-enabled ContactSurface rigid body, fixed to the Griffin body. A single composed-collider snapshot shall establish the minimum travel-direction overlap across the adapter's entire lateral span from exact convex footprints, the source-owned transition length within tolerance, coplanar deck and transition top faces, and a closed transition-to-ramp-track hinge seam. Aggregate AABB overlap is not acceptance evidence because the octagonal adapter corners can reduce the actual contact width. The octagonal outer deck remains eight separate convex beam colliders and the rover platform keeps its own geometry-derived convex collider, preserving the tank openings. These checks accept the authored static interface only; rover traversal and runtime wheel contacts require separate mission evidence. Dimensions remain explicit Twin study datums until supplier mechanical CAD/ICD is available. */
+        doc /* Each bank shall have a fixed, positive-mass TransitionPlate body carrying two collision-enabled tracks aligned with the rover tires. The open centre and unused outer stock remain clear for unfolding. Per-track native convex-footprint observations shall establish the required deck overlap, source-owned transition length, coplanar top faces and closed nominal hinge seam within the existing interface tolerance. No whole-envelope convex hull may fill the openings. This static nominal interface check is distinct from loaded deployment and rover traversal. Geometry and mass properties remain replaceable reconstruction estimates. */
         require GRC012_ComposedDeckTransitionFit;
     }
 
@@ -962,6 +975,13 @@ package GriffinRampRequirements {
             verify grr019;
             verify grr020;
         }
+    }
+
+    verification def Verify_GriffinRampPostLanding {
+        doc /* Production descent followed by measured root-clear, middle,
+         * opposite-toe and final root-lowering settlement. No pose overrides. */
+        subject ramp : GriffinEgressRamp;
+        verify grr017;
     }
 
     verification def Verify_GriffinRampTouchdownGeometry {

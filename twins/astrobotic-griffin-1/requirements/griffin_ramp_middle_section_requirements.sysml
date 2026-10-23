@@ -12,8 +12,8 @@ package GriffinRampMiddleSectionRequirements {
          * collider receipt. Astrobotic confirms a payload adapter and optional
          * egress ramps, not their dimensions. The shorter middle carries the downward-offset toe fold in
          * the unequal-fold reconstruction. Its ends share the root upper
-         * axis and the new lower toe axis; no released hardware is claimed. This component is not mounted or qualified as
-         * a working mechanism until the dependent sections and hinges pass.
+         * axis and the new lower toe axis; no released hardware is claimed. Its geometry is independently qualified. The installed mechanism has
+         * a separate post-landing acceptance case.
          * Dimensions are SI metres, Y-up, +X from the root fold to the toe
          * fold. No supplier CAD, stiffness or structural strength is claimed. */
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_ramp_middle_section_visual.usda";

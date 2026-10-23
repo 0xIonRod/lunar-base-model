@@ -130,6 +130,9 @@ fn on_start(me, ctx) {
     this.ramp_settle_probe_tick = ();
     this.ramp_sections_expected = ();
     this.ramp_section_motion = ();
+    this.ramp_root_motion = ();
+    this.ramp_root_clearance_expected = ();
+    this.ramp_root_clearance_evidence = ();
     this.ramp_section_final_commanded = false;
     this.ramp_unfold_waypoint_evidence = [];
     this.ramp_deployment_expected = ();
@@ -483,6 +486,40 @@ fn ramp_unfold_task() {
         wait_until(|m| this.ramp_unfold_requested || this.ramp_timeout),
         check(|m| this.ramp_timeout != true),
         once(|m| {
+            let clear=griffin_surface_ramp_ops::clear_roots();
+            if clear.ok!=true{
+                this.ramp_timeout=true;
+                this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-root-clearance-command");
+            }else{this.ramp_root_motion=clear.motion;this.ramp_root_clearance_expected=clear.expected_angles;}
+            true
+        }),
+        check(|m| this.ramp_timeout != true),
+        par_race([
+            seq([wait_until(|m| {
+                let tick=sim_tick();let previous=this.ramp_settle_probe_tick;
+                if previous!=() && tick>=previous && tick-previous<6{return false;}
+                this.ramp_settle_probe_tick=tick;
+                let progress=griffin_surface_ramp_ops::root_motion_progress(this.ramp_root_motion);
+                if progress.ok!=true{
+                    this.ramp_timeout=true;
+                    this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-root-clearance-progress");
+                    return true;
+                }
+                this.ramp_root_motion=progress.motion;
+                if !progress.complete{return false;}
+                let evidence=griffin_surface_ops::physical_ramp_hinges_settled(this.ramp_root_clearance_expected,
+                    griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
+                this.ramp_root_clearance_evidence=evidence;
+                evidence.ok==true && evidence.settled==true
+            })]),
+            seq([wait(20.0),once(|m|{
+                this.ramp_timeout=true;
+                this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-root-clearance-settle");true
+            })])
+        ]),
+        check(|m| this.ramp_timeout != true),
+        once(|m|{emit(griffin_surface_ramp_ops::unfold_event_contract().root_clear_settled);true}),
+        once(|m| {
             this.ramp_motion_trace = [];
             this.ramp_motion_trace_last_tick = ();
             this.ramp_section_final_commanded = false;
@@ -629,7 +666,7 @@ fn ramp_unfold_task() {
             if ramps.ok != true {
                 this.ramp_timeout = true;
                 this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "ramp-root-deploy-command");
-            }
+            }else{this.ramp_root_motion=ramps.motion;}
             true
         }),
         check(|m| this.ramp_timeout != true),
@@ -647,6 +684,13 @@ fn ramp_unfold_task() {
                         return false;
                     }
                     this.ramp_settle_probe_tick = tick;
+                    let motion=griffin_surface_ramp_ops::root_motion_progress(this.ramp_root_motion);
+                    if motion.ok!=true{
+                        this.ramp_timeout=true;
+                        this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-root-deployment-progress");return true;
+                    }
+                    this.ramp_root_motion=motion.motion;
+                    if !motion.complete{return false;}
                     let progress=griffin_surface_ramp_ops::traversal_settle_progress(
                         this.ramp_deployment_expected,this.ramp_traversal_stable_since);
                     this.ramp_traversal_stable_since=progress.stable_since;

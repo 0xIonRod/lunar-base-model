@@ -53,7 +53,7 @@ package GriffinVehicleAssemblyRequirements {
     enum def RampPackagingBankIdentity { CandidateRampPort; CandidateRampStarboard; }
 
     // A detached integration fixture for the unequal-section reconstruction.
-    // These target mount values are not yet installed in vehicles/griffin_1.
+    // Its qualified component datums also own the installed mechanism interfaces.
     part def GriffinRampPackagingStudy {
         doc /* SI metres/radians. Native 2026-10-23 interference and path study:
          * contracts/griffin-ramp-packaging-study-2026-10-23.md. Optional ramps
@@ -66,14 +66,13 @@ package GriffinVehicleAssemblyRequirements {
         attribute roverPath : UsdPrimPath = "/GriffinFlipVisual/FLIP";
         attribute banks : RampPackagingBankIdentity[2] = ("CandidateRampPort", "CandidateRampStarboard");
         attribute mountZ : Real = GriffinEgressRamp::physicalRampMountZ;
-        attribute transitionLengthM : Real = 1.42;
-        attribute transitionOutboardX : Real = 2.42;
+        attribute transitionLengthM : Real = GriffinEgressRamp::physicalRampDeckTransitionLengthM;
+        attribute transitionOutboardX : Real = GriffinEgressRamp::physicalRampDeckTransitionOutboardX;
         // Positive running clearance at the nominal mitered entrance. The
         // native rigid-frame relation solves the raised bearing from the
         // fixed deck top, this corner offset and the root's entry datum.
         attribute hingeRunningClearanceM : Real = GriffinEgressRamp::physicalRampDeckTransitionInterfaceToleranceM;
-        attribute transitionTrackWidthM : Real = GriffinEgressRamp::assemblyTrackWidthM
-            - 2.0 * GriffinRampPackagingStudy::hingeRunningClearanceM;
+        attribute transitionTrackWidthM : Real = GriffinEgressRamp::physicalRampDeckTransitionTrackWidthM;
         attribute bridgeTireSideClearanceM : Real = (GriffinRampPackagingStudy::transitionTrackWidthM
             - FlipRover::wheelWidthM) / 2.0;
         attribute rootClearanceAngleRad : Real = -GriffinEgressRamp::physicalRampSectionJointFrameOffsetRad;

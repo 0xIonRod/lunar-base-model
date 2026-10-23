@@ -3,6 +3,7 @@
 // This module owns the SysML-targeted hinge command batches. The mission
 // scenario remains the single owner of sequencing, measured settlement, and
 // phase state.
+import "lunco://scripting/tools/sysml_requirements" as requirements;
 
 // Validate the complete pair before retiring either solver latch. USD owns
 // the fixed attachment; SysML owns its hinge pairing; Rhai owns release order.
@@ -129,7 +130,7 @@ fn restore_released_motors(profiles,event_name) {
         let sections=griffin_spec::ramp_intermediate_joint_names();
         let offset=if event_name==events.middle_commanded {0} else {1};
         names=[sections[offset],sections[offset+2]];
-    } else if event_name==events.roots_commanded {names=griffin_spec::ramp_root_joint_names();}
+    } else if event_name==events.root_clear_commanded {names=griffin_spec::ramp_root_joint_names();}
     else {return #{ok:true,restored:[]};}
     let plan=released_motor_plan(profiles,names);
     if plan.ok!=true {return plan;}
@@ -142,6 +143,8 @@ fn restore_released_motors(profiles,event_name) {
 }
 
 fn unfold_event_contract() {
+    let root_clear_commanded = "griffin_ramp_root_clearance_commanded";
+    let root_clear_settled = "griffin_ramp_root_clearance_settled";
     let middle_commanded = "griffin_ramp_middle_sections_unfold_commanded";
     let middle_settled = "griffin_ramp_middle_sections_unfold_settled";
     let toes_commanded = "griffin_ramp_toes_unfold_commanded";
@@ -149,24 +152,85 @@ fn unfold_event_contract() {
     let roots_commanded = "griffin_ramps_deploy_commanded";
     let roots_settled = "griffin_ramp_deployment_settled";
     #{
+        root_clear_commanded:root_clear_commanded,
+        root_clear_settled:root_clear_settled,
         middle_commanded: middle_commanded,
         middle_settled: middle_settled,
         toes_commanded: toes_commanded,
         toes_settled: toes_settled,
         roots_commanded: roots_commanded,
         roots_settled: roots_settled,
-        ordered: [middle_commanded, middle_settled, toes_commanded,
+        ordered: [root_clear_commanded,root_clear_settled,middle_commanded, middle_settled, toes_commanded,
             toes_settled, roots_commanded, roots_settled]
     }
+}
+
+// Delivery order within one admitted tick is unspecified. A phase must settle
+// on a later tick than its command; its successor may begin on that same tick.
+fn event_order_report(trace){
+    let required=unfold_event_contract().ordered;let observed=[];let previous=();
+    if trace==(){return #{ok:false,expected:required,error:"Unfold event trace unavailable"};}
+    for i in 0..required.len(){
+        let matches=[];for index in 0..trace.len(){if trace[index].name==required[i]{matches.push(index);}}
+        if matches.len()!=1{return #{ok:false,expected:required,observed:observed,event:required[i],match_count:matches.len(),error:"Each phase event must occur exactly once"};}
+        let index=matches[0];let tick=trace[index].sim_tick;
+        if tick==() || tick<0 || (previous!=() && (tick<previous || (i%2==1 && tick==previous))){
+            return #{ok:false,expected:required,observed:observed,event:required[i],sim_tick:tick,previous_tick:previous,error:"Unfold phase chronology violated"};
+        }
+        observed.push(#{name:required[i],event_index:index,sim_tick:tick});previous=tick;
+    }
+    #{ok:true,expected:required,observed:observed}
+}
+
+fn root_clearance_targets() {
+    let model=requirements::model();let angle=model.value("GriffinVehicleAssemblyRequirements::GriffinRampPackagingStudy::rootClearanceAngleRad");
+    let names=griffin_spec::ramp_root_joint_names();
+    if names.len()!=2 || angle<=0.0 || !angle.is_finite(){throw("Source root-clearance targets unavailable");}
+    [#{name:names[0],target_rad:angle},#{name:names[1],target_rad:-angle}]
+}
+
+fn _begin_root_motion(expected,event_name) {
+    let snapshot=griffin_surface_ops::physical_ramp_joint_evidence();
+    if snapshot.ok!=true || expected.len()!=2{return #{ok:false,error:"Both measured root coordinates are required"};}
+    let starts=[];let travel=0.0;
+    for target in expected{
+        let measured=();for hinge in snapshot.hinges{if hinge.name==target.name{measured=hinge.measured_angle_rad;}}
+        if measured==() || !measured.is_finite(){return #{ok:false,error:"Root coordinate unavailable",hinge:target.name};}
+        starts.push(#{name:target.name,target_rad:measured});travel=max(travel,abs(target.target_rad-measured));
+    }
+    let quarter=abs(griffin_spec::physical_ramp_section_stowed_relative_angle_rad())/2.0;
+    let duration=griffin_spec::physical_ramp_unfold_quarter_turn_duration_s()*travel/quarter;
+    if duration<=0.0 || !duration.is_finite(){return #{ok:false,error:"Root motion requires finite positive travel and source duration"};}
+    let command=griffin_surface_ops::set_physical_ramp_hinge_angles(starts);if command.ok!=true{return command;}
+    emit(event_name);
+    #{ok:true,expected_angles:expected,motion:#{start_tick:sim_tick(),starts:starts,targets:expected,duration_s:duration}}
+}
+
+fn clear_roots() {
+    let release=_release_flight_latches(griffin_spec::ramp_root_joint_names());if release.ok!=true{return release;}
+    let result=_begin_root_motion(root_clearance_targets(),unfold_event_contract().root_clear_commanded);
+    result.flight_latch_release=release;result
+}
+
+fn root_motion_progress(motion) {
+    if motion==(){return #{ok:true,complete:true,motion:()};}
+    let clock=clock_snapshot();
+    if clock.fixed_dt_s==() || clock.fixed_dt_s<=0.0 || clock.sim_tick<motion.start_tick{
+        return #{ok:false,error:"Root motion has no admitted simulation clock"};
+    }
+    let u=min(1.0,max(0.0,(clock.sim_tick-motion.start_tick).to_float()*clock.fixed_dt_s/motion.duration_s));
+    let fraction=u*u*u*(10.0+u*(-15.0+6.0*u));let expected=[];
+    for i in 0..motion.targets.len(){let a=motion.starts[i];let b=motion.targets[i];
+        expected.push(#{name:b.name,target_rad:if u>=1.0{b.target_rad}else{a.target_rad+(b.target_rad-a.target_rad)*fraction}});}
+    let command=griffin_surface_ops::set_physical_ramp_hinge_angles(expected);if command.ok!=true{return command;}
+    #{ok:true,complete:u>=1.0,motion:if u>=1.0{()}else{motion}}
 }
 
 // Break the antipodal half-turn into two measured quarter-turns. A joint
 // frame offset alone cannot disambiguate the motor's shortest-path error.
 fn _command_section_unfold(stage, target, publish_start) {
     let names=griffin_spec::ramp_intermediate_joint_names();
-    let stowed=griffin_spec::physical_ramp_section_stowed_joint_angle_rad();
-    let level=griffin_spec::physical_ramp_section_deployment_joint_angle_rad();
-    if names.len()!=4 || target==() || stowed==() || level==()
+    if names.len()!=4 || target==()
         || (stage!="middle" && stage!="toe") {
         return #{ok:false,error:"ramp section unfold source or stage is invalid"};
     }
@@ -174,7 +238,8 @@ fn _command_section_unfold(stage, target, publish_start) {
     let writes=[];
     for index in 0..4 {
         let moving=if stage=="middle" {index%2==0} else {index%2==1};
-        let held=if stage=="middle" {stowed} else {level};
+        let held=if stage=="middle" {griffin_spec::physical_ramp_section_stowed_joint_angle_rad("toe")}
+            else {griffin_spec::physical_ramp_section_deployment_joint_angle_rad("middle")};
         let item=#{name:names[index],target_rad:if moving {target} else {held}};
         expected.push(item);
         if moving {writes.push(item);}
@@ -218,13 +283,13 @@ fn _begin_section_motion(stage, start, target, publish_start) {
 }
 
 fn unfold_middle_sections() {
-    _begin_section_motion("middle",griffin_spec::physical_ramp_section_stowed_joint_angle_rad(),
-        griffin_spec::physical_ramp_section_unfold_waypoint_joint_angle_rad(),true)
+    _begin_section_motion("middle",griffin_spec::physical_ramp_section_stowed_joint_angle_rad("middle"),
+        griffin_spec::physical_ramp_section_unfold_waypoint_joint_angle_rad("middle"),true)
 }
 
 fn unfold_toes() {
-    _begin_section_motion("toe",griffin_spec::physical_ramp_section_stowed_joint_angle_rad(),
-        griffin_spec::physical_ramp_section_unfold_waypoint_joint_angle_rad(),true)
+    _begin_section_motion("toe",griffin_spec::physical_ramp_section_stowed_joint_angle_rad("toe"),
+        griffin_spec::physical_ramp_section_unfold_waypoint_joint_angle_rad("toe"),true)
 }
 
 // The scenario owns state and timing. Return the next expected snapshot
@@ -258,8 +323,8 @@ fn section_unfold_progress(expected, stage, final_commanded, waypoints, motion) 
     }
     if evidence.settled==true && !final_commanded {
         let next=_begin_section_motion(stage,
-            griffin_spec::physical_ramp_section_unfold_waypoint_joint_angle_rad(),
-            griffin_spec::physical_ramp_section_deployment_joint_angle_rad(),false);
+            griffin_spec::physical_ramp_section_unfold_waypoint_joint_angle_rad(stage),
+            griffin_spec::physical_ramp_section_deployment_joint_angle_rad(stage),false);
         if next.ok!=true {return next;}
         waypoints.push(#{stage:stage,evidence:evidence});
         return #{ok:true,settled:false,evidence:evidence,
@@ -302,8 +367,8 @@ fn _toe_clearance(angle, frame) {
     let minimum=1000000.0;
     let points=[];
     for z in frame.stations {
-        for edge in [[frame.length,frame.half_thickness],
-            [frame.length-frame.bevel,-frame.half_thickness]] {
+        for edge in [[frame.length,frame.track_y+frame.half_thickness],
+            [frame.length-frame.bevel,frame.track_y-frame.half_thickness]] {
             let local=vec3(edge[0]*cos(delta)-edge[1]*sin(delta),
                 edge[0]*sin(delta)+edge[1]*cos(delta),z);
             let point=frame.position+qrot(frame.rotation,local);
@@ -327,7 +392,9 @@ fn landed_root_deployment_plan() {
     let tolerance=griffin_spec::physical_ramp_terrain_contact_tolerance_m();
     let thickness=griffin_spec::ramp_surface_thickness_m();
     let width=griffin_spec::ramp_contact_track_width_m();
-    let length=griffin_spec::ramp_section_length_m()*griffin_spec::ramp_section_count();
+    let model=requirements::model();let length=0.0;
+    for name in ["GriffinRampRootSectionRequirements::RampRootSection", "GriffinRampMiddleSectionRequirements::RampMiddleSection", "GriffinRampToeSectionRequirements::RampToeSection"]{length+=model.value(name+"::lengthM");}
+    let track_y=model.value("GriffinRampRequirements::GriffinEgressRamp::rampSurfaceCenterYM")-model.value("GriffinRampRootSectionRequirements::RampRootSection::entryAxisYM");
     let nominal=abs(griffin_spec::physical_ramp_port_deployment_angle_rad());
     if snapshot.ok!=true || joints.len()!=2 || limit==() || tolerance==()
         || thickness==() || width==() || length==() || nominal==() {
@@ -356,7 +423,7 @@ fn landed_root_deployment_plan() {
         }
         let sign=if index==0 {1.0} else {-1.0};
         let frame=#{position:position,rotation:rotation,measured:measured,
-            sign:sign,length:length,half_thickness:thickness/2.0,
+            sign:sign,length:length,track_y:track_y,half_thickness:thickness/2.0,
             bevel:mechanical_relations::planar_horizontal_face_bevel_run(thickness,nominal),
             stations:stations};
         let shallow=0.0;
@@ -417,16 +484,10 @@ fn deploy_roots(expected) {
     if port_angle == () || starboard_angle == () {
         return #{ok: false, error: "physical ramp deployment angles are missing from SysML"};
     }
-    let release=_release_flight_latches(joints);
-    if release.ok!=true {return release;}
-    let command = griffin_surface_ops::set_physical_ramp_hinge_angles(expected);
-    if command == () || command.ok != true {
-        return #{ok: false, error: "atomic physical ramp deployment command was rejected",
-            expected_angles: expected, command: command};
-    }
-    emit(unfold_event_contract().roots_commanded);
+    let command=_begin_root_motion(expected,unfold_event_contract().roots_commanded);
+    if command.ok!=true{return command;}
     notify_kind("Griffin solid side ramps are deploying after touchdown.", "info");
     print("[griffin] atomic physical egress ramp angle command accepted");
-    #{ok: true, command: command,flight_latch_release:release,
+    #{ok: true, command: command,motion:command.motion,
         port_angle_rad: port_angle, starboard_angle_rad: starboard_angle}
 }

@@ -837,3 +837,13 @@ paths, braking heat and wheel/ground thermal response. The maintained shared
 mechanical regression has 46 checks including contact energy conservation and
 airborne isolation; native mechanics has 13 and drivetrain parity has 20.
 Evidence: `/tmp/griffin-native-heat-20261019/route-final.log`.
+
+### Griffin ramp opening — 23 October 2026
+
+The installed unequal-section mechanism passes 30 integration, 22 flight-stow,
+10 nominal-toe and 20 production post-landing deployment checks. Both banks
+settle after root clearance, middle opening, opposite toe opening and final
+terrain-fitted root lowering. See
+[the deployment repair contract](griffin-ramp-deployment-2026-10-23.md) and its
+portable receipt for exact evidence and executable provenance. This accepts
+opening only; rover traversal and the 60 FPS target remain separate gates.

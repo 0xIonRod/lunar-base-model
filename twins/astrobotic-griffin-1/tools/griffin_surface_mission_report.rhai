@@ -100,25 +100,7 @@ fn fail_phase(state, phase) {
 }
 
 fn ramp_unfold_order_report(state) {
-    let required = griffin_surface_ramp_ops::unfold_event_contract().ordered;
-    let observed = [];
-    let cursor = 0;
-    for event_name in required {
-        let event_index = ();
-        for index in cursor..state.event_trace.len() {
-            if state.event_trace[index].name == event_name {
-                event_index = index;
-                break;
-            }
-        }
-        if event_index == () {
-            return #{ok: false, expected: required, observed: observed,
-                missing_event: event_name, event_trace: state.event_trace};
-        }
-        observed.push(#{name: event_name, event_index: event_index});
-        cursor = event_index + 1;
-    }
-    #{ok: true, expected: required, observed: observed}
+    griffin_surface_ramp_ops::event_order_report(state.event_trace)
 }
 
 // Route entry is a historical phase fact; guidance authority can end after
@@ -134,6 +116,9 @@ fn route_start_check(state) {
 
 fn finish_surface_ops(state) {
     let ramp_unfold_order = ramp_unfold_order_report(state);
+    let ramp_clear_settled = state.ramp_root_clearance_evidence != ()
+        && state.ramp_root_clearance_evidence.ok == true
+        && state.ramp_root_clearance_evidence.settled == true;
     let ramp_middle_settled = state.ramp_middle_settle_evidence != ()
         && state.ramp_middle_settle_evidence.ok == true
         && state.ramp_middle_settle_evidence.settled == true;
@@ -144,6 +129,7 @@ fn finish_surface_ops(state) {
         && state.ramp_deployment_settle_evidence.ok == true
         && state.ramp_deployment_settle_evidence.settled == true;
     let ramp_deployment_evidence = #{order: ramp_unfold_order,
+        clearance_settle:state.ramp_root_clearance_evidence,
         middle_settle: state.ramp_middle_settle_evidence,
         toe_settle: state.ramp_toe_settle_evidence,
         root_settle: state.ramp_deployment_settle_evidence};
@@ -176,7 +162,7 @@ fn finish_surface_ops(state) {
         #{id: "GR-037-landing-target-datum", component: "landing", requirement: "GriffinSimulationAccuracyRequirements::gr037", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: global::MISSION_ROOT + "/LandingTarget", actual: if state.landing_setup_evidence == () { () } else { state.landing_setup_evidence.landing_target }, expected: "SysML body-reference touchdown Y", ok: state.landing_setup_evidence != () && state.landing_setup_evidence.landing_target != () && state.landing_setup_evidence.landing_target.ok == true, error: "landing target Y does not satisfy GR-037"},
         #{id: "GR-038-landing-surface-datum", component: "landing", requirement: "GriffinSimulationAccuracyRequirements::gr038", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "preflight", path: global::MISSION_ROOT + "/Environment/Terrain", actual: if state.landing_setup_evidence == () { () } else { state.landing_setup_evidence.landing_surface }, expected: "finite source-backed DEM height and target above the measured terrain datum", ok: state.landing_setup_evidence != () && state.landing_setup_evidence.landing_surface != () && state.landing_setup_evidence.landing_surface.ok == true, error: "landing DEM datum does not satisfy GR-038"},
         #{id: "GR-035-egress-terrain-contact", component: "egress_terrain", requirement: "GriffinFunctionalRequirements::gr035", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "contact", path: global::MISSION_ROOT + "/Environment/Terrain", actual: egress_terrain, expected: "four native FLIP wheel contacts on the DEM at ramp exit", ok: egress_terrain_ok, error: "GR-035 native DEM wheel contact evidence is missing"},
-        #{id: "GRR-017-ramp-unfold-order", component: "egress_ramps", requirement: "GriffinRampRequirements::grr017", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander/EgressRampPort", actual: ramp_deployment_evidence, expected: ramp_unfold_order.expected, ok: ramp_unfold_order.ok && ramp_middle_settled && ramp_toe_settled && ramp_root_settled, error: "ramp middle hinges, toe hinges, and deck hinges did not command and settle in the required order"}
+        #{id: "GRR-017-ramp-unfold-order", component: "egress_ramps", requirement: "GriffinRampRequirements::grr017", verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations", kind: "phase", path: global::MISSION_ROOT + "/Lander/EgressRampPort", actual: ramp_deployment_evidence, expected: ramp_unfold_order.expected, ok: ramp_unfold_order.ok && ramp_clear_settled && ramp_middle_settled && ramp_toe_settled && ramp_root_settled, error: "ramp middle hinges, toe hinges, and deck hinges did not command and settle in the required order"}
     ];
     let failures = [];
     for check in checks { if check.ok != true { failures.push(check); } }

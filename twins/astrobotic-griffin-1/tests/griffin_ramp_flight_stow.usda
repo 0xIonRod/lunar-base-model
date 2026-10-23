@@ -1,31 +1,18 @@
 #usda 1.0
 (
-    defaultPrim = "World"
+    defaultPrim = "Griffin1SurfaceOps"
     upAxis = "Y"
     metersPerUnit = 1.0
 )
 
-def Xform "World"
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda@</Griffin1SurfaceOps>
+)
 {
-    def DistantLight "KeyLight"
+    over "Scenario"
     {
-        float intensity = 0.55
-        float angle = 0.5
-        custom double3 xformOp:rotateXYZ = (-35.0, -35.0, 0.0)
-        custom token[] xformOpOrder = ["xformOp:rotateXYZ"]
-    }
-    def Xform "Griffin1" (
-        references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
-    )
-    {
-    }
-    def Scope "Scenario"
-    {
-        def Scope "Mission" (
-            prepend apiSchemas = "LunCoProgramAPI"
-        )
+        over "Mission"
         {
-            uniform token info:implementationSource = "sourceAsset"
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_ramp_flight_stow.rhai@
         }
     }

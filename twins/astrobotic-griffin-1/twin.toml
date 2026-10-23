@@ -99,6 +99,12 @@ script = "scenarios/tests/griffin_ramp_requirements.rhai"
 verdict_channel = "GRIFFIN_RAMP_REQUIREMENTS"
 
 [[verification.cases]]
+name = "GriffinRampRequirements::Verify_GriffinRampPostLanding"
+scene = "tests/griffin_ramp_postlanding.usda"
+script = "scenarios/tests/griffin_ramp_postlanding.rhai"
+verdict_channel = "GRIFFIN_RAMP_POSTLANDING"
+
+[[verification.cases]]
 name = "GriffinRampRequirements::Verify_GriffinRampFlightStow"
 scene = "tests/griffin_ramp_flight_stow.usda"
 script = "scenarios/tests/griffin_ramp_flight_stow.rhai"

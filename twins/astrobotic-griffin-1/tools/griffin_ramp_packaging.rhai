@@ -156,9 +156,14 @@ fn fixture_plan(doc,edit_target){
 // One inboard housing and stem per inner rail, clear of the rotating tongue
 // and walking track. The pin and centre shaft rotate inside its open bore.
 fn bearing_station_plan(doc,edit_target,docs,bank,station){
+    let model=requirements::model();let lander=model.value(owner()+"landerPath");
+    bearing_station_plan_at(doc,edit_target,docs,bank,station,lander,
+        lander+"/"+bank_names(model)[bank]+"/DeckSection/Looks/RampStructure")
+}
+fn bearing_station_plan_at(doc,edit_target,docs,bank,station,lander,material){
     if (bank!=0 && bank!=1) || (station!=0 && station!=1){throw("Select one root bearing station");}
     let model=requirements::model();let own="GriffinRampRootBearingRequirements::RampRootBearing::";
-    let ramp="GriffinRampRequirements::GriffinEgressRamp::";let lander=model.value(owner()+"landerPath");
+    let ramp="GriffinRampRequirements::GriffinEgressRamp::";
     let placement=bank_placements(model,docs,bank);let point=vec3_from(placement.position);
     let width=model.value(ramp+"rampPivotLugWidthM");let depth=model.value(own+"axialLengthM");
     let inside=model.value(own+"innerRadiusM");let outside=model.value(own+"outerRadiusM");
@@ -167,7 +172,6 @@ fn bearing_station_plan(doc,edit_target,docs,bank,station){
     let bottom=spec::component_bus_mount_y()+spec::visual_deck_center_y_m()+spec::visual_deck_thickness_m()/2.0;
     let top=point.y-(inside+outside)/2.0;if top<=bottom || depth<=0.0{throw("Bearing stem has no positive stock");}
     let name="RampMount"+if bank==0{"Port"}else{"Starboard"}+if station==0{"InnerRear"}else{"InnerFront"};
-    let material=lander+"/"+bank_names(model)[bank]+"/DeckSection/Looks/RampStructure";
     let stem=visual::_component_cube_visual_ops(doc,edit_target,lander,name,[point.x,(bottom+top)/2.0,z],(),[width,top-bottom,depth],spec::visual_deck_display_color());
     if !stem.ok{return stem;}let ops=stem.ops;
     ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:lander+"/"+name,schemas:["PhysicsCollisionAPI","MaterialBindingAPI"]}});

@@ -15,7 +15,7 @@ package GriffinRampToeSectionRequirements {
          * degrees around the lower middle/toe axis. The retained total span
          * determines its length after the longer root and shorter middle.
          * SI metres, Y-up, +X from middle fold toward the ground-contact toe.
-         * This detached study component is not installed mechanism acceptance. */
+         * The installed mechanism has a separate post-landing acceptance case. */
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_ramp_toe_visual.usda";
         attribute usdPath : UsdPrimPath = "/World/RampToeSection";
         attribute lengthM : Real = GriffinRampRequirements::GriffinEgressRamp::rampSurfaceLengthM
