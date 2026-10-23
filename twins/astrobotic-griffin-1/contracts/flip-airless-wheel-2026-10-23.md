@@ -81,8 +81,11 @@ or run the `FlipAirlessWheelRequirements::Verify_FLIPAirlessWheel` case with
 `tests/flip_airless_wheel_oversize.usda`; launch it directly with its scene and
 verdict channel, since the verification selector maps the positive scene.
 
-The production rover still uses its cylinder/shader appearance. Installing the
-new component on all four wheels, replacing the stale single-cylinder visual
-requirement, and checking native render-root binding/roll are the next assembly
-step. The component qualifies no ramp path, load-deflection or full-mission
-performance. The optimization-owned physics findings remain separate.
+The [installation checkpoint](flip-wheel-install-2026-10-23.md) now references
+the component from all four hidden wheel proxies and replaces the former
+single-cylinder visual requirement. Its 129-check production gate accepts the
+authored topology. Measured native roll, windowed appearance, the enlarged
+Griffin ramp payload sweep and full-mission performance remain open. The
+Editor has a separate inherited primitive-basis defect; the checkpoint records
+it without changing the source axle to compensate. The optimization-owned
+physics findings remain separate.

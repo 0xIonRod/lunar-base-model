@@ -99,7 +99,7 @@ fn on_tick(me, ctx) {
         let station = ROOT + "/Suspension_" + name;
         let wheel = station + "/Wheel_" + name;
         checks.push(_exists("FGV-003-" + name, "fvg003", wheel, "Cylinder"));
-        for check in flip_wheel_checks::single_surface("FGV-003-" + name,
+        for check in flip_wheel_checks::render_surface("FGV-003-" + name,
             "wheel", "fvg003", VERIFICATION, wheel) { checks.push(check); }
         checks.push(#{id: "FGV-003-" + name + "-radius", component: "wheel",
             requirement: "fvg003", verification: VERIFICATION,

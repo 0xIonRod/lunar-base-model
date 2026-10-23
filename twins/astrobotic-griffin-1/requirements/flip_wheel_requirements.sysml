@@ -6,6 +6,7 @@ package FlipWheelRequirements {
     private import GriffinRequirementSources::UsdPrimPath;
 
     enum def FlipWheelAxis { Z; }
+    enum def FlipWheelRenderRoot { Render; }
 
     part def FlipDirectionalWheelAssembly {
         attribute usdRootPath : UsdPrimPath = "/World/FLIP";
@@ -16,13 +17,25 @@ package FlipWheelRequirements {
         ref part suspension : FlipSuspensionRequirements::FlipSuspensionComponent;
         ref attribute suspensionRestLengthM : FlipRequirements::FlipRover::suspensionRestLengthM;
         attribute wheelAxis : FlipWheelAxis = "Z";
+        attribute renderRootName : FlipWheelRenderRoot = "Render";
+        ref part visualComponent : FlipAirlessWheelRequirements::AirlessWheelVisual;
     }
 
     requirement def FWW001_WheelCount {
         doc /* FWW-001 [topology] exactly four named FLIP directional wheel stations are active: FL, RL, FR, and RR. */
     }
     requirement def FWW002_WheelGeometry {
-        doc /* FWW-002 [visual] each active station uses its physical UsdGeomCylinder as the sole tire surface. No additional Visual/Tire geometry shall be authored. The shared tire material supplies rim, hub and tread appearance. Rationale: lunco-usd-sim::spawn_wheel_visual already transfers this cylinder mesh to a runtime render child driven by wheel state; a second authored tire creates duplicate surfaces. Source: LunCoSim skills/build-vehicle/SKILL.md and crates/lunco-usd-sim/src/lib.rs, inspected 2026-09-30. */
+        doc /* FWW-002 [visual] every wheel shall retain its analytic Cylinder as
+         * a hidden purpose=proxy contact owner, with VisibilityAPI and
+         * proxyVisibility=invisible. One centred Xform child, named by
+         * renderRootName, shall have purpose=render and renderVisibility=visible,
+         * reference visualComponent.componentAsset, and retain the wheel-local transform
+         * stack. The component owns its geometry and four surface materials.
+         * Native wheel presentation shall bind that root and inherit measured
+         * axle roll. Extra render roots and misaligned root frames are invalid.
+         * Source: LunCoSim skills/build-vehicle/SKILL.md and the production
+         * wheel_render_root contract; component basis is
+         * contracts/flip-airless-wheel-2026-10-23.md. */
     }
     requirement def FWW003_SteeringArchitecture {
         doc /* FWW-003 [behavior] the composed FLIP vehicle uses the SysML-selected steering architecture; the shared skid drive law turns it with independent left/right wheel drive on fixed-axis wheels. */
@@ -37,7 +50,15 @@ package FlipWheelRequirements {
         doc /* FWW-006 [integration] each active wheel station references the detached FlipSuspension component; its internal geometry and collision contract are verified by FlipSuspensionRequirements. */
     }
     requirement def FWW007_WheelEnvelope {
-        doc /* FWW-007 [geometry] the wheel cylinder radius and height shall match the physical wheel radius and width, with a Z axle in the reconstructed X-forward frame. Its purpose is default so the same geometry serves rendering and contact. Suspension and spin shall drive the runtime render child from wheel state, preserving the authored axle and rest pose. Dimensions remain study estimates in griffin-size-evidence.md; deleting duplicate geometry does not change their evidential status. */
+        doc /* FWW-007 [geometry] the hidden wheel cylinder radius and height
+         * shall match the physical wheel radius and width, with a Z axle in the
+         * reconstructed X-forward frame. The separate render component shall
+         * remain within this nominal wheel envelope, qualified by
+         * FlipAirlessWheelRequirements. Suspension and spin shall use the native
+         * render-root binding, preserving the authored axle and rest pose.
+         * Contact, inertia, suspension and drivetrain parameters remain unchanged.
+         * Diameter has the published Venturi basis; the retained width and other
+         * metric assumptions retain their status in griffin-size-evidence.md. */
     }
 
     requirement <'FWW-001'> fww001 : FWW001_WheelCount { subject wheels : FlipDirectionalWheelAssembly; }

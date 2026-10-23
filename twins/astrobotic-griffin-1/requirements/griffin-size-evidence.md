@@ -343,7 +343,17 @@ powered-descent startup, not an accepted landing.
 
 ### FLIP wheel ownership correction, 2026-09-30
 
-Four wheel stations remain. Each physical wheel cylinder is now the sole tire geometry source; the redundant three-cylinder visual component is removed. LunCoSim's `spawn_wheel_visual` already transfers the source mesh to a render child driven by suspension and spin. The shared selected tire material supplies tread, rim and hub appearance. Source: simulator `skills/build-vehicle/SKILL.md`, `crates/lunco-usd-sim/src/lib.rs`, `assets/components/mobility/wheel.usda` and `assets/components/mobility/tires/regolith.usda`, inspected 2026-09-30. Existing 0.45 m radius and 0.28 m width remain explicit reconstruction estimates, not newly sourced flight dimensions. Animation must preserve the authored Z axle; a fixed X-axle visual rotation is invalid. Static ownership checks do not establish dynamic acceptance.
+The September correction removed redundant three-cylinder tire geometry.
+Its single-cylinder appearance and 0.45 m study radius are superseded by the
+[23 October airless wheel reconstruction](../contracts/flip-airless-wheel-2026-10-23.md)
+and [four-station installation checkpoint](../contracts/flip-wheel-install-2026-10-23.md).
+The sourced 0.465 m radius and retained estimated 0.28 m width now apply.
+Each analytic cylinder remains the mechanical owner, hidden with purpose=proxy;
+one centred purpose=render root references the detached component. The current
+native contract is in simulator `skills/build-vehicle/SKILL.md` and
+`crates/lunco-usd-sim-authoring/src/wheel_visual.rs`, inspected 2026-10-23.
+Animation must preserve the authored Z axle. Static ownership checks do not
+establish dynamic or installed visual acceptance.
 
 ## Landing-gear reconstruction, 2026-09-30
 

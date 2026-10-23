@@ -122,7 +122,7 @@ package FlipRequirements {
     }
 
     requirement def FLIPV003_WheelStations {
-        doc /* FGV-003 [topology] each of the four typed wheel stations shall use one physical wheel cylinder with the authored envelope and a shared tire material. The material supplies tread, hub and rim appearance; no second authored tire surface is permitted. The detailed ownership contract is FWW-002 in FlipWheelRequirements. */
+        doc /* FGV-003 [topology] each of the four typed wheel stations shall retain one hidden analytic wheel cylinder and one centred render root referencing the reusable airless wheel component. Contact and mechanical ownership remain on the cylinder. The detailed ownership contract is FWW-002 in FlipWheelRequirements. */
     }
 
     requirement def FLIPV004_SensorAndPower {

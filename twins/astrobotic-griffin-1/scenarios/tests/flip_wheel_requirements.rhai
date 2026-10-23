@@ -75,7 +75,7 @@ fn run_wheel_review() {
         let station = root + "/Suspension_" + name;
         let wheel = station + "/Wheel_" + name;
         checks.push(sysml_requirement_checks::exists("FWW-001-" + name, "wheel", "fww001", verification(), wheel, "Cylinder"));
-        for check in flip_wheel_checks::single_surface("FWW-002-" + name,
+        for check in flip_wheel_checks::render_surface("FWW-002-" + name,
             "wheel", "fww002", verification(), wheel) { checks.push(check); }
         checks.push(#{id: "FWW-002-" + name + "-radius", component: "wheel",
             requirement: "fww002", verification: verification(),

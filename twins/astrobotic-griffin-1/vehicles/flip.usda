@@ -158,7 +158,7 @@ def Xform "FLIP" (
         custom double3 xformOp:translate = (0.65, -0.05, -1.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_FL" (
-            prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
+            prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "MaterialBindingAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI", "VisibilityAPI"]
             prepend references = [@lunco://components/mobility/wheel.usda@</Wheel>, @lunco://components/mobility/suspensions/standard.usda@</Suspension>]
         )
         {
@@ -172,8 +172,21 @@ def Xform "FLIP" (
             float inputs:drive.connect = </FLIP/Shaft_FL.outputs:torque>
             float lunco:suspension:restLength = 0.7649999856948853
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            uniform token purpose = "default"
+            uniform token purpose = "proxy"
             uniform token axis = "Z"
+            uniform token proxyVisibility = "invisible"
+            def Xform "Render" (
+                references = @../components/rover/flip_airless_wheel_visual.usda@
+                prepend apiSchemas = ["VisibilityAPI"]
+            )
+            {
+                uniform token purpose = "render"
+                uniform token renderVisibility = "visible"
+                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+            }
         }
         def Xform "Visual" (
             references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
@@ -190,7 +203,7 @@ def Xform "FLIP" (
         custom double3 xformOp:translate = (0.65, -0.05, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_FR" (
-            prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
+            prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "MaterialBindingAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI", "VisibilityAPI"]
             prepend references = [@lunco://components/mobility/wheel.usda@</Wheel>, @lunco://components/mobility/suspensions/standard.usda@</Suspension>]
         )
         {
@@ -204,8 +217,21 @@ def Xform "FLIP" (
             float inputs:drive.connect = </FLIP/Shaft_FR.outputs:torque>
             float lunco:suspension:restLength = 0.7649999856948853
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            uniform token purpose = "default"
+            uniform token purpose = "proxy"
             uniform token axis = "Z"
+            uniform token proxyVisibility = "invisible"
+            def Xform "Render" (
+                references = @../components/rover/flip_airless_wheel_visual.usda@
+                prepend apiSchemas = ["VisibilityAPI"]
+            )
+            {
+                uniform token purpose = "render"
+                uniform token renderVisibility = "visible"
+                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+            }
         }
         def Xform "Visual" (
             references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
@@ -222,7 +248,7 @@ def Xform "FLIP" (
         custom double3 xformOp:translate = (-0.65, -0.05, -1.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_RL" (
-            prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
+            prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "MaterialBindingAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI", "VisibilityAPI"]
             prepend references = [@lunco://components/mobility/wheel.usda@</Wheel>, @lunco://components/mobility/suspensions/standard.usda@</Suspension>]
         )
         {
@@ -236,8 +262,21 @@ def Xform "FLIP" (
             float inputs:drive.connect = </FLIP/Shaft_RL.outputs:torque>
             float lunco:suspension:restLength = 0.7649999856948853
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            uniform token purpose = "default"
+            uniform token purpose = "proxy"
             uniform token axis = "Z"
+            uniform token proxyVisibility = "invisible"
+            def Xform "Render" (
+                references = @../components/rover/flip_airless_wheel_visual.usda@
+                prepend apiSchemas = ["VisibilityAPI"]
+            )
+            {
+                uniform token purpose = "render"
+                uniform token renderVisibility = "visible"
+                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+            }
         }
         def Xform "Visual" (
             references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@
@@ -254,7 +293,7 @@ def Xform "FLIP" (
         custom double3 xformOp:translate = (-0.65, -0.05, 1.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_RR" (
-            prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI"]
+            prepend apiSchemas = ["PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "MaterialBindingAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI", "VisibilityAPI"]
             prepend references = [@lunco://components/mobility/wheel.usda@</Wheel>, @lunco://components/mobility/suspensions/standard.usda@</Suspension>]
         )
         {
@@ -268,8 +307,21 @@ def Xform "FLIP" (
             float inputs:drive.connect = </FLIP/Shaft_RR.outputs:torque>
             float lunco:suspension:restLength = 0.7649999856948853
             custom rel physics:filteredPairs = [</FLIP/Chassis/LowerFrame>, </FLIP/Chassis/WhiteEquipmentBox>, </FLIP/Chassis/FrontBumper>, </FLIP/Chassis/PayloadDeck>]
-            uniform token purpose = "default"
+            uniform token purpose = "proxy"
             uniform token axis = "Z"
+            uniform token proxyVisibility = "invisible"
+            def Xform "Render" (
+                references = @../components/rover/flip_airless_wheel_visual.usda@
+                prepend apiSchemas = ["VisibilityAPI"]
+            )
+            {
+                uniform token purpose = "render"
+                uniform token renderVisibility = "visible"
+                custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+            }
         }
         def Xform "Visual" (
             references = @twin://astrobotic-griffin-1/components/rover/flip_suspension_visual.usda@

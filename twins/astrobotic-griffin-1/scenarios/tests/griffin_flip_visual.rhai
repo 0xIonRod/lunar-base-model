@@ -282,7 +282,7 @@ fn run_visual_review(batch_index) {
     let wheel_names = _sysml_list(source, "wheelStations");
     for name in wheel_names {
         checks.push(flip_visual_exists_check("GV-003-wheel-" + name, "wheels", "exists", root + "/FLIP/Suspension_" + name + "/Wheel_" + name));
-        for check in flip_wheel_checks::single_surface("GV-003-wheel-" + name,
+        for check in flip_wheel_checks::render_surface("GV-003-wheel-" + name,
             "wheels", "fvg001", "Verify_GriffinVisualRequirements",
             root + "/FLIP/Suspension_" + name + "/Wheel_" + name) { checks.push(check); }
     }

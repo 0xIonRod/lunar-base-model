@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "verification": "FlipWheelRequirements::Verify_FLIPWheelRequirements",
+  "process_exit_code": 0,
+  "process_status": "verdict_produced",
+  "source_revision_at_start": 12206982448573308549,
+  "source_revision_at_end": 12206982448573308549,
+  "verdict": "pass",
+  "verdict_channel": "FLIP_WHEEL_REQUIREMENTS",
+  "mechanical_audit": [
+    {
+      "station": "FL",
+      "attributes_preserved": true,
+      "relationships_preserved": true,
+      "schema_delta": [
+        "VisibilityAPI"
+      ],
+      "added_child": "/FLIP/Suspension_FL/Wheel_FL/Render"
+    },
+    {
+      "station": "RL",
+      "attributes_preserved": true,
+      "relationships_preserved": true,
+      "schema_delta": [
+        "VisibilityAPI"
+      ],
+      "added_child": "/FLIP/Suspension_RL/Wheel_RL/Render"
+    },
+    {
+      "station": "FR",
+      "attributes_preserved": true,
+      "relationships_preserved": true,
+      "schema_delta": [
+        "VisibilityAPI"
+      ],
+      "added_child": "/FLIP/Suspension_FR/Wheel_FR/Render"
+    },
+    {
+      "station": "RR",
+      "attributes_preserved": true,
+      "relationships_preserved": true,
+      "schema_delta": [
+        "VisibilityAPI"
+      ],
+      "added_child": "/FLIP/Suspension_RR/Wheel_RR/Render"
+    }
+  ],
+  "production_checks": 129,
+  "accepted_scope": "authored four-station render-root topology and mechanical-parameter preservation",
+  "open_acceptance": [
+    "measured native roll",
+    "production windowed visual review",
+    "Editor inherited primitive-basis projection defect",
+    "updated Griffin ramp payload sweep",
+    "60 FPS mission acceptance"
+  ],
+  "source_hashes": {
+    "vehicles/flip.usda": "33ffa49b2d780317bc1ff9a718112e973999b206351b752b32a7dbfe71605b98",
+    "tools/flip_wheel_checks.rhai": "fad33137da2c5134a8bb5ecad9b0cc76ea27b7f9d3ab24585e7fdcf0c18888a8",
+    "requirements/flip_wheel_requirements.sysml": "2bc30fb92481982824d2f91107933e672aed99fc7fc740e0cd8cf6ba4b1b0c56",
+    "tools/flip_wheel_install.rhai": "f42189595086e24019c15950f79f9fcec509cb90771ae002f6f27122861bde3d",
+    "requirements/flip_requirements.sysml": "743e43f01c471ff394031f96307abaeecc595198ccb8fc1305c99dee3c786f0d",
+    "scenarios/tests/flip_wheel_requirements.rhai": "30440d174312755892e53e49a6d1884517082a9ebd560350e4d4aa6fbf1d0454",
+    "scenarios/tests/flip_requirements.rhai": "b7d6056fe303e67516cb5d1ed71a36cb7b0c20cd1462f8578fd509aed09e48ed",
+    "scenarios/tests/griffin_flip_visual.rhai": "e25e6417e8056aeb08ce5ece841a437d82d0b29b68b5687605116a861cfba4fe"
+  },
+  "binary_revision": "0cb4d37137554af3227a316100c903f44a1c3a4c",
+  "binary_sha256": "5b24ec52f8893910cf764334a75279a20522bfdd8d30d0bbfdb827b5ed28c73d",
+  "component_gate_checks": 18,
+  "negative": {
+    "change": "FL render-root translation x=0.01 m",
+    "failed_checks": 1,
+    "failed_id": "FWW-FL-xformOp:translate-0",
+    "restored_checks_passed": 18,
+    "restored_through": "UndoDocument and SaveDocument"
+  }
+}

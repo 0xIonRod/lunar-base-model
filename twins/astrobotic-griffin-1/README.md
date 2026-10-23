@@ -76,8 +76,11 @@ The production vehicle still contains the earlier mechanism. Full obstacle
 clearance, native loaded deployment and clean 60 FPS remain open.
 The detached [airless wheel component](contracts/flip-airless-wheel-2026-10-23.md)
 now reconstructs Venturi's cable/spring wheel architecture and passes 62
-production checks. It is not yet installed on the rover; the existing physical
-wheel, contact model and active cylinder/shader appearance remain unchanged.
+production checks. Its four installed render roots now pass 129 authored
+wheel checks, with mechanical fields and wiring preserved. Native roll,
+windowed appearance and the enlarged ramp payload study remain unaccepted;
+the [installation checkpoint](contracts/flip-wheel-install-2026-10-23.md)
+records an Editor projection defect separately.
 The seven-engine/four-leg configuration is source-backed; current metric
 dimensions, mass properties and propulsion ratings remain reconstruction or
 integration-study inputs.
