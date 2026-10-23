@@ -40,8 +40,11 @@ fn simulation_dependencies(me, ctx) {
         lander_environment, altimeter];
     let entity_writes = [rover, gnc];
     for name in ["EgressRampPort","EgressRampPortTrackStarboard","EgressRampStarboard","EgressRampStarboardTrackStarboard"] {
-        entity_reads.push(find_path(LANDER+"/"+name));
+        for suffix in ["","/MiddleSection","/MiddleSection/ToeSection"] {
+            entity_reads.push(find_path(LANDER+"/"+name+suffix));
+        }
     }
+    for name in ["TransitionPlatePort","TransitionPlateStarboard"] {entity_reads.push(find_path(LANDER+"/"+name));}
     for station in ["FL", "FR", "RL", "RR"] {
         entity_reads.push(find_path(ROVER+"/Suspension_"+station+"/Wheel_"+station));
     }
@@ -144,6 +147,8 @@ fn on_start(me, ctx) {
     this.ramp_unfold_waypoint_evidence = [];
     this.ramp_deployment_expected = ();
     this.ramp_traversal_stable_since = ();
+    this.ramp_contact_geometry = ();
+    this.ramp_deployment_mode = ();
     this.ramp_middle_settle_evidence = ();
     this.ramp_toe_settle_evidence = ();
     this.ramp_section_settle_evidence = ();
@@ -655,6 +660,14 @@ fn ramp_unfold_task() {
         once(|m| {
             let plan=griffin_surface_ramp_ops::root_deployment_plan();
             this.ramp_terrain_plan=plan;
+            this.ramp_deployment_mode=plan.mode;
+            this.ramp_contact_geometry=if plan.mode=="terrain_contact" {griffin_ramp_contact::capture()} else {()};
+            if plan.mode=="terrain_contact" && this.ramp_contact_geometry.ok!=true {
+                this.ramp_timeout=true;
+                this.ramp_deployment_settle_evidence=this.ramp_contact_geometry;
+                this.phase_failure_reported=griffin_surface_mission_report::fail_phase(this,"ramp-contact-geometry");
+                return true;
+            }
             this.ramp_deployment_expected=if plan.ok==true {plan.expected_angles} else {()};
             if this.ramp_deployment_expected!=() {
                 for expected in this.ramp_sections_expected {
@@ -699,7 +712,8 @@ fn ramp_unfold_task() {
                     this.ramp_root_motion=motion.motion;
                     if !motion.complete{return false;}
                     let progress=griffin_surface_ramp_ops::traversal_settle_progress(
-                        this.ramp_deployment_expected,this.ramp_traversal_stable_since);
+                        this.ramp_deployment_expected,this.ramp_traversal_stable_since,
+                        this.ramp_contact_geometry,this.ramp_deployment_mode);
                     this.ramp_traversal_stable_since=progress.stable_since;
                     this.ramp_deployment_settle_evidence=progress.evidence;
                     progress.ok==true && progress.settled==true
@@ -709,7 +723,8 @@ fn ramp_unfold_task() {
                 wait(30.0),
                 once(|m| {
                     let progress=griffin_surface_ramp_ops::traversal_settle_progress(
-                        this.ramp_deployment_expected,this.ramp_traversal_stable_since);
+                        this.ramp_deployment_expected,this.ramp_traversal_stable_since,
+                        this.ramp_contact_geometry,this.ramp_deployment_mode);
                     this.ramp_traversal_stable_since=progress.stable_since;
                     this.ramp_deployment_settle_evidence=progress.evidence;
                     this.ramp_timeout = true;
@@ -723,7 +738,7 @@ fn ramp_unfold_task() {
             this.ramps_deployed = true;
             emit(griffin_surface_ramp_ops::unfold_event_contract().roots_settled);
             griffin_controls::show_rover_release_actions();
-            print("[griffin] both physical ramps reached their measured deployment hinge targets");
+            print("[griffin] all four ramp tracks passed measured deployment readiness");
             if is_unattended() {
                 if release_rover(this, false) {
                     this.release_requested = true;

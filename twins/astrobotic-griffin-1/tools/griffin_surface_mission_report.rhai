@@ -40,6 +40,24 @@ fn recent_motion_samples(trace) {
     samples
 }
 
+fn traversal_snapshot(evidence) {
+    if evidence==(){return ();}
+    let result=#{};
+    if evidence.contact!=() {
+        let contact=evidence.contact;let rows=[];
+        if contact.tracks!=(){for track in contact.tracks{rows.push(#{track:track.track,
+            minimum_toe_clearance_m:track.minimum_toe_clearance_m,entry_gap_m:track.entry_gap_m,
+            toe_contact:track.toe_contact,deck_continuous:track.deck_continuous});}}
+        result.contact=#{ok:contact.ok,ready:contact.ready,tracks:rows,
+            tolerance_m:contact.tolerance_m,interface_tolerance_m:contact.interface_tolerance_m,
+            source_revision:contact.source_revision,document_generation:contact.document_generation,stage_generation:contact.stage_generation};
+        if contact.error!=(){result.contact.error=contact.error;}
+    }
+    for field in ["ok","settled","hinges_settled","mode","dwell_elapsed_s","dwell_required_s"] {
+        if evidence[field]!=(){result[field]=evidence[field];}
+    }result
+}
+
 fn fail_phase(state, phase) {
     if state.phase_failure_reported == true { return true; }
     print("[griffin] phase failure: " + phase);
@@ -64,7 +82,11 @@ fn fail_phase(state, phase) {
     // Preserve the facts needed to diagnose this phase, rather than repeat
     // complete geometry/provider snapshots and the whole historical trace.
     // Each failed result is streamed independently from the summary below.
-    let source = sysml_requirements::source();
+    // Only these identities are needed here. A full-Twin projection can
+    // exceed the Rhai bridge budget before the failure event is delivered.
+    let source = sysml_requirements::source_with_selection([], [
+        "GriffinFunctionalRequirements::gr004", "GriffinSimulationAccuracyRequirements::gr039"],
+        ["Griffin1Requirements::Verify_GriffinSurfaceOperations"]);
     let failure = #{id: "GR-004-phase-" + phase, component: "mission",
         requirement: "GriffinFunctionalRequirements::gr004",
         verification: "Griffin1Requirements::Verify_GriffinSurfaceOperations",
@@ -72,8 +94,9 @@ fn fail_phase(state, phase) {
         actual: #{phase: phase, sim_tick: sim_tick(),
             hinges: ramp_joints, bodies: ramp_runtime,
             settlement: settle_snapshot(state.ramp_section_settle_evidence),
+            traversal: traversal_snapshot(state.ramp_deployment_settle_evidence),
             expected_angles: state.ramp_sections_expected,
-            recent_motion: recent_motion_samples(state.ramp_motion_trace)},
+            recent_motion: if state.ramp_deployment_settle_evidence==() {recent_motion_samples(state.ramp_motion_trace)} else {[]}},
         expected: "completed", ok: false, error: "mission phase or preflight failed"};
     let mass_evidence = state.guidance_assembly_mass_evidence;
     let mass_ok = mass_evidence != () && mass_evidence.ok == true;
@@ -95,7 +118,7 @@ fn fail_phase(state, phase) {
         metrics: #{phase: phase, event_trace: state.event_trace,
             clocks: clock_snapshot(), landing_gates: landing}},
         "GRIFFIN SURFACE OPS", "GRIFFIN_SURFACE_OPS");
-    emit("griffin_phase_timeout");
+    emit("griffin_phase_timeout", #{phase:phase,traversal:traversal_snapshot(state.ramp_deployment_settle_evidence)});
     true
 }
 

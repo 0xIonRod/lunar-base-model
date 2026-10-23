@@ -745,13 +745,24 @@ package GriffinRampRequirements {
          * Speed and dwell are unqualified study choices: at this rate a
          * hinge advances <=0.02 rad in the dwell, below the angle tolerance;
          * 1 s exceeds the observed 0.25 s overshoot window by four times.
-         * This does not prove toe contact, deck continuity, load capacity or
-         * hardware stability. Supplier actuator and deployed-lock data are
+         * Landed release also requires actual cooked toe vertices within the
+         * terrain-contact allowance and deck-entry tire corridors within the
+         * traversal-interface allowance throughout the same dwell. Airborne
+         * manual opening remains a pose-only operation. These observations
+         * do not establish load capacity or hardware stability.
+         * Supplier actuator and deployed-lock data are
          * unavailable. The native port is Avian revolute angular_velocity,
          * SI rad/s, from lunco-cosim/src/joint.rs and ports.rs. */
         attribute physicalRampHingeSettleAngleToleranceRad : Real = 0.035;
         attribute physicalRampHingeSettleSpeedToleranceRadPerS : Real = 0.02;
         attribute physicalRampTraversalSettleDwellS : Real = 1.0;
+        /* Runtime path allowance, 2026-10-23: reuse the existing 20 mm
+         * terrain-contact study budget at the loaded deck/root interface.
+         * Sample the actual 280 mm tire corridor, not the plate overhang.
+         * This is distinct from the unchanged 2 mm source assembly-fit
+         * tolerance. It is an unqualified traversal study limit, not an ICD. */
+        attribute physicalRampTraversalInterfaceToleranceM : Real =
+            GriffinEgressRamp::physicalRampTerrainContactToleranceM;
         /* Motion estimate, 2026-10-03: each measured 90-degree unfold
          * waypoint uses a six-second quintic command profile, with zero
          * endpoint speed and acceleration. Average speed is 15 deg/s and
@@ -999,7 +1010,19 @@ package GriffinRampRequirements {
 
     verification def Verify_GriffinRampPostLanding {
         doc /* Production descent followed by measured root-clear, middle,
-         * opposite-toe and final root-lowering settlement. No pose overrides. */
+         * opposite-toe and final root-lowering settlement, actual toe contact
+         * and deck-entry tire-corridor continuity. No pose overrides. */
+        subject ramp : GriffinEgressRamp;
+        verify grr017;
+    }
+
+    verification def Verify_GriffinRampToeContactRejection {
+        doc /* Shortened native toe stock must block release despite settled hinges. */
+        subject ramp : GriffinEgressRamp;
+        verify grr017;
+    }
+    verification def Verify_GriffinRampDeckContactRejection {
+        doc /* Lowered bridge stock must block release despite settled hinges. */
         subject ramp : GriffinEgressRamp;
         verify grr017;
     }

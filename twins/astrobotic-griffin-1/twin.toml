@@ -383,3 +383,15 @@ name = "GriffinLandingLegRequirements::Verify_GriffinRoverLegCollision"
 scene = "tests/griffin_rover_leg_collision.usda"
 script = "scenarios/tests/griffin_rover_leg_collision.rhai"
 verdict_channel = "GRIFFIN_ROVER_LEG_COLLISION"
+
+[[verification.cases]]
+name = "GriffinRampRequirements::Verify_GriffinRampToeContactRejection"
+scene = "tests/griffin_ramp_toe_gap.usda"
+script = "scenarios/tests/griffin_ramp_contact_rejection.rhai"
+verdict_channel = "GRIFFIN_RAMP_CONTACT_REJECTION"
+
+[[verification.cases]]
+name = "GriffinRampRequirements::Verify_GriffinRampDeckContactRejection"
+scene = "tests/griffin_ramp_deck_gap.usda"
+script = "scenarios/tests/griffin_ramp_contact_rejection.rhai"
+verdict_channel = "GRIFFIN_RAMP_CONTACT_REJECTION"

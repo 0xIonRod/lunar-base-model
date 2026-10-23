@@ -20,9 +20,9 @@ fn on_event(me,event,ctx){
     if event.name==this.contract.root_clear_commanded{this.opening_landing=surface::landed_status();}
     if event.name==this.contract.root_clear_settled || event.name==this.contract.middle_settled
         || event.name==this.contract.toes_settled || event.name==this.contract.roots_settled{
-        this.snapshots[event.name]=surface::physical_ramp_hinge_report();
+        this.snapshots[event.name]=surface::physical_ramp_joint_evidence();
     }
-    if event.name==this.contract.roots_settled{this.finished=true;}
+    if event.name==this.contract.roots_settled{this.finished=true;this.contact=griffin_ramp_contact::observe(griffin_ramp_contact::capture());}
 }
 fn hinge_at(snapshot,name){
     if snapshot==() || snapshot.ok!=true{throw("Measured hinge snapshot unavailable");}
@@ -71,6 +71,15 @@ fn on_tick(me,ctx){
                 || abs(h.measured_angular_speed_rad_per_s)>spec::physical_ramp_hinge_settle_speed_tolerance_rad_per_s(){failures.push("Root did not settle in its outward deployment envelope: "+h.name);}
         }
     }
+    if this.finished {
+        count+=1;
+        if this.contact==() || this.contact.ok!=true || this.contact.tracks.len()!=4 {failures.push("Native ramp contact evidence unavailable");}
+        else {for track in this.contact.tracks {
+            count+=2;
+            if !track.toe_contact {failures.push("Actual toe is not at retained terrain: "+track.track);}
+            if !track.deck_continuous {failures.push("Actual tire corridor is discontinuous at deck: "+track.track);}
+        }}
+    }
     let route=[];
     if this.route_started{
         let plan=this.route_plan;
@@ -89,7 +98,7 @@ fn on_tick(me,ctx){
     }
     report_structured_verdict(#{ok:failures.len()==0,verdict:if failures.len()==0{"pass"}else{"fail"},check_count:count,
         failure_count:failures.len(),pass_count:count-failures.len(),failures:failures,source_revision:requirements::model().source_revision,
-        metrics:#{route_annotations:route,events:this.events,chronology:chronology,opening_landing:this.opening_landing,measured_hinge_snapshots:this.snapshots,
+        metrics:#{contact:this.contact,route_annotations:route,events:this.events,chronology:chronology,opening_landing:this.opening_landing,measured_hinge_snapshots:this.snapshots,
             scope:"Production descent and measured root-clear/middle/opposite-toe/root-lowering sequence; no pose overrides"}},
         "GRIFFIN POST-LANDING RAMP DEPLOYMENT","GRIFFIN_RAMP_POSTLANDING");this.done=true;
 }

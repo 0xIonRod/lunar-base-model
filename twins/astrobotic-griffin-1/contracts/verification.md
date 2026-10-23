@@ -1,6 +1,12 @@
 # Griffin verification boundary
 
-The current [size, independent-track, RCS and waypoint review](griffin-fidelity-review-2026-10-23.md) passes 199 production checks: 54 integration, 40 stow, 16 toe geometry, 43 descent/deployment/waypoint, 31 RCS and 15 panel-contact checks. Four three-span wheel tracks fit terrain independently. Windowed manual opening also reaches all twelve hinge goals. This supersedes the installed equal-span and paired-track coupling checkpoints below; their results retain their original revision scope. Complete loaded rover traversal, flight dimensions and clean 60 FPS real-time acceptance remain open.
+The [landed ramp contact gate](griffin-ramp-contact-2026-10-23.md) adds actual
+cooked toe/terrain and deck-entry tire-corridor checks to the existing hinge
+settlement dwell. Its three production replays cover normal deployment and two
+authored contact faults; the receipt records 78 focused checks. Full loaded
+traversal and clean 60 FPS real-time acceptance remain open.
+
+The earlier [size, independent-track, RCS and waypoint review](griffin-fidelity-review-2026-10-23.md) passes 199 production checks: 54 integration, 40 stow, 16 toe geometry, 43 descent/deployment/waypoint, 31 RCS and 15 panel-contact checks. Four three-span wheel tracks fit terrain independently. Windowed manual opening also reaches all twelve hinge goals. This supersedes the installed equal-span and paired-track coupling checkpoints below; their results retain their original revision scope. Complete loaded rover traversal, flight dimensions and clean 60 FPS real-time acceptance remain open.
 
 The [solar collision repair](griffin-solar-collision-2026-10-23.md) adds
 59 frame/backplane stock colliders without filling the panel openings.

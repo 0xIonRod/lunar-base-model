@@ -1,0 +1,782 @@
+{
+  "date": "2026-10-23",
+  "scope": "Actual cooked toe/terrain contact and deck-entry continuity gate before landed ramp readiness",
+  "base_commit": "9cd44a0e9aebcf9f76526ecdf22f92d60ad0197c",
+  "binary": {
+    "path": "/home/rod/.cache/griffin-review-20261023/griffin-review",
+    "build": "3ebc93a7-dirty",
+    "sha256": "6fb5f3596919d4ba9d675d71b4b4163d3a37b4129d9dfa5281b5cc12cbb3d248"
+  },
+  "profile": {
+    "tick_hz": 60,
+    "compute_threads": 1,
+    "jitter": 0,
+    "seed": "6840157149251759617",
+    "substeps": "unchanged production defaults"
+  },
+  "cases": [
+    {
+      "scene": "tests/griffin_ramp_postlanding.usda",
+      "channel": "GRIFFIN_RAMP_POSTLANDING",
+      "checks": 52,
+      "verdict": "pass",
+      "source_revision": "15156805741260234840",
+      "sim_tick": 3562,
+      "metrics": {
+        "chronology": {
+          "expected": [
+            "griffin_ramp_root_clearance_commanded",
+            "griffin_ramp_root_clearance_settled",
+            "griffin_ramp_middle_sections_unfold_commanded",
+            "griffin_ramp_middle_sections_unfold_settled",
+            "griffin_ramp_toes_unfold_commanded",
+            "griffin_ramp_toes_unfold_settled",
+            "griffin_ramps_deploy_commanded",
+            "griffin_ramp_deployment_settled"
+          ],
+          "observed": [
+            {
+              "event_index": 0,
+              "name": "griffin_ramp_root_clearance_commanded",
+              "sim_tick": 1432
+            },
+            {
+              "event_index": 2,
+              "name": "griffin_ramp_root_clearance_settled",
+              "sim_tick": 1564
+            },
+            {
+              "event_index": 1,
+              "name": "griffin_ramp_middle_sections_unfold_commanded",
+              "sim_tick": 1564
+            },
+            {
+              "event_index": 3,
+              "name": "griffin_ramp_middle_sections_unfold_settled",
+              "sim_tick": 2284
+            },
+            {
+              "event_index": 4,
+              "name": "griffin_ramp_toes_unfold_commanded",
+              "sim_tick": 2284
+            },
+            {
+              "event_index": 5,
+              "name": "griffin_ramp_toes_unfold_settled",
+              "sim_tick": 3004
+            },
+            {
+              "event_index": 6,
+              "name": "griffin_ramps_deploy_commanded",
+              "sim_tick": 3004
+            },
+            {
+              "event_index": 7,
+              "name": "griffin_ramp_deployment_settled",
+              "sim_tick": 3544
+            }
+          ],
+          "ok": true
+        },
+        "contact": {
+          "document_generation": 0,
+          "interface_tolerance_m": 0.02,
+          "ok": true,
+          "ready": true,
+          "source_revision": 15156805741260234840,
+          "stage_generation": 0,
+          "tire_width_m": 0.28,
+          "tolerance_m": 0.02,
+          "tracks": [
+            {
+              "deck_continuous": true,
+              "entry_gap_m": 0.0019498579792336136,
+              "minimum_toe_clearance_m": -0.0004340347744531542,
+              "toe_contact": true,
+              "toe_corners": [
+                {
+                  "clearance_m": 0.0025346590168222882,
+                  "point_m": [
+                    -7.015536120363853,
+                    0.15593290460993958,
+                    -1.644432793528502
+                  ]
+                },
+                {
+                  "clearance_m": 0.001775819857022326,
+                  "point_m": [
+                    -6.952846346888996,
+                    0.1554204096165448,
+                    -1.6360561200020425
+                  ]
+                },
+                {
+                  "clearance_m": 0.0003786673133432811,
+                  "point_m": [
+                    -6.939419614035233,
+                    0.10524882211136244,
+                    -2.217178270931872
+                  ]
+                },
+                {
+                  "clearance_m": -0.0004340347744531542,
+                  "point_m": [
+                    -6.876729840560374,
+                    0.10473632711796788,
+                    -2.2088015974054125
+                  ]
+                }
+              ],
+              "track": "EgressRampPort"
+            },
+            {
+              "deck_continuous": true,
+              "entry_gap_m": 0.0018629047183804394,
+              "minimum_toe_clearance_m": -0.000995226008414174,
+              "toe_contact": true,
+              "toe_corners": [
+                {
+                  "clearance_m": 0.0036900964503102096,
+                  "point_m": [
+                    -7.272623588654821,
+                    0.32085658450975785,
+                    0.33227469154761785
+                  ]
+                },
+                {
+                  "clearance_m": 0.0031724001406123192,
+                  "point_m": [
+                    -7.2099307078944825,
+                    0.320476739597666,
+                    0.34063515975394043
+                  ]
+                },
+                {
+                  "clearance_m": -0.00046108475800465953,
+                  "point_m": [
+                    -7.196550589983051,
+                    0.2701893343872229,
+                    -0.24047805552437795
+                  ]
+                },
+                {
+                  "clearance_m": -0.000995226008414174,
+                  "point_m": [
+                    -7.133857709222713,
+                    0.2698094894751313,
+                    -0.2321175873180552
+                  ]
+                }
+              ],
+              "track": "EgressRampPortTrackStarboard"
+            },
+            {
+              "deck_continuous": true,
+              "entry_gap_m": 0.0021837428973589023,
+              "minimum_toe_clearance_m": -0.0011819748395074658,
+              "toe_contact": true,
+              "toe_corners": [
+                {
+                  "clearance_m": 0.011831256962124392,
+                  "point_m": [
+                    7.026791347614798,
+                    0.1839836401124737,
+                    1.6569900319415665
+                  ]
+                },
+                {
+                  "clearance_m": 0.011379698336006688,
+                  "point_m": [
+                    6.964095823359822,
+                    0.18419533857181014,
+                    1.6486434499481855
+                  ]
+                },
+                {
+                  "clearance_m": -0.0008843399831072463,
+                  "point_m": [
+                    6.950714304595813,
+                    0.23476342423738505,
+                    2.229732275616788
+                  ]
+                },
+                {
+                  "clearance_m": -0.0011819748395074658,
+                  "point_m": [
+                    6.888018780340837,
+                    0.2349751226967215,
+                    2.221385693623407
+                  ]
+                }
+              ],
+              "track": "EgressRampStarboard"
+            },
+            {
+              "deck_continuous": true,
+              "entry_gap_m": 0.0017952536148904158,
+              "minimum_toe_clearance_m": -0.0007439055758935494,
+              "toe_contact": true,
+              "toe_corners": [
+                {
+                  "clearance_m": 0.014879058624615707,
+                  "point_m": [
+                    7.262640321128973,
+                    -0.037559152798615436,
+                    -0.3174189985484887
+                  ]
+                },
+                {
+                  "clearance_m": 0.014553049158732907,
+                  "point_m": [
+                    7.199957038564923,
+                    -0.03672136935614545,
+                    -0.32581799936496325
+                  ]
+                },
+                {
+                  "clearance_m": -0.0005503701250150709,
+                  "point_m": [
+                    7.186576576418306,
+                    0.013226787491636527,
+                    0.25532446553454846
+                  ]
+                },
+                {
+                  "clearance_m": -0.0007439055758935494,
+                  "point_m": [
+                    7.123893293854255,
+                    0.014064570934106735,
+                    0.24692546471807375
+                  ]
+                }
+              ],
+              "track": "EgressRampStarboardTrackStarboard"
+            }
+          ]
+        },
+        "events": [
+          {
+            "name": "griffin_ramp_root_clearance_commanded",
+            "sim_tick": 1432
+          },
+          {
+            "name": "griffin_ramp_middle_sections_unfold_commanded",
+            "sim_tick": 1564
+          },
+          {
+            "name": "griffin_ramp_root_clearance_settled",
+            "sim_tick": 1564
+          },
+          {
+            "name": "griffin_ramp_middle_sections_unfold_settled",
+            "sim_tick": 2284
+          },
+          {
+            "name": "griffin_ramp_toes_unfold_commanded",
+            "sim_tick": 2284
+          },
+          {
+            "name": "griffin_ramp_toes_unfold_settled",
+            "sim_tick": 3004
+          },
+          {
+            "name": "griffin_ramps_deploy_commanded",
+            "sim_tick": 3004
+          },
+          {
+            "name": "griffin_ramp_deployment_settled",
+            "sim_tick": 3544
+          }
+        ],
+        "opening_landing": {
+          "landed": true,
+          "ok": true
+        },
+        "route_annotations": [
+          {
+            "path": "/Griffin1SurfaceOps/RoverRampApproach",
+            "position_m": [
+              -1.929663896560669,
+              2.779078960418701,
+              -0.5016134977340698
+            ],
+            "terrain_y_m": 0.1957824000157296
+          },
+          {
+            "path": "/Griffin1SurfaceOps/RoverRampExit",
+            "position_m": [
+              -8.40571403503418,
+              0.2599976658821106,
+              -1.0590882301330566
+            ],
+            "terrain_y_m": 0.2099976706366844
+          },
+          {
+            "path": "/Griffin1SurfaceOps/RoverTarget1",
+            "position_m": [
+              -12.889132499694824,
+              0.22815768420696259,
+              -1.4450323581695557
+            ],
+            "terrain_y_m": 0.17815768626592857
+          },
+          {
+            "path": "/Griffin1SurfaceOps/RoverTarget2",
+            "position_m": [
+              -22.199031829833984,
+              0.4834037125110626,
+              1.768341064453125
+            ],
+            "terrain_y_m": 0.4334037149768246
+          },
+          {
+            "path": "/Griffin1SurfaceOps/BaseSite",
+            "position_m": [
+              -31.680463790893555,
+              0.7921559810638428,
+              6.9743452072143555
+            ],
+            "terrain_y_m": 0.7421559791784708
+          }
+        ],
+        "scope": "Production descent and measured root-clear/middle/opposite-toe/root-lowering sequence; no pose overrides"
+      },
+      "log_sha256": "47c32264525fc1cd5a19323c20168f5df71382353cb10d04d4758aa38306ebbf",
+      "run": "luncosim test PASS  scene=/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_ramp_postlanding.usda  channel=GRIFFIN_RAMP_POSTLANDING  ticks=3562  updates=4098  sim=59.37s  threads=1  jitter=0.000  seed=6840157149251759617  tick_hz=60.0000"
+    },
+    {
+      "scene": "tests/griffin_ramp_toe_gap.usda",
+      "channel": "GRIFFIN_RAMP_CONTACT_REJECTION",
+      "checks": 13,
+      "verdict": "pass",
+      "source_revision": "15156805741260234840",
+      "sim_tick": 4805,
+      "metrics": {
+        "fault": "toe_gap",
+        "ready_emitted": false,
+        "rejection": {
+          "phase": "ramp-root-deployment-settle",
+          "traversal": {
+            "contact": {
+              "document_generation": 0,
+              "interface_tolerance_m": 0.02,
+              "ok": true,
+              "ready": false,
+              "source_revision": 15156805741260234840,
+              "stage_generation": 0,
+              "tolerance_m": 0.02,
+              "tracks": [
+                {
+                  "deck_continuous": true,
+                  "entry_gap_m": 0.0016474155772181643,
+                  "minimum_toe_clearance_m": 0.029149311504004613,
+                  "toe_contact": false,
+                  "track": "EgressRampPort"
+                },
+                {
+                  "deck_continuous": true,
+                  "entry_gap_m": 0.0015810363042545936,
+                  "minimum_toe_clearance_m": 0.029838473171225677,
+                  "toe_contact": false,
+                  "track": "EgressRampPortTrackStarboard"
+                },
+                {
+                  "deck_continuous": true,
+                  "entry_gap_m": 0.0019174033332722761,
+                  "minimum_toe_clearance_m": 0.0313009089470645,
+                  "toe_contact": false,
+                  "track": "EgressRampStarboard"
+                },
+                {
+                  "deck_continuous": true,
+                  "entry_gap_m": 0.001563653536769449,
+                  "minimum_toe_clearance_m": 0.032118805071851955,
+                  "toe_contact": false,
+                  "track": "EgressRampStarboardTrackStarboard"
+                }
+              ]
+            },
+            "dwell_elapsed_s": 0.0,
+            "dwell_required_s": 1.0,
+            "hinges_settled": true,
+            "mode": "terrain_contact",
+            "ok": true,
+            "settled": false
+          }
+        },
+        "route_started": false
+      },
+      "log_sha256": "c82c54e32a0453e3120e78b7dffdf5b370e198cd183d6ba73cf5ed251b35db51",
+      "run": "luncosim test PASS  scene=/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_ramp_toe_gap.usda  channel=GRIFFIN_RAMP_CONTACT_REJECTION  ticks=4805  updates=7694  sim=80.08s  threads=1  jitter=0.000  seed=6840157149251759617  tick_hz=60.0000"
+    },
+    {
+      "scene": "tests/griffin_ramp_deck_gap.usda",
+      "channel": "GRIFFIN_RAMP_CONTACT_REJECTION",
+      "checks": 13,
+      "verdict": "pass",
+      "source_revision": "15156805741260234840",
+      "sim_tick": 4805,
+      "metrics": {
+        "fault": "deck_gap",
+        "ready_emitted": false,
+        "rejection": {
+          "phase": "ramp-root-deployment-settle",
+          "traversal": {
+            "contact": {
+              "document_generation": 0,
+              "interface_tolerance_m": 0.02,
+              "ok": true,
+              "ready": false,
+              "source_revision": 15156805741260234840,
+              "stage_generation": 0,
+              "tolerance_m": 0.02,
+              "tracks": [
+                {
+                  "deck_continuous": false,
+                  "entry_gap_m": 0.05008307687239208,
+                  "minimum_toe_clearance_m": -0.00045565841042992383,
+                  "toe_contact": true,
+                  "track": "EgressRampPort"
+                },
+                {
+                  "deck_continuous": false,
+                  "entry_gap_m": 0.05013025912079102,
+                  "minimum_toe_clearance_m": -0.0010152037583197049,
+                  "toe_contact": true,
+                  "track": "EgressRampPortTrackStarboard"
+                },
+                {
+                  "deck_continuous": false,
+                  "entry_gap_m": 0.049968842118843795,
+                  "minimum_toe_clearance_m": -0.0011636245186543992,
+                  "toe_contact": true,
+                  "track": "EgressRampStarboard"
+                },
+                {
+                  "deck_continuous": false,
+                  "entry_gap_m": 0.05016414505392891,
+                  "minimum_toe_clearance_m": -0.0007324176711375717,
+                  "toe_contact": true,
+                  "track": "EgressRampStarboardTrackStarboard"
+                }
+              ]
+            },
+            "dwell_elapsed_s": 0.0,
+            "dwell_required_s": 1.0,
+            "hinges_settled": true,
+            "mode": "terrain_contact",
+            "ok": true,
+            "settled": false
+          }
+        },
+        "route_started": false
+      },
+      "log_sha256": "8543e9fc0f4eb0dd89910999e7ebfd10eefd20eb4a8c58970ce487a13459e417",
+      "run": "luncosim test PASS  scene=/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_ramp_deck_gap.usda  channel=GRIFFIN_RAMP_CONTACT_REJECTION  ticks=4805  updates=7250  sim=80.08s  threads=1  jitter=0.000  seed=6840157149251759617  tick_hz=60.0000"
+    }
+  ],
+  "total_focused_checks": 78,
+  "headful": {
+    "readiness": {
+      "ready": true,
+      "world_hold": false,
+      "faulted": false,
+      "fault": null,
+      "readiness_tracked": true,
+      "pending_count": 0,
+      "pending": []
+    },
+    "contact": {
+      "document_generation": 0,
+      "interface_tolerance_m": 0.02,
+      "ok": true,
+      "ready": true,
+      "source_revision": 15156805741260234840,
+      "stage_generation": 0,
+      "tire_width_m": 0.28,
+      "tolerance_m": 0.02,
+      "tracks": [
+        {
+          "deck_continuous": true,
+          "entry_gap_m": 0.0019103228182483618,
+          "minimum_toe_clearance_m": -0.00039185703023952856,
+          "toe_contact": true,
+          "toe_corners": [
+            {
+              "clearance_m": 0.0023533064364111844,
+              "point_m": [
+                -7.017879226393804,
+                0.15640336194061566,
+                -1.6368341066870575
+              ]
+            },
+            {
+              "clearance_m": 0.0016224657269497678,
+              "point_m": [
+                -6.955182790443427,
+                0.15591430100989867,
+                -1.6285060368421018
+              ]
+            },
+            {
+              "clearance_m": 0.0003927923677108647,
+              "point_m": [
+                -6.9421846590724945,
+                0.10591296762417413,
+                -2.2096526060393584
+              ]
+            },
+            {
+              "clearance_m": -0.00039185703023952856,
+              "point_m": [
+                -6.879488223122117,
+                0.10542390669345769,
+                -2.2013245361944027
+              ]
+            }
+          ],
+          "track": "EgressRampPort"
+        },
+        {
+          "deck_continuous": true,
+          "entry_gap_m": 0.0018314745424424116,
+          "minimum_toe_clearance_m": -0.000984681679457533,
+          "toe_contact": true,
+          "toe_corners": [
+            {
+              "clearance_m": 0.0034855707826175197,
+              "point_m": [
+                -7.273675592237282,
+                0.32127139060479826,
+                0.3400199723404509
+              ]
+            },
+            {
+              "clearance_m": 0.0029853197499672968,
+              "point_m": [
+                -7.210976101798307,
+                0.320904923237893,
+                0.3483313265729447
+              ]
+            },
+            {
+              "clearance_m": -0.00046810371646899274,
+              "point_m": [
+                -7.198037100678306,
+                0.27081643203434447,
+                -0.23280905659466566
+              ]
+            },
+            {
+              "clearance_m": -0.000984681679457533,
+              "point_m": [
+                -7.135337610239331,
+                0.2704499646674393,
+                -0.22449770236217176
+              ]
+            }
+          ],
+          "track": "EgressRampPortTrackStarboard"
+        },
+        {
+          "deck_continuous": true,
+          "entry_gap_m": 0.0022242688778597607,
+          "minimum_toe_clearance_m": -0.0008967627293884062,
+          "toe_contact": true,
+          "toe_corners": [
+            {
+              "clearance_m": 0.01235604571427143,
+              "point_m": [
+                7.02713386679298,
+                0.18408961475095176,
+                1.653206786032857
+              ]
+            },
+            {
+              "clearance_m": 0.011875521939855693,
+              "point_m": [
+                6.964431646535066,
+                0.18427895542681594,
+                1.6449101159988846
+              ]
+            },
+            {
+              "clearance_m": -0.000570331831649229,
+              "point_m": [
+                6.9514920927027095,
+                0.23466345415652556,
+                2.2260248980201336
+              ]
+            },
+            {
+              "clearance_m": -0.0008967627293884062,
+              "point_m": [
+                6.888789872444796,
+                0.23485279483238974,
+                2.2177282279861608
+              ]
+            }
+          ],
+          "track": "EgressRampStarboard"
+        },
+        {
+          "deck_continuous": true,
+          "entry_gap_m": 0.0018273170688753943,
+          "minimum_toe_clearance_m": -0.0010238098028356336,
+          "toe_contact": true,
+          "toe_corners": [
+            {
+              "clearance_m": 0.01481009117547219,
+              "point_m": [
+                7.260638036431621,
+                -0.03800877454572238,
+                -0.32141580778657425
+              ]
+            },
+            {
+              "clearance_m": 0.014473496314825085,
+              "point_m": [
+                7.1979483354821845,
+                -0.037174925499200984,
+                -0.3297671609376468
+              ]
+            },
+            {
+              "clearance_m": -0.0008197320825496512,
+              "point_m": [
+                7.185001523104692,
+                0.01257193644405974,
+                0.2514023921407025
+              ]
+            },
+            {
+              "clearance_m": -0.0010238098028356336,
+              "point_m": [
+                7.122311822155255,
+                0.013405785490581246,
+                0.24305103898962965
+              ]
+            }
+          ],
+          "track": "EgressRampStarboardTrackStarboard"
+        }
+      ]
+    },
+    "hinges": {
+      "hinges": [
+        {
+          "drive_target_rad": -0.4943874180316925,
+          "error_rad": 0.0028400723870740108,
+          "measured_angle_rad": -0.4972274904187665,
+          "measured_angular_speed_rad_per_s": -9.39226062770855e-05,
+          "name": "RampHingePort"
+        },
+        {
+          "drive_target_rad": -0.4963058531284332,
+          "error_rad": 0.0029057272615228835,
+          "measured_angle_rad": -0.4992115803899561,
+          "measured_angular_speed_rad_per_s": -0.00011633362737101884,
+          "name": "RampHingePortTrackStarboard"
+        },
+        {
+          "drive_target_rad": 0.4863533079624176,
+          "error_rad": 0.0030029546468951507,
+          "measured_angle_rad": 0.48935626260931275,
+          "measured_angular_speed_rad_per_s": -5.283371042643895e-05,
+          "name": "RampHingeStarboard"
+        },
+        {
+          "drive_target_rad": 0.4964551329612732,
+          "error_rad": 0.003099899837895881,
+          "measured_angle_rad": 0.4995550327991691,
+          "measured_angular_speed_rad_per_s": -5.533250885369637e-05,
+          "name": "RampHingeStarboardTrackStarboard"
+        },
+        {
+          "drive_target_rad": -1.5707963705062866,
+          "error_rad": 0.0006482019057076904,
+          "measured_angle_rad": -1.570148168600579,
+          "measured_angular_speed_rad_per_s": 5.1958570944552086e-05,
+          "name": "RampSectionHingePort01"
+        },
+        {
+          "drive_target_rad": 1.5707963705062866,
+          "error_rad": 0.0008641964708129279,
+          "measured_angle_rad": 1.5716605669770995,
+          "measured_angular_speed_rad_per_s": -5.386842729966474e-05,
+          "name": "RampSectionHingePort12"
+        },
+        {
+          "drive_target_rad": -1.5707963705062866,
+          "error_rad": 0.000624019234546136,
+          "measured_angle_rad": -1.5701723512717405,
+          "measured_angular_speed_rad_per_s": 5.117871747267146e-05,
+          "name": "RampSectionHingePort01TrackStarboard"
+        },
+        {
+          "drive_target_rad": 1.5707963705062866,
+          "error_rad": 0.0009181557445123723,
+          "measured_angle_rad": 1.571714526250799,
+          "measured_angular_speed_rad_per_s": 6.10904328717654e-07,
+          "name": "RampSectionHingePort12TrackStarboard"
+        },
+        {
+          "drive_target_rad": -1.5707963705062866,
+          "error_rad": 0.0005659459408435819,
+          "measured_angle_rad": -1.570230424565443,
+          "measured_angular_speed_rad_per_s": -0.00017706884286541888,
+          "name": "RampSectionHingeStarboard01"
+        },
+        {
+          "drive_target_rad": 1.5707963705062866,
+          "error_rad": 0.0008971727649742522,
+          "measured_angle_rad": 1.5716935432712609,
+          "measured_angular_speed_rad_per_s": 0.00015263565655709892,
+          "name": "RampSectionHingeStarboard12"
+        },
+        {
+          "drive_target_rad": -1.5707963705062866,
+          "error_rad": 0.0005740107259528671,
+          "measured_angle_rad": -1.5702223597803338,
+          "measured_angular_speed_rad_per_s": -0.00017434080465440914,
+          "name": "RampSectionHingeStarboard01TrackStarboard"
+        },
+        {
+          "drive_target_rad": 1.5707963705062866,
+          "error_rad": 0.0008592977267756208,
+          "measured_angle_rad": 1.5716556682330622,
+          "measured_angular_speed_rad_per_s": 0.00012505700382490356,
+          "name": "RampSectionHingeStarboard12TrackStarboard"
+        }
+      ],
+      "ok": true,
+      "sim_tick": 8563
+    },
+    "screenshot": "griffin-ramp-contact-2026-10-23.png"
+  },
+  "sysml_validation": {
+    "ok": true,
+    "errors": 0,
+    "warnings": 153,
+    "source_revision": "15156805741260234840"
+  },
+  "source_sha256": {
+    "requirements/griffin_ramp_requirements.sysml": "d914b5fed8e592903225164f776b952c25639d17c9b706be0d56fae05a44434b",
+    "scenarios/griffin_1_surface_ops.rhai": "d762c5e1038c298a9c2d72019e7601aa16d1f135dfbe338b3207c0b951265f3b",
+    "scenarios/tests/griffin_ramp_contact_rejection.rhai": "51d8bf6300bbfb7aa01aec8cbc6c79f93d66465bd815dba96ff83a4e2ad5eaf5",
+    "scenarios/tests/griffin_ramp_postlanding.rhai": "7eba1d73041d88281b84bdbc5f0a259db44a4b2a813976b08bba49c5ff17363a",
+    "tests/griffin_ramp_deck_gap.usda": "8ee345792acf3e636f2007654795b9707c0a53f7174bb102c9d4cb6634a2ddd1",
+    "tests/griffin_ramp_toe_gap.usda": "45404fb318b30f7639b090c6c9d39bdfc6488303620c1b927baf92ecafa65394",
+    "tools/griffin_ramp_contact.rhai": "ab09356cd12107f376f81e4ccca5995ec969b4e86f41060beadf1ca46515ffe4",
+    "tools/griffin_spec.rhai": "5113a057375552e8b788d67643fab7ea8cf214980604fd06cc0253acb94b1582",
+    "tools/griffin_surface_mission_report.rhai": "91bb9b25cfe1b8ed9924fc0f3ab40943719b32e07a2f65ef3ffe44f9491f3353",
+    "tools/griffin_surface_ramp_ops.rhai": "ccbef6cc4c853fa6747ee7202ff5594fedb6e1c8a939adabc9724f9e12dd2207",
+    "twin.toml": "0cf3f04e9d85035f2872edb1725779fe8e3d5a7571df45cb92b5caea18995cfe"
+  },
+  "boundaries": [
+    "Geometric contact and tire-corridor continuity, not load capacity or hardware qualification",
+    "Existing 20 mm terrain allowance and explicit derived runtime interface allowance; source fit remains 2 mm",
+    "Airborne manual opening remains pose-only; forced manual detachment remains independent",
+    "Full loaded traversal and clean 60 FPS real-time acceptance remain open"
+  ]
+}

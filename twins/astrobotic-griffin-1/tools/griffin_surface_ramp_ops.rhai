@@ -338,9 +338,17 @@ fn section_unfold_progress(expected, stage, final_commanded, waypoints, motion) 
 
 // Final traversal gate includes every hinge, not only the roots. One angle
 // crossing cannot release the payload while the deployed bundle is moving.
-fn traversal_settle_progress(expected, stable_since) {
+fn traversal_settle_progress(expected, stable_since, geometry, mode) {
     let evidence=griffin_surface_ops::physical_ramp_hinges_settled(expected,
         griffin_spec::physical_ramp_hinge_settle_angle_tolerance_rad());
+    evidence.hinges_settled=evidence.settled;
+    if mode=="terrain_contact" {
+        evidence.contact=griffin_ramp_contact::observe(geometry);
+        evidence.settled=evidence.settled && evidence.contact.ok==true && evidence.contact.ready==true;
+    } else if mode=="airborne_pose" {
+        evidence.contact=#{ok:true,ready:false,mode:"airborne_pose",scope:"Commanded pose only; no ground-contact claim"};
+    } else {return #{ok:false,settled:false,stable_since:(),evidence:evidence,error:"Explicit ramp deployment mode required"};}
+    evidence.mode=mode;
     let dwell=griffin_spec::physical_ramp_traversal_settle_dwell_s();
     let clocks=clock_snapshot();
     let dt=clocks.fixed_dt_s;
@@ -445,7 +453,7 @@ fn landed_root_deployment_plan() {
             nominal_target_rad:if track.bank==0 {-nominal} else {nominal},
             planned_clearance:planned});
     }
-    #{ok:true,expected_angles:expected,evidence:evidence}
+    #{ok:true,mode:"terrain_contact",expected_angles:expected,evidence:evidence}
 }
 
 /// Airborne opening is a commanded mechanism pose, not terrain contact.

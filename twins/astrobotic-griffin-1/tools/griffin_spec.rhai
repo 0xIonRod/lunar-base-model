@@ -180,7 +180,7 @@ fn _qualified_attribute(name) {
         "physicalRampSectionUnfoldWaypointRelativeAngleRad",
         "physicalRampHingeSettleAngleToleranceRad",
         "physicalRampHingeSettleSpeedToleranceRadPerS",
-        "physicalRampTraversalSettleDwellS",
+        "physicalRampTraversalSettleDwellS", "physicalRampTraversalInterfaceToleranceM",
         "physicalRampUnfoldQuarterTurnDurationS",
         "physicalRampSectionMassPartitionToleranceKg",
         "physicalRampJointDriveStiffnessNmPerDeg",
@@ -824,6 +824,7 @@ fn physical_ramp_transition_joint_name(side) {
 }
 fn physical_ramp_port_deployment_angle_rad() { _sysml_attribute("physicalRampPortDeploymentAngleRad") }
 fn physical_ramp_terrain_contact_tolerance_m() { _sysml_attribute("physicalRampTerrainContactToleranceM") }
+fn ramp_section_geometry_tolerance_m() { _sysml_attribute("rampSectionGeometryToleranceM") }
 fn ramp_surface_thickness_m() { _sysml_attribute("rampSurfaceThicknessM") }
 fn physical_ramp_starboard_deployment_angle_rad() { _sysml_attribute("physicalRampStarboardDeploymentAngleRad") }
 fn physical_ramp_port_root_stowed_angle_rad() { _sysml_attribute("physicalRampRootStowedAngleRad") }
@@ -861,6 +862,7 @@ fn physical_ramp_hinge_settle_angle_tolerance_rad() {
 fn physical_ramp_hinge_settle_speed_tolerance_rad_per_s() {
     _sysml_attribute("physicalRampHingeSettleSpeedToleranceRadPerS")
 }
+fn physical_ramp_traversal_interface_tolerance_m() { _sysml_attribute("physicalRampTraversalInterfaceToleranceM") }
 fn physical_ramp_traversal_settle_dwell_s() {
     _sysml_attribute("physicalRampTraversalSettleDwellS")
 }
