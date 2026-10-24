@@ -1408,6 +1408,16 @@ package GriffinRequirementSources {
         ref targetRequirement = GriffinSimulationAccuracyRequirements::gr039;
         ref sources = (source_astrobotic_griffin_1_requirements_griffin_simulation_accuracy_requiremen);
     }
+    part source_griffin_contact_validity : EvidenceSource {
+        doc /* Project model-validity policy and production containment qualification; not a flight-hardware damage rating. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/griffin-contact-validity.md";
+    }
+
+    part evidence_gr_040 : RequirementEvidence {
+        ref targetRequirement = GriffinSimulationAccuracyRequirements::gr040;
+        ref sources = (source_griffin_contact_validity);
+    }
     part source_pghtech_griffin_hardware_photo : EvidenceSource {
         attribute role : EvidenceSourceRole = "Reference";
         attribute locator : SourceLocator = "https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png";

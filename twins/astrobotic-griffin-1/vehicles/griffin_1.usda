@@ -134,6 +134,7 @@ def Xform "Griffin1" (
     float3 physics:diagonalInertia = (7279.60009765625, 7695.0, 7279.60009765625)
     custom double inputs:control_powered
     double inputs:control_powered.connect = </Griffin1/ElectricalPower.outputs:avionics_powered>
+    custom double outputs:contact_approach_speed = 0.0
     def Scope "PhysicsMaterials"
     {
         def Material "LandingPadSlide" (
@@ -2792,6 +2793,16 @@ def Xform "Griffin1" (
                 uniform asset info:wesl:sourceAsset = @lunco://shaders/solar_panel.wesl@
             }
         }
+        def Material "RampStructure" (
+            prepend references = @../components/lander/griffin_ramp_root_section_visual.usda@</RampSection/Looks/RampStructure>
+        )
+        {
+        }
+        def Material "RampWalkingPlate" (
+            prepend references = @../components/lander/griffin_ramp_root_section_visual.usda@</RampSection/Looks/RampWalkingPlate>
+        )
+        {
+        }
     }
     def LunCoEvent "LowFuel"
     {
@@ -2847,7 +2858,7 @@ def Xform "Griffin1" (
     )
     {
         uniform token info:implementationSource = "sourceAsset"
-        uniform asset info:sourceAsset = @lunco://scenarios/lander_subsystems.rhai@
+        uniform asset info:sourceAsset = @../scenarios/griffin_impact_policy.rhai@
     }
     def "Controls" (
         prepend references = @lunco://vessels/control_profiles.usda@</LanderControls>
@@ -4391,6 +4402,7 @@ def Xform "Griffin1" (
         float outputs:contact = 0.0
         bool physxRigidBody:enableCCD = true
         point3f physics:centerOfMass = (0.0, -1.2599999904632568, 0.0)
+        custom double outputs:contact_approach_speed = 0.0
         def Xform "LandingLegVisual" (
             prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
         )
@@ -4530,6 +4542,7 @@ def Xform "Griffin1" (
         float outputs:contact = 0.0
         bool physxRigidBody:enableCCD = true
         point3f physics:centerOfMass = (0.0, -1.2599999904632568, 0.0)
+        custom double outputs:contact_approach_speed = 0.0
         def Xform "LandingLegVisual" (
             prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
         )
@@ -4669,6 +4682,7 @@ def Xform "Griffin1" (
         float outputs:contact = 0.0
         bool physxRigidBody:enableCCD = true
         point3f physics:centerOfMass = (0.0, -1.2599999904632568, 0.0)
+        custom double outputs:contact_approach_speed = 0.0
         def Xform "LandingLegVisual" (
             prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
         )
@@ -4808,6 +4822,7 @@ def Xform "Griffin1" (
         float outputs:contact = 0.0
         bool physxRigidBody:enableCCD = true
         point3f physics:centerOfMass = (0.0, -1.2599999904632568, 0.0)
+        custom double outputs:contact_approach_speed = 0.0
         def Xform "LandingLegVisual" (
             prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
         )
@@ -5119,14 +5134,14 @@ def Xform "Griffin1" (
         )
         {
             custom double3 xformOp:translate = (2.4433441945204004, 0.8196159735495077, 0.0)
-            custom rel material:binding = </Griffin1/EgressRampPort/DeckSection/Looks/RampStructure>
+            custom rel material:binding = </Griffin1/Looks/RampStructure>
         }
         def Cylinder "RampSharedShaftStarboard" (
             prepend references = @../components/lander/griffin_ramp_root_section_visual.usda@</RampSection/HingeBarrel>
         )
         {
             custom double3 xformOp:translate = (-2.4433441945204004, 0.8196159735495077, 0.0)
-            custom rel material:binding = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampStructure>
+            custom rel material:binding = </Griffin1/Looks/RampStructure>
         }
     }
     def Xform "TankPX" (
@@ -5478,7 +5493,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 1.0)
             uniform token purpose = "default"
             color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
-            custom rel material:binding = </Griffin1/EgressRampPort/DeckSection/Looks/RampWalkingPlate>
+            custom rel material:binding = </Griffin1/Looks/RampWalkingPlate>
         }
         def Cube "RampTrackStarboard" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -5491,7 +5506,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, -1.0)
             uniform token purpose = "default"
             color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
-            custom rel material:binding = </Griffin1/EgressRampPort/DeckSection/Looks/RampWalkingPlate>
+            custom rel material:binding = </Griffin1/Looks/RampWalkingPlate>
         }
     }
     def PhysicsFixedJoint "RampTransitionJointPort"
@@ -5526,7 +5541,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, 1.0)
             uniform token purpose = "default"
             color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
-            custom rel material:binding = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampWalkingPlate>
+            custom rel material:binding = </Griffin1/Looks/RampWalkingPlate>
         }
         def Cube "RampTrackStarboard" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -5539,7 +5554,7 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 0.0, -1.0)
             uniform token purpose = "default"
             color3f[] primvars:displayColor = [(0.02500000037252903, 0.02800000086426735, 0.032999999821186066)]
-            custom rel material:binding = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampWalkingPlate>
+            custom rel material:binding = </Griffin1/Looks/RampWalkingPlate>
         }
     }
     def PhysicsFixedJoint "RampTransitionJointStarboard"
@@ -6039,7 +6054,7 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (2.4433441945204004, 1.9621829867747538, -0.6892499999999999)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom rel material:binding = </Griffin1/EgressRampPort/DeckSection/Looks/RampStructure>
+        custom rel material:binding = </Griffin1/Looks/RampStructure>
     }
     def Cube "RampMountPortInnerRearDeckShoe" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -6052,7 +6067,7 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (2.3066720972602006, 1.76, -0.707)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom rel material:binding = </Griffin1/EgressRampPort/DeckSection/Looks/RampStructure>
+        custom rel material:binding = </Griffin1/Looks/RampStructure>
     }
     def Cube "RampMountPortInnerFront" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -6065,7 +6080,7 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (2.4433441945204004, 1.9621829867747538, 0.6892499999999999)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom rel material:binding = </Griffin1/EgressRampPort/DeckSection/Looks/RampStructure>
+        custom rel material:binding = </Griffin1/Looks/RampStructure>
     }
     def Cube "RampMountPortInnerFrontDeckShoe" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -6078,7 +6093,7 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (2.3066720972602006, 1.76, 0.707)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom rel material:binding = </Griffin1/EgressRampPort/DeckSection/Looks/RampStructure>
+        custom rel material:binding = </Griffin1/Looks/RampStructure>
     }
     def Cube "RampMountStarboardInnerRear" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -6091,7 +6106,7 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (-2.4433441945204004, 1.9621829867747538, -0.6892499999999999)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom rel material:binding = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampStructure>
+        custom rel material:binding = </Griffin1/Looks/RampStructure>
     }
     def Cube "RampMountStarboardInnerRearDeckShoe" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -6104,7 +6119,7 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (-2.3066720972602006, 1.76, -0.707)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom rel material:binding = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampStructure>
+        custom rel material:binding = </Griffin1/Looks/RampStructure>
     }
     def Cube "RampMountStarboardInnerFront" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -6117,7 +6132,7 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (-2.4433441945204004, 1.9621829867747538, 0.6892499999999999)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom rel material:binding = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampStructure>
+        custom rel material:binding = </Griffin1/Looks/RampStructure>
     }
     def Cube "RampMountStarboardInnerFrontDeckShoe" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -6130,7 +6145,7 @@ def Xform "Griffin1" (
         custom double3 xformOp:translate = (-2.3066720972602006, 1.76, 0.707)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
-        custom rel material:binding = </Griffin1/EgressRampStarboard/DeckSection/Looks/RampStructure>
+        custom rel material:binding = </Griffin1/Looks/RampStructure>
     }
     def Xform "RcsPitchPos" (
         prepend apiSchemas = ["LunCoForceActuatorAPI"]
@@ -9965,6 +9980,36 @@ def Xform "Griffin1" (
             uniform token purpose = "render"
             custom bool physics:collisionEnabled = false
             color3f[] primvars:displayColor = [(0.550000011920929, 0.5799999833106995, 0.6200000047683716)]
+        }
+    }
+    def Scope "ContactValidity" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+        documentation = "Contact-model study validity only: maximum normal approach speed 5 m/s on the hull or four landing legs. This conservative presentation-study cutoff excludes high-speed crashes; it is not a calibrated absorption capacity or flight hardware rating. Deployed ramp-only and detached payload contacts require their own authored validity observers."
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @../models/GriffinContactValidity.mo@
+        custom double inputs:hull_speed_mps = 0.0
+        double inputs:hull_speed_mps.connect = </Griffin1.outputs:contact_approach_speed>
+        custom double inputs:leg_px_speed_mps = 0.0
+        double inputs:leg_px_speed_mps.connect = </Griffin1/LegPX.outputs:contact_approach_speed>
+        custom double inputs:leg_nx_speed_mps = 0.0
+        double inputs:leg_nx_speed_mps.connect = </Griffin1/LegNX.outputs:contact_approach_speed>
+        custom double inputs:leg_pz_speed_mps = 0.0
+        double inputs:leg_pz_speed_mps.connect = </Griffin1/LegPZ.outputs:contact_approach_speed>
+        custom double inputs:leg_nz_speed_mps = 0.0
+        double inputs:leg_nz_speed_mps.connect = </Griffin1/LegNZ.outputs:contact_approach_speed>
+        custom double inputs:maximum_speed_mps = 5.0
+        custom float outputs:exceedance_ratio = 0.0
+        custom double outputs:speed_limit_mps = 0.0
+        def LunCoEvent "Exceeded"
+        {
+            uniform token lunco:event:name = "griffin.contact-validity-exceeded"
+            uniform token lunco:event:severity = "warning"
+            uniform bool lunco:event:latched = true
+            uniform double lunco:event:qualificationTime = 0.0
+            float inputs:trigger
+            float inputs:trigger.connect = </Griffin1/ContactValidity.outputs:exceedance_ratio>
         }
     }
 }

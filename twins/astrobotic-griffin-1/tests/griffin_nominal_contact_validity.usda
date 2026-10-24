@@ -1,0 +1,20 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda@</Griffin1SurfaceOps>
+)
+{
+    def Scope "ValidityTest" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_contact_validity.rhai@
+        custom bool inputs:expect_pause = false
+    }
+}

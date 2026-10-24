@@ -124,6 +124,20 @@ package GriffinSimulationAccuracyRequirements {
         }
     }
 
+    constraint def GR040_ContactValidityResponse {
+        in telemetryFinite : Boolean;
+        in sceneUsable : Boolean;
+        in responseMatchesExpectedContactEnvelope : Boolean;
+        in coupledClocksMatchExpectedRunState : Boolean;
+        telemetryFinite and sceneUsable and responseMatchesExpectedContactEnvelope
+            and coupledClocksMatchExpectedRunState;
+    }
+
+    requirement def GR040_ContactModelValidity {
+        doc /* GR-040 [simulation validity] the hull and four landing legs shall supply native pre-solver normal approach speeds to the authored contact-model validity observer. Its positive maximum_speed_mps input is owned by the vehicle USD. Exceeding that study limit shall produce a retained, source-qualified event and one explanatory warning, then suspend the complete connected vehicle, including its continuous equations and guidance. Normal powered descent and touchdown shall remain operational within that contact envelope. This is a project model-validity policy, not a supplier damage rating or an absorption-capacity claim. Deployed ramp-only and detached-payload impacts require their own observers. */
+        require GR040_ContactValidityResponse;
+    }
+
     // System integration requirement usages owned by this domain.
     requirement <'GR-008'> gr008 : GR008_AttitudeCases { subject rover : HostedRoverInterface; }
     requirement <'GR-021'> gr021 : GR021_MassProperties { subject lander : Griffin1Lander; }
@@ -135,6 +149,7 @@ package GriffinSimulationAccuracyRequirements {
     requirement <'GR-037'> gr037 : GR037_LandingTargetDatum { subject lander : Griffin1Lander; }
     requirement <'GR-038'> gr038 : GR038_LandingSurfaceDatum { subject lander : Griffin1Lander; }
     requirement <'GR-039'> gr039 : GR039_GuidanceUsesDynamicJointIslandMass { subject lander : Griffin1Lander; }
+    requirement <'GR-040'> gr040 : GR040_ContactModelValidity { subject lander : Griffin1Lander; }
 
 
     verification def Verify_GriffinLandingStability {
@@ -142,6 +157,16 @@ package GriffinSimulationAccuracyRequirements {
         objective {
             verify gr036;
         }
+    }
+
+    verification def Verify_GriffinHighImpactValidity {
+        subject lander : Griffin1Lander;
+        objective { verify gr040; }
+    }
+
+    verification def Verify_GriffinNominalContactValidity {
+        subject lander : Griffin1Lander;
+        objective { verify gr040; }
     }
 
 }
