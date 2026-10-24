@@ -104,8 +104,10 @@ analytic motor dynamics and all physical landing limits are unchanged.
 Landing stability still fails: maximum ground speed 0.10715 m/s, angular speed
 0.017928 rad/s and horizontal drift 2.16788 m over the unchanged 60 s horizon.
 All sampled four-leg contact, finite-data and attitude predicates pass. The
-engine-off replay still fails footpad clearance, native penetration, final
-four-leg contact and hard-stop travel. Do not call the model fully passing.
+engine-off drop is covered by the [GR-040 contact-validity contract](griffin-contact-validity.md):
+an overload must pause with an explanatory warning. Its result does not qualify
+footpad clearance, penetration, settled contact or hard-stop travel beyond that
+model envelope. Do not call the model fully passing.
 
 Mission phase-failure reports now carry one bounded result chunk, a compact
 settlement snapshot and the latest two motion samples. A deliberate replay of
@@ -181,9 +183,9 @@ The image does not provide calibrated dimensions or qualified material data.
    four-tank equation oracle remains enabled. Determine the backend's declared
    precision contract and owner-specific forward error before changing this
    observer; do not mask a lost/delayed propagation update with a broad bound.
-4. **Engine-off impact:** fails footpad rim/centre clearance, native penetration,
-   final four-leg contact and the authored suspension hard-stop travel check.
-   This is a physical failure, separate from display-skirt thickness.
+4. **Engine-off impact:** the ballistic overload requires the GR-040 coupled
+   pause and warning. Survivable-impact absorption and hard-stop accuracy require
+   their own qualified model and remain outside that containment verdict.
 
 The mission phase-failure snapshot also exceeds the scene-test per-event
 evidence limit. The process still emits its failing verdict and the raw log

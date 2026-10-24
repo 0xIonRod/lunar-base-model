@@ -29,8 +29,13 @@ Tracy enabled, standard eight physics substeps and one scene-test thread:
   descent confirms touchdown at tick 1339, without a validity event or object
   pause; the observer continues for another 30 ticks. Peak flight descent is
   6.586 m/s, demonstrating that this policy is not a flight-speed clamp.
+- `griffin_engine_off_impact`: seven checks pass. The production flight-input
+  path disables guidance while throttle remains zero. The ballistic drop
+  reaches 13.839 m/s; a retained 13.803 m/s contact observation causes one warning
+  and a coupled pause. Pose, flight controller, guidance and observer clocks
+  remain stopped for another 30 ticks.
 
-Both cases are registered against GR-040 in `twin.toml`. Their receipts, logs and
+All three cases are registered against GR-040 in `twin.toml`. Their receipts, logs and
 authoring plans remain untracked under the application worktree's
 `.cache/codex-evidence/performance-20261023/instability-latest/`. Application
 commits `c82cd0072`, `5e5dc8c9a`, `248b5a230` and `731716005` provide initial
@@ -41,3 +46,9 @@ surface mission, long-term landing stability or impact absorption.
 The mounted `ValidateSysml` source-set check and active Twin verification
 registry report no errors. GR-040 has its typed source-evidence link and formal
 response predicate; the source set retains 153 unrelated acceptance warnings.
+
+A separate graphical observation through simulation tick 5422 (90.367 s)
+retains the same identities and sessions for all 12 continuous participants;
+their clocks never move backwards, and authored source hashes and modification
+times remain unchanged. This covers nominal descent and post-touchdown operation.
+It does not reproduce or close the reported interactive mid-flight reload.

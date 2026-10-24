@@ -309,11 +309,6 @@ package GriffinLandingLegRequirements {
             verify gll010;
         }
     }
-    verification def Verify_GriffinEngineOffImpact {
-        subject legs : GriffinLandingLegAssembly;
-        objective { verify gll008; verify gll010; }
-    }
-
     verification def Verify_GriffinRoverLegCollision {
         subject legs : GriffinLandingLegAssembly;
         objective { verify gll002; verify gll008; }

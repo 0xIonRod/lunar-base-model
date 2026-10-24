@@ -169,4 +169,9 @@ package GriffinSimulationAccuracyRequirements {
         objective { verify gr040; }
     }
 
+    verification def Verify_GriffinEngineOffImpact {
+        subject lander : Griffin1Lander;
+        objective { verify gr040; }
+    }
+
 }

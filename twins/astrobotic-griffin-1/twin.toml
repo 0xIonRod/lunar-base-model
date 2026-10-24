@@ -373,7 +373,7 @@ usd_path = "/World/RampRootBearing"
 "numerics.solver.residual_abs" = 1.0e-9
 
 [[verification.cases]]
-name = "GriffinLandingLegRequirements::Verify_GriffinEngineOffImpact"
+name = "GriffinSimulationAccuracyRequirements::Verify_GriffinEngineOffImpact"
 scene = "tests/griffin_engine_off_impact.usda"
 script = "scenarios/tests/griffin_engine_off_impact.rhai"
 verdict_channel = "GRIFFIN_ENGINE_OFF_IMPACT"

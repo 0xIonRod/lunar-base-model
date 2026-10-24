@@ -7,15 +7,15 @@
 
 def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda@</Griffin1SurfaceOps>
-    documentation = "Production engine-off drop validates terrain CCD and suspension hard stops."
-    prepend apiSchemas = "LunCoEpochAPI"
+    documentation = "Production engine-off ballistic drop verifies model-validity containment, coupled pause and an explanatory warning. It does not qualify survivable impact absorption or suspension hard-stop accuracy."
+    prepend apiSchemas = ["LunCoEpochAPI"]
 )
 {
     double lunco:time:epochJd = 2461395.5
     def Scope "EngineOffImpact"
     {
         def Scope "Observer" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"

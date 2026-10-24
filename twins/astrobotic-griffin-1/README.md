@@ -769,8 +769,13 @@ changes before deriving collision proxies from that revision. The footpads
 retain nonlinear CCD against the sampled terrain collision mesh.
 
 Engine-off impact acceptance uses `tests/griffin_engine_off_impact.usda` and
-`GRIFFIN_ENGINE_OFF_IMPACT`; it observes the complete startup drop, footpad
-terrain clearance, engine extinction, and suspension hard-stop travel.
+`GriffinSimulationAccuracyRequirements::Verify_GriffinEngineOffImpact` with
+verdict `GRIFFIN_ENGINE_OFF_IMPACT`. It observes a zero-throttle ballistic drop,
+the source-qualified contact-envelope violation, one warning and the complete
+coupled pause. The [GR-040 contract](contracts/griffin-contact-validity.md)
+states the study cutoff and qualification scope. Survivable impact absorption,
+footpad clearance and suspension hard-stop travel outside that model envelope
+require separate qualification.
 
 `tests/griffin_rover_leg_collision.usda` drives the real FLIP into the PX gear
 using its authored rolling axis and normal avatar controls. The

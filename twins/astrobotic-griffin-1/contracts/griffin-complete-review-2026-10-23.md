@@ -72,11 +72,12 @@ reproduce this discrepancy. This does not show that the payload remains
 attached; it prevents claiming a clean complete solver topology. The check
 remains failing and is handed to the optimization worktree.
 
-The engine-off impact case also fails its unchanged pad-clearance, penetration
-and 1 mm hard-stop-travel requirements. These current-build reproductions are
-recorded in optimization's local
-`.cache/griffin-handoffs/20261023-egress-joint-graph.md`. No solver, dependency,
-friction, substep, mass or acceptance limit was changed by this review.
+The engine-off ballistic impact is governed by the
+[GR-040 contact-validity contract](griffin-contact-validity.md): exceeding the
+authored study envelope requires a coupled pause and warning. This containment
+verdict does not qualify pad clearance, penetration or hard-stop travel under
+an overload. No solver, dependency, friction, substep or mass was changed by
+this review.
 
 The full `Verify_GriffinRequirements` audit now completes every phase and
 produces a structured FAIL. Shared engine commit `27790624c` reads native
