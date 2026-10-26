@@ -69,8 +69,8 @@ def Xform "SouthPoleSurrogate" (
         {
             uniform token lunco:layer = "dem"
             asset lunco:layer:demSource = @terrain/nobile03@
-            float lunco:layer:windowM = 512.0
-            int lunco:layer:targetRes = 129
+            float lunco:layer:windowM = 2048.0
+            int lunco:layer:targetRes = 513
             bool lunco:layer:lodViz = true
             bool lunco:layer:colliderRing = true
             int lunco:layer:colliderDepth = 4

@@ -46,9 +46,9 @@ def prepare(source: Path, output: Path, lat: float, lon: float, window: int) -> 
         raise ValueError("requires zero false origin and pixel-is-area")
     scale, tie = image.tag_v2[33550], image.tag_v2[33922]
     pixels = image.load()
-    # One-metre pixel centres, with a half-window margin. The native crop's
+    # One-metre pixel centres, with a two-pixel resampling margin. The native crop's
     # central `window` pixels then span exactly [-window/2, +window/2].
-    size = window * 2
+    size = window + 4
     out = Image.new("F", (size, size))
     samples = []
     for row in range(size):
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--center-lat", required=True, type=float)
     parser.add_argument("--center-lon", required=True, type=float)
-    parser.add_argument("--window-m", type=int, default=512)
+    parser.add_argument("--window-m", type=int, default=2048)
     args = parser.parse_args()
     if args.window_m < 2 or args.window_m % 2 or not -90 < args.center_lat < 0 or not 0 <= args.center_lon <= 360:
         parser.error("requires an even positive window and a southern latitude / 0-360 longitude")

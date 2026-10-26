@@ -34,18 +34,31 @@ cargo run --manifest-path "$LUNCO_ROOT/Cargo.toml" -p lunco-assets -- \
 python3 tools/terrain/reproject_lroc_polar_dem.py \
   --source "$TWIN/.cache/sources/nobile03/NAC_DTM_NOBILE03.TIF" \
   --label "$TWIN/.cache/sources/nobile03/NAC_DTM_NOBILE03.LBL" \
-  --output "$TWIN/terrain/nobile03/materials/textures/heightmap.tif" \
+  --output "$TWIN/.cache/nobile-terrain-preparation" \
   --center-lat -84.72672255 --center-lon 29.14428685 \
-  --window-m 512 --resolution 129 \
+  --window-m 2048 --resolution 513 \
   --vertical-offset -5187.322
+cargo run --manifest-path "$LUNCO_ROOT/Cargo.toml" -p lunco-assets -- \
+  process --twin "$TWIN/.cache/nobile-terrain-preparation" -a dem
+cp "$TWIN/.cache/nobile-terrain-preparation/terrain/materials/textures/heightmap.tif" \
+  "$TWIN/.cache/terrain/nobile03/materials/textures/heightmap.tif"
 ```
 
-The final offset must be measured from the tool's reported `border_datum` and
-then recorded in `research/griffin_1_assumptions.md`. It is a local simulation
-datum offset, not a change to the LROC source elevations. The scene anchor keeps
+The fixed vertical offset is the scene's local simulation datum, recorded in
+`research/griffin_1_assumptions.md`. Keep it unchanged when enlarging the crop;
+the new perimeter's reported `border_datum` does not redefine the mission frame.
+The scene anchor keeps
 the source latitude/longitude and body datum provenance; the current runtime
 does not yet apply `lunco:anchor:height` as an entity-Y placement, which is why
 the local offset is explicit.
+
+The adapter preserves unresolved source voids as NaN. The native DEM processor
+owns coverage rejection and bounded neighbour interpolation; this crop requires
+658 filled nodes out of 263169 (0.25%). These values are interpolated terrain,
+not additional LROC measurements. Use a build with the node-span correction in
+the DEM processor (pipeline version 8 or newer): the installed GeoTIFF must have
+513 × 513 nodes, 4 m spacing and a 2048 m extent. The bundle verifier checks this.
+Install the same TIFF in an authored `terrain/nobile03/` directory if present.
 
 Raw downloads and generated `materials/` bytes are ignored by the repository.
 Commit `Assets.toml`, this tool, the command parameters/provenance, and USD
@@ -62,7 +75,7 @@ The terrain material binds `terrain/nobile03/materials/textures/albedo.png` at
 full weight. Its source is the co-registered LROC
 [NAC_DTM_NOBILE03_M1101097181_90CM orthophoto](https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_NOBILE03_M1101097181_90CM),
 0.9 m/pixel. `Assets.toml` pins the download SHA-256. The prepared output has
-512 x 512 texels over the same 512 m ENU footprint as the DEM. Source zeroes
+2048 x 2048 texels over the same 2048 m ENU footprint as the DEM. Source zeroes
 are unmapped coverage; the native albedo processor gives them neutral material
 colour, not a black crater. Small acquisition shadows remain in the image:
 local illumination removal is an appearance approximation, not a calibrated
@@ -80,7 +93,7 @@ cargo run --manifest-path "$LUNCO_ROOT/Cargo.toml" -p lunco-assets -- \
 python3 tools/terrain/prepare_lroc_polar_ortho.py \
   --source "$TWIN/.cache/sources/nobile03/NAC_DTM_NOBILE03_M1101097181_90CM.TIF" \
   --output "$TWIN/.cache/nobile-albedo-preparation" \
-  --center-lat -84.72672255 --center-lon 29.14428685
+  --center-lat -84.72672255 --center-lon 29.14428685 --window-m 2048
 cargo run --manifest-path "$LUNCO_ROOT/Cargo.toml" -p lunco-assets -- \
   process --twin "$TWIN/.cache/nobile-albedo-preparation" -a albedo
 cp "$TWIN/.cache/nobile-albedo-preparation/albedo.png" \

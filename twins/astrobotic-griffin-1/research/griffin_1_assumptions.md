@@ -55,7 +55,7 @@ mission-owner data is supplied, do not present these as Griffin flight values:
 | attitude-engine reference | manufacturer specification, configuration applicability limited | Agile confirms A110 delivery to Griffin in 2023. Its 2023 datasheet supplies 111.2 N, M20/MON3, O/F 0.90, nominal flows and exit diameter; current as-built mounting and configuration remain unconfirmed. See `../requirements/griffin-size-evidence.md`, A110 section |
 | FLIP geometry, wheel loads, motor data, battery and steering ICD | mostly unknown | the active study configuration is owned by the FLIP SysML packages; Astrolab's public material does not provide the vehicle ICD |
 | exact landing coordinates | unresolved | reproducible NOBILE03 regional study anchor; not a flight touchdown coordinate |
-| terrain relief | source-backed regional product | 512 m NOBILE03 crop, locally reprojected and vertically normalized for the Twin |
+| terrain relief | source-backed regional product | 2048 m NOBILE03 crop, locally reprojected and vertically normalized for the Twin; 0.25% of output nodes require native bounded void interpolation |
 | lighting / epoch | deterministic study condition | surface-operations and visual-review scene roots use TDB JD 2461395.5 (2026-12-21 TDB calendar date) at the NOBILE03 regional anchor. The simulator ephemeris gives Sun azimuth 7.52° clockwise from north and elevation 6.49° at that epoch. The visual-review scene references the same solar-system model and copies its typed site/time values from the surface-operations composition. Public material gives a late-2026 launch window, not a landing timestamp; this study epoch does not assert flight timing. Reproduce with `cargo run -p lunco-celestial-ephemeris --example sun_at_site -- -84.72672255 29.14428685 2461395.5 1.0 0.125` |
 | communications geometry | study setup | deterministic local environment |
 | FLIP flight-stack attachment | unresolved in public data | the mission adapter and release interface require controlled integration data; current implementation status is recorded in `../contracts/implementation_gaps.md` |
@@ -76,19 +76,25 @@ processor as if it were already in the runtime frame.
 
 The checked-in adapter
 `tools/terrain/reproject_lroc_polar_dem.py` performs the source projection
-conversion and writes a LunCoSim-compatible float32 GeoTIFF with `MOON_ME`
-frame tags. The active crop is:
+conversion and prepares a local float32 raster for the native DEM processor,
+which validates coverage, interpolates remaining voids and writes the runtime
+GeoTIFF with `MOON_ME` frame tags. The active crop is:
 
 | Field | Authored value | Confidence |
 |---|---:|---|
 | regional center latitude | -84.72672255 deg | simulator study anchor |
 | regional center longitude | 29.14428685 deg east | simulator study anchor |
-| local window | 512 m × 512 m | simulator study choice |
-| node spacing / resolution | 4 m / 129 × 129 | source-aligned processing choice |
-| source border datum | 5187.322 m | computed from the selected crop |
+| local window | 2048 m × 2048 m | simulator study choice |
+| node spacing / resolution | 4 m / 513 × 513 | source-aligned processing choice |
+| scene vertical datum | 5187.322 m | fixed local simulation frame |
 | local vertical offset | -5187.322 m | explicit normalization into the Twin scene frame |
 
-The resulting local height range is approximately -33.674 m to +27.445 m.
+The resulting local height range is approximately -94.447 m to +103.978 m.
+The source crop supplies 262511 of 263169 output nodes after reprojection;
+the native processor interpolates the remaining 658 (0.25%) from neighbours.
+Those filled nodes are not measured elevations. The new perimeter median is
+approximately +1.855 m in the fixed local frame. The central 512 m operating
+area retains all 16641 of its source samples unchanged.
 This is the terrain relief used by the simulation, not an assertion about the
 absolute elevation of the Griffin touchdown point. The scene root remains at
 local height zero; the terrain georeference records the source datum for

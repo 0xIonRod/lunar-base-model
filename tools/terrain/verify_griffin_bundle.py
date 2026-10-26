@@ -40,14 +40,16 @@ def verify(twin: Path) -> None:
     width, height, samples, fields = read_source_tiff(
         site / "materials" / "textures" / "heightmap.tif"
     )
-    if (width, height) != (129, 129) or not all(math.isfinite(v) for v in samples):
-        raise ValueError("expected a complete finite 129 x 129 terrain crop")
+    if (width, height) != (513, 513) or not all(math.isfinite(v) for v in samples):
+        raise ValueError("expected a complete finite 513 x 513 terrain crop")
     if 33550 not in fields or 33922 not in fields or 34735 not in fields:
         raise ValueError("terrain georeferencing is missing")
+    if fields[33550][:2] != [4.0, 4.0] or fields[33922][3:5] != [-1024.0, 1024.0]:
+        raise ValueError("expected 4 m node spacing over a centered 2048 m crop")
     print("OK: processed NOBILE03 DEM and georeferencing")
     albedo = (site / "materials" / "textures" / "albedo.png").read_bytes()
-    if albedo[:8] != b"\x89PNG\r\n\x1a\n" or struct.unpack(">II", albedo[16:24]) != (512, 512):
-        raise ValueError("expected the processed 512 x 512 NOBILE03 albedo map")
+    if albedo[:8] != b"\x89PNG\r\n\x1a\n" or struct.unpack(">II", albedo[16:24]) != (2048, 2048):
+        raise ValueError("expected the processed 2048 x 2048 NOBILE03 albedo map")
     print("OK: processed NOBILE03 material albedo")
     print("OK: extracted Twin contains its terrain sources and runtime maps offline")
 

@@ -7,8 +7,8 @@ small, official LROC PDS product, so this tool is the explicit boundary adapter:
 
 * it validates the PDS3 label and the source GeoTIFF's float32/uncompressed layout;
 * it maps a local ENU square (X=east, -Z=north) to the source polar projection;
-* it writes a square, node-based, float32 GeoTIFF with the same georeferencing
-  contract as ``lunco-assets``;
+* it prepares a square, node-based float32 GeoTIFF and a disposable Twin;
+* the native DEM processor validates coverage and interpolates remaining voids;
 * it never downloads anything and it never modifies the raw source.
 
 Only the standard library is used so the adapter can run before optional GIS
@@ -19,6 +19,8 @@ terrain paths; the manifest, command parameters, and provenance belong in Git.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import math
 import re
 import struct
@@ -216,8 +218,8 @@ def bilinear(samples: list[float], width: int, height: int, px: float, py: float
         # native DEM processor's void fill; it never invents a broad edge apron.
         return sum(value * weight for value, weight in valid) / total_weight
     # Exact sampling on a missing node gives all zero bilinear weights. Find a
-    # nearby measured node only for that isolated case; a larger unsupported
-    # hole remains a hard error instead of becoming a fabricated surface.
+    # nearby measured node only for that isolated case. Remaining voids retain
+    # NaN for the native processor's bounded interpolation and coverage check.
     nearest: list[tuple[float, float]] = []
     ix = round(px)
     iy = round(py)
@@ -233,7 +235,7 @@ def bilinear(samples: list[float], width: int, height: int, px: float, py: float
             if distance <= 4.0:
                 return value
             break
-    raise TiffError(f"source nodata reached output sample at pixel ({px:.3f}, {py:.3f})")
+    return math.nan
 
 
 def inline_short(value: int) -> bytes:
@@ -338,21 +340,23 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True, help="raw LROC float32 GeoTIFF")
     parser.add_argument("--label", type=Path, required=True, help="matching LROC PDS3 label")
-    parser.add_argument("--output", type=Path, required=True, help="generated heightmap.tif")
+    parser.add_argument("--output", type=Path, required=True, help="disposable native-processing Twin directory")
     parser.add_argument("--center-lat", type=float, required=True, help="local frame centre, degrees")
     parser.add_argument("--center-lon", type=float, required=True, help="local frame centre, 0-360 degrees east")
-    parser.add_argument("--window-m", type=float, default=512.0)
-    parser.add_argument("--resolution", type=int, default=129)
+    parser.add_argument("--window-m", type=float, default=2048.0)
+    parser.add_argument("--resolution", type=int, default=513)
     parser.add_argument("--body-radius-m", type=float, default=MOON_RADIUS_M)
     parser.add_argument(
         "--vertical-offset",
         type=float,
         default=0.0,
-        help="metres added to source heights for the local scene datum; pass -<border datum> explicitly",
+        help="metres added to source heights for the fixed local scene datum",
     )
     args = parser.parse_args()
     if args.resolution < 2 or args.window_m <= 0.0 or args.body_radius_m <= 0.0:
         parser.error("window, body radius, and resolution must be positive; resolution must be >= 2")
+    if args.body_radius_m != MOON_RADIUS_M:
+        parser.error("native lunar DEM processing requires the 1737400 m Moon datum")
     label = read_label(args.label)
     width, height, source, fields = read_source_tiff(args.source)
     scale = float_value(fields, 33550, "ModelPixelScale", 2)
@@ -387,19 +391,58 @@ def main() -> int:
             output.append(bilinear(source, width, height, px, py) + args.vertical_offset)
 
     finite = [value for value in output if math.isfinite(value)]
+    if not finite:
+        raise TiffError("requested crop has no measured elevations")
     border = [
         output[index]
         for index in range(len(output))
-        if index < args.resolution
-        or index >= len(output) - args.resolution
-        or index % args.resolution == 0
-        or index % args.resolution == args.resolution - 1
+        if math.isfinite(output[index]) and (
+            index < args.resolution
+            or index >= len(output) - args.resolution
+            or index % args.resolution == 0
+            or index % args.resolution == args.resolution - 1
+        )
     ]
+    if not border:
+        raise TiffError("requested crop has no measured perimeter elevations")
     border.sort()
     print(f"output stats: min={min(finite):.3f} max={max(finite):.3f} border_datum={border[len(border) // 2]:.3f} m")
     print(f"vertical offset: {args.vertical_offset:.3f} m")
-    write_geotiff(args.output, output, args.resolution, args.window_m, args.center_lat, args.center_lon, args.body_radius_m)
-    print(f"wrote: {args.output}")
+    raster = args.output / ".cache" / "local_dem.tif"
+    write_geotiff(raster, output, args.resolution, args.window_m, args.center_lat, args.center_lon, args.body_radius_m)
+    lat_half = math.degrees(half / args.body_radius_m)
+    lon_half = lat_half / math.cos(math.radians(args.center_lat))
+    raster_hash = hashlib.sha256(raster.read_bytes()).hexdigest()
+    (args.output / "twin.toml").write_text('name = "NobileTerrainPreparation"\nversion = "0.1.0"\n')
+    (args.output / "Assets.toml").write_text(f'''[dem]
+name = "Reprojected Nobile elevation; native void interpolation"
+url = {json.dumps(raster.resolve().as_uri())}
+dest = "local_dem.tif"
+sha256 = "{raster_hash}"
+[dem.process]
+kind = "dem"
+output_root = "twin"
+output = "terrain"
+center_lat = {args.center_lat}
+center_lon = {args.center_lon}
+window_m = {args.window_m}
+pixel_scale_m = {step}
+target_resolution = [{args.resolution}, {args.resolution}]
+src_min_lat = {args.center_lat-lat_half}
+src_max_lat = {args.center_lat+lat_half}
+src_min_lon = {args.center_lon-lon_half}
+src_max_lon = {args.center_lon+lon_half}
+frame = "MOON_ME"
+''')
+    voids = len(output) - len(finite)
+    (args.output / "provenance.json").write_text(json.dumps({
+        "source": args.source.name, "sha256": hashlib.sha256(args.source.read_bytes()).hexdigest(),
+        "center_lat": args.center_lat, "center_lon": args.center_lon,
+        "window_m": args.window_m, "resolution": args.resolution,
+        "vertical_offset_m": args.vertical_offset, "unresolved_void_nodes": voids,
+        "void_treatment": "native DEM processor bounded neighbour interpolation",
+    }, indent=2) + "\n")
+    print(f"Prepared {args.output}; {voids} void nodes require native processing before installation.")
     return 0
 
 
