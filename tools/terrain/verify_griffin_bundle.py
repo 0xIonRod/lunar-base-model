@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import math
+import struct
 from pathlib import Path
 import tomllib
 
@@ -44,7 +45,11 @@ def verify(twin: Path) -> None:
     if 33550 not in fields or 33922 not in fields or 34735 not in fields:
         raise ValueError("terrain georeferencing is missing")
     print("OK: processed NOBILE03 DEM and georeferencing")
-    print("OK: extracted Twin contains its DEM sources and runtime crop offline")
+    albedo = (site / "materials" / "textures" / "albedo.png").read_bytes()
+    if albedo[:8] != b"\x89PNG\r\n\x1a\n" or struct.unpack(">II", albedo[16:24]) != (512, 512):
+        raise ValueError("expected the processed 512 x 512 NOBILE03 albedo map")
+    print("OK: processed NOBILE03 material albedo")
+    print("OK: extracted Twin contains its terrain sources and runtime maps offline")
 
 
 def main() -> None:

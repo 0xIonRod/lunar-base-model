@@ -180,6 +180,14 @@ def destination(lat0_deg: float, lon0_deg: float, east_m: float, north_m: float,
     return math.degrees(lat), math.degrees(lon) % 360.0
 
 
+def polar_pixel(lat: float, lon: float, radius_m: float, scale: list[float], tie: list[float]) -> tuple[float, float]:
+    """South-polar spherical projection, in source raster corner coordinates."""
+    rho = 2.0 * radius_m * math.tan((math.radians(lat) + math.pi / 2.0) / 2.0)
+    angle = math.radians(lon)
+    return ((rho * math.sin(angle) - tie[3]) / scale[0],
+            (tie[4] - rho * math.cos(angle)) / scale[1])
+
+
 def bilinear(samples: list[float], width: int, height: int, px: float, py: float) -> float:
     if not (0.0 <= px <= width - 1 and 0.0 <= py <= height - 1):
         raise TiffError(f"requested local window falls outside source at pixel ({px:.3f}, {py:.3f})")
@@ -375,12 +383,7 @@ def main() -> int:
             lat, lon = destination(args.center_lat, args.center_lon, east, north, args.body_radius_m)
             # South-polar stereographic inverse: x is east of the pole and y is
             # north in the projection's convention, matching lon=atan2(x, y).
-            rho = 2.0 * args.body_radius_m * math.tan((math.radians(lat) + math.pi / 2.0) / 2.0)
-            angle = math.radians(lon)
-            model_x = rho * math.sin(angle)
-            model_y = rho * math.cos(angle)
-            px = (model_x - tie[3]) / scale[0]
-            py = (tie[4] - model_y) / scale[1]
+            px, py = polar_pixel(lat, lon, args.body_radius_m, scale, tie)
             output.append(bilinear(source, width, height, px, py) + args.vertical_offset)
 
     finite = [value for value in output if math.isfinite(value)]

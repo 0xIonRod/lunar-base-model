@@ -18,3 +18,10 @@ url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/S
 dest = "sources/nobile03/NAC_DTM_NOBILE03.LBL"
 sha256 = "a208196171bfb777554e8e9ae840339135f99f28d7fe4ce0e3be60f9937e5906"
 recommended = true
+
+[nobile03_ortho]
+name = "LROC NOBILE03 M1101097181 orthophoto (0.90 m/pixel; polar reprojection required)"
+url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/EXTRAS/BROWSE/NAC_DTM/NOBILE03/NAC_DTM_NOBILE03_M1101097181_90CM.TIF"
+dest = "sources/nobile03/NAC_DTM_NOBILE03_M1101097181_90CM.TIF"
+sha256 = "bf825b560c796d8507f9d05f2e646b572b58369ca553d59f407dd305d7d22dbc"
+recommended = true

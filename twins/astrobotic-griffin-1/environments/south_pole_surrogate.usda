@@ -7,7 +7,7 @@
 
 def Xform "SouthPoleSurrogate" (
     kind = "assembly"
-    documentation = "Procedural South-Pole terrain surrogate; not a validated Nobile Crater DEM."
+    doc = "Procedural South-Pole terrain surrogate; not a validated Nobile Crater DEM."
 )
 {
     custom string lunco:terrain:source = "LROC NAC DTM NOBILE03 (4 m/pixel polar-stereographic source; locally reprojected)"
@@ -38,6 +38,12 @@ def Xform "SouthPoleSurrogate" (
                 token outputs:surface
                 uniform asset info:wesl:sourceAsset = @lunco://shaders/terrain_layered.wesl@
                 asset info:wesl:vertexAsset = @lunco://shaders/terrain_geomorph.wesl@
+                custom asset inputs:albedo_map = @terrain/nobile03/materials/textures/albedo.png@
+                custom float inputs:weight_albedo = 1.0
+                custom float inputs:micro_albedo = 0.20000000298023224
+                custom float inputs:macro_clump_scale = 4.0
+                custom float inputs:macro_bump = 0.014999999664723873
+                custom float inputs:micro_bump = 0.001500000013038516
             }
         }
     }
