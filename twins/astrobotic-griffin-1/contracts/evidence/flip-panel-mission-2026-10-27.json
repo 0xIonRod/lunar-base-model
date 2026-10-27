@@ -1,0 +1,166 @@
+{
+  "date": "2026-10-27",
+  "simulator_revision": "8bad5b08b08357412218087ae20be03e80c4db55",
+  "simulator_binary_sha256": "8347AFEA277191F8FFBFE4475831B4AB2D7D341B28F27EC02878304D9C34DCBF",
+  "model_base_revision": "e45cd8d5fd1e81c29dbdaa04cacbacd74731720c",
+  "model_changes_uncommitted": true,
+  "mission": {
+    "verdict": "FAIL",
+    "ticks": 18001,
+    "sim_seconds": 300.01666666666665,
+    "failed_check": "GR-004-phase-landing",
+    "guidance_assembly_mass_kg": 5389.999760627747,
+    "guidance_assembly_mass_check": "PASS",
+    "landing_gates": {
+      "all_legs_contact": 0.0,
+      "angular_speed": 0.0003407467763003578,
+      "descent_speed": 0.0002943090221378952,
+      "engine_cutoff_contact": 0.0,
+      "ground_speed": 0.001786214580760241,
+      "landing_contact": 0.0,
+      "landing_handoff": 0.0,
+      "leg_contact_geometry": [
+        {
+          "contact": 1.0,
+          "contact_force_n": 4503.205539523063,
+          "footpad_center": [
+            -0.04676226775729808,
+            0.9859265265039103,
+            5.454477362581843
+          ],
+          "leg_position": [
+            0.06147869769938641,
+            0.8224827035720352,
+            4.149115375312596
+          ],
+          "name": "LegPX",
+          "suspension_displacement_m": -0.03698131853513225,
+          "suspension_velocity_mps": 0.0012471799254271223
+        },
+        {
+          "contact": 0.0,
+          "contact_force_n": 0.0,
+          "footpad_center": [
+            0.07370287905156492,
+            6.309924488401736,
+            4.832066174280444
+          ],
+          "leg_position": [
+            0.18194356136785128,
+            6.146481378245355,
+            3.52670385094131
+          ],
+          "name": "LegNX",
+          "suspension_displacement_m": -0.0011710029510924108,
+          "suspension_velocity_mps": 3.1021751061732257e-06
+        },
+        {
+          "contact": 0.0,
+          "contact_force_n": 0.0,
+          "footpad_center": [
+            2.6890235850962267,
+            3.6101767612830185,
+            5.387782716274313
+          ],
+          "leg_position": [
+            2.797264366862188,
+            3.4467332239424664,
+            4.082420670221154
+          ],
+          "name": "LegPZ",
+          "suspension_displacement_m": -0.0003107425812023047,
+          "suspension_velocity_mps": 9.32701362398944e-05
+        },
+        {
+          "contact": 0.0,
+          "contact_force_n": 0.0,
+          "footpad_center": [
+            -2.665290843624315,
+            3.67842764405616,
+            4.9353277984550274
+          ],
+          "leg_position": [
+            -2.5570500679482757,
+            3.5149850370527815,
+            3.6299657033040367
+          ],
+          "name": "LegNZ",
+          "suspension_displacement_m": -0.00023637278155379905,
+          "suspension_velocity_mps": 8.756680374815952e-05
+        }
+      ],
+      "position": [
+        0.04629753797933489,
+        3.592332928581186,
+        4.746468676780353
+      ],
+      "touchdown": 0.0,
+      "upright_axis_y": -0.12382096291129119
+    },
+    "later_phases_executed": false
+  },
+  "panel_buttons": {
+    "input_path": "InjectWindowInput PointerButton Pressed/Released, visible native HUD",
+    "stow_command_deg": 0.0,
+    "stow_measured_angle_rad": 3.1730827065257267e-05,
+    "open_command_deg": 82.0,
+    "open_controller_deg": 81.99999999999983,
+    "open_settled_measured_angle_rad": -1.389360236968962,
+    "open_settled_measured_deg": 79.60447780161745,
+    "tracking_error_deg": 2.395522198382551,
+    "existing_two_degree_tracking_criterion_met": false
+  },
+  "authored_source_sha256": {
+    "vehicles/flip_v5.usda": "cd7f4aaaa175069b391188790ef86386e5a8ebb26b655ed81ab73aa97a85d757",
+    "scenes/griffin_1_surface_ops.usda": "982218a58ddbf11daace20d9f92b07f0a1c1b6acce6f3feb559c1ba83dd3d68b",
+    "tools/flip_controls.rhai": "8d6208d692485d9f870c03ff1e40a7c4bd0121ad10a02dddd311cbfb3aa53f08",
+    "scenarios/flip_panel_controls.rhai": "d7db9a86de8e12528dfea095bca8da8f2ff47c718b299e323ab29d412cabe4c8"
+  },
+  "mounted_panel_open": {
+    "command_deg": 82.0,
+    "controller_deployment_deg": 81.99999999999525,
+    "native_angle_rad": -1.3754951308344647,
+    "adapter_present_after_open": true,
+    "adapter_api_id": 5504410603518397,
+    "mounted_stow_validation": "inconclusive: gesture did not change command; subsequent interactive input changed the session"
+  },
+  "mount_shortcuts_followup": {
+    "scope": "Mounted alignment and keyboard controls; no full mission acceptance after rotation",
+    "mount": {
+      "stdout": "GRIFFIN_FLIP_V5_MOUNT: PASS\n#{\"adapter_frame_error_m\": 1.2636184720804522e-7, \"checks\": [#{\"name\": \"deck seating\", \"pass\": true}, #{\"name\": \"adapter endpoints\", \"pass\": true}, #{\"name\": \"adapter vertical frame alignment\", \"pass\": true}, #{\"name\": \"mounted forward points along port rails\", \"pass\": true}, #{\"name\": \"adapter angular frame alignment\", \"pass\": true}, #{\"name\": \"panel hinge retained\", \"pass\": true}, #{\"name\": \"wheel and drive FL\", \"pass\": true}, #{\"name\": \"wheel and drive FR\", \"pass\": true}, #{\"name\": \"wheel and drive RL\", \"pass\": true}, #{\"name\": \"wheel and drive RR\", \"pass\": true}], \"deck_y\": 62.11999988555908, \"ok\": true, \"rover_bottom_y\": 62.12, \"scope\": \"composed assembly; no dynamic acceptance\"}\n"
+    },
+    "native_shortcuts": [
+      {
+        "label": "before",
+        "state": {
+          "stdout": "#{\"api_id\": 2248997015218264, \"ports\": [#{\"direction\": \"out\", \"metadata\": #{\"authority\": \"solver\", \"frame\": (), \"range\": (), \"source\": \"Co-simulation participant\", \"type\": \"scalar\", \"unit\": #{\"definition\": (), \"id\": \"deg\"}, \"writable\": false}, \"name\": \"deployment_deg\", \"value\": 0.0}, #{\"direction\": \"in\", \"metadata\": #{\"authority\": \"controller / wire\", \"frame\": (), \"range\": (), \"source\": \"Co-simulation participant\", \"type\": \"scalar\", \"unit\": #{\"definition\": (), \"id\": \"deg\"}, \"writable\": true}, \"name\": \"command_deg\", \"value\": 0.0}]}\nfalse\n"
+        }
+      },
+      {
+        "label": "opened",
+        "state": {
+          "stdout": "#{\"api_id\": 2248997015218264, \"ports\": [#{\"direction\": \"out\", \"metadata\": #{\"authority\": \"solver\", \"frame\": (), \"range\": (), \"source\": \"Co-simulation participant\", \"type\": \"scalar\", \"unit\": #{\"definition\": (), \"id\": \"deg\"}, \"writable\": false}, \"name\": \"deployment_deg\", \"value\": 12.833333333333341}, #{\"direction\": \"in\", \"metadata\": #{\"authority\": \"controller / wire\", \"frame\": (), \"range\": (), \"source\": \"Co-simulation participant\", \"type\": \"scalar\", \"unit\": #{\"definition\": (), \"id\": \"deg\"}, \"writable\": true}, \"name\": \"command_deg\", \"value\": 82.0}]}\nfalse\n"
+        }
+      },
+      {
+        "label": "stowed",
+        "state": {
+          "stdout": "#{\"api_id\": 2248997015218264, \"ports\": [#{\"direction\": \"out\", \"metadata\": #{\"authority\": \"solver\", \"frame\": (), \"range\": (), \"source\": \"Co-simulation participant\", \"type\": \"scalar\", \"unit\": #{\"definition\": (), \"id\": \"deg\"}, \"writable\": false}, \"name\": \"deployment_deg\", \"value\": 1.054388552515552}, #{\"direction\": \"in\", \"metadata\": #{\"authority\": \"controller / wire\", \"frame\": (), \"range\": (), \"source\": \"Co-simulation participant\", \"type\": \"scalar\", \"unit\": #{\"definition\": (), \"id\": \"deg\"}, \"writable\": true}, \"name\": \"command_deg\", \"value\": 0.0}]}\nfalse\n"
+        }
+      },
+      {
+        "label": "native_mount",
+        "state": {
+          "stdout": "0.9999999999999903\nNATIVE_MOUNT_ALIGNMENT_PASS\n5504410603518397\n"
+        }
+      }
+    ],
+    "source_sha256": {
+      "vehicles/flip_v5.usda": "cd7f4aaaa175069b391188790ef86386e5a8ebb26b655ed81ab73aa97a85d757",
+      "scenes/griffin_1_surface_ops.usda": "08c0f10df444ef5f6c14cfcdd744c9780c74b9ed0a0b9a17a87a9f21c13b7b45",
+      "tools/flip_controls.rhai": "e5ddf2c3e4a35c5574fd18686da5f02ad6e4ef3cc20f453c386d60b76c669a35",
+      "scenarios/flip_panel_controls.rhai": "bec5c638f4b02bb36958fe9b47958b8a8ec520cf83949656bcdece2a2714f3be",
+      "scenarios/tests/griffin_flip_v5_mount.rhai": "40456d64f6b0960befd2e3855bae8bfd86134ea48b1f8ce3ae70303216ee0e28"
+    }
+  }
+}

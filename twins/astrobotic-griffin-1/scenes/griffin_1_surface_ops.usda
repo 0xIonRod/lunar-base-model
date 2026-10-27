@@ -9,7 +9,7 @@ def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
     prepend apiSchemas = ["LunCoCatalogAPI", "LunCoEpochAPI"]
     kind = "assembly"
-    documentation = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
+    doc = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
 )
 {
     uniform bool lunco:spawnable = false
@@ -60,7 +60,7 @@ def Xform "Griffin1SurfaceOps" (
     }
     def "Lander" (
         prepend references = [@twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>, @lunco://components/gnc/position_pid_guidance.usda@</PositionPIDGuidance>]
-        documentation = "Final-approach study starts at 60 m with all connected rigid bodies at rest, yawed 172.483 degrees toward the Sun at the authored site/epoch. Guidance immediately descends while tracking solar heading. The initial yaw is an epoch-specific study value, not a flight attitude plan."
+        doc = "Final-approach study starts at 60 m with all connected rigid bodies at rest, yawed 172.483 degrees toward the Sun at the authored site/epoch. Guidance immediately descends while tracking solar heading. The initial yaw is an epoch-specific study value, not a flight attitude plan."
     )
     {
         double3 xformOp:translate = (0.0, 60.0, 0.0)
@@ -155,7 +155,7 @@ def Xform "Griffin1SurfaceOps" (
         {
         }
         over "AttitudeReference" (
-            documentation = "Forward solar-bank +Z faces Sun azimuth during automatic descent. IMU thrust tilt retains priority; first pilot flight input disables heading hold through the GNC authority gate."
+            doc = "Forward solar-bank +Z faces Sun azimuth during automatic descent. IMU thrust tilt retains priority; first pilot flight input disables heading hold through the GNC authority gate."
         )
         {
             custom double inputs:heading_enable
@@ -178,8 +178,24 @@ def Xform "Griffin1SurfaceOps" (
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         double3 physics:velocity = (0.0, 0.0, 0.0)
         custom token lunco:mission:deploymentState = "top_deck_attached_until_touchdown"
-        custom double3 xformOp:rotateXYZ = (0.0, 172.483, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 82.483, 0.0)
         custom rel programs = </Griffin1SurfaceOps/FlipRoute/Program>
+        over "SolarMechanism"
+        {
+            double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            over "Controller"
+            {
+                double inputs:command_deg = 0.0
+                double inputs:initial_deg = 0.0
+                double outputs:angle = 0.0
+                double outputs:deployment_deg = 0.0
+            }
+        }
+        over "PanelHinge"
+        {
+            float drive:angular:physics:targetPosition = 0.0
+            double inputs:angle = 0.0
+        }
     }
     def PhysicsFixedJoint "FLIPPayloadAdapterJoint"
     {
@@ -188,6 +204,7 @@ def Xform "Griffin1SurfaceOps" (
         point3f physics:localPos0 = (0.0, 2.119999885559082, 0.0)
         point3f physics:localPos1 = (0.0, -0.699999988079071, 0.0)
         quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+        quatf physics:localRot0 = (0.7071067690849304, 0.0, -0.7071067690849304, 0.0)
     }
     def Scope "FLIPEgressInterface"
     {
@@ -323,7 +340,7 @@ def Xform "Griffin1SurfaceOps" (
         }
     }
     def Scope "FlipRoute" (
-        documentation = "Operator route for FLIP: Alt+left-click adds a point to this route while FLIP is selected or possessed; the action key starts or stops following. Points live in the runtime layer and are not saved (usd.runtime_persistence is false)."
+        doc = "Operator route for FLIP: Alt+left-click adds a point to this route while FLIP is selected or possessed; the action key starts or stops following. Points live in the runtime layer and are not saved (usd.runtime_persistence is false)."
     )
     {
         def Scope "Program" (

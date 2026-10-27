@@ -1267,4 +1267,13 @@ def Xform "FLIP" (
         custom double inputs:contact_RR
         double inputs:contact_RR.connect = </FLIP/Suspension_RR/Wheel_RR.outputs:contact>
     }
+    def Scope "PanelControls" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/flip_panel_controls.rhai@
+        custom double inputs:open_angle_deg = 82.0
+        custom double inputs:stow_angle_deg = 0.0
+    }
 }

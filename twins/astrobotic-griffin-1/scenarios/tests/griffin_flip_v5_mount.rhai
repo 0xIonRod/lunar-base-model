@@ -13,7 +13,7 @@ fn verify(doc, root) {
     let adapter = prim(doc, root + "/FLIPPayloadAdapterJoint", false,
         ["physics:body0", "physics:body1"]);
     let tolerance = 0.000001;
-    // This scene has an identity root and translation-only lander placement.
+    // This scene has an identity root; lander yaw preserves the vertical datum.
     // Use authored doubles; world_position is a presentation readback.
     let deck_local_y = deck.attrs["points"][0][1];
     for point in deck.attrs["points"] {
@@ -31,6 +31,22 @@ fn verify(doc, root) {
     let anchor1 = rover.attrs["xformOp:translate"][1] + adapter.attrs["physics:localPos1"][1];
     checks.push(#{name: "adapter vertical frame alignment",
         pass: (anchor0 - anchor1).abs() <= tolerance});
+    let yaw = (rover.attrs["xformOp:rotateXYZ"][1]
+        - lander.attrs["xformOp:rotateY"]) * acos(-1.0) / 180.0;
+    // CAD forward is -Z. The port rail runs outboard along lander +X.
+    checks.push(#{name: "mounted forward points along port rails",
+        pass: (-sin(yaw) - 1.0).abs() <= tolerance && cos(yaw).abs() <= tolerance});
+    let q0 = adapter.attrs["physics:localRot0"];
+    let q1 = adapter.attrs["physics:localRot1"];
+    checks.push(#{name: "adapter angular frame alignment",
+        pass: q0 != () && q1 != ()
+            && (q0[0] - cos(yaw / 2.0)).abs() <= tolerance
+            && q0[1].abs() <= tolerance
+            && (q0[2] - sin(yaw / 2.0)).abs() <= tolerance
+            && q0[3].abs() <= tolerance
+            && (q1[0] - 1.0).abs() <= tolerance
+            && q1[1].abs() <= tolerance && q1[2].abs() <= tolerance
+            && q1[3].abs() <= tolerance});
     let panel = prim(doc, rover_path + "/PanelHinge", false,
         ["physics:body0", "physics:body1"]);
     checks.push(#{name: "panel hinge retained",

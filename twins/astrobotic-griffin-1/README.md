@@ -36,9 +36,24 @@ test taking control. Its avatar starts at `(8, 5, 10)` in the terrain frame,
 aimed at the rover. See the [CAD acceptance receipt](contracts/flip-cad-runtime-2026-10-26.md)
 for motion, braking, panel/EPS, reload and avatar movement checks.
 
+The FLIP solar-panel card provides **OPEN SOLAR PANEL** and **STOW SOLAR PANEL**
+in View. Both use the existing Modelica deployment controller and native hinge;
+they remain available while FLIP is mounted on Griffin and after detachment.
+The full surface-operations mission starts the mounted panel stowed. Opening
+commands the authored 82-degree deployment target; stowing commands zero.
+**O** opens the panel; **S** stows it while FLIP is unpossessed, including
+while mounted. When driving FLIP, S keeps its normal reverse function; use
+the Stow button then.
+The [mission and panel test receipt](contracts/flip-panel-mission-2026-10-27.md)
+records the earlier landing failure and hinge tracking error, plus the tested
+mount correction and shortcuts. Full mission acceptance after the mount
+correction is still open.
+
 The Griffin deck datum is 2.119999885559082 m. The CAD payload root is 0.70 m
 above it; its adapter anchor is `(0, -0.7, 0)`. The mission retains the
-172.483-degree lander/rover heading. Full landing, release and ramp traversal
+172.483-degree lander heading. Mounted FLIP is yawed 90 degrees relative to it
+(82.483 degrees) so its -Z forward points along the port egress rails; the
+payload joint has the matching attachment rotation. Full landing, release and ramp traversal
 remain a separate mission acceptance gate; subsystem passes do not qualify it.
 
 ## Griffin model correctness
