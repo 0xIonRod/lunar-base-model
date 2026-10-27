@@ -39,7 +39,7 @@ def Xform "Griffin1SurfaceOps" (
     {
     }
     def Camera "Avatar" (
-        prepend apiSchemas = "LunCoAvatarAPI"
+        prepend apiSchemas = ["LunCoAvatarAPI"]
         prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
     )
     {
@@ -50,7 +50,7 @@ def Xform "Griffin1SurfaceOps" (
         custom double3 xformOp:rotateXYZ = (-31.65, 45.0, 0.0)
     }
     def Scope "CameraTrack" (
-        prepend apiSchemas = "LunCoCameraTrackAPI"
+        prepend apiSchemas = ["LunCoCameraTrackAPI"]
     )
     {
         token lunco:activeCamera
@@ -59,7 +59,7 @@ def Xform "Griffin1SurfaceOps" (
         }
     }
     def "FLIP" (
-        prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
+        references = @twin://astrobotic-griffin-1/vehicles/flip_v5.usda@</FLIP>
     )
     {
         custom double3 xformOp:translate = (0.0, 1.8, 0.0)
@@ -73,7 +73,7 @@ def Xform "Griffin1SurfaceOps" (
     )
     {
         def Scope "Program" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"
@@ -85,7 +85,7 @@ def Xform "Griffin1SurfaceOps" (
     def Scope "Scenario"
     {
         def Scope "Test" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"

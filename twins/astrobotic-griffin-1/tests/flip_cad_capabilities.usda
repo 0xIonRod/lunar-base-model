@@ -1,0 +1,28 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/tests/flip_route_follow.usda@</Griffin1SurfaceOps>
+)
+{
+    over "Scenario"
+    {
+        over "Test"
+        {
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/flip_cad_capabilities.rhai@
+        }
+    }
+    over "Avatar"
+    {
+        custom double3 xformOp:translate = (8.0, 5.0, 10.0)
+        double3 lunco:cameraLookAt = (0.0, 0.7, 0.0)
+    }
+}

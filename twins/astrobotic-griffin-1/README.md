@@ -22,6 +22,25 @@ An older library reports unresolved `NozzleDesign.gamma_out` or
 Modelica assets. Main and RCS plumes share the Modelica gas/energy model and
 shader field, with optical study assumptions in `GriffinPlumeStudy`.
 
+## Current FLIP rover — 2026-10-26
+
+The surface-operations and visual scenes now use `vehicles/flip_v5.usda`, with
+the retained CAD meshes, four native wheel hinges, physical suspension sliders
+and moving solar-panel mechanism. Finite battery power, solar generation,
+drivetrain/tire thermal networks, route control and the vessel HUD are connected.
+The original `vehicles/flip.usda` remains the source of the shared thermal
+subassembly and the older proxy requirement fixtures.
+
+Open `scenes/flip_cad_drive.usda` for interactive driving without an automatic
+test taking control. Its avatar starts at `(8, 5, 10)` in the terrain frame,
+aimed at the rover. See the [CAD acceptance receipt](contracts/flip-cad-runtime-2026-10-26.md)
+for motion, braking, panel/EPS, reload and avatar movement checks.
+
+The Griffin deck datum is 2.119999885559082 m. The CAD payload root is 0.70 m
+above it; its adapter anchor is `(0, -0.7, 0)`. The mission retains the
+172.483-degree lander/rover heading. Full landing, release and ramp traversal
+remain a separate mission acceptance gate; subsystem passes do not qualify it.
+
 ## Griffin model correctness
 
 See [the 2026-10-21 Griffin audit](contracts/griffin-model-audit-2026-10-21.md)

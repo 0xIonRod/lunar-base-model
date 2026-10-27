@@ -1,7 +1,7 @@
 # Tank blanket appearance checkpoint
 
 The front review after the rail pass showed smooth gold tank domes. Reused the
-existing `lunco://shaders/mli_foil.wgsl` material; no new shader, texture asset,
+existing `lunco://shaders/mli_foil.wesl` material; no new shader, texture asset,
 Rust mechanism or tank geometry was introduced. Its two colors and four scalar
 controls now come from GriffinVisualConfiguration, with the illustrated wraps
 in the user-supplied Pittsburgh Technology Council image and ESA rendering as

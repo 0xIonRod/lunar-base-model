@@ -1280,29 +1280,47 @@ fn set_physical_ramp_hinge_angles(expected_angles) {
         hinge_states: report.hinges, result: result}
 }
 
-// Observe the real DEM support once at the ramp-exit boundary. A valid
-// suspension ray alone could hit the ramp or another vehicle: compare each
-// measured hit point to the DEM instead of accepting an arbitrary collider.
+// Observe loaded physical wheel contacts at the ramp-exit boundary. The
+// collider solver supplies actual contact points; the DEM oracle qualifies
+// those points under the same source-owned height tolerance as the mission.
 fn egress_terrain_runtime_evidence(rover) {
     let physics = query("QueryPhysicsState", #{id:rover});
-    let contacts = if physics == () || physics.wheel_contacts == () {[]} else {physics.wheel_contacts};
     let required = griffin_spec::_sysml_integer("egressTerrainWheelContactCount");
     let tolerance = griffin_spec::_sysml_attribute("egressTerrainContactHeightToleranceM");
     if required == () || tolerance == () {throw("missing DEM egress contact contract");}
+    let sample = if physics == () {()} else {physics.support_sample_tick};
+    let now = sim_tick().to_float();
+    let fresh = sample != () && sample.to_float() <= now && now-sample.to_float() <= 1.0;
     let evidence=[];
-    for contact in contacts {
-        if !contact.contact_valid || !contact.distance_available {continue;}
-        let origin=contact.ray_origin; let direction=contact.ray_direction;
-        let hit=[]; for axis in 0..3 {hit.push(origin[axis]+direction[axis]*contact.distance_m);}
-        let terrain=terrain_height(hit[0],hit[2]);
-        if terrain == () || !terrain.is_finite() {continue;}
-        let error=(hit[1]-terrain).abs();
-        evidence.push(#{wheel:contact.wheel_usd_prim_path,sample_tick:contact.sample_tick,
-            measured_hit_m:hit,terrain_height_m:terrain,height_error_m:error,
-            normal:contact.normal,ok:error<=tolerance && contact.normal[1]>0.0});
+    for station in griffin_spec::rover_wheel_station_names() {
+        let path=usd_path(rover)+"/Suspension_"+station+"/Wheel_"+station;
+        let wheel=find_path(path);
+        if wheel==() || wheel<0 {throw("missing physical wheel at DEM exit: "+path);}
+        let native=contact_debug(wheel);
+        let best=();
+        if native!=() && native.points!=() {
+            for contact in native.points {
+                if contact.normal_impulse<=0.0 || contact.normal[1]<=0.0 {continue;}
+                let hit=contact.point;
+                let terrain=terrain_height(hit[0],hit[2]);
+                if terrain==() || !terrain.is_finite() {continue;}
+                let error=(hit[1]-terrain).abs();
+                if best==() || error<best.height_error_m {
+                    best=#{measured_hit_m:hit,terrain_height_m:terrain,height_error_m:error,
+                        normal:contact.normal,normal_impulse:contact.normal_impulse,
+                        source1_available:contact.source1_available,source1:contact.source1,
+                        source2_available:contact.source2_available,source2:contact.source2};
+                }
+            }
+        }
+        let points=[];if best!=() {points.push(best);}
+        let observed=#{wheel:path,method:"native_collider_contact",sample_fresh:fresh,
+            points:points,ok:fresh && best!=() && best.height_error_m<=tolerance};
+        if sample!=() {observed.sample_tick=sample;}
+        evidence.push(observed);
     }
-    let valid=0; for item in evidence {if item.ok {valid+=1;}}
-    #{ok:contacts.len()==required && valid==required,requirement:"GR-035",
+    let valid=0;for item in evidence {if item.ok {valid+=1;}}
+    #{ok:evidence.len()==required && valid==required,requirement:"GR-035",
       required_contacts:required,terrain_contact_count:valid,
       height_tolerance_m:tolerance,contacts:evidence}
 }

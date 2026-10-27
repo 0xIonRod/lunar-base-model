@@ -171,10 +171,10 @@ def Xform "Griffin1SurfaceOps" (
         }
     }
     def "FLIP" (
-        prepend references = @twin://astrobotic-griffin-1/vehicles/flip.usda@</FLIP>
+        references = @twin://astrobotic-griffin-1/vehicles/flip_v5.usda@</FLIP>
     )
     {
-        custom double3 xformOp:translate = (0.0, 62.635, 0.0)
+        custom double3 xformOp:translate = (0.0, 62.82, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         double3 physics:velocity = (0.0, 0.0, 0.0)
         custom token lunco:mission:deploymentState = "top_deck_attached_until_touchdown"
@@ -186,7 +186,7 @@ def Xform "Griffin1SurfaceOps" (
         rel physics:body0 = </Griffin1SurfaceOps/Lander>
         rel physics:body1 = </Griffin1SurfaceOps/FLIP>
         point3f physics:localPos0 = (0.0, 2.119999885559082, 0.0)
-        point3f physics:localPos1 = (0.0, -0.5149999856948853, 0.0)
+        point3f physics:localPos1 = (0.0, -0.699999988079071, 0.0)
         quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
     }
     def Scope "FLIPEgressInterface"

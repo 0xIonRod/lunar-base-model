@@ -5,6 +5,9 @@ records current mounted preflight and focused verification after the
 [integrated packaging correction](griffin-integrated-packaging-review.md).
 The [contact-model validity contract](griffin-contact-validity.md) records
 high-energy impact containment and its nominal-descent control against GR-040.
+The [CAD FLIP integration checkpoint](flip-cad-integration-2026-10-27.md)
+records the current rover, the upstream merge, focused acceptance and required
+simulator integration changes.
 
 This folder is the reviewable design-contract layer for the Griffin Twin. It
 does not contain USD source and it is not a second runtime loader. The

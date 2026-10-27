@@ -35,6 +35,13 @@ mechanical ICD. The current native checks and source hashes are recorded in the
   wheelbase, track, chassis dimensions and suspension details remain a study
   reconstruction. They do not justify resizing the lander from a visual guess.
 
+The earlier 20 October engine-count review also retained Astrobotic's
+[GM1 engine procurement announcement](https://www.astrobotic.com/astrobotic-selects-lander-engines-more-for-griffin-viper-mission/),
+which specifies five 700-lbf engines. That provisional five-engine target
+belongs to the historical source configuration; the current seven-engine
+reconstruction above remains the authored baseline. Evaluating a five-engine
+CAD configuration requires its own source and coordinated propulsion checks.
+
 References were checked on 23 October 2026. Product-family capacity, a historical
 prototype, an environmental-test configuration and the hosted rover are distinct
 measurement boundaries.

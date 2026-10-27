@@ -100,7 +100,7 @@ package Griffin1Requirements {
         attribute surfaceRouteArrivalRadiusM : Real[5] = (0.35, 0.30, 1.20, 1.20, 1.20);
         // Source-backed DEM is the physical support surface. No artificial
         // landing slab or egress apron is allowed in the production mission.
-        // Four raycast wheel contacts must reach that DEM at the exit gate.
+        // Four native physical-wheel contacts must reach that DEM at the exit gate.
         // 0.10 m allows bilinear height sampling vs collider triangulation of
         // the 4 m LROC cells; it is a study tolerance, not survey precision.
         // Source: local processed NOBILE03 crop and user scene-cleanup request.
