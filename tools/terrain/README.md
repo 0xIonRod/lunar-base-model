@@ -52,11 +52,12 @@ the source latitude/longitude and body datum provenance; the current runtime
 does not yet apply `lunco:anchor:height` as an entity-Y placement, which is why
 the local offset is explicit.
 
-The adapter preserves unresolved source voids as NaN. The native DEM processor
-owns coverage rejection and bounded neighbour interpolation; this crop requires
-658 filled nodes out of 263169 (0.25%). These values are interpolated terrain,
-not additional LROC measurements. Use a build with the node-span correction in
-the DEM processor (pipeline version 8 or newer): the installed GeoTIFF must have
+The adapter preserves unresolved source voids as NaN without copying nearby
+postings into missing coverage. The native DEM processor owns coverage
+rejection and bounded harmonic interpolation with measured nodes held fixed;
+this crop has 1727 unresolved nodes out of 263169 (0.66%). These values are
+interpolated terrain, not additional LROC measurements. Use native processing
+pipeline version 9 or newer: the installed GeoTIFF must have
 513 × 513 nodes, 4 m spacing and a 2048 m extent. The bundle verifier checks this.
 Install the same TIFF in an authored `terrain/nobile03/` directory if present.
 

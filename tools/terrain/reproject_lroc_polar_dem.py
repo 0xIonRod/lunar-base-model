@@ -213,28 +213,13 @@ def bilinear(samples: list[float], width: int, height: int, px: float, py: float
     ]
     total_weight = sum(weight for _, weight in valid)
     if total_weight > 1.0e-12:
-        # NOBILE03 contains small internal voids. Renormalising the measured
-        # bilinear corners is the same local interpolation contract as the
-        # native DEM processor's void fill; it never invents a broad edge apron.
+        # NOBILE03 contains small internal voids. Renormalise the measured
+        # corners that contribute to this sample; unresolved coverage stays
+        # missing for the native DEM processor.
         return sum(value * weight for value, weight in valid) / total_weight
-    # Exact sampling on a missing node gives all zero bilinear weights. Find a
-    # nearby measured node only for that isolated case. Remaining voids retain
-    # NaN for the native processor's bounded interpolation and coverage check.
-    nearest: list[tuple[float, float]] = []
-    ix = round(px)
-    iy = round(py)
-    for radius in range(1, 5):
-        for sy in range(max(0, iy - radius), min(height, iy + radius + 1)):
-            for sx in range(max(0, ix - radius), min(width, ix + radius + 1)):
-                value = samples[sy * width + sx]
-                if math.isfinite(value) and value > -1.0e30:
-                    distance = math.hypot(sx - px, sy - py)
-                    nearest.append((distance, value))
-        if nearest:
-            distance, value = min(nearest)
-            if distance <= 4.0:
-                return value
-            break
+    # Preserve missing coverage for the native interpolation owner. Copying a
+    # nearby posting here would turn an unmeasured terrace into a fixed boundary
+    # condition that the native void solver could no longer correct.
     return math.nan
 
 
@@ -440,7 +425,7 @@ frame = "MOON_ME"
         "center_lat": args.center_lat, "center_lon": args.center_lon,
         "window_m": args.window_m, "resolution": args.resolution,
         "vertical_offset_m": args.vertical_offset, "unresolved_void_nodes": voids,
-        "void_treatment": "native DEM processor bounded neighbour interpolation",
+        "void_treatment": "native DEM processor bounded harmonic interpolation",
     }, indent=2) + "\n")
     print(f"Prepared {args.output}; {voids} void nodes require native processing before installation.")
     return 0
