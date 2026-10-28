@@ -1,0 +1,304 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinFlipVisual"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "GriffinFlipVisual" (
+    prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
+    kind = "assembly"
+    doc = "Griffin-1 and Astrolab FLIP visual review composition; SI metres."
+    prepend apiSchemas = ["LunCoEpochAPI"]
+)
+{
+    custom string lunco:visual:status = "review-ready proxy geometry, not flight CAD"
+    custom string lunco:visual:ownership = "Twin USD owns topology/material placement; Rhai owns visual acceptance"
+    custom string lunco:visual:camera = "VisualCamera"
+    custom token lunco:visual:terrain_mode = "standard_layered"
+    custom asset lunco:visual:terrain_asset = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@
+    custom asset lunco:visual:terrain_shader = @lunco://shaders/terrain_layered.wesl@
+    double lunco:anchor:lat = -84.72672255
+    double lunco:anchor:lon = 29.14428685
+    double lunco:anchor:height = 0.0
+    int lunco:anchor:body = 301
+    double lunco:time:epochJd = 2461395.5
+    def Xform "Ground"
+    {
+        def Cylinder "LandingPad"
+        {
+            float radius = 6.0
+            float height = 0.1599999964237213
+            uniform token axis = "Y"
+            double3 xformOp:translate = (0.0, 0.08, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.25999999046325684, 0.27000001072883606, 0.28999999165534973)]
+            bool physics:collisionEnabled = false
+            uniform token purpose = "guide"
+            token visibility = "invisible"
+        }
+        def Cylinder "PadRing"
+        {
+            float radius = 5.400000095367432
+            float height = 0.1899999976158142
+            uniform token axis = "Y"
+            double3 xformOp:translate = (0.0, 0.18, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.6499999761581421, 0.47999998927116394, 0.18000000715255737)]
+            bool physics:collisionEnabled = false
+            uniform token purpose = "guide"
+            token visibility = "invisible"
+        }
+        def Plane "FlatReviewSurface" (
+            prepend apiSchemas = ["LunCoTerrainAPI", "PhysicsCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            double width = 36.0
+            double length = 36.0
+            uniform token axis = "Y"
+            uniform token lunco:terrain:surfaceRole = "flat-site"
+            bool physics:collisionEnabled = false
+            color3f[] primvars:displayColor = [(0.12999999523162842, 0.11999999731779099, 0.10999999940395355)]
+            uniform token purpose = "render"
+            token visibility = "inherited"
+        }
+    }
+    def Xform "Griffin1" (
+        references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
+    )
+    {
+        bool physics:rigidBodyEnabled = false
+        custom double3 xformOp:translate = (0.0, 0.44, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        float inputs:leg_displacement_px = 0.0 (
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_px.connect = None
+        float inputs:leg_displacement_nx = 0.0 (
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_nx.connect = None
+        float inputs:leg_displacement_pz = 0.0 (
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_pz.connect = None
+        float inputs:leg_displacement_nz = 0.0 (
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_displacement_nz.connect = None
+        float inputs:leg_velocity_px = 0.0 (
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_px.connect = None
+        float inputs:leg_velocity_nx = 0.0 (
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_nx.connect = None
+        float inputs:leg_velocity_pz = 0.0 (
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_pz.connect = None
+        float inputs:leg_velocity_nz = 0.0 (
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+        )
+        float inputs:leg_velocity_nz.connect = None
+        over "LegPX"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        over "LegNX"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        over "LegPZ"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        over "LegNZ"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "EgressRampPort"
+        {
+            bool physics:rigidBodyEnabled = false
+            def "MiddleSection"
+            {
+                bool physics:rigidBodyEnabled = false
+                def "ToeSection"
+                {
+                    bool physics:rigidBodyEnabled = false
+                }
+            }
+        }
+        def "TransitionPlatePort"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "EgressRampStarboard"
+        {
+            bool physics:rigidBodyEnabled = false
+            def "MiddleSection"
+            {
+                bool physics:rigidBodyEnabled = false
+                def "ToeSection"
+                {
+                    bool physics:rigidBodyEnabled = false
+                }
+            }
+        }
+        def "TransitionPlateStarboard"
+        {
+            bool physics:rigidBodyEnabled = false
+        }
+        def "LegPX_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNX_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegPZ_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "LegNZ_Spring"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampHingePort"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampHingeStarboard"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingePort01"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingePort12"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingeStarboard01"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampSectionHingeStarboard12"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampTransitionJointPort"
+        {
+            bool physics:jointEnabled = false
+        }
+        def "RampTransitionJointStarboard"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchPortRoot"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchStarboardRoot"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchPortMiddle"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchPortToe"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchStarboardMiddle"
+        {
+            bool physics:jointEnabled = false
+        }
+        def PhysicsFixedJoint "RampFlightLatchStarboardToe"
+        {
+            bool physics:jointEnabled = false
+        }
+    }
+    def Xform "FLIP" (
+        references = @twin://astrobotic-griffin-1/vehicles/flip_v5.usda@</FLIP>
+    )
+    {
+        bool physics:rigidBodyEnabled = false
+        custom double3 xformOp:translate = (0.0, 3.26, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def DomeLight "ReviewFill"
+    {
+        float inputs:intensity = 0.0
+        float inputs:exposure = 0.0
+        color3f inputs:color = (1.0, 1.0, 1.0)
+    }
+    over "Sun"
+    {
+        float inputs:intensity = 120000.0
+    }
+    def Camera "VisualCamera" (
+        prepend apiSchemas = ["LunCoCameraAPI", "LunCoAvatarAPI"]
+        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+    )
+    {
+        uniform bool lunco:avatar = true
+        uniform token lunco:cameraMode = "freeflight"
+        double3 lunco:cameraLookAt = (0.0, 2.0, 0.0)
+        custom double3 xformOp:translate = (10.0, 8.0, -14.0)
+        float focalLength = 40.0
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        float exposure = 0.0
+    }
+    def Scope "CameraTrack" (
+        prepend apiSchemas = ["LunCoCameraTrackAPI"]
+    )
+    {
+        token lunco:activeCamera
+        token lunco:activeCamera.timeSamples = {
+            0.0: "VisualCamera",
+        }
+    }
+    def Scope "Scenario" (
+        active = false
+    )
+    {
+        def Scope "Mission" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_flip_visual.rhai@
+        }
+    }
+    def Xform "Environment" (
+        references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@
+    )
+    {
+        over "VisualBerms"
+        {
+            def "BermEast"
+            {
+                token visibility = "invisible"
+            }
+            def "BermWest"
+            {
+                token visibility = "invisible"
+            }
+        }
+        def "Terrain" (
+            active = false
+        )
+        {
+        }
+    }
+    def Xform "SolarSystem" (
+        prepend references = @lunco://celestial/solar_system.usda@</SolarSystem>
+    )
+    {
+    }
+}

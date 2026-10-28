@@ -6,7 +6,7 @@
 )
 
 def Xform "Griffin1" (
-    documentation = "A powered-descent lander. Possess it to take the stick: Space thrusts, WASD tilts, Q/E turns. It has no guidance of its own — a scene composes that on."
+    doc = "A powered-descent lander. Possess it to take the stick: Space thrusts, WASD tilts, Q/E turns. It has no guidance of its own — a scene composes that on."
     kind = "assembly"
     prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "LunCoCatalogAPI", "LunCoProgramAPI", "LunCoUiSchemaAPI", "MaterialBindingAPI"]
     prepend references = @lunco://components/avionics/obc_lander.usda@</LanderOBC>
@@ -2803,6 +2803,19 @@ def Xform "Griffin1" (
         )
         {
         }
+        def Material "PayloadInterfaceMetal"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </Griffin1/Looks/PayloadInterfaceMetal/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                custom token outputs:surface = ""
+                custom color3f inputs:diffuseColor = (0.6299999952316284, 0.6700000166893005, 0.7200000286102295)
+                custom float inputs:metallic = 0.8199999928474426
+                custom float inputs:roughness = 0.33000001311302185
+            }
+        }
     }
     def LunCoEvent "LowFuel"
     {
@@ -2854,7 +2867,7 @@ def Xform "Griffin1" (
     }
     def Scope "Subsystems" (
         prepend apiSchemas = ["LunCoProgramAPI"]
-        documentation = "Reacts to touchdown and propellant events. Does not fly the vehicle."
+        doc = "Reacts to touchdown and propellant events. Does not fly the vehicle."
     )
     {
         uniform token info:implementationSource = "sourceAsset"
@@ -2966,7 +2979,7 @@ def Xform "Griffin1" (
         float inputs:desired_tilt_z
         float inputs:desired_tilt_z.connect = </Griffin1.outputs:desired_tilt_z>
         custom double inputs:heading_enable = 0.0 (
-            documentation = "Autonomous solar-heading authority is connected by the mission. Default zero allows standalone vehicle and manual yaw operation."
+            doc = "Autonomous solar-heading authority is connected by the mission. Default zero allows standalone vehicle and manual yaw operation."
         )
         custom double inputs:heading_target_body_x = 0.0
         custom double inputs:heading_target_body_y = 0.0
@@ -4959,9 +4972,10 @@ def Xform "Griffin1" (
             custom double3 xformOp:translate = (0.0, 2.08, 0.0)
             custom double3 xformOp:scale = (1.3, 0.08, 1.3)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-            color3f[] primvars:displayColor = [(0.6600000262260437, 0.41999998688697815, 0.18000000715255737)]
+            color3f[] primvars:displayColor = [(0.6299999952316284, 0.6700000166893005, 0.7200000286102295)]
             bool physics:collisionEnabled = true
             uniform token purpose = "render"
+            custom rel material:binding = </Griffin1/Looks/PayloadInterfaceMetal>
         }
     }
     def PhysicsRevoluteJoint "RampHingePort" (
@@ -5156,7 +5170,6 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["MaterialBindingAPI"]
         )
         {
-            custom rel material:binding = </Griffin1/Looks/MliFoil_Mat>
         }
     }
     def Xform "TankNX" (
@@ -5171,7 +5184,6 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["MaterialBindingAPI"]
         )
         {
-            custom rel material:binding = </Griffin1/Looks/MliFoil_Mat>
         }
     }
     def Xform "TankPZ" (
@@ -5186,7 +5198,6 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["MaterialBindingAPI"]
         )
         {
-            custom rel material:binding = </Griffin1/Looks/MliFoil_Mat>
         }
     }
     def Xform "TankNZ" (
@@ -5201,7 +5212,6 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["MaterialBindingAPI"]
         )
         {
-            custom rel material:binding = </Griffin1/Looks/MliFoil_Mat>
         }
     }
     def Cube "TopDeckBeamCollider0" (
@@ -5613,6 +5623,57 @@ def Xform "Griffin1" (
                 uniform token purpose = "render"
                 double radius = 0.06
                 double height = 0.9602149671935358
+                def Xform "ThermalDetail"
+                {
+                    def Cylinder "Blanket" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.074
+                        double height = 0.8641934704741823
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07400000095367432, -0.07400000095367432, -0.4320967495441437), (0.07400000095367432, 0.07400000095367432, 0.4320967495441437)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegPX_BusMount/Looks/UpperStrutBlanket>
+                    }
+                    def Cylinder "UpperCuff" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, 0.43209673523709113, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.078
+                        double height = 0.024
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07800000160932541, -0.07800000160932541, -0.012000000104308128), (0.07800000160932541, 0.07800000160932541, 0.012000000104308128)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegPX_BusMount/Looks/JointMetal>
+                    }
+                    def Cylinder "LowerCuff" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.43209673523709113, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.078
+                        double height = 0.024
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07800000160932541, -0.07800000160932541, -0.012000000104308128), (0.07800000160932541, 0.07800000160932541, 0.012000000104308128)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegPX_BusMount/Looks/PhotoCuffMetal>
+                    }
+                }
             }
             def Cylinder "TubeCollider" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
@@ -5685,6 +5746,10 @@ def Xform "Griffin1" (
             token visibility = "invisible"
             custom rel lunco:derived:source = </Griffin1/LegPX_BusMount/MountClevisInner>
         }
+        over "FootPadCover"
+        {
+            token visibility = "invisible"
+        }
     }
     def Xform "LegNX_BusMount" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
@@ -5732,6 +5797,57 @@ def Xform "Griffin1" (
                 uniform token purpose = "render"
                 double radius = 0.06
                 double height = 0.9602149671935358
+                def Xform "ThermalDetail"
+                {
+                    def Cylinder "Blanket" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.074
+                        double height = 0.8641934704741823
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07400000095367432, -0.07400000095367432, -0.4320967495441437), (0.07400000095367432, 0.07400000095367432, 0.4320967495441437)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegNX_BusMount/Looks/UpperStrutBlanket>
+                    }
+                    def Cylinder "UpperCuff" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, 0.43209673523709113, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.078
+                        double height = 0.024
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07800000160932541, -0.07800000160932541, -0.012000000104308128), (0.07800000160932541, 0.07800000160932541, 0.012000000104308128)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegNX_BusMount/Looks/JointMetal>
+                    }
+                    def Cylinder "LowerCuff" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.43209673523709113, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.078
+                        double height = 0.024
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07800000160932541, -0.07800000160932541, -0.012000000104308128), (0.07800000160932541, 0.07800000160932541, 0.012000000104308128)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegNX_BusMount/Looks/PhotoCuffMetal>
+                    }
+                }
             }
             def Cylinder "TubeCollider" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
@@ -5804,6 +5920,10 @@ def Xform "Griffin1" (
             token visibility = "invisible"
             custom rel lunco:derived:source = </Griffin1/LegNX_BusMount/MountClevisInner>
         }
+        over "FootPadCover"
+        {
+            token visibility = "invisible"
+        }
     }
     def Xform "LegPZ_BusMount" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
@@ -5851,6 +5971,57 @@ def Xform "Griffin1" (
                 uniform token purpose = "render"
                 double radius = 0.06
                 double height = 0.9602149671935358
+                def Xform "ThermalDetail"
+                {
+                    def Cylinder "Blanket" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.074
+                        double height = 0.8641934704741823
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07400000095367432, -0.07400000095367432, -0.4320967495441437), (0.07400000095367432, 0.07400000095367432, 0.4320967495441437)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegPZ_BusMount/Looks/UpperStrutBlanket>
+                    }
+                    def Cylinder "UpperCuff" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, 0.43209673523709113, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.078
+                        double height = 0.024
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07800000160932541, -0.07800000160932541, -0.012000000104308128), (0.07800000160932541, 0.07800000160932541, 0.012000000104308128)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegPZ_BusMount/Looks/JointMetal>
+                    }
+                    def Cylinder "LowerCuff" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.43209673523709113, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.078
+                        double height = 0.024
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07800000160932541, -0.07800000160932541, -0.012000000104308128), (0.07800000160932541, 0.07800000160932541, 0.012000000104308128)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegPZ_BusMount/Looks/PhotoCuffMetal>
+                    }
+                }
             }
             def Cylinder "TubeCollider" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
@@ -5923,6 +6094,10 @@ def Xform "Griffin1" (
             token visibility = "invisible"
             custom rel lunco:derived:source = </Griffin1/LegPZ_BusMount/MountClevisInner>
         }
+        over "FootPadCover"
+        {
+            token visibility = "invisible"
+        }
     }
     def Xform "LegNZ_BusMount" (
         prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda@</LandingLeg>
@@ -5970,6 +6145,57 @@ def Xform "Griffin1" (
                 uniform token purpose = "render"
                 double radius = 0.06
                 double height = 0.9602149671935358
+                def Xform "ThermalDetail"
+                {
+                    def Cylinder "Blanket" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.074
+                        double height = 0.8641934704741823
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07400000095367432, -0.07400000095367432, -0.4320967495441437), (0.07400000095367432, 0.07400000095367432, 0.4320967495441437)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegNZ_BusMount/Looks/UpperStrutBlanket>
+                    }
+                    def Cylinder "UpperCuff" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, 0.43209673523709113, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.078
+                        double height = 0.024
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07800000160932541, -0.07800000160932541, -0.012000000104308128), (0.07800000160932541, 0.07800000160932541, 0.012000000104308128)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegNZ_BusMount/Looks/JointMetal>
+                    }
+                    def Cylinder "LowerCuff" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:translate = (0.0, -0.43209673523709113, 0.0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                        custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                        double radius = 0.078
+                        double height = 0.024
+                        uniform token axis = "Y"
+                        float3[] extent = [(-0.07800000160932541, -0.07800000160932541, -0.012000000104308128), (0.07800000160932541, 0.07800000160932541, 0.012000000104308128)]
+                        bool physics:collisionEnabled = false
+                        uniform token purpose = "render"
+                        custom rel material:binding = </Griffin1/LegNZ_BusMount/Looks/PhotoCuffMetal>
+                    }
+                }
             }
             def Cylinder "TubeCollider" (
                 prepend apiSchemas = ["PhysicsCollisionAPI", "LunCoDerivedGeometryAPI"]
@@ -6041,6 +6267,10 @@ def Xform "Griffin1" (
             uniform token purpose = "proxy"
             token visibility = "invisible"
             custom rel lunco:derived:source = </Griffin1/LegNZ_BusMount/MountClevisInner>
+        }
+        over "FootPadCover"
+        {
+            token visibility = "invisible"
         }
     }
     def Cube "RampMountPortInnerRear" (
@@ -9984,7 +10214,7 @@ def Xform "Griffin1" (
     }
     def Scope "ContactValidity" (
         prepend apiSchemas = ["LunCoProgramAPI"]
-        documentation = "Contact-model study validity only: maximum normal approach speed 5 m/s on the hull or four landing legs. This conservative presentation-study cutoff excludes high-speed crashes; it is not a calibrated absorption capacity or flight hardware rating. Deployed ramp-only and detached payload contacts require their own authored validity observers."
+        doc = "Contact-model study validity only: maximum normal approach speed 5 m/s on the hull or four landing legs. This conservative presentation-study cutoff excludes high-speed crashes; it is not a calibrated absorption capacity or flight hardware rating. Deployed ramp-only and detached payload contacts require their own authored validity observers."
     )
     {
         uniform token info:implementationSource = "sourceAsset"

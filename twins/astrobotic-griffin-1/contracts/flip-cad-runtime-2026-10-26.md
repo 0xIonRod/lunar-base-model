@@ -7,9 +7,11 @@ existing FLIP thermal subassembly, and mounts a photovoltaic electrical componen
 and environment probe on the moving panel body. The component's generic panel
 meshes and duplicate equipment mass facets are disabled.
 
-The battery's 28 V / 222.14285 Ah rating and the 0.7 m², 35% panel efficiency
-are inherited study assumptions. This is simulator integration evidence, not
-supplier-calibrated power, mobility or thermal performance.
+The battery's 28 V bus and the 0.7 m², 35% panel efficiency are inherited study
+assumptions. The 222.14285 Ah allocation at that voltage represents Astrolab's
+published 6.22 kWh energy; the panel's rounded 270 W rating also follows its
+public post. This is simulator integration evidence, not supplier-calibrated
+power, mobility or thermal performance. See `flip-public-power-2026-10-27.md`.
 
 ## Production evidence
 

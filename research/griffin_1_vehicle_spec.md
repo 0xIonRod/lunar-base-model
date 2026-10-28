@@ -67,8 +67,13 @@ measurement boundaries.
 All dimensions in this table except the separately sourced tire scale are study
 estimates. The old 5.4 m box, diagonal-leg stations, 45-degree outward stow,
 equal-span coupled ramps and 0.90 m tires are superseded configurations.
-The selected gold MLI finish is an operator presentation preference; it does not
-identify flight blanket material or its thermal properties.
+The 27 October photographic presentation supersedes the earlier gold MLI
+preference with silver-gray tank and engine-bay blankets, separate metal
+finishes, domed pad covers and visible service harnesses. The
+[presentation review](../twins/astrobotic-griffin-1/contracts/griffin-visual-realism-2026-10-27.md)
+records scope and checks. Colors, fold controls, pad profiles and harness
+routing remain explicit visual-study assumptions, not flight material or
+thermal measurements.
 
 The inherited propulsion study uses a 2,000 kg dry-mass input and 1,000 kg per
 reactant, with an assumed 2.6 oxidizer/fuel flow ratio. These are not measured

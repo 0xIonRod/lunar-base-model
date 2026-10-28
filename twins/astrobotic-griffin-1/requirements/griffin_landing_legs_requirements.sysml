@@ -13,6 +13,7 @@ package GriffinLandingLegRequirements {
         StrutInner;
         ShockPiston;
         FootPad;
+        FootPadCover;
         MountClevisOuter;
         MountClevisInner;
         FootPadPlate;
@@ -31,8 +32,8 @@ package GriffinLandingLegRequirements {
         attribute componentAsset : TwinAssetPath = "components/lander/griffin_landing_leg_visual.usda";
         attribute bodyChildNames : GriffinLandingLegBodyChild[2] =
             ("LandingLegVisual", "ShockPiston");
-        attribute childNames : GriffinLandingLegChild[9] =
-            ("StrutOuter", "StrutInner", "ShockPiston", "FootPad",
+        attribute childNames : GriffinLandingLegChild[10] =
+            ("StrutOuter", "StrutInner", "ShockPiston", "FootPad", "FootPadCover",
              "MountClevisOuter", "MountClevisInner", "FootPadPlate", "MountAxle",
              "BodyMountArm");
         // Three-member topology follows the user-provided PGH Tech hardware

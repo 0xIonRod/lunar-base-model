@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-28",
+  "targeted_surfaces_checked": 31,
+  "ready": {
+    "ready": true,
+    "world_hold": false,
+    "faulted": false,
+    "fault": null,
+    "readiness_tracked": true,
+    "pending_count": 0,
+    "pending": []
+  },
+  "runtime_diagnostics": {
+    "errors": 0,
+    "warnings": 0,
+    "findings": []
+  },
+  "tests": [
+    {
+      "channel": "GRIFFIN_RAMP_ROOT_SECTION",
+      "exit_code": 1,
+      "case": "ramp_root_section"
+    },
+    {
+      "channel": "GRIFFIN_RAMP_MIDDLE_SECTION",
+      "exit_code": 1,
+      "case": "ramp_middle_section"
+    },
+    {
+      "channel": "GRIFFIN_RAMP_TOE_SECTION",
+      "exit_code": 1,
+      "case": "ramp_toe_section"
+    },
+    {
+      "channel": "GRIFFIN_ROOT_BEARING",
+      "exit_code": 1,
+      "case": "ramp_root_bearing"
+    },
+    {
+      "channel": "GRIFFIN_SOLAR_REQUIREMENTS",
+      "exit_code": 0,
+      "case": "solar_requirements"
+    }
+  ],
+  "non_finish_comparison": [
+    {
+      "path": "twins\\astrobotic-griffin-1\\components\\lander\\griffin_ramp_middle_section_visual.usda",
+      "unchanged_non_finish_source": true
+    },
+    {
+      "path": "twins\\astrobotic-griffin-1\\components\\lander\\griffin_ramp_root_bearing_visual.usda",
+      "unchanged_non_finish_source": true
+    },
+    {
+      "path": "twins\\astrobotic-griffin-1\\components\\lander\\griffin_ramp_root_section_visual.usda",
+      "unchanged_non_finish_source": true
+    },
+    {
+      "path": "twins\\astrobotic-griffin-1\\components\\lander\\griffin_ramp_toe_visual.usda",
+      "unchanged_non_finish_source": true
+    },
+    {
+      "path": "twins\\astrobotic-griffin-1\\components\\lander\\griffin_solar_panel_port_visual.usda",
+      "unchanged_non_finish_source": true
+    },
+    {
+      "path": "twins\\astrobotic-griffin-1\\components\\lander\\griffin_solar_panel_starboard_visual.usda",
+      "unchanged_non_finish_source": true
+    },
+    {
+      "path": "twins\\astrobotic-griffin-1\\components\\lander\\griffin_solar_panel_visual.usda",
+      "unchanged_non_finish_source": true
+    }
+  ],
+  "sha256": {
+    "scenes/griffin_1_surface_ops.usda": "a2429419483a5d535bab4bf501c58393dbb301ebfbd825dfd10be7e158ae70f3",
+    "scenes/griffin_shader_review.usda": "2caff2cbdfbcccd7f8d1a165e9a1892b48bb4fc9de4acb5310442533926c4bb2",
+    "environments/presentation_ground_fill.hdr": "d6514797626bd26d7223c87067835447eb86d1b15563e288df368341be48526d",
+    "tools/griffin_shader_readability.rhai": "f19de7791abdb691d76e4ed657b9da982176c7d5a51140256d83c6d10b64bf8e",
+    "requirements/griffin_presentation_study.sysml": "d8b23d44412464789d377378e9a56b968a5a1eb5a9756a61c6dfa5d8b8625eab"
+  },
+  "status": "superseded_by_user_request",
+  "superseded_by": "griffin-sun-only-2026-10-28.json"
+}

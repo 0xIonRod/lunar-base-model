@@ -3,7 +3,7 @@
     defaultPrim = "RootBearing"
     upAxis = "Y"
     metersPerUnit = 1.0
-    documentation = "Griffin root bearing housing reconstruction; SI/Y-up, Z bore. Explicit study assumptions: requirements/griffin_ramp_root_bearing_requirements.sysml; no qualified engineering material, lubricant or load rating."
+    doc = "Griffin root bearing housing reconstruction; SI/Y-up, Z bore. Explicit study assumptions: requirements/griffin_ramp_root_bearing_requirements.sysml; no qualified engineering material, lubricant or load rating."
 )
 
 def Xform "RootBearing" (

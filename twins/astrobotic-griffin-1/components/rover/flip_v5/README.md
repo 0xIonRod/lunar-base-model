@@ -10,6 +10,15 @@ The five visual layers and panel Modelica source were copied without changing
 their geometry or equations. All five visual-layer hashes match the source.
 `DELIVERY_REPORT.md` is the original supplier handoff, not a fresh acceptance result.
 
+The vehicle now adds component-scoped presentation material bindings over those
+unchanged CAD layers. Brushed hardware, pale chassis panels, darker wheel tread
+and fine solar electrodes are artistic rendering studies owned by
+`GriffinPresentationStudy::SocialFinish`; they do not define engineering material
+properties. See `../../../contracts/social-materials-2026-10-28.md` for the review.
+Raised chassis rails, service hatch surrounds and moving solar-frame caps are
+also authored at the vehicle level; the supplier meshes remain unchanged. See
+`../../../contracts/social-geometry-2026-10-28.md` for the matched before/after views.
+
 The vehicle was extracted from the source `/World/FLIP` with LunCoSim's typed
 `MovePrim` operation, which also remapped joint and connection targets. Its
 standalone scene environment, ground, camera and inactive acceptance controller
@@ -24,7 +33,10 @@ motor, gearbox, bearing, brake, tire and contact boundaries. A photovoltaic
 component is mounted on the moving panel body, with its own environment probe
 and a connection to the battery bus. Generic panel proxy geometry is disabled.
 Electrical components do not add another mechanical mass over the CAD budget.
-Battery and solar ratings remain study assumptions, not supplier calibration.
+Battery energy (6.22 kWh) and the rounded solar peak (270 W) match Astrolab's
+public power post. The 28 V bus, panel area/efficiency and electrical conversion
+behavior remain study assumptions, not supplier calibration. See
+`../../../contracts/flip-public-power-2026-10-27.md` for the comparison and live test.
 The CAD differential-steering route, forward/reverse/braking, panel stow/deploy
 and finite EPS gates have passed; see `../../../contracts/flip-cad-runtime-2026-10-26.md`.
 

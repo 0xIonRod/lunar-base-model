@@ -10,7 +10,7 @@ def Xform "SolarPanel" (
 )
 {
     def Cylinder "HingeBar" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:translate = (0.0, -0.18, 0.5805)
@@ -21,6 +21,7 @@ def Xform "SolarPanel" (
         color3f[] primvars:displayColor = [(0.1599999964237213, 0.1899999976158142, 0.23999999463558197)]
         double radius = 0.025
         double height = 1.866
+        custom rel material:binding = </SolarPanel/Looks/PanelFrame>
     }
     def Mesh "Frame" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
@@ -38,9 +39,220 @@ def Xform "SolarPanel" (
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
         custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+        def Xform "EdgeCaps"
+        {
+            def Cube "Lip0" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (1.8399999656677246, 0.007, 0.03400003099441529)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.0, 0.018499999664723873, -0.9180000126361847)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip1" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.03400003099441529, 0.007, 1.222999981880188)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.9180000126361847, 0.018499999664723873, -0.3084999918937683)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip2" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.1694999852180481, 0.007, 0.0340000011920929)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.8352499902248383, 0.018499999664723873, 0.3010000139474869)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip3" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.03399997138977051, 0.007, 0.45549999856948853)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.7524999976158142, 0.018499999664723873, 0.52674999833107)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip4" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.1694999852180481, 0.007, 0.03399997138977051)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.8352499902248383, 0.018499999664723873, 0.7524999976158142)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip5" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.03400003099441529, 0.007, 0.1694999852180481)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.9180000126361847, 0.018499999664723873, 0.8352499902248383)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip6" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.6209999837875366, 0.007, 0.03400003099441529)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.609499990940094, 0.018499999664723873, 0.9180000126361847)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip7" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.0340000011920929, 0.007, 0.4704999842643738)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.3010000139474869, 0.018499999664723873, 0.6847499907016754)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip8" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.15449999952316285, 0.007, 0.0340000011920929)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.22574999928474426, 0.018499999664723873, 0.4515000134706497)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip9" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.0340000011920929, 0.007, 0.15449999952316285)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.15049999952316284, 0.018499999664723873, 0.3762499988079071)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip10" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.3049999990463257, 0.007, 0.0340000011920929)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (0.0, 0.018499999664723873, 0.3010000139474869)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip11" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.0340000011920929, 0.007, 0.22975002908706665)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-0.15049999952316284, 0.018499999664723873, 0.413875013589859)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip12" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.15449999952316285, 0.007, 0.03400003099441529)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-0.22574999928474426, 0.018499999664723873, 0.52674999833107)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip13" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.0340000011920929, 0.007, 0.39524995470047)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-0.3010000139474869, 0.018499999664723873, 0.7223750054836273)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip14" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.6209999837875366, 0.007, 0.03400003099441529)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-0.609499990940094, 0.018499999664723873, 0.9180000126361847)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+            def Cube "Lip15" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.03400003099441529, 0.007, 1.8399999656677246)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-0.9180000126361847, 0.018499999664723873, 0.0)
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                uniform token purpose = "render"
+                custom rel material:binding = </SolarPanel/Looks/PanelFrame>
+            }
+        }
     }
     def Cube "MountBracketNegativeX" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:scale = (0.1, 0.08, 0.12)
@@ -50,9 +262,10 @@ def Xform "SolarPanel" (
         custom double3 xformOp:translate = (-1.008, -0.22000000000000008, 0.5110384615384616)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
+        custom rel material:binding = </SolarPanel/Looks/PanelFrame>
     }
     def Cube "MountLinkNegativeX" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:scale = (0.1, 0.2924327859833892, 0.04)
@@ -63,9 +276,10 @@ def Xform "SolarPanel" (
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, -18.82471001824005)
+        custom rel material:binding = </SolarPanel/Looks/PanelFrame>
     }
     def Cube "MountBracketPositiveX" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:scale = (0.1, 0.08, 0.12)
@@ -75,9 +289,10 @@ def Xform "SolarPanel" (
         custom double3 xformOp:translate = (1.008, -0.22000000000000008, 0.5110384615384616)
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.20000000298023224)]
+        custom rel material:binding = </SolarPanel/Looks/PanelFrame>
     }
     def Cube "MountLinkPositiveX" (
-        prepend apiSchemas = ["PhysicsCollisionAPI"]
+        prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
     )
     {
         custom double3 xformOp:scale = (0.1, 0.2924327859833892, 0.04)
@@ -88,6 +303,7 @@ def Xform "SolarPanel" (
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         custom double3 xformOp:rotateXYZ = (0.0, 0.0, 18.82471001824005)
+        custom rel material:binding = </SolarPanel/Looks/PanelFrame>
     }
     def Mesh "ArrayBackplane" (
         prepend apiSchemas = ["PhysicsCollisionAPI"]

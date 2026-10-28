@@ -1,0 +1,262 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+    def Xform "Lander" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 0.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        over "Nozzle"
+        {
+            over "MainEngineCluster"
+            {
+                over "EngineSkirt"
+                {
+                    over "EngineSkirtShell"
+                    {
+                        over Xform "BlanketSeams"
+                        {
+                            token visibility = "inherited"
+                        }
+                    }
+                }
+            }
+        }
+        over "SolarPanelForward"
+        {
+            over "Frame"
+            {
+                over Xform "EdgeCaps"
+                {
+                    token visibility = "inherited"
+                }
+            }
+        }
+        over "SolarPanelFrontPort"
+        {
+            over "Frame"
+            {
+                over Xform "EdgeCaps"
+                {
+                    token visibility = "inherited"
+                }
+            }
+        }
+        over "SolarPanelFrontStarboard"
+        {
+            over "Frame"
+            {
+                over Xform "EdgeCaps"
+                {
+                    token visibility = "inherited"
+                }
+            }
+        }
+        over "Bus"
+        {
+            over "TankSupportPlate"
+            {
+                over Xform "ExternalServiceLoops"
+                {
+                    token visibility = "inherited"
+                }
+            }
+        }
+        over "LegPX"
+        {
+            over "LandingLegVisual"
+            {
+                over "StrutOuter"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+                over "StrutInner"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+                over "ShockPiston"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+            }
+        }
+        over "LegPX_BusMount"
+        {
+            over "ShockBarrel"
+            {
+                over "Tube"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+            }
+        }
+        over "LegNX"
+        {
+            over "LandingLegVisual"
+            {
+                over "StrutOuter"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+                over "StrutInner"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+                over "ShockPiston"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+            }
+        }
+        over "LegNX_BusMount"
+        {
+            over "ShockBarrel"
+            {
+                over "Tube"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+            }
+        }
+        over "LegPZ"
+        {
+            over "LandingLegVisual"
+            {
+                over "StrutOuter"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+                over "StrutInner"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+                over "ShockPiston"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+            }
+        }
+        over "LegPZ_BusMount"
+        {
+            over "ShockBarrel"
+            {
+                over "Tube"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+            }
+        }
+        over "LegNZ"
+        {
+            over "LandingLegVisual"
+            {
+                over "StrutOuter"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+                over "StrutInner"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+                over "ShockPiston"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+            }
+        }
+        over "LegNZ_BusMount"
+        {
+            over "ShockBarrel"
+            {
+                over "Tube"
+                {
+                    over Xform "ThermalDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+            }
+        }
+    }
+    def Xform "FLIP" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/flip_v5.usda@</FLIP>
+    )
+    {
+        double3 xformOp:translate = (5.7, 0.7, -3.0)
+        over "CADVisuals"
+        {
+            over "TopDeck"
+            {
+                def Xform "GeometryDetail"
+                {
+                    token visibility = "inherited"
+                }
+            }
+        }
+        over "SolarMechanism"
+        {
+            over "CADVisuals"
+            {
+                over "SolarBackplate"
+                {
+                    def Xform "GeometryDetail"
+                    {
+                        token visibility = "inherited"
+                    }
+                }
+            }
+        }
+    }
+}

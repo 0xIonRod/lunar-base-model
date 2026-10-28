@@ -19,11 +19,12 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.11999999731779099, 0.12999999523162842, 0.1599999964237213)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/MachinedAluminum>
     }
     def Xform "TankMountBrackets"
     {
         def Cube "TankMountBracketPX" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
             custom double3 xformOp:translate = (0.4447473758846575, -0.6482420453384021, 0.4444066231886681)
@@ -36,7 +37,7 @@ def Xform "PropellantTank" (
             uniform token purpose = "render"
         }
         def Cube "TankMountBracketNX" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
             custom double3 xformOp:translate = (-0.4447473758846575, -0.6482420453384021, 0.4444066231886681)
@@ -49,7 +50,7 @@ def Xform "PropellantTank" (
             uniform token purpose = "render"
         }
         def Cube "TankMountBracketPZ" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
             custom double3 xformOp:translate = (0.4447473758846575, -0.6482420453384021, -0.4444066231886681)
@@ -62,7 +63,7 @@ def Xform "PropellantTank" (
             uniform token purpose = "render"
         }
         def Cube "TankMountBracketNZ" (
-            prepend apiSchemas = "PhysicsCollisionAPI"
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
             custom double3 xformOp:translate = (-0.4447473758846575, -0.6482420453384021, -0.4444066231886681)
@@ -86,6 +87,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/RetentionMetal>
     }
     def Cylinder "TankBandB"
     {
@@ -98,6 +100,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/RetentionMetal>
     }
     def Cylinder "TankBandC"
     {
@@ -110,6 +113,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/RetentionMetal>
     }
     def Cylinder "TankNeckTop"
     {
@@ -122,6 +126,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/MachinedAluminum>
     }
     def Cylinder "TankNeckBottom"
     {
@@ -134,6 +139,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.25, 0.1899999976158142, 0.11999999731779099)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/MachinedAluminum>
     }
     def Cylinder "TankShoulderTop"
     {
@@ -146,6 +152,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.2800000011920929, 0.18000000715255737, 0.07999999821186066)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/RetentionMetal>
     }
     def Cylinder "TankShoulderBottom"
     {
@@ -158,6 +165,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.2800000011920929, 0.18000000715255737, 0.07999999821186066)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/RetentionMetal>
     }
     def Cylinder "TankValveTop"
     {
@@ -170,6 +178,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.47999998927116394, 0.5, 0.5299999713897705)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/ValveMetal>
     }
     def Cylinder "TankValveBottom"
     {
@@ -182,6 +191,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.47999998927116394, 0.5, 0.5299999713897705)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/ValveMetal>
     }
     def Cylinder "TankValveCapTop"
     {
@@ -194,6 +204,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/ValveMetal>
     }
     def Cylinder "TankValveCapBottom"
     {
@@ -206,6 +217,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/ValveMetal>
     }
     def Cylinder "TankCradle"
     {
@@ -218,6 +230,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.20000000298023224, 0.2199999988079071, 0.25)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/MachinedAluminum>
     }
     def Cylinder "TankSupportPost"
     {
@@ -230,6 +243,7 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.10000000149011612, 0.11999999731779099, 0.15000000596046448)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/MachinedAluminum>
     }
     def Cone "TankTransitionTop"
     {
@@ -243,6 +257,7 @@ def Xform "PropellantTank" (
         float3[] extent = [(-0.5400000214576721, -0.09000000357627869, -0.5400000214576721), (0.5400000214576721, 0.09000000357627869, 0.5400000214576721)]
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.2800000011920929, 0.18000000715255737, 0.07999999821186066)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/ValveMetal>
     }
     def Cone "TankTransitionBottom"
     {
@@ -256,6 +271,7 @@ def Xform "PropellantTank" (
         float3[] extent = [(-0.5400000214576721, -0.09000000357627869, -0.5400000214576721), (0.5400000214576721, 0.09000000357627869, 0.5400000214576721)]
         uniform token purpose = "render"
         color3f[] primvars:displayColor = [(0.2800000011920929, 0.18000000715255737, 0.07999999821186066)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/ValveMetal>
     }
     def Sphere "MliTank"
     {
@@ -266,5 +282,83 @@ def Xform "PropellantTank" (
         uniform token purpose = "render"
         bool physics:collisionEnabled = false
         color3f[] primvars:displayColor = [(0.5799999833106995, 0.4300000071525574, 0.23999999463558197)]
+        custom rel material:binding = </PropellantTank/MliTank/Looks/TankInsulation>
+        def Scope "Looks"
+        {
+            def Material "RetentionMetal"
+            {
+                token outputs:surface
+                token outputs:surface.connect = </PropellantTank/MliTank/Looks/RetentionMetal/Surface.outputs:surface>
+                def Shader "Surface"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    custom token outputs:surface = ""
+                    custom color3f inputs:diffuseColor = (0.3400000035762787, 0.3799999952316284, 0.4300000071525574)
+                    custom float inputs:metallic = 0.8500000238418579
+                    custom float inputs:roughness = 0.2800000011920929
+                    uniform token info:implementationSource = "sourceAsset"
+                    custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                    custom color3f inputs:base_color = (0.3400000035762787, 0.3799999952316284, 0.4300000071525574)
+                    custom float inputs:grain_strength = 0.03500000014901161
+                    custom float inputs:grain_scale = 160.0
+                    custom float inputs:brush_ratio = 8.0
+                }
+            }
+            def Material "MachinedAluminum"
+            {
+                token outputs:surface
+                token outputs:surface.connect = </PropellantTank/MliTank/Looks/MachinedAluminum/Surface.outputs:surface>
+                def Shader "Surface"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    custom token outputs:surface = ""
+                    custom color3f inputs:diffuseColor = (0.6299999952316284, 0.6700000166893005, 0.7200000286102295)
+                    custom float inputs:metallic = 0.8199999928474426
+                    custom float inputs:roughness = 0.33000001311302185
+                    uniform token info:implementationSource = "sourceAsset"
+                    custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                    custom color3f inputs:base_color = (0.6299999952316284, 0.6700000166893005, 0.7200000286102295)
+                    custom float inputs:grain_strength = 0.03500000014901161
+                    custom float inputs:grain_scale = 160.0
+                    custom float inputs:brush_ratio = 8.0
+                }
+            }
+            def Material "ValveMetal"
+            {
+                token outputs:surface
+                token outputs:surface.connect = </PropellantTank/MliTank/Looks/ValveMetal/Surface.outputs:surface>
+                def Shader "Surface"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    custom token outputs:surface = ""
+                    custom color3f inputs:diffuseColor = (0.4699999988079071, 0.3400000035762787, 0.14000000059604645)
+                    custom float inputs:metallic = 0.800000011920929
+                    custom float inputs:roughness = 0.30000001192092896
+                    uniform token info:implementationSource = "sourceAsset"
+                    custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                    custom color3f inputs:base_color = (0.4699999988079071, 0.3400000035762787, 0.14000000059604645)
+                    custom float inputs:grain_strength = 0.03500000014901161
+                    custom float inputs:grain_scale = 160.0
+                    custom float inputs:brush_ratio = 8.0
+                }
+            }
+            def Material "TankInsulation"
+            {
+                token outputs:surface
+                token outputs:surface.connect = </PropellantTank/MliTank/Looks/TankInsulation/Surface.outputs:surface>
+                def Shader "Surface"
+                {
+                    uniform token info:implementationSource = "sourceAsset"
+                    custom asset info:wesl:sourceAsset = @lunco://shaders/mli_foil.wesl@
+                    custom token outputs:surface = ""
+                    custom color3f inputs:foil_color = (0.7599999904632568, 0.7900000214576721, 0.8199999928474426)
+                    custom color3f inputs:shade_color = (0.23999999463558197, 0.27000001072883606, 0.30000001192092896)
+                    custom float inputs:crinkle = 12.0
+                    custom float inputs:facet_depth = 0.6200000047683716
+                    custom float inputs:sheen = 0.800000011920929
+                    custom float inputs:v_scale = 0.800000011920929
+                }
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@
 def Xform "GriffinFlipVisual" (
     prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
     kind = "assembly"
-    documentation = "Griffin-1 and Astrolab FLIP visual review composition; SI metres."
+    doc = "Griffin-1 and Astrolab FLIP visual review composition; SI metres."
     prepend apiSchemas = ["LunCoEpochAPI"]
 )
 {
@@ -71,35 +71,35 @@ def Xform "GriffinFlipVisual" (
         custom double3 xformOp:translate = (0.0, 0.44, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         float inputs:leg_displacement_px = 0.0 (
-            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
         )
         float inputs:leg_displacement_px.connect = None
         float inputs:leg_displacement_nx = 0.0 (
-            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
         )
         float inputs:leg_displacement_nx.connect = None
         float inputs:leg_displacement_pz = 0.0 (
-            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
         )
         float inputs:leg_displacement_pz.connect = None
         float inputs:leg_displacement_nz = 0.0 (
-            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
         )
         float inputs:leg_displacement_nz.connect = None
         float inputs:leg_velocity_px = 0.0 (
-            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
         )
         float inputs:leg_velocity_px.connect = None
         float inputs:leg_velocity_nx = 0.0 (
-            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
         )
         float inputs:leg_velocity_nx.connect = None
         float inputs:leg_velocity_pz = 0.0 (
-            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
         )
         float inputs:leg_velocity_pz.connect = None
         float inputs:leg_velocity_nz = 0.0 (
-            documentation = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
+            doc = "Fixed-pose visual fixture: unloaded spring rest coordinate and zero velocity. Joint physics is disabled here; surface-operations retains live joint wiring."
         )
         float inputs:leg_velocity_nz.connect = None
         over "LegPX"
@@ -233,7 +233,7 @@ def Xform "GriffinFlipVisual" (
     }
     def DomeLight "ReviewFill"
     {
-        float inputs:intensity = 300.0
+        float inputs:intensity = 1000.0
         float inputs:exposure = 0.0
         color3f inputs:color = (1.0, 1.0, 1.0)
     }
@@ -252,6 +252,7 @@ def Xform "GriffinFlipVisual" (
         custom double3 xformOp:translate = (0.0, 4.5, -17.0)
         float focalLength = 40.0
         uniform token[] xformOpOrder = ["xformOp:translate"]
+        float exposure = -0.6000000238418579
     }
     def Scope "CameraTrack" (
         prepend apiSchemas = ["LunCoCameraTrackAPI"]

@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-28",
+  "scope": "Presentation materials and static review-camera grade; no full mission or final video acceptance",
+  "component_runs": [
+    {
+      "case": "tank",
+      "checks": 536,
+      "verdict": "PASS",
+      "exit_code": 0
+    },
+    {
+      "case": "landing_legs",
+      "checks": 189,
+      "verdict": "PASS",
+      "exit_code": 0
+    },
+    {
+      "case": "bus",
+      "checks": 254,
+      "verdict": "PASS",
+      "exit_code": 0
+    }
+  ],
+  "component_checks": 979,
+  "flip_binding_checks": {
+    "chassis": 43,
+    "solar": 96,
+    "FL": 50,
+    "FR": 50,
+    "RL": 50,
+    "RR": 50
+  },
+  "focused_readback_checks": {
+    "tank": 10,
+    "leg": 6,
+    "bus_service_geometry": 16
+  },
+  "source_sha256": {
+    "vehicles/flip_v5.usda": "de962e7adcfd57f0cf6e6ea603b75de692437b033088477491e54bb2fa7cef77",
+    "components/lander/griffin_tank_visual.usda": "bf607aa9d9446ed265781f055ec2cbdf371f3fa0164632cfa48143ed2ce2f72f",
+    "components/lander/griffin_bus_visual.usda": "583adf6e3ddf365301ea3b1427846f92edfebc753bc6919ab427c8fda5ba5308",
+    "components/lander/griffin_landing_leg_visual.usda": "bb96d27cd0548855d7d8d9d512c9019e8c5a197e74fd7a41c351640229f81014",
+    "components/lander/griffin_engine_skirt_visual.usda": "a14e3e62ccbefda4c3f9f82c3afc91029f81fde8833928add0aae64be3b889a0",
+    "requirements/griffin_visual_configuration.sysml": "6c0e12b65013922b57fcc5207ccbb48b9150825a89039310f009a3f712b8e2ab",
+    "requirements/griffin_presentation_study.sysml": "73ba796c9d455094f2a2c5a3a9341dd9aacaa2168ebe4a5476ed94b7a18647c7",
+    "scenes/griffin_flip_visual.usda": "269a7d3cab9b23e8e04d7dc58df541ec63d9a6a26c58620046e3f9e8e9f854d6",
+    "shaders/hardware_finish.wesl": "50f3302965d1c317e6abae879f804d9d5a6fb410e5c74701bf03c18cd6262672",
+    "shaders/photovoltaic_finish.wesl": "72ecae0c335e7cc3c1dbb9cfb50e0795018bf02f12902bc6c6f0c90a63f055e2",
+    "tools/social_surface_finish.rhai": "9fae2bd18cea7031fba1367d36f8341da88a37082e13cd15cb1480508398e2aa"
+  },
+  "limits": [
+    "Final moving-camera export not reviewed",
+    "Existing visual observer vec3_array(map) error",
+    "Existing CAD preview composed-text restLength diagnostic",
+    "Standalone validation requires the Twin/source-set context"
+  ]
+}

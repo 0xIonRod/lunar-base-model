@@ -193,6 +193,12 @@ fn on_event(me, evt, ctx) {
         return;
     }
 
+    // Selection can happen through the native viewport as well as our helper.
+    // Explain a mechanically blocked drive attempt on that same input edge.
+    if evt.name=="intent.edge" && evt.source==rover && griffin_controls::rover_attached() {
+        griffin_controls::show_mounted_rover_controls();
+    }
+
     if evt.name=="intent.edge" && evt.source==rover && this.route_engaged {
         let value=evt.value;
         if value!=() && value["target_gid"]!=()

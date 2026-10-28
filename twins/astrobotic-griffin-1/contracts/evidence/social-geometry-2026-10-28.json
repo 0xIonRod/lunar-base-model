@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-28",
+  "scope": "Visual-only raised surface detail, fixed wide comparison and focused mechanical regressions",
+  "visual_shapes": {
+    "blanket": 24,
+    "chassis": 20,
+    "panel": 8
+  },
+  "production_tests": [
+    {
+      "case": "griffin_propulsion_requirements",
+      "checks": 104,
+      "verdict": "PASS",
+      "exit_code": 0
+    },
+    {
+      "case": "flip_cad_capabilities",
+      "checks": 7,
+      "verdict": "PASS",
+      "exit_code": 0
+    }
+  ],
+  "total_production_checks": 111,
+  "additive_source_check": {
+    "vehicles/flip_v5.usda": {
+      "removed_or_rewritten_source_lines": 0,
+      "source_lines_added": 370
+    },
+    "components/lander/griffin_engine_skirt_visual.usda": {
+      "removed_or_rewritten_source_lines": 0,
+      "source_lines_added": 331
+    }
+  },
+  "unchanged_supplier_visuals_sha256": {
+    "components/rover/flip_v5/FLIP_visual_Body.usda": "5a7e557664b3620131fc8ff4f631d6694615f7bb15607ffd73699bb8b730777a",
+    "components/rover/flip_v5/FLIP_visual_FL.usda": "5c9dc1a634257a777cfd476a3af9af5d8d110ef51e9a894f7c5c11feb4d7fffb",
+    "components/rover/flip_v5/FLIP_visual_FR.usda": "2759db521cf42950be8036ce6bbe7447ad478e070db69a67ef45807843a8dc0d",
+    "components/rover/flip_v5/FLIP_visual_RL.usda": "7e49ffa50674b60ebbe61eeecfd2ec07668d50fe9caa8a97df00e16fc6af474e",
+    "components/rover/flip_v5/FLIP_visual_RR.usda": "45507e1a395ccbe35aaf6dd0ed298833c6866c438086fc9dfab083da0439c140"
+  },
+  "source_sha256": {
+    "vehicles/flip_v5.usda": "99eefccc52c909988f08b33643948e80dad24b9bbbd327cfbc708005da766b3f",
+    "components/lander/griffin_engine_skirt_visual.usda": "0d58716243ccffa1aff0a1d2216e8440c3e02c55fb0d143acd44808b53573221",
+    "requirements/griffin_presentation_study.sysml": "07cafe774a30916b758fa3d7f00ed2678ac822a81e03e6ad8b59043939a88550",
+    "tools/social_geometry_detail.rhai": "389f42ad9d3d289620dc5099976084487f3bdc91b4e5e2f9ce950cb2a4203dee",
+    "scenes/social_geometry_review.usda": "044474442811f01e0caff4d0e8242f8950b9893e30b67844951401d4c2a7a726"
+  },
+  "capture": {
+    "camera_yaw_rad": 0.6747000217437744,
+    "camera_pitch_rad": 0.12349998950958252,
+    "camera_distance_m": 12.186965942382812,
+    "camera_target": [
+      2.4594550132751465,
+      1.932183027267456,
+      -1.9673988819122314
+    ],
+    "region": [
+      180,
+      240,
+      820,
+      380
+    ],
+    "method": "Same Editor preview; hide only three new detail groups for before, restore inherited visibility for after",
+    "lighting": "Neutral Editor rig; not the user mission screenshot lighting"
+  },
+  "limits": [
+    "Artistic seam/hatch layout, not measured supplier geometry",
+    "Full mission hot reload and final moving video not qualified",
+    "Authoring-session terrain continuation fault cleared with disposable live scene before final captures"
+  ]
+}

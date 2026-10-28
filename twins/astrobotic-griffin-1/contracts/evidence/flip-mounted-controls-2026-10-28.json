@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-28",
+  "runtime_revision": "8bad5b08b08357412218087ae20be03e80c4db55",
+  "source_sha256": {
+    "tools/griffin_controls.rhai": "e8b3c8ede81d8e880ed7484a867b0af78a66dbf0f64bc836874c2b8895b8165b",
+    "scenarios/griffin_1_surface_ops.rhai": "7f6fc3fdeadb53e9a4cb960256c1eee63c9286fed01dbe12950ff9ace8a5f52e"
+  },
+  "standalone_scene": "scenes/flip_cad_drive.usda",
+  "mission_scene": "scenes/griffin_1_surface_ops.usda",
+  "results": {
+    "motion-forward.json": {
+      "stdout": "TESTS_OK 11\nFLIP MOTION forward: PASS\n#{\"after\": #{\"forward\": [-0.011682523395694333, -0.082687673254057, -0.9965070332611503], \"position\": [0.23300824805028242, 0.519155502649113, -3.7857595167464524], \"tick\": 2443, \"upright\": 0.9960377633988602, \"velocity\": [0.04909127578139305, -0.21764777600765228, -2.099761962890625], \"wheels\": [#{\"angle\": -0.2544904814660702, \"bound\": true, \"rate\": -8.285562731065557, \"rotation_dot\": 1.0, \"station\": \"FL\"}, #{\"angle\": -1.4000476333115204, \"bound\": true, \"rate\": -9.30154298580429, \"rotation_dot\": 1.0, \"station\": \"FR\"}, #{\"angle\": 2.8504927792781127, \"bound\": true, \"rate\": -5.647413076938185, \"rotation_dot\": 1.0, \"station\": \"RL\"}, #{\"angle\": -2.142239075681199, \"bound\": true, \"rate\": -5.027419857045087, \"rotation_dot\": 1.0, \"station\": \"RR\"}]}, \"before\": #{\"forward\": [-0.0023893875905758814, -0.08661866605723616, -0.9962386749757345], \"position\": [0.13600833814689395, 0.8653649253847959, -0.08678500799430822], \"tick\": 2261, \"upright\": 0.9959616651501426, \"velocity\": [0.0033383159898221493, -0.00023926411813590676, -0.001941694295965135], \"wheels\": [#{\"angle\": -1.9146790428726315, \"bound\": true, \"rate\": -0.05252667101227177, \"rotation_dot\": 1.0, \"station\": \"FL\"}, #{\"angle\": -2.015802523447295, \"bound\": true, \"rate\": -0.05481102738916279, \"rotation_dot\": 1.0, \"station\": \"FR\"}, #{\"angle\": -1.9425824594043295, \"bound\": true, \"rate\": -0.05154629398429126, \"rotation_dot\": 1.0, \"station\": \"RL\"}, #{\"angle\": -2.0721519542723907, \"bound\": true, \"rate\": -0.05475379328211682, \"rotation_dot\": 1.0, \"station\": \"RR\"}]}, \"ok\": true, \"travel_m\": 3.7148178913610552}"
+    },
+    "motion-reverse.json": {
+      "stdout": "TESTS_OK 11\nFLIP MOTION reverse: PASS\n#{\"after\": #{\"forward\": [-0.010590429012225597, -0.1020856131769265, -0.994719241995262], \"position\": [0.7989604147589944, -0.0353925703679181, -9.414211408715687], \"tick\": 5485, \"upright\": 0.9934781318142868, \"velocity\": [0.1534510850906372, 0.13662227988243103, 1.5983794927597046], \"wheels\": [#{\"angle\": 0.6907342495415617, \"bound\": true, \"rate\": 5.083694021213463, \"rotation_dot\": 1.0, \"station\": \"FL\"}, #{\"angle\": -0.73151246343671, \"bound\": true, \"rate\": 5.362218412509564, \"rotation_dot\": 1.0, \"station\": \"FR\"}, #{\"angle\": 2.846711243804904, \"bound\": true, \"rate\": 8.693723416226668, \"rotation_dot\": 1.0, \"station\": \"RL\"}, #{\"angle\": -1.8168582643285238, \"bound\": true, \"rate\": 8.732066605067258, \"rotation_dot\": 1.0, \"station\": \"RR\"}]}, \"before\": #{\"forward\": [-0.017917608939017934, -0.09280069740409594, -0.9955234752888663], \"position\": [0.5148905964599635, -0.27472932436867836, -12.219238884885613], \"tick\": 5303, \"upright\": 0.9944260210197631, \"velocity\": [0.00772678479552269, -0.0005957453395240009, -0.002158851595595479], \"wheels\": [#{\"angle\": -0.0010399914802230704, \"bound\": true, \"rate\": -0.05612353308981863, \"rotation_dot\": 1.0, \"station\": \"FL\"}, #{\"angle\": -1.3388178597281037, \"bound\": true, \"rate\": -0.05723680509001038, \"rotation_dot\": 1.0, \"station\": \"FR\"}, #{\"angle\": -1.9276925558913838, \"bound\": true, \"rate\": -0.05608798209597926, \"rotation_dot\": 1.0, \"station\": \"RL\"}, #{\"angle\": -1.0847979867309097, \"bound\": true, \"rate\": -0.05721085125652362, \"rotation_dot\": 1.0, \"station\": \"RR\"}]}, \"ok\": true, \"travel_m\": 2.819771170958805}"
+    },
+    "motion-brake.json": {
+      "stdout": "TESTS_OK 3\nFLIP PHYSICAL STOP: PASS\n#{\"final_speed_mps\": 0.008608562285817179, \"initial_speed_mps\": 1.630652723455989, \"ok\": true}"
+    },
+    "adapter-release.json": {
+      "before": {
+        "stdout": "true"
+      },
+      "request": {
+        "stdout": "#{\"event\": \"griffin_rover_release_requested\", \"ok\": true, \"queued\": true}"
+      },
+      "after": {
+        "stdout": "false"
+      },
+      "readiness": {
+        "ready": true,
+        "world_hold": false,
+        "faulted": false,
+        "fault": null,
+        "readiness_tracked": true,
+        "pending_count": 0,
+        "pending": []
+      }
+    }
+  },
+  "mounted_observation": {
+    "adapter_type": "PhysicsFixedJoint",
+    "body0": "/Griffin1SurfaceOps/Lander",
+    "body1": "/Griffin1SurfaceOps/FLIP",
+    "native_W_input_throttle": 1.0,
+    "hud_screenshot": "runs/flip-drive-debug-2026-10-28/mounted-input.png"
+  },
+  "limits": [
+    "Standalone motion is not loaded ramp traversal.",
+    "Release callback tested in isolated running mission before touchdown, then scene restarted; this does not qualify landing or egress.",
+    "Console snapshot uses clock_snapshot().sim_tick because sim_tick() requires simulation-cycle context."
+  ],
+  "syntax_validation": "Both changed Rhai files OK, exit 0",
+  "diff_check": "exit 0"
+}

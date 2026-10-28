@@ -24,6 +24,13 @@ shader field, with optical study assumptions in `GriffinPlumeStudy`.
 
 ## Current FLIP rover — 2026-10-26
 
+**28 October status:** the presentation fill and extra hinge/bearing shaders
+were removed; the operational scene retains its original Sun lighting. The
+current v5 mission has a reproduced gearbox-overload failure immediately after
+detachment with seed `6840157149251759617`. Release is not accepted as reliable.
+See the [Sun-only correction and failure reproduction](contracts/griffin-sun-only-2026-10-28.md)
+for the exact command, passing and failing cases, and reverted trial.
+
 The surface-operations and visual scenes now use `vehicles/flip_v5.usda`, with
 the retained CAD meshes, four native wheel hinges, physical suspension sliders
 and moving solar-panel mechanism. Finite battery power, solar generation,
@@ -35,6 +42,14 @@ Open `scenes/flip_cad_drive.usda` for interactive driving without an automatic
 test taking control. Its avatar starts at `(8, 5, 10)` in the terrain frame,
 aimed at the rover. See the [CAD acceptance receipt](contracts/flip-cad-runtime-2026-10-26.md)
 for motion, braking, panel/EPS, reload and avatar movement checks.
+
+While FLIP is mounted on Griffin, the payload adapter physically prevents it
+from driving. After landing, use **OPEN RAMPS** (U while controlling Griffin),
+wait for the ramps to settle, then use **DETACH ROVER**. The detach button works
+while either vehicle is selected. **F detaches only when controlling Griffin**;
+on FLIP, F starts/stops its route. Once detached, select FLIP and use W/S to
+drive, A/D to turn and Space to brake. The mission brief explains the attachment
+when a mounted drive command is attempted.
 
 The FLIP solar-panel card provides **OPEN SOLAR PANEL** and **STOW SOLAR PANEL**
 in View. Both use the existing Modelica deployment controller and native hinge;
@@ -57,6 +72,13 @@ payload joint has the matching attachment rotation. Full landing, release and ra
 remain a separate mission acceptance gate; subsystem passes do not qualify it.
 
 ## Griffin model correctness
+
+The [27 October visual realism pass](contracts/griffin-visual-realism-2026-10-27.md)
+uses the June integration photograph to guide silver-gray insulation, separate
+metal finishes, domed landing-pad covers, service bundles, clamps and avionics
+connectors. The public photographs guide appearance; detail dimensions and
+material settings remain study assumptions. Contact bodies, mass, propulsion
+and guidance are unchanged. This pass does not close the recorded landing failure.
 
 See [the 2026-10-21 Griffin audit](contracts/griffin-model-audit-2026-10-21.md)
 for the reference comparison, production checks and remaining fidelity gaps.

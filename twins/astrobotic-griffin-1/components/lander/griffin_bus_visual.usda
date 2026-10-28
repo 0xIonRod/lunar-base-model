@@ -753,6 +753,941 @@ def Xform "GriffinBus" (
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.1899999976158142)]
         }
+        def Xform "ServiceHarness"
+        {
+            custom string documentation = "\"Photo-inspired service harness. Estimated routing and connectors, non-colliding and massless; not an electrical or pressure network.\""
+            def Cylinder "Bundle0A" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.591578284825, -0.1305, 2.082)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (2.1781292379718415, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 1.1840120220276291
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.5920060276985168), (0.00800000037997961, 0.00800000037997961, 0.5920060276985168)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Bundle0B" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.591578284825, -0.1305, 2.082)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-2.1781292379718415, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 1.1840120220276291
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.5920060276985168), (0.00800000037997961, 0.00800000037997961, 0.5920060276985168)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cube "Clamp0" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.024, 0.016, 0.024)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-1.18315656965, -0.108, 2.082)
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/FrameMetal>
+            }
+            def Cylinder "Bundle1A" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (1.4078674272375, -0.1305, 1.8572891424124998)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (4.049878358245385, 135.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 0.6371693308231946
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.3185846507549286), (0.00800000037997961, 0.00800000037997961, 0.3185846507549286)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Bundle1B" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (1.8572891424124998, -0.1305, 1.4078674272375)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-4.049878358245385, 135.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 0.6371693308231946
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.3185846507549286), (0.00800000037997961, 0.00800000037997961, 0.3185846507549286)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cube "Clamp1" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.024, 0.016, 0.024)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (1.18315656965, -0.108, 2.082)
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/FrameMetal>
+            }
+            def Cylinder "Bundle2A" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (2.082, -0.1305, 0.591578284825)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (2.1781292379718415, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 1.1840120220276291
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.5920060276985168), (0.00800000037997961, 0.00800000037997961, 0.5920060276985168)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Bundle2B" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (2.082, -0.1305, -0.591578284825)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-2.1781292379718415, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 1.1840120220276291
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.5920060276985168), (0.00800000037997961, 0.00800000037997961, 0.5920060276985168)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cube "Clamp2" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.024, 0.016, 0.024)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (2.082, -0.108, 1.18315656965)
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/FrameMetal>
+            }
+            def Cylinder "Bundle3A" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (1.8572891424124998, -0.1305, -1.4078674272375)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (4.049878358245385, -135.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 0.6371693308231946
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.3185846507549286), (0.00800000037997961, 0.00800000037997961, 0.3185846507549286)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Bundle3B" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (1.4078674272375, -0.1305, -1.8572891424124998)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-4.049878358245385, -135.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 0.6371693308231946
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.3185846507549286), (0.00800000037997961, 0.00800000037997961, 0.3185846507549286)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cube "Clamp3" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.024, 0.016, 0.024)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (2.082, -0.108, -1.18315656965)
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/FrameMetal>
+            }
+            def Cylinder "Bundle4A" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.591578284825, -0.1305, -2.082)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (2.1781292379718415, -90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 1.1840120220276291
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.5920060276985168), (0.00800000037997961, 0.00800000037997961, 0.5920060276985168)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Bundle4B" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.591578284825, -0.1305, -2.082)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-2.1781292379718415, -90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 1.1840120220276291
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.5920060276985168), (0.00800000037997961, 0.00800000037997961, 0.5920060276985168)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cube "Clamp4" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.024, 0.016, 0.024)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (1.18315656965, -0.108, -2.082)
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/FrameMetal>
+            }
+            def Cylinder "Bundle5A" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-1.4078674272375, -0.1305, -1.8572891424124998)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (4.049878358245385, -45.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 0.6371693308231946
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.3185846507549286), (0.00800000037997961, 0.00800000037997961, 0.3185846507549286)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Bundle5B" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-1.8572891424124998, -0.1305, -1.4078674272375)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-4.049878358245385, -45.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 0.6371693308231946
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.3185846507549286), (0.00800000037997961, 0.00800000037997961, 0.3185846507549286)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cube "Clamp5" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.024, 0.016, 0.024)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-1.18315656965, -0.108, -2.082)
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/FrameMetal>
+            }
+            def Cylinder "Bundle6A" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-2.082, -0.1305, -0.591578284825)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (2.1781292379718415, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 1.1840120220276291
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.5920060276985168), (0.00800000037997961, 0.00800000037997961, 0.5920060276985168)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Bundle6B" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-2.082, -0.1305, 0.591578284825)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-2.1781292379718415, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 1.1840120220276291
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.5920060276985168), (0.00800000037997961, 0.00800000037997961, 0.5920060276985168)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cube "Clamp6" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.024, 0.016, 0.024)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-2.082, -0.108, -1.18315656965)
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/FrameMetal>
+            }
+            def Cylinder "Bundle7A" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-1.8572891424124998, -0.1305, 1.4078674272375)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (4.049878358245385, 45.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 0.6371693308231946
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.3185846507549286), (0.00800000037997961, 0.00800000037997961, 0.3185846507549286)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Bundle7B" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-1.4078674272375, -0.1305, 1.8572891424124998)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-4.049878358245385, 45.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.008
+                double height = 0.6371693308231946
+                uniform token axis = "Z"
+                float3[] extent = [(-0.00800000037997961, -0.00800000037997961, -0.3185846507549286), (0.00800000037997961, 0.00800000037997961, 0.3185846507549286)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cube "Clamp7" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:scale = (0.024, 0.016, 0.024)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                double size = 1.0
+                bool physics:collisionEnabled = false
+                custom double3 xformOp:translate = (-2.082, -0.108, 1.18315656965)
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/FrameMetal>
+            }
+            def Cylinder "Connector0" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.252, 0.0, -2.102)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.02400000000000002
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.012000000104308128), (0.012000000104308128, 0.012000000104308128, 0.012000000104308128)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Pigtail0" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.252, -0.063, -2.122)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (82.76307797403199, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.0036000000000000003
+                double height = 0.12701181047445942
+                uniform token axis = "Z"
+                float3[] extent = [(-0.003599999938160181, -0.003599999938160181, -0.06350590288639069), (0.003599999938160181, 0.003599999938160181, 0.06350590288639069)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Connector1" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.15119999999999997, 0.0, -2.102)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.02400000000000002
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.012000000104308128), (0.012000000104308128, 0.012000000104308128, 0.012000000104308128)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Pigtail1" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.15119999999999997, -0.063, -2.122)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (82.76307797403199, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.0036000000000000003
+                double height = 0.12701181047445942
+                uniform token axis = "Z"
+                float3[] extent = [(-0.003599999938160181, -0.003599999938160181, -0.06350590288639069), (0.003599999938160181, 0.003599999938160181, 0.06350590288639069)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Connector2" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.050399999999999966, 0.0, -2.102)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.02400000000000002
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.012000000104308128), (0.012000000104308128, 0.012000000104308128, 0.012000000104308128)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Pigtail2" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.050399999999999966, -0.063, -2.122)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (82.76307797403199, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.0036000000000000003
+                double height = 0.12701181047445942
+                uniform token axis = "Z"
+                float3[] extent = [(-0.003599999938160181, -0.003599999938160181, -0.06350590288639069), (0.003599999938160181, 0.003599999938160181, 0.06350590288639069)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Connector3" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.05040000000000004, 0.0, -2.102)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.02400000000000002
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.012000000104308128), (0.012000000104308128, 0.012000000104308128, 0.012000000104308128)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Pigtail3" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.05040000000000004, -0.063, -2.122)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (82.76307797403199, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.0036000000000000003
+                double height = 0.12701181047445942
+                uniform token axis = "Z"
+                float3[] extent = [(-0.003599999938160181, -0.003599999938160181, -0.06350590288639069), (0.003599999938160181, 0.003599999938160181, 0.06350590288639069)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Connector4" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.15120000000000006, 0.0, -2.102)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.02400000000000002
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.012000000104308128), (0.012000000104308128, 0.012000000104308128, 0.012000000104308128)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Pigtail4" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.15120000000000006, -0.063, -2.122)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (82.76307797403199, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.0036000000000000003
+                double height = 0.12701181047445942
+                uniform token axis = "Z"
+                float3[] extent = [(-0.003599999938160181, -0.003599999938160181, -0.06350590288639069), (0.003599999938160181, 0.003599999938160181, 0.06350590288639069)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Connector5" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.25200000000000006, 0.0, -2.102)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.02400000000000002
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.012000000104308128), (0.012000000104308128, 0.012000000104308128, 0.012000000104308128)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Pigtail5" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.25200000000000006, -0.063, -2.122)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (82.76307797403199, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.0036000000000000003
+                double height = 0.12701181047445942
+                uniform token axis = "Z"
+                float3[] extent = [(-0.003599999938160181, -0.003599999938160181, -0.06350590288639069), (0.003599999938160181, 0.003599999938160181, 0.06350590288639069)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+        }
+        def Xform "ExternalServiceLoops"
+        {
+            def Cylinder "Loom0Segment0" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.9533674272375, -0.3988908729652601, 2.265)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (6.977134691358983, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6403200419642421
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.32016003131866455), (0.012000000104308128, 0.012000000104308128, 0.32016003131866455)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom0Segment1" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.3177891424125, -0.4538908729652601, 2.265)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (2.901910468884516, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6363943526119432
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.31819719076156616), (0.012000000104308128, 0.012000000104308128, 0.31819719076156616)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom0Segment2" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.3177891424125, -0.4538908729652601, 2.265)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-2.901910468884516, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6363943526119432
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.31819719076156616), (0.012000000104308128, 0.012000000104308128, 0.31819719076156616)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom0Segment3" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.9533674272375, -0.3988908729652601, 2.265)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-6.977134691358983, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6403200419642421
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.32016003131866455), (0.012000000104308128, 0.012000000104308128, 0.32016003131866455)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom0Connector0" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-1.27115656965, -0.36, 2.2425)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.019799999999999998
+                double height = 0.04499999999999993
+                uniform token axis = "Z"
+                float3[] extent = [(-0.01979999989271164, -0.01979999989271164, -0.02250000089406967), (0.01979999989271164, 0.01979999989271164, 0.02250000089406967)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Loom0Connector4" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (1.27115656965, -0.36, 2.2425)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.019799999999999998
+                double height = 0.04499999999999993
+                uniform token axis = "Z"
+                float3[] extent = [(-0.01979999989271164, -0.01979999989271164, -0.02250000089406967), (0.01979999989271164, 0.01979999989271164, 0.02250000089406967)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Loom1Segment0" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.9533674272375, -0.3988908729652601, -2.265)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (6.977134691358983, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6403200419642421
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.32016003131866455), (0.012000000104308128, 0.012000000104308128, 0.32016003131866455)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom1Segment1" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-0.3177891424125, -0.4538908729652601, -2.265)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (2.901910468884516, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6363943526119432
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.31819719076156616), (0.012000000104308128, 0.012000000104308128, 0.31819719076156616)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom1Segment2" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.3177891424125, -0.4538908729652601, -2.265)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-2.901910468884516, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6363943526119432
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.31819719076156616), (0.012000000104308128, 0.012000000104308128, 0.31819719076156616)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom1Segment3" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (0.9533674272375, -0.3988908729652601, -2.265)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-6.977134691358983, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6403200419642421
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.32016003131866455), (0.012000000104308128, 0.012000000104308128, 0.32016003131866455)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom1Connector0" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-1.27115656965, -0.36, -2.2425)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.019799999999999998
+                double height = 0.04499999999999993
+                uniform token axis = "Z"
+                float3[] extent = [(-0.01979999989271164, -0.01979999989271164, -0.02250000089406967), (0.01979999989271164, 0.01979999989271164, 0.02250000089406967)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Loom1Connector4" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (1.27115656965, -0.36, -2.2425)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.019799999999999998
+                double height = 0.04499999999999993
+                uniform token axis = "Z"
+                float3[] extent = [(-0.01979999989271164, -0.01979999989271164, -0.02250000089406967), (0.01979999989271164, 0.01979999989271164, 0.02250000089406967)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Loom2Segment0" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (2.265, -0.3988908729652601, 0.9533674272375)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (6.977134691358983, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6403200419642421
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.32016003131866455), (0.012000000104308128, 0.012000000104308128, 0.32016003131866455)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom2Segment1" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (2.265, -0.4538908729652601, 0.3177891424125)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (2.901910468884516, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6363943526119432
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.31819719076156616), (0.012000000104308128, 0.012000000104308128, 0.31819719076156616)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom2Segment2" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (2.265, -0.4538908729652601, -0.3177891424125)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-2.901910468884516, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6363943526119432
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.31819719076156616), (0.012000000104308128, 0.012000000104308128, 0.31819719076156616)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom2Segment3" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (2.265, -0.3988908729652601, -0.9533674272375)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-6.977134691358983, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6403200419642421
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.32016003131866455), (0.012000000104308128, 0.012000000104308128, 0.32016003131866455)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom2Connector0" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (2.2425, -0.36, 1.27115656965)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.019799999999999998
+                double height = 0.04499999999999993
+                uniform token axis = "Z"
+                float3[] extent = [(-0.01979999989271164, -0.01979999989271164, -0.02250000089406967), (0.01979999989271164, 0.01979999989271164, 0.02250000089406967)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Loom2Connector4" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (2.2425, -0.36, -1.27115656965)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.019799999999999998
+                double height = 0.04499999999999993
+                uniform token axis = "Z"
+                float3[] extent = [(-0.01979999989271164, -0.01979999989271164, -0.02250000089406967), (0.01979999989271164, 0.01979999989271164, 0.02250000089406967)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Loom3Segment0" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-2.265, -0.3988908729652601, 0.9533674272375)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (6.977134691358983, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6403200419642421
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.32016003131866455), (0.012000000104308128, 0.012000000104308128, 0.32016003131866455)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom3Segment1" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-2.265, -0.4538908729652601, 0.3177891424125)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (2.901910468884516, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6363943526119432
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.31819719076156616), (0.012000000104308128, 0.012000000104308128, 0.31819719076156616)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom3Segment2" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-2.265, -0.4538908729652601, -0.3177891424125)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-2.901910468884516, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6363943526119432
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.31819719076156616), (0.012000000104308128, 0.012000000104308128, 0.31819719076156616)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom3Segment3" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-2.265, -0.3988908729652601, -0.9533674272375)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (-6.977134691358983, 180.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.012
+                double height = 0.6403200419642421
+                uniform token axis = "Z"
+                float3[] extent = [(-0.012000000104308128, -0.012000000104308128, -0.32016003131866455), (0.012000000104308128, 0.012000000104308128, 0.32016003131866455)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/HarnessJacket>
+            }
+            def Cylinder "Loom3Connector0" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-2.2425, -0.36, 1.27115656965)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.019799999999999998
+                double height = 0.04499999999999993
+                uniform token axis = "Z"
+                float3[] extent = [(-0.01979999989271164, -0.01979999989271164, -0.02250000089406967), (0.01979999989271164, 0.01979999989271164, 0.02250000089406967)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+            def Cylinder "Loom3Connector4" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom double3 xformOp:translate = (-2.2425, -0.36, -1.27115656965)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+                custom double3 xformOp:scale = (1.0, 1.0, 1.0)
+                double radius = 0.019799999999999998
+                double height = 0.04499999999999993
+                uniform token axis = "Z"
+                float3[] extent = [(-0.01979999989271164, -0.01979999989271164, -0.02250000089406967), (0.01979999989271164, 0.01979999989271164, 0.02250000089406967)]
+                bool physics:collisionEnabled = false
+                uniform token purpose = "render"
+                custom rel material:binding = </GriffinBus/Looks/ServiceConnectors>
+            }
+        }
     }
     def Mesh "UpperCentralBucket" (
         active = true
@@ -818,12 +1753,12 @@ def Xform "GriffinBus" (
             def Shader "Surface"
             {
                 token outputs:surface = ""
-                color3f inputs:foil_color = (0.8299999833106995, 0.6200000047683716, 0.18000000715255737)
-                color3f inputs:shade_color = (0.44999998807907104, 0.30000001192092896, 0.07999999821186066)
+                color3f inputs:foil_color = (0.7599999904632568, 0.7900000214576721, 0.8199999928474426)
+                color3f inputs:shade_color = (0.23999999463558197, 0.27000001072883606, 0.30000001192092896)
                 float inputs:crinkle = 12.0
-                float inputs:facet_depth = 0.4000000059604645
-                float inputs:sheen = 0.75
-                float inputs:v_scale = 1.0
+                float inputs:facet_depth = 0.6200000047683716
+                float inputs:sheen = 0.800000011920929
+                float inputs:v_scale = 0.800000011920929
                 uniform token info:implementationSource = "sourceAsset"
                 asset info:wesl:sourceAsset = @lunco://shaders/mli_foil.wesl@
             }
@@ -878,6 +1813,32 @@ def Xform "GriffinBus" (
                 color3f inputs:diffuseColor = (0.550000011920929, 0.5799999833106995, 0.6200000047683716)
                 float inputs:metallic = 0.75
                 float inputs:roughness = 0.41999998688697815
+            }
+        }
+        def Material "HarnessJacket"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </GriffinBus/Looks/HarnessJacket/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                custom token outputs:surface = ""
+                custom color3f inputs:diffuseColor = (0.07500000298023224, 0.08500000089406967, 0.10000000149011612)
+                custom float inputs:metallic = 0.0
+                custom float inputs:roughness = 0.7200000286102295
+            }
+        }
+        def Material "ServiceConnectors"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </GriffinBus/Looks/ServiceConnectors/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                custom token outputs:surface = ""
+                custom color3f inputs:diffuseColor = (0.46000000834465027, 0.3100000023841858, 0.10000000149011612)
+                custom float inputs:metallic = 0.800000011920929
+                custom float inputs:roughness = 0.30000001192092896
             }
         }
     }

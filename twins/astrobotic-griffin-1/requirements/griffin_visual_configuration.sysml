@@ -153,8 +153,8 @@ package GriffinVisualConfigurationRequirements {
          * below the separate solar bank. The internal octagonal support
          * envelope above is a packaging study, not an exterior blanket belt.
          * Blanket color belongs to the shared engine-bay material template;
-         * gold is the user's display preference, not measured flight optics. */
-        attribute bodySkinDisplayColor : Real[3] = (.83, .62, .18);
+         * the 27 October photographic presentation is silver-gray, not measured flight optics. */
+        attribute bodySkinDisplayColor : Real[3] = (.76, .79, .82);
         /* Standard UsdPreviewSurface presentation parameters. ESA/Astrobotic
          * reference renderings show pale exterior panels
          * and silver ramp/leg members. These linear RGB colors, metallic and
@@ -165,18 +165,14 @@ package GriffinVisualConfigurationRequirements {
         attribute silverDisplayColor : Real[3] = (.55, .58, .62);
         attribute silverMetallic : Real = .75;
         attribute silverRoughness : Real = .42;
-        /* Yellow-gold bus MLI presentation selected by the user, 2026-10-20.
-         * The shared object-space foil shader models broad folds and reflective
-         * highlights. These linear RGB and fold controls are display estimates,
-         * not measured optical/thermal properties or an as-built blanket stack.
-         * Hardware photographs include pale blankets with gold seam tape;
-         * this requested gold finish must not be described as flight metrology.
-         * Shader inputs narrow only at the explicit GPU boundary. */
-        attribute busFoilValleyColor : Real[3] = (.45, .30, .08);
+        /* Photo-inspired silver-gray blankets, revised 27 October 2026.
+         * Display-only values are owned once by GriffinPresentationStudy.
+         * Supersedes the earlier requested gold presentation. */
+        attribute busFoilValleyColor : Real[3] = (.24, .27, .30);
         attribute busFoilCrinkleDensity : Real = 12.0;
-        attribute busFoilFacetContrast : Real = .40;
-        attribute busFoilSheen : Real = .75;
-        attribute busFoilAxialPatternScale : Real = 1.0;
+        attribute busFoilFacetContrast : Real = .62;
+        attribute busFoilSheen : Real = .80;
+        attribute busFoilAxialPatternScale : Real = .8;
         attribute bodyGroundClearanceM : Real = 0.20;
         attribute lowerSkirtDimensions : Dimensions = (4.30, 0.24, 4.30);
         attribute lowerSkirtCenter : Position = (0.0, -0.36, 0.0);
@@ -242,22 +238,14 @@ package GriffinVisualConfigurationRequirements {
         attribute avionicsPodDisplayColor : Real[3] = (0.22, 0.25, 0.29);
         attribute tankSupportDisplayColor : Real[3] = (0.12, 0.15, 0.19);
         attribute tankCollarDisplayColor : Real[3] = (0.24, 0.28, 0.34);
-        /* Tank blanket appearance follows the visibly crumpled gold wraps in
-         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
-         * and https://www.esa.int/ESA_Multimedia/Images/2022/09/Griffin_lander.
-         * These are illustrative sources, not measured optical properties.
-         * Reuse LunCo's object-space mli_foil shader: density 32 per metre
-         * gives roughly 31 mm pattern cells; equal axial/radial pattern scale
-         * avoids elongated smooth bands. Full facet contrast and a darker
-         * valley color make folds legible at assembly distance. All colors,
-         * contrast and sheen are artistic estimates, not blanket thickness,
-         * insulation performance, absorptance or infrared emittance. */
-        attribute tankFoilBrightColor : Real[3] = (.83, .62, .18);
-        attribute tankFoilValleyColor : Real[3] = (.18, .13, .04);
-        attribute tankFoilCrinkleDensity : Real = 32.0;
-        attribute tankFoilFacetContrast : Real = 1.0;
-        attribute tankFoilSheen : Real = .85;
-        attribute tankFoilAxialPatternScale : Real = 1.0;
+        /* The current photographic presentation shares the typed insulation
+         * palette with the bus. These are display estimates, not flight optics. */
+        attribute tankFoilBrightColor : Real[3] = (.76, .79, .82);
+        attribute tankFoilValleyColor : Real[3] = (.24, .27, .30);
+        attribute tankFoilCrinkleDensity : Real = 24.0;
+        attribute tankFoilFacetContrast : Real = .45;
+        attribute tankFoilSheen : Real = .72;
+        attribute tankFoilAxialPatternScale : Real = .8;
 
 
         /* Normalized (X, -Z) clipped-square octagon profile. CartesianVectorValue

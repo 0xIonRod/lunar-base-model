@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-28",
+  "scope": "Public-reference presentation geometry; estimated dimensions, no flight qualification",
+  "sources": [
+    {
+      "url": "https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf",
+      "edition": "August 2021 v5.0",
+      "pages": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "role": "historical subsystem context"
+    },
+    {
+      "url": "https://www.nasa.gov/missions/moon-base/nasa-jpl-testing-readies-voyager-technologies-lander-for-moon-mission/",
+      "published": "2026-10-13",
+      "role": "contemporary hardware imagery; laboratory equipment excluded"
+    },
+    {
+      "url": "https://www.nasa.gov/gallery/astrobotics-griffin-1/",
+      "role": "June 2026 integrated appearance"
+    }
+  ],
+  "production_tests": [
+    {
+      "case": "solar",
+      "checks": 170,
+      "verdict": "PASS",
+      "exit_code": 0
+    },
+    {
+      "case": "landing_legs",
+      "checks": 189,
+      "verdict": "PASS",
+      "exit_code": 0
+    },
+    {
+      "case": "bus",
+      "checks": 254,
+      "verdict": "PASS",
+      "exit_code": 0
+    }
+  ],
+  "total_production_checks": 613,
+  "new_shape_readbacks": {
+    "forward_panel": 16,
+    "port_panel": 12,
+    "starboard_panel": 12,
+    "reusable_leg": 9,
+    "installed_barrels": 12,
+    "bus_looms": 24
+  },
+  "additive_source_checks": {
+    "components/lander/griffin_solar_panel_visual.usda": {
+      "removed_or_rewritten_baseline_lines": 0,
+      "added_lines": 211
+    },
+    "components/lander/griffin_solar_panel_port_visual.usda": {
+      "removed_or_rewritten_baseline_lines": 0,
+      "added_lines": 159
+    },
+    "components/lander/griffin_solar_panel_starboard_visual.usda": {
+      "removed_or_rewritten_baseline_lines": 0,
+      "added_lines": 159
+    },
+    "components/lander/griffin_landing_leg_visual.usda": {
+      "removed_or_rewritten_baseline_lines": 0,
+      "added_lines": 173
+    },
+    "components/lander/griffin_bus_visual.usda": {
+      "removed_or_rewritten_baseline_lines": 0,
+      "added_lines": 387
+    },
+    "vehicles/griffin_1.usda": {
+      "removed_or_rewritten_baseline_lines": 0,
+      "added_lines": 204
+    }
+  },
+  "source_sha256": {
+    "components/lander/griffin_solar_panel_visual.usda": "a54849b8fd820525ee10bcbcb1f3b6283f43efd09ec73c8242c807e874b4615a",
+    "components/lander/griffin_solar_panel_port_visual.usda": "9c2297c8632ed8d8f44418d7d7f52fddd862fdb37300400aa7bb35ef2ed0420a",
+    "components/lander/griffin_solar_panel_starboard_visual.usda": "a2cfe7bc73cd8a80c1bf7e8e3719076e6ae3b87f8224dde20bef31c51476b860",
+    "components/lander/griffin_landing_leg_visual.usda": "0b78d9186920b2b370082fd41e271967f34014dfc99ff63a96389bc1e996683e",
+    "components/lander/griffin_bus_visual.usda": "fbd8bdde4ad8a285189fa3099f7978b697e091afbe0e2f02e1c0edcf5359417e",
+    "vehicles/griffin_1.usda": "bd55feb2390eb103b79fbf7e3a2c714070e8b030bf4119a01e72df8d4f3dc699",
+    "requirements/griffin_presentation_study.sysml": "c5fc3551f5072a42bc5fda9ef0cc9336e2da8be665a50d9765d9c7c9e15ecdb4",
+    "tools/griffin_public_hardware.rhai": "6196b3754ae1bf04270a38a84eb1e909c7fb2e89aea45d8c90a7b849a597e56f",
+    "scenes/social_geometry_review.usda": "4fde142a91eb50d954752a88c72386db4acf8bce5884c485032ee575e8348754"
+  },
+  "comparison_camera": {
+    "view": 7,
+    "focused": true,
+    "mode": "visual",
+    "text_layer": "authored",
+    "projection": "perspective",
+    "target": [
+      2.4593944549560547,
+      1.932183027267456,
+      -1.9673506021499634
+    ],
+    "yaw": 0.6747000217437744,
+    "pitch": 0.12349998950958252,
+    "distance": 12.186964988708496,
+    "orthographic_scale": 1.0,
+    "image_rect": {
+      "origin": [
+        6.0,
+        125.0
+      ],
+      "size": [
+        1268.0,
+        569.0
+      ]
+    },
+    "scale_factor": 1.0,
+    "active_preset": null
+  },
+  "comparison_region": [
+    180,
+    240,
+    820,
+    380
+  ],
+  "limits": [
+    "Public imagery does not supply as-built dimensions or cable ICDs",
+    "Still-image studio comparison, no final moving-video qualification",
+    "No engineering/physical coefficients inferred from appearance"
+  ]
+}

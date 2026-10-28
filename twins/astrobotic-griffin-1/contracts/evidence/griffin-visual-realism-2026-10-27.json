@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-27",
+  "model_base_revision": "ba327d9917b52cd0c43ca643cd4c7422b6788f92",
+  "simulator_revision": "8bad5b08b08357412218087ae20be03e80c4db55",
+  "simulator_binary_sha256": "8347afea277191f8ffbfe4475831b4ab2d7d341b28f27ec02878304d9c34dcbf",
+  "scope": "Photographic presentation and static source-backed component verification; full landing remains unqualified",
+  "reference": "https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1348-edit/",
+  "regressions": [
+    {
+      "case": "tank",
+      "checks": 536,
+      "failures": 0,
+      "passed": true,
+      "sim_tick": 6,
+      "source_revision": {
+        "U64": 5763111341947936436
+      },
+      "log": "runs\\griffin-realism-2026-10-27\\test-tank-final\\stdout.log"
+    },
+    {
+      "case": "landing_legs",
+      "checks": 189,
+      "failures": 0,
+      "passed": true,
+      "sim_tick": 6,
+      "source_revision": {
+        "U64": 5763111341947936436
+      },
+      "log": "runs\\griffin-realism-2026-10-27\\test-landing_legs-final\\stdout.log"
+    },
+    {
+      "case": "bus",
+      "checks": 254,
+      "failures": 0,
+      "passed": true,
+      "sim_tick": 21,
+      "source_revision": {
+        "U64": 5763111341947936436
+      },
+      "log": "runs\\griffin-realism-2026-10-27\\test-bus-final\\stdout.log"
+    },
+    {
+      "case": "lander",
+      "checks": 122,
+      "failures": 0,
+      "passed": true,
+      "sim_tick": 6,
+      "source_revision": {
+        "U64": 5763111341947936436
+      },
+      "log": "runs\\griffin-realism-2026-10-27\\test-lander-final\\stdout.log"
+    }
+  ],
+  "source_hashes": {
+    "components/lander/griffin_bus_visual.usda": "2e8dadec09225dcdd5c3aa707fd147192691f6b74ece515fa8d8298930afc7d0",
+    "components/lander/griffin_tank_visual.usda": "32fe396b22c90dcc84abeeaae7fbc1e86bbfa7a2011eea987eef1c73911030a6",
+    "components/lander/griffin_landing_leg_visual.usda": "6b53adffd954591c5a9e2f9c9015516ff16a1d17d7a39afc5f0ffcfab841d31d",
+    "components/lander/griffin_engine_skirt_visual.usda": "0efa782116e19ceaf7c0a77dcbad23626e94e70b4f3b8986bcf61a3f3dade71f",
+    "vehicles/griffin_1.usda": "c6607192db22eb92f7994b323c63312d2e00d4f53130241cf6cc01ba84f70f9f",
+    "requirements/griffin_visual_configuration.sysml": "1a027155d6aa4959671acd5f447c427ea08065f555d11c41cb3bc3097ff5a1b4",
+    "requirements/griffin_landing_legs_requirements.sysml": "69d89e6f7e74340459f8b13cf54e211803542ad405241506c36be3c978c4fd30",
+    "requirements/griffin_presentation_study.sysml": "5389d9d2ae4c7c5f04869423447669a0a111f026cbe0d14e408408a47b7c7321",
+    "tools/griffin_tank_finish.rhai": "2b9458b6ab4bc24a4288317258233f8323bb69482f85c9da3b88913bd452ddff",
+    "tools/griffin_leg_finish.rhai": "3db4b0e50f37080895a6fd77d76840dcc4e4922fd5bced6fe8ecb7cf43cc0a29",
+    "tools/griffin_bus_detail.rhai": "59753b1257a1468a0eedb44ddc91def6873859ac986a38972d59821f5c97b0ac"
+  },
+  "focused_editor_checks": {
+    "tank": 10,
+    "landing_leg": 6,
+    "service_bundles": 16
+  },
+  "total_regression_checks": 1101
+}

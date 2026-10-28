@@ -101,6 +101,306 @@ def Xform "FLIP" (
             {
                 uniform token purpose = "render"
                 uniform token renderVisibility = "visible"
+                over "DriveRF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                over "TireRF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Tread>
+                }
+                over "SpiderRF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Spider>
+                }
+                over "HubCapRF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                over "HubBoltRF0_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRF1_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRF2_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRF3_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRF4_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRF5_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRF6_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRF7_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "CableWebRF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "CableWebRF_Chunk1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "CableWebRF_Chunk2" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk2" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk3" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk4" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk5" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk6" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk7" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk8" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk9" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk10" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk11" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk12" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk13" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk14" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk15" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk16" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk17" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk18" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk19" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk20" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk21" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk22" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk23" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk24" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk25" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk26" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk27" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk28" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk29" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk30" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk31" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk32" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk33" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRF_Chunk34" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
             }
             def Cylinder "ContactProxy" (
                 prepend apiSchemas = ["PhysicsCollisionAPI"]
@@ -171,6 +471,306 @@ def Xform "FLIP" (
             {
                 uniform token purpose = "render"
                 uniform token renderVisibility = "visible"
+                over "DriveLF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                over "TireLF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Tread>
+                }
+                over "SpiderLF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Spider>
+                }
+                over "HubCapLF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                over "HubBoltLF0_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLF1_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLF2_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLF3_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLF4_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLF5_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLF6_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLF7_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "CableWebLF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "CableWebLF_Chunk1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "CableWebLF_Chunk2" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk2" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk3" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk4" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk5" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk6" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk7" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk8" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk9" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk10" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk11" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk12" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk13" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk14" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk15" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk16" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk17" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk18" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk19" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk20" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk21" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk22" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk23" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk24" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk25" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk26" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk27" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk28" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk29" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk30" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk31" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk32" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk33" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLF_Chunk34" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
             }
             def Cylinder "ContactProxy" (
                 prepend apiSchemas = ["PhysicsCollisionAPI"]
@@ -241,6 +841,306 @@ def Xform "FLIP" (
             {
                 uniform token purpose = "render"
                 uniform token renderVisibility = "visible"
+                over "DriveRR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                over "TireRR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Tread>
+                }
+                over "SpiderRR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Spider>
+                }
+                over "HubCapRR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                over "HubBoltRR0_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRR1_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRR2_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRR3_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRR4_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRR5_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRR6_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltRR7_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "CableWebRR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "CableWebRR_Chunk1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "CableWebRR_Chunk2" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk2" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk3" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk4" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk5" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk6" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk7" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk8" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk9" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk10" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk11" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk12" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk13" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk14" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk15" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk16" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk17" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk18" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk19" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk20" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk21" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk22" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk23" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk24" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk25" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk26" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk27" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk28" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk29" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk30" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk31" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk32" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk33" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailRR_Chunk34" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
             }
             def Cylinder "ContactProxy" (
                 prepend apiSchemas = ["PhysicsCollisionAPI"]
@@ -311,6 +1211,306 @@ def Xform "FLIP" (
             {
                 uniform token purpose = "render"
                 uniform token renderVisibility = "visible"
+                over "DriveLR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                over "TireLR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Tread>
+                }
+                over "SpiderLR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Spider>
+                }
+                over "HubCapLR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                over "HubBoltLR0_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLR1_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLR2_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLR3_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLR4_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLR5_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLR6_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "HubBoltLR7_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+                }
+                over "CableWebLR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "CableWebLR_Chunk1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "CableWebLR_Chunk2" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk2" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk3" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk4" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk5" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk6" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk7" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk8" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk9" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk10" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk11" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk12" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk13" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk14" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk15" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk16" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk17" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk18" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk19" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk20" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk21" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk22" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk23" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk24" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk25" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk26" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk27" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk28" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk29" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk30" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk31" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk32" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk33" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
+                over "SpringDetailLR_Chunk34" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom rel material:binding = </FLIP/PresentationLooks/Cable>
+                }
             }
             def Cylinder "ContactProxy" (
                 prepend apiSchemas = ["PhysicsCollisionAPI"]
@@ -837,6 +2037,527 @@ def Xform "FLIP" (
         )
         {
         }
+        over "Baseplate" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "LowerRailL" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "UpperRailL" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PostLF" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PostLR" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "LowerRailR" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "UpperRailR" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PostRF" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PostRR" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "UpperCrossF" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "UpperCrossR" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "FloorCross0" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "FloorCross1" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "FloorCross2" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "SkinL" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Chassis>
+        }
+        over "SkinR" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Chassis>
+        }
+        over "SkinFront" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Chassis>
+        }
+        over "SkinRear" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Chassis>
+        }
+        over "TopDeck" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Chassis>
+            def Xform "GeometryDetail"
+            {
+                def Cube "SkinLRail0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.025, 2.0999999046325684)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.7429999756813049, -0.30049999356269835, 0.0)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinLRail1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.025, 2.0999999046325684)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.7429999756813049, 0.034499998390674594, 0.0)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinLJoint0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.30999999195337297, 0.025)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.7429999756813049, -0.1329999975860119, -0.349999984106128)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                def Cube "SkinLJoint1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.30999999195337297, 0.025)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.7429999756813049, -0.1329999975860119, 0.3499999841061281)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                def Cube "SkinLCorner0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.35999999195337296, 0.025)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.7429999756813049, -0.1329999975860119, -1.0374999523162842)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinLCorner1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.35999999195337296, 0.025)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.7429999756813049, -0.1329999975860119, 1.0374999523162842)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinRRail0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.025, 2.0999999046325684)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (-0.7429999756813049, -0.30049999356269835, 0.0)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinRRail1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.025, 2.0999999046325684)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (-0.7429999756813049, 0.034499998390674594, 0.0)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinRJoint0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.30999999195337297, 0.025)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (-0.7429999756813049, -0.1329999975860119, -0.349999984106128)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                def Cube "SkinRJoint1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.30999999195337297, 0.025)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (-0.7429999756813049, -0.1329999975860119, 0.3499999841061281)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                def Cube "SkinRCorner0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.35999999195337296, 0.025)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (-0.7429999756813049, -0.1329999975860119, -1.0374999523162842)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinRCorner1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.014, 0.35999999195337296, 0.025)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (-0.7429999756813049, -0.1329999975860119, 1.0374999523162842)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinFrontRail0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (1.4600000381469727, 0.025, 0.014)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, -0.30049999356269835, -1.0629999685287475)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinFrontRail1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (1.4600000381469727, 0.025, 0.014)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, 0.034499998390674594, -1.0629999685287475)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinFrontHatchSeal" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.6132000160217285, 0.24479999452829362, 0.012)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, -0.1329999975860119, -1.0629999685287475)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                def Cube "SkinFrontHatchCover" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.5772000160217284, 0.20879999452829362, 0.012)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, -0.1329999975860119, -1.0689999685287475)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Chassis>
+                }
+                def Cube "SkinRearRail0" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (1.4600000381469727, 0.025, 0.014)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, -0.30049999356269835, 1.0629999685287475)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinRearRail1" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (1.4600000381469727, 0.025, 0.014)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, 0.034499998390674594, 1.0629999685287475)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                }
+                def Cube "SkinRearHatchSeal" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.6132000160217285, 0.24479999452829362, 0.012)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, -0.1329999975860119, 1.0629999685287475)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                }
+                def Cube "SkinRearHatchCover" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    custom double3 xformOp:scale = (0.5772000160217284, 0.20879999452829362, 0.012)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                    double size = 1.0
+                    bool physics:collisionEnabled = false
+                    custom double3 xformOp:translate = (0.0, -0.1329999975860119, 1.0689999685287475)
+                    custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+                    uniform token purpose = "render"
+                    custom rel material:binding = </FLIP/PresentationLooks/Chassis>
+                }
+            }
+        }
+        over "BatteryTray" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "BatteryEnclosure" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+        }
+        over "AvionicsTray" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "AvionicsEnclosure" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+        }
+        over "PowerControllerTray" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PowerControllerEnclosure" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+        }
+        over "PayloadMount0" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PayloadMount1" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PayloadMount2" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PayloadMount3" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PayloadDeck" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Chassis>
+        }
+        over "PayloadRail0" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "PayloadRail1" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "LanderMount0" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "LanderMount1" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "LanderMount2" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "LanderMount3" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "HingeSupportL" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "HingePinL" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+        }
+        over "HingeSupportR" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "HingePinR" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Fastener>
+        }
+        over "StowRestL" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "StowRestR" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/Frame>
+        }
+        over "BatteryPackB" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+        }
     }
     def "Comms" (
         active = false
@@ -1129,6 +2850,689 @@ def Xform "FLIP" (
             )
             {
             }
+            over "SolarBackplate" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Chassis>
+                def Xform "GeometryDetail"
+                {
+                    def Cube "SolarFrameLCap" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:scale = (0.018, 1.379999910346755, 0.045)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        double size = 1.0
+                        bool physics:collisionEnabled = false
+                        custom double3 xformOp:translate = (0.6355618278955805, 0.9461302286399028, -0.9099999964237213)
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 7.999999765548998)
+                        uniform token purpose = "render"
+                        custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                    }
+                    def Cube "SolarFrameLLowerCorner" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:scale = (0.018, 0.11, 0.065)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        double size = 1.0
+                        bool physics:collisionEnabled = false
+                        custom double3 xformOp:translate = (0.7328491508172658, 0.31856260688992516, -0.9099999964237213)
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 7.999999765548998)
+                        uniform token purpose = "render"
+                        custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                    }
+                    def Cube "SolarFrameLUpperCorner" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:scale = (0.018, 0.11, 0.065)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        double size = 1.0
+                        bool physics:collisionEnabled = false
+                        custom double3 xformOp:translate = (0.5560993302214942, 1.5762029661342236, -0.9099999964237213)
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 7.999999765548998)
+                        uniform token purpose = "render"
+                        custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                    }
+                    def Cube "SolarFrameRCap" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:scale = (0.018, 1.379999910346755, 0.045)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        double size = 1.0
+                        bool physics:collisionEnabled = false
+                        custom double3 xformOp:translate = (0.6355618278955805, 0.9461302286399028, 0.9099999964237213)
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 7.999999765548998)
+                        uniform token purpose = "render"
+                        custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                    }
+                    def Cube "SolarFrameRLowerCorner" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:scale = (0.018, 0.11, 0.065)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        double size = 1.0
+                        bool physics:collisionEnabled = false
+                        custom double3 xformOp:translate = (0.7328491508172658, 0.31856260688992516, 0.9099999964237213)
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 7.999999765548998)
+                        uniform token purpose = "render"
+                        custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                    }
+                    def Cube "SolarFrameRUpperCorner" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:scale = (0.018, 0.11, 0.065)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        double size = 1.0
+                        bool physics:collisionEnabled = false
+                        custom double3 xformOp:translate = (0.5560993302214942, 1.5762029661342236, 0.9099999964237213)
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 7.999999765548998)
+                        uniform token purpose = "render"
+                        custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+                    }
+                    def Cube "SolarFrameFrontCap" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:scale = (0.018, 0.045, 1.840000033378601)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        double size = 1.0
+                        bool physics:collisionEnabled = false
+                        custom double3 xformOp:translate = (0.5381406586145746, 1.639317808152499, 0.0)
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 7.999999765548998)
+                        uniform token purpose = "render"
+                        custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                    }
+                    def Cube "SolarFrameRearCap" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        custom double3 xformOp:scale = (0.018, 0.045, 1.840000033378601)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+                        double size = 1.0
+                        bool physics:collisionEnabled = false
+                        custom double3 xformOp:translate = (0.7329829971765863, 0.25294258207208137, 0.0)
+                        custom double3 xformOp:rotateXYZ = (0.0, 0.0, 7.999999765548998)
+                        uniform token purpose = "render"
+                        custom rel material:binding = </FLIP/PresentationLooks/Frame>
+                    }
+                }
+            }
+            over "SolarFrameFront" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "SolarFrameRear" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "SolarFrameL" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "SolarFrameR" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "MovingHingeL" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "MovingHingeR" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "SensorBar" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "SensorFootL" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "CameraL" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+            }
+            over "LensL" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Lens>
+            }
+            over "SensorFootR" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "CameraR" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/DarkHousing>
+            }
+            over "LensR" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Lens>
+            }
+            over "Cell00_00" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell00_01" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell00_02" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell00_03" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell00_04" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell00_05" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell00_06" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell00_07" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell00_08" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell00_09" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_00" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_01" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_02" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_03" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_04" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_05" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_06" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_07" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_08" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell01_09" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_00" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_01" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_02" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_03" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_04" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_05" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_06" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_07" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_08" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell02_09" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_00" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_01" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_02" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_03" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_04" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_05" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_06" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_07" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_08" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell03_09" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_00" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_01" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_02" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_03" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_04" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_05" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_06" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_07" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_08" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell04_09" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_00" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_01" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_02" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_03" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_04" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_05" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_06" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_07" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_08" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell05_09" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_00" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_01" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_02" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_03" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_04" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_05" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_06" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_07" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_08" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell06_09" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_00" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_01" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_02" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_03" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_04" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_05" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_06" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_07" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_08" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "Cell07_09" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Cell>
+            }
+            over "SensorMast" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
+            over "AntennaStub" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            }
         }
         def Cube "Contact" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
@@ -1275,5 +3679,170 @@ def Xform "FLIP" (
         uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/flip_panel_controls.rhai@
         custom double inputs:open_angle_deg = 82.0
         custom double inputs:stow_angle_deg = 0.0
+    }
+    def Scope "PresentationLooks"
+    {
+        def Material "Frame"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FLIP/PresentationLooks/Frame/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:base_color = (0.550000011920929, 0.5899999737739563, 0.6399999856948853)
+                custom float inputs:metallic = 0.8199999928474426
+                custom float inputs:roughness = 0.30000001192092896
+                custom float inputs:grain_strength = 0.03500000014901161
+                custom float inputs:grain_scale = 160.0
+                custom float inputs:brush_ratio = 8.0
+                custom color3f inputs:diffuseColor = (0.550000011920929, 0.5899999737739563, 0.6399999856948853)
+            }
+        }
+        def Material "Chassis"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FLIP/PresentationLooks/Chassis/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:base_color = (0.6700000166893005, 0.699999988079071, 0.7300000190734863)
+                custom float inputs:metallic = 0.15000000596046448
+                custom float inputs:roughness = 0.46000000834465027
+                custom float inputs:grain_strength = 0.02199999988079071
+                custom float inputs:grain_scale = 120.0
+                custom float inputs:brush_ratio = 3.0
+                custom color3f inputs:diffuseColor = (0.6700000166893005, 0.699999988079071, 0.7300000190734863)
+            }
+        }
+        def Material "DarkHousing"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FLIP/PresentationLooks/DarkHousing/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:base_color = (0.03500000014901161, 0.04500000178813934, 0.05999999865889549)
+                custom float inputs:metallic = 0.15000000596046448
+                custom float inputs:roughness = 0.5600000023841858
+                custom float inputs:grain_strength = 0.02500000037252903
+                custom float inputs:grain_scale = 100.0
+                custom float inputs:brush_ratio = 2.0
+                custom color3f inputs:diffuseColor = (0.03500000014901161, 0.04500000178813934, 0.05999999865889549)
+            }
+        }
+        def Material "Tread"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FLIP/PresentationLooks/Tread/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:base_color = (0.1599999964237213, 0.18000000715255737, 0.20999999344348907)
+                custom float inputs:metallic = 0.6499999761581421
+                custom float inputs:roughness = 0.5799999833106995
+                custom float inputs:grain_strength = 0.06499999761581421
+                custom float inputs:grain_scale = 90.0
+                custom float inputs:brush_ratio = 2.0
+                custom color3f inputs:diffuseColor = (0.1599999964237213, 0.18000000715255737, 0.20999999344348907)
+            }
+        }
+        def Material "Spider"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FLIP/PresentationLooks/Spider/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:base_color = (0.47999998927116394, 0.5299999713897705, 0.5899999737739563)
+                custom float inputs:metallic = 0.8799999952316284
+                custom float inputs:roughness = 0.27000001072883606
+                custom float inputs:grain_strength = 0.02500000037252903
+                custom float inputs:grain_scale = 190.0
+                custom float inputs:brush_ratio = 10.0
+                custom color3f inputs:diffuseColor = (0.47999998927116394, 0.5299999713897705, 0.5899999737739563)
+            }
+        }
+        def Material "Cable"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FLIP/PresentationLooks/Cable/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:base_color = (0.20999999344348907, 0.23999999463558197, 0.28999999165534973)
+                custom float inputs:metallic = 0.8500000238418579
+                custom float inputs:roughness = 0.3799999952316284
+                custom float inputs:grain_strength = 0.03500000014901161
+                custom float inputs:grain_scale = 180.0
+                custom float inputs:brush_ratio = 3.0
+                custom color3f inputs:diffuseColor = (0.20999999344348907, 0.23999999463558197, 0.28999999165534973)
+            }
+        }
+        def Material "Fastener"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FLIP/PresentationLooks/Fastener/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:base_color = (0.6299999952316284, 0.6700000166893005, 0.7200000286102295)
+                custom float inputs:metallic = 0.9200000166893005
+                custom float inputs:roughness = 0.2199999988079071
+                custom float inputs:grain_strength = 0.017999999225139618
+                custom float inputs:grain_scale = 220.0
+                custom float inputs:brush_ratio = 10.0
+                custom color3f inputs:diffuseColor = (0.6299999952316284, 0.6700000166893005, 0.7200000286102295)
+            }
+        }
+        def Material "Lens"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FLIP/PresentationLooks/Lens/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:base_color = (0.00800000037997961, 0.017999999225139618, 0.02800000086426735)
+                custom float inputs:metallic = 0.15000000596046448
+                custom float inputs:roughness = 0.10000000149011612
+                custom float inputs:grain_strength = 0.0
+                custom float inputs:grain_scale = 100.0
+                custom float inputs:brush_ratio = 1.0
+                custom color3f inputs:diffuseColor = (0.00800000037997961, 0.017999999225139618, 0.02800000086426735)
+            }
+        }
+        def Material "Cell"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </FLIP/PresentationLooks/Cell/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/photovoltaic_finish.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:cell_color = (0.017999999225139618, 0.03500000014901161, 0.07500000298023224)
+                custom color3f inputs:electrode_color = (0.3199999928474426, 0.36000001430511475, 0.41999998688697815)
+                custom float inputs:roughness = 0.23999999463558197
+                custom float inputs:metallic = 0.2800000011920929
+                custom float inputs:pitch = 0.006000000052154064
+                custom float inputs:width = 0.00011999999696854502
+                custom color3f inputs:diffuseColor = (0.017999999225139618, 0.03500000014901161, 0.07500000298023224)
+            }
+        }
     }
 }

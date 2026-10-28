@@ -8,6 +8,17 @@
 fn lander_path() { "/Griffin1SurfaceOps/Lander" }
 fn rover_path() { "/Griffin1SurfaceOps/FLIP" }
 
+// Runtime topology, rather than a release acknowledgement, decides whether
+// wheel commands can move the rover independently of Griffin.
+fn rover_attached() {
+    let joint = find_path("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint");
+    joint != () && joint >= 0
+}
+
+fn show_mounted_rover_controls() {
+    hint("griffin-controls", "FLIP ATTACHED: the payload adapter locks the rover to Griffin. Use OPEN RAMPS, wait for settlement, then DETACH ROVER. U opens ramps and F detaches while controlling Griffin; on FLIP, F runs/stops the route.");
+}
+
 fn resolve(path, label) {
     let target = find_path(path);
     if target == () || target < 0 {
@@ -19,7 +30,8 @@ fn resolve(path, label) {
 
 fn show_briefing() {
     let cancel = input_hint("cancel");
-    hint("griffin-controls", "Click a vehicle to control. " + cancel + " releases.");
+    if rover_attached() { show_mounted_rover_controls(); }
+    else { hint("griffin-controls", "Click a vehicle to control. " + cancel + " releases."); }
     objectives_hud("griffin-controls", []);
     set_surface_action_buttons();
 }
@@ -56,7 +68,7 @@ fn guidance_engagement_applied(enabled) {
 fn set_surface_action_buttons_for(gnc) {
     let result = guided_hud_actions("griffin-controls", "griffin_surface_ops", "on_hud_action", [
         #{id: "unfold_ramps", label: "OPEN RAMPS  U", enabled: true},
-        #{id: "release_rover", label: "DETACH ROVER  F", enabled: true},
+        #{id: "release_rover", label: "DETACH ROVER", enabled: true},
         #{id: "toggle_gnc",
           label: if gnc == false { "RECONNECT GNC" } else { "DISCONNECT GNC" },
           enabled: gnc != ()}
@@ -100,6 +112,7 @@ fn clear_surface_operation_actions() {
 }
 
 fn show_rover_controls() {
+    if rover_attached() { show_mounted_rover_controls(); return; }
     let forward = input_hint("forward");
     let backward = input_hint("backward");
     let left = input_hint("left");
@@ -108,8 +121,8 @@ fn show_rover_controls() {
     let cancel = input_hint("cancel");
     // The vessel HUD carries telemetry and the route program run/stop button;
     // this brief only names the manual skid-steer controls.
-    hint("griffin-controls", "FLIP CONTROL: " + forward + "/" + backward + " drive · " + left + "/" + right
-        + " skid turn · Space brake · " + action + " run/stop route · " + cancel + " release");
+    hint("griffin-controls", "FLIP CONTROL: " + forward + "/" + backward + " drive | " + left + "/" + right
+        + " skid turn | Space brake | " + action + " run/stop route | " + cancel + " release");
 }
 
 // SimulateIntent is the controller-owned persistent hold used by the keyboard;
@@ -170,7 +183,7 @@ fn control_lander() {
     if target == () { return; }
     let result = cmd("AcquireControl", #{ target: target, bind_camera: true });
     if result.ok {
-        hint("griffin-controls", "LANDER CONTROL: GNC stays on until flight input. " + input_hint("thrust") + " thrust · W/S pitch · A/D roll · Q/E yaw · F detach rover");
+        hint("griffin-controls", "LANDER CONTROL: GNC stays on until flight input. " + input_hint("thrust") + " thrust | W/S pitch | A/D roll | Q/E yaw | F detach rover");
         notify_kind("Griffin selected. Flight input takes manual control.", "success");
     } else {
         notify_kind("Lander control was rejected: " + result.error, "error");
@@ -211,7 +224,9 @@ fn control_rover() {
     if result.ok {
         follow(target);
         show_rover_controls();
-        notify_kind("FLIP under manual control.", "success");
+        if rover_attached() {
+            notify_kind("FLIP selected; detach the payload adapter before driving.", "warning");
+        } else { notify_kind("FLIP under manual control.", "success"); }
     } else {
         notify_kind("FLIP control was rejected: " + result.error, "error");
     }

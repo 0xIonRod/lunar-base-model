@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-28",
+  "lighting_status": "experimental fill and extra role shaders removed",
+  "detach_status": "unresolved; reproduced gearbox rating assertion",
+  "failing_seed": 6840157149251759617,
+  "current_vehicle_default_seed_release": {
+    "exit_code": 0,
+    "checks": 10,
+    "travel_m": 8.253567453912764,
+    "contacts": 4,
+    "joints": 27,
+    "graph_edges": 27
+  },
+  "full_mission": {
+    "exit_code": 1,
+    "tick": 3593,
+    "sim_s": 59.88
+  },
+  "current_vehicle_failing_seed_release": {
+    "exit_code": 1,
+    "tick": 3594,
+    "sim_s": 59.9
+  },
+  "contact_trial": "rejected due to missing native tire-heat interface; reverted",
+  "source_sha256": {
+    "scenes/griffin_1_surface_ops.usda": "08c0f10df444ef5f6c14cfcdd744c9780c74b9ed0a0b9a17a87a9f21c13b7b45",
+    "scenes/griffin_shader_review.usda": "b75b4eb0410fa335ceb173fffeb2b1ae43b7c770b25a47f5312292f093b37032",
+    "vehicles/flip_v5.usda": "99eefccc52c909988f08b33643948e80dad24b9bbbd327cfbc708005da766b3f",
+    "tools/griffin_standard_lighting.rhai": "c040136af13a17bfac055f1ebd62fc6143535cf995fbce3f1ea52c30b484ce77",
+    "requirements/griffin_presentation_study.sysml": "8f74b074e80094506ab4874d4bdb7ce1ad761ca07ca6c2201e784431bf70b940",
+    "tests/griffin_flip_v5_payload_release.usda": "fdc51c3940d62b253feb12097cf8badb8163a2f75d789e9f3c13787aeb1ac093",
+    "scenarios/tests/griffin_payload_release.rhai": "4a756196548bce359064dc7b0b6a85a636bf67a76e793155c3bd7728d6337b18",
+    "twin.toml": "26ee372517a3933a1053868b94d3e7e0235cd22cb80c91035e70bc8eadd90c08"
+  }
+}

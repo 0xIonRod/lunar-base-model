@@ -1,0 +1,1888 @@
+{
+  "checked_utc": "2026-10-27T13:22:29.364046+00:00",
+  "source": "https://www.linkedin.com/posts/astrolabspace_our-flip-rover-is-equipped-with-a-622-kwh-activity-7508563602279309312-W5Le",
+  "published": {
+    "battery_energy_wh": 6220,
+    "solar_peak_w": "nearly 270"
+  },
+  "root": "/Griffin1SurfaceOps/FLIP",
+  "port": 4202,
+  "passed": true,
+  "scope": "Public nameplate agreement and live simulator consistency only",
+  "unverified": [
+    "flight pack voltage and discharge curve",
+    "panel I-V curve and MPPT/converter",
+    "panel collection area and cell efficiency",
+    "thermal losses and night survival",
+    "mobility and mechanical fidelity"
+  ],
+  "battery": {
+    "path": "/Griffin1SurfaceOps/FLIP/Battery",
+    "type_name": "Xform",
+    "attrs": {
+      "info:implementationSource": "sourceAsset",
+      "info:sourceAsset": "lunco://models/LunCo/Electrical/Battery.mo",
+      "inputs:capacity": 222.14285278320312,
+      "inputs:R_internal": 0.009999999776482582,
+      "inputs:soc_init": 0.8500000238418579,
+      "inputs:voltage_nom": 28.0,
+      "lunco:modelica:topologyRole": "storage",
+      "lunco:spawnable": true,
+      "physics:mass": 50.0,
+      "xformOpOrder": [
+        "xformOp:translate"
+      ],
+      "xformOp:scale": [
+        1.2,
+        0.2,
+        2.0
+      ],
+      "xformOp:translate": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "spawned": true,
+    "active": true,
+    "doc_id": 120396946717720,
+    "document_generation": 0,
+    "stage_generation": 0,
+    "world_position": [
+      -63.39225974523225,
+      -14.183508845315465,
+      -165.7019821528433
+    ],
+    "position_frame": "active_physics"
+  },
+  "solar": {
+    "path": "/Griffin1SurfaceOps/FLIP/SolarMechanism/Photovoltaics",
+    "type_name": "Xform",
+    "attrs": {
+      "info:implementationSource": "sourceAsset",
+      "info:sourceAsset": "lunco://models/LunCo/Electrical/SolarPanel.mo",
+      "inputs:cell_temperature_k": 298.15,
+      "inputs:panel_normal_x": 0.0,
+      "inputs:panel_normal_y": 1.0,
+      "inputs:panel_normal_z": 0.0,
+      "lunco:modelica:topologyRole": "source",
+      "lunco:spawnable": true,
+      "lunco:telemetry": true,
+      "lunco:telemetry:description": "Solved power delivered by the solar panel at its terminals.",
+      "lunco:telemetry:name": "power.solar_power",
+      "lunco:telemetry:port": "power_out",
+      "lunco:telemetry:unit": "W",
+      "outputs:absorbed_power_w": 0.0,
+      "outputs:conversion_efficiency": 0.0,
+      "outputs:heat_w": 0.0,
+      "outputs:reflected_power_w": 0.0,
+      "outputs:temperature_adjusted_peak_power_w": 0.0,
+      "outputs:temperature_factor": 0.0,
+      "outputs:temperature_k": 0.0,
+      "parameters:area": 0.7,
+      "parameters:efficiency": 0.35,
+      "parameters:peak_power_rating_w": 270.0,
+      "parameters:power_temperature_coefficient_per_k": -0.0037,
+      "parameters:reference_temperature_k": 298.15,
+      "parameters:solar_absorptivity": 1.0,
+      "physics:mass": 15.0,
+      "ui:displayName": "Solar power"
+    },
+    "spawned": true,
+    "active": true,
+    "doc_id": 120396946717720,
+    "document_generation": 0,
+    "stage_generation": 0,
+    "world_position": [
+      -63.25075383605244,
+      -13.956858461117235,
+      -166.38820354161453
+    ],
+    "position_frame": "active_physics"
+  },
+  "entity": 5554994116698552,
+  "batches": [
+    {
+      "sim_tick": 479564,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.8537596958437895,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.995605584398131,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479596,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.8537634471836256,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955848718621129,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479628,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.8537671985234617,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955665588979558,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479659,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.853770832633928,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955493926197153,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479691,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.853774583973764,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955308441388064,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479722,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.8537782180842303,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955179477799563,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479753,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.8537818521946965,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955115128482401,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479784,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.8537854863051627,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955068485956632,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479815,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.8537891204156289,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.995507672084404,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479847,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.853792871755465,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955073273185268,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479880,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.853796740324671,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955063415898895,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sim_tick": 479912,
+      "entities": [
+        {
+          "api_id": 5554994116698552,
+          "ports": [
+            {
+              "name": "solar_available_power",
+              "value": 270.0,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_temperature_k",
+              "value": 298.15,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "K",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "battery_soc",
+              "value": 0.8538004916645071,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "1",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_power",
+              "value": 157.8951956376251,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "W",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "solar_cos_incidence",
+              "value": 0.9955055593868448,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": null,
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_current",
+              "value": 5.625,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "A",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            },
+            {
+              "name": "bus_voltage",
+              "value": 28.070257002244464,
+              "direction": "out",
+              "metadata": {
+                "type": "scalar",
+                "unit": {
+                  "id": "V",
+                  "definition": null
+                },
+                "frame": null,
+                "range": null,
+                "source": "Co-simulation participant",
+                "authority": "solver",
+                "writable": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "published_battery_energy",
+      "passed": true,
+      "detail": {
+        "observed_wh": 6219.9998779296875,
+        "published_wh": 6220,
+        "numerical_allowance_wh": 1.0
+      }
+    },
+    {
+      "name": "rounded_public_solar_rating",
+      "passed": true,
+      "detail": {
+        "observed_w": 270.0,
+        "rounded_public_w": 270,
+        "numerical_allowance_w": 0.01
+      }
+    },
+    {
+      "name": "simulation_advances",
+      "passed": true,
+      "detail": {
+        "first_tick": 479564,
+        "last_tick": 479912
+      }
+    },
+    {
+      "name": "soc_bounds",
+      "passed": true,
+      "detail": "SOC in [0,1]"
+    },
+    {
+      "name": "incidence_bounds",
+      "passed": true,
+      "detail": "Clamped incidence cosine in [0,1]"
+    },
+    {
+      "name": "terminal_power_arithmetic",
+      "passed": true,
+      "detail": {
+        "max_residual_w": 0.0,
+        "numerical_allowance_w": 0.05
+      }
+    },
+    {
+      "name": "solar_delivery_bound",
+      "passed": true,
+      "detail": "Delivered solar power is nonnegative and does not exceed availability"
+    },
+    {
+      "name": "positive_voltage_and_temperature",
+      "passed": true,
+      "detail": "Positive bus voltage and absolute cell temperature"
+    },
+    {
+      "name": "battery_responds_to_current",
+      "passed": true,
+      "detail": {
+        "soc_delta": 4.079582071758736e-05,
+        "current_min_a": 5.625,
+        "current_max_a": 5.625,
+        "prerequisite": "Interior SOC and stable current sign; otherwise rerun under steady load/charge"
+      }
+    }
+  ]
+}
