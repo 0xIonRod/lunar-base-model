@@ -2,9 +2,9 @@
 
 The landing footprint now follows the terrain surface, and route labels offset
 along site up. Guidance retains its authored touchdown reference. The engine
-change is local commit `7adf81263` in
-`/home/rod/Documents/luncosim-workspace/optimization`; the Twin change is on the
-existing `main` branch. Nothing was pushed or merged into engine main.
+change is commit `7adf81263`, fast-forwarded into local engine `main` from
+`optimization`. The Twin change is on its existing `main` branch. Engine
+publication remains separate from the Griffin push.
 
 ## Ownership and behavior
 
