@@ -1,5 +1,10 @@
 # Sun-only correction and release failure — 28 October 2026
 
+**Later architecture correction:** the [compact FLIP egress reconstruction](griffin-compact-egress-2026-10-28.md)
+supersedes the folding-ramp/free-release configuration tested below. The overload
+receipt belongs to commit `35d21c7`; the new layout holds the payload attached
+until tether dynamics are qualified. That hold is not a gearbox repair.
+
 The user rejected the presentation fill and additional hardware shaders.
 `griffin_1_surface_ops.usda` now exactly matches its pre-fill source. The hidden
 DomeLight was also removed from the separate shader-review scene. The HDR,

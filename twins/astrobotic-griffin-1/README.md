@@ -22,14 +22,26 @@ An older library reports unresolved `NozzleDesign.gamma_out` or
 Modelica assets. Main and RCS plumes share the Modelica gas/energy model and
 shader field, with optical study assumptions in `GriffinPlumeStudy`.
 
+The current FLIP drive also requires the shared `LunCo.Electrical.DCMotor`
+`coast_at_zero` parameter. Deploy the matching Modelica asset with the Twin;
+FLIP selects open-circuit idle, while other vehicles retain the default drive.
+See the [ramp shading and release receipt](contracts/griffin-ramp-release-2026-10-28.md).
+
 ## Current FLIP rover — 2026-10-26
 
-**28 October status:** the presentation fill and extra hinge/bearing shaders
-were removed; the operational scene retains its original Sun lighting. The
-current v5 mission has a reproduced gearbox-overload failure immediately after
-detachment with seed `6840157149251759617`. Release is not accepted as reliable.
-See the [Sun-only correction and failure reproduction](contracts/griffin-sun-only-2026-10-28.md)
-for the exact command, passing and failing cases, and reverted trial.
+**28 October correction:** the long, articulated ramp banks have been replaced
+by two compact tracks with curved transitions and steep lips, following
+Astrolab's FLIP-specific egress paper and test imagery. Fabric tether routing is
+shown in the mounted rest pose. Dimensions remain reconstruction assumptions.
+Tether payout and restrained descent are not yet qualified. The payload stays
+attached automatically after landing; F / DETACH ROVER explicitly releases it
+for manual control, transfers driving possession to FLIP and releases the
+parking brake. W/S then drive. The old unfolding and automatic drive-off remain disabled.
+See the [compact-egress contract](contracts/griffin-compact-egress-2026-10-28.md)
+for geometry, sources, checks and the remaining dynamics boundary.
+The operational scene retains its original Sun lighting. The earlier
+[Sun-only correction and release-overload reproduction](contracts/griffin-sun-only-2026-10-28.md)
+records the superseded free-release configuration.
 
 The surface-operations and visual scenes now use `vehicles/flip_v5.usda`, with
 the retained CAD meshes, four native wheel hinges, physical suspension sliders
@@ -43,13 +55,11 @@ test taking control. Its avatar starts at `(8, 5, 10)` in the terrain frame,
 aimed at the rover. See the [CAD acceptance receipt](contracts/flip-cad-runtime-2026-10-26.md)
 for motion, braking, panel/EPS, reload and avatar movement checks.
 
-While FLIP is mounted on Griffin, the payload adapter physically prevents it
-from driving. After landing, use **OPEN RAMPS** (U while controlling Griffin),
-wait for the ramps to settle, then use **DETACH ROVER**. The detach button works
-while either vehicle is selected. **F detaches only when controlling Griffin**;
-on FLIP, F starts/stops its route. Once detached, select FLIP and use W/S to
-drive, A/D to turn and Space to brake. The mission brief explains the attachment
-when a mounted drive command is attempted.
+While FLIP is mounted on Griffin, the payload adapter prevents independent
+driving. The compact tracks are fixed: there is no long-ramp unfolding action.
+Use F / DETACH ROVER for manual adapter release. Tether restraint is not simulated.
+Standalone driving remains available in `scenes/flip_cad_drive.usda` using W/S,
+A/D and Space. Older folding-ramp fixtures retain their historical controls.
 
 The FLIP solar-panel card provides **OPEN SOLAR PANEL** and **STOW SOLAR PANEL**
 in View. Both use the existing Modelica deployment controller and native hinge;

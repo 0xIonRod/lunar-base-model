@@ -56,9 +56,9 @@ measurement boundaries.
 | Main propulsion | Seven actual force owners; one centre and six outer stations on a 0.64 m ring; pressure-fed valve/chamber network | `GriffinPropulsionRequirements` |
 | Attitude propulsion | Twelve force owners in four corner clusters; open-bore rings and connected support stock | `GriffinPropulsionRequirements` |
 | Solar layout | Three adjacent stepped faces; photo-derived cell contours and leg/equipment openings; source-linked stock colliders | `GriffinSolarRequirements` |
-| Ramp mechanism | Two exits, each with two independent three-span wheel tracks; twelve hinges and twelve flight latches | `GriffinRampRequirements` and root/middle/toe component owners |
-| Ramp stow/deployment | Inward 120-degree study stow; root clearance, middle unfold, opposite toe unfold, then terrain-fitted root lowering | `GriffinRampRequirements` |
-| Ramp contact path | 5.397 m total span; actual toe clearance and deck-entry continuity join the angle/rate/dwell readiness gate | `GriffinRampRequirements` |
+| FLIP egress | One exit with two compact curved tracks and steep lips; rear-wheel fabric tether rest routing | `GriffinFlipEgressStudy` |
+| Egress deployment | Fixed-track reconstruction; legacy folding bodies, hinges and latches are inactive | `GriffinFlipEgressStudy` |
+| Egress acceptance | Mounted geometry and contact proxies checked; tether payout and restrained descent remain unqualified, so release is inhibited | `GriffinFlipEgressStudy` |
 | Hosted payload | One fixed adapter until solver-owned release; separate live rover body after retirement | `GriffinFunctionalRequirements` |
 | Electrical and thermal | 28 V bus; battery/solar power network; temperature-dependent photovoltaic and reduced thermal models | `GriffinPowerThermalRequirements` |
 | Guidance and sensors | Modelica descent/control with IMU, altimeter and environment connections; measured landing/handoff gates | `GriffinSimulationAccuracyRequirements` |
@@ -67,6 +67,11 @@ measurement boundaries.
 All dimensions in this table except the separately sourced tire scale are study
 estimates. The old 5.4 m box, diagonal-leg stations, 45-degree outward stow,
 equal-span coupled ramps and 0.90 m tires are superseded configurations.
+The 28 October egress correction follows Astrolab's FLIP-specific
+[LEAG October 2025 paper](https://www.hou.usra.edu/meetings/leag2025/pdf/5034.pdf)
+and Venturi's [January 2026 test photograph, slide 25](https://www.nasa.gov/wp-content/uploads/2024/01/scalable-battery-pack-designed-for-lunar-terrain-vehicles-abw-2025.pdf).
+The earlier 5.397 m folding-ramp study remains available in historical fixtures;
+it does not establish the current FLIP deployment geometry.
 The 27 October photographic presentation supersedes the earlier gold MLI
 preference with silver-gray tank and engine-bay blankets, separate metal
 finishes, domed pad covers and visible service harnesses. The

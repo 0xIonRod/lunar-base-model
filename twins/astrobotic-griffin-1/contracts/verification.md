@@ -1,3 +1,9 @@
+**28 October architecture correction:** compact, steep FLIP egress tracks now
+replace the long folding banks in the vehicle. The legacy component and
+unfolding receipts below retain their historical scope. The new mounted geometry
+and release hold do not qualify tether payout or restrained descent; automatic
+egress remains inhibited pending that physical model.
+
 The [source paging repair receipt](../handover/griffin-source-pagination-2026-10-23.json)
 records complete reads of all 458 requirements and 53 verification cases with
 unchanged Rhai limits. The full composite audit now produces a structured FAIL
@@ -866,3 +872,10 @@ terrain-fitted root lowering. See
 [the deployment repair contract](griffin-ramp-deployment-2026-10-23.md) and its
 portable receipt for exact evidence and executable provenance. This accepts
 opening only; rover traversal and the 60 FPS target remain separate gates.
+
+## 28 October compact-ramp shading and manual release correction
+
+The [release receipt](griffin-ramp-release-2026-10-28.md) records six passing
+manual-detach and forward-motion checks, the shared open-idle motor contract, twelve hidden but
+active contact proxies, and a rendered Sun-only review. Automatic tethered
+egress remains unqualified.

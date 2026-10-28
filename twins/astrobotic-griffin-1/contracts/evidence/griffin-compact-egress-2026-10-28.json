@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-28",
+  "status": "compact geometry installed; restrained descent remains unqualified",
+  "sources": [
+    "https://www.hou.usra.edu/meetings/leag2025/pdf/5034.pdf",
+    "https://www.nasa.gov/wp-content/uploads/2024/01/scalable-battery-pack-designed-for-lunar-terrain-vehicles-abw-2025.pdf"
+  ],
+  "legacy_prims_inactivated": 44,
+  "track_profile_stations_each": 7,
+  "contact_proxies": 12,
+  "runtime_test": {
+    "channel": "GRIFFIN_COMPACT_EGRESS",
+    "exit_code": 0,
+    "checks": 5,
+    "tick": 1383,
+    "sim_s": 23.05,
+    "seed": 6840157149251759617,
+    "joints": 14,
+    "graph_edges": 14,
+    "scope": "measured landing and retained adapter; no tether payout acceptance"
+  },
+  "first_observer_attempt": "NO-VERDICT; repaired to observe authoritative landing port",
+  "review_readiness": {
+    "ready": true,
+    "world_hold": false,
+    "faulted": false,
+    "fault": null,
+    "readiness_tracked": true,
+    "pending_count": 0,
+    "pending": []
+  },
+  "review_runtime_diagnostics": {
+    "errors": 0,
+    "warnings": 0,
+    "findings": []
+  },
+  "lighting": "original mission Sun; no new fill or visual shader",
+  "sha256": {
+    "components/lander/griffin_flip_egress_visual.usda": "fe6351305d74a9fbc5dc58e94dde66eb8f8344867dd8c95433774c398400541a",
+    "vehicles/griffin_1.usda": "c4e8f5fd26b53c419909b8fd2d96289be042f53f4ffa60a75badb8867730abb3",
+    "requirements/griffin_flip_egress.sysml": "2b5c0b501c81709b0070ba5e8e9fd1d365ed8c99ef6287eca01c0845e8b54868",
+    "requirements/griffin_vehicle_assembly.sysml": "a9659e4f65a0ade13ffc56d9b6f1e46e09df13eb12b617afa391c2c75d21ece2",
+    "scenarios/griffin_1_surface_ops.rhai": "bb8691483694618cc10ce95ceeeb8d3735a0760767c1fe555b7328466581f8d2",
+    "scenarios/tests/griffin_compact_egress.rhai": "6472ebeb03ed77b73ede105bc4adea81f31cc504bdd76624d8f813371e4cf494",
+    "tools/griffin_compact_egress.rhai": "6eeb89a9cfaaa008ac504ec1fa89f98827c33bfde02aecbd92f526286b6faf13",
+    "tools/griffin_controls.rhai": "1d838ac0e4c3202ac2b330c4e568faadfa4db76fac1aaff652cac9d86afce2cf",
+    "tools/griffin_surface_ops.rhai": "8e70b97be5ec25666f22df82c990fa5b690339d9cea9c7e4ce40885241bc6968",
+    "scenes/griffin_shader_review.usda": "479a8d2a2cadde9c92eee26c52e2a12375df8918e5d197518afe4abe9df9e8de",
+    "tests/griffin_compact_egress.usda": "3e2b57352577ebffdab2e13b7fe8020fc35466ed936a47f249b0088d77c9a802",
+    "scenarios/tests/griffin_compact_manual_release.rhai": "e3258d359bbca1ba4700f1744eb091c37b57cf53729849fee4c1ac6cc65d768e"
+  },
+  "manual_release_correction": {
+    "receipt": "../griffin-ramp-release-2026-10-28.md",
+    "verdict": "PASS",
+    "checks": 6,
+    "exit_code": 0,
+    "request_tick": 1383,
+    "detached_tick": 1385,
+    "verdict_tick": 1565,
+    "joints": 13,
+    "graph_edges": 13,
+    "scope": "Production HUD detach, possession and brake handoff; 120 idle ticks then 60 forward-input ticks; tethered descent unqualified",
+    "drive_displacement_m": 0.6302798165623397,
+    "drive_ticks": 60
+  },
+  "motor_contract": {
+    "state": "done",
+    "samples": 11,
+    "start_s": 0,
+    "end_s": 0.1,
+    "experiment_id": "6de6f027-8832-49ff-8739-d1a990b9d625"
+  },
+  "hidden_contact_proxies": 12
+}

@@ -2580,6 +2580,7 @@ def Xform "FLIP" (
     }
     over "Motor_FL"
     {
+        custom float inputs:coast_at_zero = 1.0
         def "Body"
         {
             token visibility = "invisible"
@@ -2587,6 +2588,7 @@ def Xform "FLIP" (
     }
     over "Motor_FR"
     {
+        custom float inputs:coast_at_zero = 1.0
         def "Body"
         {
             token visibility = "invisible"
@@ -2594,6 +2596,7 @@ def Xform "FLIP" (
     }
     over "Motor_RL"
     {
+        custom float inputs:coast_at_zero = 1.0
         def "Body"
         {
             token visibility = "invisible"
@@ -2601,6 +2604,7 @@ def Xform "FLIP" (
     }
     over "Motor_RR"
     {
+        custom float inputs:coast_at_zero = 1.0
         def "Body"
         {
             token visibility = "invisible"

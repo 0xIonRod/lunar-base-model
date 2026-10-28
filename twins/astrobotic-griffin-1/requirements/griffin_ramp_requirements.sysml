@@ -1,4 +1,8 @@
 package GriffinRampRequirements {
+    // Legacy folding-ramp reconstruction retained for component fixtures.
+    // Superseded as the FLIP vehicle baseline on 28 October 2026 by
+    // GriffinFlipEgressStudy. Passing these gates does not qualify compact
+    // tracks, fabric restraints, payout or the current mission's egress.
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
     private import ScalarValues::String;

@@ -1,8 +1,8 @@
 // Griffin-1 landing + surface-operations scenario.
 //
 // Powered descent and rover steering remain in their Modelica domains. This
-// automatic mission waits for landing and ramp settlement before egress.
-// Manual ramp opening and adapter detachment remain available during flight.
+// compact FLIP mission lands and retains its adapter until an explicit manual
+// release. Older folding-ramp fixtures keep their historical mission branch.
 
 const LANDER = "/Griffin1SurfaceOps/Lander";
 const ROVER = "/Griffin1SurfaceOps/FLIP";
@@ -21,7 +21,7 @@ fn simulation_dependencies(me, ctx) {
     let lander_environment = find_path(LANDER + "/Environment");
     let altimeter = find_path(LANDER + "/Altimeter");
     // Bootstrap identities are literal until the required SysML analysis is ready.
-    let ramp_joints=[
+    let ramp_joints=if griffin_compact_egress::enabled() {[]} else {[
         find_path(LANDER+"/RampHingePort"),
         find_path(LANDER+"/RampHingePortTrackStarboard"),
         find_path(LANDER+"/RampHingeStarboard"),
@@ -34,17 +34,20 @@ fn simulation_dependencies(me, ctx) {
         find_path(LANDER+"/RampSectionHingeStarboard12"),
         find_path(LANDER+"/RampSectionHingeStarboard01TrackStarboard"),
         find_path(LANDER+"/RampSectionHingeStarboard12TrackStarboard"),
-    ];
+    ]};
     let entity_reads = [find_path("/Griffin1SurfaceOps"), lander, gnc, propulsion, altimeter_model, imu,
         attitude_reference, attitude_propulsion, attitude_actuation, rover,
         lander_environment, altimeter];
     let entity_writes = [rover, gnc];
     for name in ["EgressRampPort","EgressRampPortTrackStarboard","EgressRampStarboard","EgressRampStarboardTrackStarboard"] {
+        if griffin_compact_egress::enabled() {continue;}
         for suffix in ["","/MiddleSection","/MiddleSection/ToeSection"] {
             entity_reads.push(find_path(LANDER+"/"+name+suffix));
         }
     }
-    for name in ["TransitionPlatePort","TransitionPlateStarboard"] {entity_reads.push(find_path(LANDER+"/"+name));}
+    if !griffin_compact_egress::enabled() {
+        for name in ["TransitionPlatePort","TransitionPlateStarboard"] {entity_reads.push(find_path(LANDER+"/"+name));}
+    }
     for station in ["FL", "FR", "RL", "RR"] {
         entity_reads.push(find_path(ROVER+"/Suspension_"+station+"/Wheel_"+station));
     }
@@ -68,6 +71,8 @@ fn simulation_dependencies(me, ctx) {
 
 fn on_start(me, ctx) {
     // Sourced identities are available after the required analysis is ready.
+    this.ramp_latched_drive_profiles=[];
+    if !griffin_compact_egress::enabled() {
     for binding in griffin_spec::ramp_flight_latch_bindings() {
         let latch = find_path(LANDER + "/" + binding.latch);
         track_entity_read(latch);
@@ -76,6 +81,7 @@ fn on_start(me, ctx) {
     let held=griffin_surface_ramp_ops::hold_flight_latch_motors(LANDER);
     if held.ok!=true {throw("flight latch motor admission failed: "+held);}
     this.ramp_latched_drive_profiles=held.drives;
+    }
     // This mission only reacts to these discrete control/phase edges. Opt into
     // the event filter so unrelated wheel/terrain collision chatter does not
     // enter the Rhai VM; the shared task/mission identity buffer remains
@@ -160,9 +166,15 @@ fn on_start(me, ctx) {
 }
 
 fn on_event(me, evt, ctx) {
+    if griffin_compact_egress::enabled() && evt.name=="griffin_ramp_unfold_requested" {
+        hint("griffin-controls","Compact tracks are fixed; use DETACH ROVER for manual release.");
+        return;
+    }
+    if !griffin_compact_egress::enabled() {
     let motors=griffin_surface_ramp_ops::restore_released_motors(
         this.ramp_latched_drive_profiles,evt.name);
     if motors.ok!=true {throw("released flight latch motor restoration failed: "+motors);}
+    }
     this.event_trace = griffin_surface_mission_report::trace_event(this, evt);
     let lander = find_path(LANDER);
     let rover = find_path(ROVER);
@@ -375,11 +387,13 @@ fn update_landing_status(previously_landed, already_announced) {
             status.touchdown_announced = true;
         }
         if !status.landed && previously_landed {
-            hint("griffin-controls", "LANDING NOT CONFIRMED: U opens ramps; F detaches FLIP. Both remain available.");
+            if griffin_compact_egress::enabled() {hint("griffin-controls","LANDING NOT CONFIRMED: manual DETACH ROVER remains available.");}
+            else {hint("griffin-controls", "LANDING NOT CONFIRMED: U opens ramps; F detaches FLIP. Both remain available.");}
         } else if status.landed && !previously_landed && already_announced {
             // Restore the live contact notice after suspension settling without
             // announcing touchdown again or resetting the egress action phase.
-            hint("griffin-controls", "FOUR-PAD CONTACT RESTORED: U opens ramps; F detaches FLIP.");
+            if griffin_compact_egress::enabled() {hint("griffin-controls","FOUR-PAD CONTACT RESTORED: F or DETACH ROVER releases FLIP for manual control.");}
+            else {hint("griffin-controls", "FOUR-PAD CONTACT RESTORED: U opens ramps; F detaches FLIP.");}
         }
     }
     status
@@ -419,8 +433,11 @@ fn release_rover(state, already_requested) {
     // before removing the adapter; navigation releases it after its settle
     // gate. A later manual brake intent remains ordinary operator authority.
     let rover = find_path(ROVER);
-    let brake = cmd("SetPorts", #{target: rover,
-        writes: [["throttle", 0.0], ["steer", 0.0], ["brake", 1.0]]});
+    let writes=[["throttle",0.0],["steer",0.0]];
+    // A manual detach must preserve the operator's brake intent. The legacy
+    // autonomous egress alone owns a temporary parking-brake hold.
+    if !griffin_compact_egress::enabled() {writes.push(["brake",1.0]);}
+    let brake = cmd("SetPorts", #{target: rover,writes:writes});
     if brake == () || brake.ok != true {
         notify_kind("FLIP release brake was rejected.", "error");
         return false;
@@ -450,7 +467,7 @@ fn complete_rover_release(me) {
     griffin_surface_ops::follow_rover();
     griffin_controls::show_rover_controls();
     emit("griffin_flip_released");
-    notify_kind("FLIP released from the top-deck adapter; rover egress enabled.", "info");
+    notify_kind("FLIP payload adapter detached; manual rover control is available.", "info");
     print("[griffin] FLIP payload adapter detached");
 }
 
@@ -957,6 +974,7 @@ fn landing_status_task() {
 }
 
 fn task(me, ctx) {
+    if griffin_compact_egress::enabled() {return par_all([compact_landing_task(),compact_manual_release_task()]);}
     // A semantic operator edge cancels the entire mission branch, including
     // pending settle/release leaves, before any later route write can run.
     let mission=par_race([surface_mission_task(),wait_until(|m| this.route_interrupted)]);
@@ -972,4 +990,48 @@ fn task(me, ctx) {
         let operator = par_all([ramp_unfold_task(), landing_status_task()]);
         par_race([mission, operator])
     }
+}
+
+// Keep the real descent/GNC and measured landing checks. The former twelve-
+// hinge sequence and free drive-off cannot represent tethered FLIP egress.
+// Automatic egress stays off. An explicit operator request may release the
+// real adapter and hand control to the rover without starting a route.
+fn compact_landing_task() {
+    seq([
+        once(|m| {
+            this.landing_setup_evidence=landing_setup_preflight();
+            this.mission_ready=this.landing_setup_evidence.ok==true;
+            this.phase_timeout=!this.mission_ready;
+            true
+        }),
+        check(|m| this.mission_ready),
+        wait_until(|m| {
+            this.guidance_assembly_mass_evidence=griffin_surface_ops::guidance_assembly_mass_report();
+            this.guidance_assembly_mass_evidence.ready==true
+        }),
+        once(|m| {this.phase_timeout=!begin_descent(this);true}),
+        check(|m| this.phase_timeout!=true),
+        landing_confirmation_task(),
+        check(|m| this.phase_timeout!=true),
+        once(|m| {
+            hint("griffin-controls","TOUCHDOWN: compact tracks installed. F or DETACH ROVER releases FLIP for manual control; no tether restraint is active.");
+            emit("griffin_compact_egress_held");true
+        })
+    ])
+}
+fn compact_manual_release_task() {
+    seq([
+        wait_until(|m| this.release_requested),
+        wait_until(|m| adapter_detach_complete()),
+        once(|m| {
+            this.rover_detached=true;
+            let manual=cmd("SetPorts",#{target:find_path(ROVER),writes:[["program_active",0.0],["autopilot_enable",0.0]]});
+            if manual==() || manual.ok!=true {throw("Manual FLIP release could not retain operator authority");}
+            let control=griffin_controls::control_rover();
+            if control==() || control.ok!=true {throw("Detached FLIP could not acquire driving control");}
+            let brake=griffin_controls::release_rover_brake();
+            if brake==() || brake.ok!=true {throw("Detached FLIP parking brake could not release");}
+            complete_rover_release(m);true
+        })
+    ])
 }
