@@ -93,6 +93,8 @@ package Griffin1Requirements {
         // presentation anchors, not a flat physical support plane.
         attribute surfaceRouteMarkerY : Real[5] = (0.2049314542207867, -0.0062310658970091, -0.14148472641245462, -1.067371954023838, -2.166758555790875);
         attribute surfaceRouteMarkerClearanceM : Real = 0.05;
+        // Presentation estimate covering the 60 m descent and chase-camera offset.
+        attribute surfaceRouteMarkerFadeEndM : Real = 150.0;
         attribute surfaceRouteMarkerZ : Real[5] = (0.00, 0.00, 0.00, -4.00, -10.00);
         // Estimated normalized throttle limits, not flight speeds. Slow down
         // on the survey/base turn; retain tight egress arrival tolerances.

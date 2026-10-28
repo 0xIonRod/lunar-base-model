@@ -1168,6 +1168,10 @@ fn surface_route_marker_plan(doc, edit_target, root) {
     let xs = griffin_spec::surface_route_marker_x();
     let ys = griffin_spec::surface_route_marker_y();
     let zs = griffin_spec::surface_route_marker_z();
+    let fade = griffin_spec::_sysml_attribute("surfaceRouteMarkerFadeEndM");
+    if fade == () || !fade.is_finite() || fade <= 0.0 {
+        return plan_error("surface route marker fade range must be finite and positive");
+    }
     if names.len() == 0 || xs.len() != names.len() || ys.len() != names.len()
         || zs.len() != names.len() {
         return plan_error("surface route marker SysML arrays must have equal non-zero cardinality");
@@ -1184,6 +1188,8 @@ fn surface_route_marker_plan(doc, edit_target, root) {
             [xs[index], ys[index], zs[index]], (), ());
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
+            name:"lunco:billboard:fadeEnd",type_name:"float",value:fade.to_string()}});
         paths.push(path);
     }
     #{ok: true, kind: "griffin_surface_route_markers", root: root,

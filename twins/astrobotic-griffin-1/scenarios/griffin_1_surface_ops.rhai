@@ -35,7 +35,7 @@ fn simulation_dependencies(me, ctx) {
         find_path(LANDER+"/RampSectionHingeStarboard01TrackStarboard"),
         find_path(LANDER+"/RampSectionHingeStarboard12TrackStarboard"),
     ];
-    let entity_reads = [lander, gnc, propulsion, altimeter_model, imu,
+    let entity_reads = [find_path("/Griffin1SurfaceOps"), lander, gnc, propulsion, altimeter_model, imu,
         attitude_reference, attitude_propulsion, attitude_actuation, rover,
         lander_environment, altimeter];
     let entity_writes = [rover, gnc];
@@ -792,6 +792,8 @@ fn surface_mission_task() {
                 this.mission_ready = false;
                 this.phase_timeout = true;
                 this.phase_failure_reported = griffin_surface_mission_report::fail_phase(this, "landing-setup-preflight");
+            } else {
+                this.descent_route_presentation=griffin_surface_ops::present_descent_surface_route();
             }
             true
         }),

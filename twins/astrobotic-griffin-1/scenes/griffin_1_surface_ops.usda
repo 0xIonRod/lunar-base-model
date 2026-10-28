@@ -220,7 +220,7 @@ def Xform "Griffin1SurfaceOps" (
         bool lunco:billboard = true
         string lunco:billboard:text = "Ramp entry"
         float lunco:billboard:offsetY = 0.800000011920929
-        float lunco:billboard:fadeEnd = 60.0
+        float lunco:billboard:fadeEnd = 150.0
         def "Trigger" (
             active = false
         )
@@ -242,7 +242,7 @@ def Xform "Griffin1SurfaceOps" (
         bool lunco:billboard = true
         string lunco:billboard:text = "Ramp exit"
         float lunco:billboard:offsetY = 0.800000011920929
-        float lunco:billboard:fadeEnd = 60.0
+        float lunco:billboard:fadeEnd = 150.0
         def "Trigger" (
             active = false
         )
@@ -264,7 +264,7 @@ def Xform "Griffin1SurfaceOps" (
         bool lunco:billboard = true
         string lunco:billboard:text = "Survey 1"
         float lunco:billboard:offsetY = 0.800000011920929
-        float lunco:billboard:fadeEnd = 60.0
+        float lunco:billboard:fadeEnd = 150.0
         def "Trigger" (
             active = false
         )
@@ -286,7 +286,7 @@ def Xform "Griffin1SurfaceOps" (
         bool lunco:billboard = true
         string lunco:billboard:text = "Survey 2"
         float lunco:billboard:offsetY = 0.800000011920929
-        float lunco:billboard:fadeEnd = 60.0
+        float lunco:billboard:fadeEnd = 150.0
         def "Trigger" (
             active = false
         )
@@ -308,7 +308,7 @@ def Xform "Griffin1SurfaceOps" (
         bool lunco:billboard = true
         string lunco:billboard:text = "Base"
         float lunco:billboard:offsetY = 0.800000011920929
-        float lunco:billboard:fadeEnd = 60.0
+        float lunco:billboard:fadeEnd = 150.0
         def "Trigger" (
             active = false
         )

@@ -1448,6 +1448,9 @@ fn surface_route_entry_height(point) {
 // The entry belongs to the payload walking plane; other gates follow terrain.
 // @view@ edits never overwrite the authored reference-scene route datums.
 fn surface_route_presentation_plan(frame) {
+    surface_route_presentation_plan(frame, true)
+}
+fn surface_route_presentation_plan(frame, entry_on_deck) {
     let names=griffin_spec::surface_route_marker_names();
     let x=griffin_spec::surface_route_marker_x();let z=griffin_spec::surface_route_marker_z();
     let clearance=griffin_spec::_sysml_attribute("surfaceRouteMarkerClearanceM");
@@ -1458,12 +1461,12 @@ fn surface_route_presentation_plan(frame) {
     for i in 0..names.len(){
         let path="/Griffin1SurfaceOps/"+names[i];
         let point=surface_route_target(vec3(x[i],0.0,z[i]),frame);let terrain=point.y;
-        if i==0{point=vec3(point.x,max(terrain,surface_route_entry_height(point)),point.z);}
+        if i==0 && entry_on_deck{point=vec3(point.x,max(terrain,surface_route_entry_height(point)),point.z);}
         point=vec3(point.x,point.y+clearance,point.z);
         ops.push(#{SetTranslate:#{edit_target:"@view@",path:path,value:vec3_array(point)}});
         ops.push(#{SetAttribute:#{edit_target:"@view@",path:path,name:"lunco:billboard",type_name:"bool",value:"true"}});
         points.push(#{path:path,position_m:vec3_array(point),terrain_y_m:terrain,
-            clearance_m:point.y-terrain,surface:if i==0{"payload_deck"}else{"terrain"}});
+            clearance_m:point.y-terrain,surface:if i==0 && entry_on_deck{"payload_deck"}else{"terrain"}});
     }
     #{ok:true,doc_id:record.doc_id,parent_gen:usd_document_generation(record.doc_id),ops:ops,points:points}
 }
@@ -1471,6 +1474,21 @@ fn present_surface_route(frame) {
     let plan=surface_route_presentation_plan(frame);
     cmd("ApplyUsdTransientOps",#{doc_id:plan.doc_id,parent_gen:plan.parent_gen,
         label:"Present terrain-fitted Griffin route",ops:plan.ops})
+}
+
+// Before landing, the reference route is a terrain-supported mission preview.
+// Egress replaces it with the frozen landed ramp frame and deck entry.
+fn present_descent_surface_route() {
+    let root=find_path("/Griffin1SurfaceOps");
+    let position=world_pos3(root);let rotation=world_rotation_quat(root);
+    if position==() || rotation==(){throw("Descent route reference frame unavailable");}
+    let forward=qrot(rotation,vec3(1.0,0.0,0.0));
+    let lateral=qrot(rotation,vec3(0.0,0.0,1.0));
+    let plan=surface_route_presentation_plan(#{origin:position,forward:forward,lateral:lateral},false);
+    let result=cmd("ApplyUsdTransientOps",#{doc_id:plan.doc_id,parent_gen:plan.parent_gen,
+        label:"Present terrain-supported descent route",ops:plan.ops});
+    if result==() || result.ok!=true {throw("Descent route presentation rejected: "+result);}
+    plan
 }
 
 fn _surface_route_leg_task(rover, leg, stall_timeout) {
