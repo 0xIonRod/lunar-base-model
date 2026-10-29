@@ -211,6 +211,21 @@ fn on_event(me, evt, ctx) {
         griffin_controls::show_mounted_rover_controls();
     }
 
+    // Detaching removes a joint; it must not release a parked rover into a
+    // gravity-driven roll off the downhill side of a tilted payload deck.
+    // The first deliberate drive edge releases this mission-owned hold.
+    if griffin_compact_egress::enabled() && evt.name=="intent.edge"
+        && evt.source==rover && this.rover_detached && this.rover_brake_held {
+        let value=evt.value;
+        if value!=() && (value["intent"]=="forward" || value["intent"]=="backward")
+            && (value["edge"]=="pressed" || value["edge"]=="pulse") {
+            let released=griffin_controls::release_rover_brake();
+            if released==() || released.ok!=true {throw("Parked FLIP could not release its brake for a drive request");}
+            this.rover_brake_held=false;
+            griffin_controls::show_rover_controls();
+        }
+    }
+
     if evt.name=="intent.edge" && evt.source==rover && this.route_engaged {
         let value=evt.value;
         if value!=() && value["target_gid"]!=()
@@ -266,6 +281,15 @@ fn on_event(me, evt, ctx) {
     if evt.name == "griffin_rover_release_requested" {
         if this.release_requested {
             if !this.rover_detached {griffin_controls::show_rover_release_pending();}
+            return;
+        }
+        if griffin_compact_egress::enabled() {
+            // Submit the explicit click in the event hook, including while
+            // transport is paused. The task only observes solver retirement.
+            if release_rover(this,false) {
+                this.release_requested=true;
+                griffin_controls::show_rover_release_pending();
+            }
             return;
         }
         if release_rover(this, false) {
@@ -1014,6 +1038,9 @@ fn compact_landing_task() {
         landing_confirmation_task(),
         check(|m| this.phase_timeout!=true),
         once(|m| {
+            this.surface_route_frame=griffin_surface_ops::landed_surface_route_frame();
+            let shown=griffin_surface_ops::present_surface_route(this.surface_route_frame);
+            if shown==() || shown.ok!=true {throw("Landed compact-ramp markers could not follow their actual frame");}
             hint("griffin-controls","TOUCHDOWN: compact tracks installed. F or DETACH ROVER releases FLIP for manual control; no tether restraint is active.");
             emit("griffin_compact_egress_held");true
         })
@@ -1022,6 +1049,9 @@ fn compact_landing_task() {
 fn compact_manual_release_task() {
     seq([
         wait_until(|m| this.release_requested),
+        // Explicit manual release owns its authority. A noisy or unavailable
+        // landing qualification must not silently hold an accepted HUD click.
+        // Automatic egress remains disabled; retain the normal parking hold.
         wait_until(|m| adapter_detach_complete()),
         once(|m| {
             this.rover_detached=true;
@@ -1029,9 +1059,12 @@ fn compact_manual_release_task() {
             if manual==() || manual.ok!=true {throw("Manual FLIP release could not retain operator authority");}
             let control=griffin_controls::control_rover();
             if control==() || control.ok!=true {throw("Detached FLIP could not acquire driving control");}
-            let brake=griffin_controls::release_rover_brake();
-            if brake==() || brake.ok!=true {throw("Detached FLIP parking brake could not release");}
-            complete_rover_release(m);true
-        })
+            let brake=griffin_controls::hold_rover_brake();
+            if brake==() || brake.ok!=true {throw("Detached FLIP could not retain its parking brake");}
+            this.rover_brake_held=true;
+            complete_rover_release(m);
+            hint("griffin-controls","FLIP DETACHED AND PARKED: W drives toward the ramp; S reverses. The first drive input releases the parking brake.");true
+        }),
+        wait_until(|m| !this.rover_brake_held)
     ])
 }

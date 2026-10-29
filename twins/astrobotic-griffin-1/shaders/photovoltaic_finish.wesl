@@ -4,7 +4,7 @@ import lunco::shaders::pbr_lit::lit;
 
 //! CAD already supplies individual cells and gaps. Add only fine electrodes.
 //! No UV dependency: supplier CAD meshes have no primvars:st.
-//!@ui cell_color color "Silicon colour"
+//!@ui cell_color color "Cell face colour"
 //!@default cell_color 0.018,0.035,0.075
 //!@ui electrode_color color "Electrode colour"
 //!@default electrode_color 0.32,0.36,0.42
@@ -36,7 +36,7 @@ fn fragment(input: VertexOutput, @builtin(front_facing) is_front: bool) -> @loca
     let d = abs(fract(p.z / pitch - 0.5) - 0.5) * pitch;
     let resolved = 1.0 - smoothstep(pitch * 0.25, pitch, footprint);
     let line = (1.0 - smoothstep(mat.width * 0.5 - footprint,
-        mat.width * 0.5 + footprint, d)) * resolved;
+        mat.width * 0.5 + footprint, d));
     let average = clamp(mat.width / pitch, 0.0, 1.0);
     let coverage = mix(average, line, resolved);
     let color = mix(mat.cell_color, mat.electrode_color, coverage);

@@ -19,6 +19,22 @@ def Xform "World"
         )
         {
         }
+        def Material "Webbing"
+        {
+            token outputs:surface
+            token outputs:surface.connect = </World/Looks/Webbing/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/woven_webbing.wesl@
+                custom token outputs:surface = ""
+                custom color3f inputs:base_color = (0.30000001192092896, 0.2800000011920929, 0.23999999463558197)
+                custom color3f inputs:diffuseColor = (0.30000001192092896, 0.2800000011920929, 0.23999999463558197)
+                custom float inputs:roughness = 0.7799999713897705
+                custom float inputs:weave_pitch = 0.0008999999845400453
+                custom float inputs:normal_strength = 0.10000000149011612
+            }
+        }
     }
     def Xform "TetherRestRouting"
     {
@@ -33,7 +49,7 @@ def Xform "World"
             custom double3 xformOp:translate = (1.005, 2.6, -1.0)
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 19.405970754001178)
             uniform token purpose = "render"
-            custom rel material:binding = </World/Looks/Walking>
+            custom rel material:binding = </World/Looks/Webbing>
         }
         def Cube "Anchor0" (
             prepend apiSchemas = ["MaterialBindingAPI"]
@@ -59,7 +75,7 @@ def Xform "World"
             custom double3 xformOp:translate = (1.005, 2.6, 1.0)
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 19.405970754001178)
             uniform token purpose = "render"
-            custom rel material:binding = </World/Looks/Walking>
+            custom rel material:binding = </World/Looks/Webbing>
         }
         def Cube "Anchor1" (
             prepend apiSchemas = ["MaterialBindingAPI"]
@@ -209,6 +225,162 @@ def Xform "World"
             uniform token purpose = "proxy"
             token visibility = "invisible"
         }
+        def Cube "CurbContactNegative0" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (2.9, 0.035, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.5, 2.1375, -1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative1" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.2531797780234435, 0.03456042211708469, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.075, 2.1175, -1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 9.090276920822323)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative2" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.2780287754891568, 0.027694975048725826, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.31, 2.0125, -1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 37.69424046668924)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative3" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.3413209633175202, 0.01845770016223502, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.51, 1.7825000000000002, -1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 58.17255342332685)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative4" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.45221676218380075, 0.010835511661127745, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.67, 1.4225, -1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 71.96571443287014)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative5" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.5688585061331156, 0.0061526723469279955, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.79, 0.9274999999999999, -1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 79.87532834460221)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive0" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (2.9, 0.035, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.5, 2.1375, -0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive1" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.2531797780234435, 0.03456042211708469, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.075, 2.1175, -0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 9.090276920822323)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive2" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.2780287754891568, 0.027694975048725826, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.31, 2.0125, -0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 37.69424046668924)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive3" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.3413209633175202, 0.01845770016223502, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.51, 1.7825000000000002, -0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 58.17255342332685)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive4" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.45221676218380075, 0.010835511661127745, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.67, 1.4225, -0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 71.96571443287014)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive5" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.5688585061331156, 0.0061526723469279955, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.79, 0.9274999999999999, -0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 79.87532834460221)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
     }
     def Xform "TrackStarboard"
     {
@@ -340,6 +512,162 @@ def Xform "World"
             double size = 1.0
             bool physics:collisionEnabled = true
             custom double3 xformOp:translate = (-2.7781868690938984, 0.9078905123381961, 1.0)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 79.87532834460221)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative0" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (2.9, 0.035, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.5, 2.1375, 0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative1" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.2531797780234435, 0.03456042211708469, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.075, 2.1175, 0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 9.090276920822323)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative2" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.2780287754891568, 0.027694975048725826, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.31, 2.0125, 0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 37.69424046668924)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative3" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.3413209633175202, 0.01845770016223502, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.51, 1.7825000000000002, 0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 58.17255342332685)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative4" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.45221676218380075, 0.010835511661127745, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.67, 1.4225, 0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 71.96571443287014)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactNegative5" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.5688585061331156, 0.0061526723469279955, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.79, 0.9274999999999999, 0.7725)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 79.87532834460221)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive0" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (2.9, 0.035, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-0.5, 2.1375, 1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 0.0)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive1" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.2531797780234435, 0.03456042211708469, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.075, 2.1175, 1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 9.090276920822323)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive2" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.2780287754891568, 0.027694975048725826, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.31, 2.0125, 1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 37.69424046668924)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive3" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.3413209633175202, 0.01845770016223502, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.51, 1.7825000000000002, 1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 58.17255342332685)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive4" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.45221676218380075, 0.010835511661127745, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.67, 1.4225, 1.2275)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 71.96571443287014)
+            uniform token purpose = "proxy"
+            token visibility = "invisible"
+        }
+        def Cube "CurbContactPositive5" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            custom double3 xformOp:scale = (0.5688585061331156, 0.0061526723469279955, 0.025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            double size = 1.0
+            bool physics:collisionEnabled = true
+            custom double3 xformOp:translate = (-2.79, 0.9274999999999999, 1.2275)
             custom double3 xformOp:rotateXYZ = (0.0, 0.0, 79.87532834460221)
             uniform token purpose = "proxy"
             token visibility = "invisible"

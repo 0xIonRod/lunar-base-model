@@ -35,8 +35,12 @@ Astrolab's FLIP-specific egress paper and test imagery. Fabric tether routing is
 shown in the mounted rest pose. Dimensions remain reconstruction assumptions.
 Tether payout and restrained descent are not yet qualified. The payload stays
 attached automatically after landing; F / DETACH ROVER explicitly releases it
-for manual control, transfers driving possession to FLIP and releases the
-parking brake. W/S then drive. The old unfolding and automatic drive-off remain disabled.
+for manual control and transfers driving possession to FLIP. FLIP remains parked;
+the first deliberate W/S input releases the parking brake. Explicit detach does
+not wait for the live landing qualification. The old unfolding and automatic
+drive-off remain disabled. The [29 October release correction](contracts/griffin-manual-release-2026-10-29.md)
+also moves guidance markers into the actual landed ramp frame and retires the
+two remaining legacy hinge shafts under the bus.
 See the [compact-egress contract](contracts/griffin-compact-egress-2026-10-28.md)
 for geometry, sources, checks and the remaining dynamics boundary.
 A subsequent [upper-hardware visual pass](contracts/griffin-upper-visuals-2026-10-29.md)

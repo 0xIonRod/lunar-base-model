@@ -23,11 +23,35 @@ package GriffinFlipEgressStudy {
         attribute plateThicknessM : Real = 0.024;
         attribute curbWidthM : Real = 0.025;
         attribute curbHeightM : Real = 0.035;
+        attribute maximumParkedRollbackM : Real = 0.025;
         attribute webbingWidthM : Real = 0.045;
         attribute webbingThicknessM : Real = 0.004;
         attribute tetherAnchorXM : Real = 1.16;
         attribute tetherAnchorYM : Real = 2.16;
         attribute rearWheelWrapXM : Real = 0.85;
         attribute rearWheelWrapYM : Real = 3.04;
+        // Renderer assumptions only; fiber chemistry, weave and optics unknown.
+        attribute webbingColor : Real[3] = (0.30, 0.28, 0.24);
+        attribute webbingRoughness : Real = 0.78;
+        attribute webbingWeavePitchM : Real = 0.0009;
+        attribute webbingNormalStrength : Real = 0.10;
+    }
+    part def ControlledDescent {
+        doc /* Reduced straight-line tether/payout study. These values are
+         * explicit assumptions, not fabric properties, flight limits or a
+         * wheel-wrapping reconstruction. Native body forces and equal/opposite
+         * lander reactions must be tested before production activation. */
+        attribute stiffnessNPerM : Real = 4000.0;
+        attribute dampingNsPerM : Real = 800.0;
+        attribute initialLengthM : Real = 0.70;
+        attribute payoutSpeedMps : Real = 0.12;
+        attribute payoutExtensionM : Real = 0.03;
+        attribute tensionLimitN : Real = 2500.0;
+        attribute driveThrottleLimit : Real = 0.10;
+        attribute exitDistanceM : Real = 6.0;
+        attribute waypointRadiusM : Real = 0.10;
+        attribute testDurationTicks : Real = 6000.0;
+        attribute releaseTensionN : Real = 5.0;
+        attribute releaseElasticEnergyJ : Real = 0.05;
     }
 }

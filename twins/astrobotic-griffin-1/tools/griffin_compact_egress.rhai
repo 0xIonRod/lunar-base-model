@@ -114,6 +114,23 @@ fn tether_plan(doc) {
     }
     #{doc_id:doc,generation:q.generation,ops:ops}
 }
+fn webbing_finish_plan(doc) {
+    let root="/World";let q=query("InspectUsdDocument",#{doc_id:doc,path:root+"/TetherRestRouting"});
+    if !q.prim.exists {throw("Open the canonical compact-egress component");}
+    let ops=surface::shader([],root+"/Looks","Webbing","twin://astrobotic-griffin-1/shaders/woven_webbing.wesl");
+    let shader=root+"/Looks/Webbing/Surface";
+    ops.push(surface::attr(shader,"inputs:base_color","color3f",surface::text_color(datum("webbingColor"))));
+    ops.push(surface::attr(shader,"inputs:diffuseColor","color3f",surface::text_color(datum("webbingColor"))));
+    for row in [["roughness","webbingRoughness"],["weave_pitch","webbingWeavePitchM"],["normal_strength","webbingNormalStrength"]] {
+        ops.push(surface::attr(shader,"inputs:"+row[0],"float",datum(row[1]).to_string()));
+    }
+    for i in 0..2 {
+        let p=root+"/TetherRestRouting/Webbing"+i;
+        if query("QueryUsdPrim",#{doc_id:doc,path:p,attrs:[]}).type_name!="Cube" {throw("Missing rest-routing strip: "+p);}
+        ops.push(finish::binding(p,root+"/Looks/Webbing"));
+    }
+    #{doc_id:doc,generation:q.generation,ops:ops}
+}
 fn install_plan(doc) {
     let root="/Griffin1";let q=query("InspectUsdDocument",#{doc_id:doc,path:root});let ops=[];let retired=[];
     for path in q.prim.children {
@@ -123,10 +140,25 @@ fn install_plan(doc) {
         }
     }
     if retired.len()<30 {throw("Expected the complete legacy articulated installation");}
+    for op in retired_bus_hardware_plan(doc).ops {ops.push(op);}
     ops=reference(ops,root,"CompactEgress","twin://astrobotic-griffin-1/components/lander/griffin_flip_egress_visual.usda","/World","Xform");
     ops=append(ops,builder::place_plan("@root@",root+"/CompactEgress",[0.0,0.0,0.0],[0.0,datum("installationYawDeg"),0.0],[1.0,1.0,1.0]));
     ops.push(surface::attr(root,"lunco:egress","string","\"Compact steep FLIP tracks; fabric tether rest routing; restrained descent not yet qualified\""));
     #{doc_id:doc,generation:q.generation,ops:ops,retired:retired}
+}
+fn retired_bus_hardware_plan(doc) {
+    let root="/Griffin1/Bus";
+    let q=query("InspectUsdDocument",#{doc_id:doc,path:root});
+    if !q.prim.exists {throw("Open the canonical Griffin vehicle");}
+    let ops=[];
+    // The previous folding banks also owned shafts nested under Bus. Retire
+    // those with their banks; they are not compact-track mounting hardware.
+    for name in ["RampSharedShaftPort","RampSharedShaftStarboard"] {
+        let p=root+"/"+name;
+        if query("QueryUsdPrim",#{doc_id:doc,path:p,attrs:[]}).type_name!="Cylinder" {throw("Missing legacy shaft: "+p);}
+        ops.push(#{SetActive:#{edit_target:"@root@",path:p,active:false}});
+    }
+    #{doc_id:doc,generation:q.generation,ops:ops}
 }
 fn check_track(doc,index) {
     let path="/World/"+if index==0 {"TrackPort"}else{"TrackStarboard"};
@@ -180,6 +212,22 @@ fn idle_coast_plan(doc) {
     let ops=[];let value=if datum("idleMotorCoast")==true {"1.0"}else{"0.0"};
     for station in ["FL","FR","RL","RR"] {
         ops.push(surface::attr("/FLIP/Motor_"+station,"inputs:coast_at_zero","float",value));
+    }
+    #{doc_id:doc,generation:q.generation,ops:ops}
+}
+fn curb_contact_plan(doc,index,side) {
+    if (index!=0 && index!=1) || (side!=1 && side != -1) {throw("Select one track and curb side");}
+    let root="/World/"+if index==0 {"TrackPort"}else{"TrackStarboard"};
+    let q=query("InspectUsdDocument",#{doc_id:doc,path:root});
+    if !q.prim.exists {throw("Missing compact track");}
+    let x=datum("stationsXM");let y=datum("heightsYM");
+    let z=datum("trackCentersZM")[index]+side.to_float()*(datum("trackWidthM")-datum("curbWidthM"))/2.0;
+    let h=datum("curbHeightM");let width=datum("curbWidthM");let ops=[];
+    for i in 0..x.len()-1 {
+        let dx=x[i]-x[i+1];let dy=y[i]-y[i+1];let length=sqrt(dx*dx+dy*dy);let angle=atan(dy/dx);
+        ops=cube(ops,root,"CurbContact"+if side<0{"Negative"}else{"Positive"}+i,
+          [(x[i]+x[i+1])/2.0,(y[i]+y[i+1]+h)/2.0,z],
+          [length,h*cos(angle),width],[0.0,0.0,angle*180.0/acos(-1.0)],"",true);
     }
     #{doc_id:doc,generation:q.generation,ops:ops}
 }
