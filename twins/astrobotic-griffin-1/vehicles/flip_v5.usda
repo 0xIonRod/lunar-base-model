@@ -27,9 +27,9 @@ def Xform "FLIP" (
     float outputs:battery_soc.connect = </FLIP/Battery.outputs:soc_out>
     float outputs:battery_drained
     float outputs:battery_drained.connect = </FLIP/Battery.outputs:drained>
-    rel collection:components:includes = [</FLIP/Drivetrain>, </FLIP/Battery>, </FLIP/SolarMechanism/Photovoltaics>, </FLIP/Motor_FL>, </FLIP/TorqueSource_FL>, </FLIP/Gearbox_FL>, </FLIP/Shaft_FL>, </FLIP/Motor_FR>, </FLIP/TorqueSource_FR>, </FLIP/Gearbox_FR>, </FLIP/Shaft_FR>, </FLIP/Motor_RL>, </FLIP/TorqueSource_RL>, </FLIP/Gearbox_RL>, </FLIP/Shaft_RL>, </FLIP/Motor_RR>, </FLIP/TorqueSource_RR>, </FLIP/Gearbox_RR>, </FLIP/Shaft_RR>]
+    rel collection:components:includes = [</FLIP/Drivetrain>, </FLIP/Battery>, </FLIP/SolarMechanism/Photovoltaics>, </FLIP/Motor_FL>, </FLIP/TorqueSource_FL>, </FLIP/Gearbox_FL>, </FLIP/Shaft_FL>, </FLIP/Motor_FR>, </FLIP/TorqueSource_FR>, </FLIP/Gearbox_FR>, </FLIP/Shaft_FR>, </FLIP/Motor_RL>, </FLIP/TorqueSource_RL>, </FLIP/Gearbox_RL>, </FLIP/Shaft_RL>, </FLIP/Motor_RR>, </FLIP/TorqueSource_RR>, </FLIP/Gearbox_RR>, </FLIP/Shaft_RR>, </FLIP/SolarCharger>, </FLIP/Equipment>]
     custom double outputs:solar_power
-    double outputs:solar_power.connect = </FLIP/SolarMechanism/Photovoltaics.outputs:power_out>
+    double outputs:solar_power.connect = </FLIP/SolarCharger.outputs:output_power_w>
     custom double outputs:solar_available_power
     double outputs:solar_available_power.connect = </FLIP/SolarMechanism/Photovoltaics.outputs:available_power_w>
     custom double outputs:solar_cos_incidence
@@ -48,6 +48,12 @@ def Xform "FLIP" (
     double inputs:target_mount_y.connect = </FLIP/SolarMechanism/Photovoltaics/Environment.outputs:sun_mount_y>
     custom double inputs:target_mount_z
     double inputs:target_mount_z.connect = </FLIP/SolarMechanism/Photovoltaics/Environment.outputs:sun_mount_z>
+    custom double outputs:equipment_power
+    double outputs:equipment_power.connect = </FLIP/Equipment.outputs:power_draw_w>
+    custom double outputs:charger_heat_w
+    double outputs:charger_heat_w.connect = </FLIP/SolarCharger.outputs:heat_w>
+    float physxRigidBody:linearDamping = 0.0
+    float physxRigidBody:angularDamping = 0.0
     def "Chassis"
     {
         double3 xformOp:scale = (1.476, 0.396, 2.116)
@@ -77,7 +83,7 @@ def Xform "FLIP" (
         double3 xformOp:translate = (-1.0, -0.235, -0.85)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_FL" (
-            prepend apiSchemas = ["VisibilityAPI"]
+            prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI"]
         )
         {
             double radius = 0.465
@@ -88,12 +94,14 @@ def Xform "FLIP" (
             float physxVehicleWheel:moi = 1.946025013923645
             float physics:mass = 18.0
             float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
-            float physics:dynamicFriction = 0.6499999761581421
+            float physics:dynamicFriction = 0.6000000238418579
             float physxVehicleTire:restLoad = 182.25
             uniform token purpose = "proxy"
             float[] primvars:displayOpacity = [0.0]
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
+            float physics:staticFriction = 0.6000000238418579
+            custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FL.usda@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -447,7 +455,7 @@ def Xform "FLIP" (
         double3 xformOp:translate = (1.0, -0.235, -0.85)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_FR" (
-            prepend apiSchemas = ["VisibilityAPI"]
+            prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI"]
         )
         {
             double radius = 0.465
@@ -458,12 +466,14 @@ def Xform "FLIP" (
             float physxVehicleWheel:moi = 1.946025013923645
             float physics:mass = 18.0
             float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
-            float physics:dynamicFriction = 0.6499999761581421
+            float physics:dynamicFriction = 0.6000000238418579
             float physxVehicleTire:restLoad = 182.25
             uniform token purpose = "proxy"
             float[] primvars:displayOpacity = [0.0]
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
+            float physics:staticFriction = 0.6000000238418579
+            custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FR.usda@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -817,7 +827,7 @@ def Xform "FLIP" (
         double3 xformOp:translate = (-1.0, -0.235, 0.85)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_RL" (
-            prepend apiSchemas = ["VisibilityAPI"]
+            prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI"]
         )
         {
             double radius = 0.465
@@ -828,12 +838,14 @@ def Xform "FLIP" (
             float physxVehicleWheel:moi = 1.946025013923645
             float physics:mass = 18.0
             float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
-            float physics:dynamicFriction = 0.6499999761581421
+            float physics:dynamicFriction = 0.6000000238418579
             float physxVehicleTire:restLoad = 182.25
             uniform token purpose = "proxy"
             float[] primvars:displayOpacity = [0.0]
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
+            float physics:staticFriction = 0.6000000238418579
+            custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RL.usda@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -1187,7 +1199,7 @@ def Xform "FLIP" (
         double3 xformOp:translate = (1.0, -0.235, 0.85)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         def Cylinder "Wheel_RR" (
-            prepend apiSchemas = ["VisibilityAPI"]
+            prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI"]
         )
         {
             double radius = 0.465
@@ -1198,12 +1210,14 @@ def Xform "FLIP" (
             float physxVehicleWheel:moi = 1.946025013923645
             float physics:mass = 18.0
             float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
-            float physics:dynamicFriction = 0.6499999761581421
+            float physics:dynamicFriction = 0.6000000238418579
             float physxVehicleTire:restLoad = 182.25
             uniform token purpose = "proxy"
             float[] primvars:displayOpacity = [0.0]
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
+            float physics:staticFriction = 0.6000000238418579
+            custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RR.usda@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -3533,6 +3547,34 @@ def Xform "FLIP" (
             {
                 custom rel material:binding = </FLIP/PresentationLooks/Frame>
             }
+            def Camera "MastForwardCamera" (
+                prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+            )
+            {
+                uniform token lunco:cameraRole = "viewport"
+                uniform token lunco:cameraPose = "mounted"
+                float focalLength = 24.0
+                float horizontalAperture = 36.0
+                float verticalAperture = 20.25
+                custom double3 xformOp:translate = (0.652, 1.673, -0.095)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
+                custom string documentation = "Navigation view at the public solar-panel mast camera location. Opposed directions follow the manufacturer description; focal length is an uncalibrated reconstruction estimate."
+            }
+            def Camera "MastRearCamera" (
+                prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+            )
+            {
+                uniform token lunco:cameraRole = "viewport"
+                uniform token lunco:cameraPose = "mounted"
+                float focalLength = 24.0
+                float horizontalAperture = 36.0
+                float verticalAperture = 20.25
+                custom double3 xformOp:translate = (0.552, 1.673, 0.095)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                custom double3 xformOp:rotateXYZ = (0.0, 90.0, 0.0)
+                custom string documentation = "Navigation view at the public solar-panel mast camera location. Opposed directions follow the manufacturer description; focal length is an uncalibrated reconstruction estimate."
+            }
         }
         def Cube "Contact" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
@@ -3565,7 +3607,7 @@ def Xform "FLIP" (
         )
         {
             custom token connectors:p
-            token connectors:p.connect = </FLIP/Battery.connectors:p>
+            token connectors:p.connect = </FLIP/SolarCharger.connectors:pv>
             double parameters:area = 0.7
             double parameters:efficiency = 0.35
             custom double parameters:peak_power_rating_w = 270.0
@@ -3844,5 +3886,36 @@ def Xform "FLIP" (
                 custom color3f inputs:diffuseColor = (0.017999999225139618, 0.03500000014901161, 0.07500000298023224)
             }
         }
+    }
+    def Scope "SolarCharger" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @lunco://models/LunCo/Electrical/SolarChargeController.mo@
+        custom token connectors:pv = ""
+        custom token connectors:bus = ""
+        token connectors:bus.connect = </FLIP/Battery.connectors:p>
+        custom double parameters:pv_voltage_v = 48.0
+        custom double parameters:efficiency = 0.95
+        custom double parameters:minimum_bus_voltage_v = 18.0
+        custom string documentation = "Reduced PV operating-point converter. 48 V input and 95% efficiency are explicit estimates, not published FLIP electronics specifications."
+        custom double outputs:input_power_w = 0.0
+        custom double outputs:output_power_w = 0.0
+        custom double outputs:heat_w = 0.0
+    }
+    def Scope "Equipment" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @lunco://models/LunCo/Electrical/EquipmentLoad.mo@
+        custom token connectors:p = ""
+        token connectors:p.connect = </FLIP/Battery.connectors:p>
+        custom double parameters:operating_power_w = 50.0
+        custom string documentation = "50 W aggregate avionics, communications and instrument allowance for the comparison. Assumption; actual duty cycles and thermal survival are not established by public specifications."
+        custom double outputs:power_draw_w = 0.0
+        custom double outputs:powered = 0.0
+        custom double outputs:heat_w = 0.0
     }
 }
