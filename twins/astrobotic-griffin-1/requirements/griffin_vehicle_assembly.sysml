@@ -12,6 +12,7 @@ package GriffinVehicleAssemblyRequirements {
     private import GriffinRampRequirements::GriffinEgressRamp;
     private import GriffinVisualConfigurationRequirements::GriffinVisualConfiguration;
     private import FlipRequirements::FlipRover;
+    private import GriffinFlipEgressStudy::CompactEgress;
 
     // The bus owns the adapter solid. The mission scene owns the releasable
     // joint because that relation crosses the independently loaded FLIP asset.
@@ -45,7 +46,7 @@ package GriffinVehicleAssemblyRequirements {
         part propellantTanks : GriffinPropellantTankAssembly[4];
         part landingLegs : GriffinLandingLegAssembly[4];
         part solarArrays : GriffinSolarArrayAssembly[3];
-        part optionalEgressRamps : GriffinEgressRamp[0..2];
+        part flipEgress : CompactEgress;
         part payloadInterface : GriffinPayloadAdapterInterface;
         part engineSkirt : GriffinEngineSkirtComponent;
     }

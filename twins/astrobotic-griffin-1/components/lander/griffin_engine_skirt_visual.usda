@@ -380,10 +380,10 @@ def Xform "World"
                 {
                     color3f inputs:foil_color = (0.7599999904632568, 0.7900000214576721, 0.8199999928474426)
                     color3f inputs:shade_color = (0.23999999463558197, 0.27000001072883606, 0.30000001192092896)
-                    float inputs:crinkle = 12.0
-                    float inputs:facet_depth = 0.6200000047683716
-                    float inputs:sheen = 0.800000011920929
-                    float inputs:v_scale = 0.800000011920929
+                    float inputs:crinkle = 26.0
+                    float inputs:facet_depth = 0.3199999928474426
+                    float inputs:sheen = 0.6000000238418579
+                    float inputs:v_scale = 1.399999976158142
                 }
             }
             def Material "BayLinerMetal"

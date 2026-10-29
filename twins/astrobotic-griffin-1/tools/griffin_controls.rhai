@@ -16,6 +16,10 @@ fn rover_attached() {
 }
 
 fn show_mounted_rover_controls() {
+    if griffin_compact_egress::enabled() {
+        hint("griffin-controls","FLIP ATTACHED: DETACH ROVER releases the adapter for manual control. Tether restraint is not simulated.");
+        return;
+    }
     hint("griffin-controls", "FLIP ATTACHED: the payload adapter locks the rover to Griffin. Use OPEN RAMPS, wait for settlement, then DETACH ROVER. U opens ramps and F detaches while controlling Griffin; on FLIP, F runs/stops the route.");
 }
 
@@ -67,7 +71,7 @@ fn guidance_engagement_applied(enabled) {
 /// `gnc` is the guidance state the GNC button offers to change.
 fn set_surface_action_buttons_for(gnc) {
     let result = guided_hud_actions("griffin-controls", "griffin_surface_ops", "on_hud_action", [
-        #{id: "unfold_ramps", label: "OPEN RAMPS  U", enabled: true},
+        #{id: "unfold_ramps", label: if griffin_compact_egress::enabled() {"FIXED EGRESS TRACKS"}else{"OPEN RAMPS  U"}, enabled: !griffin_compact_egress::enabled()},
         #{id: "release_rover", label: "DETACH ROVER", enabled: true},
         #{id: "toggle_gnc",
           label: if gnc == false { "RECONNECT GNC" } else { "DISCONNECT GNC" },
@@ -82,6 +86,10 @@ fn set_surface_action_buttons_for(gnc) {
 
 fn show_touchdown_actions() {
     show_briefing();
+    if griffin_compact_egress::enabled() {
+        hint("griffin-controls","TOUCHDOWN CONFIRMED: F or DETACH ROVER releases FLIP for manual control. No tether restraint is active.");
+        return;
+    }
     hint("griffin-controls", "TOUCHDOWN CONFIRMED: U or OPEN RAMPS to lower both ramps. F detaches FLIP immediately.");
     set_surface_action_buttons();
 }
@@ -183,7 +191,8 @@ fn control_lander() {
     if target == () { return; }
     let result = cmd("AcquireControl", #{ target: target, bind_camera: true });
     if result.ok {
-        hint("griffin-controls", "LANDER CONTROL: GNC stays on until flight input. " + input_hint("thrust") + " thrust | W/S pitch | A/D roll | Q/E yaw | F detach rover");
+        let egress_hint=" | F detach rover";
+        hint("griffin-controls", "LANDER CONTROL: GNC stays on until flight input. " + input_hint("thrust") + " thrust | W/S pitch | A/D roll | Q/E yaw"+egress_hint);
         notify_kind("Griffin selected. Flight input takes manual control.", "success");
     } else {
         notify_kind("Lander control was rejected: " + result.error, "error");

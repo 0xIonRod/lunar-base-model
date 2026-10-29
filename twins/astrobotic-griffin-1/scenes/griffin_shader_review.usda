@@ -229,7 +229,8 @@ def Xform "GriffinFlipVisual" (
     {
         bool physics:rigidBodyEnabled = false
         custom double3 xformOp:translate = (0.0, 3.26, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (0.0, -90.0, 0.0)
     }
     def DomeLight "ReviewFill"
     {
@@ -248,8 +249,8 @@ def Xform "GriffinFlipVisual" (
     {
         uniform bool lunco:avatar = true
         uniform token lunco:cameraMode = "freeflight"
-        double3 lunco:cameraLookAt = (0.0, 2.0, 0.0)
-        custom double3 xformOp:translate = (10.0, 8.0, -14.0)
+        double3 lunco:cameraLookAt = (0.7, 2.0, 0.0)
+        custom double3 xformOp:translate = (10.0, 7.0, -11.0)
         float focalLength = 40.0
         uniform token[] xformOpOrder = ["xformOp:translate"]
         float exposure = 0.0

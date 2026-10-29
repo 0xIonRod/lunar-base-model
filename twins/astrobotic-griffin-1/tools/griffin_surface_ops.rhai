@@ -1206,6 +1206,10 @@ fn landed_status() {
 /// Manual actions are available in every flight/landing phase. The mission
 /// sequences physical hinge motion; automatic egress retains its own gates.
 fn request_ramp_unfold() {
+    if griffin_compact_egress::enabled() {
+        hint("griffin-controls","Compact egress tracks are fixed; there is no long folding-ramp deployment.");
+        return #{ok:true,queued:false,fixed_tracks:true};
+    }
     emit("griffin_ramp_unfold_requested");
     #{ok: true, queued: true, event: "griffin_ramp_unfold_requested"}
 }

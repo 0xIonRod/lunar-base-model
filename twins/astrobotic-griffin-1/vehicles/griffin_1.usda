@@ -20,7 +20,7 @@ def Xform "Griffin1" (
     custom string lunco:parameter_status = "public configuration plus explicit simulator study values; flight ICD TBD"
     custom string lunco:provenance:source = "https://www.astrobotic.com/griffin"
     custom string lunco:collision:contract = "named proxy colliders own contact; render-only geometry is non-colliding"
-    custom string lunco:egress = "FLIP payload adapter with port and starboard hinged ramps"
+    custom string lunco:egress = "\"Compact steep FLIP tracks; fabric tether rest routing; restrained descent not yet qualified\""
     uniform bool lunco:spawnable = true
     bool physics:rigidBodyEnabled = true
     float physxRigidBody:linearDamping = 0.0
@@ -4980,6 +4980,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampHingePort" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         rel physics:body0 = </Griffin1>
@@ -5001,6 +5002,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampHingeStarboard" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         rel physics:body0 = </Griffin1>
@@ -5022,6 +5024,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampSectionHingePort01" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         custom rel physics:body0 = </Griffin1/EgressRampPort>
@@ -5043,6 +5046,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampSectionHingePort12" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         custom rel physics:body0 = </Griffin1/EgressRampPort/MiddleSection>
@@ -5064,6 +5068,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampSectionHingeStarboard01" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         custom rel physics:body0 = </Griffin1/EgressRampStarboard>
@@ -5085,6 +5090,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampSectionHingeStarboard12" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         custom rel physics:body0 = </Griffin1/EgressRampStarboard/MiddleSection>
@@ -5483,6 +5489,7 @@ def Xform "Griffin1" (
     }
     def Xform "TransitionPlatePort" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+        active = false
     )
     {
         custom double3 xformOp:translate = (1.71, 2.105, 0.0)
@@ -5519,7 +5526,9 @@ def Xform "Griffin1" (
             custom rel material:binding = </Griffin1/Looks/RampWalkingPlate>
         }
     }
-    def PhysicsFixedJoint "RampTransitionJointPort"
+    def PhysicsFixedJoint "RampTransitionJointPort" (
+        active = false
+    )
     {
         custom rel physics:body0 = </Griffin1>
         custom rel physics:body1 = </Griffin1/TransitionPlatePort>
@@ -5531,6 +5540,7 @@ def Xform "Griffin1" (
     }
     def Xform "TransitionPlateStarboard" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI"]
+        active = false
     )
     {
         custom double3 xformOp:translate = (-1.71, 2.105, 0.0)
@@ -5567,7 +5577,9 @@ def Xform "Griffin1" (
             custom rel material:binding = </Griffin1/Looks/RampWalkingPlate>
         }
     }
-    def PhysicsFixedJoint "RampTransitionJointStarboard"
+    def PhysicsFixedJoint "RampTransitionJointStarboard" (
+        active = false
+    )
     {
         custom rel physics:body0 = </Griffin1>
         custom rel physics:body1 = </Griffin1/TransitionPlateStarboard>
@@ -6275,6 +6287,7 @@ def Xform "Griffin1" (
     }
     def Cube "RampMountPortInnerRear" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        active = false
     )
     {
         custom double3 xformOp:scale = (0.06, 0.3443659735495075, 0.024499999999999997)
@@ -6288,6 +6301,7 @@ def Xform "Griffin1" (
     }
     def Cube "RampMountPortInnerRearDeckShoe" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        active = false
     )
     {
         custom double3 xformOp:scale = (0.33334419452040004, 0.06, 0.06)
@@ -6301,6 +6315,7 @@ def Xform "Griffin1" (
     }
     def Cube "RampMountPortInnerFront" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        active = false
     )
     {
         custom double3 xformOp:scale = (0.06, 0.3443659735495075, 0.024499999999999997)
@@ -6314,6 +6329,7 @@ def Xform "Griffin1" (
     }
     def Cube "RampMountPortInnerFrontDeckShoe" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        active = false
     )
     {
         custom double3 xformOp:scale = (0.33334419452040004, 0.06, 0.06)
@@ -6327,6 +6343,7 @@ def Xform "Griffin1" (
     }
     def Cube "RampMountStarboardInnerRear" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        active = false
     )
     {
         custom double3 xformOp:scale = (0.06, 0.3443659735495075, 0.024499999999999997)
@@ -6340,6 +6357,7 @@ def Xform "Griffin1" (
     }
     def Cube "RampMountStarboardInnerRearDeckShoe" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        active = false
     )
     {
         custom double3 xformOp:scale = (0.33334419452040004, 0.06, 0.06)
@@ -6353,6 +6371,7 @@ def Xform "Griffin1" (
     }
     def Cube "RampMountStarboardInnerFront" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        active = false
     )
     {
         custom double3 xformOp:scale = (0.06, 0.3443659735495075, 0.024499999999999997)
@@ -6366,6 +6385,7 @@ def Xform "Griffin1" (
     }
     def Cube "RampMountStarboardInnerFrontDeckShoe" (
         prepend apiSchemas = ["PhysicsCollisionAPI", "MaterialBindingAPI"]
+        active = false
     )
     {
         custom double3 xformOp:scale = (0.33334419452040004, 0.06, 0.06)
@@ -8620,7 +8640,9 @@ def Xform "Griffin1" (
             custom double outputs:sun_mount_z = 0.0
         }
     }
-    def PhysicsFixedJoint "RampFlightLatchPortRoot"
+    def PhysicsFixedJoint "RampFlightLatchPortRoot" (
+        active = false
+    )
     {
         custom rel physics:body0 = </Griffin1>
         custom rel physics:body1 = </Griffin1/EgressRampPort>
@@ -8630,7 +8652,9 @@ def Xform "Griffin1" (
         quatf physics:localRot1 = (0.5, 0.0, 0.0, -0.8660253882408142)
         bool physics:collisionEnabled = false
     }
-    def PhysicsFixedJoint "RampFlightLatchStarboardRoot"
+    def PhysicsFixedJoint "RampFlightLatchStarboardRoot" (
+        active = false
+    )
     {
         custom rel physics:body0 = </Griffin1>
         custom rel physics:body1 = </Griffin1/EgressRampStarboard>
@@ -8640,7 +8664,9 @@ def Xform "Griffin1" (
         quatf physics:localRot1 = (0.000000000000000030616171314629196, -0.8660253882408142, -0.5, 0.00000000000000005302876236065149)
         bool physics:collisionEnabled = false
     }
-    def PhysicsFixedJoint "RampFlightLatchPortMiddle"
+    def PhysicsFixedJoint "RampFlightLatchPortMiddle" (
+        active = false
+    )
     {
         custom rel physics:body0 = </Griffin1/EgressRampPort>
         custom rel physics:body1 = </Griffin1/EgressRampPort/MiddleSection>
@@ -8650,7 +8676,9 @@ def Xform "Griffin1" (
         quatf physics:localRot1 = (-0.0000000002051034342365199, 0.0, 0.0, -1.0)
         bool physics:collisionEnabled = false
     }
-    def PhysicsFixedJoint "RampFlightLatchPortToe"
+    def PhysicsFixedJoint "RampFlightLatchPortToe" (
+        active = false
+    )
     {
         custom rel physics:body0 = </Griffin1/EgressRampPort/MiddleSection>
         custom rel physics:body1 = </Griffin1/EgressRampPort/MiddleSection/ToeSection>
@@ -8660,7 +8688,9 @@ def Xform "Griffin1" (
         quatf physics:localRot1 = (-0.0000000002051034342365199, 0.0, 0.0, 1.0)
         bool physics:collisionEnabled = false
     }
-    def PhysicsFixedJoint "RampFlightLatchStarboardMiddle"
+    def PhysicsFixedJoint "RampFlightLatchStarboardMiddle" (
+        active = false
+    )
     {
         custom rel physics:body0 = </Griffin1/EgressRampStarboard>
         custom rel physics:body1 = </Griffin1/EgressRampStarboard/MiddleSection>
@@ -8670,7 +8700,9 @@ def Xform "Griffin1" (
         quatf physics:localRot1 = (-0.0000000002051034342365199, 0.0, 0.0, -1.0)
         bool physics:collisionEnabled = false
     }
-    def PhysicsFixedJoint "RampFlightLatchStarboardToe"
+    def PhysicsFixedJoint "RampFlightLatchStarboardToe" (
+        active = false
+    )
     {
         custom rel physics:body0 = </Griffin1/EgressRampStarboard/MiddleSection>
         custom rel physics:body1 = </Griffin1/EgressRampStarboard/MiddleSection/ToeSection>
@@ -9212,6 +9244,7 @@ def Xform "Griffin1" (
     }
     def Xform "RampMountPortInnerRearBearing" (
         references = @../components/lander/griffin_ramp_root_bearing_visual.usda@</RootBearing>
+        active = false
     )
     {
         custom double3 xformOp:translate = (2.4433441945204004, 2.1596159735495077, -0.6892499999999999)
@@ -9221,6 +9254,7 @@ def Xform "Griffin1" (
     }
     def Xform "RampMountPortInnerFrontBearing" (
         references = @../components/lander/griffin_ramp_root_bearing_visual.usda@</RootBearing>
+        active = false
     )
     {
         custom double3 xformOp:translate = (2.4433441945204004, 2.1596159735495077, 0.6892499999999999)
@@ -9230,6 +9264,7 @@ def Xform "Griffin1" (
     }
     def Xform "RampMountStarboardInnerRearBearing" (
         references = @../components/lander/griffin_ramp_root_bearing_visual.usda@</RootBearing>
+        active = false
     )
     {
         custom double3 xformOp:translate = (-2.4433441945204004, 2.1596159735495077, -0.6892499999999999)
@@ -9239,6 +9274,7 @@ def Xform "Griffin1" (
     }
     def Xform "RampMountStarboardInnerFrontBearing" (
         references = @../components/lander/griffin_ramp_root_bearing_visual.usda@</RootBearing>
+        active = false
     )
     {
         custom double3 xformOp:translate = (-2.4433441945204004, 2.1596159735495077, 0.6892499999999999)
@@ -9248,6 +9284,7 @@ def Xform "Griffin1" (
     }
     def Xform "EgressRampPort" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysicsFilteredPairsAPI", "LunCoMountPlugAPI"]
+        active = false
     )
     {
         custom double3 xformOp:translate = (2.4433441945204004, 2.1596159735495077, 0.0)
@@ -9311,6 +9348,7 @@ def Xform "Griffin1" (
     }
     def Xform "EgressRampPortTrackStarboard" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysicsFilteredPairsAPI", "LunCoMountPlugAPI"]
+        active = false
     )
     {
         custom double3 xformOp:translate = (2.4433441945204004, 2.1596159735495077, 0.0)
@@ -9374,6 +9412,7 @@ def Xform "Griffin1" (
     }
     def Xform "EgressRampStarboard" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysicsFilteredPairsAPI", "LunCoMountPlugAPI"]
+        active = false
     )
     {
         custom double3 xformOp:translate = (-2.4433441945204004, 2.1596159735495077, -0.0000000000000000000000000000000001925929944387236)
@@ -9437,6 +9476,7 @@ def Xform "Griffin1" (
     }
     def Xform "EgressRampStarboardTrackStarboard" (
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsMassAPI", "PhysicsFilteredPairsAPI", "LunCoMountPlugAPI"]
+        active = false
     )
     {
         custom double3 xformOp:translate = (-2.4433441945204004, 2.1596159735495077, -0.0000000000000000000000000000000001925929944387236)
@@ -9500,6 +9540,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampHingePortTrackStarboard" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         float drive:angular:physics:damping = 450.0
@@ -9519,7 +9560,9 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/EgressRampPortTrackStarboard>
     }
-    def PhysicsFixedJoint "RampFlightLatchPortRootTrackStarboard"
+    def PhysicsFixedJoint "RampFlightLatchPortRootTrackStarboard" (
+        active = false
+    )
     {
         bool physics:collisionEnabled = false
         point3f physics:localPos0 = (2.4433441162109375, 2.159615993499756, -1.0)
@@ -9531,6 +9574,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampSectionHingePort01TrackStarboard" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         float drive:angular:physics:damping = 75.0
@@ -9550,7 +9594,9 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1/EgressRampPortTrackStarboard>
         rel physics:body1 = </Griffin1/EgressRampPortTrackStarboard/MiddleSection>
     }
-    def PhysicsFixedJoint "RampFlightLatchPortMiddleTrackStarboard"
+    def PhysicsFixedJoint "RampFlightLatchPortMiddleTrackStarboard" (
+        active = false
+    )
     {
         bool physics:collisionEnabled = false
         point3f physics:localPos0 = (2.1490840911865234, 0.14000000059604645, -1.0)
@@ -9562,6 +9608,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampSectionHingePort12TrackStarboard" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         float drive:angular:physics:damping = 75.0
@@ -9581,7 +9628,9 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1/EgressRampPortTrackStarboard/MiddleSection>
         rel physics:body1 = </Griffin1/EgressRampPortTrackStarboard/MiddleSection/ToeSection>
     }
-    def PhysicsFixedJoint "RampFlightLatchPortToeTrackStarboard"
+    def PhysicsFixedJoint "RampFlightLatchPortToeTrackStarboard" (
+        active = false
+    )
     {
         bool physics:collisionEnabled = false
         point3f physics:localPos0 = (1.4490840435028076, -0.07999999821186066, 0.0)
@@ -9593,6 +9642,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampHingeStarboardTrackStarboard" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         float drive:angular:physics:damping = 450.0
@@ -9612,7 +9662,9 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1>
         rel physics:body1 = </Griffin1/EgressRampStarboardTrackStarboard>
     }
-    def PhysicsFixedJoint "RampFlightLatchStarboardRootTrackStarboard"
+    def PhysicsFixedJoint "RampFlightLatchStarboardRootTrackStarboard" (
+        active = false
+    )
     {
         bool physics:collisionEnabled = false
         point3f physics:localPos0 = (-2.4433441162109375, 2.159615993499756, 1.0)
@@ -9624,6 +9676,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampSectionHingeStarboard01TrackStarboard" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         float drive:angular:physics:damping = 75.0
@@ -9643,7 +9696,9 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1/EgressRampStarboardTrackStarboard>
         rel physics:body1 = </Griffin1/EgressRampStarboardTrackStarboard/MiddleSection>
     }
-    def PhysicsFixedJoint "RampFlightLatchStarboardMiddleTrackStarboard"
+    def PhysicsFixedJoint "RampFlightLatchStarboardMiddleTrackStarboard" (
+        active = false
+    )
     {
         bool physics:collisionEnabled = false
         point3f physics:localPos0 = (2.1490840911865234, 0.14000000059604645, -1.0)
@@ -9655,6 +9710,7 @@ def Xform "Griffin1" (
     }
     def PhysicsRevoluteJoint "RampSectionHingeStarboard12TrackStarboard" (
         prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        active = false
     )
     {
         float drive:angular:physics:damping = 75.0
@@ -9674,7 +9730,9 @@ def Xform "Griffin1" (
         rel physics:body0 = </Griffin1/EgressRampStarboardTrackStarboard/MiddleSection>
         rel physics:body1 = </Griffin1/EgressRampStarboardTrackStarboard/MiddleSection/ToeSection>
     }
-    def PhysicsFixedJoint "RampFlightLatchStarboardToeTrackStarboard"
+    def PhysicsFixedJoint "RampFlightLatchStarboardToeTrackStarboard" (
+        active = false
+    )
     {
         bool physics:collisionEnabled = false
         point3f physics:localPos0 = (1.4490840435028076, -0.07999999821186066, 0.0)
@@ -10241,5 +10299,12 @@ def Xform "Griffin1" (
             float inputs:trigger
             float inputs:trigger.connect = </Griffin1/ContactValidity.outputs:exceedance_ratio>
         }
+    }
+    def Xform "CompactEgress" (
+        prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_flip_egress_visual.usda@</World>
+    )
+    {
+        custom double3 xformOp:rotateXYZ = (0.0, 180.0, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
     }
 }
