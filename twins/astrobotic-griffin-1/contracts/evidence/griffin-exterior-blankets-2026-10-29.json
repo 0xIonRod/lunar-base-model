@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-29",
+  "scope": "Visual-first fallback after tether capability check; manual release preserved",
+  "readiness": {
+    "ready": true,
+    "world_hold": false,
+    "faulted": false,
+    "fault": null,
+    "readiness_tracked": true,
+    "pending_count": 0,
+    "pending": []
+  },
+  "runtime_diagnostics": {
+    "errors": 0,
+    "warnings": 0,
+    "findings": []
+  },
+  "blanket_bays": 8,
+  "tape_tabs": 16,
+  "face_checks": [
+    {
+      "bay": 0,
+      "result": "#{\"bay\": 0, \"ok\": true, \"parts\": [\"Blanket0\", \"Tape0A\", \"Tape0B\"], \"scope\": \"Frame-fitted render blankets only; no tether, collider or thermal physics\"}\n"
+    },
+    {
+      "bay": 1,
+      "result": "#{\"bay\": 1, \"ok\": true, \"parts\": [\"Blanket1\", \"Tape1A\", \"Tape1B\"], \"scope\": \"Frame-fitted render blankets only; no tether, collider or thermal physics\"}\n"
+    },
+    {
+      "bay": 2,
+      "result": "#{\"bay\": 2, \"ok\": true, \"parts\": [\"Blanket2\", \"Tape2A\", \"Tape2B\"], \"scope\": \"Frame-fitted render blankets only; no tether, collider or thermal physics\"}\n"
+    },
+    {
+      "bay": 3,
+      "result": "#{\"bay\": 3, \"ok\": true, \"parts\": [\"Blanket3\", \"Tape3A\", \"Tape3B\"], \"scope\": \"Frame-fitted render blankets only; no tether, collider or thermal physics\"}\n"
+    },
+    {
+      "bay": 4,
+      "result": "#{\"bay\": 4, \"ok\": true, \"parts\": [\"Blanket4\", \"Tape4A\", \"Tape4B\"], \"scope\": \"Frame-fitted render blankets only; no tether, collider or thermal physics\"}\n"
+    },
+    {
+      "bay": 5,
+      "result": "#{\"bay\": 5, \"ok\": true, \"parts\": [\"Blanket5\", \"Tape5A\", \"Tape5B\"], \"scope\": \"Frame-fitted render blankets only; no tether, collider or thermal physics\"}\n"
+    },
+    {
+      "bay": 6,
+      "result": "#{\"bay\": 6, \"ok\": true, \"parts\": [\"Blanket6\", \"Tape6A\", \"Tape6B\"], \"scope\": \"Frame-fitted render blankets only; no tether, collider or thermal physics\"}\n"
+    },
+    {
+      "bay": 7,
+      "result": "#{\"bay\": 7, \"ok\": true, \"parts\": [\"Blanket7\", \"Tape7A\", \"Tape7B\"], \"scope\": \"Frame-fitted render blankets only; no tether, collider or thermal physics\"}\n"
+    }
+  ],
+  "manual_departure": {
+    "verdict": "PASS",
+    "exit_code": 0,
+    "checks": 6,
+    "seed": 6840157149251759617,
+    "tick_hz": 60,
+    "verdict_tick": 1565,
+    "detach_tick": 1385,
+    "joints": 13,
+    "graph_edges": 13,
+    "forward_travel_m": 0.6302798165623397
+  },
+  "tether_physics": "Not implemented; fixed-distance constraint found, reusable payout/tension component not found in checked library",
+  "sha256": {
+    "components/lander/griffin_bus_visual.usda": "ce8e0e430ec1b34c095c6babde710169fdb8d76fadeb68a6e9484c9d4e91c569",
+    "requirements/griffin_upper_visuals.sysml": "2789a748c170cee62260a5ea4e8c94a266bd15d371af9e792528722ab130cc00",
+    "tools/griffin_exterior_blankets.rhai": "09ed2eb4571d6017ef1d589f3ec6de3dc78f6e1e95129898d7b77de328915f91",
+    "handover/griffin-exterior-blankets-2026-10-29.png": "ce48817d2550f57d84ca6bf287204e42d04ec4440c5678576888902899653b43"
+  }
+}

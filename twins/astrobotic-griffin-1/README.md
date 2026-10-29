@@ -39,6 +39,13 @@ for manual control, transfers driving possession to FLIP and releases the
 parking brake. W/S then drive. The old unfolding and automatic drive-off remain disabled.
 See the [compact-egress contract](contracts/griffin-compact-egress-2026-10-28.md)
 for geometry, sources, checks and the remaining dynamics boundary.
+A subsequent [upper-hardware visual pass](contracts/griffin-upper-visuals-2026-10-29.md)
+adds the two prominent horizontal pressurant bottles, deck infill and mounting
+heads, and a finer skirt blanket finish. The four main tank assemblies remain
+intact; placement of the third confirmed helium tank remains unresolved.
+The [exterior-blanket follow-up](contracts/griffin-exterior-blankets-2026-10-29.md)
+fills eight bus frame bays with silver blanket panels. Tether payout and
+restrained descent remain deferred; the working manual detach path is retained.
 The operational scene retains its original Sun lighting. The earlier
 [Sun-only correction and release-overload reproduction](contracts/griffin-sun-only-2026-10-28.md)
 records the superseded free-release configuration.

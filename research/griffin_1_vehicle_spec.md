@@ -50,9 +50,10 @@ measurement boundaries.
 
 | Area | Current reconstruction | Authoritative SysML owner |
 | --- | --- | --- |
-| Bus and deck | 4.50 m exterior bus; 4.40 m perimeter deck; 3.60 m inner tank frame; open structural bays | `GriffinVisualConfigurationRequirements`, `GriffinBusRequirements` |
+| Bus and deck | 4.50 m exterior bus; 4.40 m perimeter deck; 3.60 m inner tank frame; eight frame-fitted exterior blanket panels | `GriffinVisualConfigurationRequirements`, `GriffinBusRequirements` |
 | Landing gear | Four broad-face stations; three-member appearance; bus-to-foot axial suspension proxy | `GriffinLandingLegRequirements` |
 | Propellant packaging | Four separately wrapped spherical tank assemblies; 1.008 m installed body diameter | `GriffinTankRequirements` |
+| Visible upper pressurant packaging | Two horizontal visual reconstructions, 1.99 m long / 0.64 m diameter; third confirmed helium tank location unresolved | `GriffinUpperVisualStudy`, explicit study dimensions |
 | Main propulsion | Seven actual force owners; one centre and six outer stations on a 0.64 m ring; pressure-fed valve/chamber network | `GriffinPropulsionRequirements` |
 | Attitude propulsion | Twelve force owners in four corner clusters; open-bore rings and connected support stock | `GriffinPropulsionRequirements` |
 | Solar layout | Three adjacent stepped faces; photo-derived cell contours and leg/equipment openings; source-linked stock colliders | `GriffinSolarRequirements` |

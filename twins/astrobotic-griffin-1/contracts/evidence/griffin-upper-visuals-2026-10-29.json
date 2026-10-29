@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-29",
+  "readiness": {
+    "ready": true,
+    "world_hold": false,
+    "faulted": false,
+    "fault": null,
+    "readiness_tracked": true,
+    "pending_count": 0,
+    "pending": []
+  },
+  "runtime_diagnostics": {
+    "errors": 0,
+    "warnings": 0,
+    "findings": []
+  },
+  "departure_test": {
+    "verdict": "PASS",
+    "exit_code": 0,
+    "checks": 6,
+    "verdict_tick": 1565,
+    "seed": 6840157149251759617,
+    "forward_travel_m": 0.6302798165623397
+  },
+  "bottles": [
+    {
+      "name": "UpperBottlePort",
+      "points": 1538,
+      "normals": 6272,
+      "bounds": [
+        [
+          -0.9950000047683716,
+          -0.3199999928474426,
+          -0.3199999928474426
+        ],
+        [
+          0.9950000047683716,
+          0.3199999928474426,
+          0.3199999928474426
+        ]
+      ],
+      "max_unit_normal_error": 7.467242224556969e-08,
+      "binding": [
+        "/World/Looks/Insulation"
+      ],
+      "schemas": [
+        "MaterialBindingAPI"
+      ]
+    },
+    {
+      "name": "UpperBottleStarboard",
+      "points": 1538,
+      "normals": 6272,
+      "bounds": [
+        [
+          -0.9950000047683716,
+          -0.3199999928474426,
+          -0.3199999928474426
+        ],
+        [
+          0.9950000047683716,
+          0.3199999928474426,
+          0.3199999928474426
+        ]
+      ],
+      "max_unit_normal_error": 7.467242224556969e-08,
+      "binding": [
+        "/World/Looks/Insulation"
+      ],
+      "schemas": [
+        "MaterialBindingAPI"
+      ]
+    }
+  ],
+  "third_helium_bottle_location": "unresolved",
+  "tether_physics": "deferred; no forces implemented",
+  "sha256": {
+    "components/lander/griffin_upper_pressurant_visual.usda": "abdf3e07b240f634f352b21307ce6be1b514926c2edd76a0019e79e0d2914c81",
+    "components/lander/griffin_bus_visual.usda": "b5c6edd5b4c23133f990216803915792f3385d1cd3749aef55cdd28b566f963d",
+    "components/lander/griffin_engine_skirt_visual.usda": "178d0300f55eeb8d38e2d1d5fbd1b14858958a483158482f48592b9995b987e2",
+    "requirements/griffin_upper_visuals.sysml": "e31828b47d9caca017e4510be900622cfa90b0c85c0185abbc7eafa3c5bfdf29",
+    "tools/griffin_upper_visuals.rhai": "d084134c3fbaf4305f3eb7ae4cdb3536b1bfb1824d6fa765eeb69b7738f3da77"
+  }
+}
