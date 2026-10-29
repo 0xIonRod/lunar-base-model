@@ -25,3 +25,68 @@ url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/EXTRAS
 dest = "sources/nobile03/NAC_DTM_NOBILE03_M1101097181_90CM.TIF"
 sha256 = "bf825b560c796d8507f9d05f2e646b572b58369ca553d59f407dd305d7d22dbc"
 recommended = true
+
+# NASA SVS CGI Moon Kit, December 2025 color revision.
+# https://svs.gsfc.nasa.gov/4720/ — credit NASA's Scientific Visualization Studio.
+# LROC WAC RGB; high latitudes incorporate LOLA monochromatic albedo.
+# Visualization color map, not a new landing-site measurement.
+[lroc_moon_2025_8k]
+name = "NASA LROC/LOLA Moon color 2025 — 8K sRGB (232 MB source)"
+url = "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_16bit_srgb_8k.tif"
+dest = "sources/moon/lroc_color_16bit_srgb_8k.tif"
+shared = false
+recommended = false
+sha256 = "db7808e878b6a55eb409bb231eab8deb477f84b5c9d7396d76ff73e5d54992d9"
+[lroc_moon_2025_8k.process]
+kind = "texture"
+target_resolution = [8192, 4096]
+output = "textures/moon/lroc_color_2025_8k.png"
+output_root = "cache"
+
+[film_moon_01_diff]
+name = "Poly Haven moon_01: diff 2K (CC0 regolith simulant scan)"
+url = "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/moon_01/moon_01_diff_2k.jpg"
+dest = "materials/lunar_regolith/moon_01_diff_2k.jpg"
+shared = false
+recommended = false
+sha256 = "9527d2c2abba5751c84df872514227e49f64e5041b7ee48178e5cb5da0a6b374"
+
+[film_moon_01_nor_gl]
+name = "Poly Haven moon_01: nor_gl 2K (CC0 regolith simulant scan)"
+url = "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/moon_01/moon_01_nor_gl_2k.png"
+dest = "materials/lunar_regolith/moon_01_nor_gl_2k.png"
+shared = false
+recommended = false
+sha256 = "5082cb90aec955528e5f7cbf3af2c750d43b7bcb1d320816a684290fefcd19a8"
+
+[film_moon_01_rough]
+name = "Poly Haven moon_01: rough 2K (CC0 regolith simulant scan)"
+url = "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/moon_01/moon_01_rough_2k.jpg"
+dest = "materials/lunar_regolith/moon_01_rough_2k.jpg"
+shared = false
+recommended = false
+sha256 = "0c9bb9389555cd39ee4a2940989fd3639d224070165d2f1880c9e8b3c60bff5c"
+
+[film_moon_01_ao]
+name = "Poly Haven moon_01: ao 2K (CC0 regolith simulant scan)"
+url = "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/moon_01/moon_01_ao_2k.jpg"
+dest = "materials/lunar_regolith/moon_01_ao_2k.jpg"
+shared = false
+recommended = false
+sha256 = "009191fd048f1394ad1f00b456465987684455af402ddd92823959d21b7beeb1"
+
+[film_moon_flat_macro_02_diff]
+name = "Poly Haven moon_flat_macro_02: diff 2K (CC0 regolith simulant scan)"
+url = "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/moon_flat_macro_02/moon_flat_macro_02_diff_2k.jpg"
+dest = "materials/lunar_regolith/moon_flat_macro_02_diff_2k.jpg"
+shared = false
+recommended = false
+sha256 = "8d8781a9291561bde8bdc2b46d4284bf03fe6383e31d0e10eeb3364d1f4713aa"
+
+[film_moon_flat_macro_02_nor_gl]
+name = "Poly Haven moon_flat_macro_02: nor_gl 2K (CC0 regolith simulant scan)"
+url = "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/moon_flat_macro_02/moon_flat_macro_02_nor_gl_2k.png"
+dest = "materials/lunar_regolith/moon_flat_macro_02_nor_gl_2k.png"
+shared = false
+recommended = false
+sha256 = "e06de0c359d199221d36d2e0ec1d6233c97db9f323b79f0a3367094a2b4a1665"

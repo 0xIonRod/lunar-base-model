@@ -214,7 +214,7 @@ verdict_channel = "GRIFFIN_PILOT_ATTITUDE"
 
 [[verification.cases]]
 name = "GriffinFunctionalRequirements::Verify_GriffinAdapterRelease"
-scene = "scenes/griffin_1_detach_stability_test.usda"
+scene = "tests/griffin_1_detach_stability_test.usda"
 script = "scenarios/tests/griffin_detach_stability.rhai"
 verdict_channel = "GRIFFIN_ADAPTER_RELEASE"
 

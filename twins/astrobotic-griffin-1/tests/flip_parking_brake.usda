@@ -1,0 +1,82 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/tests/flip_route_follow.usda@</Griffin1SurfaceOps>
+)
+{
+    over "Scenario"
+    {
+        over "Test"
+        {
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/flip_parking_brake.rhai@
+        }
+    }
+    over "FLIP"
+    {
+        custom double3 xformOp:translate = (25.0, 3.2, 15.0)
+        custom string lunco:modelScope = "Isothermal electrical and rigid-wheel mobility comparison. PV temperature is prescribed; wheel/soil deformation and thermal survival are outside this case."
+        def Scope "ContactMaterials"
+        {
+            def Material "RegolithTread" (
+                prepend apiSchemas = ["PhysicsMaterialAPI", "PhysxMaterialAPI"]
+            )
+            {
+                float physics:staticFriction = 0.6000000238418579
+                float physics:dynamicFriction = 0.6000000238418579
+                float physics:restitution = 0.0
+                custom token physxMaterial:frictionCombineMode = "min"
+                custom string documentation = "Native rigid wheel/soil contact, nominal mu 0.6. An estimated Coulomb approximation; wheel deformation and soil sinkage are not resolved. The separate tire slip-force layer is excluded by native material ownership."
+            }
+        }
+        over "Suspension_FL"
+        {
+            over "Wheel_FL" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Suspension_FR"
+        {
+            over "Wheel_FR" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Suspension_RL"
+        {
+            over "Wheel_RL" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Suspension_RR"
+        {
+            over "Wheel_RR" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Thermal" (
+            active = false
+        )
+        {
+        }
+    }
+}
