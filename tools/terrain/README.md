@@ -54,10 +54,11 @@ the local offset is explicit.
 
 The adapter preserves unresolved source voids as NaN without copying nearby
 postings into missing coverage. The native DEM processor owns coverage
-rejection and bounded harmonic interpolation with measured nodes held fixed;
+rejection and bounded minimum-curvature (biharmonic) interpolation with
+measured nodes held fixed;
 this crop has 1727 unresolved nodes out of 263169 (0.66%). These values are
 interpolated terrain, not additional LROC measurements. Use native processing
-pipeline version 9 or newer: the installed GeoTIFF must have
+pipeline version 10 or newer: the installed GeoTIFF must have
 513 × 513 nodes, 4 m spacing and a 2048 m extent. The bundle verifier checks this.
 Install the same TIFF in an authored `terrain/nobile03/` directory if present.
 
@@ -77,8 +78,10 @@ full weight. Its source is the co-registered LROC
 [NAC_DTM_NOBILE03_M1101097181_90CM orthophoto](https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_NOBILE03_M1101097181_90CM),
 0.9 m/pixel. `Assets.toml` pins the download SHA-256. The prepared output has
 2048 x 2048 texels over the same 2048 m ENU footprint as the DEM. Source zeroes
-are unmapped coverage; the native albedo processor gives them neutral material
-colour, not a black crater. Small acquisition shadows remain in the image:
+are unmapped coverage; the native albedo processor excludes them before
+resampling and gives uncovered pixels neutral material colour. This prevents
+unmapped pixels from creating a dark outline around a crater. Small acquisition
+shadows remain in the image:
 local illumination removal is an appearance approximation, not a calibrated
 reflectance measurement or new terrain geometry.
 

@@ -425,7 +425,7 @@ frame = "MOON_ME"
         "center_lat": args.center_lat, "center_lon": args.center_lon,
         "window_m": args.window_m, "resolution": args.resolution,
         "vertical_offset_m": args.vertical_offset, "unresolved_void_nodes": voids,
-        "void_treatment": "native DEM processor bounded harmonic interpolation",
+        "void_treatment": "native DEM processor; measured nodes remain fixed",
     }, indent=2) + "\n")
     print(f"Prepared {args.output}; {voids} void nodes require native processing before installation.")
     return 0
