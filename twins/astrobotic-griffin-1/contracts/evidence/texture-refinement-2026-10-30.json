@@ -1,0 +1,308 @@
+{
+  "date": "2026-10-30",
+  "parent_commit": "0e5a95e",
+  "editor": {
+    "bus": {
+      "doc_id": 120964487285469,
+      "generation": 55
+    },
+    "tank": {
+      "doc_id": 120964947093797,
+      "generation": 4
+    },
+    "skirt": {
+      "doc_id": 120965093365695,
+      "generation": 4
+    },
+    "projection_ready": true,
+    "explicit_saves": true,
+    "focused_preview": "FocusPanel usd::viewport opened the previously missing preview panel"
+  },
+  "checks": {
+    "flip_bindings": 339,
+    "bus_hardware_groups": 12,
+    "blanket_source_readbacks": 9
+  },
+  "saved_scene_readbacks": [
+    {
+      "path": "/GriffinFlipVisual/Griffin1/Bus/Looks/ExteriorPanels/Surface",
+      "type_name": "Shader",
+      "attrs": {
+        "info:wesl:sourceAsset": "twin://astrobotic-griffin-1/shaders/thermal_blanket.wesl",
+        "inputs:micro_scale": 240.0,
+        "inputs:micro_strength": 0.04500000178813934
+      },
+      "spawned": false,
+      "active": true,
+      "doc_id": 120965760670165,
+      "generation": 0,
+      "world_position": [
+        0.0,
+        1.78,
+        0.0
+      ],
+      "position_frame": "canonical_stage",
+      "document_generation": 0,
+      "stage_generation": 0
+    },
+    {
+      "path": "/GriffinFlipVisual/Griffin1/Bus/UpperPressurantVisuals/Looks/Insulation/Surface",
+      "type_name": "Shader",
+      "attrs": {
+        "info:wesl:sourceAsset": "twin://astrobotic-griffin-1/shaders/thermal_blanket.wesl",
+        "inputs:micro_scale": 240.0,
+        "inputs:micro_strength": 0.04500000178813934
+      },
+      "spawned": false,
+      "active": true,
+      "doc_id": 120965760670165,
+      "generation": 0,
+      "world_position": [
+        0.0,
+        1.78,
+        0.0
+      ],
+      "position_frame": "canonical_stage",
+      "document_generation": 0,
+      "stage_generation": 0
+    },
+    {
+      "path": "/GriffinFlipVisual/Griffin1/Nozzle/MainEngineCluster/EngineSkirt/Looks/BayBlanket/Surface",
+      "type_name": "Shader",
+      "attrs": {
+        "info:wesl:sourceAsset": "twin://astrobotic-griffin-1/shaders/thermal_blanket.wesl",
+        "inputs:micro_scale": 240.0,
+        "inputs:micro_strength": 0.04500000178813934
+      },
+      "spawned": false,
+      "active": true,
+      "doc_id": 120965760670165,
+      "generation": 0,
+      "world_position": [
+        0.0,
+        0.78,
+        0.0
+      ],
+      "position_frame": "canonical_stage",
+      "document_generation": 0,
+      "stage_generation": 0
+    }
+  ],
+  "sysml": {
+    "path": "twin://astrobotic-griffin-1",
+    "kind": "sysml",
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "analysis": {
+      "source_revision": 12899535108293189179,
+      "source_fingerprint": 7519013633874301805,
+      "stdlib": true,
+      "source_files": [
+        "twin://astrobotic-griffin-1/requirements/flip_airless_wheel_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_chassis_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_bus_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_flip_egress.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_landing_legs_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_material_catalog.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_power_thermal.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_presentation_study.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_middle_section_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_root_bearing_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_root_section_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_toe_section_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_requirement_sources.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_solar_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_upper_visuals.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_vehicle_assembly.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/moonbase_project_requirements.sysml"
+      ],
+      "attributes": [
+        {
+          "handle": {
+            "element": {
+              "source_revision": 12899535108293189179,
+              "source_fingerprint": 7519013633874301805,
+              "element_id": 70140
+            }
+          },
+          "owner_handle": {
+            "source_revision": 12899535108293189179,
+            "source_fingerprint": 7519013633874301805,
+            "element_id": 70138
+          },
+          "owner": "GriffinPresentationStudy::BlanketFinish",
+          "name": "MicroScalePerM",
+          "qualified_name": "GriffinPresentationStudy::BlanketFinish::MicroScalePerM",
+          "type_name": "Real",
+          "declared_type": {
+            "base": "Real",
+            "category": "Primitive",
+            "value_category": "Primitive",
+            "resolved_type": {
+              "element": {
+                "source_revision": 12899535108293189179,
+                "source_fingerprint": 7519013633874301805,
+                "element_id": 33455
+              },
+              "qualified_name": "ScalarValues::Real"
+            },
+            "primitive": "Real",
+            "dimensions": [],
+            "multiplicity": {
+              "lower": 1,
+              "upper": 1,
+              "ordered": false,
+              "unique": true
+            },
+            "quantity_kind": null,
+            "modelica_type": "Real"
+          },
+          "value": {
+            "literal": "240.0",
+            "kind": "real",
+            "literal_kind": "real",
+            "number": "240.0",
+            "integer_value": null,
+            "boolean_value": null,
+            "string_value": null,
+            "unit_symbol": null,
+            "measurement_reference": null,
+            "number_value": 240.0,
+            "elements": null
+          },
+          "file": "twin://astrobotic-griffin-1/requirements/griffin_presentation_study.sysml",
+          "start": 471,
+          "end": 511
+        },
+        {
+          "handle": {
+            "element": {
+              "source_revision": 12899535108293189179,
+              "source_fingerprint": 7519013633874301805,
+              "element_id": 70143
+            }
+          },
+          "owner_handle": {
+            "source_revision": 12899535108293189179,
+            "source_fingerprint": 7519013633874301805,
+            "element_id": 70138
+          },
+          "owner": "GriffinPresentationStudy::BlanketFinish",
+          "name": "MicroSlope",
+          "qualified_name": "GriffinPresentationStudy::BlanketFinish::MicroSlope",
+          "type_name": "Real",
+          "declared_type": {
+            "base": "Real",
+            "category": "Primitive",
+            "value_category": "Primitive",
+            "resolved_type": {
+              "element": {
+                "source_revision": 12899535108293189179,
+                "source_fingerprint": 7519013633874301805,
+                "element_id": 33455
+              },
+              "qualified_name": "ScalarValues::Real"
+            },
+            "primitive": "Real",
+            "dimensions": [],
+            "multiplicity": {
+              "lower": 1,
+              "upper": 1,
+              "ordered": false,
+              "unique": true
+            },
+            "quantity_kind": null,
+            "modelica_type": "Real"
+          },
+          "value": {
+            "literal": "0.045",
+            "kind": "real",
+            "literal_kind": "real",
+            "number": "0.045",
+            "integer_value": null,
+            "boolean_value": null,
+            "string_value": null,
+            "unit_symbol": null,
+            "measurement_reference": null,
+            "number_value": 0.045,
+            "elements": null
+          },
+          "file": "twin://astrobotic-griffin-1/requirements/griffin_presentation_study.sysml",
+          "start": 521,
+          "end": 557
+        }
+      ],
+      "diagnostics": [],
+      "page": {
+        "offset": 0,
+        "limit": 4,
+        "tables": {
+          "attributes": {
+            "offset": 0,
+            "limit": 4,
+            "total": 2,
+            "returned": 2,
+            "has_more": false
+          },
+          "diagnostics": {
+            "offset": 0,
+            "limit": 4,
+            "total": 0,
+            "returned": 0,
+            "has_more": false
+          }
+        }
+      }
+    }
+  },
+  "final_readiness": {
+    "ready": true,
+    "world_hold": false,
+    "faulted": false,
+    "fault": null,
+    "readiness_tracked": true,
+    "pending_count": 0,
+    "pending": []
+  },
+  "final_runtime_diagnostics": {
+    "errors": 0,
+    "warnings": 0,
+    "findings": []
+  },
+  "shader_syntax": "Three WESL files passed native --validate",
+  "limitations": [
+    "The authoring session later hit usd-sim-duplicate-order-identity during dependent layer reload; its final runtime frame was discarded.",
+    "Fresh final review loaded saved files with no authoring edits and was ready with no runtime findings.",
+    "Startup Vulkan-loader and Modelica-source-admission messages are retained in local logs; no shader compilation failure was observed.",
+    "Close and medium-distance stills reviewed; final moving-camera social-video export remains a separate deliverable.",
+    "All optical and surface-profile settings are reconstruction assumptions, not measured flight properties."
+  ],
+  "physical_or_lighting_changes": false,
+  "source_sha256": {
+    "components/lander/griffin_bus_visual.usda": "2728277912b5e5306810db25aab72380277765a83fa4de10abcef4a3ae45113d",
+    "components/lander/griffin_tank_visual.usda": "51a1d78724ed156576b8f699358780e30006c0e16ffa9f1185041efc969af89f",
+    "components/lander/griffin_engine_skirt_visual.usda": "7d000b4573dd8762f574b79d754a8940fa94b41df3cb632b68528f5882dcfbc8",
+    "requirements/griffin_presentation_study.sysml": "5421e4c2fa768e0bf88d881fc584eee845c6cb86efd6fd644ce91a42a7d26fd3",
+    "shaders/hardware_finish.wesl": "b1010d6022d851f9ebb72fbe14029c1c2492d081c01d867a16bd52b270238562",
+    "shaders/photovoltaic_finish.wesl": "d8444b95f61a314daf87aa63f8d4c55d52c4acdb280a222e52d285ba194dd85a",
+    "shaders/thermal_blanket.wesl": "0c9195bb611f84ba7904b52092923d615909da582fd82df98e3e8bae5d952f90",
+    "tools/social_surface_finish.rhai": "37b106d0afe5062c0f84ddd8ad70e43319e43b1fef677e908f672546f2ba7fb8"
+  }
+}

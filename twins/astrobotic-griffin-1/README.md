@@ -27,6 +27,11 @@ The current FLIP drive also requires the shared `LunCo.Electrical.DCMotor`
 FLIP selects open-circuit idle, while other vehicles retain the default drive.
 See the [ramp shading and release receipt](contracts/griffin-ramp-release-2026-10-28.md).
 
+The [30 October texture pass](contracts/texture-refinement-2026-10-30.md) refines
+the bus/deck metal, tank and skirt blankets, FLIP brushing and solar electrodes.
+It adds no lights or emission. Material identities, appearance assumptions and
+unknown grades remain documented in the [material register](research/materials.md).
+
 ## Current FLIP rover — 2026-10-26
 
 **28 October correction:** the long, articulated ramp banks have been replaced

@@ -384,6 +384,10 @@ def Xform "World"
                     float inputs:facet_depth = 0.3199999928474426
                     float inputs:sheen = 0.6000000238418579
                     float inputs:v_scale = 1.399999976158142
+                    uniform token info:implementationSource = "sourceAsset"
+                    asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/thermal_blanket.wesl@
+                    custom float inputs:micro_scale = 240.0
+                    custom float inputs:micro_strength = 0.04500000178813934
                 }
             }
             def Material "BayLinerMetal"

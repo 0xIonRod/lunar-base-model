@@ -34,7 +34,12 @@ fn fragment(input: VertexOutput, @builtin(front_facing) is_front: bool) -> @loca
     let R = mat3x3<f32>(normalize(m[0].xyz), normalize(m[1].xyz), normalize(m[2].xyz));
     let p = transpose(R) * (input.world_position.xyz - m[3].xyz);
     let n = normalize(transpose(R) * normalize(input.world_normal));
-    let stretch = vec3<f32>(1.0, 1.0 / max(mat.brush_ratio, 1.0), 1.0);
+    // A fixed Y brush has no directional effect on horizontal deck faces.
+    // Blend smoothly toward local X there, avoiding a hard triplanar seam.
+    let ratio = max(mat.brush_ratio, 1.0);
+    let horizontal = pow(abs(n.y), 8.0);
+    let stretch = mix(vec3<f32>(1.0, 1.0 / ratio, 1.0),
+        vec3<f32>(1.0 / ratio, 1.0, 1.0), horizontal);
     let q = p * mat.grain_scale * stretch;
     let footprint = max(length(dpdx(q)), length(dpdy(q)));
     let grain = fbm_rot_gradient(q, 2, 0.5, footprint, vec2<f32>(1.0, 2.0));
@@ -42,8 +47,9 @@ fn fragment(input: VertexOutput, @builtin(front_facing) is_front: bool) -> @loca
     let tangent = gradient - n * dot(n, gradient);
     let normal = normalize(R * normalize(n - mat.grain_strength * tangent));
     let resolved = noise_footprint_weight(footprint, vec2<f32>(1.0, 2.0));
-    let roughness = clamp(mat.roughness + mat.grain_strength * (grain.x - 0.5)
-        + (1.0 - resolved) * mat.grain_strength * 0.5, 0.08, 0.95);
+    let base_roughness = max(mat.roughness + mat.grain_strength * (grain.x - 0.5), 0.08);
+    let roughness = clamp(sqrt(base_roughness * base_roughness
+        + (1.0 - resolved) * mat.grain_strength * mat.grain_strength), 0.08, 0.95);
     let color = mat.base_color * (1.0 + (grain.x - 0.5) * mat.grain_strength);
     return lit_n(input, is_front, normal, color, roughness, mat.metallic, vec3<f32>(0.0));
 }

@@ -1,6 +1,14 @@
 package GriffinPresentationStudy {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
+    part def BlanketFinish {
+        doc /* 30 October 2026 visual reconstruction. Fine crinkles supplement
+         * the existing component-owned coarse folds. Renderer controls only:
+         * no measured surface profile, coating identity or thermal property.
+         * Fine frequency is in inverse metres; slope is dimensionless. */
+        attribute MicroScalePerM : Real = 240.0;
+        attribute MicroSlope : Real = 0.045;
+    }
     part def HardwareFinish {
         doc /* Presentation reconstruction, 27 October 2026. June integration photo:
          * https://www.nasa.gov/image-detail/26-06-15-griffin-1-pressconference-1348-edit/

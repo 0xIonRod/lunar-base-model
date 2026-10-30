@@ -1,5 +1,12 @@
 # Griffin and FLIP material register
 
+The [30 October texture refinement](../contracts/texture-refinement-2026-10-30.md)
+adds a Twin-owned two-scale blanket shader, directional hardware grain and
+area-preserving photovoltaic electrode filtering. It supersedes the appearance
+mapping below for the bus/tank/skirt covers: those now use
+`thermal_blanket.wesl`, with the original component palettes and coarse-fold
+controls retained. Engineering identities and confidence remain unchanged.
+
 Reviewed 29 October 2026. This register separates manufacturer statements,
 photographic appearance and renderer assumptions. A material's appearance does
 not establish its composition or qualified mechanical/thermal properties.
