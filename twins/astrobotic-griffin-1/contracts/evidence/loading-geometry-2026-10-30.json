@@ -1,0 +1,51 @@
+{
+  "source_revision": "d2d1575a22ce79829fb8f3a655ab7571afdaaae0",
+  "authoring": "OpenFile, InspectUsdDocument, SaveAsDocument, CloseDocument, reopen, canonical USDA round-trip; ApplyUsdOps SetReferenceArcs and SaveDocument",
+  "lossless": true,
+  "items": [
+    {
+      "wheel": "FL",
+      "source": "components/rover/flip_v5/FLIP_visual_FL.usda",
+      "target": "components/rover/flip_v5/FLIP_visual_FL.usdc",
+      "source_bytes": 10748116,
+      "target_bytes": 2117132,
+      "canonical_sha256": "5479666e35ab8b730ac8624de8eb2fc0c3c66e6a71f5879248a456d7c069df8e",
+      "exact_canonical_roundtrip": true,
+      "source_sha256": "5479666e35ab8b730ac8624de8eb2fc0c3c66e6a71f5879248a456d7c069df8e",
+      "target_sha256": "7f1378b1bc0354f21f929772489f754113ef8fbf9a97ac08ec1fb62bc955aeef"
+    },
+    {
+      "wheel": "FR",
+      "source": "components/rover/flip_v5/FLIP_visual_FR.usda",
+      "target": "components/rover/flip_v5/FLIP_visual_FR.usdc",
+      "source_bytes": 10746935,
+      "target_bytes": 2115729,
+      "canonical_sha256": "29efd9c8ecbf120241fdace22f58b6275907abffa98726db7c047b5271f91356",
+      "exact_canonical_roundtrip": true,
+      "source_sha256": "29efd9c8ecbf120241fdace22f58b6275907abffa98726db7c047b5271f91356",
+      "target_sha256": "959b8b76cce77d747e5a8e873c3f117733c19f9a32455ba4fb6e07e7eb509327"
+    },
+    {
+      "wheel": "RL",
+      "source": "components/rover/flip_v5/FLIP_visual_RL.usda",
+      "target": "components/rover/flip_v5/FLIP_visual_RL.usdc",
+      "source_bytes": 10750210,
+      "target_bytes": 2116069,
+      "canonical_sha256": "227f53eda94bb0b0ea6818d0d7ac311f2e51a71a5e64d5ef6dfef15c521ad8ef",
+      "exact_canonical_roundtrip": true,
+      "source_sha256": "227f53eda94bb0b0ea6818d0d7ac311f2e51a71a5e64d5ef6dfef15c521ad8ef",
+      "target_sha256": "3bd0a7117c87330cbc5ae2224262c615dd1cc3af0614d38f23d94c957fcdf379"
+    },
+    {
+      "wheel": "RR",
+      "source": "components/rover/flip_v5/FLIP_visual_RR.usda",
+      "target": "components/rover/flip_v5/FLIP_visual_RR.usdc",
+      "source_bytes": 10749877,
+      "target_bytes": 2115511,
+      "canonical_sha256": "c2e48e168f22f3930092a9265fe51d73ac60f3c65d70e43daaec5265c2d6de00",
+      "exact_canonical_roundtrip": true,
+      "source_sha256": "c2e48e168f22f3930092a9265fe51d73ac60f3c65d70e43daaec5265c2d6de00",
+      "target_sha256": "b5300be1b8c81d5e52e314e7bd95e67550c51836b8aae77a48e266048b0f6c6d"
+    }
+  ]
+}

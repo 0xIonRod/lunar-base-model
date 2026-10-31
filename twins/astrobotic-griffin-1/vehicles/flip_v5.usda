@@ -103,7 +103,7 @@ def Xform "FLIP" (
             float physics:staticFriction = 0.6000000238418579
             custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
             def Xform "CADVisuals" (
-                references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FL.usda@</World>
+                references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FL.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
             )
             {
@@ -475,7 +475,7 @@ def Xform "FLIP" (
             float physics:staticFriction = 0.6000000238418579
             custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
             def Xform "CADVisuals" (
-                references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FR.usda@</World>
+                references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FR.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
             )
             {
@@ -847,7 +847,7 @@ def Xform "FLIP" (
             float physics:staticFriction = 0.6000000238418579
             custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
             def Xform "CADVisuals" (
-                references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RL.usda@</World>
+                references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RL.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
             )
             {
@@ -1219,7 +1219,7 @@ def Xform "FLIP" (
             float physics:staticFriction = 0.6000000238418579
             custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
             def Xform "CADVisuals" (
-                references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RR.usda@</World>
+                references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RR.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
             )
             {
