@@ -11,7 +11,11 @@ package GriffinFlipEgressStudy {
          * 180-degree yaw selects lander +X, matching the retained payload yaw.
          * Track spacing follows
          * the mounted CAD rover. Tethers are rest-pose visual routing only:
-         * payout, attachment strength and restrained descent are unqualified. */
+         * payout, attachment strength and restrained descent are unqualified.
+         * V12 EgressPair experiment adds a passive elastic cylindrical wrap,
+         * k=8000 N/m and damping=600 N.s/m (study assumptions, not flight data).
+         * Isolated conservation checks pass; the coupled vehicle descent failed
+         * safe-attitude acceptance and is excluded from the V12 film. */
         attribute stationsXM : Real[7] = (0.95, -1.95, -2.20, -2.42, -2.60, -2.74, -2.84);
         attribute installationYawDeg : Real = 180.0;
         // Operator drive selection: zero command coasts the H-bridge instead

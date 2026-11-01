@@ -1,0 +1,9 @@
+@import "lunco://ui/runtime_fonts.css";
+#route-card {display:flex;flex-direction:column;justify-content:center;gap:4px;padding:16px 24px;background-color:#08111be8;border-top:3px solid var(--ui-case-color);border-radius:6px;height:100%;}
+#route-title {font-size:38px;font-weight:700;color:var(--ui-case-color);}
+#route-row {display:flex;flex-direction:row;align-items:center;justify-content:space-between;}
+#route-value {font-size:76px;font-weight:700;color:#ffffff;}
+#route-time {font-size:34px;color:#c3cbd3;}
+#route-caption {font-size:32px;color:#c3cbd3;}
+#bar-track {height:8px;width:100%;background-color:#39434c;}
+#bar-fill {height:8px;width:var(--ui-balance-width);background-color:var(--ui-case-color);}

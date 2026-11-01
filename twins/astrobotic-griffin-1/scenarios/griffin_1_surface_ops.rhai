@@ -8,6 +8,14 @@ const LANDER = "/Griffin1SurfaceOps/Lander";
 const ROVER = "/Griffin1SurfaceOps/FLIP";
 const DOCK = "/Griffin1SurfaceOps/FLIPPayloadAdapterJoint";
 
+// Routine status cards can be hidden for a clean presentation. Faults retain
+// their own notifications and every mission transition stays in telemetry.
+fn mission_notice(text, kind) {
+    if get_twin_setting("ui.mission_notifications") != false {
+        notify_kind(text, kind);
+    }
+}
+
 fn simulation_dependencies(me, ctx) {
     let lander = find_path(LANDER);
     let gnc = find_path(LANDER + "/GNC");
@@ -371,7 +379,7 @@ fn begin_descent(state) {
     if owner_of(lander) == () { griffin_surface_ops::follow_lander(); }
     griffin_controls::show_briefing();
     emit("griffin_powered_descent_started");
-    notify_kind("Griffin-1 powered descent started.", "info");
+    mission_notice("Griffin-1 powered descent started.", "info");
     print("[griffin] powered descent started");
     true
 }
@@ -414,7 +422,7 @@ fn on_stop(me, ctx) {
 fn touchdown_notice() {
     griffin_controls::show_touchdown_actions();
     emit("griffin_touchdown_confirmed");
-    notify_kind("Griffin-1 touchdown confirmed.", "success");
+    mission_notice("Griffin-1 touchdown confirmed.", "success");
     print("[griffin] touchdown confirmed");
 }
 
@@ -467,7 +475,7 @@ fn complete_rover_release(me) {
     griffin_surface_ops::follow_rover();
     griffin_controls::show_rover_controls();
     emit("griffin_flip_released");
-    notify_kind("FLIP payload adapter detached; manual rover control is available.", "info");
+    mission_notice("FLIP payload adapter detached; manual rover control is available.", "info");
     print("[griffin] FLIP payload adapter detached");
 }
 
@@ -501,7 +509,7 @@ fn engage_rover(me) {
         emit("griffin_phase_timeout");
         return #{ok: false, error: detail};
     }
-    notify_kind("FLIP deployment complete; authored rover route continues.", "success");
+    mission_notice("FLIP deployment complete; authored rover route continues.", "success");
     print("[griffin] FLIP authored route continues after release");
     #{ok: true}
 }

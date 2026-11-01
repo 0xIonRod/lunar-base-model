@@ -1,0 +1,2792 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/tests/flip_route_follow.usda@</Griffin1SurfaceOps>
+)
+{
+    over "Scenario"
+    {
+        def "Test" (
+            active = true
+        )
+        {
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/media/griffin_flip_v12/scenarios/routes_04.rhai@
+        }
+    }
+    over "Avatar"
+    {
+        custom double3 xformOp:translate = (-16.46215333887149, 49.230282748857086, -39.63182421474647)
+        double3 lunco:cameraLookAt = (-7.9558111948738635, -0.7697172511429119, -12.288778602941452)
+        custom double3 xformOp:rotateXYZ = (-90.0, 0.0, 0.0)
+        float focalLength = 24.0
+    }
+    def Scope "Policies"
+    {
+    }
+    def LunCoPolicy "FilmViews"
+    {
+        uniform string lunco:policy:seam = "workbench.perspectives.twin"
+        string lunco:policy:entry = "assemble"
+        uniform string info:sourceCode = "fn assemble(facts) { [#{id:\"film-drive\",title:\"Driving energy\",description:\"Four native motion and power histories with the rover centered above them.\",interaction:\"editor\",restore:false,scene_visible:true,floating:[#{kind:\"signal_grid\",instance:1,corner:\"bottom_left\",width:2500,height:420,inset:20}]},#{id:\"film-model\",title:\"Power and control\",description:\"Actual exported Modelica components, electrical connections and control bindings.\",interaction:\"editor\",restore:false,instances:[#{kind:\"modelica_model_view\",instance:3,slot:\"center\"}]}] }"
+        bool lunco:policy:deterministic = false
+    }
+    def LunCoPolicy "FilmRecordingUI"
+    {
+        uniform string lunco:policy:seam = "runtime.ui.recording"
+        string lunco:policy:entry = "select"
+        uniform string info:sourceCode = "fn select(facts) {let ids=[];for id in facts.visible_surface_ids {if id==\"route-short\" || id==\"route-long\" {ids.push(id);}}ids}"
+        bool lunco:policy:deterministic = false
+    }
+    def Scope "DriveStimulus"
+    {
+    }
+    def Xform "DriveProgramHost"
+    {
+    }
+    def Scope "AmberRoute"
+    {
+        custom color3f[] primvars:displayColor = [(1.0, 0.8500000238418579, 0.019999999552965164)]
+        def Scope "Program" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://scenarios/route_follow.rhai@
+            custom float inputs:enabled = 0.0
+            custom rel inputs:subject = </Griffin1SurfaceOps/FLIP_Amber>
+            custom double inputs:cruise_throttle = 0.1
+            custom double inputs:arrival_radius = 0.4
+        }
+        def Xform "P0" (
+            references = @lunco://markers/route_point.usda@
+            active = true
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 0.21062861382961273, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            bool lunco:billboard = false
+            custom color3f[] primvars:displayColor = [(0.8999999761581421, 0.8999999761581421, 0.8999999761581421)]
+            custom double inputs:drive_direction = 1.0
+            over "Trigger"
+            {
+                token lunco:triggerZone = "AmberRoute_P0"
+                double radius = 0.4
+            }
+            over "Dome"
+            {
+                double radius = 0.35
+                double3 xformOp:translate = (0.0, 0.35, 0.0)
+            }
+        }
+        def Xform "P1" (
+            references = @lunco://markers/route_point.usda@
+            active = true
+        )
+        {
+            custom double3 xformOp:translate = (-19.04191463163227, -1.0348315081461528, -14.608404675447241)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            bool lunco:billboard = false
+            custom double inputs:drive_direction = 1.0
+            over "Trigger"
+            {
+                token lunco:triggerZone = "AmberRoute_P1"
+                double radius = 0.4
+            }
+            over "Dome" (
+                active = false
+            )
+            {
+                double radius = 0.35
+                double3 xformOp:translate = (0.0, 0.35, 0.0)
+            }
+        }
+        def Xform "P2" (
+            references = @lunco://markers/route_point.usda@
+            active = true
+        )
+        {
+            custom double3 xformOp:translate = (3.1302922418845442, -2.35186789354453, -23.794984145411767)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            bool lunco:billboard = false
+            custom color3f[] primvars:displayColor = [(0.30000001192092896, 1.0, 0.6499999761581421)]
+            custom double inputs:drive_direction = -1.0
+            over "Trigger"
+            {
+                token lunco:triggerZone = "AmberRoute_P2"
+                double radius = 0.4
+            }
+            over "Dome" (
+                active = false
+            )
+            {
+                double radius = 0.35
+                double3 xformOp:translate = (0.0, 0.35, 0.0)
+            }
+        }
+        def Xform "P3" (
+            references = @lunco://markers/route_point.usda@
+            active = true
+        )
+        {
+            custom double3 xformOp:translate = (-2.8184537944683976, -2.2453343579008975, -24.577557205882904)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            bool lunco:billboard = false
+            custom double inputs:drive_direction = 1.0
+            custom color3f[] primvars:displayColor = [(0.30000001192092896, 1.0, 0.6499999761581421)]
+            over "Trigger"
+            {
+                token lunco:triggerZone = "AmberRoute_P3"
+                double radius = 0.4
+            }
+            over "Dome"
+            {
+                double radius = 0.35
+                double3 xformOp:translate = (0.0, 0.35, 0.0)
+            }
+        }
+        def Xform "P4" (
+            references = @lunco://markers/route_point.usda@
+            active = false
+        )
+        {
+            custom double3 xformOp:translate = (3.138200535148209, -2.35208527487989, -23.793942451834152)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            custom double inputs:drive_direction = -1.0
+            bool lunco:billboard = false
+            over Sphere "Dome"
+            {
+                double radius = 0.35
+                double3 xformOp:translate = (0.0, 0.35, 0.0)
+            }
+            over Sphere "Trigger"
+            {
+                double radius = 0.4
+                token lunco:triggerZone = "AmberRoute_P4"
+            }
+        }
+    }
+    over "FlipRoute"
+    {
+        custom color3f[] primvars:displayColor = [(0.029999999329447746, 0.5, 1.0)]
+        def Xform "P0" (
+            references = @lunco://markers/route_point.usda@
+            active = true
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 0.21062861382961273, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            bool lunco:billboard = false
+            custom color3f[] primvars:displayColor = [(0.8999999761581421, 0.8999999761581421, 0.8999999761581421)]
+            custom double inputs:drive_direction = 1.0
+            over "Trigger"
+            {
+                token lunco:triggerZone = "FlipRoute_P0"
+                double radius = 0.4
+            }
+            over "Dome"
+            {
+                double radius = 0.35
+                double3 xformOp:translate = (0.0, 0.35, 0.0)
+            }
+        }
+        def Xform "P1" (
+            references = @lunco://markers/route_point.usda@
+            active = true
+        )
+        {
+            custom double3 xformOp:translate = (1.5651461209422721, -0.9745265790635869, -11.897492072705884)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            bool lunco:billboard = false
+            custom double inputs:drive_direction = 1.0
+            over "Trigger"
+            {
+                token lunco:triggerZone = "FlipRoute_P1"
+                double radius = 0.4
+            }
+            over "Dome" (
+                active = false
+            )
+            {
+                double radius = 0.35
+                double3 xformOp:translate = (0.0, 0.35, 0.0)
+            }
+        }
+        def Xform "P2" (
+            references = @lunco://markers/route_point.usda@
+            active = true
+        )
+        {
+            custom double3 xformOp:translate = (3.1302922418845442, -2.35186789354453, -23.794984145411767)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            bool lunco:billboard = false
+            custom color3f[] primvars:displayColor = [(0.30000001192092896, 1.0, 0.6499999761581421)]
+            custom double inputs:drive_direction = 1.0
+            over "Trigger"
+            {
+                token lunco:triggerZone = "FlipRoute_P2"
+                double radius = 0.4
+            }
+            over "Dome" (
+                active = false
+            )
+            {
+                double radius = 0.35
+                double3 xformOp:translate = (0.0, 0.35, 0.0)
+            }
+        }
+        over Scope "Program"
+        {
+            custom double inputs:cruise_throttle = 0.1
+            custom double inputs:arrival_radius = 0.4
+        }
+        def Xform "P3" (
+            references = @lunco://markers/route_point.usda@
+            active = true
+        )
+        {
+            custom double3 xformOp:translate = (-2.8184537944683976, -2.2453343579008975, -24.577557205882904)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            custom double inputs:drive_direction = 1.0
+            bool lunco:billboard = false
+            custom color3f[] primvars:displayColor = [(0.30000001192092896, 1.0, 0.6499999761581421)]
+            over Sphere "Dome" (
+                active = false
+            )
+            {
+                double radius = 0.35
+                double3 xformOp:translate = (0.0, 0.35, 0.0)
+            }
+            over Sphere "Trigger"
+            {
+                double radius = 0.4
+                token lunco:triggerZone = "FlipRoute_P3"
+            }
+        }
+    }
+    over "FLIP" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "LunCoCatalogAPI", "CollectionAPI:components", "PhysicsArticulationRootAPI", "LunCoUiSchemaAPI", "PhysxRigidBodyAPI"]
+    )
+    {
+        custom rel programs = </Griffin1SurfaceOps/FlipRoute/Program>
+        custom double inputs:energy_count_enable = 0.0
+        custom double outputs:energy_Solar_wh = 0.0
+        double outputs:energy_Solar_wh.connect = </Griffin1SurfaceOps/FLIP/EnergySolar.outputs:positive_energy_wh>
+        custom double outputs:energy_Solar_returned_wh = 0.0
+        double outputs:energy_Solar_returned_wh.connect = </Griffin1SurfaceOps/FLIP/EnergySolar.outputs:negative_energy_wh>
+        custom double outputs:energy_FL_wh = 0.0
+        double outputs:energy_FL_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyFL.outputs:positive_energy_wh>
+        custom double outputs:energy_FL_returned_wh = 0.0
+        double outputs:energy_FL_returned_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyFL.outputs:negative_energy_wh>
+        custom double outputs:energy_FR_wh = 0.0
+        double outputs:energy_FR_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyFR.outputs:positive_energy_wh>
+        custom double outputs:energy_FR_returned_wh = 0.0
+        double outputs:energy_FR_returned_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyFR.outputs:negative_energy_wh>
+        custom double outputs:energy_RL_wh = 0.0
+        double outputs:energy_RL_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyRL.outputs:positive_energy_wh>
+        custom double outputs:energy_RL_returned_wh = 0.0
+        double outputs:energy_RL_returned_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyRL.outputs:negative_energy_wh>
+        custom double outputs:energy_RR_wh = 0.0
+        double outputs:energy_RR_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyRR.outputs:positive_energy_wh>
+        custom double outputs:energy_RR_returned_wh = 0.0
+        double outputs:energy_RR_returned_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyRR.outputs:negative_energy_wh>
+        rel collection:components:includes = [</Griffin1SurfaceOps/FLIP/Drivetrain>, </Griffin1SurfaceOps/FLIP/Battery>, </Griffin1SurfaceOps/FLIP/SolarMechanism/Photovoltaics>, </Griffin1SurfaceOps/FLIP/Motor_FL>, </Griffin1SurfaceOps/FLIP/TorqueSource_FL>, </Griffin1SurfaceOps/FLIP/Gearbox_FL>, </Griffin1SurfaceOps/FLIP/Shaft_FL>, </Griffin1SurfaceOps/FLIP/Motor_FR>, </Griffin1SurfaceOps/FLIP/TorqueSource_FR>, </Griffin1SurfaceOps/FLIP/Gearbox_FR>, </Griffin1SurfaceOps/FLIP/Shaft_FR>, </Griffin1SurfaceOps/FLIP/Motor_RL>, </Griffin1SurfaceOps/FLIP/TorqueSource_RL>, </Griffin1SurfaceOps/FLIP/Gearbox_RL>, </Griffin1SurfaceOps/FLIP/Shaft_RL>, </Griffin1SurfaceOps/FLIP/Motor_RR>, </Griffin1SurfaceOps/FLIP/TorqueSource_RR>, </Griffin1SurfaceOps/FLIP/Gearbox_RR>, </Griffin1SurfaceOps/FLIP/Shaft_RR>, </Griffin1SurfaceOps/FLIP/EnergySolar>, </Griffin1SurfaceOps/FLIP/EnergyFL>, </Griffin1SurfaceOps/FLIP/EnergyFR>, </Griffin1SurfaceOps/FLIP/EnergyRL>, </Griffin1SurfaceOps/FLIP/EnergyRR>, </Griffin1SurfaceOps/FLIP/SolarCharger>, </Griffin1SurfaceOps/FLIP/Equipment>, </Griffin1SurfaceOps/FLIP/EnergyBattery>, </Griffin1SurfaceOps/FLIP/EnergyEquipment>]
+        custom double outputs:energy_elapsed_s = 0.0
+        double outputs:energy_elapsed_s.connect = </Griffin1SurfaceOps/FLIP/EnergySolar.outputs:elapsed_s>
+        string lunco:ui:surfaceId = "route-short"
+        string lunco:ui:visibilityMode = "always"
+        custom double outputs:energy_Battery_wh = 0.0
+        double outputs:energy_Battery_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyBattery.outputs:positive_energy_wh>
+        custom double outputs:energy_Battery_returned_wh = 0.0
+        double outputs:energy_Battery_returned_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyBattery.outputs:negative_energy_wh>
+        custom double outputs:energy_Equipment_wh = 0.0
+        double outputs:energy_Equipment_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyEquipment.outputs:positive_energy_wh>
+        custom double outputs:energy_Equipment_returned_wh = 0.0
+        double outputs:energy_Equipment_returned_wh.connect = </Griffin1SurfaceOps/FLIP/EnergyEquipment.outputs:negative_energy_wh>
+        custom double3 xformOp:rotateXYZ = (0.0, 82.50562576904294, 0.0)
+        def Scope "EnergySolar" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom double inputs:power_w
+            double inputs:power_w.connect = </Griffin1SurfaceOps/FLIP.outputs:solar_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyFL" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP/Motor_FL.outputs:electrical_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyFR" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP/Motor_FR.outputs:electrical_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyRL" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP/Motor_RL.outputs:electrical_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyRR" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP/Motor_RR.outputs:electrical_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyBattery" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP.outputs:bus_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyEquipment" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom double inputs:power_w
+            double inputs:power_w.connect = </Griffin1SurfaceOps/FLIP.outputs:equipment_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        over "PanelControls" (
+            active = false
+        )
+        {
+        }
+        def Scope "ContactMaterials"
+        {
+            def Material "RegolithTread" (
+                prepend apiSchemas = ["PhysicsMaterialAPI", "PhysxMaterialAPI"]
+            )
+            {
+                float physics:staticFriction = 0.6000000238418579
+                float physics:dynamicFriction = 0.6000000238418579
+                float physics:restitution = 0.0
+                custom token physxMaterial:frictionCombineMode = "min"
+                custom string documentation = "Native rigid wheel/soil contact, nominal mu 0.6. An estimated Coulomb approximation; wheel deformation and soil sinkage are not resolved. The separate tire slip-force layer is excluded by native material ownership."
+            }
+        }
+        over "Suspension_FL"
+        {
+            over "Wheel_FL" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Suspension_FR"
+        {
+            over "Wheel_FR" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Suspension_RL"
+        {
+            over "Wheel_RL" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Suspension_RR"
+        {
+            over "Wheel_RR" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Thermal" (
+            active = false
+        )
+        {
+        }
+        over Scope "Drivetrain"
+        {
+            custom double parameters:steer_gain = 1.0
+        }
+    }
+    def Xform "FLIP_Amber" (
+        prepend references = @twin://astrobotic-griffin-1/vehicles/flip_v5.usda@</FLIP>
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "LunCoCatalogAPI", "CollectionAPI:components", "PhysicsArticulationRootAPI", "LunCoUiSchemaAPI", "PhysxRigidBodyAPI"]
+    )
+    {
+        double3 xformOp:translate = (0.0, 1.8, 0.0)
+        custom double3 xformOp:rotateXYZ = (0.0, 82.50562576904294, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom rel programs = </Griffin1SurfaceOps/AmberRoute/Program>
+        custom double inputs:energy_count_enable = 0.0
+        custom double outputs:energy_Solar_wh = 0.0
+        double outputs:energy_Solar_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergySolar.outputs:positive_energy_wh>
+        custom double outputs:energy_Solar_returned_wh = 0.0
+        double outputs:energy_Solar_returned_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergySolar.outputs:negative_energy_wh>
+        custom double outputs:energy_FL_wh = 0.0
+        double outputs:energy_FL_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyFL.outputs:positive_energy_wh>
+        custom double outputs:energy_FL_returned_wh = 0.0
+        double outputs:energy_FL_returned_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyFL.outputs:negative_energy_wh>
+        custom double outputs:energy_FR_wh = 0.0
+        double outputs:energy_FR_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyFR.outputs:positive_energy_wh>
+        custom double outputs:energy_FR_returned_wh = 0.0
+        double outputs:energy_FR_returned_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyFR.outputs:negative_energy_wh>
+        custom double outputs:energy_RL_wh = 0.0
+        double outputs:energy_RL_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyRL.outputs:positive_energy_wh>
+        custom double outputs:energy_RL_returned_wh = 0.0
+        double outputs:energy_RL_returned_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyRL.outputs:negative_energy_wh>
+        custom double outputs:energy_RR_wh = 0.0
+        double outputs:energy_RR_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyRR.outputs:positive_energy_wh>
+        custom double outputs:energy_RR_returned_wh = 0.0
+        double outputs:energy_RR_returned_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyRR.outputs:negative_energy_wh>
+        rel collection:components:includes = [</Griffin1SurfaceOps/FLIP_Amber/Drivetrain>, </Griffin1SurfaceOps/FLIP_Amber/Battery>, </Griffin1SurfaceOps/FLIP_Amber/SolarMechanism/Photovoltaics>, </Griffin1SurfaceOps/FLIP_Amber/Motor_FL>, </Griffin1SurfaceOps/FLIP_Amber/TorqueSource_FL>, </Griffin1SurfaceOps/FLIP_Amber/Gearbox_FL>, </Griffin1SurfaceOps/FLIP_Amber/Shaft_FL>, </Griffin1SurfaceOps/FLIP_Amber/Motor_FR>, </Griffin1SurfaceOps/FLIP_Amber/TorqueSource_FR>, </Griffin1SurfaceOps/FLIP_Amber/Gearbox_FR>, </Griffin1SurfaceOps/FLIP_Amber/Shaft_FR>, </Griffin1SurfaceOps/FLIP_Amber/Motor_RL>, </Griffin1SurfaceOps/FLIP_Amber/TorqueSource_RL>, </Griffin1SurfaceOps/FLIP_Amber/Gearbox_RL>, </Griffin1SurfaceOps/FLIP_Amber/Shaft_RL>, </Griffin1SurfaceOps/FLIP_Amber/Motor_RR>, </Griffin1SurfaceOps/FLIP_Amber/TorqueSource_RR>, </Griffin1SurfaceOps/FLIP_Amber/Gearbox_RR>, </Griffin1SurfaceOps/FLIP_Amber/Shaft_RR>, </Griffin1SurfaceOps/FLIP_Amber/EnergySolar>, </Griffin1SurfaceOps/FLIP_Amber/EnergyFL>, </Griffin1SurfaceOps/FLIP_Amber/EnergyFR>, </Griffin1SurfaceOps/FLIP_Amber/EnergyRL>, </Griffin1SurfaceOps/FLIP_Amber/EnergyRR>, </Griffin1SurfaceOps/FLIP_Amber/SolarCharger>, </Griffin1SurfaceOps/FLIP_Amber/Equipment>, </Griffin1SurfaceOps/FLIP_Amber/EnergyBattery>, </Griffin1SurfaceOps/FLIP_Amber/EnergyEquipment>]
+        custom double outputs:energy_elapsed_s = 0.0
+        double outputs:energy_elapsed_s.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergySolar.outputs:elapsed_s>
+        string lunco:ui:surfaceId = "route-long"
+        string lunco:ui:visibilityMode = "always"
+        custom double outputs:energy_Battery_wh = 0.0
+        double outputs:energy_Battery_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyBattery.outputs:positive_energy_wh>
+        custom double outputs:energy_Battery_returned_wh = 0.0
+        double outputs:energy_Battery_returned_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyBattery.outputs:negative_energy_wh>
+        custom double outputs:energy_Equipment_wh = 0.0
+        double outputs:energy_Equipment_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyEquipment.outputs:positive_energy_wh>
+        custom double outputs:energy_Equipment_returned_wh = 0.0
+        double outputs:energy_Equipment_returned_wh.connect = </Griffin1SurfaceOps/FLIP_Amber/EnergyEquipment.outputs:negative_energy_wh>
+        over "Suspension_FL"
+        {
+            over "Wheel_FL" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP_Amber/ContactMaterials/RegolithTread>
+                over "CADVisuals"
+                {
+                    over "DriveRF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "TireRF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpiderRF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubCapRF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRF0_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRF1_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRF2_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRF3_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRF4_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRF5_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRF6_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRF7_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebRF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebRF_Chunk1"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebRF_Chunk2"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk1"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk2"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk3"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk4"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk5"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk6"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk7"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk8"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk9"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk10"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk11"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk12"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk13"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk14"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk15"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk16"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk17"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk18"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk19"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk20"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk21"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk22"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk23"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk24"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk25"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk26"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk27"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk28"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk29"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk30"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk31"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk32"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk33"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRF_Chunk34"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                }
+            }
+        }
+        over "Suspension_FR"
+        {
+            over "Wheel_FR" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP_Amber/ContactMaterials/RegolithTread>
+                over "CADVisuals"
+                {
+                    over "DriveLF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "TireLF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpiderLF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubCapLF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLF0_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLF1_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLF2_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLF3_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLF4_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLF5_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLF6_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLF7_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebLF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebLF_Chunk1"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebLF_Chunk2"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk1"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk2"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk3"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk4"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk5"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk6"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk7"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk8"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk9"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk10"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk11"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk12"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk13"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk14"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk15"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk16"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk17"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk18"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk19"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk20"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk21"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk22"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk23"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk24"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk25"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk26"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk27"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk28"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk29"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk30"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk31"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk32"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk33"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLF_Chunk34"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                }
+            }
+        }
+        over "Suspension_RL"
+        {
+            over "Wheel_RL" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP_Amber/ContactMaterials/RegolithTread>
+                over "CADVisuals"
+                {
+                    over "DriveRR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "TireRR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpiderRR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubCapRR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRR0_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRR1_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRR2_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRR3_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRR4_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRR5_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRR6_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltRR7_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebRR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebRR_Chunk1"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebRR_Chunk2"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk1"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk2"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk3"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk4"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk5"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk6"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk7"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk8"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk9"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk10"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk11"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk12"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk13"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk14"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk15"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk16"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk17"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk18"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk19"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk20"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk21"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk22"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk23"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk24"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk25"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk26"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk27"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk28"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk29"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk30"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk31"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk32"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk33"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailRR_Chunk34"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                }
+            }
+        }
+        over "Suspension_RR"
+        {
+            over "Wheel_RR" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP_Amber/ContactMaterials/RegolithTread>
+                over "CADVisuals"
+                {
+                    over "DriveLR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "TireLR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpiderLR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubCapLR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLR0_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLR1_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLR2_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLR3_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLR4_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLR5_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLR6_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "HubBoltLR7_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebLR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebLR_Chunk1"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "CableWebLR_Chunk2"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk0"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk1"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk2"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk3"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk4"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk5"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk6"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk7"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk8"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk9"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk10"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk11"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk12"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk13"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk14"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk15"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk16"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk17"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk18"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk19"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk20"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk21"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk22"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk23"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk24"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk25"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk26"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk27"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk28"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk29"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk30"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk31"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk32"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk33"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                    over "SpringDetailLR_Chunk34"
+                    {
+                        float[] primvars:displayOpacity = [1.0]
+                        color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                        custom bool primvars:doNotCastShadows = false
+                    }
+                }
+            }
+        }
+        over "CADVisuals"
+        {
+            over "Baseplate"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "LowerRailL"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "UpperRailL"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PostLF"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PostLR"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "LowerRailR"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "UpperRailR"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PostRF"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PostRR"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "UpperCrossF"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "UpperCrossR"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "FloorCross0"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "FloorCross1"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "FloorCross2"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "SkinL"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "SkinR"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "SkinFront"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "SkinRear"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "TopDeck"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "BatteryTray"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "BatteryEnclosure"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "AvionicsTray"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "AvionicsEnclosure"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PowerControllerTray"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PowerControllerEnclosure"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PayloadMount0"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PayloadMount1"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PayloadMount2"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PayloadMount3"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PayloadDeck"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PayloadRail0"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "PayloadRail1"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "LanderMount0"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "LanderMount1"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "LanderMount2"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "LanderMount3"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "HingeSupportL"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "HingePinL"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "HingeSupportR"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "HingePinR"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "StowRestL"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "StowRestR"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+            over "BatteryPackB"
+            {
+                float[] primvars:displayOpacity = [1.0]
+                color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                custom bool primvars:doNotCastShadows = false
+            }
+        }
+        over "SolarMechanism"
+        {
+            over "CADVisuals"
+            {
+                over "SolarBackplate"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "SolarFrameFront"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "SolarFrameRear"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "SolarFrameL"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "SolarFrameR"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "MovingHingeL"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "MovingHingeR"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "SensorBar"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "SensorFootL"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "CameraL"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "LensL"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "SensorFootR"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "CameraR"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "LensR"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_00"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_01"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_02"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_03"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_04"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_05"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_06"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_07"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_08"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell00_09"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_00"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_01"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_02"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_03"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_04"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_05"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_06"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_07"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_08"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell01_09"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_00"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_01"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_02"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_03"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_04"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_05"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_06"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_07"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_08"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell02_09"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_00"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_01"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_02"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_03"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_04"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_05"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_06"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_07"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_08"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell03_09"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_00"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_01"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_02"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_03"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_04"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_05"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_06"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_07"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_08"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell04_09"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_00"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_01"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_02"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_03"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_04"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_05"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_06"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_07"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_08"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell05_09"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_00"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_01"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_02"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_03"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_04"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_05"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_06"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_07"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_08"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell06_09"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_00"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_01"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_02"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_03"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_04"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_05"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_06"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_07"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_08"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "Cell07_09"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "SensorMast"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+                over "AntennaStub"
+                {
+                    float[] primvars:displayOpacity = [1.0]
+                    color3f[] primvars:displayColor = [(0.949999988079071, 0.41999998688697815, 0.054999999701976776)]
+                    custom bool primvars:doNotCastShadows = false
+                }
+            }
+        }
+        def Scope "EnergySolar" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom double inputs:power_w
+            double inputs:power_w.connect = </Griffin1SurfaceOps/FLIP_Amber.outputs:solar_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP_Amber.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyFL" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP_Amber/Motor_FL.outputs:electrical_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP_Amber.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyFR" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP_Amber/Motor_FR.outputs:electrical_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP_Amber.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyRL" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP_Amber/Motor_RL.outputs:electrical_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP_Amber.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyRR" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP_Amber/Motor_RR.outputs:electrical_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP_Amber.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyBattery" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom float inputs:power_w
+            float inputs:power_w.connect = </Griffin1SurfaceOps/FLIP_Amber.outputs:bus_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP_Amber.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        def Scope "EnergyEquipment" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Sensors/PowerEnergyMeter.mo@
+            custom double inputs:power_w
+            double inputs:power_w.connect = </Griffin1SurfaceOps/FLIP_Amber.outputs:equipment_power>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </Griffin1SurfaceOps/FLIP_Amber.inputs:energy_count_enable>
+            custom double outputs:positive_energy_wh = 0.0
+            custom double outputs:negative_energy_wh = 0.0
+            custom double outputs:net_energy_wh = 0.0
+            custom double outputs:elapsed_s = 0.0
+        }
+        over "PanelControls" (
+            active = false
+        )
+        {
+        }
+        def Scope "ContactMaterials"
+        {
+            def Material "RegolithTread" (
+                prepend apiSchemas = ["PhysicsMaterialAPI", "PhysxMaterialAPI"]
+            )
+            {
+                float physics:staticFriction = 0.6000000238418579
+                float physics:dynamicFriction = 0.6000000238418579
+                float physics:restitution = 0.0
+                custom token physxMaterial:frictionCombineMode = "min"
+                custom string documentation = "Native rigid wheel/soil contact, nominal mu 0.6. An estimated Coulomb approximation; wheel deformation and soil sinkage are not resolved. The separate tire slip-force layer is excluded by native material ownership."
+            }
+        }
+        over "Thermal" (
+            active = false
+        )
+        {
+        }
+        over Scope "Drivetrain"
+        {
+            custom double parameters:steer_gain = 1.0
+        }
+    }
+    def Scope "ComparisonGroups"
+    {
+        def PhysicsCollisionGroup "Blue"
+        {
+            rel collection:colliders:includes = </Griffin1SurfaceOps/FLIP>
+            rel physics:filteredGroups = </Griffin1SurfaceOps/ComparisonGroups/Amber>
+            uniform token collection:colliders:expansionRule = "expandPrims"
+        }
+        def PhysicsCollisionGroup "Amber"
+        {
+            rel collection:colliders:includes = </Griffin1SurfaceOps/FLIP_Amber>
+            rel physics:filteredGroups = </Griffin1SurfaceOps/ComparisonGroups/Blue>
+            uniform token collection:colliders:expansionRule = "expandPrims"
+        }
+    }
+    def LunCoPolicy "MissionEnergyProperties"
+    {
+        uniform string lunco:policy:seam = "runtime.ui.properties"
+        string lunco:policy:entry = "runtime_ui_properties"
+        uniform string info:sourceCode = "fn runtime_ui_properties(facts) {\n if facts.surface_id!=\"route-short\" && facts.surface_id!=\"route-long\" {return #{};}\n let out=#{title:if facts.surface_id==\"route-short\" {\"Short route\"}else{\"Long route\"},balance:\"—\",elapsed:\"—\",case_color:if facts.surface_id==\"route-short\" {\"#45C7FF\"}else{\"#FFE34D\"},balance_width:\"0px\"};\n for participant in facts.participants {\n  let p=participant.outputs;if p[\"energy_Battery_wh\"]==() || p[\"energy_Battery_returned_wh\"]==() || p[\"energy_elapsed_s\"]==() {continue;}\n  let net=p[\"energy_Battery_wh\"]-p[\"energy_Battery_returned_wh\"];\n  let v=(net*10.0).round()/10.0;if abs(v)<0.05 {v=0.0;}\n  out.balance=(if v>0.0 {\"+\"}else{\"\"})+v.to_string()+\" Wh\";\n  let sec=p[\"energy_elapsed_s\"].round().to_int();out.elapsed=(sec/60).to_string()+\"m \"+(sec%60).to_string()+\"s\";\n  out.balance_width=(max(0.0,min(10.0,net))/10.0*572.0).to_string()+\"px\";return out;\n }\n out\n}"
+        bool lunco:policy:deterministic = false
+    }
+    over "Environment" (
+        references = @twin://astrobotic-griffin-1/media/griffin_flip_v8/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
+    )
+    {
+    }
+    over "SolarSystem"
+    {
+        over "Looks"
+        {
+            over "Moon"
+            {
+                over "Shader"
+                {
+                    custom asset inputs:albedo_map = @twin://astrobotic-griffin-1/textures/moon/lroc_color_2025_8k.png@
+                    color3f inputs:surface_color = (1.0, 1.0, 1.0)
+                }
+            }
+        }
+    }
+}

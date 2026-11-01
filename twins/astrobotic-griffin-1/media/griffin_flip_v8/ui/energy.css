@@ -1,0 +1,17 @@
+@import "lunco://ui/runtime_fonts.css";
+#energy-card {display:flex;flex-direction:column;gap:8px;height:100%;padding:12px 16px;background-color:#0b1420ed;border:1px solid #ffffff20;border-top:2px solid var(--ui-case-color);border-radius:10px;color:#f1f5fa;}
+#energy-heading {display:flex;flex-direction:row;justify-content:space-between;align-items:center;}
+#route-title {font-size:18px;font-weight:700;color:var(--ui-case-color);}
+#route-clock {font-size:17px;color:#e6edf5;}
+#charge {font-size:17px;color:#c3d0de;}
+#energy-totals {display:flex;flex-direction:row;gap:10px;justify-content:space-between;}
+#received-col,#used-col,#balance-col {display:flex;flex-direction:column;align-items:center;gap:4px;width:215px;}
+#used-col,#balance-col {border-left:1px solid #72839744;}
+#received-label,#used-label,#balance-label {font-size:15px;color:#c3d0de;text-align:center;}
+#received-number {font-size:32px;font-weight:700;color:#79edaf;text-align:center;}
+#used-number {font-size:32px;font-weight:700;color:#ffc56d;text-align:center;}
+#balance-number {font-size:32px;font-weight:700;color:var(--ui-balance-color);text-align:center;}
+#solar-track,#used-track {width:170px;height:4px;background-color:#344554;}
+#solar-fill {width:var(--ui-solar-width);height:4px;background-color:#79edaf;}
+#used-fill {width:var(--ui-used-width);height:4px;background-color:#ffc56d;}
+#current {font-size:15px;color:#c3d0de;text-align:center;align-self:center;}

@@ -1,0 +1,4 @@
+@import "lunco://ui/runtime_fonts.css";
+#reading {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:100%;padding:10px 24px;background-color:#07111dde;border-radius:8px;}
+#label {font-size:38px;color:#e5eaf0;text-align:center;}
+#value {font-size:78px;font-weight:700;color:#ffffff;text-align:center;}

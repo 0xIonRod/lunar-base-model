@@ -13,7 +13,6 @@ scenes = [
 root = "requirements/griffin_requirements.sysml"
 paths = ["requirements"]
 
-[verification]
 [[verification.cases]]
 name = "GriffinSolarRequirements::Verify_GriffinSolarCollision"
 scene = "tests/griffin_solar_collision.usda"
@@ -254,9 +253,48 @@ scene = "tests/griffin_oxidizer_exhaustion.usda"
 script = "scenarios/tests/griffin_fuel_exhaustion.rhai"
 verdict_channel = "GRIFFIN_FUEL_EXHAUSTION"
 
-# Component ownership is explicit.  Each entry points to one normative SysML
-# source and one qualified verification case; the case supplies that
-# component's Twin-local USD fixture and Rhai observer above.
+[[verification.cases]]
+name = "GriffinSimulationAccuracyRequirements::Verify_GriffinEngineOffImpact"
+scene = "tests/griffin_engine_off_impact.usda"
+script = "scenarios/tests/griffin_engine_off_impact.rhai"
+verdict_channel = "GRIFFIN_ENGINE_OFF_IMPACT"
+
+[[verification.cases]]
+name = "GriffinSimulationAccuracyRequirements::Verify_GriffinHighImpactValidity"
+scene = "tests/griffin_high_impact_validity.usda"
+script = "scenarios/tests/griffin_contact_validity.rhai"
+verdict_channel = "GRIFFIN_CONTACT_VALIDITY"
+
+[[verification.cases]]
+name = "GriffinSimulationAccuracyRequirements::Verify_GriffinNominalContactValidity"
+scene = "tests/griffin_nominal_contact_validity.usda"
+script = "scenarios/tests/griffin_contact_validity.rhai"
+verdict_channel = "GRIFFIN_CONTACT_VALIDITY"
+
+[[verification.cases]]
+name = "GriffinLandingLegRequirements::Verify_GriffinRoverLegCollision"
+scene = "tests/griffin_rover_leg_collision.usda"
+script = "scenarios/tests/griffin_rover_leg_collision.rhai"
+verdict_channel = "GRIFFIN_ROVER_LEG_COLLISION"
+
+[[verification.cases]]
+name = "GriffinRampRequirements::Verify_GriffinRampToeContactRejection"
+scene = "tests/griffin_ramp_toe_gap.usda"
+script = "scenarios/tests/griffin_ramp_contact_rejection.rhai"
+verdict_channel = "GRIFFIN_RAMP_CONTACT_REJECTION"
+
+[[verification.cases]]
+name = "GriffinRampRequirements::Verify_GriffinRampDeckContactRejection"
+scene = "tests/griffin_ramp_deck_gap.usda"
+script = "scenarios/tests/griffin_ramp_contact_rejection.rhai"
+verdict_channel = "GRIFFIN_RAMP_CONTACT_REJECTION"
+
+[[verification.cases]]
+name = "GriffinFunctionalRequirements::Verify_GriffinProductionPayloadRelease"
+scene = "tests/griffin_flip_v5_payload_release.usda"
+script = "scenarios/tests/griffin_payload_release.rhai"
+verdict_channel = "GRIFFIN_PAYLOAD_RELEASE"
+
 [[components]]
 name = "griffin.lander"
 requirements = "requirements/griffin_lander_requirements.sysml"
@@ -366,50 +404,11 @@ verification = "GriffinRampRootBearingRequirements::Verify_GriffinRampRootBearin
 usd_path = "/World/RampRootBearing"
 
 [settings]
+"numerics.comparison.angle_abs_rad" = 0.000000001
+"numerics.comparison.length_abs_m" = 0.000001
+"numerics.comparison.scalar_abs" = 0.000000001
+"numerics.solver.residual_abs" = 0.000000001
+"ui.camera_status" = false
+"ui.mission_notifications" = false
+"ui.vehicle_controls" = false
 "usd.runtime_persistence" = false
-"numerics.comparison.length_abs_m" = 1.0e-6
-"numerics.comparison.scalar_abs" = 1.0e-9
-"numerics.comparison.angle_abs_rad" = 1.0e-9
-"numerics.solver.residual_abs" = 1.0e-9
-
-[[verification.cases]]
-name = "GriffinSimulationAccuracyRequirements::Verify_GriffinEngineOffImpact"
-scene = "tests/griffin_engine_off_impact.usda"
-script = "scenarios/tests/griffin_engine_off_impact.rhai"
-verdict_channel = "GRIFFIN_ENGINE_OFF_IMPACT"
-
-[[verification.cases]]
-name = "GriffinSimulationAccuracyRequirements::Verify_GriffinHighImpactValidity"
-scene = "tests/griffin_high_impact_validity.usda"
-script = "scenarios/tests/griffin_contact_validity.rhai"
-verdict_channel = "GRIFFIN_CONTACT_VALIDITY"
-
-[[verification.cases]]
-name = "GriffinSimulationAccuracyRequirements::Verify_GriffinNominalContactValidity"
-scene = "tests/griffin_nominal_contact_validity.usda"
-script = "scenarios/tests/griffin_contact_validity.rhai"
-verdict_channel = "GRIFFIN_CONTACT_VALIDITY"
-
-[[verification.cases]]
-name = "GriffinLandingLegRequirements::Verify_GriffinRoverLegCollision"
-scene = "tests/griffin_rover_leg_collision.usda"
-script = "scenarios/tests/griffin_rover_leg_collision.rhai"
-verdict_channel = "GRIFFIN_ROVER_LEG_COLLISION"
-
-[[verification.cases]]
-name = "GriffinRampRequirements::Verify_GriffinRampToeContactRejection"
-scene = "tests/griffin_ramp_toe_gap.usda"
-script = "scenarios/tests/griffin_ramp_contact_rejection.rhai"
-verdict_channel = "GRIFFIN_RAMP_CONTACT_REJECTION"
-
-[[verification.cases]]
-name = "GriffinRampRequirements::Verify_GriffinRampDeckContactRejection"
-scene = "tests/griffin_ramp_deck_gap.usda"
-script = "scenarios/tests/griffin_ramp_contact_rejection.rhai"
-verdict_channel = "GRIFFIN_RAMP_CONTACT_REJECTION"
-
-[[verification.cases]]
-name = "GriffinFunctionalRequirements::Verify_GriffinProductionPayloadRelease"
-scene = "tests/griffin_flip_v5_payload_release.usda"
-script = "scenarios/tests/griffin_payload_release.rhai"
-verdict_channel = "GRIFFIN_PAYLOAD_RELEASE"

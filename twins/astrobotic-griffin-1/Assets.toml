@@ -5,6 +5,17 @@
 # accepts equirectangular products only. Use tools/terrain/
 # reproject_lroc_polar_dem.py after downloading both entries.
 
+# NASA SVS CGI Moon Kit / LRO LOLA global elevation, 16 pixels per degree.
+# Float32 kilometres relative to 1737.4 km; longitude centered on zero.
+# Broad regional relief only: retain the NOBILE03 raster for local contact.
+[lola_global_16ppd]
+name = "NASA LOLA global lunar elevation — 16 ppd (63 MB)"
+url = "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_16.tif"
+dest = "sources/moon/ldem_16.tif"
+sha256 = "1ea42bf44f7e9d694f79c3afa7145f97fbf06cc67372067d9fe73dce43bad796"
+shared = false
+recommended = false
+
 [nobile03_dem]
 name = "LROC NAC DTM NOBILE03 (4 m/pixel polar-stereographic DEM)"
 url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/NOBILE03/NAC_DTM_NOBILE03.TIF"

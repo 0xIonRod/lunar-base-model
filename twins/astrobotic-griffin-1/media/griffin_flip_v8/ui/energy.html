@@ -1,0 +1,12 @@
+<template>
+<property name="title">Route</property><property name="case_color">#38BDFF</property><property name="collected">—</property><property name="used">—</property><property name="balance">—</property><property name="charge">—</property><property name="current">Preparing</property><property name="elapsed">0m 0s</property><property name="solar_width">0px</property><property name="used_width">0px</property><property name="balance_color">#b7a3ff</property>
+<node id="energy-card">
+ <node id="energy-heading"><text id="route-title">{title}</text><text id="route-clock">{elapsed}</text><text id="charge">{charge}</text></node>
+ <node id="energy-totals">
+  <node id="received-col"><text id="received-label">Sun collected</text><text id="received-number">{collected}</text><node id="solar-track"><node id="solar-fill"/></node></node>
+  <node id="used-col"><text id="used-label">Energy used</text><text id="used-number">{used}</text><node id="used-track"><node id="used-fill"/></node></node>
+  <node id="balance-col"><text id="balance-label">Battery balance</text><text id="balance-number">{balance}</text></node>
+ </node>
+ <text id="current">{current}</text>
+</node>
+</template>

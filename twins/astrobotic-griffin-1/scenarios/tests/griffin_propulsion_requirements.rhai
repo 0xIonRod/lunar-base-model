@@ -584,7 +584,7 @@ fn on_tick(me, ctx) {
     for path in engine_paths {
         plume_paths.push(path + "/Exhaust/Flame");
         plume_paths.push(path + "/Exhaust/FlameCore");
-        light_paths.push(path + "/Exhaust/FlameCore/PlumeLight");
+        light_paths.push(path + "/Exhaust/PlumeLight");
     }
     let observed_plumes = query("QueryUsdPrims", #{paths: plume_paths,
         attrs: ["purpose", "physics:collisionEnabled"],

@@ -1,0 +1,283 @@
+{
+  "kind": "lunco.runtime-ui-manifest.v1",
+  "surfaces": [
+    {
+      "id": "energy-blue",
+      "template": "media/griffin_flip_v8/ui/energy.html",
+      "stylesheet": "media/griffin_flip_v8/ui/energy.css",
+      "namespace": "energy-blue",
+      "bindings": {
+        "title": {
+          "source": "title"
+        },
+        "case_color": {
+          "source": "case_color",
+          "css": true
+        },
+        "collected": {
+          "source": "collected"
+        },
+        "used": {
+          "source": "used"
+        },
+        "balance": {
+          "source": "balance"
+        },
+        "charge": {
+          "source": "charge"
+        },
+        "current": {
+          "source": "current"
+        },
+        "elapsed": {
+          "source": "elapsed"
+        },
+        "solar_width": {
+          "source": "solar_width",
+          "css": true
+        },
+        "used_width": {
+          "source": "used_width",
+          "css": true
+        },
+        "balance_color": {
+          "source": "balance_color",
+          "css": true
+        }
+      },
+      "visible_in_perspective": "sandbox_view",
+      "interactive": false,
+      "placement": {
+        "mode": "window",
+        "anchor": "bottom_left",
+        "offset": [
+          28,
+          -26
+        ],
+        "width": 720,
+        "height": 158
+      }
+    },
+    {
+      "id": "energy-amber",
+      "template": "media/griffin_flip_v8/ui/energy.html",
+      "stylesheet": "media/griffin_flip_v8/ui/energy.css",
+      "namespace": "energy-amber",
+      "bindings": {
+        "title": {
+          "source": "title"
+        },
+        "case_color": {
+          "source": "case_color",
+          "css": true
+        },
+        "collected": {
+          "source": "collected"
+        },
+        "used": {
+          "source": "used"
+        },
+        "balance": {
+          "source": "balance"
+        },
+        "charge": {
+          "source": "charge"
+        },
+        "current": {
+          "source": "current"
+        },
+        "elapsed": {
+          "source": "elapsed"
+        },
+        "solar_width": {
+          "source": "solar_width",
+          "css": true
+        },
+        "used_width": {
+          "source": "used_width",
+          "css": true
+        },
+        "balance_color": {
+          "source": "balance_color",
+          "css": true
+        }
+      },
+      "visible_in_perspective": "sandbox_view",
+      "interactive": false,
+      "placement": {
+        "mode": "window",
+        "anchor": "bottom_right",
+        "offset": [
+          -28,
+          -26
+        ],
+        "width": 720,
+        "height": 158
+      }
+    },
+    {
+      "id": "drive-power",
+      "template": "media/griffin_flip_v8/ui/drive_power.html",
+      "stylesheet": "media/griffin_flip_v8/ui/drive_power.css",
+      "namespace": "drive-power",
+      "bindings": {
+        "motors": {
+          "source": "motors"
+        },
+        "solar": {
+          "source": "solar"
+        },
+        "battery": {
+          "source": "battery"
+        },
+        "battery_label": {
+          "source": "battery_label"
+        },
+        "equipment": {
+          "source": "equipment"
+        },
+        "motor_label": {
+          "source": "motor_label"
+        }
+      },
+      "visible_in_perspective": "sandbox_view",
+      "interactive": false,
+      "placement": {
+        "mode": "window",
+        "anchor": "bottom_center",
+        "offset": [
+          0,
+          -26
+        ],
+        "width": 920,
+        "height": 104
+      }
+    },
+    {
+      "id": "route-short",
+      "template": "media/griffin_flip_v12/ui/route.html",
+      "stylesheet": "media/griffin_flip_v12/ui/route.css",
+      "namespace": "route-short",
+      "bindings": {
+        "title": {
+          "source": "title"
+        },
+        "balance": {
+          "source": "balance"
+        },
+        "elapsed": {
+          "source": "elapsed"
+        },
+        "case_color": {
+          "source": "case_color",
+          "css": true
+        },
+        "balance_width": {
+          "source": "balance_width",
+          "css": true
+        }
+      },
+      "visible_in_perspective": "sandbox_view",
+      "interactive": false,
+      "placement": {
+        "mode": "window",
+        "anchor": "bottom_left",
+        "offset": [
+          32,
+          -28
+        ],
+        "width": 620,
+        "height": 238
+      }
+    },
+    {
+      "id": "route-long",
+      "template": "media/griffin_flip_v12/ui/route.html",
+      "stylesheet": "media/griffin_flip_v12/ui/route.css",
+      "namespace": "route-long",
+      "bindings": {
+        "title": {
+          "source": "title"
+        },
+        "balance": {
+          "source": "balance"
+        },
+        "elapsed": {
+          "source": "elapsed"
+        },
+        "case_color": {
+          "source": "case_color",
+          "css": true
+        },
+        "balance_width": {
+          "source": "balance_width",
+          "css": true
+        }
+      },
+      "visible_in_perspective": "sandbox_view",
+      "interactive": false,
+      "placement": {
+        "mode": "window",
+        "anchor": "bottom_right",
+        "offset": [
+          -32,
+          -28
+        ],
+        "width": 620,
+        "height": 238
+      }
+    },
+    {
+      "id": "film-motor",
+      "template": "media/griffin_flip_v12/ui/reading.html",
+      "stylesheet": "media/griffin_flip_v12/ui/reading.css",
+      "namespace": "film-motor",
+      "bindings": {
+        "label": {
+          "source": "label"
+        },
+        "value": {
+          "source": "value"
+        }
+      },
+      "visible_in_perspective": "sandbox_view",
+      "interactive": false,
+      "placement": {
+        "mode": "window",
+        "anchor": "bottom_center",
+        "offset": [
+          0,
+          -32
+        ],
+        "width": 580,
+        "height": 160
+      }
+    },
+    {
+      "id": "film-solar",
+      "template": "media/griffin_flip_v12/ui/reading.html",
+      "stylesheet": "media/griffin_flip_v12/ui/reading.css",
+      "namespace": "film-solar",
+      "bindings": {
+        "label": {
+          "source": "label"
+        },
+        "value": {
+          "source": "value"
+        }
+      },
+      "visible_in_perspective": "sandbox_view",
+      "interactive": false,
+      "placement": {
+        "mode": "window",
+        "anchor": "bottom_center",
+        "offset": [
+          0,
+          -32
+        ],
+        "width": 580,
+        "height": 160
+      }
+    }
+  ]
+}

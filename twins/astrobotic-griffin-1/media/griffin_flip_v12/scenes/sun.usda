@@ -1,0 +1,212 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/tests/flip_route_follow.usda@</Griffin1SurfaceOps>
+)
+{
+    over "Scenario"
+    {
+        def "Test" (
+            active = true
+        )
+        {
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/media/griffin_flip_v8/scenarios/idle.rhai@
+        }
+    }
+    over "Avatar"
+    {
+        custom double3 xformOp:translate = (8.0, 5.0, 10.0)
+        double3 lunco:cameraLookAt = (0.0, 0.7, 0.0)
+    }
+    def Scope "Policies"
+    {
+    }
+    def LunCoPolicy "FilmViews"
+    {
+        uniform string lunco:policy:seam = "workbench.perspectives.twin"
+        string lunco:policy:entry = "assemble"
+        uniform string info:sourceCode = "fn assemble(facts) { [#{id:\"film-drive\",title:\"Driving energy\",description:\"Four native motion and power histories with the rover centered above them.\",interaction:\"editor\",restore:false,scene_visible:true,floating:[#{kind:\"signal_grid\",instance:1,corner:\"bottom_left\",width:2500,height:420,inset:20}]},#{id:\"film-model\",title:\"Power and control\",description:\"Actual exported Modelica components, electrical connections and control bindings.\",interaction:\"editor\",restore:false,instances:[#{kind:\"modelica_model_view\",instance:3,slot:\"center\"}]}] }"
+        bool lunco:policy:deterministic = false
+    }
+    def LunCoPolicy "FilmRecordingUI"
+    {
+        uniform string lunco:policy:seam = "runtime.ui.recording"
+        string lunco:policy:entry = "select"
+        uniform string info:sourceCode = "fn select(facts) { [] }"
+        bool lunco:policy:deterministic = false
+    }
+    def Scope "DriveStimulus"
+    {
+    }
+    def Xform "DriveProgramHost"
+    {
+    }
+    def BasisCurves "DriveCameraPath" (
+        prepend apiSchemas = ["LunCoCameraPathAPI"]
+        active = false
+    )
+    {
+        uniform token type = "linear"
+        uniform token wrap = "nonperiodic"
+        uniform token basis = "bezier"
+        int[] curveVertexCounts = [34]
+        point3f[] points = [(4.0, 3.049999952316284, 4.5), (4.008896350860596, 2.124392509460449, 4.479839324951172), (4.018561840057373, 2.0992441177368164, 4.190018653869629), (4.033555507659912, 1.9259918928146362, 2.2916080951690674), (4.054861068725586, 1.6958656311035156, -0.11724362522363663), (4.07699728012085, 1.4597735404968262, -2.6174156665802), (4.097257614135742, 1.2295200824737549, -5.12615442276001), (4.117534637451172, 1.002146601676941, -7.630218029022217), (4.137284278869629, 0.7629426717758179, -10.139836311340332), (4.1559319496154785, 0.4961440861225128, -12.671866416931152), (4.207866668701172, 0.40351781249046326, -13.457013130187988), (4.221683502197266, 0.4023612141609192, -13.46215534210205), (4.239287376403809, 0.3946702480316162, -13.52452278137207), (4.257776737213135, 0.35431036353111267, -13.863907814025879), (4.292220115661621, 0.3016631603240967, -14.300078392028809), (4.426764011383057, 0.24915608763694763, -14.698931694030762), (4.590428352355957, 0.20445097982883453, -15.019994735717773), (4.70744514465332, 0.16730765998363495, -15.2958402633667), (4.7754621505737305, 0.12731394171714783, -15.603879928588867), (4.835964679718018, 0.08100976049900055, -15.970157623291016), (4.868851661682129, 0.030678806826472282, -16.376571655273438), (4.870038986206055, -0.02322433330118656, -16.817686080932617), (4.9022064208984375, -0.06060633063316345, -17.114423751831055), (4.891686916351318, -0.06269967555999756, -17.134416580200195), (4.880708694458008, -0.06480249762535095, -17.154987335205078), (4.869899272918701, -0.06688505411148071, -17.175338745117188), (4.764058589935303, -0.05566868558526039, -17.117507934570313), (4.057154655456543, 0.03868545591831207, -16.56680679321289), (3.156980037689209, 0.15748222172260284, -15.864374160766602), (2.218240261077881, 0.2802892029285431, -15.136008262634277), (1.2682950496673584, 0.4020799696445465, -14.40224552154541), (0.30685997009277344, 0.5200595259666443, -13.663664817810059), (-0.6725231409072876, 0.6299482583999634, -12.91645622253418), (-1.4262444972991943, 0.7053244113922119, -12.343896865844727)]
+        double lunco:path:duration = 66.0
+        token lunco:path:clock = "sim"
+        token visibility = "invisible"
+        rel lunco:path:camera = </Griffin1SurfaceOps/DriveCamera>
+        rel lunco:path:lookAt = </Griffin1SurfaceOps/FLIP>
+    }
+    def Camera "DriveCamera" (
+        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+    )
+    {
+        float focalLength = 24.0
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        custom double3 xformOp:translate = (4.0, 3.049999952316284, 4.5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "authored"
+    }
+    over "FLIP" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxVehicleContextAPI", "LunCoCatalogAPI", "CollectionAPI:components", "PhysicsArticulationRootAPI", "LunCoUiSchemaAPI", "PhysxRigidBodyAPI"]
+    )
+    {
+        string lunco:ui:surfaceId = ""
+        string lunco:ui:visibilityMode = "always"
+        def Camera "PanelHero" (
+            prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+        )
+        {
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float focalLength = 32.0
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            custom double3 xformOp:translate = (4.3, 2.5, 5.4)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (-15.389392428269325, 38.530180014826826, 0.0)
+        }
+        def Camera "WheelDetail" (
+            prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+        )
+        {
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float focalLength = 32.0
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            custom double3 xformOp:translate = (-3.8, 1.8, 4.8)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (-12.880914991942996, -38.36748538486154, 0.0)
+        }
+        over "PanelControls" (
+            active = false
+        )
+        {
+        }
+        def Scope "ContactMaterials"
+        {
+            def Material "RegolithTread" (
+                prepend apiSchemas = ["PhysicsMaterialAPI", "PhysxMaterialAPI"]
+            )
+            {
+                float physics:staticFriction = 0.6000000238418579
+                float physics:dynamicFriction = 0.6000000238418579
+                float physics:restitution = 0.0
+                custom token physxMaterial:frictionCombineMode = "min"
+                custom string documentation = "Native rigid wheel/soil contact, nominal mu 0.6. An estimated Coulomb approximation; wheel deformation and soil sinkage are not resolved. The separate tire slip-force layer is excluded by native material ownership."
+            }
+        }
+        over "Suspension_FL"
+        {
+            over "Wheel_FL" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Suspension_FR"
+        {
+            over "Wheel_FR" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Suspension_RL"
+        {
+            over "Wheel_RL" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Suspension_RR"
+        {
+            over "Wheel_RR" (
+                prepend apiSchemas = ["VisibilityAPI", "MaterialBindingAPI", "PhysxVehicleWheelAttachmentAPI", "PhysxVehicleWheelAPI", "PhysicsRigidBodyAPI", "PhysicsCollisionAPI", "PhysicsFilteredPairsAPI", "LunCoCatalogAPI", "LunCoWheelAPI", "PhysxVehicleTireAPI", "PhysicsMaterialAPI", "LunCoTireAPI", "PhysxVehicleSuspensionAPI", "LunCoSuspensionAPI"]
+            )
+            {
+                custom rel material:binding:physics = </Griffin1SurfaceOps/FLIP/ContactMaterials/RegolithTread>
+            }
+        }
+        over "Thermal" (
+            active = false
+        )
+        {
+        }
+    }
+    def LunCoPolicy "DrivePowerProperties"
+    {
+        uniform string lunco:policy:seam = "runtime.ui.properties"
+        string lunco:policy:entry = "runtime_ui_properties"
+        uniform string info:sourceCode = "fn runtime_ui_properties(facts) {\n if facts.surface_id!=\"film-motor\" && facts.surface_id!=\"film-solar\" {return #{};}\n for participant in facts.participants {\n  let out=participant.outputs;\n  let p=if facts.surface_id==\"film-motor\" {out[\"__member_Motor_FL_electrical_power\"]}else{out[\"solar_power\"]};\n  if p==() {continue;}\n  let label=if facts.surface_id==\"film-motor\" {if p < -0.5 {\"Front motor returns\"}else{\"Front motor uses\"}}else{\"Solar panel produces\"};\n  return #{label:label,value:abs(p).round().to_int().to_string()+\" W\"};\n }\n #{label:\"Waiting for measurement\",value:\"—\"}\n}"
+        bool lunco:policy:deterministic = false
+    }
+    def Camera "SlopeView" (
+        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+    )
+    {
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "authored"
+        float focalLength = 30.0
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        custom double3 xformOp:translate = (3.0, 2.5, -27.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (-18.736901380909107, 147.9946167919165, 0.0)
+    }
+    over "Environment" (
+        references = @twin://astrobotic-griffin-1/media/griffin_flip_v8/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
+    )
+    {
+    }
+    over "SolarSystem"
+    {
+        over "Looks"
+        {
+            over "Moon"
+            {
+                over "Shader"
+                {
+                    custom asset inputs:albedo_map = @twin://astrobotic-griffin-1/textures/moon/lroc_color_2025_8k.png@
+                    color3f inputs:surface_color = (1.0, 1.0, 1.0)
+                }
+            }
+        }
+    }
+}

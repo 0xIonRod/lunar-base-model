@@ -3,6 +3,7 @@
     defaultPrim = "Griffin1"
     upAxis = "Y"
     metersPerUnit = 1.0
+    relocates = {  }
 )
 
 def Xform "Griffin1" (
@@ -3131,19 +3132,6 @@ def Xform "Griffin1" (
                         float inputs:flow_phase_sin.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:flow_phase_sin>
                         custom float inputs:flow_phase_cos
                         float inputs:flow_phase_cos.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:flow_phase_cos>
-                        def "PlumeLight"
-                        {
-                            custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:intensity>
-                            custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:radius>
-                            custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_r>
-                            custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_g>
-                            custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_b>
-                        }
                     }
                     over "Looks"
                     {
@@ -3165,6 +3153,19 @@ def Xform "Griffin1" (
                                 float inputs:flicker = 0.9700000286102295
                             }
                         }
+                    }
+                    over "PlumeLight"
+                    {
+                        float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:intensity>
+                        float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:radius>
+                        float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_r>
+                        float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_g>
+                        float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_b>
                     }
                 }
             }
@@ -3305,19 +3306,6 @@ def Xform "Griffin1" (
                         float inputs:flow_phase_sin.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:flow_phase_sin>
                         custom float inputs:flow_phase_cos
                         float inputs:flow_phase_cos.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:flow_phase_cos>
-                        def "PlumeLight"
-                        {
-                            custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:intensity>
-                            custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:radius>
-                            custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_r>
-                            custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_g>
-                            custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_b>
-                        }
                     }
                     over "Looks"
                     {
@@ -3339,6 +3327,19 @@ def Xform "Griffin1" (
                                 float inputs:flicker = 0.9700000286102295
                             }
                         }
+                    }
+                    over "PlumeLight"
+                    {
+                        float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:intensity>
+                        float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:radius>
+                        float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_r>
+                        float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_g>
+                        float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_b>
                     }
                 }
             }
@@ -3479,19 +3480,6 @@ def Xform "Griffin1" (
                         float inputs:flow_phase_sin.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:flow_phase_sin>
                         custom float inputs:flow_phase_cos
                         float inputs:flow_phase_cos.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:flow_phase_cos>
-                        def "PlumeLight"
-                        {
-                            custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:intensity>
-                            custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:radius>
-                            custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_r>
-                            custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_g>
-                            custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_b>
-                        }
                     }
                     over "Looks"
                     {
@@ -3513,6 +3501,19 @@ def Xform "Griffin1" (
                                 float inputs:flicker = 0.9700000286102295
                             }
                         }
+                    }
+                    over "PlumeLight"
+                    {
+                        float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:intensity>
+                        float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:radius>
+                        float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_r>
+                        float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_g>
+                        float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_b>
                     }
                 }
             }
@@ -3653,19 +3654,6 @@ def Xform "Griffin1" (
                         float inputs:flow_phase_sin.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:flow_phase_sin>
                         custom float inputs:flow_phase_cos
                         float inputs:flow_phase_cos.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:flow_phase_cos>
-                        def "PlumeLight"
-                        {
-                            custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:intensity>
-                            custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:radius>
-                            custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_r>
-                            custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_g>
-                            custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_b>
-                        }
                     }
                     over "Looks"
                     {
@@ -3687,6 +3675,19 @@ def Xform "Griffin1" (
                                 float inputs:flicker = 0.9700000286102295
                             }
                         }
+                    }
+                    over "PlumeLight"
+                    {
+                        float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:intensity>
+                        float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:radius>
+                        float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_r>
+                        float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_g>
+                        float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_b>
                     }
                 }
             }
@@ -3827,19 +3828,6 @@ def Xform "Griffin1" (
                         float inputs:flow_phase_sin.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:flow_phase_sin>
                         custom float inputs:flow_phase_cos
                         float inputs:flow_phase_cos.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:flow_phase_cos>
-                        def "PlumeLight"
-                        {
-                            custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:intensity>
-                            custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:radius>
-                            custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_r>
-                            custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_g>
-                            custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_b>
-                        }
                     }
                     over "Looks"
                     {
@@ -3861,6 +3849,19 @@ def Xform "Griffin1" (
                                 float inputs:flicker = 0.9700000286102295
                             }
                         }
+                    }
+                    over "PlumeLight"
+                    {
+                        float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:intensity>
+                        float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:radius>
+                        float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_r>
+                        float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_g>
+                        float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_b>
                     }
                 }
             }
@@ -4008,19 +4009,6 @@ def Xform "Griffin1" (
                         float inputs:flow_phase_sin.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:flow_phase_sin>
                         custom float inputs:flow_phase_cos
                         float inputs:flow_phase_cos.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:flow_phase_cos>
-                        def "PlumeLight"
-                        {
-                            custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:intensity>
-                            custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:radius>
-                            custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_r>
-                            custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_g>
-                            custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_b>
-                        }
                     }
                     over "Looks"
                     {
@@ -4042,6 +4030,19 @@ def Xform "Griffin1" (
                                 float inputs:flicker = 0.9700000286102295
                             }
                         }
+                    }
+                    over "PlumeLight"
+                    {
+                        float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:intensity>
+                        float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:radius>
+                        float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_r>
+                        float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_g>
+                        float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_b>
                     }
                 }
             }
@@ -4182,19 +4183,6 @@ def Xform "Griffin1" (
                         float inputs:flow_phase_sin.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:flow_phase_sin>
                         custom float inputs:flow_phase_cos
                         float inputs:flow_phase_cos.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:flow_phase_cos>
-                        def "PlumeLight"
-                        {
-                            custom float inputs:light_intensity
-                            float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:intensity>
-                            custom float inputs:light_radius
-                            float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:radius>
-                            custom float inputs:light_color_r
-                            float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_r>
-                            custom float inputs:light_color_g
-                            float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_g>
-                            custom float inputs:light_color_b
-                            float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_b>
-                        }
                     }
                     over "Looks"
                     {
@@ -4216,6 +4204,19 @@ def Xform "Griffin1" (
                                 float inputs:flicker = 0.9700000286102295
                             }
                         }
+                    }
+                    over "PlumeLight"
+                    {
+                        float inputs:light_intensity
+                        float inputs:light_intensity.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:intensity>
+                        float inputs:light_radius
+                        float inputs:light_radius.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:radius>
+                        float inputs:light_color_r
+                        float inputs:light_color_r.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_r>
+                        float inputs:light_color_g
+                        float inputs:light_color_g.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_g>
+                        float inputs:light_color_b
+                        float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_b>
                     }
                 }
             }
@@ -6540,19 +6541,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -6574,6 +6562,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosModel.outputs:color_b>
                 }
             }
         }
@@ -6721,19 +6722,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -6755,6 +6743,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchPosBModel.outputs:color_b>
                 }
             }
         }
@@ -6902,19 +6903,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -6936,6 +6924,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegModel.outputs:color_b>
                 }
             }
         }
@@ -7083,19 +7084,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -7117,6 +7105,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsPitchNegBModel.outputs:color_b>
                 }
             }
         }
@@ -7264,19 +7265,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -7298,6 +7286,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosModel.outputs:color_b>
                 }
             }
         }
@@ -7445,19 +7446,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -7479,6 +7467,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollPosBModel.outputs:color_b>
                 }
             }
         }
@@ -7626,19 +7627,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -7660,6 +7648,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegModel.outputs:color_b>
                 }
             }
         }
@@ -7807,19 +7808,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -7841,6 +7829,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsRollNegBModel.outputs:color_b>
                 }
             }
         }
@@ -7988,19 +7989,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -8022,6 +8010,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:color_b>
                 }
             }
         }
@@ -8169,19 +8170,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -8203,6 +8191,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawPosBModel.outputs:color_b>
                 }
             }
         }
@@ -8350,19 +8351,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -8384,6 +8372,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegModel.outputs:color_b>
                 }
             }
         }
@@ -8531,19 +8532,6 @@ def Xform "Griffin1" (
                     float inputs:flow_phase_sin.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:flow_phase_sin>
                     custom float inputs:flow_phase_cos
                     float inputs:flow_phase_cos.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:flow_phase_cos>
-                    def "PlumeLight"
-                    {
-                        custom float inputs:light_intensity
-                        float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:light_intensity>
-                        custom float inputs:light_radius
-                        float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:light_radius>
-                        custom float inputs:light_color_r
-                        float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_r>
-                        custom float inputs:light_color_g
-                        float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_g>
-                        custom float inputs:light_color_b
-                        float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_b>
-                    }
                 }
                 over "Looks"
                 {
@@ -8565,6 +8553,19 @@ def Xform "Griffin1" (
                             float inputs:flicker = 0.9700000286102295
                         }
                     }
+                }
+                over "PlumeLight"
+                {
+                    float inputs:light_intensity
+                    float inputs:light_intensity.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:light_intensity>
+                    float inputs:light_radius
+                    float inputs:light_radius.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:light_radius>
+                    float inputs:light_color_r
+                    float inputs:light_color_r.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_r>
+                    float inputs:light_color_g
+                    float inputs:light_color_g.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_g>
+                    float inputs:light_color_b
+                    float inputs:light_color_b.connect = </Griffin1/AttitudePropulsion/RcsYawNegBModel.outputs:color_b>
                 }
             }
         }
