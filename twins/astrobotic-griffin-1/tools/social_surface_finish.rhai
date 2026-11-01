@@ -123,6 +123,7 @@ fn hardware_ops(shader,prefix) {
     let ops=[attr(shader,"info:implementationSource","token","\"sourceAsset\""),
         attr(shader,"info:wesl:sourceAsset","asset","@twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@"),
         attr(shader,"inputs:base_color","color3f",text_color(color)),
+        attr(shader,"inputs:diffuseColor","color3f",text_color(color)),
         attr(shader,"inputs:metallic","float",metallic.to_string()),
         attr(shader,"inputs:roughness","float",roughness.to_string())];
     for item in [["grain_strength","FrameGrain"],["grain_scale","FrameScale"],["brush_ratio","FrameBrush"]] {
@@ -170,4 +171,66 @@ fn review_lighting_plan(doc) {
     #{doc_id:doc,generation:q.generation,ops:[
         attr(root+"/VisualCamera","exposure","float",datum("ReviewExposureStops").to_string()),
         attr(root+"/ReviewFill","inputs:intensity","float",datum("ReviewFillIntensity").to_string())]}
+}
+fn bus_hardware_plan(doc) {
+    let root="/GriffinBus/Looks";
+    let q=query("InspectUsdDocument",#{doc_id:doc,path:root});
+    if !q.prim.exists {throw("Open the canonical Griffin bus component");}
+    let ops=[];
+    for item in [["FrameMetal","aluminum"],["TankCollars","aluminum"],["TankFrame","retention"]] {
+        let shader=root+"/"+item[0]+"/Surface";
+        if query("QueryUsdPrim",#{doc_id:doc,path:shader,attrs:[]}).type_name!="Shader" {throw("Missing bus finish: "+shader);}
+        for op in hardware_ops(shader,item[1]) {ops.push(op);}
+    }
+    #{doc_id:doc,generation:q.generation,ops:ops}
+}
+fn check_bus_hardware(doc) {
+    let m=sysml_model("twin://astrobotic-griffin-1/requirements/griffin_presentation_study.sysml");
+    let checks=0;
+    for row in [["FrameMetal","aluminum"],["TankCollars","aluminum"],["TankFrame","retention"]] {
+        let p=query("QueryUsdPrim",#{doc_id:doc,path:"/GriffinBus/Looks/"+row[0]+"/Surface",
+          attrs:["info:wesl:sourceAsset","inputs:base_color","inputs:diffuseColor","inputs:metallic","inputs:roughness"]});
+        if p.attrs["info:wesl:sourceAsset"]!="twin://astrobotic-griffin-1/shaders/hardware_finish.wesl" {throw("Wrong bus hardware shader");}
+        let prefix="GriffinPresentationStudy::HardwareFinish::"+row[1];
+        let color=m.value(prefix+"Color");
+        for i in 0..3 {for channel in ["base_color","diffuseColor"] {
+            if abs(p.attrs["inputs:"+channel][i]-color[i])>0.000001 {throw("Bus metal color differs from its source");}
+        }}
+        for field in [["metallic","Metallic"],["roughness","Roughness"]] {
+            if abs(p.attrs["inputs:"+field[0]]-m.value(prefix+field[1]))>0.000001 {throw("Bus finish differs from its source");}
+        }
+        checks+=4;
+    }
+    #{ok:true,checks:checks}
+}
+fn blanket_path(component) {
+    if component=="bus" {return "/GriffinBus/Looks/ExteriorPanels/Surface";}
+    if component=="tank" {return "/PropellantTank/MliTank/Looks/TankInsulation/Surface";}
+    if component=="skirt" {return "/World/EngineSkirt/Looks/BayBlanket/Surface";}
+    throw("Unknown canonical blanket owner: "+component)
+}
+fn blanket_detail_plan(doc,component) {
+    let shader=blanket_path(component);
+    let q=query("InspectUsdDocument",#{doc_id:doc,path:shader});
+    if !q.prim.exists {throw("Open the canonical blanket owner: "+shader);}
+    let m=sysml_model("twin://astrobotic-griffin-1/requirements/griffin_presentation_study.sysml");
+    let ops=[attr(shader,"info:implementationSource","token","\"sourceAsset\""),
+        attr(shader,"info:wesl:sourceAsset","asset","@twin://astrobotic-griffin-1/shaders/thermal_blanket.wesl@")];
+    for row in [["micro_scale","MicroScalePerM"],["micro_strength","MicroSlope"]] {
+        let v=m.value("GriffinPresentationStudy::BlanketFinish::"+row[1]);
+        if v==() {throw("Missing fine blanket control: "+row[1]);}
+        ops.push(attr(shader,"inputs:"+row[0],"float",v.to_string()));
+    }
+    #{doc_id:doc,generation:q.generation,ops:ops}
+}
+fn check_blanket_detail(doc,component) {
+    let p=query("QueryUsdPrim",#{doc_id:doc,path:blanket_path(component),
+      attrs:["info:wesl:sourceAsset","inputs:micro_scale","inputs:micro_strength"]});
+    if p.attrs["info:wesl:sourceAsset"]!="twin://astrobotic-griffin-1/shaders/thermal_blanket.wesl" {throw("Wrong blanket shader");}
+    let m=sysml_model("twin://astrobotic-griffin-1/requirements/griffin_presentation_study.sysml");
+    for row in [["micro_scale","MicroScalePerM"],["micro_strength","MicroSlope"]] {
+        let expected=m.value("GriffinPresentationStudy::BlanketFinish::"+row[1]);
+        if abs(p.attrs["inputs:"+row[0]]-expected)>0.00001 {throw("Blanket control readback differs from SysML");}
+    }
+    #{ok:true,checks:3,component:component,generation:p.generation}
 }

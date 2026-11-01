@@ -2416,7 +2416,9 @@ def Xform "GriffinBus" (
                 float inputs:sheen = 0.6000000238418579
                 float inputs:v_scale = 1.399999976158142
                 uniform token info:implementationSource = "sourceAsset"
-                asset info:wesl:sourceAsset = @lunco://shaders/mli_foil.wesl@
+                asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/thermal_blanket.wesl@
+                custom float inputs:micro_scale = 240.0
+                custom float inputs:micro_strength = 0.04500000178813934
             }
         }
         def Material "TankFrame"
@@ -2427,9 +2429,15 @@ def Xform "GriffinBus" (
             {
                 uniform token info:id = "UsdPreviewSurface"
                 token outputs:surface = ""
-                color3f inputs:diffuseColor = (0.11999999731779099, 0.15000000596046448, 0.1899999976158142)
-                float inputs:metallic = 0.75
-                float inputs:roughness = 0.41999998688697815
+                color3f inputs:diffuseColor = (0.3400000035762787, 0.3799999952316284, 0.4300000071525574)
+                float inputs:metallic = 0.8500000238418579
+                float inputs:roughness = 0.2800000011920929
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom color3f inputs:base_color = (0.3400000035762787, 0.3799999952316284, 0.4300000071525574)
+                custom float inputs:grain_strength = 0.03500000014901161
+                custom float inputs:grain_scale = 160.0
+                custom float inputs:brush_ratio = 8.0
             }
         }
         def Material "TankCollars"
@@ -2440,9 +2448,15 @@ def Xform "GriffinBus" (
             {
                 uniform token info:id = "UsdPreviewSurface"
                 token outputs:surface = ""
-                color3f inputs:diffuseColor = (0.23999999463558197, 0.2800000011920929, 0.3400000035762787)
-                float inputs:metallic = 0.75
-                float inputs:roughness = 0.41999998688697815
+                color3f inputs:diffuseColor = (0.6299999952316284, 0.6700000166893005, 0.7200000286102295)
+                float inputs:metallic = 0.8199999928474426
+                float inputs:roughness = 0.33000001311302185
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom color3f inputs:base_color = (0.6299999952316284, 0.6700000166893005, 0.7200000286102295)
+                custom float inputs:grain_strength = 0.03500000014901161
+                custom float inputs:grain_scale = 160.0
+                custom float inputs:brush_ratio = 8.0
             }
         }
         def Material "MediumGainRadome"
@@ -2466,9 +2480,15 @@ def Xform "GriffinBus" (
             {
                 uniform token info:id = "UsdPreviewSurface"
                 token outputs:surface = ""
-                color3f inputs:diffuseColor = (0.550000011920929, 0.5799999833106995, 0.6200000047683716)
-                float inputs:metallic = 0.75
-                float inputs:roughness = 0.41999998688697815
+                color3f inputs:diffuseColor = (0.6299999952316284, 0.6700000166893005, 0.7200000286102295)
+                float inputs:metallic = 0.8199999928474426
+                float inputs:roughness = 0.33000001311302185
+                uniform token info:implementationSource = "sourceAsset"
+                custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
+                custom color3f inputs:base_color = (0.6299999952316284, 0.6700000166893005, 0.7200000286102295)
+                custom float inputs:grain_strength = 0.03500000014901161
+                custom float inputs:grain_scale = 160.0
+                custom float inputs:brush_ratio = 8.0
             }
         }
         def Material "HarnessJacket"

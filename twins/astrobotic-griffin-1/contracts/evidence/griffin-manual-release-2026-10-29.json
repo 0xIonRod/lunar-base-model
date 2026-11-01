@@ -1,0 +1,264 @@
+{
+  "date": "2026-10-29",
+  "seed": 6840157149251759617,
+  "tick_hz": 60,
+  "runs": {
+    "early-release": {
+      "exit_code": 0,
+      "summary": "luncosim test PASS  scene=F:/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_compact_early_release.usda  channel=GRIFFIN_COMPACT_EARLY_RELEASE  ticks=123  updates=131  sim=2.05s  threads=default  jitter=0.000  seed=6840157149251759617  tick_hz=60.0000",
+      "evidence": {
+        "name": "GRIFFIN_COMPACT_EARLY_RELEASE_EVIDENCE",
+        "sim_tick": 123,
+        "data": {
+          "Map": {
+            "channel": {
+              "String": "GRIFFIN_COMPACT_EARLY_RELEASE"
+            },
+            "check_count": {
+              "I64": 4
+            },
+            "error_count": {
+              "I64": 0
+            },
+            "evidence_chunked": {
+              "Bool": false
+            },
+            "evidence_result_events": {
+              "I64": 0
+            },
+            "failure_count": {
+              "I64": 0
+            },
+            "failures": {
+              "Array": []
+            },
+            "inconclusive_count": {
+              "I64": 0
+            },
+            "metrics": {
+              "Map": {
+                "brake": {
+                  "F64": 1.0
+                },
+                "completed_tick": {
+                  "I64": 123
+                },
+                "detached": {
+                  "Bool": true
+                },
+                "qualified_at_click": {
+                  "Bool": false
+                },
+                "release_events": {
+                  "I64": 1
+                },
+                "request_tick": {
+                  "I64": 120
+                }
+              }
+            },
+            "non_pass_count": {
+              "I64": 0
+            },
+            "non_pass_results": {
+              "Array": []
+            },
+            "ok": {
+              "Bool": true
+            },
+            "pass_count": {
+              "I64": 4
+            },
+            "requirement_count": {
+              "I64": 0
+            },
+            "requirement_names": {
+              "Array": []
+            },
+            "requirement_summary": {
+              "Map": {}
+            },
+            "result_count": {
+              "I64": 0
+            },
+            "results": {
+              "Array": []
+            },
+            "schema_version": {
+              "I64": 3
+            },
+            "source_files": {
+              "Array": []
+            },
+            "source_revision": {
+              "Bool": true
+            },
+            "title": {
+              "String": "GRIFFIN EXPLICIT RELEASE AUTHORITY"
+            },
+            "unverified_count": {
+              "I64": 0
+            },
+            "verdict": {
+              "String": "pass"
+            },
+            "verification": {
+              "String": ""
+            }
+          }
+        }
+      }
+    },
+    "parked3": {
+      "exit_code": 0,
+      "summary": "luncosim test PASS  scene=F:/lunar-base-model/twins/astrobotic-griffin-1/tests/griffin_compact_manual_release.usda  channel=GRIFFIN_COMPACT_MANUAL_RELEASE  ticks=2041  updates=7207  sim=34.02s  threads=default  jitter=0.000  seed=6840157149251759617  tick_hz=60.0000",
+      "evidence": {
+        "name": "GRIFFIN_COMPACT_MANUAL_RELEASE_EVIDENCE",
+        "sim_tick": 2041,
+        "data": {
+          "Map": {
+            "channel": {
+              "String": "GRIFFIN_COMPACT_MANUAL_RELEASE"
+            },
+            "check_count": {
+              "I64": 9
+            },
+            "error_count": {
+              "I64": 0
+            },
+            "evidence_chunked": {
+              "Bool": false
+            },
+            "evidence_result_events": {
+              "I64": 0
+            },
+            "failure_count": {
+              "I64": 0
+            },
+            "failures": {
+              "Array": []
+            },
+            "inconclusive_count": {
+              "I64": 0
+            },
+            "metrics": {
+              "Map": {
+                "autopilot": {
+                  "F64": 0.0
+                },
+                "brake": {
+                  "F64": 0.0
+                },
+                "detached_tick": {
+                  "I64": 1381
+                },
+                "drive_displacement_m": {
+                  "F64": 0.425817857018471
+                },
+                "graph_edges": {
+                  "U64": 13
+                },
+                "joints": {
+                  "U64": 13
+                },
+                "lateral_clearance_m": {
+                  "F64": 0.07499999999999998
+                },
+                "parked_drift_m": {
+                  "F64": 0.06816651545261536
+                },
+                "parked_lateral_m": {
+                  "F64": 0.06649203269523121
+                },
+                "parked_rollback_m": {
+                  "F64": 0.0036385981169928545
+                },
+                "ramp_marker_forward_m": {
+                  "F64": 1.9519334316415689
+                },
+                "ramp_marker_lateral_m": {
+                  "F64": 0.0047169708741192085
+                },
+                "release_events": {
+                  "I64": 1
+                },
+                "request_tick": {
+                  "I64": 1379
+                },
+                "scope": {
+                  "String": "HUD detach, ten seconds parked, deliberate drive releases brake and advances toward actual ramp; tethered descent not qualified"
+                },
+                "travel_toward_ramp_m": {
+                  "F64": 0.4258179028105234
+                }
+              }
+            },
+            "non_pass_count": {
+              "I64": 0
+            },
+            "non_pass_results": {
+              "Array": []
+            },
+            "ok": {
+              "Bool": true
+            },
+            "pass_count": {
+              "I64": 9
+            },
+            "requirement_count": {
+              "I64": 0
+            },
+            "requirement_names": {
+              "Array": []
+            },
+            "requirement_summary": {
+              "Map": {}
+            },
+            "result_count": {
+              "I64": 0
+            },
+            "results": {
+              "Array": []
+            },
+            "schema_version": {
+              "I64": 3
+            },
+            "source_files": {
+              "Array": []
+            },
+            "source_revision": {
+              "Bool": true
+            },
+            "title": {
+              "String": "GRIFFIN COMPACT MANUAL RELEASE"
+            },
+            "unverified_count": {
+              "I64": 0
+            },
+            "verdict": {
+              "String": "pass"
+            },
+            "verification": {
+              "String": ""
+            }
+          }
+        }
+      }
+    }
+  },
+  "shaft_document_generation": 2,
+  "shaft_projection_ready": true,
+  "shaft_paths": [
+    "/Griffin1/Bus/RampSharedShaftPort",
+    "/Griffin1/Bus/RampSharedShaftStarboard"
+  ],
+  "shaft_active": false,
+  "controlled_descent_qualified": false,
+  "normal_landed_result": {
+    "passed_checks": 9,
+    "tick": 2041,
+    "sim_seconds": 34.016666666666666,
+    "parked_rollback_m": 0.0036385981169928545,
+    "travel_toward_ramp_m": 0.4258179028105234
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-29",
+  "sysml": {
+    "path": "twin://astrobotic-griffin-1",
+    "kind": "sysml",
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "analysis": {
+      "source_revision": 8521075844834223816,
+      "source_fingerprint": 15963475887572803900,
+      "stdlib": true,
+      "source_files": [
+        "twin://astrobotic-griffin-1/requirements/flip_airless_wheel_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_chassis_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_sensor_power_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_suspension_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/flip_wheel_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_assurance_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_bus_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_flip_egress.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_lander_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_landing_legs_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_material_catalog.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_mechanical_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_power_thermal.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_presentation_study.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_propulsion_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_middle_section_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_root_bearing_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_root_section_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_ramp_toe_section_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_requirement_sources.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_simulation_accuracy_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_solar_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_tank_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_upper_visuals.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_vehicle_assembly.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_visual_configuration.sysml",
+        "twin://astrobotic-griffin-1/requirements/griffin_visual_requirements.sysml",
+        "twin://astrobotic-griffin-1/requirements/moonbase_project_requirements.sysml"
+      ],
+      "diagnostics": [],
+      "page": {
+        "offset": 0,
+        "limit": 5,
+        "tables": {
+          "diagnostics": {
+            "offset": 0,
+            "limit": 5,
+            "total": 0,
+            "returned": 0,
+            "has_more": false
+          }
+        }
+      }
+    }
+  },
+  "webbing_document_generation": 13,
+  "projection_ready": true,
+  "shader_validation": "WESL syntax pass; rendered assembly RuntimeDiagnostics 0 errors 0 warnings",
+  "isolated_editor_preview": "blank despite ready and OpenUsdPreview renewal; focused appearance not accepted",
+  "physical_material_properties_added": false,
+  "lights_changed": false
+}

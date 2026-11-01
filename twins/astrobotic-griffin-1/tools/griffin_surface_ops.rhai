@@ -1416,6 +1416,15 @@ fn report_route_stall(rover, target, pose, distance, command_updates) {
 // All gates share that frame, so a yawed touchdown cannot route FLIP back
 // through the lander after clearing its port ramp.
 fn landed_surface_route_frame() {
+    if griffin_compact_egress::enabled() {
+        let lander=find_path("/Griffin1SurfaceOps/Lander");
+        let ramp=find_path("/Griffin1SurfaceOps/Lander/CompactEgress");
+        let axis=qrot(world_rotation_quat(ramp),vec3(-1.0,0.0,0.0));
+        let horizontal=vec3(axis.x,0.0,axis.z);let length=vlen(horizontal);
+        if length<0.001 {throw("Compact egress direction is vertical");}
+        let forward=horizontal*(1.0/length);
+        return #{origin:world_pos3(lander),forward:forward,lateral:vec3(-forward.z,0.0,forward.x)};
+    }
     let root=find_path("/Griffin1SurfaceOps/Lander/EgressRampPort");
     let position=world_pos3(root);
     let rotation=world_rotation_quat(root);
@@ -1457,6 +1466,14 @@ fn surface_route_presentation_plan(frame) {
 fn surface_route_presentation_plan(frame, entry_on_deck) {
     let names=griffin_spec::surface_route_marker_names();
     let x=griffin_spec::surface_route_marker_x();let z=griffin_spec::surface_route_marker_z();
+    if griffin_compact_egress::enabled() {
+        let stations=griffin_compact_egress::datum("stationsXM");
+        let cad=sysml_model("twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml");
+        let wheelbase=cad.value("FlipCadRequirements::CadStudy::wheelbaseMm")
+          /cad.value("FlipCadRequirements::CadStudy::millimetresPerMetre");
+        x[0]=abs(stations[1]);
+        x[1]=abs(stations[stations.len()-1])+wheelbase;
+    }
     let clearance=griffin_spec::_sysml_attribute("surfaceRouteMarkerClearanceM");
     if clearance==() || !clearance.is_finite() || clearance<=0.0{throw("Route annotation clearance is invalid");}
     let record=query("QueryUsdPrim",#{path:"/Griffin1SurfaceOps/"+names[0],attrs:[]});
