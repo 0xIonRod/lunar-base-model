@@ -32,8 +32,7 @@ at tick 1561. The mounted CAD assembly passes all eight deck/adapter/drive check
 against the updated Griffin. Windowed reloads and native controls are recorded
 in [the CAD runtime receipt](flip-cad-runtime-2026-10-26.md).
 
-Rebuild the ignored terrain maps using `tools/terrain/README.md`. The offline
-bundle verifier passes for all three pinned sources, finite 513-by-513 terrain,
+Rebuild the ignored terrain maps using `docs/terrain-assets.md`. Native `lunco-assets verify` checks for all three pinned sources, finite 513-by-513 terrain,
 4 m node spacing over 2048 m, and the 2048-by-2048 albedo map. Generated maps,
 downloads, local config and raw simulator runs are excluded from the commit.
 

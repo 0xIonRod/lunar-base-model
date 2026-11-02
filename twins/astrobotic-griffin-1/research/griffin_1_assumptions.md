@@ -70,15 +70,14 @@ The terrain source is the official LROC product [NAC DTM
 NOBILE03](https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_NOBILE03)
 and its PDS3 label. The direct source URLs and SHA-256 checksums are pinned in
 `Assets.toml`; the raw TIF and LBL remain under the ignored Twin-local cache.
-The label identifies a polar-stereographic product centered on the south pole,
-so it cannot be passed honestly to the native equirectangular-only DEM
-processor as if it were already in the runtime frame.
+The native processor reads its polar-stereographic spherical CRS and pixel
+registration from standard GeoTIFF tags. `Assets.toml` defines the ordered DEM,
+albedo and coverage recipe. Native coverage validation and minimum-curvature
+interpolation preserve measured samples; the final GeoTIFF stores float64
+heights and `MOON_ME` frame tags. The complete bundle and input checksums are
+verified through `lunco-assets verify`.
 
-The checked-in adapter
-`tools/terrain/reproject_lroc_polar_dem.py` performs the source projection
-conversion and prepares a local float32 raster for the native DEM processor,
-which validates coverage, interpolates remaining voids and writes the runtime
-GeoTIFF with `MOON_ME` frame tags. The active crop is:
+The active crop is:
 
 | Field | Authored value | Confidence |
 |---|---:|---|

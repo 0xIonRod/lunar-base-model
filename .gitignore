@@ -42,12 +42,10 @@ Thumbs.db
 luna2_twin/.cache/terrain/luna2/luna2_sinus_lunicus_preview.png
 
 # Downloaded and baked Twin geo-assets are reproducible from Assets.toml and
-# the checked-in processing tools. Never commit raw downloads, generated DEM
+# the native LunCoSim processing pipeline. Never commit raw downloads, generated DEM
 # bytes, or bake stamps; keep the manifest, provenance, and USD wiring
 # reviewable instead.
 twins/**/.cache/
 twins/**/tests/_power_failure_*.usda
 twins/**/tests/_bus_failure_*.usda
 twins/**/tests/_skirt_failure_*.usda
-twins/**/terrain/*/materials/
-twins/**/terrain/*/.bakekey

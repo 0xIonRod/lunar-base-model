@@ -1,9 +1,7 @@
-# Griffin-1 terrain inputs
-#
-# These entries are raw, download-only sources. NOBILE03 is a PDS3-labelled
-# polar-stereographic DTM, while the native lunco-assets DEM cropper currently
-# accepts equirectangular products only. Use tools/terrain/
-# reproject_lroc_polar_dem.py after downloading both entries.
+# Griffin-1 source declarations and reproducible native artifact recipes.
+# The NOBILE03 recipe publishes the complete terrain bundle into this Twin's
+# .cache. Source projection and sample registration come from standard GeoTIFF
+# metadata; site selection and material policy remain authored below.
 
 # NASA SVS CGI Moon Kit / LRO LOLA global elevation, 16 pixels per degree.
 # Float32 kilometres relative to 1737.4 km; longitude centered on zero.
@@ -38,19 +36,57 @@ dest = "sources/nobile03/NAC_DTM_NOBILE03.TIF"
 sha256 = "952f4b898e03fc10e7cdda5ee8e95c8f7c20ba669b7cd5d3e20589d489081f02"
 recommended = true
 
-[nobile03_label]
-name = "LROC NAC DTM NOBILE03 PDS3 label"
-url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/NOBILE03/NAC_DTM_NOBILE03.LBL"
-dest = "sources/nobile03/NAC_DTM_NOBILE03.LBL"
-sha256 = "a208196171bfb777554e8e9ae840339135f99f28d7fe4ce0e3be60f9937e5906"
-recommended = true
+[nobile03_dem.process]
+kind = "pipeline"
+output = "terrain/nobile03"
+output_root = "cache"
+center_lat = -84.72672255
+center_lon = 29.14428685
+window_m = 2048.0
+target_resolution = [513, 513]
+source_height_offset_m = -5187.322
+frame = "MOON_ME"
 
-[nobile03_ortho]
-name = "LROC NOBILE03 M1101097181 orthophoto (0.90 m/pixel; polar reprojection required)"
+[nobile03_dem.process.pipeline]
+artifacts = [
+  { from = "dem", source = "materials/textures/heightmap.tif", path = "materials/textures/heightmap.tif", kind = "dem", dimensions = [513, 513] },
+  { from = "albedo", path = "materials/textures/albedo.png", kind = "image", dimensions = [2048, 2048] },
+  { from = "coverage", path = "materials/textures/coverage.png", kind = "image", dimensions = [513, 513] },
+]
+
+[nobile03_dem.process.pipeline.sources.ortho]
+name = "LROC NOBILE03 M1101097181 orthophoto (0.90 m/pixel)"
 url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/EXTRAS/BROWSE/NAC_DTM/NOBILE03/NAC_DTM_NOBILE03_M1101097181_90CM.TIF"
 dest = "sources/nobile03/NAC_DTM_NOBILE03_M1101097181_90CM.TIF"
 sha256 = "bf825b560c796d8507f9d05f2e646b572b58369ca553d59f407dd305d7d22dbc"
-recommended = true
+
+[nobile03_dem.process.pipeline.sources.label]
+name = "LROC NAC DTM NOBILE03 source provenance label"
+url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/NOBILE03/NAC_DTM_NOBILE03.LBL"
+dest = "sources/nobile03/NAC_DTM_NOBILE03.LBL"
+sha256 = "a208196171bfb777554e8e9ae840339135f99f28d7fe4ce0e3be60f9937e5906"
+
+[[nobile03_dem.process.pipeline.steps]]
+id = "dem"
+input = "source"
+kind = "dem"
+output = "dem"
+
+[[nobile03_dem.process.pipeline.steps]]
+id = "albedo"
+input = "ortho"
+kind = "albedo"
+output = "albedo.png"
+target_resolution = [2048, 2048]
+albedo_base_linear = 0.13
+albedo_detail_strength = 0.9
+albedo_illumination_radius_m = 40.0
+
+[[nobile03_dem.process.pipeline.steps]]
+id = "coverage"
+input = "source"
+kind = "coverage"
+output = "coverage.png"
 
 # NASA SVS CGI Moon Kit, December 2025 color revision.
 # https://svs.gsfc.nasa.gov/4720/ — credit NASA's Scientific Visualization Studio.

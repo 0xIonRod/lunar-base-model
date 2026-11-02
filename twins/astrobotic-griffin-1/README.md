@@ -234,7 +234,7 @@ The latest primary-source baseline used for this package is:
 - LROC's official NAC DTM NOBILE03 product is a 4 m/pixel polar-stereographic
   digital terrain model covering the Nobile South-Pole region. The source
   product, label, checksums, crop, and reprojection are recorded in
-  `Assets.toml`, `tools/terrain/README.md`, and the research record.
+  `Assets.toml`, `docs/terrain-assets.md`, and the research record.
 
 Sources:
 
@@ -264,8 +264,8 @@ Sources:
 | components/rover/ | Twin-local visual components for chassis, wheels, mast, and solar array |
 | behaviors/griffin_1_flip_patrol.btxml | Griffin-local route tree targeting the deck approach, ramp exit, waypoints, and base site |
 | environments/south_pole_surrogate.usda | DEM-backed NOBILE03 South-Pole environment |
-| terrain/nobile03/ | Ignored processed heightfield output, regenerated from the manifest and adapter |
-| tools/terrain/ | Polar-stereo download, reprojection, and provenance instructions |
+| .cache/terrain/nobile03/ | Generated artifact bundle, reproduced by the native manifest recipe |
+| docs/terrain-assets.md | Native manifest recipe, cache verification, and source provenance |
 | scenarios/griffin_1_surface_ops.rhai | Single mission state owner, event routing, and phase sequencing |
 | scenarios/tests/griffin_mission_evidence.rhai | Production one-shot verdict gate for route-start evidence after guidance release, including absent and false phase evidence |
 | scenarios/tests/griffin_requirements.rhai | Twin-owned structural/parameter verdict and boundary checks |
@@ -350,19 +350,16 @@ folder, including `.cache/`, and open it in a compatible LunCoSim installation.
 No terrain downloads or preprocessing are needed for the distributed archive.
 The instructions below apply to source checkouts.
 
-The checked-in `Assets.toml` is the source manifest. Raw downloads are stored
-under the Twin-local `.cache/` directory and are ignored by Git. The processed
-heightfield is also ignored because it is reproducible; only the manifest,
-adapter, provenance, and USD wiring are reviewable source.
+`Assets.toml` defines downloads, native processing steps and the complete
+artifact bundle. Request `nobile03_dem` in LunCoSim, or use the native asset
+manager as described in [terrain preparation](docs/terrain-assets.md).
+Sources and generated artifacts stay under the Twin-local `.cache/`.
 
-From the LunCoSim repository root, follow
-[`tools/terrain/README.md`](../../tools/terrain/README.md). The current reproducible
-study crop is a 512 m × 512 m local ENU window at 4 m node spacing (129 × 129
-nodes), centered at latitude `-84.72672255` and east longitude `29.14428685`.
-The source is polar stereographic, so the checked-in Python adapter converts it
-to the equirectangular local GeoTIFF format currently consumed by LunCoSim and
-normalizes the source datum into the scene-local height frame. This center is a
-regional simulation anchor until the flight site is published.
+The study crop covers 2048 m at 4 m node spacing (513 × 513 nodes), centered
+at latitude `-84.72672255` and east longitude `29.14428685`. LunCoSim reads the
+source polar CRS and prepares a float64 local GeoTIFF, matching albedo and
+coverage mask. The fixed vertical offset preserves the scene-local datum.
+This center is a regional simulation anchor until the flight site is published.
 
 ## Build and run
 

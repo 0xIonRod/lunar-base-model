@@ -58,9 +58,9 @@ package Griffin1Requirements {
         // Isolated Editor review pad only; absent from the surface mission.
         attribute visualReviewPadHalfExtentM : Real = 6.0;
         // Measured from the processed NOBILE03 DEM at scene X=Z=0 using
-        // TerrainHeight, 2026-10-04. The crop datum is 5187.322 m. This is
+        // TerrainHeight, 2026-11-02 (native GeoTIFF registration). The crop datum is 5187.322 m. This is
         // the selected study anchor height, not a confirmed mission site.
-        attribute landingTerrainDatumY : Real = .21062861382961273;
+        attribute landingTerrainDatumY : Real = .1787641942501068;
         attribute visualReviewGroundWidthM : Real = 36.0;
         // Operator-selected five-point surface route, 2026-10-03.
         // The estimated deployed ramp is now 5.397 m, rooted near X=1.90 m;

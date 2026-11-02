@@ -43,8 +43,7 @@ Keep this structure:
     vehicles/flip.usda
     behaviors/griffin_1_flip_patrol.btxml
     Assets.toml
-    terrain/nobile03/                 # generated and ignored
-    tools/terrain/reproject_lroc_polar_dem.py
+    .cache/terrain/nobile03/          # generated and ignored
     environments/south_pole_surrogate.usda
     scenarios/griffin_1_surface_ops.rhai
     tools/griffin_controls.rhai
@@ -62,12 +61,12 @@ Keep the included `.cache/` directory: it contains both pinned NOBILE03 sources
 and the processed terrain crop. Open the extracted Twin with a compatible
 installed LunCoSim runtime; archive users do not need the source-build step below.
 
-From the repository root, follow [`tools/terrain/README.md`](../../tools/terrain/README.md)
-to download the two pinned NOBILE03 source files and generate the local
-heightfield. Downloads and generated terrain bytes must remain ignored; verify
+From the repository root, follow [`docs/terrain-assets.md`](docs/terrain-assets.md)
+to request the complete native NOBILE03 processing recipe. It downloads its
+pinned DEM, orthophoto and provenance label and publishes the terrain bundle. Downloads and generated terrain bytes must remain ignored; verify
 the boundary with `git check-ignore -v` before staging.
 
-The processing record uses a 512 m × 512 m, 129 × 129-node crop centered at
+The processing recipe uses a 2048 m × 2048 m, 513 × 513-node crop centered at
 `-84.72672255, 29.14428685` east, with an explicit source-datum normalization
 into the scene-local height frame.
 
