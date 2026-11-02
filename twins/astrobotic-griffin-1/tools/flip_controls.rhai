@@ -8,7 +8,7 @@ fn panel_subject_path(host) {
 fn show_panel_actions(root) {
     let hud="flip-panel:"+root;
     if get_twin_setting("ui.vehicle_controls")==false {
-        clear_hint(hud);clear_guided_hud_actions(hud);return;
+        clear_hint(hud);clear_guided_hud_actions(hud);return #{ok:true};
     }
     hint(hud,"FLIP solar panel");
     guided_hud_actions(hud,"flip_controls","on_panel_action",[

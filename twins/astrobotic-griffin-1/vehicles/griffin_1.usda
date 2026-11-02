@@ -1512,8 +1512,6 @@ def Xform "Griffin1" (
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:propellant_flow>
-            custom double inputs:exit_temperature_k
-            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:exit_temperature_k>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1549,8 +1547,6 @@ def Xform "Griffin1" (
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:propellant_flow>
-            custom double inputs:exit_temperature_k
-            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:exit_temperature_k>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1586,8 +1582,6 @@ def Xform "Griffin1" (
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:propellant_flow>
-            custom double inputs:exit_temperature_k
-            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:exit_temperature_k>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1623,8 +1617,6 @@ def Xform "Griffin1" (
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:propellant_flow>
-            custom double inputs:exit_temperature_k
-            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:exit_temperature_k>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1660,8 +1652,6 @@ def Xform "Griffin1" (
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:propellant_flow>
-            custom double inputs:exit_temperature_k
-            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:exit_temperature_k>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1697,8 +1687,6 @@ def Xform "Griffin1" (
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:propellant_flow>
-            custom double inputs:exit_temperature_k
-            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:exit_temperature_k>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1734,8 +1722,6 @@ def Xform "Griffin1" (
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:propellant_flow>
-            custom double inputs:exit_temperature_k
-            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:exit_temperature_k>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
