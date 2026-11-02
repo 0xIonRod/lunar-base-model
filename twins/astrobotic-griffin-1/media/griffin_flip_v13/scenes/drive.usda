@@ -209,4 +209,7 @@ def Xform "Griffin1SurfaceOps" (
             }
         }
     }
+    def Scope "FilmCapture"
+    {
+    }
 }

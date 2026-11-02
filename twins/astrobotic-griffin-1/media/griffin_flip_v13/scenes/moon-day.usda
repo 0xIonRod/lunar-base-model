@@ -105,4 +105,7 @@ def Xform "Griffin1SurfaceOps" (
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/flip_route_follow.rhai@
         }
     }
+    def Scope "FilmCapture"
+    {
+    }
 }

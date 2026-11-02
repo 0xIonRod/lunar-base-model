@@ -12,7 +12,7 @@ def Xform "EngineBell" (
 {
     def Xform "Exhaust"
     {
-        custom double3 xformOp:translate = (0.0, -0.26, 0.0)
+        custom double3 xformOp:translate = (0.0, -0.24717596579865733, 0.0)
         custom token[] xformOpOrder = ["xformOp:translate"]
         over "Looks"
         {

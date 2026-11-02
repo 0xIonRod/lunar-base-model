@@ -473,6 +473,7 @@ def Xform "Griffin1SurfaceOps" (
     }
     def Scope "FilmDrop" (
         prepend apiSchemas = ["LunCoProgramAPI"]
+        active = false
     )
     {
         uniform token info:implementationSource = "sourceAsset"
@@ -497,5 +498,8 @@ def Xform "Griffin1SurfaceOps" (
         string lunco:policy:entry = "select"
         uniform string info:sourceCode = "fn select(facts) { [] }"
         bool lunco:policy:deterministic = false
+    }
+    def Scope "FilmCapture"
+    {
     }
 }

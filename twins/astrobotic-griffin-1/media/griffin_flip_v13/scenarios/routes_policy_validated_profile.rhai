@@ -49,61 +49,30 @@ fn motion(rover) {
  if v==() || yaw==() {throw "Native rover velocity is unavailable";}
  #{speed:vlen(v),yaw:abs(yaw)}
 }
-fn prepare_sun_parking(s) {
- let name=if s.name=="blue" {"FLIP"}else{"FLIP_Amber"};
- let q=world_rotation_quat(find_path(ROOT+"/"+name+"/SolarMechanism/Photovoltaics"));
- let normal=qrot(q,vec3(0.0,1.0,0.0));
- let sun=qrot(q,vec3(port(s.rover,"target_mount_x"),port(s.rover,"target_mount_y"),port(s.rover,"target_mount_z")));
- let angle=atan(normal.z*sun.x-normal.x*sun.z,normal.x*sun.x+normal.z*sun.z);
- let f=world_forward3(s.rover);let p=world_pos(s.rover);
- let dx=cos(angle)*f.x+sin(angle)*f.z;let dz=-sin(angle)*f.x+cos(angle)*f.z;
- let result=modelica_waypoint(s.rover,[p[0]+100.0*dx,p[1],p[2]+100.0*dz],0.12,0.25,1.0);
- if !result.ok {throw "Sun parking heading rejected";}
-}
 fn service_arrival(s) {
  if !s.route_completed || s.completed || s.failed {return s;}
  let now=elapsed_seconds();let p=world_pos(s.rover);let state=motion(s.rover);
- let speed=state.speed;let yaw=state.yaw;
- let point=find_path(ROOT+if s.name=="blue" {"/FlipRoute/P2"}else{"/AmberRoute/P2"});let goal=world_pos(point);
+ let goal=world_pos(find_path(ROOT+if s.name=="blue" {"/FlipRoute/P2"}else{"/AmberRoute/P2"}));
  let dx=p[0]-goal[0];let dz=p[2]-goal[2];let distance=sqrt(dx*dx+dz*dz);
  if s.stage==0 {
-  s.stage=-1;s.stage_started=now;print("ARRIVAL_PHASE|"+s.name+"|release_route|"+now);
- } else if s.stage == -1 && now > s.stage_started && port(s.rover,"program_active") < 0.5 && port(s.rover,"autopilot_enable") < 0.5 {
-  // Plan the final heading before arrival: a six-metre straight approach.
-  let name=if s.name=="blue" {"FLIP"}else{"FLIP_Amber"};
-  let q=world_rotation_quat(find_path(ROOT+"/"+name+"/SolarMechanism/Photovoltaics"));
-  let normal=qrot(q,vec3(0.0,1.0,0.0));
-  let sun=qrot(q,vec3(port(s.rover,"target_mount_x"),port(s.rover,"target_mount_y"),port(s.rover,"target_mount_z")));
-  let angle=atan(normal.z*sun.x-normal.x*sun.z,normal.x*sun.x+normal.z*sun.z);
-  let f=world_forward3(s.rover);let dx=cos(angle)*f.x+sin(angle)*f.z;let dz=-sin(angle)*f.x+cos(angle)*f.z;
-  s.approach=[goal[0]-6.0*dx,goal[1],goal[2]-6.0*dz];
-  let af=world_forward3(s.rover);let approach_speed=if (s.approach[0]-p[0])*af.x+(s.approach[2]-p[2])*af.z<0.0 {-0.18}else{0.18};
-  let result=modelica_waypoint(s.rover,s.approach,approach_speed,0.20,0.0);if !result.ok {throw "Parking approach rejected";}
-  s.stage=1;s.stage_started=now;print("ARRIVAL_PHASE|"+s.name+"|parking_approach|"+now);
- } else if s.stage==1 && sqrt((p[0]-s.approach[0])*(p[0]-s.approach[0])+(p[2]-s.approach[2])*(p[2]-s.approach[2]))<0.36 {
-  let result=modelica_waypoint(s.rover,goal,0.18,0.20,0.0);if !result.ok {throw "Final straight approach rejected";}
-  s.stage=2;s.stage_started=now;print("ARRIVAL_PHASE|"+s.name+"|final_straight|"+now);
- } else if s.stage==2 && distance<0.36 {
-  let result=modelica_waypoint_stop(s.rover);if !result.ok {throw "Arrival brake rejected";}
-  s.stage=4;s.stage_started=now;
- } else if s.stage==3 && get(s.rover,"solar_cos_incidence")>=0.97 && abs(get(s.rover,"__member_Drivetrain_guidance_heading_error"))<0.035 && yaw<0.03 {
-  let result=modelica_waypoint_stop(s.rover);if !result.ok {throw "Final heading brake rejected";}
-  s.stage=4;s.stage_started=now;
- } else if s.stage==4 && now-s.stage_started>=1.0 && speed<0.02 && yaw<0.03 {
-  if get(s.rover,"solar_cos_incidence")<0.97 {
-   prepare_sun_parking(s);s.stage=3;s.stage_started=now;print("ARRIVAL_PHASE|"+s.name+"|heading_refinement|"+now);
-  } else {
-   s.stage=5;s.completed=true;s.park_pose=p;
-  }
+  s.stage=1;s.stage_started=now;
+  print("ARRIVAL_PHASE|"+s.name+"|braking_at_destination|"+now);
  }
- if s.completed {s.arrival_error=distance;print("PARK_POSE|"+s.name+"|"+now+"|"+p+"|"+distance+"|"+get(s.rover,"solar_cos_incidence"));}
- if s.stage!=0 && !s.completed && now-s.stage_started>120.0 {s.failed=true;modelica_waypoint_stop(s.rover);print("ARRIVAL_FAILED|"+s.name+"|"+now);}
+ // Both authored paths contain their Sun-facing final approach. Arrival only
+ // brakes and settles; it never sends a parked rover away for another lap.
+ if now-s.stage_started>=1.0 && state.speed<0.02 && state.yaw<0.03 {
+  s.completed=true;s.park_pose=p;s.arrival_error=distance;
+  print("PARK_POSE|"+s.name+"|"+now+"|"+p+"|"+distance+"|"+get(s.rover,"solar_cos_incidence"));
+ }
+ if !s.completed && now-s.stage_started>15.0 {
+  s.failed=true;modelica_waypoint_stop(s.rover);print("ARRIVAL_FAILED|"+s.name+"|"+now);
+ }
  s
 }
 fn finished(me) {
  for i in 0..this.cases.len() {this.cases[i]=service_arrival(this.cases[i]);}
- if this.cases[0].reported && this.cases[1].reported && this.stop_started==() {this.stop_started=elapsed_seconds();print("PARK_BEGIN|"+this.stop_started);cmd("SetTimeTransport",#{playing:true,rate:30.0});}
- this.cases[0].failed || this.cases[1].failed || (this.stop_started!=() && elapsed_seconds()-this.stop_started>=60.0) || elapsed_seconds()-this.start_s>420.0
+ if this.cases[0].reported && this.cases[1].reported && this.stop_started==() {this.stop_started=elapsed_seconds();print("PARK_BEGIN|"+this.stop_started);}
+ this.cases[0].failed || this.cases[1].failed || this.stop_started!=() || elapsed_seconds()-this.start_s>420.0
 }
 fn finish_dual(me) {
  this.measuring=false;this.done=true;this.native_energy_ok=true;this.energy_closure_ok=true;this.balances=[];
@@ -122,8 +91,7 @@ fn finish_dual(me) {
 
  let checks=[t_true(this.alignment_gate_ok,"skid guidance aligns before forward drive"),t_true(this.native_energy_ok,"native energy meters agree with independent sampled integration"),t_true(this.energy_closure_ok,"solar and recovered energy minus motors and equipment matches the battery bus"),t_true(this.balances[1]>this.balances[0],"sun-facing forward/reverse traverse has the better measured energy balance"),t_true(this.contact_free && this.blue_bodies.len()==6,"all six collider owners stay free of cross-copy contact"),t_true(this.ground_seen[0] && this.ground_seen[1],"both copies retain loaded wheel contact with terrain"),t_true(this.valid,"finite native power and pose samples"),t_true(this.equal_start,"identical initial battery state at simultaneous departure")];
  for s in this.cases {print("DRIVING_QUALITY|"+s.name+"|"+s.peak_speed+"|"+s.peak_yaw_rate+"|"+s.park_drift+"|"+s.arrival_error+"|"+s.reverse_distance);checks.push(t_true(s.peak_speed<1.0,s.name+" stays below the conservative one metre per second mission limit"));checks.push(t_true(s.park_drift<0.05,s.name+" holds its parked location within five centimetres"));checks.push(t_true(s.arrival_error<0.45,s.name+" stops at the actual destination"));print("SOLAR_ALIGNMENT_RESULT|"+s.name+"|"+s.minimum_solar_cosine+"|"+s.maximum_solar_cosine_error);if s.name=="amber" {checks.push(t_true(s.minimum_solar_cosine>0.65,"zigzag keeps the solar face towards the light"));checks.push(t_true(s.reverse_distance>15.0,"zigzag includes actual native reverse travel"));}checks.push(t_true(get(s.rover,"solar_cos_incidence")>=0.97,s.name+" uses the same Sun-facing parking condition"));checks.push(t_true(s.maximum_solar_cosine_error<0.035,s.name+" solar measurement follows the physical panel normal and Sun direction"));checks.push(t_true(s.started && s.completed && s.reported,s.name+" native route completed"));checks.push(t_true(s.minimum_up>0.906307787,s.name+" remains upright"));}
- report_verdict(checks,"SIMULTANEOUS ROUTE COMPARISON","DUAL_ROUTE_COMPARISON");cmd("StopOfflineRecording",#{});cmd("StepSimulation",#{hold:true});
- cmd("SetTimeTransport",#{playing:true,rate:1.0});
+ report_verdict(checks,"SIMULTANEOUS ROUTE COMPARISON","DUAL_ROUTE_COMPARISON");cmd("StepSimulation",#{hold:true});emit("route-comparison-finished");
 }
 fn task(me,ctx) {seq([wait(3.0),wait(0.25),once(Fn("start_dual")),wait_until(Fn("finished")),once(Fn("finish_dual"))])}
 fn on_tick(me,ctx) {

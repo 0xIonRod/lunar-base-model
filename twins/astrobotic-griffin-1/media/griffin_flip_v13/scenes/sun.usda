@@ -16,7 +16,7 @@ def Xform "Griffin1SurfaceOps" (
     over "Scenario"
     {
         def "Test" (
-            active = true
+            active = false
         )
         {
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/media/griffin_flip_v13/scenarios/headful_sun_capture.rhai@
@@ -208,5 +208,8 @@ def Xform "Griffin1SurfaceOps" (
                 }
             }
         }
+    }
+    def Scope "FilmCapture"
+    {
     }
 }

@@ -65,7 +65,7 @@ fn begin_climb(me) {
  let result=modelica_waypoint(r,goal,0.10,0.3,0.0);if !result.ok {throw result.to_string();}phase("climb");
 }
 fn task(me,ctx) {
- seq([wait(3.0),once(Fn("wait_for_capture")),wait_until(Fn("capture_is_running")),once(|m|{clean_view();phase("start");drive(0.10,0.0,0.0);}),wait(8.0),once(|m|cmd("SetUserCamera",#{name:"WheelDetail"})),wait(7.0),once(|m|{cmd("SetUserCamera",#{name:"PanelHero"});phase("first_stop");drive(0.0,0.0,1.0);}),wait(5.0),once(Fn("begin_turn")),wait_until(Fn("sun_facing")),once(|m|{phase("sun_facing");drive(0.0,0.0,1.0);}),wait_until(Fn("turn_interval_finished")),wait(8.0),once(Fn("plan_climb")),wait_until(Fn("climb_aligned")),once(Fn("begin_climb")),wait(15.0),once(|m|{phase("finish");drive(0.0,0.0,1.0);this.done=true;cmd("StopOfflineRecording",#{});cmd("SetTimeTransport",#{playing:true,rate:1.0});})])
+ seq([wait(3.0),once(Fn("wait_for_capture")),wait_until(Fn("capture_is_running")),once(|m|{clean_view();phase("start");drive(0.10,0.0,0.0);}),wait(8.0),once(|m|cmd("SetUserCamera",#{name:"WheelDetail"})),wait(7.0),once(|m|{cmd("SetUserCamera",#{name:"PanelHero"});phase("first_stop");drive(0.0,0.0,1.0);}),wait(5.0),once(Fn("begin_turn")),wait_until(Fn("sun_facing")),once(|m|{phase("sun_facing");drive(0.0,0.0,1.0);}),wait_until(Fn("turn_interval_finished")),wait(8.0),once(Fn("plan_climb")),wait_until(Fn("climb_aligned")),once(Fn("begin_climb")),wait(15.0),once(|m|{phase("finish");drive(0.0,0.0,1.0);this.done=true;emit("film-maneuver-finished");})])
 }
 fn on_tick(me,ctx) {
  if this.done {return;}

@@ -411,6 +411,21 @@ def Xform "Griffin1SurfaceOps" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (-11.918991645266123, 39.28940686250036, 0.0)
         }
+        def Camera "NozzleView" (
+            prepend apiSchemas = ["LunCoCameraAPI"]
+        )
+        {
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            token projection = "perspective"
+            float focalLength = 30.0
+            float verticalAperture = 20.25
+            float horizontalAperture = 36.0
+            float2 clippingRange = (0.05000000074505806, 10000.0)
+            custom double3 xformOp:translate = (3.0, -2.5, 3.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom double3 xformOp:rotateXYZ = (27.409574, 45.0, 0.0)
+        }
     }
     def "FLIP" (
         references = @twin://astrobotic-griffin-1/vehicles/flip_v5.usda@</FLIP>
@@ -629,7 +644,7 @@ def Xform "Griffin1SurfaceOps" (
     }
     def Scope "PlumeProbe" (
         prepend apiSchemas = ["LunCoProgramAPI"]
-        active = true
+        active = false
     )
     {
         uniform token info:implementationSource = "sourceAsset"
@@ -641,5 +656,8 @@ def Xform "Griffin1SurfaceOps" (
         string lunco:policy:entry = "select"
         uniform string info:sourceCode = "fn select(facts) { [] }"
         bool lunco:policy:deterministic = false
+    }
+    def Scope "FilmCapture"
+    {
     }
 }

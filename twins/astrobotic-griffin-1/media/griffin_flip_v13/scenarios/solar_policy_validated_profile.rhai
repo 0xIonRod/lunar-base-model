@@ -67,10 +67,14 @@ fn begin_climb(me) {
 fn begin_away(me) {
  let r=find_path(R);let p=world_pos(r);let f=world_forward3(r);
  let result=modelica_waypoint(r,[p[0]-100.0*f.x,p[1],p[2]-100.0*f.z],0.25,0.3,1.0);
- if !result.ok {throw result.to_string();}phase("turn_away");cmd("SetUserCamera",#{name:"WheelDetail"});
+ if !result.ok {throw result.to_string();}phase("turn_away");
+ let normal=qrot(world_rotation_quat(find_path(R+"/SolarMechanism/Photovoltaics")),vec3(0.0,1.0,0.0));
+ let h=sqrt(normal.x*normal.x+normal.z*normal.z);
+ if h<0.1 {throw "Panel camera requires a deployed panel";}
+ cmd("SetCameraLookAt",#{camera:find_path("/Griffin1SurfaceOps/Avatar"),eye:[p[0]+7.0*normal.x/h+2.0*f.x,p[1]+3.0,p[2]+7.0*normal.z/h+2.0*f.z],target:[p[0],p[1]+0.7,p[2]]});cmd("SetUserCamera",#{name:"Avatar"});
 }
 fn task(me,ctx) {
- seq([wait(3.0),once(Fn("wait_for_capture")),wait_until(Fn("capture_is_running")),once(Fn("begin_turn")),wait_until(Fn("sun_facing")),once(|m|{phase("sun_facing");drive(0.0,0.0,1.0);}),wait(1.0),once(Fn("begin_away")),wait(20.0),once(|m|{drive(0.0,0.0,1.0);phase("finish");this.done=true;cmd("StopOfflineRecording",#{});cmd("SetTimeTransport",#{playing:true,rate:1.0});})])
+ seq([wait(3.0),once(Fn("wait_for_capture")),wait_until(Fn("capture_is_running")),once(Fn("begin_turn")),wait_until(Fn("sun_facing")),once(|m|{phase("sun_facing");drive(0.0,0.0,1.0);}),wait(1.0),once(Fn("begin_away")),wait(20.0),once(|m|{drive(0.0,0.0,1.0);phase("finish");this.done=true;emit("film-maneuver-finished");})])
 }
 fn on_tick(me,ctx) {
  if this.done {return;}

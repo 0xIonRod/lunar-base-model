@@ -158,7 +158,7 @@ def Xform "Griffin1" (
         int lunco:ui:schemaRow = 1
         string lunco:ui:schemaRole = "Throttle in · downward braking"
         uniform token collection:components:expansionRule = "explicitOnly"
-        custom rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/NozzleDesign>, </Griffin1/MainPropulsion/PropellantStatus>, </Griffin1/MainPropulsion/Engine01>, </Griffin1/MainPropulsion/Engine01Plume>, </Griffin1/MainPropulsion/Engine02>, </Griffin1/MainPropulsion/Engine02Plume>, </Griffin1/MainPropulsion/Engine03>, </Griffin1/MainPropulsion/Engine03Plume>, </Griffin1/MainPropulsion/Engine04>, </Griffin1/MainPropulsion/Engine04Plume>, </Griffin1/MainPropulsion/Engine05>, </Griffin1/MainPropulsion/Engine05Plume>, </Griffin1/MainPropulsion/Engine06>, </Griffin1/MainPropulsion/Engine06Plume>, </Griffin1/MainPropulsion/Engine07>, </Griffin1/MainPropulsion/Engine07Plume>]
+        custom rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/NozzleDesign>, </Griffin1/MainPropulsion/PropellantStatus>, </Griffin1/MainPropulsion/Engine01>, </Griffin1/MainPropulsion/Engine01Plume>, </Griffin1/MainPropulsion/Engine02>, </Griffin1/MainPropulsion/Engine02Plume>, </Griffin1/MainPropulsion/Engine03>, </Griffin1/MainPropulsion/Engine03Plume>, </Griffin1/MainPropulsion/Engine04>, </Griffin1/MainPropulsion/Engine04Plume>, </Griffin1/MainPropulsion/Engine05>, </Griffin1/MainPropulsion/Engine05Plume>, </Griffin1/MainPropulsion/Engine06>, </Griffin1/MainPropulsion/Engine06Plume>, </Griffin1/MainPropulsion/Engine07>, </Griffin1/MainPropulsion/Engine07Plume>, </Griffin1/MainPropulsion/Engine01Wall>, </Griffin1/MainPropulsion/Engine02Wall>, </Griffin1/MainPropulsion/Engine03Wall>, </Griffin1/MainPropulsion/Engine04Wall>, </Griffin1/MainPropulsion/Engine05Wall>, </Griffin1/MainPropulsion/Engine06Wall>, </Griffin1/MainPropulsion/Engine07Wall>]
         float inputs:rcs_fuel_mass_flow_kgs
         float inputs:rcs_fuel_mass_flow_kgs.connect = </Griffin1/AttitudePropulsion.outputs:fuel_mass_flow_kgs>
         float inputs:rcs_oxidizer_mass_flow_kgs
@@ -1481,6 +1481,265 @@ def Xform "Griffin1" (
             string lunco:telemetry:port = "\"engine07_thrust_n\""
             string lunco:telemetry:name = "\"lander.engine07_thrust\""
             string lunco:telemetry:unit = "\"N\""
+        }
+        def Scope "Engine01Wall" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/NozzleWallThermal.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:heat_capacity_j_k = 750.0
+            custom double inputs:initial_temperature_k = 293.15
+            custom double inputs:heated_area_m2 = 0.33
+            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:emissivity = 0.8
+            custom double inputs:reference_flow_kgs = 0.8
+            custom double inputs:reference_film_coefficient_w_m2_k = 120.0
+            custom double inputs:mount_conductance_w_k = 2.0
+            custom double inputs:mount_temperature_k = 293.15
+            custom double inputs:surroundings_temperature_k = 3.0
+            custom double inputs:recovery_factor = 0.9
+            custom double inputs:maximum_heating_fraction = 0.03
+            custom double outputs:wall_temperature_k = 0.0
+            custom double outputs:recovery_temperature_k = 0.0
+            custom double outputs:heating_w = 0.0
+            custom double outputs:radiation_w = 0.0
+            custom double outputs:conduction_w = 0.0
+            custom double outputs:stored_heat_rate_w = 0.0
+            custom double outputs:energy_residual_w = 0.0
+            custom float outputs:render_temperature_k = 0.0
+            custom float outputs:render_emissivity = 0.0
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:propellant_flow>
+            custom double inputs:exit_temperature_k
+            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:exit_temperature_k>
+            custom double inputs:stagnation_temperature_k
+            double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:stagnation_temperature_k>
+            custom double inputs:jet_power_w
+            double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:jet_power_w>
+        }
+        def Scope "Engine02Wall" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/NozzleWallThermal.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:heat_capacity_j_k = 750.0
+            custom double inputs:initial_temperature_k = 293.15
+            custom double inputs:heated_area_m2 = 0.33
+            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:emissivity = 0.8
+            custom double inputs:reference_flow_kgs = 0.8
+            custom double inputs:reference_film_coefficient_w_m2_k = 120.0
+            custom double inputs:mount_conductance_w_k = 2.0
+            custom double inputs:mount_temperature_k = 293.15
+            custom double inputs:surroundings_temperature_k = 3.0
+            custom double inputs:recovery_factor = 0.9
+            custom double inputs:maximum_heating_fraction = 0.03
+            custom double outputs:wall_temperature_k = 0.0
+            custom double outputs:recovery_temperature_k = 0.0
+            custom double outputs:heating_w = 0.0
+            custom double outputs:radiation_w = 0.0
+            custom double outputs:conduction_w = 0.0
+            custom double outputs:stored_heat_rate_w = 0.0
+            custom double outputs:energy_residual_w = 0.0
+            custom float outputs:render_temperature_k = 0.0
+            custom float outputs:render_emissivity = 0.0
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:propellant_flow>
+            custom double inputs:exit_temperature_k
+            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:exit_temperature_k>
+            custom double inputs:stagnation_temperature_k
+            double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:stagnation_temperature_k>
+            custom double inputs:jet_power_w
+            double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:jet_power_w>
+        }
+        def Scope "Engine03Wall" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/NozzleWallThermal.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:heat_capacity_j_k = 750.0
+            custom double inputs:initial_temperature_k = 293.15
+            custom double inputs:heated_area_m2 = 0.33
+            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:emissivity = 0.8
+            custom double inputs:reference_flow_kgs = 0.8
+            custom double inputs:reference_film_coefficient_w_m2_k = 120.0
+            custom double inputs:mount_conductance_w_k = 2.0
+            custom double inputs:mount_temperature_k = 293.15
+            custom double inputs:surroundings_temperature_k = 3.0
+            custom double inputs:recovery_factor = 0.9
+            custom double inputs:maximum_heating_fraction = 0.03
+            custom double outputs:wall_temperature_k = 0.0
+            custom double outputs:recovery_temperature_k = 0.0
+            custom double outputs:heating_w = 0.0
+            custom double outputs:radiation_w = 0.0
+            custom double outputs:conduction_w = 0.0
+            custom double outputs:stored_heat_rate_w = 0.0
+            custom double outputs:energy_residual_w = 0.0
+            custom float outputs:render_temperature_k = 0.0
+            custom float outputs:render_emissivity = 0.0
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:propellant_flow>
+            custom double inputs:exit_temperature_k
+            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:exit_temperature_k>
+            custom double inputs:stagnation_temperature_k
+            double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:stagnation_temperature_k>
+            custom double inputs:jet_power_w
+            double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:jet_power_w>
+        }
+        def Scope "Engine04Wall" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/NozzleWallThermal.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:heat_capacity_j_k = 750.0
+            custom double inputs:initial_temperature_k = 293.15
+            custom double inputs:heated_area_m2 = 0.33
+            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:emissivity = 0.8
+            custom double inputs:reference_flow_kgs = 0.8
+            custom double inputs:reference_film_coefficient_w_m2_k = 120.0
+            custom double inputs:mount_conductance_w_k = 2.0
+            custom double inputs:mount_temperature_k = 293.15
+            custom double inputs:surroundings_temperature_k = 3.0
+            custom double inputs:recovery_factor = 0.9
+            custom double inputs:maximum_heating_fraction = 0.03
+            custom double outputs:wall_temperature_k = 0.0
+            custom double outputs:recovery_temperature_k = 0.0
+            custom double outputs:heating_w = 0.0
+            custom double outputs:radiation_w = 0.0
+            custom double outputs:conduction_w = 0.0
+            custom double outputs:stored_heat_rate_w = 0.0
+            custom double outputs:energy_residual_w = 0.0
+            custom float outputs:render_temperature_k = 0.0
+            custom float outputs:render_emissivity = 0.0
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:propellant_flow>
+            custom double inputs:exit_temperature_k
+            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:exit_temperature_k>
+            custom double inputs:stagnation_temperature_k
+            double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:stagnation_temperature_k>
+            custom double inputs:jet_power_w
+            double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:jet_power_w>
+        }
+        def Scope "Engine05Wall" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/NozzleWallThermal.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:heat_capacity_j_k = 750.0
+            custom double inputs:initial_temperature_k = 293.15
+            custom double inputs:heated_area_m2 = 0.33
+            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:emissivity = 0.8
+            custom double inputs:reference_flow_kgs = 0.8
+            custom double inputs:reference_film_coefficient_w_m2_k = 120.0
+            custom double inputs:mount_conductance_w_k = 2.0
+            custom double inputs:mount_temperature_k = 293.15
+            custom double inputs:surroundings_temperature_k = 3.0
+            custom double inputs:recovery_factor = 0.9
+            custom double inputs:maximum_heating_fraction = 0.03
+            custom double outputs:wall_temperature_k = 0.0
+            custom double outputs:recovery_temperature_k = 0.0
+            custom double outputs:heating_w = 0.0
+            custom double outputs:radiation_w = 0.0
+            custom double outputs:conduction_w = 0.0
+            custom double outputs:stored_heat_rate_w = 0.0
+            custom double outputs:energy_residual_w = 0.0
+            custom float outputs:render_temperature_k = 0.0
+            custom float outputs:render_emissivity = 0.0
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:propellant_flow>
+            custom double inputs:exit_temperature_k
+            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:exit_temperature_k>
+            custom double inputs:stagnation_temperature_k
+            double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:stagnation_temperature_k>
+            custom double inputs:jet_power_w
+            double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:jet_power_w>
+        }
+        def Scope "Engine06Wall" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/NozzleWallThermal.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:heat_capacity_j_k = 750.0
+            custom double inputs:initial_temperature_k = 293.15
+            custom double inputs:heated_area_m2 = 0.33
+            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:emissivity = 0.8
+            custom double inputs:reference_flow_kgs = 0.8
+            custom double inputs:reference_film_coefficient_w_m2_k = 120.0
+            custom double inputs:mount_conductance_w_k = 2.0
+            custom double inputs:mount_temperature_k = 293.15
+            custom double inputs:surroundings_temperature_k = 3.0
+            custom double inputs:recovery_factor = 0.9
+            custom double inputs:maximum_heating_fraction = 0.03
+            custom double outputs:wall_temperature_k = 0.0
+            custom double outputs:recovery_temperature_k = 0.0
+            custom double outputs:heating_w = 0.0
+            custom double outputs:radiation_w = 0.0
+            custom double outputs:conduction_w = 0.0
+            custom double outputs:stored_heat_rate_w = 0.0
+            custom double outputs:energy_residual_w = 0.0
+            custom float outputs:render_temperature_k = 0.0
+            custom float outputs:render_emissivity = 0.0
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:propellant_flow>
+            custom double inputs:exit_temperature_k
+            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:exit_temperature_k>
+            custom double inputs:stagnation_temperature_k
+            double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:stagnation_temperature_k>
+            custom double inputs:jet_power_w
+            double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:jet_power_w>
+        }
+        def Scope "Engine07Wall" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/NozzleWallThermal.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double inputs:heat_capacity_j_k = 750.0
+            custom double inputs:initial_temperature_k = 293.15
+            custom double inputs:heated_area_m2 = 0.33
+            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:emissivity = 0.8
+            custom double inputs:reference_flow_kgs = 0.8
+            custom double inputs:reference_film_coefficient_w_m2_k = 120.0
+            custom double inputs:mount_conductance_w_k = 2.0
+            custom double inputs:mount_temperature_k = 293.15
+            custom double inputs:surroundings_temperature_k = 3.0
+            custom double inputs:recovery_factor = 0.9
+            custom double inputs:maximum_heating_fraction = 0.03
+            custom double outputs:wall_temperature_k = 0.0
+            custom double outputs:recovery_temperature_k = 0.0
+            custom double outputs:heating_w = 0.0
+            custom double outputs:radiation_w = 0.0
+            custom double outputs:conduction_w = 0.0
+            custom double outputs:stored_heat_rate_w = 0.0
+            custom double outputs:energy_residual_w = 0.0
+            custom float outputs:render_temperature_k = 0.0
+            custom float outputs:render_emissivity = 0.0
+            custom double inputs:propellant_flow_kgs
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:propellant_flow>
+            custom double inputs:exit_temperature_k
+            double inputs:exit_temperature_k.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:exit_temperature_k>
+            custom double inputs:stagnation_temperature_k
+            double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:stagnation_temperature_k>
+            custom double inputs:jet_power_w
+            double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:jet_power_w>
         }
     }
     def Scope "AttitudeActuation" (
@@ -3168,6 +3427,13 @@ def Xform "Griffin1" (
                         float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:color_b>
                     }
                 }
+                over "Bell"
+                {
+                    custom float inputs:temperature_k
+                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_emissivity>
+                }
             }
             def Xform "Engine02" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
@@ -3341,6 +3607,13 @@ def Xform "Griffin1" (
                         float inputs:light_color_b
                         float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:color_b>
                     }
+                }
+                over "Bell"
+                {
+                    custom float inputs:temperature_k
+                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_emissivity>
                 }
             }
             def Xform "Engine03" (
@@ -3516,6 +3789,13 @@ def Xform "Griffin1" (
                         float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:color_b>
                     }
                 }
+                over "Bell"
+                {
+                    custom float inputs:temperature_k
+                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_emissivity>
+                }
             }
             def Xform "Engine04" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
@@ -3690,6 +3970,13 @@ def Xform "Griffin1" (
                         float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:color_b>
                     }
                 }
+                over "Bell"
+                {
+                    custom float inputs:temperature_k
+                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_emissivity>
+                }
             }
             def Xform "Engine05" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
@@ -3863,6 +4150,13 @@ def Xform "Griffin1" (
                         float inputs:light_color_b
                         float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:color_b>
                     }
+                }
+                over "Bell"
+                {
+                    custom float inputs:temperature_k
+                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_emissivity>
                 }
             }
             def Xform "EngineSkirt" (
@@ -4045,6 +4339,13 @@ def Xform "Griffin1" (
                         float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:color_b>
                     }
                 }
+                over "Bell"
+                {
+                    custom float inputs:temperature_k
+                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_emissivity>
+                }
             }
             def Xform "Engine07" (
                 prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_engine_bell_visual.usda@</EngineBell>
@@ -4218,6 +4519,13 @@ def Xform "Griffin1" (
                         float inputs:light_color_b
                         float inputs:light_color_b.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:color_b>
                     }
+                }
+                over "Bell"
+                {
+                    custom float inputs:temperature_k
+                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_emissivity>
                 }
             }
         }

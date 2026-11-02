@@ -7,6 +7,9 @@ fn panel_subject_path(host) {
 }
 fn show_panel_actions(root) {
     let hud="flip-panel:"+root;
+    if get_twin_setting("ui.vehicle_controls")==false {
+        clear_hint(hud);clear_guided_hud_actions(hud);return;
+    }
     hint(hud,"FLIP solar panel");
     guided_hud_actions(hud,"flip_controls","on_panel_action",[
         #{id:root+"|open",label:"OPEN SOLAR PANEL  O",enabled:true},
@@ -35,6 +38,8 @@ fn apply_panel_action(root,action) {
     }
     let result=cmd("SetPorts",#{target:controller,writes:[["command_deg",target]]});
     if result==() || result.ok!=true {throw("FLIP panel command rejected: "+result);}
-    hint("flip-panel:"+root,if action=="open" {"Opening FLIP solar panel"} else {"Stowing FLIP solar panel"});
+    if get_twin_setting("ui.vehicle_controls")!=false {
+        hint("flip-panel:"+root,if action=="open" {"Opening FLIP solar panel"} else {"Stowing FLIP solar panel"});
+    }
     #{ok:true,controller:controller,command_deg:target}
 }

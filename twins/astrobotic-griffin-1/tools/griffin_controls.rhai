@@ -8,6 +8,15 @@
 fn lander_path() { "/Griffin1SurfaceOps/Lander" }
 fn rover_path() { "/Griffin1SurfaceOps/FLIP" }
 
+fn controls_visible() {
+    if get_twin_setting("ui.vehicle_controls")==false {
+        clear_guided_hud_actions("griffin-controls");
+        clear_hint("griffin-controls");
+        return false;
+    }
+    true
+}
+
 // Runtime topology, rather than a release acknowledgement, decides whether
 // wheel commands can move the rover independently of Griffin.
 fn rover_attached() {
@@ -16,6 +25,7 @@ fn rover_attached() {
 }
 
 fn show_mounted_rover_controls() {
+    if !controls_visible() {return;}
     if griffin_compact_egress::enabled() {
         hint("griffin-controls","FLIP ATTACHED: DETACH ROVER releases the adapter for manual control. Tether restraint is not simulated.");
         return;
@@ -33,6 +43,7 @@ fn resolve(path, label) {
 }
 
 fn show_briefing() {
+    if !controls_visible() {return;}
     let cancel = input_hint("cancel");
     if rover_attached() { show_mounted_rover_controls(); }
     else { hint("griffin-controls", "Click a vehicle to control. " + cancel + " releases."); }
@@ -58,6 +69,7 @@ fn set_surface_action_buttons() {
 }
 
 fn guidance_engagement_applied(enabled) {
+    if !controls_visible() {return;}
     if enabled {
         hint("griffin-controls", "GNC RECONNECTED: guidance commands the lander again.");
         notify_kind("Griffin GNC reconnected.", "success");
@@ -70,6 +82,7 @@ fn guidance_engagement_applied(enabled) {
 
 /// `gnc` is the guidance state the GNC button offers to change.
 fn set_surface_action_buttons_for(gnc) {
+    if !controls_visible() {return #{ok:true,visible:false};}
     let result = guided_hud_actions("griffin-controls", "griffin_surface_ops", "on_hud_action", [
         #{id: "unfold_ramps", label: if griffin_compact_egress::enabled() {"FIXED EGRESS TRACKS"}else{"OPEN RAMPS  U"}, enabled: !griffin_compact_egress::enabled()},
         #{id: "release_rover", label: "DETACH ROVER", enabled: true},
@@ -85,6 +98,7 @@ fn set_surface_action_buttons_for(gnc) {
 }
 
 fn show_touchdown_actions() {
+    if !controls_visible() {return;}
     show_briefing();
     if griffin_compact_egress::enabled() {
         hint("griffin-controls","TOUCHDOWN CONFIRMED: F or DETACH ROVER releases FLIP for manual control. No tether restraint is active.");
@@ -95,16 +109,19 @@ fn show_touchdown_actions() {
 }
 
 fn show_ramp_unfolding_actions() {
+    if !controls_visible() {return;}
     hint("griffin-controls", "RAMP UNFOLDING: middle sections, toes, then deck hinges. F remains available.");
     set_surface_action_buttons();
 }
 
 fn show_rover_release_actions() {
+    if !controls_visible() {return;}
     hint("griffin-controls", "RAMPS SETTLED: F or DETACH ROVER detaches FLIP from the top deck.");
     set_surface_action_buttons();
 }
 
 fn show_rover_release_pending() {
+    if !controls_visible() {return;}
     let paused=clock_snapshot().transport_playing==false;
     let detached=find_path("/Griffin1SurfaceOps/FLIPPayloadAdapterJoint")<0;
     let message=if paused {
@@ -120,6 +137,7 @@ fn clear_surface_operation_actions() {
 }
 
 fn show_rover_controls() {
+    if !controls_visible() {return;}
     if rover_attached() { show_mounted_rover_controls(); return; }
     let forward = input_hint("forward");
     let backward = input_hint("backward");

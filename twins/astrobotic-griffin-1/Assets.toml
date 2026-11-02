@@ -16,6 +16,21 @@ sha256 = "1ea42bf44f7e9d694f79c3afa7145f97fbf06cc67372067d9fe73dce43bad796"
 shared = false
 recommended = false
 
+# Native unsigned half-metre LOLA posts, with the NASA +10 km encoding offset.
+# Linear preparation preserves every 16-bit sample. No colour/gamma conversion.
+[lola_global_displacement_16ppd]
+name = "NASA LOLA global displacement, half-metre units (32 MB)"
+url = "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_16_uint.tif"
+dest = "sources/moon/ldem_16_uint.tif"
+shared = false
+recommended = false
+[lola_global_displacement_16ppd.process]
+kind = "texture"
+color_space = "linear"
+target_resolution = [5760, 2880]
+output = "textures/moon/lola_displacement_16ppd.png"
+output_root = "cache"
+
 [nobile03_dem]
 name = "LROC NAC DTM NOBILE03 (4 m/pixel polar-stereographic DEM)"
 url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/NOBILE03/NAC_DTM_NOBILE03.TIF"

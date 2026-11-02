@@ -155,25 +155,31 @@
     },
     {
       "id": "route-short",
-      "template": "media/griffin_flip_v12/ui/route.html",
-      "stylesheet": "media/griffin_flip_v12/ui/route.css",
+      "template": "media/griffin_flip_v13/ui/route.html",
+      "stylesheet": "media/griffin_flip_v13/ui/route.css",
       "namespace": "route-short",
       "bindings": {
         "title": {
           "source": "title"
         },
-        "balance": {
-          "source": "balance"
-        },
         "elapsed": {
           "source": "elapsed"
+        },
+        "solar": {
+          "source": "solar"
+        },
+        "used": {
+          "source": "used"
+        },
+        "balance": {
+          "source": "balance"
         },
         "case_color": {
           "source": "case_color",
           "css": true
         },
-        "balance_width": {
-          "source": "balance_width",
+        "balance_color": {
+          "source": "balance_color",
           "css": true
         }
       },
@@ -186,31 +192,37 @@
           32,
           -28
         ],
-        "width": 620,
-        "height": 238
+        "width": 900,
+        "height": 208
       }
     },
     {
       "id": "route-long",
-      "template": "media/griffin_flip_v12/ui/route.html",
-      "stylesheet": "media/griffin_flip_v12/ui/route.css",
+      "template": "media/griffin_flip_v13/ui/route.html",
+      "stylesheet": "media/griffin_flip_v13/ui/route.css",
       "namespace": "route-long",
       "bindings": {
         "title": {
           "source": "title"
         },
-        "balance": {
-          "source": "balance"
-        },
         "elapsed": {
           "source": "elapsed"
+        },
+        "solar": {
+          "source": "solar"
+        },
+        "used": {
+          "source": "used"
+        },
+        "balance": {
+          "source": "balance"
         },
         "case_color": {
           "source": "case_color",
           "css": true
         },
-        "balance_width": {
-          "source": "balance_width",
+        "balance_color": {
+          "source": "balance_color",
           "css": true
         }
       },
@@ -223,8 +235,8 @@
           -32,
           -28
         ],
-        "width": 620,
-        "height": 238
+        "width": 900,
+        "height": 208
       }
     },
     {
