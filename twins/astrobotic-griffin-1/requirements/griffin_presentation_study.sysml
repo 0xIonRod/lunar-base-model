@@ -1,6 +1,19 @@
 package GriffinPresentationStudy {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
+    part def EngineBayFinish {
+        doc /* 2 November 2026 operator-requested skirt refinement. STUDY PROXY:
+         * satin grey belly apron and softer outer blanket folds. Renderer
+         * controls only; no flight material or thermal-property claim.
+         * Geometry, aperture, mass and propulsion ownership are unchanged. */
+        attribute apronColor : Real[3] = (0.30, 0.32, 0.35);
+        attribute apronMetallic : Real = 0.55;
+        attribute apronRoughness : Real = 0.56;
+        attribute wallFoldDensityPerM : Real = 10.0;
+        attribute wallFoldSlope : Real = 0.10;
+        attribute wallMicroSlope : Real = 0.015;
+        attribute wallSheen : Real = 0.35;
+    }
     part def BlanketFinish {
         doc /* 30 October 2026 visual reconstruction. Fine crinkles supplement
          * the existing component-owned coarse folds. Renderer controls only:

@@ -1,5 +1,16 @@
 # Griffin-1 model requirements and acceptance
 
+## Engine-skirt finish — 2026-11-02
+
+**Status: study proxy.** The operator's underside screenshot requests a cleaner
+engine surround. Keep the existing metre/Y-up octagonal shell, finite walls and
+open exhaust aperture. Give the belly apron a separate satin grey finish and
+soften the outer blanket folds. Renderer coefficients are owned by
+`GriffinPresentationStudy::EngineBayFinish`; this is not a flight material or
+thermal-performance claim. Acceptance: native underside review, composed apron
+binding and shader readback, and the existing finite-wall check. Bell envelopes,
+collision, mass, joints and thrust retain their existing owners and values.
+
 Reviewed: 2026-10-19. Scope: the Griffin-1 / FLIP Twin under
 [`twins/astrobotic-griffin-1`](../twins/astrobotic-griffin-1/README.md).
 

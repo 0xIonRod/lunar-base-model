@@ -17,6 +17,32 @@ python3 /path/to/astrobotic-griffin-1/tools/terrain/verify_griffin_bundle.py \
 
 The steps below are for regenerating terrain from a source checkout.
 
+## Windows Python workaround
+
+If the Nobile terrain directory or albedo is missing, run the Python adapters
+below from the repository root. On Windows use `py` in place of `python3`;
+`python` may be the Microsoft Store shortcut rather than an installed interpreter.
+Install the orthophoto adapter's dependency with `py -m pip install --user Pillow`.
+The DEM adapter uses only the Python standard library.
+
+Run `reproject_lroc_polar_dem.py` and `prepare_lroc_polar_ortho.py` with the
+source paths and exact parameters shown below. Do not send the original polar
+TIFF directly to the equirectangular-only native cropper. Python prepares local
+input Twins; LunCoSim still owns void interpolation and albedo processing.
+
+If the asset CLI is unavailable, open each preparation Twin in a separate
+LunCoSim API session. After `ListDatasets` lists the prepared dataset, issue
+`ProcessDataset` with `id` equal to `twin/NobileTerrainPreparation/dem` or
+`twin/NobileAlbedoPreparation/albedo`. Wait for `state.kind = "installed"` before
+copying the generated files to `.cache/terrain/nobile03/materials/textures/`.
+Reload the scene after both maps are installed. Keep the Editor's open model
+in its own session while processing the preparation Twins.
+
+Verified on Windows on 2026-11-02: the three NOBILE03 source hashes matched
+`Assets.toml`; the installed DEM has 513 × 513 finite nodes, 4 m spacing and a
+2048 m extent, and the albedo has 2048 × 2048 pixels. Generated files remain
+ignored by Git.
+
 The Twin uses the official LROC NAC DTM `NOBILE03`, a 4 m/pixel product whose
 PDS3 label declares a south-polar stereographic projection. The native
 `lunco-assets` cropper currently accepts equirectangular products only, so the
