@@ -120,7 +120,12 @@ fn skirt_finish_plan(doc) {
     let existing=query("QueryUsdPrim",#{doc_id:doc,path:material,attrs:[]});
     if existing.type_name==() {
         ops=finish::material(ops,root+"/Looks","BayApronSatin",finish::color_text(color),metallic.to_string(),roughness.to_string());
-    } else {throw("Apron finish already exists; inspect before revising");}
+    } else {
+        if existing.type_name!="Material" {throw("Apron finish owner must be a Material");}
+        ops.push(finish::attr(material+"/Surface","inputs:diffuseColor","color3f",finish::color_text(color)));
+        ops.push(finish::attr(material+"/Surface","inputs:metallic","float",metallic.to_string()));
+        ops.push(finish::attr(material+"/Surface","inputs:roughness","float",roughness.to_string()));
+    }
     ops.push(finish::binding(root+"/ThermalApron",material));
     ops.push(finish::attr(root+"/ThermalApron","primvars:displayColor","color3f[]","["+finish::color_text(color)+"]"));
     for item in [["crinkle","wallFoldDensityPerM"],["facet_depth","wallFoldSlope"],

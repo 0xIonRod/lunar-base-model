@@ -1,5 +1,26 @@
 # Griffin-1 model requirements and acceptance
 
+## Engine-bay visual reconstruction — 2026-11-03
+
+**Status: study proxy.** The operator requested a reference-informed shape pass
+after reviewing the broad apron. Widen the common exhaust opening to a 1.44 m
+apothem, leaving approximately 0.212 m of apron at each flat. Retain the seven
+bell stations, 20 mm exit recess, outer shell, engine mounting and physics.
+The aperture remains owned by `GriffinEngineSkirtComponent`; render-only hems,
+panel seams and retaining heads use `GriffinPresentationStudy::EngineBayDetail`.
+The PGH Griffin hardware photo and NASA integration gallery support wrapping,
+segmentation and attachment vocabulary, but do not expose the full underside.
+The hidden contour and attachment dimensions are reconstruction estimates.
+
+Acceptance: inspect both the isolated skirt and complete seven-bell assembly;
+verify a finite, consistently wound closed skin; measure bell-to-opening
+clearance in the common cluster frame; retain render-only detail ownership.
+Intentional fitted pairs are inner hem–apron/liner, outer hem–apron/shell,
+seam–apron and retaining head–apron. These contacts are not a general exemption
+from intersection checks. Rebuild the base skirt with its existing visual
+builder, apply `skirt_finish_plan`, then use `griffin_skirt_detail::plan` and
+`check` for the finish hardware. Final flight dimensions remain TBD.
+
 ## Engine-skirt finish — 2026-11-02
 
 **Status: study proxy.** The operator's underside screenshot requests a cleaner

@@ -270,9 +270,12 @@ package GriffinPropulsionRequirements {
          * No coating or thermal-property claim follows from that RGB value.
          * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
          * https://www.nasa.gov/gallery/astrobotics-griffin-1/ */
-        // Compact central exhaust opening with a surrounding belly apron and
-        // internal radiant barrier. Reconstruction dimensions, not flight data.
-        attribute thermalOpeningApothemM : Real = 1.02;
+        // 2026-11-03 visual reconstruction: enlarge the common opening so the
+        // seven recessed bells read as an engine bay, rather than a small hole
+        // in a broad slab. The remaining apron is approximately 0.212 m wide.
+        // Public imagery supports thin wrapped panels and exposed structure;
+        // this hidden underside dimension remains an unmeasured study proxy.
+        attribute thermalOpeningApothemM : Real = 1.44;
         attribute thermalApronThicknessM : Real = .008;
         // Finite visual edge volume uses the existing apron allowance.
         // This radial inset is a reconstruction envelope, not flight MLI
