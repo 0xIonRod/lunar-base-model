@@ -45,19 +45,13 @@ def Xform "Griffin1SurfaceOps" (
     }
     def Xform "Environment" (
         prepend references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
+        active = true
     )
     {
-    }
-    def Camera "Avatar" (
-        prepend apiSchemas = ["LunCoAvatarAPI"]
-        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
-    )
-    {
-        uniform bool lunco:avatar = true
-        uniform token lunco:cameraMode = "freeflight"
-        custom double3 xformOp:translate = (30.0, 30.0, 30.0)
-        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
-        custom double3 xformOp:rotateXYZ = (-31.65, 45.0, 0.0)
+        over "Terrain"
+        {
+            token visibility = "invisible"
+        }
     }
     def Scope "CameraTrack" (
         prepend apiSchemas = ["LunCoCameraTrackAPI"]
@@ -65,7 +59,7 @@ def Xform "Griffin1SurfaceOps" (
     {
         token lunco:activeCamera
         token lunco:activeCamera.timeSamples = {
-            0.0: "Avatar",
+            0.0: "MoonView",
         }
     }
     def "FLIP" (
@@ -107,5 +101,39 @@ def Xform "Griffin1SurfaceOps" (
     }
     def Scope "FilmCapture"
     {
+    }
+    over "Sun" (
+        active = true
+    )
+    {
+    }
+    def Camera "Avatar" (
+        prepend apiSchemas = ["LunCoAvatarAPI"]
+        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+    )
+    {
+        uniform bool lunco:avatar = true
+        uniform token lunco:cameraMode = "freeflight"
+        custom double3 xformOp:translate = (30.0, 30.0, 30.0)
+        custom token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        custom double3 xformOp:rotateXYZ = (-31.65, 45.0, 0.0)
+    }
+    def Camera "MoonView" (
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (0.0, 3474800.0, 200000.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (0.0, -1737400.0, 0.0)
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        float focalLength = 24.0
+        float exposure:fStop = 16.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
+        float2 clippingRange = (1000.0, 100000000.0)
     }
 }

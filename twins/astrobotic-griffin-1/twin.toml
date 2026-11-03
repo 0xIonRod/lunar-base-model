@@ -14,6 +14,12 @@ root = "requirements/griffin_requirements.sysml"
 paths = ["requirements"]
 
 [[verification.cases]]
+name = "FlipMotionRequirements::Verify_FLIPMotion"
+scene = "tests/flip_motion.usda"
+script = "scenarios/tests/flip_motion.rhai"
+verdict_channel = "FLIP_MOTION_COMPLETE"
+
+[[verification.cases]]
 name = "GriffinSolarRequirements::Verify_GriffinSolarCollision"
 scene = "tests/griffin_solar_collision.usda"
 script = "scenarios/tests/griffin_solar_collision.rhai"

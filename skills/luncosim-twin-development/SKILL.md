@@ -87,6 +87,12 @@ behavior; a headless pass does not prove the scene looks correct. For a visual
 claim, open the exact requested scene in the running app and inspect the relevant
 view. Record the command, exit status, and actual verdict or observation.
 
+For Griffin/FLIP motion, use the Twin's
+[`motion contract`](../../twins/astrobotic-griffin-1/contracts/flip-motion-runtime.md)
+and [test driver](../../twins/astrobotic-griffin-1/tests/README.md).
+Require both the positive physical stop and terminal rejection when the brake
+command is omitted. Keep physical parameters unchanged during acceptance.
+
 If an error says a function or API is missing, first compare the executable's
 revision/capabilities with the Twin's expected LunCoSim version and rebuild or
 select a compatible release before treating it as a Twin defect. For detailed

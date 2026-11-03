@@ -121,29 +121,60 @@ fn flip_motion_snapshot() {
       upright:world_up3(target).y,velocity:state.linear_velocity_mps,wheels:wheels}
 }
 
-fn flip_motion_assert(before, after, label, direction) {
-    let travel = vdot(vsub(after.position,before.position),before.forward)*direction;
-    let checks = [t_true(after.tick>before.tick,label+": simulation did not advance"),
-        t_true(travel>0.05,label+": signed travel did not exceed the 5 cm observation margin"),
-        t_true(after.upright>=0.906307787,label+": exceeded the route test's 25 degree tip margin")];
-    for wheel in after.wheels {
-        checks.push(t_true(wheel.bound && abs(wheel.rate)>0.1,
-            label+": "+wheel.station+" has no measured wheel roll"));
-        checks.push(t_true(wheel.rotation_dot>0.9999,
-            label+": "+wheel.station+" render root does not follow measured axle roll"));
+fn flip_motion_config() {
+    let names=["settleDurationS","settleTimeoutS","driveTimeoutS","brakeEntrySpeedMps",
+        "maximumBrakeEntrySpeedMps","stoppedSpeedMps","minimumAverageDecelerationMps2",
+        "brakeResponseAllowanceS","maximumStoppingDistanceM","stoppedDwellS",
+        "maximumStoppedDriftM","minimumMotionTravelM","minimumWheelRateRadPerS",
+        "minimumRenderRotationDot","minimumUprightAxisY"];
+    let prefix="FlipMotionRequirements::MotionStudy::";
+    let qualified=[];for name in names {qualified.push(prefix+name);}
+    let source=sysml_requirements::source_with_attributes(qualified);
+    if source.ok!=true {throw("FLIP motion requirement source unavailable: "+source);}
+    let config=#{};
+    for name in names {
+        let value=f64_from(sysml_requirements::number(source,prefix+name));
+        if value==() || value<=0.0 {throw("FLIP motion requires a positive "+prefix+name);}
+        config[name]=value;
     }
-    report_verdict(checks,"FLIP MOTION "+label,"FLIP_MOTION");
-    let passed=true;for check in checks {if check!="" {passed=false;}}
-    #{ok:passed,travel_m:travel,before:before,after:after}
+    if config.maximumBrakeEntrySpeedMps<=config.brakeEntrySpeedMps
+        || config.brakeEntrySpeedMps<=config.stoppedSpeedMps
+        || config.settleTimeoutS<config.settleDurationS {
+        throw("FLIP motion requirement bounds are inconsistent");
+    }
+    config
 }
 
-fn flip_brake_assert(before, after) {
+fn flip_motion_assert(before, after, label, direction, config) {
+    let travel = vdot(vsub(after.position,before.position),before.forward)*direction;
+    let checks = [t_true(after.tick>before.tick,label+": simulation did not advance"),
+        t_true(travel>config.minimumMotionTravelM,label+": signed travel below requirement: "+travel+" m"),
+        t_true(after.upright>=config.minimumUprightAxisY,label+": upright axis below requirement: "+after.upright)];
+    for wheel in after.wheels {
+        checks.push(t_true(wheel.bound && abs(wheel.rate)>config.minimumWheelRateRadPerS,
+            label+": "+wheel.station+" has no measured wheel roll"));
+        checks.push(t_true(wheel.rotation_dot>config.minimumRenderRotationDot,
+            label+": "+wheel.station+" render root does not follow measured axle roll"));
+    }
+    let passed=true;for check in checks {if check!="" {passed=false;}}
+    #{ok:passed,checks:checks,travel_m:travel,before:before,after:after}
+}
+
+fn flip_brake_assert(before, after, elapsed, distance, config) {
     let initial = vlen(before.velocity);
     let final = vlen(after.velocity);
-    let checks = [t_true(after.tick>before.tick,"braking: simulation did not advance"),
-        t_true(initial>0.1,"braking: test did not establish moving-wheel momentum"),
-        t_true(final<initial && final<0.1,"braking: rover did not stop below 0.1 m/s")];
-    report_verdict(checks,"FLIP PHYSICAL STOP","FLIP_MOTION");
+    let deadline=(initial-config.stoppedSpeedMps)/config.minimumAverageDecelerationMps2
+        +config.brakeResponseAllowanceS;
+    let detail="initial="+initial+" m/s final="+final+" m/s elapsed="+elapsed
+        +" s limit="+deadline+" s distance="+distance+" m limit="+config.maximumStoppingDistanceM+" m";
+    let checks = [t_true(after.tick>before.tick,"braking: simulation did not advance; "+detail),
+        t_true(initial>=config.brakeEntrySpeedMps && initial<=config.maximumBrakeEntrySpeedMps,
+            "braking: entry speed outside requirement; "+detail),
+        t_true(final<=config.stoppedSpeedMps,"braking: stopped-speed requirement failed; "+detail),
+        t_true(elapsed>0.0 && elapsed<=deadline,"braking: stopping-time requirement failed; "+detail),
+        t_true(distance<=config.maximumStoppingDistanceM,"braking: stopping-distance requirement failed; "+detail),
+        t_true(after.upright>=config.minimumUprightAxisY,"braking: upright requirement failed; "+detail)];
     let passed=true;for check in checks {if check!="" {passed=false;}}
-    #{ok:passed,initial_speed_mps:initial,final_speed_mps:final}
+    #{ok:passed,checks:checks,initial_speed_mps:initial,final_speed_mps:final,
+      elapsed_s:elapsed,deadline_s:deadline,distance_m:distance}
 }

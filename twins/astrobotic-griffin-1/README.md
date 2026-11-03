@@ -381,10 +381,14 @@ when the route finishes. The one-shot
 after the Twin is mounted and checks completed, active, false and missing
 route-start evidence through the report's own structured check.
 
-Opening the Twin defaults to `scenes/griffin_flip_visual.usda`, the combined
-Griffin/FLIP review composition. The powered landing mission remains a separate
-scene; open `scenes/griffin_1_surface_ops.usda` when you want its mission
-controls and surface-operations sequence.
+Opening the Twin starts `scenes/griffin_1_surface_ops.usda`, the maintained
+Griffin/FLIP surface-operations scene with mission controls and the powered
+landing sequence.
+
+The [motion contract](contracts/flip-motion-runtime.md) and its positive/negative
+production gates qualify controlled stopping. The separate
+[Moon presentation](docs/moon-presentation.md) retains its physical site observer
+and surface data while hiding the local terrain mesh and leaving FLIP inactive.
 
 For Griffin work, open the integrated `vehicles/griffin_1.usda` source through
 `scenes/griffin_1_editor.usda`; its visual components remain replaceable assets
@@ -616,7 +620,7 @@ execute the suite.
     .\target\debug\luncosim.exe --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda
 
 The old sandbox binary is not the target for this Twin. Use the production
-luncosim binary. The Twin default is the combined visual review scene;
+luncosim binary. The Twin default is the surface-operations scene;
 explicitly select `griffin_1_surface_ops.usda` for powered landing and its
 mission controls.
 

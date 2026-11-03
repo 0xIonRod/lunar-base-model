@@ -18,6 +18,7 @@ def Xform "Griffin1SurfaceOps" (
         over "Test"
         {
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/flip_motion.rhai@
+            custom bool inputs:apply_brake = true
         }
     }
 }

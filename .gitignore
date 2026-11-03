@@ -49,3 +49,4 @@ twins/**/.cache/
 twins/**/tests/_power_failure_*.usda
 twins/**/tests/_bus_failure_*.usda
 twins/**/tests/_skirt_failure_*.usda
+twins/**/tests/_motion_failure_*.usda

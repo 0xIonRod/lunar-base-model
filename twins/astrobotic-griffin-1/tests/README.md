@@ -5,17 +5,46 @@ verification cases to these scenes and their observers in `scenarios/tests/`.
 SysML owns acceptance criteria; Rhai observes the composed/runtime system and
 emits typed verdicts; Modelica owns continuous physics.
 
-`flip_motion.usda` is the focused forward/reverse, four-wheel render-roll and
-physical-stop gate. It references the existing route scene and replaces only
-its observer. Run it with the production binary:
+`flip_motion.usda` checks forward/reverse motion, four-wheel render roll,
+physical stops and stationary dwell against `FlipMotionRequirements::MotionStudy`.
+It references the route scene and replaces its observer. Run the production gate:
 
 ```sh
-"$LUNCOSIM_BIN" test --scene tests/flip_motion.usda --verdict-channel FLIP_MOTION_COMPLETE --max-ticks 1800 --api 4201
+"$LUNCOSIM_BIN" test --scene tests/flip_motion.usda --verification FlipMotionRequirements::Verify_FLIPMotion --max-ticks 2400 --api 4201
 ```
 
 See [CAD FLIP acceptance](../contracts/flip-cad-runtime-2026-10-26.md) for the
 active CAD rover. The [2026-10-23 receipt](../contracts/flip-runtime-2026-10-23.md)
 records the earlier proxy rover only.
+
+[Motion acceptance](../contracts/flip-motion-runtime.md) defines the current
+test boundary. Qualify its negative case with an owned authoring session and
+one free test port:
+
+```sh
+python3 tests/check_flip_motion.py --engine /path/to/lunco-sim --author-port 4291 --test-port 4294
+```
+
+This runs the positive case and a disposable document-authored fork that omits
+the braking command. The fork must fail on `FLIP_MOTION_COMPLETE` with measured
+stop diagnostics; a timeout, runtime fault or script error cannot qualify it.
+The driver removes the fork and preserves the positive source. Use `--case`
+to select one unchanged trial when reusing existing evidence.
+
+The [Moon presentation](../docs/moon-presentation.md) gate uses a windowed
+production session and the engine's existing API-test dependencies (including
+Pillow for rendered-image inspection):
+
+```sh
+python3 tests/check_moon_presentation.py --engine /path/to/lunco-sim --port 4294
+```
+
+It requires ten authored runtime checks, rejects a temporarily clipped target,
+restores the camera, and requires visible globe pixels plus a clean render log.
+Only the disposable document view layer changes; the saved scene is preserved.
+Evidence defaults under the engine workspace for screenshot access. The explicit
+`--render-quality` option selects the tested preset and is recorded in evidence;
+the driver never changes preset after a graphics failure.
 
 The Python files here are external test drivers. They use an already-built
 `LUNCOSIM_BIN`, create disposable fault fixtures through an owned simulator's
