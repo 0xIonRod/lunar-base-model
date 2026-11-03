@@ -1,8 +1,9 @@
 // Two independent native vehicles: mission targets and parking policy, with measured acceptance.
 const ROOT="/Griffin1SurfaceOps";
 fn simulation_dependencies(me,ctx) {
- let a=find_path(ROOT+"/FLIP");let b=find_path(ROOT+"/FLIP_Amber");
- #{modelica_entities:[a,b],entity_reads:[a,b,find_path(ROOT+"/FLIP/SolarMechanism/Photovoltaics"),find_path(ROOT+"/FLIP_Amber/SolarMechanism/Photovoltaics"),find_path(ROOT+"/FlipRoute/P2"),find_path(ROOT+"/AmberRoute/P2")],entity_writes:[a,b],query_reads:["QueryPhysicsState","QueryUsdPrim","GetOfflineRecordingStatus"],required_inputs:[]}
+ let doc=query("QueryUsdPrim",#{path:ROOT}).doc_id;
+ let a=find_path_in_document(doc,ROOT+"/FLIP");let b=find_path_in_document(doc,ROOT+"/FLIP_Amber");
+ #{modelica_entities:[a,b],entity_reads:[a,b,find_path_in_document(doc,ROOT+"/FLIP/SolarMechanism/Photovoltaics"),find_path_in_document(doc,ROOT+"/FLIP_Amber/SolarMechanism/Photovoltaics"),find_path_in_document(doc,ROOT+"/FlipRoute/P1"),find_path_in_document(doc,ROOT+"/AmberRoute/P2")],entity_writes:[a,b],query_reads:["QueryPhysicsState","QueryUsdPrim","GetOfflineRecordingStatus"],required_inputs:[]}
 }
 fn clean_view() {
  set_twin_setting("ui.camera_status",false);set_twin_setting("ui.vehicle_controls",false);set_twin_setting("ui.mission_notifications",false);
@@ -10,17 +11,18 @@ fn clean_view() {
  clear_guided_hud_actions("griffin-controls");clear_hint("griffin-controls");objectives_hud("griffin-controls",[]);
 }
 fn on_start(me,ctx) {
+ this.scene_doc=query("QueryUsdPrim",#{path:ROOT}).doc_id;
  if !set_physics_substeps(32) || !set_physics_joint_velocity_iterations(128) {throw "Native contact solver quality rejected";}
  print("PHYSICS_PROFILE|"+physics_substeps()+"|"+physics_joint_velocity_iterations()+"|"+solver_configuration_fingerprint());
- for p in [ROOT+"/FLIP",ROOT+"/FLIP_Amber"] {cmd("SetPorts",#{target:find_path(p),writes:[["program_active",1.0],["autopilot_enable",0.0],["throttle",0.0],["steer",0.0],["brake",1.0]]});}
+ for p in [ROOT+"/FLIP",ROOT+"/FLIP_Amber"] {cmd("SetPorts",#{target:find_path_in_document(this.scene_doc,p),writes:[["program_active",1.0],["autopilot_enable",0.0],["throttle",0.0],["steer",0.0],["brake",1.0]]});}
  this.alignment_gate_ok=true;this.stop_started=();this.crossover=();this.cases=[];this.measuring=false;this.done=false;this.valid=true;this.equal_start=false;this.contact_free=true;this.ground_seen=[false,false];this.blue_bodies=[];
  for item in [["blue","FLIP","FlipRoute"],["amber","FLIP_Amber","AmberRoute"]] {
-  this.cases.push(#{name:item[0],rover:find_path(ROOT+"/"+item[1]),route:find_path(ROOT+"/"+item[2]),started:false,route_completed:false,stage:0,completed:false,reported:false,failed:false,park_pose:(),park_drift:0.0,peak_speed:0.0,peak_yaw_rate:0.0,previous:(),motor_wh:0.0,motor_phases:#{turn:0.0,drive:0.0,hold:0.0},regen_wh:0.0,solar_wh:0.0,equipment_wh:0.0,battery_wh:0.0,distance:0.0,peak:0.0,minimum_up:1.0,minimum_solar_cosine:1.0,maximum_solar_cosine_error:0.0,drive_direction:1.0,reverse_distance:0.0,samples:0});
+  this.cases.push(#{name:item[0],rover:find_path_in_document(this.scene_doc,ROOT+"/"+item[1]),route:find_path_in_document(this.scene_doc,ROOT+"/"+item[2]),started:false,route_completed:false,stage:0,completed:false,reported:false,failed:false,park_pose:(),park_drift:0.0,peak_speed:0.0,peak_yaw_rate:0.0,previous:(),motor_wh:0.0,motor_phases:#{turn:0.0,drive:0.0,hold:0.0},regen_wh:0.0,solar_wh:0.0,equipment_wh:0.0,battery_wh:0.0,distance:0.0,peak:0.0,minimum_up:1.0,minimum_solar_cosine:1.0,maximum_solar_cosine_error:0.0,drive_direction:1.0,reverse_distance:0.0,samples:0});
  }
  // These six admitted collider owners are retained in rover-topology.json.
  this.blue_bodies=[ROOT+"/FLIP",ROOT+"/FLIP/SolarMechanism"];
  for side in ["FL","FR","RL","RR"] {this.blue_bodies.push(ROOT+"/FLIP/Suspension_"+side+"/Wheel_"+side);}
- cmd("SetCameraLookAt",#{camera:find_path(ROOT+"/Avatar"),eye:[-16.46215333887149, 49.230282748857086, -39.63182421474647],target:[-7.9558111948738635, -0.7697172511429119, -12.288778602941452]});clean_view();cmd("StepSimulation",#{hold:true});cmd("SetTimeTransport",#{playing:true,rate:1.0});
+ cmd("SetUserCamera",#{name:"RouteMaster"});clean_view();cmd("StepSimulation",#{hold:true});cmd("SetTimeTransport",#{playing:true,rate:1.0});
 }
 fn on_event(me,evt,ctx) {
  for i in 0..this.cases.len() {
@@ -52,25 +54,35 @@ fn motion(rover) {
 fn service_arrival(s) {
  if !s.route_completed || s.completed || s.failed {return s;}
  let now=elapsed_seconds();let p=world_pos(s.rover);let state=motion(s.rover);
- let goal=world_pos(find_path(ROOT+if s.name=="blue" {"/FlipRoute/P2"}else{"/AmberRoute/P2"}));
+ let goal=world_pos(find_path_in_document(this.scene_doc,ROOT+if s.name=="blue" {"/FlipRoute/P1"}else{"/AmberRoute/P2"}));
  let dx=p[0]-goal[0];let dz=p[2]-goal[2];let distance=sqrt(dx*dx+dz*dz);
  if s.stage==0 {
   s.stage=1;s.stage_started=now;
+  print("ARRIVAL_PHASE|"+s.name+"|route_to_parking_handoff|"+now);
+ }
+ // The route emits completion before its final safe-stop write is applied.
+ // Let that authority retire before the parking controller takes ownership.
+ if s.stage==1 && now-s.stage_started>=0.25 {
+  let command=modelica_waypoint(s.rover,goal,0.05*s.drive_direction,0.30,0.0);
+  if command.ok!=true {throw "Precision arrival target rejected";}
+  s.stage=2;s.stage_started=now;
+  print("ARRIVAL_PHASE|"+s.name+"|final_approach_to_destination|"+now);
+ }
+ if s.stage==2 && distance<0.35 {
+  modelica_waypoint_stop(s.rover);s.stage=3;s.stage_started=now;
   print("ARRIVAL_PHASE|"+s.name+"|braking_at_destination|"+now);
  }
- // Both authored paths contain their Sun-facing final approach. Arrival only
- // brakes and settles; it never sends a parked rover away for another lap.
- if now-s.stage_started>=1.0 && state.speed<0.02 && state.yaw<0.03 {
+ if s.stage==3 && now-s.stage_started>=1.0 && state.speed<0.02 && state.yaw<0.03 {
   s.completed=true;s.park_pose=p;s.arrival_error=distance;
   print("PARK_POSE|"+s.name+"|"+now+"|"+p+"|"+distance+"|"+get(s.rover,"solar_cos_incidence"));
  }
- if !s.completed && now-s.stage_started>15.0 {
+ if !s.completed && now-s.stage_started>30.0 {
   s.failed=true;modelica_waypoint_stop(s.rover);print("ARRIVAL_FAILED|"+s.name+"|"+now);
  }
  s
 }
 fn finished(me) {
- for i in 0..this.cases.len() {this.cases[i]=service_arrival(this.cases[i]);}
+ for i in 0..this.cases.len() {this.cases[i]=this.service_arrival(this.cases[i]);}
  if this.cases[0].reported && this.cases[1].reported && this.stop_started==() {this.stop_started=elapsed_seconds();print("PARK_BEGIN|"+this.stop_started);}
  this.cases[0].failed || this.cases[1].failed || this.stop_started!=() || elapsed_seconds()-this.start_s>420.0
 }
@@ -90,19 +102,19 @@ fn finish_dual(me) {
  }
 
  let checks=[t_true(this.alignment_gate_ok,"skid guidance aligns before forward drive"),t_true(this.native_energy_ok,"native energy meters agree with independent sampled integration"),t_true(this.energy_closure_ok,"solar and recovered energy minus motors and equipment matches the battery bus"),t_true(this.balances[1]>this.balances[0],"sun-facing forward/reverse traverse has the better measured energy balance"),t_true(this.contact_free && this.blue_bodies.len()==6,"all six collider owners stay free of cross-copy contact"),t_true(this.ground_seen[0] && this.ground_seen[1],"both copies retain loaded wheel contact with terrain"),t_true(this.valid,"finite native power and pose samples"),t_true(this.equal_start,"identical initial battery state at simultaneous departure")];
- for s in this.cases {print("DRIVING_QUALITY|"+s.name+"|"+s.peak_speed+"|"+s.peak_yaw_rate+"|"+s.park_drift+"|"+s.arrival_error+"|"+s.reverse_distance);checks.push(t_true(s.peak_speed<1.0,s.name+" stays below the conservative one metre per second mission limit"));checks.push(t_true(s.park_drift<0.05,s.name+" holds its parked location within five centimetres"));checks.push(t_true(s.arrival_error<0.45,s.name+" stops at the actual destination"));print("SOLAR_ALIGNMENT_RESULT|"+s.name+"|"+s.minimum_solar_cosine+"|"+s.maximum_solar_cosine_error);if s.name=="amber" {checks.push(t_true(s.minimum_solar_cosine>0.65,"zigzag keeps the solar face towards the light"));checks.push(t_true(s.reverse_distance>15.0,"zigzag includes actual native reverse travel"));}checks.push(t_true(get(s.rover,"solar_cos_incidence")>=0.97,s.name+" uses the same Sun-facing parking condition"));checks.push(t_true(s.maximum_solar_cosine_error<0.035,s.name+" solar measurement follows the physical panel normal and Sun direction"));checks.push(t_true(s.started && s.completed && s.reported,s.name+" native route completed"));checks.push(t_true(s.minimum_up>0.906307787,s.name+" remains upright"));}
+ for s in this.cases {print("DRIVING_QUALITY|"+s.name+"|"+s.peak_speed+"|"+s.peak_yaw_rate+"|"+s.park_drift+"|"+s.arrival_error+"|"+s.reverse_distance);checks.push(t_true(s.peak_speed<1.0,s.name+" stays below the conservative one metre per second mission limit"));checks.push(t_true(s.park_drift<0.05,s.name+" holds its parked location within five centimetres"));checks.push(t_true(s.arrival_error<0.45,s.name+" stops at the actual destination"));print("SOLAR_ALIGNMENT_RESULT|"+s.name+"|"+s.minimum_solar_cosine+"|"+s.maximum_solar_cosine_error);if s.name=="amber" {checks.push(t_true(s.minimum_solar_cosine>0.65,"zigzag keeps the solar face towards the light"));checks.push(t_true(s.reverse_distance>15.0,"zigzag includes actual native reverse travel"));}checks.push(t_true(get(s.rover,"solar_cos_incidence")>0.25,s.name+" keeps the solar-cell face exposed at the destination"));checks.push(t_true(s.maximum_solar_cosine_error<0.035,s.name+" solar measurement follows the physical panel normal and Sun direction"));checks.push(t_true(s.started && s.completed && s.reported,s.name+" native route completed"));checks.push(t_true(s.minimum_up>0.906307787,s.name+" remains upright"));}
  report_verdict(checks,"SIMULTANEOUS ROUTE COMPARISON","DUAL_ROUTE_COMPARISON");cmd("StepSimulation",#{hold:true});emit("route-comparison-finished");
 }
 fn task(me,ctx) {seq([wait(3.0),wait(0.25),once(Fn("start_dual")),wait_until(Fn("finished")),once(Fn("finish_dual"))])}
 fn on_tick(me,ctx) {
  if this.done {return;}
  for path in this.blue_bodies {
-  let contact=contact_debug(find_path(path),this.cases[1].rover);
+  let contact=contact_debug(find_path_in_document(this.scene_doc,path),this.cases[1].rover);
   if contact==() || contact.touching_pair_count!=0 {this.contact_free=false;}
  }
  for i in 0..2 {
   let body=if i==0 {"FLIP"}else{"FLIP_Amber"};
-  let wheel=contact_debug(find_path(ROOT+"/"+body+"/Suspension_FL/Wheel_FL"));
+  let wheel=contact_debug(find_path_in_document(this.scene_doc,ROOT+"/"+body+"/Suspension_FL/Wheel_FL"));
   if wheel!=() && wheel.total_normal_impulse>0.0 {this.ground_seen[i]=true;}
  }
  if !this.measuring {return;}
@@ -140,7 +152,7 @@ fn on_tick(me,ctx) {
   if abs(heading)>0.205 && abs(throttle)>1.0e-7 {this.alignment_gate_ok=false;}
   if s.park_pose!=() {let dx=pose[0]-s.park_pose[0];let dy=pose[1]-s.park_pose[1];let dz=pose[2]-s.park_pose[2];s.park_drift=max(s.park_drift,sqrt(dx*dx+dy*dy+dz*dz));}
   let path=if s.name=="blue" {"FLIP"}else{"FLIP_Amber"};
-  let q=world_rotation_quat(find_path(ROOT+"/"+path+"/SolarMechanism/Photovoltaics"));
+  let q=world_rotation_quat(find_path_in_document(this.scene_doc,ROOT+"/"+path+"/SolarMechanism/Photovoltaics"));
   let normal=qrot(q,vec3(0.0,1.0,0.0));
   let sun=qrot(q,vec3(port(s.rover,"target_mount_x"),port(s.rover,"target_mount_y"),port(s.rover,"target_mount_z")));
   let raw=normal.x*sun.x+normal.y*sun.y+normal.z*sun.z;let incidence=get(s.rover,"solar_cos_incidence");

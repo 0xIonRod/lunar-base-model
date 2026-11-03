@@ -189,11 +189,11 @@
         "mode": "window",
         "anchor": "bottom_left",
         "offset": [
-          32,
-          -28
+          20,
+          -20
         ],
-        "width": 900,
-        "height": 208
+        "width": 600,
+        "height": 185
       }
     },
     {
@@ -232,11 +232,11 @@
         "mode": "window",
         "anchor": "bottom_right",
         "offset": [
-          -32,
-          -28
+          -20,
+          -20
         ],
-        "width": 900,
-        "height": 208
+        "width": 600,
+        "height": 185
       }
     },
     {
@@ -289,6 +289,25 @@
         ],
         "width": 580,
         "height": 160
+      }
+    },
+    {
+      "id": "film-map",
+      "template": "media/griffin_flip_v13/ui/moon_map.html",
+      "stylesheet": "media/griffin_flip_v13/ui/moon_map.css",
+      "namespace": "film-map",
+      "bindings": {},
+      "visible_in_perspective": "sandbox_view",
+      "interactive": false,
+      "placement": {
+        "mode": "window",
+        "anchor": "top_right",
+        "offset": [
+          -20,
+          20
+        ],
+        "width": 428,
+        "height": 534
       }
     }
   ]

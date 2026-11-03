@@ -380,7 +380,6 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/BellNozzle.mo@
             uniform bool lunco:program:realtimeSafe = true
             float outputs:exit_area
-            float outputs:exit_radius_m
             float inputs:p_ambient = 0.0
             float inputs:g0 = 9.806650161743164
             float outputs:ideal_exhaust_velocity_mps = 0.0
@@ -394,6 +393,10 @@ def Xform "Griffin1" (
             custom double inputs:p_chamber = 1500000.0
             custom double inputs:gamma = 1.2
             custom double inputs:characteristic_velocity_mps = 1550.0
+            custom double outputs:throat_radius_m = 0.0
+            custom double outputs:nozzle_length_m = 0.0
+            custom double outputs:contour_out = 0.0
+            custom double outputs:exit_radius_m = 0.0
         }
         def Scope "PropellantStatus" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -508,8 +511,6 @@ def Xform "Griffin1" (
             double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine01.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
             double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine01.outputs:mixture_ratio>
-            custom float inputs:nozzle_exit_radius_m
-            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -581,6 +582,8 @@ def Xform "Griffin1" (
             double inputs:nozzle_exit_mach.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_mach>
             custom double inputs:gas_gamma
             double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double inputs:nozzle_exit_radius_m
+            double inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
         }
         def Scope "Engine01ThrustTelemetry" (
             prepend apiSchemas = ["LunCoTelemetryAPI"]
@@ -656,8 +659,6 @@ def Xform "Griffin1" (
             double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine02.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
             double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine02.outputs:mixture_ratio>
-            custom float inputs:nozzle_exit_radius_m
-            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -729,6 +730,8 @@ def Xform "Griffin1" (
             double inputs:nozzle_exit_mach.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_mach>
             custom double inputs:gas_gamma
             double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double inputs:nozzle_exit_radius_m
+            double inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
         }
         def Scope "Engine02ThrustTelemetry" (
             prepend apiSchemas = ["LunCoTelemetryAPI"]
@@ -804,8 +807,6 @@ def Xform "Griffin1" (
             double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine03.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
             double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine03.outputs:mixture_ratio>
-            custom float inputs:nozzle_exit_radius_m
-            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -877,6 +878,8 @@ def Xform "Griffin1" (
             double inputs:nozzle_exit_mach.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_mach>
             custom double inputs:gas_gamma
             double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double inputs:nozzle_exit_radius_m
+            double inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
         }
         def Scope "Engine03ThrustTelemetry" (
             prepend apiSchemas = ["LunCoTelemetryAPI"]
@@ -952,8 +955,6 @@ def Xform "Griffin1" (
             double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine04.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
             double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine04.outputs:mixture_ratio>
-            custom float inputs:nozzle_exit_radius_m
-            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -1025,6 +1026,8 @@ def Xform "Griffin1" (
             double inputs:nozzle_exit_mach.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_mach>
             custom double inputs:gas_gamma
             double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double inputs:nozzle_exit_radius_m
+            double inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
         }
         def Scope "Engine04ThrustTelemetry" (
             prepend apiSchemas = ["LunCoTelemetryAPI"]
@@ -1100,8 +1103,6 @@ def Xform "Griffin1" (
             double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine05.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
             double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine05.outputs:mixture_ratio>
-            custom float inputs:nozzle_exit_radius_m
-            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -1173,6 +1174,8 @@ def Xform "Griffin1" (
             double inputs:nozzle_exit_mach.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_mach>
             custom double inputs:gas_gamma
             double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double inputs:nozzle_exit_radius_m
+            double inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
         }
         def Scope "Engine05ThrustTelemetry" (
             prepend apiSchemas = ["LunCoTelemetryAPI"]
@@ -1248,8 +1251,6 @@ def Xform "Griffin1" (
             double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine06.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
             double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine06.outputs:mixture_ratio>
-            custom float inputs:nozzle_exit_radius_m
-            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -1321,6 +1322,8 @@ def Xform "Griffin1" (
             double inputs:nozzle_exit_mach.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_mach>
             custom double inputs:gas_gamma
             double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double inputs:nozzle_exit_radius_m
+            double inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
         }
         def Scope "Engine06ThrustTelemetry" (
             prepend apiSchemas = ["LunCoTelemetryAPI"]
@@ -1396,8 +1399,6 @@ def Xform "Griffin1" (
             double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine07.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
             double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine07.outputs:mixture_ratio>
-            custom float inputs:nozzle_exit_radius_m
-            float inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -1469,6 +1470,8 @@ def Xform "Griffin1" (
             double inputs:nozzle_exit_mach.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_mach>
             custom double inputs:gas_gamma
             double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double inputs:nozzle_exit_radius_m
+            double inputs:nozzle_exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
         }
         def Scope "Engine07ThrustTelemetry" (
             prepend apiSchemas = ["LunCoTelemetryAPI"]
@@ -1492,7 +1495,7 @@ def Xform "Griffin1" (
             custom double inputs:heat_capacity_j_k = 750.0
             custom double inputs:initial_temperature_k = 293.15
             custom double inputs:heated_area_m2 = 0.33
-            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:radiating_area_m2 = 0.33
             custom double inputs:emissivity = 0.8
             custom double inputs:reference_flow_kgs = 0.8
             custom double inputs:reference_film_coefficient_w_m2_k = 120.0
@@ -1508,7 +1511,6 @@ def Xform "Griffin1" (
             custom double outputs:conduction_w = 0.0
             custom double outputs:stored_heat_rate_w = 0.0
             custom double outputs:energy_residual_w = 0.0
-            custom float outputs:render_temperature_k = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:propellant_flow>
@@ -1516,6 +1518,23 @@ def Xform "Griffin1" (
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
             double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:jet_power_w>
+            custom double inputs:throat_radius_m
+            double inputs:throat_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:throat_radius_m>
+            custom double inputs:exit_radius_m
+            double inputs:exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom double inputs:nozzle_length_m
+            double inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:nozzle_length_m>
+            custom double inputs:nozzle_contour
+            double inputs:nozzle_contour.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:contour_out>
+            custom double inputs:gas_gamma
+            double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double outputs:throat_temperature_k = 293.15
+            custom double outputs:middle_temperature_k = 293.15
+            custom double outputs:exit_temperature_k = 293.15
+            custom float outputs:render_throat_temperature_k = 0.0
+            custom float outputs:render_middle_temperature_k = 0.0
+            custom float outputs:render_exit_temperature_k = 0.0
+            custom float outputs:render_nozzle_length_m = 0.0
         }
         def Scope "Engine02Wall" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1527,7 +1546,7 @@ def Xform "Griffin1" (
             custom double inputs:heat_capacity_j_k = 750.0
             custom double inputs:initial_temperature_k = 293.15
             custom double inputs:heated_area_m2 = 0.33
-            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:radiating_area_m2 = 0.33
             custom double inputs:emissivity = 0.8
             custom double inputs:reference_flow_kgs = 0.8
             custom double inputs:reference_film_coefficient_w_m2_k = 120.0
@@ -1543,7 +1562,6 @@ def Xform "Griffin1" (
             custom double outputs:conduction_w = 0.0
             custom double outputs:stored_heat_rate_w = 0.0
             custom double outputs:energy_residual_w = 0.0
-            custom float outputs:render_temperature_k = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:propellant_flow>
@@ -1551,6 +1569,23 @@ def Xform "Griffin1" (
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
             double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:jet_power_w>
+            custom double inputs:throat_radius_m
+            double inputs:throat_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:throat_radius_m>
+            custom double inputs:exit_radius_m
+            double inputs:exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom double inputs:nozzle_length_m
+            double inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:nozzle_length_m>
+            custom double inputs:nozzle_contour
+            double inputs:nozzle_contour.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:contour_out>
+            custom double inputs:gas_gamma
+            double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double outputs:throat_temperature_k = 293.15
+            custom double outputs:middle_temperature_k = 293.15
+            custom double outputs:exit_temperature_k = 293.15
+            custom float outputs:render_throat_temperature_k = 0.0
+            custom float outputs:render_middle_temperature_k = 0.0
+            custom float outputs:render_exit_temperature_k = 0.0
+            custom float outputs:render_nozzle_length_m = 0.0
         }
         def Scope "Engine03Wall" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1562,7 +1597,7 @@ def Xform "Griffin1" (
             custom double inputs:heat_capacity_j_k = 750.0
             custom double inputs:initial_temperature_k = 293.15
             custom double inputs:heated_area_m2 = 0.33
-            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:radiating_area_m2 = 0.33
             custom double inputs:emissivity = 0.8
             custom double inputs:reference_flow_kgs = 0.8
             custom double inputs:reference_film_coefficient_w_m2_k = 120.0
@@ -1578,7 +1613,6 @@ def Xform "Griffin1" (
             custom double outputs:conduction_w = 0.0
             custom double outputs:stored_heat_rate_w = 0.0
             custom double outputs:energy_residual_w = 0.0
-            custom float outputs:render_temperature_k = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:propellant_flow>
@@ -1586,6 +1620,23 @@ def Xform "Griffin1" (
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
             double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:jet_power_w>
+            custom double inputs:throat_radius_m
+            double inputs:throat_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:throat_radius_m>
+            custom double inputs:exit_radius_m
+            double inputs:exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom double inputs:nozzle_length_m
+            double inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:nozzle_length_m>
+            custom double inputs:nozzle_contour
+            double inputs:nozzle_contour.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:contour_out>
+            custom double inputs:gas_gamma
+            double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double outputs:throat_temperature_k = 293.15
+            custom double outputs:middle_temperature_k = 293.15
+            custom double outputs:exit_temperature_k = 293.15
+            custom float outputs:render_throat_temperature_k = 0.0
+            custom float outputs:render_middle_temperature_k = 0.0
+            custom float outputs:render_exit_temperature_k = 0.0
+            custom float outputs:render_nozzle_length_m = 0.0
         }
         def Scope "Engine04Wall" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1597,7 +1648,7 @@ def Xform "Griffin1" (
             custom double inputs:heat_capacity_j_k = 750.0
             custom double inputs:initial_temperature_k = 293.15
             custom double inputs:heated_area_m2 = 0.33
-            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:radiating_area_m2 = 0.33
             custom double inputs:emissivity = 0.8
             custom double inputs:reference_flow_kgs = 0.8
             custom double inputs:reference_film_coefficient_w_m2_k = 120.0
@@ -1613,7 +1664,6 @@ def Xform "Griffin1" (
             custom double outputs:conduction_w = 0.0
             custom double outputs:stored_heat_rate_w = 0.0
             custom double outputs:energy_residual_w = 0.0
-            custom float outputs:render_temperature_k = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:propellant_flow>
@@ -1621,6 +1671,23 @@ def Xform "Griffin1" (
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
             double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:jet_power_w>
+            custom double inputs:throat_radius_m
+            double inputs:throat_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:throat_radius_m>
+            custom double inputs:exit_radius_m
+            double inputs:exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom double inputs:nozzle_length_m
+            double inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:nozzle_length_m>
+            custom double inputs:nozzle_contour
+            double inputs:nozzle_contour.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:contour_out>
+            custom double inputs:gas_gamma
+            double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double outputs:throat_temperature_k = 293.15
+            custom double outputs:middle_temperature_k = 293.15
+            custom double outputs:exit_temperature_k = 293.15
+            custom float outputs:render_throat_temperature_k = 0.0
+            custom float outputs:render_middle_temperature_k = 0.0
+            custom float outputs:render_exit_temperature_k = 0.0
+            custom float outputs:render_nozzle_length_m = 0.0
         }
         def Scope "Engine05Wall" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1632,7 +1699,7 @@ def Xform "Griffin1" (
             custom double inputs:heat_capacity_j_k = 750.0
             custom double inputs:initial_temperature_k = 293.15
             custom double inputs:heated_area_m2 = 0.33
-            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:radiating_area_m2 = 0.33
             custom double inputs:emissivity = 0.8
             custom double inputs:reference_flow_kgs = 0.8
             custom double inputs:reference_film_coefficient_w_m2_k = 120.0
@@ -1648,7 +1715,6 @@ def Xform "Griffin1" (
             custom double outputs:conduction_w = 0.0
             custom double outputs:stored_heat_rate_w = 0.0
             custom double outputs:energy_residual_w = 0.0
-            custom float outputs:render_temperature_k = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:propellant_flow>
@@ -1656,6 +1722,23 @@ def Xform "Griffin1" (
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
             double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:jet_power_w>
+            custom double inputs:throat_radius_m
+            double inputs:throat_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:throat_radius_m>
+            custom double inputs:exit_radius_m
+            double inputs:exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom double inputs:nozzle_length_m
+            double inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:nozzle_length_m>
+            custom double inputs:nozzle_contour
+            double inputs:nozzle_contour.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:contour_out>
+            custom double inputs:gas_gamma
+            double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double outputs:throat_temperature_k = 293.15
+            custom double outputs:middle_temperature_k = 293.15
+            custom double outputs:exit_temperature_k = 293.15
+            custom float outputs:render_throat_temperature_k = 0.0
+            custom float outputs:render_middle_temperature_k = 0.0
+            custom float outputs:render_exit_temperature_k = 0.0
+            custom float outputs:render_nozzle_length_m = 0.0
         }
         def Scope "Engine06Wall" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1667,7 +1750,7 @@ def Xform "Griffin1" (
             custom double inputs:heat_capacity_j_k = 750.0
             custom double inputs:initial_temperature_k = 293.15
             custom double inputs:heated_area_m2 = 0.33
-            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:radiating_area_m2 = 0.33
             custom double inputs:emissivity = 0.8
             custom double inputs:reference_flow_kgs = 0.8
             custom double inputs:reference_film_coefficient_w_m2_k = 120.0
@@ -1683,7 +1766,6 @@ def Xform "Griffin1" (
             custom double outputs:conduction_w = 0.0
             custom double outputs:stored_heat_rate_w = 0.0
             custom double outputs:energy_residual_w = 0.0
-            custom float outputs:render_temperature_k = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:propellant_flow>
@@ -1691,6 +1773,23 @@ def Xform "Griffin1" (
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
             double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:jet_power_w>
+            custom double inputs:throat_radius_m
+            double inputs:throat_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:throat_radius_m>
+            custom double inputs:exit_radius_m
+            double inputs:exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom double inputs:nozzle_length_m
+            double inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:nozzle_length_m>
+            custom double inputs:nozzle_contour
+            double inputs:nozzle_contour.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:contour_out>
+            custom double inputs:gas_gamma
+            double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double outputs:throat_temperature_k = 293.15
+            custom double outputs:middle_temperature_k = 293.15
+            custom double outputs:exit_temperature_k = 293.15
+            custom float outputs:render_throat_temperature_k = 0.0
+            custom float outputs:render_middle_temperature_k = 0.0
+            custom float outputs:render_exit_temperature_k = 0.0
+            custom float outputs:render_nozzle_length_m = 0.0
         }
         def Scope "Engine07Wall" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1702,7 +1801,7 @@ def Xform "Griffin1" (
             custom double inputs:heat_capacity_j_k = 750.0
             custom double inputs:initial_temperature_k = 293.15
             custom double inputs:heated_area_m2 = 0.33
-            custom double inputs:radiating_area_m2 = 0.66
+            custom double inputs:radiating_area_m2 = 0.33
             custom double inputs:emissivity = 0.8
             custom double inputs:reference_flow_kgs = 0.8
             custom double inputs:reference_film_coefficient_w_m2_k = 120.0
@@ -1718,7 +1817,6 @@ def Xform "Griffin1" (
             custom double outputs:conduction_w = 0.0
             custom double outputs:stored_heat_rate_w = 0.0
             custom double outputs:energy_residual_w = 0.0
-            custom float outputs:render_temperature_k = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
             double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:propellant_flow>
@@ -1726,6 +1824,23 @@ def Xform "Griffin1" (
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
             double inputs:jet_power_w.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:jet_power_w>
+            custom double inputs:throat_radius_m
+            double inputs:throat_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:throat_radius_m>
+            custom double inputs:exit_radius_m
+            double inputs:exit_radius_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_radius_m>
+            custom double inputs:nozzle_length_m
+            double inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:nozzle_length_m>
+            custom double inputs:nozzle_contour
+            double inputs:nozzle_contour.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:contour_out>
+            custom double inputs:gas_gamma
+            double inputs:gas_gamma.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:gamma_out>
+            custom double outputs:throat_temperature_k = 293.15
+            custom double outputs:middle_temperature_k = 293.15
+            custom double outputs:exit_temperature_k = 293.15
+            custom float outputs:render_throat_temperature_k = 0.0
+            custom float outputs:render_middle_temperature_k = 0.0
+            custom float outputs:render_exit_temperature_k = 0.0
+            custom float outputs:render_nozzle_length_m = 0.0
         }
     }
     def Scope "AttitudeActuation" (
@@ -3415,8 +3530,27 @@ def Xform "Griffin1" (
                 }
                 over "Bell"
                 {
-                    custom float inputs:temperature_k
-                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_emissivity>
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_nozzle_length_m>
+                }
+                over "Throat"
+                {
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_nozzle_length_m>
                     custom float inputs:emissivity
                     float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine01Wall.outputs:render_emissivity>
                 }
@@ -3596,8 +3730,27 @@ def Xform "Griffin1" (
                 }
                 over "Bell"
                 {
-                    custom float inputs:temperature_k
-                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_emissivity>
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_nozzle_length_m>
+                }
+                over "Throat"
+                {
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_nozzle_length_m>
                     custom float inputs:emissivity
                     float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine02Wall.outputs:render_emissivity>
                 }
@@ -3777,8 +3930,27 @@ def Xform "Griffin1" (
                 }
                 over "Bell"
                 {
-                    custom float inputs:temperature_k
-                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_emissivity>
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_nozzle_length_m>
+                }
+                over "Throat"
+                {
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_nozzle_length_m>
                     custom float inputs:emissivity
                     float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine03Wall.outputs:render_emissivity>
                 }
@@ -3958,8 +4130,27 @@ def Xform "Griffin1" (
                 }
                 over "Bell"
                 {
-                    custom float inputs:temperature_k
-                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_emissivity>
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_nozzle_length_m>
+                }
+                over "Throat"
+                {
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_nozzle_length_m>
                     custom float inputs:emissivity
                     float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine04Wall.outputs:render_emissivity>
                 }
@@ -4139,8 +4330,27 @@ def Xform "Griffin1" (
                 }
                 over "Bell"
                 {
-                    custom float inputs:temperature_k
-                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_emissivity>
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_nozzle_length_m>
+                }
+                over "Throat"
+                {
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_nozzle_length_m>
                     custom float inputs:emissivity
                     float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine05Wall.outputs:render_emissivity>
                 }
@@ -4327,8 +4537,27 @@ def Xform "Griffin1" (
                 }
                 over "Bell"
                 {
-                    custom float inputs:temperature_k
-                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_emissivity>
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_nozzle_length_m>
+                }
+                over "Throat"
+                {
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_nozzle_length_m>
                     custom float inputs:emissivity
                     float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine06Wall.outputs:render_emissivity>
                 }
@@ -4508,8 +4737,27 @@ def Xform "Griffin1" (
                 }
                 over "Bell"
                 {
-                    custom float inputs:temperature_k
-                    float inputs:temperature_k.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_temperature_k>
+                    custom float inputs:emissivity
+                    float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_emissivity>
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_nozzle_length_m>
+                }
+                over "Throat"
+                {
+                    custom float inputs:temperature_throat_k
+                    float inputs:temperature_throat_k.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_throat_temperature_k>
+                    custom float inputs:temperature_middle_k
+                    float inputs:temperature_middle_k.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_middle_temperature_k>
+                    custom float inputs:temperature_exit_k
+                    float inputs:temperature_exit_k.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_exit_temperature_k>
+                    custom float inputs:nozzle_length_m
+                    float inputs:nozzle_length_m.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_nozzle_length_m>
                     custom float inputs:emissivity
                     float inputs:emissivity.connect = </Griffin1/MainPropulsion/Engine07Wall.outputs:render_emissivity>
                 }

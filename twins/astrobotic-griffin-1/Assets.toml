@@ -29,6 +29,23 @@ target_resolution = [5760, 2880]
 output = "textures/moon/lola_displacement_16ppd.png"
 output_root = "cache"
 
+# Higher detail global LOLA source for regional orbital film shots.
+# Source: NASA SVS CGI Moon Kit, 64 ppd unsigned half-metre posts (506 MiB).
+# Prepare within the renderer's 16k texture limit while retaining linear 16-bit data.
+[lola_global_displacement_64ppd]
+name = "NASA LOLA global elevation — 64 ppd source (506 MiB)"
+url = "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_64_uint.tif"
+dest = "sources/moon/ldem_64_uint.tif"
+sha256 = "0f40bce8b42864deddb6943a38474879e691d5b20647aa5e54c2612b23106499"
+shared = false
+recommended = false
+[lola_global_displacement_64ppd.process]
+kind = "texture"
+color_space = "linear"
+target_resolution = [16384, 8192]
+output = "textures/moon/lola_displacement_16k.png"
+output_root = "cache"
+
 [nobile03_dem]
 name = "LROC NAC DTM NOBILE03 (4 m/pixel polar-stereographic DEM)"
 url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/NOBILE03/NAC_DTM_NOBILE03.TIF"

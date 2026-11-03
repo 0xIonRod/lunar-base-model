@@ -175,7 +175,7 @@ fn on_start(me, ctx) {
 
 fn on_event(me, evt, ctx) {
     if griffin_compact_egress::enabled() && evt.name=="griffin_ramp_unfold_requested" {
-        hint("griffin-controls","Compact tracks are fixed; use DETACH ROVER for manual release.");
+        griffin_controls::show_hint("Compact tracks are fixed; use DETACH ROVER for manual release.");
         return;
     }
     if !griffin_compact_egress::enabled() {
@@ -419,13 +419,13 @@ fn update_landing_status(previously_landed, already_announced) {
             status.touchdown_announced = true;
         }
         if !status.landed && previously_landed {
-            if griffin_compact_egress::enabled() {hint("griffin-controls","LANDING NOT CONFIRMED: manual DETACH ROVER remains available.");}
-            else {hint("griffin-controls", "LANDING NOT CONFIRMED: U opens ramps; F detaches FLIP. Both remain available.");}
+            if griffin_compact_egress::enabled() {griffin_controls::show_hint("LANDING NOT CONFIRMED: manual DETACH ROVER remains available.");}
+            else {griffin_controls::show_hint( "LANDING NOT CONFIRMED: U opens ramps; F detaches FLIP. Both remain available.");}
         } else if status.landed && !previously_landed && already_announced {
             // Restore the live contact notice after suspension settling without
             // announcing touchdown again or resetting the egress action phase.
-            if griffin_compact_egress::enabled() {hint("griffin-controls","FOUR-PAD CONTACT RESTORED: F or DETACH ROVER releases FLIP for manual control.");}
-            else {hint("griffin-controls", "FOUR-PAD CONTACT RESTORED: U opens ramps; F detaches FLIP.");}
+            if griffin_compact_egress::enabled() {griffin_controls::show_hint("FOUR-PAD CONTACT RESTORED: F or DETACH ROVER releases FLIP for manual control.");}
+            else {griffin_controls::show_hint( "FOUR-PAD CONTACT RESTORED: U opens ramps; F detaches FLIP.");}
         }
     }
     status
@@ -438,7 +438,7 @@ fn on_stop(me, ctx) {
         this.route_engaged=false;
     }
     // Retire this mission's shared scene card when its scenario stops.
-    hint("griffin-controls", "");
+    griffin_controls::show_hint( "");
     objectives_hud("griffin-controls", []);
     griffin_controls::clear_surface_operation_actions();
 }
@@ -1049,7 +1049,7 @@ fn compact_landing_task() {
             this.surface_route_frame=griffin_surface_ops::landed_surface_route_frame();
             let shown=griffin_surface_ops::present_surface_route(this.surface_route_frame);
             if shown==() || shown.ok!=true {throw("Landed compact-ramp markers could not follow their actual frame");}
-            hint("griffin-controls","TOUCHDOWN: compact tracks installed. F or DETACH ROVER releases FLIP for manual control; no tether restraint is active.");
+            griffin_controls::show_hint("TOUCHDOWN: compact tracks installed. F or DETACH ROVER releases FLIP for manual control; no tether restraint is active.");
             emit("griffin_compact_egress_held");true
         })
     ])
@@ -1071,7 +1071,7 @@ fn compact_manual_release_task() {
             if brake==() || brake.ok!=true {throw("Detached FLIP could not retain its parking brake");}
             this.rover_brake_held=true;
             complete_rover_release(m);
-            hint("griffin-controls","FLIP DETACHED AND PARKED: W drives toward the ramp; S reverses. The first drive input releases the parking brake.");true
+            griffin_controls::show_hint("FLIP DETACHED AND PARKED: W drives toward the ramp; S reverses. The first drive input releases the parking brake.");true
         }),
         wait_until(|m| !this.rover_brake_held)
     ])

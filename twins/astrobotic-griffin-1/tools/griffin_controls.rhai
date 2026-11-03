@@ -17,6 +17,12 @@ fn controls_visible() {
     true
 }
 
+// Mission status uses the same visibility owner as the control buttons.
+fn show_hint(text) {
+    if !controls_visible() {return;}
+    hint("griffin-controls",text);
+}
+
 // Runtime topology, rather than a release acknowledgement, decides whether
 // wheel commands can move the rover independently of Griffin.
 fn rover_attached() {

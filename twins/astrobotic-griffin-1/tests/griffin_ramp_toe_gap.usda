@@ -9,7 +9,7 @@ def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
     prepend apiSchemas = ["LunCoCatalogAPI", "LunCoEpochAPI"]
     kind = "assembly"
-    documentation = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
+    doc = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
 )
 {
     uniform bool lunco:spawnable = false
@@ -60,7 +60,7 @@ def Xform "Griffin1SurfaceOps" (
     }
     def "Lander" (
         references = [@twin://astrobotic-griffin-1/vehicles/griffin_1.usda@</Griffin1>, @lunco://components/gnc/position_pid_guidance.usda@</PositionPIDGuidance>]
-        documentation = "Final-approach study starts at 60 m with all connected rigid bodies at rest, yawed 172.483 degrees toward the Sun at the authored site/epoch. Guidance immediately descends while tracking solar heading. The initial yaw is an epoch-specific study value, not a flight attitude plan."
+        doc = "Final-approach study starts at 60 m with all connected rigid bodies at rest, yawed 172.483 degrees toward the Sun at the authored site/epoch. Guidance immediately descends while tracking solar heading. The initial yaw is an epoch-specific study value, not a flight attitude plan."
     )
     {
         double3 xformOp:translate = (0.0, 60.0, 0.0)
@@ -155,7 +155,7 @@ def Xform "Griffin1SurfaceOps" (
         {
         }
         over "AttitudeReference" (
-            documentation = "Forward solar-bank +Z faces Sun azimuth during automatic descent. IMU thrust tilt retains priority; first pilot flight input disables heading hold through the GNC authority gate."
+            doc = "Forward solar-bank +Z faces Sun azimuth during automatic descent. IMU thrust tilt retains priority; first pilot flight input disables heading hold through the GNC authority gate."
         )
         {
             custom double inputs:heading_enable
@@ -375,7 +375,7 @@ def Xform "Griffin1SurfaceOps" (
         }
     }
     def Scope "FlipRoute" (
-        documentation = "Operator route for FLIP: Alt+left-click adds a point to this route while FLIP is selected or possessed; the action key starts or stops following. Points live in the runtime layer and are not saved (usd.runtime_persistence is false)."
+        doc = "Operator route for FLIP: Alt+left-click adds a point to this route while FLIP is selected or possessed; the action key starts or stops following. Points live in the runtime layer and are not saved (usd.runtime_persistence is false)."
     )
     {
         def Scope "Program" (
