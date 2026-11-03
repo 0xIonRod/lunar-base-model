@@ -103,3 +103,62 @@ fn adapter_material_plan(doc) {
     ops.push(finish::attr("/Griffin1/PayloadAdapter/AdapterPlate","primvars:displayColor","color3f[]","["+finish::color_text(finish::study("aluminumColor"))+"]"));
     #{ok:true,doc_id:doc,generation:q.generation,ops:ops}
 }
+
+// Independent satin underside; outer walls retain the silver blanket palette.
+fn skirt_finish_plan(doc) {
+    let root="/World/EngineSkirt";
+    let q=query("InspectUsdDocument",#{doc_id:doc,path:root});
+    if !q.prim.exists {throw("Open the canonical engine-skirt component");}
+    let model=sysml_model("twin://astrobotic-griffin-1/requirements/griffin_presentation_study.sysml");
+    let prefix="GriffinPresentationStudy::EngineBayFinish::";
+    let color=model.value(prefix+"apronColor");
+    let metallic=model.value(prefix+"apronMetallic");
+    let roughness=model.value(prefix+"apronRoughness");
+    if color==() || metallic==() || roughness==() {throw("Missing engine-bay finish source");}
+    let material=root+"/Looks/BayApronSatin";
+    let ops=[];
+    let existing=query("QueryUsdPrim",#{doc_id:doc,path:material,attrs:[]});
+    if existing.type_name==() {
+        ops=finish::material(ops,root+"/Looks","BayApronSatin",finish::color_text(color),metallic.to_string(),roughness.to_string());
+    } else {
+        if existing.type_name!="Material" {throw("Apron finish owner must be a Material");}
+        ops.push(finish::attr(material+"/Surface","inputs:diffuseColor","color3f",finish::color_text(color)));
+        ops.push(finish::attr(material+"/Surface","inputs:metallic","float",metallic.to_string()));
+        ops.push(finish::attr(material+"/Surface","inputs:roughness","float",roughness.to_string()));
+    }
+    ops.push(finish::binding(root+"/ThermalApron",material));
+    ops.push(finish::attr(root+"/ThermalApron","primvars:displayColor","color3f[]","["+finish::color_text(color)+"]"));
+    for item in [["crinkle","wallFoldDensityPerM"],["facet_depth","wallFoldSlope"],
+                 ["micro_strength","wallMicroSlope"],["sheen","wallSheen"]] {
+        let value=model.value(prefix+item[1]);
+        if value==() {throw("Missing skirt finish source: "+item[1]);}
+        ops.push(finish::attr(root+"/Looks/BayBlanket/Surface","inputs:"+item[0],"float",value.to_string()));
+    }
+    #{ok:true,doc_id:doc,generation:q.generation,ops:ops}
+}
+
+fn skirt_finish_check(doc) {
+    let root="/World/EngineSkirt";
+    let apron=query("QueryUsdPrim",#{doc_id:doc,path:root+"/ThermalApron",
+        attrs:["purpose","physics:collisionEnabled"],relationships:true});
+    if apron.type_name!="Mesh" || apron.attrs.purpose!="render"
+        || apron.attrs["physics:collisionEnabled"]!=false
+        || apron.relationships["material:binding"]!=[root+"/Looks/BayApronSatin"] {
+        throw("Skirt apron must retain render-only ownership and its separate satin binding");
+    }
+    let model=sysml_model("twin://astrobotic-griffin-1/requirements/griffin_presentation_study.sysml");
+    let prefix="GriffinPresentationStudy::EngineBayFinish::";
+    for item in [["Looks/BayApronSatin/Surface","inputs:metallic","apronMetallic"],
+                 ["Looks/BayApronSatin/Surface","inputs:roughness","apronRoughness"],
+                 ["Looks/BayBlanket/Surface","inputs:crinkle","wallFoldDensityPerM"],
+                 ["Looks/BayBlanket/Surface","inputs:facet_depth","wallFoldSlope"],
+                 ["Looks/BayBlanket/Surface","inputs:micro_strength","wallMicroSlope"],
+                 ["Looks/BayBlanket/Surface","inputs:sheen","wallSheen"]] {
+        let expected=model.value(prefix+item[2]);
+        let q=query("QueryUsdPrim",#{doc_id:doc,path:root+"/"+item[0],attrs:[item[1]]});
+        if expected==() || q.attrs[item[1]]==() || abs(q.attrs[item[1]]-expected)>0.000001 {
+            throw("Skirt finish differs from its source: "+item[2]);
+        }
+    }
+    #{ok:true,checks:7,scope:"Separate apron binding, render-only ownership and source-owned finish controls"}
+}

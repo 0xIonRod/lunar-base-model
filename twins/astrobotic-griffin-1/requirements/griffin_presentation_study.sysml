@@ -1,6 +1,45 @@
 package GriffinPresentationStudy {
     private import ScalarValues::Real;
     private import ScalarValues::Integer;
+    part def EngineBayFinish {
+        doc /* 2 November 2026 operator-requested skirt refinement. STUDY PROXY:
+         * satin grey belly apron and softer outer blanket folds. Renderer
+         * controls only; no flight material or thermal-property claim.
+         * Aperture geometry is owned by the propulsion component; these finish
+         * controls do not define mass or propulsion behavior. */
+        attribute apronColor : Real[3] = (0.18, 0.20, 0.22);
+        attribute apronMetallic : Real = 0.32;
+        attribute apronRoughness : Real = 0.65;
+        attribute wallFoldDensityPerM : Real = 10.0;
+        attribute wallFoldSlope : Real = 0.10;
+        attribute wallMicroSlope : Real = 0.015;
+        attribute wallSheen : Real = 0.35;
+    }
+    part def EngineBayDetail {
+        doc /* 3 November 2026 presentation reconstruction. Thin metallic edge
+         * hems, panel divisions and retaining heads make the bay read as
+         * assembled thermal hardware. The PGH Griffin hardware photograph and
+         * NASA integration gallery support wrapping and attachment detail,
+         * but do not expose a measured complete underside. These dimensions
+         * are visual estimates, not flight sheet gauges, fasteners or loads.
+         * All additions are massless render geometry attached to the skirt.
+         * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
+         * https://www.nasa.gov/gallery/astrobotics-griffin-1/ */
+        attribute hemWidthM : Real = 0.016;
+        attribute hemHeightM : Real = 0.018;
+        attribute hemDropM : Real = 0.004;
+        attribute seamWidthM : Real = 0.006;
+        attribute seamHeightM : Real = 0.001;
+        attribute fastenerRadiusM : Real = 0.008;
+        attribute fastenerHeightM : Real = 0.004;
+        attribute fastenerFaceFractions : Real[2] = (0.22, 0.78);
+        attribute edgeColor : Real[3] = (0.46, 0.48, 0.50);
+        attribute edgeMetallic : Real = 0.75;
+        attribute edgeRoughness : Real = 0.34;
+        attribute seamColor : Real[3] = (0.10, 0.115, 0.13);
+        attribute seamMetallic : Real = 0.0;
+        attribute seamRoughness : Real = 0.82;
+    }
     part def BlanketFinish {
         doc /* 30 October 2026 visual reconstruction. Fine crinkles supplement
          * the existing component-owned coarse folds. Renderer controls only:
