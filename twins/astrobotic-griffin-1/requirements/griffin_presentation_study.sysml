@@ -56,9 +56,10 @@ package GriffinPresentationStudy {
          * dome proportions and harness dimensions below are STUDY ASSUMPTIONS.
          * They are not measured optical/thermal properties, flight CAD or loads.
          * The mesh cover adds no mass, collision, joints or force authority. */
-        attribute retentionColor : Real[3] = (0.34, 0.38, 0.43);
+        // 2026-11-04: darker satin retention hardware separates it from silver insulation.
+        attribute retentionColor : Real[3] = (0.20, 0.24, 0.29);
         attribute retentionMetallic : Real = 0.85;
-        attribute retentionRoughness : Real = 0.28;
+        attribute retentionRoughness : Real = 0.42;
         attribute aluminumColor : Real[3] = (0.63, 0.67, 0.72);
         attribute aluminumMetallic : Real = 0.82;
         attribute aluminumRoughness : Real = 0.33;
@@ -112,8 +113,10 @@ package GriffinPresentationStudy {
         attribute DarkHousingGrain : Real = 0.025;
         attribute DarkHousingScale : Real = 100;
         attribute DarkHousingBrush : Real = 2;
-        attribute TreadColor : Real[3] = (0.16, 0.18, 0.21);
-        attribute TreadMetallic : Real = 0.65;
+        // 2026-11-04: carry the selected yellow outer tread finish onto active CAD FLIP v5.
+        // Presentation study only; no physical material or contact-property change.
+        attribute TreadColor : Real[3] = (1.0, 0.72, 0.015);
+        attribute TreadMetallic : Real = 0.0;
         attribute TreadRoughness : Real = 0.58;
         attribute TreadGrain : Real = 0.065;
         attribute TreadScale : Real = 90;
