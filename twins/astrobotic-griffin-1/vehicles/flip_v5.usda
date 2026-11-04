@@ -3657,8 +3657,8 @@ def Xform "FLIP" (
         bool physics:collisionEnabled = false
         token drive:angular:physics:type = "force"
         float drive:angular:physics:maxForce = 60.0
-        float drive:angular:physics:stiffness = 1.0
-        float drive:angular:physics:damping = 0.10000000149011612
+        float drive:angular:physics:stiffness = 20.0
+        float drive:angular:physics:damping = 3.5
         float drive:angular:physics:targetPosition = -82.0
         float drive:angular:physics:targetVelocity = 0.0
         double inputs:angle = -1.4311699866353502
