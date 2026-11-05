@@ -1,0 +1,59 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/media/griffin_flip_v13/scenes/broll.usda@</Griffin1SurfaceOps>
+)
+{
+    over "FilmRecordingUI"
+    {
+        uniform string info:sourceCode = "fn select(facts) {[]}"
+    }
+    def Camera "FilmCamera" (
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        float exposure:fStop = 16.0
+        custom double3 xformOp:translate = (7.0, 4.4, 8.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (0.0, 1.3, 0.0)
+        float focalLength = 38.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
+    }
+    def Xform "ClosingAim"
+    {
+        custom double3 xformOp:translate = (0.0, 1.3, 0.0)
+    }
+    def BasisCurves "FilmPath" (
+        prepend apiSchemas = ["LunCoCameraPathAPI"]
+    )
+    {
+        uniform token type = "linear"
+        uniform token basis = "bezier"
+        uniform token wrap = "nonperiodic"
+        int[] curveVertexCounts = [3]
+        point3f[] points = [(7.0, 4.400000095367432, 8.0), (9.0, 5.0, 10.0), (12.0, 6.0, 13.0)]
+        double lunco:path:duration = 25.0
+        token lunco:path:clock = "real"
+        token visibility = "invisible"
+        rel lunco:path:camera = </Griffin1SurfaceOps/FilmCamera>
+        rel lunco:path:lookAt = </Griffin1SurfaceOps/ClosingAim>
+    }
+    over Scope "FilmCapture"
+    {
+    }
+}

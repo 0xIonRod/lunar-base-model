@@ -20,6 +20,7 @@ def Xform "Griffin1SurfaceOps" (
         )
         {
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/media/griffin_flip_v13/scenarios/routes_policy_validated_profile.rhai@
+            custom double inputs:parking_clearance_m = 2.5
         }
     }
     over "Avatar" (
@@ -123,7 +124,7 @@ def Xform "Griffin1SurfaceOps" (
             custom double3 xformOp:translate = (-8.0, -1.8668532820884138, -22.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
             bool lunco:billboard = false
-            custom color3f[] primvars:displayColor = [(0.30000001192092896, 1.0, 0.6499999761581421)]
+            custom color3f[] primvars:displayColor = [(1.0, 1.0, 1.0)]
             custom double inputs:drive_direction = -1.0
             over "Trigger"
             {

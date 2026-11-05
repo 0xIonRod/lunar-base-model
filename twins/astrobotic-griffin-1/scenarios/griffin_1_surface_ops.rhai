@@ -1046,9 +1046,13 @@ fn compact_landing_task() {
         landing_confirmation_task(),
         check(|m| this.phase_timeout!=true),
         once(|m| {
-            this.surface_route_frame=griffin_surface_ops::landed_surface_route_frame();
-            let shown=griffin_surface_ops::present_surface_route(this.surface_route_frame);
-            if shown==() || shown.ok!=true {throw("Landed compact-ramp markers could not follow their actual frame");}
+            let prepare=get_twin_setting("mission.prepare_surface_route");
+            if prepare!=true && prepare!=false {throw "mission.prepare_surface_route must be an authored boolean";}
+            if prepare {
+                this.surface_route_frame=griffin_surface_ops::landed_surface_route_frame();
+                let shown=griffin_surface_ops::present_surface_route(this.surface_route_frame);
+                if shown==() || shown.ok!=true {throw("Landed compact-ramp markers could not follow their actual frame");}
+            }
             griffin_controls::show_hint("TOUCHDOWN: compact tracks installed. F or DETACH ROVER releases FLIP for manual control; no tether restraint is active.");
             emit("griffin_compact_egress_held");true
         })
