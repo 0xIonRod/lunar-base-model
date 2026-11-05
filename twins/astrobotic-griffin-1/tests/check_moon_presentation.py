@@ -83,7 +83,7 @@ def main():
         try:
             clip([original_range[0], 1000000.0])
             offset = log.stat().st_size
-            command('RunScenarioAsset', source_asset=observer, reload_policy='Retain', params={})
+            command('RunScenarioAsset', source_asset=observer, reload_policy='retain', params={})
             deadline = time.monotonic() + 30
             while time.monotonic() < deadline:
                 with log.open('rb') as stream:

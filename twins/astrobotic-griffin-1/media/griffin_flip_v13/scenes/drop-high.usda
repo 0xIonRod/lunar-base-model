@@ -45,7 +45,7 @@ def Xform "Griffin1SurfaceOps" (
         }
     }
     def Xform "Environment" (
-        references = @twin://astrobotic-griffin-1/media/griffin_flip_v8/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
+        references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
     )
     {
     }
@@ -498,6 +498,25 @@ def Xform "Griffin1SurfaceOps" (
         string lunco:policy:entry = "select"
         uniform string info:sourceCode = "fn select(facts) { [] }"
         bool lunco:policy:deterministic = false
+    }
+    def Camera "DropObserve" (
+        references = None
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-9.0, 4.0, -12.0)
+        custom double3 xformOp:rotateXYZ = (-10.203973721731685, -143.13010235415598, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        float focalLength = 32.0
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        double3 lunco:cameraLookAt = (0.0, 1.3, 0.0)
+        float exposure:fStop = 16.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
     }
     def Scope "FilmCapture"
     {

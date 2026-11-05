@@ -410,6 +410,9 @@ verification = "GriffinRampRootBearingRequirements::Verify_GriffinRampRootBearin
 usd_path = "/World/RampRootBearing"
 
 [settings]
+"assets.texture_decode_max_bytes" = 1073741824
+"celestial.globe_lod.max_resident_mesh_bytes" = 536870912
+"mission.prepare_surface_route" = true
 "numerics.comparison.angle_abs_rad" = 0.000000001
 "numerics.comparison.length_abs_m" = 0.000001
 "numerics.comparison.scalar_abs" = 0.000000001

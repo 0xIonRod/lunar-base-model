@@ -1,6 +1,6 @@
 // Retained observer: compare two RestartScene trajectories in one app.
 // Mount the surface contract fixture first, then attach one RunScenarioAsset
-// observer on WorldGrid with reload_policy=Retain and no scene_asset. on_start
+// observer on WorldGrid with reload_policy=retain and no scene_asset. on_start
 // owns the first restart. Model state is observed, never overwritten.
 fn report_restart(name, result) {
     print(name + " " + result);

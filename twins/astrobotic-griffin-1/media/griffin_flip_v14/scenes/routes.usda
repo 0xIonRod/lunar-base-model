@@ -1,0 +1,68 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/media/griffin_flip_v13/scenes/routes.usda@</Griffin1SurfaceOps>
+)
+{
+    over "FilmRecordingUI"
+    {
+        uniform string info:sourceCode = "fn select(facts) {let ids=[];for id in facts.visible_surface_ids {if id==\"film-map\" {ids.push(id);}}ids}"
+    }
+    over "RouteMaster"
+    {
+        custom double3 xformOp:translate = (12.0, 24.0, -38.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (-10.0, -1.0, -11.0)
+        float focalLength = 30.0
+    }
+    over "ResultView"
+    {
+        custom double3 xformOp:translate = (12.0, 24.0, -38.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (-10.0, -1.0, -11.0)
+        float focalLength = 30.0
+    }
+    over "ResultAim"
+    {
+        custom double3 xformOp:translate = (-10.0, -1.0, -11.0)
+    }
+    over "ResultOrbit"
+    {
+        point3f[] points = [(12.0, 24.0, -38.0), (8.0, 25.0, -40.0), (2.0, 26.0, -41.0)]
+        double lunco:path:duration = 18.0
+    }
+    over "FlipRoute"
+    {
+        over "P1"
+        {
+            custom double3 xformOp:translate = (-8.0, -1.8668532820884138, -22.0)
+        }
+    }
+    over "AmberRoute"
+    {
+        over "P2"
+        {
+            custom double3 xformOp:translate = (-8.0, -1.8668532820884138, -22.0)
+        }
+    }
+    over "FLIP"
+    {
+        string lunco:ui:surfaceId = ""
+    }
+    over "FLIP_Amber"
+    {
+        string lunco:ui:surfaceId = ""
+    }
+    over Scope "FilmCapture"
+    {
+    }
+}

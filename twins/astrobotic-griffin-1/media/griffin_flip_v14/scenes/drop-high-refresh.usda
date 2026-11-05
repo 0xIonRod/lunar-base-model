@@ -1,0 +1,27 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/media/griffin_flip_v13/scenes/drop-high.usda@</Griffin1SurfaceOps>
+)
+{
+    over "FilmRecordingUI"
+    {
+        uniform string info:sourceCode = "fn select(facts) {[]}"
+    }
+    over "FLIP"
+    {
+        custom string lunco:ui:surfaceId = ""
+    }
+    over Scope "FilmCapture"
+    {
+    }
+}

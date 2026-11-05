@@ -45,7 +45,7 @@ def Xform "Griffin1SurfaceOps" (
         }
     }
     def Xform "Environment" (
-        references = @twin://astrobotic-griffin-1/media/griffin_flip_v8/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
+        references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
     )
     {
     }
@@ -426,6 +426,21 @@ def Xform "Griffin1SurfaceOps" (
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             custom double3 xformOp:rotateXYZ = (27.409574, 45.0, 0.0)
         }
+        def Camera "NozzleCoolView" (
+            prepend apiSchemas = ["LunCoCameraAPI"]
+        )
+        {
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            token projection = "perspective"
+            float focalLength = 14.0
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            float2 clippingRange = (0.029999999329447746, 10000.0)
+            custom double3 xformOp:translate = (0.6, -0.25, 0.6)
+            custom double3 xformOp:rotateXYZ = (38.29471221243967, 45.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
     }
     def "FLIP" (
         references = @twin://astrobotic-griffin-1/vehicles/flip_v5.usda@</FLIP>
@@ -480,7 +495,7 @@ def Xform "Griffin1SurfaceOps" (
         custom double3 xformOp:translate = (2.0, 0.2049314542207867, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         bool lunco:billboard = false
-        string lunco:billboard:text = "Ramp entry"
+        string lunco:billboard:text = ""
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0
         def "Trigger" (
@@ -502,7 +517,7 @@ def Xform "Griffin1SurfaceOps" (
         custom double3 xformOp:translate = (8.5, -0.0062310658970091, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         bool lunco:billboard = false
-        string lunco:billboard:text = "Ramp exit"
+        string lunco:billboard:text = ""
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0
         def "Trigger" (
@@ -524,7 +539,7 @@ def Xform "Griffin1SurfaceOps" (
         custom double3 xformOp:translate = (13.0, -0.14148472641245463, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         bool lunco:billboard = false
-        string lunco:billboard:text = "Survey 1"
+        string lunco:billboard:text = ""
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0
         def "Trigger" (
@@ -546,7 +561,7 @@ def Xform "Griffin1SurfaceOps" (
         custom double3 xformOp:translate = (22.0, -1.067371954023838, -4.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         bool lunco:billboard = false
-        string lunco:billboard:text = "Survey 2"
+        string lunco:billboard:text = ""
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0
         def "Trigger" (
@@ -568,7 +583,7 @@ def Xform "Griffin1SurfaceOps" (
         custom double3 xformOp:translate = (31.0, -2.166758555790875, -10.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         bool lunco:billboard = false
-        string lunco:billboard:text = "Base"
+        string lunco:billboard:text = ""
         float lunco:billboard:offsetY = 0.800000011920929
         float lunco:billboard:fadeEnd = 60.0
         def "Trigger" (
@@ -656,6 +671,63 @@ def Xform "Griffin1SurfaceOps" (
         string lunco:policy:entry = "select"
         uniform string info:sourceCode = "fn select(facts) { [] }"
         bool lunco:policy:deterministic = false
+    }
+    def Camera "DescentWide" (
+        references = None
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-45.0, 35.0, -55.0)
+        custom double3 xformOp:rotateXYZ = (9.949126297159781, -142.12501634890182, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        float focalLength = 28.0
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        double3 lunco:cameraLookAt = (0.0, 35.0, 0.0)
+        float exposure:fStop = 16.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
+    }
+    def Camera "GroundEngines" (
+        references = None
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-2.0, 0.7, -3.3)
+        custom double3 xformOp:rotateXYZ = (33.68599868099272, -142.12501634890182, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        float focalLength = 22.0
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        double3 lunco:cameraLookAt = (0.0, 12.0, 0.0)
+        float exposure:fStop = 16.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
+    }
+    def Camera "GroundTouchdown" (
+        references = None
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-10.0, 2.3, -14.0)
+        custom double3 xformOp:rotateXYZ = (-0.9989736226386635, -144.46232220802563, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        float focalLength = 30.0
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        double3 lunco:cameraLookAt = (0.0, 2.0, 0.0)
+        float exposure:fStop = 16.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
     }
     def Scope "FilmCapture"
     {

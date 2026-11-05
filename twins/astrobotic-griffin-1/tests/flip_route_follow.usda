@@ -9,7 +9,7 @@ def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/environments/lunar_surface_base.usda@</LunarSurface>
     prepend apiSchemas = ["LunCoCatalogAPI", "LunCoEpochAPI"]
     kind = "assembly"
-    documentation = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
+    doc = "Griffin-1 landing study: guided descent, touchdown, top-deck FLIP egress, and bounded rover operations."
 )
 {
     uniform bool lunco:spawnable = false
@@ -69,7 +69,7 @@ def Xform "Griffin1SurfaceOps" (
         custom rel programs = </Griffin1SurfaceOps/FlipRoute/Program>
     }
     def Scope "FlipRoute" (
-        documentation = "Operator route for FLIP: Alt+left-click adds a point to this route while FLIP is selected or possessed; the action key starts or stops following. Points live in the runtime layer and are not saved (usd.runtime_persistence is false)."
+        doc = "Operator route for FLIP: Alt+left-click adds a point to this route while FLIP is selected or possessed; the action key starts or stops following. Points live in the runtime layer and are not saved (usd.runtime_persistence is false)."
     )
     {
         def Scope "Program" (

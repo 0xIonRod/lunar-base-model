@@ -20,9 +20,12 @@ def Xform "Griffin1SurfaceOps" (
         )
         {
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/media/griffin_flip_v13/scenarios/routes_policy_validated_profile.rhai@
+            custom double inputs:parking_clearance_m = 2.5
         }
     }
-    over "Avatar"
+    over "Avatar" (
+        active = false
+    )
     {
         custom double3 xformOp:translate = (-16.46215333887149, 49.230282748857086, -39.63182421474647)
         double3 lunco:cameraLookAt = (-7.9558111948738635, -0.7697172511429119, -12.288778602941452)
@@ -43,7 +46,7 @@ def Xform "Griffin1SurfaceOps" (
     {
         uniform string lunco:policy:seam = "runtime.ui.recording"
         string lunco:policy:entry = "select"
-        uniform string info:sourceCode = "fn select(facts) {let ids=[];for id in facts.visible_surface_ids {if id==\"route-short\" || id==\"route-long\" {ids.push(id);}}ids}"
+        uniform string info:sourceCode = "fn select(facts) {let ids=[];for id in facts.visible_surface_ids {if id==\"route-short\" || id==\"route-long\" || id==\"film-map\" {ids.push(id);}}ids}"
         bool lunco:policy:deterministic = false
     }
     def Scope "DriveStimulus"
@@ -63,7 +66,7 @@ def Xform "Griffin1SurfaceOps" (
             uniform asset info:sourceAsset = @lunco://scenarios/route_follow.rhai@
             custom float inputs:enabled = 0.0
             custom rel inputs:subject = </Griffin1SurfaceOps/FLIP_Amber>
-            custom double inputs:cruise_throttle = 0.1
+            custom double inputs:cruise_throttle = 0.05
             custom double inputs:arrival_radius = 0.4
         }
         def Xform "P0" (
@@ -71,7 +74,7 @@ def Xform "Griffin1SurfaceOps" (
             active = true
         )
         {
-            custom double3 xformOp:translate = (0.0, 0.21062861382961273, 0.0)
+            custom double3 xformOp:translate = (0.0, 0.1787641942501068, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
             bool lunco:billboard = false
             custom color3f[] primvars:displayColor = [(0.8999999761581421, 0.8999999761581421, 0.8999999761581421)]
@@ -80,6 +83,8 @@ def Xform "Griffin1SurfaceOps" (
             {
                 token lunco:triggerZone = "AmberRoute_P0"
                 double radius = 0.4
+                custom double3 xformOp:translate = (0.0, 0.65, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
             }
             over "Dome"
             {
@@ -92,7 +97,7 @@ def Xform "Griffin1SurfaceOps" (
             active = true
         )
         {
-            custom double3 xformOp:translate = (-19.04191463163227, -1.0348315081461528, -14.608404675447241)
+            custom double3 xformOp:translate = (-24.0, -0.8154122433625162, -12.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
             bool lunco:billboard = false
             custom double inputs:drive_direction = 1.0
@@ -100,6 +105,8 @@ def Xform "Griffin1SurfaceOps" (
             {
                 token lunco:triggerZone = "AmberRoute_P1"
                 double radius = 0.4
+                custom double3 xformOp:translate = (0.0, 0.65, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
             }
             over "Dome" (
                 active = false
@@ -114,15 +121,17 @@ def Xform "Griffin1SurfaceOps" (
             active = true
         )
         {
-            custom double3 xformOp:translate = (3.1302922418845442, -2.35186789354453, -23.794984145411767)
+            custom double3 xformOp:translate = (-8.0, -1.8668532820884138, -22.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
             bool lunco:billboard = false
-            custom color3f[] primvars:displayColor = [(0.30000001192092896, 1.0, 0.6499999761581421)]
+            custom color3f[] primvars:displayColor = [(1.0, 1.0, 1.0)]
             custom double inputs:drive_direction = -1.0
             over "Trigger"
             {
                 token lunco:triggerZone = "AmberRoute_P2"
                 double radius = 0.4
+                custom double3 xformOp:translate = (0.0, 0.65, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
             }
             over "Dome" (
                 active = true
@@ -147,7 +156,9 @@ def Xform "Griffin1SurfaceOps" (
                 token lunco:triggerZone = "AmberRoute_P3"
                 double radius = 0.4
             }
-            over "Dome"
+            over "Dome" (
+                active = true
+            )
             {
                 double radius = 0.35
                 double3 xformOp:translate = (0.0, 0.35, 0.0)
@@ -182,7 +193,7 @@ def Xform "Griffin1SurfaceOps" (
             active = true
         )
         {
-            custom double3 xformOp:translate = (0.0, 0.21062861382961273, 0.0)
+            custom double3 xformOp:translate = (0.0, 0.1787641942501068, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
             bool lunco:billboard = false
             custom color3f[] primvars:displayColor = [(0.8999999761581421, 0.8999999761581421, 0.8999999761581421)]
@@ -191,6 +202,8 @@ def Xform "Griffin1SurfaceOps" (
             {
                 token lunco:triggerZone = "FlipRoute_P0"
                 double radius = 0.4
+                custom double3 xformOp:translate = (0.0, 0.65, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
             }
             over "Dome"
             {
@@ -203,7 +216,7 @@ def Xform "Griffin1SurfaceOps" (
             active = true
         )
         {
-            custom double3 xformOp:translate = (1.5651461209422721, -0.9745265790635869, -11.897492072705884)
+            custom double3 xformOp:translate = (-8.0, -1.8668532820884138, -22.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
             bool lunco:billboard = false
             custom double inputs:drive_direction = 1.0
@@ -211,6 +224,8 @@ def Xform "Griffin1SurfaceOps" (
             {
                 token lunco:triggerZone = "FlipRoute_P1"
                 double radius = 0.4
+                custom double3 xformOp:translate = (0.0, 0.65, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
             }
             over "Dome" (
                 active = false
@@ -222,7 +237,7 @@ def Xform "Griffin1SurfaceOps" (
         }
         def Xform "P2" (
             references = @lunco://markers/route_point.usda@
-            active = true
+            active = false
         )
         {
             custom double3 xformOp:translate = (3.1302922418845442, -2.35186789354453, -23.794984145411767)
@@ -245,7 +260,7 @@ def Xform "Griffin1SurfaceOps" (
         }
         over Scope "Program"
         {
-            custom double inputs:cruise_throttle = 0.1
+            custom double inputs:cruise_throttle = 0.05
             custom double inputs:arrival_radius = 0.4
         }
         def Xform "P3" (
@@ -479,6 +494,41 @@ def Xform "Griffin1SurfaceOps" (
         over Scope "Drivetrain"
         {
             custom double parameters:steer_gain = 1.0
+        }
+        def Camera "CaseView" (
+            prepend apiSchemas = ["LunCoCameraAPI"]
+            active = false
+        )
+        {
+            custom double3 xformOp:translate = (4.3, 2.1, 4.8)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            double3 lunco:cameraLookAt = (0.0, 0.45, 0.0)
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            float focalLength = 32.0
+            float exposure:fStop = 16.0
+            float exposure:time = 0.00390625
+            float exposure:iso = 100.0
+            float exposure:responsivity = 1.0
+        }
+        def Camera "BlueCaseView" (
+            prepend apiSchemas = ["LunCoCameraAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (4.3, 2.1, 4.8)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            double3 lunco:cameraLookAt = (0.0, 0.45, 0.0)
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            float focalLength = 32.0
+            float exposure:fStop = 16.0
+            float exposure:time = 0.00390625
+            float exposure:iso = 100.0
+            float exposure:responsivity = 1.0
         }
     }
     def Xform "FLIP_Amber" (
@@ -2747,6 +2797,41 @@ def Xform "Griffin1SurfaceOps" (
         {
             custom double parameters:steer_gain = 1.0
         }
+        def Camera "CaseView" (
+            prepend apiSchemas = ["LunCoCameraAPI"]
+            active = false
+        )
+        {
+            custom double3 xformOp:translate = (4.3, 2.1, 4.8)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            double3 lunco:cameraLookAt = (0.0, 0.45, 0.0)
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            float focalLength = 32.0
+            float exposure:fStop = 16.0
+            float exposure:time = 0.00390625
+            float exposure:iso = 100.0
+            float exposure:responsivity = 1.0
+        }
+        def Camera "YellowCaseView" (
+            prepend apiSchemas = ["LunCoCameraAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (4.3, 2.1, 4.8)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            double3 lunco:cameraLookAt = (0.0, 0.45, 0.0)
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            float focalLength = 32.0
+            float exposure:fStop = 16.0
+            float exposure:time = 0.00390625
+            float exposure:iso = 100.0
+            float exposure:responsivity = 1.0
+        }
     }
     def Scope "ComparisonGroups"
     {
@@ -2767,11 +2852,11 @@ def Xform "Griffin1SurfaceOps" (
     {
         uniform string lunco:policy:seam = "runtime.ui.properties"
         string lunco:policy:entry = "runtime_ui_properties"
-        uniform string info:sourceCode = "fn runtime_ui_properties(facts) {\n if facts.surface_id!=\"route-short\" && facts.surface_id!=\"route-long\" {return #{};}\n let out=#{title:if facts.surface_id==\"route-short\" {\"Short route\"}else{\"Long route\"},balance:\"—\",elapsed:\"—\",case_color:if facts.surface_id==\"route-short\" {\"#45C7FF\"}else{\"#FFE34D\"},balance_width:\"0px\"};\n for participant in facts.participants {\n  let p=participant.outputs;if p[\"energy_Battery_wh\"]==() || p[\"energy_Battery_returned_wh\"]==() || p[\"energy_elapsed_s\"]==() {continue;}\n  let net=p[\"energy_Battery_wh\"]-p[\"energy_Battery_returned_wh\"];\n  let v=(net*10.0).round()/10.0;if abs(v)<0.05 {v=0.0;}\n  out.balance=(if v>0.0 {\"+\"}else{\"\"})+v.to_string()+\" Wh\";\n  let sec=p[\"energy_elapsed_s\"].round().to_int();out.elapsed=(sec/60).to_string()+\"m \"+(sec%60).to_string()+\"s\";\n  out.balance_width=(max(0.0,min(10.0,net))/10.0*572.0).to_string()+\"px\";return out;\n }\n out\n}"
+        uniform string info:sourceCode = "fn number(v) {let n=(v*10.0).round()/10.0;if abs(n)<0.05 {n=0.0;}n.to_string()}\nfn runtime_ui_properties(facts) {\n if facts.surface_id!=\"route-short\" && facts.surface_id!=\"route-long\" {return #{};}\n let blue=facts.surface_id==\"route-short\";\n for participant in facts.participants {\n let p=participant.outputs;if p[\"energy_Battery_wh\"]==() {continue;}\n for name in [\"energy_Battery_returned_wh\",\"energy_elapsed_s\",\"energy_Solar_wh\",\"energy_Equipment_wh\",\"energy_FL_wh\",\"energy_FR_wh\",\"energy_RL_wh\",\"energy_RR_wh\",\"energy_FL_returned_wh\",\"energy_FR_returned_wh\",\"energy_RL_returned_wh\",\"energy_RR_returned_wh\"] {if p[name]==() {throw \"Route HUD is missing native meter: \"+name;}}\n let net=p.energy_Battery_wh-p.energy_Battery_returned_wh;\n let used=p.energy_Equipment_wh;for side in [\"FL\",\"FR\",\"RL\",\"RR\"] {used+=p[\"energy_\"+side+\"_wh\"]-p[\"energy_\"+side+\"_returned_wh\"];}\n let sec=p.energy_elapsed_s.round().to_int();\n let out=#{};out.title=if blue {\"Blue · short\"}else{\"Yellow · long\"};\n out.solar=number(p.energy_Solar_wh);out.used=number(used);out.balance=number(net);if net>0.05 {out.balance=\"+\"+out.balance;}\n out.elapsed=(sec/60).to_string()+\"m \"+(sec%60).to_string()+\"s · Wh\";\n out.case_color=if blue {\"#45C7FF\"}else{\"#FFE34D\"};out.balance_color=if net>=0.0 {\"#74E6B7\"}else{\"#BCA5FF\"};return out;\n }\n #{title:if blue {\"Blue · short\"}else{\"Yellow · long\"},solar:\"—\",used:\"—\",balance:\"—\",elapsed:\"Loading\",case_color:\"#FFFFFF\",balance_color:\"#FFFFFF\"}\n}"
         bool lunco:policy:deterministic = false
     }
     over "Environment" (
-        references = @twin://astrobotic-griffin-1/media/griffin_flip_v8/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
+        references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
     )
     {
     }
@@ -2785,9 +2870,86 @@ def Xform "Griffin1SurfaceOps" (
                 {
                     custom asset inputs:albedo_map = @twin://astrobotic-griffin-1/textures/moon/lroc_color_2025_8k.png@
                     color3f inputs:surface_color = (1.0, 1.0, 1.0)
+                    custom asset inputs:displacement_map = @twin://astrobotic-griffin-1/textures/moon/lola_displacement_16k.png@
+                    custom double inputs:displacement_scale_m = 32767.5
+                    custom double inputs:displacement_offset_m = -10000.0
+                    custom double inputs:displacement_bound_m = 23000.0
+                    custom float inputs:displacement_shadow_on = 1.0
+                    custom double inputs:globe_tile_resolution = 128.0
                 }
             }
         }
+    }
+    def Camera "RouteMaster" (
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-5.0, 50.0, -42.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (-10.0, -5.0, -12.0)
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        float focalLength = 30.0
+        float exposure:fStop = 16.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
+    }
+    def Camera "ResultView" (
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        custom double3 xformOp:translate = (-5.0, 50.0, -42.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (-10.0, -5.0, -12.0)
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        float focalLength = 30.0
+        float exposure:fStop = 16.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
+    }
+    over "CameraTrack" (
+        active = false
+    )
+    {
+    }
+    def Xform "ResultAim"
+    {
+        custom double3 xformOp:translate = (-10.0, -5.0, -12.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+    def BasisCurves "ResultOrbit" (
+        prepend apiSchemas = ["LunCoCameraPathAPI"]
+    )
+    {
+        uniform token type = "linear"
+        uniform token basis = "bezier"
+        uniform token wrap = "nonperiodic"
+        int[] curveVertexCounts = [3]
+        point3f[] points = [(-5.0, 50.0, -42.0), (-10.0, 46.0, -41.0), (-16.0, 43.0, -39.0)]
+        double lunco:path:duration = 20.0
+        token lunco:path:clock = "real"
+        token visibility = "invisible"
+        rel lunco:path:camera = </Griffin1SurfaceOps/ResultView>
+        rel lunco:path:lookAt = </Griffin1SurfaceOps/ResultAim>
+    }
+    def Camera "MissionMoonView" (
+        prepend references = @twin://astrobotic-griffin-1/media/griffin_flip_v13/scenes/moon-day.usda@</Griffin1SurfaceOps/MoonView>
+        prepend apiSchemas = ["LunCoCameraAPI", "LunCoUiSchemaAPI"]
+    )
+    {
+        uniform token lunco:cameraRole = "sensor"
+        string lunco:ui:surfaceId = "film-map"
+        string lunco:ui:visibilityMode = "always"
+        float verticalAperture = 36.0
+        float2 clippingRange = (1000.0, 100000000.0)
+        float focalLength = 40.0
     }
     def Scope "FilmCapture"
     {

@@ -1,0 +1,52 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/media/griffin_flip_v13/scenes/moon-region.usda@</Griffin1SurfaceOps>
+)
+{
+    def LunCoPolicy "FilmRecordingUI"
+    {
+        uniform string lunco:policy:seam = "runtime.ui.recording"
+        string lunco:policy:entry = "select"
+        uniform string info:sourceCode = "fn select(facts) {[]}"
+    }
+    over "RegionView"
+    {
+        custom double3 xformOp:translate = (50000.0, 240000.0, 170000.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (0.0, -2000.0, 0.0)
+        float focalLength = 32.0
+    }
+    over "RegionFlyover" (
+        active = false
+    )
+    {
+    }
+    def BasisCurves "FilmPath" (
+        prepend apiSchemas = ["LunCoCameraPathAPI"]
+    )
+    {
+        uniform token type = "linear"
+        uniform token basis = "bezier"
+        uniform token wrap = "nonperiodic"
+        int[] curveVertexCounts = [2]
+        point3f[] points = [(50000.0, 240000.0, 170000.0), (50000.0, 240000.0, 170000.0)]
+        double lunco:path:duration = 22.0
+        token lunco:path:clock = "real"
+        token visibility = "invisible"
+        rel lunco:path:camera = </Griffin1SurfaceOps/RegionView>
+        rel lunco:path:lookAt = </Griffin1SurfaceOps/RegionAim>
+    }
+    over Scope "FilmCapture"
+    {
+    }
+}

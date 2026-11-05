@@ -1,10 +1,10 @@
 @import "lunco://ui/runtime_fonts.css";
-#route-card {display:flex;flex-direction:column;gap:20px;padding:20px 24px;background-color:#08111bf5;border-top:4px solid var(--ui-case-color);border-radius:8px;height:100%;}
+#route-card {display:flex;flex-direction:column;gap:16px;padding:16px 20px;background-color:#08111bf5;border-top:4px solid var(--ui-case-color);border-radius:8px;height:100%;}
 #route-heading {display:flex;flex-direction:row;align-items:center;justify-content:space-between;}
-#route-title {font-size:32px;font-weight:700;color:var(--ui-case-color);}
-#route-time {font-size:26px;color:#cad5df;}
-#route-values {display:flex;flex-direction:row;justify-content:space-between;gap:24px;}
+#route-title {font-size:30px;font-weight:700;color:var(--ui-case-color);}
+#route-time {font-size:23px;color:#cad5df;}
+#route-values {display:flex;flex-direction:row;justify-content:space-between;gap:18px;}
 #received, #used, #balance {display:flex;flex-direction:column;gap:9px;flex-grow:1;}
-#received-label, #used-label, #balance-label {font-size:27px;color:#cad5df;}
-#received-value, #used-value, #balance-value {font-size:54px;font-weight:700;color:#ffffff;}
+#received-label, #used-label, #balance-label {font-size:26px;color:#cad5df;}
+#received-value, #used-value, #balance-value {font-size:48px;font-weight:700;color:#ffffff;}
 #balance-value {color:var(--ui-balance-color);}

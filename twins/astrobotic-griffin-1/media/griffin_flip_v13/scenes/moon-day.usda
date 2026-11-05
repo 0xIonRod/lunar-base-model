@@ -13,11 +13,7 @@ def Xform "Griffin1SurfaceOps" (
 )
 {
     uniform bool lunco:spawnable = false
-    double lunco:anchor:lat = -84.72672255
-    double lunco:anchor:lon = 29.14428685
-    double lunco:anchor:height = 0.0
-    int lunco:anchor:body = 301
-    double lunco:time:epochJd = 2461395.5
+    double lunco:time:epochJd = 2461419.5
     custom string lunco:mission:id = "M02"
     custom string lunco:mission:name = "Astrobotic Griffin Mission One"
     custom string lunco:mission:site = "Nobile regional study anchor backed by LROC NAC DTM NOBILE03; exact touchdown coordinate unresolved"
@@ -28,6 +24,10 @@ def Xform "Griffin1SurfaceOps" (
     custom string lunco:lighting:contract = "all Griffin and FLIP geometry uses LunarSurface/Sun polar direction and the authored mission epoch"
     custom string lunco:route:status = "ramp entry marker moved outside descent column; center lane remains clear of four solid legs"
     custom string lunco:terrain:source = "twin://astrobotic-griffin-1/Assets.toml#nobile03_dem.process -> native pipeline -> .cache/terrain/nobile03 (.pipeline.toml)"
+    int lunco:anchor:body = 301
+    double lunco:anchor:lat = -84.72672255
+    double lunco:anchor:lon = 29.14428685
+    double lunco:anchor:height = 0.0
     def "SolarSystem" (
         prepend references = @lunco://celestial/solar_system.usda@</SolarSystem>
     )
@@ -39,6 +39,12 @@ def Xform "Griffin1SurfaceOps" (
                 over "Shader"
                 {
                     custom asset inputs:albedo_map = @twin://astrobotic-griffin-1/textures/moon/lroc_color_2025_8k.png@
+                    custom asset inputs:displacement_map = @twin://astrobotic-griffin-1/textures/moon/lola_displacement_16k.png@
+                    custom double inputs:displacement_scale_m = 32767.5
+                    custom double inputs:displacement_offset_m = -10000.0
+                    custom double inputs:displacement_bound_m = 23000.0
+                    custom double inputs:displacement_shadow_on = 1.0
+                    custom double inputs:globe_tile_resolution = 128.0
                 }
             }
         }

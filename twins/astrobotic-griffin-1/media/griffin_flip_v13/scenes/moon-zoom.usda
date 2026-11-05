@@ -13,6 +13,7 @@ def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/tests/flip_route_follow.usda@</Griffin1SurfaceOps>
 )
 {
+    double lunco:time:epochJd = 2461419.5
     over "Scenario"
     {
         def "Test" (
@@ -193,6 +194,7 @@ def Xform "Griffin1SurfaceOps" (
     }
     over "Environment" (
         references = @twin://astrobotic-griffin-1/media/griffin_flip_v8/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>
+        active = false
     )
     {
     }
@@ -206,6 +208,12 @@ def Xform "Griffin1SurfaceOps" (
                 {
                     custom asset inputs:albedo_map = @twin://astrobotic-griffin-1/textures/moon/lroc_color_2025_8k.png@
                     color3f inputs:surface_color = (1.0, 1.0, 1.0)
+                    custom asset inputs:displacement_map = @twin://astrobotic-griffin-1/textures/moon/lola_displacement_16k.png@
+                    custom double inputs:displacement_scale_m = 32767.5
+                    custom double inputs:displacement_offset_m = -10000.0
+                    custom double inputs:displacement_bound_m = 23000.0
+                    custom double inputs:displacement_shadow_on = 1.0
+                    custom double inputs:globe_tile_resolution = 128.0
                 }
             }
         }

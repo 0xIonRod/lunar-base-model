@@ -1,0 +1,79 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/media/griffin_flip_v13/scenes/landing.usda@</Griffin1SurfaceOps>
+)
+{
+    over "FilmRecordingUI"
+    {
+        uniform string info:sourceCode = "fn select(facts) {[]}"
+    }
+    def Camera "FilmCamera" (
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        float exposure:fStop = 16.0
+        custom double3 xformOp:translate = (30.0, 18.0, 27.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (0.0, 27.0, 0.0)
+        float focalLength = 30.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
+    }
+    over "DescentWide"
+    {
+        custom double3 xformOp:translate = (-45.0, 10.0, -55.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (0.0, 35.0, 0.0)
+        float focalLength = 20.0
+    }
+    def Camera "DescentHero" (
+        prepend apiSchemas = ["LunCoCameraAPI"]
+    )
+    {
+        uniform token lunco:cameraRole = "viewport"
+        uniform token lunco:cameraPose = "mounted"
+        float horizontalAperture = 36.0
+        float verticalAperture = 20.25
+        float exposure:fStop = 16.0
+        custom double3 xformOp:translate = (-10.0, 1.0, -15.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        double3 lunco:cameraLookAt = (0.0, 47.0, 0.0)
+        float focalLength = 55.0
+        float exposure:time = 0.00390625
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
+    }
+    def BasisCurves "HeroTripod" (
+        prepend apiSchemas = ["LunCoCameraPathAPI"]
+    )
+    {
+        uniform token type = "linear"
+        uniform token basis = "bezier"
+        uniform token wrap = "nonperiodic"
+        int[] curveVertexCounts = [2]
+        point3f[] points = [(-10.0, 1.0, -15.0), (-10.0, 1.0, -15.0)]
+        double lunco:path:duration = 24.0
+        token lunco:path:clock = "real"
+        token visibility = "invisible"
+        rel lunco:path:camera = </Griffin1SurfaceOps/DescentHero>
+        rel lunco:path:lookAt = </Griffin1SurfaceOps/Lander>
+    }
+    over Scope "FilmCapture"
+    {
+    }
+}

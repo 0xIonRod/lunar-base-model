@@ -9,10 +9,13 @@ fn observe() {
  let main=find_path(ROOT+"/Lander/MainPropulsion");
  let names=["engine01_thrust_n","__member_Engine01Wall_wall_temperature_k",
  "__member_Engine01Wall_heating_w","__member_Engine01Wall_radiation_w",
- "__member_Engine01Wall_conduction_w","__member_Engine01Wall_energy_residual_w"];
+ "__member_Engine01Wall_conduction_w","__member_Engine01Wall_energy_residual_w",
+ "__member_Engine01Wall_throat_temperature_k","__member_Engine01Wall_middle_temperature_k",
+ "__member_Engine01Wall_exit_temperature_k"];
  print("NOZZLE_STATE|"+clock_snapshot().sim_tick+"|"+query("ReadPorts",#{api_id:main,port_names:names}));
  let bell=find_path(ROOT+"/Lander/Nozzle/MainEngineCluster/Engine01/Bell");
- print("NOZZLE_GPU|"+query("ReadPorts",#{api_id:bell,port_names:["temperature_k","emissivity"]}));
+ print("NOZZLE_GPU|"+query("ReadPorts",#{api_id:bell,port_names:["temperature_throat_k",
+ "temperature_middle_k","temperature_exit_k","nozzle_length_m","emissivity"]}));
 }
 fn on_start(me,ctx) {
  this.elapsed=0.0;this.stage=0;this.cooling=0.0;this.sample=0.0;

@@ -13,6 +13,7 @@ def Xform "Griffin1SurfaceOps" (
     prepend references = @twin://astrobotic-griffin-1/tests/flip_route_follow.usda@</Griffin1SurfaceOps>
 )
 {
+    double lunco:time:epochJd = 2461419.5
     over "Scenario"
     {
         def "Test" (
