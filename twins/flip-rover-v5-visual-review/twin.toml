@@ -1,0 +1,6 @@
+name = "FLIP Rover v5 Visual Review"
+version = "0.1.0"
+uuid = "be502323-00d6-4cb6-a594-946a66b736ea"
+
+[usd]
+default_scene = "scenes/FLIP_rover_v5_review.usda"
