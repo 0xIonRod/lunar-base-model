@@ -31,6 +31,13 @@ The [30 October texture pass](contracts/texture-refinement-2026-10-30.md) refine
 the bus/deck metal, tank and skirt blankets, FLIP brushing and solar electrodes.
 It adds no lights or emission. Material identities, appearance assumptions and
 unknown grades remain documented in the [material register](research/materials.md).
+The four finish sources declare `lunco.shadow-receiver.surface.v1`: their
+shared PBR calls use the rasterized surface position, matching view depth and
+bounded normal. This allows LunCoSim's conservative directional-shadow scissor
+without changing appearance, filtering or shadow texel density. Shader source
+reload retires that optimization proof for the loaded Shader asset's lifetime;
+use a fresh simulator process for performance acceptance after shader editing.
+
 
 ## Current FLIP rover — 2026-10-26
 
