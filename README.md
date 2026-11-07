@@ -1,9 +1,8 @@
 # NASA Lunar Base Model
 
-This model is built for LunCoSim, the simulator that opens and runs it. The
-repository and model ZIP contain the model files, not the simulator itself.
-LunCoSim calls a model project folder a Twin; install LunCoSim, then open the
-Twin inside the app.
+This model is built for LunCoSim, the simulator that opens and runs it.
+LunCoSim must be installed to use the model. The project folder that you open
+in LunCoSim is called a Twin.
 
 The current model contains the Astrobotic Griffin-1 lunar lander and FLIP
 rover. It does not yet simulate a lunar base. This is a study model, not a
@@ -15,16 +14,14 @@ flight-qualified vehicle or mission.
 
 Download and install [LunCoSim for your operating system](https://github.com/LunCoSim/lunco-sim/releases),
 or [build LunCoSim from source](https://github.com/LunCoSim/lunco-sim/blob/main/docs/apps/README.md#build-from-source).
-The Twin needs LunCoSim to open and run.
 
-### 2. Get the Griffin-1 / FLIP Twin
+### 2. Get the Griffin-1 / FLIP model files
 
 **Recommended: download the Twin ZIP.**
 
 [Download the latest Griffin Twin ZIP](https://github.com/0xIonRod/lunar-base-model/releases/latest/download/astrobotic-griffin-1.zip)
 ([SHA-256 checksum](https://github.com/0xIonRod/lunar-base-model/releases/latest/download/astrobotic-griffin-1.zip.sha256)).
-Extract the ZIP, then open the extracted `astrobotic-griffin-1` folder in
-LunCoSim as a Twin.
+Extract the ZIP. The folder you will open is `astrobotic-griffin-1`.
 
 **Alternatively: clone or download the source repository.**
 
@@ -34,9 +31,16 @@ Clone with Git:
 git clone https://github.com/0xIonRod/lunar-base-model.git
 ```
 
-Or [download the repository ZIP](https://github.com/0xIonRod/lunar-base-model/archive/refs/heads/main.zip).
-In LunCoSim, open `twins/astrobotic-griffin-1` from the extracted or cloned
-repository as a Twin.
+Or [download the repository ZIP](https://github.com/0xIonRod/lunar-base-model/archive/refs/heads/main.zip)
+and extract it. The folder you will open is
+`lunar-base-model/twins/astrobotic-griffin-1`.
+
+### 3. Open the model in LunCoSim
+
+Start LunCoSim. On its welcome screen, click **Open Twin**. Browse to the
+folder from step 2 that contains `twin.toml`, select that folder, and confirm.
+If LunCoSim is already open, choose **File → Open Folder/Twin…** and select
+the same folder. LunCoSim opens the Twin's default Griffin/FLIP scene.
 
 On first opening the Twin, LunCoSim downloads missing assets such as terrain.
 An internet connection is required.
