@@ -1,7 +1,12 @@
 # NASA Lunar Base Model
 
-The current runnable model is the Astrobotic Griffin-1 lander and FLIP rover
-Twin; it does not yet simulate a lunar base. This is a study model, not a
+This model is built for LunCoSim, the simulator that opens and runs it. The
+repository and model ZIP contain the model files, not the simulator itself.
+LunCoSim calls a model project folder a Twin; install LunCoSim, then open the
+Twin inside the app.
+
+The current model contains the Astrobotic Griffin-1 lunar lander and FLIP
+rover. It does not yet simulate a lunar base. This is a study model, not a
 flight-qualified vehicle or mission.
 
 ## Install and open the Twin
@@ -10,7 +15,7 @@ flight-qualified vehicle or mission.
 
 Download and install [LunCoSim for your operating system](https://github.com/LunCoSim/lunco-sim/releases),
 or [build LunCoSim from source](https://github.com/LunCoSim/lunco-sim/blob/main/docs/apps/README.md#build-from-source).
-Keep LunCoSim installed; the Twin uses its runtime and shared assets.
+The Twin needs LunCoSim to open and run.
 
 ### 2. Get the Griffin-1 / FLIP Twin
 
