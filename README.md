@@ -1,66 +1,48 @@
 # NASA Lunar Base Model
 
-This repository is the working model for a future lunar-base campaign.
+The current runnable model is the Astrobotic Griffin-1 lander and FLIP rover
+Twin; it does not yet simulate a lunar base. This is a study model, not a
+flight-qualified vehicle or mission.
 
-The durable project inputs are:
+## Install and open the Twin
 
-- [`research/`](research/) — curated mission, vehicle, location, source, and assumption records.
-- [`missions/`](missions/) — versioned executable mission twins.
-- [`scenarios/`](scenarios/) — operational scenario contracts.
-- [`tools/`](tools/) — validation and analysis utilities.
+### 1. Install LunCoSim
 
-The repository contains Mission One: Blue Origin’s Blue Moon MK1 Endurance,
-and the executable Astrobotic Griffin-1 / FLIP Twin. The Griffin package now
-uses a reproducibly processed LROC NOBILE03 regional terrain crop alongside
-its lander and rover study assets. Neither Twin is a flight-ready model;
-public facts and unknowns are recorded in
-[`missions/mission-001/mission-research.md`](missions/mission-001/mission-research.md).
+Download and install [LunCoSim for your operating system](https://github.com/LunCoSim/lunco-sim/releases),
+or [build LunCoSim from source](https://github.com/LunCoSim/lunco-sim/blob/main/docs/apps/README.md#build-from-source).
+Keep LunCoSim installed; the Twin uses its runtime and shared assets.
 
-## Repository map
+### 2. Get the Griffin-1 / FLIP Twin
 
-| Path | Contents |
-|---|---|
-| [`research/`](research/) | Human-reviewed evidence and explicit research gaps. |
-| [`missions/mission-001/`](missions/mission-001/) | M01 Endurance twin, research record, and physical assumptions. |
-| [`missions/mission-002/`](missions/mission-002/) | M02 Griffin-1 / FLIP mission record; its scene composes the canonical Twin scene. |
-| [`twins/astrobotic-griffin-1/`](twins/astrobotic-griffin-1/) | Canonical executable Griffin-1 / FLIP Twin, including both vehicle assets, requirements, terrain, and mission scenes. |
-| [`scenarios/`](scenarios/) | Five initial mission scenarios. |
-| [`tools/`](tools/) | Scripts and notebooks; analysis code does not live beside project data. |
-| [`NASA_LUNAR_BASE_OVERVIEW.md`](NASA_LUNAR_BASE_OVERVIEW.md) | Plain-language lunar-base context. |
+**Recommended: download the Twin ZIP.**
 
-## Download the Griffin Twin
+[Download the latest Griffin Twin ZIP](https://github.com/0xIonRod/lunar-base-model/releases/latest/download/astrobotic-griffin-1.zip)
+([SHA-256 checksum](https://github.com/0xIonRod/lunar-base-model/releases/latest/download/astrobotic-griffin-1.zip.sha256)).
+Extract the ZIP, then open the extracted `astrobotic-griffin-1` folder in
+LunCoSim as a Twin.
 
-Download `astrobotic-griffin-1.zip` from a Griffin Twin entry on the
-[Releases page](https://github.com/0xIonRod/lunar-base-model/releases).
-Extract it and open the `astrobotic-griffin-1` folder as a Twin in a compatible
-LunCoSim installation. The archive includes the vehicle assets, scenes,
-scripts, requirements, research, and processed NOBILE03 terrain. LunCoSim
-provides the shared `lunco://` assets and runtime separately. The ZIP carries
-both verified NOBILE03 source files and the processed DEM in the Twin-local
-`.cache/` directory; no terrain downloads or preprocessing are needed after
-extraction. Keep the `.cache/` directory when copying the Twin.
+**Alternatively: clone or download the source repository.**
 
-To publish an archive, use **Actions → Package Astrobotic Griffin Twin →
-Run workflow**, then select the source branch. The workflow must first be
-committed and pushed to the default branch for the manual button to appear.
-Each run publishes a separate release with a ZIP and SHA-256 checksum and
-links to it from the run summary. The workflow runs only when manually
-requested; it does not compile LunCoSim or run simulations. Terrain inputs
-are downloaded from `Assets.toml`, verified against its SHA-256 values, and
-processed with the checked-in Python adapter. Before publishing, the workflow
-extracts the ZIP into a fresh folder and verifies its DEM payload offline.
+Clone with Git:
 
-## Working rules
-
-- Keep facts, assumptions, and simulator inputs separate.
-- Use `TBD` or `null` when a source does not provide a value.
-- Record units, provenance, and confidence for every physical parameter.
-- Prefer LunCoSim-native scene and visual-processing features.
-- Iterate from the simple twin toward a realistic mission model.
-- Validate the repository after each mission-parameter change.
-
-Run the structural checks from the project root:
-
-```powershell
-python .\tools\validate_repository.py
+```sh
+git clone https://github.com/0xIonRod/lunar-base-model.git
 ```
+
+Or [download the repository ZIP](https://github.com/0xIonRod/lunar-base-model/archive/refs/heads/main.zip).
+In LunCoSim, open `twins/astrobotic-griffin-1` from the extracted or cloned
+repository as a Twin.
+
+On first opening the Twin, LunCoSim downloads missing assets such as terrain.
+An internet connection is required.
+
+The default scene is `scenes/griffin_1_surface_ops.usda`. For controls and
+mission details, see the [Twin instructions](twins/astrobotic-griffin-1/instructions.md)
+and [Twin overview](twins/astrobotic-griffin-1/README.md).
+
+## Downloadable builds
+
+A push to `main` packages the Twin files and publishes a ZIP and SHA-256
+checksum to GitHub Releases. After the first successful main build, the
+download links above point to the newest successful main build. Each archive
+records its source commit. The LunCoSim application is not included.

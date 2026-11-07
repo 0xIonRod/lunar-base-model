@@ -1,12 +1,14 @@
 name: Package Astrobotic Griffin Twin
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      engine_ref:
-        description: LunCoSim revision with native Assets.toml pipeline support
-        required: true
-        default: main
+
+concurrency:
+  group: package-griffin-twin-${{ github.event_name == 'push' && 'main' || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 permissions:
   contents: write
@@ -30,30 +32,12 @@ jobs:
               --exclude=astrobotic-griffin-1/.lunco/runtime \
               --exclude=astrobotic-griffin-1/.cache
 
-      - name: Check out native asset processor
-        uses: actions/checkout@v7
-        with:
-          repository: LunCoSim/lunco-sim
-          ref: ${{ inputs.engine_ref }}
-          path: engine
-          persist-credentials: false
-
-      - name: Build native asset processor
-        working-directory: engine
-        run: cargo build --locked -p lunco-assets --bin lunco-assets -j 4
-
-      - name: Provision declared terrain recipe
-        shell: bash
-        run: |
-          engine/target/debug/lunco-assets download --twin "$GITHUB_WORKSPACE/package/astrobotic-griffin-1" -a nobile03_dem
-          engine/target/debug/lunco-assets process --twin "$GITHUB_WORKSPACE/package/astrobotic-griffin-1" -a nobile03_dem
-          engine/target/debug/lunco-assets verify --twin "$GITHUB_WORKSPACE/package/astrobotic-griffin-1" -a nobile03_dem
-
       - name: Create ZIP and checksum
         shell: bash
         run: |
           test -s package/astrobotic-griffin-1/twin.toml
-          test -s package/astrobotic-griffin-1/.cache/terrain/nobile03/materials/textures/heightmap.tif
+          test -s package/astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda
+          test ! -e package/astrobotic-griffin-1/.cache
           printf '%s\n' "$GITHUB_SHA" > package/astrobotic-griffin-1/SOURCE_COMMIT.txt
           cd package
           zip -qr ../astrobotic-griffin-1.zip astrobotic-griffin-1
@@ -61,27 +45,26 @@ jobs:
           unzip -tq astrobotic-griffin-1.zip
           sha256sum astrobotic-griffin-1.zip > astrobotic-griffin-1.zip.sha256
 
-      - name: Verify extracted Twin offline
-        shell: bash
-        run: |
-          unzip -q astrobotic-griffin-1.zip -d "$RUNNER_TEMP/griffin-offline"
-          engine/target/debug/lunco-assets verify \
-            --twin "$RUNNER_TEMP/griffin-offline/astrobotic-griffin-1" -a nobile03_dem
-
       - name: Publish downloadable release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          release_tag="griffin-twin-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            release_tag="griffin-twin-main-${GITHUB_SHA:0:12}-${GITHUB_RUN_ATTEMPT}"
+            release_title="Astrobotic Griffin Twin — main @ ${GITHUB_SHA:0:12}"
+            latest_flag=(--latest)
+          else
+            release_tag="griffin-twin-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+            release_title="Astrobotic Griffin Twin — manual run $GITHUB_RUN_NUMBER"
+            latest_flag=(--latest=false)
+          fi
           cat > "$RUNNER_TEMP/griffin-release-notes.md" <<EOF
           Download astrobotic-griffin-1.zip and extract the astrobotic-griffin-1 folder.
           Open that folder as a Twin in a compatible LunCoSim installation.
 
-          Includes Griffin/FLIP vehicles, scenes, Rhai scripts, SysML requirements,
-          research records, and a complete Twin-local NOBILE03 cache (verified
-          source DEM/orthophoto/label, prepared float64 DEM, albedo, coverage and integrity receipt). No terrain downloads or
-          preprocessing are needed after extraction.
+          Includes Griffin/FLIP Twin files: vehicles, scenes, Rhai scripts,
+          SysML requirements, and research records.
           LunCoSim supplies the shared lunco:// assets and runtime; it is not included.
           This is a study model, not a flight-validated vehicle or mission.
 
@@ -90,7 +73,12 @@ jobs:
           gh release create "$release_tag" \
             astrobotic-griffin-1.zip astrobotic-griffin-1.zip.sha256 \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "Astrobotic Griffin Twin — run $GITHUB_RUN_NUMBER" \
-            --notes-file "$RUNNER_TEMP/griffin-release-notes.md" --latest=false
-          printf '[Download the Griffin Twin](%s/%s/releases/tag/%s)\n' \
-            "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$release_tag" >> "$GITHUB_STEP_SUMMARY"
+            --title "$release_title" \
+            --notes-file "$RUNNER_TEMP/griffin-release-notes.md" "${latest_flag[@]}"
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            printf '[Download the latest main build](%s/%s/releases/latest/download/astrobotic-griffin-1.zip)\n' \
+              "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '[Download this Griffin Twin build](%s/%s/releases/tag/%s)\n' \
+              "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$release_tag" >> "$GITHUB_STEP_SUMMARY"
+          fi
