@@ -7,6 +7,8 @@ emits typed verdicts; Modelica owns continuous physics.
 
 `flip_motion.usda` checks forward/reverse motion, four-wheel render roll,
 physical stops and stationary dwell against `FlipMotionRequirements::MotionStudy`.
+It also bounds native panel tracking error and relative angular velocity during
+driving, braking and dwell, and publishes panel peaks with the motion evidence.
 It references the route scene and replaces its observer. Run the production gate:
 
 ```sh

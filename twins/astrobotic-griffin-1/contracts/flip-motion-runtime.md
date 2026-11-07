@@ -1,5 +1,13 @@
 # FLIP motion acceptance
 
+The motion observer also samples the native panel angle, relative angular
+velocity and controller setpoint on every driving, braking and stopped-dwell
+tick. It fails on unavailable/nonfinite samples or the SysML-owned holding
+error/rate bounds. Three aggregate checks and peak measurements are retained
+in the same terminal verdict/evidence; the complete positive gate now has
+44 checks. See [panel-hold review](flip-panel-hold-2026-11-04.md) for the
+drive correction and current execution boundary.
+
 `requirements/flip_motion_requirements.sysml` owns the reconstructed rover's
 motion-study envelope and `Verify_FLIPMotion` binding. These are simulator
 acceptance values, not supplier braking specifications. USD owns friction,

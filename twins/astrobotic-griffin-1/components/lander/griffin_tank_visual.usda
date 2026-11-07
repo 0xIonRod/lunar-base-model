@@ -293,12 +293,12 @@ def Xform "PropellantTank" (
                 {
                     uniform token info:id = "UsdPreviewSurface"
                     custom token outputs:surface = ""
-                    custom color3f inputs:diffuseColor = (0.3400000035762787, 0.3799999952316284, 0.4300000071525574)
+                    custom color3f inputs:diffuseColor = (0.20000000298023224, 0.23999999463558197, 0.28999999165534973)
                     custom float inputs:metallic = 0.8500000238418579
-                    custom float inputs:roughness = 0.2800000011920929
+                    custom float inputs:roughness = 0.41999998688697815
                     uniform token info:implementationSource = "sourceAsset"
                     custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
-                    custom color3f inputs:base_color = (0.3400000035762787, 0.3799999952316284, 0.4300000071525574)
+                    custom color3f inputs:base_color = (0.20000000298023224, 0.23999999463558197, 0.28999999165534973)
                     custom float inputs:grain_strength = 0.03500000014901161
                     custom float inputs:grain_scale = 160.0
                     custom float inputs:brush_ratio = 8.0

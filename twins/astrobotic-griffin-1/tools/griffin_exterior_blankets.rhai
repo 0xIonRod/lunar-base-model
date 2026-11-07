@@ -58,6 +58,36 @@ fn face_plan(doc,index) {
     let ops=[];for s in specs(doc,index) {ops=geometry::cube(ops,root(),s);}
     #{doc_id:doc,generation:q.generation,ops:ops}
 }
+// Photo-informed border tape. Existing bay datums and tape dimensions own the
+// envelope. Borders sit on the blanket face and meet at fitted corner contacts.
+fn border_specs(doc,index) {
+    let b=bay(doc,index);
+    let width=study::datum("BlanketTapeHeightM");
+    let depth=study::datum("BlanketTapeDepthM");
+    let lift=(b.scale[2]+depth)/2.0;
+    let radians=b.rotation[1]*acos(-1.0)/180.0;
+    let tangent=[cos(radians),0.0,-sin(radians)];
+    let result=[];
+    for side in [-1.0,1.0] {
+        let suffix=if side<0.0 {"A"} else {"B"};
+        let y=side*(b.scale[1]-width)/2.0;
+        result.push(geometry::shape("BorderHorizontal"+index+suffix,
+          [b.position[0]+b.normal[0]*lift,b.position[1]+y,b.position[2]+b.normal[2]*lift],
+          [b.scale[0],width,depth],b.rotation,"/GriffinBus/Looks/ServiceConnectors"));
+        let x=side*(b.scale[0]-width)/2.0;
+        result.push(geometry::shape("BorderVertical"+index+suffix,
+          [b.position[0]+tangent[0]*x+b.normal[0]*lift,b.position[1],b.position[2]+tangent[2]*x+b.normal[2]*lift],
+          [width,b.scale[1]-2.0*width,depth],b.rotation,"/GriffinBus/Looks/ServiceConnectors"));
+    }
+    result
+}
+fn border_plan(doc,index) {
+    let q=query("InspectUsdDocument",#{doc_id:doc,path:root()});
+    if !q.prim.exists {throw("Prepare the exterior blanket collection first");}
+    let ops=[];
+    for s in border_specs(doc,index) {ops=geometry::cube(ops,root(),s);}
+    #{doc_id:doc,generation:q.generation,ops:ops}
+}
 fn check_face(doc,index) {
     let observed=[];
     for s in specs(doc,index) {

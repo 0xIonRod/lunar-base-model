@@ -1,8 +1,10 @@
 // Native motion and physical stopping against the Twin-owned study envelope.
 import "twin://astrobotic-griffin-1/scenarios/tests/flip_manual_controls" as checks;
 const FLIP="/Griffin1SurfaceOps/FLIP";
+const PI=3.141592653589793;
 fn simulation_dependencies(me,ctx) {
-    let rover=find_path(FLIP);let reads=[rover];
+    let rover=find_path(FLIP);let reads=[rover,find_path(FLIP+"/PanelHinge"),
+        find_path(FLIP+"/SolarMechanism/Controller")];
     for station in ["FL","FR","RL","RR"] {
         let path=FLIP+"/Suspension_"+station+"/Wheel_"+station;
         reads.push(find_path(path));reads.push(find_path(path+"/CADVisuals"));
@@ -19,6 +21,15 @@ fn intent(name,held) {
 }
 fn finish(state) {
     state.done=true;
+    if state.config.maximumPanelAngleErrorDeg!=() {
+        state.checks.push(t_true(state.panel_samples>0,"panel has no driving/stopping samples"));
+        state.checks.push(t_true(state.panel_max_error_deg<=state.config.maximumPanelAngleErrorDeg,
+            "panel holding error="+state.panel_max_error_deg+" deg limit="+state.config.maximumPanelAngleErrorDeg));
+        state.checks.push(t_true(state.panel_max_rate_deg_s<=state.config.maximumPanelRateDegPerS,
+            "panel relative rate="+state.panel_max_rate_deg_s+" deg/s limit="+state.config.maximumPanelRateDegPerS));
+        state.evidence.panel=#{samples:state.panel_samples,maximum_error_deg:state.panel_max_error_deg,
+            maximum_rate_deg_s:state.panel_max_rate_deg_s};
+    }
     for name in ["forward","backward"] {
         let result=cmd("SimulateIntent",#{target:find_path(FLIP),intent:name,held:false});
         state.checks.push(t_true(result.ok==true,"release "+name+" rejected: "+result));
@@ -35,9 +46,36 @@ fn collect(state,result) {
     for check in result.checks {state.checks.push(check);}
     state
 }
+// Read native output ports, never the commanded hinge input or render pose.
+fn panel_output(path,name) {
+    let result=query("ReadPorts",#{api_id:find_path(path),port_names:[name]});
+    let values=[];
+    for row in result.ports {
+        if row.direction=="out" && row.name==name {values.push(row.value);}
+    }
+    if values.len()!=1 || values[0]==() || !values[0].is_finite() {
+        throw("panel needs one finite native output "+path+"."+name);
+    }
+    values[0]
+}
+fn observe_panel(state) {
+    let actual=panel_output(FLIP+"/PanelHinge","angle");
+    let requested=panel_output(FLIP+"/SolarMechanism/Controller","angle");
+    let rate=panel_output(FLIP+"/PanelHinge","angular_velocity");
+    let degrees_per_rad=180.0/PI;
+    state.panel_samples+=1;
+    state.panel_max_error_deg=max(state.panel_max_error_deg,abs(actual-requested)*degrees_per_rad);
+    state.panel_max_rate_deg_s=max(state.panel_max_rate_deg_s,abs(rate)*degrees_per_rad);
+    if state.panel_max_error_deg>state.config.maximumPanelAngleErrorDeg
+        || state.panel_max_rate_deg_s>state.config.maximumPanelRateDegPerS {
+        return fail(state,"panel oscillation during "+state.phase);
+    }
+    state
+}
 fn on_start(me,ctx) {
     this.phase="settle";this.time=0.0;this.done=false;this.evidence=#{};
     this.checks=[];this.config=#{};this.direction=1.0;
+    this.panel_samples=0;this.panel_max_error_deg=0.0;this.panel_max_rate_deg_s=0.0;
     try {
         this.config=checks::flip_motion_config();
         this.apply_brake=query("QueryUsdPrim",#{path:"/Griffin1SurfaceOps/Scenario/Test",
@@ -51,6 +89,10 @@ fn on_start(me,ctx) {
 }
 fn advance(state) {
     let current=checks::flip_motion_snapshot();let c=state.config;
+    if state.phase!="settle" {
+        state=observe_panel(state);
+        if state.done {return state;}
+    }
     let speed=vlen(current.velocity);
     if state.phase=="settle" {
         if state.time>=c.settleTimeoutS {return fail(state,"FLIP did not settle: speed="+speed+" m/s");}

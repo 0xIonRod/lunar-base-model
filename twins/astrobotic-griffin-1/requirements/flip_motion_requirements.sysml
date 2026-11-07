@@ -22,6 +22,10 @@ package FlipMotionRequirements {
         attribute minimumWheelRateRadPerS : Real = 0.1;
         attribute minimumRenderRotationDot : Real = 0.9999;
         attribute minimumUprightAxisY : Real = 0.906307787;
+        // Driving/stopping with the panel held at its deployment request.
+        // Simulator study acceptance, not a flight actuator specification.
+        attribute maximumPanelAngleErrorDeg : Real = 3.0;
+        attribute maximumPanelRateDegPerS : Real = 15.0;
     }
 
     requirement def FMR001_ControlledStop {

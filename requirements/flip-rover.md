@@ -1,4 +1,21 @@
 # FLIP rover requirements
+
+## Active simulator panel holding drive — 2026-11-04
+
+**Status: study proxy; native driving qualification pending.** The active
+`vehicles/flip_v5.usda` retains a separate 15 kg panel body and its named
+Z-axis revolute `PanelHinge`. Its torque-limited angular force drive now uses
+20 N·m/degree stiffness and 3.5 N·m·s/degree damping, retaining the 60 N·m cap,
+-90…0 degree travel and the existing slew-limited Modelica deployment controller.
+The former 1 / 0.1 gains left the panel substantially underdamped while driving.
+These are reconstructed simulator tuning values, not supplier actuator data.
+
+`FlipMotionRequirements::MotionStudy` owns panel tracking-error and relative-rate
+acceptance during forward/reverse driving, braking and stopped dwell. Native
+observations must use the hinge's measured output ports and the controller's
+requested angle. See [panel holding evidence](../twins/astrobotic-griffin-1/contracts/flip-panel-hold-2026-11-04.md)
+for units, reduced-model response and the unresolved runtime test prerequisites.
+
 Updated 2026-09-17. Current artifact: [FreeCAD v3](../freecad/flip_v3/README.md).
 Scope: editable reference-informed CAD study and requirements for later Twin promotion.
 Neither the CAD nor its sampled checks constitutes flight qualification.

@@ -126,7 +126,8 @@ fn flip_motion_config() {
         "maximumBrakeEntrySpeedMps","stoppedSpeedMps","minimumAverageDecelerationMps2",
         "brakeResponseAllowanceS","maximumStoppingDistanceM","stoppedDwellS",
         "maximumStoppedDriftM","minimumMotionTravelM","minimumWheelRateRadPerS",
-        "minimumRenderRotationDot","minimumUprightAxisY"];
+        "minimumRenderRotationDot","minimumUprightAxisY",
+        "maximumPanelAngleErrorDeg","maximumPanelRateDegPerS"];
     let prefix="FlipMotionRequirements::MotionStudy::";
     let qualified=[];for name in names {qualified.push(prefix+name);}
     let source=sysml_requirements::source_with_attributes(qualified);
