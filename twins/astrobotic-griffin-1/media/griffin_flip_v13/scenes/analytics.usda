@@ -2861,10 +2861,10 @@ def Xform "Griffin1SurfaceOps" (
     }
     def LunCoPolicy "MissionEnergyProperties"
     {
-        uniform string lunco:policy:seam = "runtime.ui.properties"
-        string lunco:policy:entry = "runtime_ui_properties"
-        uniform string info:sourceCode = "fn number(v) {let n=(v*10.0).round()/10.0;if abs(n)<0.05 {n=0.0;}n.to_string()}\nfn runtime_ui_properties(facts) {\n if facts.surface_id!=\"route-short\" && facts.surface_id!=\"route-long\" {return #{};}\n let blue=facts.surface_id==\"route-short\";\n for participant in facts.participants {\n let p=participant.outputs;if p[\"energy_Battery_wh\"]==() {continue;}\n for name in [\"energy_Battery_returned_wh\",\"energy_elapsed_s\",\"energy_Solar_wh\",\"energy_Equipment_wh\",\"energy_FL_wh\",\"energy_FR_wh\",\"energy_RL_wh\",\"energy_RR_wh\",\"energy_FL_returned_wh\",\"energy_FR_returned_wh\",\"energy_RL_returned_wh\",\"energy_RR_returned_wh\"] {if p[name]==() {throw \"Route HUD is missing native meter: \"+name;}}\n let net=p.energy_Battery_wh-p.energy_Battery_returned_wh;\n let used=p.energy_Equipment_wh;for side in [\"FL\",\"FR\",\"RL\",\"RR\"] {used+=p[\"energy_\"+side+\"_wh\"]-p[\"energy_\"+side+\"_returned_wh\"];}\n let sec=p.energy_elapsed_s.round().to_int();\n let out=#{};out.title=if blue {\"Blue · short\"}else{\"Yellow · long\"};\n out.solar=number(p.energy_Solar_wh);out.used=number(used);out.balance=number(net);if net>0.05 {out.balance=\"+\"+out.balance;}\n out.elapsed=(sec/60).to_string()+\"m \"+(sec%60).to_string()+\"s · Wh\";\n out.case_color=if blue {\"#45C7FF\"}else{\"#FFE34D\"};out.balance_color=if net>=0.0 {\"#74E6B7\"}else{\"#BCA5FF\"};return out;\n }\n #{title:if blue {\"Blue · short\"}else{\"Yellow · long\"},solar:\"—\",used:\"—\",balance:\"—\",elapsed:\"Loading\",case_color:\"#FFFFFF\",balance_color:\"#FFFFFF\"}\n}"
+        uniform string lunco:policy:seam = "runtime.ui.surface"
+        string lunco:policy:entry = "route_energy_surface"
         bool lunco:policy:deterministic = false
+        uniform asset info:sourceAsset = @../../policies/runtime_surfaces.rhai@
     }
     over "Environment" (
         references = @twin://astrobotic-griffin-1/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>

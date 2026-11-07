@@ -2765,10 +2765,10 @@ def Xform "Griffin1SurfaceOps" (
     }
     def LunCoPolicy "MissionEnergyProperties"
     {
-        uniform string lunco:policy:seam = "runtime.ui.properties"
-        string lunco:policy:entry = "runtime_ui_properties"
-        uniform string info:sourceCode = "fn runtime_ui_properties(facts) {\n if facts.surface_id!=\"route-short\" && facts.surface_id!=\"route-long\" {return #{};}\n let out=#{title:if facts.surface_id==\"route-short\" {\"Short route\"}else{\"Long route\"},balance:\"—\",elapsed:\"—\",case_color:if facts.surface_id==\"route-short\" {\"#45C7FF\"}else{\"#FFE34D\"},balance_width:\"0px\"};\n for participant in facts.participants {\n  let p=participant.outputs;if p[\"energy_Battery_wh\"]==() || p[\"energy_Battery_returned_wh\"]==() || p[\"energy_elapsed_s\"]==() {continue;}\n  let net=p[\"energy_Battery_wh\"]-p[\"energy_Battery_returned_wh\"];\n  let v=(net*10.0).round()/10.0;if abs(v)<0.05 {v=0.0;}\n  out.balance=(if v>0.0 {\"+\"}else{\"\"})+v.to_string()+\" Wh\";\n  let sec=p[\"energy_elapsed_s\"].round().to_int();out.elapsed=(sec/60).to_string()+\"m \"+(sec%60).to_string()+\"s\";\n  out.balance_width=(max(0.0,min(10.0,net))/10.0*572.0).to_string()+\"px\";return out;\n }\n out\n}"
+        uniform string lunco:policy:seam = "runtime.ui.surface"
+        string lunco:policy:entry = "route_balance_surface"
         bool lunco:policy:deterministic = false
+        uniform asset info:sourceAsset = @../../policies/runtime_surfaces.rhai@
     }
     over "Environment" (
         references = @twin://astrobotic-griffin-1/media/griffin_flip_v8/environments/south_pole_surrogate.usda@</SouthPoleSurrogate>

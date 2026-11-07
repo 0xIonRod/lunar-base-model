@@ -174,10 +174,10 @@ def Xform "Griffin1SurfaceOps" (
     }
     def LunCoPolicy "DrivePowerProperties"
     {
-        uniform string lunco:policy:seam = "runtime.ui.properties"
-        string lunco:policy:entry = "runtime_ui_properties"
-        uniform string info:sourceCode = "fn runtime_ui_properties(facts) {\n if facts.surface_id!=\"film-motor\" && facts.surface_id!=\"film-solar\" {return #{};}\n for participant in facts.participants {\n  let out=participant.outputs;\n  let p=if facts.surface_id==\"film-motor\" {out[\"__member_Motor_FL_electrical_power\"]}else{out[\"solar_power\"]};\n  if p==() {continue;}\n  let label=if facts.surface_id==\"film-motor\" {if p < -0.5 {\"Front motor returns\"}else{\"Front motor uses\"}}else{\"Solar panel produces\"};\n  return #{label:label,value:abs(p).round().to_int().to_string()+\" W\"};\n }\n #{label:\"Waiting for measurement\",value:\"—\"}\n}"
+        uniform string lunco:policy:seam = "runtime.ui.surface"
+        string lunco:policy:entry = "power_surface"
         bool lunco:policy:deterministic = false
+        uniform asset info:sourceAsset = @../../policies/runtime_surfaces.rhai@
     }
     def Camera "SlopeView" (
         prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
