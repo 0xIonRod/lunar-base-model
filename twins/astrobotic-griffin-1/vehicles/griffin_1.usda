@@ -5083,6 +5083,24 @@ def Xform "Griffin1" (
                 custom rel lunco:derived:source = </Griffin1/LegPX/ShockPiston/Tube>
             }
         }
+
+
+        def Camera "LegPXCamera" (
+            prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+        )
+        {
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float focalLength = 14.0
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            float2 clippingRange = (0.1, 100000.0)
+            float exposure:fStop = 8.0
+            double3 xformOp:translate = (0.95, -0.70, 0.45)
+            double3 lunco:cameraLookAt = (0.0, -1.32, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            custom string documentation = "Mounted to the LegPX spring body with a wide view of its strut, footpad and contact patch. Position is a visual study estimate."
+        }
     }
     def Xform "LegNX" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
@@ -5222,6 +5240,24 @@ def Xform "Griffin1" (
                 token visibility = "invisible"
                 custom rel lunco:derived:source = </Griffin1/LegNX/ShockPiston/Tube>
             }
+        }
+
+
+        def Camera "LegNXCamera" (
+            prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+        )
+        {
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float focalLength = 14.0
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            float2 clippingRange = (0.1, 100000.0)
+            float exposure:fStop = 8.0
+            double3 xformOp:translate = (0.95, -0.70, 0.45)
+            double3 lunco:cameraLookAt = (0.0, -1.32, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            custom string documentation = "Mounted to the LegNX spring body with a wide view of its strut, footpad and contact patch. Position is a visual study estimate."
         }
     }
     def Xform "LegPZ" (
@@ -5363,6 +5399,24 @@ def Xform "Griffin1" (
                 custom rel lunco:derived:source = </Griffin1/LegPZ/ShockPiston/Tube>
             }
         }
+
+
+        def Camera "LegPZCamera" (
+            prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+        )
+        {
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float focalLength = 14.0
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            float2 clippingRange = (0.1, 100000.0)
+            float exposure:fStop = 8.0
+            double3 xformOp:translate = (0.95, -0.70, 0.45)
+            double3 lunco:cameraLookAt = (0.0, -1.32, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            custom string documentation = "Mounted to the LegPZ spring body with a wide view of its strut, footpad and contact patch. Position is a visual study estimate."
+        }
     }
     def Xform "LegNZ" (
         references = @twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_physics.usda@</World>
@@ -5502,6 +5556,24 @@ def Xform "Griffin1" (
                 token visibility = "invisible"
                 custom rel lunco:derived:source = </Griffin1/LegNZ/ShockPiston/Tube>
             }
+        }
+
+
+        def Camera "LegNZCamera" (
+            prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+        )
+        {
+            uniform token lunco:cameraRole = "viewport"
+            uniform token lunco:cameraPose = "mounted"
+            float focalLength = 14.0
+            float horizontalAperture = 36.0
+            float verticalAperture = 20.25
+            float2 clippingRange = (0.1, 100000.0)
+            float exposure:fStop = 8.0
+            double3 xformOp:translate = (0.95, -0.70, 0.45)
+            double3 lunco:cameraLookAt = (0.0, -1.32, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            custom string documentation = "Mounted to the LegNZ spring body with a wide view of its strut, footpad and contact patch. Position is a visual study estimate."
         }
     }
     def Xform "PayloadAdapter"
@@ -10858,12 +10930,13 @@ def Xform "Griffin1" (
     {
         uniform token lunco:cameraRole = "viewport"
         uniform token lunco:cameraPose = "mounted"
-        float focalLength = 24.0
+        float focalLength = 18.0
         float horizontalAperture = 36.0
         float verticalAperture = 20.25
         float2 clippingRange = (0.10000000149011612, 100000.0)
-        double3 xformOp:translate = (0.0, 2.45, 2.5)
-        double3 lunco:cameraLookAt = (0.0, -18.0, 34.0)
+        float exposure:fStop = 8.0
+        double3 xformOp:translate = (0.0, 4.2, 2.0)
+        double3 lunco:cameraLookAt = (0.0, -70.0, 26.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom string documentation = "Mounted viewport study camera on the forward deck edge, aimed down and outward to frame the approach terrain and landing legs. The mount and boresight are presentation estimates, not Griffin flight-camera ICD data."
     }
@@ -10873,12 +10946,13 @@ def Xform "Griffin1" (
     {
         uniform token lunco:cameraRole = "viewport"
         uniform token lunco:cameraPose = "mounted"
-        float focalLength = 20.0
+        float focalLength = 18.0
         float horizontalAperture = 36.0
         float verticalAperture = 20.25
         float2 clippingRange = (0.10000000149011612, 100000.0)
-        double3 xformOp:translate = (-2.35, 2.85, 0.45)
-        double3 lunco:cameraLookAt = (-13.0, 0.35, 1.4)
+        float exposure:fStop = 8.0
+        double3 xformOp:translate = (-4.5, 4.5, 2.0)
+        double3 lunco:cameraLookAt = (0.0, -0.5, -4.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom string documentation = "Mounted viewport study camera at the port-side deck edge, aimed along the compact FLIP egress side to frame the rover, ramp and nearby terrain. The mount and boresight are presentation estimates."
     }
@@ -10888,74 +10962,15 @@ def Xform "Griffin1" (
     {
         uniform token lunco:cameraRole = "viewport"
         uniform token lunco:cameraPose = "mounted"
-        float focalLength = 14.0
+        float focalLength = 18.0
         float horizontalAperture = 36.0
         float verticalAperture = 20.25
         float2 clippingRange = (0.1, 100000.0)
-        double3 xformOp:translate = (0.0, 0.58, 0.0)
-        double3 lunco:cameraLookAt = (0.0, -0.42, 2.68700576850888)
+        float exposure:fStop = 8.0
+        double3 xformOp:translate = (0.0, -0.8, 0.0)
+        double3 lunco:cameraLookAt = (0.0, -1.6, 2.68700576850888)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom string documentation = "Mounted on the Griffin lower hull, aimed outward and down across the LegPX footpad and nearby lunar surface for a wide underbody clearance view. Presentation-camera placement; not a claimed flight-camera location."
-    }
-    def Camera "LegPXCamera" (
-        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
-    )
-    {
-        uniform token lunco:cameraRole = "viewport"
-        uniform token lunco:cameraPose = "mounted"
-        float focalLength = 20.0
-        float horizontalAperture = 36.0
-        float verticalAperture = 20.25
-        float2 clippingRange = (0.1, 100000.0)
-        double3 xformOp:translate = (0.0, 0.58, 2.35)
-        double3 lunco:cameraLookAt = (0.0, -0.42, 2.68700576850888)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom string documentation = "Lower-hull viewport camera aimed at the LegPX strut, footpad and local contact patch. Fixed to the Griffin frame; coordinates are visual study estimates."
-    }
-    def Camera "LegNXCamera" (
-        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
-    )
-    {
-        uniform token lunco:cameraRole = "viewport"
-        uniform token lunco:cameraPose = "mounted"
-        float focalLength = 20.0
-        float horizontalAperture = 36.0
-        float verticalAperture = 20.25
-        float2 clippingRange = (0.1, 100000.0)
-        double3 xformOp:translate = (0.0, 0.58, -2.35)
-        double3 lunco:cameraLookAt = (0.0, -0.42, -2.68700576850888)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom string documentation = "Lower-hull viewport camera aimed at the LegNX strut, footpad and local contact patch. Fixed to the Griffin frame; coordinates are visual study estimates."
-    }
-    def Camera "LegPZCamera" (
-        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
-    )
-    {
-        uniform token lunco:cameraRole = "viewport"
-        uniform token lunco:cameraPose = "mounted"
-        float focalLength = 20.0
-        float horizontalAperture = 36.0
-        float verticalAperture = 20.25
-        float2 clippingRange = (0.1, 100000.0)
-        double3 xformOp:translate = (-2.35, 0.58, 0.0)
-        double3 lunco:cameraLookAt = (-2.68700576850888, -0.42, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom string documentation = "Lower-hull viewport camera aimed at the LegPZ strut, footpad and local contact patch. Fixed to the Griffin frame; coordinates are visual study estimates."
-    }
-    def Camera "LegNZCamera" (
-        prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
-    )
-    {
-        uniform token lunco:cameraRole = "viewport"
-        uniform token lunco:cameraPose = "mounted"
-        float focalLength = 20.0
-        float horizontalAperture = 36.0
-        float verticalAperture = 20.25
-        float2 clippingRange = (0.1, 100000.0)
-        double3 xformOp:translate = (2.35, 0.58, 0.0)
-        double3 lunco:cameraLookAt = (2.68700576850888, -0.42, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-        custom string documentation = "Lower-hull viewport camera aimed at the LegNZ strut, footpad and local contact patch. Fixed to the Griffin frame; coordinates are visual study estimates."
     }
     def Camera "PayloadReleaseCamera" (
         prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
@@ -10963,13 +10978,22 @@ def Xform "Griffin1" (
     {
         uniform token lunco:cameraRole = "viewport"
         uniform token lunco:cameraPose = "mounted"
-        float focalLength = 24.0
+        float focalLength = 18.0
         float horizontalAperture = 36.0
         float verticalAperture = 20.25
         float2 clippingRange = (0.1, 100000.0)
-        double3 xformOp:translate = (2.9, 2.65, 0.0)
+        float exposure:fStop = 8.0
+        double3 xformOp:translate = (4.4, 4.3, 3.5)
         double3 lunco:cameraLookAt = (0.0, 2.12, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom string documentation = "Mounted at the starboard deck edge, aimed across the payload adapter interface for a clear FLIP release and deck-clearance view. Presentation-camera placement; not a claimed flight-camera location."
     }
+
+
+
+
+
+
+
+
 }

@@ -207,7 +207,7 @@ def Xform "Griffin1SurfaceOps" (
             {
                 uniform token lunco:cameraRole = "viewport"
                 uniform token lunco:cameraPose = "authored"
-                float focalLength = 28.0
+                float focalLength = 35.0
                 float horizontalAperture = 36.0
                 float verticalAperture = 20.25
                 float2 clippingRange = (0.10000000149011612, 100000.0)
