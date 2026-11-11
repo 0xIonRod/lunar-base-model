@@ -3560,7 +3560,7 @@ def Xform "FLIP" (
                 float focalLength = 18.0
                 float horizontalAperture = 36.0
                 float verticalAperture = 20.25
-                float exposure:fStop = 8.0
+                float exposure:fStop = 16.0
                 double3 lunco:cameraLookAt = (0.652, 0.65, -16.0)
                 custom double3 xformOp:translate = (0.652, 1.673, -0.095)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
@@ -3575,7 +3575,7 @@ def Xform "FLIP" (
                 float focalLength = 18.0
                 float horizontalAperture = 36.0
                 float verticalAperture = 20.25
-                float exposure:fStop = 8.0
+                float exposure:fStop = 16.0
                 double3 lunco:cameraLookAt = (0.552, 0.65, 16.0)
                 custom double3 xformOp:translate = (0.552, 1.673, 0.095)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
@@ -3933,12 +3933,15 @@ def Xform "FLIP" (
         float focalLength = 18.0
         float horizontalAperture = 36.0
         float verticalAperture = 20.25
-        float2 clippingRange = (0.1, 100000.0)
-        float exposure:fStop = 8.0
+        float2 clippingRange = (0.10000000149011612, 100000.0)
+        float exposure:fStop = 16.0
         double3 xformOp:translate = (0.0, 0.8, -2.8)
-        double3 lunco:cameraLookAt = (0.0, 0.0, -18.0)
+        double3 lunco:cameraLookAt = (0.0, 0.65, -18.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom string documentation = "Mounted viewport study camera at the FLIP front chassis edge, aimed slightly down for terrain and wheel-path context. Position and boresight are visual reconstruction estimates."
+        float exposure:iso = 100.0
+        float exposure:responsivity = 1.0
+        float exposure:time = 0.00390625
     }
     def Camera "RearEgressCamera" (
         prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
@@ -3949,9 +3952,9 @@ def Xform "FLIP" (
         float focalLength = 20.0
         float horizontalAperture = 36.0
         float verticalAperture = 20.25
-        float2 clippingRange = (0.1, 100000.0)
+        float2 clippingRange = (0.10000000149011612, 100000.0)
         double3 xformOp:translate = (0.0, 1.15, 1.8)
-        double3 lunco:cameraLookAt = (0.0, 0.2, 12.0)
+        double3 lunco:cameraLookAt = (0.0, -3.8, 12.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom string documentation = "Mounted viewport study camera on the FLIP rear deck, aimed toward the lander during deck departure and ramp egress. Position and boresight are visual reconstruction estimates."
     }
@@ -3964,10 +3967,10 @@ def Xform "FLIP" (
         float focalLength = 14.0
         float horizontalAperture = 36.0
         float verticalAperture = 20.25
-        float2 clippingRange = (0.1, 100000.0)
-        float exposure:fStop = 8.0
+        float2 clippingRange = (0.10000000149011612, 100000.0)
+        float exposure:fStop = 16.0
         double3 xformOp:translate = (-1.9, 0.5, -2.2)
-        double3 lunco:cameraLookAt = (-0.75, -0.45, -0.9)
+        double3 lunco:cameraLookAt = (-1.0, -0.72, -0.85)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom string documentation = "Mounted at the FLIP front-left chassis edge, aimed down at the FL wheel and adjacent terrain to show wheel clearance and contact while driving. Position and boresight are visual study estimates."
     }
