@@ -97,6 +97,14 @@ is authored in this Twin and uses the simulator's compiled Modelica artifact
 cache. The camera remains available in the Camera menu alongside the freeflight
 avatar and vehicle-mounted views.
 
+The operations scene also replaces the flat guidance circle with a shallow
+circular landing deck, amber perimeter lamps, and a cached SVG guidance decal.
+The authored source is `sources/griffin_landing_pad.svg`; the Twin's existing
+texture processor writes the raster to `.cache/textures/griffin_landing_pad.png`
+on scene startup. Its content key reuses exact hits and rebuilds after the SVG
+or recipe changes. The pad is visual-only; the terrain and `LandingTarget` keep
+owning contact and guidance.
+
 Open `scenes/flip_cad_drive.usda` for interactive driving without an automatic
 test taking control. Its avatar starts at `(8, 5, 10)` in the terrain frame,
 aimed at the rover. See the [CAD acceptance receipt](contracts/flip-cad-runtime-2026-10-26.md)

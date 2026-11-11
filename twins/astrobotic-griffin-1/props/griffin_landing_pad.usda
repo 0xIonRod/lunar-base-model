@@ -1,0 +1,345 @@
+#usda 1.0
+(
+    defaultPrim = "GriffinLandingPad"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+# Twin-local presentation model. The deck is visual only; Griffin's existing
+# terrain collision and LandingTarget remain the authorities for contact and GNC.
+def Xform "GriffinLandingPad" (
+    doc = "Shallow circular landing-site deck with a cached raster surface decal; presentation geometry only."
+    kind = "component"
+)
+{
+    def Scope "Looks"
+    {
+        def Material "DeckFinish"
+        {
+            token outputs:surface.connect = </GriffinLandingPad/Looks/DeckFinish/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.39, 0.42, 0.43)
+                float inputs:metallic = 0.22
+                float inputs:roughness = 0.72
+                token outputs:surface
+            }
+        }
+        def Material "DeckTop"
+        {
+            token outputs:surface.connect = </GriffinLandingPad/Looks/DeckTop/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.56, 0.58, 0.57)
+                float inputs:metallic = 0.12
+                float inputs:roughness = 0.82
+                token outputs:surface
+            }
+        }
+        def Material "Markings"
+        {
+            token outputs:surface.connect = </GriffinLandingPad/Looks/Markings/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor.connect = </GriffinLandingPad/Looks/Markings/Texture.outputs:rgb>
+                float inputs:opacity = 0.98
+                float inputs:roughness = 0.9
+                token outputs:surface
+            }
+            def Shader "TexcoordReader"
+            {
+                uniform token info:id = "UsdPrimvarReader_float2"
+                token inputs:varname = "st"
+                float2 outputs:result
+            }
+            def Shader "Texture"
+            {
+                uniform token info:id = "UsdUVTexture"
+                asset inputs:file = @twin://astrobotic-griffin-1/textures/griffin_landing_pad.png@
+                token inputs:sourceColorSpace = "sRGB"
+                token inputs:wrapS = "clamp"
+                token inputs:wrapT = "clamp"
+                float inputs:scale = 1.0
+                float inputs:bias = 0.0
+                float2 inputs:st.connect = </GriffinLandingPad/Looks/Markings/TexcoordReader.outputs:result>
+                float3 outputs:rgb
+                float outputs:a
+            }
+        }
+        def Material "AmberLights"
+        {
+            token outputs:surface.connect = </GriffinLandingPad/Looks/AmberLights/Surface.outputs:surface>
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.76, 0.58, 0.16)
+                color3f inputs:emissiveColor = (0.54, 0.35, 0.035)
+                float inputs:roughness = 0.4
+                token outputs:surface
+            }
+        }
+    }
+
+    def Cylinder "Foundation" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform token axis = "Y"
+        double radius = 7.35
+        double height = 0.38
+        double3 xformOp:translate = (0.0, 0.405, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        rel material:binding = </GriffinLandingPad/Looks/DeckFinish>
+        color3f[] primvars:displayColor = [(0.39, 0.42, 0.43)]
+        bool physics:collisionEnabled = false
+        bool primvars:doNotCastShadows = false
+    }
+
+    def Cylinder "TopPlate" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform token axis = "Y"
+        double radius = 7.18
+        double height = 0.055
+        double3 xformOp:translate = (0.0, 0.615, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        rel material:binding = </GriffinLandingPad/Looks/DeckTop>
+        color3f[] primvars:displayColor = [(0.56, 0.58, 0.57)]
+        bool physics:collisionEnabled = false
+        bool primvars:doNotCastShadows = false
+    }
+
+    def Mesh "SurfaceDecal" (
+        prepend apiSchemas = ["MaterialBindingAPI", "LunCoSurfaceAPI"]
+    )
+    {
+        point3f[] points = [(-7.05, 0.0, -7.05), (-7.05, 0.0, 7.05), (7.05, 0.0, 7.05), (7.05, 0.0, -7.05)]
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        normal3f[] normals = [(0.0, 1.0, 0.0)] (
+            interpolation = "constant"
+        )
+        texCoord2f[] primvars:st = [(0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)] (
+            interpolation = "vertex"
+        )
+        double3 xformOp:translate = (0.0, 0.645, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        rel material:binding = </GriffinLandingPad/Looks/Markings>
+        color3f[] primvars:displayColor = [(0.56, 0.58, 0.57)]
+        bool doubleSided = true
+        bool physics:collisionEnabled = false
+        bool primvars:doNotCastShadows = true
+    }
+
+    def Xform "SupportFeet"
+    {
+        def Cylinder "FootNW"
+        {
+            uniform token axis = "Y"
+            double radius = 0.19
+            double height = 0.40
+            double3 xformOp:translate = (-5.1, 0.20, -5.1)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.23, 0.25, 0.26)]
+            bool physics:collisionEnabled = false
+        }
+        def Cylinder "FootNE"
+        {
+            uniform token axis = "Y"
+            double radius = 0.19
+            double height = 0.40
+            double3 xformOp:translate = (5.1, 0.20, -5.1)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.23, 0.25, 0.26)]
+            bool physics:collisionEnabled = false
+        }
+        def Cylinder "FootSW"
+        {
+            uniform token axis = "Y"
+            double radius = 0.19
+            double height = 0.40
+            double3 xformOp:translate = (-5.1, 0.20, 5.1)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.23, 0.25, 0.26)]
+            bool physics:collisionEnabled = false
+        }
+        def Cylinder "FootSE"
+        {
+            uniform token axis = "Y"
+            double radius = 0.19
+            double height = 0.40
+            double3 xformOp:translate = (5.1, 0.20, 5.1)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.23, 0.25, 0.26)]
+            bool physics:collisionEnabled = false
+        }
+    }
+
+    def Scope "PerimeterLights"
+    {
+        def Sphere "Lamp00" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (7.05, 0.655, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp01" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (6.47, 0.655, 2.78)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp02" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (4.98, 0.655, 4.98)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp03" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (2.78, 0.655, 6.47)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp04" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (0.0, 0.655, 7.05)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp05" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (-2.78, 0.655, 6.47)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp06" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (-4.98, 0.655, 4.98)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp07" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (-6.47, 0.655, 2.78)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp08" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (-7.05, 0.655, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp09" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (-6.47, 0.655, -2.78)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp10" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (-4.98, 0.655, -4.98)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp11" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (-2.78, 0.655, -6.47)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp12" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (0.0, 0.655, -7.05)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp13" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (2.78, 0.655, -6.47)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp14" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (4.98, 0.655, -4.98)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+        def Sphere "Lamp15" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            double radius = 0.11
+            double3 xformOp:translate = (6.47, 0.655, -2.78)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            rel material:binding = </GriffinLandingPad/Looks/AmberLights>
+            color3f[] primvars:displayColor = [(0.96, 0.78, 0.24)]
+        }
+    }
+}

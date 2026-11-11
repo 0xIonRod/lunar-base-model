@@ -560,6 +560,27 @@ def Xform "Griffin1SurfaceOps" (
     {
         custom double3 xformOp:translate = (0.0, 0.6187641942501068, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
+        over "Dome"
+        {
+            token visibility = "invisible"
+        }
+        over "SurfaceMark"
+        {
+            token visibility = "invisible"
+        }
+        over "Presentation" (
+            active = false
+        )
+        {
+        }
+    }
+    def Xform "LandingPad" (
+        prepend references = @twin://astrobotic-griffin-1/props/griffin_landing_pad.usda@</GriffinLandingPad>
+        doc = "Presentation-only landing pad; the terrain and LandingTarget remain the contact and guidance authorities."
+    )
+    {
+        double3 xformOp:translate = (0.0, -0.6187641942501068, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Scope "Scenario"
     {

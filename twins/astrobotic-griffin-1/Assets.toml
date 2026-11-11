@@ -169,3 +169,19 @@ dest = "materials/lunar_regolith/moon_flat_macro_02_nor_gl_2k.png"
 shared = false
 recommended = false
 sha256 = "e06de0c359d199221d36d2e0ec1d6233c97db9f323b79f0a3367094a2b4a1665"
+
+# Local SVG source is rasterized through the native texture processor. The
+# prepared PNG lives in this Twin's .cache and its recipe key includes the SVG.
+[griffin_landing_pad_texture]
+name = "Griffin landing pad surface markings"
+url = "https://raw.githubusercontent.com/0xIonRod/lunar-base-model/main/twins/astrobotic-griffin-1/sources/griffin_landing_pad.svg"
+dest = "sources/griffin_landing_pad.svg"
+shared = false
+recommended = false
+sha256 = "c45607f146d70563c0d2860790effbd7a76471a1d9a5aa38979af5ec58988c8c"
+
+[griffin_landing_pad_texture.process]
+kind = "texture"
+target_resolution = [1024, 1024]
+output = "textures/griffin_landing_pad.png"
+output_root = "cache"

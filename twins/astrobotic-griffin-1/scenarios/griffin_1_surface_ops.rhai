@@ -82,6 +82,13 @@ fn simulation_dependencies(me, ctx) {
 }
 
 fn on_start(me, ctx) {
+    // Bake the Twin-authored SVG into .cache. The content key keeps this cheap
+    // on an exact hit and rebuilds when the SVG or processing recipe changes.
+    let landing_pad_bake = assets::bake("twin/astrobotic-griffin-1/griffin_landing_pad_texture");
+    if landing_pad_bake == () || landing_pad_bake.ok != true {
+        mission_notice("Landing pad markings are not baked yet; geometry remains visible.", "warning");
+    }
+
     // Sourced identities are available after the required analysis is ready.
     this.ramp_latched_drive_profiles=[];
     if !griffin_compact_egress::enabled() {
