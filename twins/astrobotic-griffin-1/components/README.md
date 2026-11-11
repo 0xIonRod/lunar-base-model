@@ -13,6 +13,11 @@ suspension, and solar hardware are under `rover/`. `vehicles/griffin_1.usda`
 and `vehicles/flip.usda` compose those component assets into their complete
 vehicle assemblies.
 
+Reusable camera components live under `cameras/`. The object-tracking camera
+is a virtual camera with no rendered hardware; a scene sets its
+`lunco:tracking:trackedObject` relationship and connects the target's world
+position ports to its Modelica controller.
+
 Do not edit USD text directly. Build or adjust an assembly through the typed
 LunCoSim Editor/runtime tools, then run the component's Rhai observer against
 the resulting composed stage. The generic Twin registry rejects a missing,

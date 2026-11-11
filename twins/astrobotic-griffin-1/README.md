@@ -88,12 +88,12 @@ the documented roles of its terrain-relative navigation camera and
 hazard-detection lidar, alongside ESA's LandCam-X landing camera; public
 sources do not define the viewport transforms used here ([NASA](https://www.nasa.gov/stmd-flight-opportunities/transitions-of-flight-tested-technologies/hazard-detection-lidar-system-goes-to-the-moon/), [ESA](https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/LandCam-X_a_lunar_landing_camera)).
 
-The surface-operations scene opens on `GriffinTrackingCamera`, a 28 mm
-pan/tilt observer mounted on a fixed 10 m scene mast. Its Modelica controller
-reads Griffin's live world-position ports through explicit USD connections,
-then drives the two physical revolute joints with rate-limited commands. The
-gimbal, camera and mast are presentation infrastructure; the `.mo` controller
-is authored in this Twin and uses the simulator's compiled Modelica artifact
+The surface-operations scene opens on `GriffinTrackingCamera`, a virtual
+pan/tilt observer from the reusable `components/cameras/` library. Its Modelica
+controller reads Griffin's live world-position ports through explicit USD
+connections and drives two revolute joints with rate-limited commands. The
+camera and joint rig have no rendered body or mast. The `.mo` controller is
+authored in this Twin and uses the simulator's compiled Modelica artifact
 cache. The camera remains available in the Camera menu alongside the freeflight
 avatar and vehicle-mounted views.
 
