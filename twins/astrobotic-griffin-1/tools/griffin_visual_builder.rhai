@@ -1159,7 +1159,7 @@ fn apply_flip_electrical_model(doc, edit_target, root, parent_gen) {
 // Route markers are part of the mission interface, not a second navigation
 // implementation. Their ordered names and XYZ datums come from the primary
 // Griffin SysML package; this Editor plan only projects those values into the
-// existing marker Xforms and journals the result in the scene layer.
+// existing route-data Xforms and journals the result in the scene layer.
 fn surface_route_marker_plan(doc, edit_target, root) {
     if doc == () || edit_target == () || !absolute_root(root) {
         return plan_error("surface_route_marker_plan requires a document, edit target, and absolute root");
@@ -1168,10 +1168,6 @@ fn surface_route_marker_plan(doc, edit_target, root) {
     let xs = griffin_spec::surface_route_marker_x();
     let ys = griffin_spec::surface_route_marker_y();
     let zs = griffin_spec::surface_route_marker_z();
-    let fade = griffin_spec::_sysml_attribute("surfaceRouteMarkerFadeEndM");
-    if fade == () || !fade.is_finite() || fade <= 0.0 {
-        return plan_error("surface route marker fade range must be finite and positive");
-    }
     if names.len() == 0 || xs.len() != names.len() || ys.len() != names.len()
         || zs.len() != names.len() {
         return plan_error("surface route marker SysML arrays must have equal non-zero cardinality");
@@ -1182,14 +1178,14 @@ fn surface_route_marker_plan(doc, edit_target, root) {
         let path = root + "/" + names[index];
         let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
         if !query_ok(prim) || prim.type_name != "Xform" {
-            return plan_error(path + ": route marker must already be an existing Xform");
+            return plan_error(path + ": route datum must already be an existing Xform");
         }
         let placement = assembly_builder::place_plan(edit_target, path,
             [xs[index], ys[index], zs[index]], (), ());
         if !placement.ok { return placement; }
         for op in placement.ops { ops.push(op); }
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
-            name:"lunco:billboard:fadeEnd",type_name:"float",value:fade.to_string()}});
+            name:"lunco:billboard",type_name:"bool",value:"false"}});
         paths.push(path);
     }
     #{ok: true, kind: "griffin_surface_route_markers", root: root,

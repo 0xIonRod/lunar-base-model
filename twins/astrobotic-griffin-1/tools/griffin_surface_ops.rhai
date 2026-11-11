@@ -1500,7 +1500,7 @@ fn surface_route_presentation_plan(frame, entry_on_deck) {
             point=world_pos3(find_path(path));
         } else {
             ops.push(#{SetTranslate:#{edit_target:"@view@",path:path,value:vec3_array(point)}});
-            ops.push(#{SetAttribute:#{edit_target:"@view@",path:path,name:"lunco:billboard",type_name:"bool",value:"true"}});
+            ops.push(#{SetAttribute:#{edit_target:"@view@",path:path,name:"lunco:billboard",type_name:"bool",value:"false"}});
         }
         points.push(#{path:path,position_m:vec3_array(point),expected_position_m:vec3_array(expected),terrain_y_m:terrain,
             clearance_m:point.y-terrain,surface:if i==0 && entry_on_deck{"payload_deck"}else{"terrain"}});
@@ -1539,8 +1539,8 @@ fn _surface_route_leg_task(rover, leg, stall_timeout) {
             if this.route_interrupted==true {return false;}
             if event=="griffin_ramp_approach_reached" {
                 this.surface_route_frame=griffin_surface_ops::landed_surface_route_frame();
-                let shown=griffin_surface_ops::present_surface_route(this.surface_route_frame);
-                if shown.ok!=true {throw("route presentation rejected: "+shown);}
+                let updated=griffin_surface_ops::present_surface_route(this.surface_route_frame);
+                if updated.ok!=true {throw("route data update rejected: "+updated);}
             }
             if this.surface_route_frame==() {throw("surface route frame was not established by egress");}
             this.route_target = griffin_surface_ops::surface_route_target(target,this.surface_route_frame);

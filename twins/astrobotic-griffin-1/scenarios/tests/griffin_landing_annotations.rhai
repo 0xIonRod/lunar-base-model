@@ -1,5 +1,5 @@
 // Attach to the scene root in a production graphics session. This observer
-// checks annotation publication without replacing the mission program.
+// checks the hidden route datum transforms without replacing the mission program.
 const TEST_KIND = "graphics";
 const ROOT = "/Griffin1SurfaceOps";
 const TARGET = ROOT + "/LandingTarget";
@@ -81,10 +81,10 @@ fn on_tick(me, ctx) {
     for name in ["RoverRampApproach", "RoverRampExit", "RoverTarget1", "RoverTarget2", "BaseSite"] {
         let path=if this.attached_entry && name=="RoverRampApproach" {ROOT+"/Lander/CompactEgress/RouteEntryAnnotation"} else {ROOT+"/"+name};
         let p=world_pos3(find_path(path));let h=terrain_height(p.x,p.z);
-        let marker=query("QueryUsdPrim",#{path:path,attrs:["lunco:billboard:fadeEnd"]});
+        let marker=query("QueryUsdPrim",#{path:path,attrs:["lunco:billboard"]});
         checks.push(t_true(h!=() && p.y-h>=0.049
-            && marker.attrs["lunco:billboard:fadeEnd"]==griffin_spec::_sysml_attribute("surfaceRouteMarkerFadeEndM"),
-            name+" has surface support and the descent display range"));
+            && marker.attrs["lunco:billboard"]==false,
+            name+" remains a hidden navigation datum without a billboard"));
     }
     if this.landed {
         let entry_path=if this.attached_entry {ROOT+"/Lander/CompactEgress/RouteEntryAnnotation"}else{ROOT+"/RoverRampApproach"};

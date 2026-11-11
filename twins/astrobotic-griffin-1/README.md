@@ -89,8 +89,9 @@ hazard-detection lidar, alongside ESA's LandCam-X landing camera; public
 sources do not define the viewport transforms used here ([NASA](https://www.nasa.gov/stmd-flight-opportunities/transitions-of-flight-tested-technologies/hazard-detection-lidar-system-goes-to-the-moon/), [ESA](https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/LandCam-X_a_lunar_landing_camera)).
 
 The surface-operations scene opens on `GriffinTrackingCamera`, a virtual
-pan/tilt observer from the reusable `components/cameras/` library. Its Modelica
-controller reads Griffin's live world-position ports through explicit USD
+pan/tilt observer from the reusable `components/cameras/` library. It sits on
+the sun-facing side of the site for a lit three-quarter view of Griffin. Its
+Modelica controller reads Griffin's live world-position ports through explicit USD
 connections and drives two revolute joints with rate-limited commands. The
 camera and joint rig have no rendered body or mast. The `.mo` controller is
 authored in this Twin and uses the simulator's compiled Modelica artifact
@@ -695,8 +696,8 @@ The current stable boundary demonstrates:
 2. Griffin and FLIP are reusable USD wrappers, not Rust-only entities.
 3. The lander owns its Modelica propulsion, attitude, sensor, and touchdown
    contracts.
-4. The mission scene owns guidance wiring, landing target, camera, anchors,
-   waypoint markers, and mission metadata.
+4. The mission scene owns guidance wiring, landing target, camera, hidden route
+   waypoints, and mission metadata.
 5. The Griffin wrapper carries source-backed values useful for integration:
    625 kg payload capacity, four landing legs, seven main engines, and an
    octagonal payload deck. It composes the three adjacent solar-array faces
@@ -724,7 +725,7 @@ The current stable boundary demonstrates:
 8. The Rhai task tree expresses descent event waits, the selected direct-deck or
    optional-ramp egress path, adapter-joint release, and a post-release
    surface-transit → base-site route.
-   The close-spaced transit and base-arc markers are authored to keep the
+   The close-spaced transit and base-arc route targets are authored to keep the
    current four-wheel proxy on a feasible turn path. Ramp approach and ramp
    exit remain authored route actions, but are not used as pre-release mission
    gates because an attached payload can own those sensors.

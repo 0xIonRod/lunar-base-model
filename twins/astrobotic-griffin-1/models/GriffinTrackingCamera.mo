@@ -3,14 +3,14 @@ model GriffinTrackingCamera "Two-axis observer camera that follows Griffin"
   input Real target_x_m(unit="m") "Tracked object's world X position";
   input Real target_y_m(unit="m") "Tracked object's world Y position";
   input Real target_z_m(unit="m") "Tracked object's world Z position";
-  parameter Real mount_x_m(unit="m") = 14.0 "Fixed gimbal world X position";
-  parameter Real mount_y_m(unit="m") = 10.0 "Fixed gimbal world Y position";
-  parameter Real mount_z_m(unit="m") = 14.0 "Fixed gimbal world Z position";
+  parameter Real mount_x_m(unit="m") = 4.0 "Fixed gimbal world X position";
+  parameter Real mount_y_m(unit="m") = 80.0 "Fixed gimbal world Y position";
+  parameter Real mount_z_m(unit="m") = -14.0 "Fixed gimbal world Z position";
   parameter Real servo_tau_s(unit="s") = 0.18 "Command response time";
   parameter Real max_pan_rate_rad_s(unit="rad/s") = 1.047197551196598 "Pan speed limit";
   parameter Real max_tilt_rate_rad_s(unit="rad/s") = 1.047197551196598 "Tilt speed limit";
-  parameter Real initial_pan_rad(unit="rad") = 0.7853981633974483;
-  parameter Real initial_tilt_rad(unit="rad") = 1.1937604386677048;
+  parameter Real initial_pan_rad(unit="rad") = 2.863292994584682;
+  parameter Real initial_tilt_rad(unit="rad") = -0.941517346897319;
 
   output Real pan_angle_rad(unit="rad", start=initial_pan_rad, fixed=true);
   output Real tilt_angle_rad(unit="rad", start=initial_tilt_rad, fixed=true);

@@ -26,6 +26,7 @@ fn simulation_dependencies(me, ctx) {
     let attitude_propulsion = find_path(LANDER + "/AttitudePropulsion");
     let attitude_actuation = find_path(LANDER + "/AttitudeActuation");
     let rover = find_path(ROVER);
+    let tracking_camera_controller = find_path("/Griffin1SurfaceOps/TrackingCameraStation/Controller");
     let lander_environment = find_path(LANDER + "/Environment");
     let altimeter = find_path(LANDER + "/Altimeter");
     // Bootstrap identities are literal until the required SysML analysis is ready.
@@ -64,7 +65,8 @@ fn simulation_dependencies(me, ctx) {
         entity_reads.push(find_path(ROVER+"/Suspension_"+station+"/Wheel_"+station));
     }
     let modelica_entities = [lander, gnc, propulsion, altimeter_model, imu,
-        attitude_reference, attitude_propulsion, attitude_actuation, rover];
+        attitude_reference, attitude_propulsion, attitude_actuation, rover,
+        tracking_camera_controller];
     for joint in ramp_joints {
         entity_reads.push(joint);
         entity_writes.push(joint);
@@ -1056,9 +1058,9 @@ fn compact_landing_task() {
             let prepare=get_twin_setting("mission.prepare_surface_route");
             if prepare!=true && prepare!=false {throw "mission.prepare_surface_route must be an authored boolean";}
             if prepare {
-                this.surface_route_frame=griffin_surface_ops::landed_surface_route_frame();
-                let shown=griffin_surface_ops::present_surface_route(this.surface_route_frame);
-                if shown==() || shown.ok!=true {throw("Landed compact-ramp markers could not follow their actual frame");}
+                let frame=griffin_surface_ops::landed_surface_route_frame();
+                let updated=griffin_surface_ops::present_surface_route(frame);
+                if updated==() || updated.ok!=true {throw("Landed route data could not follow the actual ramp frame");}
             }
             griffin_controls::show_hint("TOUCHDOWN: compact tracks installed. F or DETACH ROVER releases FLIP for manual control; no tether restraint is active.");
             emit("griffin_compact_egress_held");true
