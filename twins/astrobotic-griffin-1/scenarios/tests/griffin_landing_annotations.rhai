@@ -6,8 +6,7 @@ const TARGET = ROOT + "/LandingTarget";
 const PAD = ROOT + "/LandingPad";
 
 fn simulation_dependencies(me, ctx) {
-    let reads = [find_path(TARGET), find_path(PAD+"/TopPlate"),
-        find_path(PAD+"/SurfaceDecal"), find_path(ROOT+"/Lander")];
+    let reads = [find_path(TARGET), find_path(ROOT+"/Lander")];
     if ctx.landed==true && ctx.headless!=true {
         let ramp = if griffin_compact_egress::enabled() {"CompactEgress"} else {"EgressRampPort"};
         reads.push(find_path(ROOT+"/Lander/"+ramp));
@@ -57,9 +56,6 @@ fn on_tick(me, ctx) {
         if result.ok!=true {throw "Landed route presentation failed: "+result;}
         this.presented=true;return;
     }
-    let top=query("QueryUsdPrim",#{path:PAD+"/TopPlate",attrs:["physics:collisionEnabled"]});
-    let decal=query("QueryUsdPrim",#{path:PAD+"/SurfaceDecal",attrs:["physics:collisionEnabled"]});
-    if top==() || decal==() {return;}
     if this.attached_entry {
         let entry_id=find_path(ROOT+"/Lander/CompactEgress/RouteEntryAnnotation");
         if entry_id<0 {return;}
@@ -71,9 +67,8 @@ fn on_tick(me, ctx) {
     }
     this.done=true;
     let checks=[];
-    checks.push(t_true(top.attrs["physics:collisionEnabled"]==false
-        && decal.attrs["physics:collisionEnabled"]==false,
-        "landing pad presentation leaves contact to the terrain"));
+    checks.push(t_true(find_path(PAD)<0,
+        "operations scene leaves the lunar landing surface unobstructed"));
     let mark=query("QueryUsdPrim",#{path:TARGET+"/SurfaceMark",attrs:["visibility"]});
     checks.push(t_true(mark!=() && mark.attrs.visibility=="invisible",
         "the replaced guidance mark stays hidden"));
@@ -105,10 +100,5 @@ fn on_tick(me, ctx) {
         #{origin:vec3(1.0e15,0.0,1.0e15),forward:vec3(1.0,0.0,0.0),lateral:vec3(0.0,0.0,1.0)});}
     catch(error){rejected=true;}
     checks.push(t_true(rejected,"missing terrain cannot fabricate a route support height"));
-    let decal_pos=world_pos3(find_path(PAD+"/SurfaceDecal"));
-    let decal_ground=terrain_height(decal_pos.x,decal_pos.z);
-    checks.push(t_true(decal_ground!=() && decal_pos.y>decal_ground
-        && decal_pos.y-decal_ground<0.1,
-        "landing decal remains just above the terrain"));
     report_verdict(checks,"GRIFFIN LANDING ANNOTATIONS","GRIFFIN_LANDING_ANNOTATIONS");
 }

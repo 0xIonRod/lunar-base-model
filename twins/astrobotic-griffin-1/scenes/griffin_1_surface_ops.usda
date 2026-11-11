@@ -572,14 +572,6 @@ def Xform "Griffin1SurfaceOps" (
         {
         }
     }
-    def Xform "LandingPad" (
-        prepend references = @twin://astrobotic-griffin-1/props/griffin_landing_pad.usda@</GriffinLandingPad>
-        doc = "Presentation-only landing pad; the terrain and LandingTarget remain the contact and guidance authorities."
-    )
-    {
-        double3 xformOp:translate = (0.0, -0.44, 0.0)
-        uniform token[] xformOpOrder = ["xformOp:translate"]
-    }
     def Scope "Scenario"
     {
         custom string lunco:scenario = "griffin-1-surface-ops"
