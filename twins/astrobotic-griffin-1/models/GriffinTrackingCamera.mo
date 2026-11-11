@@ -40,9 +40,9 @@ equation
                         cos(pan_command_rad - pan_angle_rad));
   tilt_error_rad = tilt_command_rad - tilt_angle_rad;
 
-  der(pan_angle_rad) = max(-max_pan_rate_rad_s,
-                           min(max_pan_rate_rad_s, pan_error_rad / servo_tau_s));
-  der(tilt_angle_rad) = max(-max_tilt_rate_rad_s,
-                            min(max_tilt_rate_rad_s, tilt_error_rad / servo_tau_s));
-  tracking_valid = if target_range_m > 0.001 then 1.0 else 0.0;
+  der(pan_angle_rad) = noEvent(max(-max_pan_rate_rad_s,
+                                   min(max_pan_rate_rad_s, pan_error_rad / servo_tau_s)));
+  der(tilt_angle_rad) = noEvent(max(-max_tilt_rate_rad_s,
+                                    min(max_tilt_rate_rad_s, tilt_error_rad / servo_tau_s)));
+  tracking_valid = noEvent(if target_range_m > 0.001 then 1.0 else 0.0);
 end GriffinTrackingCamera;

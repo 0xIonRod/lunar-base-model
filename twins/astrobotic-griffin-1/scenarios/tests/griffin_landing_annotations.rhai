@@ -3,10 +3,11 @@
 const TEST_KIND = "graphics";
 const ROOT = "/Griffin1SurfaceOps";
 const TARGET = ROOT + "/LandingTarget";
-const CURVE = TARGET + "/SurfaceMark/Geometry";
+const PAD = ROOT + "/LandingPad";
 
 fn simulation_dependencies(me, ctx) {
-    let reads = [find_path(TARGET), find_path(CURVE), find_path(ROOT+"/Lander")];
+    let reads = [find_path(TARGET), find_path(PAD+"/TopPlate"),
+        find_path(PAD+"/SurfaceDecal"), find_path(ROOT+"/Lander")];
     if ctx.landed==true && ctx.headless!=true {
         let ramp = if griffin_compact_egress::enabled() {"CompactEgress"} else {"EgressRampPort"};
         reads.push(find_path(ROOT+"/Lander/"+ramp));
@@ -16,13 +17,13 @@ fn simulation_dependencies(me, ctx) {
         reads.push(find_path(ROOT + "/" + name));
     }
     #{modelica_entities: [], entity_reads: reads, entity_writes: [],
-      query_reads: ["QueryUsdPrim", "TerrainHeight", "InspectUsdCurveView",
+      query_reads: ["QueryUsdPrim", "TerrainHeight",
         "AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract", "ScriptInspect", "GetReadiness", "SceneCameraAudit"],
       required_inputs: [#{owner:"sysml.twin-analysis",identity:twin_name()}]}
 }
 
 fn on_start(me, ctx) {
-    subscribe("landing_annotation_ready");this.done=false; this.ticks=0;this.entry_local=();
+    this.done=false;this.ticks=0;this.entry_local=();
     this.landed=ctx.landed==true;this.presented=false;
     this.attached_entry=this.landed && griffin_compact_egress::enabled();
     this.headless=ctx.headless==true;
@@ -56,14 +57,9 @@ fn on_tick(me, ctx) {
         if result.ok!=true {throw "Landed route presentation failed: "+result;}
         this.presented=true;return;
     }
-    let target=query("QueryUsdPrim",#{path:TARGET,attrs:["xformOp:translate"]});
-    let curve=find_path(CURVE);
-    if target==() || target.doc_id==() || curve<0 {return;}
-    let view=query("InspectUsdCurveView",#{doc_id:target.doc_id,entity_id:curve});
-    if view==() || view.state=="pending" {
-        if this.ticks>1800 {this.done=true;report_verdict(["landing annotation publication timed out"],"GRIFFIN LANDING ANNOTATIONS","GRIFFIN_LANDING_ANNOTATIONS");}
-        return;
-    }
+    let top=query("QueryUsdPrim",#{path:PAD+"/TopPlate",attrs:["physics:collisionEnabled"]});
+    let decal=query("QueryUsdPrim",#{path:PAD+"/SurfaceDecal",attrs:["physics:collisionEnabled"]});
+    if top==() || decal==() {return;}
     if this.attached_entry {
         let entry_id=find_path(ROOT+"/Lander/CompactEgress/RouteEntryAnnotation");
         if entry_id<0 {return;}
@@ -75,12 +71,12 @@ fn on_tick(me, ctx) {
     }
     this.done=true;
     let checks=[];
-    checks.push(t_true(view.state=="ready" && view.projection=="terrain_surface"
-        && view.applied_revision==view.requested_revision
-        && view.result_segment_count==64 && view.displayed_surface_binding_count>0,
-        "landing footprint publishes on the terrain surface"));
-    checks.push(t_true(view.local_visibility=="hidden",
-        "no independent landing mesh intersects the terrain"));
+    checks.push(t_true(top.attrs["physics:collisionEnabled"]==false
+        && decal.attrs["physics:collisionEnabled"]==false,
+        "landing pad presentation leaves contact to the terrain"));
+    let mark=query("QueryUsdPrim",#{path:TARGET+"/SurfaceMark",attrs:["visibility"]});
+    checks.push(t_true(mark!=() && mark.attrs.visibility=="invisible",
+        "the replaced guidance mark stays hidden"));
     let pose=world_pos3(find_path(TARGET));let ground=terrain_height(pose.x,pose.z);
     checks.push(t_true(abs(pose.y-ground-griffin_spec::_sysml_attribute("landingVehicleReferenceTouchdownY"))<0.001,
         "surface presentation preserves the navigation touchdown reference"));
@@ -109,12 +105,10 @@ fn on_tick(me, ctx) {
         #{origin:vec3(1.0e15,0.0,1.0e15),forward:vec3(1.0,0.0,0.0),lateral:vec3(0.0,0.0,1.0)});}
     catch(error){rejected=true;}
     checks.push(t_true(rejected,"missing terrain cannot fabricate a route support height"));
-    let invalid=cmd("UpdateUsdCurveView",#{doc_id:target.doc_id,
-        root_entity_id:find_path(TARGET+"/SurfaceMark"),curve_entity_id:curve,
-        points:[[0.0,0.0,0.0],[1.0,0.0,0.0]],width_m:-1.0});
-    let after=query("InspectUsdCurveView",#{doc_id:target.doc_id,entity_id:curve});
-    checks.push(t_true(invalid.ok==false && after.requested_revision==view.requested_revision
-        && after.surface_texture==view.surface_texture,
-        "invalid footprint width rejects without replacing the displayed surface"));
+    let decal_pos=world_pos3(find_path(PAD+"/SurfaceDecal"));
+    let decal_ground=terrain_height(decal_pos.x,decal_pos.z);
+    checks.push(t_true(decal_ground!=() && decal_pos.y>decal_ground
+        && decal_pos.y-decal_ground<0.1,
+        "landing decal remains just above the terrain"));
     report_verdict(checks,"GRIFFIN LANDING ANNOTATIONS","GRIFFIN_LANDING_ANNOTATIONS");
 }

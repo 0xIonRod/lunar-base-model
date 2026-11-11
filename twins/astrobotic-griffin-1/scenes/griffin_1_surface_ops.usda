@@ -66,7 +66,6 @@ def Xform "Griffin1SurfaceOps" (
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom rel lunco:tracking:trackedObject = </Griffin1SurfaceOps/Lander>
         custom string lunco:tracking:role = "remote landing and surface-operations observer"
-
         def Cylinder "MastColumn"
         {
             uniform token axis = "Y"
@@ -74,7 +73,7 @@ def Xform "Griffin1SurfaceOps" (
             double height = 9.72
             double3 xformOp:translate = (0.0, 4.86, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.32, 0.35, 0.38)]
+            color3f[] primvars:displayColor = [(0.3199999928474426, 0.3499999940395355, 0.3799999952316284)]
         }
         def Cylinder "MastFoot"
         {
@@ -83,27 +82,26 @@ def Xform "Griffin1SurfaceOps" (
             double height = 0.28
             double3 xformOp:translate = (0.0, 0.14, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.16, 0.18, 0.20)]
+            color3f[] primvars:displayColor = [(0.1599999964237213, 0.18000000715255737, 0.20000000298023224)]
         }
         def Cylinder "MastCollarLower"
         {
             uniform token axis = "Y"
-            double radius = 0.20
-            double height = 0.10
+            double radius = 0.2
+            double height = 0.1
             double3 xformOp:translate = (0.0, 2.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.68, 0.49, 0.19)]
+            color3f[] primvars:displayColor = [(0.6800000071525574, 0.49000000953674316, 0.1899999976158142)]
         }
         def Cylinder "MastCollarUpper"
         {
             uniform token axis = "Y"
-            double radius = 0.20
-            double height = 0.10
+            double radius = 0.2
+            double height = 0.1
             double3 xformOp:translate = (0.0, 8.0, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate"]
-            color3f[] primvars:displayColor = [(0.68, 0.49, 0.19)]
+            color3f[] primvars:displayColor = [(0.6800000071525574, 0.49000000953674316, 0.1899999976158142)]
         }
-
         def Xform "GimbalBase" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI"]
         )
@@ -118,7 +116,7 @@ def Xform "Griffin1SurfaceOps" (
                 double3 xformOp:translate = (0.0, -0.13, 0.0)
                 double3 xformOp:scale = (0.34, 0.12, 0.34)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                color3f[] primvars:displayColor = [(0.19, 0.22, 0.25)]
+                color3f[] primvars:displayColor = [(0.1899999976158142, 0.2199999988079071, 0.25)]
             }
             def Cylinder "PanBearing"
             {
@@ -127,7 +125,7 @@ def Xform "Griffin1SurfaceOps" (
                 double height = 0.12
                 double3 xformOp:translate = (0.0, 0.0, 0.0)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.77, 0.57, 0.22)]
+                color3f[] primvars:displayColor = [(0.7699999809265137, 0.5699999928474426, 0.2199999988079071)]
             }
         }
         def Xform "PanYoke" (
@@ -135,19 +133,19 @@ def Xform "Griffin1SurfaceOps" (
         )
         {
             custom double3 xformOp:translate = (0.0, 10.0, 0.0)
-            quatf xformOp:orient = (0.9238795325, 0.0, 0.3826834324, 0.0)
+            quatf xformOp:orient = (0.9238795042037964, 0.0, 0.3826834261417389, 0.0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
             bool physics:rigidBodyEnabled = true
-            float physics:mass = 1.8
+            float physics:mass = 1.7999999523162842
             point3f physics:centerOfMass = (0.0, 0.0, 0.0)
-            float3 physics:diagonalInertia = (0.08, 0.10, 0.08)
+            float3 physics:diagonalInertia = (0.07999999821186066, 0.10000000149011612, 0.07999999821186066)
             def Cube "YokeBridge"
             {
                 double size = 1.0
-                double3 xformOp:translate = (0.0, 0.20, 0.05)
+                double3 xformOp:translate = (0.0, 0.2, 0.05)
                 double3 xformOp:scale = (0.36, 0.055, 0.08)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                color3f[] primvars:displayColor = [(0.25, 0.28, 0.31)]
+                color3f[] primvars:displayColor = [(0.25, 0.2800000011920929, 0.3100000023841858)]
             }
             def Cube "YokeArmLeft"
             {
@@ -155,7 +153,7 @@ def Xform "Griffin1SurfaceOps" (
                 double3 xformOp:translate = (-0.29, -0.02, 0.06)
                 double3 xformOp:scale = (0.055, 0.28, 0.07)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                color3f[] primvars:displayColor = [(0.25, 0.28, 0.31)]
+                color3f[] primvars:displayColor = [(0.25, 0.2800000011920929, 0.3100000023841858)]
             }
             def Cube "YokeArmRight"
             {
@@ -163,7 +161,7 @@ def Xform "Griffin1SurfaceOps" (
                 double3 xformOp:translate = (0.29, -0.02, 0.06)
                 double3 xformOp:scale = (0.055, 0.28, 0.07)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                color3f[] primvars:displayColor = [(0.25, 0.28, 0.31)]
+                color3f[] primvars:displayColor = [(0.25, 0.2800000011920929, 0.3100000023841858)]
             }
         }
         def Xform "TiltHead" (
@@ -171,19 +169,19 @@ def Xform "Griffin1SurfaceOps" (
         )
         {
             custom double3 xformOp:translate = (0.0, 10.0, 0.0)
-            quatf xformOp:orient = (0.7641344385, 0.5192802235, 0.3165148479, -0.2150929112)
+            quatf xformOp:orient = (0.7641344666481018, 0.519280195236206, 0.31651484966278076, -0.21509291231632233)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
             bool physics:rigidBodyEnabled = true
-            float physics:mass = 1.2
+            float physics:mass = 1.2000000476837158
             point3f physics:centerOfMass = (0.0, 0.0, 0.0)
-            float3 physics:diagonalInertia = (0.035, 0.045, 0.035)
+            float3 physics:diagonalInertia = (0.03500000014901161, 0.04500000178813934, 0.03500000014901161)
             def Cube "CameraHousing"
             {
                 double size = 1.0
                 double3 xformOp:translate = (0.0, 0.08, -0.12)
                 double3 xformOp:scale = (0.23, 0.17, 0.24)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
-                color3f[] primvars:displayColor = [(0.12, 0.15, 0.18)]
+                color3f[] primvars:displayColor = [(0.11999999731779099, 0.15000000596046448, 0.18000000715255737)]
             }
             def Cylinder "LensBarrel"
             {
@@ -192,7 +190,7 @@ def Xform "Griffin1SurfaceOps" (
                 double height = 0.13
                 double3 xformOp:translate = (0.0, 0.08, -0.31)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.08, 0.10, 0.13)]
+                color3f[] primvars:displayColor = [(0.07999999821186066, 0.10000000149011612, 0.12999999523162842)]
             }
             def Cylinder "LensGlass"
             {
@@ -201,7 +199,7 @@ def Xform "Griffin1SurfaceOps" (
                 double height = 0.012
                 double3 xformOp:translate = (0.0, 0.08, -0.382)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
-                color3f[] primvars:displayColor = [(0.13, 0.31, 0.43)]
+                color3f[] primvars:displayColor = [(0.12999999523162842, 0.3100000023841858, 0.4300000071525574)]
             }
             def Camera "GriffinTrackingCamera" (
                 prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
@@ -212,7 +210,7 @@ def Xform "Griffin1SurfaceOps" (
                 float focalLength = 28.0
                 float horizontalAperture = 36.0
                 float verticalAperture = 20.25
-                float2 clippingRange = (0.1, 100000.0)
+                float2 clippingRange = (0.10000000149011612, 100000.0)
                 double3 xformOp:translate = (0.0, 0.08, -0.39)
                 uniform token[] xformOpOrder = ["xformOp:translate"]
                 custom string documentation = "Two-axis Modelica-tracked observer view, framed from the fixed scene mast above the landing area. The camera station is presentation infrastructure, not Griffin flight equipment."
@@ -259,7 +257,7 @@ def Xform "Griffin1SurfaceOps" (
             float drive:angular:physics:maxForce = 20.0
             float drive:angular:physics:stiffness = 35.0
             float drive:angular:physics:damping = 4.0
-            float drive:angular:physics:targetPosition = 68.4
+            float drive:angular:physics:targetPosition = 68.4000015258789
             float drive:angular:physics:targetVelocity = 0.0
             double inputs:angle = 1.1937604386677048
             double inputs:angle.connect = </Griffin1SurfaceOps/TrackingCameraStation/Controller.outputs:tilt_angle_rad>
@@ -579,7 +577,7 @@ def Xform "Griffin1SurfaceOps" (
         doc = "Presentation-only landing pad; the terrain and LandingTarget remain the contact and guidance authorities."
     )
     {
-        double3 xformOp:translate = (0.0, -0.6187641942501068, 0.0)
+        double3 xformOp:translate = (0.0, -0.44, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
     def Scope "Scenario"
