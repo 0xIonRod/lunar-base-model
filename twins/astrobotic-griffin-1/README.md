@@ -73,6 +73,30 @@ drivetrain/tire thermal networks, route control and the vessel HUD are connected
 The original `vehicles/flip.usda` remains the source of the shared thermal
 subassembly and the older proxy requirement fixtures.
 
+Mounted viewport cameras can be selected from the Camera menu. Griffin's
+`LandingContextCamera` looks down and forward over the landing terrain, while
+`DeckEgressCamera` frames FLIP and the compact egress side. FLIP's
+`ForwardDriveCamera` shows the terrain ahead; `RearEgressCamera` looks back
+toward Griffin during departure; FLIP's `WheelContactCamera` shows the front
+wheel and nearby terrain while driving. For landing and release close-ups,
+Griffin also has an `UnderbellyOperationsCamera` and a dedicated camera for
+each footpad: `LegPXCamera`, `LegNXCamera`, `LegPZCamera`, and `LegNZCamera`.
+`PayloadReleaseCamera` watches the FLIP adapter. The existing mast views remain
+available. These added poses are visual study estimates, not claimed
+flight-camera mount or boresight coordinates. Griffin's landing views follow
+the documented roles of its terrain-relative navigation camera and
+hazard-detection lidar, alongside ESA's LandCam-X landing camera; public
+sources do not define the viewport transforms used here ([NASA](https://www.nasa.gov/stmd-flight-opportunities/transitions-of-flight-tested-technologies/hazard-detection-lidar-system-goes-to-the-moon/), [ESA](https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/LandCam-X_a_lunar_landing_camera)).
+
+The surface-operations scene opens on `GriffinTrackingCamera`, a 28 mm
+pan/tilt observer mounted on a fixed 10 m scene mast. Its Modelica controller
+reads Griffin's live world-position ports through explicit USD connections,
+then drives the two physical revolute joints with rate-limited commands. The
+gimbal, camera and mast are presentation infrastructure; the `.mo` controller
+is authored in this Twin and uses the simulator's compiled Modelica artifact
+cache. The camera remains available in the Camera menu alongside the freeflight
+avatar and vehicle-mounted views.
+
 Open `scenes/flip_cad_drive.usda` for interactive driving without an automatic
 test taking control. Its avatar starts at `(8, 5, 10)` in the terrain frame,
 aimed at the rover. See the [CAD acceptance receipt](contracts/flip-cad-runtime-2026-10-26.md)

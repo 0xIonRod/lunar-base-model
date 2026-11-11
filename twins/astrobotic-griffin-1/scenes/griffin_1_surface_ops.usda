@@ -55,7 +55,240 @@ def Xform "Griffin1SurfaceOps" (
     {
         token lunco:activeCamera
         token lunco:activeCamera.timeSamples = {
-            0.0: "Avatar",
+            0.0: "GriffinTrackingCamera",
+        }
+    }
+    def Xform "TrackingCameraStation" (
+        doc = "Static scene observer station with a Modelica-controlled pan/tilt camera; presentation infrastructure, not Griffin flight hardware."
+    )
+    {
+        custom double3 xformOp:translate = (14.0, 0.0, 14.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        custom rel lunco:tracking:trackedObject = </Griffin1SurfaceOps/Lander>
+        custom string lunco:tracking:role = "remote landing and surface-operations observer"
+
+        def Cylinder "MastColumn"
+        {
+            uniform token axis = "Y"
+            double radius = 0.12
+            double height = 9.72
+            double3 xformOp:translate = (0.0, 4.86, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.32, 0.35, 0.38)]
+        }
+        def Cylinder "MastFoot"
+        {
+            uniform token axis = "Y"
+            double radius = 0.48
+            double height = 0.28
+            double3 xformOp:translate = (0.0, 0.14, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.16, 0.18, 0.20)]
+        }
+        def Cylinder "MastCollarLower"
+        {
+            uniform token axis = "Y"
+            double radius = 0.20
+            double height = 0.10
+            double3 xformOp:translate = (0.0, 2.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.68, 0.49, 0.19)]
+        }
+        def Cylinder "MastCollarUpper"
+        {
+            uniform token axis = "Y"
+            double radius = 0.20
+            double height = 0.10
+            double3 xformOp:translate = (0.0, 8.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            color3f[] primvars:displayColor = [(0.68, 0.49, 0.19)]
+        }
+
+        def Xform "GimbalBase" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 10.0, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            bool physics:rigidBodyEnabled = true
+            bool physics:kinematicEnabled = true
+            def Cube "BearingHousing"
+            {
+                double size = 1.0
+                double3 xformOp:translate = (0.0, -0.13, 0.0)
+                double3 xformOp:scale = (0.34, 0.12, 0.34)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                color3f[] primvars:displayColor = [(0.19, 0.22, 0.25)]
+            }
+            def Cylinder "PanBearing"
+            {
+                uniform token axis = "Y"
+                double radius = 0.16
+                double height = 0.12
+                double3 xformOp:translate = (0.0, 0.0, 0.0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+                color3f[] primvars:displayColor = [(0.77, 0.57, 0.22)]
+            }
+        }
+        def Xform "PanYoke" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 10.0, 0.0)
+            quatf xformOp:orient = (0.9238795325, 0.0, 0.3826834324, 0.0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+            bool physics:rigidBodyEnabled = true
+            float physics:mass = 1.8
+            point3f physics:centerOfMass = (0.0, 0.0, 0.0)
+            float3 physics:diagonalInertia = (0.08, 0.10, 0.08)
+            def Cube "YokeBridge"
+            {
+                double size = 1.0
+                double3 xformOp:translate = (0.0, 0.20, 0.05)
+                double3 xformOp:scale = (0.36, 0.055, 0.08)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                color3f[] primvars:displayColor = [(0.25, 0.28, 0.31)]
+            }
+            def Cube "YokeArmLeft"
+            {
+                double size = 1.0
+                double3 xformOp:translate = (-0.29, -0.02, 0.06)
+                double3 xformOp:scale = (0.055, 0.28, 0.07)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                color3f[] primvars:displayColor = [(0.25, 0.28, 0.31)]
+            }
+            def Cube "YokeArmRight"
+            {
+                double size = 1.0
+                double3 xformOp:translate = (0.29, -0.02, 0.06)
+                double3 xformOp:scale = (0.055, 0.28, 0.07)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                color3f[] primvars:displayColor = [(0.25, 0.28, 0.31)]
+            }
+        }
+        def Xform "TiltHead" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom double3 xformOp:translate = (0.0, 10.0, 0.0)
+            quatf xformOp:orient = (0.7641344385, 0.5192802235, 0.3165148479, -0.2150929112)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+            bool physics:rigidBodyEnabled = true
+            float physics:mass = 1.2
+            point3f physics:centerOfMass = (0.0, 0.0, 0.0)
+            float3 physics:diagonalInertia = (0.035, 0.045, 0.035)
+            def Cube "CameraHousing"
+            {
+                double size = 1.0
+                double3 xformOp:translate = (0.0, 0.08, -0.12)
+                double3 xformOp:scale = (0.23, 0.17, 0.24)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                color3f[] primvars:displayColor = [(0.12, 0.15, 0.18)]
+            }
+            def Cylinder "LensBarrel"
+            {
+                uniform token axis = "Z"
+                double radius = 0.12
+                double height = 0.13
+                double3 xformOp:translate = (0.0, 0.08, -0.31)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+                color3f[] primvars:displayColor = [(0.08, 0.10, 0.13)]
+            }
+            def Cylinder "LensGlass"
+            {
+                uniform token axis = "Z"
+                double radius = 0.084
+                double height = 0.012
+                double3 xformOp:translate = (0.0, 0.08, -0.382)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+                color3f[] primvars:displayColor = [(0.13, 0.31, 0.43)]
+            }
+            def Camera "GriffinTrackingCamera" (
+                prepend references = @lunco://components/cameras/lunar_surface_camera.usda@</LunarSurfaceCamera>
+            )
+            {
+                uniform token lunco:cameraRole = "viewport"
+                uniform token lunco:cameraPose = "authored"
+                float focalLength = 28.0
+                float horizontalAperture = 36.0
+                float verticalAperture = 20.25
+                float2 clippingRange = (0.1, 100000.0)
+                double3 xformOp:translate = (0.0, 0.08, -0.39)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+                custom string documentation = "Two-axis Modelica-tracked observer view, framed from the fixed scene mast above the landing area. The camera station is presentation infrastructure, not Griffin flight equipment."
+            }
+        }
+        def PhysicsRevoluteJoint "CameraPanJoint" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        )
+        {
+            rel physics:body0 = </Griffin1SurfaceOps/TrackingCameraStation/GimbalBase>
+            rel physics:body1 = </Griffin1SurfaceOps/TrackingCameraStation/PanYoke>
+            uniform token physics:axis = "Y"
+            point3f physics:localPos0 = (0.0, 0.0, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+            quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+            quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+            float physics:lowerLimit = -170.0
+            float physics:upperLimit = 170.0
+            bool physics:collisionEnabled = false
+            token drive:angular:physics:type = "force"
+            float drive:angular:physics:maxForce = 30.0
+            float drive:angular:physics:stiffness = 45.0
+            float drive:angular:physics:damping = 5.0
+            float drive:angular:physics:targetPosition = 45.0
+            float drive:angular:physics:targetVelocity = 0.0
+            double inputs:angle = 0.7853981633974483
+            double inputs:angle.connect = </Griffin1SurfaceOps/TrackingCameraStation/Controller.outputs:pan_angle_rad>
+        }
+        def PhysicsRevoluteJoint "CameraTiltJoint" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        )
+        {
+            rel physics:body0 = </Griffin1SurfaceOps/TrackingCameraStation/PanYoke>
+            rel physics:body1 = </Griffin1SurfaceOps/TrackingCameraStation/TiltHead>
+            uniform token physics:axis = "X"
+            point3f physics:localPos0 = (0.0, 0.0, 0.0)
+            point3f physics:localPos1 = (0.0, 0.0, 0.0)
+            quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
+            quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+            float physics:lowerLimit = -85.0
+            float physics:upperLimit = 85.0
+            bool physics:collisionEnabled = false
+            token drive:angular:physics:type = "force"
+            float drive:angular:physics:maxForce = 20.0
+            float drive:angular:physics:stiffness = 35.0
+            float drive:angular:physics:damping = 4.0
+            float drive:angular:physics:targetPosition = 68.4
+            float drive:angular:physics:targetVelocity = 0.0
+            double inputs:angle = 1.1937604386677048
+            double inputs:angle.connect = </Griffin1SurfaceOps/TrackingCameraStation/Controller.outputs:tilt_angle_rad>
+        }
+        def Scope "Controller" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/models/GriffinTrackingCamera.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            double parameters:mount_x_m = 14.0
+            double parameters:mount_y_m = 10.0
+            double parameters:mount_z_m = 14.0
+            double parameters:servo_tau_s = 0.18
+            double parameters:max_pan_rate_rad_s = 1.047197551196598
+            double parameters:max_tilt_rate_rad_s = 1.047197551196598
+            double parameters:initial_pan_rad = 0.7853981633974483
+            double parameters:initial_tilt_rad = 1.1937604386677048
+            double inputs:target_x_m
+            double inputs:target_x_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_x>
+            double inputs:target_y_m
+            double inputs:target_y_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_y>
+            double inputs:target_z_m
+            double inputs:target_z_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_z>
+            double outputs:pan_angle_rad = 0.7853981633974483
+            double outputs:tilt_angle_rad = 1.1937604386677048
+            double outputs:target_range_m = 53.777
+            double outputs:tracking_valid = 1.0
         }
     }
     def "Lander" (
