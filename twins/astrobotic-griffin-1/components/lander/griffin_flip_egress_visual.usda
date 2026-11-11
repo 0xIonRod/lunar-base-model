@@ -673,4 +673,24 @@ def Xform "World"
             token visibility = "invisible"
         }
     }
+    def Xform "RouteEntryAnnotation" (
+        prepend references = @lunco://markers/route_point.usda@</RoutePoint>
+    )
+    {
+        custom double3 xformOp:translate = (-1.95, 2.17, 0.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        string lunco:billboard:text = "Ramp entry"
+        float lunco:billboard:offsetY = 0.800000011920929
+        float lunco:billboard:fadeEnd = 150.0
+        over "Trigger" (
+            active = false
+        )
+        {
+        }
+        over "Dome" (
+            active = false
+        )
+        {
+        }
+    }
 }

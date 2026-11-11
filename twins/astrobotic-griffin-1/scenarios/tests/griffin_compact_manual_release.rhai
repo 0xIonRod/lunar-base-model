@@ -62,7 +62,11 @@ fn on_tick(me,ctx) {
     let toward_ramp=vdot(vsub(world_pos(rover),this.drive_start),vec3_array(ramp_direction));
     if toward_ramp<0.05 {failures.push("Forward departure did not move toward the actual ramp instance");}
     let route_frame=griffin_surface_ops::landed_surface_route_frame();
-    let marker_delta=world_pos3(find_path(ROOT+"/RoverRampApproach"))-world_pos3(lander);
+    let deck_y=griffin_spec::visual_payload_adapter_center_y_m()
+        +griffin_spec::visual_payload_adapter_thickness_m()/2.0
+        +griffin_spec::_sysml_attribute("surfaceRouteMarkerClearanceM");
+    let marker_delta=world_pos3(find_path(ROOT+"/Lander/CompactEgress/RouteEntryAnnotation"))-world_pos3(lander)
+        -qrot(world_rotation_quat(lander),vec3(0.0,deck_y,0.0));
     let marker_forward=vdot(marker_delta,route_frame.forward);
     let marker_lateral=abs(vdot(marker_delta,route_frame.lateral));
     if abs(marker_forward-abs(griffin_compact_egress::datum("stationsXM")[1]))>0.01

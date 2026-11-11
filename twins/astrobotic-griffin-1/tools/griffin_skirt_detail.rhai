@@ -2,8 +2,8 @@
 import "griffin_geometry" as geometry;
 import "griffin_spec" as spec;
 import "griffin_tank_finish" as finish;
-import "assembly_builder" as builder;
-import "sysml_requirements" as requirements;
+import "lunco://scripting/tools/assembly_builder" as builder;
+import "lunco://scripting/tools/sysml_requirements" as requirements;
 
 fn required(model, prefix, name) {
     let value=model.value(prefix+name);

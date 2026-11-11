@@ -1479,14 +1479,30 @@ fn surface_route_presentation_plan(frame, entry_on_deck) {
     let record=query("QueryUsdPrim",#{path:"/Griffin1SurfaceOps/"+names[0],attrs:[]});
     if record==() || record.doc_id==(){throw("Route presentation document unavailable");}
     let ops=[];let points=[];
+    let preview_entry="/Griffin1SurfaceOps/"+names[0];
+    let deck_entry="/Griffin1SurfaceOps/Lander/CompactEgress/RouteEntryAnnotation";
+    let attached_entry=entry_on_deck && griffin_compact_egress::enabled();
+    if attached_entry {
+        if find_path(deck_entry)<0 {throw("Deck entry annotation is unavailable");}
+        ops.push(#{SetAttribute:#{edit_target:"@view@",path:preview_entry,name:"visibility",type_name:"token",value:"\"invisible\""}});
+    }
     for i in 0..names.len(){
-        let path="/Griffin1SurfaceOps/"+names[i];
+        let path=if i==0 && attached_entry {deck_entry}else{"/Griffin1SurfaceOps/"+names[i]};
         let point=surface_route_target(vec3(x[i],0.0,z[i]),frame);let terrain=point.y;
         if i==0 && entry_on_deck{point=vec3(point.x,max(terrain,surface_route_entry_height(point)),point.z);}
         point=vec3(point.x,point.y+clearance,point.z);
-        ops.push(#{SetTranslate:#{edit_target:"@view@",path:path,value:vec3_array(point)}});
-        ops.push(#{SetAttribute:#{edit_target:"@view@",path:path,name:"lunco:billboard",type_name:"bool",value:"true"}});
-        points.push(#{path:path,position_m:vec3_array(point),terrain_y_m:terrain,
+        let expected=point;
+        if i==0 && attached_entry {
+            let lander=find_path("/Griffin1SurfaceOps/Lander");
+            let deck_y=griffin_spec::visual_payload_adapter_center_y_m()
+                +griffin_spec::visual_payload_adapter_thickness_m()/2.0+clearance;
+            expected=world_pos3(lander)+qrot(world_rotation_quat(lander),vec3(x[0],deck_y,z[0]));
+            point=world_pos3(find_path(path));
+        } else {
+            ops.push(#{SetTranslate:#{edit_target:"@view@",path:path,value:vec3_array(point)}});
+            ops.push(#{SetAttribute:#{edit_target:"@view@",path:path,name:"lunco:billboard",type_name:"bool",value:"true"}});
+        }
+        points.push(#{path:path,position_m:vec3_array(point),expected_position_m:vec3_array(expected),terrain_y_m:terrain,
             clearance_m:point.y-terrain,surface:if i==0 && entry_on_deck{"payload_deck"}else{"terrain"}});
     }
     #{ok:true,doc_id:record.doc_id,parent_gen:usd_document_generation(record.doc_id),ops:ops,points:points}

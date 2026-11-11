@@ -47,6 +47,10 @@ fn simulation_dependencies(me, ctx) {
         attitude_reference, attitude_propulsion, attitude_actuation, rover,
         lander_environment, altimeter];
     let entity_writes = [rover, gnc];
+    if griffin_compact_egress::enabled() {
+        entity_reads.push(find_path(LANDER+"/CompactEgress"));
+        entity_reads.push(find_path(LANDER+"/CompactEgress/RouteEntryAnnotation"));
+    }
     for name in ["EgressRampPort","EgressRampPortTrackStarboard","EgressRampStarboard","EgressRampStarboardTrackStarboard"] {
         if griffin_compact_egress::enabled() {continue;}
         for suffix in ["","/MiddleSection","/MiddleSection/ToeSection"] {
@@ -1034,6 +1038,9 @@ fn compact_landing_task() {
             this.landing_setup_evidence=landing_setup_preflight();
             this.mission_ready=this.landing_setup_evidence.ok==true;
             this.phase_timeout=!this.mission_ready;
+            if this.mission_ready {
+                this.descent_route_presentation=griffin_surface_ops::present_descent_surface_route();
+            }
             true
         }),
         check(|m| this.mission_ready),

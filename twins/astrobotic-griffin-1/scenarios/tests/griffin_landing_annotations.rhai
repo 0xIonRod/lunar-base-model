@@ -6,8 +6,12 @@ const TARGET = ROOT + "/LandingTarget";
 const CURVE = TARGET + "/SurfaceMark/Geometry";
 
 fn simulation_dependencies(me, ctx) {
-    let reads = [find_path(TARGET), find_path(CURVE), find_path(ROOT+"/Lander"),
-        find_path(ROOT+"/Lander/EgressRampPort")];
+    let reads = [find_path(TARGET), find_path(CURVE), find_path(ROOT+"/Lander")];
+    if ctx.landed==true && ctx.headless!=true {
+        let ramp = if griffin_compact_egress::enabled() {"CompactEgress"} else {"EgressRampPort"};
+        reads.push(find_path(ROOT+"/Lander/"+ramp));
+        if griffin_compact_egress::enabled() {reads.push(find_path(ROOT+"/Lander/CompactEgress/RouteEntryAnnotation"));}
+    }
     for name in ["RoverRampApproach", "RoverRampExit", "RoverTarget1", "RoverTarget2", "BaseSite"] {
         reads.push(find_path(ROOT + "/" + name));
     }
@@ -18,8 +22,9 @@ fn simulation_dependencies(me, ctx) {
 }
 
 fn on_start(me, ctx) {
-    subscribe("landing_annotation_ready");this.done=false; this.ticks=0;
+    subscribe("landing_annotation_ready");this.done=false; this.ticks=0;this.entry_local=();
     this.landed=ctx.landed==true;this.presented=false;
+    this.attached_entry=this.landed && griffin_compact_egress::enabled();
     this.headless=ctx.headless==true;
 }
 
@@ -59,6 +64,15 @@ fn on_tick(me, ctx) {
         if this.ticks>1800 {this.done=true;report_verdict(["landing annotation publication timed out"],"GRIFFIN LANDING ANNOTATIONS","GRIFFIN_LANDING_ANNOTATIONS");}
         return;
     }
+    if this.attached_entry {
+        let entry_id=find_path(ROOT+"/Lander/CompactEgress/RouteEntryAnnotation");
+        if entry_id<0 {return;}
+        let lander=find_path(ROOT+"/Lander");
+        let local=qrot(quat_inverse(world_rotation_quat(lander)),world_pos3(entry_id)-world_pos3(lander));
+        if this.entry_local==() {this.entry_local=local;this.entry_tick=this.ticks;return;}
+        if this.ticks-this.entry_tick<60 {return;}
+        this.entry_local_delta=vlen(local-this.entry_local);
+    }
     this.done=true;
     let checks=[];
     checks.push(t_true(view.state=="ready" && view.projection=="terrain_surface"
@@ -74,17 +88,21 @@ fn on_tick(me, ctx) {
     checks.push(t_true(dome.attrs.visibility=="invisible" && dome.attrs["xformOp:translate"]==(),
         "the footprint template carries no vehicle-height offset"));
     for name in ["RoverRampApproach", "RoverRampExit", "RoverTarget1", "RoverTarget2", "BaseSite"] {
-        let p=world_pos3(find_path(ROOT+"/"+name));let h=terrain_height(p.x,p.z);
-        let marker=query("QueryUsdPrim",#{path:ROOT+"/"+name,attrs:["lunco:billboard:fadeEnd"]});
+        let path=if this.attached_entry && name=="RoverRampApproach" {ROOT+"/Lander/CompactEgress/RouteEntryAnnotation"} else {ROOT+"/"+name};
+        let p=world_pos3(find_path(path));let h=terrain_height(p.x,p.z);
+        let marker=query("QueryUsdPrim",#{path:path,attrs:["lunco:billboard:fadeEnd"]});
         checks.push(t_true(h!=() && p.y-h>=0.049
             && marker.attrs["lunco:billboard:fadeEnd"]==griffin_spec::_sysml_attribute("surfaceRouteMarkerFadeEndM"),
             name+" has surface support and the descent display range"));
     }
     if this.landed {
-        let entry=world_pos3(find_path(ROOT+"/RoverRampApproach"));
-        checks.push(t_true(vlen(entry-vec3_from(this.plan.points[0].position_m))<0.03
+        let entry_path=if this.attached_entry {ROOT+"/Lander/CompactEgress/RouteEntryAnnotation"}else{ROOT+"/RoverRampApproach"};
+        let entry=world_pos3(find_path(entry_path));
+        checks.push(t_true(vlen(entry-vec3_from(this.plan.points[0].expected_position_m))<0.03
             && entry.y-griffin_surface_ops::surface_route_entry_height(entry)>=0.049,
             "landed entry follows the payload deck while other markers follow terrain"));
+        if this.attached_entry {checks.push(t_true(this.entry_local_delta<0.001,
+            "landed entry remains fixed to the moving payload deck"));}
     }
     let rejected=false;
     try {griffin_surface_ops::surface_route_target(vec3(0.0,0.0,0.0),
