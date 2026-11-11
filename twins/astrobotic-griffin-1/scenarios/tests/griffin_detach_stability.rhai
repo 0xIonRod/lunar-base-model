@@ -84,10 +84,13 @@ fn emit_release_verdict() {
     let has_post = post != ();
     // ECS joint counts are bounded by native entity capacity; convert the
     // unsigned API counters explicitly before signed integer arithmetic.
+    // The released FLIP admits custom wheel-stop constraints into Avian's
+    // joint graph. `joints` counts built-in joint types; native_joint_components
+    // is the graph-wide identity count used for the parity check.
     let topology_ok = has_post
         && post.detach_requests == 0
         && post.pending_joints == 0
-        && post.joints == post.joint_graph_edges
+        && post.native_joint_components == post.joint_graph_edges
         && pre != ()
         && post.joints.to_int() + 1 == pre.joints.to_int()
         && post.entities <= pre.entities;
