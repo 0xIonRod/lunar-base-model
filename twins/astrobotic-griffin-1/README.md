@@ -32,6 +32,12 @@ The current FLIP drive also requires the shared `LunCo.Electrical.DCMotor`
 FLIP selects open-circuit idle, while other vehicles retain the default drive.
 See the [ramp shading and release receipt](contracts/griffin-ramp-release-2026-10-28.md).
 
+Autonomous landing requires the shared `Lander.mo` contact-cutoff repair:
+pad-contact engine cutoff has its own bounded angular-rate limit, while final
+four-pad settled handoff retains its stricter limit. The production landing
+passes two fresh 60-second stability trials. See the
+[landing repair and validation](contracts/landing-cutoff-2026-11-12.md).
+
 The [30 October texture pass](contracts/texture-refinement-2026-10-30.md) refines
 the bus/deck metal, tank and skirt blankets, FLIP brushing and solar electrodes.
 It adds no lights or emission. Material identities, appearance assumptions and
