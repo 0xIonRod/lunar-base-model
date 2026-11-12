@@ -75,6 +75,7 @@
             point3f physics:localPos1 = (0.0, 0.0, 0.0)
             quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
             quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+            # The tracking controllers soft-limit at +/-168 degrees (2 degrees inside these stops).
             float physics:lowerLimit = -170.0
             float physics:upperLimit = 170.0
             bool physics:collisionEnabled = false
@@ -98,6 +99,7 @@
             point3f physics:localPos1 = (0.0, 0.0, 0.0)
             quatf physics:localRot0 = (1.0, 0.0, 0.0, 0.0)
             quatf physics:localRot1 = (1.0, 0.0, 0.0, 0.0)
+            # The tracking controllers soft-limit at +/-83 degrees (2 degrees inside these stops).
             float physics:lowerLimit = -85.0
             float physics:upperLimit = 85.0
             bool physics:collisionEnabled = false
