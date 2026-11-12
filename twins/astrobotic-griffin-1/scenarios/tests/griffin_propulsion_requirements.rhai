@@ -583,7 +583,6 @@ fn on_tick(me, ctx) {
     let light_paths = [];
     for path in engine_paths {
         plume_paths.push(path + "/Exhaust/Flame");
-        plume_paths.push(path + "/Exhaust/FlameCore");
         light_paths.push(path + "/Exhaust/PlumeLight");
     }
     let observed_plumes = query("QueryUsdPrims", #{paths: plume_paths,
@@ -630,37 +629,27 @@ fn on_tick(me, ctx) {
             let engine_path = engine_paths[index];
             let engine_record = record_at(observed_engines, engine_path);
             let flame_path = engine_path + "/Exhaust/Flame";
-            let core_path = engine_path + "/Exhaust/FlameCore";
             let flame = record_at(observed_plumes, flame_path);
-            let core = record_at(observed_plumes, core_path);
-            let light = record_at(observed_lights, core_path + "/PlumeLight");
-            let has_pair = flame != () && core != () && light != ();
-            if has_pair { plume_engine_count += 1; }
+            let light = record_at(observed_lights, engine_path + "/Exhaust/PlumeLight");
+            let has_visual = flame != () && light != ();
+            if has_visual { plume_engine_count += 1; }
             let model_source = photometry_paths[index] + ".outputs:";
             plume_connections_match = plume_connections_match
                 && has_single_connection(flame, "inputs:throttle",
                     model_source + "render_throttle")
                 && has_single_connection(flame, "inputs:plume_length_fraction",
                     model_source + "visual_length_fraction")
-                && has_single_connection(core, "inputs:throttle",
-                    model_source + "render_throttle")
-                && has_single_connection(core, "inputs:plume_length_fraction",
-                    model_source + "visual_length_fraction")
                 && has_single_connection(light, "inputs:light_intensity",
                     model_source + "intensity")
                 && has_single_connection(light, "inputs:light_radius",
                     model_source + "radius");
-            if has_pair {
+            if has_visual {
                 plume_materials_match = plume_materials_match
                     && has_single_relationship_target(flame, "material:binding",
-                        engine_path + "/Exhaust/Looks/Flame_Mat")
-                    && has_single_relationship_target(core, "material:binding",
-                        engine_path + "/Exhaust/Looks/FlameCore_Mat");
+                        engine_path + "/Exhaust/Looks/Flame_Mat");
                 plume_geometry_is_render_only = plume_geometry_is_render_only
                     && flame.attrs["purpose"] == "render"
-                    && flame.attrs["physics:collisionEnabled"] == false
-                    && core.attrs["purpose"] == "render"
-                    && core.attrs["physics:collisionEnabled"] == false;
+                    && flame.attrs["physics:collisionEnabled"] == false;
             } else {
                 plume_geometry_is_render_only = false;
             }

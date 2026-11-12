@@ -14,9 +14,14 @@ mobility claim is made. The terrain source is real LROC data, but the selected
 regional center is a reproducible study anchor, not a confirmed touchdown
 coordinate.
 
-The current plume interface requires LunCoSim's conservative propulsion assets
-(engine commit `a446c2659`, also integrated into optimization as `0e927735d`).
-Deploy that shared Modelica library, shader and component set with this Twin.
+The current plume interface requires the coordinated single-volume propulsion
+update in LunCoSim: `plume.wesl`, `plume_field.wesl`, `blackbody_radiance.wesl`,
+the shared engine visual/helper, and the matching Modelica outputs. Deploy that
+asset set with this Twin. Each nozzle has one `Flame`; broad/core emission uses
+`core_fraction`, `core_width` and separate colour pairs in one bounded ray.
+`steps` is the total ray ceiling and `Shader.inputs:seed` is authored per emitter. The removed
+`FlameCore` volume and `core_envelope_radius_m` output are no longer part of the
+interface. See the [update and validation boundary](contracts/plume-render-update-2026-11-12.md).
 An older library reports unresolved `NozzleDesign.gamma_out` or
 `NozzleDesign.exit_lip_angle_rad`; rebuilding Rust alone cannot supply missing
 Modelica assets. Main and RCS plumes share the Modelica gas/energy model and
@@ -81,6 +86,10 @@ toward Griffin during departure; FLIP's `WheelContactCamera` shows the front
 wheel and nearby terrain while driving. For landing and release close-ups,
 Griffin also has an `UnderbellyOperationsCamera` and a dedicated camera for
 each footpad: `LegPXCamera`, `LegNXCamera`, `LegPZCamera`, and `LegNZCamera`.
+These four cameras are fixed to the main body sidewall and look outward/down
+at their corresponding leg. Their root paths are `/Griffin1/Leg*Camera`; they
+do not move with the leg spring bodies. The f/8 exposure supports inspection of
+shadowed hardware. See [mount/framing validation](contracts/body-leg-cameras-2026-11-12.md).
 `PayloadReleaseCamera` watches the FLIP adapter. The existing mast views remain
 available. These added poses are visual study estimates, not claimed
 flight-camera mount or boresight coordinates. Griffin's landing views follow

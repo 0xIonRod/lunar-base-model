@@ -192,10 +192,6 @@ def Xform "Griffin1SurfaceOps" (
                         {
                             token visibility = "invisible"
                         }
-                        over "FlameCore"
-                        {
-                            token visibility = "invisible"
-                        }
                     }
                 }
                 over "Engine02"
@@ -203,10 +199,6 @@ def Xform "Griffin1SurfaceOps" (
                     over "Exhaust"
                     {
                         over "Flame"
-                        {
-                            token visibility = "invisible"
-                        }
-                        over "FlameCore"
                         {
                             token visibility = "invisible"
                         }
@@ -220,10 +212,6 @@ def Xform "Griffin1SurfaceOps" (
                         {
                             token visibility = "invisible"
                         }
-                        over "FlameCore"
-                        {
-                            token visibility = "invisible"
-                        }
                     }
                 }
                 over "Engine04"
@@ -231,10 +219,6 @@ def Xform "Griffin1SurfaceOps" (
                     over "Exhaust"
                     {
                         over "Flame"
-                        {
-                            token visibility = "invisible"
-                        }
-                        over "FlameCore"
                         {
                             token visibility = "invisible"
                         }
@@ -248,10 +232,6 @@ def Xform "Griffin1SurfaceOps" (
                         {
                             token visibility = "invisible"
                         }
-                        over "FlameCore"
-                        {
-                            token visibility = "invisible"
-                        }
                     }
                 }
                 over "Engine06"
@@ -262,10 +242,6 @@ def Xform "Griffin1SurfaceOps" (
                         {
                             token visibility = "invisible"
                         }
-                        over "FlameCore"
-                        {
-                            token visibility = "invisible"
-                        }
                     }
                 }
                 over "Engine07"
@@ -273,10 +249,6 @@ def Xform "Griffin1SurfaceOps" (
                     over "Exhaust"
                     {
                         over "Flame"
-                        {
-                            token visibility = "invisible"
-                        }
-                        over "FlameCore"
                         {
                             token visibility = "invisible"
                         }
