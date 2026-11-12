@@ -51,10 +51,10 @@ def Xform "Griffin1SurfaceOps" (
     }
     def Xform "TrackingCameraStation" (
         prepend references = @twin://astrobotic-griffin-1/components/cameras/object_tracking_camera.usda@</ObjectTrackingCamera>
-        doc = "Ground-level virtual two-axis tracking camera at the marked south-site overlook; no rendered mast or camera body."
+        doc = "Ground-level virtual two-axis tracking camera at the marked south-east landing-site overlook; no rendered mast or camera body."
     )
     {
-        custom double3 xformOp:translate = (11.0, 0.0, 76.0)
+        custom double3 xformOp:translate = (11.0, 0.0, 20.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom rel lunco:tracking:trackedObject = </Griffin1SurfaceOps/Lander>
         custom string lunco:tracking:role = "remote landing and surface-operations observer"
@@ -63,11 +63,11 @@ def Xform "Griffin1SurfaceOps" (
             uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/models/GriffinTrackingCameraGround.mo@
             double parameters:mount_x_m = 11.0
             double parameters:mount_y_m = 2.0
-            double parameters:mount_z_m = 76.0
-            double parameters:initial_pan_rad = 0.14373867314832622
-            double parameters:initial_tilt_rad = 0.6468766758390077
-            double outputs:pan_angle_rad = 0.14373867314832622
-            double outputs:tilt_angle_rad = 0.6468766758390077
+            double parameters:mount_z_m = 20.0
+            double parameters:initial_pan_rad = 0.5028432109278608
+            double parameters:initial_tilt_rad = 1.1958697313651445
+            double outputs:pan_angle_rad = 0.5028432109278608
+            double outputs:tilt_angle_rad = 1.1958697313651445
             double inputs:target_x_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_x>
             double inputs:target_y_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_y>
             double inputs:target_z_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_z>
@@ -79,7 +79,7 @@ def Xform "Griffin1SurfaceOps" (
         over "TiltHead"
         {
             custom double3 xformOp:translate = (0.0, 2.0, 0.0)
-            quatf xformOp:orient = (0.9457005885605204, 0.3170080160447472, 0.06808413704595116, -0.02282246354727147)
+            quatf xformOp:orient = (0.8005145377617765, 0.5452379564652233, 0.2056175749435443, -0.1400480579515918)
             over "GriffinTrackingCamera"
             {
                 custom rel lunco:tracking:trackedObject = </Griffin1SurfaceOps/Lander>
@@ -90,17 +90,17 @@ def Xform "Griffin1SurfaceOps" (
         over "PanYoke"
         {
             custom double3 xformOp:translate = (0.0, 2.0, 0.0)
-            quatf xformOp:orient = (0.9974185106766074, 0.0, 0.07180748261607835, 0.0)
+            quatf xformOp:orient = (0.9685597319413622, 0.0, 0.2487811199863778, 0.0)
         }
         over "CameraPanJoint"
         {
-            float drive:angular:physics:targetPosition = 8.235619324209505
-            double inputs:angle = 0.14373867314832622
+            float drive:angular:physics:targetPosition = 28.81079374052747
+            double inputs:angle = 0.5028432109278608
         }
         over "CameraTiltJoint"
         {
-            float drive:angular:physics:targetPosition = 37.06330339102741
-            double inputs:angle = 0.6468766758390077
+            float drive:angular:physics:targetPosition = 68.518288454666
+            double inputs:angle = 1.1958697313651445
         }
     }
     def Scope "CameraTrack" (
