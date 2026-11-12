@@ -43,7 +43,11 @@ equation
 
   // Camera local forward is -Z. Pan is about world +Y and tilt about the
   // panned head's local +X, so these angles aim -Z along the target vector.
-  pan_unlimited_command_rad = atan2(-delta_x_m, -delta_z_m);
+  // At the pan axis the target has no horizontal bearing. Hold the current
+  // heading instead of letting atan2(0, 0) select an arbitrary direction.
+  pan_unlimited_command_rad = noEvent(
+    if horizontal_range_m > 0.001 then atan2(-delta_x_m, -delta_z_m)
+    else pan_angle_rad);
   tilt_unlimited_command_rad = atan2(delta_y_m, horizontal_range_m);
   pan_command_rad = max(-pan_soft_limit_rad,
                         min(pan_soft_limit_rad, pan_unlimited_command_rad));
