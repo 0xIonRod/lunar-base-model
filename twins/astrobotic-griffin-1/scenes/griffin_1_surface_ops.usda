@@ -54,29 +54,28 @@ def Xform "Griffin1SurfaceOps" (
         doc = "Virtual two-axis camera on the sun-facing side of the site; no rendered mast or camera body."
     )
     {
-        custom double3 xformOp:translate = (4.0, 55.0, -14.0)
+        custom double3 xformOp:translate = (4.0, 0.0, -14.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom rel lunco:tracking:trackedObject = </Griffin1SurfaceOps/Lander>
         custom string lunco:tracking:role = "remote landing and surface-operations observer"
         over "Controller"
         {
             double parameters:mount_x_m = 4.0
-            double parameters:mount_y_m = 65.0
+            double parameters:mount_y_m = 10.0
             double parameters:mount_z_m = -14.0
             double parameters:initial_pan_rad = 2.863292994584682
-            double parameters:initial_tilt_rad = -0.330784291082257
+            double parameters:initial_tilt_rad = 1.287428299546643
             double outputs:pan_angle_rad = 2.863292994584682
-            double outputs:tilt_angle_rad = -0.330784291082257
+            double outputs:tilt_angle_rad = 1.287428299546643
             double inputs:target_x_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_x>
             double inputs:target_y_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_y>
             double inputs:target_z_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_z>
         }
         over "TiltHead"
         {
-            quatf xformOp:orient = (0.1368084769382695, -0.0228356479526952, 0.9768200422317931, 0.1630477810787052)
+            quatf xformOp:orient = (0.1109432375683240, 0.0832443644786052, 0.7921408119741102, -0.5943693362089004)
             over "GriffinTrackingCamera"
             {
-                float focalLength = 50.0
                 custom rel lunco:tracking:trackedObject = </Griffin1SurfaceOps/Lander>
             }
         }
@@ -91,8 +90,8 @@ def Xform "Griffin1SurfaceOps" (
         }
         over "CameraTiltJoint"
         {
-            float drive:angular:physics:targetPosition = -18.952543808240
-            double inputs:angle = -0.330784291082257
+            float drive:angular:physics:targetPosition = 73.764207989727
+            double inputs:angle = 1.287428299546643
         }
     }
     def Scope "CameraTrack" (
