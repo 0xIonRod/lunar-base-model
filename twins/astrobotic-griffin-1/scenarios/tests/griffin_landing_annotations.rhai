@@ -18,7 +18,7 @@ fn simulation_dependencies(me, ctx) {
     #{modelica_entities: [], entity_reads: reads, entity_writes: [],
       query_reads: ["QueryUsdPrim", "TerrainHeight",
         "AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract", "ScriptInspect", "GetReadiness", "SceneCameraAudit"],
-      required_inputs: [#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+      required_inputs: [#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 
 fn on_start(me, ctx) {

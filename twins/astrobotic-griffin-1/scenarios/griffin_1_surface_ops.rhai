@@ -79,7 +79,7 @@ fn simulation_dependencies(me, ctx) {
             "QueryUsdPrim", "QueryUsdPrims", "QueryPhysicsState", "PhysicsPerformance",
             "ReadPorts", "ReadPortsBatch", "ReadModelicaStepSamples",
             "ListOpenDocuments", "Raycast", "TerrainHeight"],
-        required_inputs: [#{owner: "sysml.twin-analysis", identity: twin_name()}]
+        required_inputs: [#{owner: "sysml.twin-analysis", identity: twin_source_identity()}]
     }
 }
 

@@ -6,7 +6,7 @@ const TEST_KIND="headless";
 const ROOT="/Griffin1SurfaceOps";
 fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path(ROOT+"/Lander"),find_path(ROOT+"/FLIP")],
-      entity_reads:[find_path(ROOT+"/Lander"),find_path(ROOT+"/FLIP"),find_path(ROOT+"/Lander/LegPX"),find_path(ROOT+"/Lander/LegNX"),find_path(ROOT+"/Lander/LegPZ"),find_path(ROOT+"/Lander/LegNZ")],entity_writes:[],query_reads:["QueryUsdPrim","QueryPhysicsState","TerrainHeight","Raycast"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+      entity_reads:[find_path(ROOT+"/Lander"),find_path(ROOT+"/FLIP"),find_path(ROOT+"/Lander/LegPX"),find_path(ROOT+"/Lander/LegNX"),find_path(ROOT+"/Lander/LegPZ"),find_path(ROOT+"/Lander/LegNZ")],entity_writes:[],query_reads:["QueryUsdPrim","QueryPhysicsState","TerrainHeight","Raycast"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 fn on_start(me,ctx) {
     this.rover=find_path(ROOT+"/FLIP");this.start_tick=sim_tick();

@@ -8,7 +8,7 @@ fn simulation_dependencies(me,ctx) {
     let net=find_path(ROOT+"/ElectricalPower");
     #{modelica_entities:[find_path(ROOT),net],entity_reads:[net,find_path(ROOT)],
       entity_writes:[],query_reads:["QueryUsdPrim","QueryUsdPrims","AnalyzeSysml","ReadActiveTwinContract"],
-      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 fn wired(record,name,source) {
     node(record,name,[source])

@@ -10,7 +10,7 @@ fn simulation_dependencies(me, ctx) {
     }
     #{modelica_entities:[],entity_reads:ids,entity_writes:[],
       query_reads:["ReadPortsBatch","AnalyzeSysml","ValidateSysml","ReadActiveTwinContract"],
-      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 fn on_start(me,ctx) {this.first=();this.previous=();this.sums=[];this.count=0;this.done=false;}
 fn on_tick(me,ctx) {

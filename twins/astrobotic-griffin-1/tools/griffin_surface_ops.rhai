@@ -523,7 +523,7 @@ fn landing_stability_dependencies() {
     #{modelica_entities: [lander, gnc, propulsion, altimeter],
       entity_reads: [lander, gnc, propulsion, altimeter], entity_writes: [],
       query_reads: ["AnalyzeSysml", "ValidateSysml", "ReadActiveTwinContract",
-        "QueryUsdPrim", "QueryPhysicsState"], required_inputs: [#{owner: "sysml.twin-analysis", identity: twin_name()}]}
+        "QueryUsdPrim", "QueryPhysicsState"], required_inputs: [#{owner: "sysml.twin-analysis", identity: twin_source_identity()}]}
 }
 
 
@@ -612,9 +612,9 @@ fn landing_stability_contract() {
 // The production command supplies the clock controls; this helper reports the
 // values that must be held constant and the current SysML source revision.
 fn repeatability_contract() {
-    let source = query("ValidateSysml", #{path: "twin://" + twin_name()});
+    let source = query("ValidateSysml", #{path: "twin://" + twin_source_identity()});
     #{
-        twin: twin_name(),
+        twin: twin_source_identity(),
         source_revision: if source == () { () } else { source.source_revision },
         scene: "scenes/griffin_1_surface_ops.usda",
         threads: 1,

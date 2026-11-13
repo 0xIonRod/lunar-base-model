@@ -2,7 +2,7 @@
 // supplied by the authoring owner; this is not a full GVA or loaded verdict.
 import "../../tools/griffin_ramp_packaging_checks.rhai" as observation;
 import "../../tools/griffin_ramp_root_bearing_fit.rhai" as mating;
-fn simulation_dependencies(me,ctx){#{modelica_entities:[],entity_reads:[],entity_writes:[],query_reads:["AnalyzeSysml","QueryUsdPrim","QueryUsdPrims","ReadActiveTwinContract"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}}
+fn simulation_dependencies(me,ctx){#{modelica_entities:[],entity_reads:[],entity_writes:[],query_reads:["AnalyzeSysml","QueryUsdPrim","QueryUsdPrims","ReadActiveTwinContract"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}}
 fn on_start(me,ctx){
     if ctx.mode!="probe" && ctx.mode!="full"{throw("Select explicit probe or full coverage");}
     if !array_is(ctx.sections) || ctx.sections.len()==0{throw("Explicit section coverage is required");}

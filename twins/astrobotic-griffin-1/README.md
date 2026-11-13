@@ -536,7 +536,7 @@ explicit GNC disconnect/reconnect. The case covers the startup/handoff slice;
 the system mission case still owns full surface-sequence acceptance.
 
 Mission and source-backed observers declare the active mount's
-`sysml.twin-analysis` readiness input through `twin_name()`. Dependency planning
+`sysml.twin-analysis` readiness input through `twin_source_identity()`. Dependency planning
 only discovers identities; source-selected latch and isolation access is
 registered at `on_start` after analysis is ready. Tools use the active Twin's
 revision-pinned SysML model, including after reopening the same Twin.

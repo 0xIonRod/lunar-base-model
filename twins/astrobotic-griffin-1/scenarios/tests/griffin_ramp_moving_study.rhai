@@ -2,7 +2,7 @@
 import "twin://astrobotic-griffin-1/tools/griffin_ramp_packaging_checks.rhai" as observation;
 import "twin://astrobotic-griffin-1/tools/griffin_ramp_packaging.rhai" as packaging;
 import "lunco://scripting/tools/sysml_requirements" as requirements;
-fn simulation_dependencies(me,ctx){#{modelica_entities:[],entity_reads:[],entity_writes:[],query_reads:["AnalyzeSysml","QueryUsdPrim","QueryUsdPrims","ReadActiveTwinContract"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}}
+fn simulation_dependencies(me,ctx){#{modelica_entities:[],entity_reads:[],entity_writes:[],query_reads:["AnalyzeSysml","QueryUsdPrim","QueryUsdPrims","ReadActiveTwinContract"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}}
 fn on_start(me,ctx){
     if ctx.mode!="probe" && ctx.mode!="full"{throw("Choose explicit moving-path coverage");}
     this.state=observation::begin(ctx.fixture_doc,ctx.source_docs);

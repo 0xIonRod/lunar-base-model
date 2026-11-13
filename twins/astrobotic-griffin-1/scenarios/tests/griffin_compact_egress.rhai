@@ -1,7 +1,7 @@
 const ROOT="/Griffin1SurfaceOps";
 fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path(ROOT+"/Lander")],entity_writes:[],entity_reads:[find_path(ROOT+"/Lander"),find_path(ROOT+"/FLIP"),find_path(ROOT+"/FLIPPayloadAdapterJoint"),find_path(ROOT+"/Lander/CompactEgress")],
-      query_reads:["QueryUsdPrim","PhysicsPerformance","ReadPorts","ReadPortsBatch"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+      query_reads:["QueryUsdPrim","PhysicsPerformance","ReadPorts","ReadPortsBatch"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 fn on_start(me,ctx) {this.held=false;this.done=false;subscribe("griffin_compact_egress_held");}
 fn on_event(me,event,ctx) {if event.name=="griffin_compact_egress_held" {this.held=true;}}

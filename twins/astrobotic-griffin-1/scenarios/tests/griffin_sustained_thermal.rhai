@@ -10,7 +10,7 @@ fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[net],entity_reads:[net],entity_writes:[],
       query_reads:["GeneratedModelicaSource","QueryUsdPrim","CompileStatus","RunStatus",
         "GetExperimentResult","AnalyzeSysml","ReadActiveTwinContract"],
-      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 fn ack(value) {
     if value!=() && value.status=="pending" && value.id!=() {return command_result(value.id);}

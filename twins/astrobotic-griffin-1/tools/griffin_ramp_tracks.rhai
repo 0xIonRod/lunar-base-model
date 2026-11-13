@@ -24,7 +24,7 @@ fn body_plan(doc,root,docs,index){
         let path=section.parent+"/"+section.name;
         let assets=model.value(own()+if track.track==0{"portTrackAssets"}else{"starboardTrackAssets"});
         let slot=if section.label=="root"{0}else if section.label=="middle"{1}else{2};
-        let asset="twin://"+twin_name()+"/"+assets[slot];
+        let asset="twin://"+twin_source_identity()+"/"+assets[slot];
         ops.push(mechanism::add(section.parent,section.name,asset));
         for op in mechanism::pose_ops(path,section.pose){ops.push(op);}
         let body=if section.label=="root"{bank}else{path};
@@ -111,7 +111,7 @@ fn adapter_plan(doc,source_doc,label,track_index){
     let station=abs(spec::rover_wheel_station_z()[0])*side;
     let source=query("QueryUsdPrim",#{doc_id:source_doc,path:"/RampSection",attrs:[],children:true});
     let current=query("QueryUsdPrim",#{doc_id:doc,path:"/RampSection",attrs:[]});
-    let ops=[#{RemovePrim:#{edit_target:"@root@",path:"/RampSection"}},mechanism::add("/","RampSection","twin://"+twin_name()+"/"+model.value(packaging::component_owner(label)+"::componentAsset"))];
+    let ops=[#{RemovePrim:#{edit_target:"@root@",path:"/RampSection"}},mechanism::add("/","RampSection","twin://"+twin_source_identity()+"/"+model.value(packaging::component_owner(label)+"::componentAsset"))];
     for path in source.children{
         let r=query("QueryUsdPrim",#{doc_id:source_doc,path:path,attrs:["xformOp:translate","xformOpOrder"],geometry_bounds:true});
         if r.geometry_bounds==(){continue;}

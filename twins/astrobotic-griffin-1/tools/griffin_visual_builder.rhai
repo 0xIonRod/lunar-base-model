@@ -801,7 +801,7 @@ fn absolute_root(root) {
 }
 
 fn component_asset(relative) {
-    "twin://" + twin_name() + "/components/" + relative
+    "twin://" + twin_source_identity() + "/components/" + relative
 }
 
 fn _sysml_number(report, name) {
@@ -881,10 +881,10 @@ fn visual_component_specs(root) {
     if !vec3_is_native(griffin) || !vec3_is_native(flip) { return []; }
     [
         #{parent: root, name: "Griffin1", type_name: "Xform",
-          asset: "twin://" + twin_name() + "/vehicles/griffin_1.usda",
+          asset: "twin://" + twin_source_identity() + "/vehicles/griffin_1.usda",
           translation: vec3_array(griffin), rotation: (), scale: ()},
         #{parent: root, name: "FLIP", type_name: "Xform",
-          asset: "twin://" + twin_name() + "/vehicles/flip.usda",
+          asset: "twin://" + twin_source_identity() + "/vehicles/flip.usda",
           translation: vec3_array(flip), rotation: (), scale: ()}
     ]
 }
@@ -5645,7 +5645,7 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     if !array_is(solar_assets) || solar_assets.len()!=solar_names.len() {return plan_error("solar component identities are unavailable");}
     for index in 0..solar_names.len() {
         let result = _migrate_griffin_component_reference(doc, edit_target,
-            root, solar_names[index], "twin://"+twin_name()+"/"+solar_assets[index], "/SolarPanel",
+            root, solar_names[index], "twin://"+twin_source_identity()+"/"+solar_assets[index], "/SolarPanel",
             vec3_array(solar_stations[index]),
             [solar_rot_x[index], 0.0, solar_rot_z[index]],
             [solar_widths[index] / solar_frame_width, 1.0, 1.0],

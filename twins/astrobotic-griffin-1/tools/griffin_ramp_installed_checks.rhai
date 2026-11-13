@@ -9,7 +9,7 @@ import "lunco://scripting/tools/assembly_builder" as frames;
 import "lunco://scripting/tools/sysml_requirements" as requirements;
 const ROOT="/Griffin1SurfaceOps/Lander";
 const OWN="GriffinRampRequirements::GriffinEgressRamp::";
-fn dependencies(){#{modelica_entities:[],entity_reads:[],entity_writes:[],query_reads:["AnalyzeSysml","QueryUsdPrim","QueryUsdPrims","ReadActiveTwinContract","ListOpenDocuments"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}}
+fn dependencies(){#{modelica_entities:[],entity_reads:[],entity_writes:[],query_reads:["AnalyzeSysml","QueryUsdPrim","QueryUsdPrims","ReadActiveTwinContract","ListOpenDocuments"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}}
 fn begin(mode){
     let model=requirements::model();let paths=[];
     for label in ["root","middle","toe"]{paths.push(model.value(packaging::component_owner(label)+"::componentAsset"));}

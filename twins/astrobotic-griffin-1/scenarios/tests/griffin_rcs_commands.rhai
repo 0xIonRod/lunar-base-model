@@ -5,7 +5,7 @@ import "twin://astrobotic-griffin-1/tools/griffin_rcs_mounts.rhai" as mounts;
 fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path("/World/Griffin1"),
         find_path("/World/Griffin1/AttitudeActuation"),find_path("/World/Griffin1/AttitudePropulsion")],
-      entity_reads:[],entity_writes:[],query_reads:["QueryUsdPrim","AnalyzeSysml"],required_inputs:[#{owner: "sysml.twin-analysis", identity: twin_name()}]}
+      entity_reads:[],entity_writes:[],query_reads:["QueryUsdPrim","AnalyzeSysml"],required_inputs:[#{owner: "sysml.twin-analysis", identity: twin_source_identity()}]}
 }
 fn command_axis(target,row) {
     let values=[0.0,0.0,0.0];values[row.axis]=row.sign;

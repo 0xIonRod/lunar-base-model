@@ -2,7 +2,7 @@ import "lunco://scripting/tools/assembly_builder" as builder;
 import "social_surface_finish" as surface;
 import "griffin_tank_finish" as finish;
 fn datum(name) {
-    let owner=twin_name();
+    let owner=twin_source_identity();
     if owner=="" {throw "Compact-egress data requires its owning Twin context";}
     let source="twin://"+owner+"/requirements/griffin_flip_egress.sysml";
     let m=sysml_model(source);

@@ -7,7 +7,7 @@ import "lunco://scripting/tools/sysml_requirements" as requirements;
 fn simulation_dependencies(me,ctx){
     #{modelica_entities:[],entity_reads:[],entity_writes:[],
         query_reads:["AnalyzeSysml","QueryUsdPrim","QueryUsdPrims","ReadActiveTwinContract"],
-        required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+        required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 fn on_start(me,ctx){
     this.done=false;this.stage="capture";this.capture=0;this.verify=0;

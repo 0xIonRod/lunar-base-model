@@ -159,7 +159,7 @@ fn _sysml_contract_failure(report, fallback) {
 }
 
 fn sysml_contract_report(verification_name) {
-    let name = twin_name();
+    let name = twin_source_identity();
     if name == "" {
         return _sysml_contract_failure((), "active Twin root is unavailable");
     }

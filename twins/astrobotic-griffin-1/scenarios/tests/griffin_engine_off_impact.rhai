@@ -7,7 +7,7 @@ fn simulation_dependencies(me, ctx) {
     #{modelica_entities: members, entity_reads: members,
       entity_writes: [find_path(LANDER), find_path(LANDER + "/GNC")],
       query_reads: ["QueryPhysicsState", "ReadPorts", "GetReadiness", "AnalyzeSysml", "ReadActiveTwinContract"],
-      required_inputs: [#{owner: "sysml.twin-analysis", identity: twin_name()}]}
+      required_inputs: [#{owner: "sysml.twin-analysis", identity: twin_source_identity()}]}
 }
 fn on_start(me, ctx) {
     this.lander = find_path(LANDER); this.gnc = find_path(LANDER + "/GNC");

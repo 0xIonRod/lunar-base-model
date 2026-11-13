@@ -2,7 +2,7 @@ import "griffin_ramp_root_bearing" as bearing;
 import "lunco://scripting/tools/sysml_requirements" as requirements;
 import "lunco://scripting/tools/sysml_requirement_checks" as checks;
 import "usd_geometry_inspection" as inspection;
-fn dependencies(){#{modelica_entities:[],entity_reads:[],entity_writes:[],query_reads:["AnalyzeSysml","QueryUsdPrim","QueryUsdPrims"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}}
+fn dependencies(){#{modelica_entities:[],entity_reads:[],entity_writes:[],query_reads:["AnalyzeSysml","QueryUsdPrim","QueryUsdPrims"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}}
 fn observe(doc,root){
     let doc=if doc==(){inspection::document_owner(root)}else{doc};
     let own=bearing::owner();let package_name="GriffinRampRootBearingRequirements";let verification="Verify_GriffinRampRootBearing";

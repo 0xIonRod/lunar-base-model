@@ -11,7 +11,7 @@ fn simulation_dependencies(me, ctx) {
     let rcs=find_path(ROOT+"/AttitudePropulsion");
     #{modelica_entities:[root,net,main,rcs],entity_reads:[root,net,main,rcs],
       entity_writes:[root],query_reads:["QueryUsdPrim","AnalyzeSysml","ReadActiveTwinContract"],
-      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 fn port(entity,name) {
     let value=get(entity,name);

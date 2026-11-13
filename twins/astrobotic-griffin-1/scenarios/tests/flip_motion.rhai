@@ -13,7 +13,7 @@ fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[rover,find_path(FLIP+"/Thermal"),find_path(FLIP+"/SolarMechanism/Controller")],
       entity_reads:reads,entity_writes:[rover],
       query_reads:["QueryPhysicsState","ReadPorts","ReadActiveTwinContract","AnalyzeSysml","QueryUsdPrim"],
-      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 fn intent(name,held) {
     let result=cmd("SimulateIntent",#{target:find_path(FLIP),intent:name,held:held});

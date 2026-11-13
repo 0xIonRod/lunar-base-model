@@ -2,7 +2,7 @@ import "lunco://scripting/tools/sysml_requirements" as requirements;
 const STUDY="GriffinSolarRequirements::GriffinSolarCollisionStudy::";
 fn simulation_dependencies(me,ctx){
     let reads=[];for panel in 0..3{for side in ["Top","Bottom"]{reads.push(find_path("/World/Panel"+panel.to_string()+"/Probe"+side));}reads.push(find_path("/World/Panel"+panel.to_string()+"/OpeningProbe"));}
-    #{modelica_entities:[],entity_reads:reads,entity_writes:[],query_reads:["QueryUsdPrim","QueryPhysicsState","AnalyzeSysml"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+    #{modelica_entities:[],entity_reads:reads,entity_writes:[],query_reads:["QueryUsdPrim","QueryPhysicsState","AnalyzeSysml"],required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 fn on_start(me,ctx){
     let model=requirements::model();this.duration=model.value(STUDY+"observationS");this.minimum_travel=model.value(STUDY+"minimumProbeTravelM");

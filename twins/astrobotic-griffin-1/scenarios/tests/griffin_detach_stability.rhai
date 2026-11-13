@@ -16,7 +16,7 @@ fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path(LANDER),find_path(ROOT+"/Rover")],
       entity_reads:[find_path(LANDER),find_path(DOCK)],entity_writes:[find_path(DOCK)],
       query_reads:["PhysicsPerformance","AnalyzeSysml","ReadActiveTwinContract"],
-      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_name()}]}
+      required_inputs:[#{owner:"sysml.twin-analysis",identity:twin_source_identity()}]}
 }
 
 fn on_start(me, ctx) {
