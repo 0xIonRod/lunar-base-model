@@ -73,7 +73,7 @@ package FlipAirlessWheelRequirements {
         attribute bladeColor : Real[3] = (0.48, 0.50, 0.52);
         attribute bladeMetallic : Real = 1.0;
         attribute bladeRoughness : Real = 0.30;
-        attribute carrierColor : Real[3] = (1.0, 0.72, 0.015);
+        attribute carrierColor : Real[3] = (0.42, 0.30, 0.06);
         attribute carrierMetallic : Real = 0.0;
         attribute carrierRoughness : Real = 0.58;
         attribute materialProjectionTolerance : Real = 0.000001;

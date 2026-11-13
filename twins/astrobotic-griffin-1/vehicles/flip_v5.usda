@@ -3793,13 +3793,13 @@ def Xform "FLIP" (
                 uniform token info:implementationSource = "sourceAsset"
                 custom asset info:wesl:sourceAsset = @twin://astrobotic-griffin-1/shaders/hardware_finish.wesl@
                 custom token outputs:surface = ""
-                custom color3f inputs:base_color = (1.0, 0.7200000286102295, 0.014999999664723873)
+                custom color3f inputs:base_color = (0.41999998688697815, 0.30000001192092896, 0.05999999865889549)
                 custom float inputs:metallic = 0.0
                 custom float inputs:roughness = 0.5799999833106995
                 custom float inputs:grain_strength = 0.06499999761581421
                 custom float inputs:grain_scale = 90.0
                 custom float inputs:brush_ratio = 2.0
-                custom color3f inputs:diffuseColor = (1.0, 0.7200000286102295, 0.014999999664723873)
+                custom color3f inputs:diffuseColor = (0.41999998688697815, 0.30000001192092896, 0.05999999865889549)
             }
         }
         def Material "Spider"

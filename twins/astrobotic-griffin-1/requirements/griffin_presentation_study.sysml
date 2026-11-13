@@ -113,9 +113,9 @@ package GriffinPresentationStudy {
         attribute DarkHousingGrain : Real = 0.025;
         attribute DarkHousingScale : Real = 100;
         attribute DarkHousingBrush : Real = 2;
-        // 2026-11-04: carry the selected yellow outer tread finish onto active CAD FLIP v5.
+        // Muted ochre yellow selected for the active CAD FLIP v5 outer tread.
         // Presentation study only; no physical material or contact-property change.
-        attribute TreadColor : Real[3] = (1.0, 0.72, 0.015);
+        attribute TreadColor : Real[3] = (0.42, 0.30, 0.06);
         attribute TreadMetallic : Real = 0.0;
         attribute TreadRoughness : Real = 0.58;
         attribute TreadGrain : Real = 0.065;
