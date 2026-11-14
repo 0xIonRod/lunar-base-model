@@ -30,10 +30,162 @@ fn rover_attached() {
     joint != () && joint >= 0
 }
 
+// The compact mission only unlocks drive after the authored tether program
+// has unloaded both lines at a stable four-wheel ground transfer. A visual
+// tether or a missing Modelica entity is never enough to enable the rover.
+fn compact_tether_installed() {
+    find_path("/Griffin1SurfaceOps/EgressTether")>=0
+        && find_path("/Griffin1SurfaceOps/CompactEgressObservation")>=0
+}
+
+fn compact_tether_disconnect_status() {
+    if rover_attached() {return #{ok:false,reason:"FLIP is still attached to Griffin"};}
+    let ground=compact_rover_transfer_status();
+    if ground.ok!=true {return #{ok:false,reason:ground.reason};}
+    let tether=find_path("/Griffin1SurfaceOps/EgressTether");
+    if tether<0 {return #{ok:false,reason:"no tether restraint is installed"};}
+    let values=#{};
+    for p in read_ports(tether,["enabled","tension0","tension1","elastic_energy"]).ports {
+        if (p.name=="enabled" && p.direction=="in") || p.direction=="out" {values[p.name]=p.value;}
+    }
+    for name in ["enabled","tension0","tension1","elastic_energy"] {
+        if values[name]==() || !values[name].is_finite() {return #{ok:false,reason:"tether telemetry is unavailable"};}
+    }
+    let ok=values.enabled>0.5 && values.tension0>=0.0 && values.tension1>=0.0
+        && values.tension0<=griffin_tether_study::datum("releaseTensionN")
+        && values.tension1<=griffin_tether_study::datum("releaseTensionN")
+        && values.elastic_energy>=0.0 && values.elastic_energy<=griffin_tether_study::datum("releaseElasticEnergyJ");
+    #{ok:ok,reason:if ok {"parked with both tethers unloaded"}else{"tethers are loaded or already disconnected"}}
+}
+
+fn compact_tether_release_status() {
+    let tether=find_path("/Griffin1SurfaceOps/EgressTether");
+    if tether==() || tether<0 {
+        return #{ok:false,reason:"physical Modelica tether is not installed in this scene"};
+    }
+    let snapshot=read_ports(tether,["enabled","tension0","tension1","elastic_energy"]);
+    let enabled=();let t0=();let t1=();let energy=();
+    for p in snapshot.ports {
+        if p.name=="enabled" && p.direction=="in" {enabled=p.value;}
+        if p.name=="tension0" && p.direction=="out" {t0=p.value;}
+        if p.name=="tension1" && p.direction=="out" {t1=p.value;}
+        if p.name=="elastic_energy" && p.direction=="out" {energy=p.value;}
+    }
+    if enabled==() || t0==() || t1==() || energy==()
+        || !t0.is_finite() || !t1.is_finite() || !energy.is_finite() {
+        return #{ok:false,reason:"tether load or cut-state telemetry is missing"};
+    }
+    for body in [find_path(rover_path()+"/Suspension_RL/Wheel_RL"),
+        find_path(rover_path()+"/Suspension_RR/Wheel_RR"),find_path(lander_path())] {
+        let seen=#{};
+        for port in read_ports(body,["force_x","force_y","force_z","torque_x","torque_y","torque_z"]).ports {
+            if port.direction=="in" {
+                if port.value==() || !port.value.is_finite() || port.value!=0.0 {
+                    return #{ok:false,reason:"Native restraint wrench is not clear"};
+                }
+                seen[port.name]=true;
+            }
+        }
+        for name in ["force_x","force_y","force_z","torque_x","torque_y","torque_z"] {
+            if seen[name]!=true {return #{ok:false,reason:"Native restraint release telemetry missing: "+name};}
+        }
+    }
+    for station in ["FL","FR","RL","RR"] {
+        let released=false;
+        for port in read_ports(find_path(rover_path()+"/Suspension_"+station+"/Wheel_"+station),["brake"]).ports {
+            if port.direction=="in" && port.name=="brake" && port.value==0.0 {released=true;}
+        }
+        if !released {return #{ok:false,reason:"Egress wheel brake has not been released"};}
+    }
+    let tension_limit=griffin_tether_study::datum("releaseTensionN");
+    let energy_limit=griffin_tether_study::datum("releaseElasticEnergyJ");
+    let unloaded=enabled<0.5 && t0>=0.0 && t1>=0.0
+        && t0<=tension_limit && t1<=tension_limit && energy>=0.0 && energy<=energy_limit;
+    #{ok:unloaded,enabled:enabled,tension0_n:t0,tension1_n:t1,elastic_energy_j:energy,
+      reason:if unloaded {"both lines are cut and unloaded"} else {"tethered transfer has not passed its unload and cut gate"}}
+}
+
+fn compact_rover_transfer_status() {
+    let stations=griffin_compact_egress::datum("stationsXM");
+    let dimensions=query("QueryUsdPrim",#{path:rover_path()+"/Suspension_RL/Wheel_RL",attrs:["radius","height"]}).attrs;
+    compact_rover_transfer_status(#{ground_min:griffin_tether_study::datum("groundedWheelCenterMinM"),
+        ground_max:griffin_tether_study::datum("groundedWheelCenterMaxM"),
+        minimum_upright:griffin_tether_study::datum("minimumUprightCos"),
+        transfer_speed:griffin_tether_study::datum("groundTransferSpeedMps"),
+        transfer_rate:griffin_tether_study::datum("groundTransferRateRadps"),
+        minimum_clearance:griffin_tether_study::datum("minimumTrackClearanceM"),
+        track_end_x:stations[stations.len()-1],wheel_radius:dimensions["radius"],wheel_width:dimensions["height"]})
+}
+
+fn compact_rover_transfer_status(config) {
+    let rover=find_path(rover_path());
+    if rover==() || rover<0 {return #{ok:false,reason:"FLIP body is unavailable"};}
+    let up=world_up3(rover).y;
+    let physics=query("QueryPhysicsState",#{id:rover});
+    if physics.physics_state_ready!=true || physics.body_mode!="dynamic"
+        || physics.rigid_body_disabled==true || physics.simulation_object_paused==true {
+        return #{ok:false,reason:"FLIP is not an enabled, ready dynamic body"};
+    }
+    let speed=vlen(physics.linear_velocity_mps);
+    let angular_speed=vlen(physics.angular_velocity_radps);
+    let wheel_count=0;
+    let front_count=0;let rear_count=0;let rear_supported_count=0;let fixed_count=0;let front_sum=vec3(0.0,0.0,0.0);let front_supported=[];
+    let ramp=find_path("/Griffin1SurfaceOps/Lander/CompactEgress");
+    let origin=world_pos3(ramp);let rotation=world_rotation_quat(ramp);let inverse=quat_inverse(rotation);
+    let inboard=qrot(rotation,vec3(1.0,0.0,0.0));
+    let rear_inboard=-1.0e30;
+    for station in ["FL","FR","RL","RR"] {
+        let wheel=find_path(rover_path()+"/Suspension_"+station+"/Wheel_"+station);
+        if wheel==() || wheel<0 {return #{ok:false,reason:"Missing wheel "+station};}
+        let p=world_pos3(wheel);
+        if station=="FL" || station=="FR" {front_sum+=p;}
+        else {
+            let axle=qrot(world_rotation_quat(wheel),vec3(1.0,0.0,0.0));
+            let cosine=min(1.0,abs(vdot(axle,inboard)));
+            let extent=config.wheel_radius*sqrt(max(0.0,1.0-cosine*cosine))+config.wheel_width*0.5*cosine;
+            rear_inboard=max(rear_inboard,qrot(inverse,p-origin).x+extent);
+        }
+        let ground=terrain_height(p.x,p.z);
+        if ground==() {return #{ok:false,reason:"Terrain height missing under "+station};}
+        let height=p.y-ground;
+        let contact=();let fixed=();
+        let ports=read_ports(wheel,["loaded_contact","fixed_contact"]);
+        for port in ports.ports {
+            if port.name=="loaded_contact" && port.direction=="out" && port.value!=()
+                && port.value.is_finite() {contact=port.value;}
+            if port.name=="fixed_contact" && port.direction=="out" && port.value!=()
+                && port.value.is_finite() {fixed=port.value;}
+        }
+        if contact==() || fixed==() {return #{ok:false,reason:"Native support telemetry missing for "+station};}
+        if station=="FL" || station=="FR" {front_supported.push(contact>0.5);}
+        if fixed>0.5 {fixed_count+=1;}
+        if (station=="RL" || station=="RR") && contact>0.5 {rear_supported_count+=1;}
+        if height>=config.ground_min
+            && height<=config.ground_max
+            && contact>0.5 && fixed>0.5 {
+            wheel_count+=1;
+            if station=="FL" || station=="FR" {front_count+=1;}else{rear_count+=1;}
+        }
+    }
+    let clearance=config.track_end_x-rear_inboard;
+    let front_center=front_sum*0.5;
+    let front_toe_clearance=config.track_end_x-qrot(inverse,front_center-origin).x;
+    let stable=wheel_count==4 && up>=config.minimum_upright
+        && speed<=config.transfer_speed && angular_speed<=config.transfer_rate;
+    let ok=stable && clearance>=config.minimum_clearance;
+    #{ok:ok,wheel_count:wheel_count,front_count:front_count,rear_count:rear_count,rear_supported_count:rear_supported_count,fixed_count:fixed_count,
+      front_center_m:vec3_array(front_center),front_toe_clearance_m:front_toe_clearance,front_supported:front_supported,upright_cos:up,speed_mps:speed,angular_speed_radps:angular_speed,
+      mechanically_stable:stable,track_clearance_m:clearance,
+      reason:if ok {"stable four-wheel ground transfer"} else {"four-wheel contact, attitude, or motion gate is not satisfied"}}
+}
+
 fn show_mounted_rover_controls() {
     if !controls_visible() {return;}
     if griffin_compact_egress::enabled() {
-        hint("griffin-controls","FLIP ATTACHED: DETACH ROVER releases the adapter for manual control. Tether restraint is not simulated.");
+        let text=if compact_tether_installed() {
+            "FLIP ATTACHED: DEPLOY FLIP prepares the tethers and starts deployment after landing."
+        } else {"FLIP ATTACHED: DETACH ROVER releases the adapter and keeps FLIP parked; this scene has no descent restraint."};
+        hint("griffin-controls",text);
         return;
     }
     hint("griffin-controls", "FLIP ATTACHED: the payload adapter locks the rover to Griffin. Use OPEN RAMPS, wait for settlement, then DETACH ROVER. U opens ramps and F detaches while controlling Griffin; on FLIP, F runs/stops the route.");
@@ -91,7 +243,8 @@ fn set_surface_action_buttons_for(gnc) {
     if !controls_visible() {return #{ok:true,visible:false};}
     let result = guided_hud_actions("griffin-controls", "griffin_surface_ops", "on_hud_action", [
         #{id: "unfold_ramps", label: if griffin_compact_egress::enabled() {"FIXED EGRESS TRACKS"}else{"OPEN RAMPS  U"}, enabled: !griffin_compact_egress::enabled()},
-        #{id: "release_rover", label: "DETACH ROVER", enabled: true},
+        #{id: "release_rover", label: if compact_tether_installed() {"DEPLOY FLIP"}else{"DETACH ROVER"}, enabled: rover_attached()},
+        #{id: "disconnect_tethers", label: "DISCONNECT TETHERS", enabled: compact_tether_installed() && compact_tether_disconnect_status().ok},
         #{id: "toggle_gnc",
           label: if gnc == false { "RECONNECT GNC" } else { "DISCONNECT GNC" },
           enabled: gnc != ()}
@@ -107,7 +260,10 @@ fn show_touchdown_actions() {
     if !controls_visible() {return;}
     show_briefing();
     if griffin_compact_egress::enabled() {
-        hint("griffin-controls","TOUCHDOWN CONFIRMED: F or DETACH ROVER releases FLIP for manual control. No tether restraint is active.");
+        let text=if compact_tether_installed() {
+            "TOUCHDOWN CONFIRMED: F or DEPLOY FLIP starts tethered deployment. Manual drive unlocks after ground transfer and tether release."
+        } else {"TOUCHDOWN CONFIRMED: F or DETACH ROVER releases the adapter and keeps FLIP parked."};
+        hint("griffin-controls",text);
         return;
     }
     hint("griffin-controls", "TOUCHDOWN CONFIRMED: U or OPEN RAMPS to lower both ramps. F detaches FLIP immediately.");
@@ -145,6 +301,15 @@ fn clear_surface_operation_actions() {
 fn show_rover_controls() {
     if !controls_visible() {return;}
     if rover_attached() { show_mounted_rover_controls(); return; }
+    if griffin_compact_egress::enabled() && find_path("/Griffin1SurfaceOps/Lander")>=0 {
+        let tether=compact_tether_release_status();
+        let transfer=compact_rover_transfer_status();
+        if tether.ok!=true || transfer.ok!=true {
+            let reason=if tether.ok!=true {tether.reason}else{transfer.reason};
+            hint("griffin-controls","FLIP: manual drive locked; "+reason+".");
+            return;
+        }
+    }
     let forward = input_hint("forward");
     let backward = input_hint("backward");
     let left = input_hint("left");
@@ -173,7 +338,6 @@ fn hold_rover_brake() {
         target: target,
         writes: [["throttle", 0.0], ["steer", 0.0], ["brake", 1.0]],
     });
-    if result.ok { notify_kind("FLIP brake held through the vehicle controller.", "info"); }
     result
 }
 
@@ -183,6 +347,13 @@ fn release_rover_brake() {
     let intent = cmd("SimulateIntent", #{ intent: "brake", held: false, target: target });
     if intent == () || intent.ok != true {
         return #{ ok: false, error: "controller rejected brake release" };
+    }
+    // Adapter release can originate from the HUD/control command layer. Its
+    // persistent brake hold outranks a simulation program's zero setpoint.
+    // End that hold explicitly before handing braking back to the program.
+    let released = cmd("ReleasePort", #{target:target,name:"brake"});
+    if released == () || released.ok != true {
+        return #{ok:false,error:"persistent brake hold could not be released"};
     }
     cmd("SetPorts", #{
         target: target,

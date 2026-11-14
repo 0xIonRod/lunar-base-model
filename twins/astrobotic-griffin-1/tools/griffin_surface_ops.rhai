@@ -1219,11 +1219,23 @@ fn request_rover_release() {
     #{ok: true, queued: true, event: "griffin_rover_release_requested"}
 }
 
+/// Request a guarded release; the egress controller owns the final dwell and cut.
+fn disconnect_tethers() {
+    let status=griffin_controls::compact_tether_disconnect_status();
+    if status.ok!=true {
+        notify_kind("Tethers retained: "+status.reason+".","warning");
+        return #{ok:false,error:status.reason};
+    }
+    emit("griffin_tethers_disconnect_requested");
+    #{ok:true,queued:true,event:"griffin_tethers_disconnect_requested"}
+}
+
 /// Shared typed HUD action hook. It is also callable through RunRhaiToolHook
-/// with `unfold_ramps`, `release_rover` or `toggle_gnc` as its string argument.
+/// with `unfold_ramps`, `release_rover`, `disconnect_tethers` or `toggle_gnc`.
 fn on_hud_action(action) {
     if action == "unfold_ramps" { return request_ramp_unfold(); }
     if action == "release_rover" { return request_rover_release(); }
+    if action == "disconnect_tethers" { return disconnect_tethers(); }
     if action == "toggle_gnc" { return griffin_controls::toggle_gnc(); }
     #{ok: false, error: "unknown Griffin surface-operation HUD action", action: action}
 }

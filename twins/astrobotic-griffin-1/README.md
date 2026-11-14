@@ -52,18 +52,23 @@ use a fresh simulator process for performance acceptance after shader editing.
 
 ## Current FLIP rover — 2026-10-26
 
-**28 October correction:** the long, articulated ramp banks have been replaced
-by two compact tracks with curved transitions and steep lips, following
-Astrolab's FLIP-specific egress paper and test imagery. Fabric tether routing is
-shown in the mounted rest pose. Dimensions remain reconstruction assumptions.
-Tether payout and restrained descent are not yet qualified. The payload stays
-attached automatically after landing; F / DETACH ROVER explicitly releases it
-for manual control and transfers driving possession to FLIP. FLIP remains parked;
-the first deliberate W/S input releases the parking brake. Explicit detach does
-not wait for the live landing qualification. The old unfolding and automatic
-drive-off remain disabled. The [29 October release correction](contracts/griffin-manual-release-2026-10-29.md)
-also moves guidance markers into the actual landed ramp frame and retires the
-two remaining legacy hinge shafts under the bus.
+**14 November validated controlled egress:** DEPLOY FLIP requests landing qualification,
+balanced tether preload, adapter release, restrained descent, four-wheel ground
+transfer and unloading. When the HUD reports both lines unloaded, click
+**DISCONNECT TETHERS** to release them and enable manual drive. The button is
+disabled while attached, loaded or unstable. The
+production scene and headless verification use the same controller. Modelica
+models two routed, tension-only rear-wheel bridles with a reduced balanced-sling
+resultant and ideal powered payout/take-up. Native wheel wrench ports carry the
+loads and the lander receives the opposite reaction. End rigging, geometry,
+fabric properties, actuator limits and the sequence are study assumptions, not released Astrolab flight
+requirements. The [safe-egress review](contracts/griffin-safe-egress-2026-11-13.md)
+records references, implementation boundaries and [runtime evidence](contracts/griffin-safe-egress-2026-11-13.md#validation).
+The deterministic deployment gate passes all seven checks, including restrained
+descent, line release and manual drive. Live ribbons follow the Modelica routing
+and rear-wheel bridles; the disconnect command removes their view. Use Standard
+rendering for lighting inspection: Fast deliberately renders standard materials
+unlit. Tank-support frames have shared coplanar face coverage removed.
 See the [compact-egress contract](contracts/griffin-compact-egress-2026-10-28.md)
 for geometry, sources, checks and the remaining dynamics boundary.
 A subsequent [upper-hardware visual pass](contracts/griffin-upper-visuals-2026-10-29.md)
@@ -71,8 +76,8 @@ adds the two prominent horizontal pressurant bottles, deck infill and mounting
 heads, and a finer skirt blanket finish. The four main tank assemblies remain
 intact; placement of the third confirmed helium tank remains unresolved.
 The [exterior-blanket follow-up](contracts/griffin-exterior-blankets-2026-10-29.md)
-fills eight bus frame bays with silver blanket panels. Tether payout and
-restrained descent remain deferred; the working manual detach path is retained.
+fills eight bus frame bays with silver blanket panels. The controlled egress
+sequence above supersedes its earlier deferred-tether status.
 The operational scene retains its original Sun lighting. The earlier
 [Sun-only correction and release-overload reproduction](contracts/griffin-sun-only-2026-10-28.md)
 records the superseded free-release configuration.

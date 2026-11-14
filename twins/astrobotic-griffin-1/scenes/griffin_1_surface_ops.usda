@@ -23,7 +23,7 @@ def Xform "Griffin1SurfaceOps" (
     custom string lunco:mission:site = "Nobile regional study anchor backed by LROC NAC DTM NOBILE03; exact touchdown coordinate unresolved"
     custom string lunco:mission:scope = "surface operations only"
     custom string lunco:mission:evidence = "LROC NOBILE03 regional relief is source-backed; Griffin vehicle values and exact touchdown site remain assumptions"
-    custom string lunco:mission:deployment = "\"Top-deck payload during descent; four independent three-span wheel tracks clear their roots, unfold middle and toe sections, then fit four root targets to retained terrain. All twelve hinges satisfy measured angle, rate and dwell gates before payload release.\""
+    custom string lunco:mission:deployment = "\"Explicit DEPLOY FLIP: qualified landing, balanced rear-wheel sling preload, adapter retirement, guarded descent, fixed four-wheel ground transfer, unloading and restraint release before manual drive. Reduced balanced sling and powered winches are study assumptions; flight end rigging is unresolved.\""
     custom string lunco:anchor:status = "MOON_ME ENU frame at NOBILE03 regional center; local height zero is the normalized terrain datum"
     custom string lunco:lighting:contract = "all Griffin and FLIP geometry uses LunarSurface/Sun polar direction and the authored mission epoch"
     custom string lunco:route:status = "hidden ramp-entry navigation datum remains outside descent column; center lane remains clear of four solid legs"
@@ -68,8 +68,11 @@ def Xform "Griffin1SurfaceOps" (
             double parameters:initial_tilt_rad = 1.1958697313651445
             double outputs:pan_angle_rad = 0.5028432109278608
             double outputs:tilt_angle_rad = 1.1958697313651445
+            double inputs:target_x_m
             double inputs:target_x_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_x>
+            double inputs:target_y_m
             double inputs:target_y_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_y>
+            double inputs:target_z_m
             double inputs:target_z_m.connect = </Griffin1SurfaceOps/Lander.outputs:position_z>
         }
         over "GimbalBase"
@@ -79,7 +82,7 @@ def Xform "Griffin1SurfaceOps" (
         over "TiltHead"
         {
             custom double3 xformOp:translate = (0.0, 2.0, 0.0)
-            quatf xformOp:orient = (0.8005145377617765, 0.5452379564652233, 0.2056175749435443, -0.1400480579515918)
+            quatf xformOp:orient = (0.8005145192146301, 0.5452379584312439, 0.20561757683753967, -0.1400480568408966)
             over "GriffinTrackingCamera"
             {
                 custom rel lunco:tracking:trackedObject = </Griffin1SurfaceOps/Lander>
@@ -90,16 +93,16 @@ def Xform "Griffin1SurfaceOps" (
         over "PanYoke"
         {
             custom double3 xformOp:translate = (0.0, 2.0, 0.0)
-            quatf xformOp:orient = (0.9685597319413622, 0.0, 0.2487811199863778, 0.0)
+            quatf xformOp:orient = (0.968559741973877, 0.0, 0.24878111481666565, 0.0)
         }
         over "CameraPanJoint"
         {
-            float drive:angular:physics:targetPosition = 28.81079374052747
+            float drive:angular:physics:targetPosition = 28.810792922973633
             double inputs:angle = 0.5028432109278608
         }
         over "CameraTiltJoint"
         {
-            float drive:angular:physics:targetPosition = 68.518288454666
+            float drive:angular:physics:targetPosition = 68.5182876586914
             double inputs:angle = 1.1958697313651445
         }
     }
@@ -250,6 +253,42 @@ def Xform "Griffin1SurfaceOps" (
             float drive:angular:physics:targetPosition = 0.0
             double inputs:angle = 0.0
         }
+        over "Suspension_FL"
+        {
+            over "Wheel_FL"
+            {
+                custom double outputs:fixed_contact = 0.0
+                custom double inputs:brake = 0.0
+                custom double outputs:loaded_contact = 0.0
+            }
+        }
+        over "Suspension_FR"
+        {
+            over "Wheel_FR"
+            {
+                custom double outputs:fixed_contact = 0.0
+                custom double inputs:brake = 0.0
+                custom double outputs:loaded_contact = 0.0
+            }
+        }
+        over "Suspension_RL"
+        {
+            over "Wheel_RL"
+            {
+                custom double outputs:fixed_contact = 0.0
+                custom double inputs:brake = 0.0
+                custom double outputs:loaded_contact = 0.0
+            }
+        }
+        over "Suspension_RR"
+        {
+            over "Wheel_RR"
+            {
+                custom double outputs:fixed_contact = 0.0
+                custom double inputs:brake = 0.0
+                custom double outputs:loaded_contact = 0.0
+            }
+        }
     }
     def PhysicsFixedJoint "FLIPPayloadAdapterJoint"
     {
@@ -265,7 +304,6 @@ def Xform "Griffin1SurfaceOps" (
         custom rel lunco:mission:payloadDeck = </Griffin1SurfaceOps/Lander/Bus/RoverPayloadDeck>
         custom rel lunco:mission:adapterJoint = </Griffin1SurfaceOps/FLIPPayloadAdapterJoint>
     }
-    # Non-rendered route data anchors used by FLIP navigation.
     def Xform "RoverRampApproach"
     {
         custom double3 xformOp:translate = (2.0, 0.2049314542207867, 0.0)
@@ -345,5 +383,179 @@ def Xform "Griffin1SurfaceOps" (
         prepend references = @lunco://components/environment/starfield_sky.usda@</StarfieldSky>
     )
     {
+    }
+    def Scope "EgressTether" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/models/GriffinTetherPairStudy.mo@
+        custom double inputs:regulate = 0.0
+        custom double inputs:body_speed = 0.0
+        custom double inputs:governed_speed = 0.1
+        custom double inputs:payout_stop_speed = 0.18
+        custom double outputs:drive_scale = 1.0
+        custom double inputs:stiffness = 4000.0
+        custom double inputs:damping = 300.0
+        custom double inputs:initial_length = 0.7
+        custom double inputs:preload_tension = 50.0
+        custom double inputs:payout_extension = 0.03
+        custom double inputs:tension_limit = 2500.0
+        custom double inputs:enabled = 0.0
+        custom double inputs:span0_x = 0.0
+        custom double inputs:rover_arm0_x = 0.0
+        custom double inputs:lander_arm0_x = 0.0
+        custom double inputs:span0_y = 0.0
+        custom double inputs:rover_arm0_y = 0.0
+        custom double inputs:lander_arm0_y = 0.0
+        custom double inputs:span0_z = 0.0
+        custom double inputs:rover_arm0_z = 0.0
+        custom double inputs:lander_arm0_z = 0.0
+        custom double inputs:rate0 = 0.0
+        custom double inputs:span1_x = 0.0
+        custom double inputs:rover_arm1_x = 0.0
+        custom double inputs:lander_arm1_x = 0.0
+        custom double inputs:span1_y = 0.0
+        custom double inputs:rover_arm1_y = 0.0
+        custom double inputs:lander_arm1_y = 0.0
+        custom double inputs:span1_z = 0.0
+        custom double inputs:rover_arm1_z = 0.0
+        custom double inputs:lander_arm1_z = 0.0
+        custom double inputs:rate1 = 0.0
+        custom double inputs:payout_speed0 = 0.0
+        custom double inputs:payout_speed1 = 0.0
+        custom double outputs:force_x = 0.0
+        custom double outputs:force_y = 0.0
+        custom double outputs:force_z = 0.0
+        custom double outputs:reaction_x = 0.0
+        custom double outputs:reaction_y = 0.0
+        custom double outputs:reaction_z = 0.0
+        custom double outputs:torque_x = 0.0
+        custom double outputs:torque_y = 0.0
+        custom double outputs:torque_z = 0.0
+        custom double outputs:reaction_torque_x = 0.0
+        custom double outputs:reaction_torque_y = 0.0
+        custom double outputs:reaction_torque_z = 0.0
+        custom double outputs:tension0 = 0.0
+        custom double outputs:tension1 = 0.0
+        custom double outputs:length0 = 0.0
+        custom double outputs:length1 = 0.0
+        custom double outputs:elastic_energy = 0.0
+        custom double outputs:spool_power = 0.0
+        custom double outputs:damper_power = 0.0
+        custom double inputs:governor_tension = 1000.0
+        custom double inputs:reel_speed_limit = 2.5
+        custom double inputs:wheel_radius = 0.465
+        custom double inputs:tangent_branch = -1.0
+        custom double inputs:routed = 1.0
+        custom double inputs:inboard_x = 1.0
+        custom double inputs:up_x = 0.0
+        custom double inputs:lander_omega_x = 0.0
+        custom double inputs:guide0_0_x = 0.0
+        custom double inputs:guide0_1_x = 0.0
+        custom double inputs:guide0_2_x = 0.0
+        custom double inputs:guide0_3_x = 0.0
+        custom double inputs:guide0_4_x = 0.0
+        custom double inputs:guide0_5_x = 0.0
+        custom double inputs:guide0_6_x = 0.0
+        custom double inputs:guide1_0_x = 0.0
+        custom double inputs:guide1_1_x = 0.0
+        custom double inputs:guide1_2_x = 0.0
+        custom double inputs:guide1_3_x = 0.0
+        custom double inputs:guide1_4_x = 0.0
+        custom double inputs:guide1_5_x = 0.0
+        custom double inputs:guide1_6_x = 0.0
+        custom double inputs:inboard_y = 0.0
+        custom double inputs:up_y = 1.0
+        custom double inputs:lander_omega_y = 0.0
+        custom double inputs:guide0_0_y = 0.0
+        custom double inputs:guide0_1_y = 0.0
+        custom double inputs:guide0_2_y = 0.0
+        custom double inputs:guide0_3_y = 0.0
+        custom double inputs:guide0_4_y = 0.0
+        custom double inputs:guide0_5_y = 0.0
+        custom double inputs:guide0_6_y = 0.0
+        custom double inputs:guide1_0_y = 0.0
+        custom double inputs:guide1_1_y = 0.0
+        custom double inputs:guide1_2_y = 0.0
+        custom double inputs:guide1_3_y = 0.0
+        custom double inputs:guide1_4_y = 0.0
+        custom double inputs:guide1_5_y = 0.0
+        custom double inputs:guide1_6_y = 0.0
+        custom double inputs:inboard_z = 0.0
+        custom double inputs:up_z = 0.0
+        custom double inputs:lander_omega_z = 0.0
+        custom double inputs:guide0_0_z = 0.0
+        custom double inputs:guide0_1_z = 0.0
+        custom double inputs:guide0_2_z = 0.0
+        custom double inputs:guide0_3_z = 0.0
+        custom double inputs:guide0_4_z = 0.0
+        custom double inputs:guide0_5_z = 0.0
+        custom double inputs:guide0_6_z = 0.0
+        custom double inputs:guide1_0_z = 0.0
+        custom double inputs:guide1_1_z = 0.0
+        custom double inputs:guide1_2_z = 0.0
+        custom double inputs:guide1_3_z = 0.0
+        custom double inputs:guide1_4_z = 0.0
+        custom double inputs:guide1_5_z = 0.0
+        custom double inputs:guide1_6_z = 0.0
+        custom double outputs:wheel_force0_x = 0.0
+        custom double outputs:wheel_force0_y = 0.0
+        custom double outputs:wheel_force0_z = 0.0
+        custom double outputs:wheel_torque0_x = 0.0
+        custom double outputs:wheel_torque0_y = 0.0
+        custom double outputs:wheel_torque0_z = 0.0
+        custom double outputs:wheel_force1_x = 0.0
+        custom double outputs:wheel_force1_y = 0.0
+        custom double outputs:wheel_force1_z = 0.0
+        custom double outputs:wheel_torque1_x = 0.0
+        custom double outputs:wheel_torque1_y = 0.0
+        custom double outputs:wheel_torque1_z = 0.0
+        custom double inputs:axis0_x = 1.0
+        custom double inputs:relative0_x = 0.0
+        custom double inputs:omega0_x = 0.0
+        custom double inputs:axis0_y = 0.0
+        custom double inputs:relative0_y = 0.0
+        custom double inputs:omega0_y = 0.0
+        custom double inputs:axis0_z = 0.0
+        custom double inputs:relative0_z = 0.0
+        custom double inputs:omega0_z = 0.0
+        custom double inputs:axis1_x = 1.0
+        custom double inputs:relative1_x = 0.0
+        custom double inputs:omega1_x = 0.0
+        custom double inputs:axis1_y = 0.0
+        custom double inputs:relative1_y = 0.0
+        custom double inputs:omega1_y = 0.0
+        custom double inputs:axis1_z = 0.0
+        custom double inputs:relative1_z = 0.0
+        custom double inputs:omega1_z = 0.0
+        custom double inputs:up_vertical = 1.0
+        custom double inputs:nose_down_rate = 0.0
+        custom double inputs:body_angular_speed = 0.0
+        custom double inputs:angular_govern_enabled = 0.0
+        custom double inputs:governed_angular_speed = 0.05
+        custom double inputs:payout_stop_angular_speed = 0.1
+        custom double outputs:material_rate0 = 0.0
+        custom double outputs:paid_rate0 = 0.0
+        custom double outputs:extension0 = 0.0
+        custom double outputs:material_rate1 = 0.0
+        custom double outputs:paid_rate1 = 0.0
+        custom double outputs:extension1 = 0.0
+        custom double inputs:balanced_wrap = 1.0
+        custom double inputs:pose_tension = 750.0
+        custom double inputs:loading_response_time = 0.15
+        custom double inputs:unloading_response_time = 0.05
+        custom double inputs:front_grounded = 0.0
+    }
+    def Scope "CompactEgressObservation"
+    {
+        def Scope "Program" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/griffin_tether_egress.rhai@
+            custom bool inputs:verification_mode = false
+        }
     }
 }

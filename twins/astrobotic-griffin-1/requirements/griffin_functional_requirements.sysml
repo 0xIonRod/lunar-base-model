@@ -28,7 +28,7 @@ package GriffinFunctionalRequirements {
     }
 
     requirement def GR007_GatedEgress {
-        doc /* GR-007 [runtime] egress shall be a physical direct-deck or optional-ramp path with wheel/contact evidence, never a teleport from deck to terrain. Source: Twin egress runtime contract. Rationale: wheel/contact evidence is the minimum proof that rover release represents a traversable path rather than a scripted relocation. */
+        doc /* GR-007 [runtime] egress shall be a physical direct-deck or optional-ramp path with wheel/contact evidence, never a teleport from deck to terrain. For the compact FLIP path, retain the parking brake and reject drive commands until an active physical descent restraint is present and within its authored load envelope. The production sequence shall qualify restrained descent and stable four-wheel terrain transfer, then unload both tethers and require the explicit guarded disconnect command before enabling manual drive. Source: Twin egress runtime contract and Astrolab's published tether egress architecture. Rationale: wheel/contact evidence and a live restraint are the minimum proof that rover release represents a controlled physical path rather than an unrestrained drop. */
     }
 
     requirement def GR009_PayloadCapacity {

@@ -1,8 +1,8 @@
-import "twin://astrobotic-griffin-1/scenarios/griffin_1_surface_ops.rhai" as mission;
+import "../griffin_1_surface_ops.rhai" as mission;
 const ROOT="/Griffin1SurfaceOps";
 fn simulation_dependencies(me,ctx) {mission::simulation_dependencies(me,ctx)}
-fn on_start(me,ctx) {this.requested=false;this.done=false;this.detached_tick=();this.release_events=0;this.drive_tick=();this.drive_start=();this.drive_forward=();this.park_start=();subscribe("griffin_flip_released");}
-fn on_event(me,event,ctx) {if event.name=="griffin_flip_released" {this.release_events+=1;}}
+fn on_start(me,ctx) {this.requested=false;this.done=false;this.detached_tick=();this.release_events=0;this.blocked_events=0;this.drive_tick=();this.drive_start=();this.drive_forward=();this.park_start=();subscribe("griffin_flip_released");subscribe("griffin_flip_egress_blocked");}
+fn on_event(me,event,ctx) {if event.name=="griffin_flip_released" {this.release_events+=1;} if event.name=="griffin_flip_egress_blocked" {this.blocked_events+=1;}}
 fn on_tick(me,ctx) {
     if this.done {return;}
     if !this.requested {
@@ -52,15 +52,15 @@ fn on_tick(me,ctx) {
     if state.body_mode!="dynamic" || state.rigid_body_disabled==true {failures.push("Released FLIP is not a live dynamic body");}
     let ports=read_ports(rover,["brake","autopilot_enable"]);let brake=();let autopilot=();
     for p in ports.ports {if p.direction=="in" && p.name=="brake" {brake=p.value;}if p.direction=="in" && p.name=="autopilot_enable" {autopilot=p.value;}}
-    if brake!=0.0 || autopilot!=0.0 {failures.push("Manual release retained a brake or engaged autopilot");}
+    if brake!=1.0 || autopilot!=0.0 {failures.push("Compact drive-off interlock did not retain the parking brake or engaged autopilot");}
     let displacement=if this.drive_start==() {0.0}else{vdot(vsub(world_pos(rover),this.drive_start),this.drive_forward)};
-    if !is_controlled(rover) || displacement<0.05 {failures.push("Possessed FLIP did not advance 5 cm under forward input");}
+    if !is_controlled(rover) || this.blocked_events!=1 || displacement>0.01 {failures.push("Unrestrained drive input was not rejected while FLIP remained parked");}
     if this.park_rollback==() || this.park_rollback>griffin_compact_egress::datum("maximumParkedRollbackM")
         || this.park_lateral>this.park_lateral_limit {failures.push("Detached FLIP rolled backward or exceeded its actual track lateral clearance during the parked hold");}
     let lander=find_path(ROOT+"/Lander");let ramp=find_path(ROOT+"/Lander/CompactEgress");
     let ramp_direction=qrot(world_rotation_quat(ramp),vec3(-1.0,0.0,0.0));
     let toward_ramp=vdot(vsub(world_pos(rover),this.drive_start),vec3_array(ramp_direction));
-    if toward_ramp<0.05 {failures.push("Forward departure did not move toward the actual ramp instance");}
+    if toward_ramp>0.01 {failures.push("FLIP moved toward the ramp while the compact drive-off interlock was active");}
     let route_frame=griffin_surface_ops::landed_surface_route_frame();
     let deck_y=griffin_spec::visual_payload_adapter_center_y_m()
         +griffin_spec::visual_payload_adapter_thickness_m()/2.0
@@ -75,10 +75,10 @@ fn on_tick(me,ctx) {
     report_structured_verdict(#{ok:failures.len()==0,verdict:if failures.len()==0{"pass"}else{"fail"},
       check_count:9,pass_count:9-failures.len(),failure_count:failures.len(),failures:failures,
       metrics:#{request_tick:this.request_tick,detached_tick:this.detached_tick,release_events:this.release_events,
-        joints:topology.joints,graph_edges:topology.joint_graph_edges,brake:brake,autopilot:autopilot,drive_displacement_m:displacement,
+        joints:topology.joints,graph_edges:topology.joint_graph_edges,brake:brake,autopilot:autopilot,blocked_events:this.blocked_events,drive_displacement_m:displacement,
         parked_drift_m:this.park_drift,travel_toward_ramp_m:toward_ramp,
         parked_rollback_m:this.park_rollback,parked_lateral_m:this.park_lateral,lateral_clearance_m:this.park_lateral_limit,
         ramp_marker_forward_m:marker_forward,ramp_marker_lateral_m:marker_lateral,
-        scope:"HUD detach, ten seconds parked, deliberate drive releases brake and advances toward actual ramp; tethered descent not qualified"}},
+        scope:"HUD detach and ten-second parking hold; drive input is rejected because the production scene has no physical descent restraint"}},
       "GRIFFIN COMPACT MANUAL RELEASE","GRIFFIN_COMPACT_MANUAL_RELEASE");
 }

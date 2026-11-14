@@ -38,6 +38,7 @@ def Xform "World"
     }
     def Xform "TetherRestRouting"
     {
+        token visibility = "invisible"
         def Cube "Webbing0" (
             prepend apiSchemas = ["MaterialBindingAPI"]
         )

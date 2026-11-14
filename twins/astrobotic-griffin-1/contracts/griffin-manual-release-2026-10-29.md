@@ -1,5 +1,19 @@
 # Explicit FLIP release and compact-ramp guidance — 29 October 2026
 
+## Current compact-egress policy — 13 November 2026
+
+The earlier manual-drive result below is historical and no longer authorizes
+driving off the lander. DEPLOY FLIP now requests qualified landing, balanced
+preload, adapter retirement, restrained descent and stable four-wheel ground
+transfer. Manual drive waits for unloading, the operator's **DISCONNECT TETHERS**
+command and verified native restraint release. Modelica supplies the two routed
+balanced-bridle forces and reaction wrenches;
+independent native wheel brakes hold unloaded front rotors while the balanced
+rear-wheel bridles retain restraint. Powered winches and line properties are study assumptions, not released
+flight hardware. See the [safe-egress review](griffin-safe-egress-2026-11-13.md)
+for current implementation and acceptance. The remaining sections below record
+the earlier adapter-only implementation and its historical limitations.
+
 The Twin's DETACH ROVER callback submits the real adapter `DetachJoint` command
 in the event hook. The compact manual task observes solver retirement, transfers
 control to FLIP, disables route guidance and holds its normal parking brake.

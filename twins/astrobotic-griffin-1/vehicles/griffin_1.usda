@@ -9722,4 +9722,47 @@ def Xform "Griffin1" (
         double3 lunco:cameraLookAt = (2.68700576850888, -0.18, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
     }
+    def Xform "LiveTethers"
+    {
+        def Scope "Looks"
+        {
+            def Material "Webbing" (
+                prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_flip_egress_visual.usda@</World/Looks/Webbing>
+            )
+            {
+            }
+        }
+        def Xform "Left"
+        {
+            def BasisCurves "Span" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                uniform token type = "linear"
+                uniform token wrap = "nonperiodic"
+                int[] curveVertexCounts = [2]
+                point3f[] points = [(-0.004999999888241291, 0.0, 0.0), (0.004999999888241291, 0.0, 0.0)]
+                normal3f[] normals = [(0.0, 1.0, 0.0), (0.0, 1.0, 0.0)]
+                float[] widths = [0.03999999910593033]
+                uniform bool doubleSided = true
+                custom rel material:binding = </Griffin1/LiveTethers/Looks/Webbing>
+            }
+        }
+        def Xform "Right"
+        {
+            def BasisCurves "Span" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                uniform token type = "linear"
+                uniform token wrap = "nonperiodic"
+                int[] curveVertexCounts = [2]
+                point3f[] points = [(-0.004999999888241291, 0.0, 0.0), (0.004999999888241291, 0.0, 0.0)]
+                normal3f[] normals = [(0.0, 1.0, 0.0), (0.0, 1.0, 0.0)]
+                float[] widths = [0.03999999910593033]
+                uniform bool doubleSided = true
+                custom rel material:binding = </Griffin1/LiveTethers/Looks/Webbing>
+            }
+        }
+    }
 }
